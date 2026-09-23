@@ -1,0 +1,13 @@
+.bar {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 6px 12px;
+  background: var(--red);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  text-align: center;
+}

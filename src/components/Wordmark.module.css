@@ -1,0 +1,14 @@
+.wordmark {
+  display: inline-flex;
+  font-family: var(--font-display);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  color: var(--text);
+  line-height: 1;
+}
+
+.hub {
+  color: var(--amber);
+}
