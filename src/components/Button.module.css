@@ -1,0 +1,55 @@
+.button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: var(--tap);
+  padding: 10px 16px;
+  border-radius: var(--radius-button);
+  font-size: 15px;
+  font-weight: 700;
+  text-align: center;
+  text-decoration: none;
+  line-height: 1.2;
+}
+
+.block {
+  display: flex;
+  width: 100%;
+}
+
+.button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.primary {
+  background: var(--amber);
+  color: var(--ink);
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  font-size: 16px;
+}
+
+.secondary {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+
+.success {
+  background: var(--green);
+  color: #0a1a0e;
+}
+
+.danger {
+  border: 1px solid var(--red-line);
+  color: var(--red);
+}
+
+.ghost {
+  color: var(--muted);
+  font-weight: 600;
+}

@@ -1,0 +1,59 @@
+/* Design tokens — the only place colors, radii and fonts are defined (ARCHITECTURE §17). */
+:root {
+  --bg: #14161a;
+  --surface: #1d2026;
+  --surface2: #242830;
+  --border: #2c313a;
+  --border-lit: #3a404b;
+  --text: #eae8e2;
+  --muted: #8a909b;
+  --amber: #f5a524;
+  --green: #34c759;
+  --red: #ff453a;
+  --blue: #5aa9ff;
+  --ink: #151515;
+
+  --amber-tint: rgba(245, 165, 36, 0.12);
+  --amber-soft: rgba(245, 165, 36, 0.16);
+  --amber-line: rgba(245, 165, 36, 0.45);
+  --green-soft: rgba(52, 199, 89, 0.16);
+  --red-soft: rgba(255, 69, 58, 0.16);
+  --red-line: rgba(255, 69, 58, 0.4);
+  --blue-soft: rgba(90, 169, 255, 0.16);
+  --muted-soft: rgba(138, 144, 155, 0.16);
+
+  --font-display: 'Arial Narrow', 'Helvetica Neue', sans-serif;
+  --font-body: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: ui-monospace, Menlo, Consolas, 'Liberation Mono', monospace;
+
+  --radius-card: 12px;
+  --radius-button: 10px;
+  --radius-input: 9px;
+  --radius-pill: 999px;
+
+  --card-pad: 14px;
+  --page-pad: 18px;
+  --content-max: 560px;
+  --heading-size: 27px;
+  --body-size: 14px;
+
+  --tap: 44px;
+  --sidebar-w: 240px;
+  --focus-ring: 0 0 0 2px var(--bg), 0 0 0 4px var(--amber);
+}
+
+@media (min-width: 768px) {
+  :root {
+    --content-max: 720px;
+  }
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --card-pad: 20px;
+    --page-pad: 32px;
+    --content-max: 900px;
+    --heading-size: 32px;
+    --body-size: 15px;
+  }
+}

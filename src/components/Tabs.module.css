@@ -1,0 +1,30 @@
+.tabs {
+  display: flex;
+  gap: 6px;
+}
+
+.tab {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: var(--tap);
+  padding: 8px;
+  border-radius: var(--radius-input);
+  font-size: 13.5px;
+  background: var(--surface2);
+  color: var(--muted);
+}
+
+.on {
+  background: var(--amber);
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.count {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  opacity: 0.85;
+}

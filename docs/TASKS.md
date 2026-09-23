@@ -68,7 +68,9 @@ Ordinea contează: fiecare sarcină se sprijină pe cele de dinainte. Sarcinile 
 
 **Pașii tăi:** înainte de sesiune, pașii 1–4 din `PORNIRE.md`. După ce se deschide pull request-ul, pasul 5 (Netlify). Apoi Merge.
 
-- [ ] Făcut
+- [x] Făcut
+
+Note: documentele urcate în rădăcina repo-ului au fost mutate la locul lor (`docs/`, `docs/brand/`, `docs/brand/logo/`, `docs/legal/`). Comutatorul de rol `?rol=` și pagina `/dev/componente` (toate componentele comune, de verificat vizual) există doar când `CONTEXT` de la Netlify nu e `production`. Adminul are pe mobil iconița Cont în antet (bara de jos are cele 5 ecrane de admin); pe desktop, Cont e fixat jos ca la celelalte roluri. Comutatorul RO/EN stă temporar în antet / bara laterală; în T04 se mută și în Cont și se salvează pe profil. Orele se afișează în format 24 h și în engleză (09:00), ca la service. Verificarea versiunii bazei de date e gata, dar pornește abia când există migrări (`EXPECTED_SCHEMA_VERSION = 0`). Pachetul JS e ~510 kB (în mare parte supabase-js + React); împărțirea pe roluri e în T18. Rămâne pentru T04: stocarea „Ține-mă minte”, sesiunea reală.
 
 ---
 

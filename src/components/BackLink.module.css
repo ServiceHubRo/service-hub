@@ -1,0 +1,14 @@
+.back {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  min-height: var(--tap);
+  color: var(--muted);
+  font-size: 14px;
+  text-decoration: none;
+  border-radius: 6px;
+}
+
+.back:hover {
+  color: var(--text);
+}

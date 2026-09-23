@@ -1,0 +1,51 @@
+.banner {
+  display: flex;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 10px;
+  border-radius: var(--radius-button);
+  padding: 11px 13px;
+  font-size: 13.5px;
+  border: 1px solid;
+}
+
+.icon {
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.text {
+  flex: 1;
+  min-width: 0;
+}
+
+.action {
+  flex-shrink: 0;
+}
+
+.info {
+  background: var(--surface2);
+  border-color: var(--border-lit);
+}
+
+.info .icon {
+  color: var(--blue);
+}
+
+.warning {
+  background: rgba(245, 165, 36, 0.08);
+  border-color: rgba(245, 165, 36, 0.3);
+}
+
+.warning .icon {
+  color: var(--amber);
+}
+
+.error {
+  background: rgba(255, 69, 58, 0.08);
+  border-color: var(--red-line);
+}
+
+.error .icon {
+  color: var(--red);
+}
