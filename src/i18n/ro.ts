@@ -28,7 +28,7 @@ export const ro = {
   'landing.drivers': 'Pentru șoferi, gratuit. Plătești doar reparația, direct la service.',
 
   'devRole.label': 'Rol de test',
-  'devRole.note': 'Doar pe linkul de test, până vin conturile.',
+  'devRole.note': 'Temporar, până vin conturile.',
   'devRole.client': 'Client',
   'devRole.shop': 'Service',
   'devRole.admin': 'Admin',

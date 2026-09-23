@@ -1,0 +1,1810 @@
+// GENERATED from the database schema — do not edit by hand.
+// Regenerate after every migration: npm run db:types (needs the local Supabase stack: npx supabase start).
+
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[]
+
+export type Database = {
+  public: {
+    Tables: {
+      admin_audit_log: {
+        Row: {
+          action: string
+          admin_id: string | null
+          after: Json | null
+          before: Json | null
+          created_at: string
+          entity_id: string | null
+          entity_type: string
+          id: string
+        }
+        Insert: {
+          action: string
+          admin_id?: string | null
+          after?: Json | null
+          before?: Json | null
+          created_at?: string
+          entity_id?: string | null
+          entity_type: string
+          id?: string
+        }
+        Update: {
+          action?: string
+          admin_id?: string | null
+          after?: Json | null
+          before?: Json | null
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string
+          id?: string
+        }
+        Relationships: []
+      }
+      bookings: {
+        Row: {
+          cancel_reason: string | null
+          cancelled_at: string | null
+          cancelled_by: string | null
+          car_id: string | null
+          car_snapshot: Json
+          client_id: string | null
+          client_lang: string
+          client_name: string | null
+          client_phone: string | null
+          confirmed_at: string | null
+          cost: number | null
+          created_at: string
+          date: string
+          decline_reason: string | null
+          done_at: string | null
+          id: string
+          inspection_started_at: string | null
+          note: string | null
+          odometer: number | null
+          ref: string
+          reminder_sent_at: string | null
+          service_id: string
+          shop_id: string
+          slot: string
+          started_at: string | null
+          status: string
+          status_changed_at: string
+          updated_at: string
+          work: string | null
+        }
+        Insert: {
+          cancel_reason?: string | null
+          cancelled_at?: string | null
+          cancelled_by?: string | null
+          car_id?: string | null
+          car_snapshot?: Json
+          client_id?: string | null
+          client_lang?: string
+          client_name?: string | null
+          client_phone?: string | null
+          confirmed_at?: string | null
+          cost?: number | null
+          created_at?: string
+          date: string
+          decline_reason?: string | null
+          done_at?: string | null
+          id?: string
+          inspection_started_at?: string | null
+          note?: string | null
+          odometer?: number | null
+          ref?: string
+          reminder_sent_at?: string | null
+          service_id: string
+          shop_id: string
+          slot: string
+          started_at?: string | null
+          status?: string
+          status_changed_at?: string
+          updated_at?: string
+          work?: string | null
+        }
+        Update: {
+          cancel_reason?: string | null
+          cancelled_at?: string | null
+          cancelled_by?: string | null
+          car_id?: string | null
+          car_snapshot?: Json
+          client_id?: string | null
+          client_lang?: string
+          client_name?: string | null
+          client_phone?: string | null
+          confirmed_at?: string | null
+          cost?: number | null
+          created_at?: string
+          date?: string
+          decline_reason?: string | null
+          done_at?: string | null
+          id?: string
+          inspection_started_at?: string | null
+          note?: string | null
+          odometer?: number | null
+          ref?: string
+          reminder_sent_at?: string | null
+          service_id?: string
+          shop_id?: string
+          slot?: string
+          started_at?: string | null
+          status?: string
+          status_changed_at?: string
+          updated_at?: string
+          work?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bookings_car_id_fkey"
+            columns: ["car_id"]
+            isOneToOne: false
+            referencedRelation: "cars"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bookings_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bookings_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bookings_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shop_ratings"
+            referencedColumns: ["shop_id"]
+          },
+          {
+            foreignKeyName: "bookings_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cars: {
+        Row: {
+          created_at: string
+          id: string
+          itp_expiry: string | null
+          make: string
+          model: string
+          owner_id: string
+          plate: string | null
+          plate_norm: string | null
+          rca_expiry: string | null
+          reminded: Json
+          updated_at: string
+          vignette_expiry: string | null
+          vin: string | null
+          year: number | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          itp_expiry?: string | null
+          make: string
+          model: string
+          owner_id?: string
+          plate?: string | null
+          plate_norm?: string | null
+          rca_expiry?: string | null
+          reminded?: Json
+          updated_at?: string
+          vignette_expiry?: string | null
+          vin?: string | null
+          year?: number | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          itp_expiry?: string | null
+          make?: string
+          model?: string
+          owner_id?: string
+          plate?: string | null
+          plate_norm?: string | null
+          rca_expiry?: string | null
+          reminded?: Json
+          updated_at?: string
+          vignette_expiry?: string | null
+          vin?: string | null
+          year?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cars_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      favorites: {
+        Row: {
+          client_id: string
+          created_at: string
+          shop_id: string
+        }
+        Insert: {
+          client_id: string
+          created_at?: string
+          shop_id: string
+        }
+        Update: {
+          client_id?: string
+          created_at?: string
+          shop_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "favorites_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "favorites_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shop_ratings"
+            referencedColumns: ["shop_id"]
+          },
+          {
+            foreignKeyName: "favorites_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      history_reports: {
+        Row: {
+          amount_paid: number
+          car_id: string | null
+          car_snapshot: Json
+          client_id: string | null
+          code: string
+          created_at: string
+          generated_at: string | null
+          id: string
+          job_count: number
+          latest_odometer: number | null
+          odometer_out_of_order: boolean
+          paid_at: string | null
+          pdf_url: string | null
+          period_from: string | null
+          period_to: string | null
+          status: string
+          stripe_session_id: string | null
+          total_amount: number
+          void_reason: string | null
+          voided_at: string | null
+        }
+        Insert: {
+          amount_paid?: number
+          car_id?: string | null
+          car_snapshot: Json
+          client_id?: string | null
+          code?: string
+          created_at?: string
+          generated_at?: string | null
+          id?: string
+          job_count?: number
+          latest_odometer?: number | null
+          odometer_out_of_order?: boolean
+          paid_at?: string | null
+          pdf_url?: string | null
+          period_from?: string | null
+          period_to?: string | null
+          status?: string
+          stripe_session_id?: string | null
+          total_amount?: number
+          void_reason?: string | null
+          voided_at?: string | null
+        }
+        Update: {
+          amount_paid?: number
+          car_id?: string | null
+          car_snapshot?: Json
+          client_id?: string | null
+          code?: string
+          created_at?: string
+          generated_at?: string | null
+          id?: string
+          job_count?: number
+          latest_odometer?: number | null
+          odometer_out_of_order?: boolean
+          paid_at?: string | null
+          pdf_url?: string | null
+          period_from?: string | null
+          period_to?: string | null
+          status?: string
+          stripe_session_id?: string | null
+          total_amount?: number
+          void_reason?: string | null
+          voided_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "history_reports_car_id_fkey"
+            columns: ["car_id"]
+            isOneToOne: false
+            referencedRelation: "cars"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "history_reports_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      invoices: {
+        Row: {
+          amount: number
+          created_at: string
+          currency: string
+          id: string
+          issued_at: string | null
+          number: string | null
+          pdf_url: string | null
+          provider: string | null
+          provider_ref: string | null
+          series: string | null
+          shop_id: string
+          status: string
+          stripe_invoice_id: string | null
+          vat_amount: number
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          currency?: string
+          id?: string
+          issued_at?: string | null
+          number?: string | null
+          pdf_url?: string | null
+          provider?: string | null
+          provider_ref?: string | null
+          series?: string | null
+          shop_id: string
+          status?: string
+          stripe_invoice_id?: string | null
+          vat_amount?: number
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          currency?: string
+          id?: string
+          issued_at?: string | null
+          number?: string | null
+          pdf_url?: string | null
+          provider?: string | null
+          provider_ref?: string | null
+          series?: string | null
+          shop_id?: string
+          status?: string
+          stripe_invoice_id?: string | null
+          vat_amount?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invoices_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shop_ratings"
+            referencedColumns: ["shop_id"]
+          },
+          {
+            foreignKeyName: "invoices_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      messages: {
+        Row: {
+          body: string | null
+          booking_id: string | null
+          created_at: string
+          event: string | null
+          id: string
+          kind: string
+          params: Json
+          sender_id: string | null
+          thread_id: string
+        }
+        Insert: {
+          body?: string | null
+          booking_id?: string | null
+          created_at?: string
+          event?: string | null
+          id?: string
+          kind: string
+          params?: Json
+          sender_id?: string | null
+          thread_id: string
+        }
+        Update: {
+          body?: string | null
+          booking_id?: string | null
+          created_at?: string
+          event?: string | null
+          id?: string
+          kind?: string
+          params?: Json
+          sender_id?: string | null
+          thread_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "messages_sender_id_fkey"
+            columns: ["sender_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "messages_thread_id_fkey"
+            columns: ["thread_id"]
+            isOneToOne: false
+            referencedRelation: "threads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notice_reads: {
+        Row: {
+          notice_id: string
+          read_at: string
+          user_id: string
+        }
+        Insert: {
+          notice_id: string
+          read_at?: string
+          user_id?: string
+        }
+        Update: {
+          notice_id?: string
+          read_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notice_reads_notice_id_fkey"
+            columns: ["notice_id"]
+            isOneToOne: false
+            referencedRelation: "notices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notice_reads_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notices: {
+        Row: {
+          audience: string
+          body_en: string
+          body_ro: string
+          city: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          send_push: boolean
+          title_en: string
+          title_ro: string
+        }
+        Insert: {
+          audience: string
+          body_en: string
+          body_ro: string
+          city?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          send_push?: boolean
+          title_en: string
+          title_ro: string
+        }
+        Update: {
+          audience?: string
+          body_en?: string
+          body_ro?: string
+          city?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          send_push?: boolean
+          title_en?: string
+          title_ro?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notices_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notification_events: {
+        Row: {
+          attempts: number
+          booking_id: string | null
+          channels: string[]
+          created_at: string
+          event: string
+          id: string
+          last_error: string | null
+          params: Json
+          processed_at: string | null
+          user_id: string
+        }
+        Insert: {
+          attempts?: number
+          booking_id?: string | null
+          channels?: string[]
+          created_at?: string
+          event: string
+          id?: string
+          last_error?: string | null
+          params?: Json
+          processed_at?: string | null
+          user_id: string
+        }
+        Update: {
+          attempts?: number
+          booking_id?: string | null
+          channels?: string[]
+          created_at?: string
+          event?: string
+          id?: string
+          last_error?: string | null
+          params?: Json
+          processed_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notification_events_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notification_events_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notifications_log: {
+        Row: {
+          channel: string
+          error: string | null
+          event_id: string | null
+          id: string
+          sent_at: string
+          status: string
+          user_id: string | null
+        }
+        Insert: {
+          channel: string
+          error?: string | null
+          event_id?: string | null
+          id?: string
+          sent_at?: string
+          status: string
+          user_id?: string | null
+        }
+        Update: {
+          channel?: string
+          error?: string | null
+          event_id?: string | null
+          id?: string
+          sent_at?: string
+          status?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_log_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "notification_events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notifications_log_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      phone_verifications: {
+        Row: {
+          attempts: number
+          code_hash: string
+          created_at: string
+          expires_at: string
+          id: string
+          phone: string
+          user_id: string
+          verified_at: string | null
+        }
+        Insert: {
+          attempts?: number
+          code_hash: string
+          created_at?: string
+          expires_at: string
+          id?: string
+          phone: string
+          user_id: string
+          verified_at?: string | null
+        }
+        Update: {
+          attempts?: number
+          code_hash?: string
+          created_at?: string
+          expires_at?: string
+          id?: string
+          phone?: string
+          user_id?: string
+          verified_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "phone_verifications_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      platform_settings: {
+        Row: {
+          default_cancel_deadline_hours: number
+          default_cars_per_slot: number
+          default_daily_capacity: number
+          default_max_advance_days: number
+          default_min_notice_hours: number
+          default_slot_minutes: number
+          id: number
+          limits: Json
+          notification_texts: Json
+          quote_expiry_days: number
+          ranking_prior_avg: number
+          ranking_prior_weight: number
+          report_price_ron: number
+          subscription_price_ron: number
+          trial_days: number
+          updated_at: string
+          updated_by: string | null
+          vat_rate_percent: number
+        }
+        Insert: {
+          default_cancel_deadline_hours?: number
+          default_cars_per_slot?: number
+          default_daily_capacity?: number
+          default_max_advance_days?: number
+          default_min_notice_hours?: number
+          default_slot_minutes?: number
+          id?: number
+          limits?: Json
+          notification_texts?: Json
+          quote_expiry_days?: number
+          ranking_prior_avg?: number
+          ranking_prior_weight?: number
+          report_price_ron?: number
+          subscription_price_ron?: number
+          trial_days?: number
+          updated_at?: string
+          updated_by?: string | null
+          vat_rate_percent?: number
+        }
+        Update: {
+          default_cancel_deadline_hours?: number
+          default_cars_per_slot?: number
+          default_daily_capacity?: number
+          default_max_advance_days?: number
+          default_min_notice_hours?: number
+          default_slot_minutes?: number
+          id?: number
+          limits?: Json
+          notification_texts?: Json
+          quote_expiry_days?: number
+          ranking_prior_avg?: number
+          ranking_prior_weight?: number
+          report_price_ron?: number
+          subscription_price_ron?: number
+          trial_days?: number
+          updated_at?: string
+          updated_by?: string | null
+          vat_rate_percent?: number
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          display_id: string
+          email_verified_at: string | null
+          id: string
+          lang: string
+          last_active_at: string | null
+          location_prompt_dismissed_at: string | null
+          name: string | null
+          phone: string | null
+          phone_verified_at: string | null
+          phone_verified_by_admin: boolean
+          push_prompt_dismissed_at: string | null
+          role: string
+          suspended: boolean
+          terms_accepted_at: string | null
+          terms_version: string | null
+        }
+        Insert: {
+          created_at?: string
+          display_id: string
+          email_verified_at?: string | null
+          id: string
+          lang?: string
+          last_active_at?: string | null
+          location_prompt_dismissed_at?: string | null
+          name?: string | null
+          phone?: string | null
+          phone_verified_at?: string | null
+          phone_verified_by_admin?: boolean
+          push_prompt_dismissed_at?: string | null
+          role: string
+          suspended?: boolean
+          terms_accepted_at?: string | null
+          terms_version?: string | null
+        }
+        Update: {
+          created_at?: string
+          display_id?: string
+          email_verified_at?: string | null
+          id?: string
+          lang?: string
+          last_active_at?: string | null
+          location_prompt_dismissed_at?: string | null
+          name?: string | null
+          phone?: string | null
+          phone_verified_at?: string | null
+          phone_verified_by_admin?: boolean
+          push_prompt_dismissed_at?: string | null
+          role?: string
+          suspended?: boolean
+          terms_accepted_at?: string | null
+          terms_version?: string | null
+        }
+        Relationships: []
+      }
+      push_subscriptions: {
+        Row: {
+          created_at: string
+          endpoint: string
+          last_success_at: string | null
+          subscription: Json
+          updated_at: string
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          endpoint: string
+          last_success_at?: string | null
+          subscription: Json
+          updated_at?: string
+          user_agent?: string | null
+          user_id?: string
+        }
+        Update: {
+          created_at?: string
+          endpoint?: string
+          last_success_at?: string | null
+          subscription?: Json
+          updated_at?: string
+          user_agent?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "push_subscriptions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      quote_items: {
+        Row: {
+          approved: boolean | null
+          created_at: string
+          id: string
+          name: string
+          position: number
+          price: number
+          quote_id: string
+        }
+        Insert: {
+          approved?: boolean | null
+          created_at?: string
+          id?: string
+          name: string
+          position: number
+          price: number
+          quote_id: string
+        }
+        Update: {
+          approved?: boolean | null
+          created_at?: string
+          id?: string
+          name?: string
+          position?: number
+          price?: number
+          quote_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quote_items_quote_id_fkey"
+            columns: ["quote_id"]
+            isOneToOne: false
+            referencedRelation: "quotes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      quotes: {
+        Row: {
+          booking_id: string
+          created_at: string
+          decided_at: string | null
+          expires_at: string | null
+          id: string
+          inspection_fee: number
+          note: string | null
+          sent_at: string
+          sent_by: string | null
+          status: string
+          total_approved: number | null
+          total_sent: number
+          version: number
+        }
+        Insert: {
+          booking_id: string
+          created_at?: string
+          decided_at?: string | null
+          expires_at?: string | null
+          id?: string
+          inspection_fee?: number
+          note?: string | null
+          sent_at?: string
+          sent_by?: string | null
+          status?: string
+          total_approved?: number | null
+          total_sent: number
+          version: number
+        }
+        Update: {
+          booking_id?: string
+          created_at?: string
+          decided_at?: string | null
+          expires_at?: string | null
+          id?: string
+          inspection_fee?: number
+          note?: string | null
+          sent_at?: string
+          sent_by?: string | null
+          status?: string
+          total_approved?: number | null
+          total_sent?: number
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quotes_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quotes_sent_by_fkey"
+            columns: ["sent_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      request_log: {
+        Row: {
+          created_at: string
+          fn: string
+          request_id: string
+          result: Json | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          fn: string
+          request_id: string
+          result?: Json | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          fn?: string
+          request_id?: string
+          result?: Json | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      reviews: {
+        Row: {
+          booking_id: string
+          client_display_name: string
+          client_id: string | null
+          created_at: string
+          id: string
+          rating: number
+          removed_at: string | null
+          reply: string | null
+          reply_at: string | null
+          report_decided_at: string | null
+          report_note: string | null
+          report_reason: string | null
+          report_status: string | null
+          reported_at: string | null
+          shop_id: string
+          text: string | null
+          updated_at: string
+        }
+        Insert: {
+          booking_id: string
+          client_display_name: string
+          client_id?: string | null
+          created_at?: string
+          id?: string
+          rating: number
+          removed_at?: string | null
+          reply?: string | null
+          reply_at?: string | null
+          report_decided_at?: string | null
+          report_note?: string | null
+          report_reason?: string | null
+          report_status?: string | null
+          reported_at?: string | null
+          shop_id: string
+          text?: string | null
+          updated_at?: string
+        }
+        Update: {
+          booking_id?: string
+          client_display_name?: string
+          client_id?: string | null
+          created_at?: string
+          id?: string
+          rating?: number
+          removed_at?: string | null
+          reply?: string | null
+          reply_at?: string | null
+          report_decided_at?: string | null
+          report_note?: string | null
+          report_reason?: string | null
+          report_status?: string | null
+          reported_at?: string | null
+          shop_id?: string
+          text?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reviews_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: true
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reviews_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reviews_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shop_ratings"
+            referencedColumns: ["shop_id"]
+          },
+          {
+            foreignKeyName: "reviews_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      schema_version: {
+        Row: {
+          id: number
+          version: number
+        }
+        Insert: {
+          id?: number
+          version: number
+        }
+        Update: {
+          id?: number
+          version?: number
+        }
+        Relationships: []
+      }
+      service_categories: {
+        Row: {
+          enabled: boolean
+          key: string
+          name_en: string
+          name_ro: string
+          position: number
+        }
+        Insert: {
+          enabled?: boolean
+          key: string
+          name_en: string
+          name_ro: string
+          position?: number
+        }
+        Update: {
+          enabled?: boolean
+          key?: string
+          name_en?: string
+          name_ro?: string
+          position?: number
+        }
+        Relationships: []
+      }
+      services: {
+        Row: {
+          category_key: string
+          enabled: boolean
+          icon: string | null
+          id: string
+          name_en: string
+          name_ro: string
+          position: number
+        }
+        Insert: {
+          category_key: string
+          enabled?: boolean
+          icon?: string | null
+          id: string
+          name_en: string
+          name_ro: string
+          position?: number
+        }
+        Update: {
+          category_key?: string
+          enabled?: boolean
+          icon?: string | null
+          id?: string
+          name_en?: string
+          name_ro?: string
+          position?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "services_category_key_fkey"
+            columns: ["category_key"]
+            isOneToOne: false
+            referencedRelation: "service_categories"
+            referencedColumns: ["key"]
+          },
+        ]
+      }
+      shop_billing: {
+        Row: {
+          bank_name: string | null
+          billing_email: string | null
+          created_at: string
+          iban: string | null
+          legal_address: string | null
+          legal_name: string | null
+          legal_rep: string | null
+          reg_com: string | null
+          shop_id: string
+          updated_at: string
+          vat_id: string | null
+          vat_payer: boolean
+        }
+        Insert: {
+          bank_name?: string | null
+          billing_email?: string | null
+          created_at?: string
+          iban?: string | null
+          legal_address?: string | null
+          legal_name?: string | null
+          legal_rep?: string | null
+          reg_com?: string | null
+          shop_id: string
+          updated_at?: string
+          vat_id?: string | null
+          vat_payer?: boolean
+        }
+        Update: {
+          bank_name?: string | null
+          billing_email?: string | null
+          created_at?: string
+          iban?: string | null
+          legal_address?: string | null
+          legal_name?: string | null
+          legal_rep?: string | null
+          reg_com?: string | null
+          shop_id?: string
+          updated_at?: string
+          vat_id?: string | null
+          vat_payer?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shop_billing_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: true
+            referencedRelation: "shop_ratings"
+            referencedColumns: ["shop_id"]
+          },
+          {
+            foreignKeyName: "shop_billing_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: true
+            referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      shop_closures: {
+        Row: {
+          created_at: string
+          end_date: string
+          id: string
+          label: string | null
+          shop_id: string
+          start_date: string
+        }
+        Insert: {
+          created_at?: string
+          end_date: string
+          id?: string
+          label?: string | null
+          shop_id: string
+          start_date: string
+        }
+        Update: {
+          created_at?: string
+          end_date?: string
+          id?: string
+          label?: string | null
+          shop_id?: string
+          start_date?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shop_closures_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shop_ratings"
+            referencedColumns: ["shop_id"]
+          },
+          {
+            foreignKeyName: "shop_closures_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      shop_hours: {
+        Row: {
+          close_time: string | null
+          is_closed: boolean
+          open_time: string | null
+          shop_id: string
+          weekday: number
+        }
+        Insert: {
+          close_time?: string | null
+          is_closed?: boolean
+          open_time?: string | null
+          shop_id: string
+          weekday: number
+        }
+        Update: {
+          close_time?: string | null
+          is_closed?: boolean
+          open_time?: string | null
+          shop_id?: string
+          weekday?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shop_hours_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shop_ratings"
+            referencedColumns: ["shop_id"]
+          },
+          {
+            foreignKeyName: "shop_hours_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      shop_services: {
+        Row: {
+          created_at: string
+          service_id: string
+          shop_id: string
+        }
+        Insert: {
+          created_at?: string
+          service_id: string
+          shop_id: string
+        }
+        Update: {
+          created_at?: string
+          service_id?: string
+          shop_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shop_services_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shop_services_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shop_ratings"
+            referencedColumns: ["shop_id"]
+          },
+          {
+            foreignKeyName: "shop_services_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      shop_staff: {
+        Row: {
+          accepted_at: string | null
+          created_at: string
+          id: string
+          invite_token_hash: string | null
+          invited_at: string
+          invited_email: string | null
+          role: string
+          shop_id: string
+          user_id: string | null
+        }
+        Insert: {
+          accepted_at?: string | null
+          created_at?: string
+          id?: string
+          invite_token_hash?: string | null
+          invited_at?: string
+          invited_email?: string | null
+          role?: string
+          shop_id: string
+          user_id?: string | null
+        }
+        Update: {
+          accepted_at?: string | null
+          created_at?: string
+          id?: string
+          invite_token_hash?: string | null
+          invited_at?: string
+          invited_email?: string | null
+          role?: string
+          shop_id?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shop_staff_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shop_ratings"
+            referencedColumns: ["shop_id"]
+          },
+          {
+            foreignKeyName: "shop_staff_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shop_staff_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      shops: {
+        Row: {
+          active: boolean
+          cancel_deadline_hours: number
+          cars_per_slot: number
+          city: string
+          county: string | null
+          created_at: string
+          daily_capacity: number
+          daily_digest: boolean
+          description: string | null
+          facebook: string | null
+          id: string
+          inspection_fee: number
+          lang: string
+          latitude: number | null
+          logo_url: string | null
+          longitude: number | null
+          max_advance_days: number
+          min_notice_hours: number
+          name: string
+          owner_id: string
+          phone: string | null
+          phone2: string | null
+          postal_code: string | null
+          setup_completed_at: string | null
+          slot_minutes: number
+          sms_on_new_booking: boolean
+          street: string | null
+          suspended: boolean
+          updated_at: string
+          website: string | null
+          year_established: number | null
+        }
+        Insert: {
+          active?: boolean
+          cancel_deadline_hours?: number
+          cars_per_slot?: number
+          city: string
+          county?: string | null
+          created_at?: string
+          daily_capacity?: number
+          daily_digest?: boolean
+          description?: string | null
+          facebook?: string | null
+          id?: string
+          inspection_fee?: number
+          lang?: string
+          latitude?: number | null
+          logo_url?: string | null
+          longitude?: number | null
+          max_advance_days?: number
+          min_notice_hours?: number
+          name: string
+          owner_id: string
+          phone?: string | null
+          phone2?: string | null
+          postal_code?: string | null
+          setup_completed_at?: string | null
+          slot_minutes?: number
+          sms_on_new_booking?: boolean
+          street?: string | null
+          suspended?: boolean
+          updated_at?: string
+          website?: string | null
+          year_established?: number | null
+        }
+        Update: {
+          active?: boolean
+          cancel_deadline_hours?: number
+          cars_per_slot?: number
+          city?: string
+          county?: string | null
+          created_at?: string
+          daily_capacity?: number
+          daily_digest?: boolean
+          description?: string | null
+          facebook?: string | null
+          id?: string
+          inspection_fee?: number
+          lang?: string
+          latitude?: number | null
+          logo_url?: string | null
+          longitude?: number | null
+          max_advance_days?: number
+          min_notice_hours?: number
+          name?: string
+          owner_id?: string
+          phone?: string | null
+          phone2?: string | null
+          postal_code?: string | null
+          setup_completed_at?: string | null
+          slot_minutes?: number
+          sms_on_new_booking?: boolean
+          street?: string | null
+          suspended?: boolean
+          updated_at?: string
+          website?: string | null
+          year_established?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shops_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      stripe_events: {
+        Row: {
+          created_at: string
+          id: string
+          payload: Json
+          processed_at: string | null
+          type: string
+        }
+        Insert: {
+          created_at?: string
+          id: string
+          payload: Json
+          processed_at?: string | null
+          type: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          payload?: Json
+          processed_at?: string | null
+          type?: string
+        }
+        Relationships: []
+      }
+      subscriptions: {
+        Row: {
+          cancel_at_period_end: boolean
+          created_at: string
+          current_period_end: string | null
+          price_ron: number
+          shop_id: string
+          status: string
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
+          trial_ends_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          cancel_at_period_end?: boolean
+          created_at?: string
+          current_period_end?: string | null
+          price_ron: number
+          shop_id: string
+          status?: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          trial_ends_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          cancel_at_period_end?: boolean
+          created_at?: string
+          current_period_end?: string | null
+          price_ron?: number
+          shop_id?: string
+          status?: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          trial_ends_at?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscriptions_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: true
+            referencedRelation: "shop_ratings"
+            referencedColumns: ["shop_id"]
+          },
+          {
+            foreignKeyName: "subscriptions_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: true
+            referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      threads: {
+        Row: {
+          client_id: string | null
+          client_last_read_at: string | null
+          client_name: string | null
+          created_at: string
+          id: string
+          last_message_at: string | null
+          shop_id: string
+          shop_last_read_at: string | null
+        }
+        Insert: {
+          client_id?: string | null
+          client_last_read_at?: string | null
+          client_name?: string | null
+          created_at?: string
+          id?: string
+          last_message_at?: string | null
+          shop_id: string
+          shop_last_read_at?: string | null
+        }
+        Update: {
+          client_id?: string | null
+          client_last_read_at?: string | null
+          client_name?: string | null
+          created_at?: string
+          id?: string
+          last_message_at?: string | null
+          shop_id?: string
+          shop_last_read_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "threads_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "threads_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shop_ratings"
+            referencedColumns: ["shop_id"]
+          },
+          {
+            foreignKeyName: "threads_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+    }
+    Views: {
+      shop_ratings: {
+        Row: {
+          average: number | null
+          rating_sum: number | null
+          review_count: number | null
+          shop_id: string | null
+          weighted_score: number | null
+        }
+        Relationships: []
+      }
+    }
+    Functions: {
+      can_read_booking: { Args: { p_booking_id: string }; Returns: boolean }
+      can_read_notice: {
+        Args: { p_audience: string; p_city: string }
+        Returns: boolean
+      }
+      can_read_shop: { Args: { p_shop_id: string }; Returns: boolean }
+      can_read_thread: { Args: { p_thread_id: string }; Returns: boolean }
+      format_sequence_id: {
+        Args: { p_number: number; p_prefix: string; p_width?: number }
+        Returns: string
+      }
+      get_schema_version: { Args: never; Returns: number }
+      is_admin: { Args: never; Returns: boolean }
+      is_shop_member: { Args: { p_shop_id: string }; Returns: boolean }
+      is_shop_owner: { Args: { p_shop_id: string }; Returns: boolean }
+      is_shop_public: { Args: { p_shop_id: string }; Returns: boolean }
+      is_valid_cui: { Args: { p: string }; Returns: boolean }
+      is_valid_iban: { Args: { p: string }; Returns: boolean }
+      is_valid_postal_code: { Args: { p: string }; Returns: boolean }
+      is_valid_regcom: { Args: { p: string }; Returns: boolean }
+      is_valid_vin: { Args: { p: string }; Returns: boolean }
+      my_shop_id: { Args: never; Returns: string }
+      next_history_report_code: { Args: never; Returns: string }
+      normalize_code: { Args: { p: string }; Returns: string }
+      promote_to_admin: { Args: { p_email: string }; Returns: string }
+      try_uuid: { Args: { p: string }; Returns: string }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
+    }
+  }
+}
+
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
+
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
+
+export type Tables<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
+    : never) = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+      Row: infer R
+    }
+    ? R
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
+        Row: infer R
+      }
+      ? R
+      : never
+    : never
+
+export type TablesInsert<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never) = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Insert: infer I
+    }
+    ? I
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Insert: infer I
+      }
+      ? I
+      : never
+    : never
+
+export type TablesUpdate<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never) = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Update: infer U
+    }
+    ? U
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Update: infer U
+      }
+      ? U
+      : never
+    : never
+
+export type Enums<
+  DefaultSchemaEnumNameOrOptions extends
+    | keyof DefaultSchema["Enums"]
+    | { schema: keyof DatabaseWithoutInternals },
+  EnumName extends (DefaultSchemaEnumNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+    : never) = never,
+> = DefaultSchemaEnumNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
+    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
+    : never
+
+export type CompositeTypes<
+  PublicCompositeTypeNameOrOptions extends
+    | keyof DefaultSchema["CompositeTypes"]
+    | { schema: keyof DatabaseWithoutInternals },
+  CompositeTypeName extends (PublicCompositeTypeNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    : never) = never,
+> = PublicCompositeTypeNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
+    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
+    : never
+
+export const Constants = {
+  public: {
+    Enums: {},
+  },
+} as const
+

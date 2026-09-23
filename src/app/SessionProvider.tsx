@@ -1,21 +1,21 @@
 import { useCallback, useMemo, useState, type ReactNode } from 'react';
-import { IS_TEST_BUILD } from '../lib/env';
+import { ROLE_SWITCH_ENABLED } from '../lib/env';
 import { storage } from '../lib/storage';
 import { roleFromParam, type Role } from './roles';
 import { SessionContext, type SessionValue } from './sessionContext';
 
 const DEV_ROLE_KEY = 'sh_dev_role';
 
-// T01: the role comes from the test-only `?rol=` switch. T04 replaces this with Supabase Auth.
+// Until T04 the role comes from the `?rol=` switch. T04 replaces this with Supabase Auth.
 function initialRole(): Role | null {
-  return IS_TEST_BUILD ? roleFromParam(storage.get(DEV_ROLE_KEY)) : null;
+  return ROLE_SWITCH_ENABLED ? roleFromParam(storage.get(DEV_ROLE_KEY)) : null;
 }
 
 export function SessionProvider({ children }: { children: ReactNode }) {
   const [role, setRole] = useState<Role | null>(initialRole);
 
   const setDevRole = useCallback((next: Role) => {
-    if (!IS_TEST_BUILD) return;
+    if (!ROLE_SWITCH_ENABLED) return;
     storage.set(DEV_ROLE_KEY, next);
     setRole(next);
   }, []);

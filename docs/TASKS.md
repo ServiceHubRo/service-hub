@@ -100,7 +100,9 @@ Note: documentele urcate în rădăcina repo-ului au fost mutate la locul lor (`
 
 **Pașii tăi:** pasul 6 din `PORNIRE.md` (cele 3 secrete în GitHub). Dacă nu l-ai făcut înainte de sesiune, îl faci acum și îi spui lui Claude să ruleze din nou verificarea.
 
-- [ ] Făcut
+- [x] Făcut
+
+Note: 6 migrări (`schema_version` = 6): foundation, identity_and_shops, bookings_and_messages, notifications_and_money, storage_and_realtime, service_catalog (generată). Nimic nu e accesibil din browser implicit — fiecare tabel/funcție primește acces explicit; `tests/sql/50_platform.sql` verifică lista exactă (vezi ARCHITECTURE §18 „Grants”). Recenziile, favoritele, mesajele și marcajele „citit” se scriu doar prin funcțiile din T03 (fără scriere directă din browser). `shops.city` poate fi gol dacă lipsește din metadate (formularul din T04 îl cere). Un service cu programări nu poate fi șters (`bookings.shop_id` restrict); facturile rămân (restrict) — `delete-account` (T04) trebuie să anonimizeze în loc să șteargă. Testele SQL rulează și pe stack-ul Supabase real (`npx supabase start` cu `SUPABASE_INTERNAL_IMAGE_REGISTRY=docker.io`), plus verificare prin API (înregistrare, login, RLS, logo, realtime). **Pentru T03:** seed-ul inserează programări în trecut (statusuri finale) — trigger-ul „nicio programare în trecut” trebuie să permită seed-ul (ex. verificare doar la statusuri active / la schimbarea datei). Cerut de Eduard în aceeași sesiune: comutatorul de rol `?rol=` merge și pe site-ul publicat până la T04 (`ROLE_SWITCH_ENABLED` în `src/lib/env.ts`).
 
 ---
 
@@ -140,7 +142,7 @@ Note: documentele urcate în rădăcina repo-ului au fost mutate la locul lor (`
 - „Ține-mă minte” bifat implicit (sesiune păstrată) / debifat (sesiune până la închiderea browserului).
 - Confirmarea emailului: banner până la confirmare, „Retrimite emailul” cel mult o dată la 60 s. Până la confirmare: service-ul nu apare în căutări, clientul nu poate programa.
 - „Ai uitat parola?” cu răspuns neutru și ecranul de parolă nouă (P4c).
-- Rutare după rol și protecția rutelor; scoaterea comutatorului de rol din T01.
+- Rutare după rol și protecția rutelor; scoaterea comutatorului de rol din T01 (`ROLE_SWITCH_ENABLED` în `src/lib/env.ts`, `DevRoleFromUrl`, cardul de pe pagina `/`; acum merge și pe site-ul publicat).
 - Ecranul Cont, baza comună (P13b): card de identitate cu ID-ul contului, editarea numelui și a telefonului, limbă, schimbare parolă, schimbare email (în așteptare până la confirmare), documentele legale în aplicație (`docs/legal`), „Datele mele”: descărcare JSON și ștergerea contului cu confirmare (Edge Functions `export-my-data`, `delete-account`), Deconectare.
 - CAPTCHA Turnstile la înregistrare, activat doar dacă există cheia.
 - Sesiunea expirată în mijlocul unei acțiuni: mesaj clar și reautentificare, fără să se piardă ce completase utilizatorul.

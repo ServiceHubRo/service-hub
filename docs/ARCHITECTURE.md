@@ -367,6 +367,15 @@ As Prompt 16e plus §7. Report code `SH-YYYY-NNNNNN` from a sequence. Public pag
 - `src/lib/schema.ts` exports `EXPECTED_SCHEMA_VERSION`. On start, preview and development builds compare the two and show a red bar: "Baza de date nu e la zi (versiunea X, aștept Y). Verifică în GitHub → Actions dacă «Deploy Supabase» a rulat." Production reports the mismatch to Sentry instead.
 - A migration is never edited after being pushed (it may already be applied); fixes go in a new migration. An abandoned pull request with migrations gets a reverting migration.
 
+**Grants — nothing is reachable by default** (set in the first migration, T02):
+- Default privileges are revoked: a new table, sequence or function in `public` is **not** readable, writable or callable by `anon`/`authenticated` (nor by `PUBLIC`) until its migration grants it. `service_role` keeps its defaults.
+- Every new table: `enable row level security`, policies, then explicit grants. Browser writes are **always column-scoped** (`grant update (col, …)`), never whole-table.
+- Every new RPC: `security definer`, `set search_path = ''`, then `grant execute … to authenticated` explicitly.
+- `tests/sql/50_platform.sql` checks this structurally: every table has RLS, every security-definer function pins `search_path`, no whole-table insert/update grants, and the **exact list** of functions callable by `anon` and by `authenticated`. Adding an RPC means adding it to that list on purpose.
+- Access helpers for policies: `is_admin()`, `my_shop_id()`, `is_shop_member(shop)`, `is_shop_owner(shop)`, `is_shop_public(shop)`, `can_read_shop(shop)`, `can_read_booking(booking)`, `can_read_thread(thread)`, `can_read_notice(audience, city)`.
+- Validators and normalizers in SQL: `is_valid_cui`, `is_valid_regcom`, `is_valid_iban`, `is_valid_postal_code`, `is_valid_vin`, `normalize_code`; triggers store CUI/IBAN/Trade Register/VIN upper-case without spaces. Test vectors shared with `src/lib/validators.ts`: `tests/fixtures/validator-vectors.json`.
+- Database types for the frontend: `src/data/database.types.ts`, regenerated with `npm run db:types` after every schema change (see the header of that file).
+
 ---
 
 ## 19. Overrides of `lovable-prompts.md`
