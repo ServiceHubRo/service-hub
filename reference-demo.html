@@ -1,0 +1,1276 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Service-Hub — demo</title>
+<style>
+:root{--bg:#14161A;--s1:#1D2026;--s2:#242830;--bd:#2C313A;--bdl:#3A404B;
+--tx:#EAE8E2;--mu:#8A909B;--am:#F5A524;--gr:#34C759;--rd:#FF453A;--bl:#5AA9FF}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{background:var(--bg);color:var(--tx);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+font-size:14px;line-height:1.55;height:100vh;overflow:hidden;display:flex;flex-direction:column}
+.dsp{font-family:"Arial Narrow","Helvetica Neue",sans-serif;letter-spacing:.02em}
+.mono{font-family:ui-monospace,Menlo,Consolas,monospace}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+input,select,textarea{font-family:inherit;font-size:16px;background:var(--s1);border:1px solid var(--bd);
+border-radius:9px;padding:11px 13px;color:var(--tx);outline:none;width:100%}
+input:focus,textarea:focus{border-color:var(--am)}
+textarea{resize:vertical;min-height:70px}
+
+header{flex-shrink:0;display:flex;align-items:center;gap:9px;padding:12px 16px;
+border-bottom:1px solid var(--bd);background:var(--s1)}
+.mk{width:28px;height:28px;border-radius:7px;background:var(--am);display:flex;align-items:center;
+justify-content:center;flex-shrink:0}
+.wm{font-family:"Arial Narrow",sans-serif;font-weight:700;font-size:17px;text-transform:uppercase;
+letter-spacing:.02em;white-space:nowrap}
+.wm i{font-style:normal;color:var(--am)}
+.role{margin-left:auto;font-size:11px;color:var(--mu);background:var(--s2);padding:4px 10px;border-radius:999px}
+
+main{flex:1;overflow-y:auto;padding:18px;max-width:560px;width:100%;margin:0 auto;-webkit-overflow-scrolling:touch}
+nav{flex-shrink:0;display:flex;border-top:1px solid var(--bd);background:var(--s1);padding-bottom:env(safe-area-inset-bottom)}
+nav button{flex:1;padding:9px 2px 11px;display:flex;flex-direction:column;align-items:center;gap:3px;
+font-size:10.5px;color:var(--mu)}
+nav button.on{color:var(--am);font-weight:700}
+nav svg{width:20px;height:20px}
+
+h1{font-family:"Arial Narrow",sans-serif;font-weight:700;font-size:27px;text-transform:uppercase;
+letter-spacing:.02em;margin-bottom:2px}
+.sub{color:var(--mu);font-size:12.5px;margin-bottom:16px}
+h2{font-size:15px;font-weight:650;margin:20px 0 9px}
+.lbl{font-size:11.5px;color:var(--mu);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px}
+
+.card{background:var(--s1);border:1px solid var(--bd);border-radius:12px;padding:14px;margin-bottom:9px}
+.card.am{border-color:rgba(245,165,36,.45)}
+.in{background:var(--s2);border-radius:9px;padding:11px;margin-top:9px}
+.row{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.mut{color:var(--mu);font-size:12.5px}
+
+.btn{display:block;width:100%;padding:13px;border-radius:10px;font-weight:700;text-align:center;
+font-size:15px;margin-top:9px}
+.bp{background:var(--am);color:#151515;font-family:"Arial Narrow",sans-serif;text-transform:uppercase;font-size:16px}
+.bd2{background:var(--s2);border:1px solid var(--bd);color:var(--tx)}
+.bg2{background:var(--gr);color:#0a1a0e}
+.br2{border:1px solid rgba(255,69,58,.4);color:var(--rd)}
+.btn:disabled{opacity:.4}
+.btns{display:flex;gap:7px;flex-wrap:wrap}
+.btns .btn{flex:1;min-width:104px;font-size:13.5px;padding:10px}
+
+.pill{display:inline-block;font-size:10.5px;font-weight:700;text-transform:uppercase;
+letter-spacing:.04em;padding:3px 9px;border-radius:999px}
+.p-am{color:var(--am);background:rgba(245,165,36,.16)}
+.p-gr{color:var(--gr);background:rgba(52,199,89,.16)}
+.p-rd{color:var(--rd);background:rgba(255,69,58,.16)}
+.p-bl{color:var(--bl);background:rgba(90,169,255,.16)}
+.p-mu{color:var(--mu);background:rgba(138,144,155,.16)}
+
+.av{width:38px;height:38px;border-radius:50%;background:rgba(245,165,36,.15);color:var(--am);
+display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0;
+font-family:"Arial Narrow",sans-serif}
+.chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:11px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex-shrink:0;font-size:12px;padding:6px 12px;border-radius:999px;border:1px solid var(--bd);color:var(--mu);white-space:nowrap}
+.chip.on{border-color:var(--am);background:rgba(245,165,36,.12);color:var(--am);font-weight:600}
+
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}
+.slot{background:var(--s1);border:1px solid var(--bd);border-radius:10px;padding:10px 4px;text-align:center;font-size:13px}
+.slot.on{border-color:var(--am);background:rgba(245,165,36,.12);color:var(--am);font-weight:700}
+.slot.off{opacity:.3}
+.slot.gone{opacity:.42;text-decoration:line-through}
+.slot b{display:block;font-size:16px;font-family:"Arial Narrow",sans-serif}
+.slot span{display:block;font-size:10px;color:var(--mu);margin-top:2px}
+
+.prog{display:flex;gap:4px;margin-bottom:16px}
+.prog div{flex:1;height:4px;border-radius:2px;background:var(--bd)}
+.prog div.on{background:var(--am)}
+
+.stat{background:var(--s1);border:1px solid var(--bd);border-radius:11px;padding:12px;text-align:center;
+display:block;width:100%;font-family:inherit;color:inherit}
+button.stat:active{background:var(--s2)}
+.stat b{display:block;font-family:"Arial Narrow",sans-serif;font-size:25px;line-height:1.1}
+.stat span{font-size:10.5px;color:var(--mu)}
+
+.msg{max-width:78%;padding:9px 12px;border-radius:14px;margin-bottom:7px;font-size:13.5px}
+.msg.me{background:var(--am);color:#151515;margin-left:auto;border-bottom-right-radius:4px}
+.msg.you{background:var(--s2);border-bottom-left-radius:4px}
+.msg.sys{max-width:100%;background:var(--s2);color:var(--mu);text-align:center;font-size:12px;border-radius:9px}
+.msg.sys em{display:block;font-size:10px;margin-top:3px;font-style:normal;opacity:.7}
+.mtime{font-size:10px;color:var(--mu);margin-bottom:9px}
+.mtime.me{text-align:right}
+
+.star{color:var(--am);font-size:15px;letter-spacing:1px}
+.star .off{color:var(--bd)}
+.empty{text-align:center;color:var(--mu);padding:32px 16px;font-size:13.5px}
+.chk{width:20px;height:20px;border-radius:6px;border:1.5px solid var(--bdl);flex-shrink:0;
+display:flex;align-items:center;justify-content:center}
+.chk.on{background:var(--am);border-color:var(--am)}
+.chk.on::after{content:"";width:5px;height:9px;border:solid #151515;border-width:0 2.5px 2.5px 0;
+transform:rotate(45deg);margin-top:-2px}
+.tabs{display:flex;gap:6px;margin-bottom:13px}
+.tabs button{flex:1;padding:8px;border-radius:9px;font-size:12.5px;background:var(--s2);color:var(--mu)}
+.tabs button.on{background:var(--am);color:#151515;font-weight:700}
+.back{color:var(--mu);font-size:13px;margin-bottom:10px;display:block}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--am);display:inline-block;
+animation:p 1.6s infinite}
+@keyframes p{0%,100%{opacity:1}50%{opacity:.3}}
+.note{background:rgba(245,165,36,.08);border:1px solid rgba(245,165,36,.3);border-radius:10px;
+padding:11px 13px;font-size:12.5px;margin-bottom:12px}
+</style>
+</head>
+<body>
+<header>
+  <span class="mk"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#151515" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></span>
+  <span class="wm">Service-<i>Hub</i></span>
+  <button class="role" id="roleBtn"></button>
+</header>
+<main id="app"></main>
+<nav id="nav"></nav>
+
+<script>
+/* ---------------- date ---------------- */
+const SVCD={ulei:["Schimb ulei + filtru","Oil & filter change"],
+frane:["Plăcuțe + discuri frână","Brake pads & discs"],itp:["ITP","Vehicle inspection"],
+vulc:["Vulcanizare","Tire service"],geom:["Geometrie roți","Wheel alignment"],
+diag:["Diagnoză computerizată","Computer diagnostics"],clima:["Încărcare climă","A/C recharge"],
+ambr:["Ambreiaj","Clutch"],distrib:["Distribuție","Timing belt"],amort:["Amortizoare","Shock absorbers"]};
+const CATD={maint:["Întreținere","Maintenance"],brake:["Frânare","Braking"],
+tires:["Anvelope","Tires"],engine:["Motor","Engine"],trans:["Transmisie","Transmission"],
+susp:["Suspensie","Suspension"]};
+
+/* ---------------- limbă ---------------- */
+const T={
+ nav_search:["Caută","Search"],nav_garage:["Garaj","Garage"],nav_bk:["Programări","Bookings"],
+ nav_msg:["Mesaje","Messages"],nav_acc:["Cont","Account"],nav_dash:["Panou","Dashboard"],
+ nav_hist:["Istoric","History"],
+ im_client:["Sunt client ⇄","I'm a client ⇄"],im_shop:["Sunt service ⇄","I'm a shop ⇄"],
+ shops_n:["service-uri","shops"],found:["service-uri găsite","shops found"],
+ ph_search:["Nume, oraș sau intervenție…","Name, city or service…"],
+ all:["Toate","All"],all_cities:["Toate orașele","All cities"],
+ clear:["Șterge filtrele","Clear filters"],no_res:["Niciun rezultat.","No results."],
+ offers:["Oferă","Offers"],reviews:["recenzii","reviews"],services:["servicii","services"],
+ all_shops:["Toate service-urile","All shops"],
+ hours:["Program","Hours"],cap:["Comenzi pe zi","Cars per day"],phone:["Telefon","Phone"],
+ fee:["Taxă de constatare","Inspection fee"],
+ fee_n:["Se percepe doar dacă refuzi devizul după verificare.","Charged only if you decline the quote after inspection."],
+ svc_off:["Servicii oferite","Services offered"],
+ price_n:["Prețul se stabilește prin deviz, după ce service-ul vede mașina.","The price is set in a quote, after the shop inspects your car."],
+ book:["Programează-te","Book now"],revs:["Recenzii","Reviews"],
+ shop_reply:["Răspunsul service-ului","Shop's reply"],
+ back:["Înapoi","Back"],need:["Ce ai nevoie?","What do you need?"],
+ pick_day:["Alege ziua","Pick a day"],pick_hour:["Alege ora","Pick a time"],
+ full:["plin","full"],slots:["locuri","slots"],
+ the_car:["Mașina","Your car"],note_opt:["Observație (opțional)","Note (optional)"],
+ ph_note:["ex. face zgomot la frânare","e.g. makes noise when braking"],
+ summary:["Rezumat","Summary"],f_shop:["Service","Shop"],f_svc:["Serviciu","Service"],
+ f_when:["Când","When"],send_req:["Trimite cererea","Send request"],
+ sent_ok:["Cerere trimisă. Service-ul îți confirmă în scurt timp.","Request sent. The shop will confirm shortly."],
+ car_saved:["mașină salvată","car saved"],cars_saved:["mașini salvate","cars saved"],
+ no_cars:["Nicio mașină salvată.","No cars saved."],add_car:["+ Adaugă mașină","+ Add car"],
+ edit:["Editează","Edit car"],hist_of:["Istoric","History"],job:["lucrare","job"],jobs:["lucrări","jobs"],
+ make:["Marcă","Make"],model:["Model","Model"],year:["An","Year"],plate:["Număr","Plate"],
+ docs_exp:["Expirări documente (opțional)","Document expiry (optional)"],
+ docs_n:["Te anunțăm din timp.","We'll remind you in advance."],
+ save:["Salvează","Save"],del_car:["Șterge mașina","Delete car"],
+ q_del:["Ștergi mașina din garaj?","Remove this car from your garage?"],
+ req_mk:["Marca și modelul sunt obligatorii.","Make and model are required."],
+ not_set:["nesetat","not set"],exp_by:["expirat de","expired"],days_:["zile","days"],
+ exp_today:["expiră azi","expires today"],in_:["în","in"],
+ spent:["cheltuit","spent"],total_:["în total","total"],
+ report_n:["Poți cumpăra un raport PDF oficial cu istoricul complet al acestei mașini — util la vânzare.","You can buy an official PDF report with this car's full history — useful when selling."],
+ in_insp:["Mașina ta este în constatare","Your car is being inspected"],
+ in_insp_n:["Service-ul o verifică și îți trimite devizul.","The shop is checking it and will send you a quote."],
+ quote:["Deviz","Quote"],total:["Total","Total"],
+ q_ask:["Service-ul a trimis un deviz. Îl accepți?","The shop sent a quote. Do you accept?"],
+ accept:["Accept","Accept"],acc_sel:["Accept selectate","Accept selected"],
+ refuse:["Refuz","Decline"],
+ q_acc:["Deviz acceptat","Quote accepted"],work_next:["Lucrarea urmează.","Work will start next."],
+ in_prog:["Mașina ta este în lucru","Your car is being worked on"],from_:["din","since"],
+ paid:["Achitat","Paid"],
+ q_ref:["Deviz refuzat. Taxă de constatare:","Quote declined. Inspection fee:"],
+ msg:["Mesaj","Message"],cancel:["Anulează","Cancel"],
+ leave_rev:["Lasă recenzie","Leave a review"],rev_sent:["★ Recenzie trimisă","★ Review sent"],
+ your_rate:["Nota ta","Your rating"],ph_rev:["Cum a fost? (opțional)","How was it? (optional)"],
+ send:["Trimite","Send"],nvm:["Renunț","Cancel"],
+ pick_rate:["Alege o notă.","Pick a rating."],
+ q_cancel:["Anulezi programarea?","Cancel this booking?"],
+ q_ref_fee:["Refuzi devizul? Se percepe taxa de constatare de","Decline the quote? An inspection fee of"],
+ q_ref_plain:["Refuzi devizul?","Decline the quote?"],lei_:["lei","lei"],
+ no_bk:["Nicio programare încă.","No bookings yet."],
+ new_req:["Cereri noi","New requests"],today:["Azi","Today"],active:["Active","Active"],
+ insp_c:["În constatare","Inspecting"],await_q:["Așteaptă deviz","Awaiting decision"],
+ working:["În lucru","In progress"],
+ sched_today:["Programul de azi","Today's schedule"],no_today:["Nicio programare azi.","Nothing scheduled today."],
+ q_wait:["deviz fără răspuns.","quote awaiting a reply."],
+ q_wait_n:["Sună clientul dacă întârzie.","Call the customer if it drags on."],
+ t_req:["Cereri","Requests"],t_sched:["Programate","Scheduled"],nothing:["Nimic aici.","Nothing here."],
+ q_sent_w:["Deviz trimis — se așteaptă răspunsul","Quote sent — awaiting reply"],
+ cl_acc:["Client a acceptat","Customer accepted"],can_start:["Poți începe.","You can start."],
+ confirm:["Confirmă","Confirm"],decline:["Respinge","Decline"],
+ to_insp:["În constatare","Start inspection"],send_q:["Trimite deviz","Send quote"],
+ to_work:["În lucru","Start work"],finish:["Finalizare","Complete"],
+ add_line:["+ Adaugă poziție","+ Add line"],ph_line:["Poziție","Item"],
+ ph_qn:["Observație (opțional)","Note (optional)"],send_quote:["Trimite devizul","Send quote"],
+ need_line:["Adaugă cel puțin o poziție cu preț.","Add at least one line with a price."],
+ fin_t:["Finalizare","Completion"],ph_work:["Ce s-a lucrat (opțional)","Work performed (optional)"],
+ ph_cost:["Cost total","Total cost"],can_empty:["Poți lăsa gol.","You can leave this empty."],
+ conf_fin:["Confirmă finalizarea","Confirm completion"],
+ earned:["încasat","collected"],
+ ph_hist:["Caută după număr, mașină sau serviciu…","Search plate, car or service…"],
+ no_hist:["Nicio lucrare încheiată.","No completed jobs."],
+ dl_hist:["Descarcă istoricul","Download history"],
+ dl_hist_n:["În aplicația reală se descarcă un fișier CSV pentru contabil.","In the real app this downloads a CSV for your accountant."],
+ work_l:["Lucrare","Work"],
+ avg:["recenzii","reviews"],reported:["Raportată","Reported"],
+ your_reply:["Răspunsul tău","Your reply"],publish:["Publică","Publish"],
+ reply:["Răspunde","Reply"],edit_reply:["Editează răspunsul","Edit reply"],
+ report:["Raportează","Report"],
+ q_report:["Raportezi recenzia ca abuzivă?","Report this review as abusive?"],
+ rep_ok:["Recenzia a fost trimisă spre verificare. Primești răspuns în maximum 5 zile lucrătoare.","The review was sent for moderation. You'll get a decision within 5 working days."],
+ set_t:["Setări service","Shop settings"],name_:["Nume","Name"],city_:["Oraș","City"],
+ opens:["Deschide","Opens"],closes:["Închide","Closes"],
+ cap_n:["Câte mașini preiei într-o zi. Tu decizi.","How many cars you take per day. You decide."],
+ fee_n2:["Se percepe dacă clientul refuză devizul. Pune 0 dacă nu percepi.","Charged if the customer declines the quote. Set 0 if you don't charge."],
+ selected:["selectate","selected"],
+ no_conv:["Nicio conversație.","No conversations."],
+ ph_msg:["Scrie un mesaj…","Write a message…"],auto_msg:["mesaj automat","automatic message"],
+ acc_client:["Cont de client","Client account"],acc_shop:["Cont de service","Shop account"],
+ acc_id:["ID cont","Account ID"],lang:["Limbă","Language"],
+ subs:["Abonament","Subscription"],trial:["Trial · 74 zile","Trial · 74 days"],
+ subs_n:["100 lei/lună după perioada gratuită.","100 RON/month after the free period."],
+ legal:["Documente legale","Legal documents"],
+ d1:["Termeni și condiții","Terms and conditions"],
+ d2:["Politica de confidențialitate","Privacy policy"],
+ d3:["Politica de cookies","Cookie policy"],
+ legal_n:["În aplicația reală se deschide documentul complet.","In the real app the full document opens here."],
+ my_data:["Datele mele","My data"],dl_data:["Descarcă datele mele","Download my data"],
+ dl_data_n:["Se descarcă un fișier cu toate datele tale.","This downloads a file with all your data."],
+ demo_t:["Acesta e un demo.","This is a demo."],
+ demo_n:["Datele se salvează doar în browserul tău. Comută între client și service din butonul de sus.","Data is stored only in your browser. Switch between client and shop using the button at the top."],
+ reset:["Resetează demo-ul","Reset demo"],
+ q_reset:["Resetezi demo-ul la starea inițială?","Reset the demo to its initial state?"],
+ st_pending:["În așteptare","Pending"],st_confirmed:["Confirmată","Confirmed"],
+ st_in_inspection:["În constatare","Inspecting"],st_quote_sent:["Deviz trimis","Quote sent"],
+ st_approved:["Deviz acceptat","Quote accepted"],st_in_progress:["În lucru","In progress"],
+ st_done:["Finalizată","Completed"],st_declined:["Respinsă","Declined"],
+ st_cancelled:["Anulată","Cancelled"],st_quote_refused:["Deviz refuzat","Quote declined"],
+ m_conf:["Programarea ta a fost confirmată.","Your booking has been confirmed."],
+ m_dec:["Ne pare rău, nu putem prelua programarea.","Sorry, we can't take this booking."],
+ m_insp:["Am primit mașina și o verificăm. Îți trimitem devizul în scurt timp.","We've received your car and are checking it. We'll send a quote shortly."],
+ m_work:["Am început lucrarea. Te anunțăm când e gata.","We've started work. We'll let you know when it's done."],
+ m_done:["Lucrarea este finalizată. Poți veni să ridici mașina.","The work is complete. You can come and collect your car."],
+ m_req:["Cerere nouă trimisă. Așteaptă confirmarea service-ului.","New request sent. Waiting for the shop to confirm."],
+ m_canc:["Clientul a anulat programarea.","The customer cancelled the booking."],
+ m_acc:["Am acceptat devizul de","I've accepted the quote of"],
+ m_acc2:["Puteți începe lucrarea.","You can start the work."],
+ m_ref:["Am refuzat devizul.","I've declined the quote."],
+ m_q:["Ți-am trimis devizul:","We've sent you a quote:"],
+ m_q2:["Îl poți accepta sau refuza în aplicație.","You can accept or decline it in the app."],
+ pub_data:["Date publice","Public details"],
+ pub_n:["Ce văd clienții pe profilul tău.","What clients see on your profile."],
+ street:["Stradă și număr","Street and number"],county:["Județ","County"],
+ zip:["Cod poștal","Postal code"],web:["Site web (opțional)","Website (optional)"],
+ descr:["Descriere scurtă","Short description"],
+ fisc:["Date de facturare","Billing details"],
+ fisc_n:["Nu apar public. Necesare doar pentru factura de abonament.","Never shown publicly. Needed only for the subscription invoice."],
+ legal_name:["Denumire legală","Legal name"],cui:["CUI","VAT code"],
+ regcom:["Nr. Registrul Comerțului","Trade Register no."],
+ legal_addr:["Sediu social","Registered office"],
+ copy_addr:["Copiază adresa atelierului","Copy workshop address"],
+ vat_payer:["Plătitor de TVA","VAT registered"],
+ bank:["Bancă","Bank"],iban:["IBAN","IBAN"],
+ bill_mail:["Email facturare","Billing email"],
+ legal_rep:["Reprezentant legal","Legal representative"],
+ yes:["Da","Yes"],no:["Nu","No"],
+ bad_cui:["CUI invalid. Verifică cifra de control.","Invalid VAT code. Check the control digit."],
+ bad_iban:["IBAN invalid.","Invalid IBAN."],
+ bad_zip:["Codul poștal are 6 cifre.","Postal code must be 6 digits."],
+ saved_ok:["Salvat.","Saved."],
+ fisc_later:["Poți completa mai târziu. Sunt necesare abia la prima factură, după cele 90 de zile gratuite.","You can fill these in later. They're only needed for the first invoice, after the 90 free days."],
+ dl_report:["Descarcă raport oficial","Download official report"],
+ my_reports:["Rapoartele mele","My reports"],
+ my_hist:["Istoricul mașinilor mele","My vehicle history"],
+ see_hist:["Vezi istoricul mașinii","See vehicle history"],
+ pick_car_h:["Alege mașina","Pick a car"],
+ rep_demo:["În aplicația reală se generează un PDF cu cod unic de verificare, pe care îl poți da cumpărătorului.","In the real app this generates a PDF with a unique verification code you can hand to a buyer."],
+ odo:["Kilometraj","Odometer"],odo_req:["Obligatoriu. Se citește de pe bord.","Required. Read it from the dashboard."],
+ odo_low:["Ultima valoare înregistrată a fost","The last recorded reading was"],
+ odo_check:["Verifică cifra.","Check the number."],
+ odo_jump:["km în plus față de ultima lucrare. Confirmi?","km more than the last job. Confirm?"],
+ odo_bad:["Kilometraj invalid.","Invalid odometer reading."],
+ odo_need:["Introdu kilometrajul.","Enter the odometer reading."],
+ reports:["Rapoarte","Reports"],
+ per_month:["Luna aceasta","This month"],per_3:["Ultimele 3 luni","Last 3 months"],
+ per_year:["Anul acesta","This year"],per_all:["Tot","All time"],
+ earned_r:["Încasat","Revenue"],jobs_r:["Lucrări","Jobs"],avg_job:["Valoare medie","Average job"],
+ rev_month:["Încasări pe lună","Revenue by month"],
+ by_svc:["Lucrări pe tip de serviciu","Jobs by service type"],
+ other:["Altele","Other"],
+ clients_t:["Clienți","Customers"],uniq:["Clienți unici","Unique customers"],
+ returning:["Clienți care au revenit","Returning customers"],
+ per_client:["Lucrări per client","Jobs per customer"],
+ quotes_t:["Devize","Quotes"],acc_rate:["Rata de acceptare","Acceptance rate"],
+ refused:["Devize refuzate","Quotes declined"],fees_in:["Taxe de constatare încasate","Inspection fees collected"],
+ acc_low:["Sub 70% înseamnă de obicei prețuri prea mari sau devize prost explicate.","Below 70% usually means prices are too high or quotes aren't explained well."],
+ occup:["Ocupare","Utilization"],busiest:["Cea mai aglomerată zi","Busiest day"],
+ of_cap:["din capacitate","of capacity"],
+ exp_csv:["Descarcă datele (CSV)","Download data (CSV)"],
+ rep_empty:["Rapoartele se completează pe măsură ce finalizezi lucrări. Revino după câteva săptămâni.","Reports fill up as you complete jobs. Come back in a few weeks."],
+ filt:["Filtru","Filter"],clear_f:["Șterge filtrul","Clear filter"],
+ next7:["7 zile","Next 7 days"],
+ fee_s:["taxă","fee"],ago_d:["acum","ago"],d_s:["zile","days"],today_s:["azi","today"]
+};
+const L=()=>S.lang==="en"?1:0;
+const t=(k)=>{const v=T[k];return v?v[L()]:k;};
+const sv=k=>{const v=SVCD[k];return v?v[L()]:k;};
+const cn=k=>{const v=CATD[k];return v?v[L()]:k;};
+const MON=[["ian","feb","mar","apr","mai","iun","iul","aug","sep","oct","noi","dec"],
+ ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]];
+const DAY=[["Dum","Lun","Mar","Mie","Joi","Vin","Sâm"],["Sun","Mon","Tue","Wed","Thu","Fri","Sat"]];
+
+const CATM={maint:["ulei","itp","clima"],brake:["frane"],tires:["vulc","geom"],
+engine:["diag","distrib"],trans:["ambr"],susp:["amort"]};
+
+const seed=()=>({
+ lang:"ro", role:null,
+ shops:[
+  {id:"s1",name:"Atelier Demo",city:"Brașov",addr:"Str. Lungă 42",phone:"0268 312 445",
+   street:"Str. Lungă 42",county:"Brașov",zip:"500059",web:"",
+   legalName:"AUTO DEMO SERV S.R.L.",cui:"RO14872301",regcom:"J08/1245/2009",
+   legalAddr:"Str. Lungă 42, Brașov",vatPayer:true,bank:"Banca Transilvania",
+   iban:"RO49AAAA1B31007593840000",billMail:"facturi@atelierdemo.ro",legalRep:"Ion Popescu",
+   open:8,close:18,cap:6,fee:80,svc:["ulei","frane","itp","diag","clima","distrib"],
+   desc:"Service auto multimarcă, 12 ani experiență."},
+  {id:"s2",name:"Rapid Service",city:"Brașov",addr:"Calea București 18",phone:"0268 447 210",
+   open:8,close:17,cap:4,fee:50,svc:["ulei","frane","vulc","geom","amort"],
+   desc:"Specializat pe suspensie și frânare."},
+  {id:"s3",name:"Vulcanizare Roți Expres",city:"Brașov",addr:"Str. Zizinului 7",phone:"0268 901 332",
+   open:8,close:20,cap:14,fee:0,svc:["vulc","geom"],desc:"Vulcanizare rapidă, fără programare lungă."},
+  {id:"s4",name:"Auto Precis",city:"Codlea",addr:"Str. Lungă 3",phone:"0268 251 108",
+   open:9,close:17,cap:5,fee:100,svc:["ulei","diag","ambr","distrib","frane"],
+   desc:"Diagnoză și reparații motor."}
+ ],
+ cars:[{id:"c1",make:"Volkswagen",model:"Golf 7",year:"2016",plate:"BV 12 ABC",
+        itp:iso(48),rca:iso(12),vig:iso(-3)}],
+ bookings:[
+  {id:"b1",shop:"s1",svc:"frane",date:iso(1),slot:"09:00",car:"Volkswagen Golf 7 · BV 12 ABC",
+   note:"Scârțâie la frânare dimineața.",status:"quote_sent",
+   quote:{items:[{n:"Plăcuțe frână față",p:280,ok:true},{n:"Discuri frână față",p:420,ok:true},
+   {n:"Manoperă",p:150,ok:true}],note:"Discurile sunt sub limită, recomand schimbarea împreună.",fee:80}},
+  {id:"b2",shop:"s2",svc:"ulei",date:iso(-40),slot:"10:00",car:"Volkswagen Golf 7 · BV 12 ABC",
+   status:"done",work:"Schimb ulei 5W30 + filtru ulei și aer",cost:340,odo:105400,
+   quote:{items:[{n:"Ulei 5W30 5L",p:210,ok:true},{n:"Filtru ulei",p:45,ok:true},{n:"Manoperă",p:85,ok:true}],fee:50}},
+  {id:"b3",shop:"s1",svc:"itp",date:iso(-95),slot:"14:00",car:"Volkswagen Golf 7 · BV 12 ABC",
+   status:"done",work:"ITP efectuat, admis",cost:150,odo:98200,quote:{items:[{n:"ITP",p:150,ok:true}],fee:80}},
+  ...hist()
+ ],
+ reviews:[
+  {id:"r1",shop:"s1",by:"Andrei M.",rating:5,text:"Prompt, deviz clar, fără surprize la plată.",
+   reply:"Mulțumim, vă așteptăm cu drag!",days:12},
+  {id:"r2",shop:"s1",by:"Cristina D.",rating:4,text:"Treabă bună, dar am așteptat puțin peste ora programată.",days:31},
+  {id:"r3",shop:"s2",by:"Mihai P.",rating:5,text:"Rapizi și corecți.",days:8},
+  {id:"r4",shop:"s2",by:"Ioana R.",rating:4,text:"Preț ok pentru ce au făcut.",days:44},
+  {id:"r5",shop:"s4",by:"George T.",rating:5,text:"Au găsit o problemă pe care alții au ratat-o.",days:19}
+ ],
+ msgs:{s1:[{f:"sys",b:"Programare confirmată pentru mâine, ora 09:00.",m:120},
+           {f:"sys",b:"Am primit mașina și o verificăm. Îți trimitem devizul în scurt timp.",m:45},
+           {f:"sys",b:"Ți-am trimis devizul: 850 lei. Îl poți accepta sau refuza în aplicație.",m:12}],
+       s2:[{f:"shop",b:"Bună ziua, lucrarea e gata, puteți veni oricând până la 17.",m:2800},
+           {f:"me",b:"Mulțumesc, vin în 20 de minute.",m:2790}]},
+ nav:"search", sel:null, step:0, draft:{}, thread:null, tab:0, q:"", cat:null, city:null, sett:null
+});
+
+/* istoric pentru rapoarte — clienti si lucrari pe ultimul an */
+function hist(){
+ const cars=[["Dacia Logan","BV 44 KLM"],["Ford Focus","BV 09 PRT"],["Skoda Octavia","BV 21 XYZ"],
+  ["Renault Clio","BV 77 DDE"],["Opel Astra","BV 33 MNO"],["BMW Seria 3","BV 55 QRS"],
+  ["Volkswagen Passat","BV 88 TUV"],["Toyota Corolla","BV 12 GHI"]];
+ const jobs=[["ulei",310],["ulei",340],["frane",820],["frane",760],["itp",150],["itp",150],
+  ["diag",180],["clima",260],["distrib",1380],["amort",690],["ambr",1550],["vulc",170],
+  ["geom",140],["ulei",295],["frane",880],["diag",200],["itp",150],["clima",240],
+  ["ulei",330],["amort",720],["vulc",160],["diag",190],["ulei",315],["frane",790]];
+ const out=[];let n=0;
+ for(let i=0;i<26;i++){
+   const c=cars[i%cars.length];
+   const j=jobs[i%jobs.length];
+   const d=-(8+i*13);
+   const km=60000+i*2300+ (i%3)*400;
+   out.push({id:"h"+i,shop:"s1",svc:j[0],date:iso(d),slot:(8+(i%9))+":00",
+     car:c[0]+" · "+c[1],status:"done",odo:km,cost:j[1],
+     work:"",quote:{items:[{n:"Lucrare",p:j[1],ok:true}],fee:80}});
+ }
+ // cateva devize refuzate, pentru rata de acceptare
+ out.push({id:"hr1",shop:"s1",svc:"ambr",date:iso(-40),slot:"11:00",
+   car:"Opel Astra · BV 33 MNO",status:"quote_refused",cost:80,
+   quote:{items:[{n:"Ambreiaj",p:1600,ok:false}],fee:80}});
+ out.push({id:"hr2",shop:"s1",svc:"distrib",date:iso(-70),slot:"09:00",
+   car:"Ford Focus · BV 09 PRT",status:"quote_refused",cost:80,
+   quote:{items:[{n:"Distribuție",p:1450,ok:false}],fee:80}});
+ return out;
+}
+function iso(d){const x=new Date();x.setDate(x.getDate()+d);return x.toISOString().slice(0,10);}
+let S;
+try{S=JSON.parse(localStorage.getItem("sh_demo_v1"))||seed();}catch(e){S=seed();}
+if(!S.shops)S=seed();
+const save=()=>{try{localStorage.setItem("sh_demo_v1",JSON.stringify(S));}catch(e){}};
+const reset=()=>{S=seed();save();r();};
+
+/* ---------------- utile ---------------- */
+const shop=id=>S.shops.find(x=>x.id===id);
+const nrm=s=>(s||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
+const lei=n=>n==null?"—":n.toLocaleString("ro-RO")+" "+t("lei_");
+const ini=n=>n.split(" ").slice(0,2).map(w=>w[0]).join("").toUpperCase();
+const dfmt=d=>{const x=new Date(d+"T00:00:00");
+  return DAY[L()][x.getDay()]+" "+x.getDate()+" "+MON[L()][x.getMonth()];};
+const days=d=>Math.round((new Date(d+"T00:00:00")-new Date().setHours(0,0,0,0))/864e5);
+const rate=id=>{const rs=S.reviews.filter(x=>x.shop===id);
+  if(!rs.length)return{a:4.3,n:0};
+  return{a:(rs.reduce((s,x)=>s+x.rating,0)+4.3*3)/(rs.length+3),n:rs.length};};
+const stars=n=>{let h="";for(let i=1;i<=5;i++)h+=`<span class="${i<=Math.round(n)?'':'off'}">★</span>`;
+  return `<span class="star">${h}</span>`;};
+const ago=n=>!n?t("today_s"):L()?`${n} ${t("d_s")} ${t("ago_d")}`:`${t("ago_d")} ${n} ${t("d_s")}`;
+const esc=s=>(s||"").replace(/[<>&"]/g,c=>({"<":"&lt;",">":"&gt;","&":"&amp;",'"':"&quot;"}[c]));
+const total=q=>q.items.filter(i=>i.ok).reduce((s,i)=>s+i.p,0);
+const act=["pending","confirmed","in_inspection","quote_sent","approved","in_progress"];
+const taken=(sid,d)=>S.bookings.filter(b=>b.shop===sid&&b.date===d&&act.includes(b.status));
+
+const STC={pending:"p-am",confirmed:"p-gr",in_inspection:"p-am",quote_sent:"p-am",
+approved:"p-gr",in_progress:"p-am",done:"p-bl",declined:"p-rd",cancelled:"p-mu",
+quote_refused:"p-mu"};
+const badge=s=>`<span class="pill ${STC[s]}">${t("st_"+s)}</span>`;
+
+function sys(sid,txt){(S.msgs[sid]=S.msgs[sid]||[]).push({f:"sys",b:txt,m:0});}
+
+/* ---------------- randare ---------------- */
+const app=document.getElementById("app");
+let _scr="";
+function r(){
+  /* păstrează poziția de scroll, derularea chip-urilor și focusul când rămâi pe același ecran */
+  const key=[S.role,S.nav,S.sel,S.step,S.thread,S.sett,S.tab,S.filt].join("|");
+  const same=key===_scr, y=app.scrollTop;
+  const cx=[...app.querySelectorAll(".chips")].map(e=>e.scrollLeft);
+  const ae=document.activeElement, fid=ae&&ae.id&&app.contains(ae)?ae.id:null;
+  let sel=null; try{if(fid&&ae.selectionStart!=null)sel=[ae.selectionStart,ae.selectionEnd];}catch(e){}
+  document.getElementById("roleBtn").textContent=S.role==="shop"?t("im_shop"):t("im_client");
+  app.innerHTML = S.role==="shop"?shopView():clientView();
+  drawNav();
+  if(same){app.scrollTop=y;app.querySelectorAll(".chips").forEach((e,i)=>{if(cx[i])e.scrollLeft=cx[i];});}
+  else app.scrollTop=0;
+  if(same&&fid){const el=document.getElementById(fid);
+    if(el){el.focus({preventScroll:true});if(sel)try{el.setSelectionRange(sel[0],sel[1]);}catch(e){}}}
+  _scr=key; save();
+}
+const IC={search:'<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',
+car:'<path d="M19 17h2l-1.5-6.5a2 2 0 0 0-2-1.5h-11a2 2 0 0 0-2 1.5L3 17h2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/>',
+cal:'<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>',
+msg:'<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
+usr:'<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+dash:'<rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/>',
+hist:'<path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/><path d="M12 7v5l4 2"/>',
+star:'<path d="m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/>'};
+function drawNav(){
+  const items=S.role==="shop"
+   ?[["dash",t("nav_dash"),"dash"],["bk",t("nav_bk"),"cal"],["hist",t("nav_hist"),"hist"],["msg",t("nav_msg"),"msg"],["acc",t("nav_acc"),"usr"]]
+   :[["search",t("nav_search"),"search"],["garage",t("nav_garage"),"car"],["bk",t("nav_bk"),"cal"],["msg",t("nav_msg"),"msg"],["acc",t("nav_acc"),"usr"]];
+  document.getElementById("nav").innerHTML=items.map(([k,l,i])=>
+   `<button class="${S.nav===k?'on':''}" onclick="go('${k}')">
+     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">${IC[i]}</svg>${l}</button>`).join("");
+}
+window.go=k=>{S.nav=k;S.sel=null;S.step=0;S.thread=null;S.sett=null;S.filt=null;r();};
+document.getElementById("roleBtn").onclick=()=>{
+  S.role=S.role==="shop"?"client":"shop";S.nav=S.role==="shop"?"dash":"search";S.sel=null;S.thread=null;r();};
+
+/* ============ CLIENT ============ */
+function clientView(){
+  if(S.nav==="search")return S.sel?(S.step?flow():shopPage()):searchPage();
+  if(S.nav==="acc"&&S.sett==="pickcar")return pickCar();
+  if(S.nav==="acc"&&S.sett&&S.sett.startsWith("ch_"))return carHist(S.sett.slice(3));
+  if(S.nav==="garage")return S.sel?carForm():(S.sett?carHist():garage());
+  if(S.nav==="bk")return myBookings();
+  if(S.nav==="msg")return S.thread?chat(S.thread):threads();
+  return account();
+}
+
+function searchPage(){
+  const al=[];
+  S.cars.forEach(c=>[["itp","ITP"],["rca","RCA"],["vig",L()?"Vignette":"Rovinietă"]].forEach(([k,n])=>{
+    if(c[k]){const d=days(c[k]);if(d<=30)al.push({n,c,d});}}));
+  al.sort((a,b)=>a.d-b.d);
+  let list=S.shops.filter(s=>{
+    if(S.city&&s.city!==S.city)return false;
+    if(S.cat&&!s.svc.some(x=>CATM[S.cat].includes(x)))return false;
+    if(!S.q)return true;
+    const q=nrm(S.q);
+    return nrm(s.name).includes(q)||nrm(s.city).includes(q)||s.svc.some(x=>nrm(sv(x)).includes(q));
+  }).map(s=>({s,r:rate(s.id)})).sort((a,b)=>b.r.a-a.r.a||b.r.n-a.r.n);
+
+  const hit=s=>{if(!S.q)return null;const q=nrm(S.q);
+    const m=s.svc.find(x=>nrm(sv(x)).includes(q));return m?sv(m):null;};
+
+  return `<h1>${t("nav_search")}</h1><div class="sub">${S.shops.length} ${t("shops_n")}</div>
+  ${al.length?`<button class="card am" style="width:100%;text-align:left" onclick="go('garage')">
+    <div class="row"><div>
+      <div style="font-weight:650;font-size:13.5px">${al[0].n} · ${al[0].c.make} ${al[0].c.model}
+        ${al[0].d<0?`<span style="color:var(--rd)">${t("exp_by")} ${-al[0].d} ${t("days_")}</span>`:
+          al[0].d===0?`<span style="color:var(--rd)">${t("exp_today")}</span>`:
+          `<span style="color:var(--am)">${t("in_")} ${al[0].d} ${t("days_")}</span>`}</div>
+      ${al.length>1?`<div class="mut">+${al.length-1} ${L()?"more to check":"de verificat"}</div>`:""}
+    </div><span style="color:var(--mu)">›</span></div></button>`:""}
+  <input id="q_search" placeholder="${t("ph_search")}" value="${esc(S.q)}"
+    oninput="S.q=this.value;r()" style="margin-bottom:10px">
+  <div class="chips">
+    <button class="chip ${!S.cat?'on':''}" onclick="S.cat=null;r()">${t("all")}</button>
+    ${Object.keys(CATM).map(c=>`<button class="chip ${S.cat===c?'on':''}" onclick="S.cat='${c}';r()">${cn(c)}</button>`).join("")}
+  </div>
+  <div class="chips">
+    <button class="chip ${!S.city?'on':''}" onclick="S.city=null;r()">${t("all_cities")}</button>
+    ${[...new Set(S.shops.map(s=>s.city))].map(c=>
+      `<button class="chip ${S.city===c?'on':''}" onclick="S.city='${c}';r()">${c}</button>`).join("")}
+  </div>
+  <div class="mut" style="margin-bottom:8px">${list.length} ${t("found")}</div>
+  ${list.length?list.map(({s,r:rr})=>{const h=hit(s);return`
+   <button class="card" style="width:100%;text-align:left" onclick="S.sel='${s.id}';r()">
+    <div class="row"><div style="display:flex;gap:11px;align-items:center;min-width:0">
+      <span class="av">${ini(s.name)}</span>
+      <div style="min-width:0"><div style="font-weight:650">${s.name}</div>
+      <div class="mut">${stars(rr.a)} ${rr.a.toFixed(1)} · ${rr.n} ${t("reviews")} · ${s.city} · ${s.svc.length} ${t("services")}</div></div>
+    </div><span style="color:var(--mu)">›</span></div>
+    ${h?`<div class="mut" style="color:var(--am);margin-top:8px;padding-top:8px;border-top:1px solid var(--bd)">${t("offers")}: ${h}</div>`:""}
+   </button>`}).join(""):`<div class="empty">${t("no_res")}</div>`}
+  <button class="btn bd2" onclick="S.q='';S.cat=null;S.city=null;r()" style="font-size:13px">${t("clear")}</button>`;
+}
+
+function shopPage(){
+  const s=shop(S.sel),rr=rate(s.id),rv=S.reviews.filter(x=>x.shop===s.id);
+  return `<button class="back" onclick="S.sel=null;r()">‹ ${t("all_shops")}</button>
+  <div style="display:flex;gap:12px;align-items:center;margin-bottom:6px">
+    <span class="av" style="width:48px;height:48px;font-size:16px">${ini(s.name)}</span>
+    <div><h1 style="font-size:23px">${s.name}</h1>
+    <div class="mut">${stars(rr.a)} ${rr.a.toFixed(1)} · ${rr.n} ${t("reviews")}</div></div></div>
+  <div class="mut" style="margin-bottom:14px">${s.addr}, ${s.city}</div>
+  <div class="card">
+    <div class="row"><span class="mut">${t("hours")}</span><span class="mono">${s.open}:00 – ${s.close}:00</span></div>
+    <div class="row" style="margin-top:8px;padding-top:8px;border-top:1px solid var(--bd)">
+      <span class="mut">${t("cap")}</span><span class="mono">${s.cap}</span></div>
+    <div class="row" style="margin-top:8px;padding-top:8px;border-top:1px solid var(--bd)">
+      <span class="mut">${t("phone")}</span><span class="mono" style="color:var(--bl)">${s.phone}</span></div>
+    ${s.fee?`<div class="row" style="margin-top:8px;padding-top:8px;border-top:1px solid var(--bd)">
+      <span class="mut">${t("fee")}</span><span class="mono">${lei(s.fee)}</span></div>
+      <div class="mut" style="margin-top:6px;font-size:11.5px">${t("fee_n")}</div>`:""}
+  </div>
+  <h2>${t("svc_off")}</h2>
+  ${s.svc.map(x=>`<div class="card" style="padding:11px 13px">${sv(x)}</div>`).join("")}
+  <div class="mut" style="margin:8px 0 4px">${t("price_n")}</div>
+  <button class="btn bp" onclick="S.step=1;S.draft={shop:'${s.id}'};r()">${t("book")}</button>
+  ${rv.length?`<h2>${t("revs")}</h2>${rv.map(v=>`<div class="card">
+    <div class="row"><b style="font-size:13.5px">${v.by}</b><span class="mut">${ago(v.days)}</span></div>
+    <div style="margin:4px 0">${stars(v.rating)}</div>
+    <div style="font-size:13.5px">${esc(v.text)}</div>
+    ${v.reply?`<div class="in"><div class="lbl" style="margin-bottom:4px">${t("shop_reply")}</div>
+      <div style="font-size:13px">${esc(v.reply)}</div></div>`:""}</div>`).join("")}`:""}`;
+}
+
+function flow(){
+  const d=S.draft,s=shop(d.shop);
+  const bar=`<div class="prog">${[1,2,3,4].map(i=>`<div class="${S.step>=i?'on':''}"></div>`).join("")}</div>`;
+  const back=`<button class="back" onclick="S.step--;if(!S.step)S.draft={};r()">‹ ${t("back")}</button>`;
+
+  if(S.step===1)return `${back}${bar}<h1>${t("need")}</h1><div class="sub">${s.name}</div>
+   ${Object.entries(CATM).map(([c,ids])=>{const av=ids.filter(i=>s.svc.includes(i));
+     return av.length?`<div class="lbl" style="margin-top:14px">${cn(c)}</div>
+     ${av.map(i=>`<button class="card" style="width:100%;text-align:left" onclick="S.draft.svc='${i}';S.step=2;r()">${sv(i)}</button>`).join("")}`:"";}).join("")}`;
+
+  if(S.step===2){
+    const ds=[];for(let i=1;ds.length<12;i++){const dt=iso(i);
+      if(new Date(dt+"T00:00:00").getDay()===0)continue;ds.push(dt);}
+    return `${back}${bar}<h1>${t("pick_day")}</h1><div class="sub">${sv(d.svc)} · ${s.name}</div>
+    <div class="grid3">${ds.map(dt=>{const left=s.cap-taken(s.id,dt).length;
+      return `<button class="slot ${left<=0?'off':''} ${d.date===dt?'on':''}" ${left<=0?'disabled':''}
+        onclick="S.draft.date='${dt}';S.step=3;r()">
+        <b>${new Date(dt+"T00:00:00").getDate()}</b>
+        <span>${dfmt(dt).split(" ")[0]}</span>
+        <span style="color:${left<=0?'var(--rd)':'var(--mu)'}">${left<=0?t("full"):left+" "+t("slots")}</span></button>`;}).join("")}</div>`;
+  }
+
+  if(S.step===3){
+    const used=taken(s.id,d.date).map(b=>b.slot);
+    const hs=[];for(let h=s.open;h<s.close;h++)hs.push((h<10?"0":"")+h+":00");
+    return `${back}${bar}<h1>${t("pick_hour")}</h1><div class="sub">${dfmt(d.date)}</div>
+    <div class="grid3">${hs.map(h=>`<button class="slot ${used.includes(h)?'gone':''} ${d.slot===h?'on':''}"
+      ${used.includes(h)?'disabled':''} onclick="S.draft.slot='${h}';S.step=4;r()">
+      <b class="mono" style="font-size:15px">${h}</b></button>`).join("")}</div>`;
+  }
+
+  return `${back}${bar}<h1>${t("the_car")}</h1>
+  ${S.cars.map(c=>`<button class="card ${d.car===c.id?'am':''}" style="width:100%;text-align:left"
+    onclick="S.draft.car='${c.id}';r()">
+    <div class="row"><div><b>${c.make} ${c.model}</b> <span class="mut">${c.year}</span>
+    <div class="mono" style="color:var(--am);font-size:12.5px">${c.plate}</div></div>
+    ${d.car===c.id?'<span style="color:var(--am);font-size:18px">✓</span>':''}</div></button>`).join("")}
+  <label class="lbl" style="margin-top:14px">${t("note_opt")}</label>
+  <textarea id="nt" placeholder="${t("ph_note")}">${esc(d.note||"")}</textarea>
+  ${d.car?`<div class="card" style="margin-top:14px">
+    <div class="lbl">${t("summary")}</div>
+    <div class="row"><span class="mut">${t("f_shop")}</span><b>${s.name}</b></div>
+    <div class="row"><span class="mut">${t("f_svc")}</span><b>${sv(d.svc)}</b></div>
+    <div class="row"><span class="mut">${t("f_when")}</span><b class="mono">${dfmt(d.date)}, ${d.slot}</b></div>
+  </div>`:""}
+  <button class="btn bp" ${!d.car?'disabled':''} onclick="submitBk()">${t("send_req")}</button>`;
+}
+window.submitBk=()=>{const d=S.draft,c=S.cars.find(x=>x.id===d.car);
+  const nt=document.getElementById("nt");
+  S.bookings.unshift({id:"b"+Date.now(),shop:d.shop,svc:d.svc,date:d.date,slot:d.slot,
+    car:`${c.make} ${c.model} · ${c.plate}`,note:nt?nt.value:"",status:"pending"});
+  sys(d.shop,t("m_req"));
+  S.draft={};S.step=0;S.sel=null;S.nav="bk";r();
+  alert(t("sent_ok"));};
+
+function garage(){
+  return `<h1>${t("nav_garage")}</h1><div class="sub">${S.cars.length} ${S.cars.length===1?t("car_saved"):t("cars_saved")}</div>
+  ${S.cars.length?S.cars.map(c=>{
+    const n=S.bookings.filter(b=>b.status==="done"&&b.car.includes(c.plate)).length;
+    const pill=(k,l)=>{if(!c[k])return `<span class="mut" style="font-size:11.5px">${l}: ${t("not_set")}</span>`;
+      const d=days(c[k]);const col=d<0||d===0?"var(--rd)":d<=30?"var(--am)":"var(--mu)";
+      const lbl=d<0?`${t("exp_by")} ${-d} ${t("days_")}`:d===0?t("exp_today"):d<=30?`${t("in_")} ${d} ${t("days_")}`:new Date(c[k]).toLocaleDateString("ro-RO");
+      return `<span style="font-size:11.5px;color:${col};font-weight:${d<=30?700:400}">${l}: ${lbl}</span>`;};
+    return `<div class="card">
+      <div class="row"><div style="display:flex;gap:11px;align-items:center">
+        <span class="av"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 17h2l-1.5-6.5a2 2 0 0 0-2-1.5h-11a2 2 0 0 0-2 1.5L3 17h2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/></svg></span>
+        <div><b>${c.make} ${c.model}</b> <span class="mut">${c.year}</span>
+        <div class="mono" style="color:var(--am);font-size:12.5px">${c.plate}</div></div></div>
+        <button onclick="S.sel='${c.id}';r()" style="color:var(--mu);font-size:18px">✎</button></div>
+      <div style="display:flex;gap:14px;flex-wrap:wrap;margin-top:10px;padding-top:10px;border-top:1px solid var(--bd)">
+        ${pill("itp","ITP")}${pill("rca","RCA")}${pill("vig",L()?"Vignette":"Rovinietă")}</div>
+      <button class="btn bd2" style="font-size:13px;margin-top:10px" ${!n?'disabled':''}
+        onclick="S.sett='${c.id}';r()">${t("hist_of")} — ${n} ${n===1?t("job"):t("jobs")}</button>
+    </div>`;}).join(""):`<div class="empty">${t("no_cars")}</div>`}
+  <button class="btn bp" onclick="S.sel='new';r()">${t("add_car")}</button>`;
+}
+function carForm(){
+  const nw=S.sel==="new",c=nw?{}:S.cars.find(x=>x.id===S.sel);
+  const f=(id,l,v,t)=>`<label class="lbl" style="margin-top:11px">${l}</label>
+    <input id="${id}" type="${t||'text'}" value="${esc(v||'')}">`;
+  return `<button class="back" onclick="S.sel=null;r()">‹ ${t("nav_garage")}</button>
+  <h1>${nw?t("add_car").replace("+ ",""):t("edit")}</h1>
+  ${f("mk",t("make"),c.make)}${f("md",t("model"),c.model)}
+  <div class="grid2">${f("yr",t("year"),c.year)}${f("pl",t("plate"),c.plate)}</div>
+  <div class="card" style="margin-top:14px;background:var(--s2)">
+    <div class="lbl">${t("docs_exp")}</div>
+    <div class="mut" style="margin-bottom:8px;font-size:11.5px">${t("docs_n")}</div>
+    ${f("itp","ITP",c.itp,"date")}${f("rca","RCA",c.rca,"date")}${f("vig",L()?"Vignette":"Rovinietă",c.vig,"date")}
+  </div>
+  <button class="btn bp" onclick="saveCar('${S.sel}')">${t("save")}</button>
+  ${nw?"":`<button class="btn br2" onclick="delCar('${S.sel}')">${t("del_car")}</button>`}`;
+}
+window.saveCar=id=>{const g=i=>document.getElementById(i).value;
+  if(!g("mk").trim()||!g("md").trim())return alert(t("req_mk"));
+  const o={make:g("mk").trim(),model:g("md").trim(),year:g("yr"),plate:g("pl").toUpperCase(),
+    itp:g("itp"),rca:g("rca"),vig:g("vig")};
+  if(id==="new")S.cars.push({id:"c"+Date.now(),...o});else Object.assign(S.cars.find(x=>x.id===id),o);
+  S.sel=null;r();};
+window.delCar=id=>{if(confirm(t("q_del"))){S.cars=S.cars.filter(x=>x.id!==id);S.sel=null;r();}};
+
+function pickCar(){
+  return `<button class="back" onclick="S.sett=null;r()">‹ ${t("nav_acc")}</button>
+  <h1>${t("my_hist")}</h1><div class="sub">${t("pick_car_h")}</div>
+  ${S.cars.map(c=>{const n=S.bookings.filter(b=>b.status==="done"&&b.car.includes(c.plate)).length;
+    return `<button class="card" style="width:100%;text-align:left" onclick="S.sett='ch_${c.id}';r()">
+      <div class="row"><div><b>${c.make} ${c.model}</b>
+        <div class="mono mut" style="color:var(--am)">${c.plate}</div></div>
+        <span class="mut">${n} ${n===1?t("job"):t("jobs")} ›</span></div></button>`;}).join("")}`;
+}
+function carHist(id){
+  const c=S.cars.find(x=>x.id===(id||S.sett));
+  const bs=S.bookings.filter(b=>b.status==="done"&&b.car.includes(c.plate));
+  const sum=bs.reduce((s,b)=>s+(b.cost||0),0);
+  return `<button class="back" onclick="S.sett=${S.nav==="acc"?"'pickcar'":"null"};r()">‹ ${S.nav==="acc"?t("my_hist"):t("nav_garage")}</button>
+  <h1>${c.make} ${c.model}</h1>
+  <div class="sub">${c.plate} · ${bs.length} ${t("jobs")} · ${lei(sum)} ${t("spent")}</div>
+  ${bs.map(b=>`<div class="card">
+    <div class="row"><b>${sv(b.svc)}</b><span class="mono" style="color:var(--gr)">${lei(b.cost)}</span></div>
+    <div class="mut">${shop(b.shop).name} · ${dfmt(b.date)}</div>
+    ${b.odo?`<div class="row" style="margin-top:4px"><span class="mut">${t("odo")}</span>
+      <b class="mono">${b.odo.toLocaleString("ro-RO")} km</b></div>`:""}
+    ${b.work?`<div class="in"><div class="mut" style="font-size:12px">${t("work_l")}</div>${esc(b.work)}</div>`:""}
+    ${b.quote?`<div class="in">${b.quote.items.map(i=>
+      `<div class="row" style="font-size:12.5px"><span class="mut">${i.n}</span><span class="mono">${lei(i.p)}</span></div>`).join("")}</div>`:""}
+  </div>`).join("")}
+  <div class="note">${t("report_n")} <b>29 lei</b></div>
+  <button class="btn bp" onclick="alert(t('rep_demo'))">${t("dl_report")} — 29 lei</button>`;
+}
+
+function myBookings(){
+  if(!S.bookings.length)return `<h1>${t("nav_bk")}</h1><div class="empty">${t("no_bk")}</div>`;
+  return `<h1>${t("nav_bk")}</h1><div class="sub">${S.bookings.length} ${t("total_")}</div>
+  ${S.bookings.map(b=>{const s=shop(b.shop);return `<div class="card ${b.status==='quote_sent'?'am':''}">
+    <div class="row"><div><b>${sv(b.svc)}</b><div class="mut">${s.name} · ${s.city}</div></div>${badge(b.status)}</div>
+    <div class="mut" style="margin-top:6px"><span class="mono">${dfmt(b.date)}, ${b.slot}</span> · ${b.car}</div>
+    ${b.note?`<div class="mut" style="font-style:italic;margin-top:4px">„${esc(b.note)}"</div>`:""}
+
+    ${b.status==="in_inspection"?`<div class="in"><span class="dot"></span> <b>${t("in_insp")}</b>
+      <div class="mut">${t("in_insp_n")}</div></div>`:""}
+
+    ${b.status==="quote_sent"?`<div class="in">
+      <div class="lbl">${t("quote")}</div>
+      ${b.quote.items.map((i,ix)=>`<div class="row" style="padding:3px 0">
+        <button style="display:flex;gap:8px;align-items:center;text-align:left;flex:1"
+          onclick="togg('${b.id}',${ix})">
+          <span class="chk ${i.ok?'on':''}"></span>
+          <span style="font-size:13px;${i.ok?'':'opacity:.45;text-decoration:line-through'}">${i.n}</span></button>
+        <span class="mono" style="font-size:13px;${i.ok?'':'opacity:.45'}">${lei(i.p)}</span></div>`).join("")}
+      ${b.quote.note?`<div class="mut" style="font-style:italic;margin-top:7px;font-size:12px">${esc(b.quote.note)}</div>`:""}
+      <div class="row" style="border-top:1px solid var(--bd);margin-top:9px;padding-top:9px">
+        <b>${t("total")}</b><b class="mono" style="color:var(--am)">${lei(total(b.quote))}</b></div>
+      </div>
+      <div class="mut" style="margin:9px 0 2px">${t("q_ask")}</div>
+      <div class="btns">
+        <button class="btn bg2" onclick="acc('${b.id}')">${b.quote.items.some(i=>!i.ok)?t("acc_sel"):t("accept")}</button>
+        <button class="btn br2" onclick="ref('${b.id}')">${t("refuse")}${b.quote.fee?` · ${t("fee_s")} ${lei(b.quote.fee)}`:""}</button>
+      </div>`:""}
+
+    ${b.status==="approved"?`<div class="in" style="color:var(--gr)">
+      ${t("q_acc")} — ${lei(total(b.quote))}. ${t("work_next")}</div>`:""}
+    ${b.status==="in_progress"?`<div class="in"><span class="dot"></span> <b>${t("in_prog")}</b>
+      <div class="mut">${t("from_")} ${b.slot}</div></div>`:""}
+    ${b.status==="done"?`<div class="in">
+      ${b.odo?`<div class="row" style="margin-bottom:4px"><span class="mut">${t("odo")}</span>
+        <b class="mono">${b.odo.toLocaleString("ro-RO")} km</b></div>`:""}
+      ${b.work?`<div>${esc(b.work)}</div>`:""}
+      <div class="row" style="margin-top:4px"><span class="mut">${t("paid")}</span>
+      <b class="mono" style="color:var(--gr)">${lei(b.cost)}</b></div></div>`:""}
+    ${b.status==="quote_refused"?`<div class="in mut">${t("q_ref")} ${lei(b.cost)}</div>`:""}
+
+    <div class="btns" style="margin-top:9px">
+      <button class="btn bd2" onclick="S.nav='msg';S.thread='${b.shop}';r()">${t("msg")}</button>
+      ${["pending","confirmed"].includes(b.status)?
+        `<button class="btn br2" onclick="canc('${b.id}')">${t("cancel")}</button>`:""}
+      ${b.status==="done"&&!S.reviews.some(v=>v.bk===b.id)?
+        `<button class="btn bd2" onclick="S.sett='rev_${b.id}';r()">${t("leave_rev")}</button>`:""}
+      ${b.status==="done"&&S.reviews.some(v=>v.bk===b.id)?
+        `<span class="mut" style="align-self:center;font-size:12.5px">${t("rev_sent")}</span>`:""}
+      ${b.status==="done"?`<button class="btn bd2" onclick="openHist('${b.car}')">${t("see_hist")}</button>`:""}
+    </div>
+    ${S.sett==="rev_"+b.id?revForm(b):""}
+  </div>`}).join("")}`;
+}
+window.openHist=car=>{const pl=(car.split(" · ")[1]||"").trim();
+  const c=S.cars.find(x=>x.plate===pl);
+  if(!c)return alert(t("no_hist"));
+  S.nav="garage";S.sel=null;S.sett=c.id;r();};
+window.togg=(id,ix)=>{const b=S.bookings.find(x=>x.id===id);b.quote.items[ix].ok=!b.quote.items[ix].ok;r();};
+window.acc=id=>{const b=S.bookings.find(x=>x.id===id);
+  if(!b.quote.items.some(i=>i.ok))return ref(id);
+  b.status="approved";sys(b.shop,`${t("m_acc")} ${lei(total(b.quote))}. ${t("m_acc2")}`);r();};
+window.ref=id=>{const b=S.bookings.find(x=>x.id===id);const f=b.quote.fee;
+  if(!confirm(f?`${t("q_ref_fee")} ${f} ${t("lei_")}.`:t("q_ref_plain")))return;
+  b.status="quote_refused";b.cost=f;sys(b.shop,t("m_ref"));r();};
+window.canc=id=>{if(!confirm(t("q_cancel")))return;
+  const b=S.bookings.find(x=>x.id===id);b.status="cancelled";
+  sys(b.shop,t("m_canc"));r();};
+function revForm(b){return `<div class="in">
+  <div class="lbl">${t("your_rate")}</div>
+  <div id="rst" style="font-size:28px;color:var(--am);letter-spacing:4px;margin-bottom:8px">
+  ${[1,2,3,4,5].map(i=>`<span onclick="setR(${i})" style="cursor:pointer" data-i="${i}">☆</span>`).join("")}</div>
+  <textarea id="rtx" placeholder="${t("ph_rev")}"></textarea>
+  <div class="btns"><button class="btn bg2" onclick="sendRev('${b.id}','${b.shop}')">${t("send")}</button>
+  <button class="btn bd2" onclick="S.sett=null;r()">${t("nvm")}</button></div></div>`;}
+let rv=0;
+window.setR=n=>{rv=n;document.querySelectorAll("#rst span").forEach(s=>
+  s.textContent=+s.dataset.i<=n?"★":"☆");};
+window.sendRev=(bid,sid)=>{if(!rv)return alert(t("pick_rate"));
+  S.reviews.unshift({id:"r"+Date.now(),bk:bid,shop:sid,by:"Eduard L.",rating:rv,
+    text:document.getElementById("rtx").value,days:0});
+  rv=0;S.sett=null;r();};
+
+/* ============ SERVICE ============ */
+function shopView(){
+  if(S.nav==="dash")return dash();
+  if(S.nav==="bk")return shopBookings();
+  if(S.nav==="hist")return history();
+  if(S.nav==="msg")return S.thread?chat(S.thread):threads();
+  if(S.nav==="acc")return S.sett==="set"?settings():S.sett==="rev"?shopReviews():
+    S.sett==="rep"?reports():account();
+  return dash();
+}
+const MY="s1";
+function dash(){
+  const all=S.bookings.filter(b=>b.shop===MY);
+  const c=st=>all.filter(b=>b.status===st).length;
+  const today=all.filter(b=>b.date===iso(0)&&act.includes(b.status));
+  const s=shop(MY);
+  return `<h1>${t("nav_dash")}</h1><div class="sub">${s.name} · ${s.city}</div>
+  ${(()=>{const card=(n,lbl,col,f)=>n?
+      `<button class="stat" style="cursor:pointer" onclick="dashGo('${f}')">
+        <b style="color:${col}">${n}</b><span>${lbl} ›</span></button>`:
+      `<div class="stat" style="opacity:.45"><b>0</b><span>${lbl}</span></div>`;
+    return `<div class="grid3" style="margin-bottom:9px">
+      ${card(c("pending"),t("new_req"),"var(--am)","pending")}
+      ${card(today.length,t("today"),"var(--gr)","today")}
+      ${card(all.filter(b=>["confirmed"].includes(b.status)).length,t("next7"),"var(--bl)","next7")}
+    </div>
+    <div class="grid3">
+      ${card(c("in_inspection"),t("insp_c"),"var(--tx)","in_inspection")}
+      ${card(c("quote_sent"),t("await_q"),"var(--am)","quote_sent")}
+      ${card(c("in_progress"),t("working"),"var(--tx)","in_progress")}
+    </div>`;})()}
+  <button class="card" style="width:100%;margin-top:12px;text-align:left;cursor:pointer"
+    onclick="S.nav='acc';S.sett='set';r()"><div class="row">
+    <span class="mut">${t("cap")}: <b class="mono" style="color:var(--tx)">${s.cap}</b></span>
+    <span class="mut">${t("today")}: <b class="mono" style="color:var(--tx)">${today.length}</b> ›</span></div></button>
+  <h2>${t("sched_today")}</h2>
+  ${today.length?today.map(b=>`<button class="card" style="width:100%;text-align:left;cursor:pointer"
+    onclick="S.nav='bk';S.tab=1;S.filt=null;r()"><div class="row">
+    <span class="mono" style="color:var(--am);font-size:17px">${b.slot}</span>
+    <div style="flex:1;margin-left:12px"><b>${sv(b.svc)}</b>
+    <div class="mut">${b.car}</div></div>${badge(b.status)}</div></button>`).join("")
+   :`<div class="empty">${t("no_today")}</div>`}
+  ${c("quote_sent")?`<div class="note" style="margin-top:12px">
+    <b>${c("quote_sent")} ${t("q_wait")}</b> ${t("q_wait_n")}</div>`:""}`;
+}
+
+function shopBookings(){
+  const all=S.bookings.filter(b=>b.shop===MY);
+  const groups=[all.filter(b=>b.status==="pending"),
+    all.filter(b=>["confirmed","in_inspection","quote_sent","approved","in_progress"].includes(b.status))];
+  let list=groups[S.tab]||[];
+  const FL={pending:t("new_req"),today:t("today"),next7:t("next7"),
+    in_inspection:t("insp_c"),quote_sent:t("await_q"),in_progress:t("working")};
+  if(S.filt){
+    if(S.filt==="today")list=list.filter(b=>b.date===iso(0));
+    else if(S.filt==="next7")list=list.filter(b=>b.status==="confirmed");
+    else if(S.filt!=="pending")list=list.filter(b=>b.status===S.filt);
+  }
+  return `<h1>${t("nav_bk")}</h1><div class="sub">${shop(MY).name}</div>
+  <div class="tabs">
+    <button class="${S.tab===0?'on':''}" onclick="S.tab=0;S.filt=null;r()">${t("t_req")} (${groups[0].length})</button>
+    <button class="${S.tab===1?'on':''}" onclick="S.tab=1;S.filt=null;r()">${t("t_sched")} (${groups[1].length})</button>
+  </div>
+  ${S.filt?`<button class="chip on" style="margin-bottom:11px" onclick="S.filt=null;r()">
+    ${FL[S.filt]||S.filt} ✕</button>`:""}
+  ${list.length?list.map(b=>bkCard(b)).join(""):`<div class="empty">${t("nothing")}</div>`}`;
+}
+function bkCard(b){
+  const q=b.quote;
+  return `<div class="card">
+    <div class="row"><div><b>${sv(b.svc)}</b>
+      <div class="mut"><span class="mono">${dfmt(b.date)}, ${b.slot}</span></div></div>${badge(b.status)}</div>
+    <div class="in">
+      <div class="row"><span>${b.car.split(" · ")[0]}</span>
+        <span class="mono" style="color:var(--am)">${b.car.split(" · ")[1]||""}</span></div>
+      <div class="row" style="margin-top:5px"><span class="mut">Eduard L.</span>
+        <span class="mono" style="color:var(--bl)">0723 375 248</span></div>
+      ${b.note?`<div class="mut" style="font-style:italic;margin-top:6px">„${esc(b.note)}"</div>`:""}
+    </div>
+    ${b.status==="quote_sent"?`<div class="in">
+      <div class="lbl">${t("q_sent_w")}</div>
+      ${q.items.map(i=>`<div class="row" style="font-size:12.5px"><span class="mut">${i.n}</span>
+        <span class="mono">${lei(i.p)}</span></div>`).join("")}
+      <div class="row" style="border-top:1px solid var(--bd);margin-top:7px;padding-top:7px">
+        <b style="font-size:13px">${t("total")}</b><b class="mono" style="color:var(--am)">${lei(total(q))}</b></div></div>`:""}
+    ${b.status==="approved"?`<div class="in" style="color:var(--gr)">
+      ${t("cl_acc")} ${lei(total(q))}. ${t("can_start")}</div>`:""}
+    ${S.sel==="q_"+b.id?quoteForm(b):""}
+    ${S.sel==="f_"+b.id?finForm(b):""}
+    ${S.sel!=="q_"+b.id&&S.sel!=="f_"+b.id?`<div class="btns" style="margin-top:9px">
+      ${b.status==="pending"?`
+        <button class="btn bg2" onclick="setSt('${b.id}','confirmed',t('m_conf'))">${t("confirm")}</button>
+        <button class="btn br2" onclick="setSt('${b.id}','declined',t('m_dec'))">${t("decline")}</button>`:""}
+      ${b.status==="confirmed"?`
+        <button class="btn bp" onclick="setSt('${b.id}','in_inspection',t('m_insp'))">${t("to_insp")}</button>`:""}
+      ${b.status==="in_inspection"?`<button class="btn bp" onclick="S.sel='q_${b.id}';r()">${t("send_q")}</button>`:""}
+      ${b.status==="approved"?`<button class="btn bg2" onclick="setSt('${b.id}','in_progress',t('m_work'))">${t("to_work")}</button>`:""}
+      ${b.status==="in_progress"?`<button class="btn bg2" onclick="S.sel='f_${b.id}';r()">${t("finish")}</button>`:""}
+      <button class="btn bd2" onclick="S.nav='msg';S.thread='${b.shop}';r()">${t("msg")}</button>
+    </div>`:""}
+  </div>`;
+}
+window.dashGo=f=>{S.nav="bk";S.filt=f;S.tab=f==="pending"?0:1;S.sel=null;r();};
+window.setSt=(id,st,m)=>{const b=S.bookings.find(x=>x.id===id);b.status=st;sys(b.shop,m);r();};
+let qi=[{n:"",p:""}];
+function quoteForm(b){
+  return `<div class="in">
+    <div class="lbl">${t("quote")}</div>
+    ${qi.map((it,ix)=>`<div style="display:flex;gap:6px;margin-bottom:6px">
+      <input placeholder="${t("ph_line")}" value="${esc(it.n)}" oninput="qi[${ix}].n=this.value" style="flex:1">
+      <input placeholder="lei" inputmode="numeric" value="${it.p}" oninput="qi[${ix}].p=this.value.replace(/\\D/g,'')"
+        style="width:78px" class="mono">
+      ${qi.length>1?`<button onclick="qi.splice(${ix},1);r()" style="color:var(--rd);width:28px">✕</button>`:""}
+    </div>`).join("")}
+    <button class="btn bd2" style="font-size:12.5px;padding:8px;border-style:dashed"
+      onclick="qi.push({n:'',p:''});r()">${t("add_line")}</button>
+    <textarea id="qn" placeholder="${t("ph_qn")}" style="margin-top:8px"></textarea>
+    <div class="row" style="margin-top:9px"><b>${t("total")}</b>
+      <b class="mono" style="color:var(--am)">${lei(qi.reduce((s,i)=>s+(+i.p||0),0))}</b></div>
+    <div class="btns"><button class="btn bp" onclick="sendQ('${b.id}')">${t("send_quote")}</button>
+    <button class="btn bd2" onclick="S.sel=null;qi=[{n:'',p:''}];r()">${t("nvm")}</button></div></div>`;
+}
+window.sendQ=id=>{const items=qi.filter(i=>i.n.trim()&&+i.p>0).map(i=>({n:i.n.trim(),p:+i.p,ok:true}));
+  if(!items.length)return alert(t("need_line"));
+  const b=S.bookings.find(x=>x.id===id);
+  b.quote={items,note:document.getElementById("qn").value,fee:shop(b.shop).fee};
+  b.status="quote_sent";
+  sys(b.shop,`${t("m_q")} ${lei(total(b.quote))} ${t("m_q2")}`);
+  qi=[{n:"",p:""}];S.sel=null;r();};
+function finForm(b){
+  return `<div class="in"><div class="lbl">${t("fin_t")}</div>
+    <label class="lbl">${t("odo")} *</label>
+    <div style="display:flex;gap:7px;align-items:center">
+      <input id="fo" class="mono" inputmode="numeric" placeholder="105400" style="flex:1">
+      <span class="mut">km</span></div>
+    <div class="mut" style="font-size:11.5px;margin:4px 0 10px">${t("odo_req")}${lastOdo(b.car)?` · ${t("odo_low")} ${lastOdo(b.car).toLocaleString("ro-RO")} km`:""}</div>
+    <textarea id="fw" placeholder="${t("ph_work")}">${b.quote?b.quote.items.filter(i=>i.ok).map(i=>i.n).join(", "):""}</textarea>
+    <input id="fc" class="mono" inputmode="numeric" placeholder="${t("ph_cost")}"
+      value="${b.quote?total(b.quote):""}" style="margin-top:8px">
+    <div class="mut" style="font-size:11.5px;margin-top:6px">${t("can_empty")}</div>
+    <div class="btns"><button class="btn bg2" onclick="fin('${b.id}')">${t("conf_fin")}</button>
+    <button class="btn bd2" onclick="S.sel=null;r()">${t("nvm")}</button></div></div>`;
+}
+function lastOdo(car){const pl=(car.split(" · ")[1]||"").trim();
+  const v=S.bookings.filter(b=>b.status==="done"&&b.odo&&b.car.includes(pl)).map(b=>b.odo);
+  return v.length?Math.max(...v):0;}
+window.fin=id=>{const b=S.bookings.find(x=>x.id===id);
+  const o=+document.getElementById("fo").value;
+  if(!o)return alert(t("odo_need"));
+  if(o<100||o>2000000)return alert(t("odo_bad"));
+  const prev=lastOdo(b.car);
+  if(prev&&o<prev)return alert(`${t("odo_low")} ${prev.toLocaleString("ro-RO")} km. ${t("odo_check")}`);
+  if(prev&&o-prev>50000&&!confirm(`${(o-prev).toLocaleString("ro-RO")} ${t("odo_jump")}`))return;
+  b.odo=o;
+  b.work=document.getElementById("fw").value;b.cost=+document.getElementById("fc").value||null;
+  b.status="done";sys(b.shop,t("m_done"));S.sel=null;r();};
+
+function history(){
+  const term=["done","quote_refused","cancelled","declined"];
+  let bs=S.bookings.filter(b=>b.shop===MY&&term.includes(b.status));
+  if(S.q){const q=nrm(S.q);bs=bs.filter(b=>nrm(b.car).includes(q)||nrm(sv(b.svc)).includes(q));}
+  const sum=bs.filter(b=>b.status==="done").reduce((s,b)=>s+(b.cost||0),0);
+  return `<h1>${t("nav_hist")}</h1><div class="sub">${bs.length} ${t("jobs")} · ${lei(sum)} ${t("earned")}</div>
+  <input id="q_hist" placeholder="${t("ph_hist")}" value="${esc(S.q)}"
+    oninput="S.q=this.value;r()" style="margin-bottom:12px">
+  ${bs.length?bs.map(b=>`<div class="card">
+    <div class="row"><div><b>${sv(b.svc)}</b><div class="mut">${dfmt(b.date)}</div></div>
+      ${b.status==="done"?`<span class="mono" style="color:var(--gr)">${lei(b.cost)}</span>`:badge(b.status)}</div>
+    <div class="in"><div class="row"><span>${b.car.split(" · ")[0]}</span>
+      <span class="mono" style="color:var(--am)">${b.car.split(" · ")[1]||""}</span></div>
+      ${b.odo?`<div class="row" style="margin-top:5px"><span class="mut">${t("odo")}</span>
+        <span class="mono">${b.odo.toLocaleString("ro-RO")} km</span></div>`:""}
+      ${b.work?`<div class="mut" style="margin-top:5px">${esc(b.work)}</div>`:""}</div>
+  </div>`).join(""):`<div class="empty">${t("no_hist")}</div>`}
+  ${bs.length?`<button class="btn bd2" onclick="alert(t('dl_hist_n'))">${t("dl_hist")}</button>`:""}`;
+}
+
+function shopReviews(){
+  const rs=S.reviews.filter(v=>v.shop===MY);
+  const avg=rs.length?rs.reduce((s,v)=>s+v.rating,0)/rs.length:0;
+  return `<button class="back" onclick="S.sett=null;r()">‹ ${t("nav_acc")}</button>
+  <h1>${t("revs")}</h1>
+  <div class="card"><div style="display:flex;gap:14px;align-items:center">
+    <b class="dsp" style="font-size:40px;color:var(--am)">${avg.toFixed(1)}</b>
+    <div>${stars(avg)}<div class="mut">${rs.length} ${t("avg")}</div></div></div></div>
+  ${rs.map(v=>`<div class="card ${v.reported?'am':''}">
+    <div class="row"><div style="display:flex;gap:9px;align-items:center">
+      <span class="av" style="width:30px;height:30px;font-size:11px">${ini(v.by)}</span>
+      <div><b style="font-size:13.5px">${v.by}</b><div class="mut">${ago(v.days)}</div></div></div>
+      ${v.reported?`<span class="pill p-am">${t("reported")}</span>`:''}</div>
+    <div style="margin:6px 0">${stars(v.rating)}</div>
+    <div style="font-size:13.5px">${esc(v.text)}</div>
+    ${v.reply?`<div class="in"><div class="lbl" style="margin-bottom:4px">${t("your_reply")}</div>
+      <div style="font-size:13px">${esc(v.reply)}</div></div>`:""}
+    ${S.sel==="rp_"+v.id?`<div class="in"><textarea id="rp">${esc(v.reply||"")}</textarea>
+      <div class="btns"><button class="btn bg2" onclick="doReply('${v.id}')">${t("publish")}</button>
+      <button class="btn bd2" onclick="S.sel=null;r()">${t("nvm")}</button></div></div>`:
+    `<div class="btns" style="margin-top:9px">
+      <button class="btn bd2" onclick="S.sel='rp_${v.id}';r()">${v.reply?t("edit_reply"):t("reply")}</button>
+      ${!v.reported?`<button class="btn br2" onclick="rep('${v.id}')">${t("report")}</button>`:""}</div>`}
+  </div>`).join("")}`;
+}
+window.doReply=id=>{S.reviews.find(v=>v.id===id).reply=document.getElementById("rp").value;S.sel=null;r();};
+window.rep=id=>{if(confirm(t("q_report"))){S.reviews.find(v=>v.id===id).reported=true;r();
+  alert(t("rep_ok"));}};
+
+function reports(){
+  const per=S.per||"all";
+  const lim={month:30,q:90,year:365,all:99999}[per]||99999;
+  const inP=b=>Math.abs(days(b.date))<=lim;
+  const all=S.bookings.filter(b=>b.shop===MY);
+  const done=all.filter(b=>b.status==="done"&&inP(b));
+  const sum=done.reduce((a,b)=>a+(b.cost||0),0);
+  const avg=done.length?Math.round(sum/done.length):0;
+
+  if(done.length<3)return `<button class="back" onclick="S.sett=null;r()">‹ ${t("nav_acc")}</button>
+    <h1>${t("reports")}</h1><div class="empty">${t("rep_empty")}</div>`;
+
+  // pe luni
+  const byM={};
+  done.forEach(b=>{const d=new Date(b.date+"T00:00:00");
+    const k=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0");
+    byM[k]=(byM[k]||0)+(b.cost||0);});
+  const ms=Object.keys(byM).sort().slice(-12);
+  const mx=Math.max(...ms.map(k=>byM[k]),1);
+
+  // pe servicii
+  const byS={};
+  done.forEach(b=>{byS[b.svc]=byS[b.svc]||{n:0,v:0};byS[b.svc].n++;byS[b.svc].v+=(b.cost||0);});
+  const svcs=Object.entries(byS).sort((a,b)=>b[1].v-a[1].v).slice(0,8);
+  const smx=Math.max(...svcs.map(x=>x[1].v),1);
+
+  // clienți (în demo, un singur client — se calculează pe numărul de înmatriculare)
+  const plates={};
+  all.filter(b=>b.status==="done").forEach(b=>{const pl=(b.car.split(" · ")[1]||b.car).trim();
+    plates[pl]=(plates[pl]||0)+1;});
+  const uniq=Object.keys(plates).length;
+  const ret=Object.values(plates).filter(n=>n>1).length;
+  const retPct=uniq?Math.round(ret/uniq*100):0;
+  const perC=uniq?(Object.values(plates).reduce((a,b)=>a+b,0)/uniq).toFixed(1):0;
+
+  // devize
+  const sent=all.filter(b=>b.quote&&["quote_sent","approved","in_progress","done","quote_refused"].includes(b.status));
+  const acc=sent.filter(b=>["approved","in_progress","done"].includes(b.status)).length;
+  const ref=sent.filter(b=>b.status==="quote_refused");
+  const rate=sent.length?Math.round(acc/sent.length*100):0;
+  const fees=ref.reduce((a,b)=>a+(b.cost||0),0);
+
+  // ocupare
+  const dts={};done.forEach(b=>dts[b.date]=(dts[b.date]||0)+1);
+  const nd=Object.keys(dts).length||1;
+  const occ=Math.round((done.length/nd)/shop(MY).cap*100);
+  const wd={};done.forEach(b=>{const d=new Date(b.date+"T00:00:00").getDay();wd[d]=(wd[d]||0)+1;});
+  const busy=Object.entries(wd).sort((a,b)=>b[1]-a[1])[0];
+
+  const chip=(k,l)=>`<button class="chip ${per===k?'on':''}" onclick="S.per='${k}';r()">${l}</button>`;
+
+  return `<button class="back" onclick="S.sett=null;r()">‹ ${t("nav_acc")}</button>
+  <h1>${t("reports")}</h1>
+  <div class="chips">${chip("month",t("per_month"))}${chip("q",t("per_3"))}${chip("year",t("per_year"))}${chip("all",t("per_all"))}</div>
+
+  <div class="grid3" style="margin-bottom:14px">
+    <div class="stat"><b style="color:var(--gr);font-size:20px">${sum.toLocaleString("ro-RO")}</b><span>${t("earned_r")} (lei)</span></div>
+    <div class="stat"><b>${done.length}</b><span>${t("jobs_r")}</span></div>
+    <div class="stat"><b style="color:var(--am);font-size:20px">${avg.toLocaleString("ro-RO")}</b><span>${t("avg_job")}</span></div>
+  </div>
+
+  <h2>${t("rev_month")}</h2>
+  <div class="card">
+    <div style="display:flex;align-items:flex-end;gap:5px;height:120px">
+      ${ms.map(k=>{const h=Math.max(6,byM[k]/mx*100);
+        return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px">
+          <span style="font-size:9.5px;color:var(--mu)" class="mono">${byM[k]>=1000?(byM[k]/1000).toFixed(1)+"k":byM[k]}</span>
+          <div style="width:100%;height:${h}px;background:var(--am);border-radius:4px 4px 0 0"></div>
+          <span style="font-size:9.5px;color:var(--mu)">${MON[L()][+k.slice(5,7)-1]}</span>
+        </div>`;}).join("")}
+    </div>
+  </div>
+
+  <h2>${t("by_svc")}</h2>
+  <div class="card">
+    ${svcs.map(([k,v])=>`<div style="margin-bottom:11px">
+      <div class="row" style="font-size:13px;margin-bottom:4px">
+        <span>${sv(k)} <span class="mut">· ${v.n}</span></span>
+        <span class="mono" style="color:var(--am)">${lei(v.v)}</span></div>
+      <div style="height:6px;background:var(--s2);border-radius:3px;overflow:hidden">
+        <div style="width:${v.v/smx*100}%;height:100%;background:var(--am)"></div></div>
+    </div>`).join("")}
+  </div>
+
+  <h2>${t("clients_t")}</h2>
+  <div class="card">
+    <div class="row"><span class="mut">${t("uniq")}</span><b class="mono">${uniq}</b></div>
+    <div class="row" style="margin-top:9px;padding-top:9px;border-top:1px solid var(--bd)">
+      <span class="mut">${t("returning")}</span>
+      <b class="mono" style="color:${retPct>=30?'var(--gr)':'var(--am)'}">${ret} · ${retPct}%</b></div>
+    <div class="row" style="margin-top:9px;padding-top:9px;border-top:1px solid var(--bd)">
+      <span class="mut">${t("per_client")}</span><b class="mono">${perC}</b></div>
+  </div>
+
+  <h2>${t("quotes_t")}</h2>
+  <div class="card">
+    <div class="row"><span class="mut">${t("acc_rate")}</span>
+      <b class="mono" style="color:${rate>=70?'var(--gr)':'var(--rd)'}">${rate}%</b></div>
+    <div style="height:7px;background:var(--s2);border-radius:4px;overflow:hidden;margin-top:7px">
+      <div style="width:${rate}%;height:100%;background:${rate>=70?'var(--gr)':'var(--rd)'}"></div></div>
+    <div class="row" style="margin-top:11px;padding-top:9px;border-top:1px solid var(--bd)">
+      <span class="mut">${t("refused")}</span><b class="mono">${ref.length}</b></div>
+    ${fees?`<div class="row" style="margin-top:7px"><span class="mut">${t("fees_in")}</span>
+      <b class="mono">${lei(fees)}</b></div>`:""}
+    ${rate<70?`<div class="mut" style="font-size:11.5px;margin-top:9px">${t("acc_low")}</div>`:""}
+  </div>
+
+  <h2>${t("occup")}</h2>
+  <div class="card">
+    <div class="row"><span class="mut">${occ}% ${t("of_cap")}</span>
+      <b class="mono">${(done.length/nd).toFixed(1)} / ${shop(MY).cap}</b></div>
+    <div style="height:7px;background:var(--s2);border-radius:4px;overflow:hidden;margin-top:7px">
+      <div style="width:${Math.min(100,occ)}%;height:100%;background:var(--bl)"></div></div>
+    ${busy?`<div class="row" style="margin-top:11px;padding-top:9px;border-top:1px solid var(--bd)">
+      <span class="mut">${t("busiest")}</span><b>${DAY[L()][+busy[0]]}</b></div>`:""}
+  </div>
+
+  <button class="btn bd2" onclick="alert(t('dl_hist_n'))">${t("exp_csv")}</button>`;
+}
+function settings(){
+  const s=shop(MY);
+  return `<button class="back" onclick="S.sett=null;r()">‹ ${t("nav_acc")}</button>
+  <h1>${t("set_t")}</h1>
+  <div class="lbl" style="margin-top:4px">${t("pub_data")}</div>
+  <div class="mut" style="font-size:11.5px;margin-bottom:9px">${t("pub_n")}</div>
+  <label class="lbl">${t("name_")}</label><input value="${esc(s.name)}" onchange="shop('${MY}').name=this.value;save()">
+  <label class="lbl" style="margin-top:11px">${t("street")}</label><input value="${esc(s.street||s.addr)}" onchange="shop('${MY}').street=this.value;save()">
+  <div class="grid2" style="margin-top:11px">
+    <div><label class="lbl">${t("city_")}</label><input value="${esc(s.city)}" onchange="shop('${MY}').city=this.value;save()"></div>
+    <div><label class="lbl">${t("county")}</label><input value="${esc(s.county||'')}" onchange="shop('${MY}').county=this.value;save()"></div>
+  </div>
+  <div class="grid2" style="margin-top:11px">
+    <div><label class="lbl">${t("zip")}</label><input class="mono" inputmode="numeric" value="${esc(s.zip||'')}"
+      onchange="setZip(this.value)"></div>
+    <div><label class="lbl">${t("phone")}</label><input value="${esc(s.phone)}" onchange="shop('${MY}').phone=this.value;save()"></div>
+  </div>
+  <label class="lbl" style="margin-top:11px">${t("web")}</label><input value="${esc(s.web||'')}" onchange="shop('${MY}').web=this.value;save()">
+  <label class="lbl" style="margin-top:11px">${t("descr")}</label><textarea onchange="shop('${MY}').desc=this.value;save()">${esc(s.desc||'')}</textarea>
+
+  <div class="card" style="margin-top:16px;border-color:rgba(90,169,255,.3)">
+    <div class="lbl">${t("fisc")}</div>
+    <div class="mut" style="font-size:11.5px;margin-bottom:11px">${t("fisc_n")}</div>
+    <label class="lbl">${t("legal_name")}</label><input value="${esc(s.legalName||'')}" onchange="shop('${MY}').legalName=this.value;save()">
+    <div class="grid2" style="margin-top:11px">
+      <div><label class="lbl">${t("cui")}</label><input class="mono" value="${esc(s.cui||'')}" onchange="setCui(this.value)"></div>
+      <div><label class="lbl">${t("regcom")}</label><input class="mono" value="${esc(s.regcom||'')}" onchange="shop('${MY}').regcom=this.value;save()"></div>
+    </div>
+    <label class="lbl" style="margin-top:11px">${t("legal_addr")}</label>
+    <input value="${esc(s.legalAddr||'')}" onchange="shop('${MY}').legalAddr=this.value;save()">
+    <button class="btn bd2" style="font-size:12px;padding:7px;margin-top:6px" onclick="copyAddr()">${t("copy_addr")}</button>
+    <div class="row" style="margin-top:13px"><span>${t("vat_payer")}</span>
+      <span><button class="chip ${s.vatPayer?'on':''}" onclick="setVat(true)">${t("yes")}</button>
+      <button class="chip ${!s.vatPayer?'on':''}" onclick="setVat(false)">${t("no")}</button></span></div>
+    <div class="grid2" style="margin-top:11px">
+      <div><label class="lbl">${t("bank")}</label><input value="${esc(s.bank||'')}" onchange="shop('${MY}').bank=this.value;save()"></div>
+      <div><label class="lbl">${t("legal_rep")}</label><input value="${esc(s.legalRep||'')}" onchange="shop('${MY}').legalRep=this.value;save()"></div>
+    </div>
+    <label class="lbl" style="margin-top:11px">${t("iban")}</label>
+    <input class="mono" value="${esc(s.iban||'')}" onchange="setIban(this.value)">
+    <label class="lbl" style="margin-top:11px">${t("bill_mail")}</label>
+    <input value="${esc(s.billMail||'')}" onchange="shop('${MY}').billMail=this.value;save()">
+    <div class="mut" style="font-size:11.5px;margin-top:11px">${t("fisc_later")}</div>
+  </div>
+  <div class="card" style="margin-top:14px">
+    <div class="row"><span>${t("opens")}</span>
+      <span><button onclick="chg('open',-1)" class="chip">−</button>
+      <b class="mono" style="padding:0 9px">${s.open}:00</b>
+      <button onclick="chg('open',1)" class="chip">+</button></span></div>
+    <div class="row" style="margin-top:9px"><span>${t("closes")}</span>
+      <span><button onclick="chg('close',-1)" class="chip">−</button>
+      <b class="mono" style="padding:0 9px">${s.close}:00</b>
+      <button onclick="chg('close',1)" class="chip">+</button></span></div>
+  </div>
+  <div class="card">
+    <div class="lbl">${t("cap")}</div>
+    <div class="mut" style="font-size:11.5px;margin-bottom:9px">${t("cap_n")}</div>
+    <div class="row"><button onclick="chg('cap',-1)" class="chip">−</button>
+      <b class="mono" style="font-size:19px">${s.cap}</b>
+      <button onclick="chg('cap',1)" class="chip">+</button></div>
+  </div>
+  <div class="card">
+    <div class="lbl">${t("fee")}</div>
+    <div class="mut" style="font-size:11.5px;margin-bottom:9px">${t("fee_n2")}</div>
+    <input class="mono" inputmode="numeric" value="${s.fee}" onchange="shop('${MY}').fee=+this.value||0;save();r()">
+  </div>
+  <div class="lbl" style="margin-top:16px">${t("svc_off")} · ${s.svc.length} ${t("selected")}</div>
+  ${Object.entries(CATM).map(([c,ids])=>`<div class="lbl" style="margin-top:12px;color:var(--mu)">${cn(c)}</div>
+    ${ids.map(i=>`<button class="card" style="width:100%;display:flex;gap:10px;align-items:center;text-align:left"
+      onclick="tsvc('${i}')"><span class="chk ${s.svc.includes(i)?'on':''}"></span>${sv(i)}</button>`).join("")}`).join("")}`;
+}
+function cuiOK(v){v=(v||"").toUpperCase().replace(/^RO/,"").replace(/\D/g,"");
+  if(v.length<2||v.length>10)return false;
+  const ctrl=+v.slice(-1);const body=v.slice(0,-1);
+  const K="753217532";const k=K.slice(K.length-body.length);
+  let sum=0;for(let i=0;i<body.length;i++)sum+=(+body[i])*(+k[i]);
+  let rest=(sum*10)%11; if(rest===10)rest=0;
+  return rest===ctrl;}
+function ibanOK(v){v=(v||"").toUpperCase().replace(/\s/g,"");
+  if(!/^RO[0-9]{2}[A-Z0-9]{20}$/.test(v))return false;
+  const r=v.slice(4)+v.slice(0,4);
+  let n="";for(const c of r)n+=/[A-Z]/.test(c)?(c.charCodeAt(0)-55):c;
+  let m=0;for(const c of n)m=(m*10+ +c)%97;
+  return m===1;}
+window.setCui=v=>{if(v&&!cuiOK(v))return alert(t("bad_cui"));shop(MY).cui=v.toUpperCase();save();r();};
+window.setIban=v=>{if(v&&!ibanOK(v))return alert(t("bad_iban"));shop(MY).iban=v.toUpperCase().replace(/\s/g,"");save();r();};
+window.setZip=v=>{if(v&&!/^[0-9]{6}$/.test(v))return alert(t("bad_zip"));shop(MY).zip=v;save();r();};
+window.setVat=b=>{shop(MY).vatPayer=b;save();r();};
+window.copyAddr=()=>{const s=shop(MY);s.legalAddr=`${s.street||s.addr}, ${s.city}`;save();r();};
+window.chg=(k,d)=>{const s=shop(MY);s[k]=Math.max(k==="cap"?1:0,s[k]+d);save();r();};
+window.tsvc=i=>{const s=shop(MY);s.svc=s.svc.includes(i)?s.svc.filter(x=>x!==i):[...s.svc,i];save();r();};
+
+/* ============ COMUN ============ */
+function threads(){
+  const ids=Object.keys(S.msgs).filter(k=>S.msgs[k].length);
+  if(!ids.length)return `<h1>${t("nav_msg")}</h1><div class="empty">${t("no_conv")}</div>`;
+  return `<h1>${t("nav_msg")}</h1>
+  ${ids.map(id=>{const m=S.msgs[id],last=m[m.length-1],s=shop(id);
+    const nm=S.role==="shop"?"Eduard L.":s.name;
+    return `<button class="card" style="width:100%;text-align:left" onclick="S.thread='${id}';r()">
+     <div style="display:flex;gap:11px;align-items:center">
+      <span class="av">${ini(nm)}</span>
+      <div style="min-width:0;flex:1"><b>${nm}</b>
+      <div class="mut" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(last.b)}</div></div>
+     </div></button>`;}).join("")}`;
+}
+function chat(id){
+  const s=shop(id),nm=S.role==="shop"?"Eduard L.":s.name;
+  const ms=S.msgs[id]||[];
+  return `<button class="back" onclick="S.thread=null;r()">‹ ${t("nav_msg")}</button>
+  <div style="display:flex;gap:10px;align-items:center;margin-bottom:14px">
+    <span class="av">${ini(nm)}</span><b>${nm}</b></div>
+  ${ms.map(m=>{
+    if(m.f==="sys")return `<div class="msg sys">${esc(m.b)}<em>${t("auto_msg")}</em></div>`;
+    const mine=(S.role==="shop")===(m.f==="shop");
+    return `<div class="msg ${mine?'me':'you'}">${esc(m.b)}</div>`;}).join("")}
+  <div style="display:flex;gap:7px;margin-top:14px">
+    <input id="mi" placeholder="${t("ph_msg")}" onkeydown="if(event.key==='Enter')snd('${id}')">
+    <button class="btn bp" style="width:52px;margin:0;padding:11px" onclick="snd('${id}')">→</button>
+  </div>`;
+}
+window.snd=id=>{const i=document.getElementById("mi");if(!i.value.trim())return;
+  (S.msgs[id]=S.msgs[id]||[]).push({f:S.role==="shop"?"shop":"me",b:i.value.trim(),m:0});r();};
+
+function account(){
+  const isShop=S.role==="shop";
+  return `<h1>${t("nav_acc")}</h1><div class="sub">${isShop?t("acc_shop"):t("acc_client")}</div>
+  <div class="card"><div style="display:flex;gap:12px;align-items:center">
+    <span class="av" style="width:46px;height:46px;font-size:15px">${isShop?"AD":"EL"}</span>
+    <div><b>${isShop?shop(MY).name:"Eduard Lengyel"}</b>
+    <div class="mono mut">${isShop?shop(MY).phone:"0723 375 248"}</div>
+    <div class="mut" style="font-size:11.5px">${t("acc_id")}: <span class="mono">${isShop?"S-00001":"C-00001"}</span></div></div>
+  </div></div>
+  <div class="card"><div class="row"><span>${t("lang")}</span>
+    <span><button class="chip ${S.lang!=="en"?"on":""}" onclick="setLang('ro')">RO</button> <button class="chip ${S.lang==="en"?"on":""}" onclick="setLang('en')">EN</button></span></div></div>
+  ${isShop?`
+   <button class="card" style="width:100%;text-align:left" onclick="S.sett='set';r()">
+     <div class="row"><span>${t("set_t")}</span><span class="mut">›</span></div></button>
+   <button class="card" style="width:100%;text-align:left" onclick="S.sett='rev';r()">
+     <div class="row"><span>${t("revs")}</span><span class="mut">›</span></div></button>
+   <button class="card" style="width:100%;text-align:left" onclick="S.sett='rep';r()">
+     <div class="row"><span>${t("reports")}</span><span class="mut">›</span></div></button>
+   <div class="card"><div class="row"><span>${t("subs")}</span>
+     <span class="pill p-am">${t("trial")}</span></div>
+     <div class="mut" style="margin-top:6px;font-size:12px">${t("subs_n")}</div></div>`:""}
+  ${!isShop?`<button class="card" style="width:100%;text-align:left" onclick="S.sett='pickcar';r()">
+    <div class="row"><span>${t("my_hist")}</span><span class="mut">›</span></div></button>
+  <button class="card" style="width:100%;text-align:left" onclick="alert(t('rep_demo'))">
+    <div class="row"><span>${t("my_reports")}</span><span class="mut">›</span></div></button>`:""}
+  <div class="lbl" style="margin-top:18px">${t("legal")}</div>
+  ${[t("d1"),t("d2"),t("d3")].map(d=>
+    `<button class="card" style="width:100%;text-align:left" onclick="alert(t('legal_n'))">
+      <div class="row"><span>${d}</span><span class="mut">›</span></div></button>`).join("")}
+  <div class="lbl" style="margin-top:18px">${t("my_data")}</div>
+  <button class="btn bd2" onclick="alert(t('dl_data_n'))">${t("dl_data")}</button>
+  <div class="note" style="margin-top:20px">
+    <b>${t("demo_t")}</b> ${t("demo_n")}</div>
+  <button class="btn br2" onclick="if(confirm(t('q_reset')))reset()">${t("reset")}</button>`;
+}
+
+window.setLang=l=>{S.lang=l;document.documentElement.lang=l;r();};
+if(!S.role){S.role="client";S.nav="search";}
+if(!S.lang)S.lang="ro";
+r();
+</script>
+</body>
+</html>

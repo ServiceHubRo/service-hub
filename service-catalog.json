@@ -1,0 +1,1152 @@
+{
+ "version": "1.1",
+ "categories": [
+  {
+   "key": "cat_rev",
+   "ro": "Revizii & Întreținere",
+   "en": "Service & Maintenance"
+  },
+  {
+   "key": "cat_mot",
+   "ro": "Motor",
+   "en": "Engine"
+  },
+  {
+   "key": "cat_tra",
+   "ro": "Transmisie & Ambreiaj",
+   "en": "Transmission & Clutch"
+  },
+  {
+   "key": "cat_fra",
+   "ro": "Frânare",
+   "en": "Braking"
+  },
+  {
+   "key": "cat_sus",
+   "ro": "Suspensie & Direcție",
+   "en": "Suspension & Steering"
+  },
+  {
+   "key": "cat_esa",
+   "ro": "Evacuare & Emisii",
+   "en": "Exhaust & Emissions"
+  },
+  {
+   "key": "cat_rac",
+   "ro": "Răcire & Alimentare",
+   "en": "Cooling & Fuel"
+  },
+  {
+   "key": "cat_ele",
+   "ro": "Electrică & Diagnoză",
+   "en": "Electrical & Diagnostics"
+  },
+  {
+   "key": "cat_cli",
+   "ro": "Climatizare",
+   "en": "Air Conditioning"
+  },
+  {
+   "key": "cat_anv",
+   "ro": "Anvelope & Jante",
+   "en": "Tires & Wheels"
+  },
+  {
+   "key": "cat_geo",
+   "ro": "Geometrie & Punte",
+   "en": "Alignment"
+  },
+  {
+   "key": "cat_itp",
+   "ro": "ITP & Verificări",
+   "en": "Inspection & Checks"
+  },
+  {
+   "key": "cat_car",
+   "ro": "Caroserie & Vopsitorie",
+   "en": "Body & Paint"
+  },
+  {
+   "key": "cat_det",
+   "ro": "Detailing & Protecție",
+   "en": "Detailing & Protection"
+  },
+  {
+   "key": "cat_gea",
+   "ro": "Geamuri & Optică",
+   "en": "Glass & Lighting"
+  },
+  {
+   "key": "cat_gpl",
+   "ro": "GPL & Alternative",
+   "en": "LPG & Alternative Fuels"
+  },
+  {
+   "key": "cat_ev",
+   "ro": "Electrice & Hibride",
+   "en": "EV & Hybrid"
+  },
+  {
+   "key": "cat_mob",
+   "ro": "Mobil & Asistență",
+   "en": "Mobile & Assistance"
+  },
+  {
+   "key": "cat_alt",
+   "ro": "Diverse",
+   "en": "Other"
+  }
+ ],
+ "services": [
+  {
+   "id": "ulei",
+   "category": "cat_rev",
+   "icon": "Droplet",
+   "ro": "Schimb ulei + filtru ulei",
+   "en": "Oil & oil filter change"
+  },
+  {
+   "id": "revizie",
+   "category": "cat_rev",
+   "icon": "Wrench",
+   "ro": "Revizie completă",
+   "en": "Full service"
+  },
+  {
+   "id": "filtru_aer",
+   "category": "cat_rev",
+   "icon": "Filter",
+   "ro": "Filtru de aer",
+   "en": "Air filter"
+  },
+  {
+   "id": "filtru_polen",
+   "category": "cat_rev",
+   "icon": "Filter",
+   "ro": "Filtru polen / habitaclu",
+   "en": "Cabin air filter"
+  },
+  {
+   "id": "filtru_comb",
+   "category": "cat_rev",
+   "icon": "Filter",
+   "ro": "Filtru combustibil",
+   "en": "Fuel filter"
+  },
+  {
+   "id": "bujii",
+   "category": "cat_rev",
+   "icon": "Zap",
+   "ro": "Schimb bujii",
+   "en": "Spark plugs"
+  },
+  {
+   "id": "bujii_incand",
+   "category": "cat_rev",
+   "icon": "Flame",
+   "ro": "Bujii incandescente (diesel)",
+   "en": "Glow plugs (diesel)"
+  },
+  {
+   "id": "stergatoare",
+   "category": "cat_rev",
+   "icon": "Waves",
+   "ro": "Lamele ștergătoare",
+   "en": "Wiper blades"
+  },
+  {
+   "id": "lichid_frana",
+   "category": "cat_rev",
+   "icon": "Droplet",
+   "ro": "Schimb lichid de frână",
+   "en": "Brake fluid change"
+  },
+  {
+   "id": "antigel",
+   "category": "cat_rev",
+   "icon": "Snowflake",
+   "ro": "Schimb antigel",
+   "en": "Coolant change"
+  },
+  {
+   "id": "pregatire_iarna",
+   "category": "cat_rev",
+   "icon": "Snowflake",
+   "ro": "Pregătire de iarnă",
+   "en": "Winter preparation"
+  },
+  {
+   "id": "distributie",
+   "category": "cat_mot",
+   "icon": "Cog",
+   "ro": "Kit distribuție (curea)",
+   "en": "Timing belt kit"
+  },
+  {
+   "id": "distributie_lant",
+   "category": "cat_mot",
+   "icon": "Cog",
+   "ro": "Lanț de distribuție",
+   "en": "Timing chain"
+  },
+  {
+   "id": "curea_accesorii",
+   "category": "cat_mot",
+   "icon": "Cog",
+   "ro": "Curea accesorii + role",
+   "en": "Serpentine belt & pulleys"
+  },
+  {
+   "id": "garnitura_chiuloasa",
+   "category": "cat_mot",
+   "icon": "Settings2",
+   "ro": "Garnitură chiulasă",
+   "en": "Head gasket"
+  },
+  {
+   "id": "chiuloasa_planare",
+   "category": "cat_mot",
+   "icon": "Settings2",
+   "ro": "Planare / recondiționare chiulasă",
+   "en": "Cylinder head reconditioning"
+  },
+  {
+   "id": "segmenti",
+   "category": "cat_mot",
+   "icon": "Settings2",
+   "ro": "Segmenți / pistoane",
+   "en": "Piston rings / pistons"
+  },
+  {
+   "id": "turbina",
+   "category": "cat_mot",
+   "icon": "Wind",
+   "ro": "Turbină — schimb / reparație",
+   "en": "Turbocharger — replace / repair"
+  },
+  {
+   "id": "injectoare",
+   "category": "cat_mot",
+   "icon": "Droplet",
+   "ro": "Injectoare — test / curățare / schimb",
+   "en": "Injectors — test / clean / replace"
+  },
+  {
+   "id": "pompa_inalta",
+   "category": "cat_mot",
+   "icon": "Gauge",
+   "ro": "Pompă de înaltă presiune",
+   "en": "High-pressure fuel pump"
+  },
+  {
+   "id": "pompa_ulei",
+   "category": "cat_mot",
+   "icon": "Droplet",
+   "ro": "Pompă de ulei",
+   "en": "Oil pump"
+  },
+  {
+   "id": "motor_complet",
+   "category": "cat_mot",
+   "icon": "Settings2",
+   "ro": "Înlocuire motor complet",
+   "en": "Full engine replacement"
+  },
+  {
+   "id": "decarbonizare",
+   "category": "cat_mot",
+   "icon": "Sparkles",
+   "ro": "Decarbonizare motor",
+   "en": "Engine carbon cleaning"
+  },
+  {
+   "id": "egr",
+   "category": "cat_mot",
+   "icon": "Wind",
+   "ro": "Curățare / schimb EGR",
+   "en": "EGR clean / replace"
+  },
+  {
+   "id": "dpf",
+   "category": "cat_mot",
+   "icon": "Filter",
+   "ro": "Curățare / schimb DPF-FAP",
+   "en": "DPF/FAP clean / replace"
+  },
+  {
+   "id": "adblue",
+   "category": "cat_mot",
+   "icon": "Droplet",
+   "ro": "Sistem AdBlue / SCR",
+   "en": "AdBlue / SCR system"
+  },
+  {
+   "id": "simeringuri",
+   "category": "cat_mot",
+   "icon": "Droplet",
+   "ro": "Simeringuri / scurgeri ulei",
+   "en": "Oil seals / leaks"
+  },
+  {
+   "id": "ambreiaj",
+   "category": "cat_tra",
+   "icon": "Disc",
+   "ro": "Kit ambreiaj",
+   "en": "Clutch kit"
+  },
+  {
+   "id": "volanta",
+   "category": "cat_tra",
+   "icon": "Disc",
+   "ro": "Volantă (masă dublă)",
+   "en": "Dual-mass flywheel"
+  },
+  {
+   "id": "cutie_manuala",
+   "category": "cat_tra",
+   "icon": "Cog",
+   "ro": "Cutie de viteze manuală — reparație",
+   "en": "Manual transmission repair"
+  },
+  {
+   "id": "cutie_auto",
+   "category": "cat_tra",
+   "icon": "Cog",
+   "ro": "Cutie automată — reparație",
+   "en": "Automatic transmission repair"
+  },
+  {
+   "id": "ulei_cutie",
+   "category": "cat_tra",
+   "icon": "Droplet",
+   "ro": "Schimb ulei cutie de viteze",
+   "en": "Transmission fluid change"
+  },
+  {
+   "id": "dsg_service",
+   "category": "cat_tra",
+   "icon": "Cog",
+   "ro": "Service DSG / mecatronic",
+   "en": "DSG / mechatronic service"
+  },
+  {
+   "id": "planetare",
+   "category": "cat_tra",
+   "icon": "Move",
+   "ro": "Planetare / burdufuri",
+   "en": "CV axles / CV boots"
+  },
+  {
+   "id": "cardan",
+   "category": "cat_tra",
+   "icon": "Move",
+   "ro": "Cardan / cruce cardanică",
+   "en": "Driveshaft / U-joint"
+  },
+  {
+   "id": "diferential",
+   "category": "cat_tra",
+   "icon": "Cog",
+   "ro": "Diferențial / punte spate",
+   "en": "Differential / rear axle"
+  },
+  {
+   "id": "cutie_transfer",
+   "category": "cat_tra",
+   "icon": "Cog",
+   "ro": "Cutie de transfer 4x4",
+   "en": "4x4 transfer case"
+  },
+  {
+   "id": "frane",
+   "category": "cat_fra",
+   "icon": "Disc",
+   "ro": "Plăcuțe de frână",
+   "en": "Brake pads"
+  },
+  {
+   "id": "discuri",
+   "category": "cat_fra",
+   "icon": "Disc",
+   "ro": "Discuri de frână",
+   "en": "Brake discs"
+  },
+  {
+   "id": "etriere",
+   "category": "cat_fra",
+   "icon": "Disc",
+   "ro": "Etriere — reparație / schimb",
+   "en": "Calipers — repair / replace"
+  },
+  {
+   "id": "tamburi",
+   "category": "cat_fra",
+   "icon": "Disc",
+   "ro": "Saboți / tamburi",
+   "en": "Brake shoes / drums"
+  },
+  {
+   "id": "frana_mana",
+   "category": "cat_fra",
+   "icon": "Disc",
+   "ro": "Frână de mână / electrică",
+   "en": "Parking brake (manual / electric)"
+  },
+  {
+   "id": "abs",
+   "category": "cat_fra",
+   "icon": "ScanLine",
+   "ro": "Sistem ABS / ESP — diagnoză",
+   "en": "ABS / ESP diagnostics"
+  },
+  {
+   "id": "conducte_frana",
+   "category": "cat_fra",
+   "icon": "Waves",
+   "ro": "Conducte și furtunuri de frână",
+   "en": "Brake lines & hoses"
+  },
+  {
+   "id": "aerisire_frane",
+   "category": "cat_fra",
+   "icon": "Droplet",
+   "ro": "Aerisire sistem de frânare",
+   "en": "Brake bleeding"
+  },
+  {
+   "id": "suspensie",
+   "category": "cat_sus",
+   "icon": "Wrench",
+   "ro": "Amortizoare",
+   "en": "Shock absorbers"
+  },
+  {
+   "id": "arcuri",
+   "category": "cat_sus",
+   "icon": "Wrench",
+   "ro": "Arcuri / spirale",
+   "en": "Springs"
+  },
+  {
+   "id": "bascule",
+   "category": "cat_sus",
+   "icon": "Wrench",
+   "ro": "Bascule / brațe",
+   "en": "Control arms"
+  },
+  {
+   "id": "bieletele",
+   "category": "cat_sus",
+   "icon": "Wrench",
+   "ro": "Bieletele / bare stabilizatoare",
+   "en": "Sway bar links / sway bars"
+  },
+  {
+   "id": "rulmenti",
+   "category": "cat_sus",
+   "icon": "CircleDot",
+   "ro": "Rulmenți roată",
+   "en": "Wheel bearings"
+  },
+  {
+   "id": "caseta_directie",
+   "category": "cat_sus",
+   "icon": "Compass",
+   "ro": "Casetă de direcție",
+   "en": "Steering rack"
+  },
+  {
+   "id": "servodirectie",
+   "category": "cat_sus",
+   "icon": "Compass",
+   "ro": "Servodirecție / pompă servo",
+   "en": "Power steering / pump"
+  },
+  {
+   "id": "capete_bara",
+   "category": "cat_sus",
+   "icon": "Wrench",
+   "ro": "Capete de bară",
+   "en": "Tie rod ends"
+  },
+  {
+   "id": "perne_aer",
+   "category": "cat_sus",
+   "icon": "Wind",
+   "ro": "Suspensie pneumatică",
+   "en": "Air suspension"
+  },
+  {
+   "id": "flanse",
+   "category": "cat_sus",
+   "icon": "Package",
+   "ro": "Flanșe / tampoane motor",
+   "en": "Engine mounts"
+  },
+  {
+   "id": "esapament",
+   "category": "cat_esa",
+   "icon": "Wind",
+   "ro": "Tobă / sistem de evacuare",
+   "en": "Muffler / exhaust system"
+  },
+  {
+   "id": "catalizator",
+   "category": "cat_esa",
+   "icon": "Filter",
+   "ro": "Catalizator",
+   "en": "Catalytic converter"
+  },
+  {
+   "id": "sonda_lambda",
+   "category": "cat_esa",
+   "icon": "ScanLine",
+   "ro": "Sondă lambda",
+   "en": "Oxygen (O2) sensor"
+  },
+  {
+   "id": "galerie_evacuare",
+   "category": "cat_esa",
+   "icon": "Wind",
+   "ro": "Galerie de evacuare",
+   "en": "Exhaust manifold"
+  },
+  {
+   "id": "test_emisii",
+   "category": "cat_esa",
+   "icon": "ClipboardCheck",
+   "ro": "Test de noxe",
+   "en": "Emissions test"
+  },
+  {
+   "id": "radiator",
+   "category": "cat_rac",
+   "icon": "Thermometer",
+   "ro": "Radiator răcire",
+   "en": "Radiator"
+  },
+  {
+   "id": "pompa_apa",
+   "category": "cat_rac",
+   "icon": "Droplet",
+   "ro": "Pompă de apă",
+   "en": "Water pump"
+  },
+  {
+   "id": "termostat",
+   "category": "cat_rac",
+   "icon": "Thermometer",
+   "ro": "Termostat",
+   "en": "Thermostat"
+  },
+  {
+   "id": "ventilator",
+   "category": "cat_rac",
+   "icon": "Wind",
+   "ro": "Ventilator / electroventilator",
+   "en": "Cooling fan"
+  },
+  {
+   "id": "intercooler",
+   "category": "cat_rac",
+   "icon": "Wind",
+   "ro": "Intercooler",
+   "en": "Intercooler"
+  },
+  {
+   "id": "rezervor",
+   "category": "cat_rac",
+   "icon": "Fuel",
+   "ro": "Rezervor / pompă de benzină",
+   "en": "Fuel tank / fuel pump"
+  },
+  {
+   "id": "alimentare_gresita",
+   "category": "cat_rac",
+   "icon": "Fuel",
+   "ro": "Alimentare greșită — golire rezervor",
+   "en": "Wrong fuel — tank drain"
+  },
+  {
+   "id": "furtunuri",
+   "category": "cat_rac",
+   "icon": "Waves",
+   "ro": "Furtunuri și conducte",
+   "en": "Hoses & pipes"
+  },
+  {
+   "id": "diag",
+   "category": "cat_ele",
+   "icon": "ScanLine",
+   "ro": "Diagnoză computerizată",
+   "en": "Computer diagnostics"
+  },
+  {
+   "id": "stergere_erori",
+   "category": "cat_ele",
+   "icon": "ScanLine",
+   "ro": "Citire / ștergere erori",
+   "en": "Fault code read / clear"
+  },
+  {
+   "id": "electrica",
+   "category": "cat_ele",
+   "icon": "Zap",
+   "ro": "Electrică auto generală",
+   "en": "General auto electrics"
+  },
+  {
+   "id": "baterie",
+   "category": "cat_ele",
+   "icon": "Battery",
+   "ro": "Baterie — test / înlocuire",
+   "en": "Battery — test / replace"
+  },
+  {
+   "id": "alternator",
+   "category": "cat_ele",
+   "icon": "BatteryCharging",
+   "ro": "Alternator",
+   "en": "Alternator"
+  },
+  {
+   "id": "electromotor",
+   "category": "cat_ele",
+   "icon": "Zap",
+   "ro": "Electromotor",
+   "en": "Starter motor"
+  },
+  {
+   "id": "instalatie",
+   "category": "cat_ele",
+   "icon": "Zap",
+   "ro": "Instalație electrică / cablaje",
+   "en": "Wiring / harness"
+  },
+  {
+   "id": "senzori",
+   "category": "cat_ele",
+   "icon": "Activity",
+   "ro": "Senzori (ABS, turație, parcare)",
+   "en": "Sensors (ABS, speed, parking)"
+  },
+  {
+   "id": "calculator",
+   "category": "cat_ele",
+   "icon": "Settings2",
+   "ro": "Calculator motor (ECU)",
+   "en": "Engine ECU"
+  },
+  {
+   "id": "imobilizator",
+   "category": "cat_ele",
+   "icon": "Key",
+   "ro": "Imobilizator / chei",
+   "en": "Immobilizer / keys"
+  },
+  {
+   "id": "alarma",
+   "category": "cat_ele",
+   "icon": "Shield",
+   "ro": "Alarmă / închidere centralizată",
+   "en": "Alarm / central locking"
+  },
+  {
+   "id": "audio",
+   "category": "cat_ele",
+   "icon": "Volume2",
+   "ro": "Sistem audio / multimedia",
+   "en": "Audio / multimedia system"
+  },
+  {
+   "id": "camera_mers",
+   "category": "cat_ele",
+   "icon": "Radio",
+   "ro": "Cameră marșarier / senzori parcare",
+   "en": "Backup camera / parking sensors"
+  },
+  {
+   "id": "incarcare_soft",
+   "category": "cat_ele",
+   "icon": "ScanLine",
+   "ro": "Actualizare software / codări",
+   "en": "Software update / coding"
+  },
+  {
+   "id": "clima",
+   "category": "cat_cli",
+   "icon": "Snowflake",
+   "ro": "Încărcare climatizare",
+   "en": "A/C recharge"
+  },
+  {
+   "id": "clima_ig",
+   "category": "cat_cli",
+   "icon": "Wind",
+   "ro": "Igienizare climatizare",
+   "en": "A/C sanitizing"
+  },
+  {
+   "id": "clima_diag",
+   "category": "cat_cli",
+   "icon": "ScanLine",
+   "ro": "Diagnoză / detectare scurgeri",
+   "en": "Leak detection & diagnostics"
+  },
+  {
+   "id": "compresor_clima",
+   "category": "cat_cli",
+   "icon": "Snowflake",
+   "ro": "Compresor de climă",
+   "en": "A/C compressor"
+  },
+  {
+   "id": "radiator_clima",
+   "category": "cat_cli",
+   "icon": "Thermometer",
+   "ro": "Radiator / condensator climă",
+   "en": "A/C condenser"
+  },
+  {
+   "id": "incalzire",
+   "category": "cat_cli",
+   "icon": "Flame",
+   "ro": "Sistem de încălzire / habitaclu",
+   "en": "Heating system"
+  },
+  {
+   "id": "webasto",
+   "category": "cat_cli",
+   "icon": "Flame",
+   "ro": "Încălzire staționară (Webasto)",
+   "en": "Auxiliary heater (Webasto)"
+  },
+  {
+   "id": "anvelope",
+   "category": "cat_anv",
+   "icon": "CircleDot",
+   "ro": "Montaj + echilibrare anvelope",
+   "en": "Tire mounting & balancing"
+  },
+  {
+   "id": "vulcanizare",
+   "category": "cat_anv",
+   "icon": "CircleDot",
+   "ro": "Vulcanizare / reparație pană",
+   "en": "Puncture repair"
+  },
+  {
+   "id": "hotel",
+   "category": "cat_anv",
+   "icon": "Package",
+   "ro": "Hotel anvelope",
+   "en": "Tire storage"
+  },
+  {
+   "id": "jante",
+   "category": "cat_anv",
+   "icon": "CircleDot",
+   "ro": "Reparație / îndreptare jante",
+   "en": "Wheel refurbishment / straightening"
+  },
+  {
+   "id": "senzori_tpms",
+   "category": "cat_anv",
+   "icon": "Gauge",
+   "ro": "Senzori presiune (TPMS)",
+   "en": "TPMS sensors"
+  },
+  {
+   "id": "roata_rezerva",
+   "category": "cat_anv",
+   "icon": "LifeBuoy",
+   "ro": "Roată de rezervă / kit pană",
+   "en": "Spare tire / tire repair kit"
+  },
+  {
+   "id": "geometrie",
+   "category": "cat_geo",
+   "icon": "Gauge",
+   "ro": "Geometrie roți (2D/3D)",
+   "en": "Wheel alignment (2D/3D)"
+  },
+  {
+   "id": "reglaj_far",
+   "category": "cat_geo",
+   "icon": "Sun",
+   "ro": "Reglaj faruri",
+   "en": "Headlight alignment"
+  },
+  {
+   "id": "test_suspensie",
+   "category": "cat_geo",
+   "icon": "Activity",
+   "ro": "Test standuri suspensie / frâne",
+   "en": "Suspension & brake test bench"
+  },
+  {
+   "id": "itp",
+   "category": "cat_itp",
+   "icon": "ClipboardCheck",
+   "ro": "Pregătire ITP",
+   "en": "Inspection preparation"
+  },
+  {
+   "id": "itp_efectiv",
+   "category": "cat_itp",
+   "icon": "ClipboardCheck",
+   "ro": "Inspecție tehnică periodică",
+   "en": "Periodic technical inspection (ITP)"
+  },
+  {
+   "id": "verificare_cumparare",
+   "category": "cat_itp",
+   "icon": "Eye",
+   "ro": "Verificare la cumpărare",
+   "en": "Pre-purchase inspection"
+  },
+  {
+   "id": "verificare_drum_lung",
+   "category": "cat_itp",
+   "icon": "Eye",
+   "ro": "Verificare înainte de drum lung",
+   "en": "Pre-trip check"
+  },
+  {
+   "id": "omologare",
+   "category": "cat_itp",
+   "icon": "ClipboardCheck",
+   "ro": "Omologare / dosar RAR",
+   "en": "RAR homologation file"
+  },
+  {
+   "id": "tinichigerie",
+   "category": "cat_car",
+   "icon": "Hammer",
+   "ro": "Tinichigerie",
+   "en": "Bodywork repair"
+  },
+  {
+   "id": "vopsitorie",
+   "category": "cat_car",
+   "icon": "Paintbrush",
+   "ro": "Vopsitorie",
+   "en": "Painting"
+  },
+  {
+   "id": "pdr",
+   "category": "cat_car",
+   "icon": "Hammer",
+   "ro": "Îndreptare fără vopsire (PDR)",
+   "en": "Paintless dent repair"
+  },
+  {
+   "id": "bara",
+   "category": "cat_car",
+   "icon": "Hammer",
+   "ro": "Reparație bară / plastice",
+   "en": "Bumper & plastic repair"
+  },
+  {
+   "id": "rugina",
+   "category": "cat_car",
+   "icon": "Shield",
+   "ro": "Tratament anticoroziv / rugină",
+   "en": "Rust treatment"
+  },
+  {
+   "id": "sudura",
+   "category": "cat_car",
+   "icon": "Flame",
+   "ro": "Sudură caroserie",
+   "en": "Body welding"
+  },
+  {
+   "id": "dauna_totala",
+   "category": "cat_car",
+   "icon": "ClipboardCheck",
+   "ro": "Constatare daună / dosar asigurare",
+   "en": "Damage assessment / insurance file"
+  },
+  {
+   "id": "banc_indreptat",
+   "category": "cat_car",
+   "icon": "Hammer",
+   "ro": "Banc de îndreptat caroserie",
+   "en": "Chassis straightening bench"
+  },
+  {
+   "id": "spalatorie",
+   "category": "cat_det",
+   "icon": "Droplet",
+   "ro": "Spălătorie auto",
+   "en": "Car wash"
+  },
+  {
+   "id": "polish",
+   "category": "cat_det",
+   "icon": "Sparkles",
+   "ro": "Polish / corecție vopsea",
+   "en": "Polish / paint correction"
+  },
+  {
+   "id": "ceramica",
+   "category": "cat_det",
+   "icon": "Shield",
+   "ro": "Protecție ceramică",
+   "en": "Ceramic coating"
+  },
+  {
+   "id": "ppf",
+   "category": "cat_det",
+   "icon": "Layers",
+   "ro": "Folie de protecție (PPF)",
+   "en": "Paint protection film"
+  },
+  {
+   "id": "colantare",
+   "category": "cat_det",
+   "icon": "Layers",
+   "ro": "Colantare completă",
+   "en": "Full wrap"
+  },
+  {
+   "id": "colantare_part",
+   "category": "cat_det",
+   "icon": "Layers",
+   "ro": "Colantare parțială",
+   "en": "Partial wrap"
+  },
+  {
+   "id": "interior",
+   "category": "cat_det",
+   "icon": "Sparkles",
+   "ro": "Curățare interior / tapițerie",
+   "en": "Interior & upholstery cleaning"
+  },
+  {
+   "id": "ozon",
+   "category": "cat_det",
+   "icon": "Wind",
+   "ro": "Tratament cu ozon / mirosuri",
+   "en": "Ozone treatment / odor removal"
+  },
+  {
+   "id": "motor_spalare",
+   "category": "cat_det",
+   "icon": "Droplet",
+   "ro": "Spălare compartiment motor",
+   "en": "Engine bay cleaning"
+  },
+  {
+   "id": "parbriz",
+   "category": "cat_gea",
+   "icon": "Eye",
+   "ro": "Înlocuire parbriz",
+   "en": "Windshield replacement"
+  },
+  {
+   "id": "reparatie_parbriz",
+   "category": "cat_gea",
+   "icon": "Eye",
+   "ro": "Reparație fisură parbriz",
+   "en": "Windshield chip repair"
+  },
+  {
+   "id": "geamuri_laterale",
+   "category": "cat_gea",
+   "icon": "Eye",
+   "ro": "Geamuri laterale / lunetă",
+   "en": "Side windows / rear window"
+  },
+  {
+   "id": "folie_geam",
+   "category": "cat_gea",
+   "icon": "Layers",
+   "ro": "Folie geamuri (omologată)",
+   "en": "Window tint (approved)"
+  },
+  {
+   "id": "faruri_polish",
+   "category": "cat_gea",
+   "icon": "Sun",
+   "ro": "Polish faruri",
+   "en": "Headlight restoration"
+  },
+  {
+   "id": "faruri_schimb",
+   "category": "cat_gea",
+   "icon": "Lightbulb",
+   "ro": "Înlocuire faruri / stopuri",
+   "en": "Headlight / tail light replacement"
+  },
+  {
+   "id": "becuri",
+   "category": "cat_gea",
+   "icon": "Lightbulb",
+   "ro": "Schimb becuri / LED / xenon",
+   "en": "Bulbs / LED / xenon"
+  },
+  {
+   "id": "oglinzi",
+   "category": "cat_gea",
+   "icon": "Eye",
+   "ro": "Oglinzi retrovizoare",
+   "en": "Mirrors"
+  },
+  {
+   "id": "montaj_gpl",
+   "category": "cat_gpl",
+   "icon": "Fuel",
+   "ro": "Montaj instalație GPL",
+   "en": "LPG system installation"
+  },
+  {
+   "id": "revizie_gpl",
+   "category": "cat_gpl",
+   "icon": "Fuel",
+   "ro": "Revizie instalație GPL",
+   "en": "LPG system service"
+  },
+  {
+   "id": "verificare_butelie",
+   "category": "cat_gpl",
+   "icon": "Package",
+   "ro": "Verificare / înlocuire butelie",
+   "en": "Tank inspection / replacement"
+  },
+  {
+   "id": "omologare_gpl",
+   "category": "cat_gpl",
+   "icon": "ClipboardCheck",
+   "ro": "Omologare RAR pentru GPL",
+   "en": "RAR homologation for LPG"
+  },
+  {
+   "id": "diag_ev",
+   "category": "cat_ev",
+   "icon": "PlugZap",
+   "ro": "Diagnoză vehicul electric / hibrid",
+   "en": "EV / hybrid diagnostics"
+  },
+  {
+   "id": "baterie_ev",
+   "category": "cat_ev",
+   "icon": "BatteryCharging",
+   "ro": "Baterie de tracțiune — test / service",
+   "en": "Traction battery — test / service"
+  },
+  {
+   "id": "incarcator_bord",
+   "category": "cat_ev",
+   "icon": "PlugZap",
+   "ro": "Încărcător de bord / port încărcare",
+   "en": "Onboard charger / charge port"
+  },
+  {
+   "id": "statie_incarcare",
+   "category": "cat_ev",
+   "icon": "Zap",
+   "ro": "Montaj stație de încărcare",
+   "en": "Charging station installation"
+  },
+  {
+   "id": "racire_baterie",
+   "category": "cat_ev",
+   "icon": "Snowflake",
+   "ro": "Sistem de răcire baterie",
+   "en": "Battery cooling system"
+  },
+  {
+   "id": "mobil_ulei",
+   "category": "cat_mob",
+   "icon": "Truck",
+   "ro": "Schimb ulei la domiciliu",
+   "en": "Mobile oil change"
+  },
+  {
+   "id": "mobil_vulcanizare",
+   "category": "cat_mob",
+   "icon": "Truck",
+   "ro": "Vulcanizare mobilă",
+   "en": "Mobile tire service"
+  },
+  {
+   "id": "mobil_baterie",
+   "category": "cat_mob",
+   "icon": "Truck",
+   "ro": "Asistență baterie / pornire",
+   "en": "Jump start assistance"
+  },
+  {
+   "id": "mobil_diag",
+   "category": "cat_mob",
+   "icon": "Truck",
+   "ro": "Diagnoză la domiciliu",
+   "en": "Mobile diagnostics"
+  },
+  {
+   "id": "tractari",
+   "category": "cat_mob",
+   "icon": "Truck",
+   "ro": "Tractări auto",
+   "en": "Towing"
+  },
+  {
+   "id": "deblocare",
+   "category": "cat_mob",
+   "icon": "Key",
+   "ro": "Deblocare auto / chei uitate",
+   "en": "Vehicle unlocking"
+  },
+  {
+   "id": "carlig",
+   "category": "cat_alt",
+   "icon": "Package",
+   "ro": "Montaj cârlig de remorcare",
+   "en": "Trailer hitch installation"
+  },
+  {
+   "id": "portbagaj",
+   "category": "cat_alt",
+   "icon": "Package",
+   "ro": "Montaj bare / portbagaj",
+   "en": "Roof rack installation"
+  },
+  {
+   "id": "scaune_copii",
+   "category": "cat_alt",
+   "icon": "Shield",
+   "ro": "Montaj scaun copil / ISOFIX",
+   "en": "Child seat / ISOFIX installation"
+  },
+  {
+   "id": "tapiterie",
+   "category": "cat_alt",
+   "icon": "Layers",
+   "ro": "Tapițerie auto",
+   "en": "Upholstery work"
+  },
+  {
+   "id": "insonorizare",
+   "category": "cat_alt",
+   "icon": "Volume2",
+   "ro": "Insonorizare",
+   "en": "Sound deadening"
+  },
+  {
+   "id": "chip_tuning",
+   "category": "cat_alt",
+   "icon": "Activity",
+   "ro": "Chip tuning / remapare",
+   "en": "ECU tuning / remapping"
+  },
+  {
+   "id": "altele",
+   "category": "cat_alt",
+   "icon": "MoreHorizontal",
+   "ro": "Altceva",
+   "en": "Something else"
+  }
+ ]
+}

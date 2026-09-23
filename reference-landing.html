@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Service-Hub — în curând</title>
+<meta name="description" content="Service-Hub conectează șoferii cu service-uri auto din Brașov: te programezi din telefon, primești devizul înainte de reparație și afli când e gata mașina. Lansăm în curând.">
+<meta name="color-scheme" content="dark">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="ro_RO">
+<meta property="og:title" content="Service-Hub — în curând">
+<meta property="og:description" content="Programări auto fără telefoane. Devizul înainte de reparație. Lansăm în curând în Brașov.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='24' fill='%23F5A524'/><path d='M61 26a25 25 0 0 0-33 33L26 61a9 9 0 1 0 13 13l2-2a25 25 0 0 0 33-33L62 50a9 9 0 0 1-12-12z' fill='%23151515'/></svg>">
+<style>
+  :root{
+    --bg:#14161A; --surface:#1D2026; --surface2:#242830;
+    --border:#2C313A; --text:#EAE8E2; --muted:#8A909B;
+    --amber:#F5A524; --green:#34C759;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    line-height:1.65;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 28px}
+  a{color:inherit}
+
+  header{padding:22px 0}
+  .hrow{display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .hright{display:flex;align-items:center;gap:0}
+  .brand{display:flex;align-items:center;gap:11px;text-decoration:none}
+  .mark{width:38px;height:38px;border-radius:9px;background:var(--amber);
+    display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .word{font-family:"Arial Narrow","Helvetica Neue",sans-serif;font-weight:700;
+    font-size:23px;text-transform:uppercase;letter-spacing:.02em;line-height:1;white-space:nowrap}
+  .word .a{color:var(--text)} .word .b{color:var(--amber)}
+  .hcta{display:none;text-decoration:none;font-size:14px;font-weight:600;color:var(--text);
+    background:var(--surface);border:1px solid var(--border);padding:9px 16px;border-radius:9px}
+  .hcta:hover{border-color:var(--amber);color:var(--amber)}
+
+  .hero{padding:40px 0 30px}
+  .herogrid{display:flex;flex-direction:column;gap:40px;align-items:stretch}
+  .heroleft{flex:1 1 0;min-width:0}
+  .mockwrap{flex:0 0 auto}
+  .badge{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:700;
+    color:var(--amber);background:rgba(245,165,36,.12);border:1px solid rgba(245,165,36,.35);
+    padding:6px 14px;border-radius:999px;text-transform:uppercase;letter-spacing:.06em;margin-bottom:22px}
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--amber);animation:pulse 2s ease-in-out infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+  h1{font-family:"Arial Narrow","Helvetica Neue",sans-serif;font-weight:700;
+    font-size:30px;line-height:1.12;letter-spacing:.01em;
+    margin-bottom:18px}
+  h1 .hl{color:var(--amber);white-space:nowrap}
+  .lead{font-size:clamp(16px,1.5vw,19px);color:var(--muted);max-width:540px;margin-bottom:30px}
+  .free{display:inline-flex;align-items:center;gap:10px;font-size:15px;
+    background:var(--surface);border:1px solid var(--border);border-radius:11px;padding:13px 18px}
+  .free b{color:var(--green)}
+
+  .mockwrap{display:flex;justify-content:center}
+  .phone{width:100%;max-width:330px;background:var(--surface);border:1px solid var(--border);
+    border-radius:26px;padding:16px;box-shadow:0 24px 60px rgba(0,0,0,.45)}
+  .pbar{display:flex;align-items:center;gap:8px;padding-bottom:12px;border-bottom:1px solid var(--border);margin-bottom:14px}
+  .pdot{width:22px;height:22px;border-radius:6px;background:var(--amber);
+    display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .pword{font-family:"Arial Narrow",sans-serif;font-weight:700;font-size:14px;text-transform:uppercase;letter-spacing:.02em}
+  .prow{background:var(--surface2);border:1px solid var(--border);border-radius:11px;padding:12px 13px;margin-bottom:9px}
+  .prow.acc{border-color:rgba(245,165,36,.45)}
+  .pt{font-size:13.5px;font-weight:600;margin-bottom:3px}
+  .ps{font-size:11.5px;color:var(--muted)}
+  .pstat{display:inline-block;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;
+    padding:3px 9px;border-radius:999px;margin-bottom:8px}
+  .s-amber{color:var(--amber);background:rgba(245,165,36,.14)}
+  .s-green{color:var(--green);background:rgba(52,199,89,.14)}
+  .pline{display:flex;justify-content:space-between;font-size:12px;padding:3px 0;color:var(--muted)}
+  .pline b{color:var(--text);font-family:ui-monospace,Menlo,monospace}
+  .ptot{display:flex;justify-content:space-between;font-size:13px;font-weight:700;
+    border-top:1px solid var(--border);margin-top:8px;padding-top:8px}
+  .ptot span:last-child{color:var(--amber);font-family:ui-monospace,Menlo,monospace}
+  .pbtns{display:flex;gap:7px;margin-top:10px}
+  .pb{flex:1;text-align:center;font-size:11.5px;font-weight:700;padding:8px;border-radius:8px}
+  .pb-y{background:var(--green);color:#0a1a0e}
+  .pb-n{border:1px solid rgba(255,69,58,.4);color:#FF453A}
+
+  section{padding:56px 0;border-top:1px solid var(--border)}
+  .eyebrow{font-size:12px;font-weight:700;color:var(--amber);text-transform:uppercase;
+    letter-spacing:.09em;margin-bottom:12px}
+  h2{font-family:"Arial Narrow","Helvetica Neue",sans-serif;font-weight:700;
+    font-size:clamp(27px,3.4vw,40px);line-height:1.12;text-transform:uppercase;margin-bottom:14px}
+  .sub{color:var(--muted);max-width:620px;margin-bottom:32px;font-size:16px}
+
+  .steps{display:flex;flex-wrap:wrap;gap:16px}
+  .step{flex:1 1 210px}
+  .step{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px;flex:1 1 210px}
+  .num{width:32px;height:32px;border-radius:50%;background:var(--amber);color:#151515;
+    display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;
+    margin-bottom:14px;font-family:"Arial Narrow",sans-serif}
+  .step h3{font-size:16.5px;font-weight:650;margin-bottom:6px}
+  .step p{font-size:14px;color:var(--muted)}
+
+  .shopgrid{display:flex;flex-direction:column;gap:28px}
+  .shopleft{flex:1 1 0;min-width:0}
+  .offer{flex:1 1 0}
+  .offer{background:var(--surface);border:1px solid rgba(245,165,36,.3);border-radius:16px;padding:28px}
+  .offer ul{list-style:none;display:flex;flex-direction:column;gap:13px}
+  .offer li{display:flex;gap:12px;align-items:flex-start;font-size:15.5px}
+  .tick{width:21px;height:21px;border-radius:50%;background:rgba(52,199,89,.15);
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+  .btns{display:flex;gap:11px;flex-wrap:wrap}
+  .btn{display:inline-flex;align-items:center;gap:9px;text-decoration:none;
+    font-weight:700;font-size:15px;padding:14px 22px;border-radius:11px;transition:opacity .15s}
+  .btn:hover{opacity:.87}
+  .btn-p{background:var(--amber);color:#151515;font-family:"Arial Narrow","Helvetica Neue",sans-serif;
+    text-transform:uppercase;letter-spacing:.03em;font-size:16px}
+  .btn-s{background:var(--surface2);color:var(--text);border:1px solid var(--border)}
+
+  footer{border-top:1px solid var(--border);padding:34px 0 48px}
+  .frow{display:flex;justify-content:space-between;align-items:flex-start;gap:24px;flex-wrap:wrap}
+  .flinks{display:flex;gap:26px;flex-wrap:wrap}
+  .flinks a{color:var(--muted);text-decoration:none;font-size:14.5px;display:inline-flex;align-items:center;gap:8px}
+  .flinks a:hover{color:var(--amber)}
+  .fnote{font-size:13px;color:var(--muted);max-width:420px}
+  .city{color:var(--amber);font-weight:600}
+
+  @media (min-width:900px){
+    .hcta{display:inline-block}
+    .hero{padding:56px 0 46px}
+    .herogrid{flex-direction:row;align-items:center;gap:56px}
+    h1{font-size:52px;line-height:1.08}
+    .heroleft{flex:1 1 56%}
+    .mockwrap{flex:0 0 40%}
+    .shopgrid{flex-direction:row;gap:48px;align-items:center}
+    section{padding:70px 0}
+  }
+  @media (min-width:430px) and (max-width:899px){
+    h1{font-size:36px}
+  }
+  @media (max-width:899px){
+    .mockwrap{margin-top:8px}
+  }
+
+  /* comutator de limbă */
+  .langsw{display:inline-flex;background:var(--surface);border:1px solid var(--border);
+    border-radius:9px;padding:3px;gap:2px;margin-left:10px}
+  .langsw button{background:none;border:none;color:var(--muted);font-family:inherit;
+    font-size:12.5px;font-weight:700;padding:6px 11px;border-radius:7px;cursor:pointer}
+  .langsw button.on{background:var(--amber);color:#151515}
+  [data-en]{display:none}
+  html[lang="en"] [data-ro]{display:none}
+  html[lang="en"] [data-en]{display:inline}
+  html[lang="en"] div[data-en],html[lang="en"] p[data-en],
+  html[lang="en"] h1[data-en],html[lang="en"] h2[data-en],
+  html[lang="en"] h3[data-en],html[lang="en"] span[data-en]{display:revert}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div class="hrow">
+      <a class="brand" href="/">
+        <span class="mark" aria-hidden="true">
+          <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#151515" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+          </svg>
+        </span>
+        <span class="word"><span class="a">Service-</span><span class="b">Hub</span></span>
+      </a>
+      <div class="langsw" role="group" aria-label="Limbă">
+        <button type="button" data-lang="ro" class="on">RO</button>
+        <button type="button" data-lang="en">EN</button>
+      </div>
+      <a class="hcta" href="#service"><span data-ro>Ai atelier?</span><span data-en>Own a shop?</span></a>
+    </div>
+  </header>
+
+  <div class="hero">
+    <div class="herogrid">
+      <div class="heroleft">
+        <div class="badge"><span class="dot"></span> <span data-ro>În curând</span><span data-en>Coming soon</span></div>
+        <h1><span data-ro>Programarea la service ar trebui să dureze </span><span data-en>Booking a service appointment should take </span><span class="hl"><span data-ro>2 minute.</span><span data-en>2 minutes.</span></span></h1>
+        <p class="lead"><span data-ro>Nu cinci telefoane date în pauza de prânz, ca să afli până la urmă că nu mai au loc săptămâna asta.</span><span data-en>Not five calls on your lunch break, only to be told there's nothing open until next week.</span></p>
+        <div class="free">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#34C759" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+          <span><span data-ro>Pentru șoferi, </span><span data-en>Free for drivers. </span><b><span data-ro>gratuit</span><span data-en>Always.</span></b><span data-ro>. Plătești doar reparația, direct la service.</span><span data-en> You only pay for the repair, directly to the shop.</span></span>
+        </div>
+      </div>
+
+      <div class="mockwrap">
+        <div class="phone" aria-hidden="true">
+          <div class="pbar">
+            <span class="pdot">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#151515" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+            </span>
+            <span class="pword"><span style="color:#EAE8E2">Service-</span><span style="color:#F5A524">Hub</span></span>
+          </div>
+
+          <div class="prow">
+            <div class="pt"><span data-ro>Atelier Demo · Brașov</span><span data-en>Demo Auto Shop · Brașov</span></div>
+            <div class="ps"><span data-ro>Mar 16 sep, 09:00 · VW Golf 7</span><span data-en>Tue 16 Sep, 09:00 · VW Golf 7</span></div>
+          </div>
+
+          <div class="prow acc">
+            <span class="pstat s-amber"><span data-ro>Deviz trimis</span><span data-en>Quote sent</span></span>
+            <div class="pline"><span><span data-ro>Plăcuțe frână față</span><span data-en>Front brake pads</span></span><b>280 lei</b></div>
+            <div class="pline"><span><span data-ro>Discuri frână față</span><span data-en>Front brake discs</span></span><b>420 lei</b></div>
+            <div class="pline"><span><span data-ro>Manoperă</span><span data-en>Labor</span></span><b>150 lei</b></div>
+            <div class="ptot"><span><span data-ro>Total</span><span data-en>Total</span></span><span>850 lei</span></div>
+            <div class="pbtns">
+              <div class="pb pb-y"><span data-ro>Accept</span><span data-en>Accept</span></div>
+              <div class="pb pb-n"><span data-ro>Refuz</span><span data-en>Decline</span></div>
+            </div>
+          </div>
+
+          <div class="prow">
+            <span class="pstat s-green"><span data-ro>Gata de ridicare</span><span data-en>Ready for pickup</span></span>
+            <div class="ps"><span data-ro>Te anunțăm când poți veni după mașină.</span><span data-en>We'll let you know when your car's ready.</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <section>
+    <div class="eyebrow"><span data-ro>Cum funcționează</span><span data-en>How it works</span></div>
+    <h2><span data-ro>Patru pași</span><span data-en>Four steps</span></h2>
+    <div class="steps">
+      <div class="step"><div class="num">1</div><h3><span data-ro>Cauți</span><span data-en>Search</span></h3><p><span data-ro>După oraș sau după ce ai nevoie: frâne, ulei, vulcanizare.</span><span data-en>By city, or by what you need: brakes, oil, tires.</span></p></div>
+      <div class="step"><div class="num">2</div><h3><span data-ro>Te programezi</span><span data-en>Book</span></h3><p><span data-ro>Alegi ziua și ora dintre cele libere. Service-ul confirmă.</span><span data-en>Pick an open slot. The shop confirms.</span></p></div>
+      <div class="step"><div class="num">3</div><h3><span data-ro>Primești devizul</span><span data-en>Get the quote</span></h3><p><span data-ro>După ce se uită la mașină. Îl accepți sau îl refuzi.</span><span data-en>Once they've looked at the car. Accept it or decline it.</span></p></div>
+      <div class="step"><div class="num">4</div><h3><span data-ro>Afli când e gata</span><span data-en>Know when it's ready</span></h3><p><span data-ro>Primești mesaj când poți veni după mașină.</span><span data-en>You get a message the moment your car's ready for pickup.</span></p></div>
+    </div>
+  </section>
+
+  <section id="service">
+    <div class="shopgrid">
+      <div class="shopleft">
+        <div class="eyebrow"><span data-ro>Pentru service-uri auto</span><span data-en>For auto repair shops</span></div>
+        <h2><span data-ro>Ai atelier în Brașov?</span><span data-en>Own a shop in Brașov?</span></h2>
+        <p class="sub"><span data-ro>Căutăm primele 10 service-uri care intră cu noi de la început. Cine intră acum rămâne cu preț fix, pe termen lung.</span><span data-en>We're looking for the first 10 shops to join us from day one. Sign up now and your price stays fixed, long term.</span></p>
+        <div class="btns">
+          <a class="btn btn-p" href="https://wa.me/40723375248">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="#151515" aria-hidden="true"><path d="M17.5 14.4c-.3-.2-1.7-.9-2-1-.3-.1-.5-.2-.7.1s-.7 1-.9 1.2c-.2.2-.3.2-.6.1-1.7-.9-2.9-1.6-4-3.6-.3-.5.3-.5.8-1.5.1-.2 0-.4 0-.5s-.7-1.6-.9-2.2c-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.2.2 2.1 3.2 5.1 4.5 1.9.8 2.6.9 3.5.7.6-.1 1.7-.7 1.9-1.4.2-.7.2-1.2.2-1.4-.1-.1-.3-.2-.5-.3z"/><path d="M12 2a10 10 0 0 0-8.6 15L2 22l5.2-1.4A10 10 0 1 0 12 2zm0 18.2c-1.6 0-3.1-.4-4.4-1.2l-.3-.2-3.1.8.8-3-.2-.3A8.2 8.2 0 1 1 12 20.2z"/></svg>
+            <span data-ro>Scrie-ne pe WhatsApp</span><span data-en>Message us on WhatsApp</span>
+          </a>
+          <a class="btn btn-s" href="mailto:contact@service-hub.ro">contact@service-hub.ro</a>
+        </div>
+      </div>
+
+      <div class="offer">
+        <ul>
+          <li><span class="tick"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#34C759" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span> <span><b><span data-ro>90 de zile gratuit.</span><span data-en>90 days free.</span></b><span data-ro> Fără card, fără contract.</span><span data-en> No card, no contract.</span></span></li>
+          <li><span class="tick"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#34C759" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span> <span><b><span data-ro>Tu decizi câte mașini iei pe zi.</span><span data-en>You set how many cars you take per day.</span></b><span data-ro> Peste numărul ăla, ziua apare ocupată.</span><span data-en> Once you hit that number, the day shows as full.</span></span></li>
+          <li><span class="tick"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#34C759" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span> <span><b><span data-ro>Deviz digital.</span><span data-en>Digital quote.</span></b><span data-ro> Clientul acceptă în scris, nu mai e discuție la casă.</span><span data-en> The customer accepts it in writing — no arguments at the register.</span></span></li>
+          <li><span class="tick"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#34C759" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></span> <span><b><span data-ro>Zero comision pe lucrare.</span><span data-en>No commission on jobs.</span></b><span data-ro> Banii de la client rămân integral ai tăi.</span><span data-en> Every leu the customer pays is yours.</span></span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="frow">
+      <div class="flinks">
+        <a href="mailto:contact@service-hub.ro">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/></svg>
+          contact@service-hub.ro
+        </a>
+        <a href="https://wa.me/40723375248">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 8.5 8.5 0 0 1-3.9-.9L3 20l1.3-4a8.4 8.4 0 0 1-.9-3.9 8.4 8.4 0 0 1 8.4-8.4 8.4 8.4 0 0 1 8.4 8.4z"/></svg>
+          0723 375 248
+        </a>
+      </div>
+      <p class="fnote"><span data-ro>Service-Hub · marketplace de programări auto. Lansăm în </span><span data-en>Service-Hub · online booking for auto repair shops. Launching in </span><span class="city">Brașov</span><span data-ro>, apoi oraș cu oraș.</span><span data-en>, then city by city.</span></p>
+    </div>
+  </footer>
+</div>
+
+
+<script>
+(function(){
+  var html=document.documentElement;
+  var btns=document.querySelectorAll('.langsw button');
+  function set(l){
+    html.setAttribute('lang',l);
+    btns.forEach(function(b){b.classList.toggle('on',b.dataset.lang===l);});
+    try{localStorage.setItem('sh_lang',l);}catch(e){}
+  }
+  // Implicit română — publicul principal e din Brașov, iar mulți români
+  // au browserul setat pe engleză. Engleza se alege explicit.
+  var saved=null;
+  try{saved=localStorage.getItem('sh_lang');}catch(e){}
+  set(saved==='en'?'en':'ro');
+  btns.forEach(function(b){b.addEventListener('click',function(){set(b.dataset.lang);});});
+})();
+</script>
+</body>
+</html>
