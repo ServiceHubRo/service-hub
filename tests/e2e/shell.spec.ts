@@ -148,3 +148,23 @@ test('component gallery: action button, stepper, errors', async ({ page }) => {
 
   await page.screenshot({ path: `test-results/shots/components-${test.info().project.name}.png`, fullPage: false });
 });
+
+// Brand guide §2: the wrench is #151515 on amber, set through CSS (Safari ignores var() in SVG attributes).
+test('logo wrench is black #151515 everywhere it appears', async ({ page }) => {
+  const expectBlackWrench = async () => {
+    const wrenches = page.locator('svg.lucide-wrench').filter({ visible: true });
+    await expect(wrenches.first()).toBeVisible();
+    for (const wrench of await wrenches.all()) {
+      await expect(wrench).toHaveAttribute('stroke', 'currentColor');
+      await expect(wrench.locator('path').first()).toHaveCSS('stroke', 'rgb(21, 21, 21)');
+    }
+  };
+  await page.goto('/');
+  await expectBlackWrench();
+  for (const role of ['client', 'service', 'admin']) {
+    await page.goto(`/?rol=${role}`);
+    await expect(page).not.toHaveURL(/rol=/);
+    await expectBlackWrench();
+  }
+  await page.screenshot({ path: `test-results/shots/logo-${test.info().project.name}.png` });
+});
