@@ -30,7 +30,7 @@ export const en: Record<MessageKey, string> = {
   'landing.drivers': 'Free for drivers. You only pay for the repair, directly to the shop.',
 
   'devRole.label': 'Test role',
-  'devRole.note': 'Test link only, until accounts arrive.',
+  'devRole.note': 'Temporary, until accounts arrive.',
   'devRole.client': 'Client',
   'devRole.shop': 'Shop',
   'devRole.admin': 'Admin',

@@ -4,7 +4,7 @@ import { Card } from '../../components/Card';
 import { LogoTile } from '../../components/LogoTile';
 import { Wordmark } from '../../components/Wordmark';
 import { useI18n } from '../../i18n/context';
-import { IS_TEST_BUILD } from '../../lib/env';
+import { IS_TEST_BUILD, ROLE_SWITCH_ENABLED } from '../../lib/env';
 import styles from './Landing.module.css';
 
 /** Temporary public page until T18: logo + "În curând". */
@@ -24,7 +24,7 @@ export function Landing() {
         <h1 className={styles.tagline}>{t('landing.tagline')}</h1>
         <p className={styles.drivers}>{t('landing.drivers')}</p>
 
-        {IS_TEST_BUILD && (
+        {ROLE_SWITCH_ENABLED && (
           <Card className={styles.dev}>
             <p className={styles.devTitle}>{t('devRole.label')}</p>
             <p className={styles.devNote}>{t('devRole.note')}</p>
@@ -32,7 +32,7 @@ export function Landing() {
               <Link to="/?rol=client">{t('devRole.client')}</Link>
               <Link to="/?rol=service">{t('devRole.shop')}</Link>
               <Link to="/?rol=admin">{t('devRole.admin')}</Link>
-              <Link to="/dev/componente">{t('devRole.components')}</Link>
+              {IS_TEST_BUILD && <Link to="/dev/componente">{t('devRole.components')}</Link>}
             </div>
           </Card>
         )}

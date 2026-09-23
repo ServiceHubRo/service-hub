@@ -26,7 +26,11 @@ done
 for f in "${tests[@]}"; do
   case "$f" in tests/sql/00_*) continue ;; esac
   echo "test   $f"
-  "${PSQL[@]}" -d "$DB" -f "$f"
+  "${PSQL[@]}" -d "$DB" -o /dev/null -f "$f"
 done
+
+# The demo seed must keep loading on top of every migration.
+echo "seed   supabase/seed/dev_seed.sql"
+"${PSQL[@]}" -d "$DB" -o /dev/null -f supabase/seed/dev_seed.sql
 
 echo "test:sql — all passed."

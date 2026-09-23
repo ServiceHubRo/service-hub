@@ -1,6 +1,5 @@
 import { defineConfig, devices } from '@playwright/test';
-
-const PORT = 4173;
+import { PORT, PUBLISHED_PORT } from './tests/e2e/ports';
 
 export default defineConfig({
   testDir: 'tests/e2e',
@@ -18,10 +17,19 @@ export default defineConfig({
     { name: 'tablet-820', use: { ...devices['Desktop Chrome'], viewport: { width: 820, height: 1180 }, hasTouch: true } },
     { name: 'desktop-1440', use: { ...devices['Desktop Chrome'], viewport: { width: 1440, height: 900 } } },
   ],
-  webServer: {
-    command: `npm run build && npx vite preview --port ${PORT} --strictPort`,
-    port: PORT,
-    reuseExistingServer: !process.env.CI,
-    timeout: 120_000,
-  },
+  webServer: [
+    {
+      command: `npm run build && npx vite preview --port ${PORT} --strictPort`,
+      port: PORT,
+      reuseExistingServer: !process.env.CI,
+      timeout: 120_000,
+    },
+    {
+      // The same app built exactly like the published site (Netlify CONTEXT=production).
+      command: `CONTEXT=production npx vite build --outDir dist-published && npx vite preview --outDir dist-published --port ${PUBLISHED_PORT} --strictPort`,
+      port: PUBLISHED_PORT,
+      reuseExistingServer: !process.env.CI,
+      timeout: 120_000,
+    },
+  ],
 });

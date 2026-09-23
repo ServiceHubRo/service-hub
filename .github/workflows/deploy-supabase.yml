@@ -1,0 +1,67 @@
+name: Deploy Supabase
+
+# Applies new database migrations and publishes Edge Functions to the Supabase project, so every
+# deploy preview has the database it needs (ARCHITECTURE §18). Until T19 there is one project;
+# T19 sends pull requests to a separate test project.
+#
+# Secrets (GitHub → Settings → Secrets and variables → Actions), see PORNIRE.md step 6:
+#   SUPABASE_ACCESS_TOKEN  personal access token (supabase.com/dashboard/account/tokens)
+#   SUPABASE_PROJECT_REF   the `abcdefgh` part of https://abcdefgh.supabase.co
+#   SUPABASE_DB_PASSWORD   the database password chosen when the project was created
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# One deploy at a time against the project, and never cancel one halfway through a migration.
+concurrency:
+  group: deploy-supabase
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy Supabase
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+      SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check the secrets are set
+        run: |
+          missing=""
+          for name in SUPABASE_ACCESS_TOKEN SUPABASE_PROJECT_REF SUPABASE_DB_PASSWORD; do
+            if [ -z "${!name}" ]; then missing="$missing $name"; fi
+          done
+          if [ -n "$missing" ]; then
+            echo "::error title=Lipsesc secrete::Adaugă în GitHub → Settings → Secrets and variables → Actions:$missing (PORNIRE.md, pasul 6)."
+            exit 1
+          fi
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: 2.117.0
+
+      # `link` also records the project's connection pooler, which the CLI uses when the runner
+      # cannot reach the database directly (GitHub runners have no IPv6).
+      - name: Link the project
+        run: supabase link --project-ref "$SUPABASE_PROJECT_REF" --password "$SUPABASE_DB_PASSWORD"
+
+      - name: Apply new migrations
+        run: supabase db push --include-all --password "$SUPABASE_DB_PASSWORD" --yes
+
+      - name: Show applied migrations
+        run: supabase migration list --password "$SUPABASE_DB_PASSWORD"
+
+      - name: Deploy Edge Functions
+        run: |
+          if find supabase/functions -mindepth 2 -name index.ts | grep -q .; then
+            supabase functions deploy --project-ref "$SUPABASE_PROJECT_REF"
+          else
+            echo "No Edge Functions yet."
+          fi

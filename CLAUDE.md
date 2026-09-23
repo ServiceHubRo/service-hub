@@ -117,7 +117,7 @@ If the network blocks a download or API you need, stop and tell Eduard the exact
 
 ## 9. Testing the database
 
-- Preferred: start a local Supabase stack with Docker (`npx supabase start`) and apply all migrations; run SQL tests and Playwright flows against it.
+- Preferred: start a local Supabase stack with Docker (`npx supabase start`) and apply all migrations; run SQL tests and Playwright flows against it. In the cloud environment start the daemon first (`dockerd &`) and pull from Docker Hub, since `public.ecr.aws` is blocked: `SUPABASE_INTERNAL_IMAGE_REGISTRY=docker.io npx supabase start -x studio,imgproxy,vector,logflare,supavisor,edge-runtime`. Run `tests/sql/00_test_helpers.sql`, `05_fixtures.sql` and the numbered tests against `postgresql://postgres:postgres@127.0.0.1:54322/postgres` after `npx supabase db reset --no-seed`. `npm run db:types` needs this stack.
 - Fallback when Docker images cannot be pulled: the preinstalled PostgreSQL 16 (`service postgresql start`) with a stub `auth` schema (`tests/sql/00_auth_stub.sql`: `auth.users`, `auth.uid()` reading `request.jwt.claim.sub`, roles `anon`/`authenticated`/`service_role`). Apply every migration in order, then run `tests/sql/*.sql`.
 - SQL tests must cover at least: capacity under concurrency, every state-machine transition (allowed and refused), abuse limits, odometer validation, RLS isolation between two clients and two shops, and that `authenticated` cannot update protected columns.
 - Seed data for local tests: `supabase/seed/dev_seed.sql` — the four demo shops from the reference demo (Brașov, Codlea), one client with two cars, bookings in every status. Never run it on the real project unless Eduard asks.

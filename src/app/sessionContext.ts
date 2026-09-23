@@ -3,7 +3,7 @@ import type { Role } from './roles';
 
 export interface SessionValue {
   role: Role | null;
-  /** Test builds only, until real accounts arrive in T04. */
+  /** The `?rol=` switch, until real accounts arrive in T04. */
   setDevRole: (role: Role) => void;
   signOut: () => void;
 }
