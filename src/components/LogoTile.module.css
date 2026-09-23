@@ -4,4 +4,9 @@
   justify-content: center;
   flex-shrink: 0;
   background: var(--amber);
+  color: var(--ink);
+}
+
+.tile svg {
+  stroke: currentColor;
 }
