@@ -3,7 +3,10 @@
   publish = "dist"
 
 [build.environment]
-  NODE_VERSION = "22"
+  # An exact version, the same as .nvmrc (GitHub CI). "22" picks the newest 22.x the day it is
+  # released, before Netlify has a ready-made build of it: Node is then compiled from source and
+  # the deploy times out after 18 minutes (happened with 22.23.3). Raise both together.
+  NODE_VERSION = "22.23.2"
 
 # Correct content type for the web app manifest (needed later for iPhone push).
 [[headers]]
