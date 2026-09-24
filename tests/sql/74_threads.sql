@@ -11,6 +11,9 @@ create function pg_temp.tick() returns void language sql as $$
                             client_last_read_at = client_last_read_at - interval '1 minute',
                             shop_last_read_at = shop_last_read_at - interval '1 minute';
 $$;
+-- The fixture writes both messages of thread A at the same instant; the client's came second.
+update public.messages set created_at = created_at + interval '1 second'
+where thread_id = test.id('thread_a') and kind = 'user';
 select pg_temp.tick();
 
 -- Fixture: thread_a (shop1 ↔ client_a) holds an automatic message with no author and the client's
@@ -90,6 +93,9 @@ from public.list_threads() where shop_id = test.id('shop1');
 select test.logout();
 select test.login(test.id('owner1'));
 select test.eq(unread, 1, 'a new request is unread for the shop') from public.list_threads() where client_name = 'Bogdan Pop';
+select test.logout();
+select pg_temp.tick();
+select test.login(test.id('owner1'));
 select public.confirm_booking(current_setting('test.bk')::uuid, gen_random_uuid());
 select test.eq(unread, 1, 'the shop''s own confirmation adds nothing') from public.list_threads() where client_name = 'Bogdan Pop';
 select test.eq(thread_id, (select t.id from public.threads t where t.shop_id = test.id('shop1') and t.client_id = test.id('client_b')),
