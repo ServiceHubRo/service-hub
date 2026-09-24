@@ -1,0 +1,87 @@
+import { ChevronRight, CircleCheck, CircleDashed } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Card } from '../../../components/Card';
+import { SETUP_STEPS, type SetupStep, type ShopSetup } from '../../../data/shop';
+import { useI18n } from '../../../i18n/context';
+import type { MessageKey } from '../../../i18n/ro';
+import { formatPhone } from '../../../lib/validators';
+import { SETTINGS_LINKS } from '../settings/paths';
+import styles from './Dashboard.module.css';
+
+const STEP_LINK: Record<Exclude<SetupStep, 'phone'>, string> = {
+  services: SETTINGS_LINKS.services,
+  hours: SETTINGS_LINKS.hours,
+  capacity: SETTINGS_LINKS.capacity,
+};
+
+/**
+ * "Pune service-ul pe picioare" (P5d): four steps with "2 din 4". Shown until all four are done,
+ * then never again (the database stamps setup_completed_at).
+ */
+export function SetupChecklist({ setup }: { setup: ShopSetup }) {
+  const { t } = useI18n();
+  const done = SETUP_STEPS.filter((s) => setup.steps[s]).length;
+  const total = SETUP_STEPS.length;
+
+  return (
+    <Card highlight>
+      <div className={styles.setupHead}>
+        <h2 className={styles.setupTitle}>{t('dash.setup.title')}</h2>
+        <span className={`mono ${styles.progressText}`}>{t('dash.setup.progress', { done, total })}</span>
+      </div>
+      <div
+        className={styles.progress}
+        role="progressbar"
+        aria-valuemin={0}
+        aria-valuemax={total}
+        aria-valuenow={done}
+        aria-valuetext={t('dash.setup.progress', { done, total })}
+        aria-label={t('dash.setup.title')}
+      >
+        <span style={{ width: `${(done / total) * 100}%` }} />
+      </div>
+      <ol className={styles.steps}>
+        {SETUP_STEPS.map((step) => {
+          const ok = setup.steps[step];
+          const label = t(`dash.setup.${step}` as MessageKey);
+          const Icon = ok ? CircleCheck : CircleDashed;
+          const content = (
+            <>
+              <Icon size={22} className={ok ? styles.stepDone : styles.stepTodo} aria-hidden="true" />
+              <span className={styles.stepText}>
+                <span className={ok ? styles.stepLabelDone : undefined}>{label}</span>
+                <span className="visually-hidden"> — {t(ok ? 'dash.setup.done' : 'dash.setup.todo')}</span>
+                {step === 'phone' && !ok && (
+                  <span className={styles.stepNote}>
+                    {setup.owner_phone
+                      ? t('dash.setup.phonePending', { phone: formatPhone(setup.owner_phone) })
+                      : t('dash.setup.phoneMissing')}
+                  </span>
+                )}
+              </span>
+            </>
+          );
+          return (
+            <li key={step}>
+              {step === 'phone' ? (
+                setup.owner_phone || ok ? (
+                  <div className={styles.step}>{content}</div>
+                ) : (
+                  <Link to="/s/cont" className={styles.step}>
+                    {content}
+                    <ChevronRight size={18} className={styles.chevron} aria-hidden="true" />
+                  </Link>
+                )
+              ) : (
+                <Link to={STEP_LINK[step]} className={styles.step}>
+                  {content}
+                  <ChevronRight size={18} className={styles.chevron} aria-hidden="true" />
+                </Link>
+              )}
+            </li>
+          );
+        })}
+      </ol>
+    </Card>
+  );
+}

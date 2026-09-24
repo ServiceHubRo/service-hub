@@ -50,7 +50,8 @@ All tables have RLS enabled. `id uuid primary key default gen_random_uuid()` unl
 - Public: `name`, `description`, `logo_url`, `street`, `city not null`, `county`, `postal_code`, `phone`, `phone2`, `website`, `facebook`, `year_established`, `latitude`, `longitude`, `lang`
 - Rules: `daily_capacity int not null default 5 check (between 1 and 100)`, `cars_per_slot int not null default 1 check (between 1 and 20)`, `slot_minutes int not null default 60 check (slot_minutes in (30,60))`, `min_notice_hours int default 2`, `max_advance_days int default 30`, `cancel_deadline_hours int default 2` (0 = anytime), `inspection_fee numeric(10,2) default 0`
 - Preferences: `sms_on_new_booking boolean default false`, `daily_digest boolean default false`
-- Controlled by system/admin only: `active boolean default true`, `suspended boolean default false`, `setup_completed_at`
+- Controlled by system/admin only: `active boolean default true`, `suspended boolean default false`, `setup_completed_at`, `hours_reviewed_at` (set by `save_shop_hours`)
+- First-run checklist and Panou (T05): `capacity_reviewed_at`, `billing_reminder_dismissed_at` — the browser may set them, but a trigger (`shops_stamp_times`) always stores the server time and never clears them
 - Read access: any signed-in user when `is_shop_public(id)`; always for the shop's members, admin, and clients who have a booking with that shop (so history keeps showing the shop even if it later becomes inactive).
 - On shop sign-up the trigger also creates: the `shops` row (name + city from metadata), default `shop_hours` (Mon–Fri 08:00–18:00, Sat–Sun closed), a `subscriptions` row in `trial`, and the owner row in `shop_staff`.
 
@@ -65,6 +66,7 @@ All tables have RLS enabled. `id uuid primary key default gen_random_uuid()` unl
 
 **shop_staff** — `shop_id`, `user_id` (null until the invite is accepted), `invited_email`, `role in ('owner','staff')`, `invite_token_hash`, `invited_at`, `accepted_at`
 - Helpers (SQL, `stable`, `security definer`): `my_shop_id()`, `is_shop_member(shop_id)`, `is_shop_owner(shop_id)`, `is_admin()`.
+- **Invitations (T05):** the owner's browser makes a random 256-bit token; `invite_staff(email, token, request_id)` stores only its SHA-256 (at most 10 staff rows per shop; inviting the same address again replaces the token). The owner sends the link `/invitatie/<token>` (by hand until invitation emails, T13). `get_staff_invite(token)` (callable signed out) shows shop name, city and the invited address; an invitation is valid 14 days. Sign-up with `invite_token` in the metadata makes the account a `shop` account **joined to that shop** (no shop of its own) — only when the token is valid and the address is the invited one; otherwise the sign-up is refused (`invite_invalid`). `list_shop_staff()` gives members the team with names; the owner removes staff with a plain delete (RLS: staff rows only, owner only). A removed member keeps a `shop` account with no shop and sees "Contul tău nu mai e legat de niciun service".
 - Staff operate bookings, quotes, messages, reviews and settings; **only the owner** sees `shop_billing`, subscription, staff management, and can delete the shop.
 
 ### Catalog
@@ -74,6 +76,8 @@ All tables have RLS enabled. `id uuid primary key default gen_random_uuid()` unl
 - Seeded from `docs/service-catalog.json` by a generated migration. Disabled services stay valid on old bookings but cannot be selected.
 
 **shop_services** — `(shop_id, service_id)` primary key
+
+Settings writes (T05): public data, booking rules, fee, preferences, closures and billing are plain row updates limited by column grants, RLS and check constraints; the week's hours go through `save_shop_hours(hours[7], request_id)` (all seven days in one transaction, half-hour times, close after open) and the offered services through `set_shop_services(ids[], request_id)` (the whole set, enabled services only).
 
 ### Client data
 
@@ -181,7 +185,7 @@ Side exits:
 | `admin_force_cancel(id, reason)` | admin | any active → `cancelled` | both parties notified; audit log |
 | `expire_quotes()` | cron | `quote_sent → expired` | quote `expired`; capacity released; events → both |
 
-Every function: `security definer`, `set search_path = ''`, fully-qualified names, checks `auth.uid()` membership, locks the booking row (`for update`), validates the current status, records `request_id`, writes the thread message and the outbox event, returns the updated booking. Errors are raised with stable codes (`raise … using message = code, detail = JSON parameters`, e.g. `odometer_lower` + `{"previous":105400}`) (`past_slot`, `day_full`, `slot_full`, `limit_active_shop`, `not_allowed`, `wrong_status`, `odometer_lower`, `odometer_jump`, …) that the UI maps to translated messages (`src/data/rpc.ts`; its code list is checked against the migrations by a unit test). **A raw database error is never shown to a user.** `mark_thread_read` is the one write without `request_id`: repeating it is harmless.
+Every function: `security definer`, `set search_path = ''`, fully-qualified names, checks `auth.uid()` membership, locks the booking row (`for update`), validates the current status, records `request_id`, writes the thread message and the outbox event, returns the updated booking. Errors are raised with stable codes (`raise … using message = code, detail = JSON parameters`, e.g. `odometer_lower` + `{"previous":105400}`) (`past_slot`, `day_full`, `slot_full`, `limit_active_shop`, `not_allowed`, `wrong_status`, `odometer_lower`, `odometer_jump`, …) that the UI maps to translated messages (`src/data/rpc.ts`; its code list is checked against the migrations by a unit test). **A raw database error is never shown to a user.** `mark_thread_read` and `get_shop_setup` (which stamps `setup_completed_at`) are the writes without `request_id`: repeating them is harmless.
 
 ---
 
@@ -214,6 +218,8 @@ A read function `get_availability(shop_id, from_date, days, slots_for)` returns 
 - at least one enabled service is selected and at least one weekday is open.
 
 Search, the shop page, and `create_booking` all use this function. A shop that is not public sees a banner explaining exactly which condition is missing ("Alege cel puțin un serviciu", "Confirmă numărul de telefon", "Abonamentul a expirat").
+
+**Panou (T05)** reads `get_shop_setup()`: the four checklist steps (services · hours saved · capacity saved · owner phone verified), the reasons the shop is hidden — the same conditions as `is_shop_public`, in the order to fix them (`account_suspended, shop_suspended, shop_inactive, subscription_inactive, email_unverified, phone_unverified, no_services, no_open_days`) — and, for the owner, whether billing data is complete (legal name, CUI, Trade Register, registered office, billing email) and whether to show the billing reminder (trial from day 60, hidden for 7 days after "Mai târziu"). When all four steps are done it stamps `setup_completed_at`, and the checklist never returns. Like `mark_thread_read` it takes no `request_id` (repeating it is harmless). Until SMS verification (T13) the phone is confirmed by hand: `select public.verify_phone_manually('email');` in the SQL Editor (not callable through the API, audit-logged).
 
 ---
 
@@ -283,7 +289,7 @@ Templates live in `supabase/functions/_shared/templates.ts` (RO + US English), o
 
 ## 11. Edge Functions
 
-`dispatch-notifications` · `geocode` (address → lat/lng; Nominatim with a proper User-Agent and 1 req/s, or Google if a key is provided) · `stripe-checkout` (subscription or report) · `stripe-portal` · `stripe-webhook` (signature verified, idempotent via `stripe_events`; the only writer of subscription status besides admin) · `issue-invoice` (SmartBill/Oblio + e-Factura after `invoice.paid`) · `generate-report` (PDF with `pdf-lib` + embedded TTF font that has Romanian diacritics ș ț ă â î; stored in `reports`) · `report-download` (signed URL after ownership check) · `delete-account` · `invite-staff` · `phone-verify-start` / `phone-verify-check` (SMSO OTP, hashed codes, 5 attempts, 10 min).
+`dispatch-notifications` · `geocode` (T05: reads the caller's shop address from the database and asks Nominatim with an identifying User-Agent, 1 req/s — street + city + county + postal code, then without the postal code, then the city alone; stores the coordinates, clears them when the place is unknown, changes nothing when Nominatim is unreachable; the app calls it after "Salvează" only when the address changed. Google Geocoding can be added later behind a key) · `stripe-checkout` (subscription or report) · `stripe-portal` · `stripe-webhook` (signature verified, idempotent via `stripe_events`; the only writer of subscription status besides admin) · `issue-invoice` (SmartBill/Oblio + e-Factura after `invoice.paid`) · `generate-report` (PDF with `pdf-lib` + embedded TTF font that has Romanian diacritics ș ț ă â î; stored in `reports`) · `report-download` (signed URL after ownership check) · `delete-account` · `invite-staff` · `phone-verify-start` / `phone-verify-check` (SMSO OTP, hashed codes, 5 attempts, 10 min).
 
 Shared code in `supabase/functions/_shared/`. Every function validates input, checks the caller's JWT, and never trusts ids from the body without checking ownership. Functions call the Auth and REST APIs with plain `fetch` (`_shared/admin.ts`), check the caller with the Auth server (`/auth/v1/user`) and run with `verify_jwt = false` in `supabase/config.toml`, so they work with both the legacy JWT keys and the new publishable/secret keys.
 
@@ -331,7 +337,7 @@ As Prompt 16e plus §7. Report code `SH-YYYY-NNNNNN` from a sequence. Public pag
 - **Supabase answers an existing address on sign-up with a user without identities** (no error, to stop address probing); the app shows "Există deja un cont cu acest email".
 - **Session ending by itself** (refresh refused, token revoked): the screen stays mounted under a sign-in panel (`ReauthPanel`); signing in again removes it and nothing typed is lost. An RPC answering `not_signed_in` triggers the same check.
 - **CAPTCHA:** Cloudflare Turnstile, shown only when the public site key `VITE_TURNSTILE_SITE_KEY` is set. When CAPTCHA is on in Supabase Auth it guards sign-up, sign-in, password reset and resend, so every one of those forms (and the password check in Cont) carries the widget.
-- Routes: `/intra` (sign in), `/cont-nou` (sign up), `/confirma-email`, `/parola-uitata`, `/parola-noua`, `/legal/:doc` (public legal documents), `/<role>/cont/legal/:doc` (inside Cont).
+- Routes: `/intra` (sign in), `/cont-nou` (sign up), `/confirma-email`, `/parola-uitata`, `/parola-noua`, `/invitatie/:token` (staff invitation sign-up), `/legal/:doc` (public legal documents), `/<role>/cont/legal/:doc` (inside Cont). Shop settings live inside Cont: `/s/cont/setari` and its sections `profil`, `program`, `reguli`, `servicii`, `facturare` (owner), `personal` (owner), `notificari`.
 - **Language before login:** `navigator.language` starting with `ro` → Romanian, anything else → English; stored in `localStorage` `sh_lang`. After login, `profiles.lang` wins; the switch updates both (the profile save is best effort: the interface switches even offline).
 - **Password reset:** always the same neutral confirmation, whether the address exists or not.
 - **Admin:** created only with the SQL function `promote_to_admin(email)`, which is owned by `postgres` and not granted to any API role. Eduard runs it in the SQL Editor after creating a normal account. There is no UI path to admin.

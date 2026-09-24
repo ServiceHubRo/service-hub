@@ -1398,7 +1398,9 @@ export type Database = {
       shops: {
         Row: {
           active: boolean
+          billing_reminder_dismissed_at: string | null
           cancel_deadline_hours: number
+          capacity_reviewed_at: string | null
           cars_per_slot: number
           city: string
           county: string | null
@@ -1407,6 +1409,7 @@ export type Database = {
           daily_digest: boolean
           description: string | null
           facebook: string | null
+          hours_reviewed_at: string | null
           id: string
           inspection_fee: number
           lang: string
@@ -1431,7 +1434,9 @@ export type Database = {
         }
         Insert: {
           active?: boolean
+          billing_reminder_dismissed_at?: string | null
           cancel_deadline_hours?: number
+          capacity_reviewed_at?: string | null
           cars_per_slot?: number
           city: string
           county?: string | null
@@ -1440,6 +1445,7 @@ export type Database = {
           daily_digest?: boolean
           description?: string | null
           facebook?: string | null
+          hours_reviewed_at?: string | null
           id?: string
           inspection_fee?: number
           lang?: string
@@ -1464,7 +1470,9 @@ export type Database = {
         }
         Update: {
           active?: boolean
+          billing_reminder_dismissed_at?: string | null
           cancel_deadline_hours?: number
+          capacity_reviewed_at?: string | null
           cars_per_slot?: number
           city?: string
           county?: string | null
@@ -1473,6 +1481,7 @@ export type Database = {
           daily_digest?: boolean
           description?: string | null
           facebook?: string | null
+          hours_reviewed_at?: string | null
           id?: string
           inspection_fee?: number
           lang?: string
@@ -2039,6 +2048,8 @@ export type Database = {
         Returns: Json
       }
       get_schema_version: { Args: never; Returns: number }
+      get_shop_setup: { Args: never; Returns: Json }
+      get_staff_invite: { Args: { p_token: string }; Returns: Json }
       insert_quote: {
         Args: {
           p_booking: Database["public"]["Tables"]["bookings"]["Row"]
@@ -2067,6 +2078,11 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      invite_staff: {
+        Args: { p_email: string; p_request_id: string; p_token: string }
+        Returns: Json
+      }
+      invite_token_hash: { Args: { p_token: string }; Returns: string }
       is_active_status: { Args: { p_status: string }; Returns: boolean }
       is_admin: { Args: never; Returns: boolean }
       is_shop_member: { Args: { p_shop_id: string }; Returns: boolean }
@@ -2085,6 +2101,7 @@ export type Database = {
         Args: { p_plate_norm: string }
         Returns: number
       }
+      list_shop_staff: { Args: never; Returns: Json }
       lock_booking_as_client: {
         Args: { p_booking_id: string }
         Returns: {
@@ -2377,6 +2394,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      require_my_shop: { Args: never; Returns: string }
       require_status: {
         Args: {
           p_allowed: string[]
@@ -2430,6 +2448,10 @@ export type Database = {
         }
       }
       review_display_name: { Args: { p_name: string }; Returns: string }
+      save_shop_hours: {
+        Args: { p_hours: Json; p_request_id: string }
+        Returns: Json
+      }
       search_shops: {
         Args: {
           p_category?: string
@@ -2522,6 +2544,10 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      set_shop_services: {
+        Args: { p_request_id: string; p_service_ids: string[] }
+        Returns: Json
       }
       shop_cancel_booking: {
         Args: { p_booking_id: string; p_reason: string; p_request_id: string }
@@ -2685,6 +2711,7 @@ export type Database = {
         Returns: boolean
       }
       try_uuid: { Args: { p: string }; Returns: string }
+      verify_phone_manually: { Args: { p_email: string }; Returns: string }
       withdraw_quote: {
         Args: { p_booking_id: string; p_request_id: string }
         Returns: {

@@ -1,0 +1,34 @@
+.block {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+  scroll-margin: 24px;
+}
+
+.block:first-child {
+  padding-top: 0;
+}
+
+.block:last-child {
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.inline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.chips {
+  display: flex;
+  gap: 6px;
+}
+
+.feeHint {
+  margin: 4px 0 12px;
+}

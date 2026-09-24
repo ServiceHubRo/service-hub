@@ -1,0 +1,44 @@
+.week {
+  display: flex;
+  flex-direction: column;
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+.day {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.day:last-child {
+  border-bottom: none;
+}
+
+.dayHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.dayName {
+  font-weight: 700;
+}
+
+.closedOn {
+  color: var(--red);
+  font-weight: 600;
+}
+
+.times {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+}
+
+.cardButtons {
+  margin-top: 12px;
+}

@@ -108,7 +108,7 @@ where grantee = 'anon' and table_schema = 'public' and privilege_type <> 'SELECT
 -- Functions callable from the API are an explicit list (a new RPC must be granted on purpose).
 select test.eq(
   string_agg(p.proname, ', ' order by p.proname) filter (where has_function_privilege('anon', p.oid, 'execute')),
-  'format_sequence_id, get_schema_version, is_valid_cui, is_valid_iban, is_valid_postal_code, is_valid_regcom, is_valid_vin, normalize_code, try_uuid',
+  'format_sequence_id, get_schema_version, get_staff_invite, is_valid_cui, is_valid_iban, is_valid_postal_code, is_valid_regcom, is_valid_vin, normalize_code, try_uuid',
   'functions callable by anon')
 from pg_proc p where p.pronamespace = 'public'::regnamespace;
 select test.eq(
@@ -117,10 +117,11 @@ select test.eq(
       and not has_function_privilege('anon', p.oid, 'execute')),
   'admin_force_cancel, can_read_booking, can_read_notice, can_read_shop, can_read_thread, cancel_booking, '
   || 'cancel_email_change, client_no_show_count, complete_job, confirm_booking, create_booking, decide_quote, '
-  || 'decline_booking, export_my_data, get_availability, is_admin, is_shop_member, is_shop_owner, is_shop_public, last_odometer_for_booking, '
+  || 'decline_booking, export_my_data, get_availability, get_shop_setup, invite_staff, is_admin, is_shop_member, '
+  || 'is_shop_owner, is_shop_public, last_odometer_for_booking, list_shop_staff, '
   || 'mark_no_show, mark_thread_read, my_shop_id, replace_quote, reply_review, report_review, reschedule_booking, '
-  || 'search_shops, send_message, send_quote, shop_cancel_booking, start_inspection, start_work, submit_review, '
-  || 'toggle_favorite, withdraw_quote',
+  || 'save_shop_hours, search_shops, send_message, send_quote, set_shop_services, shop_cancel_booking, start_inspection, '
+  || 'start_work, submit_review, toggle_favorite, withdraw_quote',
   'functions callable only when signed in')
 from pg_proc p where p.pronamespace = 'public'::regnamespace;
 

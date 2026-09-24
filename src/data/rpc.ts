@@ -38,13 +38,18 @@ export const RPC_ERROR_CODES = [
   'car_year_invalid',
   'cost_invalid',
   'day_full',
+  'email_invalid',
   'email_not_verified',
+  'hours_close_before_open',
+  'hours_invalid',
   'invalid_slot',
+  'invite_invalid',
   'limit_active_shop',
   'limit_active_total',
   'limit_daily',
   'limit_messages',
   'limit_quote_versions',
+  'limit_staff',
   'message_empty',
   'message_too_long',
   'no_booking_together',
@@ -79,6 +84,7 @@ export const RPC_ERROR_CODES = [
   'shop_not_found',
   'shop_unavailable',
   'slot_full',
+  'staff_exists',
   'thread_not_found',
   'too_early',
   'too_far',
@@ -176,6 +182,10 @@ export function rpcErrorMessage(lang: Lang, error: unknown): string {
     case 'too_far':
     case 'review_window_closed':
       return translate(lang, `rpcError.${code}`, { days: plural(lang, 'unit.days', num(p.days) ?? 0) });
+    case 'hours_close_before_open':
+      return translate(lang, 'rpcError.hours_close_before_open', {
+        day: translate(lang, `weekday.${num(p.weekday) ?? 1}` as MessageKey),
+      });
     case 'quote_item_invalid':
       return num(p.position) === null
         ? translate(lang, 'rpcError.quote_item_invalid')

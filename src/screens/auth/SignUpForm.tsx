@@ -39,15 +39,18 @@ export function SignUpForm({
   email,
   setEmail,
   onOpenDoc,
+  invite,
 }: {
   email: string;
   setEmail: (email: string) => void;
   onOpenDoc: (doc: LegalDocId) => void;
+  /** Staff invitation: a shop account for the invited address, joining the inviting shop. */
+  invite?: { token: string; email: string };
 }) {
   const { t, lang } = useI18n();
   const navigate = useNavigate();
   const formRef = useRef<HTMLFormElement>(null);
-  const [role, setRole] = useState<SignUpRole | null>(null);
+  const [role, setRole] = useState<SignUpRole | null>(invite ? 'shop' : null);
   const [name, setName] = useState('');
   const [shopName, setShopName] = useState('');
   const [city, setCity] = useState('');
@@ -63,8 +66,8 @@ export function SignUpForm({
     const next: Errors = {};
     if (!role) next.role = t('auth.error.roleRequired');
     if (name.trim() === '') next.name = t('auth.error.nameRequired');
-    if (role === 'shop' && shopName.trim() === '') next.shopName = t('auth.error.shopNameRequired');
-    if (role === 'shop' && city.trim() === '') next.city = t('auth.error.cityRequired');
+    if (role === 'shop' && !invite && shopName.trim() === '') next.shopName = t('auth.error.shopNameRequired');
+    if (role === 'shop' && !invite && city.trim() === '') next.city = t('auth.error.cityRequired');
     if (!normalizePhone(phone)) next.phone = t('auth.error.phoneInvalid');
     if (!looksLikeEmail(email)) next.email = t('auth.error.emailFormat');
     if (password.length < MIN_PASSWORD_LENGTH) next.password = t('auth.error.passwordShort', { min: MIN_PASSWORD_LENGTH });
@@ -90,6 +93,7 @@ export function SignUpForm({
         termsVersion: TERMS_VERSION,
         shopName: role === 'shop' ? shopName : undefined,
         city: role === 'shop' ? city : undefined,
+        inviteToken: invite?.token,
         captchaToken: captcha.token,
       });
     } finally {
@@ -112,7 +116,7 @@ export function SignUpForm({
 
   return (
     <form ref={formRef} className={styles.form} noValidate onSubmit={(e) => e.preventDefault()}>
-      <div>
+      <div hidden={!!invite}>
         <p className={styles.groupLabel} id="signup-role">
           {t('auth.roleQuestion')}
         </p>
@@ -161,7 +165,7 @@ export function SignUpForm({
         }}
         error={errors.name}
       />
-      {role === 'shop' && (
+      {role === 'shop' && !invite && (
         <>
           <Field
             label={t('auth.shopName')}
@@ -213,6 +217,7 @@ export function SignUpForm({
         autoComplete="email"
         inputMode="email"
         value={email}
+        readOnly={!!invite}
         onChange={(e) => {
           setEmail(e.target.value);
           clear('email');
@@ -271,7 +276,14 @@ export function SignUpForm({
         )}
       </div>
       {captcha.element}
-      <ActionButton submit onAction={submit} errorMessage={(e) => authErrorMessage(lang, e)} canRetry={isRetryable}>
+      <ActionButton
+        submit
+        onAction={submit}
+        errorMessage={(e) =>
+          invite && e instanceof AuthFailure && e.code === 'email_exists' ? t('invite.emailExists') : authErrorMessage(lang, e)
+        }
+        canRetry={isRetryable}
+      >
         {t('auth.createAccount')}
       </ActionButton>
     </form>

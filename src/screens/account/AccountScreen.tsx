@@ -1,4 +1,4 @@
-import { FileText, Globe } from 'lucide-react';
+import { FileText, Globe, Settings } from 'lucide-react';
 import { useOutletContext } from 'react-router-dom';
 import type { ShellOutletContext } from '../../app/AppShell';
 import { LangSwitch } from '../../app/LangSwitch';
@@ -10,6 +10,7 @@ import { Tile } from '../../components/Tile';
 import { useI18n } from '../../i18n/context';
 import type { MessageKey } from '../../i18n/ro';
 import { LEGAL_DOCS } from '../../lib/legal';
+import { SETTINGS_PATH } from '../shop/settings/paths';
 import { DataSection } from './DataSection';
 import { IdentityCard } from './IdentityCard';
 import { SecuritySection } from './SecuritySection';
@@ -23,7 +24,8 @@ const SUBTITLE: Record<Role, MessageKey> = {
 
 /**
  * Cont, the part every role shares (P13b): identity, language, email and password, legal
- * documents, my data, log out. Role tiles (shop settings, subscription, …) arrive with their tasks.
+ * documents, my data, log out. Shops also get the Setări tile; Abonament, Recenzii and Rapoarte
+ * arrive with their tasks.
  */
 export function AccountScreen({ role }: { role: Role }) {
   const { t } = useI18n();
@@ -47,6 +49,12 @@ export function AccountScreen({ role }: { role: Role }) {
           <LangSwitch />
         </div>
       </Card>
+
+      {role === 'shop' && (
+        <div className={styles.tiles}>
+          <Tile to={SETTINGS_PATH} icon={Settings} label={t('account.tile.settings')} />
+        </div>
+      )}
 
       <SecuritySection />
 

@@ -25,6 +25,7 @@ export type AuthFailureCode =
   | 'signup_disabled'
   | 'wrong_current_password'
   | 'session_missing'
+  | 'invite_invalid'
   | 'network'
   | 'unknown';
 
@@ -156,13 +157,15 @@ export interface SignUpInput {
   termsVersion: string;
   shopName?: string;
   city?: string;
+  /** Sign-up through a staff invitation link: the account joins that shop (handle_new_user). */
+  inviteToken?: string;
   captchaToken?: string;
 }
 
 /** 'confirm_email' when the account waits for the email link (the normal case). */
 export async function signUp(input: SignUpInput): Promise<'confirm_email' | 'signed_in'> {
   setRememberMe(true);
-  const { data } = await run(
+  const request = run(
     auth().signUp({
       email: input.email.trim(),
       password: input.password,
@@ -176,11 +179,21 @@ export async function signUp(input: SignUpInput): Promise<'confirm_email' | 'sig
           phone: input.phone,
           lang: input.lang,
           terms_version: input.termsVersion,
-          ...(input.role === 'shop' ? { shop_name: input.shopName?.trim(), city: input.city?.trim() } : {}),
+          ...(input.role === 'shop' && !input.inviteToken ? { shop_name: input.shopName?.trim(), city: input.city?.trim() } : {}),
+          ...(input.inviteToken ? { invite_token: input.inviteToken } : {}),
         },
       },
     }),
   );
+  let data;
+  try {
+    ({ data } = await request);
+  } catch (e) {
+    // The sign-up trigger refuses a used, expired or cancelled invitation; Auth reports it as a
+    // generic database error.
+    if (input.inviteToken && e instanceof AuthFailure && e.code === 'unknown') throw new AuthFailure('invite_invalid');
+    throw e;
+  }
   // With email confirmation on, Supabase answers an existing address with a user without
   // identities instead of an error (so nobody can probe addresses); that is our "already exists".
   if (data.user && (data.user.identities?.length ?? 0) === 0) throw new AuthFailure('email_exists');
