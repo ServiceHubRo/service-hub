@@ -25,7 +25,7 @@ export function translate(lang: Lang, key: MessageKey, params?: Params): string 
   return interpolate(dictionaries[lang][key], params);
 }
 
-type PluralBase = 'unit.days';
+type PluralBase = 'unit.days' | 'unit.hours';
 const pluralRules: Record<Lang, Intl.PluralRules> = {
   ro: new Intl.PluralRules('ro-RO'),
   en: new Intl.PluralRules('en-US'),

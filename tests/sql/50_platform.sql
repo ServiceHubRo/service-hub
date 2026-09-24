@@ -115,7 +115,12 @@ select test.eq(
   string_agg(p.proname, ', ' order by p.proname) filter (
     where has_function_privilege('authenticated', p.oid, 'execute')
       and not has_function_privilege('anon', p.oid, 'execute')),
-  'can_read_booking, can_read_notice, can_read_shop, can_read_thread, is_admin, is_shop_member, is_shop_owner, is_shop_public, my_shop_id',
+  'admin_force_cancel, can_read_booking, can_read_notice, can_read_shop, can_read_thread, cancel_booking, '
+  || 'client_no_show_count, complete_job, confirm_booking, create_booking, decide_quote, decline_booking, '
+  || 'get_availability, is_admin, is_shop_member, is_shop_owner, is_shop_public, last_odometer_for_booking, '
+  || 'mark_no_show, mark_thread_read, my_shop_id, replace_quote, reply_review, report_review, reschedule_booking, '
+  || 'search_shops, send_message, send_quote, shop_cancel_booking, start_inspection, start_work, submit_review, '
+  || 'toggle_favorite, withdraw_quote',
   'functions callable only when signed in')
 from pg_proc p where p.pronamespace = 'public'::regnamespace;
 
