@@ -6,8 +6,8 @@ let sequence = 0;
 /**
  * Live row changes (CLAUDE.md §6.9): Supabase Realtime streams inserts and updates of one table,
  * filtered to the caller's rows and checked against the same RLS as a normal read. Each time the
- * channel is ready — the first time, and again after the connection dropped and came back —
- * `onResync` asks the screen to reload quietly: changes made before the channel was listening
+ * server confirms it is streaming the table — the first time, and again after the connection
+ * dropped and came back — `onResync` asks the screen to reload quietly: changes made before that
  * (while the first read was on its way, or while offline) were not streamed.
  */
 export function subscribeRows<Row extends Record<string, unknown>>(options: {
@@ -30,9 +30,12 @@ export function subscribeRows<Row extends Record<string, unknown>>(options: {
     .on<Row>('postgres_changes', { event: '*', schema: 'public', table: options.table, filter: options.filter }, (payload) =>
       options.onChange(payload),
     )
-    .subscribe((status) => {
-      if (status === 'SUBSCRIBED') options.onResync();
-    });
+    // "SUBSCRIBED" only means the channel was joined; database changes flow from the moment the
+    // server sends this message (seconds later on a cold server), and earlier ones are lost.
+    .on('system', {}, (message: { extension?: string; status?: string }) => {
+      if (message.extension === 'postgres_changes' && message.status === 'ok') options.onResync();
+    })
+    .subscribe();
   return () => {
     void client.removeChannel(channel);
   };
