@@ -101,10 +101,21 @@ function dayNumber(ymd: string): number {
   return Math.round(dateFromYmd(ymd).getTime() / 86_400_000);
 }
 
+/** Calendar days from today to `ymd` in Europe/Bucharest: 0 today, 1 tomorrow, −3 three days ago. */
+export function daysFromToday(ymd: string, now: Date = new Date()): number {
+  return dayNumber(ymd) - dayNumber(ymdInBucharest(now));
+}
+
+/** The pieces of a booking-calendar tile: RO `Mar` `14` `oct`, EN `Tue` `14` `Oct`. */
+export function formatDayTile(lang: Lang, ymd: string): { weekday: string; day: string; month: string } {
+  const p = parts(lang, dateFromYmd(ymd), { weekday: 'short', day: 'numeric', month: 'short' });
+  return { weekday: capitalize(p.weekday ?? ''), day: p.day ?? '', month: p.month ?? '' };
+}
+
 /** "azi", "mâine", "în 12 zile", "acum 3 zile" — counted in Bucharest calendar days. */
 export function formatRelativeDays(lang: Lang, target: Date | string, now: Date = new Date()): string {
   const targetYmd = typeof target === 'string' ? target : ymdInBucharest(target);
-  const diff = dayNumber(targetYmd) - dayNumber(ymdInBucharest(now));
+  const diff = daysFromToday(targetYmd, now);
   if (diff === 0) return translate(lang, 'rel.today');
   if (diff === 1) return translate(lang, 'rel.tomorrow');
   if (diff === -1) return translate(lang, 'rel.yesterday');

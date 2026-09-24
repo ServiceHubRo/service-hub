@@ -20,3 +20,16 @@ export function SkeletonList({ count = 3 }: { count?: number }) {
     </div>
   );
 }
+
+/** Loading placeholder for a grid of tiles (booking days and times). */
+export function SkeletonGrid({ count, className }: { count: number; className?: string }) {
+  const { t } = useI18n();
+  return (
+    <div className={className} aria-busy="true" role="status">
+      <span className="visually-hidden">{t('common.loading')}</span>
+      {Array.from({ length: count }, (_, i) => (
+        <span key={i} className={`${styles.bar} ${styles.tile}`} aria-hidden="true" />
+      ))}
+    </div>
+  );
+}

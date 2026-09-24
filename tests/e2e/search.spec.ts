@@ -150,10 +150,10 @@ test.describe('client search', () => {
     await page.getByRole('link', { name: 'Toate service-urile' }).click();
     await expect(search(page)).toHaveValue('frane');
 
-    // "Programează-te" opens the booking screen (the 4 steps arrive in T07).
+    // "Programează-te" opens the first of the 4 booking steps (T07).
     await result(page, 'Atelier Demo').click();
     await page.getByRole('link', { name: 'Programează-te' }).click();
-    await expect(page.getByRole('heading', { level: 1, name: 'Programare' })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1, name: 'Ce ai nevoie?' })).toBeVisible();
 
     // A shop without reviews has no review section.
     await page.goto('/c/cauta?q=vulcanizare');

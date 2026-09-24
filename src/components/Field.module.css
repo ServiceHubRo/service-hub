@@ -82,3 +82,11 @@
   color: var(--muted);
   pointer-events: none;
 }
+
+.upper {
+  text-transform: uppercase;
+}
+
+.upper::placeholder {
+  text-transform: none;
+}

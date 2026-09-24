@@ -23,6 +23,7 @@ import { groupHours, type HoursRow } from '../../../lib/hours';
 import { useLocation } from '../../../lib/location';
 import { useLoad } from '../../../lib/useLoad';
 import { bookingPath, SEARCH_PATH, type ShopLinkState } from '../paths';
+import { groupServices, serviceName } from './serviceGroups';
 import styles from './ShopPage.module.css';
 
 /**
@@ -233,12 +234,7 @@ function PhoneLinks({ phones, shopName }: { phones: (string | null)[]; shopName:
 
 function ServiceGroups({ services }: { services: ShopPageService[] }) {
   const { lang } = useI18n();
-  const groups: { key: string; name: string; items: ShopPageService[] }[] = [];
-  for (const s of services) {
-    const last = groups.at(-1);
-    if (last && last.key === s.category_key) last.items.push(s);
-    else groups.push({ key: s.category_key, name: lang === 'ro' ? s.category_ro : s.category_en, items: [s] });
-  }
+  const groups = groupServices(services, lang);
   return (
     <div className={styles.serviceGroups}>
       {groups.map((g) => (
@@ -248,7 +244,7 @@ function ServiceGroups({ services }: { services: ShopPageService[] }) {
             {g.items.map((s) => (
               <li key={s.id} className={styles.service}>
                 <ServiceIcon name={s.icon} className={styles.serviceIcon} />
-                {lang === 'ro' ? s.name_ro : s.name_en}
+                {serviceName(s, lang)}
               </li>
             ))}
           </ul>

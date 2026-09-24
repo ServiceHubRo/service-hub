@@ -48,6 +48,11 @@
   width: 80%;
 }
 
+.tile {
+  height: 76px;
+  border-radius: var(--radius-button);
+}
+
 @keyframes shimmer {
   from {
     background-position: 100% 0;

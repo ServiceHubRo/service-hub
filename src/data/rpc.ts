@@ -198,6 +198,15 @@ export function rpcErrorMessage(lang: Lang, error: unknown): string {
   }
 }
 
+/**
+ * Whether "Încearcă din nou" can help: only when the answer never arrived or the failure was not a
+ * business rule (a full day or a limit stays the same on a second try).
+ */
+export function canRetryRpc(error: unknown): boolean {
+  const code = toRpcError(error).code;
+  return code === 'network' || code === 'unknown';
+}
+
 // ------------------------------------------------------------------------------------ plumbing
 
 type Fns = Database['public']['Functions'];

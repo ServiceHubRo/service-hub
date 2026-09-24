@@ -210,3 +210,59 @@
   color: var(--muted);
   border-radius: var(--radius-input);
 }
+
+/* ---------------------------------------------------------------- document expiry banner (P7) */
+.expiry {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  min-height: 52px;
+  padding: 11px var(--card-pad);
+  background: var(--surface);
+  border: 1px solid;
+  border-radius: var(--radius-card);
+  color: var(--text);
+  text-decoration: none;
+}
+
+.expiryAmber {
+  border-color: var(--amber-line);
+}
+
+.expiryAmber .expiryIcon {
+  color: var(--amber);
+}
+
+.expiryRed {
+  border-color: var(--red-line);
+}
+
+.expiryRed .expiryIcon {
+  color: var(--red);
+}
+
+.expiryIcon {
+  flex-shrink: 0;
+}
+
+.expiryText {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.expiryLine {
+  font-weight: 650;
+  font-size: 13.5px;
+}
+
+.expiryMore {
+  color: var(--muted);
+  font-size: 12.5px;
+}
+
+.expiryChevron {
+  color: var(--muted);
+  flex-shrink: 0;
+}

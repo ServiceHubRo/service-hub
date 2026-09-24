@@ -25,7 +25,14 @@ export function translate(lang: Lang, key: MessageKey, params?: Params): string 
   return interpolate(dictionaries[lang][key], params);
 }
 
-type PluralBase = 'unit.days' | 'unit.hours' | 'unit.shops' | 'unit.reviews' | 'unit.services';
+type PluralBase =
+  | 'unit.days'
+  | 'unit.hours'
+  | 'unit.shops'
+  | 'unit.reviews'
+  | 'unit.services'
+  | 'unit.places'
+  | 'unit.savedCars';
 const pluralRules: Record<Lang, Intl.PluralRules> = {
   ro: new Intl.PluralRules('ro-RO'),
   en: new Intl.PluralRules('en-US'),
