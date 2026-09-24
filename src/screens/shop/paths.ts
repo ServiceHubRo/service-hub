@@ -11,3 +11,7 @@ export function shopBookingsLink(options: { tab?: ShopTab; filter?: ShopFilter; 
   const query = params.toString();
   return query ? `${SHOP_BOOKINGS_PATH}?${query}` : SHOP_BOOKINGS_PATH;
 }
+
+/** Cont of the shop and the Recenzii tile inside it (T11). */
+export const ACCOUNT_PATH = '/s/cont';
+export const REVIEWS_PATH = '/s/cont/recenzii';

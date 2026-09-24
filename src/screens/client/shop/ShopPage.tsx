@@ -1,5 +1,5 @@
 import { CalendarPlus, Globe, MapPin, Phone, Store } from 'lucide-react';
-import { useCallback, type ReactNode } from 'react';
+import { useCallback, useEffect, type ReactNode } from 'react';
 import { Link, useLocation as useRouterLocation, useParams } from 'react-router-dom';
 import { BackLink } from '../../../components/BackLink';
 import { Banner } from '../../../components/Banner';
@@ -12,6 +12,7 @@ import { ServiceIcon } from '../../../components/ServiceIcon';
 import { ShopAvatar } from '../../../components/ShopAvatar';
 import { SkeletonList } from '../../../components/Skeleton';
 import { Stars } from '../../../components/Stars';
+import { subscribeRows } from '../../../data/realtime';
 import { toRpcError } from '../../../data/rpc';
 import { fetchShopPage, type ShopPage as ShopPageData, type ShopPageService } from '../../../data/search';
 import { useI18n } from '../../../i18n/context';
@@ -40,6 +41,34 @@ export function ShopPage() {
 
   const load = useCallback(() => fetchShopPage(shopId), [shopId]);
   const { state, reload, setData } = useLoad(load);
+
+  // Reviews and replies arrive live (T11): a change to this shop's reviews reads the page again
+  // quietly; the favorite heart keeps what is on screen.
+  const ready = state.status === 'ready';
+  useEffect(() => {
+    if (!ready || !shopId) return;
+    let timer: number | undefined;
+    const refresh = () => {
+      window.clearTimeout(timer);
+      timer = window.setTimeout(() => {
+        fetchShopPage(shopId).then(
+          (page) => setData((prev) => ({ ...page, is_favorite: prev.is_favorite })),
+          () => {},
+        );
+      }, 200);
+    };
+    const unsubscribe = subscribeRows({
+      channel: `shop-page-reviews:${shopId}`,
+      table: 'reviews',
+      filter: `shop_id=eq.${shopId}`,
+      onChange: refresh,
+      onResync: () => {}, // the page was just read; only later changes matter here
+    });
+    return () => {
+      window.clearTimeout(timer);
+      unsubscribe();
+    };
+  }, [ready, shopId, setData]);
 
   return (
     <div className={styles.page}>

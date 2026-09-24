@@ -10,6 +10,8 @@ import { useOptionalClientBookings } from '../screens/client/bookings/clientBook
 import { BOOKINGS_PATH } from '../screens/client/paths';
 import { useOptionalShopBookings } from '../screens/shop/bookings/shopBookingsContext';
 import { SHOP_BOOKINGS_PATH } from '../screens/shop/paths';
+import { messagesPath } from '../screens/messages/paths';
+import { unreadThreads, useOptionalThreads } from '../screens/messages/threadsContext';
 import { EmailVerifyBanner } from './EmailVerifyBanner';
 import { LangSwitch } from './LangSwitch';
 import { NAV, type NavItem, type Role } from './roles';
@@ -55,19 +57,24 @@ interface Badge {
 
 /**
  * Counts shown on navigation items: new booking requests on the shop's Programări, quotes waiting
- * for a decision on the client's.
+ * for a decision on the client's, conversations with unread messages on Mesaje (both).
  */
 function useNavBadges(): Record<string, Badge> {
   const shopBookings = useOptionalShopBookings();
   const clientBookings = useOptionalClientBookings();
+  const threads = useOptionalThreads();
+  const badges: Record<string, Badge> = {};
   if (shopBookings?.state.status === 'ready') {
     const count = shopBookings.state.data.bookings.filter((b) => b.status === 'pending').length;
-    return { [SHOP_BOOKINGS_PATH]: { count, unit: 'unit.newRequests' } };
+    badges[SHOP_BOOKINGS_PATH] = { count, unit: 'unit.newRequests' };
   }
   if (clientBookings?.state.status === 'ready') {
-    return { [BOOKINGS_PATH]: { count: quotesWaiting(clientBookings.state.data.bookings), unit: 'unit.quotesToDecide' } };
+    badges[BOOKINGS_PATH] = { count: quotesWaiting(clientBookings.state.data.bookings), unit: 'unit.quotesToDecide' };
   }
-  return {};
+  if (threads?.state.status === 'ready') {
+    badges[messagesPath(threads.side)] = { count: unreadThreads(threads.state.data.threads), unit: 'unit.unreadConversations' };
+  }
+  return badges;
 }
 
 /**

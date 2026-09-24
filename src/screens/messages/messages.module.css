@@ -1,0 +1,338 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.center {
+  display: flex;
+  justify-content: center;
+  padding: 40px 0;
+}
+
+/* ---------------------------------------------------------------- conversation list */
+.threadList {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.thread {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  min-height: var(--tap);
+  padding: var(--card-pad);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  color: var(--text);
+  text-decoration: none;
+}
+
+.thread:hover {
+  border-color: var(--border-lit);
+}
+
+.threadUnread {
+  border-color: var(--amber-line);
+}
+
+.threadText {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.threadTop,
+.threadBottom {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.threadName {
+  flex: 1;
+  min-width: 0;
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.threadTime {
+  flex-shrink: 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.threadUnread .threadTime {
+  color: var(--amber);
+}
+
+.preview {
+  flex: 1;
+  min-width: 0;
+  color: var(--muted);
+  font-size: 13.5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.threadUnread .preview {
+  color: var(--text);
+}
+
+.unread {
+  flex-shrink: 0;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: var(--radius-pill);
+  background: var(--amber);
+  color: var(--ink);
+  font-size: 11.5px;
+  font-weight: 700;
+  line-height: 20px;
+  text-align: center;
+}
+
+/* ---------------------------------------------------------------- conversation */
+.conversation {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.headerName {
+  min-width: 0;
+  font-size: 20px;
+  overflow-wrap: anywhere;
+}
+
+.headerName a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.headerName a:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.log {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.older {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.noMessages {
+  color: var(--muted);
+  text-align: center;
+  font-size: 13.5px;
+  padding: 24px 0;
+}
+
+.messages {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.item {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.day {
+  align-self: center;
+  margin: 8px 0 2px;
+  padding: 2px 10px;
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.mineWrap,
+.theirsWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  max-width: 78%;
+}
+
+.mineWrap {
+  align-self: flex-end;
+  align-items: flex-end;
+}
+
+.theirsWrap {
+  align-self: flex-start;
+  align-items: flex-start;
+}
+
+.mine,
+.theirs {
+  padding: 9px 12px;
+  border-radius: 14px;
+  font-size: 14.5px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.mine {
+  background: var(--amber);
+  color: var(--ink);
+  border-bottom-right-radius: 4px;
+}
+
+.theirs {
+  background: var(--surface2);
+  color: var(--text);
+  border-bottom-left-radius: 4px;
+}
+
+.time {
+  font-size: 10.5px;
+  color: var(--muted);
+}
+
+.system {
+  align-self: stretch;
+  padding: 9px 12px;
+  border-radius: 9px;
+  background: var(--surface2);
+  color: var(--muted);
+  font-size: 13px;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.systemLabel {
+  display: block;
+  margin-top: 3px;
+  font-size: 11px;
+  opacity: 0.8;
+}
+
+/* The box to write in stays at the bottom of the screen while the messages scroll. */
+.composerWrap {
+  position: sticky;
+  bottom: calc(-1 * var(--page-pad));
+  margin-bottom: calc(-1 * var(--page-pad));
+  padding: 10px 0 var(--page-pad);
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.composer {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.input {
+  flex: 1;
+  min-width: 0;
+  min-height: var(--tap);
+  max-height: 160px;
+  padding: 11px 12px;
+  resize: none;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-input);
+  color: var(--text);
+  font: inherit;
+  font-size: 16px;
+  line-height: 1.35;
+}
+
+.input:focus-visible {
+  outline: none;
+  border-color: var(--amber);
+  box-shadow: var(--focus-ring);
+}
+
+.input[readonly] {
+  opacity: 0.75;
+}
+
+.send {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--tap);
+  height: var(--tap);
+  border-radius: 50%;
+  background: var(--amber);
+  color: var(--ink);
+}
+
+.send:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.send[aria-busy='true'] {
+  opacity: 0.75;
+  cursor: progress;
+}
+
+.error {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 10px;
+  color: var(--red);
+  font-size: 13px;
+}
+
+.retry {
+  min-height: var(--tap);
+  padding: 0 4px;
+  color: var(--text);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.closed {
+  color: var(--muted);
+  font-size: 13.5px;
+  text-align: center;
+  padding: 12px 0;
+}
+
+/* ---------------------------------------------------------------- "Mesaj" on booking cards */
+.messageLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
