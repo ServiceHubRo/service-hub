@@ -1,5 +1,5 @@
 import { Car, ChevronRight, Unlink } from 'lucide-react';
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ActionButton } from '../../../components/ActionButton';
 import { Banner } from '../../../components/Banner';
@@ -9,62 +9,98 @@ import { RpcError, rpcErrorMessage } from '../../../data/rpc';
 import { dismissBillingReminder, getShopSetup, type ShopSetup } from '../../../data/shop';
 import { useI18n } from '../../../i18n/context';
 import type { MessageKey } from '../../../i18n/ro';
+import { ymdInBucharest } from '../../../i18n/format';
+import { dashboardCounts } from '../../../lib/shopBookings';
 import { useLoad } from '../../../lib/useLoad';
+import { useNow } from '../../../lib/useNow';
 import { LoadError } from '../../../components/LoadError';
+import { useShopBookings } from '../bookings/shopBookingsContext';
 import { SETTINGS_LINKS } from '../settings/paths';
 import { SetupChecklist } from './SetupChecklist';
+import { TodayBoard } from './TodayBoard';
 import styles from './Dashboard.module.css';
 
 /**
- * Panou. T05: the first-run checklist (P5d), why the shop is not in search (§5), the billing
- * reminder (FR §4.5b) and the capacity line. Counters and today's schedule arrive in T08.
+ * Panou (FR §4.1): why the shop is not in search (§5), the billing reminder (FR §4.5b), the
+ * first-run checklist (P5d), then the six counters, the capacity line and today's schedule (T08),
+ * live from ShopBookingsProvider.
  */
 export function Dashboard() {
   const { t, lang } = useI18n();
   const load = useCallback(() => getShopSetup(), []);
   const { state, reload, setData } = useLoad(load);
+  const bookings = useShopBookings();
+  const today = ymdInBucharest(useNow());
+  const { refresh } = bookings;
+
+  // Arriving here reads the bookings again quietly (the counters are already on screen).
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
 
   let body;
-  if (state.status === 'loading') body = <SkeletonList />;
-  else if (state.status === 'error') {
+  if (state.status === 'loading' || bookings.state.status === 'loading') body = <SkeletonList />;
+  else if (state.status === 'error' || bookings.state.status === 'error') {
+    const error = state.status === 'error' ? state.error : bookings.state.status === 'error' ? bookings.state.error : null;
     body =
-      state.error instanceof RpcError && state.error.code === 'not_allowed' ? (
+      error instanceof RpcError && error.code === 'not_allowed' ? (
         <EmptyState icon={Unlink} title={t('settings.noShop')} />
       ) : (
-        <LoadError message={t('dash.loadError')} onRetry={reload} />
+        <LoadError
+          message={t('dash.loadError')}
+          onRetry={() => {
+            if (state.status === 'error') reload();
+            if (bookings.state.status === 'error') bookings.reload();
+          }}
+        />
       );
   } else {
     const setup = state.data;
+    const data = bookings.state.data;
+    const counts = dashboardCounts(data.bookings, today);
     body = (
       <>
-        {setup.reasons.length > 0 && <HiddenBanner setup={setup} />}
-        {setup.billing?.reminder && (
-          <Banner tone="info">
-            <div className={styles.reminder}>
-              <span>{t('dash.billing.reminder')}</span>
-              <div className={styles.reminderButtons}>
-                <Link to={SETTINGS_LINKS.billing} className={styles.reminderLink}>
-                  {t('dash.billing.open')}
-                </Link>
-                <ActionButton
-                  variant="ghost"
-                  block={false}
-                  errorMessage={(e) => rpcErrorMessage(lang, e)}
-                  onAction={async () => {
-                    await dismissBillingReminder(setup.shop_id);
-                    setData((s) => ({ ...s, billing: s.billing && { ...s.billing, reminder: false } }));
-                  }}
-                >
-                  {t('dash.billing.dismiss')}
-                </ActionButton>
-              </div>
-            </div>
-          </Banner>
+        {setup.reasons.length > 0 && (
+          <div className="no-print">
+            <HiddenBanner setup={setup} />
+          </div>
         )}
-        {!setup.setup_completed && <SetupChecklist setup={setup} />}
-        <Link to={SETTINGS_LINKS.capacity} className={styles.capacity}>
+        {setup.billing?.reminder && (
+          <div className="no-print">
+            <Banner tone="info">
+              <div className={styles.reminder}>
+                <span>{t('dash.billing.reminder')}</span>
+                <div className={styles.reminderButtons}>
+                  <Link to={SETTINGS_LINKS.billing} className={styles.reminderLink}>
+                    {t('dash.billing.open')}
+                  </Link>
+                  <ActionButton
+                    variant="ghost"
+                    block={false}
+                    errorMessage={(e) => rpcErrorMessage(lang, e)}
+                    onAction={async () => {
+                      await dismissBillingReminder(setup.shop_id);
+                      setData((s) => ({ ...s, billing: s.billing && { ...s.billing, reminder: false } }));
+                    }}
+                  >
+                    {t('dash.billing.dismiss')}
+                  </ActionButton>
+                </div>
+              </div>
+            </Banner>
+          </div>
+        )}
+        {!setup.setup_completed && (
+          <div className="no-print">
+            <SetupChecklist setup={setup} />
+          </div>
+        )}
+        <TodayBoard data={data} today={today} />
+        <Link to={SETTINGS_LINKS.capacity} className={`${styles.capacity} no-print`}>
           <Car size={20} className={styles.capacityIcon} aria-hidden="true" />
-          <span className={styles.capacityText}>{t('dash.capacity', { n: setup.daily_capacity })}</span>
+          <span className={styles.capacityText}>
+            {t('dash.capacity', { n: data.shop.daily_capacity, today: counts.todayTaken })}
+          </span>
           <ChevronRight size={18} className={styles.chevron} aria-hidden="true" />
         </Link>
       </>
@@ -73,7 +109,7 @@ export function Dashboard() {
 
   return (
     <div className={styles.page}>
-      <h1>{t('nav.shop.dashboard')}</h1>
+      <h1 className="no-print">{t('nav.shop.dashboard')}</h1>
       {body}
     </div>
   );

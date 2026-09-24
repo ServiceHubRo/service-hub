@@ -2041,6 +2041,7 @@ export type Database = {
       get_availability: {
         Args: {
           p_days?: number
+          p_exclude_booking?: string
           p_from?: string
           p_shop_id: string
           p_slots_for?: string
@@ -2102,6 +2103,7 @@ export type Database = {
         Args: { p_plate_norm: string }
         Returns: number
       }
+      list_shop_bookings: { Args: never; Returns: Json }
       list_shop_staff: { Args: never; Returns: Json }
       lock_booking_as_client: {
         Args: { p_booking_id: string }

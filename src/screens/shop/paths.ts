@@ -1,0 +1,13 @@
+import type { ShopFilter, ShopTab } from '../../lib/shopBookings';
+
+/** Programări of the shop (T08). The tab, a Panou filter or one booking live in the address. */
+export const SHOP_BOOKINGS_PATH = '/s/programari';
+
+export function shopBookingsLink(options: { tab?: ShopTab; filter?: ShopFilter; booking?: string } = {}): string {
+  const params = new URLSearchParams();
+  if (options.tab) params.set('tab', options.tab);
+  if (options.filter) params.set('filtru', options.filter);
+  if (options.booking) params.set('p', options.booking);
+  const query = params.toString();
+  return query ? `${SHOP_BOOKINGS_PATH}?${query}` : SHOP_BOOKINGS_PATH;
+}

@@ -32,7 +32,9 @@ type PluralBase =
   | 'unit.reviews'
   | 'unit.services'
   | 'unit.places'
-  | 'unit.savedCars';
+  | 'unit.savedCars'
+  | 'unit.quotes'
+  | 'unit.newRequests';
 const pluralRules: Record<Lang, Intl.PluralRules> = {
   ro: new Intl.PluralRules('ro-RO'),
   en: new Intl.PluralRules('en-US'),

@@ -245,6 +245,36 @@ begin
 
   perform pg_temp.seed_booking(s3, u_client, c_golf, 'geometrie', -20, '09:00', 'no_show');
 
+  -- Atelier Demo's working week (T08), with other clients: a confirmed booking whose time has
+  -- passed (no-show possible), one tomorrow, a partly accepted quote, a job in progress today, and
+  -- George's three no-shows elsewhere (the shop sees "Client cu 3 neprezentări"). Past active
+  -- bookings are refused by the bookings trigger, so it is paused for these rows only.
+  alter table public.bookings disable trigger bookings_guard;
+  b := pg_temp.seed_booking(s1, u_george, null, 'ulei', -1, '16:00', 'confirmed', 'Vin după program, dacă se poate.');
+  update public.bookings set confirmed_at = now() - interval '3 days',
+    car_snapshot = '{"make":"Renault","model":"Clio","year":2015,"plate":"BV 21 GTO","plate_norm":"BV21GTO"}' where id = b;
+  perform pg_temp.seed_booking(s2, u_george, null, 'ulei', -15, '09:00', 'no_show');
+  perform pg_temp.seed_booking(s3, u_george, null, 'vulcanizare', -25, '10:00', 'no_show');
+  perform pg_temp.seed_booking(s4, u_george, null, 'diag', -40, '11:00', 'no_show');
+
+  b := pg_temp.seed_booking(s1, u_cristina, null, 'geometrie', 1, '10:00', 'confirmed');
+  update public.bookings set confirmed_at = now() - interval '1 day',
+    car_snapshot = '{"make":"Toyota","model":"Corolla","year":2019,"plate":"BV 55 CRD","plate_norm":"BV55CRD"}' where id = b;
+
+  b := pg_temp.seed_booking(s1, u_mihai, null, 'suspensie', 1, '13:00', 'approved');
+  update public.bookings set confirmed_at = now() - interval '2 days', inspection_started_at = now() - interval '1 day',
+    car_snapshot = '{"make":"Skoda","model":"Octavia","year":2017,"plate":"BV 90 MHP","plate_norm":"BV90MHP"}' where id = b;
+  perform pg_temp.seed_quote(b, 'partially_accepted', 80,
+    '[{"name":"Bieletă antiruliu","price":180,"ok":true},{"name":"Amortizoare spate","price":640,"ok":false},{"name":"Manoperă","price":150,"ok":true}]');
+
+  b := pg_temp.seed_booking(s1, u_ioana, null, 'ulei', 0, '08:00', 'in_progress');
+  update public.bookings set confirmed_at = now() - interval '2 days', inspection_started_at = now() - interval '1 day',
+    started_at = now() - interval '40 minutes',
+    car_snapshot = '{"make":"Ford","model":"Focus","year":2018,"plate":"B 123 IRD","plate_norm":"B123IRD"}' where id = b;
+  perform pg_temp.seed_quote(b, 'accepted', 80,
+    '[{"name":"Ulei 5W30 5L","price":210,"ok":true},{"name":"Filtru ulei","price":45,"ok":true}]');
+  alter table public.bookings enable trigger bookings_guard;
+
   -- The other demo reviews, each on its own completed booking.
   b := pg_temp.seed_booking(s1, u_cristina, null, 'frane', -35, '10:00', 'done');
   update public.bookings set cost = 760, odometer = 142000, done_at = now() - interval '34 days' where id = b;

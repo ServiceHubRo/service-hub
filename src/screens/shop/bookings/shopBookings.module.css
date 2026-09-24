@@ -1,0 +1,380 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.filterRow {
+  display: flex;
+}
+
+.noticeButtons {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.noticeClose {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--tap);
+  height: var(--tap);
+  border-radius: var(--radius-button);
+  color: var(--muted);
+}
+
+/* ---------------------------------------------------------------- card */
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.top {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.icon {
+  color: var(--amber);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.what {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.service {
+  font-weight: 700;
+}
+
+.when {
+  font-size: 13.5px;
+}
+
+.ref {
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+}
+
+.client {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  overflow-wrap: anywhere;
+}
+
+.carRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.car {
+  font-weight: 600;
+  min-width: 0;
+}
+
+.plate {
+  color: var(--amber);
+  font-size: 14px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.clientName {
+  font-size: 14px;
+}
+
+.phone {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  align-self: flex-start;
+  min-height: var(--tap);
+  color: var(--blue);
+  font-size: 15px;
+  text-decoration: none;
+}
+
+.muted {
+  color: var(--muted);
+  font-size: 13.5px;
+  overflow-wrap: anywhere;
+}
+
+.ok {
+  color: var(--green);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.warn {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  color: var(--amber);
+  font-size: 13.5px;
+}
+
+.warn svg {
+  flex-shrink: 0;
+  margin-top: 3px;
+}
+
+.note {
+  color: var(--muted);
+  font-size: 13px;
+  font-style: italic;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+/* ---------------------------------------------------------------- quote */
+.quote {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.quoteLines {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.quoteLine {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 14px;
+}
+
+.quoteName {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.refused {
+  color: var(--muted);
+  text-decoration: line-through;
+}
+
+.quoteTotal {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 6px;
+  border-top: 1px solid var(--border);
+  font-weight: 700;
+}
+
+.quoteTotal .mono {
+  color: var(--amber);
+  font-size: 17px;
+}
+
+/* ---------------------------------------------------------------- inline panels */
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.panelTitle {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.panelBody {
+  font-size: 14px;
+}
+
+.panelButtons {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.stepLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.formError {
+  color: var(--red);
+  font-size: 13.5px;
+}
+
+/* ---------------------------------------------------------------- reschedule: days and times, 3 → 6 columns */
+.grid {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+@media (min-width: 1024px) {
+  .grid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+}
+
+.tile,
+.time {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-button);
+}
+
+.tile {
+  min-height: 76px;
+  padding: 8px 4px;
+  gap: 1px;
+}
+
+.time {
+  min-height: var(--tap);
+  padding: 8px 4px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.tile:hover:not(:disabled),
+.time:hover:not(:disabled) {
+  border-color: var(--border-lit);
+}
+
+.tile:disabled,
+.time:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.tileOn,
+.tileOn:hover:not(:disabled) {
+  border-color: var(--amber);
+  background: var(--amber-tint);
+}
+
+.taken .mono {
+  text-decoration: line-through;
+}
+
+.tileSmall {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.2;
+}
+
+.tileBig {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.places {
+  font-size: 11.5px;
+  color: var(--green);
+}
+
+.full {
+  font-size: 11.5px;
+  color: var(--muted);
+}
+
+/* ---------------------------------------------------------------- quote composer */
+.composer {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.composerRows {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.composerRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.composerName {
+  flex: 1;
+  min-width: 0;
+}
+
+.composerPrice {
+  flex: 0 0 104px;
+}
+
+.removeRow {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--tap);
+  height: var(--tap);
+  /* Level with the inputs, under their labels. */
+  margin-top: 25px;
+  border-radius: var(--radius-button);
+  color: var(--muted);
+}
+
+.removeRow:hover {
+  color: var(--red);
+  background: var(--surface);
+}
+
+.addRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: var(--tap);
+  border: 1px dashed var(--border-lit);
+  border-radius: var(--radius-button);
+  color: var(--amber);
+  font-weight: 600;
+}
+
+.addRow:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}

@@ -7,3 +7,9 @@
   font-weight: 600;
   text-align: center;
 }
+
+@media print {
+  .bar {
+    display: none;
+  }
+}
