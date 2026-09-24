@@ -1,10 +1,11 @@
-import { Heart, Search, SearchX, X } from 'lucide-react';
+import { Heart, SearchX, X } from 'lucide-react';
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Button } from '../../../components/Button';
 import { Chip, ChipRow } from '../../../components/Chip';
 import { EmptyState } from '../../../components/EmptyState';
 import { LoadError } from '../../../components/LoadError';
+import { SearchField } from '../../../components/SearchField';
 import { SkeletonList } from '../../../components/Skeleton';
 import { searchShops, type ShopSearchResult } from '../../../data/rpc';
 import { fetchCategories, fetchCities, type SearchCategory, type SearchCity } from '../../../data/search';
@@ -177,27 +178,15 @@ export function SearchScreen() {
       <ExpiryBanner />
       <LocationBanner />
 
-      <div className={styles.searchBox}>
-        <label htmlFor="search-q" className="visually-hidden">
-          {t('search.label')}
-        </label>
-        <Search size={18} className={styles.searchIcon} aria-hidden="true" />
-        <input
-          id="search-q"
-          type="search"
-          className={styles.searchInput}
-          placeholder={t('search.placeholder')}
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          autoComplete="off"
-          enterKeyHint="search"
-        />
-        {text && (
-          <button type="button" className={styles.clearText} aria-label={t('search.clearQuery')} onClick={clearQuery}>
-            <X size={18} aria-hidden="true" />
-          </button>
-        )}
-      </div>
+      <SearchField
+        id="search-q"
+        label={t('search.label')}
+        placeholder={t('search.placeholder')}
+        value={text}
+        onChange={setText}
+        onClear={clearQuery}
+        clearLabel={t('search.clearQuery')}
+      />
 
       {meta.status === 'error' && <LoadError message={t('search.loadError')} onRetry={reloadMeta} />}
       {meta.status === 'ready' && (

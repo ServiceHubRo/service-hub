@@ -36,7 +36,9 @@ export type PluralUnit =
   | 'unit.quotes'
   | 'unit.newRequests'
   | 'unit.quotesToDecide'
-  | 'unit.unreadConversations';
+  | 'unit.unreadConversations'
+  | 'unit.repairs'
+  | 'unit.jobs';
 const pluralRules: Record<Lang, Intl.PluralRules> = {
   ro: new Intl.PluralRules('ro-RO'),
   en: new Intl.PluralRules('en-US'),

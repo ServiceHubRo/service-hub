@@ -148,3 +148,41 @@
   gap: 8px;
   margin-top: 4px;
 }
+
+/* ---------------------------------------------------------------- history row (P16c) */
+.history,
+.historyNone {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+  font-size: 13.5px;
+}
+
+.history {
+  min-height: var(--tap);
+  color: var(--text);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.history svg {
+  color: var(--muted);
+  flex-shrink: 0;
+}
+
+.history:hover .historyText {
+  color: var(--amber);
+}
+
+.historyText {
+  flex: 1;
+  min-width: 0;
+}
+
+.historyNone {
+  min-height: var(--tap);
+  color: var(--muted);
+}

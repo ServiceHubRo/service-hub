@@ -27,3 +27,20 @@ export interface ShopLinkState {
   backTo: string;
   backLabel: 'search' | 'favorites';
 }
+
+/** Vehicle history (T10, P16c): one screen, three ways in — the garage card, Cont, a finished booking. */
+export const VEHICLE_HISTORY_PICK_PATH = '/c/cont/istoric';
+
+export function carHistoryPath(carId: string): string {
+  return `${GARAGE_PATH}/${carId}/istoric`;
+}
+
+/** The history of the car a booking was for (also a car no longer in the garage). */
+export function bookingCarHistoryPath(bookingId: string): string {
+  return `${BOOKINGS_PATH}/${bookingId}/istoric`;
+}
+
+/** Router state of a link into the vehicle history: where "Înapoi" leads. */
+export interface VehicleHistoryLinkState {
+  from: 'garage' | 'bookings' | 'account';
+}

@@ -1,4 +1,4 @@
-import { Bell, Car as CarIcon, Pencil, Plus } from 'lucide-react';
+import { Bell, Car as CarIcon, ChevronRight, History, Pencil, Plus } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { buttonClass } from '../../../components/buttonClass';
 import { Card } from '../../../components/Card';
@@ -11,8 +11,10 @@ import { daysFromToday, formatDayMonth } from '../../../i18n/format';
 import type { MessageKey } from '../../../i18n/ro';
 import { plural } from '../../../i18n/translate';
 import { CAR_DOCS, urgencyOf, type CarDoc } from '../../../lib/expiry';
+import { jobsOf } from '../../../lib/history';
 import { useLoad } from '../../../lib/useLoad';
-import { carPath, NEW_CAR_PATH } from '../paths';
+import { useClientBookings } from '../bookings/clientBookingsContext';
+import { carHistoryPath, carPath, NEW_CAR_PATH, type VehicleHistoryLinkState } from '../paths';
 import styles from './garage.module.css';
 
 /**
@@ -22,6 +24,8 @@ import styles from './garage.module.css';
 export function GarageScreen() {
   const { t, lang } = useI18n();
   const { state, reload } = useLoad(fetchCars);
+  const { state: bookingsState } = useClientBookings();
+  const bookings = bookingsState.status === 'ready' ? bookingsState.data.bookings : null;
 
   return (
     <div className={styles.page}>
@@ -51,7 +55,7 @@ export function GarageScreen() {
             <ul className={styles.list}>
               {state.data.map((car) => (
                 <li key={car.id}>
-                  <CarCard car={car} />
+                  <CarCard car={car} jobs={bookings ? jobsOf(bookings, car).length : null} />
                 </li>
               ))}
             </ul>
@@ -65,8 +69,11 @@ export function GarageScreen() {
   );
 }
 
-function CarCard({ car }: { car: Car }) {
-  const { t } = useI18n();
+const FROM_GARAGE: VehicleHistoryLinkState = { from: 'garage' };
+
+/** `jobs`: finished jobs on this car (P16c), null while the bookings load (or did not). */
+function CarCard({ car, jobs }: { car: Car; jobs: number | null }) {
+  const { t, lang } = useI18n();
   const name = `${car.make} ${car.model}`;
   const anyDate = CAR_DOCS.some(({ column }) => car[column]);
   return (
@@ -85,6 +92,15 @@ function CarCard({ car }: { car: Car }) {
           <Pencil size={18} aria-hidden="true" />
         </Link>
       </div>
+      {jobs === null ? null : jobs > 0 ? (
+        <Link to={carHistoryPath(car.id)} state={FROM_GARAGE} className={styles.history}>
+          <History size={16} aria-hidden="true" />
+          <span className={styles.historyText}>{t('vh.garageRow', { jobs: plural(lang, 'unit.jobs', jobs) })}</span>
+          <ChevronRight size={18} aria-hidden="true" />
+        </Link>
+      ) : (
+        <p className={styles.historyNone}>{t('vh.noJobs')}</p>
+      )}
       {anyDate && (
         <ul className={styles.docs}>
           {CAR_DOCS.map(({ doc, column }) => (
