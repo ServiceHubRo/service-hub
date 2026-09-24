@@ -1,75 +1,59 @@
 import { CalendarDays } from 'lucide-react';
-import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { useSession } from '../../../app/sessionContext';
 import { buttonClass } from '../../../components/buttonClass';
-import { Card } from '../../../components/Card';
 import { EmptyState } from '../../../components/EmptyState';
 import { LoadError } from '../../../components/LoadError';
-import { ServiceIcon } from '../../../components/ServiceIcon';
 import { SkeletonList } from '../../../components/Skeleton';
-import { StatusBadge } from '../../../components/StatusBadge';
-import { fetchClientBookings, splitBookings, type ClientBooking } from '../../../data/bookings';
-import { subscribeRows } from '../../../data/realtime';
-import type { Booking } from '../../../data/rpc';
+import { splitBookings, type ClientBooking } from '../../../data/bookings';
 import { useI18n } from '../../../i18n/context';
-import { formatDate } from '../../../i18n/format';
-import { useLoad } from '../../../lib/useLoad';
+import { useNow } from '../../../lib/useNow';
 import { SEARCH_PATH } from '../paths';
-import { serviceName } from '../shop/serviceGroups';
+import { ClientBookingCard } from './ClientBookingCard';
+import { useClientBookings } from './clientBookingsContext';
 import styles from './bookings.module.css';
 
 /**
- * Programări (FR §3.5, P10b) — the basic cards of T07: service, shop, day and time, car, status.
- * Live: a change the shop makes shows up without reloading (Realtime, filtered to this client).
- * The quote decision, cancelling and the review arrive in T09.
+ * Programări (FR §3.5, P10b): active bookings first (soonest on top), then the ended ones (newest
+ * on top), every status with its badge. The quote decision, cancelling and the review happen on
+ * the cards. Live through ClientBookingsProvider: a change the shop makes shows up without
+ * reloading.
  */
 export function ClientBookingsScreen() {
   const { t } = useI18n();
-  const { user } = useSession();
-  const clientId = user?.id ?? '';
-  const load = useCallback(() => fetchClientBookings(clientId), [clientId]);
-  const { state, reload, setData } = useLoad(load);
+  const { state, reload, refresh, apply, patch } = useClientBookings();
+  const now = useNow();
 
-  // The latest list, for the realtime handler (which is set up once).
-  const known = useRef<ReadonlySet<string>>(new Set());
+  // Arriving here reads the list again quietly.
   useEffect(() => {
-    if (state.status === 'ready') known.current = new Set(state.data.map((b) => b.id));
-  }, [state]);
+    refresh();
+  }, [refresh]);
 
-  useEffect(() => {
-    if (!clientId) return;
-    let alive = true;
-    const refresh = () => {
-      fetchClientBookings(clientId).then(
-        (data) => {
-          if (alive) setData(data);
-        },
-        () => {}, // the list on screen stays; the next change or reconnect tries again
-      );
-    };
-    const stop = subscribeRows<Booking>({
-      channel: `client-bookings:${clientId}`,
-      table: 'bookings',
-      filter: `client_id=eq.${clientId}`,
-      onChange: (payload) => {
-        const row = payload.new as Partial<Booking>;
-        if (payload.eventType === 'UPDATE' && row.id && known.current.has(row.id)) {
-          const { status, date, slot, note } = row as Booking;
-          setData((prev) => prev.map((b) => (b.id === row.id ? { ...b, status: status as ClientBooking['status'], date, slot, note } : b)));
-        } else {
-          refresh(); // a new booking (from another device): its shop and service names come with a read
-        }
-      },
-      onResync: refresh,
-    });
-    return () => {
-      alive = false;
-      stop();
-    };
-  }, [clientId, setData]);
+  const data = state.status === 'ready' ? state.data : null;
+  const groups = useMemo(() => (data ? splitBookings(data.bookings) : null), [data]);
 
-  const groups = useMemo(() => (state.status === 'ready' ? splitBookings(state.data) : null), [state]);
+  const group = (title: string, items: ClientBooking[], id: string) =>
+    items.length === 0 ? null : (
+      <section className={styles.section} aria-labelledby={`bookings-${id}`}>
+        <h2 id={`bookings-${id}`} className={styles.sectionTitle}>
+          {title}
+        </h2>
+        <ul className={styles.list}>
+          {items.map((b) => (
+            <li key={b.id}>
+              <ClientBookingCard
+                booking={b}
+                reviewWindowDays={data?.reviewWindowDays ?? 60}
+                now={now}
+                onDone={apply}
+                onReviewed={(id, review) => patch(id, { review })}
+                onStale={refresh}
+              />
+            </li>
+          ))}
+        </ul>
+      </section>
+    );
 
   return (
     <div className={styles.page}>
@@ -90,56 +74,10 @@ export function ClientBookingsScreen() {
           />
         ) : (
           <>
-            <Group title={t('bookings.active')} items={groups.active} id="active" />
-            <Group title={t('bookings.past')} items={groups.past} id="past" />
+            {group(t('bookings.active'), groups.active, 'active')}
+            {group(t('bookings.past'), groups.past, 'past')}
           </>
         ))}
     </div>
-  );
-}
-
-function Group({ title, items, id }: { title: string; items: ClientBooking[]; id: string }) {
-  if (items.length === 0) return null;
-  return (
-    <section className={styles.section} aria-labelledby={`bookings-${id}`}>
-      <h2 id={`bookings-${id}`} className={styles.sectionTitle}>
-        {title}
-      </h2>
-      <ul className={styles.list}>
-        {items.map((b) => (
-          <li key={b.id}>
-            <BookingCard booking={b} />
-          </li>
-        ))}
-      </ul>
-    </section>
-  );
-}
-
-function BookingCard({ booking: b }: { booking: ClientBooking }) {
-  const { lang } = useI18n();
-  const car = [[b.car_snapshot.make, b.car_snapshot.model].filter(Boolean).join(' '), b.car_snapshot.plate].filter(Boolean).join(' · ');
-  return (
-    <Card highlight={b.status === 'quote_sent'} className={styles.card}>
-      <div className={styles.top}>
-        <ServiceIcon name={b.service?.icon} className={styles.icon} />
-        <div className={styles.what}>
-          <p className={styles.service}>{b.service ? serviceName(b.service, lang) : b.service_id}</p>
-          {b.shop && (
-            <p className={styles.muted}>
-              {b.shop.name} · {b.shop.city}
-            </p>
-          )}
-        </div>
-        <StatusBadge status={b.status} />
-      </div>
-      <p className={styles.when}>
-        <span className="mono">
-          {formatDate(lang, b.date)}, {b.slot.slice(0, 5)}
-        </span>
-        {car && <span className={styles.muted}> · {car}</span>}
-      </p>
-      {b.note && <p className={styles.note}>{b.note}</p>}
-    </Card>
   );
 }

@@ -197,17 +197,6 @@
 }
 
 /* ---------------------------------------------------------------- inline panels */
-.panel {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.panelTitle {
-  font-size: 15px;
-  font-weight: 700;
-}
-
 .panelBody {
   font-size: 14px;
 }
@@ -377,4 +366,30 @@
 .addRow:disabled {
   opacity: 0.45;
   cursor: not-allowed;
+}
+
+/* ---------------------------------------------------------------- completion */
+.odometer {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.unit {
+  padding-right: 14px;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 15px;
+  pointer-events: none;
+}
+
+.jump {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 12px;
+  border: 1px solid var(--amber-line);
+  border-radius: var(--radius-input);
+  background: var(--amber-tint);
+  font-size: 14px;
 }

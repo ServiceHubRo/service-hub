@@ -7,6 +7,7 @@ import { AccountScreen } from '../screens/account/AccountScreen';
 import { AuthScreen } from '../screens/auth/AuthScreen';
 import { BookingFlow } from '../screens/client/booking/BookingFlow';
 import { BookingSent } from '../screens/client/booking/BookingSent';
+import { ClientBookingsProvider } from '../screens/client/bookings/ClientBookingsProvider';
 import { ClientBookingsScreen } from '../screens/client/bookings/ClientBookingsScreen';
 import { FavoritesScreen } from '../screens/client/favorites/FavoritesScreen';
 import { CarFormScreen } from '../screens/client/garage/CarFormScreen';
@@ -90,6 +91,11 @@ function roleRoutes(role: Role) {
             <ShopBookingsProvider>
               <AppShell role={role} />
             </ShopBookingsProvider>
+          ) : role === 'client' ? (
+            // The client's bookings, live, for Programări and the badge on its tab.
+            <ClientBookingsProvider>
+              <AppShell role={role} />
+            </ClientBookingsProvider>
           ) : (
             <AppShell role={role} />
           )

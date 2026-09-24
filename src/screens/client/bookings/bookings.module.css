@@ -63,10 +63,264 @@
   overflow-wrap: anywhere;
 }
 
+.ref {
+  color: var(--muted);
+  font-size: 12.5px;
+}
+
 .note {
   color: var(--muted);
   font-size: 13px;
   font-style: italic;
   white-space: pre-line;
   overflow-wrap: anywhere;
+}
+
+.hint {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.reason {
+  font-size: 13.5px;
+  overflow-wrap: anywhere;
+  white-space: pre-line;
+}
+
+.ok {
+  color: var(--green);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.ask {
+  font-size: 14.5px;
+  font-weight: 600;
+  margin-top: 4px;
+}
+
+/* ---------------------------------------------------------------- live states */
+.live {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.liveTitle {
+  font-weight: 600;
+  font-size: 14.5px;
+}
+
+/* The amber dot of "în constatare" / "în lucru"; it pulses unless motion is reduced. */
+.dot {
+  flex-shrink: 0;
+  width: 10px;
+  height: 10px;
+  margin-top: 6px;
+  border-radius: 50%;
+  background: var(--amber);
+  box-shadow: 0 0 0 0 var(--amber-line);
+  animation: pulse 1.6s ease-out infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 var(--amber-line);
+  }
+  80%,
+  100% {
+    box-shadow: 0 0 0 9px rgba(245, 165, 36, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dot {
+    animation: none;
+  }
+}
+
+/* ---------------------------------------------------------------- quote */
+.quote {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.quoteLines {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.quoteLine {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 14px;
+}
+
+.lineText {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.lineName {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.unticked,
+.refused {
+  color: var(--muted);
+  text-decoration: line-through;
+}
+
+.quoteTotal {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 6px;
+  border-top: 1px solid var(--border);
+  font-weight: 700;
+}
+
+.quoteTotal .mono {
+  color: var(--amber);
+  font-size: 17px;
+}
+
+/* ---------------------------------------------------------------- finished job */
+.doneBox {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 11px;
+  border-radius: var(--radius-input);
+  background: var(--blue-soft);
+}
+
+.doneTitle {
+  color: var(--blue);
+  font-weight: 700;
+  font-size: 14.5px;
+}
+
+.facts {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 14px;
+}
+
+.facts div {
+  display: flex;
+  gap: 12px;
+}
+
+.facts dt {
+  flex: 0 0 92px;
+  color: var(--muted);
+}
+
+.facts dd {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  white-space: pre-line;
+}
+
+/* ---------------------------------------------------------------- actions */
+.actions,
+.buttons {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.buttons {
+  align-items: flex-start;
+}
+
+.panelBody {
+  font-size: 14px;
+}
+
+.reviewSent {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 13.5px;
+}
+
+.starFilled {
+  color: var(--amber);
+  fill: var(--amber);
+}
+
+.contact {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 12px;
+}
+
+.phone {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: var(--tap);
+  color: var(--amber);
+  font-size: 14px;
+}
+
+/* ---------------------------------------------------------------- review form */
+.rating {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ratingLabel {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.stars {
+  display: flex;
+  gap: 2px;
+}
+
+.star {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--tap);
+  height: var(--tap);
+  border-radius: var(--radius-button);
+  background: none;
+  border: 0;
+  color: var(--border-lit);
+  cursor: pointer;
+}
+
+.star:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+.starOn {
+  color: var(--amber);
+}
+
+.starOn svg {
+  fill: var(--amber);
+}
+
+.error {
+  color: var(--red);
+  font-size: 13px;
 }

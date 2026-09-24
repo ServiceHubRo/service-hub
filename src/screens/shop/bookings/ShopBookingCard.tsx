@@ -13,6 +13,7 @@ import {
   rpcErrorMessage,
   shopCancelBooking,
   startInspection,
+  startWork,
   toRpcError,
   withdrawQuote,
   type Booking,
@@ -23,12 +24,13 @@ import { daysFromToday, formatDate, formatMoney, formatTime, ymdInBucharest } fr
 import { slotStarted } from '../../../lib/shopBookings';
 import { formatPhone, normalizePhone } from '../../../lib/validators';
 import { ConfirmPanel, ReasonPanel } from './BookingPanels';
+import { CompletionPanel } from './CompletionPanel';
 import { QuoteComposer } from './QuoteComposer';
 import { QuoteLines } from './QuoteLines';
 import { ReschedulePanel } from './ReschedulePanel';
 import styles from './shopBookings.module.css';
 
-type PanelKind = 'decline' | 'reschedule' | 'cancel' | 'noShow' | 'quote' | 'editQuote' | 'withdraw';
+type PanelKind = 'decline' | 'reschedule' | 'cancel' | 'noShow' | 'quote' | 'editQuote' | 'withdraw' | 'complete';
 
 /** From 3 no-shows in 90 days shops see a discreet line (ARCHITECTURE §6); no automatic block. */
 const NO_SHOW_MARK = 3;
@@ -170,6 +172,22 @@ export function ShopBookingCard({ booking: b, shopId, fee, expiryDays, now, onDo
               </Button>
             </>
           )}
+          {b.status === 'approved' && (
+            <ActionButton
+              variant="success"
+              block={false}
+              onAction={(rid) => act(() => startWork(b.id, rid))}
+              errorMessage={(e) => rpcErrorMessage(lang, e)}
+              canRetry={canRetryRpc}
+            >
+              {t('sb.action.startWork')}
+            </ActionButton>
+          )}
+          {b.status === 'in_progress' && (
+            <Button variant="success" onClick={() => setPanel('complete')}>
+              {t('sb.action.complete')}
+            </Button>
+          )}
         </div>
       )}
 
@@ -211,9 +229,8 @@ export function ShopBookingCard({ booking: b, shopId, fee, expiryDays, now, onDo
           onClose={close}
         />
       )}
-      {panel === 'reschedule' && (
-<ReschedulePanel booking={b} shopId={shopId} act={act} onClose={close} />
-      )}
+      {panel === 'reschedule' && <ReschedulePanel booking={b} shopId={shopId} act={act} onClose={close} />}
+      {panel === 'complete' && <CompletionPanel booking={b} act={act} onClose={close} />}
       {(panel === 'quote' || panel === 'editQuote') && (
         <QuoteComposer
           booking={b}
@@ -273,7 +290,8 @@ function StatusDetail({ booking: b, started }: { booking: ShopBooking; started: 
                     total: b.quote.items.length,
                     amount: formatMoney(lang, b.quote.total_approved ?? 0),
                   })
-                : t('sb.detail.approved', { amount: formatMoney(lang, b.quote.total_approved ?? b.quote.total_sent) })}
+                : t('sb.detail.approved', { amount: formatMoney(lang, b.quote.total_approved ?? b.quote.total_sent) })}{' '}
+              {t('sb.detail.approvedNext')}
             </p>
           )}
         </>

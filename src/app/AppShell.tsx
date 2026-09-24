@@ -4,7 +4,10 @@ import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { LogoTile } from '../components/LogoTile';
 import { Wordmark } from '../components/Wordmark';
 import { useI18n } from '../i18n/context';
-import { plural } from '../i18n/translate';
+import { plural, type PluralUnit } from '../i18n/translate';
+import { quotesWaiting } from '../lib/clientBookings';
+import { useOptionalClientBookings } from '../screens/client/bookings/clientBookingsContext';
+import { BOOKINGS_PATH } from '../screens/client/paths';
 import { useOptionalShopBookings } from '../screens/shop/bookings/shopBookingsContext';
 import { SHOP_BOOKINGS_PATH } from '../screens/shop/paths';
 import { EmailVerifyBanner } from './EmailVerifyBanner';
@@ -28,27 +31,43 @@ function NavIcon({ item, size, badge }: { item: NavItem; size: number; badge: nu
 }
 
 /** ", 3 cereri noi" for screen readers, after the item's label. */
-function BadgeText({ badge }: { badge: number }) {
+function BadgeText({ badge }: { badge: Badge | undefined }) {
   const { lang } = useI18n();
-  return badge > 0 ? <span className="visually-hidden">, {plural(lang, 'unit.newRequests', badge)}</span> : null;
+  return badge && badge.count > 0 ? <span className="visually-hidden">, {plural(lang, badge.unit, badge.count)}</span> : null;
 }
 
-function SidebarLink({ item, badge = 0 }: { item: NavItem; badge?: number }) {
+function SidebarLink({ item, badge }: { item: NavItem; badge?: Badge }) {
   const { t } = useI18n();
   return (
     <NavLink to={item.path} className={({ isActive }) => `${styles.sideLink} ${isActive ? styles.sideActive : ''}`}>
-      <NavIcon item={item} size={20} badge={badge} />
+      <NavIcon item={item} size={20} badge={badge?.count ?? 0} />
       <span>{t(item.labelKey)}</span>
       <BadgeText badge={badge} />
     </NavLink>
   );
 }
 
-/** Counts shown on navigation items: new booking requests on the shop's Programări. */
-function useNavBadges(): Record<string, number> {
+/** A count on a navigation item and what it counts (read out after the label). */
+interface Badge {
+  count: number;
+  unit: PluralUnit;
+}
+
+/**
+ * Counts shown on navigation items: new booking requests on the shop's Programări, quotes waiting
+ * for a decision on the client's.
+ */
+function useNavBadges(): Record<string, Badge> {
   const shopBookings = useOptionalShopBookings();
-  if (shopBookings?.state.status !== 'ready') return {};
-  return { [SHOP_BOOKINGS_PATH]: shopBookings.state.data.bookings.filter((b) => b.status === 'pending').length };
+  const clientBookings = useOptionalClientBookings();
+  if (shopBookings?.state.status === 'ready') {
+    const count = shopBookings.state.data.bookings.filter((b) => b.status === 'pending').length;
+    return { [SHOP_BOOKINGS_PATH]: { count, unit: 'unit.newRequests' } };
+  }
+  if (clientBookings?.state.status === 'ready') {
+    return { [BOOKINGS_PATH]: { count: quotesWaiting(clientBookings.state.data.bookings), unit: 'unit.quotesToDecide' } };
+  }
+  return {};
 }
 
 /**
@@ -133,9 +152,9 @@ export function AppShell({ role }: { role: Role }) {
               to={item.path}
               className={({ isActive }) => `${styles.tab} ${isActive ? styles.tabActive : ''}`}
             >
-              <NavIcon item={item} size={21} badge={badges[item.path] ?? 0} />
+              <NavIcon item={item} size={21} badge={badges[item.path]?.count ?? 0} />
               <span className={styles.tabLabel}>{t(item.labelKey)}</span>
-              <BadgeText badge={badges[item.path] ?? 0} />
+              <BadgeText badge={badges[item.path]} />
             </NavLink>
           );
         })}
