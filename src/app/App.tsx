@@ -35,6 +35,13 @@ import { ShopSettingsLayout } from '../screens/shop/settings/ShopSettingsLayout'
 import { StaffSettings } from '../screens/shop/settings/StaffSettings';
 import { ShopBookingsProvider } from '../screens/shop/bookings/ShopBookingsProvider';
 import { ShopBookingsScreen } from '../screens/shop/bookings/ShopBookingsScreen';
+import { REVIEWS_PATH } from '../screens/shop/paths';
+import { ShopReviewsScreen } from '../screens/shop/reviews/ShopReviewsScreen';
+import { BookingThreadRedirect } from '../screens/messages/BookingThreadRedirect';
+import { ConversationScreen } from '../screens/messages/ConversationScreen';
+import { MessagesScreen } from '../screens/messages/MessagesScreen';
+import { messagesPath } from '../screens/messages/paths';
+import { ThreadsProvider } from '../screens/messages/ThreadsProvider';
 import { AppShell } from './AppShell';
 import { PublicOnly, RoleGuard } from './RoleGuard';
 import { NAV, homeOf, type Role } from './roles';
@@ -49,7 +56,20 @@ const SCREENS: Record<string, ReactElement> = {
   '/c/programari': <ClientBookingsScreen />,
   '/s/panou': <Dashboard />,
   '/s/programari': <ShopBookingsScreen />,
+  '/c/mesaje': <MessagesScreen />,
+  '/s/mesaje': <MessagesScreen />,
 };
+
+/** A conversation and the way in from a booking card (T11), for the client and the shop. */
+function messageRoutes(side: 'client' | 'shop') {
+  const base = messagesPath(side);
+  return (
+    <>
+      <Route path={`${base}/programare/:bookingId`} element={<BookingThreadRedirect />} />
+      <Route path={`${base}/:threadId`} element={<ConversationScreen />} />
+    </>
+  );
+}
 
 /** Routes a role has besides its navigation items and Cont. */
 function extraRoutes(role: Role) {
@@ -62,12 +82,16 @@ function extraRoutes(role: Role) {
         <Route path="/c/garaj/nou" element={<CarFormScreen />} />
         <Route path="/c/garaj/:carId" element={<CarFormScreen />} />
         <Route path="/c/cont/favorite" element={<FavoritesScreen />} />
+        {messageRoutes('client')}
       </>
     );
   }
   if (role !== 'shop') return null;
   return (
-    <Route path={SETTINGS_PATH} element={<ShopSettingsLayout />}>
+    <>
+      {messageRoutes('shop')}
+      <Route path={REVIEWS_PATH} element={<ShopReviewsScreen />} />
+      <Route path={SETTINGS_PATH} element={<ShopSettingsLayout />}>
       <Route index element={<SettingsIndex />} />
       <Route path="profil" element={<ProfileSettings />} />
       <Route path="program" element={<HoursSettings />} />
@@ -75,8 +99,9 @@ function extraRoutes(role: Role) {
       <Route path="servicii" element={<ServicesSettings />} />
       <Route path="facturare" element={<BillingSettings />} />
       <Route path="personal" element={<StaffSettings />} />
-      <Route path="notificari" element={<NotificationSettings />} />
-    </Route>
+        <Route path="notificari" element={<NotificationSettings />} />
+      </Route>
+    </>
   );
 }
 
@@ -87,14 +112,19 @@ function roleRoutes(role: Role) {
       <Route
         element={
           role === 'shop' ? (
-            // One live list of the shop's bookings for Panou, Programări and the tab badge.
+            // One live list of the shop's bookings for Panou, Programări and the tab badge; one of
+            // its conversations for Mesaje and that tab's badge.
             <ShopBookingsProvider>
-              <AppShell role={role} />
+              <ThreadsProvider side="shop">
+                <AppShell role={role} />
+              </ThreadsProvider>
             </ShopBookingsProvider>
           ) : role === 'client' ? (
             // The client's bookings, live, for Programări and the badge on its tab.
             <ClientBookingsProvider>
-              <AppShell role={role} />
+              <ThreadsProvider side="client">
+                <AppShell role={role} />
+              </ThreadsProvider>
             </ClientBookingsProvider>
           ) : (
             <AppShell role={role} />

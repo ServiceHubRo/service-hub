@@ -61,6 +61,13 @@
   padding: var(--page-pad);
 }
 
+/* A screen that fills the whole content area (a conversation keeps its box at the bottom). */
+.content:has(> [data-fill-screen]) {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
 .bottomBar {
   flex-shrink: 0;
   display: flex;

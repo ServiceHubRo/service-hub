@@ -28,6 +28,7 @@ import { CompletionPanel } from './CompletionPanel';
 import { QuoteComposer } from './QuoteComposer';
 import { QuoteLines } from './QuoteLines';
 import { ReschedulePanel } from './ReschedulePanel';
+import { MessageLink } from '../../messages/MessageLink';
 import styles from './shopBookings.module.css';
 
 type PanelKind = 'decline' | 'reschedule' | 'cancel' | 'noShow' | 'quote' | 'editQuote' | 'withdraw' | 'complete';
@@ -188,6 +189,8 @@ export function ShopBookingCard({ booking: b, shopId, fee, expiryDays, now, onDo
               {t('sb.action.complete')}
             </Button>
           )}
+          {/* A deleted client account has no conversation. */}
+          {b.client_account && <MessageLink side="shop" bookingId={b.id} />}
         </div>
       )}
 

@@ -14,6 +14,7 @@ import { useI18n } from '../../../i18n/context';
 import { daysFromToday, formatDate, formatKm, formatMoney, formatTime, ymdInBucharest } from '../../../i18n/format';
 import { cancelState, reviewState, type Quote } from '../../../lib/clientBookings';
 import { formatPhone, normalizePhone } from '../../../lib/validators';
+import { MessageLink } from '../../messages/MessageLink';
 import { bookingPath } from '../paths';
 import { serviceName } from '../shop/serviceGroups';
 import { QuoteDecision } from './QuoteDecision';
@@ -65,7 +66,8 @@ export function ClientBookingCard({ booking: b, reviewWindowDays, now, onDone, o
   }
 
   const bookAgain = b.status === 'done' && b.shop;
-  const hasActions = panel === null && (cancel !== 'not_allowed' || review === 'open' || review === 'sent' || bookAgain);
+  // "Mesaj" is on every card, so the actions row always shows while no panel is open.
+  const hasActions = panel === null;
 
   return (
     <Card highlight={b.status === 'quote_sent'} className={styles.card}>
@@ -114,6 +116,7 @@ export function ClientBookingCard({ booking: b, reviewWindowDays, now, onDone, o
               {t('cb.bookAgain')}
             </Link>
           )}
+          <MessageLink side="client" bookingId={b.id} />
           {review === 'sent' && (
             <p className={styles.reviewSent}>
               <Star size={15} aria-hidden="true" className={styles.starFilled} />

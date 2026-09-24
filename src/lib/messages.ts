@@ -129,12 +129,12 @@ export function mergeMessages<T extends { id: string; created_at: string }>(curr
   );
 }
 
-/** Initials for an avatar: "Ana Marin" → "AM"; nothing → "?". */
-export function initials(name: string | null | undefined): string {
-  const words = (name ?? '').trim().split(/\s+/).filter(Boolean);
-  if (words.length === 0) return '?';
-  return words
-    .slice(0, 2)
-    .map((w) => w[0]!.toUpperCase())
-    .join('');
+/** The other side's name as the reader sees it; a deleted client account has none. */
+export function counterpartName(
+  side: Side,
+  thread: { shop_name: string; client_name: string | null },
+  deletedLabel: string,
+): string {
+  if (side === 'client') return thread.shop_name;
+  return thread.client_name?.trim() || deletedLabel;
 }

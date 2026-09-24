@@ -1,4 +1,4 @@
-import { FileText, Globe, Heart, Settings } from 'lucide-react';
+import { FileText, Globe, Heart, Settings, Star } from 'lucide-react';
 import { useOutletContext } from 'react-router-dom';
 import type { ShellOutletContext } from '../../app/AppShell';
 import { LangSwitch } from '../../app/LangSwitch';
@@ -11,6 +11,7 @@ import { useI18n } from '../../i18n/context';
 import type { MessageKey } from '../../i18n/ro';
 import { LEGAL_DOCS } from '../../lib/legal';
 import { FAVORITES_PATH } from '../client/paths';
+import { REVIEWS_PATH } from '../shop/paths';
 import { SETTINGS_PATH } from '../shop/settings/paths';
 import { DataSection } from './DataSection';
 import { IdentityCard } from './IdentityCard';
@@ -27,7 +28,7 @@ const SUBTITLE: Record<Role, MessageKey> = {
 /**
  * Cont, the part every role shares (P13b): identity, language, email and password, legal
  * documents, my data, log out. Clients also get Locație and Favorite (T06); shops get the Setări
- * tile; Abonament, Recenzii and Rapoarte arrive with their tasks.
+ * and Recenzii tiles; Abonament and Rapoarte arrive with their tasks.
  */
 export function AccountScreen({ role }: { role: Role }) {
   const { t } = useI18n();
@@ -64,6 +65,7 @@ export function AccountScreen({ role }: { role: Role }) {
       {role === 'shop' && (
         <div className={styles.tiles}>
           <Tile to={SETTINGS_PATH} icon={Settings} label={t('account.tile.settings')} />
+          <Tile to={REVIEWS_PATH} icon={Star} label={t('reviews.title')} />
         </div>
       )}
 
