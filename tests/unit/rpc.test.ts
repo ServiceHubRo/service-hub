@@ -1,5 +1,3 @@
-import { readFileSync, readdirSync } from 'node:fs';
-import { join } from 'node:path';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { en } from '../../src/i18n/en';
 import { ro } from '../../src/i18n/ro';
@@ -22,10 +20,10 @@ const {
 
 /** Every code raised with public.fail('…') in the migrations. */
 function codesInMigrations(): string[] {
-  const dir = join(__dirname, '../../supabase/migrations');
+  const files = import.meta.glob('../../supabase/migrations/*.sql', { query: '?raw', import: 'default', eager: true });
   const codes = new Set<string>();
-  for (const file of readdirSync(dir)) {
-    for (const m of readFileSync(join(dir, file), 'utf8').matchAll(/public\.fail\('([a-z_]+)'/g)) codes.add(m[1]!);
+  for (const sql of Object.values(files) as string[]) {
+    for (const m of sql.matchAll(/public\.fail\('([a-z_]+)'/g)) codes.add(m[1]!);
   }
   return [...codes].sort();
 }
@@ -114,7 +112,9 @@ describe('rpcErrorMessage', () => {
 });
 
 describe('calls', () => {
-  beforeEach(() => rpc.mockReset());
+  beforeEach(() => {
+    rpc.mockReset();
+  });
 
   it('createBooking sends a garage car by id', async () => {
     rpc.mockResolvedValue({ data: { id: 'b1', status: 'pending' }, error: null });
