@@ -22,7 +22,8 @@ export function checkSupabaseConfig(rawUrl: string | undefined, rawKey: string |
   if (!/^https?:$/.test(parsed.protocol) || (parsed.pathname !== '/' && parsed.pathname !== '')) {
     return { ok: false, problem: 'bad_url' };
   }
-  if (/abcdefgh|your-project|<|cheia-anon/i.test(url + key)) return { ok: false, problem: 'placeholder' };
+  // The example values from PORNIRE.md / .env.example, copied as they are.
+  if (parsed.hostname === 'abcdefgh.supabase.co' || /^cheia-anon/i.test(key)) return { ok: false, problem: 'placeholder' };
   return { ok: true, url: parsed.origin, key };
 }
 
