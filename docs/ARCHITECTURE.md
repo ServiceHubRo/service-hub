@@ -84,6 +84,7 @@ Settings writes (T05): public data, booking rules, fee, preferences, closures an
 **cars** — owner only; **shops have no access at all**
 - `owner_id`, `make not null`, `model not null`, `year int`, `plate`, `plate_norm` (generated: upper-case, no spaces or dashes), `vin` (17 chars, upper-case, no I/O/Q), `itp_expiry date`, `rca_expiry date`, `vignette_expiry date`
 - `reminded jsonb default '{}'` — thresholds already notified per document and expiry date, e.g. `{"itp":{"2026-11-02":[30,7]}}`, so a reminder is never sent twice
+- Written by the browser as plain rows (column grants + RLS). **A new car's `id` is made in the browser once per form** (T07), so a save retried after a lost answer hits the primary key and the app reads back the row it already wrote instead of adding the car twice.
 
 **favorites** — `(client_id, shop_id)` primary key
 
@@ -203,6 +204,8 @@ For a shop, a date is bookable when all hold:
 Slots: from `open_time` to `close_time − slot_minutes`, every `slot_minutes`. A slot is available when its start is at least `min_notice_hours` from now and active bookings at that exact slot `< cars_per_slot`.
 
 The booking calendar shows the next 12 bookable days (3 columns mobile, 6 desktop) with "places left" per day; full days dimmed and disabled. The time grid shows taken slots struck through and disabled.
+
+**Booking flow (T07).** `/c/service/:id/programare?pas=&serviciu=&zi=&ora=` — the choices live in the address, so Back goes one step back and a reload keeps them. The day list is `get_availability` from today up to `max_advance_days`, filtered by `bookingDays()` (`src/lib/bookingDays.ts`): closed days, closures and `too_far` never show; `full` shows dimmed; `no_slots` shows dimmed only after the minimum-notice window (before it the day simply has no time left: today after the last slot, or inside the notice). Times that are `past`/`too_soon` are hidden, `full` struck through. When `create_booking` answers one of the codes in `RELOAD_AVAILABILITY_CODES` (`past_slot`, `day_full`, `slot_full`, …), the flow shows that message above a freshly loaded day list; the car and note stay. A client without a confirmed email sees the explanation instead of the send button.
 
 Enforcement: `create_booking` and `reschedule_booking` lock the shop row (`select … for update` on `shops`) before counting, so concurrent requests serialize. A `BEFORE INSERT OR UPDATE` trigger on `bookings` repeats the capacity check as a safety net.
 

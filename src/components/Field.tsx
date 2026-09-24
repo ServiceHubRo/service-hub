@@ -7,12 +7,14 @@ export interface FieldProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 
   error?: string | null;
   /** Plates, phones, prices, km. */
   mono?: boolean;
+  /** Shown in capitals as typed (plates, VIN); the caller stores the upper-case value. */
+  upper?: boolean;
   /** A small button inside the input, on the right (e.g. show password). */
   end?: ReactNode;
 }
 
 /** Label + input + hint/error, tied together for screen readers. */
-export function Field({ label, hint, error, mono, end, className, ...rest }: FieldProps) {
+export function Field({ label, hint, error, mono, upper, end, className, ...rest }: FieldProps) {
   const id = useId();
   const hintId = hint ? `${id}-hint` : undefined;
   const errorId = error ? `${id}-error` : undefined;
@@ -24,7 +26,7 @@ export function Field({ label, hint, error, mono, end, className, ...rest }: Fie
       <div className={end ? styles.withEnd : undefined}>
         <input
           id={id}
-          className={`${styles.input} ${mono ? 'mono' : ''}`}
+          className={`${styles.input} ${mono ? 'mono' : ''} ${upper ? styles.upper : ''}`}
           aria-invalid={error ? true : undefined}
           aria-describedby={[hintId, errorId].filter(Boolean).join(' ') || undefined}
           {...rest}

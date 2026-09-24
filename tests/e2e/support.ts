@@ -76,6 +76,41 @@ export async function verifyPhoneByAdmin(email: string): Promise<void> {
   expect(res.ok, await res.clone().text()).toBe(true);
 }
 
+/** A request to the local REST API as the service role (test stack only; bypasses RLS). */
+export async function serviceRest<T = unknown>(path: string, method: 'GET' | 'POST' | 'PATCH', body?: unknown): Promise<T> {
+  const res = await fetch(`${API}/rest/v1/${path}`, {
+    method,
+    headers: {
+      apikey: SERVICE_KEY,
+      Authorization: `Bearer ${SERVICE_KEY}`,
+      'Content-Type': 'application/json',
+      Prefer: 'return=representation',
+    },
+    body: body === undefined ? undefined : JSON.stringify(body),
+  });
+  expect(res.ok, await res.clone().text()).toBe(true);
+  return (await res.json()) as T;
+}
+
+/**
+ * A new shop that clients can book: phone verified by hand, the given services offered, default
+ * hours (Mon–Fri 08:00–18:00), and any booking rules to change. Returns the shop id.
+ */
+export async function createBookableShop(
+  shopName: string,
+  services: string[],
+  rules: Record<string, number> = {},
+): Promise<{ email: string; shopId: string }> {
+  const email = await createUser('shop', { shop_name: shopName });
+  await verifyPhoneByAdmin(email);
+  const owner = await userIdOf(email);
+  const [shop] = await serviceRest<{ id: string }[]>(`shops?owner_id=eq.${owner}&select=id`, 'GET');
+  const shopId = shop!.id;
+  await serviceRest('shop_services', 'POST', services.map((service_id) => ({ shop_id: shopId, service_id })));
+  if (Object.keys(rules).length > 0) await serviceRest(`shops?id=eq.${shopId}`, 'PATCH', rules);
+  return { email, shopId };
+}
+
 /** Revokes every session of a user (as if they changed their password elsewhere). */
 export async function revokeSessions(accessToken: string): Promise<void> {
   const res = await fetch(`${API}/auth/v1/logout?scope=global`, {

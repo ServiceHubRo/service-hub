@@ -31,3 +31,10 @@ export const STATUS_TONE: Record<BookingStatus, StatusTone> = {
 };
 
 export const BOOKING_STATUSES = Object.keys(STATUS_TONE) as BookingStatus[];
+
+/** Statuses that still hold a place in the shop's calendar (ARCHITECTURE §3). */
+const ACTIVE: ReadonlySet<BookingStatus> = new Set(['pending', 'confirmed', 'in_inspection', 'quote_sent', 'approved', 'in_progress']);
+
+export function isActiveStatus(status: BookingStatus): boolean {
+  return ACTIVE.has(status);
+}

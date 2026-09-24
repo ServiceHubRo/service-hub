@@ -1,0 +1,299 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.title {
+  outline: none;
+}
+
+.sub,
+.muted {
+  color: var(--muted);
+  font-size: 13.5px;
+}
+
+.sub {
+  margin-top: 2px;
+  overflow-wrap: anywhere;
+}
+
+/* ---------------------------------------------------------------- progress (P6: 4 segments) */
+.progress {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.bars {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 5px;
+}
+
+.bar,
+.barOn {
+  height: 4px;
+  border-radius: 2px;
+  background: var(--border);
+}
+
+.barOn {
+  background: var(--amber);
+}
+
+.progressText {
+  font-size: 12px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ---------------------------------------------------------------- option lists (services, cars) */
+.groups {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.groupTitle {
+  margin-bottom: 7px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.options {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 52px;
+  padding: 11px var(--card-pad);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  text-align: left;
+}
+
+.option:hover {
+  border-color: var(--border-lit);
+}
+
+.optionOn,
+.optionOn:hover {
+  border-color: var(--amber);
+  background: var(--amber-tint);
+}
+
+.dashed {
+  border-style: dashed;
+  border-color: var(--border-lit);
+}
+
+.optionIcon {
+  color: var(--amber);
+  flex-shrink: 0;
+}
+
+.optionText {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  overflow-wrap: anywhere;
+}
+
+.carName {
+  font-weight: 650;
+}
+
+.plate {
+  color: var(--amber);
+  font-size: 12.5px;
+}
+
+.check {
+  color: var(--amber);
+  flex-shrink: 0;
+}
+
+.chevron {
+  color: var(--muted);
+  flex-shrink: 0;
+}
+
+/* ---------------------------------------------------------------- day and time grids: 3 → 6 columns */
+.grid {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+@media (min-width: 1024px) {
+  .grid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+}
+
+.tile,
+.time {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-button);
+}
+
+.tile {
+  min-height: 76px;
+  padding: 8px 4px;
+  gap: 1px;
+}
+
+.time {
+  min-height: var(--tap);
+  padding: 10px 4px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.tile:hover:not(:disabled),
+.time:hover:not(:disabled) {
+  border-color: var(--border-lit);
+}
+
+.tile:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.tileOn,
+.tileOn:hover:not(:disabled) {
+  border-color: var(--amber);
+  background: var(--amber-tint);
+}
+
+.tileSmall {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.2;
+}
+
+.tileBig {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.places,
+.full {
+  margin-top: 3px;
+  font-size: 11.5px;
+  line-height: 1.2;
+}
+
+.places {
+  color: var(--green);
+}
+
+.full {
+  color: var(--red);
+}
+
+.taken {
+  opacity: 0.45;
+  text-decoration: line-through;
+  cursor: not-allowed;
+}
+
+/* ---------------------------------------------------------------- car form, summary */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.pair {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 10px;
+}
+
+.summary {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.summaryRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.summaryValue {
+  font-weight: 650;
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* ---------------------------------------------------------------- success */
+.sent {
+  align-items: stretch;
+  text-align: center;
+  padding-top: 12px;
+}
+
+.sentIcon {
+  align-self: center;
+  width: 66px;
+  height: 66px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--green);
+  color: #fff;
+}
+
+.sentTitle {
+  margin-top: 6px;
+}
+
+.sentBody {
+  color: var(--muted);
+}
+
+.sent .summary {
+  text-align: left;
+}
+
+.sentActions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 4px;
+}

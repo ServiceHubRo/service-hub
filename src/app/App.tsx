@@ -5,9 +5,13 @@ import { I18nProvider } from '../i18n/I18nProvider';
 import { IS_TEST_BUILD } from '../lib/env';
 import { AccountScreen } from '../screens/account/AccountScreen';
 import { AuthScreen } from '../screens/auth/AuthScreen';
+import { BookingFlow } from '../screens/client/booking/BookingFlow';
+import { BookingSent } from '../screens/client/booking/BookingSent';
+import { ClientBookingsScreen } from '../screens/client/bookings/ClientBookingsScreen';
 import { FavoritesScreen } from '../screens/client/favorites/FavoritesScreen';
+import { CarFormScreen } from '../screens/client/garage/CarFormScreen';
+import { GarageScreen } from '../screens/client/garage/GarageScreen';
 import { SearchScreen } from '../screens/client/search/SearchScreen';
-import { BookingSoon } from '../screens/client/shop/BookingSoon';
 import { ShopPage } from '../screens/client/shop/ShopPage';
 import { CheckEmail } from '../screens/auth/CheckEmail';
 import { ForgotPassword } from '../screens/auth/ForgotPassword';
@@ -38,6 +42,8 @@ import styles from './App.module.css';
 /** Screens built so far; the other navigation items show only their title until their task. */
 const SCREENS: Record<string, ReactElement> = {
   '/c/cauta': <SearchScreen />,
+  '/c/garaj': <GarageScreen />,
+  '/c/programari': <ClientBookingsScreen />,
   '/s/panou': <Dashboard />,
 };
 
@@ -47,7 +53,10 @@ function extraRoutes(role: Role) {
     return (
       <>
         <Route path="/c/service/:shopId" element={<ShopPage />} />
-        <Route path="/c/service/:shopId/programare" element={<BookingSoon />} />
+        <Route path="/c/service/:shopId/programare" element={<BookingFlow />} />
+        <Route path="/c/service/:shopId/programare/trimisa" element={<BookingSent />} />
+        <Route path="/c/garaj/nou" element={<CarFormScreen />} />
+        <Route path="/c/garaj/:carId" element={<CarFormScreen />} />
         <Route path="/c/cont/favorite" element={<FavoritesScreen />} />
       </>
     );

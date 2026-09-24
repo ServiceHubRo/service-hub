@@ -15,6 +15,7 @@ import { useLocation } from '../../../lib/location';
 import { cityNamedBy, fold } from '../../../lib/text';
 import { useLoad } from '../../../lib/useLoad';
 import { SEARCH_PATH, type ShopLinkState } from '../paths';
+import { ExpiryBanner } from './ExpiryBanner';
 import { LocationBanner } from './LocationBanner';
 import { RankingExplanation, RankingToggle } from './RankingInfo';
 import { ShopCard } from './ShopCard';
@@ -173,6 +174,7 @@ export function SearchScreen() {
     <div className={styles.page}>
       <h1>{t('nav.client.search')}</h1>
 
+      <ExpiryBanner />
       <LocationBanner />
 
       <div className={styles.searchBox}>
