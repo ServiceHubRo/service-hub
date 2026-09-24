@@ -65,3 +65,18 @@ jobs:
           else
             echo "No Edge Functions yet."
           fi
+
+      # Push notifications (T12): on its first call the dispatcher makes its VAPID keys and stores
+      # its own address, so the database can wake it after every new notification. Repeating it
+      # changes nothing. If it does not answer, the app's first "Activează" does the same.
+      - name: Start the notification dispatcher
+        run: |
+          url="https://${SUPABASE_PROJECT_REF}.supabase.co/functions/v1/dispatch-notifications"
+          for i in 1 2 3 4 5; do
+            if curl -fsS --max-time 30 "$url" > /dev/null; then
+              echo "Dispatcher ready."
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "::warning title=Notificări::dispatch-notifications nu a răspuns. Pornește singur la prima activare a notificărilor din aplicație."

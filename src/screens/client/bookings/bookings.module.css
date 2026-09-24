@@ -324,3 +324,10 @@
   color: var(--red);
   font-size: 13px;
 }
+
+/* The booking a tapped notification opened (?p=). */
+.focused {
+  border-radius: var(--radius-card, 12px);
+  outline: 2px solid var(--amber);
+  outline-offset: 3px;
+}

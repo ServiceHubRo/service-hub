@@ -1,6 +1,6 @@
 import { CalendarDays } from 'lucide-react';
-import { useEffect, useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import { useEffect, useMemo, useRef } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import { buttonClass } from '../../../components/buttonClass';
 import { EmptyState } from '../../../components/EmptyState';
 import { LoadError } from '../../../components/LoadError';
@@ -17,12 +17,14 @@ import styles from './bookings.module.css';
  * Programări (FR §3.5, P10b): active bookings first (soonest on top), then the ended ones (newest
  * on top), every status with its badge. The quote decision, cancelling and the review happen on
  * the cards. Live through ClientBookingsProvider: a change the shop makes shows up without
- * reloading.
+ * reloading. `?p=<id>` (a tapped notification) scrolls to that booking and marks it.
  */
 export function ClientBookingsScreen() {
   const { t } = useI18n();
   const { state, reload, refresh, apply, patch } = useClientBookings();
   const now = useNow();
+  const focusId = useSearchParams()[0].get('p');
+  const scrolledTo = useRef<string | null>(null);
 
   // Arriving here reads the list again quietly.
   useEffect(() => {
@@ -31,6 +33,20 @@ export function ClientBookingsScreen() {
 
   const data = state.status === 'ready' ? state.data : null;
   const groups = useMemo(() => (data ? splitBookings(data.bookings) : null), [data]);
+  const focusShown = Boolean(focusId && data?.bookings.some((b) => b.id === focusId));
+
+  // Once the booking is on screen; after the shell's own scroll to the top of a new screen.
+  useEffect(() => {
+    if (!focusId || !focusShown || scrolledTo.current === focusId) return;
+    scrolledTo.current = focusId;
+    const id = window.setTimeout(() => {
+      const el = document.getElementById(`booking-${focusId}`);
+      const smooth = !window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+      el?.scrollIntoView?.({ block: 'center', behavior: smooth ? 'smooth' : 'auto' });
+      el?.focus({ preventScroll: true });
+    }, 50);
+    return () => window.clearTimeout(id);
+  }, [focusId, focusShown]);
 
   const group = (title: string, items: ClientBooking[], id: string) =>
     items.length === 0 ? null : (
@@ -40,7 +56,12 @@ export function ClientBookingsScreen() {
         </h2>
         <ul className={styles.list}>
           {items.map((b) => (
-            <li key={b.id}>
+            <li
+              key={b.id}
+              id={`booking-${b.id}`}
+              tabIndex={b.id === focusId ? -1 : undefined}
+              className={b.id === focusId ? styles.focused : undefined}
+            >
               <ClientBookingCard
                 booking={b}
                 reviewWindowDays={data?.reviewWindowDays ?? 60}

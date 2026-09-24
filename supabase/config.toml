@@ -427,3 +427,7 @@ verify_jwt = false
 
 [functions.geocode]
 verify_jwt = false
+
+# Called by the database (pg_net, with its own token) and, for the public VAPID key, by the app.
+[functions.dispatch-notifications]
+verify_jwt = false

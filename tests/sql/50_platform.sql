@@ -119,7 +119,7 @@ select test.eq(
   || 'cancel_email_change, client_no_show_count, complete_job, confirm_booking, create_booking, decide_quote, '
   || 'decline_booking, export_my_data, get_availability, get_shop_page, get_shop_setup, invite_staff, is_admin, is_shop_member, '
   || 'is_shop_owner, is_shop_public, last_odometer_for_booking, list_shop_bookings, list_shop_history, list_shop_staff, list_threads, '
-  || 'mark_no_show, mark_thread_read, my_shop_id, replace_quote, reply_review, report_review, reschedule_booking, '
+  || 'mark_no_show, mark_thread_read, my_shop_id, replace_quote, reply_review, report_review, reschedule_booking, save_push_subscription, '
   || 'save_shop_hours, search_cities, search_shops, send_message, send_quote, set_shop_services, shop_cancel_booking, start_inspection, '
   || 'start_work, submit_review, toggle_favorite, withdraw_quote',
   'functions callable only when signed in')

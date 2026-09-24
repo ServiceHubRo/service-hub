@@ -2,6 +2,7 @@ import type { Session, User } from '@supabase/supabase-js';
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { signOut as authSignOut } from '../data/auth';
 import { fetchProfile, updateLang, type Profile } from '../data/profile';
+import { forgetPushDevice } from '../data/push';
 import { onSessionLost } from '../data/sessionEvents';
 import { supabase } from '../data/supabase';
 import { useI18n } from '../i18n/context';
@@ -124,6 +125,8 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   const signOut = useCallback(async () => {
     leavingRef.current = true;
     loadedForRef.current = null;
+    // While still signed in: this device stops getting the leaving person's notifications.
+    await forgetPushDevice();
     await authSignOut();
     setState({ status: 'signedOut', user: null, profile: null });
   }, [setState]);

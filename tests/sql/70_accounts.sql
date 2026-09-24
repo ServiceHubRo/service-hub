@@ -32,8 +32,9 @@ select test.fails('select public.export_my_data()', 'permission denied', 'export
 
 -- ------------------------------------------------------------------ cancel_email_change
 select test.logout();
-update auth.users set email_change = 'ana.noua@test.local', email_change_token_new = 'tok-new',
-                      email_change_token_current = 'tok-cur'
+-- (Tokens unique per user, as the real Supabase Auth schema requires.)
+update auth.users set email_change = 'ana.noua@test.local', email_change_token_new = 'tok-new-' || id,
+                      email_change_token_current = 'tok-cur-' || id
 where id in (test.id('client_a'), test.id('client_b'));
 select test.login(test.id('client_a'));
 select public.cancel_email_change(test.rid());

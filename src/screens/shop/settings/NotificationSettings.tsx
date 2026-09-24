@@ -3,6 +3,7 @@ import { Card } from '../../../components/Card';
 import { Checkbox } from '../../../components/Checkbox';
 import { updateShop } from '../../../data/shop';
 import { useI18n } from '../../../i18n/context';
+import { PushRow } from '../../push/PushRow';
 import { useState } from 'react';
 import { SETTINGS_PATH } from './paths';
 import { SaveButton } from './SaveButton';
@@ -10,8 +11,8 @@ import { useShopSettings } from './shopSettingsContext';
 import styles from './settings.module.css';
 
 /**
- * Notificări (P5b): SMS on a new request and the daily summary. Saved now; SMS sending starts in
- * T13 and the daily summary in T12. Phone push status and control arrive in Cont with T12.
+ * Notificări (P5b): push on this device (the same row as in Cont, T12), SMS on a new request
+ * (sending starts in T13) and the daily summary (a push at opening time, T12).
  */
 export function NotificationSettings() {
   const { t } = useI18n();
@@ -31,6 +32,7 @@ export function NotificationSettings() {
       <BackLink to={SETTINGS_PATH} label={t('settings.title')} />
       <h1>{t('settings.notifications')}</h1>
       <p className={styles.intro}>{t('notif.intro')}</p>
+      <PushRow />
       <Card className={styles.stack}>
         <div>
           <Checkbox checked={sms} onChange={(e) => setSms(e.target.checked)} aria-describedby="notif-sms-hint">

@@ -573,6 +573,7 @@ export type Database = {
           event: string
           id: string
           last_error: string | null
+          locked_until: string | null
           params: Json
           processed_at: string | null
           user_id: string
@@ -585,6 +586,7 @@ export type Database = {
           event: string
           id?: string
           last_error?: string | null
+          locked_until?: string | null
           params?: Json
           processed_at?: string | null
           user_id: string
@@ -597,6 +599,7 @@ export type Database = {
           event?: string
           id?: string
           last_error?: string | null
+          locked_until?: string | null
           params?: Json
           processed_at?: string | null
           user_id?: string
@@ -827,6 +830,36 @@ export type Database = {
         }
         Relationships: []
       }
+      push_config: {
+        Row: {
+          dispatch_token: string
+          dispatch_url: string | null
+          extra_push_origins: string[]
+          id: number
+          updated_at: string
+          vapid_private_jwk: Json | null
+          vapid_public_key: string | null
+        }
+        Insert: {
+          dispatch_token?: string
+          dispatch_url?: string | null
+          extra_push_origins?: string[]
+          id?: number
+          updated_at?: string
+          vapid_private_jwk?: Json | null
+          vapid_public_key?: string | null
+        }
+        Update: {
+          dispatch_token?: string
+          dispatch_url?: string | null
+          extra_push_origins?: string[]
+          id?: number
+          updated_at?: string
+          vapid_private_jwk?: Json | null
+          vapid_public_key?: string | null
+        }
+        Relationships: []
+      }
       push_subscriptions: {
         Row: {
           created_at: string
@@ -909,6 +942,7 @@ export type Database = {
           created_at: string
           decided_at: string | null
           expires_at: string | null
+          expiry_reminded_at: string | null
           id: string
           inspection_fee: number
           note: string | null
@@ -924,6 +958,7 @@ export type Database = {
           created_at?: string
           decided_at?: string | null
           expires_at?: string | null
+          expiry_reminded_at?: string | null
           id?: string
           inspection_fee?: number
           note?: string | null
@@ -939,6 +974,7 @@ export type Database = {
           created_at?: string
           decided_at?: string | null
           expires_at?: string | null
+          expiry_reminded_at?: string | null
           id?: string
           inspection_fee?: number
           note?: string | null
@@ -1769,6 +1805,7 @@ export type Database = {
         }
         Returns: undefined
       }
+      claim_notifications: { Args: { p_limit?: number }; Returns: Json }
       clean_quote_items: {
         Args: { p_items: Json }
         Returns: {
@@ -1925,6 +1962,7 @@ export type Database = {
           created_at: string
           decided_at: string | null
           expires_at: string | null
+          expiry_reminded_at: string | null
           id: string
           inspection_fee: number
           note: string | null
@@ -2027,6 +2065,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      dispatch_sweep: { Args: never; Returns: boolean }
       ensure_thread: {
         Args: { p_client_id: string; p_shop_id: string }
         Returns: string
@@ -2034,6 +2073,7 @@ export type Database = {
       expire_quotes: { Args: never; Returns: number }
       export_my_data: { Args: never; Returns: Json }
       fail: { Args: { p_code: string; p_params?: Json }; Returns: undefined }
+      finish_notifications: { Args: { p_results: Json }; Returns: number }
       fold_text: { Args: { p: string }; Returns: string }
       format_sequence_id: {
         Args: { p_number: number; p_prefix: string; p_width?: number }
@@ -2064,6 +2104,7 @@ export type Database = {
           created_at: string
           decided_at: string | null
           expires_at: string | null
+          expiry_reminded_at: string | null
           id: string
           inspection_fee: number
           note: string | null
@@ -2088,6 +2129,7 @@ export type Database = {
       invite_token_hash: { Args: { p_token: string }; Returns: string }
       is_active_status: { Args: { p_status: string }; Returns: boolean }
       is_admin: { Args: never; Returns: boolean }
+      is_push_endpoint: { Args: { p_url: string }; Returns: boolean }
       is_shop_member: { Args: { p_shop_id: string }; Returns: boolean }
       is_shop_owner: { Args: { p_shop_id: string }; Returns: boolean }
       is_shop_public: { Args: { p_shop_id: string }; Returns: boolean }
@@ -2096,6 +2138,7 @@ export type Database = {
       is_valid_postal_code: { Args: { p: string }; Returns: boolean }
       is_valid_regcom: { Args: { p: string }; Returns: boolean }
       is_valid_vin: { Args: { p: string }; Returns: boolean }
+      kick_dispatcher: { Args: never; Returns: boolean }
       last_odometer_for_booking: {
         Args: { p_booking_id: string }
         Returns: number
@@ -2288,6 +2331,8 @@ export type Database = {
       }
       prepare_account_deletion: { Args: { p_user_id: string }; Returns: string }
       promote_to_admin: { Args: { p_email: string }; Returns: string }
+      purge_request_log: { Args: { p_now?: string }; Returns: number }
+      remind_expiring_quotes: { Args: { p_now?: string }; Returns: number }
       replace_quote: {
         Args: {
           p_booking_id: string
@@ -2479,10 +2524,21 @@ export type Database = {
         }
       }
       review_display_name: { Args: { p_name: string }; Returns: string }
+      run_hourly_jobs: { Args: { p_now?: string }; Returns: Json }
+      run_quote_jobs: { Args: { p_now?: string }; Returns: Json }
+      save_push_subscription: {
+        Args: {
+          p_endpoint: string
+          p_subscription: Json
+          p_user_agent?: string
+        }
+        Returns: undefined
+      }
       save_shop_hours: {
         Args: { p_hours: Json; p_request_id: string }
         Returns: Json
       }
+      schedule_notification_jobs: { Args: never; Returns: string }
       search_cities: {
         Args: never
         Returns: {
@@ -2519,6 +2575,9 @@ export type Database = {
         }[]
       }
       search_words: { Args: { p_q: string }; Returns: string[] }
+      send_appointment_reminders: { Args: { p_now?: string }; Returns: number }
+      send_daily_digests: { Args: { p_now?: string }; Returns: number }
+      send_doc_expiry_reminders: { Args: { p_today?: string }; Returns: number }
       send_message: {
         Args: { p_body: string; p_request_id: string; p_thread_id: string }
         Returns: {

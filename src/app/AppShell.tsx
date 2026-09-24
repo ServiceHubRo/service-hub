@@ -14,6 +14,7 @@ import { messagesPath } from '../screens/messages/paths';
 import { unreadThreads, useOptionalThreads } from '../screens/messages/threadsContext';
 import { EmailVerifyBanner } from './EmailVerifyBanner';
 import { LangSwitch } from './LangSwitch';
+import { PushBridge } from './PushBridge';
 import { NAV, type NavItem, type Role } from './roles';
 import { useSession } from './sessionContext';
 import styles from './AppShell.module.css';
@@ -146,6 +147,7 @@ export function AppShell({ role }: { role: Role }) {
         <main className={styles.main} ref={mainRef}>
           <div className={styles.content}>
             <EmailVerifyBanner role={role} />
+            {role !== 'admin' && <PushBridge />}
             <Outlet context={{ logOut } satisfies ShellOutletContext} />
           </div>
         </main>

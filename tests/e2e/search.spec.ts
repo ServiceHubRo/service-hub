@@ -201,7 +201,7 @@ test.describe('client search', () => {
     await expect(page.getByText('Activează locația ca să vezi service-urile din apropiere.')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Aproape de tine' })).toHaveCount(0);
     const saved = page.waitForResponse((r) => r.url().includes('/rest/v1/profiles') && r.request().method() === 'PATCH');
-    await page.getByRole('button', { name: 'Nu acum' }).click();
+    await page.getByRole('region', { name: 'Locație' }).getByRole('button', { name: 'Nu acum' }).click();
     await expect(page.getByText('Activează locația ca să vezi service-urile din apropiere.')).toHaveCount(0);
     expect((await saved).ok()).toBe(true);
     // Saved on the profile: a new visit does not ask again.
@@ -213,7 +213,7 @@ test.describe('client search', () => {
     // It can still be turned on from Cont.
     await openAccount(page);
     await expect(page.getByText('Locație', { exact: true })).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Activează' })).toBeVisible();
+    await expect(page.getByRole('group', { name: 'Locație' }).getByRole('button', { name: 'Activează' })).toBeVisible();
   });
 
   test('English: search, "Offers", the shop page', async ({ page }) => {

@@ -47,10 +47,9 @@ select test.eq(owner_id, test.id('client_a'), 'new car belongs to the caller')
 from public.cars where model = 'Octavia';
 select test.fails(format($$insert into public.cars (owner_id, make, model) values (%L, 'X', 'Y')$$, test.id('client_b')),
   'permission denied', 'A cannot create a car for B');
--- Device subscriptions always belong to the caller.
-insert into public.push_subscriptions (endpoint, subscription) values ('https://push.test/a2', '{}');
-select test.eq(user_id, test.id('client_a'), 'device subscription belongs to the caller')
-from public.push_subscriptions where endpoint = 'https://push.test/a2';
+-- Devices are saved only through save_push_subscription (T12), always for the caller.
+select test.fails($$insert into public.push_subscriptions (endpoint, subscription) values ('https://push.test/a2', '{}')$$,
+  'permission denied', 'no direct device insert from the browser');
 select test.logout();
 
 select test.eq(model, 'Logan', 'B''s car untouched') from public.cars where id = test.id('car_b');
