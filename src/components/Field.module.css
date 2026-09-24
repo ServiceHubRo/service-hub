@@ -40,3 +40,20 @@
   font-size: 13px;
   color: var(--red);
 }
+
+.withEnd {
+  position: relative;
+}
+
+.withEnd .input {
+  padding-right: 52px;
+}
+
+.end {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+}

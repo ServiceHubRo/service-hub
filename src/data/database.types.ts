@@ -770,6 +770,7 @@ export type Database = {
       profiles: {
         Row: {
           created_at: string
+          deleted_at: string | null
           display_id: string
           email_verified_at: string | null
           id: string
@@ -788,6 +789,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          deleted_at?: string | null
           display_id: string
           email_verified_at?: string | null
           id: string
@@ -806,6 +808,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          deleted_at?: string | null
           display_id?: string
           email_verified_at?: string | null
           id?: string
@@ -1742,6 +1745,10 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      cancel_email_change: {
+        Args: { p_request_id: string }
+        Returns: undefined
+      }
       check_slot: {
         Args: {
           p_client_rules: boolean
@@ -2015,6 +2022,7 @@ export type Database = {
         Returns: string
       }
       expire_quotes: { Args: never; Returns: number }
+      export_my_data: { Args: never; Returns: Json }
       fail: { Args: { p_code: string; p_params?: Json }; Returns: undefined }
       fold_text: { Args: { p: string }; Returns: string }
       format_sequence_id: {
@@ -2230,6 +2238,7 @@ export type Database = {
         }
         Returns: undefined
       }
+      prepare_account_deletion: { Args: { p_user_id: string }; Returns: string }
       promote_to_admin: { Args: { p_email: string }; Returns: string }
       replace_quote: {
         Args: {
@@ -2344,6 +2353,7 @@ export type Database = {
         Args: never
         Returns: {
           created_at: string
+          deleted_at: string | null
           display_id: string
           email_verified_at: string | null
           id: string

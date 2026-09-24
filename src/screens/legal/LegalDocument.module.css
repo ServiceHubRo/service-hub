@@ -1,0 +1,78 @@
+.doc {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  padding: var(--card-pad);
+  overflow-wrap: anywhere;
+}
+
+.body h2 {
+  margin-top: 10px;
+  font-size: 17px;
+  line-height: 1.3;
+}
+
+.body h3 {
+  margin-top: 4px;
+  font-size: 15px;
+  color: var(--text);
+}
+
+.body p,
+.body li {
+  color: var(--text);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-left: 20px;
+}
+
+.list .list {
+  margin-top: 6px;
+}
+
+.quote {
+  border-left: 3px solid var(--amber);
+  padding: 8px 12px;
+  background: var(--surface2);
+  border-radius: 0 var(--radius-input) var(--radius-input) 0;
+}
+
+.tableWrap {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
+}
+
+.table th,
+.table td {
+  border: 1px solid var(--border);
+  padding: 8px 10px;
+  text-align: left;
+  vertical-align: top;
+}
+
+.table th {
+  background: var(--surface2);
+}
+
+.rule {
+  border: none;
+  border-top: 1px solid var(--border);
+}

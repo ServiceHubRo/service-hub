@@ -1,4 +1,4 @@
-// localStorage can throw (private mode, blocked storage); never let that break the app.
+// Web storage can throw (private mode, blocked storage); never let that break the app.
 function safe<T>(fn: () => T, fallback: T): T {
   try {
     return fn();
@@ -7,8 +7,16 @@ function safe<T>(fn: () => T, fallback: T): T {
   }
 }
 
-export const storage = {
-  get: (key: string): string | null => safe(() => window.localStorage.getItem(key), null),
-  set: (key: string, value: string): void => safe(() => window.localStorage.setItem(key, value), undefined),
-  remove: (key: string): void => safe(() => window.localStorage.removeItem(key), undefined),
-};
+function wrap(pick: () => Storage) {
+  return {
+    get: (key: string): string | null => safe(() => pick().getItem(key), null),
+    set: (key: string, value: string): void => safe(() => pick().setItem(key, value), undefined),
+    remove: (key: string): void => safe(() => pick().removeItem(key), undefined),
+  };
+}
+
+/** localStorage: survives closing the browser. */
+export const storage = wrap(() => window.localStorage);
+
+/** sessionStorage: gone when the browser (tab) closes. */
+export const sessionStore = wrap(() => window.sessionStorage);

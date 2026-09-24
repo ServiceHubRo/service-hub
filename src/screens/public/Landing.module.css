@@ -54,31 +54,27 @@
   max-width: 40ch;
 }
 
-.dev {
-  margin-top: 24px;
+.actions {
   width: 100%;
-  text-align: left;
+  max-width: 360px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 12px;
 }
 
-.devTitle {
-  font-weight: 700;
-}
-
-.devNote {
-  color: var(--muted);
-  font-size: 13px;
-}
-
-.devLinks {
+.legal {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px 18px;
-  margin-top: 6px;
+  justify-content: center;
+  gap: 0 16px;
+  margin-top: 16px;
 }
 
-.devLinks a {
+.legal a {
   display: inline-flex;
   align-items: center;
   min-height: var(--tap);
-  font-weight: 600;
+  color: var(--muted);
+  font-size: 13px;
 }

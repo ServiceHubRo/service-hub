@@ -4,6 +4,7 @@ import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { LogoTile } from '../components/LogoTile';
 import { Wordmark } from '../components/Wordmark';
 import { useI18n } from '../i18n/context';
+import { EmailVerifyBanner } from './EmailVerifyBanner';
 import { LangSwitch } from './LangSwitch';
 import { NAV, type NavItem, type Role } from './roles';
 import { useSession } from './sessionContext';
@@ -37,9 +38,10 @@ export function AppShell({ role }: { role: Role }) {
     mainRef.current?.scrollTo(0, 0);
   }, [pathname]);
 
-  function logOut() {
-    signOut();
-    navigate('/', { replace: true });
+  // Leave first, then end the session: otherwise the role guard would send us to sign-in.
+  async function logOut() {
+    navigate('/', { replace: true, state: { leaving: true } });
+    await signOut();
   }
 
   return (
@@ -77,7 +79,7 @@ export function AppShell({ role }: { role: Role }) {
               <LangSwitch />
             </div>
             <SidebarLink item={nav.account} />
-            <button type="button" className={`${styles.sideLink} ${styles.logout}`} onClick={logOut}>
+            <button type="button" className={`${styles.sideLink} ${styles.logout}`} onClick={() => void logOut()}>
               <LogOut size={20} aria-hidden="true" />
               <span>{t('nav.logout')}</span>
             </button>
@@ -86,6 +88,7 @@ export function AppShell({ role }: { role: Role }) {
 
         <main className={styles.main} ref={mainRef}>
           <div className={styles.content}>
+            <EmailVerifyBanner role={role} />
             <Outlet context={{ logOut } satisfies ShellOutletContext} />
           </div>
         </main>
@@ -111,5 +114,5 @@ export function AppShell({ role }: { role: Role }) {
 }
 
 export interface ShellOutletContext {
-  logOut: () => void;
+  logOut: () => Promise<void>;
 }

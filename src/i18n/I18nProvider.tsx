@@ -15,7 +15,7 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     document.documentElement.lang = lang;
   }, [lang]);
 
-  // After login (T04) the profile language also gets updated here.
+  // SessionProvider also saves the choice on the profile when signed in (ARCHITECTURE §15).
   const setLang = useCallback((next: Lang) => {
     storage.set(LANG_STORAGE_KEY, next);
     setLangState(next);

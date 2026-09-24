@@ -28,3 +28,19 @@
   font-size: 12px;
   opacity: 0.85;
 }
+
+.segmented {
+  gap: 0;
+  padding: 4px;
+  border-radius: var(--radius-button);
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
+.segmented .tab {
+  background: transparent;
+}
+
+.segmented .on {
+  background: var(--amber);
+}

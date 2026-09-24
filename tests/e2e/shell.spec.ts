@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
+import { BACKEND, SEED, SEED_PASSWORD, expectNoHorizontalScroll, isDesktop, signIn } from './support';
 
 const NAV = {
   client: ['Caută', 'Garaj', 'Programări', 'Mesaje', 'Cont'],
@@ -12,19 +13,6 @@ const NAV_EN = {
   admin: ['Overview', 'Shops', 'Clients', 'Bookings', 'Moderation'],
 } as const;
 
-const isDesktop = (page: Page) => (page.viewportSize()?.width ?? 0) >= 1024;
-
-async function expectNoHorizontalScroll(page: Page) {
-  const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
-  expect(overflow).toBeLessThanOrEqual(0);
-}
-
-async function navLabels(page: Page): Promise<string[]> {
-  const nav = page.getByRole('navigation', { name: /Navigare principală|Main navigation/ }).filter({ visible: true });
-  await expect(nav).toHaveCount(1);
-  return (await nav.getByRole('link').allInnerTexts()).map((s) => s.trim());
-}
-
 test.beforeEach(async ({ context }) => {
   await context.addInitScript(() => {
     if (!sessionStorage.getItem('sh_test_init')) {
@@ -34,6 +22,12 @@ test.beforeEach(async ({ context }) => {
   });
 });
 
+async function navLabels(page: Page): Promise<string[]> {
+  const nav = page.getByRole('navigation', { name: /Navigare principală|Main navigation/ }).filter({ visible: true });
+  await expect(nav).toHaveCount(1);
+  return (await nav.getByRole('link').allInnerTexts()).map((s) => s.trim());
+}
+
 test('landing shows the logo and "În curând" without wrapping the wordmark', async ({ page }) => {
   await page.goto('/');
   const wordmark = page.getByRole('img', { name: 'Service-Hub' });
@@ -41,14 +35,30 @@ test('landing shows the logo and "În curând" without wrapping the wordmark', a
   const box = await wordmark.boundingBox();
   expect(box!.height).toBeLessThan(50); // one line
   await expect(page.getByText('În curând')).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Intră în cont' })).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Creează cont' })).toBeVisible();
   await expectNoHorizontalScroll(page);
   await page.screenshot({ path: `test-results/shots/landing-${test.info().project.name}.png` });
 });
 
+test('role screens need an account: signed-out visitors go to sign-in', async ({ page }) => {
+  for (const path of ['/c/cauta', '/s/panou', '/admin/prezentare', '/c/cont']) {
+    await page.goto(path);
+    await expect(page).toHaveURL(/\/intra$/);
+    await expect(page.getByRole('button', { name: 'Intră în cont' })).toBeVisible();
+  }
+});
+
 for (const role of Object.keys(NAV) as (keyof typeof NAV)[]) {
-  test(`?rol=${role} shows exactly its five navigation items`, async ({ page }) => {
-    await page.goto(`/?rol=${role}`);
-    await expect(page).not.toHaveURL(/rol=/);
+  test(`${role} sees exactly its five navigation items`, async ({ page }) => {
+    test.skip(!BACKEND, 'needs the local Supabase stack');
+    // Shared demo accounts: switching to English must not change their saved language
+    // (other tests, running in parallel, sign in as them too).
+    await page.route('**/rest/v1/profiles?*', (route) =>
+      route.request().method() === 'PATCH' ? route.fulfill({ status: 204 }) : route.continue(),
+    );
+    await signIn(page, SEED[role === 'service' ? 'shop' : role], SEED_PASSWORD);
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText(NAV[role][0]);
     const labels = await navLabels(page);
     if (isDesktop(page) && role !== 'admin') {
       // Desktop: four main rows on top; Cont is pinned at the bottom.
@@ -58,7 +68,6 @@ for (const role of Object.keys(NAV) as (keyof typeof NAV)[]) {
     } else {
       expect(labels).toEqual([...NAV[role]]);
     }
-    await expect(page.getByRole('heading', { level: 1 })).toHaveText(NAV[role][0]);
     await expectNoHorizontalScroll(page);
     await page.screenshot({ path: `test-results/shots/${role}-ro-${test.info().project.name}.png` });
 
@@ -69,7 +78,7 @@ for (const role of Object.keys(NAV) as (keyof typeof NAV)[]) {
     }
 
     // Switching to English changes every label.
-    await page.getByRole('button', { name: 'English' }).filter({ visible: true }).click();
+    await page.getByRole('button', { name: 'English' }).filter({ visible: true }).first().click();
     const en = await navLabels(page);
     if (isDesktop(page) && role !== 'admin') expect(en.slice(0, 4)).toEqual(NAV_EN[role].slice(0, 4));
     else expect(en).toEqual([...NAV_EN[role]]);
@@ -78,7 +87,8 @@ for (const role of Object.keys(NAV) as (keyof typeof NAV)[]) {
 }
 
 test('a client cannot open shop or admin screens', async ({ page }) => {
-  await page.goto('/?rol=client');
+  test.skip(!BACKEND, 'needs the local Supabase stack');
+  await signIn(page, SEED.client, SEED_PASSWORD);
   await expect(page).toHaveURL(/\/c\/cauta$/);
   await page.goto('/s/panou');
   await expect(page).toHaveURL(/\/c\/cauta$/);
@@ -87,7 +97,8 @@ test('a client cannot open shop or admin screens', async ({ page }) => {
 });
 
 test('a shop never sees the garage', async ({ page }) => {
-  await page.goto('/?rol=service');
+  test.skip(!BACKEND, 'needs the local Supabase stack');
+  await signIn(page, SEED.shop, SEED_PASSWORD);
   await expect(page).toHaveURL(/\/s\/panou$/);
   await page.goto('/c/garaj');
   await expect(page).toHaveURL(/\/s\/panou$/);
@@ -95,7 +106,8 @@ test('a shop never sees the garage', async ({ page }) => {
 });
 
 test('log out returns to the public page and closes the role screens', async ({ page }) => {
-  await page.goto('/?rol=service');
+  test.skip(!BACKEND, 'needs the local Supabase stack');
+  await signIn(page, SEED.shop, SEED_PASSWORD);
   await expect(page).toHaveURL(/\/s\/panou$/);
   if (isDesktop(page)) {
     await page.getByRole('button', { name: 'Deconectare' }).click();
@@ -105,11 +117,11 @@ test('log out returns to the public page and closes the role screens', async ({ 
   }
   await expect(page).toHaveURL(/\/$/);
   await page.goto('/s/panou');
-  await expect(page).toHaveURL(/\/$/);
+  await expect(page).toHaveURL(/\/intra$/);
 });
 
 test('offline bar appears and disappears', async ({ page, context }) => {
-  await page.goto('/?rol=client');
+  await page.goto('/intra');
   await context.setOffline(true);
   await expect(page.getByText('Fără conexiune. Modificările nu se salvează.')).toBeVisible();
   await context.setOffline(false);
@@ -150,8 +162,8 @@ test('component gallery: action button, stepper, errors', async ({ page }) => {
 });
 
 // Brand guide §2: the wrench is #151515 on amber, set through CSS (Safari ignores var() in SVG attributes).
-test('logo wrench is black #151515 everywhere it appears', async ({ page }) => {
-  const expectBlackWrench = async () => {
+test('logo wrench is black #151515 everywhere it appears', async ({ page, browser }) => {
+  const expectBlackWrench = async (page: Page) => {
     const wrenches = page.locator('svg.lucide-wrench').filter({ visible: true });
     await expect(wrenches.first()).toBeVisible();
     for (const wrench of await wrenches.all()) {
@@ -160,11 +172,19 @@ test('logo wrench is black #151515 everywhere it appears', async ({ page }) => {
     }
   };
   await page.goto('/');
-  await expectBlackWrench();
-  for (const role of ['client', 'service', 'admin']) {
-    await page.goto(`/?rol=${role}`);
-    await expect(page).not.toHaveURL(/rol=/);
-    await expectBlackWrench();
+  await expectBlackWrench(page);
+  await page.goto('/intra');
+  await expectBlackWrench(page);
+  if (BACKEND) {
+    for (const email of [SEED.client, SEED.shop, SEED.admin]) {
+      const context = await browser.newContext({ baseURL: test.info().project.use.baseURL, viewport: page.viewportSize() });
+      await context.addInitScript(() => localStorage.setItem('sh_lang', 'ro'));
+      const other = await context.newPage();
+      await signIn(other, email, SEED_PASSWORD);
+      await expect(other).not.toHaveURL(/\/intra/);
+      await expectBlackWrench(other);
+      await context.close();
+    }
   }
   await page.screenshot({ path: `test-results/shots/logo-${test.info().project.name}.png` });
 });
