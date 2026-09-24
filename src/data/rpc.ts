@@ -61,6 +61,8 @@ export const RPC_ERROR_CODES = [
   'odometer_lower',
   'odometer_required',
   'past_slot',
+  'push_endpoint_invalid',
+  'push_subscription_invalid',
   'quote_changed',
   'quote_expired',
   'quote_item_invalid',

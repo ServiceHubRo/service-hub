@@ -14,6 +14,7 @@ import { dashboardCounts } from '../../../lib/shopBookings';
 import { useLoad } from '../../../lib/useLoad';
 import { useNow } from '../../../lib/useNow';
 import { LoadError } from '../../../components/LoadError';
+import { PushBanner } from '../../push/PushBanner';
 import { useShopBookings } from '../bookings/shopBookingsContext';
 import { SETTINGS_LINKS } from '../settings/paths';
 import { SetupChecklist } from './SetupChecklist';
@@ -110,6 +111,9 @@ export function Dashboard() {
   return (
     <div className={styles.page}>
       <h1 className="no-print">{t('nav.shop.dashboard')}</h1>
+      <div className="no-print">
+        <PushBanner role="shop" />
+      </div>
       {body}
     </div>
   );

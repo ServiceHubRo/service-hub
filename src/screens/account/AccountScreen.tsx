@@ -16,6 +16,7 @@ import { SETTINGS_PATH } from '../shop/settings/paths';
 import { DataSection } from './DataSection';
 import { IdentityCard } from './IdentityCard';
 import { LocationRow } from './LocationRow';
+import { PushRow } from '../push/PushRow';
 import { SecuritySection } from './SecuritySection';
 import styles from './account.module.css';
 
@@ -26,8 +27,8 @@ const SUBTITLE: Record<Role, MessageKey> = {
 };
 
 /**
- * Cont, the part every role shares (P13b): identity, language, email and password, legal
- * documents, my data, log out. Clients also get Locație, Favorite (T06) and "Istoricul mașinilor
+ * Cont, the part every role shares (P13b): identity, language, push notifications on this device
+ * (clients and shops, T12), email and password, legal documents, my data, log out. Clients also get Locație, Favorite (T06) and "Istoricul mașinilor
  * mele" (T10); shops get the Setări and Recenzii tiles; Abonament and Rapoarte arrive with their
  * tasks.
  */
@@ -53,6 +54,8 @@ export function AccountScreen({ role }: { role: Role }) {
           <LangSwitch />
         </div>
       </Card>
+
+      {role !== 'admin' && <PushRow />}
 
       {role === 'client' && (
         <>

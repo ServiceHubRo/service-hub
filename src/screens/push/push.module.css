@@ -1,0 +1,83 @@
+/* Push notifications: the banner on Caută / Panou and the row in Cont (T12, P15b). */
+.banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 12px;
+  padding: 12px 13px;
+  background: var(--surface2);
+  border: 1px solid var(--border-lit);
+  border-radius: var(--radius-button);
+}
+
+.icon {
+  flex-shrink: 0;
+  color: var(--amber);
+}
+
+.text {
+  flex: 1;
+  min-width: 180px;
+  font-size: 13.5px;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.close {
+  width: var(--tap);
+  height: var(--tap);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: -8px -6px -8px auto;
+  color: var(--muted);
+  border-radius: var(--radius-input);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.label > svg {
+  flex-shrink: 0;
+  color: var(--amber);
+}
+
+.labelOff > svg {
+  color: var(--muted);
+}
+
+.who {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.status {
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+.hint {
+  margin-top: 10px;
+  font-size: 12.5px;
+  color: var(--muted);
+}

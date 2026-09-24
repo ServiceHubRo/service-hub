@@ -15,7 +15,7 @@ export function LocationRow() {
   const canAsk = status === 'prompt' || status === 'error' || status === 'unknown';
 
   return (
-    <Card>
+    <Card role="group" aria-label={t('location.title')}>
       <div className={styles.row}>
         <span className={styles.rowLabel}>
           <MapPin size={20} aria-hidden="true" />

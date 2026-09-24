@@ -58,7 +58,7 @@ export function LocationBanner() {
 
   const busy = location.status === 'locating';
   return (
-    <div className={styles.locationBanner}>
+    <section className={styles.locationBanner} aria-label={t('location.title')}>
       <MapPin size={18} className={styles.locationIcon} aria-hidden="true" />
       <p className={styles.locationText}>{t('location.banner')}</p>
       <div className={styles.locationActions}>
@@ -69,6 +69,6 @@ export function LocationBanner() {
           {t('location.notNow')}
         </Button>
       </div>
-    </div>
+    </section>
   );
 }
