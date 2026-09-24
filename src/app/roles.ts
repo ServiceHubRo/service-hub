@@ -68,17 +68,8 @@ export function homeOf(role: Role): string {
   return NAV[role].main[0]!.path;
 }
 
-/** Values accepted by the test-only `?rol=` switch. */
-export function roleFromParam(value: string | null): Role | null {
-  switch (value) {
-    case 'client':
-      return 'client';
-    case 'service':
-    case 'shop':
-      return 'shop';
-    case 'admin':
-      return 'admin';
-    default:
-      return null;
-  }
+/** Where a user lands after signing in: the page they asked for if it is theirs, else their home. */
+export function afterSignIn(role: Role, from: string | undefined): string {
+  const base = NAV[role].base;
+  return from && (from === base || from.startsWith(`${base}/`)) ? from : homeOf(role);
 }

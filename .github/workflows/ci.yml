@@ -33,6 +33,7 @@ jobs:
   e2e:
     name: Browser tests (390 / 820 / 1440 px)
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -41,6 +42,20 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npx playwright install --with-deps chromium
+      # A throwaway Supabase on the runner (all migrations + supabase/seed/dev_seed.sql + Edge
+      # Functions + a local mail catcher), so sign-up, email links and Cont are tested for real.
+      # Never the real project.
+      - name: Start the local Supabase stack
+        run: npx supabase start -x studio,imgproxy,vector,logflare,supavisor
+      - name: Point the browser tests at it
+        run: |
+          eval "$(npx supabase status -o env)"
+          {
+            echo "E2E_BACKEND=1"
+            echo "VITE_SUPABASE_URL=$API_URL"
+            echo "VITE_SUPABASE_ANON_KEY=$ANON_KEY"
+            echo "E2E_SERVICE_ROLE_KEY=$SERVICE_ROLE_KEY"
+          } >> "$GITHUB_ENV"
       - run: npm run test:e2e
       - uses: actions/upload-artifact@v4
         if: failure()

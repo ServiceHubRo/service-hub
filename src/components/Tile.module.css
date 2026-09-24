@@ -1,0 +1,31 @@
+.tile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 52px;
+  padding: 12px var(--card-pad);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  color: var(--text);
+  text-decoration: none;
+}
+
+.tile:hover {
+  border-color: var(--border-lit);
+}
+
+.icon {
+  color: var(--amber);
+  flex-shrink: 0;
+}
+
+.label {
+  flex: 1;
+  min-width: 0;
+}
+
+.chevron {
+  color: var(--muted);
+  flex-shrink: 0;
+}

@@ -40,6 +40,7 @@ All tables have RLS enabled. `id uuid primary key default gen_random_uuid()` unl
 - `suspended boolean default false`
 - `terms_version text`, `terms_accepted_at`
 - `push_prompt_dismissed_at`, `location_prompt_dismissed_at`, `last_active_at`
+- `deleted_at` — set when the account is deleted (§11 `delete-account`); only kept rows are anonymized shop owners
 - Created by a trigger on `auth.users` insert from sign-up metadata. Metadata role may only be `client` or `shop`; anything else becomes `client`. **The trigger can never create an admin.**
 - `email_verified_at` is synced by a trigger when `auth.users.email_confirmed_at` changes.
 - Browser may update only `name`, `phone`, `lang`, `*_prompt_dismissed_at` (column grants).
@@ -282,9 +283,15 @@ Templates live in `supabase/functions/_shared/templates.ts` (RO + US English), o
 
 ## 11. Edge Functions
 
-`dispatch-notifications` · `geocode` (address → lat/lng; Nominatim with a proper User-Agent and 1 req/s, or Google if a key is provided) · `stripe-checkout` (subscription or report) · `stripe-portal` · `stripe-webhook` (signature verified, idempotent via `stripe_events`; the only writer of subscription status besides admin) · `issue-invoice` (SmartBill/Oblio + e-Factura after `invoice.paid`) · `generate-report` (PDF with `pdf-lib` + embedded TTF font that has Romanian diacritics ș ț ă â î; stored in `reports`) · `report-download` (signed URL after ownership check) · `export-my-data` (JSON) · `delete-account` · `invite-staff` · `phone-verify-start` / `phone-verify-check` (SMSO OTP, hashed codes, 5 attempts, 10 min).
+`dispatch-notifications` · `geocode` (address → lat/lng; Nominatim with a proper User-Agent and 1 req/s, or Google if a key is provided) · `stripe-checkout` (subscription or report) · `stripe-portal` · `stripe-webhook` (signature verified, idempotent via `stripe_events`; the only writer of subscription status besides admin) · `issue-invoice` (SmartBill/Oblio + e-Factura after `invoice.paid`) · `generate-report` (PDF with `pdf-lib` + embedded TTF font that has Romanian diacritics ș ț ă â î; stored in `reports`) · `report-download` (signed URL after ownership check) · `delete-account` · `invite-staff` · `phone-verify-start` / `phone-verify-check` (SMSO OTP, hashed codes, 5 attempts, 10 min).
 
-Shared code in `supabase/functions/_shared/`. Every function validates input, checks the caller's JWT, and never trusts ids from the body without checking ownership.
+Shared code in `supabase/functions/_shared/`. Every function validates input, checks the caller's JWT, and never trusts ids from the body without checking ownership. Functions call the Auth and REST APIs with plain `fetch` (`_shared/admin.ts`), check the caller with the Auth server (`/auth/v1/user`) and run with `verify_jwt = false` in `supabase/config.toml`, so they work with both the legacy JWT keys and the new publishable/secret keys.
+
+**Account data (T04).** "Descarcă datele mele" is the RPC `export_my_data()` (read-only JSON of the caller's own data; a shop member also gets the shop's settings, the owner also billing, subscription and invoices; never other people's data). "Șterge contul" is the Edge Function `delete-account`:
+1. `prepare_account_deletion(user)` (SQL, service role only): refuses `account_has_active_bookings` / `shop_has_active_bookings` / `not_allowed` (admin); removes name and phone from booking snapshots and threads, empties `reviews.client_display_name` (the UI shows an empty name as a deleted account), deletes cars, favorites, push subscriptions, phone verifications, notice reads and pending notifications; answers `delete` or `anonymize`;
+2. `delete` → the login is deleted (Auth admin API); the database cascades (bookings keep anonymous snapshots with `client_id` null, reviews and messages stay without an author);
+3. `anonymize` → a shop owner whose shop has bookings or invoices (legal retention): the shop gets `active = false` and subscription `inactive`, staff rows are removed, the profile keeps no name or phone and gets `deleted_at`; the login is closed for good (banned 100 years, email replaced with `deleted-<id>@deleted.invalid`, random password).
+Both steps are idempotent, so a retry after a half-failure finishes the job. Pending email changes are cancelled with `cancel_email_change()` (Supabase Auth has no API for it).
 
 ---
 
@@ -319,8 +326,13 @@ As Prompt 16e plus §7. Report code `SH-YYYY-NNNNNN` from a sequence. Public pag
 
 - Email + password. Email confirmation required (link valid 24 h; "Retrimite" at most once per 60 s).
 - **Sign-up metadata:** `role`, `name`, `phone`, `lang`, `terms_version`, and for shops `shop_name`, `city`.
-- **Remember me** (ticked by default): session kept in `localStorage`; unticked: `sessionStorage` (ends when the browser closes). Chosen per device via a custom storage adapter; the choice is stored in `localStorage` key `sh_remember`, never on the profile. Sessions inactive for 30 days are signed out.
-- **Language before login:** `navigator.language` starting with `ro` → Romanian, anything else → English; stored in `localStorage` `sh_lang`. After login, `profiles.lang` wins; the switch updates both.
+- **Remember me** (ticked by default): session kept in `localStorage`; unticked: `sessionStorage` (ends when the browser closes). Chosen per device via a custom storage adapter (`src/lib/remember.ts`); the choice is stored in `localStorage` key `sh_remember`, never on the profile. Sessions not used for 30 days on a device are signed out (`sh_last_seen`). Signing out ends the session on this device only (`scope: 'local'`).
+- **Email links** use the implicit flow (tokens in the address), so a link opened in another browser or device still works. Links land on `/` (confirmation, email change) or `/parola-noua` (reset); an expired or used link lands on `/intra` with an explanation. Supabase Auth → URL Configuration must list the Netlify site and preview URLs.
+- **Supabase answers an existing address on sign-up with a user without identities** (no error, to stop address probing); the app shows "Există deja un cont cu acest email".
+- **Session ending by itself** (refresh refused, token revoked): the screen stays mounted under a sign-in panel (`ReauthPanel`); signing in again removes it and nothing typed is lost. An RPC answering `not_signed_in` triggers the same check.
+- **CAPTCHA:** Cloudflare Turnstile, shown only when the public site key `VITE_TURNSTILE_SITE_KEY` is set. When CAPTCHA is on in Supabase Auth it guards sign-up, sign-in, password reset and resend, so every one of those forms (and the password check in Cont) carries the widget.
+- Routes: `/intra` (sign in), `/cont-nou` (sign up), `/confirma-email`, `/parola-uitata`, `/parola-noua`, `/legal/:doc` (public legal documents), `/<role>/cont/legal/:doc` (inside Cont).
+- **Language before login:** `navigator.language` starting with `ro` → Romanian, anything else → English; stored in `localStorage` `sh_lang`. After login, `profiles.lang` wins; the switch updates both (the profile save is best effort: the interface switches even offline).
 - **Password reset:** always the same neutral confirmation, whether the address exists or not.
 - **Admin:** created only with the SQL function `promote_to_admin(email)`, which is owned by `postgres` and not granted to any API role. Eduard runs it in the SQL Editor after creating a normal account. There is no UI path to admin.
 - Routing: signed-out → public routes (landing, auth, legal, `/verifica`); client → `/c/...`; shop → `/s/...`; admin → `/admin/...`. A guard redirects anyone hitting another role's route to their own home.
@@ -365,6 +377,7 @@ As Prompt 16e plus §7. Report code `SH-YYYY-NNNNNN` from a sequence. Public pag
 - Table `schema_version(version int not null)` with one row. Every migration ends with `update public.schema_version set version = N;` where N is the next integer (1, 2, 3 …), independent of the file timestamp.
 - Function `get_schema_version()` is callable by `anon` and `authenticated`.
 - `src/lib/schema.ts` exports `EXPECTED_SCHEMA_VERSION`. On start, preview and development builds compare the two and show a red bar: "Baza de date nu e la zi (versiunea X, aștept Y). Verifică în GitHub → Actions dacă «Deploy Supabase» a rulat." Production reports the mismatch to Sentry instead.
+- When the version cannot be read at all, the bar says why instead of "unknown": the build has no usable `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY` (missing, example values, or a URL with a path), or the database's answer (HTTP status, code, message). On Netlify (`NETLIFY=true`) the build itself fails with the same explanation when those two variables are missing or malformed (`vite.config.ts`, `src/lib/supabaseConfig.ts`), so a preview can never be published without a database.
 - A migration is never edited after being pushed (it may already be applied); fixes go in a new migration. An abandoned pull request with migrations gets a reverting migration.
 
 **Grants — nothing is reachable by default** (set in the first migration, T02):

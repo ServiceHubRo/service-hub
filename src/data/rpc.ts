@@ -1,4 +1,5 @@
 import type { Database, Json } from './database.types';
+import { reportSessionLost } from './sessionEvents';
 import { supabase } from './supabase';
 import { formatKm } from '../i18n/format';
 import type { MessageKey } from '../i18n/ro';
@@ -24,6 +25,7 @@ export type Review = Tables['reviews']['Row'];
 
 /** Every code the database functions raise. `tests/unit/rpc.test.ts` checks this list against the migrations. */
 export const RPC_ERROR_CODES = [
+  'account_has_active_bookings',
   'account_suspended',
   'already_reported',
   'booking_not_found',
@@ -73,6 +75,7 @@ export const RPC_ERROR_CODES = [
   'review_window_closed',
   'service_unavailable',
   'shop_closed',
+  'shop_has_active_bookings',
   'shop_not_found',
   'shop_unavailable',
   'slot_full',
@@ -131,9 +134,13 @@ function parseParams(details: unknown): RpcErrorParams {
 export function toRpcError(error: unknown): RpcError {
   if (error instanceof RpcError) return error;
   if (error && typeof error === 'object') {
-    const e = error as { message?: unknown; details?: unknown; name?: unknown };
+    const e = error as { message?: unknown; details?: unknown; name?: unknown; code?: unknown };
     if (typeof e.message === 'string' && knownCodes.has(e.message)) {
       return new RpcError(e.message as RpcErrorCode, parseParams(e.details));
+    }
+    // PostgREST refusing the access token (expired or revoked session).
+    if (e.code === 'PGRST301' || e.code === 'PGRST303' || (typeof e.message === 'string' && /JWT expired/i.test(e.message))) {
+      return new RpcError('not_signed_in');
     }
     // fetch failures: "TypeError: Failed to fetch" (Chrome), "Load failed" (Safari), "NetworkError…" (Firefox).
     if (e.name === 'TypeError' || (typeof e.message === 'string' && /fetch|network|load failed/i.test(e.message))) {
@@ -185,15 +192,22 @@ export function rpcErrorMessage(lang: Lang, error: unknown): string {
 
 type Fns = Database['public']['Functions'];
 
-async function call<F extends keyof Fns>(fn: F, args: Fns[F]['Args']): Promise<Fns[F]['Returns']> {
+/** Converts a failure and, when it means the session is gone, tells SessionProvider. */
+export function failure(error: unknown): RpcError {
+  const rpcError = toRpcError(error);
+  if (rpcError.code === 'not_signed_in') reportSessionLost();
+  return rpcError;
+}
+
+export async function call<F extends keyof Fns>(fn: F, args: Fns[F]['Args']): Promise<Fns[F]['Returns']> {
   if (!supabase) throw new RpcError('network');
   let result;
   try {
     result = await supabase.rpc(fn, args as never);
   } catch (e) {
-    throw toRpcError(e);
+    throw failure(e);
   }
-  if (result.error) throw toRpcError(result.error);
+  if (result.error) throw failure(result.error);
   return result.data as Fns[F]['Returns'];
 }
 

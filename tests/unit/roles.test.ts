@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { NAV, homeOf, roleFromParam } from '../../src/app/roles';
+import { NAV, homeOf } from '../../src/app/roles';
 import { translate } from '../../src/i18n/translate';
 
 const labels = (role: keyof typeof NAV) => NAV[role].bottomBar.map((i) => translate('ro', i.labelKey));
@@ -19,11 +19,9 @@ describe('navigation per role (CLAUDE.md §1)', () => {
       for (const item of [...nav.main, nav.account]) expect(item.path.startsWith(`${nav.base}/`)).toBe(true);
     }
   });
-  it('maps the test switch values', () => {
-    expect(roleFromParam('service')).toBe('shop');
-    expect(roleFromParam('client')).toBe('client');
-    expect(roleFromParam('admin')).toBe('admin');
-    expect(roleFromParam('root')).toBeNull();
+  it('each role has its home', () => {
+    expect(homeOf('client')).toBe('/c/cauta');
     expect(homeOf('shop')).toBe('/s/panou');
+    expect(homeOf('admin')).toBe('/admin/prezentare');
   });
 });

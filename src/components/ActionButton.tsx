@@ -14,6 +14,10 @@ export interface ActionButtonProps {
   disabled?: boolean;
   /** Maps an error to a translated message; defaults to the generic network message. */
   errorMessage?: (error: unknown) => string;
+  /** Whether "Încearcă din nou" makes sense for this error (not for a wrong password). Default: always. */
+  canRetry?: (error: unknown) => boolean;
+  /** The form's submit button: Enter in a field of the form triggers it. */
+  submit?: boolean;
 }
 
 /**
@@ -22,12 +26,21 @@ export interface ActionButtonProps {
  * A retry reuses the same request id, so the server returns the first result if the
  * earlier attempt actually went through.
  */
-export function ActionButton({ onAction, children, variant = 'primary', block = true, disabled, errorMessage }: ActionButtonProps) {
+export function ActionButton({
+  onAction,
+  children,
+  variant = 'primary',
+  block = true,
+  disabled,
+  errorMessage,
+  canRetry,
+  submit,
+}: ActionButtonProps) {
   const { t } = useI18n();
   const busyRef = useRef(false);
   const requestIdRef = useRef<string | null>(null);
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<{ text: string; retry: boolean } | null>(null);
 
   async function run() {
     if (busyRef.current) return;
@@ -39,7 +52,10 @@ export function ActionButton({ onAction, children, variant = 'primary', block = 
       await onAction(requestIdRef.current);
       requestIdRef.current = null;
     } catch (e) {
-      setError(errorMessage ? errorMessage(e) : t('action.error'));
+      const retry = canRetry ? canRetry(e) : true;
+      // A different answer next time needs a new request id (e.g. after fixing a typo).
+      if (!retry) requestIdRef.current = null;
+      setError({ text: errorMessage ? errorMessage(e) : t('action.error'), retry });
     } finally {
       busyRef.current = false;
       setBusy(false);
@@ -49,9 +65,12 @@ export function ActionButton({ onAction, children, variant = 'primary', block = 
   return (
     <div className={block ? styles.wrapBlock : styles.wrap}>
       <button
-        type="button"
+        type={submit ? 'submit' : 'button'}
         className={buttonClass(variant, block, styles.action)}
-        onClick={run}
+        onClick={(e) => {
+          if (submit) e.preventDefault();
+          void run();
+        }}
         disabled={disabled || busy}
         aria-busy={busy}
         aria-label={busy ? t('action.sending') : undefined}
@@ -65,10 +84,12 @@ export function ActionButton({ onAction, children, variant = 'primary', block = 
       </button>
       {error && (
         <div className={styles.error} role="alert">
-          <span>{error}</span>
-          <button type="button" className={styles.retry} onClick={run}>
-            {t('action.retry')}
-          </button>
+          <span>{error.text}</span>
+          {error.retry && (
+            <button type="button" className={styles.retry} onClick={run}>
+              {t('action.retry')}
+            </button>
+          )}
         </div>
       )}
     </div>

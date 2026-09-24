@@ -11,11 +11,13 @@ export interface TabsProps<K extends string> {
   value: K;
   onChange: (key: K) => void;
   label: string;
+  /** One dark container with the active tab in amber (sign-in screen). */
+  segmented?: boolean;
 }
 
-export function Tabs<K extends string>({ items, value, onChange, label }: TabsProps<K>) {
+export function Tabs<K extends string>({ items, value, onChange, label, segmented }: TabsProps<K>) {
   return (
-    <div className={styles.tabs} role="tablist" aria-label={label}>
+    <div className={`${styles.tabs} ${segmented ? styles.segmented : ''}`} role="tablist" aria-label={label}>
       {items.map((item) => (
         <button
           key={item.key}
