@@ -1,8 +1,8 @@
-import { useRef, useState, type ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { useI18n } from '../i18n/context';
-import { newRequestId } from '../lib/requestId';
 import { buttonClass, type ButtonVariant } from './buttonClass';
 import { Spinner } from './Spinner';
+import { useAction } from './useAction';
 import styles from './ActionButton.module.css';
 
 export interface ActionButtonProps {
@@ -37,30 +37,7 @@ export function ActionButton({
   submit,
 }: ActionButtonProps) {
   const { t } = useI18n();
-  const busyRef = useRef(false);
-  const requestIdRef = useRef<string | null>(null);
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<{ text: string; retry: boolean } | null>(null);
-
-  async function run() {
-    if (busyRef.current) return;
-    busyRef.current = true;
-    requestIdRef.current ??= newRequestId();
-    setBusy(true);
-    setError(null);
-    try {
-      await onAction(requestIdRef.current);
-      requestIdRef.current = null;
-    } catch (e) {
-      const retry = canRetry ? canRetry(e) : true;
-      // A different answer next time needs a new request id (e.g. after fixing a typo).
-      if (!retry) requestIdRef.current = null;
-      setError({ text: errorMessage ? errorMessage(e) : t('action.error'), retry });
-    } finally {
-      busyRef.current = false;
-      setBusy(false);
-    }
-  }
+  const { run, busy, error } = useAction(onAction, { errorMessage, canRetry });
 
   return (
     <div className={block ? styles.wrapBlock : styles.wrap}>
@@ -86,7 +63,7 @@ export function ActionButton({
         <div className={styles.error} role="alert">
           <span>{error.text}</span>
           {error.retry && (
-            <button type="button" className={styles.retry} onClick={run}>
+            <button type="button" className={styles.retry} onClick={() => void run()}>
               {t('action.retry')}
             </button>
           )}

@@ -1,0 +1,61 @@
+.wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.heart {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--tap);
+  height: var(--tap);
+  border-radius: 50%;
+  color: var(--muted);
+}
+
+.heart:hover {
+  color: var(--text);
+}
+
+.heart:disabled {
+  cursor: progress;
+  opacity: 0.6;
+}
+
+.on,
+.on:hover {
+  color: var(--amber);
+}
+
+.on svg {
+  fill: var(--amber);
+}
+
+/* Floats under the heart so the card around it does not reflow. */
+.error {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  z-index: 2;
+  width: max-content;
+  max-width: min(260px, 70vw);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 10px;
+  padding: 8px 10px;
+  border: 1px solid var(--red-line);
+  border-radius: var(--radius-input);
+  background: var(--surface2);
+  color: var(--red);
+  font-size: 13px;
+}
+
+.retry {
+  min-height: var(--tap);
+  padding: 0 4px;
+  color: var(--text);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}

@@ -1,0 +1,20 @@
+.logo,
+.initials {
+  flex-shrink: 0;
+  border-radius: var(--radius-card);
+}
+
+.logo {
+  object-fit: cover;
+  background: var(--surface2);
+}
+
+.initials {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--amber-soft);
+  color: var(--amber);
+  font-family: var(--font-display);
+  font-weight: 700;
+}

@@ -5,6 +5,10 @@ import { I18nProvider } from '../i18n/I18nProvider';
 import { IS_TEST_BUILD } from '../lib/env';
 import { AccountScreen } from '../screens/account/AccountScreen';
 import { AuthScreen } from '../screens/auth/AuthScreen';
+import { FavoritesScreen } from '../screens/client/favorites/FavoritesScreen';
+import { SearchScreen } from '../screens/client/search/SearchScreen';
+import { BookingSoon } from '../screens/client/shop/BookingSoon';
+import { ShopPage } from '../screens/client/shop/ShopPage';
 import { CheckEmail } from '../screens/auth/CheckEmail';
 import { ForgotPassword } from '../screens/auth/ForgotPassword';
 import { InviteScreen } from '../screens/auth/InviteScreen';
@@ -33,11 +37,21 @@ import styles from './App.module.css';
 
 /** Screens built so far; the other navigation items show only their title until their task. */
 const SCREENS: Record<string, ReactElement> = {
+  '/c/cauta': <SearchScreen />,
   '/s/panou': <Dashboard />,
 };
 
 /** Routes a role has besides its navigation items and Cont. */
 function extraRoutes(role: Role) {
+  if (role === 'client') {
+    return (
+      <>
+        <Route path="/c/service/:shopId" element={<ShopPage />} />
+        <Route path="/c/service/:shopId/programare" element={<BookingSoon />} />
+        <Route path="/c/cont/favorite" element={<FavoritesScreen />} />
+      </>
+    );
+  }
   if (role !== 'shop') return null;
   return (
     <Route path={SETTINGS_PATH} element={<ShopSettingsLayout />}>

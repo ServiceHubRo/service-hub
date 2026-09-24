@@ -117,10 +117,10 @@ select test.eq(
       and not has_function_privilege('anon', p.oid, 'execute')),
   'admin_force_cancel, can_read_booking, can_read_notice, can_read_shop, can_read_thread, cancel_booking, '
   || 'cancel_email_change, client_no_show_count, complete_job, confirm_booking, create_booking, decide_quote, '
-  || 'decline_booking, export_my_data, get_availability, get_shop_setup, invite_staff, is_admin, is_shop_member, '
+  || 'decline_booking, export_my_data, get_availability, get_shop_page, get_shop_setup, invite_staff, is_admin, is_shop_member, '
   || 'is_shop_owner, is_shop_public, last_odometer_for_booking, list_shop_staff, '
   || 'mark_no_show, mark_thread_read, my_shop_id, replace_quote, reply_review, report_review, reschedule_booking, '
-  || 'save_shop_hours, search_shops, send_message, send_quote, set_shop_services, shop_cancel_booking, start_inspection, '
+  || 'save_shop_hours, search_cities, search_shops, send_message, send_quote, set_shop_services, shop_cancel_booking, start_inspection, '
   || 'start_work, submit_review, toggle_favorite, withdraw_quote',
   'functions callable only when signed in')
 from pg_proc p where p.pronamespace = 'public'::regnamespace;
