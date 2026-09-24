@@ -1,4 +1,4 @@
-import { useId, type InputHTMLAttributes, type ReactNode } from 'react';
+import { useId, type InputHTMLAttributes, type ReactNode, type Ref } from 'react';
 import styles from './Field.module.css';
 
 export interface FieldProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'id'> {
@@ -11,6 +11,8 @@ export interface FieldProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 
   upper?: boolean;
   /** A small button inside the input, on the right (e.g. show password). */
   end?: ReactNode;
+  /** The input element (to focus it). */
+  ref?: Ref<HTMLInputElement>;
 }
 
 /** Label + input + hint/error, tied together for screen readers. */

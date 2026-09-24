@@ -98,20 +98,7 @@ describe('car details', () => {
 });
 
 describe('client bookings list (FR §3.5)', () => {
-  const b = (id: string, status: ClientBooking['status'], date: string, slot = '10:00:00'): ClientBooking => ({
-    id,
-    ref: id,
-    status,
-    date,
-    slot,
-    note: null,
-    car_snapshot: {},
-    created_at: '2026-10-01T00:00:00Z',
-    shop_id: 's',
-    service_id: 'ulei',
-    shop: null,
-    service: null,
-  });
+  const b = (id: string, status: ClientBooking['status'], date: string, slot = '10:00:00') => ({ id, status, date, slot });
 
   it('active first, soonest first; then the ended ones, newest first', () => {
     const { active, past } = splitBookings([

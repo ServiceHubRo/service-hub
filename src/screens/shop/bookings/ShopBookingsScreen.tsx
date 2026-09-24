@@ -50,6 +50,8 @@ const DONE_MESSAGE: Partial<Record<BookingStatus, MessageKey>> = {
   no_show: 'sb.done.no_show',
   in_inspection: 'sb.done.in_inspection',
   quote_sent: 'sb.done.quote_sent',
+  in_progress: 'sb.done.in_progress',
+  done: 'sb.done.done',
 };
 
 function doneMessage(before: BookingStatus, after: BookingStatus, moved: boolean): MessageKey | null {

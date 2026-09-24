@@ -25,7 +25,7 @@ export function translate(lang: Lang, key: MessageKey, params?: Params): string 
   return interpolate(dictionaries[lang][key], params);
 }
 
-type PluralBase =
+export type PluralUnit =
   | 'unit.days'
   | 'unit.hours'
   | 'unit.shops'
@@ -34,14 +34,15 @@ type PluralBase =
   | 'unit.places'
   | 'unit.savedCars'
   | 'unit.quotes'
-  | 'unit.newRequests';
+  | 'unit.newRequests'
+  | 'unit.quotesToDecide';
 const pluralRules: Record<Lang, Intl.PluralRules> = {
   ro: new Intl.PluralRules('ro-RO'),
   en: new Intl.PluralRules('en-US'),
 };
 
 /** RO: 1 zi / 2–19 zile / 20+ de zile. EN: 1 day / other days. */
-export function plural(lang: Lang, base: PluralBase, n: number): string {
+export function plural(lang: Lang, base: PluralUnit, n: number): string {
   const category = pluralRules[lang].select(n);
   const form = category === 'one' ? 'one' : category === 'few' ? 'few' : 'other';
   return translate(lang, `${base}.${form}` as MessageKey, { n });

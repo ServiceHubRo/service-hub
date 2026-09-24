@@ -1,7 +1,7 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { useState } from 'react';
 import { ActionButton } from '../../../components/ActionButton';
 import { Button } from '../../../components/Button';
-import { Card } from '../../../components/Card';
+import { InlinePanel } from '../../../components/InlinePanel';
 import { TextArea } from '../../../components/TextArea';
 import { canRetryRpc, rpcErrorMessage } from '../../../data/rpc';
 import { useI18n } from '../../../i18n/context';
@@ -9,24 +9,8 @@ import styles from './shopBookings.module.css';
 
 export const REASON_MAX = 500;
 
-/**
- * The inline panel every card action opens (ARCHITECTURE §17: no dialogs). Its title takes the
- * focus when it opens, so keyboard and screen-reader users land in it.
- */
-export function Panel({ title, children }: { title: string; children: ReactNode }) {
-  const titleRef = useRef<HTMLHeadingElement>(null);
-  useEffect(() => {
-    titleRef.current?.focus({ preventScroll: false });
-  }, []);
-  return (
-    <Card inset className={styles.panel}>
-      <h3 ref={titleRef} tabIndex={-1} className={styles.panelTitle}>
-        {title}
-      </h3>
-      {children}
-    </Card>
-  );
-}
+/** The inline panel every card action opens (no dialogs). */
+export const Panel = InlinePanel;
 
 /** The confirming write and "Renunță", side by side. */
 export function PanelButtons({

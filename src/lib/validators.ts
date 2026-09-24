@@ -81,3 +81,33 @@ export function formatPhone(value: string): string {
   const national = `0${normalized.slice(3)}`;
   return `${national.slice(0, 4)} ${national.slice(4, 7)} ${national.slice(7)}`;
 }
+
+/** Odometer rules (ARCHITECTURE §7), the same as `complete_job`. */
+export const ODOMETER_MIN = 100;
+export const ODOMETER_MAX = 2_000_000;
+/** More than this above the last reading needs an explicit confirmation. */
+export const ODOMETER_JUMP = 50_000;
+
+/**
+ * Odometer as typed → whole km: `105400`, `105.400`, `105 400` and `105,400` are all 105 400
+ * (kilometres have no decimals, so dots, commas and spaces can only group thousands). Null when
+ * it is empty or holds anything else.
+ */
+export function parseOdometer(text: string): number | null {
+  const compacted = text.replace(/[\s.,]/g, '');
+  if (!/^\d{1,9}$/.test(compacted)) return null;
+  return Number(compacted);
+}
+
+export type OdometerCheck =
+  | { ok: true; km: number; /** km above the last reading when that needs a confirmation. */ jump: number | null }
+  | { ok: false; error: 'odometer_required' | 'odometer_invalid' | 'odometer_lower'; previous?: number };
+
+/** Checked in the database's order: required, 100–2 000 000, not lower than the last reading, jump. */
+export function checkOdometer(text: string, last: number | null): OdometerCheck {
+  if (text.trim() === '') return { ok: false, error: 'odometer_required' };
+  const km = parseOdometer(text);
+  if (km === null || km < ODOMETER_MIN || km > ODOMETER_MAX) return { ok: false, error: 'odometer_invalid' };
+  if (last !== null && km < last) return { ok: false, error: 'odometer_lower', previous: last };
+  return { ok: true, km, jump: last !== null && km - last > ODOMETER_JUMP ? km - last : null };
+}
