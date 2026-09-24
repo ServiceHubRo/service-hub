@@ -56,6 +56,10 @@ export function adminApi() {
     },
     /** Calls a database function as the service role. Business errors keep their code as the message. */
     rpc: (fn: string, args: Record<string, unknown>) => request('POST', `/rest/v1/rpc/${fn}`, args),
+    /** Reads rows through the REST API as the service role, e.g. `shops?select=id&id=eq.…`. */
+    select: async (query: string) => (await request('GET', `/rest/v1/${query}`)) as Record<string, unknown>[],
+    /** Updates the rows a REST query selects, as the service role. */
+    update: (query: string, values: Record<string, unknown>) => request('PATCH', `/rest/v1/${query}`, values),
     deleteUser: (id: string) => request('DELETE', `/auth/v1/admin/users/${id}`),
     updateUser: (id: string, attributes: Record<string, unknown>) =>
       request('PUT', `/auth/v1/admin/users/${id}`, attributes),

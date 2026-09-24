@@ -1,0 +1,84 @@
+.logoRow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.logo,
+.logoEmpty {
+  width: 64px;
+  height: 64px;
+  flex-shrink: 0;
+  border-radius: var(--radius-card);
+}
+
+.logo {
+  object-fit: cover;
+  background: var(--surface2);
+}
+
+.logoEmpty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--amber-soft);
+  color: var(--amber);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 20px;
+}
+
+.logoText {
+  min-width: 0;
+}
+
+.logoButtons {
+  margin-top: 12px;
+}
+
+.logoError {
+  margin-top: 10px;
+  font-size: 13px;
+  color: var(--red);
+}
+
+.mapHead {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.mapOk {
+  color: var(--green);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.mapMissing {
+  color: var(--muted);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.mapNote,
+.mapNoteOk,
+.mapNoteWarn {
+  margin-top: 10px;
+  font-size: 13px;
+}
+
+.mapNote {
+  color: var(--muted);
+}
+
+.mapNoteOk {
+  color: var(--green);
+}
+
+.mapNoteWarn {
+  color: var(--amber);
+}
+
+.mapAction {
+  margin-top: 12px;
+}

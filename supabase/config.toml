@@ -424,3 +424,6 @@ enabled = true
 # with the new publishable/secret API keys, where the gateway's JWT check does not apply.
 [functions.delete-account]
 verify_jwt = false
+
+[functions.geocode]
+verify_jwt = false

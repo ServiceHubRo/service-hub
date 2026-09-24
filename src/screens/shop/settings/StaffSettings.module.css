@@ -1,0 +1,46 @@
+.who {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.me {
+  color: var(--muted);
+  font-weight: 400;
+}
+
+.role,
+.roleOwner {
+  flex-shrink: 0;
+  padding: 3px 10px;
+  border-radius: var(--radius-pill);
+  font-size: 12px;
+  font-weight: 600;
+  border: 1px solid var(--border);
+  color: var(--muted);
+}
+
+.roleOwner {
+  border-color: var(--amber-line);
+  color: var(--amber);
+  background: var(--amber-tint);
+}
+
+.buttons {
+  margin-top: 12px;
+}
+
+.link {
+  display: flex;
+}
+
+.linkInput {
+  width: 100%;
+  min-height: var(--tap);
+  padding: 10px 12px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-input);
+  font-size: 13px;
+  font-family: var(--font-mono);
+  color: var(--text);
+}

@@ -155,6 +155,8 @@ begin
     description = 'Diagnoză și reparații motor.', daily_capacity = 5, inspection_fee = 100,
     latitude = 45.6969, longitude = 25.4439, setup_completed_at = now()
   where id = s4;
+  -- The first-run checklist (T05) is done for the demo shops.
+  update public.shops set hours_reviewed_at = now(), capacity_reviewed_at = now() where id in (s1, s2, s3, s4);
 
   -- Hours: Atelier Demo 08–18, Rapid 08–17, Vulcanizare 08–20 (+ Saturday 09–14), Precis 09–17.
   update public.shop_hours set open_time = '08:00', close_time = '17:00' where shop_id = s2 and not is_closed;

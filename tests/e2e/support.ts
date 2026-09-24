@@ -9,6 +9,7 @@ import { expect, type Page } from '@playwright/test';
 export const BACKEND = process.env.E2E_BACKEND === '1';
 const API = process.env.VITE_SUPABASE_URL ?? 'http://127.0.0.1:54321';
 const SERVICE_KEY = process.env.E2E_SERVICE_ROLE_KEY ?? '';
+const ANON_KEY = process.env.VITE_SUPABASE_ANON_KEY ?? '';
 const MAILPIT = process.env.E2E_MAILPIT_URL ?? 'http://127.0.0.1:54324';
 
 /** Accounts from supabase/seed/dev_seed.sql. */
@@ -48,6 +49,31 @@ export async function createUser(role: 'client' | 'shop', extra: Record<string, 
   });
   expect(res.ok, await res.clone().text()).toBe(true);
   return email;
+}
+
+/** The user id behind an email/password account (signs in through the Auth API). */
+export async function userIdOf(email: string, password = PASSWORD): Promise<string> {
+  const res = await fetch(`${API}/auth/v1/token?grant_type=password`, {
+    method: 'POST',
+    headers: { apikey: ANON_KEY, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password }),
+  });
+  expect(res.ok, await res.clone().text()).toBe(true);
+  return ((await res.json()) as { user: { id: string } }).user.id;
+}
+
+/**
+ * What `select public.verify_phone_manually('…')` does in the SQL Editor (not callable through the
+ * API): marks the account's phone as verified. Here through the service role, test stack only.
+ */
+export async function verifyPhoneByAdmin(email: string): Promise<void> {
+  const id = await userIdOf(email);
+  const res = await fetch(`${API}/rest/v1/profiles?id=eq.${id}`, {
+    method: 'PATCH',
+    headers: { apikey: SERVICE_KEY, Authorization: `Bearer ${SERVICE_KEY}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ phone_verified_by_admin: true }),
+  });
+  expect(res.ok, await res.clone().text()).toBe(true);
 }
 
 /** Revokes every session of a user (as if they changed their password elsewhere). */
@@ -98,4 +124,9 @@ export async function openAccount(page: Page) {
 
 export function shot(page: Page, name: string, projectName: string) {
   return page.screenshot({ path: `test-results/shots/${name}-${projectName}.png`, fullPage: true });
+}
+
+/** The app's scroll container (the page itself never scrolls inside the shell). */
+export function scrollTopOf(page: Page): Promise<number> {
+  return page.locator('main').evaluate((el) => el.scrollTop);
 }
