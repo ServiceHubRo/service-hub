@@ -31,7 +31,10 @@ export const ro = {
   'offline.bar': 'Fără conexiune. Modificările nu se salvează.',
   'schema.behind':
     'Baza de date nu e la zi (versiunea {actual}, aștept {expected}). Verifică în GitHub → Actions dacă «Deploy Supabase» a rulat.',
-  'schema.unknown': 'necunoscută',
+  'schema.noConfig':
+    'Build-ul nu știe unde e baza de date ({detail}). În Netlify → Site configuration → Environment variables pune VITE_SUPABASE_URL și VITE_SUPABASE_ANON_KEY pentru toate contextele (inclusiv Deploy Previews), apoi refă deploy-ul.',
+  'schema.unreachable':
+    'Nu pot citi versiunea bazei de date (aștept {expected}): {detail}. Verifică în Netlify valorile VITE_SUPABASE_URL și VITE_SUPABASE_ANON_KEY și în GitHub → Actions dacă «Deploy Supabase» a rulat.',
 
   'action.sending': 'Se trimite…',
   'action.error': 'Nu s-a putut trimite. Verifică internetul și încearcă din nou.',

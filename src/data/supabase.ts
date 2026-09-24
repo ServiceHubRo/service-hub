@@ -1,9 +1,10 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { authStorage } from '../lib/remember';
+import { checkSupabaseConfig } from '../lib/supabaseConfig';
 import type { Database } from './database.types';
 
-const url = import.meta.env.VITE_SUPABASE_URL;
-const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+/** What this build knows about its Supabase project (the schema bar explains a problem). */
+export const supabaseConfig = checkSupabaseConfig(import.meta.env.VITE_SUPABASE_URL, import.meta.env.VITE_SUPABASE_ANON_KEY);
 
 /**
  * An error Supabase Auth put in the address after an email link (expired or already used), read
@@ -25,14 +26,14 @@ export function takeAuthLinkError(): string | null {
 
 /**
  * The single Supabase client, built from the two public env vars.
- * Null when they are missing (e.g. a local build without .env) so the shell still renders.
+ * Null when they are missing or malformed (e.g. a local build without .env) so the shell still renders.
  *
  * Email links use the implicit flow (tokens in the address), so a confirmation link opened on
  * another device or browser still works. The session is stored where "Ține-mă minte" says.
  */
 export const supabase: SupabaseClient<Database> | null =
-  url && anonKey
-    ? createClient<Database>(url, anonKey, {
+  supabaseConfig.ok
+    ? createClient<Database>(supabaseConfig.url, supabaseConfig.key, {
         auth: {
           flowType: 'implicit',
           storage: authStorage,

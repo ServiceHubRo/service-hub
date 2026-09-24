@@ -33,7 +33,10 @@ export const en: Record<MessageKey, string> = {
   'offline.bar': "You're offline. Changes aren't being saved.",
   'schema.behind':
     'The database is out of date (version {actual}, expected {expected}). Check GitHub → Actions to see whether "Deploy Supabase" ran.',
-  'schema.unknown': 'unknown',
+  'schema.noConfig':
+    "This build doesn't know where the database is ({detail}). In Netlify → Site configuration → Environment variables, set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY for all contexts (including Deploy Previews), then redeploy.",
+  'schema.unreachable':
+    'Cannot read the database version (expected {expected}): {detail}. Check VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY in Netlify, and in GitHub → Actions whether "Deploy Supabase" ran.',
 
   'action.sending': 'Sending…',
   'action.error': "Couldn't send. Check your connection and try again.",

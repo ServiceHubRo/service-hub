@@ -377,6 +377,7 @@ As Prompt 16e plus §7. Report code `SH-YYYY-NNNNNN` from a sequence. Public pag
 - Table `schema_version(version int not null)` with one row. Every migration ends with `update public.schema_version set version = N;` where N is the next integer (1, 2, 3 …), independent of the file timestamp.
 - Function `get_schema_version()` is callable by `anon` and `authenticated`.
 - `src/lib/schema.ts` exports `EXPECTED_SCHEMA_VERSION`. On start, preview and development builds compare the two and show a red bar: "Baza de date nu e la zi (versiunea X, aștept Y). Verifică în GitHub → Actions dacă «Deploy Supabase» a rulat." Production reports the mismatch to Sentry instead.
+- When the version cannot be read at all, the bar says why instead of "unknown": the build has no usable `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY` (missing, example values, or a URL with a path), or the database's answer (HTTP status, code, message). On Netlify (`NETLIFY=true`) the build itself fails with the same explanation when those two variables are missing or malformed (`vite.config.ts`, `src/lib/supabaseConfig.ts`), so a preview can never be published without a database.
 - A migration is never edited after being pushed (it may already be applied); fixes go in a new migration. An abandoned pull request with migrations gets a reverting migration.
 
 **Grants — nothing is reachable by default** (set in the first migration, T02):

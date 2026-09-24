@@ -41,6 +41,14 @@ test('landing shows the logo and "În curând" without wrapping the wordmark', a
   await page.screenshot({ path: `test-results/shots/landing-${test.info().project.name}.png` });
 });
 
+test('no red database bar when the build reaches a database at the expected version', async ({ page }) => {
+  test.skip(!BACKEND, 'needs the local Supabase stack');
+  await page.goto('/');
+  await expect(page.getByRole('link', { name: 'Intră în cont' })).toBeVisible();
+  await page.waitForLoadState('networkidle');
+  await expect(page.getByText(/Baza de date|Nu pot citi versiunea|Build-ul nu știe/)).toHaveCount(0);
+});
+
 test('role screens need an account: signed-out visitors go to sign-in', async ({ page }) => {
   for (const path of ['/c/cauta', '/s/panou', '/admin/prezentare', '/c/cont']) {
     await page.goto(path);
