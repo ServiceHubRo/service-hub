@@ -1706,6 +1706,7 @@ export type Database = {
         Args: { p_booking: Database["public"]["Tables"]["bookings"]["Row"] }
         Returns: Json
       }
+      booking_thread: { Args: { p_booking_id: string }; Returns: string }
       bucharest_today: { Args: never; Returns: string }
       can_read_booking: { Args: { p_booking_id: string }; Returns: boolean }
       can_read_notice: {
@@ -2105,6 +2106,24 @@ export type Database = {
       }
       list_shop_bookings: { Args: never; Returns: Json }
       list_shop_staff: { Args: never; Returns: Json }
+      list_threads: {
+        Args: never
+        Returns: {
+          client_id: string
+          client_name: string
+          last_body: string
+          last_event: string
+          last_kind: string
+          last_message_at: string
+          last_own: boolean
+          last_params: Json
+          shop_id: string
+          shop_logo_url: string
+          shop_name: string
+          thread_id: string
+          unread: number
+        }[]
+      }
       lock_booking_as_client: {
         Args: { p_booking_id: string }
         Returns: {
@@ -2226,6 +2245,14 @@ export type Database = {
         }
       }
       mark_thread_read: { Args: { p_thread_id: string }; Returns: string }
+      message_is_own_side: {
+        Args: {
+          p_client_id: string
+          p_message: Database["public"]["Tables"]["messages"]["Row"]
+          p_side: string
+        }
+        Returns: boolean
+      }
       my_shop_id: { Args: never; Returns: string }
       next_history_report_code: { Args: never; Returns: string }
       normalize_code: { Args: { p: string }; Returns: string }
