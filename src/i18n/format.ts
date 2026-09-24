@@ -23,6 +23,22 @@ export function formatMoney(lang: Lang, amount: number): string {
   return lang === 'ro' ? `${n} lei` : `${n} RON`;
 }
 
+/** Distance to a shop: RO `2,3 km`, EN `2.3 km`; whole km from 10 km on (`14 km`). */
+export function formatDistance(lang: Lang, km: number): string {
+  const digits = km < 10 ? 1 : 0;
+  const n = new Intl.NumberFormat(locales[lang], {
+    minimumFractionDigits: digits,
+    maximumFractionDigits: digits,
+    useGrouping: 'always',
+  }).format(km);
+  return `${n} km`;
+}
+
+/** Average rating with one decimal: RO `4,8`, EN `4.8`. */
+export function formatRating(lang: Lang, value: number): string {
+  return new Intl.NumberFormat(locales[lang], { minimumFractionDigits: 1, maximumFractionDigits: 1 }).format(value);
+}
+
 /** RO `105.400 km`, EN `105,400 km`. */
 export function formatKm(lang: Lang, km: number): string {
   return `${groupedInteger(lang, km)} km`;
@@ -47,6 +63,21 @@ export function formatDate(lang: Lang, value: Date | string): string {
   return lang === 'ro'
     ? `${capitalize(p.weekday ?? '')} ${p.day} ${p.month}`
     : `${p.weekday}, ${p.month} ${p.day}`;
+}
+
+/** RO `20 oct`, EN `Oct 20`; the year is added when it is not the current one (`3 ian 2027`). */
+export function formatDayMonth(lang: Lang, value: Date | string, now: Date = new Date()): string {
+  const date = typeof value === 'string' ? dateFromYmd(value) : value;
+  const p = parts(lang, date, { day: 'numeric', month: 'short', year: 'numeric' });
+  const thisYear = parts(lang, now, { year: 'numeric' }).year;
+  const year = p.year !== thisYear ? p.year : null;
+  if (lang === 'ro') return [p.day, p.month, year].filter(Boolean).join(' ');
+  return year ? `${p.month} ${p.day}, ${year}` : `${p.month} ${p.day}`;
+}
+
+/** A closed period: `20 oct – 22 oct`, or one day `20 oct`. */
+export function formatDateRange(lang: Lang, start: string, end: string, now: Date = new Date()): string {
+  return start === end ? formatDayMonth(lang, start, now) : `${formatDayMonth(lang, start, now)} – ${formatDayMonth(lang, end, now)}`;
 }
 
 /** 24-hour `09:00` in Europe/Bucharest. */

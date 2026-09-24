@@ -1,0 +1,212 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ---------------------------------------------------------------- search field */
+.searchBox {
+  position: relative;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 13px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--muted);
+  pointer-events: none;
+}
+
+.searchInput {
+  width: 100%;
+  min-height: 48px;
+  padding: 12px 48px 12px 40px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-input);
+  font-size: 16px;
+  outline: none;
+  appearance: none;
+}
+
+.searchInput::-webkit-search-cancel-button {
+  display: none;
+}
+
+.searchInput::placeholder {
+  color: var(--muted);
+}
+
+.searchInput:focus-visible {
+  border-color: var(--amber);
+}
+
+.clearText {
+  position: absolute;
+  right: 2px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: var(--tap);
+  height: var(--tap);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-input);
+  color: var(--muted);
+}
+
+/* ---------------------------------------------------------------- chips */
+.filters {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* Chip rows scroll sideways to the screen edge on phones and tablets. */
+@media (max-width: 1023px) {
+  .filters > [role='group'] {
+    margin: 0 calc(var(--page-pad) * -1);
+    padding-left: var(--page-pad);
+    padding-right: var(--page-pad);
+  }
+}
+
+.divider {
+  flex-shrink: 0;
+  width: 1px;
+  margin: 8px 4px;
+  background: var(--border-lit);
+}
+
+.heartOn {
+  fill: var(--amber);
+}
+
+/* ---------------------------------------------------------------- results */
+.results {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: opacity 0.15s;
+}
+
+.results[aria-busy='true'] {
+  opacity: 0.6;
+}
+
+.countRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0 12px;
+}
+
+.count {
+  color: var(--muted);
+  font-size: 13.5px;
+}
+
+.textButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: var(--tap);
+  color: var(--text);
+  font-size: 13.5px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: var(--border-lit);
+}
+
+.textButton:hover {
+  text-decoration-color: var(--amber);
+}
+
+.chevron,
+.chevronOpen {
+  transition: transform 0.15s;
+  color: var(--muted);
+}
+
+.chevronOpen {
+  transform: rotate(180deg);
+}
+
+.explain {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 4px;
+  padding: 11px 13px;
+  background: var(--surface2);
+  border-radius: var(--radius-input);
+  color: var(--muted);
+  font-size: 13.5px;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.section + .section {
+  margin-top: 10px;
+}
+
+.sectionTitle {
+  font-size: 12px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
+
+.list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* ---------------------------------------------------------------- location banner */
+.locationBanner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 12px;
+  padding: 12px 13px;
+  background: var(--surface2);
+  border: 1px solid var(--border-lit);
+  border-radius: var(--radius-button);
+}
+
+.locationIcon {
+  flex-shrink: 0;
+  color: var(--amber);
+}
+
+.locationText {
+  flex: 1;
+  min-width: 180px;
+  font-size: 13.5px;
+}
+
+.locationActions {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.iconButton {
+  width: var(--tap);
+  height: var(--tap);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: -8px -6px -8px auto;
+  color: var(--muted);
+  border-radius: var(--radius-input);
+}

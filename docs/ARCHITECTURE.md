@@ -111,6 +111,7 @@ Settings writes (T05): public data, booking rules, fee, preferences, closures an
 - `reply`, `reply_at` — shop members may update only these (column grants)
 - Reports: `report_reason in ('fake','abusive','wrong_shop','personal_data')`, `reported_at`, `report_status in ('pending','kept','removed')`, `report_decided_at`, `report_note`, `removed_at`
 - Removed reviews disappear from public lists and from averages. A reported review stays visible until admin decides.
+- Read access (T06): a visible review is readable together with its shop (`can_read_shop`); the author, the shop's members and admin also see removed ones.
 
 **shop_ratings** (view) — `shop_id`, `review_count`, `rating_sum`, `average`, `weighted_score` (formula §8), excluding removed reviews.
 
@@ -258,6 +259,8 @@ Shown on: completed booking cards (both sides), shop history (column + searchabl
 ## 8. Ranking
 
 `weighted_score = (rating_sum + prior_avg × prior_weight) / (review_count + prior_weight)` with `prior_avg = 4.3`, `prior_weight = 3` from settings. Order: score desc, then review count desc, then name asc. Filters narrow, never reorder. "Aproape de tine" is a separate section sorted by straight-line distance (Haversine), and "Cele mai apropiate" is an explicit sort option; distance never enters the score. The client's location stays in memory only — it is never written to the database.
+
+**Search (T06).** `search_shops(q, category, city, lat, lng, sort)` matches **word by word**: the query is folded (no case, no diacritics) and split into at most 8 words by `search_words()`, each with an optional English plural "s" and then an optional last vowel ("brakes" → `brak`, "frane" → `fran`; same rule as `searchWords()` in `src/lib/text.ts`). A shop matches when every word is in its name or city, or — for the words that are not — all in **one** offered service (service or category name, RO or EN); that service is returned as `matched_service_*` ("Oferă: …"). So "schimb ulei", "oil change" and "frane brasov" work; "frane ulei" (two different services) does not. The city chips come from `search_cities()` (cities with public shops, one chip per city whatever the spelling, most shops first). The client computes distances itself (`src/lib/geo.ts`), so the position is never sent anywhere; the `lat`/`lng` parameters stay for other callers. "Aproape de tine" shows the 3 nearest shops within 25 km of the filtered results; it is hidden when the list is already sorted by distance. The shop page reads `get_shop_page(shop_id)`: public shop columns only (never `shop_billing`, preferences or internal stamps), `bookable` (= `is_shop_public`), rating, the week's hours, closures from today on, offered services with their category and icon, and the 50 newest visible reviews with replies — `shop_not_found` when the caller may not read the shop. The filters live in the address (`/c/cauta?q=&cat=&oras=&fav=1&sort=aproape`), so Back and reload keep them.
 
 ---
 

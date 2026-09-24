@@ -1,0 +1,31 @@
+.stars {
+  position: relative;
+  display: inline-flex;
+  flex-shrink: 0;
+  vertical-align: -2px;
+}
+
+.off,
+.on {
+  display: inline-flex;
+  gap: 1px;
+  white-space: nowrap;
+}
+
+.off {
+  color: var(--border-lit);
+}
+
+.on {
+  color: var(--amber);
+}
+
+.on svg {
+  fill: var(--amber);
+}
+
+.clip {
+  position: absolute;
+  inset: 0 auto 0 0;
+  overflow: hidden;
+}

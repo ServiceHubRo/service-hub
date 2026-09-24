@@ -2048,6 +2048,7 @@ export type Database = {
         Returns: Json
       }
       get_schema_version: { Args: never; Returns: number }
+      get_shop_page: { Args: { p_shop_id: string }; Returns: Json }
       get_shop_setup: { Args: never; Returns: Json }
       get_staff_invite: { Args: { p_token: string }; Returns: Json }
       insert_quote: {
@@ -2452,6 +2453,13 @@ export type Database = {
         Args: { p_hours: Json; p_request_id: string }
         Returns: Json
       }
+      search_cities: {
+        Args: never
+        Returns: {
+          city: string
+          shop_count: number
+        }[]
+      }
       search_shops: {
         Args: {
           p_category?: string
@@ -2480,6 +2488,7 @@ export type Database = {
           weighted_score: number
         }[]
       }
+      search_words: { Args: { p_q: string }; Returns: string[] }
       send_message: {
         Args: { p_body: string; p_request_id: string; p_thread_id: string }
         Returns: {
