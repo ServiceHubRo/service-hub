@@ -15,7 +15,7 @@ import { daysFromToday, formatDate, formatKm, formatMoney, formatTime, ymdInBuch
 import { cancelState, reviewState, type Quote } from '../../../lib/clientBookings';
 import { formatPhone, normalizePhone } from '../../../lib/validators';
 import { MessageLink } from '../../messages/MessageLink';
-import { bookingPath } from '../paths';
+import { bookingCarHistoryPath, bookingPath, type VehicleHistoryLinkState } from '../paths';
 import { serviceName } from '../shop/serviceGroups';
 import { QuoteDecision } from './QuoteDecision';
 import { ReviewForm } from './ReviewForm';
@@ -25,6 +25,8 @@ import styles from './bookings.module.css';
 const STALE: ReadonlySet<RpcErrorCode> = new Set(['wrong_status', 'booking_not_found', 'quote_changed', 'quote_expired']);
 
 const PICKUP_DAYS = 2;
+
+const FROM_BOOKINGS: VehicleHistoryLinkState = { from: 'bookings' };
 
 export interface ClientBookingCardProps {
   booking: ClientBooking;
@@ -42,7 +44,8 @@ export interface ClientBookingCardProps {
  * One booking in the client's Programări (FR §3.5, P10b, P15, P15c): service, shop, day and time,
  * car and status; what the status means now (the quote to decide on, the job in progress, the
  * finished job with odometer, work and amount); and what the client can do: cancel while allowed,
- * review a finished job once, book again. Every write goes through a database function.
+ * review a finished job once, book again, see the car's history (T10). Every write goes through a
+ * database function.
  */
 export function ClientBookingCard({ booking: b, reviewWindowDays, now, onDone, onReviewed, onStale }: ClientBookingCardProps) {
   const { t, lang } = useI18n();
@@ -114,6 +117,11 @@ export function ClientBookingCard({ booking: b, reviewWindowDays, now, onDone, o
           {bookAgain && (
             <Link to={`${bookingPath(b.shop_id)}?pas=2&serviciu=${encodeURIComponent(b.service_id)}`} className={buttonClass('secondary')}>
               {t('cb.bookAgain')}
+            </Link>
+          )}
+          {b.status === 'done' && (
+            <Link to={bookingCarHistoryPath(b.id)} state={FROM_BOOKINGS} className={buttonClass('secondary')}>
+              {t('vh.see')}
             </Link>
           )}
           <MessageLink side="client" bookingId={b.id} />

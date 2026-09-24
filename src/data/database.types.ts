@@ -2105,6 +2105,7 @@ export type Database = {
         Returns: number
       }
       list_shop_bookings: { Args: never; Returns: Json }
+      list_shop_history: { Args: never; Returns: Json }
       list_shop_staff: { Args: never; Returns: Json }
       list_threads: {
         Args: never

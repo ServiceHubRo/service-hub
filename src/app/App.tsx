@@ -11,6 +11,8 @@ import { ClientBookingsProvider } from '../screens/client/bookings/ClientBooking
 import { ClientBookingsScreen } from '../screens/client/bookings/ClientBookingsScreen';
 import { FavoritesScreen } from '../screens/client/favorites/FavoritesScreen';
 import { CarFormScreen } from '../screens/client/garage/CarFormScreen';
+import { VehicleHistoryScreen } from '../screens/client/history/VehicleHistoryScreen';
+import { VehiclePickScreen } from '../screens/client/history/VehiclePickScreen';
 import { GarageScreen } from '../screens/client/garage/GarageScreen';
 import { SearchScreen } from '../screens/client/search/SearchScreen';
 import { ShopPage } from '../screens/client/shop/ShopPage';
@@ -35,6 +37,7 @@ import { ShopSettingsLayout } from '../screens/shop/settings/ShopSettingsLayout'
 import { StaffSettings } from '../screens/shop/settings/StaffSettings';
 import { ShopBookingsProvider } from '../screens/shop/bookings/ShopBookingsProvider';
 import { ShopBookingsScreen } from '../screens/shop/bookings/ShopBookingsScreen';
+import { ShopHistoryScreen } from '../screens/shop/history/ShopHistoryScreen';
 import { REVIEWS_PATH } from '../screens/shop/paths';
 import { ShopReviewsScreen } from '../screens/shop/reviews/ShopReviewsScreen';
 import { BookingThreadRedirect } from '../screens/messages/BookingThreadRedirect';
@@ -56,6 +59,7 @@ const SCREENS: Record<string, ReactElement> = {
   '/c/programari': <ClientBookingsScreen />,
   '/s/panou': <Dashboard />,
   '/s/programari': <ShopBookingsScreen />,
+  '/s/istoric': <ShopHistoryScreen />,
   '/c/mesaje': <MessagesScreen />,
   '/s/mesaje': <MessagesScreen />,
 };
@@ -81,7 +85,10 @@ function extraRoutes(role: Role) {
         <Route path="/c/service/:shopId/programare/trimisa" element={<BookingSent />} />
         <Route path="/c/garaj/nou" element={<CarFormScreen />} />
         <Route path="/c/garaj/:carId" element={<CarFormScreen />} />
+        <Route path="/c/garaj/:carId/istoric" element={<VehicleHistoryScreen />} />
+        <Route path="/c/programari/:bookingId/istoric" element={<VehicleHistoryScreen />} />
         <Route path="/c/cont/favorite" element={<FavoritesScreen />} />
+        <Route path="/c/cont/istoric" element={<VehiclePickScreen />} />
         {messageRoutes('client')}
       </>
     );
