@@ -32,6 +32,8 @@ import { ServicesSettings } from '../screens/shop/settings/ServicesSettings';
 import { SettingsIndex } from '../screens/shop/settings/SettingsIndex';
 import { ShopSettingsLayout } from '../screens/shop/settings/ShopSettingsLayout';
 import { StaffSettings } from '../screens/shop/settings/StaffSettings';
+import { ShopBookingsProvider } from '../screens/shop/bookings/ShopBookingsProvider';
+import { ShopBookingsScreen } from '../screens/shop/bookings/ShopBookingsScreen';
 import { AppShell } from './AppShell';
 import { PublicOnly, RoleGuard } from './RoleGuard';
 import { NAV, homeOf, type Role } from './roles';
@@ -45,6 +47,7 @@ const SCREENS: Record<string, ReactElement> = {
   '/c/garaj': <GarageScreen />,
   '/c/programari': <ClientBookingsScreen />,
   '/s/panou': <Dashboard />,
+  '/s/programari': <ShopBookingsScreen />,
 };
 
 /** Routes a role has besides its navigation items and Cont. */
@@ -80,7 +83,18 @@ function roleRoutes(role: Role) {
   const nav = NAV[role];
   return (
     <Route element={<RoleGuard role={role} />}>
-      <Route element={<AppShell role={role} />}>
+      <Route
+        element={
+          role === 'shop' ? (
+            // One live list of the shop's bookings for Panou, Programări and the tab badge.
+            <ShopBookingsProvider>
+              <AppShell role={role} />
+            </ShopBookingsProvider>
+          ) : (
+            <AppShell role={role} />
+          )
+        }
+      >
         {nav.main.map((item) => (
           <Route key={item.path} path={item.path} element={SCREENS[item.path] ?? <Placeholder titleKey={item.labelKey} />} />
         ))}

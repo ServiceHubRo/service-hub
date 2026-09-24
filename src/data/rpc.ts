@@ -255,16 +255,20 @@ export interface Availability {
   slots: AvailabilitySlot[];
 }
 
-/** Days from `from` (default today) with places left; with `slotsFor`, that day's slots too. */
+/**
+ * Days from `from` (default today) with places left; with `slotsFor`, that day's slots too. A shop
+ * moving one of its bookings passes `excludeBooking`, so the place it holds now counts as free.
+ */
 export async function getAvailability(
   shopId: string,
-  options: { from?: string; days?: number; slotsFor?: string } = {},
+  options: { from?: string; days?: number; slotsFor?: string; excludeBooking?: string } = {},
 ): Promise<Availability> {
   const data = await call('get_availability', {
     p_shop_id: shopId,
     p_from: options.from,
     p_days: options.days,
     p_slots_for: options.slotsFor,
+    p_exclude_booking: options.excludeBooking,
   });
   return data as unknown as Availability;
 }

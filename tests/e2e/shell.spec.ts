@@ -25,7 +25,16 @@ test.beforeEach(async ({ context }) => {
 async function navLabels(page: Page): Promise<string[]> {
   const nav = page.getByRole('navigation', { name: /Navigare principală|Main navigation/ }).filter({ visible: true });
   await expect(nav).toHaveCount(1);
-  return (await nav.getByRole('link').allInnerTexts()).map((s) => s.trim());
+  // The visible label only (not a count badge or the text read out for it).
+  return nav.getByRole('link').evaluateAll((links) =>
+    links.map((link) =>
+      Array.from(link.querySelectorAll('span'))
+        .filter((s) => s.children.length === 0 && !s.closest('[aria-hidden="true"]') && !s.classList.contains('visually-hidden'))
+        .map((s) => s.textContent ?? '')
+        .join('')
+        .trim(),
+    ),
+  );
 }
 
 test('landing shows the logo and "În curând" without wrapping the wordmark', async ({ page }) => {
@@ -81,7 +90,8 @@ for (const role of Object.keys(NAV) as (keyof typeof NAV)[]) {
 
     // Every item opens its screen.
     for (const label of NAV[role]) {
-      await page.getByRole('link', { name: label, exact: true }).filter({ visible: true }).first().click();
+      // A count badge is read out after the label ("Programări, 1 cerere nouă").
+      await page.getByRole('link', { name: new RegExp(`^${label}( ?,.*)?$`) }).filter({ visible: true }).first().click();
       await expect(page.getByRole('heading', { level: 1 })).toHaveText(label);
     }
 

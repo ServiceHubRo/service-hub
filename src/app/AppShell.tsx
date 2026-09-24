@@ -4,21 +4,51 @@ import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { LogoTile } from '../components/LogoTile';
 import { Wordmark } from '../components/Wordmark';
 import { useI18n } from '../i18n/context';
+import { plural } from '../i18n/translate';
+import { useOptionalShopBookings } from '../screens/shop/bookings/shopBookingsContext';
+import { SHOP_BOOKINGS_PATH } from '../screens/shop/paths';
 import { EmailVerifyBanner } from './EmailVerifyBanner';
 import { LangSwitch } from './LangSwitch';
 import { NAV, type NavItem, type Role } from './roles';
 import { useSession } from './sessionContext';
 import styles from './AppShell.module.css';
 
-function SidebarLink({ item }: { item: NavItem }) {
-  const { t } = useI18n();
+/** The item's icon with its count bubble (the count is read out after the label). */
+function NavIcon({ item, size, badge }: { item: NavItem; size: number; badge: number }) {
   const Icon = item.icon;
+  if (badge <= 0) return <Icon size={size} aria-hidden="true" />;
+  return (
+    <span className={styles.iconWrap}>
+      <Icon size={size} aria-hidden="true" />
+      <span className={styles.badge} aria-hidden="true">
+        {badge > 99 ? '99+' : badge}
+      </span>
+    </span>
+  );
+}
+
+/** ", 3 cereri noi" for screen readers, after the item's label. */
+function BadgeText({ badge }: { badge: number }) {
+  const { lang } = useI18n();
+  return badge > 0 ? <span className="visually-hidden">, {plural(lang, 'unit.newRequests', badge)}</span> : null;
+}
+
+function SidebarLink({ item, badge = 0 }: { item: NavItem; badge?: number }) {
+  const { t } = useI18n();
   return (
     <NavLink to={item.path} className={({ isActive }) => `${styles.sideLink} ${isActive ? styles.sideActive : ''}`}>
-      <Icon size={20} aria-hidden="true" />
+      <NavIcon item={item} size={20} badge={badge} />
       <span>{t(item.labelKey)}</span>
+      <BadgeText badge={badge} />
     </NavLink>
   );
+}
+
+/** Counts shown on navigation items: new booking requests on the shop's Programări. */
+function useNavBadges(): Record<string, number> {
+  const shopBookings = useOptionalShopBookings();
+  if (shopBookings?.state.status !== 'ready') return {};
+  return { [SHOP_BOOKINGS_PATH]: shopBookings.state.data.bookings.filter((b) => b.status === 'pending').length };
 }
 
 /**
@@ -32,6 +62,7 @@ export function AppShell({ role }: { role: Role }) {
   const { pathname } = useLocation();
   const nav = NAV[role];
   const mainRef = useRef<HTMLElement>(null);
+  const badges = useNavBadges();
 
   // A new screen starts at the top; only the content area scrolls.
   useEffect(() => {
@@ -71,7 +102,7 @@ export function AppShell({ role }: { role: Role }) {
           </div>
           <nav className={styles.sideNav} aria-label={t('nav.main')}>
             {nav.main.map((item) => (
-              <SidebarLink key={item.path} item={item} />
+              <SidebarLink key={item.path} item={item} badge={badges[item.path]} />
             ))}
           </nav>
           <div className={styles.sideBottom}>
@@ -96,15 +127,15 @@ export function AppShell({ role }: { role: Role }) {
 
       <nav className={styles.bottomBar} aria-label={t('nav.main')}>
         {nav.bottomBar.map((item) => {
-          const Icon = item.icon;
           return (
             <NavLink
               key={item.path}
               to={item.path}
               className={({ isActive }) => `${styles.tab} ${isActive ? styles.tabActive : ''}`}
             >
-              <Icon size={21} aria-hidden="true" />
+              <NavIcon item={item} size={21} badge={badges[item.path] ?? 0} />
               <span className={styles.tabLabel}>{t(item.labelKey)}</span>
+              <BadgeText badge={badges[item.path] ?? 0} />
             </NavLink>
           );
         })}

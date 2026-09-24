@@ -94,3 +94,24 @@ textarea {
     color: #000;
   }
 }
+
+/* Printing (P17b): the shell's navigation and every button disappear; `.print-only` appears. */
+.print-only {
+  display: none;
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  .print-only {
+    display: revert;
+  }
+
+  html,
+  body,
+  #root {
+    height: auto;
+  }
+}

@@ -62,6 +62,24 @@ export async function userIdOf(email: string, password = PASSWORD): Promise<stri
   return ((await res.json()) as { user: { id: string } }).user.id;
 }
 
+/** Calls a database function as a signed-in user, the way the app does (RLS and checks apply). */
+export async function rpcAs<T = unknown>(email: string, fn: string, args: Record<string, unknown>, password = PASSWORD): Promise<T> {
+  const auth = await fetch(`${API}/auth/v1/token?grant_type=password`, {
+    method: 'POST',
+    headers: { apikey: ANON_KEY, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password }),
+  });
+  expect(auth.ok, await auth.clone().text()).toBe(true);
+  const token = ((await auth.json()) as { access_token: string }).access_token;
+  const res = await fetch(`${API}/rest/v1/rpc/${fn}`, {
+    method: 'POST',
+    headers: { apikey: ANON_KEY, Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify(args),
+  });
+  expect(res.ok, await res.clone().text()).toBe(true);
+  return (await res.json()) as T;
+}
+
 /**
  * What `select public.verify_phone_manually('…')` does in the SQL Editor (not callable through the
  * API): marks the account's phone as verified. Here through the service role, test stack only.
@@ -100,8 +118,9 @@ export async function createBookableShop(
   shopName: string,
   services: string[],
   rules: Record<string, number> = {},
+  extra: Record<string, string> = {},
 ): Promise<{ email: string; shopId: string }> {
-  const email = await createUser('shop', { shop_name: shopName });
+  const email = await createUser('shop', { shop_name: shopName, ...extra });
   await verifyPhoneByAdmin(email);
   const owner = await userIdOf(email);
   const [shop] = await serviceRest<{ id: string }[]>(`shops?owner_id=eq.${owner}&select=id`, 'GET');
