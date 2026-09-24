@@ -1649,6 +1649,52 @@ export type Database = {
       }
     }
     Functions: {
+      admin_force_cancel: {
+        Args: { p_booking_id: string; p_reason: string; p_request_id: string }
+        Returns: {
+          cancel_reason: string | null
+          cancelled_at: string | null
+          cancelled_by: string | null
+          car_id: string | null
+          car_snapshot: Json
+          client_id: string | null
+          client_lang: string
+          client_name: string | null
+          client_phone: string | null
+          confirmed_at: string | null
+          cost: number | null
+          created_at: string
+          date: string
+          decline_reason: string | null
+          done_at: string | null
+          id: string
+          inspection_started_at: string | null
+          note: string | null
+          odometer: number | null
+          ref: string
+          reminder_sent_at: string | null
+          service_id: string
+          shop_id: string
+          slot: string
+          started_at: string | null
+          status: string
+          status_changed_at: string
+          updated_at: string
+          work: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "bookings"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      app_limit: { Args: { p_default: number; p_key: string }; Returns: number }
+      booking_event_params: {
+        Args: { p_booking: Database["public"]["Tables"]["bookings"]["Row"] }
+        Returns: Json
+      }
+      bucharest_today: { Args: never; Returns: string }
       can_read_booking: { Args: { p_booking_id: string }; Returns: boolean }
       can_read_notice: {
         Args: { p_audience: string; p_city: string }
@@ -1656,11 +1702,364 @@ export type Database = {
       }
       can_read_shop: { Args: { p_shop_id: string }; Returns: boolean }
       can_read_thread: { Args: { p_thread_id: string }; Returns: boolean }
+      cancel_booking: {
+        Args: { p_booking_id: string; p_request_id: string }
+        Returns: {
+          cancel_reason: string | null
+          cancelled_at: string | null
+          cancelled_by: string | null
+          car_id: string | null
+          car_snapshot: Json
+          client_id: string | null
+          client_lang: string
+          client_name: string | null
+          client_phone: string | null
+          confirmed_at: string | null
+          cost: number | null
+          created_at: string
+          date: string
+          decline_reason: string | null
+          done_at: string | null
+          id: string
+          inspection_started_at: string | null
+          note: string | null
+          odometer: number | null
+          ref: string
+          reminder_sent_at: string | null
+          service_id: string
+          shop_id: string
+          slot: string
+          started_at: string | null
+          status: string
+          status_changed_at: string
+          updated_at: string
+          work: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "bookings"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      check_slot: {
+        Args: {
+          p_client_rules: boolean
+          p_date: string
+          p_exclude_booking: string
+          p_shop: Database["public"]["Tables"]["shops"]["Row"]
+          p_slot: string
+        }
+        Returns: undefined
+      }
+      clean_quote_items: {
+        Args: { p_items: Json }
+        Returns: {
+          name: string
+          pos: number
+          price: number
+        }[]
+      }
+      client_no_show_count: {
+        Args: { p_client_id: string; p_days?: number }
+        Returns: number
+      }
+      complete_job: {
+        Args: {
+          p_booking_id: string
+          p_confirm_jump?: boolean
+          p_cost?: number
+          p_odometer: number
+          p_request_id: string
+          p_work?: string
+        }
+        Returns: {
+          cancel_reason: string | null
+          cancelled_at: string | null
+          cancelled_by: string | null
+          car_id: string | null
+          car_snapshot: Json
+          client_id: string | null
+          client_lang: string
+          client_name: string | null
+          client_phone: string | null
+          confirmed_at: string | null
+          cost: number | null
+          created_at: string
+          date: string
+          decline_reason: string | null
+          done_at: string | null
+          id: string
+          inspection_started_at: string | null
+          note: string | null
+          odometer: number | null
+          ref: string
+          reminder_sent_at: string | null
+          service_id: string
+          shop_id: string
+          slot: string
+          started_at: string | null
+          status: string
+          status_changed_at: string
+          updated_at: string
+          work: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "bookings"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      confirm_booking: {
+        Args: { p_booking_id: string; p_request_id: string }
+        Returns: {
+          cancel_reason: string | null
+          cancelled_at: string | null
+          cancelled_by: string | null
+          car_id: string | null
+          car_snapshot: Json
+          client_id: string | null
+          client_lang: string
+          client_name: string | null
+          client_phone: string | null
+          confirmed_at: string | null
+          cost: number | null
+          created_at: string
+          date: string
+          decline_reason: string | null
+          done_at: string | null
+          id: string
+          inspection_started_at: string | null
+          note: string | null
+          odometer: number | null
+          ref: string
+          reminder_sent_at: string | null
+          service_id: string
+          shop_id: string
+          slot: string
+          started_at: string | null
+          status: string
+          status_changed_at: string
+          updated_at: string
+          work: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "bookings"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      create_booking: {
+        Args: {
+          p_car?: Json
+          p_car_id?: string
+          p_date: string
+          p_note?: string
+          p_request_id: string
+          p_save_car?: boolean
+          p_service_id: string
+          p_shop_id: string
+          p_slot: string
+        }
+        Returns: {
+          cancel_reason: string | null
+          cancelled_at: string | null
+          cancelled_by: string | null
+          car_id: string | null
+          car_snapshot: Json
+          client_id: string | null
+          client_lang: string
+          client_name: string | null
+          client_phone: string | null
+          confirmed_at: string | null
+          cost: number | null
+          created_at: string
+          date: string
+          decline_reason: string | null
+          done_at: string | null
+          id: string
+          inspection_started_at: string | null
+          note: string | null
+          odometer: number | null
+          ref: string
+          reminder_sent_at: string | null
+          service_id: string
+          shop_id: string
+          slot: string
+          started_at: string | null
+          status: string
+          status_changed_at: string
+          updated_at: string
+          work: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "bookings"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      current_sent_quote: {
+        Args: { p_booking_id: string }
+        Returns: {
+          booking_id: string
+          created_at: string
+          decided_at: string | null
+          expires_at: string | null
+          id: string
+          inspection_fee: number
+          note: string | null
+          sent_at: string
+          sent_by: string | null
+          status: string
+          total_approved: number | null
+          total_sent: number
+          version: number
+        }
+        SetofOptions: {
+          from: "*"
+          to: "quotes"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      decide_quote: {
+        Args: {
+          p_approved_item_ids: string[]
+          p_booking_id: string
+          p_quote_id: string
+          p_request_id: string
+        }
+        Returns: {
+          cancel_reason: string | null
+          cancelled_at: string | null
+          cancelled_by: string | null
+          car_id: string | null
+          car_snapshot: Json
+          client_id: string | null
+          client_lang: string
+          client_name: string | null
+          client_phone: string | null
+          confirmed_at: string | null
+          cost: number | null
+          created_at: string
+          date: string
+          decline_reason: string | null
+          done_at: string | null
+          id: string
+          inspection_started_at: string | null
+          note: string | null
+          odometer: number | null
+          ref: string
+          reminder_sent_at: string | null
+          service_id: string
+          shop_id: string
+          slot: string
+          started_at: string | null
+          status: string
+          status_changed_at: string
+          updated_at: string
+          work: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "bookings"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      decline_booking: {
+        Args: { p_booking_id: string; p_reason?: string; p_request_id: string }
+        Returns: {
+          cancel_reason: string | null
+          cancelled_at: string | null
+          cancelled_by: string | null
+          car_id: string | null
+          car_snapshot: Json
+          client_id: string | null
+          client_lang: string
+          client_name: string | null
+          client_phone: string | null
+          confirmed_at: string | null
+          cost: number | null
+          created_at: string
+          date: string
+          decline_reason: string | null
+          done_at: string | null
+          id: string
+          inspection_started_at: string | null
+          note: string | null
+          odometer: number | null
+          ref: string
+          reminder_sent_at: string | null
+          service_id: string
+          shop_id: string
+          slot: string
+          started_at: string | null
+          status: string
+          status_changed_at: string
+          updated_at: string
+          work: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "bookings"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      ensure_thread: {
+        Args: { p_client_id: string; p_shop_id: string }
+        Returns: string
+      }
+      expire_quotes: { Args: never; Returns: number }
+      fail: { Args: { p_code: string; p_params?: Json }; Returns: undefined }
+      fold_text: { Args: { p: string }; Returns: string }
       format_sequence_id: {
         Args: { p_number: number; p_prefix: string; p_width?: number }
         Returns: string
       }
+      get_availability: {
+        Args: {
+          p_days?: number
+          p_from?: string
+          p_shop_id: string
+          p_slots_for?: string
+        }
+        Returns: Json
+      }
       get_schema_version: { Args: never; Returns: number }
+      insert_quote: {
+        Args: {
+          p_booking: Database["public"]["Tables"]["bookings"]["Row"]
+          p_items: Json
+          p_note: string
+        }
+        Returns: {
+          booking_id: string
+          created_at: string
+          decided_at: string | null
+          expires_at: string | null
+          id: string
+          inspection_fee: number
+          note: string | null
+          sent_at: string
+          sent_by: string | null
+          status: string
+          total_approved: number | null
+          total_sent: number
+          version: number
+        }
+        SetofOptions: {
+          from: "*"
+          to: "quotes"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      is_active_status: { Args: { p_status: string }; Returns: boolean }
       is_admin: { Args: never; Returns: boolean }
       is_shop_member: { Args: { p_shop_id: string }; Returns: boolean }
       is_shop_owner: { Args: { p_shop_id: string }; Returns: boolean }
@@ -1670,11 +2069,652 @@ export type Database = {
       is_valid_postal_code: { Args: { p: string }; Returns: boolean }
       is_valid_regcom: { Args: { p: string }; Returns: boolean }
       is_valid_vin: { Args: { p: string }; Returns: boolean }
+      last_odometer_for_booking: {
+        Args: { p_booking_id: string }
+        Returns: number
+      }
+      last_odometer_for_plate: {
+        Args: { p_plate_norm: string }
+        Returns: number
+      }
+      lock_booking_as_client: {
+        Args: { p_booking_id: string }
+        Returns: {
+          cancel_reason: string | null
+          cancelled_at: string | null
+          cancelled_by: string | null
+          car_id: string | null
+          car_snapshot: Json
+          client_id: string | null
+          client_lang: string
+          client_name: string | null
+          client_phone: string | null
+          confirmed_at: string | null
+          cost: number | null
+          created_at: string
+          date: string
+          decline_reason: string | null
+          done_at: string | null
+          id: string
+          inspection_started_at: string | null
+          note: string | null
+          odometer: number | null
+          ref: string
+          reminder_sent_at: string | null
+          service_id: string
+          shop_id: string
+          slot: string
+          started_at: string | null
+          status: string
+          status_changed_at: string
+          updated_at: string
+          work: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "bookings"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      lock_booking_as_shop: {
+        Args: { p_booking_id: string }
+        Returns: {
+          cancel_reason: string | null
+          cancelled_at: string | null
+          cancelled_by: string | null
+          car_id: string | null
+          car_snapshot: Json
+          client_id: string | null
+          client_lang: string
+          client_name: string | null
+          client_phone: string | null
+          confirmed_at: string | null
+          cost: number | null
+          created_at: string
+          date: string
+          decline_reason: string | null
+          done_at: string | null
+          id: string
+          inspection_started_at: string | null
+          note: string | null
+          odometer: number | null
+          ref: string
+          reminder_sent_at: string | null
+          service_id: string
+          shop_id: string
+          slot: string
+          started_at: string | null
+          status: string
+          status_changed_at: string
+          updated_at: string
+          work: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "bookings"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      mark_no_show: {
+        Args: { p_booking_id: string; p_request_id: string }
+        Returns: {
+          cancel_reason: string | null
+          cancelled_at: string | null
+          cancelled_by: string | null
+          car_id: string | null
+          car_snapshot: Json
+          client_id: string | null
+          client_lang: string
+          client_name: string | null
+          client_phone: string | null
+          confirmed_at: string | null
+          cost: number | null
+          created_at: string
+          date: string
+          decline_reason: string | null
+          done_at: string | null
+          id: string
+          inspection_started_at: string | null
+          note: string | null
+          odometer: number | null
+          ref: string
+          reminder_sent_at: string | null
+          service_id: string
+          shop_id: string
+          slot: string
+          started_at: string | null
+          status: string
+          status_changed_at: string
+          updated_at: string
+          work: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "bookings"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      mark_thread_read: { Args: { p_thread_id: string }; Returns: string }
       my_shop_id: { Args: never; Returns: string }
       next_history_report_code: { Args: never; Returns: string }
       normalize_code: { Args: { p: string }; Returns: string }
+      notify_shop: {
+        Args: {
+          p_booking_id: string
+          p_event: string
+          p_owner_channels?: string[]
+          p_params: Json
+          p_shop_id: string
+        }
+        Returns: undefined
+      }
+      notify_user: {
+        Args: {
+          p_booking_id: string
+          p_channels?: string[]
+          p_event: string
+          p_params: Json
+          p_user_id: string
+        }
+        Returns: undefined
+      }
+      post_booking_event: {
+        Args: {
+          p_booking: Database["public"]["Tables"]["bookings"]["Row"]
+          p_by: string
+          p_event: string
+          p_params?: Json
+        }
+        Returns: undefined
+      }
       promote_to_admin: { Args: { p_email: string }; Returns: string }
+      replace_quote: {
+        Args: {
+          p_booking_id: string
+          p_items: Json
+          p_note?: string
+          p_request_id: string
+        }
+        Returns: {
+          cancel_reason: string | null
+          cancelled_at: string | null
+          cancelled_by: string | null
+          car_id: string | null
+          car_snapshot: Json
+          client_id: string | null
+          client_lang: string
+          client_name: string | null
+          client_phone: string | null
+          confirmed_at: string | null
+          cost: number | null
+          created_at: string
+          date: string
+          decline_reason: string | null
+          done_at: string | null
+          id: string
+          inspection_started_at: string | null
+          note: string | null
+          odometer: number | null
+          ref: string
+          reminder_sent_at: string | null
+          service_id: string
+          shop_id: string
+          slot: string
+          started_at: string | null
+          status: string
+          status_changed_at: string
+          updated_at: string
+          work: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "bookings"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      reply_review: {
+        Args: { p_reply: string; p_request_id: string; p_review_id: string }
+        Returns: {
+          booking_id: string
+          client_display_name: string
+          client_id: string | null
+          created_at: string
+          id: string
+          rating: number
+          removed_at: string | null
+          reply: string | null
+          reply_at: string | null
+          report_decided_at: string | null
+          report_note: string | null
+          report_reason: string | null
+          report_status: string | null
+          reported_at: string | null
+          shop_id: string
+          text: string | null
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "reviews"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      report_review: {
+        Args: { p_reason: string; p_request_id: string; p_review_id: string }
+        Returns: {
+          booking_id: string
+          client_display_name: string
+          client_id: string | null
+          created_at: string
+          id: string
+          rating: number
+          removed_at: string | null
+          reply: string | null
+          reply_at: string | null
+          report_decided_at: string | null
+          report_note: string | null
+          report_reason: string | null
+          report_status: string | null
+          reported_at: string | null
+          shop_id: string
+          text: string | null
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "reviews"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      request_begin: {
+        Args: { p_fn: string; p_request_id: string }
+        Returns: Json
+      }
+      request_finish: {
+        Args: { p_request_id: string; p_result: Json }
+        Returns: undefined
+      }
+      require_caller: {
+        Args: never
+        Returns: {
+          created_at: string
+          display_id: string
+          email_verified_at: string | null
+          id: string
+          lang: string
+          last_active_at: string | null
+          location_prompt_dismissed_at: string | null
+          name: string | null
+          phone: string | null
+          phone_verified_at: string | null
+          phone_verified_by_admin: boolean
+          push_prompt_dismissed_at: string | null
+          role: string
+          suspended: boolean
+          terms_accepted_at: string | null
+          terms_version: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "profiles"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      require_status: {
+        Args: {
+          p_allowed: string[]
+          p_booking: Database["public"]["Tables"]["bookings"]["Row"]
+        }
+        Returns: undefined
+      }
+      reschedule_booking: {
+        Args: {
+          p_booking_id: string
+          p_date: string
+          p_request_id: string
+          p_slot: string
+        }
+        Returns: {
+          cancel_reason: string | null
+          cancelled_at: string | null
+          cancelled_by: string | null
+          car_id: string | null
+          car_snapshot: Json
+          client_id: string | null
+          client_lang: string
+          client_name: string | null
+          client_phone: string | null
+          confirmed_at: string | null
+          cost: number | null
+          created_at: string
+          date: string
+          decline_reason: string | null
+          done_at: string | null
+          id: string
+          inspection_started_at: string | null
+          note: string | null
+          odometer: number | null
+          ref: string
+          reminder_sent_at: string | null
+          service_id: string
+          shop_id: string
+          slot: string
+          started_at: string | null
+          status: string
+          status_changed_at: string
+          updated_at: string
+          work: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "bookings"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      review_display_name: { Args: { p_name: string }; Returns: string }
+      search_shops: {
+        Args: {
+          p_category?: string
+          p_city?: string
+          p_lat?: number
+          p_lng?: number
+          p_q?: string
+          p_sort?: string
+        }
+        Returns: {
+          average: number
+          city: string
+          distance_km: number
+          is_favorite: boolean
+          latitude: number
+          logo_url: string
+          longitude: number
+          matched_service_en: string
+          matched_service_id: string
+          matched_service_ro: string
+          name: string
+          review_count: number
+          service_count: number
+          shop_id: string
+          street: string
+          weighted_score: number
+        }[]
+      }
+      send_message: {
+        Args: { p_body: string; p_request_id: string; p_thread_id: string }
+        Returns: {
+          body: string | null
+          booking_id: string | null
+          created_at: string
+          event: string | null
+          id: string
+          kind: string
+          params: Json
+          sender_id: string | null
+          thread_id: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "messages"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      send_quote: {
+        Args: {
+          p_booking_id: string
+          p_items: Json
+          p_note?: string
+          p_request_id: string
+        }
+        Returns: {
+          cancel_reason: string | null
+          cancelled_at: string | null
+          cancelled_by: string | null
+          car_id: string | null
+          car_snapshot: Json
+          client_id: string | null
+          client_lang: string
+          client_name: string | null
+          client_phone: string | null
+          confirmed_at: string | null
+          cost: number | null
+          created_at: string
+          date: string
+          decline_reason: string | null
+          done_at: string | null
+          id: string
+          inspection_started_at: string | null
+          note: string | null
+          odometer: number | null
+          ref: string
+          reminder_sent_at: string | null
+          service_id: string
+          shop_id: string
+          slot: string
+          started_at: string | null
+          status: string
+          status_changed_at: string
+          updated_at: string
+          work: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "bookings"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      shop_cancel_booking: {
+        Args: { p_booking_id: string; p_reason: string; p_request_id: string }
+        Returns: {
+          cancel_reason: string | null
+          cancelled_at: string | null
+          cancelled_by: string | null
+          car_id: string | null
+          car_snapshot: Json
+          client_id: string | null
+          client_lang: string
+          client_name: string | null
+          client_phone: string | null
+          confirmed_at: string | null
+          cost: number | null
+          created_at: string
+          date: string
+          decline_reason: string | null
+          done_at: string | null
+          id: string
+          inspection_started_at: string | null
+          note: string | null
+          odometer: number | null
+          ref: string
+          reminder_sent_at: string | null
+          service_id: string
+          shop_id: string
+          slot: string
+          started_at: string | null
+          status: string
+          status_changed_at: string
+          updated_at: string
+          work: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "bookings"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      slot_starts_at: {
+        Args: { p_date: string; p_slot: string }
+        Returns: string
+      }
+      start_inspection: {
+        Args: { p_booking_id: string; p_request_id: string }
+        Returns: {
+          cancel_reason: string | null
+          cancelled_at: string | null
+          cancelled_by: string | null
+          car_id: string | null
+          car_snapshot: Json
+          client_id: string | null
+          client_lang: string
+          client_name: string | null
+          client_phone: string | null
+          confirmed_at: string | null
+          cost: number | null
+          created_at: string
+          date: string
+          decline_reason: string | null
+          done_at: string | null
+          id: string
+          inspection_started_at: string | null
+          note: string | null
+          odometer: number | null
+          ref: string
+          reminder_sent_at: string | null
+          service_id: string
+          shop_id: string
+          slot: string
+          started_at: string | null
+          status: string
+          status_changed_at: string
+          updated_at: string
+          work: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "bookings"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      start_work: {
+        Args: { p_booking_id: string; p_request_id: string }
+        Returns: {
+          cancel_reason: string | null
+          cancelled_at: string | null
+          cancelled_by: string | null
+          car_id: string | null
+          car_snapshot: Json
+          client_id: string | null
+          client_lang: string
+          client_name: string | null
+          client_phone: string | null
+          confirmed_at: string | null
+          cost: number | null
+          created_at: string
+          date: string
+          decline_reason: string | null
+          done_at: string | null
+          id: string
+          inspection_started_at: string | null
+          note: string | null
+          odometer: number | null
+          ref: string
+          reminder_sent_at: string | null
+          service_id: string
+          shop_id: string
+          slot: string
+          started_at: string | null
+          status: string
+          status_changed_at: string
+          updated_at: string
+          work: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "bookings"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      submit_review: {
+        Args: {
+          p_booking_id: string
+          p_rating: number
+          p_request_id: string
+          p_text?: string
+        }
+        Returns: {
+          booking_id: string
+          client_display_name: string
+          client_id: string | null
+          created_at: string
+          id: string
+          rating: number
+          removed_at: string | null
+          reply: string | null
+          reply_at: string | null
+          report_decided_at: string | null
+          report_note: string | null
+          report_reason: string | null
+          report_status: string | null
+          reported_at: string | null
+          shop_id: string
+          text: string | null
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "reviews"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      toggle_favorite: {
+        Args: { p_request_id: string; p_shop_id: string }
+        Returns: boolean
+      }
       try_uuid: { Args: { p: string }; Returns: string }
+      withdraw_quote: {
+        Args: { p_booking_id: string; p_request_id: string }
+        Returns: {
+          cancel_reason: string | null
+          cancelled_at: string | null
+          cancelled_by: string | null
+          car_id: string | null
+          car_snapshot: Json
+          client_id: string | null
+          client_lang: string
+          client_name: string | null
+          client_phone: string | null
+          confirmed_at: string | null
+          cost: number | null
+          created_at: string
+          date: string
+          decline_reason: string | null
+          done_at: string | null
+          id: string
+          inspection_started_at: string | null
+          note: string | null
+          odometer: number | null
+          ref: string
+          reminder_sent_at: string | null
+          service_id: string
+          shop_id: string
+          slot: string
+          started_at: string | null
+          status: string
+          status_changed_at: string
+          updated_at: string
+          work: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "bookings"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
     }
     Enums: {
       [_ in never]: never

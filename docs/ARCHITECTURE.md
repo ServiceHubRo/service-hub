@@ -174,13 +174,13 @@ Side exits:
 | `send_quote(id, items[], note)` | shop | `in_inspection → quote_sent` | ≥ 1 item, total > 0; snapshots `inspection_fee`; `expires_at = now + quote_expiry_days`; max 20 quote versions per booking; event → client |
 | `replace_quote(id, items[], note)` | shop | `quote_sent → quote_sent` | old version `superseded`, new version, clock restarts; event → client |
 | `withdraw_quote(id)` | shop | `quote_sent → in_inspection` | quote `withdrawn` |
-| `decide_quote(id, approved_item_ids[])` | client | `quote_sent → approved` or `quote_refused` | all items → `accepted`; some → `partially_accepted`; none → refusal: quote `refused`, booking `quote_refused`, `cost = inspection_fee`; events → shop |
+| `decide_quote(id, quote_id, approved_item_ids[])` | client | `quote_sent → approved` or `quote_refused` | `quote_id` = the version the client saw (a replaced one → `quote_changed`); all items → `accepted`; some → `partially_accepted`; none → refusal: quote `refused`, booking `quote_refused`, `cost = inspection_fee`; events → shop |
 | `start_work(id)` | shop | `approved → in_progress` | `started_at`; event → client |
 | `complete_job(id, odometer, work, cost, confirm_jump)` | shop | `in_progress → done` | odometer rules (§7); work/cost prefilled from approved items, editable; `done_at`; event → client |
 | `admin_force_cancel(id, reason)` | admin | any active → `cancelled` | both parties notified; audit log |
 | `expire_quotes()` | cron | `quote_sent → expired` | quote `expired`; capacity released; events → both |
 
-Every function: `security definer`, `set search_path = ''`, fully-qualified names, checks `auth.uid()` membership, locks the booking row (`for update`), validates the current status, records `request_id`, writes the thread message and the outbox event, returns the updated booking. Errors are raised with stable codes (`past_slot`, `day_full`, `slot_full`, `limit_active_shop`, `not_allowed`, `wrong_status`, `odometer_lower`, `odometer_jump`, …) that the UI maps to translated messages. **A raw database error is never shown to a user.**
+Every function: `security definer`, `set search_path = ''`, fully-qualified names, checks `auth.uid()` membership, locks the booking row (`for update`), validates the current status, records `request_id`, writes the thread message and the outbox event, returns the updated booking. Errors are raised with stable codes (`raise … using message = code, detail = JSON parameters`, e.g. `odometer_lower` + `{"previous":105400}`) (`past_slot`, `day_full`, `slot_full`, `limit_active_shop`, `not_allowed`, `wrong_status`, `odometer_lower`, `odometer_jump`, …) that the UI maps to translated messages (`src/data/rpc.ts`; its code list is checked against the migrations by a unit test). **A raw database error is never shown to a user.** `mark_thread_read` is the one write without `request_id`: repeating it is harmless.
 
 ---
 
@@ -200,7 +200,7 @@ The booking calendar shows the next 12 bookable days (3 columns mobile, 6 deskto
 
 Enforcement: `create_booking` and `reschedule_booking` lock the shop row (`select … for update` on `shops`) before counting, so concurrent requests serialize. A `BEFORE INSERT OR UPDATE` trigger on `bookings` repeats the capacity check as a safety net.
 
-A read function `get_availability(shop_id, from_date, days)` returns days with remaining places and, for one date, slots with their state — the UI never counts bookings itself.
+A read function `get_availability(shop_id, from_date, days, slots_for)` returns days with remaining places and, for the date `slots_for`, slots with their state — the UI never counts bookings itself. Shop members get their own grid without the client notice/advance rules (for rescheduling).
 
 ---
 

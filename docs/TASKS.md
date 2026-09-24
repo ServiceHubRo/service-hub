@@ -127,7 +127,9 @@ Note: 6 migrări (`schema_version` = 6): foundation, identity_and_shops, booking
 
 **Pașii tăi:** verifici că „Deploy Supabase” e verde pe pull request, apoi Merge.
 
-- [ ] Făcut
+- [x] Făcut
+
+Note: 3 migrări (`schema_version` = 9): booking_engine, quotes_and_jobs, messages_reviews_search. Au timestamp-uri alese manual după cele din T02 (`npx supabase migration new` ar fi dat un timestamp mai mic decât al lor). Erorile au forma `message = cod`, `detail = JSON cu parametri`; `src/data/rpc.ts` le traduce (RO/EN) și un test unitar verifică că lista de coduri din frontend e exact cea din migrări. Decizii: o cerere **în așteptare** poate fi retrasă de client oricând (termenul de anulare se aplică doar programărilor confirmate); `decide_quote` primește și id-ul variantei de deviz văzute de client (`quote_changed` dacă service-ul a schimbat-o între timp); reprogramarea de către service respectă programul, zilele libere și capacitatea, dar nu preavizul minim; `mark_thread_read` nu are `request_id` (repetarea e inofensivă); fiecare tranziție scrie mesajul automat (cu `params.by` = cine l-a cauzat, ca să nu apară necitit la autor) și câte un eveniment pentru fiecare membru al service-ului; SMS doar pe copia proprietarului; căutarea tolerează ultima vocală („frane” găsește „Plăcuțe de frână”) și caută și în numele categoriei; limita de mesaje e per expeditor și conversație. Trigger-ul de siguranță verifică trecutul și capacitatea doar când o programare devine activă sau se mută, așa că seed-ul cu lucrări vechi merge. `expire_quotes()` există, dar programarea lui la 15 minute e în T12. Testele SQL (60–67, 90) rulează pe PostgreSQL 16 (CI) și pe stack-ul Supabase local (Postgres 17); `90_concurrency.sql` deschide o a doua sesiune reală cu `dblink` — pe stack-ul Supabase rulează cu `PGOPTIONS='-c test.dblink_password=postgres'`.
 
 ---
 
