@@ -13,6 +13,9 @@ const NAV_EN = {
   admin: ['Overview', 'Shops', 'Clients', 'Bookings', 'Moderation'],
 } as const;
 
+/** Screens whose title says more than their navigation label (P16b: "Istoric reparații"). */
+const HEADING: Partial<Record<string, string>> = { Istoric: 'Istoric reparații' };
+
 test.beforeEach(async ({ context }) => {
   await context.addInitScript(() => {
     if (!sessionStorage.getItem('sh_test_init')) {
@@ -92,7 +95,7 @@ for (const role of Object.keys(NAV) as (keyof typeof NAV)[]) {
     for (const label of NAV[role]) {
       // A count badge is read out after the label ("Programări, 1 cerere nouă").
       await page.getByRole('link', { name: new RegExp(`^${label}( ?,.*)?$`) }).filter({ visible: true }).first().click();
-      await expect(page.getByRole('heading', { level: 1 })).toHaveText(label);
+      await expect(page.getByRole('heading', { level: 1 })).toHaveText(HEADING[label] ?? label);
     }
 
     // Switching to English changes every label.
