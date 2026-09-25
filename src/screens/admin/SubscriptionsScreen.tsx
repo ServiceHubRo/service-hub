@@ -48,9 +48,10 @@ function SubscriptionRow({ r }: { r: AdminSubscriptionRow }) {
         <span className={styles.id}>{r.display_id}</span>
         <span>{r.city}</span>
         <span>
-          <Money amount={r.price_ron} />
+          <Money amount={r.monthly_ron} />
           {t('admin.subs.perMonth')}
         </span>
+        {r.seats > 0 && <span>{t('admin.subs.seats', { n: r.seats })}</span>}
       </span>
       {next && <span className={styles.rowMeta}>{next}</span>}
       <span className={styles.rowMeta}>

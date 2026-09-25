@@ -415,6 +415,7 @@ ADMIN_EMAIL = "admin@service-hub.test"
 STRIPE_SECRET_KEY = "sk_test_local"
 STRIPE_WEBHOOK_SECRET = "whsec_local_test"
 STRIPE_PRICE_ID = "price_local_monthly"
+STRIPE_SEAT_PRICE_ID = "price_local_seat"
 STRIPE_API_URL = "http://host.docker.internal:54398/stripe"
 
 [analytics]

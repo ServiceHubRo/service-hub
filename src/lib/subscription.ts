@@ -12,6 +12,9 @@ export interface SubscriptionRow {
   current_period_end: string | null;
   cancel_at_period_end: boolean;
   price_ron: number;
+  /** Price per colleague with an account, and how many there are (paid staff seats). */
+  seat_price_ron: number;
+  seats: number;
   stripe_customer_id: string | null;
   stripe_status: string | null;
   ended_reason: string | null;
@@ -93,6 +96,11 @@ export function subscriptionView(sub: SubscriptionRow, now: Date = new Date()): 
     canCheckout: !live,
     canManage: sub.stripe_customer_id !== null,
   };
+}
+
+/** What the shop pays a month: its price plus its colleagues (same as subscription_monthly_ron). */
+export function monthlyTotal(sub: Pick<SubscriptionRow, 'price_ron' | 'seat_price_ron' | 'seats'>): number {
+  return Math.round((Number(sub.price_ron) + Number(sub.seats) * Number(sub.seat_price_ron)) * 100) / 100;
 }
 
 /** The free period shown on Panou: a warning in its last 7 days while no card is given. */

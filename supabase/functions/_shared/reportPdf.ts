@@ -63,7 +63,9 @@ export interface PdfLib {
 const PAGE: [number, number] = [595.28, 841.89]; // A4
 const MARGIN = 40;
 const CONTENT = PAGE[0] - 2 * MARGIN;
-const BOTTOM = MARGIN + 26; // room for the page footer
+/** The running footer: a line, the note on what the report covers (2 lines), verify + page. */
+const FOOTER_H = 40;
+const BOTTOM = MARGIN + FOOTER_H + 6; // lowest point the content may reach
 
 /** Column left edges and widths of the jobs table (they add up to CONTENT). */
 const COLS = { date: 72, shop: 132, work: 173, km: 58, cost: 80 };
@@ -194,37 +196,59 @@ export async function renderReportPdf(lib: PdfLib, data: ReportData): Promise<Ui
     text(s, xCenter - font.widthOfTextAtSize(s, size) / 2, baseline, size, font, color);
   const box = (x: number, top: number, w: number, h: number, fill: Color, border: Color) =>
     page.drawSvgPath(roundRectPath(w, h, 6), { x, y: top, color: fill, borderColor: border, borderWidth: 0.8 });
+
+  // ---------------------------------------------------------------- the running header
+  // Every page starts the same way: who issued it, what it is, when. Pages after the first also
+  // say which car and which report code, so a loose page is never anonymous.
+  const plate = clean(data.car.plate);
+  const vin = clean(data.car.vin);
+  const header = (first: boolean) => {
+    const tile = 26;
+    page.drawSvgPath(roundRectPath(tile, tile, 6), { x: MARGIN, y, color: C.amber });
+    page.drawSvgPath(WRENCH, {
+      x: MARGIN + tile * 0.225,
+      y: y - tile * 0.225,
+      scale: (tile * 0.55) / 24,
+      borderColor: C.wrench,
+      borderWidth: 2.5,
+      borderLineCap: 1,
+    });
+    const wordX = MARGIN + tile + 7;
+    text('SERVICE-', wordX, y - 19, 17, fonts.bold, C.ink);
+    text('HUB', wordX + fonts.bold.widthOfTextAtSize('SERVICE-', 17), y - 19, 17, fonts.bold, C.amber);
+
+    right(t('title'), MARGIN + CONTENT, y - 12, 12, fonts.bold, C.ink);
+    right(t('generated', generated), MARGIN + CONTENT, y - 26, 8, fonts.sans, C.muted);
+    right(clean(data.verifyAt.split('/')[0]), MARGIN + CONTENT, y - 37, 8, fonts.sans, C.muted);
+    y -= 48;
+    page.drawLine({ start: { x: MARGIN, y }, end: { x: MARGIN + CONTENT, y }, thickness: 1.6, color: C.amber });
+    if (first) {
+      y -= 30;
+      return;
+    }
+    // Which car, which report: the identity strip under the rule.
+    const codeW = fonts.monoBold.widthOfTextAtSize(data.code, 10);
+    const room = CONTENT - codeW - 16;
+    const name = clampLines(wrapText(carName, fonts.bold, 10, room), 1, fonts.bold, 10, room)[0] ?? '';
+    text(name, MARGIN, y - 16, 10, fonts.bold, C.ink);
+    const ids = [plate, vin].filter(Boolean).join(' · ');
+    const idsLine = clampLines(wrapText(ids, fonts.sans, 8, room), 1, fonts.sans, 8, room)[0] ?? '';
+    text(idsLine, MARGIN, y - 28, 8, fonts.sans, C.muted);
+    right(data.code, MARGIN + CONTENT, y - 16, 10, fonts.monoBold, C.amberText);
+    right(t('continued'), MARGIN + CONTENT, y - 28, 7.5, fonts.sans, C.muted);
+    y -= 44;
+  };
+
   const newPage = () => {
     page = doc.addPage(PAGE);
     y = PAGE[1] - MARGIN;
-    text(clean(t('continued', { title: t('title'), code: data.code })), MARGIN, y - 10, 8.5, fonts.sans, C.muted);
-    y -= 26;
+    header(false);
   };
   const ensure = (height: number) => {
     if (y - height < BOTTOM) newPage();
   };
 
-  // ---------------------------------------------------------------- header
-  const tile = 26;
-  page.drawSvgPath(roundRectPath(tile, tile, 6), { x: MARGIN, y, color: C.amber });
-  page.drawSvgPath(WRENCH, {
-    x: MARGIN + tile * 0.225,
-    y: y - tile * 0.225,
-    scale: (tile * 0.55) / 24,
-    borderColor: C.wrench,
-    borderWidth: 2.5,
-    borderLineCap: 1,
-  });
-  const wordX = MARGIN + tile + 7;
-  text('SERVICE-', wordX, y - 19, 17, fonts.bold, C.ink);
-  text('HUB', wordX + fonts.bold.widthOfTextAtSize('SERVICE-', 17), y - 19, 17, fonts.bold, C.amber);
-
-  right(t('title'), MARGIN + CONTENT, y - 12, 12, fonts.bold, C.ink);
-  right(t('generated', generated), MARGIN + CONTENT, y - 26, 8, fonts.sans, C.muted);
-  right(clean(data.verifyAt.split('/')[0]), MARGIN + CONTENT, y - 37, 8, fonts.sans, C.muted);
-  y -= 48;
-  page.drawLine({ start: { x: MARGIN, y }, end: { x: MARGIN + CONTENT, y }, thickness: 1.6, color: C.amber });
-  y -= 30;
+  header(true);
 
   // ---------------------------------------------------------------- the car
   text(carName, MARGIN, y - 4, 20, fonts.bold, C.ink);
@@ -233,9 +257,9 @@ export async function renderReportPdf(lib: PdfLib, data: ReportData): Promise<Ui
   y -= 22;
 
   const facts: [string, string, PdfFont][] = [
-    [t('plate'), clean(data.car.plate) || t('none'), fonts.bold],
+    [t('plate'), plate || t('none'), fonts.bold],
     [t('year'), clean(data.car.year != null ? String(data.car.year) : '') || t('none'), fonts.bold],
-    [t('vin'), clean(data.car.vin) || t('none'), fonts.bold],
+    [t('vin'), vin || t('none'), fonts.bold],
   ];
   const gap = 6;
   const factW = (CONTENT - 2 * gap) / 3;
@@ -255,7 +279,7 @@ export async function renderReportPdf(lib: PdfLib, data: ReportData): Promise<Ui
   right(data.code, MARGIN + CONTENT - 12, y - 26, 15, fonts.monoBold, C.amberText);
   y -= 42 + 16;
 
-  // ---------------------------------------------------------------- the jobs
+  // ---------------------------------------------------------------- the jobs, measured first
   const colX = {
     date: MARGIN,
     shop: MARGIN + COLS.date,
@@ -263,24 +287,23 @@ export async function renderReportPdf(lib: PdfLib, data: ReportData): Promise<Ui
     kmRight: MARGIN + COLS.date + COLS.shop + COLS.work + COLS.km - PAD,
     costRight: MARGIN + CONTENT - PAD,
   };
+  const TABLE_HEAD = 22;
   const tableHeader = () => {
-    page.drawRectangle({ x: MARGIN, y: y - 22, width: CONTENT, height: 22, color: C.ink });
+    page.drawRectangle({ x: MARGIN, y: y - TABLE_HEAD, width: CONTENT, height: TABLE_HEAD, color: C.ink });
     const base = y - 14.5;
     text(t('colDate'), colX.date + PAD, base, 7, fonts.bold, C.white);
     text(t('colShop'), colX.shop + PAD, base, 7, fonts.bold, C.white);
     text(t('colWork'), colX.work + PAD, base, 7, fonts.bold, C.white);
     right(t('colKm'), colX.kmRight, base, 7, fonts.bold, C.white);
     right(t('colCost'), colX.costRight, base, 7, fonts.bold, C.white);
-    y -= 22;
+    y -= TABLE_HEAD;
   };
-  ensure(22 + 40);
-  tableHeader();
 
   const LEAD = 12.5;
   const SMALL = 10.5;
-  for (const job of data.jobs) {
-    const shopW = COLS.shop - 2 * PAD;
-    const workW = COLS.work - 2 * PAD;
+  const shopW = COLS.shop - 2 * PAD;
+  const workW = COLS.work - 2 * PAD;
+  const rows = data.jobs.map((job) => {
     const shopLines = clampLines(wrapText(clean(job.shop_name) || t('unknownShop'), fonts.sans, 9, shopW), 2, fonts.sans, 9, shopW);
     const cityLines = clampLines(wrapText(clean(job.shop_city), fonts.sans, 7.5, shopW), 1, fonts.sans, 7.5, shopW);
     const serviceLines = clampLines(wrapText(clean(jobService(lang, job)), fonts.sans, 9, workW), 2, fonts.sans, 9, workW);
@@ -292,46 +315,65 @@ export async function renderReportPdf(lib: PdfLib, data: ReportData): Promise<Ui
         : [];
     const leftH = shopLines.length * LEAD + cityLines.length * SMALL;
     const workH = serviceLines.length * LEAD + (itemLines.length + workLines.length) * SMALL;
-    const rowH = Math.max(leftH, workH, LEAD) + 14;
+    return { job, shopLines, cityLines, serviceLines, notes: [...itemLines, ...workLines], height: Math.max(leftH, workH, LEAD) + 14 };
+  });
 
-    if (y - rowH < BOTTOM) {
+  // What closes the report (total, figures, the odometer note, the notice): one block
+  // that always travels with the last job, so it never sits alone on a page of its own.
+  const TOTAL_H = 30 + 14;
+  const STATS_H = 56 + 12;
+  const kmNote = data.odometerOutOfOrder ? wrapText(t('kmNote'), fonts.sans, 7.5, CONTENT - 4) : [];
+  const KM_NOTE_H = kmNote.length ? kmNote.length * 10 + 10 : 0;
+  const noticeLead = t('disclaimerLead');
+  const notice = clean(`${noticeLead} ${t('disclaimer', { date: generated.date, host: data.verifyAt.split('/')[0] ?? '' })}`);
+  const noticeLines = wrapText(notice, fonts.sans, 6.5, CONTENT);
+  const NOTICE_H = 6 + noticeLines.length * 8.5;
+  const CLOSING_H = TOTAL_H + STATS_H + KM_NOTE_H + NOTICE_H;
+
+  // ---------------------------------------------------------------- the jobs, drawn
+  // A row is never split; the table header repeats on every page it continues on.
+  if (y - TABLE_HEAD - (rows[0]?.height ?? 0) < BOTTOM) newPage();
+  tableHeader();
+  rows.forEach((row, i) => {
+    const last = i === rows.length - 1;
+    const needed = row.height + (last ? CLOSING_H : 0);
+    if (y - needed < BOTTOM) {
       newPage();
       tableHeader();
     }
     const top = y - 16;
-    text(reportDay(lang, job.date), colX.date + PAD, top, 9, fonts.mono, C.ink);
+    text(reportDay(lang, row.job.date), colX.date + PAD, top, 9, fonts.mono, C.ink);
     let ly = top;
-    for (const l of shopLines) {
+    for (const l of row.shopLines) {
       text(l, colX.shop + PAD, ly, 9, fonts.sans, C.ink);
       ly -= LEAD;
     }
-    for (const l of cityLines) {
+    for (const l of row.cityLines) {
       text(l, colX.shop + PAD, ly + 1.5, 7.5, fonts.sans, C.muted);
       ly -= SMALL;
     }
     let wy = top;
-    for (const l of serviceLines) {
+    for (const l of row.serviceLines) {
       text(l, colX.work + PAD, wy, 9, fonts.sans, C.ink);
       wy -= LEAD;
     }
-    for (const l of [...itemLines, ...workLines]) {
+    for (const l of row.notes) {
       text(l, colX.work + PAD, wy + 1.5, 7.5, fonts.sans, C.muted);
       wy -= SMALL;
     }
-    right(job.odometer != null ? reportKm(lang, job.odometer) : t('none'), colX.kmRight, top, 9, fonts.mono, C.ink);
-    right(job.cost != null ? reportMoney(lang, job.cost) : t('none'), colX.costRight, top, 9, fonts.mono, C.ink);
-    y -= rowH;
+    right(row.job.odometer != null ? reportKm(lang, row.job.odometer) : t('none'), colX.kmRight, top, 9, fonts.mono, C.ink);
+    right(row.job.cost != null ? reportMoney(lang, row.job.cost) : t('none'), colX.costRight, top, 9, fonts.mono, C.ink);
+    y -= row.height;
     page.drawLine({ start: { x: MARGIN, y }, end: { x: MARGIN + CONTENT, y }, thickness: 0.6, color: C.line });
-  }
+  });
 
-  ensure(30);
+  // ---------------------------------------------------------------- the closing block
+  ensure(CLOSING_H);
   page.drawLine({ start: { x: MARGIN, y }, end: { x: MARGIN + CONTENT, y }, thickness: 1, color: C.ink });
   text(t('total'), MARGIN + PAD, y - 18, 9.5, fonts.bold, C.ink);
   right(reportMoney(lang, data.total), colX.costRight, y - 18, 11, fonts.monoBold, C.ink);
-  y -= 30 + 14;
+  y -= TOTAL_H;
 
-  // ---------------------------------------------------------------- totals
-  ensure(64);
   const stats: [string, string][] = [
     [t('jobs'), String(data.jobs.length)],
     [t('period'), reportPeriod(lang, data.periodFrom, data.periodTo)],
@@ -344,53 +386,44 @@ export async function renderReportPdf(lib: PdfLib, data: ReportData): Promise<Ui
     const size = fonts.bold.widthOfTextAtSize(value, 15) > factW - 16 ? 11 : 15;
     center(value, x + factW / 2, y - 40, size, fonts.bold, C.amberText);
   });
-  y -= 56 + 12;
+  y -= STATS_H;
 
-  if (data.odometerOutOfOrder) {
-    const lines = wrapText(t('kmNote'), fonts.sans, 7.5, CONTENT - 4);
-    ensure(lines.length * 10 + 10);
-    for (const l of lines) {
+  if (kmNote.length) {
+    for (const l of kmNote) {
       text(l, MARGIN + 2, y - 8, 7.5, fonts.sans, C.muted);
       y -= 10;
     }
     y -= 10;
   }
 
-  // ---------------------------------------------------------------- verification
-  ensure(62);
-  box(MARGIN, y, CONTENT, 50, C.white, C.box);
-  text(t('verifyTitle'), MARGIN + 14, y - 20, 9.5, fonts.bold, C.ink);
-  const verifyLines = clampLines(wrapText(t('verifyBody'), fonts.sans, 8, CONTENT * 0.58), 2, fonts.sans, 8, CONTENT * 0.58);
-  verifyLines.forEach((l, i) => text(l, MARGIN + 14, y - 33 - i * 10, 8, fonts.sans, C.ink));
-  const address = clean(data.verifyAt);
-  const codeX = MARGIN + CONTENT - 14 - Math.max(fonts.mono.widthOfTextAtSize(address, 9), fonts.mono.widthOfTextAtSize(data.code, 9));
-  text(address, codeX, y - 20, 9, fonts.mono, C.amberText);
-  text(data.code, codeX, y - 33, 9, fonts.mono, C.amberText);
-  y -= 50 + 14;
 
-  // ---------------------------------------------------------------- disclaimer
-  const disclaimer = clean(`${t('disclaimerLead')} ${t('disclaimer', { date: generated.date, host: data.verifyAt.split('/')[0] ?? '' })}`);
-  const lines = wrapText(disclaimer, fonts.sans, 6.5, CONTENT);
-  ensure(lines.length * 8.5 + 10);
   page.drawLine({ start: { x: MARGIN, y }, end: { x: MARGIN + CONTENT, y }, thickness: 0.6, color: C.line });
   y -= 6;
-  lines.forEach((l, i) => {
-    const lead = t('disclaimerLead');
-    if (i === 0 && l.startsWith(lead)) {
-      text(lead, MARGIN, y - 7, 6.5, fonts.bold, C.muted);
-      text(l.slice(lead.length), MARGIN + fonts.bold.widthOfTextAtSize(lead, 6.5), y - 7, 6.5, fonts.sans, C.faint);
+  noticeLines.forEach((l, i) => {
+    if (i === 0 && l.startsWith(noticeLead)) {
+      text(noticeLead, MARGIN, y - 7, 6.5, fonts.bold, C.muted);
+      text(l.slice(noticeLead.length), MARGIN + fonts.bold.widthOfTextAtSize(noticeLead, 6.5), y - 7, 6.5, fonts.sans, C.faint);
     } else {
       text(l, MARGIN, y - 7, 6.5, fonts.sans, C.faint);
     }
     y -= 8.5;
   });
 
-  // ---------------------------------------------------------------- page footers
+  // ---------------------------------------------------------------- the running footer
+  // Every page ends the same way: what the report covers, where and how to verify it (the check
+  // needs no account), which page.
   const pages = doc.getPages();
+  const footerNote = clampLines(wrapText(clean(t('footerNote')), fonts.sans, 6.5, CONTENT), 2, fonts.sans, 6.5, CONTENT);
+  const address = clean(data.verifyAt);
+  const footerVerify = clean(t('footerVerify', { address, code: data.code }));
   pages.forEach((p, i) => {
     page = p;
-    const label = `${data.code} · ${t('page', { n: i + 1, total: pages.length })}`;
-    center(label, PAGE[0] / 2, MARGIN - 14, 7, fonts.sans, C.faint);
+    const top = MARGIN + FOOTER_H - 6;
+    page.drawLine({ start: { x: MARGIN, y: top }, end: { x: MARGIN + CONTENT, y: top }, thickness: 0.6, color: C.line });
+    footerNote.forEach((l, n) => text(l, MARGIN, top - 10 - n * 8.5, 6.5, fonts.sans, C.faint));
+    const base = MARGIN - 2;
+    text(footerVerify, MARGIN, base, 7, fonts.sans, C.muted);
+    right(t('page', { n: i + 1, total: pages.length }), MARGIN + CONTENT, base, 7, fonts.bold, C.muted);
   });
 
   return doc.save();

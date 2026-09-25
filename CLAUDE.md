@@ -4,7 +4,7 @@
 
 ## 1. What this project is
 
-Service-Hub (always written with the hyphen) is a car-repair booking marketplace for Romania, starting in Brașov. Car owners find a repair shop, book a slot online, receive a **quote (deviz)** after the shop inspects the car, approve or refuse it in the app, and get notified when the car is ready. Shops manage bookings, quotes, messages, reviews and history, and pay one flat subscription (100 lei/month, 90-day free trial). Domain: `service-hub.ro`.
+Service-Hub (always written with the hyphen) is a car-repair booking marketplace for Romania, starting in Brașov. Car owners find a repair shop, book a slot online, receive a **quote (deviz)** after the shop inspects the car, approve or refuse it in the app, and get notified when the car is ready. Shops manage bookings, quotes, messages, reviews and history, and pay one subscription: 100 lei/month plus 20 lei/month for each colleague with an account in the shop (90-day free trial). Domain: `service-hub.ro`.
 
 Three roles, three completely separate interfaces:
 

@@ -18,8 +18,11 @@ import {
   type InviteEmailResult,
   type StaffMember,
 } from '../../../data/shop';
+import { getSubscriptionRow } from '../../../data/subscription';
 import { useI18n } from '../../../i18n/context';
-import { formatDate } from '../../../i18n/format';
+import { formatDate, formatMoney } from '../../../i18n/format';
+import { plural } from '../../../i18n/translate';
+import { monthlyTotal } from '../../../lib/subscription';
 import { looksLikeEmail } from '../../../lib/password';
 import { useLoad } from '../../../lib/useLoad';
 import { LoadError } from '../../../components/LoadError';
@@ -62,6 +65,10 @@ export function StaffSettings() {
       ) : (
         <>
           <p className={styles.intro}>{t('staff.intro')}</p>
+          {/* Read again whenever the team with accounts changes (a colleague removed here). */}
+          <SeatPrice
+            key={state.status === 'ready' ? state.data.filter((m) => m.role === 'staff' && m.accepted_at).length : -1}
+          />
 
           <InviteForm
             onInvited={async (email, url, mailed) => {
@@ -92,6 +99,25 @@ export function StaffSettings() {
         </>
       )}
     </div>
+  );
+}
+
+/**
+ * What a colleague costs (paid staff seats): the price per colleague with an account, and what the
+ * shop pays now. Shown once the subscription is read; nothing while loading or if it cannot be.
+ */
+function SeatPrice() {
+  const { t, lang } = useI18n();
+  const load = useCallback(() => getSubscriptionRow(), []);
+  const { state } = useLoad(load);
+  if (state.status !== 'ready' || !state.data || !(state.data.seat_price_ron > 0)) return null;
+  const sub = state.data;
+  return (
+    <p className={styles.intro}>
+      {t('staff.seats.price', { seat: formatMoney(lang, sub.seat_price_ron) })}{' '}
+      {sub.seats > 0 &&
+        t('staff.seats.now', { total: formatMoney(lang, monthlyTotal(sub)), colleagues: plural(lang, 'unit.colleagues', sub.seats) })}
+    </p>
   );
 }
 

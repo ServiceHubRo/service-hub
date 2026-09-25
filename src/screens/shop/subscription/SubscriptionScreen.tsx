@@ -23,7 +23,7 @@ import { useI18n } from '../../../i18n/context';
 import { formatDate, formatDayMonth, formatMoney } from '../../../i18n/format';
 import type { MessageKey } from '../../../i18n/ro';
 import { plural } from '../../../i18n/translate';
-import { STATE_TONE, subscriptionView, type SubscriptionView } from '../../../lib/subscription';
+import { monthlyTotal, STATE_TONE, subscriptionView, type SubscriptionView } from '../../../lib/subscription';
 import { useLoad } from '../../../lib/useLoad';
 import { useNow } from '../../../lib/useNow';
 import { SETTINGS_LINKS } from '../settings/paths';
@@ -114,7 +114,7 @@ function ReturnBanner({ returned, view }: { returned: string; view: Subscription
 function StatusCard({ data, view }: { data: SubscriptionData; view: SubscriptionView }) {
   const { t, lang } = useI18n();
   const sub = data.subscription;
-  const price = formatMoney(lang, sub.price_ron);
+  const price = formatMoney(lang, monthlyTotal(sub));
   const date = (iso: string | null) => (iso ? formatDayMonth(lang, new Date(iso)) : '');
 
   let text: string;
@@ -177,6 +177,27 @@ function StatusCard({ data, view }: { data: SubscriptionData; view: Subscription
   );
 }
 
+/**
+ * The price per colleague (paid staff seats): "100 lei + 2 colegi × 20 lei" when there are
+ * colleagues with an account, else what one would add. Nothing is paid in the free period.
+ */
+function SeatsLine({ sub }: { sub: SubscriptionData['subscription'] }) {
+  const { t, lang } = useI18n();
+  const seat = formatMoney(lang, sub.seat_price_ron);
+  if (!(sub.seat_price_ron > 0)) return null;
+  return (
+    <p className={styles.seats}>
+      {sub.seats > 0
+        ? t('sub.seats.breakdown', {
+            base: formatMoney(lang, sub.price_ron),
+            colleagues: plural(lang, 'unit.colleagues', sub.seats),
+            seat,
+          })
+        : t('sub.seats.none', { seat })}
+    </p>
+  );
+}
+
 const TONE_CLASS = { amber: 'toneAmber', green: 'toneGreen', red: 'toneRed', muted: 'toneMuted' } as const;
 
 const FEATURES: MessageKey[] = ['sub.feature.all', 'sub.feature.capacity', 'sub.feature.ranking', 'sub.feature.cancel'];
@@ -193,9 +214,10 @@ function PlanCard({ data, view }: { data: SubscriptionData; view: SubscriptionVi
     <Card className={styles.plan}>
       <p className={styles.planLabel}>{t('sub.plan')}</p>
       <p className={styles.price}>
-        <span className={styles.amount}>{formatMoney(lang, data.subscription.price_ron)}</span>
+        <span className={styles.amount}>{formatMoney(lang, monthlyTotal(data.subscription))}</span>
         <span className={styles.per}>{t('sub.perMonth')}</span>
       </p>
+      <SeatsLine sub={data.subscription} />
       <ul className={styles.features}>
         {FEATURES.map((key) => (
           <li key={key}>

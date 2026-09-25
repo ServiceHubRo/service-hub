@@ -26,6 +26,12 @@ export interface AdminSubscriptionRow {
   status: SubscriptionStatus;
   stripe_status: string | null;
   price_ron: number;
+  /** Price per colleague with an account, how many there are, and how many Stripe charges now. */
+  seat_price_ron: number;
+  seats: number;
+  billed_seats: number | null;
+  /** price_ron + seats × seat_price_ron. */
+  monthly_ron: number;
   trial_ends_at: string | null;
   current_period_end: string | null;
   cancel_at_period_end: boolean;
@@ -202,6 +208,8 @@ export type NotificationTexts = Record<string, Partial<Record<'ro' | 'en', Notif
 
 export interface PlatformSettings {
   subscription_price_ron: number;
+  /** Price per colleague with an account, a month (paid staff seats). */
+  staff_seat_price_ron: number;
   trial_days: number;
   quote_expiry_days: number;
   report_price_ron: number;

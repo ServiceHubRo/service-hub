@@ -130,10 +130,12 @@ function formDecode(body: string): Obj {
 }
 
 /**
- * A small Stripe: customers, one price (100 lei a month), Checkout sessions with a test payment
- * page, subscriptions, the customer portal (cancel), and signed webhooks to the local
- * stripe-webhook function — so the whole payment path runs for real, only without cards.
- * Test hooks: POST /stripe/_fail/<customer>[?final=1], POST /stripe/_end/<customer>.
+ * A small Stripe: customers, two prices (100 lei a month, 20 lei a month per colleague), Checkout
+ * sessions with a test payment page, subscriptions and their items, the customer portal (cancel),
+ * and signed webhooks to the local stripe-webhook function — so the whole payment path runs for
+ * real, only without cards.
+ * Test hooks: POST /stripe/_fail/<customer>[?final=1], POST /stripe/_end/<customer>,
+ * GET /stripe/_subscription/<customer> (the newest subscription as the stand-in has it).
  */
 function stripeStandIn() {
   let seq = 0;
@@ -141,8 +143,24 @@ function stripeStandIn() {
   const customers = new Map<string, Obj>();
   const sessions = new Map<string, Obj>();
   const subscriptions = new Map<string, Obj>();
+  const invoices = new Map<string, Obj>();
   const byKey = new Map<string, Obj>();
   const price = { id: 'price_local_monthly', object: 'price', unit_amount: 10000, currency: 'ron', product: 'prod_local' };
+  const seatPrice = { id: 'price_local_seat', object: 'price', unit_amount: 2000, currency: 'ron', product: 'prod_local_seat' };
+  /** A subscription item from a Checkout line or a subscription_items call. */
+  const itemFrom = (line: Obj, periodEnd: number): Obj => {
+    const data = (line.price_data ?? {}) as Obj;
+    const known = [price, seatPrice].find((p) => p.id === line.price);
+    return {
+      id: id('si'),
+      object: 'subscription_item',
+      price: known ?? { id: id('price'), object: 'price', unit_amount: Number(data.unit_amount), currency: 'ron', product: data.product },
+      quantity: Number(line.quantity ?? 1),
+      current_period_end: periodEnd,
+    };
+  };
+  const subOfItem = (itemId: string) =>
+    [...subscriptions.values()].find((s) => ((s.items as { data: Obj[] }).data ?? []).some((i) => i.id === itemId));
   const month = 30 * 86_400;
   const now = () => Math.floor(Date.now() / 1000);
 
@@ -160,7 +178,7 @@ function stripeStandIn() {
 
   function invoice(sub: Obj, paid: boolean, extra: Obj = {}): Obj {
     const amount = Number((sub as { amount?: number }).amount ?? 10000);
-    return {
+    const inv: Obj = {
       id: id('in'),
       object: 'invoice',
       number: `LOCAL-${seq}`,
@@ -174,6 +192,8 @@ function stripeStandIn() {
       parent: { subscription_details: { subscription: sub.id } },
       ...extra,
     };
+    invoices.set(String(inv.id), inv);
+    return inv;
   }
 
   const subFor = (customer: string) => [...subscriptions.values()].reverse().find((s) => s.customer === customer);
@@ -224,13 +244,44 @@ function stripeStandIn() {
             return reply(200, c);
           }
           if (req.method === 'GET' && path === `/v1/prices/${price.id}`) return reply(200, price);
+          if (req.method === 'GET' && path === `/v1/prices/${seatPrice.id}`) return reply(200, seatPrice);
+          // The colleagues' item: added, its quantity changed, removed (announced as an update).
+          if (req.method === 'POST' && path === '/v1/subscription_items') {
+            const sub = subscriptions.get(String(body.subscription));
+            if (!sub) return reply(404, { error: { message: 'No such subscription' } });
+            const item = itemFrom(body, now() + month);
+            (sub.items as { data: Obj[] }).data.push(item);
+            // Stripe announces the change on its own, after answering the call.
+            void send('customer.subscription.updated', sub).catch(() => undefined);
+            return remember(item);
+          }
+          if ((req.method === 'POST' || req.method === 'DELETE') && (m = /^\/v1\/subscription_items\/([^/]+)$/.exec(path))) {
+            const sub = subOfItem(m[1]!);
+            if (!sub) return reply(404, { error: { message: 'No such subscription item' } });
+            const items = (sub.items as { data: Obj[] }).data;
+            const item = items.find((i) => i.id === m![1])!;
+            if (req.method === 'DELETE') items.splice(items.indexOf(item), 1);
+            else item.quantity = Number(body.quantity);
+            void send('customer.subscription.updated', sub).catch(() => undefined);
+            return reply(200, item);
+          }
           if (req.method === 'POST' && path === '/v1/checkout/sessions') {
-            const items = (body.line_items as Obj)['0'] as Obj;
-            const amount = items.price ? price.unit_amount : Number((items.price_data as Obj).unit_amount);
-            const s: Obj = { id: id('cs'), object: 'checkout.session', mode: 'subscription', ...body, amount };
+            const lines = Object.values(body.line_items as Obj) as Obj[];
+            const unit = (l: Obj) => (l.price === price.id ? price.unit_amount : l.price === seatPrice.id ? seatPrice.unit_amount : Number((l.price_data as Obj).unit_amount));
+            const amount = lines.reduce((sum, l) => sum + unit(l) * Number(l.quantity ?? 1), 0);
+            const s: Obj = { id: id('cs'), object: 'checkout.session', mode: 'subscription', ...body, amount, lines };
             s.url = `${PAGES}/pay/${s.id}`;
             sessions.set(String(s.id), s);
             return remember(s);
+          }
+          // The webhook reads the session and the invoice back from the API.
+          if (req.method === 'GET' && (m = /^\/v1\/checkout\/sessions\/([^/]+)$/.exec(path))) {
+            const s = sessions.get(m[1]!);
+            return s ? reply(200, s) : reply(404, { error: { message: 'No such checkout session' } });
+          }
+          if (req.method === 'GET' && (m = /^\/v1\/invoices\/([^/]+)$/.exec(path))) {
+            const inv = invoices.get(m[1]!);
+            return inv ? reply(200, inv) : reply(404, { error: { message: 'No such invoice' } });
           }
           if (req.method === 'GET' && (m = /^\/v1\/subscriptions\/([^/]+)$/.exec(path))) {
             const sub = subscriptions.get(m[1]!);
@@ -268,8 +319,7 @@ function stripeStandIn() {
           if (s.mode === 'payment') {
             // A one-off payment (the history report, T15): paid at once, announced by the webhook.
             try {
-              await send('checkout.session.completed', {
-                ...s,
+              Object.assign(s, {
                 status: 'complete',
                 payment_status: 'paid',
                 amount_total: Number(s.amount),
@@ -277,6 +327,7 @@ function stripeStandIn() {
                 created: now(),
                 payment_intent: id('pi'),
               });
+              await send('checkout.session.completed', s);
             } catch (e) {
               return reply(500, { error: String(e) });
             }
@@ -292,13 +343,14 @@ function stripeStandIn() {
             cancel_at_period_end: false,
             trial_end: trialEnd,
             metadata: data.metadata ?? {},
-            items: { data: [{ current_period_end: trialEnd ?? now() + month }] },
+            items: { data: ((s.lines as Obj[] | undefined) ?? [{ price: price.id, quantity: 1 }]).map((l) => itemFrom(l, trialEnd ?? now() + month)) },
             amount: s.amount,
           };
           subscriptions.set(String(sub.id), sub);
           try {
             if (!trialEnd) await send('invoice.paid', invoice(sub, true));
-            await send('checkout.session.completed', { ...s, subscription: sub.id, status: 'complete' });
+            Object.assign(s, { subscription: sub.id, status: 'complete' });
+            await send('checkout.session.completed', s);
           } catch (e) {
             return reply(500, { error: String(e) });
           }
@@ -325,6 +377,10 @@ function stripeStandIn() {
         if (/^\/receipt\/\d+$/.test(path)) return page(res, 'Stripe test receipt', '<p>Chitanță</p>');
 
         // ---------------------------------------------------------------- test hooks
+        if (req.method === 'GET' && (m = /^\/_subscription\/([^/]+)$/.exec(path))) {
+          const sub = subFor(m[1]!);
+          return sub ? reply(200, sub) : reply(404, {});
+        }
         if (req.method === 'POST' && (m = /^\/_fail\/([^/]+)$/.exec(path))) {
           const sub = subFor(m[1]!);
           if (!sub) return reply(404, {});
@@ -362,6 +418,12 @@ function stripeStandIn() {
 export async function stripeFailPayment(customer: string, final = false): Promise<void> {
   const res = await fetch(`http://127.0.0.1:${PROVIDERS_PORT}/stripe/_fail/${customer}${final ? '?final=1' : ''}`, { method: 'POST' });
   expect(res.ok, await res.clone().text()).toBe(true);
+}
+
+/** The newest subscription of a customer as the stand-in has it (its items: the plan, the colleagues). */
+export async function stripeSubscriptionOf(customer: string): Promise<{ items: { data: { price: { id: string }; quantity: number }[] } } | null> {
+  const res = await fetch(`http://127.0.0.1:${PROVIDERS_PORT}/stripe/_subscription/${customer}`);
+  return res.ok ? ((await res.json()) as { items: { data: { price: { id: string }; quantity: number }[] } }) : null;
 }
 
 export async function stripeEndSubscription(customer: string): Promise<void> {

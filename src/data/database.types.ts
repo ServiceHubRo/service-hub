@@ -752,6 +752,7 @@ export type Database = {
           ranking_prior_avg: number
           ranking_prior_weight: number
           report_price_ron: number
+          staff_seat_price_ron: number
           subscription_price_ron: number
           trial_days: number
           updated_at: string
@@ -772,6 +773,7 @@ export type Database = {
           ranking_prior_avg?: number
           ranking_prior_weight?: number
           report_price_ron?: number
+          staff_seat_price_ron?: number
           subscription_price_ron?: number
           trial_days?: number
           updated_at?: string
@@ -792,6 +794,7 @@ export type Database = {
           ranking_prior_avg?: number
           ranking_prior_weight?: number
           report_price_ron?: number
+          staff_seat_price_ron?: number
           subscription_price_ron?: number
           trial_days?: number
           updated_at?: string
@@ -1612,6 +1615,7 @@ export type Database = {
       }
       subscriptions: {
         Row: {
+          billed_seats: number | null
           cancel_at_period_end: boolean
           created_at: string
           current_period_end: string | null
@@ -1620,6 +1624,8 @@ export type Database = {
           payment_failed_at: string | null
           payment_failed_key: string | null
           price_ron: number
+          seat_price_ron: number
+          seats: number
           shop_id: string
           status: string
           status_changed_at: string | null
@@ -1631,6 +1637,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          billed_seats?: number | null
           cancel_at_period_end?: boolean
           created_at?: string
           current_period_end?: string | null
@@ -1639,6 +1646,8 @@ export type Database = {
           payment_failed_at?: string | null
           payment_failed_key?: string | null
           price_ron: number
+          seat_price_ron?: number
+          seats?: number
           shop_id: string
           status?: string
           status_changed_at?: string | null
@@ -1650,6 +1659,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          billed_seats?: number | null
           cancel_at_period_end?: boolean
           created_at?: string
           current_period_end?: string | null
@@ -1658,6 +1668,8 @@ export type Database = {
           payment_failed_at?: string | null
           payment_failed_key?: string | null
           price_ron?: number
+          seat_price_ron?: number
+          seats?: number
           shop_id?: string
           status?: string
           status_changed_at?: string | null
@@ -3027,6 +3039,10 @@ export type Database = {
         }
       }
       send_trial_warnings: { Args: { p_now?: string }; Returns: number }
+      set_billed_seats: {
+        Args: { p_seats: number; p_shop_id: string }
+        Returns: undefined
+      }
       set_history_report_session: {
         Args: { p_report_id: string; p_session_id: string }
         Returns: undefined
@@ -3085,6 +3101,7 @@ export type Database = {
       }
       shop_hidden_reasons: { Args: { p_shop_id: string }; Returns: string[] }
       shop_reports: { Args: never; Returns: Json }
+      shop_seat_count: { Args: { p_shop_id: string }; Returns: number }
       shop_state: { Args: { p_shop_id: string }; Returns: string }
       slot_starts_at: {
         Args: { p_date: string; p_slot: string }
@@ -3175,6 +3192,10 @@ export type Database = {
         Returns: boolean
       }
       stripe_event_done: { Args: { p_id: string }; Returns: undefined }
+      stripe_seat_info: {
+        Args: { p_customer?: string; p_shop_id?: string }
+        Returns: Json
+      }
       submit_review: {
         Args: {
           p_booking_id: string
@@ -3212,6 +3233,7 @@ export type Database = {
       subscription_for_customer: {
         Args: { p_customer: string; p_shop_id?: string }
         Returns: {
+          billed_seats: number | null
           cancel_at_period_end: boolean
           created_at: string
           current_period_end: string | null
@@ -3220,6 +3242,8 @@ export type Database = {
           payment_failed_at: string | null
           payment_failed_key: string | null
           price_ron: number
+          seat_price_ron: number
+          seats: number
           shop_id: string
           status: string
           status_changed_at: string | null
@@ -3236,6 +3260,10 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      subscription_monthly_ron: {
+        Args: { p: Database["public"]["Tables"]["subscriptions"]["Row"] }
+        Returns: number
       }
       subscription_next_billing: {
         Args: { p: Database["public"]["Tables"]["subscriptions"]["Row"] }

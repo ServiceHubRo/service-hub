@@ -1,7 +1,8 @@
 // Stripe, with plain fetch and WebCrypto (ARCHITECTURE §12). No npm package: the functions start
 // fast and this module stays free of Deno, so the unit tests load it.
 //
-// Secrets: STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET, STRIPE_PRICE_ID; STRIPE_API_URL only for the
+// Secrets: STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET, STRIPE_PRICE_ID, STRIPE_SEAT_PRICE_ID (a
+// colleague's account, 20 lei a month); STRIPE_API_URL only for the
 // local browser tests (a stand-in). Every call pins the API version, so the objects read here
 // always have the shape this file expects, whatever the account's default version is.
 
@@ -11,6 +12,8 @@ export interface StripeConfig {
   secretKey?: string;
   webhookSecret?: string;
   priceId?: string;
+  /** The monthly price of one colleague's account (paid staff seats). */
+  seatPriceId?: string;
   url?: string;
   fetch?: typeof fetch;
 }
@@ -85,7 +88,7 @@ export function stripeApi(config: StripeConfig) {
     get: (path: string, params?: Record<string, unknown>) => request('GET', path, params),
     post: (path: string, params: Record<string, unknown>, idempotencyKey?: string) =>
       request('POST', path, params, idempotencyKey),
-    del: (path: string) => request('DELETE', path),
+    del: (path: string, params?: Record<string, unknown>) => request('DELETE', path, params),
   };
 }
 

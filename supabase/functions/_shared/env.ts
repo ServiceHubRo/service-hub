@@ -25,12 +25,13 @@ export function adminEmailFromEnv(): string | null {
   return secret('ADMIN_EMAIL') ?? null;
 }
 
-/** Stripe (T14): the secret key, the webhook's signing secret, the monthly price. */
+/** Stripe (T14): the secret key, the webhook's signing secret, the monthly price, the price per colleague. */
 export function stripeConfigFromEnv(): StripeConfig {
   return {
     secretKey: secret('STRIPE_SECRET_KEY'),
     webhookSecret: secret('STRIPE_WEBHOOK_SECRET'),
     priceId: secret('STRIPE_PRICE_ID'),
+    seatPriceId: secret('STRIPE_SEAT_PRICE_ID'),
     url: secret('STRIPE_API_URL'),
   };
 }

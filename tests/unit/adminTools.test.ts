@@ -35,6 +35,10 @@ const sub = (over: Partial<AdminSubscriptionRow>): AdminSubscriptionRow => ({
   status: 'trial',
   stripe_status: null,
   price_ron: 100,
+  seat_price_ron: 20,
+  seats: 0,
+  billed_seats: null,
+  monthly_ron: 100,
   trial_ends_at: '2026-12-20T10:00:00Z',
   current_period_end: null,
   cancel_at_period_end: false,
@@ -127,6 +131,7 @@ describe('catalog ids', () => {
 describe('settings form', () => {
   const current = {
     subscription_price_ron: 100,
+    staff_seat_price_ron: 20,
     trial_days: 90,
     quote_expiry_days: 3,
     report_price_ron: 29,
@@ -235,9 +240,10 @@ describe('exports', () => {
   });
 
   it('a subscription row: status translated, amounts with the decimal comma', () => {
-    const [, row] = exportTable('subscriptions', [sub({ price_ron: 79.5, paid_total: 159, paid_count: 2 })], t, 'ro');
+    const [, row] = exportTable('subscriptions', [sub({ price_ron: 79.5, seats: 2, monthly_ron: 119.5, paid_total: 159, paid_count: 2 })], t, 'ro');
     expect(row).toContain('Perioadă gratuită');
     expect(row).toContain('79,50');
+    expect(row).toContain('119,50');
     expect(row).toContain('2026-12-20 12:00');
   });
 });

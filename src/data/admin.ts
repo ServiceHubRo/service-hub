@@ -146,6 +146,9 @@ export interface AdminBilling {
 
 export interface AdminSubscription {
   status: SubscriptionStatus;
+  seat_price_ron: number;
+  seats: number;
+  billed_seats: number | null;
   trial_ends_at: string | null;
   current_period_end: string | null;
   cancel_at_period_end: boolean;

@@ -1947,6 +1947,25 @@ export const en: Record<MessageKey, string> = {
   'rpcError.audience_invalid': 'Choose who the notice is for.',
   'rpcError.notice_not_found': 'The notice was already withdrawn.',
   'rpcError.no_recipients': 'The notice doesn’t reach anyone. Check the city.',
+
+  // Paid staff accounts (price per colleague)
+  'unit.colleagues.one': '{n} colleague',
+  'unit.colleagues.few': '{n} colleagues',
+  'unit.colleagues.other': '{n} colleagues',
+  'sub.seats.breakdown': '{base} + {colleagues} × {seat}',
+  'sub.seats.none': 'Each colleague with an account in your shop adds {seat} a month.',
+  'staff.seats.price': 'Each colleague who creates an account from the invitation adds {seat} a month to the subscription; the invitation itself is free, and nothing is paid during the free period.',
+  'staff.seats.now': 'Your subscription is now {total} a month, with {colleagues}.',
+  'admin.subs.seats': 'Colleagues: {n}',
+  'admin.sub.seats': 'Paid colleagues',
+  'admin.sub.seatsValue': '{n} × {price}',
+  'admin.sub.monthly': 'Total per month',
+  'admin.csv.seats': 'Colleagues',
+  'admin.csv.seatPrice': 'Price per colleague',
+  'admin.csv.monthly': 'Total per month',
+  'admin.field.staff_seat_price_ron': 'Per colleague per month (RON)',
+  'admin.settings.hint.staff_seat_price_ron': 'Added to the subscription for each colleague with an account. For shops that sign up from now on.',
+
   // ---------------------------------------------------------------- Reports (T17)
   'rep.title': 'Reports',
   'rep.tileHint': 'Revenue, customers, quotes',

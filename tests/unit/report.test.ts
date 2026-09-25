@@ -111,6 +111,26 @@ describe('the PDF', () => {
     expect(doc.getTitle()).toContain('Volkswagen Golf 7');
   });
 
+  it('keeps a usual history on one page, and never leaves the closing block alone on a page', async () => {
+    const pages = async (n: number) => {
+      const d = data();
+      d.jobs = Array.from({ length: n }, () => d.jobs[0]!);
+      return (await PDFDocument.load(await renderReportPdf(lib, d))).getPageCount();
+    };
+    // Five jobs, the total, the figures and the notice fit on the first page.
+    expect(await pages(5)).toBe(1);
+    // More jobs: pages are added one at a time, never an extra page for the closing block alone
+    // (it moves together with the last job, so one more job never costs more than one page).
+    let before = 1;
+    for (let n = 6; n <= 24; n++) {
+      const now = await pages(n);
+      expect(now - before, `${n} jobs`).toBeGreaterThanOrEqual(0);
+      expect(now - before, `${n} jobs`).toBeLessThanOrEqual(1);
+      before = now;
+    }
+    expect(before).toBeGreaterThan(1);
+  });
+
   it('adds pages for long histories and prints English', async () => {
     const many = data({ lang: 'en', odometerOutOfOrder: true });
     many.jobs = Array.from({ length: 30 }, () => many.jobs[0]!);
