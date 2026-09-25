@@ -1,0 +1,114 @@
+// stripe-webhook — the only way a payment changes a subscription (ARCHITECTURE §12, P12b).
+//
+// 1. Checks the Stripe-Signature header against the raw body with STRIPE_WEBHOOK_SECRET
+//    (a forged or replayed request is refused with 400).
+// 2. stripe_event_begin records the event; one already handled is answered 200 and skipped.
+// 3. Reads the subscription as Stripe has it now (so events arriving out of order change
+//    nothing) and hands it to sync_stripe_subscription; paid and failed invoices are recorded
+//    first (record_stripe_invoice / record_payment_failed), so a payment reactivates at once.
+// 4. stripe_event_done. Any failure answers 500 and Stripe delivers the event again later.
+//
+// Events to send (Stripe → Developers → Webhooks): checkout.session.completed,
+// customer.subscription.created, customer.subscription.updated, customer.subscription.deleted,
+// invoice.paid, invoice.payment_failed.
+import { adminApi } from '../_shared/admin.ts';
+import { stripeConfigFromEnv } from '../_shared/env.ts';
+import { json } from '../_shared/http.ts';
+import {
+  failedInvoice,
+  invoiceSubscriptionId,
+  paidInvoice,
+  StripeError,
+  stripeApi,
+  subscriptionState,
+  verifyStripeSignature,
+  type StripeApi,
+} from '../_shared/stripe.ts';
+
+type Api = ReturnType<typeof adminApi>;
+type Obj = Record<string, unknown>;
+
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const uuidOrNull = (v: unknown) => (typeof v === 'string' && UUID.test(v) ? v : null);
+const idOf = (v: unknown): string | null =>
+  typeof v === 'string' ? v || null : v && typeof v === 'object' ? ((v as { id?: string }).id ?? null) : null;
+
+/** The subscription as Stripe has it now; the event's own copy when Stripe no longer has it. */
+async function latest(stripe: StripeApi, id: string, fallback?: Obj): Promise<Obj | null> {
+  try {
+    return await stripe.get(`subscriptions/${id}`);
+  } catch (e) {
+    if (e instanceof StripeError && e.status === 404) return fallback ?? null;
+    throw e;
+  }
+}
+
+async function sync(api: Api, stripe: StripeApi, id: string | null, shopHint: unknown, fallback?: Obj) {
+  if (!id) return;
+  const sub = await latest(stripe, id, fallback);
+  if (!sub) return;
+  const state = subscriptionState(sub);
+  if (!state.customer) return;
+  const shop = uuidOrNull(shopHint) ?? uuidOrNull((sub.metadata as Obj | undefined)?.shop_id);
+  await api.rpc('sync_stripe_subscription', { p_customer: state.customer, p_shop_id: shop, p_sub: state });
+}
+
+async function handle(api: Api, stripe: StripeApi, type: string, object: Obj): Promise<void> {
+  switch (type) {
+    case 'checkout.session.completed':
+      if (object.mode === 'subscription') await sync(api, stripe, idOf(object.subscription), object.client_reference_id);
+      return;
+    case 'customer.subscription.created':
+    case 'customer.subscription.updated':
+    case 'customer.subscription.deleted':
+    case 'customer.subscription.paused':
+    case 'customer.subscription.resumed':
+      await sync(api, stripe, idOf(object.id), null, object);
+      return;
+    case 'invoice.paid': {
+      const customer = idOf(object.customer);
+      if (customer) await api.rpc('record_stripe_invoice', { p_customer: customer, p_invoice: paidInvoice(object) });
+      await sync(api, stripe, invoiceSubscriptionId(object), null);
+      return;
+    }
+    case 'invoice.payment_failed': {
+      const customer = idOf(object.customer);
+      if (customer) await api.rpc('record_payment_failed', { p_customer: customer, p_invoice: failedInvoice(object) });
+      await sync(api, stripe, invoiceSubscriptionId(object), null);
+      return;
+    }
+    default:
+      return;
+  }
+}
+
+Deno.serve(async (req) => {
+  if (req.method !== 'POST') return json({ error: 'method_not_allowed' }, 405);
+  const config = stripeConfigFromEnv();
+  if (!config.webhookSecret || !config.secretKey) return json({ error: 'payments_unavailable' }, 503);
+
+  const payload = await req.text();
+  if (!(await verifyStripeSignature(payload, req.headers.get('stripe-signature'), config.webhookSecret))) {
+    return json({ error: 'bad_signature' }, 400);
+  }
+
+  let event: { id?: string; type?: string; data?: { object?: Obj } };
+  try {
+    event = JSON.parse(payload);
+  } catch {
+    return json({ error: 'bad_payload' }, 400);
+  }
+  if (typeof event.id !== 'string' || typeof event.type !== 'string') return json({ error: 'bad_payload' }, 400);
+
+  try {
+    const api = adminApi();
+    const fresh = await api.rpc('stripe_event_begin', { p_id: event.id, p_type: event.type, p_payload: event });
+    if (fresh !== true) return json({ received: true, duplicate: true });
+    await handle(api, stripeApi(config), event.type, event.data?.object ?? {});
+    await api.rpc('stripe_event_done', { p_id: event.id });
+    return json({ received: true });
+  } catch (e) {
+    console.error('stripe-webhook failed', event.type, e instanceof Error ? e.message : e);
+    return json({ error: 'server_error' }, 500);
+  }
+});

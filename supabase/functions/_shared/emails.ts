@@ -3,7 +3,8 @@
 // change) are the Go templates in supabase/templates, drawn the same way.
 //
 // Built with tables and inline styles, which is what email programs understand.
-import { formatDate, formatTime, type Lang } from './format.ts';
+import { formatDate, formatDayMonth, formatMoney, formatTime, type Lang } from './format.ts';
+import { SUBSCRIPTION_PATH } from './templates.ts';
 
 export interface EmailContent {
   subject: string;
@@ -191,8 +192,150 @@ function when(lang: Lang, iso: string): string {
   return Number.isNaN(d.getTime()) ? '' : `${formatDate(lang, d)}, ${formatTime(lang, d)}`;
 }
 
-/** Events sent by email only (no push text): the ones emailForEvent writes. */
-export const EMAIL_EVENTS: readonly string[] = ['account_suspended', 'review_reported'];
+/** Events sent by email only (no push text). */
+export const EMAIL_EVENTS: readonly string[] = ['account_suspended', 'review_reported', 'invoice_paid'];
+
+const num = (v: unknown): number | null => {
+  const n = typeof v === 'number' ? v : typeof v === 'string' && v.trim() !== '' ? Number(v) : NaN;
+  return Number.isFinite(n) ? n : null;
+};
+
+/** The subscription emails (T14): payment received, free period ending, payment failed, shop inactive. */
+function subscriptionEmail(e: EmailEvent, lang: Lang, app: string): EmailContent | null {
+  const p = e.params ?? {};
+  const shop = str(p.shop_name) || 'Service-Hub';
+  const amount = num(p.total);
+  const total = amount === null ? '' : formatMoney(lang, amount);
+  // A calendar day (YYYY-MM-DD) or an instant (ISO timestamp), as "14 oct" / "Oct 14".
+  const day = (v: unknown) => {
+    const s = str(v);
+    if (!s) return '';
+    const value = s.length > 10 ? new Date(s) : s;
+    return typeof value === 'string' || !Number.isNaN(value.getTime()) ? formatDayMonth(lang, value) : '';
+  };
+  const open = { label: lang === 'en' ? 'Open Subscription' : 'Deschide Abonament', url: `${app}${SUBSCRIPTION_PATH}` };
+  const footer =
+    lang === 'en'
+      ? `You are receiving this email as the owner of ${shop} on Service-Hub.`
+      : `Primești acest email ca proprietar al ${shop} pe Service-Hub.`;
+  const en = lang === 'en';
+
+  switch (e.event) {
+    case 'invoice_paid': {
+      const rows: [string, string][] = [
+        [en ? 'Shop' : 'Service', shop],
+        [en ? 'Amount' : 'Suma', total],
+      ];
+      if (str(p.paid_at)) rows.push([en ? 'Paid on' : 'Plătit pe', day(p.paid_at)]);
+      if (str(p.period_end)) rows.push([en ? 'Active until' : 'Activ până pe', day(p.period_end)]);
+      if (str(p.number)) rows.push([en ? 'Payment no.' : 'Nr. plată', str(p.number)]);
+      const receipt = str(p.receipt_url);
+      return email(en ? `Payment received: ${total}` : `Plată primită: ${total}`, {
+        lang,
+        preheader: en ? 'Your Service-Hub subscription is active.' : 'Abonamentul Service-Hub e activ.',
+        title: en ? 'Payment received' : 'Plată primită',
+        blocks: [
+          { p: en ? `Thank you. The subscription for ${shop} is active.` : `Mulțumim. Abonamentul pentru ${shop} e activ.` },
+          { rows },
+          {
+            p: en
+              ? 'The invoice follows separately. The receipt is on the payment page.'
+              : 'Factura vine separat. Chitanța e pe pagina plății.',
+          },
+        ],
+        button: receipt ? { label: en ? 'See the receipt' : 'Vezi chitanța', url: receipt } : open,
+        footer,
+      });
+    }
+    case 'trial_ending': {
+      const days = num(p.days) ?? 0;
+      const price = num(p.price);
+      const when = days <= 0 ? (en ? 'today' : 'azi') : day(p.expiry);
+      const lead =
+        days <= 0
+          ? en
+            ? 'Your free period on Service-Hub ends today.'
+            : 'Perioada gratuită pe Service-Hub se termină azi.'
+          : en
+            ? `Your free period on Service-Hub ends on ${when}.`
+            : `Perioada gratuită pe Service-Hub se termină pe ${when}.`;
+      return email(en ? `Your free period ends ${days <= 0 ? 'today' : `on ${when}`}` : `Perioada gratuită se termină ${days <= 0 ? 'azi' : `pe ${when}`}`, {
+        lang,
+        preheader: en ? 'Activate the subscription to stay in search results.' : 'Activează abonamentul ca să rămâi în căutări.',
+        title: en ? 'Your free period is ending' : 'Perioada gratuită se termină',
+        blocks: [
+          { p: lead },
+          {
+            p: en
+              ? `To keep ${shop} in search results and receive bookings, activate the subscription${price ? ` (${formatMoney(lang, price)} a month)` : ''}. No contract, cancel anytime.`
+              : `Ca ${shop} să rămână în căutări și să primească programări, activează abonamentul${price ? ` (${formatMoney(lang, price)} pe lună)` : ''}. Fără contract, anulezi oricând.`,
+          },
+        ],
+        button: { label: en ? 'Activate the subscription' : 'Activează abonamentul', url: open.url },
+        footer,
+      });
+    }
+    case 'payment_failed': {
+      const next = day(p.expiry);
+      const final = p.final === true || !next;
+      return email(en ? 'Your subscription payment failed' : 'Plata abonamentului nu a trecut', {
+        lang,
+        preheader: en ? 'Check or change your card.' : 'Verifică sau schimbă cardul.',
+        title: en ? 'Payment failed' : 'Plata nu a trecut',
+        blocks: [
+          {
+            p: en
+              ? `We couldn't charge the ${total} subscription for ${shop}.`
+              : `Nu am putut încasa abonamentul de ${total} pentru ${shop}.`,
+          },
+          {
+            p: final
+              ? en
+                ? 'That was the last try. Pay under Subscription so the shop stays in search results.'
+                : 'A fost ultima încercare. Plătește din Abonament ca service-ul să rămână în căutări.'
+              : en
+                ? `We'll try again on ${next}. Check or change the card under Subscription → Manage.`
+                : `Reîncercăm pe ${next}. Verifică sau schimbă cardul din Abonament → Gestionează.`,
+          },
+        ],
+        button: open,
+        footer,
+      });
+    }
+    case 'shop_inactive': {
+      const reason = str(p.reason);
+      const why =
+        reason === 'payment_failed'
+          ? en
+            ? "The subscription payment didn't go through."
+            : 'Plata abonamentului nu a trecut.'
+          : reason === 'cancelled'
+            ? en
+              ? 'Your subscription has ended.'
+              : 'Abonamentul s-a încheiat.'
+            : en
+              ? 'Your free period has ended.'
+              : 'Perioada gratuită s-a încheiat.';
+      return email(en ? `${shop} is no longer in search results` : `${shop} nu mai apare în căutări`, {
+        lang,
+        preheader: en ? 'Pay to receive bookings again.' : 'Plătește ca să primești din nou programări.',
+        title: en ? 'Shop not in search' : 'Service-ul nu mai apare în căutări',
+        blocks: [
+          { p: why },
+          {
+            p: en
+              ? `${shop} no longer appears in search and cannot receive new bookings. Bookings already made continue, and all your data is kept. Paying reactivates it at once.`
+              : `${shop} nu mai apare în căutări și nu mai poate primi programări noi. Programările deja făcute continuă, iar toate datele rămân. Plata îl reactivează imediat.`,
+          },
+        ],
+        button: { label: en ? 'Pay the subscription' : 'Plătește abonamentul', url: open.url },
+        footer,
+      });
+    }
+    default:
+      return null;
+  }
+}
 
 /** The email for an outbox event, or null when the event has none. */
 export function emailForEvent(e: EmailEvent, app: string): EmailContent | null {
@@ -261,6 +404,6 @@ export function emailForEvent(e: EmailEvent, app: string): EmailContent | null {
       });
     }
     default:
-      return null;
+      return subscriptionEmail(e, lang, app);
   }
 }

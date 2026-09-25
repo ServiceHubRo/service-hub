@@ -15,3 +15,6 @@ export function shopBookingsLink(options: { tab?: ShopTab; filter?: ShopFilter; 
 /** Cont of the shop and the Recenzii tile inside it (T11). */
 export const ACCOUNT_PATH = '/s/cont';
 export const REVIEWS_PATH = '/s/cont/recenzii';
+
+/** Abonament, the owner's tile in Cont (T14). Every subscription notice and email leads here. */
+export const SUBSCRIPTION_PATH = '/s/cont/abonament';

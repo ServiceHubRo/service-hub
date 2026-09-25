@@ -1,0 +1,240 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.section {
+  margin-top: 10px;
+}
+
+.muted {
+  color: var(--muted);
+  font-size: 13.5px;
+  overflow-wrap: anywhere;
+}
+
+/* ------------------------------------------------------------------ status */
+
+.status {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.statusBad {
+  border-color: var(--red);
+}
+
+.statusHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.statusLabel {
+  font-family: var(--font-display);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  font-size: 15px;
+}
+
+.pill {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 3px 9px;
+  border-radius: var(--radius-pill);
+  white-space: nowrap;
+}
+
+.toneAmber {
+  color: var(--amber);
+  background: var(--amber-soft);
+}
+
+.toneGreen {
+  color: var(--green);
+  background: var(--green-soft);
+}
+
+.toneRed {
+  color: var(--red);
+  background: var(--red-soft);
+}
+
+.toneMuted {
+  color: var(--muted);
+  background: var(--muted-soft);
+}
+
+.trial {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+}
+
+.crown {
+  color: var(--amber);
+  flex-shrink: 0;
+}
+
+.meter {
+  height: 8px;
+  border-radius: var(--radius-pill);
+  background: var(--surface2);
+  overflow: hidden;
+}
+
+.meter span {
+  display: block;
+  height: 100%;
+  background: var(--amber);
+  border-radius: inherit;
+}
+
+.statusText {
+  overflow-wrap: anywhere;
+}
+
+.statusTextBad {
+  color: var(--red);
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+/* ------------------------------------------------------------------ plan */
+
+.plan {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.planLabel {
+  color: var(--muted);
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.price {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.amount {
+  font-family: var(--font-display);
+  font-size: 34px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--amber);
+}
+
+.per {
+  color: var(--muted);
+}
+
+.features {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.features li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.check {
+  color: var(--green);
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.billing,
+.action {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.billing p {
+  color: var(--amber);
+}
+
+/* ------------------------------------------------------------------ payments */
+
+.invoices {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.invoice {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.invoiceMain {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.invoiceDate {
+  font-weight: 700;
+}
+
+.invoiceSide {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.invoiceAmount {
+  font-family: var(--font-mono);
+  font-weight: 700;
+}
+
+.links {
+  display: flex;
+  gap: 12px;
+}
+
+.links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: var(--tap);
+  color: var(--amber);
+}
+
+.note {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 12.5px;
+}
+
+.note svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+}

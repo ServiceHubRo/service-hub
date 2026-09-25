@@ -18,6 +18,9 @@ import { LoadError } from '../../../components/LoadError';
 import { PushBanner } from '../../push/PushBanner';
 import { useShopBookings } from '../bookings/shopBookingsContext';
 import { SETTINGS_LINKS } from '../settings/paths';
+import { SUBSCRIPTION_PATH } from '../paths';
+import { trialWarningDays } from '../../../lib/subscription';
+import { plural } from '../../../i18n/translate';
 import { SetupChecklist } from './SetupChecklist';
 import { TodayBoard } from './TodayBoard';
 import styles from './Dashboard.module.css';
@@ -68,6 +71,7 @@ export function Dashboard() {
             <HiddenBanner setup={setup} />
           </div>
         )}
+        <SubscriptionBanner setup={setup} />
         {setup.billing?.reminder && (
           <div className="no-print">
             <Banner tone="info">
@@ -127,19 +131,57 @@ export function Dashboard() {
   );
 }
 
+/**
+ * The owner's subscription on Panou (T14): the last 7 days of the free period while no card is
+ * given, and a payment Stripe is still retrying. An expired subscription is in HiddenBanner.
+ */
+function SubscriptionBanner({ setup }: { setup: ShopSetup }) {
+  const { t, lang } = useI18n();
+  const now = useNow();
+  const sub = setup.subscription;
+  if (!sub) return null;
+  const days = trialWarningDays(sub, now);
+  const pastDue = sub.status === 'past_due';
+  if (days === null && !pastDue) return null;
+  return (
+    <div className="no-print">
+      <Banner tone={pastDue ? 'error' : 'warning'}>
+        <div className={styles.reminder}>
+          <span>
+            {pastDue
+              ? t('dash.pastDue')
+              : days === 0
+                ? t('dash.trial.endingToday')
+                : t('dash.trial.ending', { days: plural(lang, 'unit.days', days!) })}
+          </span>
+          <div className={styles.reminderButtons}>
+            <Link to={SUBSCRIPTION_PATH} className={styles.reminderLink}>
+              {t(pastDue ? 'dash.pastDue.open' : 'dash.trial.open')}
+            </Link>
+          </div>
+        </div>
+      </Banner>
+    </div>
+  );
+}
+
 /** "Service-ul tău nu apare încă în căutări." with every reason, in the order to fix them. */
 function HiddenBanner({ setup }: { setup: ShopSetup }) {
   const { t } = useI18n();
   const link: Partial<Record<ShopSetup['reasons'][number], string>> = {
     no_services: SETTINGS_LINKS.services,
     no_open_days: SETTINGS_LINKS.hours,
+    ...(setup.is_owner ? { subscription_inactive: SUBSCRIPTION_PATH } : {}),
   };
   return (
     <Banner tone="warning">
       <p className={styles.hiddenTitle}>{t('dash.hidden.title')}</p>
       <ul className={styles.reasons}>
         {setup.reasons.map((r) => {
-          const text = t(`dash.hidden.${r}` as MessageKey);
+          const text =
+            r === 'subscription_inactive'
+              ? t(setup.is_owner ? 'dash.hidden.subscription_inactive.owner' : 'dash.hidden.subscription_inactive.staff')
+              : t(`dash.hidden.${r}` as MessageKey);
           const to = link[r];
           return <li key={r}>{to ? <Link to={to}>{text}</Link> : text}</li>;
         })}

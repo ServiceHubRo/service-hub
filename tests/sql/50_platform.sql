@@ -46,7 +46,7 @@ select test.eq(public, false, 'reports bucket private') from storage.buckets whe
 
 -- Realtime publication.
 select test.eq(array_agg(tablename::text order by tablename),
-               array['bookings', 'messages', 'notices', 'reviews', 'threads'], 'realtime tables')
+               array['bookings', 'invoices', 'messages', 'notices', 'reviews', 'subscriptions', 'threads'], 'realtime tables')
 from pg_publication_tables where pubname = 'supabase_realtime' and schemaname = 'public';
 
 -- Logo uploads: only members of that shop, only in the shop's folder; reports never from the browser.
