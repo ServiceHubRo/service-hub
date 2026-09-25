@@ -25,6 +25,7 @@ interface Errors {
   phone?: string;
   email?: string;
   password?: string;
+  confirm?: string;
   terms?: string;
 }
 
@@ -34,7 +35,7 @@ const CITY_SUGGESTIONS = [
   'Hărman', 'Sânpetru', 'Cristian', 'Rupea', 'Victoria', 'Sibiu', 'București', 'Cluj-Napoca',
 ];
 
-/** P4b sign-up: role cards, name, shop name + city (shops), phone, email, password, terms. */
+/** P4b sign-up: role cards, name, shop name + city (shops), phone, email, password twice, terms. */
 export function SignUpForm({
   email,
   setEmail,
@@ -59,6 +60,7 @@ export function SignUpForm({
   const [city, setCity] = useState('');
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
+  const [confirm, setConfirm] = useState('');
   const [terms, setTerms] = useState(false);
   const [errors, setErrors] = useState<Errors>({});
   const [attempt, setAttempt] = useState(0);
@@ -74,6 +76,7 @@ export function SignUpForm({
     if (!normalizePhone(phone)) next.phone = t('auth.error.phoneInvalid');
     if (!looksLikeEmail(email)) next.email = t('auth.error.emailFormat');
     if (password.length < MIN_PASSWORD_LENGTH) next.password = t('auth.error.passwordShort', { min: MIN_PASSWORD_LENGTH });
+    else if (confirm !== password) next.confirm = t('auth.error.passwordMismatch');
     if (!terms) next.terms = t('auth.error.termsRequired');
     return next;
   }
@@ -238,6 +241,16 @@ export function SignUpForm({
           clear('password');
         }}
         error={errors.password}
+      />
+      <PasswordField
+        label={t('auth.repeatPassword')}
+        autoComplete="new-password"
+        value={confirm}
+        onChange={(e) => {
+          setConfirm(e.target.value);
+          clear('confirm');
+        }}
+        error={errors.confirm}
       />
       <div id="signup-terms">
         <Checkbox

@@ -238,6 +238,7 @@ test.describe('shop settings', () => {
     await guest.getByLabel('Nume și prenume').fill('Mihai Coleg');
     await guest.getByLabel('Telefon').fill('0723 111 222');
     await guest.getByLabel('Parolă', { exact: true }).fill(PASSWORD);
+    await guest.getByLabel('Repetă parola').fill(PASSWORD);
     await guest.getByRole('checkbox').check();
     await guest.getByRole('button', { name: 'Creează cont' }).click();
     await expect(guest).toHaveURL(/\/confirma-email$/);

@@ -114,7 +114,7 @@ export function ShopDetailScreen() {
             <span id="shop-actions">{t('admin.actions')}</span>
           </SectionTitle>
           {panel === null && (
-            <div className={styles.actions}>
+            <div className={styles.actionGrid}>
               {!phoneVerified && o.phone && (
                 <ActionButton
                   variant="secondary"

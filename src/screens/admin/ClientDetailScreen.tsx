@@ -100,7 +100,7 @@ export function ClientDetailScreen() {
           <span id="client-actions">{t('admin.actions')}</span>
         </SectionTitle>
         {panel === null && (
-          <div className={styles.actions}>
+          <div className={styles.actionGrid}>
             {p.suspended ? (
               <ActionButton
                 variant="secondary"

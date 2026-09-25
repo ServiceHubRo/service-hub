@@ -146,6 +146,7 @@ export const en: Record<MessageKey, string> = {
   'auth.password': 'Password',
   'auth.newPassword': 'New password',
   'auth.confirmPassword': 'Repeat the new password',
+  'auth.repeatPassword': 'Repeat password',
   'auth.passwordHint': 'At least {min} characters.',
   'auth.remember': 'Keep me signed in',
   'auth.forgot': 'Forgot your password?',

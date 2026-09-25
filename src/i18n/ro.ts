@@ -144,6 +144,7 @@ export const ro = {
   'auth.password': 'Parolă',
   'auth.newPassword': 'Parola nouă',
   'auth.confirmPassword': 'Repetă parola nouă',
+  'auth.repeatPassword': 'Repetă parola',
   'auth.passwordHint': 'Cel puțin {min} caractere.',
   'auth.remember': 'Ține-mă minte',
   'auth.forgot': 'Ai uitat parola?',

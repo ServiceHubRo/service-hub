@@ -283,6 +283,19 @@ a.stat:hover {
   flex: 1 1 200px;
 }
 
+/* A shop's or a client's actions: a grid of equal cells, every button the same width and height
+   (the tallest one, when a label takes two lines), including those inside an ActionButton. */
+.actionGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  grid-auto-rows: 1fr;
+  gap: 8px;
+}
+
+.actionGrid > div > button {
+  flex: 1 1 auto;
+}
+
 .danger {
   color: var(--red);
 }

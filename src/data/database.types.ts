@@ -1782,6 +1782,10 @@ export type Database = {
     }
     Functions: {
       account_email: { Args: { p_user_id: string }; Returns: string }
+      add_local_days: {
+        Args: { p_at: string; p_days: number }
+        Returns: string
+      }
       admin_account_deletion: {
         Args: { p_admin_id: string; p_user_id: string }
         Returns: string
