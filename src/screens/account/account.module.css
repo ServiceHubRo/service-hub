@@ -155,3 +155,25 @@
 .phoneTodo {
   color: var(--amber);
 }
+
+/* Ajutor și contact */
+.helpId {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+}
+
+.helpId svg {
+  color: var(--amber);
+  flex-shrink: 0;
+}
+
+.helpNote {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.helpId + .helpNote {
+  margin-top: 6px;
+}

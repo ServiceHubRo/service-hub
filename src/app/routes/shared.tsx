@@ -1,6 +1,8 @@
 import type { ReactElement } from 'react';
 import { Navigate, Route } from 'react-router-dom';
 import { AccountScreen } from '../../screens/account/AccountScreen';
+import { HelpScreen } from '../../screens/account/HelpScreen';
+import { helpPath } from '../../screens/account/paths';
 import { AccountLegal } from '../../screens/legal/LegalPages';
 import { BookingThreadRedirect } from '../../screens/messages/BookingThreadRedirect';
 import { ConversationScreen } from '../../screens/messages/ConversationScreen';
@@ -18,7 +20,10 @@ export function rel(role: Role, path: string): string {
   return path.slice(base.length);
 }
 
-/** Every role: its navigation screens, Cont with the legal documents, and a 404 inside the shell. */
+/**
+ * Every role: its navigation screens, Cont with the legal documents and (clients and shops) Ajutor
+ * și contact, and a 404 inside the shell.
+ */
 export function commonRoutes(role: Role, screens: Record<string, ReactElement>) {
   const nav = NAV[role];
   return (
@@ -29,6 +34,7 @@ export function commonRoutes(role: Role, screens: Record<string, ReactElement>) 
       ))}
       <Route path={rel(role, nav.account.path)} element={<AccountScreen role={role} />} />
       <Route path={`${rel(role, nav.account.path)}/legal/:doc`} element={<AccountLegal role={role} />} />
+      {role !== 'admin' && <Route path={rel(role, helpPath(role))} element={<HelpScreen role={role} />} />}
       <Route path="*" element={<NotFound inShell />} />
     </>
   );
