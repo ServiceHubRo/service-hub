@@ -234,4 +234,31 @@ describe('the browser reporter', () => {
     target.dispatchEvent(rejection);
     expect(fetcher).toHaveBeenCalledTimes(2);
   });
+
+  it('a refused database answer goes with the steps before it and whether the session was stored', async () => {
+    vi.stubEnv('VITE_SENTRY_DSN', DSN);
+    const bodies: string[] = [];
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (_url: string, init: RequestInit) => {
+        bodies.push(String(init.body));
+        return new Response('{}');
+      }),
+    );
+    localStorage.clear();
+    const { failure } = await import('../../src/data/rpc');
+    // A business refusal: only a step, no report.
+    expect(failure({ message: 'day_full' }, 'create_booking').code).toBe('day_full');
+    expect(bodies).toHaveLength(0);
+    // The session is gone from this device: permission denied.
+    expect(failure({ code: '42501', message: 'permission denied for function list_threads' }, 'list_threads').code).toBe('unknown');
+    expect(bodies).toHaveLength(1);
+    const event = JSON.parse(bodies[0]!.split('\n')[2]!);
+    expect(event.tags).toMatchObject({ rpc: 'list_threads' });
+    expect(event.extra).toEqual({ stored_session: 'none' });
+    expect(event.breadcrumbs.values.map((b: { message: string }) => b.message)).toEqual([
+      'create_booking: day_full',
+      'list_threads: 42501',
+    ]);
+  });
 });

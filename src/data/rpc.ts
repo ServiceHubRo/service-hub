@@ -1,6 +1,7 @@
 import type { Database, Json } from './database.types';
 import { reportSessionLost } from './sessionEvents';
-import { captureError } from '../lib/monitoring';
+import { addBreadcrumb, captureError } from '../lib/monitoring';
+import { authStorage, rememberMe } from '../lib/remember';
 import { supabase } from './supabase';
 import { formatKm } from '../i18n/format';
 import { ro, type MessageKey } from '../i18n/ro';
@@ -251,11 +252,32 @@ type Fns = Database['public']['Functions'];
  */
 export function failure(error: unknown, where?: string): RpcError {
   const rpcError = toRpcError(error);
+  if (rpcError.code !== 'network') addBreadcrumb('rpc', `${where ?? 'query'}: ${rpcError.code === 'unknown' ? describeCode(error) : rpcError.code}`, 'warning');
   if (rpcError.code === 'not_signed_in') reportSessionLost();
   if (rpcError.code === 'unknown' && !isAbort(error)) {
-    captureError(error, { tags: where ? { rpc: where } : {}, fingerprint: where ? ['rpc', where, describeCode(error)] : undefined });
+    captureError(error, {
+      tags: where ? { rpc: where } : {},
+      fingerprint: where ? ['rpc', where, describeCode(error)] : undefined,
+      // "permission denied" usually means the request went without the user's session.
+      extra: describeCode(error) === '42501' ? { stored_session: storedSessionState() } : undefined,
+    });
   }
   return rpcError;
+}
+
+/** Whether this device still holds the session (no token is read out, only its state). */
+function storedSessionState(): string {
+  try {
+    const key = Object.keys(localStorage).concat(Object.keys(sessionStorage)).find((k) => /^sb-.+-auth-token$/.test(k));
+    const raw = key ? authStorage.getItem(key) : null;
+    if (!raw) return key ? `none (key ${rememberMe() ? 'local' : 'session'} store empty)` : 'none';
+    const parsed = JSON.parse(raw) as { expires_at?: number; access_token?: string; refresh_token?: string };
+    if (!parsed.access_token || !parsed.refresh_token) return 'incomplete';
+    const left = (parsed.expires_at ?? 0) - Date.now() / 1000;
+    return `stored, expires in ${Math.round(left)} s`;
+  } catch (e) {
+    return `unreadable: ${e instanceof Error ? e.name : 'error'}`;
+  }
 }
 
 /** A request the app itself stopped (a screen closed): not an error. */
