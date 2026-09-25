@@ -1,7 +1,8 @@
 // geocode — the shop's address → latitude/longitude, after "Salvează" in Setări → Profil public
 // (FR §4.6, ARCHITECTURE §11). Coordinates feed "Aproape de tine" in the client search.
 //
-// 1. Checks the caller's access token with the Auth server and finds the shop they work for.
+// 1. Checks the caller's access token with the Auth server and finds the shop they work for (an
+//    admin names the shop: { shop_id }, after editing its address — T16a).
 // 2. Reads the address from the database (never from the request) and asks OpenStreetMap
 //    Nominatim, most precise first: street + city + county + postal code, then without the postal
 //    code, then the city alone.
@@ -16,6 +17,7 @@ import { bearerToken, corsHeaders, json } from '../_shared/http.ts';
 
 const NOMINATIM = 'https://nominatim.openstreetmap.org/search';
 const USER_AGENT = 'Service-Hub/1.0 (https://service-hub.ro)';
+const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 interface Address {
   street: string | null;
@@ -75,10 +77,24 @@ Deno.serve(async (req) => {
     const user = await api.userFromToken(bearerToken(req));
     if (!user) return json({ error: 'not_signed_in' }, 401);
 
-    const staff = await api.select(
-      `shop_staff?select=shop_id&user_id=eq.${encodeURIComponent(user.id)}&accepted_at=not.is.null`,
-    );
-    const shopId = staff[0]?.shop_id;
+    // The admin (T16a) asks for a shop they just edited: { shop_id }. Everyone else gets their own.
+    let asked: unknown = null;
+    try {
+      asked = ((await req.json()) as { shop_id?: unknown } | null)?.shop_id ?? null;
+    } catch {
+      asked = null; // no body: the caller's own shop
+    }
+    let shopId: unknown;
+    if (typeof asked === 'string' && UUID.test(asked)) {
+      const me = await api.select(`profiles?select=role,suspended&id=eq.${encodeURIComponent(user.id)}`);
+      if (me[0]?.role !== 'admin' || me[0]?.suspended === true) return json({ error: 'not_allowed' }, 403);
+      shopId = asked;
+    } else {
+      const staff = await api.select(
+        `shop_staff?select=shop_id&user_id=eq.${encodeURIComponent(user.id)}&accepted_at=not.is.null`,
+      );
+      shopId = staff[0]?.shop_id;
+    }
     if (typeof shopId !== 'string') return json({ error: 'not_allowed' }, 403);
     const shops = await api.select(`shops?select=street,city,county,postal_code&id=eq.${shopId}`);
     const address = shops[0] as unknown as Address | undefined;

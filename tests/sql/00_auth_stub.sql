@@ -42,6 +42,7 @@ create table auth.users (
   email_change_confirm_status smallint default 0,
   email_change_sent_at timestamptz,
   banned_until timestamptz,
+  last_sign_in_at timestamptz,
   phone_change text default '',
   phone_change_token text default '',
   reauthentication_token text default '',

@@ -24,6 +24,19 @@ export async function updateProfile(userId: string, fields: { name: string; phon
   return data;
 }
 
+/**
+ * Tells the admin lists the person uses the app (T16a). The database keeps one stamp an hour at
+ * most; best effort, a failure changes nothing for the person.
+ */
+export async function touchLastActive(): Promise<void> {
+  if (!supabase) return;
+  try {
+    await supabase.rpc('touch_last_active');
+  } catch {
+    // offline: the next start stamps it
+  }
+}
+
 export async function updateLang(userId: string, lang: Lang): Promise<void> {
   const { error } = await db().from('profiles').update({ lang }).eq('id', userId);
   if (error) throw failure(error);

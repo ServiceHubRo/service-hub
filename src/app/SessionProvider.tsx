@@ -1,7 +1,7 @@
 import type { Session, User } from '@supabase/supabase-js';
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { signOut as authSignOut } from '../data/auth';
-import { fetchProfile, updateLang, type Profile } from '../data/profile';
+import { fetchProfile, touchLastActive, updateLang, type Profile } from '../data/profile';
 import { forgetPushDevice } from '../data/push';
 import { onSessionLost } from '../data/sessionEvents';
 import { supabase } from '../data/supabase';
@@ -56,6 +56,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
         // After login the language saved on the profile wins.
         if (profile.lang !== langRef.current) setLang(profile.lang as Lang);
         setState({ status: 'signedIn', user, profile });
+        void touchLastActive();
       } catch {
         if (loadedForRef.current === user.id) setState({ status: 'error', user, profile: null });
       }

@@ -4,6 +4,17 @@ import { OfflineBar } from '../components/OfflineBar';
 import { I18nProvider } from '../i18n/I18nProvider';
 import { IS_TEST_BUILD } from '../lib/env';
 import { AccountScreen } from '../screens/account/AccountScreen';
+import { AdminProvider } from '../screens/admin/AdminProvider';
+import { AuditScreen } from '../screens/admin/AuditScreen';
+import { BookingDetailScreen } from '../screens/admin/BookingDetailScreen';
+import { BookingsScreen as AdminBookingsScreen } from '../screens/admin/BookingsScreen';
+import { ClientDetailScreen } from '../screens/admin/ClientDetailScreen';
+import { ClientsScreen } from '../screens/admin/ClientsScreen';
+import { ModerationScreen } from '../screens/admin/ModerationScreen';
+import { OverviewScreen } from '../screens/admin/OverviewScreen';
+import { ShopDetailScreen } from '../screens/admin/ShopDetailScreen';
+import { ShopsScreen } from '../screens/admin/ShopsScreen';
+import { ThreadScreen } from '../screens/admin/ThreadScreen';
 import { AuthScreen } from '../screens/auth/AuthScreen';
 import { BookingFlow } from '../screens/client/booking/BookingFlow';
 import { BookingSent } from '../screens/client/booking/BookingSent';
@@ -66,6 +77,11 @@ const SCREENS: Record<string, ReactElement> = {
   '/s/istoric': <ShopHistoryScreen />,
   '/c/mesaje': <MessagesScreen />,
   '/s/mesaje': <MessagesScreen />,
+  '/admin/prezentare': <OverviewScreen />,
+  '/admin/service-uri': <ShopsScreen />,
+  '/admin/clienti': <ClientsScreen />,
+  '/admin/rezervari': <AdminBookingsScreen />,
+  '/admin/moderare': <ModerationScreen />,
 };
 
 /** A conversation and the way in from a booking card (T11), for the client and the shop. */
@@ -97,6 +113,17 @@ function extraRoutes(role: Role) {
         <Route path="/c/programari/:bookingId/raport" element={<ReportPreviewScreen />} />
         <Route path="/c/cont/rapoarte" element={<MyReportsScreen />} />
         {messageRoutes('client')}
+      </>
+    );
+  }
+  if (role === 'admin') {
+    return (
+      <>
+        <Route path="/admin/service-uri/:shopId" element={<ShopDetailScreen />} />
+        <Route path="/admin/clienti/:clientId" element={<ClientDetailScreen />} />
+        <Route path="/admin/rezervari/:bookingId" element={<BookingDetailScreen />} />
+        <Route path="/admin/mesaje/:threadId" element={<ThreadScreen />} />
+        <Route path="/admin/cont/jurnal" element={<AuditScreen />} />
       </>
     );
   }
@@ -142,7 +169,10 @@ function roleRoutes(role: Role) {
               </ThreadsProvider>
             </ClientBookingsProvider>
           ) : (
-            <AppShell role={role} />
+            // The reported reviews waiting, live, for the badge on Moderare (T16a).
+            <AdminProvider>
+              <AppShell role={role} />
+            </AdminProvider>
           )
         }
       >

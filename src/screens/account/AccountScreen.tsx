@@ -1,4 +1,4 @@
-import { FileCheck, FileText, Globe, Heart, History, Settings, Star } from 'lucide-react';
+import { FileCheck, FileText, Globe, Heart, History, ScrollText, Settings, Star } from 'lucide-react';
 import { useOutletContext } from 'react-router-dom';
 import type { ShellOutletContext } from '../../app/AppShell';
 import { LangSwitch } from '../../app/LangSwitch';
@@ -10,6 +10,7 @@ import { Tile } from '../../components/Tile';
 import { useI18n } from '../../i18n/context';
 import type { MessageKey } from '../../i18n/ro';
 import { LEGAL_DOCS } from '../../lib/legal';
+import { ADMIN_AUDIT_PATH } from '../admin/paths';
 import { FAVORITES_PATH, MY_REPORTS_PATH, VEHICLE_HISTORY_PICK_PATH } from '../client/paths';
 import { REVIEWS_PATH } from '../shop/paths';
 import { SETTINGS_PATH } from '../shop/settings/paths';
@@ -31,7 +32,7 @@ const SUBTITLE: Record<Role, MessageKey> = {
 /**
  * Cont, the part every role shares (P13b): identity, language, push notifications on this device
  * (clients and shops, T12), email and password, legal documents, my data, log out. Clients also get Locație, Favorite (T06), "Istoricul mașinilor
- * mele" (T10) and "Rapoartele mele" (T15); shops get the Setări and Recenzii tiles, and the owner Abonament (T14); Rapoarte
+ * mele" (T10) and "Rapoartele mele" (T15); shops get the Setări and Recenzii tiles, and the owner Abonament (T14); the admin gets the audit log (T16a). Rapoarte
  * arrives with its task.
  */
 export function AccountScreen({ role }: { role: Role }) {
@@ -76,6 +77,12 @@ export function AccountScreen({ role }: { role: Role }) {
           <Tile to={SETTINGS_PATH} icon={Settings} label={t('account.tile.settings')} />
           <Tile to={REVIEWS_PATH} icon={Star} label={t('reviews.title')} />
           <SubscriptionTile />
+        </div>
+      )}
+
+      {role === 'admin' && (
+        <div className={styles.tiles}>
+          <Tile to={ADMIN_AUDIT_PATH} icon={ScrollText} label={t('admin.audit.title')} hint={t('admin.audit.tileHint')} />
         </div>
       )}
 
