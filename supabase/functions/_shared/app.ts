@@ -1,16 +1,17 @@
 // Where the app lives, for links in emails and SMS.
 //
 // APP_URL (optional Edge Function secret) is the published app; until launch (T19) that is the
-// Netlify site, afterwards https://service-hub.ro. A link may also point to the address the
-// request came from (a deploy preview), but only when that address is one of ours — an email
-// from service-hub.ro must never carry a link somewhere else.
+// Netlify site (service-hubapp.netlify.app), afterwards https://service-hub.ro. A link may also
+// point to the address the request came from (a deploy preview), but only when that address is
+// one of ours — an email from service-hub.ro must never carry a link somewhere else.
 
-export const DEFAULT_APP_URL = 'https://service-hub-app.netlify.app';
+export const DEFAULT_APP_URL = 'https://service-hubapp.netlify.app';
 
 const OWN_ORIGINS = [
   /^https:\/\/(www\.)?service-hub\.ro$/,
-  // The Netlify site and its deploy previews (deploy-preview-12--service-hub-app.netlify.app).
-  /^https:\/\/([a-z0-9-]+--)?service-hub-app\.netlify\.app$/,
+  // The Netlify site and its deploy previews (deploy-preview-12--service-hubapp.netlify.app). The
+  // site is named `service-hubapp`; `service-hub-app`, the name first planned, is accepted too.
+  /^https:\/\/([a-z0-9-]+--)?service-(hubapp|hub-app)\.netlify\.app$/,
   // Local development and the browser tests.
   /^http:\/\/(localhost|127\.0\.0\.1):\d{2,5}$/,
 ];

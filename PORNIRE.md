@@ -69,7 +69,7 @@ Claude lucrează singur (de obicei între 20 de minute și o oră), apoi deschid
 2. Setările de build le lași cum le propune (le citește din fișierul făcut de Claude).
 3. La **Environment variables** adaugi aceleași două valori ca la pasul 3.5: `VITE_SUPABASE_URL` și `VITE_SUPABASE_ANON_KEY`.
 4. **Deploy**.
-5. **Site configuration → Change site name** → `service-hub-app`. Aplicația va fi la `service-hub-app.netlify.app`.
+5. **Site configuration → Change site name** → `service-hubapp`. Aplicația va fi la `service-hubapp.netlify.app`.
 
 Pagina „în curând” de pe service-hub.ro rămâne neatinsă până la lansare (T19).
 

@@ -490,3 +490,7 @@ verify_jwt = false
 
 [functions.report-download]
 verify_jwt = false
+
+# The wordmark image in emails: fetched by email programs, no sign-in.
+[functions.email-logo]
+verify_jwt = false

@@ -150,7 +150,7 @@ jobs:
             "https://api.supabase.com/v1/projects/${SUPABASE_PROJECT_REF}/config/auth" \
             -H "Authorization: Bearer ${SUPABASE_ACCESS_TOKEN}" \
             -H 'Content-Type: application/json' \
-            --data '{"site_url":"https://service-hub-app.netlify.app","uri_allow_list":"https://*--service-hub-app.netlify.app/**,http://localhost:5173/**,http://localhost:4173/**"}')
+            --data '{"site_url":"https://service-hubapp.netlify.app","uri_allow_list":"https://*--service-hubapp.netlify.app/**,https://*--service-hub-app.netlify.app/**,http://localhost:5173/**,http://localhost:4173/**"}')
           if [ "$status" = "200" ]; then
             echo "Deploy-preview addresses allowed."
           else
