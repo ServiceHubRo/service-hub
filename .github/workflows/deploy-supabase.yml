@@ -1,19 +1,31 @@
 name: Deploy Supabase
 
-# Applies new database migrations and publishes Edge Functions to the Supabase project, so every
-# deploy preview has the database it needs (ARCHITECTURE §18). Until T19 there is one project;
-# T19 sends pull requests to a separate test project.
+# Applies new database migrations and publishes Edge Functions, so every deploy preview has the
+# database it needs (ARCHITECTURE §18). Two projects since T19:
+#   pull requests → the TEST project (what the deploy previews use)
+#   main          → the REAL project (the published site)
+# Until the test project's two secrets exist, pull requests still go to the real project, as
+# before (with a warning). docs/LANSARE.md has the steps.
 #
 # Secrets (GitHub → Settings → Secrets and variables → Actions), see PORNIRE.md step 6:
-#   SUPABASE_ACCESS_TOKEN  personal access token (supabase.com/dashboard/account/tokens)
-#   SUPABASE_PROJECT_REF   the `abcdefgh` part of https://abcdefgh.supabase.co
-#   SUPABASE_DB_PASSWORD   the database password chosen when the project was created
+#   SUPABASE_ACCESS_TOKEN        personal access token (supabase.com/dashboard/account/tokens)
+#   SUPABASE_PROJECT_REF         the real project: the `abcdefgh` part of https://abcdefgh.supabase.co
+#   SUPABASE_DB_PASSWORD         the real project's database password
+#   SUPABASE_TEST_PROJECT_REF    the test project's ref (T19)
+#   SUPABASE_TEST_DB_PASSWORD    the test project's database password (T19)
+#   SENTRY_DSN                   optional (T19): the Edge Functions report their errors to Sentry
 
 on:
   pull_request:
   push:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      target:
+        description: 'Which project: real (the published site) or test (the deploy previews)'
+        type: choice
+        options: [real, test]
+        default: real
 
 # One deploy at a time against the project, and never cancel one halfway through a migration.
 concurrency:
@@ -27,21 +39,57 @@ jobs:
     timeout-minutes: 15
     env:
       SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-      SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
-      SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+      REAL_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+      REAL_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+      TEST_PROJECT_REF: ${{ secrets.SUPABASE_TEST_PROJECT_REF }}
+      TEST_DB_PASSWORD: ${{ secrets.SUPABASE_TEST_DB_PASSWORD }}
+      SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+      WANTED: ${{ github.event_name == 'pull_request' && 'test' || inputs.target || 'real' }}
+      # The commit the deploy preview is built from (Netlify's COMMIT_REF), for error reports.
+      RELEASE: ${{ github.event.pull_request.head.sha || github.sha }}
     steps:
       - uses: actions/checkout@v4
 
       - name: Check the secrets are set
         run: |
           missing=""
-          for name in SUPABASE_ACCESS_TOKEN SUPABASE_PROJECT_REF SUPABASE_DB_PASSWORD; do
+          for name in SUPABASE_ACCESS_TOKEN REAL_PROJECT_REF REAL_DB_PASSWORD; do
             if [ -z "${!name}" ]; then missing="$missing $name"; fi
           done
           if [ -n "$missing" ]; then
+            missing=$(echo "$missing" | sed 's/REAL_PROJECT_REF/SUPABASE_PROJECT_REF/; s/REAL_DB_PASSWORD/SUPABASE_DB_PASSWORD/')
             echo "::error title=Lipsesc secrete::Adaugă în GitHub → Settings → Secrets and variables → Actions:$missing (PORNIRE.md, pasul 6)."
             exit 1
           fi
+
+      # Pull requests go to the test project once it exists (T19); main always to the real one.
+      # A half-configured test project stops here instead of falling back to the real one.
+      - name: Choose the project
+        run: |
+          if [ "$WANTED" = "test" ] && [ -n "$TEST_PROJECT_REF" ] && [ -n "$TEST_DB_PASSWORD" ]; then
+            target=test; ref=$TEST_PROJECT_REF; password=$TEST_DB_PASSWORD
+          elif [ "$WANTED" = "test" ] && { [ -n "$TEST_PROJECT_REF" ] || [ -n "$TEST_DB_PASSWORD" ]; }; then
+            echo "::error title=Proiectul de test::Lipsește unul din secretele SUPABASE_TEST_PROJECT_REF / SUPABASE_TEST_DB_PASSWORD. Pune-le pe amândouă (docs/LANSARE.md, partea 2)."
+            exit 1
+          else
+            if [ "$WANTED" = "test" ]; then
+              echo "::warning title=Mediul de test::Nu există încă proiectul de test, așa că linkul de test folosește proiectul real, ca până acum (docs/LANSARE.md, partea 2)."
+            fi
+            target=real; ref=$REAL_PROJECT_REF; password=$REAL_DB_PASSWORD
+          fi
+          if [ "$target" = "test" ] && [ "$TEST_PROJECT_REF" = "$REAL_PROJECT_REF" ]; then
+            echo "::error title=Proiectul de test::SUPABASE_TEST_PROJECT_REF este chiar proiectul real. Proiectul de test trebuie să fie altul (docs/LANSARE.md, partea 2)."
+            exit 1
+          fi
+          {
+            echo "TARGET=$target"
+            echo "SUPABASE_PROJECT_REF=$ref"
+            echo "SUPABASE_DB_PASSWORD=$password"
+            echo "SENTRY_ENVIRONMENT=$([ "$target" = "test" ] && echo test || echo production)"
+          } >> "$GITHUB_ENV"
+          if [ "$target" = "test" ]; then label="proiectul de test"; else label="proiectul real"; fi
+          echo "Deploy Supabase → $label" >> "$GITHUB_STEP_SUMMARY"
+          echo "Deploying to the $target project."
 
       - uses: supabase/setup-cli@v1
         with:
@@ -57,6 +105,17 @@ jobs:
 
       - name: Show applied migrations
         run: supabase migration list --password "$SUPABASE_DB_PASSWORD"
+
+      # Error reports (T19): the Edge Functions send their failures to Sentry, named after the
+      # project (production / test) and the commit. Without the SENTRY_DSN secret, nothing.
+      - name: Error reports for the Edge Functions
+        run: |
+          if [ -z "$SENTRY_DSN" ]; then
+            echo "No SENTRY_DSN secret: the Edge Functions keep their errors in the function logs only."
+            exit 0
+          fi
+          supabase secrets set --project-ref "$SUPABASE_PROJECT_REF" \
+            "SENTRY_DSN=$SENTRY_DSN" "SENTRY_ENVIRONMENT=$SENTRY_ENVIRONMENT" "SENTRY_RELEASE=$RELEASE"
 
       - name: Deploy Edge Functions
         run: |
@@ -80,6 +139,23 @@ jobs:
             sleep 10
           done
           echo "::warning title=Notificări::dispatch-notifications nu a răspuns. Pornește singur la prima activare a notificărilor din aplicație."
+
+      # The test project (T19) sends its email links to whichever deploy preview asked for them
+      # (the app passes its own address): every preview of the Netlify site is allowed. The real
+      # project's addresses stay as set in the dashboard.
+      - name: Allow the deploy previews in Auth (test project)
+        if: env.TARGET == 'test'
+        run: |
+          status=$(curl -sS -o "$RUNNER_TEMP/url-answer.txt" -w '%{http_code}' -X PATCH \
+            "https://api.supabase.com/v1/projects/${SUPABASE_PROJECT_REF}/config/auth" \
+            -H "Authorization: Bearer ${SUPABASE_ACCESS_TOKEN}" \
+            -H 'Content-Type: application/json' \
+            --data '{"site_url":"https://service-hub-app.netlify.app","uri_allow_list":"https://*--service-hub-app.netlify.app/**,http://localhost:5173/**,http://localhost:4173/**"}')
+          if [ "$status" = "200" ]; then
+            echo "Deploy-preview addresses allowed."
+          else
+            echo "::warning title=Adresele de test::Supabase a răspuns $status: $(head -c 300 "$RUNNER_TEMP/url-answer.txt"). Pune-le de mână: docs/LANSARE.md, partea 2."
+          fi
 
       # Auth emails (T13): the Service-Hub templates for confirmation, password reset and email
       # change (supabase/templates, RO/EN by the account language), installed through the

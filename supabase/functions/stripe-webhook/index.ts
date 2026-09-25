@@ -39,6 +39,7 @@ import {
   verifyStripeSignature,
   type StripeApi,
 } from '../_shared/stripe.ts';
+import { reportError } from '../_shared/monitor.ts';
 
 type Api = ReturnType<typeof adminApi>;
 type Obj = Record<string, unknown>;
@@ -170,7 +171,7 @@ Deno.serve(async (req) => {
     await api.rpc('stripe_event_done', { p_id: event.id });
     return json({ received: true });
   } catch (e) {
-    console.error('stripe-webhook failed', event.type, e instanceof Error ? e.message : e);
+    await reportError('stripe-webhook', e, { tags: { event_type: event.type } });
     return json({ error: 'server_error' }, 500);
   }
 });

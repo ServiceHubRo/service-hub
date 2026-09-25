@@ -9,6 +9,7 @@ import { AdminError, adminApi } from '../_shared/admin.ts';
 import { bearerToken, corsHeaders, json } from '../_shared/http.ts';
 import { reportFileName } from '../_shared/report.ts';
 import { REPORTS_BUCKET } from '../_shared/reportGenerate.ts';
+import { reportError } from '../_shared/monitor.ts';
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -48,7 +49,7 @@ Deno.serve(async (req) => {
       },
     });
   } catch (e) {
-    console.error('report-download failed', e instanceof Error ? e.message : e);
+    await reportError('report-download', e);
     return json({ error: 'unknown' }, 500);
   }
 });

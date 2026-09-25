@@ -13,3 +13,10 @@
   flex-direction: column;
   gap: 12px;
 }
+
+/* Inside the shell, under the header: the menu stays usable. */
+.inline {
+  display: flex;
+  justify-content: center;
+  padding: 24px 0;
+}

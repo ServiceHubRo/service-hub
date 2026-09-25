@@ -1,5 +1,5 @@
 import { defineConfig, devices } from '@playwright/test';
-import { PORT, PUBLISHED_PORT } from './tests/e2e/ports';
+import { PORT, PUBLISHED_PORT, SENTRY_TEST_DSN } from './tests/e2e/ports';
 
 export default defineConfig({
   testDir: 'tests/e2e',
@@ -21,14 +21,15 @@ export default defineConfig({
   ],
   webServer: [
     {
-      command: `npm run build && npx vite preview --port ${PORT} --strictPort`,
+      // Error reports go to the Sentry stand-in (tests/e2e/providers.ts, T19).
+      command: `VITE_SENTRY_DSN=${SENTRY_TEST_DSN} npm run build && npx vite preview --port ${PORT} --strictPort`,
       port: PORT,
       reuseExistingServer: !process.env.CI,
       timeout: 120_000,
     },
     {
       // The same app built exactly like the published site (Netlify CONTEXT=production).
-      command: `CONTEXT=production npx vite build --outDir dist-published && npx vite preview --outDir dist-published --port ${PUBLISHED_PORT} --strictPort`,
+      command: `CONTEXT=production VITE_SENTRY_DSN=${SENTRY_TEST_DSN} npx vite build --outDir dist-published && npx vite preview --outDir dist-published --port ${PUBLISHED_PORT} --strictPort`,
       port: PUBLISHED_PORT,
       reuseExistingServer: !process.env.CI,
       timeout: 120_000,

@@ -8,6 +8,7 @@ import { linkBase } from '../_shared/app.ts';
 import { appUrlFromEnv, stripeConfigFromEnv } from '../_shared/env.ts';
 import { bearerToken, corsHeaders, json } from '../_shared/http.ts';
 import { stripeApi, stripeLocale } from '../_shared/stripe.ts';
+import { reportError } from '../_shared/monitor.ts';
 
 const KNOWN_CODES = new Set(['not_allowed', 'account_suspended']);
 
@@ -40,7 +41,7 @@ Deno.serve(async (req) => {
     if (typeof session.url !== 'string') throw new Error('portal session without url');
     return json({ url: session.url });
   } catch (e) {
-    console.error('stripe-portal failed', e instanceof Error ? e.message : e);
+    await reportError('stripe-portal', e);
     return json({ error: 'unknown' }, 500);
   }
 });

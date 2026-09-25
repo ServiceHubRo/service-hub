@@ -7,6 +7,7 @@ import { onSessionLost } from '../data/sessionEvents';
 import { supabase } from '../data/supabase';
 import { useI18n } from '../i18n/context';
 import type { Lang } from '../i18n/translate';
+import { setMonitoringUser } from '../lib/monitoring';
 import { inactiveTooLong, markSeen, rememberMe } from '../lib/remember';
 import type { Role } from './roles';
 import { SessionContext, type SessionStatus, type SessionValue } from './sessionContext';
@@ -158,6 +159,13 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     },
     [setLang, setState],
   );
+
+  // Error reports carry who hit them as an id and a role only (T19).
+  const reportedId = state.profile?.id ?? null;
+  const reportedRole = state.profile?.role ?? null;
+  useEffect(() => {
+    setMonitoringUser(reportedId ? { id: reportedId, role: reportedRole ?? undefined } : null);
+  }, [reportedId, reportedRole]);
 
   const value = useMemo<SessionValue>(
     () => ({

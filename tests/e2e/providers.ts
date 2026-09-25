@@ -28,7 +28,22 @@ export interface SentSms {
   body: string;
 }
 
-type Sent = SentEmail | SentSms;
+/** An error report that reached the Sentry stand-in (T19). */
+export interface SentReport {
+  kind: 'sentry';
+  /** The envelope's event (see supabase/functions/_shared/sentry.ts). */
+  event: {
+    level: string;
+    environment: string;
+    tags: Record<string, string>;
+    user?: { id: string; role?: string };
+    request?: { url?: string };
+    exception: { values: { type: string; value: string }[] };
+  };
+}
+
+type Sent = SentEmail | SentSms | SentReport;
+
 
 export function startProviders(): Promise<() => Promise<void>> {
   const log: Sent[] = [];
@@ -50,6 +65,14 @@ export function startProviders(): Promise<() => Promise<void>> {
       };
       const url = req.url ?? '';
       if (req.method === 'GET' && url === '/_log') return reply(200, log);
+      if (url.startsWith('/sentry/api/1/envelope/')) {
+        // The browser sends from another origin, as plain text (no preflight).
+        res.setHeader('Access-Control-Allow-Origin', '*');
+        if (req.method !== 'POST') return reply(204, {});
+        const [, item, event] = body.split('\n');
+        if (JSON.parse(item ?? '{}').type === 'event') log.push({ kind: 'sentry', event: JSON.parse(event ?? '{}') });
+        return reply(200, {});
+      }
       if (req.method === 'POST' && url === '/resend/emails') {
         if (req.headers.authorization !== 'Bearer local-test-key') return reply(401, { message: 'bad key' });
         const m = JSON.parse(body) as { to: string[]; subject: string; html: string; text: string; reply_to?: string };
@@ -103,6 +126,11 @@ export async function nextSms(to: string, after = 0): Promise<SentSms> {
   await expect.poll(async () => (await smsTo(to)).length, { timeout: 20_000 }).toBeGreaterThan(after);
   const list = await smsTo(to);
   return list[list.length - 1]!;
+}
+
+/** Error reports received so far (T19). */
+export async function sentryReports(): Promise<SentReport['event'][]> {
+  return (await readLog()).filter((m): m is SentReport => m.kind === 'sentry').map((m) => m.event);
 }
 
 // ------------------------------------------------------------------------------------ Stripe (T14)
@@ -295,6 +323,8 @@ function stripeStandIn() {
             return reply(200, sub);
           }
           if (req.method === 'POST' && path === '/v1/billing_portal/sessions') {
+            // Stripe down for this customer (T19: the function's failure reaches Sentry).
+            if (String(body.customer).startsWith('cus_down_')) return reply(500, { error: { message: 'stand-in: Stripe is down' } });
             const back = encodeURIComponent(String(body.return_url));
             return reply(200, { id: id('bps'), url: `${PAGES}/portal/${String(body.customer)}?return=${back}` });
           }
