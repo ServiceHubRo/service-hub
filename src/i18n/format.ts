@@ -75,6 +75,12 @@ export function formatDayMonth(lang: Lang, value: Date | string, now: Date = new
   return year ? `${p.month} ${p.day}, ${year}` : `${p.month} ${p.day}`;
 }
 
+/** RO `aug 2026`, EN `Aug 2026`. */
+export function formatMonthYear(lang: Lang, ymd: string): string {
+  const p = parts(lang, dateFromYmd(ymd), { month: 'short', year: 'numeric' });
+  return `${(p.month ?? '').replace(/\.$/, '')} ${p.year}`;
+}
+
 /** A closed period: `20 oct – 22 oct`, or one day `20 oct`. */
 export function formatDateRange(lang: Lang, start: string, end: string, now: Date = new Date()): string {
   return start === end ? formatDayMonth(lang, start, now) : `${formatDayMonth(lang, start, now)} – ${formatDayMonth(lang, end, now)}`;

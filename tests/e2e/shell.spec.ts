@@ -40,6 +40,20 @@ async function navLabels(page: Page): Promise<string[]> {
   );
 }
 
+// On an iPhone the app from the Home Screen draws under the status bar (viewport-fit=cover): the
+// language switch of the public pages must stay below the clock and battery, where it can be tapped.
+test('public pages keep the language switch below the iPhone status bar', async ({ page }) => {
+  const cdp = await page.context().newCDPSession(page);
+  await cdp.send('Emulation.setSafeAreaInsetsOverride' as never, { insets: { top: 59, bottom: 34, left: 0, right: 0 } } as never);
+  for (const path of ['/', '/intra', '/verifica', '/legal/termeni']) {
+    await page.goto(path);
+    const ro = page.getByRole('button', { name: /^(RO|Română)$/ }).filter({ visible: true }).first();
+    await expect(ro).toBeVisible();
+    const box = (await ro.boundingBox())!;
+    expect(box.y, path).toBeGreaterThanOrEqual(59);
+  }
+});
+
 test('landing shows the logo and "În curând" without wrapping the wordmark', async ({ page }) => {
   await page.goto('/');
   const wordmark = page.getByRole('img', { name: 'Service-Hub' });

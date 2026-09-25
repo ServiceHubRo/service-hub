@@ -24,6 +24,9 @@ import { ComponentGallery } from '../screens/dev/ComponentGallery';
 import { AccountLegal, PublicLegal } from '../screens/legal/LegalPages';
 import { Placeholder } from '../screens/Placeholder';
 import { Landing } from '../screens/public/Landing';
+import { VerifyScreen } from '../screens/public/VerifyScreen';
+import { MyReportsScreen } from '../screens/client/report/MyReportsScreen';
+import { ReportPreviewScreen } from '../screens/client/report/ReportPreviewScreen';
 import { Dashboard } from '../screens/shop/dashboard/Dashboard';
 import { BillingSettings } from '../screens/shop/settings/BillingSettings';
 import { HoursSettings } from '../screens/shop/settings/HoursSettings';
@@ -90,6 +93,9 @@ function extraRoutes(role: Role) {
         <Route path="/c/programari/:bookingId/istoric" element={<VehicleHistoryScreen />} />
         <Route path="/c/cont/favorite" element={<FavoritesScreen />} />
         <Route path="/c/cont/istoric" element={<VehiclePickScreen />} />
+        <Route path="/c/garaj/:carId/raport" element={<ReportPreviewScreen />} />
+        <Route path="/c/programari/:bookingId/raport" element={<ReportPreviewScreen />} />
+        <Route path="/c/cont/rapoarte" element={<MyReportsScreen />} />
         {messageRoutes('client')}
       </>
     );
@@ -171,6 +177,7 @@ export function App() {
               <Route path="/parola-noua" element={<NewPassword />} />
               <Route path="/invitatie/:token" element={<InviteScreen />} />
               <Route path="/legal/:doc" element={<PublicLegal />} />
+              <Route path="/verifica" element={<VerifyScreen />} />
               {IS_TEST_BUILD && <Route path="/dev/componente" element={<ComponentGallery />} />}
               {roleRoutes('client')}
               {roleRoutes('shop')}

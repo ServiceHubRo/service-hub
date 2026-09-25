@@ -1,0 +1,72 @@
+/* /verifica — public report check (T15). */
+.main {
+  gap: 14px;
+  max-width: 560px;
+}
+
+.muted {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.result {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.good {
+  border-color: var(--green);
+}
+
+.bad {
+  border-color: var(--red);
+}
+
+.verdict {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  font-size: 17px;
+}
+
+.good .verdict {
+  color: var(--green);
+}
+
+.bad .verdict {
+  color: var(--red);
+}
+
+.code {
+  color: var(--amber);
+  font-weight: 700;
+}
+
+.facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 14px;
+}
+
+.facts dt {
+  color: var(--muted);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.facts dd {
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}

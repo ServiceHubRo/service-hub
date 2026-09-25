@@ -13,7 +13,7 @@
   align-items: center;
   gap: 9px;
   padding: 8px 12px 8px 16px;
-  padding-top: max(8px, env(safe-area-inset-top));
+  padding-top: max(8px, calc(env(safe-area-inset-top) + 4px));
   background: var(--surface);
   border-bottom: 1px solid var(--border);
 }

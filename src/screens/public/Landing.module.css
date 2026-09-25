@@ -5,6 +5,12 @@
   display: flex;
   flex-direction: column;
   padding: 16px var(--page-pad) 32px;
+  /* On an iPhone (the app on the Home Screen draws under the status bar, viewport-fit=cover) the
+     language switch must sit below the clock and battery, and nothing under the home bar. */
+  padding-top: max(16px, calc(env(safe-area-inset-top) + 8px));
+  padding-bottom: max(32px, calc(env(safe-area-inset-bottom) + 16px));
+  padding-left: max(var(--page-pad), env(safe-area-inset-left));
+  padding-right: max(var(--page-pad), env(safe-area-inset-right));
 }
 
 .top {

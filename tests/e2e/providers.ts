@@ -255,15 +255,33 @@ function stripeStandIn() {
           const s = sessions.get(m[1]!);
           if (!s) return reply(404, {});
           const lei = Number(s.amount) / 100;
+          const what = s.mode === 'payment' ? `Plată unică: ${lei} lei` : `Abonament: ${lei} lei / lună`;
           return page(
             res,
             'Stripe test checkout',
-            `<p>Abonament: ${lei} lei / lună</p><form method="post" action="${PAGES}/pay/${s.id}/complete"><button type="submit">Plătește</button></form><a href="${String(s.cancel_url)}">Înapoi</a>`,
+            `<p>${what}</p><form method="post" action="${PAGES}/pay/${s.id}/complete"><button type="submit">Plătește</button></form><a href="${String(s.cancel_url)}">Înapoi</a>`,
           );
         }
         if (req.method === 'POST' && (m = /^\/pay\/([^/]+)\/complete$/.exec(path))) {
           const s = sessions.get(m[1]!);
           if (!s) return reply(404, {});
+          if (s.mode === 'payment') {
+            // A one-off payment (the history report, T15): paid at once, announced by the webhook.
+            try {
+              await send('checkout.session.completed', {
+                ...s,
+                status: 'complete',
+                payment_status: 'paid',
+                amount_total: Number(s.amount),
+                currency: 'ron',
+                created: now(),
+                payment_intent: id('pi'),
+              });
+            } catch (e) {
+              return reply(500, { error: String(e) });
+            }
+            return redirect(String(s.success_url));
+          }
           const data = (s.subscription_data ?? {}) as Obj;
           const trialEnd = data.trial_end ? Number(data.trial_end) : null;
           const sub: Obj = {
