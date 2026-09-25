@@ -66,25 +66,6 @@ jobs:
             echo "No Edge Functions yet."
           fi
 
-      # Auth emails (T13): the Service-Hub templates for confirmation, password reset and email
-      # change (supabase/templates, RO/EN by the account language), installed through the
-      # Management API with the same access token. Sending them again changes nothing. The SMTP
-      # server (Resend) is set once in the dashboard: it needs the Resend key, which only
-      # Supabase holds.
-      - name: Install the Auth email templates
-        run: |
-          node scripts/auth-email-config.mjs > "$RUNNER_TEMP/auth.json"
-          status=$(curl -sS -o "$RUNNER_TEMP/auth-answer.txt" -w '%{http_code}' -X PATCH \
-            "https://api.supabase.com/v1/projects/${SUPABASE_PROJECT_REF}/config/auth" \
-            -H "Authorization: Bearer ${SUPABASE_ACCESS_TOKEN}" \
-            -H 'Content-Type: application/json' \
-            --data @"$RUNNER_TEMP/auth.json")
-          if [ "$status" != "200" ]; then
-            echo "::error title=Șabloanele de email::Supabase a răspuns $status: $(head -c 300 "$RUNNER_TEMP/auth-answer.txt")"
-            exit 1
-          fi
-          echo "Auth email templates installed."
-
       # Push notifications (T12): on its first call the dispatcher makes its VAPID keys and stores
       # its own address, so the database can wake it after every new notification. Repeating it
       # changes nothing. If it does not answer, the app's first "Activează" does the same.
@@ -99,3 +80,27 @@ jobs:
             sleep 10
           done
           echo "::warning title=Notificări::dispatch-notifications nu a răspuns. Pornește singur la prima activare a notificărilor din aplicație."
+
+      # Auth emails (T13): the Service-Hub templates for confirmation, password reset and email
+      # change (supabase/templates, RO/EN by the account language), installed through the
+      # Management API with the same access token. Sending them again changes nothing. The SMTP
+      # server (Resend) is set once in the dashboard: it needs the Resend key, which only
+      # Supabase holds. Until it is set, Supabase refuses template changes on the free plan:
+      # that is a warning here (the rest of the deploy is done), and the next deploy installs them.
+      - name: Install the Auth email templates
+        run: |
+          node scripts/auth-email-config.mjs > "$RUNNER_TEMP/auth.json"
+          status=$(curl -sS -o "$RUNNER_TEMP/auth-answer.txt" -w '%{http_code}' -X PATCH \
+            "https://api.supabase.com/v1/projects/${SUPABASE_PROJECT_REF}/config/auth" \
+            -H "Authorization: Bearer ${SUPABASE_ACCESS_TOKEN}" \
+            -H 'Content-Type: application/json' \
+            --data @"$RUNNER_TEMP/auth.json")
+          answer=$(head -c 300 "$RUNNER_TEMP/auth-answer.txt")
+          if [ "$status" = "200" ]; then
+            echo "Auth email templates installed."
+          elif [ "$status" = "400" ] && echo "$answer" | grep -qi "custom SMTP"; then
+            echo "::warning title=Șabloanele de email::Nu sunt instalate încă: pune întâi SMTP-ul Resend în Supabase → Authentication → Emails → SMTP Settings (pașii din PR-ul T13), apoi rulează din nou acțiunea (Actions → Deploy Supabase → Re-run)."
+          else
+            echo "::error title=Șabloanele de email::Supabase a răspuns $status: $answer"
+            exit 1
+          fi
