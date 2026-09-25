@@ -18,7 +18,8 @@ const STEP_LINK: Record<Exclude<SetupStep, 'phone'>, string> = {
 /**
  * "Pune service-ul pe picioare" (P5d): four steps with "2 din 4". Shown until all four are done,
  * then never again (the database stamps setup_completed_at). Step 4 is done right here: the
- * owner asks for a code by SMS and types it (T13).
+ * owner asks for a code by SMS and types it (T13). The steps are the owner's: a colleague sees how
+ * far it is, without links, and who does it.
  */
 export function SetupChecklist({ setup, onPhoneVerified }: { setup: ShopSetup; onPhoneVerified: () => Promise<void> }) {
   const { t } = useI18n();
@@ -42,6 +43,7 @@ export function SetupChecklist({ setup, onPhoneVerified }: { setup: ShopSetup; o
       >
         <span style={{ width: `${(done / total) * 100}%` }} />
       </div>
+      {!setup.is_owner && <p className={styles.stepNote}>{t('dash.setup.staff')}</p>}
       <ol className={styles.steps}>
         {SETUP_STEPS.map((step) => {
           const ok = setup.steps[step];
@@ -81,11 +83,13 @@ export function SetupChecklist({ setup, onPhoneVerified }: { setup: ShopSetup; o
                     <ChevronRight size={18} className={styles.chevron} aria-hidden="true" />
                   </Link>
                 )
-              ) : (
+              ) : setup.is_owner ? (
                 <Link to={STEP_LINK[step]} className={styles.step}>
                   {content}
                   <ChevronRight size={18} className={styles.chevron} aria-hidden="true" />
                 </Link>
+              ) : (
+                <div className={styles.step}>{content}</div>
               )}
             </li>
           );

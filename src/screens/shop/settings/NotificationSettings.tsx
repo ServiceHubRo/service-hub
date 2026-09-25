@@ -12,11 +12,12 @@ import styles from './settings.module.css';
 
 /**
  * Notificări (P5b): push on this device (the same row as in Cont, T12), SMS on a new request
- * (sending starts in T13) and the daily summary (a push at opening time, T12).
+ * (sending starts in T13) and the daily summary (a push at opening time, T12). A colleague turns
+ * push on for their own phone; the shop's SMS and summary are the owner's.
  */
 export function NotificationSettings() {
   const { t } = useI18n();
-  const { shop, setShop } = useShopSettings();
+  const { shop, setShop, isOwner } = useShopSettings();
   const [sms, setSms] = useState(shop.sms_on_new_booking);
   const [digest, setDigest] = useState(shop.daily_digest);
 
@@ -33,26 +34,32 @@ export function NotificationSettings() {
       <h1>{t('settings.notifications')}</h1>
       <p className={styles.intro}>{t('notif.intro')}</p>
       <PushRow />
-      <Card className={styles.stack}>
-        <div>
-          <Checkbox checked={sms} onChange={(e) => setSms(e.target.checked)} aria-describedby="notif-sms-hint">
-            {t('notif.sms')}
-          </Checkbox>
-          <p id="notif-sms-hint" className={styles.hint}>
-            {t('notif.sms.hint')}
-          </p>
-        </div>
-        <div>
-          <Checkbox checked={digest} onChange={(e) => setDigest(e.target.checked)} aria-describedby="notif-digest-hint">
-            {t('notif.digest')}
-          </Checkbox>
-          <p id="notif-digest-hint" className={styles.hint}>
-            {t('notif.digest.hint')}
-          </p>
-        </div>
-      </Card>
-      <p className={styles.note}>{t('notif.soon')}</p>
-      <SaveButton onSave={save}>{t('notif.save')}</SaveButton>
+      {isOwner ? (
+        <>
+          <Card className={styles.stack}>
+            <div>
+              <Checkbox checked={sms} onChange={(e) => setSms(e.target.checked)} aria-describedby="notif-sms-hint">
+                {t('notif.sms')}
+              </Checkbox>
+              <p id="notif-sms-hint" className={styles.hint}>
+                {t('notif.sms.hint')}
+              </p>
+            </div>
+            <div>
+              <Checkbox checked={digest} onChange={(e) => setDigest(e.target.checked)} aria-describedby="notif-digest-hint">
+                {t('notif.digest')}
+              </Checkbox>
+              <p id="notif-digest-hint" className={styles.hint}>
+                {t('notif.digest.hint')}
+              </p>
+            </div>
+          </Card>
+          <p className={styles.note}>{t('notif.soon')}</p>
+          <SaveButton onSave={save}>{t('notif.save')}</SaveButton>
+        </>
+      ) : (
+        <p className={styles.note}>{t('settings.staff.notifications')}</p>
+      )}
     </div>
   );
 }

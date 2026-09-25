@@ -47,7 +47,10 @@ select test.eq(jsonb_array_length(public.get_availability(test.id('shop1'), curr
 select test.logout();
 update public.shops set slot_minutes = 60 where id = test.id('shop1');
 
--- Today's passed slots are never offered.
+-- Today's passed slots are never offered. (Today is opened for this check and put back after it:
+-- on a Saturday or Sunday it would otherwise open the weekend the tests below expect closed.)
+create temp table today_hours on commit drop as
+  select * from public.shop_hours where shop_id = test.id('shop1') and weekday = extract(dow from test.today())::int;
 update public.shop_hours set is_closed = false, open_time = '00:00', close_time = '23:59'
 where shop_id = test.id('shop1') and weekday = extract(dow from test.today())::int;
 select test.login(test.id('client_a'));
@@ -55,6 +58,8 @@ select test.eq(s->>'reason', 'past', 'today 00:00 is past'), test.eq(s->>'availa
 from jsonb_array_elements(public.get_availability(test.id('shop1'), test.today(), 1, test.today())->'slots') s
 where s->>'time' = '00:00';
 select test.logout();
+update public.shop_hours h set is_closed = t.is_closed, open_time = t.open_time, close_time = t.close_time
+from today_hours t where h.shop_id = t.shop_id and h.weekday = t.weekday;
 
 -- Minimum notice applies to clients; the shop itself sees its own grid.
 update public.shops set min_notice_hours = 168 where id = test.id('shop1');

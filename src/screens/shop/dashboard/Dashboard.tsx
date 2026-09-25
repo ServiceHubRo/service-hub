@@ -170,11 +170,10 @@ function SubscriptionBanner({ setup }: { setup: ShopSetup }) {
 /** "Service-ul tău nu apare încă în căutări." with every reason, in the order to fix them. */
 function HiddenBanner({ setup }: { setup: ShopSetup }) {
   const { t } = useI18n();
-  const link: Partial<Record<ShopSetup['reasons'][number], string>> = {
-    no_services: SETTINGS_LINKS.services,
-    no_open_days: SETTINGS_LINKS.hours,
-    ...(setup.is_owner ? { subscription_inactive: SUBSCRIPTION_PATH } : {}),
-  };
+  // The settings and the subscription are the owner's: a colleague reads the reasons, no links.
+  const link: Partial<Record<ShopSetup['reasons'][number], string>> = setup.is_owner
+    ? { no_services: SETTINGS_LINKS.services, no_open_days: SETTINGS_LINKS.hours, subscription_inactive: SUBSCRIPTION_PATH }
+    : {};
   return (
     <Banner tone="warning">
       <p className={styles.hiddenTitle}>{t('dash.hidden.title')}</p>

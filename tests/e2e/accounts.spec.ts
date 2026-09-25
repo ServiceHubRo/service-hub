@@ -76,12 +76,21 @@ test('sign-up refuses missing data with a specific message per field', async ({ 
   await page.getByLabel('Telefon').fill('0723 375 248');
   await page.getByLabel('Email').fill('ion@example.com');
   await page.getByLabel('Parolă', { exact: true }).fill('parolalunga1');
+  await page.getByLabel('Repetă parola').fill('parolalunga1');
   await expect(page.getByText('Parolă medie')).toBeVisible();
   await page.getByRole('checkbox').check();
   await page.getByRole('button', { name: 'Creează cont' }).click();
   await expect(page.getByText('Scrie orașul service-ului.')).toBeVisible();
   await expect(page.getByLabel('Oraș')).toBeFocused();
   await expect(page.getByText('Scrie numele.')).toHaveCount(0);
+
+  // The password typed twice must match.
+  await page.getByLabel('Oraș').fill('Codlea');
+  await page.getByLabel('Repetă parola').fill('parolalunga2');
+  await page.getByRole('button', { name: 'Creează cont' }).click();
+  await expect(page.getByText('Parolele nu sunt la fel.')).toBeVisible();
+  await expect(page.getByLabel('Repetă parola')).toBeFocused();
+  await shot(page, 'auth-signup-mismatch', name());
 });
 
 test('the terms open as a screen of their own and the form keeps what was typed', async ({ page }) => {
@@ -174,6 +183,7 @@ test.describe('with accounts', () => {
     await page.getByLabel('Telefon').fill('0723 375 248');
     await page.getByLabel('Email').fill(email);
     await page.getByLabel('Parolă', { exact: true }).fill(PASSWORD);
+    await page.getByLabel('Repetă parola').fill(PASSWORD);
     await page.getByRole('checkbox').check();
     await page.getByRole('button', { name: 'Creează cont' }).click();
 
@@ -214,6 +224,7 @@ test.describe('with accounts', () => {
     await page.getByLabel('Telefon').fill('0268 312 445');
     await page.getByLabel('Email').fill(email);
     await page.getByLabel('Parolă', { exact: true }).fill(PASSWORD);
+    await page.getByLabel('Repetă parola').fill(PASSWORD);
     await page.getByRole('checkbox').check();
     await page.getByRole('button', { name: 'Creează cont' }).click();
     await expect(page).toHaveURL(/\/confirma-email$/);
@@ -233,6 +244,7 @@ test.describe('with accounts', () => {
     await page.getByLabel('Telefon').fill('0723 375 248');
     await page.getByLabel('Email').fill(SEED.client);
     await page.getByLabel('Parolă', { exact: true }).fill(PASSWORD);
+    await page.getByLabel('Repetă parola').fill(PASSWORD);
     await page.getByRole('checkbox').check();
     await page.getByRole('button', { name: 'Creează cont' }).click();
     await expect(page.getByText('Există deja un cont cu acest email. Intră în cont sau resetează parola.')).toBeVisible();

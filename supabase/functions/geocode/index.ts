@@ -1,7 +1,7 @@
 // geocode — the shop's address → latitude/longitude, after "Salvează" in Setări → Profil public
 // (FR §4.6, ARCHITECTURE §11). Coordinates feed "Aproape de tine" in the client search.
 //
-// 1. Checks the caller's access token with the Auth server and finds the shop they work for (an
+// 1. Checks the caller's access token with the Auth server and finds the shop they own (an
 //    admin names the shop: { shop_id }, after editing its address — T16a).
 // 2. Reads the address from the database (never from the request) and asks OpenStreetMap
 //    Nominatim, most precise first: street + city + county + postal code, then without the postal
@@ -92,7 +92,8 @@ Deno.serve(async (req) => {
       shopId = asked;
     } else {
       const staff = await api.select(
-        `shop_staff?select=shop_id&user_id=eq.${encodeURIComponent(user.id)}&accepted_at=not.is.null`,
+        // The address is the owner's setting (after T19b): only the owner's save asks for the map.
+        `shop_staff?select=shop_id&user_id=eq.${encodeURIComponent(user.id)}&role=eq.owner&accepted_at=not.is.null`,
       );
       shopId = staff[0]?.shop_id;
     }

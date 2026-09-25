@@ -115,6 +115,14 @@ select test.fails(format($$select public.reply_review(%L, 'x', gen_random_uuid()
 select test.fails(format($$select public.report_review(%L, 'fake', gen_random_uuid())$$, current_setting('test.rv')), 'not_allowed', 'another shop cannot report');
 select test.logout();
 select test.login(test.id('staff1'));
+select test.fails(format($$select public.reply_review(%L, 'Coleg', gen_random_uuid())$$, current_setting('test.rv')), 'not_allowed',
+  'a colleague cannot reply (the shop''s public voice is the owner''s)');
+select test.fails(format($$select public.report_review(%L, 'fake', gen_random_uuid())$$, current_setting('test.rv')), 'not_allowed',
+  'nor report');
+select test.eq(test.count(format('select 1 from public.reviews where id = %L', current_setting('test.rv'))), 1::bigint,
+  'but reads the review');
+select test.logout();
+select test.login(test.id('owner1'));
 select public.reply_review(current_setting('test.rv')::uuid, '', gen_random_uuid());
 select test.logout();
 select test.eq(reply, null, 'empty reply removes it'), test.eq(reply_at, null, 'and its time')

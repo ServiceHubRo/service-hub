@@ -138,7 +138,18 @@ export function filterCatalog(categories: readonly CatalogCategory[], query: str
 
 /** The form's fields, by section, in the order shown. */
 export const SETTING_SECTIONS: readonly { key: string; fields: readonly SettingKey[] }[] = [
-  { key: 'prices', fields: ['subscription_price_ron', 'staff_seat_price_ron', 'report_price_ron', 'vat_rate_percent'] },
+  {
+    key: 'prices',
+    fields: [
+      'subscription_price_ron',
+      'launch_price_ron',
+      'launch_shops',
+      'staff_seat_price_ron',
+      'staff_free_seats',
+      'report_price_ron',
+      'vat_rate_percent',
+    ],
+  },
   { key: 'periods', fields: ['trial_days', 'quote_expiry_days'] },
   { key: 'ranking', fields: ['ranking_prior_avg', 'ranking_prior_weight'] },
   {
@@ -158,6 +169,7 @@ export const SETTING_SECTIONS: readonly { key: string; fields: readonly SettingK
 export const DECIMAL_SETTINGS: ReadonlySet<SettingKey> = new Set([
   'subscription_price_ron',
   'staff_seat_price_ron',
+  'launch_price_ron',
   'report_price_ron',
   'vat_rate_percent',
   'ranking_prior_avg',

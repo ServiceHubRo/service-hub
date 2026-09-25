@@ -201,8 +201,11 @@ test.describe('new shop', () => {
     await shot(page, 't17-reports-en-bottom', name());
   });
 
-  test('a staff member has no Rapoarte tile and the screen says it is the owner’s', async ({ page }) => {
-    const { shopId } = await createBookableShop(`Staff T17 ${Date.now()}`, ['frane']);
+  test('a staff member has no Rapoarte tile and the screen says it is the owner’s; Istoric without the takings', async ({ page, browser }) => {
+    const { email: shop, shopId } = await createBookableShop(`Staff T17 ${Date.now()}`, ['frane']);
+    const client = await createUser('client');
+    const [a] = await freeSlot(client, shopId, 1);
+    await job(shop, client, shopId, a!, true, 100000);
     const staff = await createUser('client', { name: 'Vlad Coleg' });
     const me = await userIdOf(staff);
     await serviceRest(`profiles?id=eq.${me}`, 'PATCH', { role: 'shop' });
@@ -218,5 +221,23 @@ test.describe('new shop', () => {
     await page.goto('/s/cont/rapoarte');
     await expect(page.getByText('Doar proprietarul service-ului vede rapoartele.')).toBeVisible();
     await shot(page, 't17-rapoarte-personal', name());
+
+    // Istoric: the job and its amount (a colleague writes the quotes), the count, no total, no CSV.
+    await page.goto('/s/istoric');
+    await expect(page.getByText('1 reparație', { exact: true })).toBeVisible();
+    await expect(page.getByText(/încasat/)).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Descarcă istoricul' })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Tipărește' })).toBeVisible();
+    await shot(page, 'staff-history', name());
+    // The owner sees the total and the CSV.
+    const context = await browser.newContext({ viewport: page.viewportSize()!, locale: 'ro-RO', timezoneId: 'Europe/Berlin' });
+    await context.addInitScript(() => localStorage.setItem('sh_lang', 'ro'));
+    const owner = await context.newPage();
+    await signIn(owner, shop, PASSWORD);
+    await expect(owner).toHaveURL(/\/s\/panou$/);
+    await owner.goto('/s/istoric');
+    await expect(owner.getByText(/^1 reparație · .+ încasat$/)).toBeVisible();
+    await expect(owner.getByRole('button', { name: 'Descarcă istoricul' })).toBeVisible();
+    await context.close();
   });
 });

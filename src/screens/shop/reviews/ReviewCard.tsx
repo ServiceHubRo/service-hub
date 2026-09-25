@@ -19,6 +19,7 @@ import { useI18n } from '../../../i18n/context';
 import { formatDayMonth } from '../../../i18n/format';
 import type { MessageKey } from '../../../i18n/ro';
 import styles from './reviews.module.css';
+import { useIsShopOwner } from '../shopRole';
 
 const REASONS: { value: ReportReason; label: MessageKey }[] = [
   { value: 'fake', label: 'reviews.reason.fake' },
@@ -41,10 +42,11 @@ export interface ReviewCardProps {
  * One review on the shop's Recenzii (P10): who, stars, date, text, the booking it is about; the
  * shop's public reply in a nested panel; "Răspunde" / "Editează răspunsul" and "Raportează" open
  * inside the card. A reported review keeps an amber border and "Raportată" until admin decides; it
- * stays public meanwhile.
+ * stays public meanwhile. Replying and reporting are the owner's; a colleague reads.
  */
 export function ReviewCard({ review: r, onChanged, onStale }: ReviewCardProps) {
   const { t, lang } = useI18n();
+  const isOwner = useIsShopOwner();
   const [panel, setPanel] = useState<'reply' | 'report' | null>(null);
   const [reply, setReply] = useState('');
   const [reason, setReason] = useState<ReportReason | null>(null);
@@ -101,7 +103,7 @@ export function ReviewCard({ review: r, onChanged, onStale }: ReviewCardProps) {
       {pending && <p className={styles.muted}>{justReported ? t('reviews.reportSent') : t('reviews.reportPending')}</p>}
       {r.report_status === 'kept' && <p className={styles.muted}>{t('reviews.reportKept')}</p>}
 
-      {panel === null && !removed && (
+      {panel === null && !removed && isOwner && (
         <div className={styles.actions}>
           <Button
             onClick={() => {

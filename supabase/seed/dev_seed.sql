@@ -59,8 +59,8 @@ begin
     case when v_car.id is null then '{}'::jsonb else jsonb_build_object(
       'make', v_car.make, 'model', v_car.model, 'year', v_car.year, 'plate', v_car.plate,
       'plate_norm', v_car.plate_norm, 'vin', v_car.vin) end,
-    current_date + p_day, p_slot, p_note, p_status,
-    least(now(), (current_date + p_day)::timestamptz - interval '3 days')
+    public.bucharest_today() + p_day, p_slot, p_note, p_status,
+    least(now(), (public.bucharest_today() + p_day)::timestamptz - interval '3 days')
   )
   returning id into v_id;
   return v_id;
@@ -168,7 +168,7 @@ begin
   update public.shop_hours set open_time = '09:00', close_time = '17:00' where shop_id = s4 and not is_closed;
 
   insert into public.shop_closures (shop_id, start_date, end_date, label)
-  values (s1, current_date + 20, current_date + 22, 'Concediu');
+  values (s1, public.bucharest_today() + 20, public.bucharest_today() + 22, 'Concediu');
 
   insert into public.shop_services (shop_id, service_id)
   select s1, unnest(array['ulei', 'frane', 'itp', 'diag', 'clima', 'distributie'])
@@ -185,10 +185,10 @@ begin
   -- The client's garage.
   insert into public.cars (owner_id, make, model, year, plate, vin, itp_expiry, rca_expiry, vignette_expiry)
   values (u_client, 'Volkswagen', 'Golf 7', 2016, 'BV 12 ABC', 'WVWZZZAUZGW123456',
-          current_date + 48, current_date + 12, current_date - 3)
+          public.bucharest_today() + 48, public.bucharest_today() + 12, public.bucharest_today() - 3)
   returning id into c_golf;
   insert into public.cars (owner_id, make, model, year, plate, itp_expiry, rca_expiry, vignette_expiry)
-  values (u_client, 'Dacia', 'Duster', 2020, 'BV 07 DAC', current_date + 200, current_date + 150, current_date + 90)
+  values (u_client, 'Dacia', 'Duster', 2020, 'BV 07 DAC', public.bucharest_today() + 200, public.bucharest_today() + 150, public.bucharest_today() + 90)
   returning id into c_duster;
 
   insert into public.favorites (client_id, shop_id) values (u_client, s1);
@@ -221,13 +221,13 @@ begin
 
   b := pg_temp.seed_booking(s2, u_client, c_golf, 'ulei', -40, '10:00', 'done');
   update public.bookings set work = 'Schimb ulei 5W30 + filtru ulei și aer', cost = 340, odometer = 105400,
-    done_at = (current_date - 40) + time '13:00' where id = b;
+    done_at = (public.bucharest_today() - 40) + time '13:00' where id = b;
   perform pg_temp.seed_quote(b, 'accepted', 50,
     '[{"name":"Ulei 5W30 5L","price":210,"ok":true},{"name":"Filtru ulei","price":45,"ok":true},{"name":"Manoperă","price":85,"ok":true}]');
 
   b := pg_temp.seed_booking(s1, u_client, c_golf, 'itp', -95, '14:00', 'done');
   update public.bookings set work = 'ITP efectuat, admis', cost = 150, odometer = 98200,
-    done_at = (current_date - 95) + time '15:00' where id = b;
+    done_at = (public.bucharest_today() - 95) + time '15:00' where id = b;
   perform pg_temp.seed_quote(b, 'accepted', 80, '[{"name":"ITP","price":150,"ok":true}]');
   insert into public.reviews (booking_id, shop_id, client_id, client_display_name, rating, text, reply, reply_at, created_at)
   values (b, s1, u_client, 'Andrei M.', 5, 'Prompt, deviz clar, fără surprize la plată.',
@@ -310,7 +310,7 @@ begin
       (array['ulei', 'frane', 'itp', 'diag', 'ulei', 'clima', 'distributie', 'frane', 'ulei'])[i % 9 + 1],
       -(38 + i * 10), (array['08:00', '10:00', '13:00', '15:00'])[i % 4 + 1]::time,
       case when i % 6 = 5 then 'quote_refused' else 'done' end);
-    v_at := ((current_date - (38 + i * 10)) + (array['08:00', '10:00', '13:00', '15:00'])[i % 4 + 1]::time) at time zone 'Europe/Bucharest';
+    v_at := ((public.bucharest_today() - (38 + i * 10)) + (array['08:00', '10:00', '13:00', '15:00'])[i % 4 + 1]::time) at time zone 'Europe/Bucharest';
     update public.bookings set
       car_snapshot = (array[
         '{"make":"Toyota","model":"Corolla","year":2019,"plate":"BV 55 CRD","plate_norm":"BV55CRD"}',
@@ -343,7 +343,7 @@ begin
   insert into public.threads (shop_id, client_id, client_name, last_message_at)
   values (s1, u_client, 'Andrei Marin', now() - interval '12 minutes') returning id into t;
   insert into public.messages (thread_id, kind, event, params, created_at) values
-    (t, 'system', 'booking_confirmed', jsonb_build_object('date', current_date + 1, 'slot', '09:00'), now() - interval '120 minutes'),
+    (t, 'system', 'booking_confirmed', jsonb_build_object('date', public.bucharest_today() + 1, 'slot', '09:00'), now() - interval '120 minutes'),
     (t, 'system', 'inspection_started', '{}', now() - interval '45 minutes'),
     (t, 'system', 'quote_sent', '{"total":850}', now() - interval '12 minutes');
 

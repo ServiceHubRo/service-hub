@@ -210,6 +210,11 @@ export interface PlatformSettings {
   subscription_price_ron: number;
   /** Price per colleague with an account, a month (paid staff seats). */
   staff_seat_price_ron: number;
+  /** Colleagues with an account included in the subscription (the first one). */
+  staff_free_seats: number;
+  /** Launch price for the first launch_shops shops (0 = no launch offer). */
+  launch_price_ron: number;
+  launch_shops: number;
   trial_days: number;
   quote_expiry_days: number;
   report_price_ron: number;

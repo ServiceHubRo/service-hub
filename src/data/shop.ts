@@ -64,6 +64,21 @@ export async function fetchOwnShop(): Promise<Shop | null> {
   return data;
 }
 
+/**
+ * The caller's place in the shop: 'owner' or 'staff' (a colleague), null without a shop. The
+ * owner alone changes the settings, answers reviews and sees the takings (enforced by RLS).
+ */
+export async function fetchMyShopRole(userId: string): Promise<'owner' | 'staff' | null> {
+  const { data, error } = await db()
+    .from('shop_staff')
+    .select('role')
+    .eq('user_id', userId)
+    .not('accepted_at', 'is', null)
+    .maybeSingle();
+  if (error) throw failure(error);
+  return data?.role === 'owner' || data?.role === 'staff' ? data.role : null;
+}
+
 export async function updateShop(shopId: string, fields: ShopUpdate): Promise<Shop> {
   const { data, error } = await db().from('shops').update(fields).eq('id', shopId).select('*').single();
   if (error) throw failure(error);

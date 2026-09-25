@@ -1,28 +1,29 @@
--- Paid staff accounts: a colleague with an account in the shop adds the price per colleague to the
--- subscription (an invitation costs nothing); while Stripe runs the subscription, a change of
--- seats asks for the Stripe quantity to be set, once.
+-- Paid staff accounts: the first colleague with an account is included; each one after it adds the
+-- price per colleague to the subscription (an invitation costs nothing); while Stripe runs the
+-- subscription, a change of paid seats asks for the Stripe quantity to be set, once.
 begin;
 select test.make_world();
 
 -- ------------------------------------------------------------------ counting
-select test.eq(seats, 1, 'shop1: its colleague with an account counts'),
-       test.eq(seat_price_ron, 20.00::numeric(10,2), 'at 20 lei'),
-       test.eq(public.subscription_monthly_ron(sub), 120.00::numeric, '100 + 1 × 20 = 120 lei a month')
+select test.eq(seats, 0, 'shop1: its only colleague is included'),
+       test.eq(free_seats, 1, 'one colleague included'),
+       test.eq(seat_price_ron, 20.00::numeric(10,2), 'the others at 20 lei'),
+       test.eq(public.subscription_monthly_ron(sub), 100.00::numeric, '100 lei a month, the colleague included')
 from public.subscriptions sub where shop_id = test.id('shop1');
 select test.eq(seats, 0, 'shop2: no colleagues') from public.subscriptions where shop_id = test.id('shop2');
 
 -- An invitation not yet accepted costs nothing.
 insert into public.shop_staff (shop_id, invited_email, role, invite_token_hash)
 values (test.id('shop1'), 'nou@test.local', 'staff', 'hash-nou');
-select test.eq(seats, 1, 'a pending invitation is not paid') from public.subscriptions where shop_id = test.id('shop1');
+select test.eq(seats, 0, 'a pending invitation is not paid') from public.subscriptions where shop_id = test.id('shop1');
 
--- A second colleague joins: 140 lei.
+-- A second colleague joins: 120 lei.
 select set_config('test.staff2', test.sign_up('coleg2@test.local', '{"role":"client","name":"Coleg Doi"}')::text, true);
 update public.profiles set role = 'shop' where id = current_setting('test.staff2')::uuid;
 update public.shop_staff set user_id = current_setting('test.staff2')::uuid, accepted_at = now()
 where invited_email = 'nou@test.local';
-select test.eq(seats, 2, 'the colleague counts once the account joined'),
-       test.eq(public.subscription_monthly_ron(sub), 140.00::numeric, '100 + 2 × 20 = 140 lei')
+select test.eq(seats, 1, 'the second colleague pays once the account joined'),
+       test.eq(public.subscription_monthly_ron(sub), 120.00::numeric, '100 + 1 × 20 = 120 lei')
 from public.subscriptions sub where shop_id = test.id('shop1');
 
 -- The trial is not in Stripe: no request to Stripe.
@@ -34,17 +35,17 @@ update public.subscriptions set stripe_subscription_id = 'sub_test', stripe_cust
        stripe_status = 'active', status = 'active'
 where shop_id = test.id('shop1');
 
--- The owner removes a colleague: 120 lei, and Stripe is asked (once) to change the quantity.
+-- The owner removes a colleague: 100 lei, and Stripe is asked (once) to change the quantity.
 select test.login(test.id('owner1'));
 delete from public.shop_staff where user_id = current_setting('test.staff2')::uuid;
 select test.logout();
-select test.eq(seats, 1, 'removed: one colleague left') from public.subscriptions where shop_id = test.id('shop1');
+select test.eq(seats, 0, 'removed: the one left is included') from public.subscriptions where shop_id = test.id('shop1');
 select test.eq(count(*), 1::bigint, 'one request to set the Stripe quantity, to the owner, on the stripe channel')
 from public.notification_events
 where event = 'seats_changed' and user_id = test.id('owner1') and channels = array['stripe']
   and params->>'shop_id' = test.id('shop1')::text;
 
--- Another change while that request waits: still one request (it reads the count when it runs).
+-- The included colleague leaves too: nothing changes in what is paid, no new request.
 delete from public.shop_staff where user_id = test.id('staff1');
 select test.eq(seats, 0, 'no colleagues left') from public.subscriptions where shop_id = test.id('shop1');
 select test.eq(count(*), 1::bigint, 'still one waiting request')
@@ -82,21 +83,35 @@ select test.eq((select (x->>'monthly_ron')::numeric from jsonb_array_elements(pu
                 where x->>'shop_id' = test.id('shop2')::text), 100::numeric, 'the admin list shows the monthly total');
 select test.logout();
 
+-- The included colleagues are a setting too (whole number, 0–10), for shops signing up afterwards.
+select test.login(test.id('admin'));
+select test.eq(test.error_params($$select public.admin_update_settings('{"staff_free_seats":1.5}', test.rid())$$)->>'field',
+               'staff_free_seats', 'a fraction is refused');
+select test.eq(test.error_params($$select public.admin_update_settings('{"staff_free_seats":11}', test.rid())$$)->>'field',
+               'staff_free_seats', 'more than 10 is refused');
+select public.admin_update_settings('{"staff_free_seats":2}', test.rid());
+select test.eq((public.public_pricing()->>'free_seats')::int, 2, 'the landing page shows the included colleagues');
+select public.admin_update_settings('{"staff_free_seats":1}', test.rid());
+select test.logout();
+
 -- A shop signing up now pays 25 lei per colleague; the ones before keep 20.
 select test.sign_up('owner3@test.local',
   '{"role":"shop","name":"Nou","phone":"0268000003","shop_name":"Atelier Trei","city":"Brașov","lang":"ro","terms_version":"2026-09"}');
 select test.eq(sub.seat_price_ron, 25.00::numeric(10,2), 'new shop: the new price per colleague'),
+       test.eq(sub.free_seats, 1, 'with one colleague included'),
        test.eq(sub.seats, 0, 'and no colleagues')
 from public.subscriptions sub join public.shops s on s.id = sub.shop_id where s.name = 'Atelier Trei';
 select test.eq(seat_price_ron, 20.00::numeric(10,2), 'an existing shop keeps its price per colleague')
 from public.subscriptions where shop_id = test.id('shop2');
 
 -- ------------------------------------------------------------------ the free period warning
--- shop2 with one colleague, its free period ending in 7 days: the warning names 120 lei.
+-- shop2 with two colleagues (one included), its free period ending in 7 days: the warning names 120 lei.
 select set_config('test.staff3', test.sign_up('coleg3@test.local', '{"role":"client","name":"Coleg Trei"}')::text, true);
-update public.profiles set role = 'shop' where id = current_setting('test.staff3')::uuid;
+select set_config('test.staff4', test.sign_up('coleg4@test.local', '{"role":"client","name":"Coleg Patru"}')::text, true);
+update public.profiles set role = 'shop' where id in (current_setting('test.staff3')::uuid, current_setting('test.staff4')::uuid);
 insert into public.shop_staff (shop_id, user_id, invited_email, role, accepted_at)
-values (test.id('shop2'), current_setting('test.staff3')::uuid, 'coleg3@test.local', 'staff', now());
+values (test.id('shop2'), current_setting('test.staff3')::uuid, 'coleg3@test.local', 'staff', now()),
+       (test.id('shop2'), current_setting('test.staff4')::uuid, 'coleg4@test.local', 'staff', now());
 update public.subscriptions set trial_ends_at = now() + interval '7 days', trial_reminded = '{}'
 where shop_id = test.id('shop2');
 select public.send_trial_warnings(now());

@@ -38,10 +38,15 @@ test('landing: every section, in Romanian and English, without horizontal scroll
     await expect(page.getByRole('heading', { level: 3, name: card })).toBeVisible();
   }
   if (BACKEND) {
-    // The prices come from Setări platformă.
-    await expect(page.getByText('100 lei pe lună')).toBeVisible();
+    // The prices come from Setări platformă: the launch price while places are left, without VAT,
+    // the first colleague included.
+    await expect(page.getByText('99 lei pe lună')).toBeVisible();
+    await expect(page.getByText('fără TVA')).toBeVisible();
     await expect(page.getByText('primele 90 de zile gratuite')).toBeVisible();
-    await expect(page.getByText(/Plus 20 lei pe lună pentru fiecare coleg/)).toBeVisible();
+    await expect(page.getByText(/^Preț de lansare pentru primele \d+ de service-uri, păstrat cât timp rămâi\. După aceea, 149 lei pe lună\.$/)).toBeVisible();
+    await expect(
+      page.getByText('Primul coleg cu cont în service e inclus în abonament. Fiecare coleg în plus: 19 lei pe lună. În perioada gratuită nu plătești nimic.'),
+    ).toBeVisible();
   }
   // Contact from the "în curând" page, legal documents and report verification in the footer.
   await expect(page.getByRole('link', { name: 'Email: contact@service-hub.ro' })).toHaveAttribute('href', 'mailto:contact@service-hub.ro');
@@ -56,7 +61,11 @@ test('landing: every section, in Romanian and English, without horizontal scroll
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Booking a car repair should take 2 minutes.');
   await expect(page.getByRole('link', { name: 'Sign in' })).toBeVisible();
   await expect(page.getByRole('heading', { level: 2, name: 'Own a shop in Brașov?' })).toBeVisible();
-  if (BACKEND) await expect(page.getByText('100 RON a month')).toBeVisible();
+  if (BACKEND) {
+    await expect(page.getByText('99 RON a month')).toBeVisible();
+    await expect(page.getByText('excl. VAT')).toBeVisible();
+    await expect(page.getByText(/^Launch price for the first \d+ shops, kept for as long as you stay\. After that, 149 RON a month\.$/)).toBeVisible();
+  }
   await expectNoHorizontalScroll(page);
   await shot(page, 'landing-en', name());
 });

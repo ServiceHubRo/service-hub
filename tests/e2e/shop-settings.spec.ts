@@ -238,6 +238,7 @@ test.describe('shop settings', () => {
     await guest.getByLabel('Nume și prenume').fill('Mihai Coleg');
     await guest.getByLabel('Telefon').fill('0723 111 222');
     await guest.getByLabel('Parolă', { exact: true }).fill(PASSWORD);
+    await guest.getByLabel('Repetă parola').fill(PASSWORD);
     await guest.getByRole('checkbox').check();
     await guest.getByRole('button', { name: 'Creează cont' }).click();
     await expect(guest).toHaveURL(/\/confirma-email$/);
@@ -246,12 +247,30 @@ test.describe('shop settings', () => {
     await expect(guest).toHaveURL(/\/s\/panou$/);
     await openAccount(guest);
     await expect(guest.getByText('Atelier Test · Brașov')).toBeVisible();
+    // A colleague works with bookings, quotes, messages and the history; the settings are the owner's.
     await guest.getByRole('link', { name: /Setări service/ }).click();
-    await expect(guest.getByRole('link', { name: /Program și zile libere/ })).toBeVisible();
-    await expect(guest.getByRole('link', { name: /Date de facturare/ })).toHaveCount(0);
-    await expect(guest.getByRole('link', { name: /Personal/ })).toHaveCount(0);
-    await guest.goto('/s/cont/setari/facturare');
-    await expect(guest.getByText('Doar proprietarul service-ului vede această secțiune.')).toBeVisible();
+    await expect(guest.getByText(/^Programul, serviciile, regulile, taxa de constatare și profilul public le schimbă proprietarul/)).toBeVisible();
+    await expect(guest.getByRole('link', { name: /Notificări/ })).toBeVisible();
+    for (const section of [/Program și zile libere/, /Servicii oferite/, /Date de facturare/, /Personal/]) {
+      await expect(guest.getByRole('link', { name: section })).toHaveCount(0);
+    }
+    await expectNoHorizontalScroll(guest);
+    await shot(guest, 'staff-settings', name());
+    for (const path of ['facturare', 'program', 'servicii', 'reguli', 'profil']) {
+      await guest.goto(`/s/cont/setari/${path}`);
+      await expect(guest.getByText('Doar proprietarul service-ului vede această secțiune.')).toBeVisible();
+    }
+    await guest.goto('/s/cont/setari/notificari');
+    await expect(guest.getByText('SMS-ul la cerere nouă și rezumatul zilnic le alege proprietarul service-ului.')).toBeVisible();
+    await expect(guest.getByRole('checkbox')).toHaveCount(0);
+    // Istoric: the jobs, no total of the takings, no CSV; Recenzii: read, no reply.
+    await guest.goto('/s/istoric');
+    await expect(guest.getByRole('heading', { level: 1, name: 'Istoric reparații' })).toBeVisible();
+    await expect(guest.getByRole('button', { name: 'Descarcă istoricul' })).toHaveCount(0);
+    await expect(guest.getByText(/încasat/)).toHaveCount(0);
+    await guest.goto('/s/cont/recenzii');
+    await expect(guest.getByText('Răspunsurile la recenzii și raportările le face proprietarul service-ului.')).toBeVisible();
+    await expect(guest.getByRole('button', { name: /Răspunde|Raportează/ })).toHaveCount(0);
 
     // A used link says so.
     const third = await (await browser.newContext({ locale: 'ro-RO' })).newPage();

@@ -6,7 +6,10 @@ import { SETTINGS_LINKS } from './paths';
 import { useShopSettings } from './shopSettingsContext';
 import styles from './settings.module.css';
 
-/** Setări service: one tile per section (reached from Cont, not from the navigation bar). */
+/**
+ * Setări service: one tile per section (reached from Cont, not from the navigation bar). A
+ * colleague gets only Notificări (push on their phone) and a line saying who changes the rest.
+ */
 export function SettingsIndex() {
   const { t } = useI18n();
   const { isOwner } = useShopSettings();
@@ -14,16 +17,24 @@ export function SettingsIndex() {
     <div className={styles.page}>
       <BackLink to="/s/cont" label={t('nav.account')} />
       <h1>{t('settings.title')}</h1>
+      {!isOwner && <p className={styles.intro}>{t('settings.staff.body')}</p>}
       <div className={styles.tiles}>
-        <Tile to={SETTINGS_LINKS.profile} icon={Store} label={t('settings.profile')} hint={t('settings.profile.hint')} />
-        <Tile to={SETTINGS_LINKS.hours} icon={CalendarClock} label={t('settings.hours')} hint={t('settings.hours.hint')} />
-        <Tile to={SETTINGS_LINKS.rules} icon={SlidersHorizontal} label={t('settings.rules')} hint={t('settings.rules.hint')} />
-        <Tile to={SETTINGS_LINKS.services} icon={ListChecks} label={t('settings.services')} hint={t('settings.services.hint')} />
         {isOwner && (
-          <Tile to={SETTINGS_LINKS.billing} icon={Building2} label={t('settings.billing')} hint={t('settings.billing.hint')} />
+          <>
+            <Tile to={SETTINGS_LINKS.profile} icon={Store} label={t('settings.profile')} hint={t('settings.profile.hint')} />
+            <Tile to={SETTINGS_LINKS.hours} icon={CalendarClock} label={t('settings.hours')} hint={t('settings.hours.hint')} />
+            <Tile to={SETTINGS_LINKS.rules} icon={SlidersHorizontal} label={t('settings.rules')} hint={t('settings.rules.hint')} />
+            <Tile to={SETTINGS_LINKS.services} icon={ListChecks} label={t('settings.services')} hint={t('settings.services.hint')} />
+            <Tile to={SETTINGS_LINKS.billing} icon={Building2} label={t('settings.billing')} hint={t('settings.billing.hint')} />
+            <Tile to={SETTINGS_LINKS.staff} icon={Users} label={t('settings.staff')} hint={t('settings.staff.hint')} />
+          </>
         )}
-        {isOwner && <Tile to={SETTINGS_LINKS.staff} icon={Users} label={t('settings.staff')} hint={t('settings.staff.hint')} />}
-        <Tile to={SETTINGS_LINKS.notifications} icon={Bell} label={t('settings.notifications')} hint={t('settings.notifications.hint')} />
+        <Tile
+          to={SETTINGS_LINKS.notifications}
+          icon={Bell}
+          label={t('settings.notifications')}
+          hint={t(isOwner ? 'settings.notifications.hint' : 'settings.notifications.staffHint')}
+        />
       </div>
     </div>
   );

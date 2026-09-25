@@ -34,7 +34,7 @@ All Shops on the Platform are professionals (companies, sole traders or individu
 - You must be at least 18 years old to create an account.
 - Your account details (name, phone, email) must be true and kept up to date. The Shop you book with receives your name and phone so it can contact you.
 - Your email address must be confirmed. Until then, a Customer cannot book and a Shop does not appear in search.
-- Your password is yours alone. You are responsible for what is done from your account. If you suspect someone else used it, change your password and write to us.
+- An account belongs to one person and is not to be shared. Your password is yours alone. You are responsible for what is done from your account. If you suspect someone else used it, change your password and write to us.
 - “Keep me signed in” keeps you signed in on that device for up to 30 days. On a computer shared with others, untick it.
 - Every account has a short code (for example `C-00012` or `S-00003`) that you use when you contact us.
 
@@ -46,7 +46,7 @@ All Shops on the Platform are professionals (companies, sole traders or individu
 
 Shops are listed by their weighted review score: the average star rating, weighted by the number of reviews, so that a shop with few reviews does not rank above one with many good reviews just because of a single 5-star rating. Ties are broken by the number of reviews, then by name. Filters (category, city, favorites) only narrow the list; they never reorder it.
 
-**No one can pay to rank higher.** The Shops’ subscription is the same for everyone and does not affect the order. Distance from you is shown separately (“Near you”) and as a sort option you choose; it is not part of the weighted score.
+**No one can pay to rank higher.** The subscription Shops pay does not affect the order. Distance from you is shown separately (“Near you”) and as a sort option you choose; it is not part of the weighted score.
 
 Search only shows Shops with a confirmed email and phone, at least one service selected and one open day, a subscription in good standing, and no suspension.
 
@@ -118,16 +118,18 @@ A Shop is listed by the owner or representative of a business authorized to prov
 
 ### 4.4 Colleagues
 
-The owner may invite colleagues, with their own accounts, to work on the same shop (bookings, quotes, messages, reviews, settings). Only the owner sees the subscription, the billing data and the revenue reports, manages colleagues and can delete the shop. The owner is responsible for what colleagues do on the Platform and removes them when they no longer work at the shop.
+The owner may invite colleagues, each with their own account (colleagues do not use the owner’s account), to work on the same shop: bookings, inspections, quotes, jobs, messages and the job history. Only the owner changes the shop’s settings (public profile, hours, services, rules and inspection fee), replies to and reports reviews, sees the total takings, the subscription and the billing data, manages colleagues and can delete the shop. The owner is responsible for what colleagues do on the Platform and removes them when they no longer work at the shop.
 
 ### 4.5 Subscription
 
-- **Price:** 100 RON per month, plus 20 RON per month for each colleague who has joined the shop with an account. Invitations are free. The price is fixed at sign-up and shown on the Subscription screen.
+- **Price:** the one shown on service-hub.ro when you sign up, **excluding VAT**. Currently: 149 RON per month, with the first colleague who has joined the shop with an account included, plus 19 RON per month for each additional colleague. Invitations are free. The price is fixed at sign-up and shown on the Subscription screen.
+- **Launch price:** the first 50 shops to sign up pay 99 RON per month instead of 149 and keep it for as long as they have the subscription.
+- **VAT:** as long as {{company}} is not registered for VAT, no VAT is added. If it becomes registered, VAT is added to the price, and we announce the change at least 30 days in advance.
 - **Free period:** 90 days from sign-up, colleagues included. Without a card you pay nothing. If you add a card during the free period, the first payment is at its end.
 - **Payment:** monthly, recurring, by card, through Stripe. When a colleague joins or is removed, the amount is adjusted by day. You receive a receipt for each payment and the tax invoice, as required by law.
 - **Canceling:** at any time, from the Subscription screen. The subscription stays active until the end of the paid month; the current month is not refunded.
 - **Non-payment:** if a payment fails, Stripe retries a few times and we let you know. If the free period ends without a card, or the last payment attempt fails, the shop becomes **inactive**: it no longer appears in search and receives no new requests. Existing bookings continue and all data is kept. As soon as you pay, the shop is back.
-- **Price changes:** a new price for a shop already signed up is announced by email at least 30 days in advance. If you do not agree, you can cancel before the change takes effect.
+- **Price changes:** apart from the launch price, a new price for a shop already signed up is announced by email at least 30 days in advance. If you do not agree, you can cancel before the change takes effect.
 - The subscription is a contract between professionals: the consumer right of withdrawal does not apply.
 
 ### 4.6 Customer data
