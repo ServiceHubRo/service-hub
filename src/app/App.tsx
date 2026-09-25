@@ -6,6 +6,13 @@ import { IS_TEST_BUILD } from '../lib/env';
 import { AccountScreen } from '../screens/account/AccountScreen';
 import { AdminProvider } from '../screens/admin/AdminProvider';
 import { AuditScreen } from '../screens/admin/AuditScreen';
+import { CatalogScreen } from '../screens/admin/CatalogScreen';
+import { ExportScreen } from '../screens/admin/ExportScreen';
+import { NoticesScreen } from '../screens/admin/NoticesScreen';
+import { ReportsScreen as AdminReportsScreen } from '../screens/admin/ReportsScreen';
+import { SettingsScreen as AdminSettingsScreen } from '../screens/admin/SettingsScreen';
+import { SubscriptionsScreen } from '../screens/admin/SubscriptionsScreen';
+import { TextsScreen } from '../screens/admin/TextsScreen';
 import { BookingDetailScreen } from '../screens/admin/BookingDetailScreen';
 import { BookingsScreen as AdminBookingsScreen } from '../screens/admin/BookingsScreen';
 import { ClientDetailScreen } from '../screens/admin/ClientDetailScreen';
@@ -124,6 +131,13 @@ function extraRoutes(role: Role) {
         <Route path="/admin/rezervari/:bookingId" element={<BookingDetailScreen />} />
         <Route path="/admin/mesaje/:threadId" element={<ThreadScreen />} />
         <Route path="/admin/cont/jurnal" element={<AuditScreen />} />
+        <Route path="/admin/cont/abonamente" element={<SubscriptionsScreen />} />
+        <Route path="/admin/cont/rapoarte" element={<AdminReportsScreen />} />
+        <Route path="/admin/cont/catalog" element={<CatalogScreen />} />
+        <Route path="/admin/cont/setari" element={<AdminSettingsScreen />} />
+        <Route path="/admin/cont/setari/texte" element={<TextsScreen />} />
+        <Route path="/admin/cont/anunturi" element={<NoticesScreen />} />
+        <Route path="/admin/cont/export" element={<ExportScreen />} />
       </>
     );
   }

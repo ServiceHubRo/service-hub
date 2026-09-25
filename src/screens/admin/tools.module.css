@@ -1,0 +1,157 @@
+/* Admin platform tools (T16b): catalog rows, move buttons, text editor, notice preview. */
+
+.categoryHead {
+  display: flex;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.expand {
+  flex: 1 1 240px;
+  min-width: 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  min-height: var(--tap);
+  padding: 4px 0;
+  background: none;
+  border: 0;
+  color: var(--text);
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+}
+
+.expand:disabled {
+  cursor: default;
+}
+
+.expand > svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: var(--muted);
+}
+
+.rowTools {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.moves {
+  display: inline-flex;
+  gap: 4px;
+}
+
+.moves button {
+  min-width: var(--tap);
+  padding-left: 8px;
+  padding-right: 8px;
+}
+
+.services {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.services > li {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.serviceRow {
+  display: flex;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 8px 10px;
+  padding: 10px 12px;
+  background: var(--surface2);
+  border-radius: var(--radius-button);
+}
+
+.serviceIcon {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: var(--amber);
+}
+
+.serviceRow > span:nth-child(2) {
+  flex: 1 1 200px;
+}
+
+.iconField {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.iconField > div:first-child {
+  flex: 1;
+  min-width: 0;
+}
+
+.iconPreview {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--tap);
+  height: var(--tap);
+  border-radius: var(--radius-input);
+  background: var(--surface2);
+  color: var(--amber);
+  flex-shrink: 0;
+}
+
+/* ---------------------------------------------------------------- push texts */
+.textRow {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.defaultText {
+  color: var(--muted);
+  font-size: 13.5px;
+  overflow-wrap: anywhere;
+}
+
+.placeholders {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.placeholder {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  padding: 2px 6px;
+  border-radius: var(--radius-pill);
+  background: var(--surface2);
+  color: var(--muted);
+}
+
+/* ---------------------------------------------------------------- notices */
+.previews {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 10px;
+}
+
+@media (min-width: 768px) {
+  .previews {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.previewLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}

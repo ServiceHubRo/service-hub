@@ -6,9 +6,10 @@ import { EmptyState } from '../../components/EmptyState';
 import { LoadError } from '../../components/LoadError';
 import { SearchField } from '../../components/SearchField';
 import { SkeletonList } from '../../components/Skeleton';
-import { fetchClients } from '../../data/admin';
+import { fetchClients, type AdminClientRow } from '../../data/admin';
 import { useI18n } from '../../i18n/context';
 import { plural } from '../../i18n/translate';
+import { ExportButton } from './ExportButton';
 import { CLIENT_FILTERS, filterClients, isClientFilter, NO_SHOW_FLAG } from '../../lib/admin';
 import { formatPhone } from '../../lib/validators';
 import { Pill, RowLink, Verified } from './parts';
@@ -65,6 +66,13 @@ export function ClientsScreen() {
                 </Chip>
               ))}
             </ChipRow>
+            <div className={styles.toolbar}>
+              <ExportButton<AdminClientRow>
+                kind="clients"
+                filters={{ q: query || undefined, filter: filter === 'all' ? undefined : filter }}
+                narrow={(rows) => filterClients(rows, query, filter)}
+              />
+            </div>
           </div>
           {shown.length === 0 ? (
             <EmptyState

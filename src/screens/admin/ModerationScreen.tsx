@@ -14,6 +14,7 @@ import { plural } from '../../i18n/translate';
 import { reportAge } from '../../lib/admin';
 import { useNow } from '../../lib/useNow';
 import { ConfirmPanel } from './ActionPanels';
+import { ExportButton } from './ExportButton';
 import { Pill, SectionTitle } from './parts';
 import { adminBookingPath, adminShopPath } from './paths';
 import { useLiveData } from './useLiveData';
@@ -163,6 +164,10 @@ export function ModerationScreen() {
             }}
             clearLabel={t('admin.search.clear')}
           />
+          <div className={styles.toolbar}>
+            <span className={styles.sub}>{t('admin.moderation.exportHint')}</span>
+            <ExportButton kind="reviews" filters={{ q: q || undefined }} />
+          </div>
           {state.data.reviews.length === 0 ? (
             <EmptyState icon={Star} title={q ? t('admin.noResults') : t('admin.noReviews')} />
           ) : (

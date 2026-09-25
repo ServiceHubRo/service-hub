@@ -1,4 +1,4 @@
-import { FileCheck, FileText, Globe, Heart, History, ScrollText, Settings, Star } from 'lucide-react';
+import { CreditCard, Download, FileCheck, FileText, Globe, Heart, History, ListTree, Megaphone, ScrollText, Settings, SlidersHorizontal, Star } from 'lucide-react';
 import { useOutletContext } from 'react-router-dom';
 import type { ShellOutletContext } from '../../app/AppShell';
 import { LangSwitch } from '../../app/LangSwitch';
@@ -10,7 +10,15 @@ import { Tile } from '../../components/Tile';
 import { useI18n } from '../../i18n/context';
 import type { MessageKey } from '../../i18n/ro';
 import { LEGAL_DOCS } from '../../lib/legal';
-import { ADMIN_AUDIT_PATH } from '../admin/paths';
+import {
+  ADMIN_AUDIT_PATH,
+  ADMIN_CATALOG_PATH,
+  ADMIN_EXPORT_PATH,
+  ADMIN_NOTICES_PATH,
+  ADMIN_REPORTS_PATH,
+  ADMIN_SETTINGS_PATH,
+  ADMIN_SUBSCRIPTIONS_PATH,
+} from '../admin/paths';
 import { FAVORITES_PATH, MY_REPORTS_PATH, VEHICLE_HISTORY_PICK_PATH } from '../client/paths';
 import { REVIEWS_PATH } from '../shop/paths';
 import { SETTINGS_PATH } from '../shop/settings/paths';
@@ -32,7 +40,7 @@ const SUBTITLE: Record<Role, MessageKey> = {
 /**
  * Cont, the part every role shares (P13b): identity, language, push notifications on this device
  * (clients and shops, T12), email and password, legal documents, my data, log out. Clients also get Locație, Favorite (T06), "Istoricul mașinilor
- * mele" (T10) and "Rapoartele mele" (T15); shops get the Setări and Recenzii tiles, and the owner Abonament (T14); the admin gets the audit log (T16a). Rapoarte
+ * mele" (T10) and "Rapoartele mele" (T15); shops get the Setări and Recenzii tiles, and the owner Abonament (T14); the admin gets the platform tools (T16b) and the audit log (T16a). Rapoarte
  * arrives with its task.
  */
 export function AccountScreen({ role }: { role: Role }) {
@@ -82,6 +90,12 @@ export function AccountScreen({ role }: { role: Role }) {
 
       {role === 'admin' && (
         <div className={styles.tiles}>
+          <Tile to={ADMIN_SUBSCRIPTIONS_PATH} icon={CreditCard} label={t('admin.subs.title')} hint={t('admin.subs.tileHint')} />
+          <Tile to={ADMIN_REPORTS_PATH} icon={FileCheck} label={t('admin.reports.title')} hint={t('admin.reports.tileHint')} />
+          <Tile to={ADMIN_CATALOG_PATH} icon={ListTree} label={t('admin.catalog.title')} hint={t('admin.catalog.tileHint')} />
+          <Tile to={ADMIN_SETTINGS_PATH} icon={SlidersHorizontal} label={t('admin.settings.title')} hint={t('admin.settings.tileHint')} />
+          <Tile to={ADMIN_NOTICES_PATH} icon={Megaphone} label={t('admin.notices.title')} hint={t('admin.notices.tileHint')} />
+          <Tile to={ADMIN_EXPORT_PATH} icon={Download} label={t('admin.export.title')} hint={t('admin.export.tileHint')} />
           <Tile to={ADMIN_AUDIT_PATH} icon={ScrollText} label={t('admin.audit.title')} hint={t('admin.audit.tileHint')} />
         </div>
       )}

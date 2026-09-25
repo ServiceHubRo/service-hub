@@ -15,6 +15,7 @@ import { distanceTo, nearby, sortByDistance } from '../../../lib/geo';
 import { useLocation } from '../../../lib/location';
 import { cityNamedBy, fold } from '../../../lib/text';
 import { useLoad } from '../../../lib/useLoad';
+import { NoticeBanner } from '../../notices/NoticeBanner';
 import { PushBanner } from '../../push/PushBanner';
 import { SEARCH_PATH, type ShopLinkState } from '../paths';
 import { ExpiryBanner } from './ExpiryBanner';
@@ -176,6 +177,7 @@ export function SearchScreen() {
     <div className={styles.page}>
       <h1>{t('nav.client.search')}</h1>
 
+      <NoticeBanner />
       <ExpiryBanner />
       <PushBanner role="client" />
       <LocationBanner />

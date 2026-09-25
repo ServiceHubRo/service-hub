@@ -135,6 +135,20 @@ export const AUDIT_ACTIONS = [
   'remove_review',
   'admin_force_cancel',
   'delete_account',
+  // T16b
+  'set_subscription_price',
+  'void_report',
+  'create_category',
+  'update_category',
+  'create_service',
+  'update_service',
+  'move_category',
+  'move_service',
+  'update_settings',
+  'set_notification_text',
+  'send_notice',
+  'withdraw_notice',
+  'export',
 ] as const;
 
 export interface AuditChange {
@@ -145,13 +159,19 @@ export interface AuditChange {
 }
 
 /** Keys that describe the action rather than a changed value: shown on their own line. */
-const DETAIL_KEYS = new Set(['reason', 'note', 'days', 'mode']);
+const DETAIL_KEYS = new Set(['reason', 'note', 'days', 'mode', 'services_off', 'kind', 'filters', 'rows', 'recipients', 'push_recipients']);
+
+/** Values kept whole (an export's filters): shown as one line, not split into their keys. */
+const WHOLE_KEYS = new Set(['filters']);
 
 function flatten(value: Record<string, unknown> | null | undefined, prefix = ''): Record<string, unknown> {
   const out: Record<string, unknown> = {};
   for (const [k, v] of Object.entries(value ?? {})) {
-    if (v && typeof v === 'object' && !Array.isArray(v)) Object.assign(out, flatten(v as Record<string, unknown>, `${prefix}${k}.`));
-    else out[`${prefix}${k}`] = v;
+    if (v && typeof v === 'object' && !Array.isArray(v) && !WHOLE_KEYS.has(k)) {
+      Object.assign(out, flatten(v as Record<string, unknown>, `${prefix}${k}.`));
+    } else {
+      out[`${prefix}${k}`] = v;
+    }
   }
   return out;
 }

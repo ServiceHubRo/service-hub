@@ -6,11 +6,12 @@ import { EmptyState } from '../../components/EmptyState';
 import { LoadError } from '../../components/LoadError';
 import { SearchField } from '../../components/SearchField';
 import { SkeletonList } from '../../components/Skeleton';
-import { fetchShops } from '../../data/admin';
+import { fetchShops, type AdminShopRow } from '../../data/admin';
 import { useI18n } from '../../i18n/context';
 import { plural } from '../../i18n/translate';
 import { filterShops, isShopFilter, SHOP_FILTERS } from '../../lib/admin';
 import { formatPhone } from '../../lib/validators';
+import { ExportButton } from './ExportButton';
 import { RowLink, ShopStatePill, Verified } from './parts';
 import { adminShopPath } from './paths';
 import { useLiveData } from './useLiveData';
@@ -65,6 +66,13 @@ export function ShopsScreen() {
                 </Chip>
               ))}
             </ChipRow>
+            <div className={styles.toolbar}>
+              <ExportButton<AdminShopRow>
+                kind="shops"
+                filters={{ q: query || undefined, state: filter === 'all' ? undefined : filter }}
+                narrow={(rows) => filterShops(rows, query, filter)}
+              />
+            </div>
           </div>
           {shown.length === 0 ? (
             <EmptyState
