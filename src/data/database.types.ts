@@ -853,6 +853,7 @@ export type Database = {
           phone_verified_at: string | null
           phone_verified_by_admin: boolean
           push_prompt_dismissed_at: string | null
+          review_requests: boolean
           role: string
           service_reminders: boolean
           suspended: boolean
@@ -873,6 +874,7 @@ export type Database = {
           phone_verified_at?: string | null
           phone_verified_by_admin?: boolean
           push_prompt_dismissed_at?: string | null
+          review_requests?: boolean
           role: string
           service_reminders?: boolean
           suspended?: boolean
@@ -893,6 +895,7 @@ export type Database = {
           phone_verified_at?: string | null
           phone_verified_by_admin?: boolean
           push_prompt_dismissed_at?: string | null
+          review_requests?: boolean
           role?: string
           service_reminders?: boolean
           suspended?: boolean
@@ -2881,6 +2884,7 @@ export type Database = {
           phone_verified_at: string | null
           phone_verified_by_admin: boolean
           push_prompt_dismissed_at: string | null
+          review_requests: boolean
           role: string
           service_reminders: boolean
           suspended: boolean
@@ -2910,6 +2914,7 @@ export type Database = {
           phone_verified_at: string | null
           phone_verified_by_admin: boolean
           push_prompt_dismissed_at: string | null
+          review_requests: boolean
           role: string
           service_reminders: boolean
           suspended: boolean

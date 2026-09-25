@@ -24,9 +24,12 @@ export async function updateProfile(userId: string, fields: { name: string; phon
   return data;
 }
 
-/** Cont → Remindere de revizie (T19d): the client turns the service reminders on or off. */
-export async function setServiceReminders(userId: string, on: boolean): Promise<Profile> {
-  const { data, error } = await db().from('profiles').update({ service_reminders: on }).eq('id', userId).select('*').single();
+/** The client's reminders in Cont (T19d): the review request and the service reminders. */
+export type ReminderSetting = 'review_requests' | 'service_reminders';
+
+export async function setReminder(userId: string, setting: ReminderSetting, on: boolean): Promise<Profile> {
+  const fields = setting === 'review_requests' ? { review_requests: on } : { service_reminders: on };
+  const { data, error } = await db().from('profiles').update(fields).eq('id', userId).select('*').single();
   if (error) throw failure(error);
   return data;
 }

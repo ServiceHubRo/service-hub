@@ -161,4 +161,72 @@ test.describe('client reminders', () => {
     await rowEn.getByRole('button', { name: 'Turn on' }).click();
     await expect(rowEn).toContainText('On.');
   });
+
+  test('Cont: the review request off hides the card on Caută; a tapped request opens the form on Programări', async ({ page }) => {
+    const shopName = `Atelier T19d ${Date.now()}`;
+    const { email: shop, shopId } = await createBookableShop(shopName, ['ulei']);
+    const client = await createUser('client');
+    const booking = await finishedJob(client, shop, shopId);
+
+    await signIn(page, client, PASSWORD);
+    await expect(page).toHaveURL(/\/c\/cauta/);
+    const card = page.getByRole('region', { name: 'Recenzie de lăsat' });
+    await expect(card).toBeVisible();
+
+    await openAccount(page);
+    const row = page.getByRole('group', { name: 'Cerere de recenzie' });
+    await expect(row).toContainText('Pornită.');
+    await row.getByRole('button', { name: 'Oprește' }).click();
+    await expect(row).toContainText('Oprită.');
+    await expectNoHorizontalScroll(page);
+    await shot(page, 't19d-account-review-requests', name());
+    const [profile] = await serviceRest<{ review_requests: boolean; service_reminders: boolean }[]>(
+      `profiles?id=eq.${await userIdOf(client)}&select=review_requests,service_reminders`,
+      'GET',
+    );
+    expect(profile).toEqual({ review_requests: false, service_reminders: true });
+
+    await page.getByRole('link', { name: 'Caută', exact: true }).filter({ visible: true }).first().click();
+    await expect(page.getByRole('heading', { level: 1, name: 'Caută' })).toBeVisible();
+    await expect(card).toHaveCount(0);
+    await openAccount(page);
+    await row.getByRole('button', { name: 'Pornește' }).click();
+    await expect(row).toContainText('Pornită.');
+    await page.getByRole('link', { name: 'Caută', exact: true }).filter({ visible: true }).first().click();
+    await expect(card).toBeVisible();
+
+    // Already on Programări when the review request is tapped (the app moves there without a
+    // reload, as PushBridge does): the card opens its form.
+    await page.getByRole('link', { name: 'Programări', exact: true }).filter({ visible: true }).first().click();
+    const done = page.locator('main section li').filter({ hasText: booking.ref });
+    await expect(done.getByRole('button', { name: 'Lasă o recenzie' })).toBeVisible();
+    await expect(done.getByRole('button', { name: 'Trimite recenzia' })).toHaveCount(0);
+    await page.evaluate((path) => {
+      window.history.pushState({}, '', path);
+      window.dispatchEvent(new PopStateEvent('popstate'));
+    }, `/c/programari?p=${booking.id}&recenzie=1`);
+    await expect(done.getByRole('button', { name: 'Trimite recenzia' })).toBeVisible();
+  });
+
+  test('the service reminder opens the booking with the service and the car already chosen', async ({ page }) => {
+    const shopName = `Atelier T19d ${Date.now()}`;
+    const { shopId } = await createBookableShop(shopName, ['ulei']);
+    const client = await createUser('client');
+    const owner = await userIdOf(client);
+    await serviceRest('cars', 'POST', { owner_id: owner, make: 'Dacia', model: 'Logan', year: 2019, plate: plate() });
+    const [car] = await serviceRest<{ id: string }[]>('cars', 'POST', { owner_id: owner, make: 'Skoda', model: 'Octavia', year: 2017, plate: plate() });
+
+    await signIn(page, client, PASSWORD);
+    await expect(page).toHaveURL(/\/c\/cauta/);
+    // The address a tap on the service_due push opens.
+    await page.goto(`/c/service/${shopId}/programare?pas=2&serviciu=ulei&masina=${car!.id}`);
+    await expect(page.getByRole('heading', { level: 1, name: 'Alege ziua' })).toBeVisible();
+    await page.getByRole('button', { name: /: \d+ loc/ }).first().click();
+    await page.getByRole('button', { name: /^\d{2}:\d{2}$/, disabled: false }).first().click();
+    await expect(page.getByRole('heading', { level: 1, name: 'Mașina' })).toBeVisible();
+    await expect(page.getByRole('button', { name: /Skoda Octavia/ })).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.getByRole('button', { name: /Dacia Logan/ })).toHaveAttribute('aria-pressed', 'false');
+    await expectNoHorizontalScroll(page);
+    await shot(page, 't19d-service-reminder-car', name());
+  });
 });

@@ -172,11 +172,11 @@ describe('notification texts', () => {
     );
   });
 
-  it('reminds the next service and opens the booking at the same shop, the service chosen', () => {
+  it('reminds the next service and opens the booking at the same shop, the service and the car chosen', () => {
     expect(render('service_due', 'client', 'ro')).toMatchObject({
       title: 'Volkswagen Golf 7: Schimb ulei și filtru',
       body: 'Ultima dată pe 20 oct 2024, la Atelier Unu. Următoarea se apropie, pe la 20 oct. Programează-te din aplicație.',
-      url: '/c/service/s-1/programare?pas=2&serviciu=lichid_frana',
+      url: '/c/service/s-1/programare?pas=2&serviciu=lichid_frana&masina=c-1',
       tag: 'service-due-c-1-lichid_frana',
     });
     expect(render('service_due', 'client', 'en')!.body).toBe(
