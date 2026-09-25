@@ -28,6 +28,7 @@ export function translate(lang: Lang, key: MessageKey, params?: Params): string 
 export type PluralUnit =
   | 'unit.days'
   | 'unit.hours'
+  | 'unit.minutes'
   | 'unit.shops'
   | 'unit.reviews'
   | 'unit.services'

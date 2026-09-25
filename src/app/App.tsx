@@ -59,7 +59,8 @@ import { StaffSettings } from '../screens/shop/settings/StaffSettings';
 import { ShopBookingsProvider } from '../screens/shop/bookings/ShopBookingsProvider';
 import { ShopBookingsScreen } from '../screens/shop/bookings/ShopBookingsScreen';
 import { ShopHistoryScreen } from '../screens/shop/history/ShopHistoryScreen';
-import { REVIEWS_PATH, SUBSCRIPTION_PATH } from '../screens/shop/paths';
+import { REPORTS_PATH, REVIEWS_PATH, SUBSCRIPTION_PATH } from '../screens/shop/paths';
+import { ShopReportsScreen } from '../screens/shop/reports/ShopReportsScreen';
 import { ShopReviewsScreen } from '../screens/shop/reviews/ShopReviewsScreen';
 import { SubscriptionScreen } from '../screens/shop/subscription/SubscriptionScreen';
 import { BookingThreadRedirect } from '../screens/messages/BookingThreadRedirect';
@@ -147,6 +148,7 @@ function extraRoutes(role: Role) {
       {messageRoutes('shop')}
       <Route path={REVIEWS_PATH} element={<ShopReviewsScreen />} />
       <Route path={SUBSCRIPTION_PATH} element={<SubscriptionScreen />} />
+      <Route path={REPORTS_PATH} element={<ShopReportsScreen />} />
       <Route path={SETTINGS_PATH} element={<ShopSettingsLayout />}>
       <Route index element={<SettingsIndex />} />
       <Route path="profil" element={<ProfileSettings />} />
