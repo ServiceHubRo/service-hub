@@ -8,7 +8,16 @@ import { EmptyState } from '../../../components/EmptyState';
 import { Field } from '../../../components/Field';
 import { SkeletonList } from '../../../components/Skeleton';
 import { rpcErrorMessage } from '../../../data/rpc';
-import { inviteLink, inviteStaff, listStaff, newInviteToken, removeStaff, type StaffMember } from '../../../data/shop';
+import {
+  emailInvite,
+  inviteLink,
+  inviteStaff,
+  listStaff,
+  newInviteToken,
+  removeStaff,
+  type InviteEmailResult,
+  type StaffMember,
+} from '../../../data/shop';
 import { useI18n } from '../../../i18n/context';
 import { formatDate } from '../../../i18n/format';
 import { looksLikeEmail } from '../../../lib/password';
@@ -31,13 +40,16 @@ function useTokenPerRequest() {
   };
 }
 
-/** Personal (P5b): invite by link (email invitations in T13), list, remove. Owner only. */
+/**
+ * Personal (P5b): invite by email (T13; the link is shown too, for WhatsApp or when the email does
+ * not arrive), list, remove. Owner only.
+ */
 export function StaffSettings() {
   const { t } = useI18n();
   const { isOwner } = useShopSettings();
   const load = useCallback(() => listStaff(), []);
   const { state, reload, setData } = useLoad(load);
-  const [link, setLink] = useState<{ email: string; url: string } | null>(null);
+  const [link, setLink] = useState<{ email: string; url: string; mailed: InviteEmailResult } | null>(null);
 
   const refresh = useCallback(async () => setData(await listStaff()), [setData]);
 
@@ -52,12 +64,12 @@ export function StaffSettings() {
           <p className={styles.intro}>{t('staff.intro')}</p>
 
           <InviteForm
-            onInvited={async (email, url) => {
-              setLink({ email, url });
+            onInvited={async (email, url, mailed) => {
+              setLink({ email, url, mailed });
               await refresh().catch(() => undefined);
             }}
           />
-          {link && <LinkPanel email={link.email} url={link.url} />}
+          {link && <LinkPanel email={link.email} url={link.url} mailed={link.mailed} />}
 
           <h2 className={styles.section}>{t('staff.team')}</h2>
           {state.status === 'loading' && <SkeletonList />}
@@ -69,8 +81,8 @@ export function StaffSettings() {
                   key={m.id}
                   member={m}
                   onRemoved={() => setData((list) => list.filter((x) => x.id !== m.id))}
-                  onNewLink={async (email, url) => {
-                    setLink({ email, url });
+                  onNewLink={async (email, url, mailed) => {
+                    setLink({ email, url, mailed });
                     await refresh().catch(() => undefined);
                   }}
                 />
@@ -83,7 +95,11 @@ export function StaffSettings() {
   );
 }
 
-function InviteForm({ onInvited }: { onInvited: (email: string, url: string) => Promise<void> }) {
+function InviteForm({
+  onInvited,
+}: {
+  onInvited: (email: string, url: string, mailed: InviteEmailResult) => Promise<void>;
+}) {
   const { t, lang } = useI18n();
   const [email, setEmail] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -116,8 +132,9 @@ function InviteForm({ onInvited }: { onInvited: (email: string, url: string) => 
             }
             const token = tokenFor(requestId);
             await inviteStaff(email.trim(), token, requestId);
+            const mailed = await emailInvite(token, lang);
             setEmail('');
-            await onInvited(email.trim().toLowerCase(), inviteLink(token));
+            await onInvited(email.trim().toLowerCase(), inviteLink(token), mailed);
           }}
         >
           <UserPlus size={18} aria-hidden="true" /> {t('staff.inviteSend')}
@@ -127,8 +144,8 @@ function InviteForm({ onInvited }: { onInvited: (email: string, url: string) => 
   );
 }
 
-/** The link to send, with a copy button (the address is also selectable in the field). */
-function LinkPanel({ email, url }: { email: string; url: string }) {
+/** Whether the email left, and the link with a copy button (the address is also selectable in the field). */
+function LinkPanel({ email, url, mailed }: { email: string; url: string; mailed: InviteEmailResult }) {
   const { t } = useI18n();
   const [copied, setCopied] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -148,7 +165,7 @@ function LinkPanel({ email, url }: { email: string; url: string }) {
 
   return (
     <Card highlight className={styles.stack}>
-      <p role="status">{t('staff.linkReady', { email })}</p>
+      <p role="status">{t(mailed === 'failed' ? 'staff.emailFailed' : 'staff.emailSent', { email })}</p>
       <div className={own.link}>
         <label htmlFor="invite-link" className="visually-hidden">
           {t('staff.link')}
@@ -177,7 +194,7 @@ function MemberCard({
 }: {
   member: StaffMember;
   onRemoved: () => void;
-  onNewLink: (email: string, url: string) => Promise<void>;
+  onNewLink: (email: string, url: string, mailed: InviteEmailResult) => Promise<void>;
 }) {
   const { t, lang } = useI18n();
   const [confirming, setConfirming] = useState(false);
@@ -214,7 +231,7 @@ function MemberCard({
               onAction={async (requestId) => {
                 const token = tokenFor(requestId);
                 await inviteStaff(member.email!, token, requestId);
-                await onNewLink(member.email!, inviteLink(token));
+                await onNewLink(member.email!, inviteLink(token), await emailInvite(token, lang));
               }}
             >
               {t('staff.newLink')}

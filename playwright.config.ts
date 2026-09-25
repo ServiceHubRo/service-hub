@@ -3,6 +3,8 @@ import { PORT, PUBLISHED_PORT } from './tests/e2e/ports';
 
 export default defineConfig({
   testDir: 'tests/e2e',
+  // Email and SMS stand-ins for the local backend (T13).
+  globalSetup: './tests/e2e/global-setup.ts',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: 0,

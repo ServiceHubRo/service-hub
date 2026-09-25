@@ -16,6 +16,7 @@ import { SETTINGS_PATH } from '../shop/settings/paths';
 import { DataSection } from './DataSection';
 import { IdentityCard } from './IdentityCard';
 import { LocationRow } from './LocationRow';
+import { PhoneCard } from './PhoneCard';
 import { PushRow } from '../push/PushRow';
 import { SecuritySection } from './SecuritySection';
 import styles from './account.module.css';
@@ -44,6 +45,7 @@ export function AccountScreen({ role }: { role: Role }) {
       <p className={styles.sub}>{t(SUBTITLE[role])}</p>
 
       <IdentityCard />
+      {role === 'shop' && <PhoneCard />}
 
       <Card>
         <div className={styles.row}>

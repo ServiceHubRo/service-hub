@@ -275,6 +275,28 @@ export async function inviteStaff(email: string, token: string, requestId: strin
   await call('invite_staff', { p_email: email, p_token: token, p_request_id: requestId });
 }
 
+/** sent · failed (the email service answered no or is not set up). A link already mailed counts as sent. */
+export type InviteEmailResult = 'sent' | 'failed';
+
+/**
+ * Edge Function `invite-staff` (T13): emails the invitation just created with `inviteStaff`,
+ * with a link to this same site. Never throws: the link on screen works either way.
+ */
+export async function emailInvite(token: string, lang: 'ro' | 'en'): Promise<InviteEmailResult> {
+  if (!supabase) return 'failed';
+  try {
+    const { data, error } = await supabase.functions.invoke('invite-staff', {
+      method: 'POST',
+      body: { token, lang, origin: window.location.origin },
+    });
+    if (error) return 'failed';
+    const d = data as { sent?: boolean; reason?: string };
+    return d.sent || d.reason === 'already_sent' ? 'sent' : 'failed';
+  } catch {
+    return 'failed';
+  }
+}
+
 export async function removeStaff(id: string): Promise<void> {
   const { error } = await db().from('shop_staff').delete().eq('id', id);
   if (error) throw failure(error);

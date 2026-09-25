@@ -1,6 +1,7 @@
 import { Car, ChevronRight, Unlink } from 'lucide-react';
 import { useCallback, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useSession } from '../../../app/sessionContext';
 import { ActionButton } from '../../../components/ActionButton';
 import { Banner } from '../../../components/Banner';
 import { EmptyState } from '../../../components/EmptyState';
@@ -28,6 +29,7 @@ import styles from './Dashboard.module.css';
  */
 export function Dashboard() {
   const { t, lang } = useI18n();
+  const session = useSession();
   const load = useCallback(() => getShopSetup(), []);
   const { state, reload, setData } = useLoad(load);
   const bookings = useShopBookings();
@@ -93,7 +95,13 @@ export function Dashboard() {
         )}
         {!setup.setup_completed && (
           <div className="no-print">
-            <SetupChecklist setup={setup} />
+            <SetupChecklist
+              setup={setup}
+              onPhoneVerified={async () => {
+                setData(await getShopSetup());
+                await session.refreshProfile();
+              }}
+            />
           </div>
         )}
         <TodayBoard data={data} today={today} />

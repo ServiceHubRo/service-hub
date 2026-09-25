@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { EMAIL_EVENTS, emailForEvent } from '../../supabase/functions/_shared/emails.ts';
 import * as serverFormat from '../../supabase/functions/_shared/format.ts';
 import {
   EVENTS,
@@ -83,7 +84,11 @@ describe('notification texts', () => {
     expect(toShop.size).toBeGreaterThan(5);
     expect(toClient.size).toBeGreaterThan(10);
     for (const event of toShop) expect(EVENTS.shop, event).toContain(event);
-    for (const event of toClient) expect(EVENTS.client, event).toContain(event);
+    for (const event of toClient) {
+      // Email-only events (T13) have an email instead of a push text.
+      if (EMAIL_EVENTS.includes(event)) expect(emailForEvent({ event, lang: 'ro', params: {} }, 'https://x'), event).not.toBeNull();
+      else expect(EVENTS.client, event).toContain(event);
+    }
   });
 
   it('renders every event on both sides in both languages without leftovers', () => {

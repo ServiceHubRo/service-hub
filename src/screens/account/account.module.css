@@ -133,3 +133,25 @@
     flex: 1;
   }
 }
+
+.cardTitle {
+  margin: 0 0 4px;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.phoneOk,
+.phoneTodo {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12.5px;
+}
+
+.phoneOk {
+  color: var(--green);
+}
+
+.phoneTodo {
+  color: var(--amber);
+}

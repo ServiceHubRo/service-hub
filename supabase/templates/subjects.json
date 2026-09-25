@@ -1,0 +1,5 @@
+{
+  "confirmation": "{{ if eq (printf \"%v\" .Data.lang) \"en\" }}Confirm your email address{{ else }}Confirmă adresa de email{{ end }}",
+  "recovery": "{{ if eq (printf \"%v\" .Data.lang) \"en\" }}Reset your Service-Hub password{{ else }}Resetează parola Service-Hub{{ end }}",
+  "email_change": "{{ if eq (printf \"%v\" .Data.lang) \"en\" }}Confirm your new email address{{ else }}Confirmă noua adresă de email{{ end }}"
+}

@@ -131,8 +131,8 @@ async function signedIn(browser: Browser, page: Page, email: string): Promise<Pa
   return other;
 }
 
-function letters(): string {
-  return Array.from({ length: 3 }, () => 'ABCDEFGHJKLMNPRSTUVWXZ'[Math.floor(Math.random() * 22)]).join('');
+function letters(from = 'ABCDEFGHJKLMNPRSTUVWXZ'): string {
+  return Array.from({ length: 3 }, () => from[Math.floor(Math.random() * from.length)]).join('');
 }
 
 test.describe('repair history', () => {
@@ -145,7 +145,8 @@ test.describe('repair history', () => {
     const [a, b, c] = await freeSlots(client, shopId, 3);
     const n = 10 + Math.floor(Math.random() * 89);
     const plate = `BV ${n} ${letters()}`;
-    const otherPlate = `CJ ${n} ${letters()}`;
+    // Without B and V, so the search "BV <n>" can never match the other car's letters.
+    const otherPlate = `CJ ${n} ${letters('ACDEFGHJKLMNPRSTUXZ')}`;
     const done = await book(client, shopId, a!, plate, true); // saves the car in the garage
     const refused = await book(client, shopId, b!, plate, false);
     const other = await book(client, shopId, c!, otherPlate, false);
