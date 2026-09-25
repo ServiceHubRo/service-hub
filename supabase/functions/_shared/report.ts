@@ -68,13 +68,14 @@ export const REPORT_TEXT = {
     lastKm: 'KM LA ULTIMA LUCRARE',
     kmNote:
       'Citirile de kilometraj nu sunt în ordine crescătoare. Le-am păstrat exact cum au fost introduse de service-uri, fără să le reordonăm sau să le corectăm.',
-    verifyTitle: 'Verifică autenticitatea raportului',
-    verifyBody: 'Oricine poate confirma că acest raport este real, fără cont și fără date personale.',
     disclaimerLead: 'Important.',
     disclaimer:
       'Acest raport conține exclusiv lucrările efectuate prin platforma Service-Hub și înregistrate de service-urile partenere. Nu reprezintă istoricul complet de service al vehiculului: lucrările efectuate în alte ateliere, în regie proprie sau înainte de înregistrarea vehiculului în aplicație nu apar aici. Datele sunt cele raportate de service-urile care au efectuat lucrările. Service-Hub este intermediar și nu răspunde pentru calitatea lucrărilor. Raport generat automat la {date} · Service-Hub · {host}',
     page: 'Pagina {n} din {total}',
-    continued: '{title} · {code} (continuare)',
+    continued: 'continuare',
+    footerNote:
+      'Conține doar lucrările efectuate prin Service-Hub, așa cum le-au înregistrat service-urile. Nu este istoricul complet al vehiculului.',
+    footerVerify: 'Verifică la {address} cu codul {code}',
     unknownShop: 'Service',
     none: '—',
   },
@@ -99,13 +100,13 @@ export const REPORT_TEXT = {
     lastKm: 'KM AT LAST JOB',
     kmNote:
       'The odometer readings do not increase with the dates. They are shown exactly as the shops entered them, not re-sorted or corrected.',
-    verifyTitle: 'Check that this report is genuine',
-    verifyBody: 'Anyone can confirm this report is real, without an account and without personal data.',
     disclaimerLead: 'Important.',
     disclaimer:
       'This report covers only work carried out through the Service-Hub platform and recorded by its partner shops. It is not the complete service history of the vehicle: work done at other shops, by the owner, or before the vehicle was added to the app does not appear here. The data is as reported by the shops that did the work. Service-Hub is an intermediary and is not responsible for the quality of the work. Report generated automatically on {date} · Service-Hub · {host}',
     page: 'Page {n} of {total}',
-    continued: '{title} · {code} (continued)',
+    continued: 'continued',
+    footerNote: 'Covers only work done through Service-Hub, as recorded by the shops. Not the complete service history of the vehicle.',
+    footerVerify: 'Verify at {address} with code {code}',
     unknownShop: 'Shop',
     none: '—',
   },
