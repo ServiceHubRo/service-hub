@@ -115,3 +115,22 @@ textarea {
     height: auto;
   }
 }
+
+/* An element with the `hidden` attribute stays hidden even when its class sets `display`
+   (a form behind a legal document must not show under it). */
+[hidden] {
+  display: none !important;
+}
+
+/* Public pages scroll under the iPhone status bar in the Home Screen app (viewport-fit=cover):
+   an opaque strip keeps the clock and battery readable over the page. No height elsewhere. */
+.status-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: env(safe-area-inset-top);
+  background: var(--bg);
+  z-index: 50;
+  pointer-events: none;
+}

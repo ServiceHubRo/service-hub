@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback } from 'react';
 import { Link, Navigate, useParams } from 'react-router-dom';
 import { useSession } from '../../app/sessionContext';
 import { Banner } from '../../components/Banner';
@@ -6,11 +6,11 @@ import { Button } from '../../components/Button';
 import { SkeletonList } from '../../components/Skeleton';
 import { getStaffInvite } from '../../data/shop';
 import { useI18n } from '../../i18n/context';
-import { LEGAL_DOCS, type LegalDocId } from '../../lib/legal';
 import { useLoad } from '../../lib/useLoad';
-import { LegalDocument } from '../legal/LegalDocument';
 import { LoadError } from '../../components/LoadError';
 import { AuthLayout } from './AuthLayout';
+import { LegalDocScreen } from './LegalDocScreen';
+import { useLegalDoc } from './useLegalDoc';
 import { SignUpForm } from './SignUpForm';
 import styles from './auth.module.css';
 
@@ -25,8 +25,7 @@ export function InviteScreen() {
   const session = useSession();
   const load = useCallback(() => getStaffInvite(token), [token]);
   const { state, reload } = useLoad(load);
-  const [doc, setDoc] = useState<LegalDocId | null>(null);
-  const docTitle = LEGAL_DOCS.find((d) => d.id === doc)?.titleKey;
+  const { doc, open: openDoc, close: closeDoc } = useLegalDoc();
 
   let body;
   if (state.status === 'loading' || session.status === 'loading') body = <SkeletonList count={1} />;
@@ -56,22 +55,12 @@ export function InviteScreen() {
     const invite = state.data;
     body = (
       <>
-        {doc && docTitle && (
-          <div className={styles.stack}>
-            <div className={styles.docTop}>
-              <Button onClick={() => setDoc(null)}>{t('auth.backToForm')}</Button>
-            </div>
-            <LegalDocument id={doc} title={t(docTitle)} />
-            <Button variant="primary" block onClick={() => setDoc(null)}>
-              {t('auth.backToForm')}
-            </Button>
-          </div>
-        )}
+        {doc && <LegalDocScreen doc={doc} onBack={closeDoc} />}
         <div className={styles.stack} hidden={doc !== null}>
           <Banner tone="info">
             {t('invite.body', { shop: invite.shop_name, city: invite.city, email: invite.email })}
           </Banner>
-          <SignUpForm email={invite.email} setEmail={() => undefined} onOpenDoc={setDoc} invite={{ token, email: invite.email }} />
+          <SignUpForm email={invite.email} setEmail={() => undefined} onOpenDoc={openDoc} invite={{ token, email: invite.email }} />
         </div>
       </>
     );

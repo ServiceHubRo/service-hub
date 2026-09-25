@@ -35,6 +35,7 @@ export function Landing() {
 
   return (
     <div className={styles.page}>
+      <div className="status-backdrop" aria-hidden="true" />
       <div className={styles.top}>
         <LangSwitch />
       </div>

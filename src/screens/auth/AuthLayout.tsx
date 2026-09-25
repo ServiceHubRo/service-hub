@@ -11,6 +11,7 @@ export function AuthLayout({ children }: { children: ReactNode }) {
   const { t } = useI18n();
   return (
     <div className={styles.page}>
+      <div className="status-backdrop" aria-hidden="true" />
       <div className={styles.top}>
         <LangSwitch />
       </div>
