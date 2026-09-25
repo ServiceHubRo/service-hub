@@ -68,7 +68,9 @@ export type Database = {
           odometer: number | null
           ref: string
           reminder_sent_at: string | null
+          review_requested_at: string | null
           service_id: string
+          service_reminded_at: string | null
           shop_id: string
           slot: string
           started_at: string | null
@@ -99,7 +101,9 @@ export type Database = {
           odometer?: number | null
           ref?: string
           reminder_sent_at?: string | null
+          review_requested_at?: string | null
           service_id: string
+          service_reminded_at?: string | null
           shop_id: string
           slot: string
           started_at?: string | null
@@ -130,7 +134,9 @@ export type Database = {
           odometer?: number | null
           ref?: string
           reminder_sent_at?: string | null
+          review_requested_at?: string | null
           service_id?: string
+          service_reminded_at?: string | null
           shop_id?: string
           slot?: string
           started_at?: string | null
@@ -827,7 +833,9 @@ export type Database = {
           phone_verified_at: string | null
           phone_verified_by_admin: boolean
           push_prompt_dismissed_at: string | null
+          review_requests: boolean
           role: string
+          service_reminders: boolean
           suspended: boolean
           terms_accepted_at: string | null
           terms_version: string | null
@@ -846,7 +854,9 @@ export type Database = {
           phone_verified_at?: string | null
           phone_verified_by_admin?: boolean
           push_prompt_dismissed_at?: string | null
+          review_requests?: boolean
           role: string
+          service_reminders?: boolean
           suspended?: boolean
           terms_accepted_at?: string | null
           terms_version?: string | null
@@ -865,7 +875,9 @@ export type Database = {
           phone_verified_at?: string | null
           phone_verified_by_admin?: boolean
           push_prompt_dismissed_at?: string | null
+          review_requests?: boolean
           role?: string
+          service_reminders?: boolean
           suspended?: boolean
           terms_accepted_at?: string | null
           terms_version?: string | null
@@ -1202,6 +1214,7 @@ export type Database = {
           enabled: boolean
           icon: string | null
           id: string
+          interval_months: number | null
           name_en: string
           name_ro: string
           position: number
@@ -1211,6 +1224,7 @@ export type Database = {
           enabled?: boolean
           icon?: string | null
           id: string
+          interval_months?: number | null
           name_en: string
           name_ro: string
           position?: number
@@ -1220,6 +1234,7 @@ export type Database = {
           enabled?: boolean
           icon?: string | null
           id?: string
+          interval_months?: number | null
           name_en?: string
           name_ro?: string
           position?: number
@@ -1871,7 +1886,9 @@ export type Database = {
           odometer: number | null
           ref: string
           reminder_sent_at: string | null
+          review_requested_at: string | null
           service_id: string
+          service_reminded_at: string | null
           shop_id: string
           slot: string
           started_at: string | null
@@ -1963,6 +1980,10 @@ export type Database = {
           p_title_en: string
           p_title_ro: string
         }
+        Returns: Json
+      }
+      admin_set_service_interval: {
+        Args: { p_id: string; p_months?: number; p_request_id: string }
         Returns: Json
       }
       admin_set_shop_suspended: {
@@ -2083,7 +2104,9 @@ export type Database = {
           odometer: number | null
           ref: string
           reminder_sent_at: string | null
+          review_requested_at: string | null
           service_id: string
+          service_reminded_at: string | null
           shop_id: string
           slot: string
           started_at: string | null
@@ -2167,7 +2190,9 @@ export type Database = {
           odometer: number | null
           ref: string
           reminder_sent_at: string | null
+          review_requested_at: string | null
           service_id: string
+          service_reminded_at: string | null
           shop_id: string
           slot: string
           started_at: string | null
@@ -2207,7 +2232,9 @@ export type Database = {
           odometer: number | null
           ref: string
           reminder_sent_at: string | null
+          review_requested_at: string | null
           service_id: string
+          service_reminded_at: string | null
           shop_id: string
           slot: string
           started_at: string | null
@@ -2257,7 +2284,9 @@ export type Database = {
           odometer: number | null
           ref: string
           reminder_sent_at: string | null
+          review_requested_at: string | null
           service_id: string
+          service_reminded_at: string | null
           shop_id: string
           slot: string
           started_at: string | null
@@ -2327,7 +2356,9 @@ export type Database = {
           odometer: number | null
           ref: string
           reminder_sent_at: string | null
+          review_requested_at: string | null
           service_id: string
+          service_reminded_at: string | null
           shop_id: string
           slot: string
           started_at: string | null
@@ -2367,7 +2398,9 @@ export type Database = {
           odometer: number | null
           ref: string
           reminder_sent_at: string | null
+          review_requested_at: string | null
           service_id: string
+          service_reminded_at: string | null
           shop_id: string
           slot: string
           started_at: string | null
@@ -2533,7 +2566,9 @@ export type Database = {
           odometer: number | null
           ref: string
           reminder_sent_at: string | null
+          review_requested_at: string | null
           service_id: string
+          service_reminded_at: string | null
           shop_id: string
           slot: string
           started_at: string | null
@@ -2573,7 +2608,9 @@ export type Database = {
           odometer: number | null
           ref: string
           reminder_sent_at: string | null
+          review_requested_at: string | null
           service_id: string
+          service_reminded_at: string | null
           shop_id: string
           slot: string
           started_at: string | null
@@ -2622,7 +2659,9 @@ export type Database = {
           odometer: number | null
           ref: string
           reminder_sent_at: string | null
+          review_requested_at: string | null
           service_id: string
+          service_reminded_at: string | null
           shop_id: string
           slot: string
           started_at: string | null
@@ -2740,7 +2779,9 @@ export type Database = {
           odometer: number | null
           ref: string
           reminder_sent_at: string | null
+          review_requested_at: string | null
           service_id: string
+          service_reminded_at: string | null
           shop_id: string
           slot: string
           started_at: string | null
@@ -2845,7 +2886,9 @@ export type Database = {
           phone_verified_at: string | null
           phone_verified_by_admin: boolean
           push_prompt_dismissed_at: string | null
+          review_requests: boolean
           role: string
+          service_reminders: boolean
           suspended: boolean
           terms_accepted_at: string | null
           terms_version: string | null
@@ -2873,7 +2916,9 @@ export type Database = {
           phone_verified_at: string | null
           phone_verified_by_admin: boolean
           push_prompt_dismissed_at: string | null
+          review_requests: boolean
           role: string
+          service_reminders: boolean
           suspended: boolean
           terms_accepted_at: string | null
           terms_version: string | null
@@ -2923,7 +2968,9 @@ export type Database = {
           odometer: number | null
           ref: string
           reminder_sent_at: string | null
+          review_requested_at: string | null
           service_id: string
+          service_reminded_at: string | null
           shop_id: string
           slot: string
           started_at: string | null
@@ -3043,7 +3090,9 @@ export type Database = {
           odometer: number | null
           ref: string
           reminder_sent_at: string | null
+          review_requested_at: string | null
           service_id: string
+          service_reminded_at: string | null
           shop_id: string
           slot: string
           started_at: string | null
@@ -3059,6 +3108,8 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      send_review_requests: { Args: { p_now?: string }; Returns: number }
+      send_service_reminders: { Args: { p_today?: string }; Returns: number }
       send_trial_warnings: { Args: { p_now?: string }; Returns: number }
       set_billed_seats: {
         Args: { p_seats: number; p_shop_id: string }
@@ -3104,7 +3155,9 @@ export type Database = {
           odometer: number | null
           ref: string
           reminder_sent_at: string | null
+          review_requested_at: string | null
           service_id: string
+          service_reminded_at: string | null
           shop_id: string
           slot: string
           started_at: string | null
@@ -3153,7 +3206,9 @@ export type Database = {
           odometer: number | null
           ref: string
           reminder_sent_at: string | null
+          review_requested_at: string | null
           service_id: string
+          service_reminded_at: string | null
           shop_id: string
           slot: string
           started_at: string | null
@@ -3193,7 +3248,9 @@ export type Database = {
           odometer: number | null
           ref: string
           reminder_sent_at: string | null
+          review_requested_at: string | null
           service_id: string
+          service_reminded_at: string | null
           shop_id: string
           slot: string
           started_at: string | null
@@ -3338,7 +3395,9 @@ export type Database = {
           odometer: number | null
           ref: string
           reminder_sent_at: string | null
+          review_requested_at: string | null
           service_id: string
+          service_reminded_at: string | null
           shop_id: string
           slot: string
           started_at: string | null

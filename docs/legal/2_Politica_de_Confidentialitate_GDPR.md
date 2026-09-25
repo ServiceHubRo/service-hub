@@ -174,7 +174,7 @@ Platforma nu e pentru persoane sub 18 ani. Dacă aflăm că un cont e al unui mi
 
 ## 9. Mesajele pe care ți le trimitem
 
-Îți trimitem doar mesaje legate de cont și de programări (confirmări, devize, remindere, plăți) și anunțuri importante despre Platformă. Notificările push le poți opri oricând; service-urile pot opri SMS-urile la cereri noi și rezumatul zilnic din Setări → Notificări.
+Îți trimitem doar mesaje legate de cont și de programări (confirmări, devize, remindere, plăți) și anunțuri importante despre Platformă. A doua zi după o lucrare te întrebăm o singură dată cum a fost (cererea de recenzie), iar după data ultimei lucrări de un anumit fel la o mașină din Garaj îți amintim de următoarea (de exemplu schimbul de ulei); pe amândouă le oprești din Cont → Remindere. Notificările push le poți opri oricând; service-urile pot opri SMS-urile la cereri noi și rezumatul zilnic din Setări → Notificări.
 
 ---
 

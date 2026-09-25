@@ -50,6 +50,13 @@ export function formatDayMonth(lang: Lang, value: Date | string): string {
   return lang === 'ro' ? `${p.day} ${p.month}` : `${p.month} ${p.day}`;
 }
 
+/** RO `oct 2025`, EN `Oct 2025`. */
+export function formatMonthYear(lang: Lang, value: Date | string): string {
+  const date = typeof value === 'string' ? dateFromYmd(value) : value;
+  const p = parts(lang, date, { month: 'short', year: 'numeric' });
+  return `${p.month} ${p.year}`;
+}
+
 /** 24-hour `09:00` in Europe/Bucharest. */
 export function formatTime(lang: Lang, date: Date): string {
   const p = parts(lang, date, { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' });

@@ -80,7 +80,8 @@ function Flow({ page }: { page: ShopPage }) {
 
   /** Why the client was sent back to the days (the time went while the screen was open). */
   const [notice, setNotice] = useState<string | null>(null);
-  const [carDraft, setCarDraft] = useState<CarDraft>(EMPTY_CAR_DRAFT);
+  // `?masina=<id>` (the service reminder, T19d): that garage car is picked on step 4.
+  const [carDraft, setCarDraft] = useState<CarDraft>(() => ({ ...EMPTY_CAR_DRAFT, carId: params.get('masina') }));
 
   const urlFor = (changes: Record<string, string | null>) => {
     const next = new URLSearchParams(params);

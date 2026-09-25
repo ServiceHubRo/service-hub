@@ -174,7 +174,7 @@ The Platform is not for people under 18. If we learn that an account belongs to 
 
 ## 9. Messages we send you
 
-We only send you messages about your account and bookings (confirmations, quotes, reminders, payments) and important announcements about the Platform. You can turn push notifications off at any time; shops can turn off SMS on new requests and the daily summary in Settings → Notifications.
+We only send you messages about your account and bookings (confirmations, quotes, reminders, payments) and important announcements about the Platform. The day after a job we ask you once how it went (the review request), and based on the date of the last job of a given kind on a car in your Garage we remind you of the next one (for example an oil change); you can turn both off in Account → Reminders. You can turn push notifications off at any time; shops can turn off SMS on new requests and the daily summary in Settings → Notifications.
 
 ---
 

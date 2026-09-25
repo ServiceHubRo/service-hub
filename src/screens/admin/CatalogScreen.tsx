@@ -18,6 +18,7 @@ import {
   createService,
   fetchCatalog,
   moveCatalogItem,
+  setServiceInterval,
   updateCategory,
   updateService,
   type CatalogCategory,
@@ -25,13 +26,16 @@ import {
 } from '../../data/adminTools';
 import { canRetryRpc, rpcErrorMessage } from '../../data/rpc';
 import { useI18n } from '../../i18n/context';
+import { plural } from '../../i18n/translate';
 import {
   CATEGORY_KEY_PATTERN,
   filterCatalog,
+  parseIntervalMonths,
   SERVICE_ID_PATTERN,
   suggestCategoryKey,
   suggestServiceId,
 } from '../../lib/adminTools';
+import { siblingRequestId } from '../../lib/requestId';
 import { SERVICE_ICON_NAMES } from '../../lib/serviceIcons';
 import { useLoad } from '../../lib/useLoad';
 import { Pill } from './parts';
@@ -164,6 +168,8 @@ function ServicePanel({
   const [icon, setIcon] = useState(service?.icon ?? 'Wrench');
   const [category, setCategory] = useState(categoryKey);
   const [enabled, setEnabled] = useState(service?.enabled ?? true);
+  const [intervalText, setIntervalText] = useState(service?.interval_months ? String(service.interval_months) : '');
+  const months = parseIntervalMonths(intervalText);
   const shownId = idTouched ? id : suggestServiceId(ro);
   const idOk = SERVICE_ID_PATTERN.test(shownId);
   const categoryOn = categories.find((c) => c.key === category)?.enabled ?? true;
@@ -211,6 +217,17 @@ function ServicePanel({
             onChange={(e) => setCategory(e.target.value)}
           />
         )}
+        <Field
+          className={styles.full}
+          label={t('admin.catalog.interval')}
+          hint={t('admin.catalog.intervalHint')}
+          error={months === 'invalid' ? t('admin.catalog.intervalInvalid') : null}
+          value={intervalText}
+          inputMode="numeric"
+          mono
+          maxLength={3}
+          onChange={(e) => setIntervalText(e.target.value)}
+        />
       </div>
       {service && (
         <>
@@ -223,13 +240,18 @@ function ServicePanel({
       )}
       <div className={styles.panelButtons}>
         <ActionButton
-          disabled={!ro.trim() || !en.trim() || (!service && !idOk) || (Boolean(service) && enabled && !categoryOn)}
+          disabled={
+            !ro.trim() || !en.trim() || (!service && !idOk) || (Boolean(service) && enabled && !categoryOn) || months === 'invalid'
+          }
           onAction={async (requestId) => {
+            if (months === 'invalid') return;
             if (service) {
               await updateService(service.id, { category_key: category, icon, name_ro: ro, name_en: en, enabled }, requestId);
+              if (months !== service.interval_months) await setServiceInterval(service.id, months, siblingRequestId(requestId));
               onDone(t('admin.catalog.saved'));
             } else {
               await createService(shownId, { category_key: categoryKey, icon, name_ro: ro, name_en: en }, requestId);
+              if (months !== null) await setServiceInterval(shownId, months, siblingRequestId(requestId));
               onDone(t('admin.catalog.serviceAdded'));
             }
           }}
@@ -272,6 +294,7 @@ function ServiceRow({
         <span className={styles.rowMeta}>
           <span className="mono">{s.id}</span>
           <span>{t('admin.catalog.usage', { shops: s.shops, bookings: s.bookings })}</span>
+          {s.interval_months !== null && <span>{t('admin.catalog.intervalShort', { months: plural(lang, 'unit.months', s.interval_months) })}</span>}
         </span>
       </span>
       <span className={tools.rowTools}>

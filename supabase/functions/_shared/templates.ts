@@ -9,6 +9,7 @@ import {
   formatDayMonth,
   formatKm,
   formatMoney,
+  formatMonthYear,
   formatTime,
   ymdInBucharest,
   type Lang,
@@ -89,6 +90,11 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
     'client.doc_expiry': { title: '{car}', body: '{doc} expiră în {days}, pe {expiry}.' },
     'client.doc_expiry_today': { title: '{car}', body: '{doc} expiră azi.' },
     'client.doc_expiry_past': { title: '{car}', body: '{doc} a expirat pe {expiry}.' },
+    'client.review_request': { title: '{shop}', body: 'Cum a fost la {shop}? Lasă o recenzie pentru {service_lower}.' },
+    'client.service_due': {
+      title: '{car}',
+      body: 'Se apropie termenul pentru {service_lower} (ultima dată: {last}, la {shop}). Programează-te din aplicație.',
+    },
     'client.report_ready': { title: 'Raportul e gata', body: 'Raportul de istoric pentru {car_plate} e gata de descărcat. Cod: {code}.' },
     'client.review_report_decided': {
       title: 'Recenzie ștearsă',
@@ -203,6 +209,11 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
     'client.doc_expiry': { title: '{car}', body: 'The {doc} expires in {days}, on {expiry}.' },
     'client.doc_expiry_today': { title: '{car}', body: 'The {doc} expires today.' },
     'client.doc_expiry_past': { title: '{car}', body: 'The {doc} expired on {expiry}.' },
+    'client.review_request': { title: '{shop}', body: 'How was {shop}? Leave a review of your {service_lower}.' },
+    'client.service_due': {
+      title: '{car}',
+      body: 'Your next {service_lower} is due soon (last done {last} at {shop}). Book it in the app.',
+    },
     'client.report_ready': { title: 'Your report is ready', body: 'The history report for {car_plate} is ready to download. Code: {code}.' },
     'client.review_report_decided': {
       title: 'Review removed',
@@ -337,7 +348,7 @@ export const EVENTS: Record<Side, readonly string[]> = {
     'booking_confirmed', 'booking_declined', 'booking_rescheduled', 'booking_cancelled_shop', 'booking_cancelled_admin',
     'no_show', 'inspection_started', 'quote_sent', 'quote_replaced', 'quote_withdrawn', 'quote_expiring', 'quote_expired',
     'work_started', 'job_done', 'appointment_reminder', 'new_message', 'review_reply', 'doc_expiry', 'report_ready',
-    'review_report_decided',
+    'review_report_decided', 'review_request', 'service_due',
   ],
   shop: [
     'booking_requested', 'booking_cancelled_client', 'booking_cancelled_admin', 'quote_accepted',
@@ -383,6 +394,11 @@ function relativeDeadline(lang: Lang, iso: string, now: Date): string {
   return word(lang, 'relOn', { date, time });
 }
 
+/** "Schimb ulei" → "schimb ulei" inside a sentence; names starting with an acronym ("ITP", "DPF") stay. */
+function lowerFirst(s: string): string {
+  return /^\p{Lu}\p{Ll}/u.test(s) ? s.charAt(0).toLowerCase() + s.slice(1) : s;
+}
+
 /** Every placeholder a text may use, always defined (an unknown value becomes empty). */
 function vars(e: NotificationEvent, lang: Lang, side: Side, now: Date): Record<string, string> {
   const p = e.params ?? {};
@@ -411,6 +427,7 @@ function vars(e: NotificationEvent, lang: Lang, side: Side, now: Date): Record<s
     .join(' ');
   const odometer = num(p.odometer);
   const docKey = `doc.${str(p.doc)}`;
+  const service = e.service ? e.service[lang] : '';
 
   return {
     ref: str(p.ref),
@@ -420,7 +437,8 @@ function vars(e: NotificationEvent, lang: Lang, side: Side, now: Date): Record<s
     preview: str(p.preview),
     car,
     car_plate: plate ? `${car} (${plate})` : car,
-    service: e.service ? e.service[lang] : '',
+    service,
+    service_lower: lowerFirst(service),
     when,
     slot,
     reason: str(p.reason),
@@ -440,6 +458,7 @@ function vars(e: NotificationEvent, lang: Lang, side: Side, now: Date): Record<s
     expiry: str(p.expiry) ? formatDayMonth(lang, str(p.expiry)) : '',
     digest,
     code: str(p.code),
+    last: str(p.last_date) ? formatMonthYear(lang, str(p.last_date)) : '',
   };
 }
 
@@ -490,6 +509,14 @@ export function urlFor(side: Side, e: NotificationEvent): string {
         return str(p.car_id) ? `/c/garaj/${str(p.car_id)}` : '/c/garaj';
       case 'report_ready':
         return REPORTS_PATH;
+      // The finished booking, with the review form open.
+      case 'review_request':
+        return booking ? `/c/programari?${q({ p: booking, recenzie: '1' })}` : '/c/programari';
+      // Booking the same service at the same shop, for the same car (step 2: the day).
+      case 'service_due':
+        return str(p.shop_id)
+          ? `/c/service/${str(p.shop_id)}/programare?${q({ serviciu: str(p.service_id), masina: str(p.car_id), pas: '2' })}`
+          : '/c/cauta';
       default:
         return booking ? `/c/programari?${q({ p: booking })}` : '/c/programari';
     }
@@ -526,6 +553,8 @@ function tagFor(e: NotificationEvent): string {
       return `thread-${str(p.thread_id)}`;
     case 'doc_expiry':
       return `car-${str(p.car_id)}-${str(p.doc)}`;
+    case 'service_due':
+      return `car-${str(p.car_id)}-${str(p.service_id)}`;
     case 'daily_digest':
       return `digest-${str(p.date)}`;
     case 'new_review':

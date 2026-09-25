@@ -109,3 +109,20 @@ export function reviewState(
 export function quotesWaiting(bookings: readonly { status: BookingStatus }[]): number {
   return bookings.filter((b) => b.status === 'quote_sent').length;
 }
+
+/**
+ * The finished job to ask a review for on Caută (T19d): the most recently finished one whose
+ * review can still be left, or null.
+ */
+export function reviewPrompt<B extends { status: BookingStatus; done_at: string | null; review: unknown }>(
+  bookings: readonly B[],
+  windowDays: number,
+  now: Date = new Date(),
+): B | null {
+  let best: B | null = null;
+  for (const b of bookings) {
+    if (reviewState(b, b.review !== null, windowDays, now) !== 'open') continue;
+    if (!best || new Date(b.done_at!).getTime() > new Date(best.done_at!).getTime()) best = b;
+  }
+  return best;
+}

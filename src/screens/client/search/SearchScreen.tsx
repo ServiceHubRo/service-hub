@@ -20,6 +20,7 @@ import { PushBanner } from '../../push/PushBanner';
 import { SEARCH_PATH, type ShopLinkState } from '../paths';
 import { ExpiryBanner } from './ExpiryBanner';
 import { LocationBanner } from './LocationBanner';
+import { ReviewPromptCard } from './ReviewPromptCard';
 import { RankingExplanation, RankingToggle } from './RankingInfo';
 import { ShopCard } from './ShopCard';
 import styles from './SearchScreen.module.css';
@@ -179,6 +180,7 @@ export function SearchScreen() {
 
       <NoticeBanner />
       <ExpiryBanner />
+      <ReviewPromptCard />
       <PushBanner role="client" />
       <LocationBanner />
 

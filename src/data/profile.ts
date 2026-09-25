@@ -24,6 +24,16 @@ export async function updateProfile(userId: string, fields: { name: string; phon
   return data;
 }
 
+/** The client's reminders in Cont (T19d): review requests and service reminders, on or off. */
+export async function updateReminderPrefs(
+  userId: string,
+  fields: { review_requests: boolean; service_reminders: boolean },
+): Promise<Profile> {
+  const { data, error } = await db().from('profiles').update(fields).eq('id', userId).select('*').single();
+  if (error) throw failure(error);
+  return data;
+}
+
 /**
  * Tells the admin lists the person uses the app (T16a). The database keeps one stamp an hour at
  * most; best effort, a failure changes nothing for the person.

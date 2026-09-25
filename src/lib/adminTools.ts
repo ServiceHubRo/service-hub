@@ -115,6 +115,15 @@ export function suggestCategoryKey(nameRo: string): string {
 export const SERVICE_ID_PATTERN = /^[a-z][a-z0-9_]{1,39}$/;
 export const CATEGORY_KEY_PATTERN = /^cat_[a-z0-9_]{2,30}$/;
 
+/** The service reminder interval typed in the catalog (T19d): empty = none, else 1–120 whole months. */
+export function parseIntervalMonths(text: string): number | null | 'invalid' {
+  const s = text.trim();
+  if (s === '') return null;
+  if (!/^\d{1,3}$/.test(s)) return 'invalid';
+  const n = Number(s);
+  return n >= 1 && n <= 120 ? n : 'invalid';
+}
+
 /**
  * The catalog narrowed to the services whose name (RO/EN) or id matches every word; a category
  * whose own name matches keeps all its services. Without a search, everything.

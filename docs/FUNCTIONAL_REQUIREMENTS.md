@@ -121,6 +121,7 @@ A user has exactly one role. The role decides the entire interface. A client can
 - Name, phone, email, account ID, language.
 - Push notifications: status + enable control.
 - Location: status + enable control.
+- Reminders (T19d): "Review request after a job" and "Service reminders", both on by default, saved on the profile.
 - Favorites list.
 - My reports: purchased history reports, free to re-download.
 - Legal documents (3), readable in-app.
@@ -243,6 +244,7 @@ Admin has a separate login route. No public link to it. Every admin action is wr
 
 ### 5.7 Catalog
 - Manage categories and services: add, rename, enable/disable, reorder. **Service IDs never change** (bookings reference them). Disabled services stay on old bookings but cannot be selected anymore.
+- Each service may carry a **reminder interval in months** (1–120, empty = none; e.g. oil 12, brake fluid 24): the client's service reminder is counted from the last job of that service on the car (T19d).
 
 ### 5.8 Messages
 - Open any thread read-only, for dispute resolution.
@@ -331,6 +333,8 @@ Permission is asked WhatsApp-Web style: in-app banner first, native browser prom
 | **Appointment reminder, 24 h before** | ✓ | — |
 | New message | ✓ | ✓ |
 | Document expiry (30 d, 7 d, day-of; once per threshold) | ✓ | — |
+| Review request, the day after the job (~10:00, once, if no review yet; off in Account) | ✓ | — |
+| Service due (~2 weeks before, from the last job of that service on the car + the catalog interval; once per job; off in Account) | ✓ | — |
 | New review / reply to review / report decided | reply → ✓ | review, decision → ✓ |
 | Daily digest at opening (optional) | — | ✓ |
 | Trial ending (7 d, 1 d), payment failed, account inactive | — | ✓ |
@@ -345,7 +349,7 @@ Verification, resend, password reset, email-change verification, invoice/receipt
 New booking request. Provider: SMSO.
 
 ### In-app
-Banners: email pending, push permission, location permission, document expiry. **Unread badges** on Bookings and Messages tabs for both roles; reported-reviews badge for admin.
+Banners: email pending, push permission, location permission, document expiry, the review card on Search (the latest finished job that can still be reviewed, 60 days; follows the review-request setting). **Unread badges** on Bookings and Messages tabs for both roles; reported-reviews badge for admin.
 
 ### Realtime
 Bookings, messages, reviews, dashboard counters and admin lists update live over Supabase Realtime — no polling, no manual refresh. Auto-reconnect and resync after connection loss.

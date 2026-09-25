@@ -28,6 +28,7 @@ import { helpPath } from './paths';
 import { IdentityCard } from './IdentityCard';
 import { LocationRow } from './LocationRow';
 import { PhoneCard } from './PhoneCard';
+import { RemindersCard } from './RemindersCard';
 import { PushRow } from '../push/PushRow';
 import { SecuritySection } from './SecuritySection';
 import styles from './account.module.css';
@@ -40,7 +41,7 @@ const SUBTITLE: Record<Role, MessageKey> = {
 
 /**
  * Cont, the part every role shares (P13b): identity, language, push notifications on this device
- * (clients and shops, T12), email and password, legal documents, my data, log out. Clients also get Locație, Favorite (T06), "Istoricul mașinilor
+ * (clients and shops, T12), email and password, legal documents, my data, log out. Clients also get Locație, Remindere (T19d), Favorite (T06), "Istoricul mașinilor
  * mele" (T10) and "Rapoartele mele" (T15); shops get the Setări and Recenzii tiles, and the owner Abonament (T14) and Rapoarte (T17); the admin gets the platform tools (T16b) and the audit log
  * (T16a).
  */
@@ -73,6 +74,7 @@ export function AccountScreen({ role }: { role: Role }) {
       {role === 'client' && (
         <>
           <LocationRow />
+          <RemindersCard />
           <div className={styles.tiles}>
             <Tile to={VEHICLE_HISTORY_PICK_PATH} icon={History} label={t('vh.title')} hint={t('vh.tileHint')} />
             <Tile to={MY_REPORTS_PATH} icon={FileCheck} label={t('reports.title')} hint={t('reports.tileHint')} />

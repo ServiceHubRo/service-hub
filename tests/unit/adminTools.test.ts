@@ -17,9 +17,11 @@ import {
   settingsChange,
   SETTING_SECTIONS,
   suggestCategoryKey,
+  parseIntervalMonths,
   suggestServiceId,
   unknownPlaceholders,
 } from '../../src/lib/adminTools';
+import { siblingRequestId } from '../../src/lib/requestId';
 import { SERVICE_ICON_NAMES } from '../../src/lib/serviceIcons';
 
 const t = (key: MessageKey, params?: Record<string, string | number>) => translate('ro', key, params);
@@ -100,8 +102,8 @@ describe('lists', () => {
         position: 1,
         enabled: true,
         services: [
-          { id: 'placute', category_key: 'cat_fra', icon: 'Disc', name_ro: 'Plăcuțe de frână', name_en: 'Brake pads', position: 1, enabled: true, shops: 0, bookings: 0 },
-          { id: 'discuri', category_key: 'cat_fra', icon: 'Disc', name_ro: 'Discuri', name_en: 'Rotors', position: 2, enabled: true, shops: 0, bookings: 0 },
+          { id: 'placute', category_key: 'cat_fra', icon: 'Disc', name_ro: 'Plăcuțe de frână', name_en: 'Brake pads', position: 1, enabled: true, interval_months: null, shops: 0, bookings: 0 },
+          { id: 'discuri', category_key: 'cat_fra', icon: 'Disc', name_ro: 'Discuri', name_en: 'Rotors', position: 2, enabled: true, interval_months: 24, shops: 0, bookings: 0 },
         ],
       },
     ];
@@ -119,6 +121,14 @@ describe('catalog ids', () => {
     expect(suggestServiceId('4x4 diagnoză')).toBe('s_4x4_diagnoza');
     expect(suggestCategoryKey('Tractoare agricole')).toBe('cat_tractoare_agricole');
     expect(suggestServiceId('')).toBe('');
+  });
+
+  it('reads the service reminder interval: empty = none, 1–120 months (T19d)', () => {
+    expect(parseIntervalMonths('')).toBeNull();
+    expect(parseIntervalMonths('  ')).toBeNull();
+    expect(parseIntervalMonths('12')).toBe(12);
+    expect(parseIntervalMonths(' 120 ')).toBe(120);
+    for (const bad of ['0', '121', '1,5', '-3', 'doi', '1000']) expect(parseIntervalMonths(bad), bad).toBe('invalid');
   });
 
   it('every catalog icon is one the app can draw', () => {
@@ -268,5 +278,15 @@ describe('audit log', () => {
     const exported = auditChanges({ before: null, after: { kind: 'bookings', filters: { statuses: ['done'] }, rows: 2 } });
     expect(exported.changes).toEqual([]);
     expect(exported.details.map((d) => d.key)).toEqual(['kind', 'filters', 'rows']);
+  });
+});
+
+describe('a second write in the same tap', () => {
+  it('gets its own request id, the same on every retry', () => {
+    const id = '3f2b8c1a-9d4e-4f6a-8b7c-1d2e3f4a5b6c';
+    const sibling = siblingRequestId(id);
+    expect(sibling).not.toBe(id);
+    expect(siblingRequestId(id)).toBe(sibling);
+    expect(sibling).toMatch(/^[0-9a-f]{8}-9d4e-4f6a-8b7c-1d2e3f4a5b6c$/);
   });
 });

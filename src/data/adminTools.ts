@@ -121,6 +121,8 @@ export interface CatalogService {
   name_en: string;
   position: number;
   enabled: boolean;
+  /** Months between two jobs, for the client's service reminder (T19d); null = none. */
+  interval_months: number | null;
   /** Shops that offer it now. */
   shops: number;
   /** Bookings made for it (they keep pointing at the id). */
@@ -182,6 +184,11 @@ export function updateService(id: string, s: ServiceInput & { enabled: boolean }
     p_enabled: s.enabled,
     p_request_id: requestId,
   });
+}
+
+/** The service reminder interval in months (1–120), or null for none (T19d). */
+export function setServiceInterval(id: string, months: number | null, requestId: string): Promise<Json> {
+  return call('admin_set_service_interval', { p_id: id, p_request_id: requestId, ...(months === null ? {} : { p_months: months }) });
 }
 
 export function moveCatalogItem(kind: 'category' | 'service', id: string, direction: -1 | 1, requestId: string): Promise<Json> {

@@ -4,6 +4,7 @@ import {
   currentQuote,
   decisionKind,
   quotesWaiting,
+  reviewPrompt,
   reviewState,
   selectedTotal,
   type Quote,
@@ -113,6 +114,21 @@ describe('reviews (once, within the window)', () => {
 
   it('nothing for a job that is not finished', () => {
     expect(reviewState({ status: 'in_progress', done_at: null }, false, 60, NOW)).toBeNull();
+  });
+
+  it('Caută asks about the most recent job that can still be reviewed (T19d)', () => {
+    const job = (id: string, doneAt: string | null, review: { id: string } | null = null, status: 'done' | 'confirmed' = 'done') => ({
+      id,
+      status,
+      done_at: doneAt,
+      review,
+    });
+    const older = job('older', '2026-10-01T10:00:00Z');
+    const newer = job('newer', '2026-10-10T10:00:00Z');
+    expect(reviewPrompt([older, newer], 60, NOW)).toBe(newer);
+    expect(reviewPrompt([job('newer', '2026-10-10T10:00:00Z', { id: 'r' }), older], 60, NOW)).toBe(older);
+    expect(reviewPrompt([job('old', '2026-08-01T10:00:00Z'), job('active', null, null, 'confirmed')], 60, NOW)).toBeNull();
+    expect(reviewPrompt([], 60, NOW)).toBeNull();
   });
 });
 

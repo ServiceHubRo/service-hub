@@ -62,6 +62,7 @@ const SAMPLE: Record<string, Record<string, unknown>> = {
   payment_failed: { total: 100, final: false, expiry: '2026-10-16' },
   shop_inactive: { reason: 'trial_ended' },
   review_report_decided: { review_id: 'r-1', rating: 1, decision: 'removed' },
+  service_due: { car_id: 'c-1', last_date: '2025-10-14', due_date: '2026-10-14', months: 12 },
 };
 
 const render = (event: string, role: 'client' | 'shop', lang: 'ro' | 'en', extra: Record<string, unknown> = {}) =>
@@ -156,6 +157,31 @@ describe('notification texts', () => {
     expect(render('doc_expiry', 'client', 'ro', { days: -3 })!.body).toBe('ITP-ul a expirat pe 25 oct.');
     expect(render('doc_expiry', 'client', 'en', { doc: 'vignette', days: 30 })!.body).toBe('The road vignette expires in 30 days, on Oct 25.');
     expect(render('doc_expiry', 'client', 'ro', { days: 20 })!.body).toBe('ITP-ul expiră în 20 de zile, pe 25 oct.');
+  });
+
+  it('asks for a review the day after the job and reminds the next service (T19d)', () => {
+    expect(render('review_request', 'client', 'ro')).toMatchObject({
+      title: 'Atelier Unu',
+      body: 'Cum a fost la Atelier Unu? Lasă o recenzie pentru schimb ulei și filtru.',
+      url: '/c/programari?p=b-1&recenzie=1',
+      tag: 'booking-b-1',
+    });
+    expect(render('review_request', 'client', 'en')!.body).toBe('How was Atelier Unu? Leave a review of your oil & oil filter change.');
+    expect(render('service_due', 'client', 'ro')).toMatchObject({
+      title: 'Volkswagen Golf 7',
+      body: 'Se apropie termenul pentru schimb ulei și filtru (ultima dată: oct 2025, la Atelier Unu). Programează-te din aplicație.',
+      url: '/c/service/s-1/programare?serviciu=ulei&masina=c-1&pas=2',
+      tag: 'car-c-1-ulei',
+    });
+    expect(render('service_due', 'client', 'en')!.body).toBe(
+      'Your next oil & oil filter change is due soon (last done Oct 2025 at Atelier Unu). Book it in the app.',
+    );
+    // A name that starts with an acronym keeps its capitals inside the sentence.
+    const itp = renderNotification({ ...ev('service_due', 'client', 'ro', SAMPLE.service_due), service: { ro: 'ITP la zi', en: 'ITP' } }, {}, NOW);
+    expect(itp!.body).toMatch(/^Se apropie termenul pentru ITP la zi /);
+    // Neither is sent to a shop.
+    expect(render('review_request', 'shop', 'ro')).toBeNull();
+    expect(render('service_due', 'shop', 'ro')).toBeNull();
   });
 
   it('tells the shop who, what and when', () => {

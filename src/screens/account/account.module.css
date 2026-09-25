@@ -177,3 +177,9 @@
 .helpId + .helpNote {
   margin-top: 6px;
 }
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
