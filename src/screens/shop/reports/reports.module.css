@@ -1,0 +1,309 @@
+/* Rapoarte (P22): headline cards, then one card per topic, single column at every width. */
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.green {
+  color: var(--green);
+}
+
+.red {
+  color: var(--red);
+}
+
+.amber {
+  color: var(--amber);
+}
+
+/* ---------------------------------------------------------------- headline figures */
+/* Revenue gets the whole first row on phones (its figure is the longest); three in a row from tablet. */
+.stats {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+@media (min-width: 768px) {
+  .stats {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  padding: 12px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+}
+
+.wide {
+  grid-column: 1 / -1;
+}
+
+@media (min-width: 768px) {
+  .wide {
+    grid-column: auto;
+  }
+}
+
+.statNumber {
+  font-family: var(--font-display);
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: 0.02em;
+  overflow-wrap: anywhere;
+}
+
+@media (min-width: 1024px) {
+  .statNumber {
+    font-size: 38px;
+  }
+}
+
+.statLabel {
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+.change {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  margin-top: 3px;
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+.compare {
+  margin-top: 7px;
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+/* ---------------------------------------------------------------- sections */
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: 10px;
+  font-size: 19px;
+}
+
+.headingHint {
+  font-family: var(--font-body);
+  font-size: 12.5px;
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--muted);
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+/* ---------------------------------------------------------------- figures in rows */
+.rows {
+  display: flex;
+  flex-direction: column;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.rows .row {
+  padding: 10px 0;
+  border-top: 1px solid var(--border);
+}
+
+.rows .row:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.rows .row:last-child {
+  padding-bottom: 0;
+}
+
+.row dt,
+.label {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  color: var(--muted);
+  min-width: 0;
+}
+
+.row dd {
+  font-weight: 700;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.plain {
+  font-family: var(--font-body);
+}
+
+.rowHint {
+  font-size: 12px;
+  color: var(--muted);
+  opacity: 0.85;
+}
+
+/* The single most valuable number on the screen (P22). */
+.highlight {
+  font-size: 20px;
+  color: var(--amber);
+}
+
+.big {
+  font-size: 18px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.meterBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.meterBlock + .rows {
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+
+.note {
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+/* ---------------------------------------------------------------- bars */
+.meter {
+  display: block;
+}
+
+.track {
+  fill: var(--surface2);
+}
+
+.meter .amber {
+  fill: var(--amber);
+}
+
+.meter .green {
+  fill: var(--green);
+}
+
+.meter .red {
+  fill: var(--red);
+}
+
+.meter .blue {
+  fill: var(--blue);
+}
+
+.chart {
+  width: 100%;
+  min-height: 170px;
+}
+
+.chartSvg {
+  display: block;
+  overflow: visible;
+}
+
+.axis {
+  stroke: var(--border);
+  stroke-width: 1;
+}
+
+.bar {
+  fill: var(--amber);
+}
+
+.barValue,
+.barLabel {
+  font-family: var(--font-display);
+  font-size: 12px;
+}
+
+.barValue {
+  fill: var(--text);
+  font-weight: 700;
+}
+
+.barLabel {
+  fill: var(--muted);
+}
+
+.barLabel.current {
+  fill: var(--text);
+  font-weight: 700;
+}
+
+.tiny {
+  font-size: 10.5px;
+}
+
+.services {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.serviceRow {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.serviceTop {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 13.5px;
+}
+
+.serviceName {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.serviceAmount {
+  color: var(--amber);
+  white-space: nowrap;
+}
+
+.download {
+  gap: 8px;
+}
+

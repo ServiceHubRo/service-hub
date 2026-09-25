@@ -18,3 +18,6 @@ export const REVIEWS_PATH = '/s/cont/recenzii';
 
 /** Abonament, the owner's tile in Cont (T14). Every subscription notice and email leads here. */
 export const SUBSCRIPTION_PATH = '/s/cont/abonament';
+
+/** Rapoarte, the owner's tile in Cont (T17): the period lives in the address (`?perioada=`). */
+export const REPORTS_PATH = '/s/cont/rapoarte';

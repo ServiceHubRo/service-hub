@@ -128,3 +128,34 @@ export function formatRelativeDays(lang: Lang, target: Date | string, now: Date 
   const days = plural(lang, 'unit.days', Math.abs(diff));
   return diff > 0 ? translate(lang, 'rel.inDays', { days }) : translate(lang, 'rel.daysAgo', { days });
 }
+
+/** A share 0–1 as a whole percent: RO `45 %`, EN `45%`. */
+export function formatPercent(lang: Lang, share: number): string {
+  return new Intl.NumberFormat(locales[lang], { style: 'percent', maximumFractionDigits: 0 }).format(share);
+}
+
+/** A figure with at most one decimal: RO `1,4`, EN `1.4`; `2` stays `2`. */
+export function formatDecimal(lang: Lang, value: number): string {
+  return new Intl.NumberFormat(locales[lang], { maximumFractionDigits: 1, useGrouping: 'always' }).format(value);
+}
+
+/** An amount without the currency, short enough to sit above a chart bar: `850`, `1,3k`, `12k`. */
+export function formatCompactAmount(lang: Lang, amount: number): string {
+  if (Math.abs(amount) < 1000) return groupedInteger(lang, amount);
+  const thousands = amount / 1000;
+  const digits = Math.abs(thousands) < 10 ? 1 : 0;
+  const n = new Intl.NumberFormat(locales[lang], { maximumFractionDigits: digits, useGrouping: 'always' }).format(thousands);
+  return `${n}k`;
+}
+
+/** The short month name of `YYYY-MM`: RO `ian`, EN `Jan`. */
+export function formatMonthShort(lang: Lang, month: string): string {
+  return parts(lang, dateFromYmd(`${month}-15`), { month: 'short' }).month ?? '';
+}
+
+/** A weekday (0 = Sunday, as in `shop_hours`) in full: RO `Marți`, EN `Tuesday`. */
+export function formatWeekday(lang: Lang, weekday: number): string {
+  // 2026-01-04 was a Sunday.
+  const date = dateFromYmd(`2026-01-${String(4 + weekday).padStart(2, '0')}`);
+  return capitalize(parts(lang, date, { weekday: 'long' }).weekday ?? '');
+}
