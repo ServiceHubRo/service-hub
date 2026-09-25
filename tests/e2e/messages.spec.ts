@@ -4,6 +4,7 @@ import {
   PASSWORD,
   createBookableShop,
   createUser,
+  expectAccessible,
   expectNoHorizontalScroll,
   isDesktop,
   openAccount,
@@ -162,6 +163,9 @@ test.describe('messages and reviews', () => {
     await expectNoHorizontalScroll(page);
     await shot(page, 't11-client-conversation', name());
     await shot(shopPage, 't11-shop-conversation', name());
+    // T18: a conversation with messages from both sides and an automatic one.
+    await expectAccessible(page, 'client conversation');
+    await expectAccessible(shopPage, 'shop conversation');
 
     // Offline: the bar shows; messages sent meanwhile are there once the connection is back.
     await page.context().setOffline(true);

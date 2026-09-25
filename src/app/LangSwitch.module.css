@@ -3,13 +3,13 @@
   background: var(--surface2);
   border: 1px solid var(--border);
   border-radius: var(--radius-pill);
-  padding: 2px;
   flex-shrink: 0;
 }
 
 .option {
+  /* 44 × 44: a tap target like every other (CLAUDE.md §6.13). */
   min-width: var(--tap);
-  min-height: 40px;
+  min-height: var(--tap);
   padding: 0 10px;
   border-radius: var(--radius-pill);
   font-size: 12px;

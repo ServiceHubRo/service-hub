@@ -1,0 +1,33 @@
+.main {
+  display: flex;
+  justify-content: center;
+  padding: 48px var(--page-pad);
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
+  max-width: 460px;
+}
+
+.main .body {
+  align-items: center;
+  text-align: center;
+}
+
+.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  background: var(--amber-tint);
+  color: var(--amber);
+}
+
+.text {
+  color: var(--muted);
+}

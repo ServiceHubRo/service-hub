@@ -184,3 +184,43 @@ export function shot(page: Page, name: string, projectName: string) {
 export function scrollTopOf(page: Page): Promise<number> {
   return page.locator('main').evaluate((el) => el.scrollTop);
 }
+
+/**
+ * WCAG 2.1 AA checks on what is on screen now (axe-core), plus the project's own rule: every
+ * button and every link that stands on its own is at least 44 × 44 px (CLAUDE.md §6.13). Links
+ * inside a sentence are exempt (they follow the text).
+ */
+export async function expectAccessible(page: Page, label: string) {
+  const { default: AxeBuilder } = await import('@axe-core/playwright');
+  const result = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']).analyze();
+  const violations = result.violations.map(
+    (v) => `${v.id} (${v.impact}): ${v.help}\n    ${v.nodes.map((n) => n.target.join(' ')).slice(0, 6).join('\n    ')}`,
+  );
+  expect(violations, `${label}: accessibility`).toEqual([]);
+
+  const small = await page.evaluate(() => {
+    const out: string[] = [];
+    for (const el of Array.from(document.querySelectorAll<HTMLElement>('button, a[href], [role="button"], select, input[type="checkbox"], input[type="radio"]'))) {
+      if (el.closest('[aria-hidden="true"], [hidden], .visually-hidden, [inert]')) continue;
+      const r = el.getBoundingClientRect();
+      if (r.width === 0 || r.height === 0) continue;
+      const style = getComputedStyle(el);
+      if (style.visibility === 'hidden' || style.display === 'none') continue;
+      // A link (or link-styled button) inside running text follows the text size (WCAG 2.5.8
+      // "inline" exception).
+      const inText = Array.from(el.parentElement?.childNodes ?? []).some(
+        (n) => n.nodeType === Node.TEXT_NODE && (n.textContent ?? '').trim() !== '',
+      );
+      if (style.display.startsWith('inline') && inText) continue;
+      // A native checkbox or radio hidden under its custom look: its label is the target.
+      if ((el as HTMLInputElement).type === 'checkbox' || (el as HTMLInputElement).type === 'radio') {
+        if (Number(style.opacity) === 0 || el.closest('label')) continue;
+      }
+      if (r.height < 43.5 || r.width < 43.5) {
+        out.push(`${el.tagName.toLowerCase()} "${(el.getAttribute('aria-label') ?? el.textContent ?? '').trim().slice(0, 40)}" ${Math.round(r.width)}×${Math.round(r.height)}`);
+      }
+    }
+    return out;
+  });
+  expect(small, `${label}: tap targets under 44 px`).toEqual([]);
+}

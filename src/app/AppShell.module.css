@@ -54,6 +54,32 @@
   -webkit-overflow-scrolling: touch;
 }
 
+/* Focused only by "Sari la conținut": no ring around the whole screen. */
+.main:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+/* "Sari la conținut": off screen until a keyboard user tabs to it, then over the header. */
+.skipLink {
+  position: fixed;
+  top: 8px;
+  left: 8px;
+  z-index: 100;
+  padding: 10px 16px;
+  min-height: var(--tap);
+  border-radius: var(--radius-button);
+  background: var(--amber);
+  color: var(--ink);
+  font-weight: 700;
+  text-decoration: none;
+  transform: translateY(-200%);
+}
+
+.skipLink:focus-visible {
+  transform: none;
+}
+
 .content {
   width: 100%;
   max-width: var(--content-max);
@@ -243,5 +269,11 @@
   .content {
     max-width: none;
     padding: 0;
+  }
+}
+
+@media print {
+  .skipLink {
+    display: none;
   }
 }

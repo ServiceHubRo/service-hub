@@ -1,6 +1,7 @@
 import { Link, Navigate, useParams } from 'react-router-dom';
 import { LangSwitch } from '../../app/LangSwitch';
 import { NAV, type Role } from '../../app/roles';
+import { useDocumentTitle } from '../../app/useDocumentTitle';
 import { BackLink } from '../../components/BackLink';
 import { LogoTile } from '../../components/LogoTile';
 import { Wordmark } from '../../components/Wordmark';
@@ -28,6 +29,8 @@ export function AccountLegal({ role }: { role: Role }) {
 export function PublicLegal() {
   const { t } = useI18n();
   const { doc } = useParams();
+  const known = isLegalDocId(doc) ? LEGAL_DOCS.find((d) => d.id === doc) : undefined;
+  useDocumentTitle(known ? t(known.titleKey) : null);
   if (!isLegalDocId(doc)) return <Navigate to="/" replace />;
   const title = LEGAL_DOCS.find((d) => d.id === doc)!.titleKey;
   return (

@@ -23,6 +23,7 @@ import { formatPhone, isValidPostalCode, normalizePhone } from '../../../lib/val
 import { normalizeUrl } from '../../../lib/url';
 import { SETTINGS_PATH } from './paths';
 import { SaveButton } from './SaveButton';
+import { ymdInBucharest } from '../../../i18n/format';
 import { useShopSettings } from './shopSettingsContext';
 import styles from './settings.module.css';
 import own from './ProfileSettings.module.css';
@@ -100,7 +101,7 @@ export function ProfileSettings() {
   const [form, setForm] = useState<Form>(() => toForm(shop));
   const [errors, setErrors] = useState<Errors>({});
   const [mapNote, setMapNote] = useState<MapNote>(null);
-  const maxYear = new Date().getFullYear();
+  const maxYear = Number(ymdInBucharest(new Date()).slice(0, 4));
 
   function set<K extends keyof Form>(key: K, value: Form[K]) {
     setForm((f) => ({ ...f, [key]: value }));

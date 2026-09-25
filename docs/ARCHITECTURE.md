@@ -424,7 +424,11 @@ As Prompt 16e plus §7. Report code `SH-YYYY-NNNNNN` from a sequence. Public pag
 - Inline panels (reschedule, quote composer, completion, review form, report) stay inline on desktop — no modal dialogs.
 - **Print** (shop daily schedule, repair history): hide navigation and buttons, dark text on white, keep table borders.
 
-**Public pages** (landing, legal, `/verifica`) scroll normally, no app shell, same tokens.
+**Public pages** (landing, legal, `/verifica`, 404) scroll normally, no app shell, same tokens. The landing page (T18) reads the shop prices through `public_pricing()` (callable signed out: subscription price, price per colleague, trial days from `platform_settings`, nothing else), so it never shows an old price. Unknown addresses show a 404 page (inside the shell for a signed-in role).
+
+**Code splitting (T18):** `src/app/App.tsx` keeps the public and sign-in screens in the start file; each role's screens are one file loaded after sign-in (`src/app/routes/ClientApp.tsx`, `ShopApp.tsx`, `AdminApp.tsx`, routes relative to `/c`, `/s`, `/admin`). A file that fails to load after a new deploy reloads the page once (`lazyChunk`), then shows "Reîncarcă pagina".
+
+**Accessibility checks (T18):** `tests/e2e/a11y.spec.ts` and `public.spec.ts` run axe-core (WCAG 2.1 AA) on every screen of every role in RO and EN, plus a 44 px tap-target check (links inside a sentence excepted). Muted text on a tinted background uses `--muted-strong`. The shell starts with a "Sari la conținut" link; every page sets the tab title ("Programări · Service-Hub").
 
 ---
 

@@ -196,7 +196,7 @@
 }
 
 .pillMuted {
-  color: var(--muted);
+  color: var(--muted-strong);
   background: var(--muted-soft);
 }
 

@@ -28,5 +28,5 @@ test('published site: ?rol= no longer opens anything', async ({ page }) => {
 
 test('published site: the component gallery is not reachable', async ({ page }) => {
   await page.goto('/dev/componente');
-  await expect(page).toHaveURL(/\/$/);
+  await expect(page.getByRole('heading', { level: 1, name: 'Pagina nu există' })).toBeVisible();
 });

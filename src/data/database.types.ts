@@ -2681,6 +2681,7 @@ export type Database = {
       }
       prepare_account_deletion: { Args: { p_user_id: string }; Returns: string }
       promote_to_admin: { Args: { p_email: string }; Returns: string }
+      public_pricing: { Args: never; Returns: Json }
       purge_request_log: { Args: { p_now?: string }; Returns: number }
       record_payment_failed: {
         Args: { p_customer: string; p_invoice: Json }

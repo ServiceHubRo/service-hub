@@ -40,17 +40,20 @@ export function SignUpForm({
   setEmail,
   onOpenDoc,
   invite,
+  initialRole,
 }: {
   email: string;
   setEmail: (email: string) => void;
   onOpenDoc: (doc: LegalDocId) => void;
   /** Staff invitation: a shop account for the invited address, joining the inviting shop. */
   invite?: { token: string; email: string };
+  /** Chosen before arriving ("Sunt client" / "Sunt service" on the landing page); still changeable. */
+  initialRole?: SignUpRole;
 }) {
   const { t, lang } = useI18n();
   const navigate = useNavigate();
   const formRef = useRef<HTMLFormElement>(null);
-  const [role, setRole] = useState<SignUpRole | null>(invite ? 'shop' : null);
+  const [role, setRole] = useState<SignUpRole | null>(invite ? 'shop' : (initialRole ?? null));
   const [name, setName] = useState('');
   const [shopName, setShopName] = useState('');
   const [city, setCity] = useState('');

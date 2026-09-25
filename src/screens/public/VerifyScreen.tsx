@@ -2,6 +2,7 @@ import { CircleCheck, CircleX, SearchX } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { LangSwitch } from '../../app/LangSwitch';
+import { useDocumentTitle } from '../../app/useDocumentTitle';
 import { ActionButton } from '../../components/ActionButton';
 import { Card } from '../../components/Card';
 import { Field } from '../../components/Field';
@@ -23,6 +24,7 @@ type Result = { code: string; report: VerifiedReport | null };
  */
 export function VerifyScreen() {
   const { t, lang } = useI18n();
+  useDocumentTitle(t('verify.title'));
   const [params, setParams] = useSearchParams();
   const [code, setCode] = useState(params.get('cod') ?? '');
   const [invalid, setInvalid] = useState(false);

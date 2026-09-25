@@ -78,7 +78,7 @@
 
 .pillMuted {
   background: var(--muted-soft);
-  color: var(--muted);
+  color: var(--muted-strong);
 }
 
 .text {

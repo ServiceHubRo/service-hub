@@ -1,14 +1,16 @@
 import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { LangSwitch } from '../../app/LangSwitch';
+import { useDocumentTitle } from '../../app/useDocumentTitle';
 import { LogoTile } from '../../components/LogoTile';
 import { Wordmark } from '../../components/Wordmark';
 import { useI18n } from '../../i18n/context';
 import styles from './AuthLayout.module.css';
 
 /** Signed-out screens: fills the viewport, content centered, scrolls on small phones (P4b). */
-export function AuthLayout({ children }: { children: ReactNode }) {
+export function AuthLayout({ title, children }: { title: string; children: ReactNode }) {
   const { t } = useI18n();
+  useDocumentTitle(title);
   return (
     <div className={styles.page}>
       <div className="status-backdrop" aria-hidden="true" />

@@ -1,5 +1,5 @@
 import { LogOut, User } from 'lucide-react';
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, type MouseEvent } from 'react';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { LogoTile } from '../components/LogoTile';
 import { Wordmark } from '../components/Wordmark';
@@ -19,6 +19,7 @@ import { LangSwitch } from './LangSwitch';
 import { PushBridge } from './PushBridge';
 import { NAV, type NavItem, type Role } from './roles';
 import { useSession } from './sessionContext';
+import { useDocumentTitle } from './useDocumentTitle';
 import styles from './AppShell.module.css';
 
 /** The item's icon with its count bubble (the count is read out after the label). */
@@ -97,11 +98,20 @@ export function AppShell({ role }: { role: Role }) {
   const nav = NAV[role];
   const mainRef = useRef<HTMLElement>(null);
   const badges = useNavBadges();
+  // The tab title follows the navigation item the screen belongs to (Cont for its tiles).
+  const current = [...nav.main, nav.account].find((item) => pathname === item.path || pathname.startsWith(`${item.path}/`));
+  useDocumentTitle(current ? t(current.labelKey) : null);
 
   // A new screen starts at the top; only the content area scrolls.
   useEffect(() => {
     mainRef.current?.scrollTo(0, 0);
   }, [pathname]);
+
+  // Keyboard users jump past the navigation straight to the screen (T18).
+  function skipToContent(event: MouseEvent<HTMLAnchorElement>) {
+    event.preventDefault();
+    mainRef.current?.focus();
+  }
 
   // Leave first, then end the session: otherwise the role guard would send us to sign-in.
   async function logOut() {
@@ -111,6 +121,9 @@ export function AppShell({ role }: { role: Role }) {
 
   return (
     <div className={styles.shell} data-role={role}>
+      <a href="#continut" className={styles.skipLink} onClick={skipToContent}>
+        {t('nav.skipToContent')}
+      </a>
       <header className={styles.header}>
         <LogoTile />
         <Wordmark />
@@ -151,7 +164,7 @@ export function AppShell({ role }: { role: Role }) {
           </div>
         </aside>
 
-        <main className={styles.main} ref={mainRef}>
+        <main className={styles.main} ref={mainRef} id="continut" tabIndex={-1}>
           <div className={styles.content}>
             <EmailVerifyBanner role={role} />
             {role !== 'admin' && <PushBridge />}

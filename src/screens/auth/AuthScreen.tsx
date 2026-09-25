@@ -1,10 +1,11 @@
 import { useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { Banner } from '../../components/Banner';
 import { Tabs } from '../../components/Tabs';
 import { useI18n } from '../../i18n/context';
 import { AuthLayout } from './AuthLayout';
 import { LegalDocScreen } from './LegalDocScreen';
+import { SIGNUP_ROLE_PARAM } from './paths';
 import { useLegalDoc } from './useLegalDoc';
 import { SignInForm } from './SignInForm';
 import { SignUpForm } from './SignUpForm';
@@ -29,13 +30,17 @@ export function AuthScreen({ tab }: { tab: AuthTab }) {
   const navigate = useNavigate();
   const location = useLocation();
   const state = (location.state ?? {}) as AuthLocationState;
+  const [params] = useSearchParams();
+  const roleParam = params.get(SIGNUP_ROLE_PARAM);
+  const initialRole = roleParam === 'client' ? 'client' : roleParam === 'service' ? 'shop' : undefined;
   const [email, setEmail] = useState(state.email ?? '');
   const { doc, open: openDoc, close: closeDoc } = useLegalDoc();
 
   return (
-    <AuthLayout>
+    <AuthLayout title={t(tab === 'signin' ? 'auth.tab.signin' : 'auth.tab.signup')}>
       {doc && <LegalDocScreen doc={doc} onBack={closeDoc} />}
       <div className={styles.stack} hidden={doc !== null}>
+        <h1 className="visually-hidden">{t(tab === 'signin' ? 'auth.tab.signin' : 'auth.tab.signup')}</h1>
         <Tabs
           segmented
           label={t('auth.tabs')}
@@ -52,7 +57,7 @@ export function AuthScreen({ tab }: { tab: AuthTab }) {
         {tab === 'signin' ? (
           <SignInForm email={email} setEmail={setEmail} />
         ) : (
-          <SignUpForm email={email} setEmail={setEmail} onOpenDoc={openDoc} />
+          <SignUpForm email={email} setEmail={setEmail} onOpenDoc={openDoc} initialRole={initialRole} />
         )}
       </div>
     </AuthLayout>

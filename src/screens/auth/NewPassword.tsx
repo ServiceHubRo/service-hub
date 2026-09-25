@@ -43,7 +43,7 @@ export function NewPassword() {
 
   if (session.status === 'loading') {
     return (
-      <AuthLayout>
+      <AuthLayout title={t('auth.reset.title')}>
         <SkeletonList count={1} />
       </AuthLayout>
     );
@@ -51,7 +51,7 @@ export function NewPassword() {
 
   if (session.status !== 'signedIn') {
     return (
-      <AuthLayout>
+      <AuthLayout title={t('auth.reset.title')}>
         <Card>
           <div className={styles.stack}>
             <h1 className={styles.title}>{t('auth.reset.expiredTitle')}</h1>
@@ -66,7 +66,7 @@ export function NewPassword() {
   }
 
   return (
-    <AuthLayout>
+    <AuthLayout title={t('auth.reset.title')}>
       <Card>
         <form ref={formRef} className={styles.form} noValidate onSubmit={(e) => e.preventDefault()}>
           <h1 className={styles.title}>{t('auth.reset.title')}</h1>
