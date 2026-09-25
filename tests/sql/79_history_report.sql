@@ -33,7 +33,8 @@ select test.eq(jsonb_array_length(p->'jobs'), 2, 'two finished jobs on the car')
        test.eq((p->'facts'->>'job_count')::int, 2, 'facts: count'),
        test.eq((p->'facts'->>'latest_odometer')::int, 104900, 'facts: odometer at the newest job'),
        test.eq((p->'facts'->>'odometer_out_of_order')::boolean, true, 'facts: readings go down'),
-       test.eq(p->'facts'->>'period_from', (current_date - 10)::text, 'facts: first day'),
+       -- booking_a was finished 10 days ago (now() - 10 days): its day in Bucharest, not in UTC.
+       test.eq(p->'facts'->>'period_from', (test.today() - 10)::text, 'facts: first day'),
        test.eq(p->'car'->>'vin', 'WVWZZZAUZGW123456', 'the garage car with its VIN'),
        test.eq((p->>'price')::numeric, 29::numeric, 'price from the platform settings')
 from (select current_setting('test.preview')::jsonb p) q;
