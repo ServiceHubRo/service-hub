@@ -16,6 +16,10 @@
   justify-content: space-between;
   gap: 12px;
   padding: 10px var(--page-pad);
+  /* Below the iPhone status bar (see Landing.module.css). */
+  padding-top: max(10px, calc(env(safe-area-inset-top) + 4px));
+  padding-left: max(var(--page-pad), env(safe-area-inset-left));
+  padding-right: max(var(--page-pad), env(safe-area-inset-right));
   border-bottom: 1px solid var(--border);
   background: var(--surface);
 }
@@ -33,6 +37,7 @@
   max-width: 820px;
   margin: 0 auto;
   padding: 12px var(--page-pad) 40px;
+  padding-bottom: max(40px, calc(env(safe-area-inset-bottom) + 24px));
   display: flex;
   flex-direction: column;
   gap: 8px;
