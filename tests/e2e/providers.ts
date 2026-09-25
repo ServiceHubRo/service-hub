@@ -143,6 +143,7 @@ function stripeStandIn() {
   const customers = new Map<string, Obj>();
   const sessions = new Map<string, Obj>();
   const subscriptions = new Map<string, Obj>();
+  const invoices = new Map<string, Obj>();
   const byKey = new Map<string, Obj>();
   const price = { id: 'price_local_monthly', object: 'price', unit_amount: 10000, currency: 'ron', product: 'prod_local' };
   const seatPrice = { id: 'price_local_seat', object: 'price', unit_amount: 2000, currency: 'ron', product: 'prod_local_seat' };
@@ -177,7 +178,7 @@ function stripeStandIn() {
 
   function invoice(sub: Obj, paid: boolean, extra: Obj = {}): Obj {
     const amount = Number((sub as { amount?: number }).amount ?? 10000);
-    return {
+    const inv: Obj = {
       id: id('in'),
       object: 'invoice',
       number: `LOCAL-${seq}`,
@@ -191,6 +192,8 @@ function stripeStandIn() {
       parent: { subscription_details: { subscription: sub.id } },
       ...extra,
     };
+    invoices.set(String(inv.id), inv);
+    return inv;
   }
 
   const subFor = (customer: string) => [...subscriptions.values()].reverse().find((s) => s.customer === customer);
@@ -271,6 +274,15 @@ function stripeStandIn() {
             sessions.set(String(s.id), s);
             return remember(s);
           }
+          // The webhook reads the session and the invoice back from the API.
+          if (req.method === 'GET' && (m = /^\/v1\/checkout\/sessions\/([^/]+)$/.exec(path))) {
+            const s = sessions.get(m[1]!);
+            return s ? reply(200, s) : reply(404, { error: { message: 'No such checkout session' } });
+          }
+          if (req.method === 'GET' && (m = /^\/v1\/invoices\/([^/]+)$/.exec(path))) {
+            const inv = invoices.get(m[1]!);
+            return inv ? reply(200, inv) : reply(404, { error: { message: 'No such invoice' } });
+          }
           if (req.method === 'GET' && (m = /^\/v1\/subscriptions\/([^/]+)$/.exec(path))) {
             const sub = subscriptions.get(m[1]!);
             return sub ? reply(200, sub) : reply(404, { error: { message: 'No such subscription' } });
@@ -307,8 +319,7 @@ function stripeStandIn() {
           if (s.mode === 'payment') {
             // A one-off payment (the history report, T15): paid at once, announced by the webhook.
             try {
-              await send('checkout.session.completed', {
-                ...s,
+              Object.assign(s, {
                 status: 'complete',
                 payment_status: 'paid',
                 amount_total: Number(s.amount),
@@ -316,6 +327,7 @@ function stripeStandIn() {
                 created: now(),
                 payment_intent: id('pi'),
               });
+              await send('checkout.session.completed', s);
             } catch (e) {
               return reply(500, { error: String(e) });
             }
@@ -337,7 +349,8 @@ function stripeStandIn() {
           subscriptions.set(String(sub.id), sub);
           try {
             if (!trialEnd) await send('invoice.paid', invoice(sub, true));
-            await send('checkout.session.completed', { ...s, subscription: sub.id, status: 'complete' });
+            Object.assign(s, { subscription: sub.id, status: 'complete' });
+            await send('checkout.session.completed', s);
           } catch (e) {
             return reply(500, { error: String(e) });
           }

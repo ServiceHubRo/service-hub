@@ -20,6 +20,10 @@
 // Events to send (Stripe → Developers → Webhooks): checkout.session.completed,
 // customer.subscription.created, customer.subscription.updated, customer.subscription.deleted,
 // invoice.paid, invoice.payment_failed.
+//
+// Any API version on the endpoint works: only the event's type and the object's id are taken from
+// the event; the Checkout session, subscription or invoice is read back from the API, which
+// answers in STRIPE_API_VERSION (the event's own copy is used only if Stripe no longer has it).
 import { adminApi } from '../_shared/admin.ts';
 import { appUrlFromEnv, stripeConfigFromEnv } from '../_shared/env.ts';
 import { json } from '../_shared/http.ts';
@@ -74,6 +78,22 @@ async function seatsAtStart(api: Api, stripe: StripeApi, seatPriceId: string | u
   if (r.billed !== null) await api.rpc('set_billed_seats', { p_shop_id: info.shop_id, p_seats: r.billed });
 }
 
+/**
+ * The event's Checkout session or invoice as the API has it now, in STRIPE_API_VERSION, whatever
+ * version the webhook endpoint renders events in. Subscriptions are read back by sync().
+ */
+async function current(stripe: StripeApi, type: string, object: Obj): Promise<Obj> {
+  const id = idOf(object.id);
+  const path = type.startsWith('checkout.session.') ? 'checkout/sessions' : type.startsWith('invoice.') ? 'invoices' : null;
+  if (!id || !path) return object;
+  try {
+    return await stripe.get(`${path}/${id}`);
+  } catch (e) {
+    if (e instanceof StripeError && e.status === 404) return object;
+    throw e;
+  }
+}
+
 /** A paid Checkout for a history report: paid, then its PDF. */
 async function reportPaid(api: Api, session: Obj): Promise<void> {
   const metadata = (session.metadata ?? {}) as Obj;
@@ -88,7 +108,8 @@ async function reportPaid(api: Api, session: Obj): Promise<void> {
   if (row && row.status === 'paid') await generateReport(api, row, appUrlFromEnv());
 }
 
-async function handle(api: Api, stripe: StripeApi, seatPriceId: string | undefined, type: string, object: Obj, eventId: string): Promise<void> {
+async function handle(api: Api, stripe: StripeApi, seatPriceId: string | undefined, type: string, sent: Obj, eventId: string): Promise<void> {
+  const object = await current(stripe, type, sent);
   switch (type) {
     case 'checkout.session.completed':
     case 'checkout.session.async_payment_succeeded':
