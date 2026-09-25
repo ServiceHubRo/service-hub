@@ -643,9 +643,12 @@ export const ro = {
   'settings.staff.hint': 'Cine mai lucrează în cont',
   'settings.notifications': 'Notificări',
   'settings.notifications.hint': 'SMS la cerere nouă, rezumatul zilei',
+  'settings.notifications.staffHint': 'Notificările pe telefonul tău',
   'settings.loadError': 'Setările nu s-au putut încărca. Verifică internetul.',
   'settings.noShop': 'Contul tău nu mai e legat de niciun service. Cere proprietarului o invitație nouă.',
   'settings.ownerOnly': 'Doar proprietarul service-ului vede această secțiune.',
+  'settings.staff.body': 'Programul, serviciile, regulile, taxa de constatare și profilul public le schimbă proprietarul service-ului. Tu lucrezi cu programările, devizele, mesajele și istoricul.',
+  'settings.staff.notifications': 'SMS-ul la cerere nouă și rezumatul zilnic le alege proprietarul service-ului.',
   'profile.intro': 'Clienții văd aceste date pe pagina service-ului.',
   'profile.name': 'Numele service-ului',
   'profile.description': 'Descriere scurtă',
@@ -788,6 +791,7 @@ export const ro = {
   'notif.soon': 'Rezumatul zilei ajunge pe dispozitivele unde ai activat notificările push.',
   'notif.save': 'Salvează notificările',
   'dash.setup.title': 'Pune service-ul pe picioare',
+  'dash.setup.staff': 'Pașii îi face proprietarul service-ului.',
   'dash.setup.progress': '{done} din {total}',
   'dash.setup.services': 'Alege serviciile pe care le faci',
   'dash.setup.hours': 'Verifică programul de lucru',
@@ -1093,6 +1097,7 @@ export const ro = {
 
   // ---------------------------------------------------------------- T11: the shop's reviews
   'reviews.title': 'Recenzii',
+  'reviews.staffNote': 'Răspunsurile la recenzii și raportările le face proprietarul service-ului.',
   'reviews.loadError': 'Nu am putut încărca recenziile.',
   'reviews.empty': 'Nicio recenzie încă.',
   'reviews.emptyBody': 'Clienții pot lăsa o recenzie după o lucrare finalizată.',

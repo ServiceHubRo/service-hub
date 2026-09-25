@@ -64,7 +64,7 @@ select test.fails($$insert into public.notification_events (user_id, event) valu
 
 -- ------------------------------------------------------------------ a reported review
 delete from public.notification_events;
-select test.login(test.id('staff1'));
+select test.login(test.id('owner1'));
 select public.report_review((select id from public.reviews where client_display_name = 'Ana M.'), 'abusive', gen_random_uuid());
 select test.logout();
 select test.ok(user_id is null, 'to the platform''s admin address'),

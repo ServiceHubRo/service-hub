@@ -65,7 +65,10 @@ select test.fails(format($$insert into storage.objects (bucket_id, name) values 
   'row-level security', 'reports bucket is not writable from the browser');
 select test.logout();
 select test.login(test.id('staff1'));
-insert into storage.objects (bucket_id, name) values ('logos', test.id('shop1') || '/logo-2.png');
+select test.fails(format($$insert into storage.objects (bucket_id, name) values ('logos', '%s/logo-2.png')$$, test.id('shop1')),
+  'row-level security', 'a colleague cannot change the logo (the owner''s setting)');
+select test.eq(test.count($$select 1 from storage.objects where bucket_id = 'logos'$$), 1::bigint,
+  'but sees the shop''s logo file');
 select test.logout();
 select test.login(test.id('client_a'));
 select test.fails(format($$insert into storage.objects (bucket_id, name) values ('logos', '%s/x.png')$$, test.id('shop1')),
@@ -79,7 +82,7 @@ select test.eq(test.count($$select 1 from storage.objects where bucket_id = 'log
   'another shop cannot even list shop1''s logo files');
 select test.logout();
 select test.eq(count(*) filter (where metadata ? 'hacked'), 0::bigint, 'client and other shop could not change logos'),
-       test.eq(count(*), 2::bigint, 'both logos still there')
+       test.eq(count(*), 1::bigint, 'the owner''s logo still there')
 from storage.objects where bucket_id = 'logos';
 
 -- ------------------------------------------------------------------ structural checks

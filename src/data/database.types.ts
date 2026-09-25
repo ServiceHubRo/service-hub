@@ -2882,6 +2882,7 @@ export type Database = {
         }
       }
       require_my_shop: { Args: never; Returns: string }
+      require_my_shop_owner: { Args: never; Returns: string }
       require_status: {
         Args: {
           p_allowed: string[]

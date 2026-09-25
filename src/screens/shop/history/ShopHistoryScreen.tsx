@@ -33,6 +33,7 @@ import { formatPhone, normalizePhone } from '../../../lib/validators';
 import { HistoryQuote } from '../../history/HistoryQuote';
 import { MessageLink } from '../../messages/MessageLink';
 import styles from '../../history/history.module.css';
+import { useIsShopOwner } from '../shopRole';
 
 function carText(b: ShopHistoryItem): string {
   return [b.car_snapshot.make, b.car_snapshot.model, b.car_snapshot.year].filter(Boolean).join(' ');
@@ -124,6 +125,8 @@ export function ShopHistoryScreen() {
     [all, query, filter, period, today],
   );
   const totals = historyTotals(shown);
+  // The takings are the owner's: a colleague sees how many jobs, each job's amount, no total, no CSV.
+  const isOwner = useIsShopOwner();
 
   const [open, setOpen] = useState<ReadonlySet<string>>(() => new Set());
   const toggle = (id: string) =>
@@ -147,7 +150,9 @@ export function ShopHistoryScreen() {
         <h1>{t('hist.title')}</h1>
         {all && all.length > 0 && (
           <p className={styles.sub}>
-            {t('hist.totals', { jobs: plural(lang, 'unit.repairs', totals.jobs), amount: formatMoney(lang, totals.revenue) })}
+            {isOwner
+              ? t('hist.totals', { jobs: plural(lang, 'unit.repairs', totals.jobs), amount: formatMoney(lang, totals.revenue) })
+              : plural(lang, 'unit.repairs', totals.jobs)}
           </p>
         )}
         {state.status === 'ready' && (
@@ -194,10 +199,12 @@ export function ShopHistoryScreen() {
             </div>
             {shown.length > 0 && (
               <div className={styles.tools}>
-                <Button variant="ghost" className={styles.tool} onClick={() => downloadCsv(shown, lang, t, today)}>
-                  <Download size={18} aria-hidden="true" />
-                  {t('hist.download')}
-                </Button>
+                {isOwner && (
+                  <Button variant="ghost" className={styles.tool} onClick={() => downloadCsv(shown, lang, t, today)}>
+                    <Download size={18} aria-hidden="true" />
+                    {t('hist.download')}
+                  </Button>
+                )}
                 <Button variant="ghost" className={styles.tool} onClick={() => window.print()}>
                   <Printer size={18} aria-hidden="true" />
                   {t('hist.print')}

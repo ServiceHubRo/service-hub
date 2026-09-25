@@ -118,7 +118,7 @@ A Shop is listed by the owner or representative of a business authorized to prov
 
 ### 4.4 Colleagues
 
-The owner may invite colleagues, each with their own account (colleagues do not use the owner’s account), to work on the same shop (bookings, quotes, messages, reviews, settings). Only the owner sees the subscription, the billing data and the revenue reports, manages colleagues and can delete the shop. The owner is responsible for what colleagues do on the Platform and removes them when they no longer work at the shop.
+The owner may invite colleagues, each with their own account (colleagues do not use the owner’s account), to work on the same shop: bookings, inspections, quotes, jobs, messages and the job history. Only the owner changes the shop’s settings (public profile, hours, services, rules and inspection fee), replies to and reports reviews, sees the total takings, the subscription and the billing data, manages colleagues and can delete the shop. The owner is responsible for what colleagues do on the Platform and removes them when they no longer work at the shop.
 
 ### 4.5 Subscription
 

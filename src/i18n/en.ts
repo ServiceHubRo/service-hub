@@ -645,9 +645,12 @@ export const en: Record<MessageKey, string> = {
   'settings.staff.hint': 'Who else works in this account',
   'settings.notifications': 'Notifications',
   'settings.notifications.hint': 'Texts for new requests, daily summary',
+  'settings.notifications.staffHint': 'Notifications on your phone',
   'settings.loadError': "Settings couldn't be loaded. Check your connection.",
   'settings.noShop': 'Your account is no longer linked to a shop. Ask the owner for a new invitation.',
   'settings.ownerOnly': 'Only the shop owner can see this section.',
+  'settings.staff.body': 'The hours, services, rules, inspection fee and public profile are changed by the shop owner. You work with bookings, quotes, messages and the history.',
+  'settings.staff.notifications': 'The SMS on a new request and the daily summary are chosen by the shop owner.',
   'profile.intro': 'Customers see this on your shop page.',
   'profile.name': 'Shop name',
   'profile.description': 'Short description',
@@ -790,6 +793,7 @@ export const en: Record<MessageKey, string> = {
   'notif.soon': 'The daily summary reaches the devices where you turned on push notifications.',
   'notif.save': 'Save notifications',
   'dash.setup.title': 'Get your shop up and running',
+  'dash.setup.staff': 'The shop owner completes these steps.',
   'dash.setup.progress': '{done} of {total}',
   'dash.setup.services': 'Choose the services you offer',
   'dash.setup.hours': 'Check your opening hours',
@@ -1095,6 +1099,7 @@ export const en: Record<MessageKey, string> = {
 
   // ---------------------------------------------------------------- T11: the shop's reviews
   'reviews.title': 'Reviews',
+  'reviews.staffNote': 'Replies to reviews and reports are made by the shop owner.',
   'reviews.loadError': "We couldn't load your reviews.",
   'reviews.empty': 'No reviews yet.',
   'reviews.emptyBody': 'Customers can leave a review after a completed job.',

@@ -15,6 +15,7 @@ import { useLoad } from '../../../lib/useLoad';
 import { ACCOUNT_PATH } from '../paths';
 import { ReviewCard } from './ReviewCard';
 import styles from './reviews.module.css';
+import { useIsColleague } from '../shopRole';
 
 /**
  * Recenzii, a tile in the shop's Cont (FR §4.5, P10): the average and the count, then every review
@@ -68,6 +69,7 @@ export function ShopReviewsScreen() {
     });
   }, [shopId, replace, refresh]);
 
+  const isColleague = useIsColleague();
   const reviews = state.status === 'ready' ? state.data.reviews : null;
   const summary = reviews ? reviewSummary(reviews) : null;
 
@@ -75,6 +77,7 @@ export function ShopReviewsScreen() {
     <div className={styles.page}>
       <BackLink to={ACCOUNT_PATH} label={t('nav.account')} />
       <h1>{t('reviews.title')}</h1>
+      {isColleague && <p className={styles.muted}>{t('reviews.staffNote')}</p>}
       {state.status === 'loading' && <SkeletonList />}
       {state.status === 'error' && <LoadError message={t('reviews.loadError')} onRetry={reload} />}
       {reviews &&

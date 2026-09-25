@@ -118,7 +118,7 @@ Un Service se înscrie de proprietarul sau reprezentantul unei afaceri autorizat
 
 ### 4.4 Colegii
 
-Proprietarul poate invita colegi, fiecare cu contul lui (colegii nu folosesc contul proprietarului), care lucrează pe același service (programări, devize, mesaje, recenzii, setări). Doar proprietarul vede abonamentul, datele de facturare și rapoartele de încasări, gestionează colegii și poate șterge service-ul. Proprietarul răspunde pentru ce fac colegii în Platformă și îi scoate când nu mai lucrează la service.
+Proprietarul poate invita colegi, fiecare cu contul lui (colegii nu folosesc contul proprietarului), care lucrează pe același service: programări, constatări, devize, lucrări, mesaje și istoricul lucrărilor. Doar proprietarul schimbă setările service-ului (profilul public, programul, serviciile, regulile și taxa de constatare), răspunde la recenzii și le raportează, vede totalul încasărilor, abonamentul și datele de facturare, gestionează colegii și poate șterge service-ul. Proprietarul răspunde pentru ce fac colegii în Platformă și îi scoate când nu mai lucrează la service.
 
 ### 4.5 Abonamentul
 

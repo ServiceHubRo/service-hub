@@ -8,9 +8,11 @@ import { ShopHistoryScreen } from '../../screens/shop/history/ShopHistoryScreen'
 import { REPORTS_PATH, REVIEWS_PATH, SUBSCRIPTION_PATH } from '../../screens/shop/paths';
 import { ShopReportsScreen } from '../../screens/shop/reports/ShopReportsScreen';
 import { ShopReviewsScreen } from '../../screens/shop/reviews/ShopReviewsScreen';
+import { ShopRoleProvider } from '../../screens/shop/ShopRoleProvider';
 import { BillingSettings } from '../../screens/shop/settings/BillingSettings';
 import { HoursSettings } from '../../screens/shop/settings/HoursSettings';
 import { NotificationSettings } from '../../screens/shop/settings/NotificationSettings';
+import { OwnerOnlySettings } from '../../screens/shop/settings/OwnerOnlySettings';
 import { SETTINGS_PATH } from '../../screens/shop/settings/paths';
 import { ProfileSettings } from '../../screens/shop/settings/ProfileSettings';
 import { RulesSettings } from '../../screens/shop/settings/RulesSettings';
@@ -28,13 +30,15 @@ export default function ShopApp() {
     <Routes>
       <Route
         element={
-          // One live list of the shop's bookings for Panou, Programări and the tab badge; one of
-          // its conversations for Mesaje and that tab's badge.
-          <ShopBookingsProvider>
-            <ThreadsProvider side="shop">
-              <AppShell role="shop" />
-            </ThreadsProvider>
-          </ShopBookingsProvider>
+          // Owner or colleague, once; one live list of the shop's bookings for Panou, Programări and
+          // the tab badge; one of its conversations for Mesaje and that tab's badge.
+          <ShopRoleProvider>
+            <ShopBookingsProvider>
+              <ThreadsProvider side="shop">
+                <AppShell role="shop" />
+              </ThreadsProvider>
+            </ShopBookingsProvider>
+          </ShopRoleProvider>
         }
       >
         {commonRoutes('shop', {
@@ -49,10 +53,12 @@ export default function ShopApp() {
         <Route path={rel('shop', REPORTS_PATH)} element={<ShopReportsScreen />} />
         <Route path={rel('shop', SETTINGS_PATH)} element={<ShopSettingsLayout />}>
           <Route index element={<SettingsIndex />} />
-          <Route path="profil" element={<ProfileSettings />} />
-          <Route path="program" element={<HoursSettings />} />
-          <Route path="reguli" element={<RulesSettings />} />
-          <Route path="servicii" element={<ServicesSettings />} />
+          <Route element={<OwnerOnlySettings />}>
+            <Route path="profil" element={<ProfileSettings />} />
+            <Route path="program" element={<HoursSettings />} />
+            <Route path="reguli" element={<RulesSettings />} />
+            <Route path="servicii" element={<ServicesSettings />} />
+          </Route>
           <Route path="facturare" element={<BillingSettings />} />
           <Route path="personal" element={<StaffSettings />} />
           <Route path="notificari" element={<NotificationSettings />} />
