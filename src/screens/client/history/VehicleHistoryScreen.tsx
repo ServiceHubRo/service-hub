@@ -1,4 +1,4 @@
-import { Car as CarIcon, ChevronDown, Wrench } from 'lucide-react';
+import { Car as CarIcon, ChevronDown, FileCheck, Wrench } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { Link, useLocation, useParams } from 'react-router-dom';
 import { BackLink } from '../../../components/BackLink';
@@ -10,6 +10,7 @@ import { ServiceIcon } from '../../../components/ServiceIcon';
 import { SkeletonList } from '../../../components/Skeleton';
 import { quoteOf, type ClientBooking } from '../../../data/bookings';
 import { fetchCars } from '../../../data/garage';
+import { getReportPrice } from '../../../data/reports';
 import { useI18n } from '../../../i18n/context';
 import { formatDayMonth, formatKm, formatMoney } from '../../../i18n/format';
 import { plural } from '../../../i18n/translate';
@@ -21,9 +22,12 @@ import { useClientBookings } from '../bookings/clientBookingsContext';
 import {
   BOOKINGS_PATH,
   bookingPath,
+  bookingReportPath,
+  carReportPath,
   GARAGE_PATH,
   SEARCH_PATH,
   VEHICLE_HISTORY_PICK_PATH,
+  type ReportLinkState,
   type VehicleHistoryLinkState,
 } from '../paths';
 import { serviceName } from '../shop/serviceGroups';
@@ -36,6 +40,7 @@ import styles from '../../history/history.module.css';
  * (/c/garaj/:carId/istoric), Cont → "Istoricul mașinilor mele", and a finished booking
  * (/c/programari/:bookingId/istoric, which also works for a car no longer in the garage). Jobs are
  * matched to the car by plate (see `vehicleKey`), so editing or deleting the car changes nothing.
+ * Under the jobs, "Generează raport oficial — 29 lei" (T15) opens the report's preview.
  * Live through ClientBookingsProvider.
  */
 export function VehicleHistoryScreen() {
@@ -54,6 +59,7 @@ export function VehicleHistoryScreen() {
 
   const { state: bookingsState, reload: reloadBookings } = useClientBookings();
   const { state: carsState, reload: reloadCars } = useLoad(fetchCars);
+  const { state: priceState } = useLoad(getReportPrice);
 
   const loading = bookingsState.status === 'loading' || carsState.status === 'loading';
   const failed = bookingsState.status === 'error' || carsState.status === 'error';
@@ -153,11 +159,24 @@ export function VehicleHistoryScreen() {
             ))}
           </ul>
           <p className={styles.sub}>{t('vh.onlyServiceHub')}</p>
+          {/* The paid report of this car (T15, P16e). */}
+          <Link
+            to={carId ? carReportPath(carId) : bookingReportPath(bookingId ?? '')}
+            state={FROM_HISTORY}
+            className={buttonClass('secondary', true)}
+          >
+            <FileCheck size={18} aria-hidden="true" />
+            {priceState.status === 'ready' && priceState.data !== null
+              ? t('report.buy', { price: formatMoney(lang, priceState.data) })
+              : t('report.buyShort')}
+          </Link>
         </>
       )}
     </div>
   );
 }
+
+const FROM_HISTORY: ReportLinkState = { from: 'history' };
 
 /** One finished job (P16c): summary as a button; opened, the quote, the work and "book again". */
 function JobCard({ booking: b, open, onToggle }: { booking: ClientBooking; open: boolean; onToggle: () => void }) {

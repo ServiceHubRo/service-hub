@@ -173,7 +173,11 @@
   flex-shrink: 0;
 }
 
-.history:hover .historyText {
+.history:hover .report {
+  margin-top: 0;
+}
+
+.historyText {
   color: var(--amber);
 }
 

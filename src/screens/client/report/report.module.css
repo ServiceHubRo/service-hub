@@ -1,0 +1,250 @@
+/* The paid history report (T15, P16e): the preview before paying and Rapoartele mele. */
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sub,
+.muted {
+  color: var(--muted);
+  font-size: 13.5px;
+  overflow-wrap: anywhere;
+}
+
+.section {
+  margin-top: 8px;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ------------------------------------------------------------------ facts */
+.facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 14px;
+}
+
+@media (min-width: 768px) {
+  .facts {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.facts dt {
+  color: var(--muted);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.facts dd {
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.big {
+  color: var(--amber);
+  font-family: var(--font-display);
+  font-size: 20px;
+}
+
+/* ------------------------------------------------------------------ job rows */
+.jobs {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+}
+
+.job {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 2px 12px;
+  padding: 10px 0;
+  border-top: 1px solid var(--border);
+}
+
+.job:first-child {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.jobWhat {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.jobService {
+  font-weight: 700;
+}
+
+.jobSide {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.amount {
+  color: var(--green);
+  font-weight: 700;
+}
+
+/* Lines paid for: readable only in the report. Hidden from screen readers too (the label says so). */
+.blurred {
+  filter: blur(5px);
+  user-select: none;
+  pointer-events: none;
+}
+
+.hiddenNote {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted);
+  font-size: 13px;
+  padding-top: 6px;
+}
+
+.note {
+  font-size: 13.5px;
+  color: var(--muted);
+}
+
+.strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+/* ------------------------------------------------------------------ pay */
+.pay {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.langRow {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.label {
+  font-size: 13.5px;
+  font-weight: 600;
+}
+
+/* ------------------------------------------------------------------ my reports */
+.list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.carName {
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.code {
+  color: var(--amber);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.plate {
+  color: var(--muted);
+}
+
+.highlight {
+  outline: 2px solid var(--amber);
+  outline-offset: 2px;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 3px 9px;
+  border-radius: var(--radius-pill);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.pillGreen {
+  color: var(--green);
+  background: var(--green-soft);
+}
+
+.pillAmber {
+  color: var(--amber);
+  background: var(--amber-soft);
+}
+
+.pillMuted {
+  color: var(--muted);
+  background: var(--muted-soft);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: var(--tap);
+  color: var(--text);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.row svg {
+  color: var(--muted);
+  flex-shrink: 0;
+}
+
+.row:hover .rowText {
+  color: var(--amber);
+}
+
+.rowText {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.rowMuted {
+  color: var(--muted);
+  font-weight: 400;
+  font-size: 13.5px;
+}
+
+.withIcon {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .spin {
+    animation: spin 1.2s linear infinite;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

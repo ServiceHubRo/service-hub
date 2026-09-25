@@ -1,4 +1,4 @@
-import { Bell, Car as CarIcon, ChevronRight, History, Pencil, Plus } from 'lucide-react';
+import { Bell, Car as CarIcon, ChevronRight, FileCheck, History, Pencil, Plus } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { buttonClass } from '../../../components/buttonClass';
 import { Card } from '../../../components/Card';
@@ -14,7 +14,7 @@ import { CAR_DOCS, urgencyOf, type CarDoc } from '../../../lib/expiry';
 import { jobsOf } from '../../../lib/history';
 import { useLoad } from '../../../lib/useLoad';
 import { useClientBookings } from '../bookings/clientBookingsContext';
-import { carHistoryPath, carPath, NEW_CAR_PATH, type VehicleHistoryLinkState } from '../paths';
+import { carHistoryPath, carPath, carReportPath, NEW_CAR_PATH, type ReportLinkState, type VehicleHistoryLinkState } from '../paths';
 import styles from './garage.module.css';
 
 /**
@@ -70,6 +70,7 @@ export function GarageScreen() {
 }
 
 const FROM_GARAGE: VehicleHistoryLinkState = { from: 'garage' };
+const REPORT_FROM_GARAGE: ReportLinkState = { from: 'garage' };
 
 /** `jobs`: finished jobs on this car (P16c), null while the bookings load (or did not). */
 function CarCard({ car, jobs }: { car: Car; jobs: number | null }) {
@@ -93,11 +94,19 @@ function CarCard({ car, jobs }: { car: Car; jobs: number | null }) {
         </Link>
       </div>
       {jobs === null ? null : jobs > 0 ? (
-        <Link to={carHistoryPath(car.id)} state={FROM_GARAGE} className={styles.history}>
-          <History size={16} aria-hidden="true" />
-          <span className={styles.historyText}>{t('vh.garageRow', { jobs: plural(lang, 'unit.jobs', jobs) })}</span>
-          <ChevronRight size={18} aria-hidden="true" />
-        </Link>
+        <>
+          <Link to={carHistoryPath(car.id)} state={FROM_GARAGE} className={styles.history}>
+            <History size={16} aria-hidden="true" />
+            <span className={styles.historyText}>{t('vh.garageRow', { jobs: plural(lang, 'unit.jobs', jobs) })}</span>
+            <ChevronRight size={18} aria-hidden="true" />
+          </Link>
+          {/* The paid report (T15, P16e): a secondary action, only for a car with finished jobs. */}
+          <Link to={carReportPath(car.id)} state={REPORT_FROM_GARAGE} className={`${styles.history} ${styles.report}`}>
+            <FileCheck size={16} aria-hidden="true" />
+            <span className={styles.historyText}>{t('report.garageRow')}</span>
+            <ChevronRight size={18} aria-hidden="true" />
+          </Link>
+        </>
       ) : (
         <p className={styles.historyNone}>{t('vh.noJobs')}</p>
       )}
