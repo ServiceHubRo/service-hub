@@ -58,6 +58,9 @@ const SAMPLE: Record<string, Record<string, unknown>> = {
   new_review: { review_id: 'r-1', rating: 5 },
   doc_expiry: { car_id: 'c-1', doc: 'itp', days: 12, expiry: '2026-10-25' },
   daily_digest: { date: '2026-10-13', today: 4, pending: 2, first_slot: '08:30' },
+  trial_ending: { days: 7, expiry: '2026-10-20', price: 100 },
+  payment_failed: { total: 100, final: false, expiry: '2026-10-16' },
+  shop_inactive: { reason: 'trial_ended' },
 };
 
 const render = (event: string, role: 'client' | 'shop', lang: 'ro' | 'en', extra: Record<string, unknown> = {}) =>
@@ -80,6 +83,13 @@ describe('notification texts', () => {
     const sent = (fn: string) => new Set([...sql.matchAll(new RegExp(`${fn}\\([^,]+,\\s*'(\\w+)'`, 'g'))].map((m) => m[1]!));
     // decide_quote passes its event in a variable.
     const toShop = new Set([...sent('notify_shop'), 'quote_accepted', 'quote_partially_accepted', 'quote_refused']);
+    // The subscription's events go to the shop's owner (T14).
+    const toOwner = sent('notify_shop_owner');
+    expect(toOwner.size).toBeGreaterThan(3);
+    for (const event of toOwner) {
+      if (EMAIL_EVENTS.includes(event)) expect(emailForEvent({ event, lang: 'ro', params: {} }, 'https://x'), event).not.toBeNull();
+      else expect(EVENTS.shop, event).toContain(event);
+    }
     const toClient = sent('notify_user');
     expect(toShop.size).toBeGreaterThan(5);
     expect(toClient.size).toBeGreaterThan(10);

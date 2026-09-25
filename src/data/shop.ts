@@ -342,6 +342,8 @@ export interface ShopSetup {
   trial_ends_at: string | null;
   /** Owner only. */
   billing?: { complete: boolean; reminder: boolean };
+  /** Owner only (T14): where the subscription stands, for the Panou banners. */
+  subscription?: { status: string; trial_ends_at: string | null; card_given: boolean; ended_reason: string | null };
 }
 
 export async function getShopSetup(): Promise<ShopSetup> {

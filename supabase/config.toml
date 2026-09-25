@@ -402,7 +402,7 @@ inspector_port = 8083
 # The Deno major version to use.
 deno_version = 2
 
-# Local stack only: stand-ins for Resend and SMSO, served by the browser tests
+# Local stack only: stand-ins for Resend, SMSO and Stripe, served by the browser tests
 # (tests/e2e/providers.ts) on the runner. The real project's secrets are set in the Supabase
 # dashboard (Edge Functions → Secrets) and never live in this file.
 [edge_runtime.secrets]
@@ -412,6 +412,10 @@ SMSO_API_KEY = "local-test-key"
 SMSO_SENDER = "1"
 SMSO_API_URL = "http://host.docker.internal:54398/smso"
 ADMIN_EMAIL = "admin@service-hub.test"
+STRIPE_SECRET_KEY = "sk_test_local"
+STRIPE_WEBHOOK_SECRET = "whsec_local_test"
+STRIPE_PRICE_ID = "price_local_monthly"
+STRIPE_API_URL = "http://host.docker.internal:54398/stripe"
 
 [analytics]
 enabled = true
@@ -459,4 +463,14 @@ verify_jwt = false
 verify_jwt = false
 
 [functions.invite-staff]
+verify_jwt = false
+
+[functions.stripe-checkout]
+verify_jwt = false
+
+[functions.stripe-portal]
+verify_jwt = false
+
+# Called by Stripe, which signs every request (checked with STRIPE_WEBHOOK_SECRET).
+[functions.stripe-webhook]
 verify_jwt = false

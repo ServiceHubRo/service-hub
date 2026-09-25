@@ -369,8 +369,10 @@ export type Database = {
           issued_at: string | null
           number: string | null
           pdf_url: string | null
+          period_end: string | null
           provider: string | null
           provider_ref: string | null
+          receipt_url: string | null
           series: string | null
           shop_id: string
           status: string
@@ -385,8 +387,10 @@ export type Database = {
           issued_at?: string | null
           number?: string | null
           pdf_url?: string | null
+          period_end?: string | null
           provider?: string | null
           provider_ref?: string | null
+          receipt_url?: string | null
           series?: string | null
           shop_id: string
           status?: string
@@ -401,8 +405,10 @@ export type Database = {
           issued_at?: string | null
           number?: string | null
           pdf_url?: string | null
+          period_end?: string | null
           provider?: string | null
           provider_ref?: string | null
+          receipt_url?: string | null
           series?: string | null
           shop_id?: string
           status?: string
@@ -1588,36 +1594,57 @@ export type Database = {
           cancel_at_period_end: boolean
           created_at: string
           current_period_end: string | null
+          ended_reason: string | null
+          next_payment_attempt: string | null
+          payment_failed_at: string | null
+          payment_failed_key: string | null
           price_ron: number
           shop_id: string
           status: string
+          status_changed_at: string | null
           stripe_customer_id: string | null
+          stripe_status: string | null
           stripe_subscription_id: string | null
           trial_ends_at: string | null
+          trial_reminded: Json
           updated_at: string
         }
         Insert: {
           cancel_at_period_end?: boolean
           created_at?: string
           current_period_end?: string | null
+          ended_reason?: string | null
+          next_payment_attempt?: string | null
+          payment_failed_at?: string | null
+          payment_failed_key?: string | null
           price_ron: number
           shop_id: string
           status?: string
+          status_changed_at?: string | null
           stripe_customer_id?: string | null
+          stripe_status?: string | null
           stripe_subscription_id?: string | null
           trial_ends_at?: string | null
+          trial_reminded?: Json
           updated_at?: string
         }
         Update: {
           cancel_at_period_end?: boolean
           created_at?: string
           current_period_end?: string | null
+          ended_reason?: string | null
+          next_payment_attempt?: string | null
+          payment_failed_at?: string | null
+          payment_failed_key?: string | null
           price_ron?: number
           shop_id?: string
           status?: string
+          status_changed_at?: string | null
           stripe_customer_id?: string | null
+          stripe_status?: string | null
           stripe_subscription_id?: string | null
           trial_ends_at?: string | null
+          trial_reminded?: Json
           updated_at?: string
         }
         Relationships: [
@@ -2079,6 +2106,7 @@ export type Database = {
         }
       }
       dispatch_sweep: { Args: never; Returns: boolean }
+      end_expired_trials: { Args: { p_now?: string }; Returns: number }
       ensure_thread: {
         Args: { p_client_id: string; p_shop_id: string }
         Returns: string
@@ -2324,6 +2352,15 @@ export type Database = {
         }
         Returns: undefined
       }
+      notify_shop_owner: {
+        Args: {
+          p_channels?: string[]
+          p_event: string
+          p_params: Json
+          p_shop_id: string
+        }
+        Returns: undefined
+      }
       notify_user: {
         Args: {
           p_booking_id: string
@@ -2355,6 +2392,14 @@ export type Database = {
       prepare_account_deletion: { Args: { p_user_id: string }; Returns: string }
       promote_to_admin: { Args: { p_email: string }; Returns: string }
       purge_request_log: { Args: { p_now?: string }; Returns: number }
+      record_payment_failed: {
+        Args: { p_customer: string; p_invoice: Json }
+        Returns: boolean
+      }
+      record_stripe_invoice: {
+        Args: { p_customer: string; p_invoice: Json }
+        Returns: Json
+      }
       remind_expiring_quotes: { Args: { p_now?: string }; Returns: number }
       replace_quote: {
         Args: {
@@ -2666,9 +2711,18 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      send_trial_warnings: { Args: { p_now?: string }; Returns: number }
       set_shop_services: {
         Args: { p_request_id: string; p_service_ids: string[] }
         Returns: Json
+      }
+      set_stripe_customer: {
+        Args: { p_customer_id: string; p_shop_id: string }
+        Returns: string
+      }
+      set_subscription_status: {
+        Args: { p_reason?: string; p_shop_id: string; p_status: string }
+        Returns: undefined
       }
       shop_cancel_booking: {
         Args: { p_booking_id: string; p_reason: string; p_request_id: string }
@@ -2794,6 +2848,11 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      stripe_event_begin: {
+        Args: { p_id: string; p_payload: Json; p_type: string }
+        Returns: boolean
+      }
+      stripe_event_done: { Args: { p_id: string }; Returns: undefined }
       submit_review: {
         Args: {
           p_booking_id: string
@@ -2826,6 +2885,47 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      subscription_checkout_info: { Args: { p_user_id: string }; Returns: Json }
+      subscription_for_customer: {
+        Args: { p_customer: string; p_shop_id?: string }
+        Returns: {
+          cancel_at_period_end: boolean
+          created_at: string
+          current_period_end: string | null
+          ended_reason: string | null
+          next_payment_attempt: string | null
+          payment_failed_at: string | null
+          payment_failed_key: string | null
+          price_ron: number
+          shop_id: string
+          status: string
+          status_changed_at: string | null
+          stripe_customer_id: string | null
+          stripe_status: string | null
+          stripe_subscription_id: string | null
+          trial_ends_at: string | null
+          trial_reminded: Json
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "subscriptions"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      subscription_ok: {
+        Args: {
+          p_status: string
+          p_stripe_status: string
+          p_trial_ends_at: string
+        }
+        Returns: boolean
+      }
+      sync_stripe_subscription: {
+        Args: { p_customer: string; p_shop_id: string; p_sub: Json }
+        Returns: Json
       }
       toggle_favorite: {
         Args: { p_request_id: string; p_shop_id: string }

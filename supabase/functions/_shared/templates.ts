@@ -46,6 +46,9 @@ export interface Rendered {
 
 const BRAND = 'Service-Hub';
 
+/** The owner's Abonament screen (T14): where every subscription notice and email leads. */
+export const SUBSCRIPTION_PATH = '/s/cont/abonament';
+
 export const TEMPLATES: Record<Lang, Record<string, Text>> = {
   ro: {
     // ------------------------------------------------------------------ to the client
@@ -114,6 +117,35 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
     'shop.new_message': { title: '{sender}', body: '{preview}' },
     'shop.new_review': { title: 'Recenzie nouă', body: '{client} ți-a dat {rating} din 5 stele.' },
     'shop.daily_digest': { title: 'Programul de azi', body: '{digest}' },
+    // ------------------------------------------------------------------ to the shop's owner (T14)
+    'shop.trial_ending': {
+      title: 'Perioada gratuită se termină',
+      body: 'Perioada gratuită se termină în {days}, pe {expiry}. Activează abonamentul ca service-ul să rămână în căutări.',
+    },
+    'shop.trial_ending_today': {
+      title: 'Perioada gratuită se termină',
+      body: 'Perioada gratuită se termină azi. Activează abonamentul ca service-ul să rămână în căutări.',
+    },
+    'shop.payment_failed': {
+      title: 'Plata nu a trecut',
+      body: 'Nu am putut încasa abonamentul de {total}. Verifică sau schimbă cardul din Abonament. Reîncercăm pe {expiry}.',
+    },
+    'shop.payment_failed_final': {
+      title: 'Plata nu a trecut',
+      body: 'Nu am putut încasa abonamentul de {total}. A fost ultima încercare: plătește din Abonament ca service-ul să rămână în căutări.',
+    },
+    'shop.shop_inactive': {
+      title: 'Service-ul nu mai apare în căutări',
+      body: 'Perioada gratuită s-a încheiat. Activează abonamentul ca să primești din nou programări. Datele tale rămân.',
+    },
+    'shop.shop_inactive_payment': {
+      title: 'Service-ul nu mai apare în căutări',
+      body: 'Plata abonamentului nu a trecut. Plătește din Abonament ca să primești din nou programări. Datele tale rămân.',
+    },
+    'shop.shop_inactive_cancelled': {
+      title: 'Service-ul nu mai apare în căutări',
+      body: 'Abonamentul s-a încheiat. Îl poți reactiva oricând din Abonament. Datele tale rămân.',
+    },
   },
   en: {
     // ------------------------------------------------------------------ to the client
@@ -182,6 +214,35 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
     'shop.new_message': { title: '{sender}', body: '{preview}' },
     'shop.new_review': { title: 'New review', body: '{client} gave you {rating} out of 5 stars.' },
     'shop.daily_digest': { title: "Today's schedule", body: '{digest}' },
+    // ------------------------------------------------------------------ to the shop's owner (T14)
+    'shop.trial_ending': {
+      title: 'Your free period is ending',
+      body: 'Your free period ends in {days}, on {expiry}. Activate the subscription to stay in search results.',
+    },
+    'shop.trial_ending_today': {
+      title: 'Your free period is ending',
+      body: 'Your free period ends today. Activate the subscription to stay in search results.',
+    },
+    'shop.payment_failed': {
+      title: 'Payment failed',
+      body: "We couldn't charge the {total} subscription. Check or change your card under Subscription. We'll try again on {expiry}.",
+    },
+    'shop.payment_failed_final': {
+      title: 'Payment failed',
+      body: "We couldn't charge the {total} subscription. That was the last try: pay under Subscription to stay in search results.",
+    },
+    'shop.shop_inactive': {
+      title: 'Your shop is no longer in search',
+      body: 'Your free period has ended. Activate the subscription to receive bookings again. Your data is kept.',
+    },
+    'shop.shop_inactive_payment': {
+      title: 'Your shop is no longer in search',
+      body: "The subscription payment didn't go through. Pay under Subscription to receive bookings again. Your data is kept.",
+    },
+    'shop.shop_inactive_cancelled': {
+      title: 'Your shop is no longer in search',
+      body: 'Your subscription has ended. You can reactivate it anytime under Subscription. Your data is kept.',
+    },
   },
 };
 
@@ -243,7 +304,7 @@ export const EVENTS: Record<Side, readonly string[]> = {
   shop: [
     'booking_requested', 'booking_cancelled_client', 'booking_cancelled_admin', 'quote_accepted',
     'quote_partially_accepted', 'quote_refused', 'quote_expiring', 'quote_expired', 'new_message', 'new_review',
-    'daily_digest',
+    'daily_digest', 'trial_ending', 'payment_failed', 'shop_inactive',
   ],
 };
 
@@ -358,6 +419,12 @@ export function templateKey(side: Side, e: NotificationEvent): string {
       const days = num(p.days) ?? 0;
       return days < 0 ? `${base}_past` : days === 0 ? `${base}_today` : base;
     }
+    case 'trial_ending':
+      return (num(p.days) ?? 0) <= 0 ? `${base}_today` : base;
+    case 'payment_failed':
+      return p.final === true || !str(p.expiry) ? `${base}_final` : base;
+    case 'shop_inactive':
+      return p.reason === 'payment_failed' ? `${base}_payment` : p.reason === 'cancelled' ? `${base}_cancelled` : base;
     default:
       return base;
   }
@@ -385,6 +452,10 @@ export function urlFor(side: Side, e: NotificationEvent): string {
       return '/s/cont/recenzii';
     case 'daily_digest':
       return '/s/panou';
+    case 'trial_ending':
+    case 'payment_failed':
+    case 'shop_inactive':
+      return SUBSCRIPTION_PATH;
     case 'booking_requested':
       return booking ? `/s/programari?${q({ tab: 'cereri', p: booking })}` : '/s/programari?tab=cereri';
     // Ended bookings are in the history, found by their code.
@@ -409,6 +480,10 @@ function tagFor(e: NotificationEvent): string {
       return `digest-${str(p.date)}`;
     case 'new_review':
       return `review-${str(p.review_id)}`;
+    case 'trial_ending':
+    case 'payment_failed':
+    case 'shop_inactive':
+      return 'subscription';
     default: {
       const booking = e.booking_id ?? str(p.booking_id);
       return booking ? `booking-${booking}` : e.event;

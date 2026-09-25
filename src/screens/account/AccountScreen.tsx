@@ -13,6 +13,7 @@ import { LEGAL_DOCS } from '../../lib/legal';
 import { FAVORITES_PATH, VEHICLE_HISTORY_PICK_PATH } from '../client/paths';
 import { REVIEWS_PATH } from '../shop/paths';
 import { SETTINGS_PATH } from '../shop/settings/paths';
+import { SubscriptionTile } from '../shop/subscription/SubscriptionTile';
 import { DataSection } from './DataSection';
 import { IdentityCard } from './IdentityCard';
 import { LocationRow } from './LocationRow';
@@ -30,8 +31,8 @@ const SUBTITLE: Record<Role, MessageKey> = {
 /**
  * Cont, the part every role shares (P13b): identity, language, push notifications on this device
  * (clients and shops, T12), email and password, legal documents, my data, log out. Clients also get Locație, Favorite (T06) and "Istoricul mașinilor
- * mele" (T10); shops get the Setări and Recenzii tiles; Abonament and Rapoarte arrive with their
- * tasks.
+ * mele" (T10); shops get the Setări and Recenzii tiles, and the owner Abonament (T14); Rapoarte
+ * arrives with its task.
  */
 export function AccountScreen({ role }: { role: Role }) {
   const { t } = useI18n();
@@ -73,6 +74,7 @@ export function AccountScreen({ role }: { role: Role }) {
         <div className={styles.tiles}>
           <Tile to={SETTINGS_PATH} icon={Settings} label={t('account.tile.settings')} />
           <Tile to={REVIEWS_PATH} icon={Star} label={t('reviews.title')} />
+          <SubscriptionTile />
         </div>
       )}
 

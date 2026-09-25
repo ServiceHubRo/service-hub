@@ -31,7 +31,8 @@ Ordinea contează: fiecare sarcină se sprijină pe cele de dinainte. Sarcinile 
 | T11 | Mesaje și recenzii | Conversații live, mesaje automate, răspuns și raportare recenzii |
 | T12 | Notificări push și remindere | Notificări pe telefon, reamintiri automate, expirarea devizelor |
 | T13 | Email și SMS | Emailuri de pe service-hub.ro, SMS la cerere nouă, verificare telefon |
-| T14 | Abonamentul | Plata cu cardul, perioada gratuită, dezactivare la neplată, facturi |
+| T14a | Abonamentul | Plata cu cardul, perioada gratuită, dezactivare la neplată, chitanțe |
+| T14b | Facturarea | Facturi fiscale SmartBill/Oblio și e-Factura, după decizia cu contabilul |
 | T15 | Raportul oficial de istoric | PDF de 29 lei per mașină, pagina publică /verifica |
 | T16a | Admin — administrare | Service-uri, clienți, rezervări, moderare, jurnal |
 | T16b | Admin — unelte | Abonamente, catalog, setări platformă, anunțuri, exporturi |
@@ -429,7 +430,7 @@ Note: 1 migrare (`schema_version` = 18), Edge Functions noi `phone-verify-start`
 
 ---
 
-## T14 — Abonamentul
+## T14a — Abonamentul (plata cu cardul)
 
 **Scop:** service-urile plătesc 100 lei/lună după 90 de zile; cine nu plătește dispare din căutări.
 
@@ -441,13 +442,34 @@ Note: 1 migrare (`schema_version` = 18), Edge Functions noi `phone-verify-start`
 - Regula de neplată: la sfârșitul perioadei gratuite fără plată sau după ultima încercare eșuată, service-ul devine inactiv (nu apare în căutări, nu primește programări noi, își păstrează datele), cu banner și buton de plată. Plata îl reactivează imediat.
 - Avertizări la 7 zile și la 1 zi înainte de final, și la plată eșuată (push + email).
 - Prețul per service (`price_ron`), ca primele 10 service-uri să-și păstreze prețul fix.
-- Facturarea cu SmartBill sau Oblio și e-Factura (`issue-invoice`): construită cu comutator, pornită după decizia ta și a contabilului.
+- Facturarea fiscală (SmartBill / Oblio, e-Factura) a trecut în **T14b**; aici fiecare plată are chitanța Stripe.
 
 **Gata când:** în modul de test Stripe, un service plătește cu cardul de test, devine activ, anulează, iar la final de perioadă dispare din căutări.
 
 **Ce testezi tu:** plata cu cardul de test `4242 4242 4242 4242`, orice dată viitoare, orice CVC; apoi anularea din portal.
 
-**Pașii tăi:** cont Stripe pe firmă, produsul „Abonament Service-Hub” la 100 lei/lună, cheile de test ca secrete (`STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_ID`), adresa webhook-ului; decizia pentru facturare (SmartBill / Oblio, seria, TVA) împreună cu contabilul.
+**Pașii tăi:** cont Stripe pe firmă, produsul „Abonament Service-Hub” la 100 lei/lună, cheile de test ca secrete (`STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_ID`), adresa webhook-ului, portalul clientului activat.
+
+- [x] Făcut
+
+Note: 1 migrare (`schema_version` = 19), Edge Functions noi `stripe-checkout`, `stripe-portal`, `stripe-webhook`; `delete-account` anulează acum și abonamentul Stripe (altfel cardul ar fi taxat după ștergerea contului). **Ecranul Abonament** (`/s/cont/abonament`, placa din Cont doar pentru proprietar, cu starea: „Perioadă gratuită · 74 de zile”, „Activ”, „Plată restantă”…): starea (coroana și zilele gratuite rămase din 90, cu bară; următoarea plată; plata eșuată și data reîncercării; „Abonamentul a expirat. Service-ul tău nu mai apare în căutări.”), planul unic (100 lei / lună, cu ce include), „Activează abonamentul” / „Plătește abonamentul” (pagina Stripe Checkout), „Gestionează abonamentul” (portalul Stripe: card, plăți, anulare la sfârșitul lunii plătite) și lista plăților cu chitanța Stripe. Se actualizează singur (Realtime): după plată, întors din Stripe, vezi „Mulțumim. Abonamentul e activ.” fără reîncărcare. Colegii nu văd abonamentul (nici în baza de date). **Doar webhook-ul schimbă starea** (semnătură verificată, fiecare eveniment o singură dată în `stripe_events`); funcția citește de fiecare dată abonamentul direct din Stripe, așa că evenimentele venite în altă ordine nu strică nimic. Stările: plată reușită → activ imediat (și înapoi în căutări); plată eșuată → „plată restantă”, service-ul rămâne în căutări cât Stripe reîncearcă (push + email la fiecare încercare eșuată); ultima încercare eșuată → inactiv; anulare din portal → activ până la sfârșitul lunii plătite, apoi „Anulat”; perioada gratuită terminată fără card → inactiv (verificat în fiecare oră). Inactiv înseamnă: nu apare în căutări, nu primește programări noi, programările existente continuă, datele rămân; plata îl reactivează imediat. **Avertizări** (push + email, doar proprietarului): la 7 zile și la 1 zi înainte de sfârșitul perioadei gratuite (la 07:00, doar dacă nu a pus cardul), la plată eșuată, când service-ul devine inactiv; plus email „Plată primită” cu chitanța. Pe Panou: banner în ultimele 7 zile gratuite și la plată restantă, iar motivul „Abonamentul a expirat” duce la Abonament. **Decizii:** (1) cardul pus în perioada gratuită doar se salvează — prima plată e la sfârșitul celor 90 de zile, nu pierzi zilele gratuite (cu mai puțin de 2 zile rămase, Stripe cere plata pe loc); (2) plata cere datele de facturare complete (denumire, CUI, Registrul Comerțului, sediu, email de facturare) — factura fiscală din T14b se emite pe firmă; (3) fiecare service plătește prețul lui (`subscriptions.price_ron`, fixat la înscriere): dacă e egal cu prețul din Stripe se folosește `STRIPE_PRICE_ID`, altfel același produs la suma service-ului — așa primele service-uri își păstrează prețul dacă îl schimbi mai târziu; (4) „Plată restantă” păstrează service-ul în căutări cât timp Stripe reîncearcă; (5) „Anulat” = s-a oprit la cererea service-ului, „Inactiv” = neplată sau sfârșit de perioadă gratuită; ambele scot service-ul din căutări. Testele din browser rulează tot drumul pe un „Stripe de test” local (pagină de plată și portal, webhook-uri semnate): perioadă gratuită → card salvat; inactiv → plată → activ, chitanță, email → anulare → sfârșitul lunii → anulat; plată eșuată → plată restantă → ultima încercare → inactiv; ecranul în engleză. **Pentru T14b:** `invoices` are deja rândul fiecărei plăți (`status = 'paid'`, `stripe_invoice_id`, suma, chitanța); factura fiscală completează `series`, `number`, `pdf_url`, `provider`, `status = 'issued'`, iar ecranul arată „Factura” lângă „Chitanța”. **Pentru T16b:** adminul schimbă starea sau prețul unui abonament (manual overrides) prin funcții cu `admin_audit_log`; `set_subscription_status()` ține deja `shops.active` în pas și anunță proprietarul.
+
+---
+
+## T14b — Facturarea (SmartBill / Oblio, e-Factura)
+
+**Scop:** fiecare plată a abonamentului primește factura fiscală, raportată automat în e-Factura.
+
+**Surse:** SERVICII_EXTERNE §6 · ARCHITECTURE §11, §12 · FR §4.7.
+
+**Include:**
+- Edge Function `issue-invoice`, pornită după fiecare plată (`invoices.status = 'paid'`): factura în SmartBill sau Oblio pe datele din `shop_billing`, seria și numărul, TVA după statutul firmei (cota e o setare, nu scrisă în cod), trimiterea în e-Factura.
+- Descărcarea facturii din ecranul Abonament („Factura”, lângă „Chitanța”) și emailul cu factura.
+- Comutator: fără cheia furnizorului nu se emite nimic (ca acum).
+
+**Gata când:** o plată de test produce factura în contul de test SmartBill/Oblio, cu datele firmei service-ului.
+
+**Pașii tăi:** decizia cu contabilul — SmartBill sau Oblio, seria facturilor, plătitor de TVA sau nu, ce se întâmplă la anulare (storno); contul la furnizor și cheia API ca secret.
 
 - [ ] Făcut
 

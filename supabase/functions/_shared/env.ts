@@ -3,6 +3,7 @@
 import { appUrl } from './app.ts';
 import type { EmailConfig } from './resend.ts';
 import type { SmsConfig } from './smso.ts';
+import type { StripeConfig } from './stripe.ts';
 
 const secret = (name: string): string | undefined => Deno.env.get(name)?.trim() || undefined;
 
@@ -22,4 +23,14 @@ export function appUrlFromEnv(): string {
 /** The platform's admin address (reported reviews; replies to app emails). */
 export function adminEmailFromEnv(): string | null {
   return secret('ADMIN_EMAIL') ?? null;
+}
+
+/** Stripe (T14): the secret key, the webhook's signing secret, the monthly price. */
+export function stripeConfigFromEnv(): StripeConfig {
+  return {
+    secretKey: secret('STRIPE_SECRET_KEY'),
+    webhookSecret: secret('STRIPE_WEBHOOK_SECRET'),
+    priceId: secret('STRIPE_PRICE_ID'),
+    url: secret('STRIPE_API_URL'),
+  };
 }
