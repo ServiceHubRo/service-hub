@@ -11,7 +11,7 @@ import {
   verifyStripeSignature,
 } from '../../supabase/functions/_shared/stripe.ts';
 import { renderNotification } from '../../supabase/functions/_shared/templates.ts';
-import { monthlyTotal, subscriptionView, trialWarningDays, type SubscriptionRow } from '../../src/lib/subscription';
+import { includedColleagues, monthlyTotal, subscriptionView, trialWarningDays, type SubscriptionRow } from '../../src/lib/subscription';
 
 describe('Stripe webhook signature', () => {
   const secret = 'whsec_test_secret';
@@ -141,6 +141,7 @@ const row = (over: Partial<SubscriptionRow> = {}): SubscriptionRow => ({
   cancel_at_period_end: false,
   price_ron: 100,
   seat_price_ron: 20,
+  free_seats: 1,
   seats: 0,
   stripe_customer_id: null,
   stripe_status: null,
@@ -281,5 +282,14 @@ describe('subscription notices and emails', () => {
     expect(inactive.subject).toBe('Atelier Unu nu mai apare în căutări');
     expect(inactive.html).toContain('https://app.test/s/cont/abonament');
     for (const e of [paid, ending, failed, inactive]) expect(`${e.subject} ${e.text}`).not.toMatch(/undefined|null|NaN|\{|!/);
+  });
+});
+
+describe('included colleagues', () => {
+  it('names the first one, or how many', () => {
+    expect(includedColleagues('ro', 0)).toBe('');
+    expect(includedColleagues('ro', 1)).toBe('Primul coleg cu cont în service e inclus în abonament.');
+    expect(includedColleagues('ro', 2)).toBe('Primii 2 colegi cu cont în service sunt incluși în abonament.');
+    expect(includedColleagues('en', 1)).toBe('The first colleague with an account in the shop is included in the subscription.');
   });
 });

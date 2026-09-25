@@ -34,7 +34,7 @@ Toate Service-urile de pe Platformă sunt profesioniști (societăți, PFA sau �
 - Ca să îți faci cont trebuie să ai cel puțin 18 ani.
 - Datele din cont (nume, telefon, email) trebuie să fie reale și ținute la zi. Service-ul la care faci o programare primește numele și telefonul tău, ca să te poată contacta.
 - Adresa de email trebuie confirmată. Până atunci, un Client nu poate face programări, iar un Service nu apare în căutare.
-- Parola e doar a ta. Răspunzi pentru ce se face din contul tău. Dacă bănuiești că altcineva l-a folosit, schimbă parola și scrie-ne.
+- Un cont e al unei singure persoane și nu se împrumută. Parola e doar a ta. Răspunzi pentru ce se face din contul tău. Dacă bănuiești că altcineva l-a folosit, schimbă parola și scrie-ne.
 - „Ține-mă minte” păstrează sesiunea pe acel dispozitiv până la 30 de zile. Pe un calculator folosit de mai multe persoane, debifează opțiunea.
 - Fiecare cont are un cod scurt (de exemplu `C-00012` sau `S-00003`), pe care îl folosești când ne scrii.
 
@@ -46,7 +46,7 @@ Toate Service-urile de pe Platformă sunt profesioniști (societăți, PFA sau �
 
 Service-urile apar în ordinea notei ponderate din recenzii: media stelelor, cântărită cu numărul de recenzii, astfel încât un service cu puține recenzii nu trece înaintea unuia cu multe recenzii bune doar datorită unei singure note de 5. La egalitate contează numărul de recenzii, apoi numele. Filtrele (categorie, oraș, favorite) doar restrâng lista, nu o reordonează.
 
-**Nimeni nu poate plăti ca să apară mai sus.** Abonamentul Service-urilor e același pentru toți și nu influențează ordinea. Distanța față de tine apare separat („Aproape de tine”) și ca sortare pe care o alegi tu; nu intră în nota ponderată.
+**Nimeni nu poate plăti ca să apară mai sus.** Abonamentul pe care îl plătesc Service-urile nu influențează ordinea. Distanța față de tine apare separat („Aproape de tine”) și ca sortare pe care o alegi tu; nu intră în nota ponderată.
 
 În căutare apar doar Service-urile cu emailul și telefonul confirmate, cu cel puțin un serviciu ales și o zi deschisă, cu abonamentul în regulă și care nu sunt suspendate.
 
@@ -118,16 +118,18 @@ Un Service se înscrie de proprietarul sau reprezentantul unei afaceri autorizat
 
 ### 4.4 Colegii
 
-Proprietarul poate invita colegi, cu contul lor, care lucrează pe același service (programări, devize, mesaje, recenzii, setări). Doar proprietarul vede abonamentul, datele de facturare și rapoartele de încasări, gestionează colegii și poate șterge service-ul. Proprietarul răspunde pentru ce fac colegii în Platformă și îi scoate când nu mai lucrează la service.
+Proprietarul poate invita colegi, fiecare cu contul lui (colegii nu folosesc contul proprietarului), care lucrează pe același service (programări, devize, mesaje, recenzii, setări). Doar proprietarul vede abonamentul, datele de facturare și rapoartele de încasări, gestionează colegii și poate șterge service-ul. Proprietarul răspunde pentru ce fac colegii în Platformă și îi scoate când nu mai lucrează la service.
 
 ### 4.5 Abonamentul
 
-- **Prețul:** 100 lei pe lună, plus 20 lei pe lună pentru fiecare coleg care și-a făcut contul în service. Invitația nu costă. Prețul se fixează la înscriere și e afișat în ecranul Abonament.
+- **Prețul:** cel afișat pe service-hub.ro când te înscrii, **fără TVA**. Acum: 149 lei pe lună, cu primul coleg care și-a făcut contul în service inclus, plus 19 lei pe lună pentru fiecare coleg în plus. Invitația nu costă. Prețul se fixează la înscriere și e afișat în ecranul Abonament.
+- **Prețul de lansare:** primele 50 de service-uri înscrise plătesc 99 lei pe lună în loc de 149 și îl păstrează cât timp au abonamentul.
+- **TVA:** cât timp {{company}} nu e plătitoare de TVA, nu se adaugă TVA. Dacă devine, TVA-ul se adaugă la preț, iar schimbarea ți-o anunțăm cu cel puțin 30 de zile înainte.
 - **Perioada gratuită:** 90 de zile de la înscriere, cu colegi cu tot. Fără card nu plătești nimic. Dacă adaugi cardul în perioada gratuită, prima plată are loc la sfârșitul ei.
 - **Plata:** lunară, recurentă, cu cardul, prin Stripe. Când un coleg intră sau e scos, suma se ajustează pe zile. Primești chitanța pentru fiecare plată și factura fiscală, conform legii.
 - **Anularea:** oricând, din ecranul Abonament. Abonamentul rămâne activ până la sfârșitul lunii plătite; suma lunii în curs nu se returnează.
 - **Neplata:** dacă o plată nu reușește, Stripe mai încearcă de câteva ori și te anunțăm. Dacă perioada gratuită se termină fără card sau ultima încercare de plată nu reușește, service-ul devine **inactiv**: nu mai apare în căutare și nu mai primește cereri noi. Programările existente continuă, iar toate datele rămân. Cum plătești, service-ul revine imediat.
-- **Schimbarea prețului:** un preț nou pentru un service deja înscris se anunță prin email cu cel puțin 30 de zile înainte. Dacă nu ești de acord, poți anula abonamentul înainte de data schimbării.
+- **Schimbarea prețului:** în afara prețului de lansare, un preț nou pentru un service deja înscris se anunță prin email cu cel puțin 30 de zile înainte. Dacă nu ești de acord, poți anula abonamentul înainte de data schimbării.
 - Abonamentul e un contract între profesioniști: nu se aplică dreptul de retragere al consumatorilor.
 
 ### 4.6 Datele clienților

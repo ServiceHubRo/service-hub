@@ -8,6 +8,11 @@
 --   owner2    — shop2 "Atelier Doi", Codlea: not public (no services, phone not verified)
 --   admin     — promoted with promote_to_admin()
 
+-- The tests count with the first prices (100 lei a month, 20 lei per colleague, no launch price).
+-- The settings as the migrations left them are kept for 85_pricing.sql, which tests them.
+create table test.original_settings as select * from public.platform_settings;
+update public.platform_settings set subscription_price_ron = 100, staff_seat_price_ron = 20, launch_price_ron = 0 where id = 1;
+
 create table test.ids (name text primary key, id uuid not null);
 grant select on test.ids to public;
 

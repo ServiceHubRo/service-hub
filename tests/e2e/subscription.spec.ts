@@ -48,6 +48,9 @@ const BILLING = {
 async function shopWith(options: { billing?: boolean; lang?: string } = {}) {
   const shop = await createBookableShop(`Atelier Abonament ${Date.now()}`, ['ulei'], {}, options.lang ? { lang: options.lang } : {});
   if (options.billing !== false) await serviceRest(`shop_billing?shop_id=eq.${shop.shopId}`, 'PATCH', BILLING);
+  // A shop that signed up at 100 lei and 20 lei per colleague, the prices of the Stripe test
+  // products (the launch price, 149 and 19 lei are checked on the landing page and in SQL).
+  await serviceRest(`subscriptions?shop_id=eq.${shop.shopId}`, 'PATCH', { price_ron: 100, seat_price_ron: 20, launch_offer: false });
   return shop;
 }
 
@@ -215,29 +218,34 @@ test.describe('subscription', () => {
     await shot(page, 't14-subscription-en', name());
   });
 
-  test('colleagues: 20 lei each, in Checkout and in Stripe, and one less when one leaves', async ({ page }) => {
+  test('colleagues: the first included, the shop’s 20 lei for each one after it, in Checkout and in Stripe', async ({ page }) => {
     const { email, shopId } = await shopWith();
-    // A colleague whose account joined the shop (the invitation flow has its own test).
-    const colleague = await createUser('client', { name: 'Coleg Plătit' });
-    const colleagueId = await userIdOf(colleague);
-    await serviceRest(`profiles?id=eq.${colleagueId}`, 'PATCH', { role: 'shop' });
-    await serviceRest('shop_staff', 'POST', {
-      shop_id: shopId,
-      user_id: colleagueId,
-      invited_email: colleague,
-      role: 'staff',
-      accepted_at: new Date().toISOString(),
-    });
+    // Two colleagues whose accounts joined the shop (the invitation flow has its own test).
+    const names = ['Coleg Inclus', 'Coleg Plătit'];
+    for (const colleagueName of names) {
+      const colleague = await createUser('client', { name: colleagueName });
+      const colleagueId = await userIdOf(colleague);
+      await serviceRest(`profiles?id=eq.${colleagueId}`, 'PATCH', { role: 'shop' });
+      await serviceRest('shop_staff', 'POST', {
+        shop_id: shopId,
+        user_id: colleagueId,
+        invited_email: colleague,
+        role: 'staff',
+        accepted_at: new Date().toISOString(),
+      });
+    }
 
     await signIn(page, email, PASSWORD);
     await expect(page).toHaveURL(/\/s\/panou$/);
     await page.goto('/s/cont/abonament');
     await expect(page.getByText('120 lei', { exact: true })).toBeVisible();
-    await expect(page.getByText('100 lei + 1 coleg × 20 lei')).toBeVisible();
+    await expect(
+      page.getByText('100 lei + 1 coleg × 20 lei · Primul coleg cu cont în service e inclus în abonament.'),
+    ).toBeVisible();
     await expectNoHorizontalScroll(page);
     await shot(page, 'seats-subscription', name());
 
-    // Stripe's page charges the plan and the colleague; the subscription has both items.
+    // Stripe's page charges the plan and the one paid colleague; the subscription has both items.
     await page.getByRole('button', { name: 'Activează abonamentul' }).click();
     await expect(page.getByText('Abonament: 120 lei / lună')).toBeVisible();
     await page.getByRole('button', { name: 'Plătește' }).click();
@@ -247,9 +255,10 @@ test.describe('subscription', () => {
       (await stripeSubscriptionOf(customer))?.items.data.find((i) => i.price.id === 'price_local_seat')?.quantity ?? 0;
     expect(await seatsInStripe()).toBe(1);
 
-    // Personal: what a colleague costs; removing the colleague takes them off the Stripe bill.
+    // Personal: what a colleague costs; removing one leaves only the included one, off the Stripe bill.
     await page.goto('/s/cont/setari/personal');
-    await expect(page.getByText('Acum abonamentul tău este 120 lei pe lună, cu 1 coleg.', { exact: false })).toBeVisible();
+    await expect(page.getByText(/^Primul coleg cu cont în service e inclus în abonament\. Fiecare coleg în plus/)).toBeVisible();
+    await expect(page.getByText('Acum abonamentul tău este 120 lei pe lună, cu 1 coleg în plus.', { exact: false })).toBeVisible();
     await shot(page, 'seats-staff', name());
     const card = page.locator('div').filter({ hasText: 'Coleg Plătit' }).filter({ has: page.getByRole('button', { name: 'Elimină' }) }).last();
     await card.getByRole('button', { name: 'Elimină' }).click();
@@ -260,6 +269,8 @@ test.describe('subscription', () => {
       .toBe(0);
     await page.goto('/s/cont/abonament');
     await expect(page.getByText('100 lei', { exact: true })).toBeVisible();
-    await expect(page.getByText('Fiecare coleg care își face cont în service adaugă 20 lei pe lună.')).toBeVisible();
+    await expect(
+      page.getByText('Primul coleg cu cont în service e inclus în abonament. Fiecare coleg în plus adaugă 20 lei pe lună.'),
+    ).toBeVisible();
   });
 });

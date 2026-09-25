@@ -1,4 +1,5 @@
 import { daysFromToday, ymdInBucharest } from '../i18n/format';
+import { translate, type Lang } from '../i18n/translate';
 
 /**
  * Where a shop's subscription stands (FR §4.7, ARCHITECTURE §5, §12), from its row as the owner
@@ -12,8 +13,9 @@ export interface SubscriptionRow {
   current_period_end: string | null;
   cancel_at_period_end: boolean;
   price_ron: number;
-  /** Price per colleague with an account, and how many there are (paid staff seats). */
+  /** Price per colleague, how many colleagues are included, and how many pay (those beyond the included ones). */
   seat_price_ron: number;
+  free_seats: number;
   seats: number;
   stripe_customer_id: string | null;
   stripe_status: string | null;
@@ -113,4 +115,10 @@ export function trialWarningDays(
   if (end.getTime() <= now.getTime()) return null;
   const days = daysFromToday(ymdInBucharest(end), now);
   return days <= 7 ? Math.max(0, days) : null;
+}
+
+/** "Primul coleg cu cont … e inclus" / "Primii 2 colegi … sunt incluși"; empty when none is included. */
+export function includedColleagues(lang: Lang, freeSeats: number): string {
+  if (!(freeSeats > 0)) return '';
+  return freeSeats === 1 ? translate(lang, 'seats.included.one') : translate(lang, 'seats.included.many', { n: freeSeats });
 }

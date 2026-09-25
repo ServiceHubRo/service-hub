@@ -22,7 +22,7 @@ import { getSubscriptionRow } from '../../../data/subscription';
 import { useI18n } from '../../../i18n/context';
 import { formatDate, formatMoney } from '../../../i18n/format';
 import { plural } from '../../../i18n/translate';
-import { monthlyTotal } from '../../../lib/subscription';
+import { includedColleagues, monthlyTotal } from '../../../lib/subscription';
 import { looksLikeEmail } from '../../../lib/password';
 import { useLoad } from '../../../lib/useLoad';
 import { LoadError } from '../../../components/LoadError';
@@ -112,11 +112,13 @@ function SeatPrice() {
   const { state } = useLoad(load);
   if (state.status !== 'ready' || !state.data || !(state.data.seat_price_ron > 0)) return null;
   const sub = state.data;
+  const seat = formatMoney(lang, sub.seat_price_ron);
+  const included = includedColleagues(lang, sub.free_seats);
+  const now = { total: formatMoney(lang, monthlyTotal(sub)), colleagues: plural(lang, 'unit.colleagues', sub.seats) };
   return (
     <p className={styles.intro}>
-      {t('staff.seats.price', { seat: formatMoney(lang, sub.seat_price_ron) })}{' '}
-      {sub.seats > 0 &&
-        t('staff.seats.now', { total: formatMoney(lang, monthlyTotal(sub)), colleagues: plural(lang, 'unit.colleagues', sub.seats) })}
+      {included ? t('staff.seats.priceIncluded', { included, seat }) : t('staff.seats.price', { seat })}{' '}
+      {sub.seats > 0 && (included ? t('staff.seats.nowExtra', now) : t('staff.seats.now', now))}
     </p>
   );
 }

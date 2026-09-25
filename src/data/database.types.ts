@@ -746,12 +746,15 @@ export type Database = {
           default_min_notice_hours: number
           default_slot_minutes: number
           id: number
+          launch_price_ron: number
+          launch_shops: number
           limits: Json
           notification_texts: Json
           quote_expiry_days: number
           ranking_prior_avg: number
           ranking_prior_weight: number
           report_price_ron: number
+          staff_free_seats: number
           staff_seat_price_ron: number
           subscription_price_ron: number
           trial_days: number
@@ -767,12 +770,15 @@ export type Database = {
           default_min_notice_hours?: number
           default_slot_minutes?: number
           id?: number
+          launch_price_ron?: number
+          launch_shops?: number
           limits?: Json
           notification_texts?: Json
           quote_expiry_days?: number
           ranking_prior_avg?: number
           ranking_prior_weight?: number
           report_price_ron?: number
+          staff_free_seats?: number
           staff_seat_price_ron?: number
           subscription_price_ron?: number
           trial_days?: number
@@ -788,12 +794,15 @@ export type Database = {
           default_min_notice_hours?: number
           default_slot_minutes?: number
           id?: number
+          launch_price_ron?: number
+          launch_shops?: number
           limits?: Json
           notification_texts?: Json
           quote_expiry_days?: number
           ranking_prior_avg?: number
           ranking_prior_weight?: number
           report_price_ron?: number
+          staff_free_seats?: number
           staff_seat_price_ron?: number
           subscription_price_ron?: number
           trial_days?: number
@@ -1620,6 +1629,8 @@ export type Database = {
           created_at: string
           current_period_end: string | null
           ended_reason: string | null
+          free_seats: number
+          launch_offer: boolean
           next_payment_attempt: string | null
           payment_failed_at: string | null
           payment_failed_key: string | null
@@ -1642,6 +1653,8 @@ export type Database = {
           created_at?: string
           current_period_end?: string | null
           ended_reason?: string | null
+          free_seats?: number
+          launch_offer?: boolean
           next_payment_attempt?: string | null
           payment_failed_at?: string | null
           payment_failed_key?: string | null
@@ -1664,6 +1677,8 @@ export type Database = {
           created_at?: string
           current_period_end?: string | null
           ended_reason?: string | null
+          free_seats?: number
+          launch_offer?: boolean
           next_payment_attempt?: string | null
           payment_failed_at?: string | null
           payment_failed_key?: string | null
@@ -3100,6 +3115,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      shop_colleague_count: { Args: { p_shop_id: string }; Returns: number }
       shop_hidden_reasons: { Args: { p_shop_id: string }; Returns: string[] }
       shop_reports: { Args: never; Returns: Json }
       shop_seat_count: { Args: { p_shop_id: string }; Returns: number }
@@ -3239,6 +3255,8 @@ export type Database = {
           created_at: string
           current_period_end: string | null
           ended_reason: string | null
+          free_seats: number
+          launch_offer: boolean
           next_payment_attempt: string | null
           payment_failed_at: string | null
           payment_failed_key: string | null

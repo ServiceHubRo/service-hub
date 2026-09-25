@@ -132,6 +132,9 @@ describe('settings form', () => {
   const current = {
     subscription_price_ron: 100,
     staff_seat_price_ron: 20,
+    staff_free_seats: 1,
+    launch_price_ron: 99,
+    launch_shops: 50,
     trial_days: 90,
     quote_expiry_days: 3,
     report_price_ron: 29,

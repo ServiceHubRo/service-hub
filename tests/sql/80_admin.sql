@@ -243,8 +243,8 @@ select test.eq(r->>'status', 'active', 'marked active'),
        test.ok(r->'ended_reason' = 'null'::jsonb, 'no end reason any more')
 from public.admin_set_subscription_status(test.id('shop1'), 'active', test.rid()) r;
 select test.ok(public.is_shop_public(test.id('shop1')), 'an active shop is public');
--- 100 lei + one colleague with an account (staff1) × 20 lei.
-select test.eq((public.admin_overview()->'subscriptions'->>'mrr')::numeric, 120::numeric, 'it counts in the monthly revenue, with its colleague');
+-- 100 lei; its one colleague with an account (staff1) is included.
+select test.eq((public.admin_overview()->'subscriptions'->>'mrr')::numeric, 100::numeric, 'it counts in the monthly revenue, its colleague included');
 
 select test.logout();
 update public.subscriptions set stripe_status = 'active', stripe_subscription_id = 'sub_1' where shop_id = test.id('shop1');

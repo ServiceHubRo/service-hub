@@ -10,6 +10,7 @@ import {
   MessageCircle,
   Search,
   Star,
+  Tag,
   Users,
   type LucideIcon,
 } from 'lucide-react';
@@ -32,6 +33,7 @@ import type { MessageKey } from '../../i18n/ro';
 import { CONTACT, whatsappLink } from '../../lib/contact';
 import { IS_TEST_BUILD } from '../../lib/env';
 import { LEGAL_DOCS } from '../../lib/legal';
+import { includedColleagues } from '../../lib/subscription';
 import { formatPhone } from '../../lib/validators';
 import { signUpPath } from '../auth/paths';
 import styles from './Landing.module.css';
@@ -267,7 +269,7 @@ function FeatureCards({ features }: { features: Feature[] }) {
 
 /** The price as set now in Setări platformă; without it, the offer without figures. */
 function PriceBlock() {
-  const { t, money, plural } = useI18n();
+  const { t, money, plural, lang } = useI18n();
   const [state, setState] = useState<PricingState>({ status: 'loading' });
 
   useEffect(() => {
@@ -294,8 +296,10 @@ function PriceBlock() {
           <>
             <p className={styles.priceMain}>
               <span className={styles.priceFigure}>
-                {t('landing.priceMain', { price: money(state.pricing.subscriptionRon) })}
+                {t('landing.priceMain', { price: money(state.pricing.launchRon ?? state.pricing.subscriptionRon) })}
               </span>
+              <span aria-hidden="true"> · </span>
+              <span>{t('landing.priceNoVat')}</span>
               {state.pricing.trialDays > 0 && (
                 <>
                   <span aria-hidden="true"> · </span>
@@ -305,10 +309,28 @@ function PriceBlock() {
               <span aria-hidden="true"> · </span>
               <span>{t('landing.priceNoContract')}</span>
             </p>
+            {state.pricing.launchRon !== null && (
+              <p className={styles.priceNote}>
+                <Tag size={16} aria-hidden="true" />
+                <span>
+                  {t('landing.priceLaunch', {
+                    shops: plural('unit.shops', state.pricing.launchShops),
+                    price: money(state.pricing.subscriptionRon),
+                  })}
+                </span>
+              </p>
+            )}
             {state.pricing.seatRon > 0 && (
               <p className={styles.priceNote}>
                 <Users size={16} aria-hidden="true" />
-                <span>{t('landing.priceSeat', { price: money(state.pricing.seatRon) })}</span>
+                <span>
+                  {state.pricing.freeSeats > 0
+                    ? t('landing.priceSeatIncluded', {
+                        included: includedColleagues(lang, state.pricing.freeSeats),
+                        price: money(state.pricing.seatRon),
+                      })
+                    : t('landing.priceSeat', { price: money(state.pricing.seatRon) })}
+                </span>
               </p>
             )}
           </>

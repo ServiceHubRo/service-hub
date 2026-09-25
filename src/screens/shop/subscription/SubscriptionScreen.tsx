@@ -23,7 +23,7 @@ import { useI18n } from '../../../i18n/context';
 import { formatDate, formatDayMonth, formatMoney } from '../../../i18n/format';
 import type { MessageKey } from '../../../i18n/ro';
 import { plural } from '../../../i18n/translate';
-import { monthlyTotal, STATE_TONE, subscriptionView, type SubscriptionView } from '../../../lib/subscription';
+import { includedColleagues, monthlyTotal, STATE_TONE, subscriptionView, type SubscriptionView } from '../../../lib/subscription';
 import { useLoad } from '../../../lib/useLoad';
 import { useNow } from '../../../lib/useNow';
 import { SETTINGS_LINKS } from '../settings/paths';
@@ -178,22 +178,26 @@ function StatusCard({ data, view }: { data: SubscriptionData; view: Subscription
 }
 
 /**
- * The price per colleague (paid staff seats): "100 lei + 2 colegi × 20 lei" when there are
- * colleagues with an account, else what one would add. Nothing is paid in the free period.
+ * The price per colleague (paid staff seats): "100 lei + 2 colegi × 20 lei" when colleagues beyond
+ * the included ones have an account, else what the included ones are and what one more would add.
+ * Nothing is paid in the free period.
  */
 function SeatsLine({ sub }: { sub: SubscriptionData['subscription'] }) {
   const { t, lang } = useI18n();
   const seat = formatMoney(lang, sub.seat_price_ron);
   if (!(sub.seat_price_ron > 0)) return null;
+  const included = includedColleagues(lang, sub.free_seats);
   return (
     <p className={styles.seats}>
       {sub.seats > 0
-        ? t('sub.seats.breakdown', {
+        ? `${t('sub.seats.breakdown', {
             base: formatMoney(lang, sub.price_ron),
             colleagues: plural(lang, 'unit.colleagues', sub.seats),
             seat,
-          })
-        : t('sub.seats.none', { seat })}
+          })}${included ? ` · ${included}` : ''}`
+        : included
+          ? t('sub.seats.noneIncluded', { included, seat })
+          : t('sub.seats.none', { seat })}
     </p>
   );
 }
