@@ -29,7 +29,7 @@ They stay on your device and are not sent to us automatically.
 | `sh_last_seen` | When you last used the app on this device, so we can sign you out after 30 days without use | localStorage, until you clear the site’s data |
 | `sh_lang` | The language you chose (Romanian or English) | localStorage, until you clear the site’s data |
 | `sh_email_log` | When we last sent you a confirmation or password reset email, so “Resend” waits 60 seconds | localStorage, until you clear the site’s data |
-| `sh_push_banner_hidden`, `sh_location_banner_hidden` | You tapped “Not now” on notifications or location: the message does not show again in this session | sessionStorage, until you close the tab |
+| `sh_push_banner_hidden`, `sh_location_banner_hidden`, `sh_review_prompt_hidden` | You tapped “Not now” on notifications, location or the review request: the message does not show again in this session | sessionStorage, until you close the tab |
 | `sh_chunk_reload` | After an app update, the page reloads only once, not endlessly | sessionStorage, until you close the tab |
 | Push notification subscription | Only if you turn notifications on: the browser keeps the subscription and the service worker | In the browser, until you turn notifications off or clear the site’s data |
 

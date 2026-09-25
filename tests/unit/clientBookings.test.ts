@@ -5,6 +5,7 @@ import {
   decisionKind,
   quotesWaiting,
   reviewState,
+  reviewToAsk,
   selectedTotal,
   type Quote,
   type QuoteItem,
@@ -113,6 +114,21 @@ describe('reviews (once, within the window)', () => {
 
   it('nothing for a job that is not finished', () => {
     expect(reviewState({ status: 'in_progress', done_at: null }, false, 60, NOW)).toBeNull();
+  });
+
+  it('the Caută card asks about the newest job still waiting for a review (T19d)', () => {
+    const b = (id: string, done_at: string | null, review: unknown = null) => ({
+      id,
+      status: done_at ? ('done' as const) : ('confirmed' as const),
+      done_at,
+      review,
+    });
+    const newest = b('new', '2026-10-12T10:00:00Z');
+    const reviewed = b('reviewed', '2026-10-13T10:00:00Z', { rating: 5 });
+    const upcoming = b('upcoming', null);
+    const list = [b('old', '2026-10-01T10:00:00Z'), newest, reviewed, b('expired', '2026-07-01T10:00:00Z'), upcoming];
+    expect(reviewToAsk(list, 60, NOW)).toEqual({ booking: newest, count: 2 });
+    expect(reviewToAsk([reviewed, upcoming], 60, NOW)).toBeNull();
   });
 });
 

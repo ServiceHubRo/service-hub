@@ -27,6 +27,7 @@ import { DataSection } from './DataSection';
 import { helpPath } from './paths';
 import { IdentityCard } from './IdentityCard';
 import { LocationRow } from './LocationRow';
+import { ServiceRemindersRow } from './ServiceRemindersRow';
 import { PhoneCard } from './PhoneCard';
 import { PushRow } from '../push/PushRow';
 import { SecuritySection } from './SecuritySection';
@@ -73,6 +74,7 @@ export function AccountScreen({ role }: { role: Role }) {
       {role === 'client' && (
         <>
           <LocationRow />
+          <ServiceRemindersRow />
           <div className={styles.tiles}>
             <Tile to={VEHICLE_HISTORY_PICK_PATH} icon={History} label={t('vh.title')} hint={t('vh.tileHint')} />
             <Tile to={MY_REPORTS_PATH} icon={FileCheck} label={t('reports.title')} hint={t('reports.tileHint')} />

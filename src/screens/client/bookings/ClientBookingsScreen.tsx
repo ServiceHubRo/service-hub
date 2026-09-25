@@ -17,13 +17,16 @@ import styles from './bookings.module.css';
  * Programări (FR §3.5, P10b): active bookings first (soonest on top), then the ended ones (newest
  * on top), every status with its badge. The quote decision, cancelling and the review happen on
  * the cards. Live through ClientBookingsProvider: a change the shop makes shows up without
- * reloading. `?p=<id>` (a tapped notification) scrolls to that booking and marks it.
+ * reloading. `?p=<id>` (a tapped notification) scrolls to that booking and marks it; with
+ * `&recenzie=1` (the review request, T19d) its review form is open.
  */
 export function ClientBookingsScreen() {
   const { t } = useI18n();
   const { state, reload, refresh, apply, patch } = useClientBookings();
   const now = useNow();
-  const focusId = useSearchParams()[0].get('p');
+  const [params] = useSearchParams();
+  const focusId = params.get('p');
+  const reviewFocus = params.get('recenzie') === '1';
   const scrolledTo = useRef<string | null>(null);
 
   // Arriving here reads the list again quietly.
@@ -69,6 +72,7 @@ export function ClientBookingsScreen() {
                 onDone={apply}
                 onReviewed={(id, review) => patch(id, { review })}
                 onStale={refresh}
+                openReview={reviewFocus && b.id === focusId}
               />
             </li>
           ))}

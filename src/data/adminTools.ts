@@ -121,6 +121,8 @@ export interface CatalogService {
   name_en: string;
   position: number;
   enabled: boolean;
+  /** Months after which clients get a service reminder (T19d); null for none. */
+  reminder_months: number | null;
   /** Shops that offer it now. */
   shops: number;
   /** Bookings made for it (they keep pointing at the id). */
@@ -182,6 +184,11 @@ export function updateService(id: string, s: ServiceInput & { enabled: boolean }
     p_enabled: s.enabled,
     p_request_id: requestId,
   });
+}
+
+/** The service reminder interval (T19d): 1–120 months, or null for none. Audited. */
+export function setServiceReminder(id: string, months: number | null, requestId: string): Promise<Json> {
+  return call('admin_set_service_reminder', { p_id: id, p_months: months as number, p_request_id: requestId });
 }
 
 export function moveCatalogItem(kind: 'category' | 'service', id: string, direction: -1 | 1, requestId: string): Promise<Json> {

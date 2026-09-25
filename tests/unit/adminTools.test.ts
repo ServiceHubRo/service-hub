@@ -13,6 +13,7 @@ import {
   filterReports,
   filterSubscriptions,
   parseNumber,
+  parseReminderMonths,
   placeholdersOf,
   settingsChange,
   SETTING_SECTIONS,
@@ -100,8 +101,8 @@ describe('lists', () => {
         position: 1,
         enabled: true,
         services: [
-          { id: 'placute', category_key: 'cat_fra', icon: 'Disc', name_ro: 'Plăcuțe de frână', name_en: 'Brake pads', position: 1, enabled: true, shops: 0, bookings: 0 },
-          { id: 'discuri', category_key: 'cat_fra', icon: 'Disc', name_ro: 'Discuri', name_en: 'Rotors', position: 2, enabled: true, shops: 0, bookings: 0 },
+          { id: 'placute', category_key: 'cat_fra', icon: 'Disc', name_ro: 'Plăcuțe de frână', name_en: 'Brake pads', position: 1, enabled: true, reminder_months: null, shops: 0, bookings: 0 },
+          { id: 'discuri', category_key: 'cat_fra', icon: 'Disc', name_ro: 'Discuri', name_en: 'Rotors', position: 2, enabled: true, reminder_months: null, shops: 0, bookings: 0 },
         ],
       },
     ];
@@ -268,5 +269,18 @@ describe('audit log', () => {
     const exported = auditChanges({ before: null, after: { kind: 'bookings', filters: { statuses: ['done'] }, rows: 2 } });
     expect(exported.changes).toEqual([]);
     expect(exported.details.map((d) => d.key)).toEqual(['kind', 'filters', 'rows']);
+  });
+});
+
+describe('service reminder months (T19d)', () => {
+  it('empty means no reminder, whole months 1–120 otherwise', () => {
+    expect(parseReminderMonths('')).toBeNull();
+    expect(parseReminderMonths('  ')).toBeNull();
+    expect(parseReminderMonths('12')).toBe(12);
+    expect(parseReminderMonths(' 120 ')).toBe(120);
+    expect(parseReminderMonths('0')).toBe('invalid');
+    expect(parseReminderMonths('121')).toBe('invalid');
+    expect(parseReminderMonths('1,5')).toBe('invalid');
+    expect(parseReminderMonths('doi')).toBe('invalid');
   });
 });

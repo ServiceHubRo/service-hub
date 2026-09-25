@@ -55,6 +55,7 @@ A user has exactly one role. The role decides the entire interface. A client can
 - **Location:** on first visit after login, an in-app banner asks permission to use location ("to suggest shops near you"). Tapping it triggers the browser's native location prompt. If granted: a "Near you" section appears above results, sorted by straight-line distance, and a distance is shown on every result card. If denied or dismissed: nothing changes, search works by text and city. Never trigger the native prompt automatically.
 - **Document expiry alert** banner at the top when any saved car's ITP/RCA/vignette expires within 30 days or has expired; tapping opens the Garage.
 - **Push permission** banner on first visit (see §7).
+- **Review request** card while the newest finished job can still be reviewed (60 days): "Lasă recenzia" opens the booking with the review form open; "Nu acum" hides it for the session.
 - **Favorites:** heart icon on each result and on the shop page; "Favorites" filter chip.
 
 ### 3.2 Shop page
@@ -331,6 +332,8 @@ Permission is asked WhatsApp-Web style: in-app banner first, native browser prom
 | **Appointment reminder, 24 h before** | ✓ | — |
 | New message | ✓ | ✓ |
 | Document expiry (30 d, 7 d, day-of; once per threshold) | ✓ | — |
+| Review request, the day after a job is done (10:00, once, only without a review) | ✓ | — |
+| Service reminder, ~14 days before a service with an interval is due again (once per job; off in Account) | ✓ | — |
 | New review / reply to review / report decided | reply → ✓ | review, decision → ✓ |
 | Daily digest at opening (optional) | — | ✓ |
 | Trial ending (7 d, 1 d), payment failed, account inactive | — | ✓ |
@@ -345,7 +348,7 @@ Verification, resend, password reset, email-change verification, invoice/receipt
 New booking request. Provider: SMSO.
 
 ### In-app
-Banners: email pending, push permission, location permission, document expiry. **Unread badges** on Bookings and Messages tabs for both roles; reported-reviews badge for admin.
+Banners: email pending, push permission, location permission, document expiry, review request. **Unread badges** on Bookings and Messages tabs for both roles; reported-reviews badge for admin.
 
 ### Realtime
 Bookings, messages, reviews, dashboard counters and admin lists update live over Supabase Realtime — no polling, no manual refresh. Auto-reconnect and resync after connection loss.

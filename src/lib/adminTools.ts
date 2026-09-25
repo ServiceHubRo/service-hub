@@ -363,3 +363,10 @@ export function exportTable(kind: ExportKind, rows: readonly unknown[], t: T, la
 export function exportFileName(kind: ExportKind, t: T, today: string): string {
   return `${t(`admin.export.file.${kind}`)}-${today}.csv`;
 }
+
+/** The service reminder field (T19d): empty = no reminder, else whole months 1–120; `invalid` otherwise. */
+export function parseReminderMonths(text: string): number | null | 'invalid' {
+  if (text.trim() === '') return null;
+  const n = parseNumber(text);
+  return n !== null && Number.isInteger(n) && n >= 1 && n <= 120 ? n : 'invalid';
+}

@@ -1,5 +1,5 @@
 import { ArrowDown, ArrowUp, ChevronDown, ChevronRight, ListTree, Plus, SearchX } from 'lucide-react';
-import { useCallback, useDeferredValue, useMemo, useState } from 'react';
+import { useCallback, useDeferredValue, useMemo, useRef, useState } from 'react';
 import { ActionButton } from '../../components/ActionButton';
 import { BackLink } from '../../components/BackLink';
 import { Button } from '../../components/Button';
@@ -18,6 +18,7 @@ import {
   createService,
   fetchCatalog,
   moveCatalogItem,
+  setServiceReminder,
   updateCategory,
   updateService,
   type CatalogCategory,
@@ -28,10 +29,12 @@ import { useI18n } from '../../i18n/context';
 import {
   CATEGORY_KEY_PATTERN,
   filterCatalog,
+  parseReminderMonths,
   SERVICE_ID_PATTERN,
   suggestCategoryKey,
   suggestServiceId,
 } from '../../lib/adminTools';
+import { newRequestId } from '../../lib/requestId';
 import { SERVICE_ICON_NAMES } from '../../lib/serviceIcons';
 import { useLoad } from '../../lib/useLoad';
 import { Pill } from './parts';
@@ -164,6 +167,10 @@ function ServicePanel({
   const [icon, setIcon] = useState(service?.icon ?? 'Wrench');
   const [category, setCategory] = useState(categoryKey);
   const [enabled, setEnabled] = useState(service?.enabled ?? true);
+  const [reminder, setReminder] = useState(service?.reminder_months ? String(service.reminder_months) : '');
+  const reminderMonths = parseReminderMonths(reminder);
+  // The interval is saved by its own call, with its own request id (kept for a retry).
+  const reminderRequest = useRef(newRequestId());
   const shownId = idTouched ? id : suggestServiceId(ro);
   const idOk = SERVICE_ID_PATTERN.test(shownId);
   const categoryOn = categories.find((c) => c.key === category)?.enabled ?? true;
@@ -211,6 +218,16 @@ function ServicePanel({
             onChange={(e) => setCategory(e.target.value)}
           />
         )}
+        <Field
+          className={styles.full}
+          label={t('admin.catalog.reminder')}
+          hint={t('admin.catalog.reminderHint')}
+          error={reminderMonths === 'invalid' ? t('admin.catalog.reminderInvalid') : null}
+          value={reminder}
+          inputMode="numeric"
+          maxLength={3}
+          onChange={(e) => setReminder(e.target.value)}
+        />
       </div>
       {service && (
         <>
@@ -223,13 +240,22 @@ function ServicePanel({
       )}
       <div className={styles.panelButtons}>
         <ActionButton
-          disabled={!ro.trim() || !en.trim() || (!service && !idOk) || (Boolean(service) && enabled && !categoryOn)}
+          disabled={
+            !ro.trim() ||
+            !en.trim() ||
+            (!service && !idOk) ||
+            (Boolean(service) && enabled && !categoryOn) ||
+            reminderMonths === 'invalid'
+          }
           onAction={async (requestId) => {
+            const months = reminderMonths === 'invalid' ? null : reminderMonths;
             if (service) {
               await updateService(service.id, { category_key: category, icon, name_ro: ro, name_en: en, enabled }, requestId);
+              if (months !== service.reminder_months) await setServiceReminder(service.id, months, reminderRequest.current);
               onDone(t('admin.catalog.saved'));
             } else {
               await createService(shownId, { category_key: categoryKey, icon, name_ro: ro, name_en: en }, requestId);
+              if (months !== null) await setServiceReminder(shownId, months, reminderRequest.current);
               onDone(t('admin.catalog.serviceAdded'));
             }
           }}
@@ -272,6 +298,7 @@ function ServiceRow({
         <span className={styles.rowMeta}>
           <span className="mono">{s.id}</span>
           <span>{t('admin.catalog.usage', { shops: s.shops, bookings: s.bookings })}</span>
+          {s.reminder_months !== null && <span>{t('admin.catalog.reminderShort', { months: s.reminder_months })}</span>}
         </span>
       </span>
       <span className={tools.rowTools}>

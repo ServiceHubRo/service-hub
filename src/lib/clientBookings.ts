@@ -105,6 +105,21 @@ export function reviewState(
   return now.getTime() - new Date(b.done_at).getTime() < windowDays * 86_400_000 ? 'open' : 'closed';
 }
 
+/**
+ * The finished job to ask a review for on Caută (T19d): the newest one that can still be reviewed,
+ * and how many there are. Null when there is none.
+ */
+export function reviewToAsk<T extends { id: string; status: BookingStatus; done_at: string | null; review: unknown }>(
+  bookings: readonly T[],
+  windowDays: number,
+  now: Date = new Date(),
+): { booking: T; count: number } | null {
+  const open = bookings
+    .filter((b) => reviewState(b, b.review !== null, windowDays, now) === 'open')
+    .sort((a, b) => (b.done_at ?? '').localeCompare(a.done_at ?? ''));
+  return open[0] ? { booking: open[0], count: open.length } : null;
+}
+
 /** Quotes waiting for the client's decision (the badge on the Programări tab). */
 export function quotesWaiting(bookings: readonly { status: BookingStatus }[]): number {
   return bookings.filter((b) => b.status === 'quote_sent').length;

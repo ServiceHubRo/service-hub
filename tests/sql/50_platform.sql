@@ -123,7 +123,7 @@ select test.eq(
   || 'admin_get_booking, admin_get_client, admin_get_shop, admin_get_thread, admin_list_audit, admin_list_bookings, '
   || 'admin_list_catalog, admin_list_clients, admin_list_history_reports, admin_list_notices, admin_list_reviews, '
   || 'admin_list_shops, admin_list_subscriptions, admin_move_catalog_item, admin_notice_preview, admin_overview, '
-  || 'admin_send_notice, admin_set_account_suspended, admin_set_notification_text, admin_set_shop_suspended, '
+  || 'admin_send_notice, admin_set_account_suspended, admin_set_notification_text, admin_set_service_reminder, admin_set_shop_suspended, '
   || 'admin_set_subscription_price, admin_set_subscription_status, admin_update_category, admin_update_service, '
   || 'admin_update_settings, admin_update_shop, admin_verify_phone, admin_void_history_report, admin_withdraw_notice, booking_thread, can_read_booking, can_read_notice, can_read_shop, can_read_thread, cancel_booking, '
   || 'cancel_email_change, check_phone_code, client_no_show_count, complete_job, confirm_booking, create_booking, decide_quote, '

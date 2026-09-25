@@ -29,7 +29,7 @@ Ele rămân pe dispozitivul tău și nu sunt trimise automat către noi.
 | `sh_last_seen` | Când ai folosit ultima dată aplicația pe acest dispozitiv, ca să te deconectăm după 30 de zile fără folosire | localStorage, până ștergi datele site-ului |
 | `sh_lang` | Limba aleasă (română sau engleză) | localStorage, până ștergi datele site-ului |
 | `sh_email_log` | Când ți-am trimis ultimul email de confirmare sau de resetare a parolei, ca „Retrimite” să aștepte 60 de secunde | localStorage, până ștergi datele site-ului |
-| `sh_push_banner_hidden`, `sh_location_banner_hidden` | Ai apăsat „Nu acum” la notificări sau la locație: mesajul nu mai apare în această sesiune | sessionStorage, până închizi fila |
+| `sh_push_banner_hidden`, `sh_location_banner_hidden`, `sh_review_prompt_hidden` | Ai apăsat „Nu acum” la notificări, la locație sau la cererea de recenzie: mesajul nu mai apare în această sesiune | sessionStorage, până închizi fila |
 | `sh_chunk_reload` | După o actualizare a aplicației, pagina se reîncarcă o singură dată, nu la nesfârșit | sessionStorage, până închizi fila |
 | Abonarea la notificări push | Doar dacă activezi notificările: browserul păstrează abonarea și service worker-ul | În browser, până dezactivezi notificările sau ștergi datele site-ului |
 

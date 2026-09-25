@@ -36,6 +36,8 @@ export interface ClientBookingCardProps {
   onDone: (row: Booking) => void;
   /** A review was sent. */
   onReviewed: (id: string, review: { id: string; rating: number }) => void;
+  /** Opened from the review request (T19d): the review form shows at once, when it can be left. */
+  openReview?: boolean;
   /** The booking changed under this card: read the list again. */
   onStale: () => void;
 }
@@ -47,13 +49,21 @@ export interface ClientBookingCardProps {
  * review a finished job once, book again, see the car's history (T10). Every write goes through a
  * database function.
  */
-export function ClientBookingCard({ booking: b, reviewWindowDays, now, onDone, onReviewed, onStale }: ClientBookingCardProps) {
+export function ClientBookingCard({
+  booking: b,
+  reviewWindowDays,
+  now,
+  onDone,
+  onReviewed,
+  onStale,
+  openReview,
+}: ClientBookingCardProps) {
   const { t, lang } = useI18n();
-  const [panel, setPanel] = useState<'cancel' | 'review' | null>(null);
   const quote = quoteOf(b);
   const car = [[b.car_snapshot.make, b.car_snapshot.model].filter(Boolean).join(' '), b.car_snapshot.plate].filter(Boolean).join(' · ');
   const cancel = cancelState(b, b.shop?.cancel_deadline_hours ?? 0, now);
   const review = reviewState(b, b.review !== null, reviewWindowDays, now);
+  const [panel, setPanel] = useState<'cancel' | 'review' | null>(() => (openReview && review === 'open' ? 'review' : null));
   const shopName = b.shop?.name ?? '';
 
   /** Runs one RPC; an outdated card makes the list reload. */

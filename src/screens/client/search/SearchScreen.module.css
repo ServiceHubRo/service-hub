@@ -214,3 +214,9 @@
   color: var(--muted);
   flex-shrink: 0;
 }
+
+/* ---------------------------------------------------------------- review request (T19d) */
+.reviewPromptService {
+  display: block;
+  color: var(--muted-strong);
+}
