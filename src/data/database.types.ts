@@ -3100,6 +3100,7 @@ export type Database = {
         }
       }
       shop_hidden_reasons: { Args: { p_shop_id: string }; Returns: string[] }
+      shop_reports: { Args: never; Returns: Json }
       shop_seat_count: { Args: { p_shop_id: string }; Returns: number }
       shop_state: { Args: { p_shop_id: string }; Returns: string }
       slot_starts_at: {

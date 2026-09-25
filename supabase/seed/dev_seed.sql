@@ -2,7 +2,8 @@
 -- Loaded by `npx supabase db reset` (config.toml → db.seed) and checked by `npm run test:sql`.
 --
 -- The four shops of docs/reference-demo.html (Brașov, Codlea), one client with two cars and a
--- booking in every status, four more clients who left the demo reviews, and an admin.
+-- booking in every status, four more clients who left the demo reviews, and an admin. Atelier Demo
+-- also has a year of finished work, for Rapoarte (T17).
 -- Every account's password: Parola-Test-1
 --
 --   atelier@service-hub.test      shop  Atelier Demo (Brașov)        — fiscal data filled in
@@ -127,6 +128,8 @@ declare
   -- bookings
   b uuid;
   t uuid;
+  i int;
+  v_at timestamptz;
 begin
   perform public.promote_to_admin('admin@service-hub.test');
 
@@ -295,6 +298,46 @@ begin
   update public.bookings set cost = 200, odometer = 173500, done_at = now() - interval '20 days' where id = b;
   insert into public.reviews (booking_id, shop_id, client_id, client_display_name, rating, text, created_at)
   values (b, s4, u_george, 'George T.', 5, 'Au găsit o problemă pe care alții au ratat-o.', now() - interval '19 days');
+
+  -- A year of finished work at Atelier Demo (T17), so Rapoarte has months, services, customers who
+  -- came back and quotes to show: a job every ten days, every sixth quote refused (the inspection
+  -- fee charged). The shop joined 400 days ago. Past bookings are refused by the bookings trigger,
+  -- so it is paused for these rows only.
+  update public.shops set created_at = now() - interval '400 days' where id = s1;
+  alter table public.bookings disable trigger bookings_guard;
+  for i in 0..35 loop
+    b := pg_temp.seed_booking(s1, (array[u_cristina, u_mihai, u_ioana, u_george, u_cristina])[i % 5 + 1], null,
+      (array['ulei', 'frane', 'itp', 'diag', 'ulei', 'clima', 'distributie', 'frane', 'ulei'])[i % 9 + 1],
+      -(38 + i * 10), (array['08:00', '10:00', '13:00', '15:00'])[i % 4 + 1]::time,
+      case when i % 6 = 5 then 'quote_refused' else 'done' end);
+    v_at := ((current_date - (38 + i * 10)) + (array['08:00', '10:00', '13:00', '15:00'])[i % 4 + 1]::time) at time zone 'Europe/Bucharest';
+    update public.bookings set
+      car_snapshot = (array[
+        '{"make":"Toyota","model":"Corolla","year":2019,"plate":"BV 55 CRD","plate_norm":"BV55CRD"}',
+        '{"make":"Skoda","model":"Octavia","year":2017,"plate":"BV 90 MHP","plate_norm":"BV90MHP"}',
+        '{"make":"Ford","model":"Focus","year":2018,"plate":"B 123 IRD","plate_norm":"B123IRD"}',
+        '{"make":"Renault","model":"Clio","year":2015,"plate":"BV 21 GTO","plate_norm":"BV21GTO"}'
+      ])[i % 4 + 1]::jsonb,
+      confirmed_at = v_at - interval '2 days', inspection_started_at = v_at, status_changed_at = v_at + interval '1 day',
+      started_at = case when i % 6 = 5 then null else v_at + interval '5 hours' end,
+      done_at = case when i % 6 = 5 then null else v_at + interval '1 day' end,
+      odometer = case when i % 6 = 5 then null else 60000 + i * 2300 end,
+      work = case when i % 6 = 5 then null else 'Lucrare efectuată conform devizului' end,
+      cost = case when i % 6 = 5 then 80 else (array[310, 820, 150, 180, 340, 260, 1380, 760, 295])[i % 9 + 1] end
+    where id = b;
+    insert into public.quotes (booking_id, version, status, inspection_fee, total_sent, total_approved,
+                               sent_at, expires_at, decided_at, sent_by)
+    values (b, 1, case when i % 6 = 5 then 'refused' else 'accepted' end, 80,
+            case when i % 6 = 5 then 1450 else (array[310, 820, 150, 180, 340, 260, 1380, 760, 295])[i % 9 + 1] end,
+            case when i % 6 = 5 then 0 else (array[310, 820, 150, 180, 340, 260, 1380, 760, 295])[i % 9 + 1] end,
+            v_at + interval '1 hour', v_at + interval '3 days', v_at + interval '1 hour' + (i % 7 + 1) * interval '50 minutes',
+            u_atelier)
+    returning id into t;
+    insert into public.quote_items (quote_id, position, name, price, approved)
+    values (t, 1, 'Piese și manoperă', case when i % 6 = 5 then 1450 else (array[310, 820, 150, 180, 340, 260, 1380, 760, 295])[i % 9 + 1] end,
+            i % 6 <> 5);
+  end loop;
+  alter table public.bookings enable trigger bookings_guard;
 
   -- Conversations: automatic messages as event + parameters, and a plain chat.
   insert into public.threads (shop_id, client_id, client_name, last_message_at)
