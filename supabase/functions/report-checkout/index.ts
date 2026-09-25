@@ -1,11 +1,13 @@
 // report-checkout — "Plătește 29 lei" on the report preview (FR §3.6b, P16e, ARCHITECTURE §12):
 // answers the address of a Stripe Checkout page for one report.
 //
-// 1. Checks the caller's access token; begin_history_report (SQL, service role) makes the
+// 1. Checks the caller's access token and that the client ticked the waiver: the report is
+//    made at once and the 14-day right of withdrawal ends with it (OUG 34/2014 art. 16 m; the
+//    Terms, §3.6) — `waiver_required` otherwise. begin_history_report (SQL, service role) makes the
 //    `pending_payment` row for the caller's own car — clients only, never for a car without
 //    finished jobs, at the price in platform_settings. The same request id gives the same report.
 // 2. Opens a one-off Checkout (card, RON) for that report; its id travels in the metadata.
-// 3. Records the session on the report.
+// 3. Records the session on the report. The waiver travels in the payment's metadata, as proof.
 // Nothing here marks the report paid: only stripe-webhook does, after Stripe confirms the payment.
 // Answers { url, report_id } — or { report_id, status } when that report is already paid — or
 // { error: code }.
@@ -48,6 +50,7 @@ Deno.serve(async (req) => {
     const body = (await req.json().catch(() => ({}))) as Record<string, unknown>;
     const requestId = uuidOrNull(body.request_id);
     if (!requestId) return json({ error: 'request_id_required' }, 400);
+    if (body.withdrawal_waiver !== true) return json({ error: 'waiver_required' }, 400);
     const carId = uuidOrNull(body.car_id);
     const bookingId = carId ? null : uuidOrNull(body.booking_id);
     const lang = body.lang === 'en' ? 'en' : 'ro';
@@ -75,7 +78,13 @@ Deno.serve(async (req) => {
     const back = typeof body.return_path === 'string' && PREVIEW_PATH.test(body.return_path) ? body.return_path : '/c/cont/rapoarte';
     const car = [reportCarName(report.lang === 'en' ? 'en' : 'ro', report.car), report.car.plate].filter(Boolean).join(' · ');
     const title = report.lang === 'en' ? 'Service history report' : 'Raport istoric service';
-    const metadata = { kind: 'history_report', report_id: report.id, code: report.code, account: report.display_id };
+    const metadata = {
+      kind: 'history_report',
+      report_id: report.id,
+      code: report.code,
+      account: report.display_id,
+      withdrawal_waiver: 'accepted',
+    };
 
     const stripe = stripeApi(config);
     const session = await stripe.post(

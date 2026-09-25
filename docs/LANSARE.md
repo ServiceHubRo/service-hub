@@ -113,3 +113,39 @@ select public.promote_to_admin('adresa-ta@exemplu.ro');
 **Verifici:** pe linkul de test nu apare bara roșie „Baza de date nu e la zi”. Un cont nou făcut pe linkul de test apare în **service-hub-test → Authentication → Users**, nu în proiectul real. Site-ul publicat (`service-hub-app.netlify.app`) arată în continuare datele reale.
 
 **Ce se schimbă la testare:** conturile de pe linkurile de test sunt separate de cele reale; îți faci conturi de test (client, service) o dată, pe proiectul de test, și le folosești la toate pull request-urile.
+
+---
+
+## Partea 3 — Documentele legale
+
+Termenii, Confidențialitatea și Cookies sunt rescrise după cum funcționează aplicația acum și au și versiunea în engleză (se vede după limba aleasă). Sunt o **ciornă bună**, nu un aviz juridic: forma finală o dai cu avocatul.
+
+### 1. Datele firmei
+
+În documente, datele firmei apar acum ca **[de completat: …]**, cu un chenar portocaliu, ca să nu scape nimic. Trimite-i lui Claude, în chat (nu sunt secrete):
+
+- denumirea firmei (de exemplu „Service Hub SRL”);
+- adresa sediului social;
+- numărul de la Registrul Comerțului (J…);
+- CUI-ul.
+
+Claude le pune în `docs/legal/company.json` (un singur loc) și apar singure în toate cele șase documente. Emailul (`contact@service-hub.ro`) și telefonul sunt deja cele de pe pagina „în curând”.
+
+### 2. Ce să verifici cu avocatul
+
+Dă-i avocatului cele șase fișiere (`docs/legal/*.md` și `docs/legal/en/*.md`) sau linkurile de pe site: `/legal/termeni`, `/legal/confidentialitate`, `/legal/cookies` (butonul „English” sus arată traducerea). Întrebări de pus:
+
+1. **Raportul de 29 lei:** bifa „Vreau raportul imediat după plată și înțeleg că pierd dreptul de retragere de 14 zile” e suficientă? Ce facem dacă cineva cere banii înapoi?
+2. **Promisiunile pentru service-uri:** anunț cu 30 de zile înainte de o schimbare de preț sau de închiderea unui cont; răspuns la reclamații în 15 zile lucrătoare; răspundere limitată la abonamentul din ultimele 12 luni. Le poți ține?
+3. **Transferurile în afara UE** (Netlify, Resend, Cloudflare, Stripe — SUA): avocatul confirmă că formularea e bună și că ai acceptat contractele de prelucrare (DPA) ale fiecărui furnizor. Le găsești în contul fiecăruia (de obicei **Settings → Legal** sau **Privacy**); Supabase, Stripe, Resend, Netlify și Sentry le au gata de semnat online.
+4. **Păstrarea datelor:** conturile nefolosite nu se șterg singure. Vrei o regulă (de exemplu, ștergere după 3 ani fără activitate)?
+5. **Litigii:** platforma europeană SOL (ODR) s-a închis în iulie 2025, așa că documentele trimit la ANPC și la SAL. Avocatul confirmă.
+6. **TVA:** Termenii spun că factura se emite „conform legii”; după ce decizi cu contabilul (T14b), avocatul poate adăuga dacă prețurile includ TVA.
+
+### 3. În Sentry
+
+Confidențialitatea spune că rapoartele de erori se păstrează „cel mult 90 de zile”. În Sentry, la **Settings → Subscription** (sau pagina planului) vezi cât păstrează planul tău erorile („data retention”). Dacă scrie mai mult de 90 de zile, spune-i lui Claude, ca să schimbe textul.
+
+**Verifici:** pe linkul de test deschide `/legal/termeni`: vezi datele firmei (fără chenare portocalii), apoi apasă **English** și vezi „Terms and Conditions”.
+
+**După forma finală:** spune-i lui Claude ce a schimbat avocatul. Claude actualizează fișierele și versiunea termenilor (`TERMS_VERSION`), ca să știi ce versiune a acceptat fiecare cont.

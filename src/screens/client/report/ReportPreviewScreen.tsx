@@ -1,10 +1,11 @@
 import { EyeOff, FileCheck } from 'lucide-react';
-import { useCallback, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { ActionButton } from '../../../components/ActionButton';
 import { BackLink } from '../../../components/BackLink';
 import { Banner } from '../../../components/Banner';
 import { Card } from '../../../components/Card';
+import { Checkbox } from '../../../components/Checkbox';
 import { Chip, ChipRow } from '../../../components/Chip';
 import { EmptyState } from '../../../components/EmptyState';
 import { LoadError } from '../../../components/LoadError';
@@ -41,6 +42,9 @@ export function ReportPreviewScreen() {
   const [params] = useSearchParams();
   const from = (location.state as ReportLinkState | null)?.from ?? 'history';
   const [reportLang, setReportLang] = useState<Lang>(lang);
+  const [waiver, setWaiver] = useState(false);
+  const [waiverMissing, setWaiverMissing] = useState(false);
+  const waiverRef = useRef<HTMLInputElement>(null);
 
   const target: ReportTarget | null = carId ? { carId } : bookingId ? { bookingId } : null;
   const load = useCallback(() => getReportPreview(carId ? { carId } : { bookingId: bookingId ?? '' }), [carId, bookingId]);
@@ -142,9 +146,38 @@ export function ReportPreviewScreen() {
                 ))}
               </ChipRow>
             </div>
+            <div>
+              <Checkbox
+                ref={waiverRef}
+                checked={waiver}
+                aria-invalid={waiverMissing || undefined}
+                aria-describedby={waiverMissing ? 'report-waiver-error' : undefined}
+                onChange={(e) => {
+                  setWaiver(e.target.checked);
+                  setWaiverMissing(false);
+                }}
+              >
+                {t('report.waiver')}
+              </Checkbox>
+              {waiverMissing && (
+                <p id="report-waiver-error" className={styles.fieldError} role="alert">
+                  {t('report.waiverRequired')}
+                </p>
+              )}
+            </div>
             <ActionButton
               onAction={async (requestId) => {
-                const answer = await startReportCheckout(target, { lang: reportLang, returnPath: location.pathname, requestId });
+                if (!waiver) {
+                  setWaiverMissing(true);
+                  waiverRef.current?.focus();
+                  return;
+                }
+                const answer = await startReportCheckout(target, {
+                  lang: reportLang,
+                  returnPath: location.pathname,
+                  requestId,
+                  waiver,
+                });
                 if ('url' in answer) window.location.assign(answer.url);
                 else navigate(`${MY_REPORTS_PATH}?raport=${answer.reportId}`);
               }}

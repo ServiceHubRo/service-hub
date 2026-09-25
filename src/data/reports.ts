@@ -180,7 +180,7 @@ export function subscribeMyReports(userId: string, onChange: () => void): () => 
 // ------------------------------------------------------------------ Edge Functions
 
 /** Refusals of the report functions besides the database's own codes (RpcError). */
-export type ReportProblem = 'payments_unavailable' | 'not_ready' | 'not_paid';
+export type ReportProblem = 'payments_unavailable' | 'not_ready' | 'not_paid' | 'waiver_required';
 
 export class ReportError extends Error {
   constructor(readonly problem: ReportProblem) {
@@ -189,7 +189,7 @@ export class ReportError extends Error {
   }
 }
 
-const PROBLEMS: ReadonlySet<string> = new Set(['payments_unavailable', 'not_ready', 'not_paid']);
+const PROBLEMS: ReadonlySet<string> = new Set(['payments_unavailable', 'not_ready', 'not_paid', 'waiver_required']);
 
 async function functionError(error: unknown): Promise<Error> {
   if (error instanceof FunctionsFetchError) return new RpcError('network');
@@ -214,10 +214,12 @@ export type CheckoutAnswer = { url: string } | { reportId: string; status: Repor
 /**
  * Stripe's page for one report on this car. `returnPath` is where Stripe's "back" leads (this
  * preview). The same request id opens the same page; a report already paid is answered as such.
+ * `waiver`: the client ticked that the report is made at once and the 14-day right of withdrawal
+ * ends with it (OUG 34/2014 art. 16 m); the function refuses without it.
  */
 export async function startReportCheckout(
   target: ReportTarget,
-  options: { lang: Lang; returnPath: string; requestId: string },
+  options: { lang: Lang; returnPath: string; requestId: string; waiver: boolean },
 ): Promise<CheckoutAnswer> {
   const { data, error } = await db().functions.invoke<{ url?: string; report_id?: string; status?: string }>('report-checkout', {
     method: 'POST',
@@ -227,6 +229,7 @@ export async function startReportCheckout(
       lang: options.lang,
       return_path: options.returnPath,
       request_id: options.requestId,
+      withdrawal_waiver: options.waiver,
     },
   });
   if (error) throw await functionError(error);

@@ -1,7 +1,7 @@
-import type { InputHTMLAttributes, ReactNode } from 'react';
+import type { ComponentProps, ReactNode } from 'react';
 import styles from './Checkbox.module.css';
 
-export interface CheckboxProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type'> {
+export interface CheckboxProps extends Omit<ComponentProps<'input'>, 'type'> {
   children: ReactNode;
 }
 

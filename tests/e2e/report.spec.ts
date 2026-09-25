@@ -8,6 +8,7 @@ import {
   createBookableShop,
   createUser,
   expectNoHorizontalScroll,
+  functionAs,
   rpcAs,
   serviceRest,
   shot,
@@ -150,6 +151,22 @@ test.describe('history report', () => {
     await page.getByRole('button', { name: 'Plătește 29 lei' }).scrollIntoViewIfNeeded();
     await page.screenshot({ path: `test-results/shots/t15-report-pay-${name()}.png` });
 
+    // ------------------------------------------------------------------ the waiver comes first
+    const waiver = page.getByRole('checkbox', { name: /Vreau raportul imediat după plată/ });
+    await expect(waiver).not.toBeChecked();
+    await page.getByRole('button', { name: 'Plătește 29 lei' }).click();
+    await expect(page.getByRole('alert')).toHaveText('Ca să plătești, bifează acordul de mai sus.');
+    await expect(waiver).toBeFocused();
+    await expect(page).toHaveURL(/\/raport$/);
+    await shot(page, 't19b-report-waiver', name());
+    // The function refuses a checkout without it, whatever the app sends.
+    const carId = /\/c\/garaj\/([0-9a-f-]{36})\/raport$/.exec(new URL(page.url()).pathname)?.[1];
+    expect(carId).toBeTruthy();
+    const refused = await functionAs(client, 'report-checkout', { car_id: carId, lang: 'ro', request_id: rid() });
+    expect(refused).toEqual({ status: 400, body: { error: 'waiver_required' } });
+    await waiver.check();
+    await expect(page.getByRole('alert')).toHaveCount(0);
+
     // ------------------------------------------------------------------ Stripe's "back": nothing paid
     await page.getByRole('button', { name: 'Plătește 29 lei' }).click();
     await expect(page.getByText('Plată unică: 29 lei')).toBeVisible();
@@ -157,6 +174,9 @@ test.describe('history report', () => {
     await expect(page.getByText('Plata nu a fost finalizată. Nu s-a încasat nimic.')).toBeVisible();
 
     // ------------------------------------------------------------------ pay → the webhook → the PDF
+    // Back from Stripe the page is new: the consent is given again, for this payment.
+    await expect(waiver).not.toBeChecked();
+    await waiver.check();
     await page.getByRole('button', { name: 'Plătește 29 lei' }).click();
     await expect(page.getByText('Plată unică: 29 lei')).toBeVisible();
     await page.getByRole('button', { name: 'Plătește' }).click();

@@ -41,6 +41,7 @@ Ordinea contează: fiecare sarcină se sprijină pe cele de dinainte. Sarcinile 
 | T19a | Lansarea — monitorizare și mediu de test | Erorile ajung în Sentry; linkurile de test pe un proiect Supabase separat |
 | T19b | Lansarea — documentele legale | Termeni, confidențialitate, cookies actualizate, în română și engleză |
 | T19c | Lansarea — verificarea finală și domeniul | `LAUNCH_CHECK.md`, service-hub.ro, plăți reale, admin, copii de siguranță |
+| T20 | Aplicațiile pentru iPhone și Android | Service-Hub în App Store și Google Play, cu notificări pe iPhone fără „Adaugă pe ecranul principal” |
 
 ---
 
@@ -642,10 +643,33 @@ Note: nicio migrare, niciun pachet nou. **Sentry** fără SDK-ul Sentry (un modu
 
 Termenii, confidențialitatea și cookies actualizate (vezi „Include” de mai sus) și versiunile în engleză, afișate în aplicație după limbă. Datele firmei de la tine; forma finală o dai cu avocatul.
 
-- [ ] Făcut
+- [x] Făcut
+
+Note: nicio migrare, niciun pachet nou. **Documentele** (`docs/legal/*.md` în română — varianta care se aplică — și `docs/legal/en/*.md` în engleză) sunt rescrise după aplicația de acum: rolurile și contul (18+), ordinea din căutare fără plasare plătită, programarea și limitele, anularea și neprezentările (indicatorul de la 3 în 90 de zile), constatarea / devizul pe poziții / taxa de constatare, kilometrajul (obligatoriu, verificat, apare în rapoarte), Garajul și alertele, raportul plătit și `/verifica`, recenziile (60 de zile, „Andrei M.”, verificare în 5 zile lucrătoare), colegii, abonamentul 100 lei + 20 lei / coleg cu 90 de zile gratuite și Stripe, datele clienților la service, mesajele, semnalarea conținutului și contestarea (DSA), suspendarea, ștergerea contului (ce se șterge, ce rămâne anonim), furnizorii (Supabase, Netlify, Resend, SMSO, Stripe, Sentry, Cloudflare Turnstile, Nominatim, serviciile push) și transferurile în afara UE, locația (rămâne pe telefon), notificările push / SMS / email, tot ce se păstrează în browser (cu numele exacte). Scoase: prețurile publice, încărcarea de poze și documente, „posturile”, planurile Start / Pro / Business, notițele interne despre clienți, platforma europeană SOL (închisă în iulie 2025). **Datele firmei** (denumire, sediu, Registrul Comerțului, CUI) stau într-un singur loc, `docs/legal/company.json`; cât sunt goale, documentele arată un chenar portocaliu „[de completat: …]”; emailul și telefonul sunt cele de pe pagina „în curând”. **Raportul plătit:** bifă nouă înainte de „Plătește” — acordul pentru livrarea imediată și pierderea dreptului de retragere de 14 zile (OUG 34/2014 art. 16 lit. m); fără ea nu pleacă nimic, iar funcția `report-checkout` refuză (`waiver_required`); acordul rămâne în datele plății din Stripe. `TERMS_VERSION` = `2026-09-25`. Testat: teste unitare (câmpurile, fără urme din ciorna veche, engleza are exact aceleași secțiuni, tabele și liste ca româna), în browser documentele publice RO/EN la 390/820/1440 și bifa raportului. **Rămas:** datele firmei (de la tine) și forma finală cu avocatul (întrebările sunt în `docs/LANSARE.md`, partea 3); după forma finală, `TERMS_VERSION` se schimbă din nou.
 
 ### T19c — Verificarea finală și domeniul
 
 `docs/LAUNCH_CHECK.md` (lista „Final check” + FR, parcursă automat cu Playwright pe mediul de test), CAPTCHA Turnstile pornit, `APP_URL` = `https://service-hub.ro`, mutarea domeniului, Site URL și adresele în Supabase Auth, cheile Stripe live (cu webhook-ul live), contul de admin real, copii de siguranță (planul Supabase Pro are copii zilnice — decizia ta, ~25 $/lună; pe planul gratuit proiectul se oprește după 7 zile fără activitate).
+
+- [ ] Făcut
+
+---
+
+## T20 — Aplicațiile pentru iPhone și Android
+
+**Scop:** Service-Hub se instalează din App Store și Google Play, pentru clienți și service-uri. Aceeași aplicație ca pe web, nu o rescriere. Se face după lansarea pe web (T19c).
+
+**Include:**
+- Capacitor în jurul aplicației React de acum: același cod, aceleași ecrane, aceeași bază de date; proiectele `ios/` și `android/` în repo.
+- Notificări native (APNs pe iPhone, FCM pe Android) în `dispatch-notifications`, lângă Web Push: pe iPhone merg fără „Adaugă pe ecranul principal”. Un dispozitiv înregistrat per telefon, ca la push-ul de acum.
+- Linkurile din emailuri (confirmare, parolă, invitații) deschid aplicația când e instalată (Universal Links / App Links pe service-hub.ro).
+- Locația, apelul și WhatsApp prin telefon; bara de sus și butonul „Înapoi” de pe Android.
+- **Plățile:** regulile Apple și Google pentru conținut digital. Raportul de istoric se cumpără pe site (aplicația deschide browserul), nu în aplicație, ca să nu intre sub comisionul de 15–30%; abonamentul service-urilor rămâne pe site. De confirmat la momentul respectiv cu regulile magazinelor.
+- Construirea automată pe GitHub (calculatoare Mac pentru iPhone) și trimiterea spre TestFlight / testarea internă Google Play.
+- Iconița, ecranul de pornire, capturile și textele pentru magazine (RO + EN), link spre Politica de confidențialitate; declarațiile de date din App Store și Google Play, după `docs/legal`.
+
+**Gata când:** aplicația de test se instalează pe un iPhone (TestFlight) și pe un Android (testare internă), iar o programare făcută din ea aduce notificarea pe telefonul service-ului.
+
+**Pașii tăi:** contul Apple Developer (99 $/an, pe firmă — cere D-U-N-S, câteva zile) și contul Google Play Console (25 $, o dată); acceptarea contractelor; accesul pentru chei (Claude îți spune exact ce și unde).
 
 - [ ] Făcut

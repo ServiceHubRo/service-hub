@@ -80,6 +80,28 @@ export async function rpcAs<T = unknown>(email: string, fn: string, args: Record
   return (await res.json()) as T;
 }
 
+/** Calls an Edge Function as a signed-in user, the way the app does; answers the status and body. */
+export async function functionAs(
+  email: string,
+  fn: string,
+  body: Record<string, unknown>,
+  password = PASSWORD,
+): Promise<{ status: number; body: Record<string, unknown> }> {
+  const auth = await fetch(`${API}/auth/v1/token?grant_type=password`, {
+    method: 'POST',
+    headers: { apikey: ANON_KEY, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password }),
+  });
+  expect(auth.ok, await auth.clone().text()).toBe(true);
+  const token = ((await auth.json()) as { access_token: string }).access_token;
+  const res = await fetch(`${API}/functions/v1/${fn}`, {
+    method: 'POST',
+    headers: { apikey: ANON_KEY, Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  return { status: res.status, body: (await res.json().catch(() => ({}))) as Record<string, unknown> };
+}
+
 /**
  * What `select public.verify_phone_manually('…')` does in the SQL Editor (not callable through the
  * API): marks the account's phone as verified. Here through the service role, test stack only.
