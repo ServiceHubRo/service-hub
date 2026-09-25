@@ -250,6 +250,10 @@ test.describe('with accounts', () => {
     await expect(a.reopened).toHaveURL(/\/c\/cauta$/);
     await a.context.close();
 
+    // Let Caută finish loading first: wiping the session under requests still in flight sends
+    // them without it (the database refuses them, and the error reports caught exactly that).
+    await expect(page.getByRole('heading', { level: 1, name: 'Caută' })).toBeVisible();
+    await page.waitForLoadState('networkidle');
     await page.context().clearCookies();
     await page.evaluate(() => {
       for (const key of Object.keys(localStorage)) if (key.startsWith('sb-')) localStorage.removeItem(key);

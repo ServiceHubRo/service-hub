@@ -7,7 +7,7 @@ import { onSessionLost } from '../data/sessionEvents';
 import { supabase } from '../data/supabase';
 import { useI18n } from '../i18n/context';
 import type { Lang } from '../i18n/translate';
-import { setMonitoringUser } from '../lib/monitoring';
+import { addBreadcrumb, setMonitoringUser } from '../lib/monitoring';
 import { inactiveTooLong, markSeen, rememberMe } from '../lib/remember';
 import type { Role } from './roles';
 import { SessionContext, type SessionStatus, type SessionValue } from './sessionContext';
@@ -105,11 +105,14 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     const client = supabase;
     // Supabase warns against awaiting its own calls inside this callback; defer the work.
     const { data } = client.auth.onAuthStateChange((event, session) => {
+      // For error reports: what the session did just before (event names only).
+      addBreadcrumb('auth', session ? event : `${event} (no session)`);
       window.setTimeout(() => handleSession(event, session), 0);
     });
     const stopLost = onSessionLost(() => {
       // The server refused our token: check whether the session is really gone.
       void client.auth.getUser().then(({ data: fresh, error }) => {
+        addBreadcrumb('auth', `session check: ${error ? `${error.name} ${error.status ?? ''}` : fresh.user ? 'valid' : 'no user'}`);
         if (error || !fresh.user) void client.auth.signOut({ scope: 'local' });
       });
     });
