@@ -1945,6 +1945,23 @@ export const ro = {
   'rpcError.audience_invalid': 'Alege cui trimiți anunțul.',
   'rpcError.notice_not_found': 'Anunțul a fost deja retras.',
   'rpcError.no_recipients': 'Anunțul nu ajunge la nimeni. Verifică orașul.',
+  // Paid staff accounts (price per colleague)
+  'unit.colleagues.one': '{n} coleg',
+  'unit.colleagues.few': '{n} colegi',
+  'unit.colleagues.other': '{n} de colegi',
+  'sub.seats.breakdown': '{base} + {colleagues} × {seat}',
+  'sub.seats.none': 'Fiecare coleg care își face cont în service adaugă {seat} pe lună.',
+  'staff.seats.price': 'Fiecare coleg care își face contul din invitație adaugă {seat} pe lună la abonament; invitația nu costă nimic, iar în perioada gratuită nu plătești nimic.',
+  'staff.seats.now': 'Acum abonamentul tău este {total} pe lună, cu {colleagues}.',
+  'admin.subs.seats': 'Colegi: {n}',
+  'admin.sub.seats': 'Colegi plătiți',
+  'admin.sub.seatsValue': '{n} × {price}',
+  'admin.sub.monthly': 'Total pe lună',
+  'admin.csv.seats': 'Colegi',
+  'admin.csv.seatPrice': 'Preț per coleg',
+  'admin.csv.monthly': 'Total pe lună',
+  'admin.field.staff_seat_price_ron': 'Per coleg pe lună (lei)',
+  'admin.settings.hint.staff_seat_price_ron': 'Se adaugă la abonament pentru fiecare coleg cu cont. Pentru service-urile care se înscriu de acum.',
 } as const;
 
 export type MessageKey = keyof typeof ro;

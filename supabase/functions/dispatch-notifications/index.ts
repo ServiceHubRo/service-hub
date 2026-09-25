@@ -13,13 +13,19 @@
 // through Resend (RESEND_API_KEY) with the event id as idempotency key; platform events (a
 // reported review) go to ADMIN_EMAIL. SMS go through SMSO (SMSO_API_KEY), only to a verified
 // phone. A channel without its secret is logged `not_configured`.
+//
+// The `stripe` channel is not a message: a `seats_changed` event (a colleague joined or left a
+// shop whose subscription Stripe runs) sets the quantity of the colleagues' item in Stripe to the
+// shop's count at that moment (_shared/seats.ts), and records what Stripe now charges.
 import { adminApi } from '../_shared/admin.ts';
 import { emailForEvent } from '../_shared/emails.ts';
 import { corsHeaders, json } from '../_shared/http.ts';
-import { adminEmailFromEnv, appUrlFromEnv, emailConfigFromEnv, smsConfigFromEnv } from '../_shared/env.ts';
+import { adminEmailFromEnv, appUrlFromEnv, emailConfigFromEnv, smsConfigFromEnv, stripeConfigFromEnv } from '../_shared/env.ts';
 import { sendEmail, type EmailConfig, type SendOutcome } from '../_shared/resend.ts';
+import { seatPrice, syncSeats, type SeatInfo } from '../_shared/seats.ts';
 import { smsForEvent } from '../_shared/sms.ts';
 import { sendSms, type SmsConfig } from '../_shared/smso.ts';
+import { StripeError, stripeApi, type StripeConfig } from '../_shared/stripe.ts';
 import { renderNotification, type NotificationEvent, type Overrides } from '../_shared/templates.ts';
 import { generateVapidKeys, sendWebPush, type PushDevice, type VapidKeys } from '../_shared/webpush.ts';
 
@@ -50,8 +56,10 @@ interface ClaimedEvent extends NotificationEvent {
 
 /** What the channels other than push need, read once per call. */
 interface Senders {
+  api: Api;
   email: EmailConfig;
   sms: SmsConfig;
+  stripe: StripeConfig;
   adminEmail: string | null;
   app: string;
 }
@@ -177,6 +185,29 @@ async function smsChannel(e: ClaimedEvent, senders: Senders): Promise<ChannelRes
   return fromOutcome('sms', e, await sendSms(e.phone, text, senders.sms));
 }
 
+/** Sets the colleagues' quantity in Stripe for the shop of a `seats_changed` event. */
+async function stripeChannel(e: ClaimedEvent, senders: Senders): Promise<ChannelResult> {
+  if (e.event !== 'seats_changed') return { done: true, log: { channel: 'stripe', status: 'no_template' } };
+  const config = senders.stripe;
+  if (!config.secretKey || !config.seatPriceId) return { done: true, log: { channel: 'stripe', status: 'not_configured' } };
+  const shopId = typeof e.params?.shop_id === 'string' ? e.params.shop_id : null;
+  if (!shopId) return { done: true, log: { channel: 'stripe', status: 'failed', error: 'no shop' } };
+  try {
+    const info = (await senders.api.rpc('stripe_seat_info', { p_shop_id: shopId })) as SeatInfo | null;
+    if (!info) return { done: true, log: { channel: 'stripe', status: 'no_subscription' } };
+    const stripe = stripeApi(config);
+    const r = await syncSeats(stripe, await seatPrice(stripe, config.seatPriceId), info, `event-${e.id}`);
+    if (r.billed !== null) await senders.api.rpc('set_billed_seats', { p_shop_id: shopId, p_seats: r.billed });
+    return { done: true, log: { channel: 'stripe', status: r.status } };
+  } catch (err) {
+    const message = (err instanceof Error ? err.message : String(err)).slice(0, 500);
+    // Stripe unreachable or busy: try again later; a refusal (4xx) will not change on a retry.
+    const retry = !(err instanceof StripeError) || err.status === 0 || err.status === 429 || err.status >= 500;
+    if (retry && e.attempts < MAX_ATTEMPTS) return { done: false, error: message };
+    return { done: true, log: { channel: 'stripe', status: 'failed', error: message } };
+  }
+}
+
 async function deliver(e: ClaimedEvent, texts: Overrides, vapid: VapidKeys, senders: Senders): Promise<Result> {
   const result: Result = { id: e.id, done: true, error: null, channels_done: [], log: [], gone: [], delivered: [] };
   const errors: string[] = [];
@@ -189,6 +220,8 @@ async function deliver(e: ClaimedEvent, texts: Overrides, vapid: VapidKeys, send
           return [channel, await emailChannel(e, senders)];
         case 'sms':
           return [channel, await smsChannel(e, senders)];
+        case 'stripe':
+          return [channel, await stripeChannel(e, senders)];
         default:
           return [channel, { done: true, log: { channel, status: 'unknown_channel' } }];
       }
@@ -210,8 +243,10 @@ async function deliver(e: ClaimedEvent, texts: Overrides, vapid: VapidKeys, send
 async function dispatch(api: Api, config: Config): Promise<number> {
   const vapid: VapidKeys = { publicKey: config.vapid_public_key!, privateJwk: config.vapid_private_jwk! };
   const senders: Senders = {
+    api,
     email: emailConfigFromEnv(),
     sms: smsConfigFromEnv(),
+    stripe: stripeConfigFromEnv(),
     adminEmail: adminEmailFromEnv(),
     app: appUrlFromEnv(),
   };

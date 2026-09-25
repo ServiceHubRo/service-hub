@@ -41,13 +41,13 @@ function db() {
 }
 
 const SUBSCRIPTION_COLUMNS =
-  'shop_id, status, trial_ends_at, current_period_end, cancel_at_period_end, price_ron, stripe_customer_id, stripe_status, ended_reason, next_payment_attempt, created_at';
+  'shop_id, status, trial_ends_at, current_period_end, cancel_at_period_end, price_ron, seat_price_ron, seats, stripe_customer_id, stripe_status, ended_reason, next_payment_attempt, created_at';
 
 /** The caller's subscription, or null when they are not the owner of a shop. */
 export async function getSubscriptionRow(): Promise<(SubscriptionRow & { shop_id: string }) | null> {
   const { data, error } = await db().from('subscriptions').select(SUBSCRIPTION_COLUMNS).maybeSingle();
   if (error) throw failure(error);
-  return data ? { ...data, price_ron: Number(data.price_ron) } : null;
+  return data ? { ...data, price_ron: Number(data.price_ron), seat_price_ron: Number(data.seat_price_ron), seats: Number(data.seats) } : null;
 }
 
 /** Everything the Abonament screen shows; null for anyone but the shop's owner. */

@@ -138,7 +138,7 @@ export function filterCatalog(categories: readonly CatalogCategory[], query: str
 
 /** The form's fields, by section, in the order shown. */
 export const SETTING_SECTIONS: readonly { key: string; fields: readonly SettingKey[] }[] = [
-  { key: 'prices', fields: ['subscription_price_ron', 'report_price_ron', 'vat_rate_percent'] },
+  { key: 'prices', fields: ['subscription_price_ron', 'staff_seat_price_ron', 'report_price_ron', 'vat_rate_percent'] },
   { key: 'periods', fields: ['trial_days', 'quote_expiry_days'] },
   { key: 'ranking', fields: ['ranking_prior_avg', 'ranking_prior_weight'] },
   {
@@ -157,6 +157,7 @@ export const SETTING_SECTIONS: readonly { key: string; fields: readonly SettingK
 /** Values with decimals (the rest are whole numbers). */
 export const DECIMAL_SETTINGS: ReadonlySet<SettingKey> = new Set([
   'subscription_price_ron',
+  'staff_seat_price_ron',
   'report_price_ron',
   'vat_rate_percent',
   'ranking_prior_avg',
@@ -317,6 +318,9 @@ const SUBSCRIPTION_COLUMNS: Column<AdminSubscriptionRow>[] = [
   ['admin.csv.status', (r, t) => t(`admin.subStatus.${r.status}`)],
   ['admin.csv.stripeStatus', (r) => r.stripe_status ?? ''],
   ['admin.csv.price', (r, _t, _l, d) => csvAmount(Number(r.price_ron), d)],
+  ['admin.csv.seats', (r) => String(r.seats ?? 0)],
+  ['admin.csv.seatPrice', (r, _t, _l, d) => csvAmount(Number(r.seat_price_ron), d)],
+  ['admin.csv.monthly', (r, _t, _l, d) => csvAmount(Number(r.monthly_ron), d)],
   ['admin.csv.nextBilling', (r) => csvDateTime(r.next_billing)],
   ['admin.csv.trialEnds', (r) => csvDateTime(r.trial_ends_at)],
   ['admin.csv.periodEnd', (r) => csvDateTime(r.current_period_end)],

@@ -475,6 +475,8 @@ Note: 1 migrare (`schema_version` = 19), Edge Functions noi `stripe-checkout`, `
 
 Note: amânat (25 sept 2026) până la decizia cu contabilul; T15 s-a făcut înainte. De inclus și plățile rapoartelor de istoric (T15, persoane fizice).
 
+**Colegi plătiți (cerut de Eduard după T16b, făcut):** abonamentul este 100 lei pe lună plus 20 lei pe lună pentru fiecare coleg care și-a făcut contul în service (invitația nu costă; în perioada gratuită nu se plătește nimic). În Stripe: al doilea rând „Cont angajat” × numărul de colegi (`STRIPE_SEAT_PRICE_ID`); când un coleg intră sau e scos, numărul se schimbă singur, cu calcul pe zile. Prețul pe coleg e în Setări platformă și se fixează la înscrierea fiecărui service (ca abonamentul). Ecranul Abonament arată „100 lei + 2 colegi × 20 lei”, Personal spune cât costă un coleg, adminul vede colegii plătiți și totalul lunar (și în CSV, și în venitul lunar). 1 migrare (`schema_version` = 23). **Pentru T14b:** factura fiscală trebuie să aibă și rândul „Cont angajat”.
+
 ---
 
 ## T15 — Raportul oficial de istoric

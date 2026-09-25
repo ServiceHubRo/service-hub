@@ -13,6 +13,10 @@
 // PDF fails, the event is answered 500 and Stripe's next delivery tries again; the client can
 // also retry from Rapoartele mele (generate-report).
 //
+// Colleagues (paid staff seats): when a subscription starts, the colleagues' quantity is checked
+// against the shop's count now (someone may have joined while Checkout was open) and set if it
+// differs (_shared/seats.ts); what Stripe charges is recorded as billed_seats.
+//
 // Events to send (Stripe → Developers → Webhooks): checkout.session.completed,
 // customer.subscription.created, customer.subscription.updated, customer.subscription.deleted,
 // invoice.paid, invoice.payment_failed.
@@ -20,6 +24,7 @@ import { adminApi } from '../_shared/admin.ts';
 import { appUrlFromEnv, stripeConfigFromEnv } from '../_shared/env.ts';
 import { json } from '../_shared/http.ts';
 import { generateReport } from '../_shared/reportGenerate.ts';
+import { seatPrice, syncSeats, type SeatInfo } from '../_shared/seats.ts';
 import {
   failedInvoice,
   invoiceSubscriptionId,
@@ -49,14 +54,24 @@ async function latest(stripe: StripeApi, id: string, fallback?: Obj): Promise<Ob
   }
 }
 
-async function sync(api: Api, stripe: StripeApi, id: string | null, shopHint: unknown, fallback?: Obj) {
-  if (!id) return;
+async function sync(api: Api, stripe: StripeApi, id: string | null, shopHint: unknown, fallback?: Obj): Promise<string | null> {
+  if (!id) return null;
   const sub = await latest(stripe, id, fallback);
-  if (!sub) return;
+  if (!sub) return null;
   const state = subscriptionState(sub);
-  if (!state.customer) return;
+  if (!state.customer) return null;
   const shop = uuidOrNull(shopHint) ?? uuidOrNull((sub.metadata as Obj | undefined)?.shop_id);
   await api.rpc('sync_stripe_subscription', { p_customer: state.customer, p_shop_id: shop, p_sub: state });
+  return state.customer;
+}
+
+/** A subscription just started: Stripe charges for the shop's colleagues as they are now. */
+async function seatsAtStart(api: Api, stripe: StripeApi, seatPriceId: string | undefined, customer: string | null, eventId: string) {
+  if (!customer || !seatPriceId) return;
+  const info = (await api.rpc('stripe_seat_info', { p_customer: customer })) as SeatInfo | null;
+  if (!info) return;
+  const r = await syncSeats(stripe, await seatPrice(stripe, seatPriceId), info, `webhook-${eventId}`);
+  if (r.billed !== null) await api.rpc('set_billed_seats', { p_shop_id: info.shop_id, p_seats: r.billed });
 }
 
 /** A paid Checkout for a history report: paid, then its PDF. */
@@ -73,14 +88,18 @@ async function reportPaid(api: Api, session: Obj): Promise<void> {
   if (row && row.status === 'paid') await generateReport(api, row, appUrlFromEnv());
 }
 
-async function handle(api: Api, stripe: StripeApi, type: string, object: Obj): Promise<void> {
+async function handle(api: Api, stripe: StripeApi, seatPriceId: string | undefined, type: string, object: Obj, eventId: string): Promise<void> {
   switch (type) {
     case 'checkout.session.completed':
     case 'checkout.session.async_payment_succeeded':
-      if (object.mode === 'subscription') await sync(api, stripe, idOf(object.subscription), object.client_reference_id);
-      else if (object.mode === 'payment' && (object.metadata as Obj | undefined)?.kind === 'history_report') await reportPaid(api, object);
+      if (object.mode === 'subscription') {
+        const customer = await sync(api, stripe, idOf(object.subscription), object.client_reference_id);
+        await seatsAtStart(api, stripe, seatPriceId, customer, eventId);
+      } else if (object.mode === 'payment' && (object.metadata as Obj | undefined)?.kind === 'history_report') await reportPaid(api, object);
       return;
     case 'customer.subscription.created':
+      await seatsAtStart(api, stripe, seatPriceId, await sync(api, stripe, idOf(object.id), null, object), eventId);
+      return;
     case 'customer.subscription.updated':
     case 'customer.subscription.deleted':
     case 'customer.subscription.paused':
@@ -126,7 +145,7 @@ Deno.serve(async (req) => {
     const api = adminApi();
     const fresh = await api.rpc('stripe_event_begin', { p_id: event.id, p_type: event.type, p_payload: event });
     if (fresh !== true) return json({ received: true, duplicate: true });
-    await handle(api, stripeApi(config), event.type, event.data?.object ?? {});
+    await handle(api, stripeApi(config), config.seatPriceId, event.type, event.data?.object ?? {}, event.id);
     await api.rpc('stripe_event_done', { p_id: event.id });
     return json({ received: true });
   } catch (e) {

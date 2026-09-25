@@ -1,15 +1,17 @@
 import { expect, test } from '@playwright/test';
-import { emailsTo, stripeEndSubscription, stripeFailPayment, type SentEmail } from './providers';
+import { emailsTo, stripeEndSubscription, stripeFailPayment, stripeSubscriptionOf, type SentEmail } from './providers';
 import {
   BACKEND,
   PASSWORD,
   createBookableShop,
   expectNoHorizontalScroll,
   openAccount,
+  createUser,
   rpcAs,
   serviceRest,
   shot,
   signIn,
+  userIdOf,
 } from './support';
 
 // T14 — the subscription. The local stack's Stripe functions talk to a Stripe stand-in
@@ -211,5 +213,53 @@ test.describe('subscription', () => {
     await expect(page.getByRole('button', { name: 'Activate subscription' })).toBeVisible();
     await expectNoHorizontalScroll(page);
     await shot(page, 't14-subscription-en', name());
+  });
+
+  test('colleagues: 20 lei each, in Checkout and in Stripe, and one less when one leaves', async ({ page }) => {
+    const { email, shopId } = await shopWith();
+    // A colleague whose account joined the shop (the invitation flow has its own test).
+    const colleague = await createUser('client', { name: 'Coleg Plătit' });
+    const colleagueId = await userIdOf(colleague);
+    await serviceRest(`profiles?id=eq.${colleagueId}`, 'PATCH', { role: 'shop' });
+    await serviceRest('shop_staff', 'POST', {
+      shop_id: shopId,
+      user_id: colleagueId,
+      invited_email: colleague,
+      role: 'staff',
+      accepted_at: new Date().toISOString(),
+    });
+
+    await signIn(page, email, PASSWORD);
+    await expect(page).toHaveURL(/\/s\/panou$/);
+    await page.goto('/s/cont/abonament');
+    await expect(page.getByText('120 lei', { exact: true })).toBeVisible();
+    await expect(page.getByText('100 lei + 1 coleg × 20 lei')).toBeVisible();
+    await expectNoHorizontalScroll(page);
+    await shot(page, 'seats-subscription', name());
+
+    // Stripe's page charges the plan and the colleague; the subscription has both items.
+    await page.getByRole('button', { name: 'Activează abonamentul' }).click();
+    await expect(page.getByText('Abonament: 120 lei / lună')).toBeVisible();
+    await page.getByRole('button', { name: 'Plătește' }).click();
+    await expect(page).toHaveURL(/\/s\/cont\/abonament\?plata=ok$/);
+    const customer = (await subscriptionOf(shopId)).stripe_customer_id!;
+    const seatsInStripe = async () =>
+      (await stripeSubscriptionOf(customer))?.items.data.find((i) => i.price.id === 'price_local_seat')?.quantity ?? 0;
+    expect(await seatsInStripe()).toBe(1);
+
+    // Personal: what a colleague costs; removing the colleague takes them off the Stripe bill.
+    await page.goto('/s/cont/setari/personal');
+    await expect(page.getByText('Acum abonamentul tău este 120 lei pe lună, cu 1 coleg.', { exact: false })).toBeVisible();
+    await shot(page, 'seats-staff', name());
+    const card = page.locator('div').filter({ hasText: 'Coleg Plătit' }).filter({ has: page.getByRole('button', { name: 'Elimină' }) }).last();
+    await card.getByRole('button', { name: 'Elimină' }).click();
+    await page.getByRole('button', { name: 'Da, elimină' }).click();
+    await expect.poll(seatsInStripe, { timeout: 30_000 }).toBe(0);
+    await expect
+      .poll(async () => (await serviceRest<{ billed_seats: number | null }[]>(`subscriptions?shop_id=eq.${shopId}&select=billed_seats`, 'GET'))[0]!.billed_seats)
+      .toBe(0);
+    await page.goto('/s/cont/abonament');
+    await expect(page.getByText('100 lei', { exact: true })).toBeVisible();
+    await expect(page.getByText('Fiecare coleg care își face cont în service adaugă 20 lei pe lună.')).toBeVisible();
   });
 });

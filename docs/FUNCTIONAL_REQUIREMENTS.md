@@ -189,7 +189,7 @@ A user has exactly one role. The role decides the entire interface. A client can
 - Notifications: push status, SMS on/off for new requests, daily digest on/off.
 
 ### 4.7 Subscription
-- Single plan: **100 RON / month**, **90-day free trial**, cancel anytime (effective end of period).
+- Single plan: **100 RON / month**, plus **20 RON / month for each colleague** whose account has joined the shop (an invitation is free; removing a colleague lowers the price; changes are prorated by day), **90-day free trial** (colleagues included), cancel anytime (effective end of period).
 - Shows: trial days left or next billing date, status (Trial / Active / Past due / Cancelled), amount.
 - Hosted checkout to start; hosted customer portal to change card, view invoices, cancel.
 - Invoice list with download.

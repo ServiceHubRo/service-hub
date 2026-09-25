@@ -8,7 +8,9 @@
 // 3. Makes the shop's Stripe customer once (recorded in subscriptions.stripe_customer_id).
 // 4. Opens Checkout at the shop's own price (subscriptions.price_ron: STRIPE_PRICE_ID when it is
 //    the same amount, else the same product at the shop's amount). Inside the free period the
-//    card is only saved: the first charge is at the end of the free period.
+//    card is only saved: the first charge is at the end of the free period. The colleagues with an
+//    account are a second line, "Cont angajat" × seats (STRIPE_SEAT_PRICE_ID, the shop's price per
+//    colleague); later changes reach Stripe through the outbox (seats_changed, _shared/seats.ts).
 // The request id of the tap is the idempotency key, so a repeated tap gets the same page.
 // Nothing here changes the subscription's status: only the webhook does (stripe-webhook).
 // Answers { url } or { error: code }.
@@ -16,6 +18,7 @@ import { AdminError, adminApi } from '../_shared/admin.ts';
 import { linkBase } from '../_shared/app.ts';
 import { appUrlFromEnv, stripeConfigFromEnv } from '../_shared/env.ts';
 import { bearerToken, corsHeaders, json } from '../_shared/http.ts';
+import { seatLineItem, seatPrice, type SeatInfo } from '../_shared/seats.ts';
 import { hasLiveSubscription, StripeError, stripeApi, stripeLocale, trialEndForCheckout } from '../_shared/stripe.ts';
 
 /** Refusals the app translates (src/data/subscription.ts). */
@@ -84,6 +87,10 @@ Deno.serve(async (req) => {
       await stripe.post(`customers/${customer}`, customerFields).catch((e) => console.error('stripe-checkout: customer update', e));
     }
 
+    const seats = (await api.rpc('stripe_seat_info', { p_shop_id: info.shop_id })) as SeatInfo;
+    if (seats.seats > 0 && !config.seatPriceId) return json({ error: 'payments_unavailable' }, 503);
+    const seatLine = seats.seats > 0 ? seatLineItem(await seatPrice(stripe, config.seatPriceId!), seats.seat_price_ron, seats.seats) : null;
+
     const price = await stripe.get(`prices/${config.priceId}`);
     const samePrice = price.unit_amount === amount && String(price.currency).toLowerCase() === 'ron';
     const lineItem = samePrice
@@ -101,7 +108,7 @@ Deno.serve(async (req) => {
         mode: 'subscription',
         customer,
         client_reference_id: info.shop_id,
-        line_items: [lineItem],
+        line_items: seatLine ? [lineItem, seatLine] : [lineItem],
         locale,
         success_url: `${base}?plata=ok`,
         cancel_url: `${base}?plata=anulata`,

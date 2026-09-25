@@ -11,7 +11,7 @@ import {
   verifyStripeSignature,
 } from '../../supabase/functions/_shared/stripe.ts';
 import { renderNotification } from '../../supabase/functions/_shared/templates.ts';
-import { subscriptionView, trialWarningDays, type SubscriptionRow } from '../../src/lib/subscription';
+import { monthlyTotal, subscriptionView, trialWarningDays, type SubscriptionRow } from '../../src/lib/subscription';
 
 describe('Stripe webhook signature', () => {
   const secret = 'whsec_test_secret';
@@ -140,12 +140,23 @@ const row = (over: Partial<SubscriptionRow> = {}): SubscriptionRow => ({
   current_period_end: null,
   cancel_at_period_end: false,
   price_ron: 100,
+  seat_price_ron: 20,
+  seats: 0,
   stripe_customer_id: null,
   stripe_status: null,
   ended_reason: null,
   next_payment_attempt: null,
   created_at: '2026-09-23T10:00:00Z',
   ...over,
+});
+
+describe('the monthly total', () => {
+  it('is the price plus 20 lei for each colleague with an account', () => {
+    expect(monthlyTotal(row())).toBe(100);
+    expect(monthlyTotal(row({ seats: 1 }))).toBe(120);
+    expect(monthlyTotal(row({ seats: 2 }))).toBe(140);
+    expect(monthlyTotal(row({ price_ron: 79.5, seats: 3, seat_price_ron: 15 }))).toBe(124.5);
+  });
 });
 
 // 2026-10-09 12:00 in Bucharest.
