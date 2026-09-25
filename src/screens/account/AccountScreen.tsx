@@ -1,4 +1,4 @@
-import { CreditCard, Download, FileCheck, FileText, Globe, Heart, History, ListTree, Megaphone, ScrollText, Settings, SlidersHorizontal, Star } from 'lucide-react';
+import { CreditCard, Download, FileCheck, FileText, Globe, Heart, History, LifeBuoy, ListTree, Megaphone, ScrollText, Settings, SlidersHorizontal, Star } from 'lucide-react';
 import { useOutletContext } from 'react-router-dom';
 import type { ShellOutletContext } from '../../app/AppShell';
 import { LangSwitch } from '../../app/LangSwitch';
@@ -24,6 +24,7 @@ import { REVIEWS_PATH } from '../shop/paths';
 import { SETTINGS_PATH } from '../shop/settings/paths';
 import { OwnerTiles } from '../shop/OwnerTiles';
 import { DataSection } from './DataSection';
+import { helpPath } from './paths';
 import { IdentityCard } from './IdentityCard';
 import { LocationRow } from './LocationRow';
 import { PhoneCard } from './PhoneCard';
@@ -101,6 +102,15 @@ export function AccountScreen({ role }: { role: Role }) {
       )}
 
       <SecuritySection />
+
+      {role !== 'admin' && (
+        <>
+          <h2 className={styles.section}>{t('help.title')}</h2>
+          <div className={styles.tiles}>
+            <Tile to={helpPath(role)} icon={LifeBuoy} label={t('help.title')} hint={t('help.tileHint')} />
+          </div>
+        </>
+      )}
 
       <h2 className={styles.section}>{t('account.legal')}</h2>
       <div className={styles.tiles}>
