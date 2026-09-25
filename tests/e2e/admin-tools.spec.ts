@@ -261,7 +261,7 @@ test.describe('admin tools', () => {
 
   test('subscriptions: search, a founder price by hand, CSV exports', async ({ page }) => {
     const shopName = `Atelier Abonament ${tag()}`;
-    await createBookableShop(shopName, ['ulei']);
+    const { shopId } = await createBookableShop(shopName, ['ulei']);
     await signInAdmin(page);
     await openTool(page, 'Abonamente și plăți');
     await page.getByLabel('Caută service, oraș, cont, email, Stripe').fill(shopName);
@@ -279,6 +279,8 @@ test.describe('admin tools', () => {
     await page.getByRole('tab', { name: /Plăți/ }).click();
     await page.getByRole('tab', { name: /Abonamente/ }).click();
     await page.getByRole('link', { name: new RegExp(shopName) }).click();
+    await expect(page).toHaveURL(new RegExp(`/admin/service-uri/${shopId}$`));
+    await expect(page.getByRole('heading', { level: 1, name: shopName })).toBeVisible();
     await page.getByRole('button', { name: 'Schimbă prețul' }).click();
     await page.getByLabel('Preț pe lună (lei)').fill('79,50');
     await page.getByRole('button', { name: 'Salvează' }).click();
