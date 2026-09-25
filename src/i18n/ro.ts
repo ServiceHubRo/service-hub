@@ -109,6 +109,8 @@ export const ro = {
   'notFound.appHome': 'Înapoi în aplicație',
   'chunk.loadError': 'Nu am putut încărca aplicația. Verifică internetul și reîncarcă pagina.',
   'chunk.reload': 'Reîncarcă pagina',
+  'crash.text': 'Ceva n-a mers pe acest ecran. Reîncarcă pagina sau alege alt ecran din meniu.',
+  'crash.textPage': 'Ceva n-a mers pe această pagină. Reîncarcă pagina; dacă se repetă, revino puțin mai târziu.',
 
   'common.save': 'Salvează',
   'common.cancel': 'Renunță',
@@ -949,6 +951,12 @@ export const ro = {
   // Component gallery (test builds only)
   'demo.title': 'Componente',
   'demo.subtitle': 'Toate piesele comune, ca să le vezi pe telefon și pe laptop.',
+  'demo.monitoring': 'Raportarea erorilor (Sentry)',
+  'demo.monitoringOn': 'Pornită: erorile ajung în Sentry.',
+  'demo.monitoringOff': 'Oprită: lipsește VITE_SENTRY_DSN în Netlify.',
+  'demo.sendTestError': 'Trimite o eroare de test',
+  'demo.testErrorSent': 'Am trimis eroarea de test. Apare în Sentry în câteva secunde.',
+  'demo.crashScreen': 'Strică ecranul (test)',
   'demo.buttons': 'Butoane',
   'demo.primary': 'Programează-te',
   'demo.secondary': 'Mesaj',

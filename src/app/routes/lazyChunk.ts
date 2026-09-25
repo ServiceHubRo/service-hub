@@ -3,6 +3,14 @@ import { sessionStore } from '../../lib/storage';
 
 const RELOADED_KEY = 'sh_chunk_reload';
 
+/** A part of the app that could not be downloaded (offline, or a deploy removed the old file). */
+export class ChunkLoadError extends Error {
+  constructor(cause: unknown) {
+    super(cause instanceof Error ? cause.message : String(cause), { cause });
+    this.name = 'ChunkLoadError';
+  }
+}
+
 /**
  * `React.lazy` for a part of the app loaded on demand (T18: each role's code is its own file).
  * After a new deploy the old files are gone, so an open tab cannot load them: reload the page once
@@ -24,7 +32,7 @@ export function lazyChunk<T extends ComponentType<object>>(load: () => Promise<{
           return new Promise<{ default: T }>(() => {});
         }
       }
-      throw error;
+      throw new ChunkLoadError(error);
     }
   });
 }

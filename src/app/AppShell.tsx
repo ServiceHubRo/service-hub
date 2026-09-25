@@ -17,6 +17,7 @@ import { unreadThreads, useOptionalThreads } from '../screens/messages/threadsCo
 import { EmailVerifyBanner } from './EmailVerifyBanner';
 import { LangSwitch } from './LangSwitch';
 import { PushBridge } from './PushBridge';
+import { ScreenErrorBoundary } from './ScreenErrorBoundary';
 import { NAV, type NavItem, type Role } from './roles';
 import { useSession } from './sessionContext';
 import { useDocumentTitle } from './useDocumentTitle';
@@ -168,7 +169,9 @@ export function AppShell({ role }: { role: Role }) {
           <div className={styles.content}>
             <EmailVerifyBanner role={role} />
             {role !== 'admin' && <PushBridge />}
-            <Outlet context={{ logOut } satisfies ShellOutletContext} />
+            <ScreenErrorBoundary resetKey={pathname}>
+              <Outlet context={{ logOut } satisfies ShellOutletContext} />
+            </ScreenErrorBoundary>
           </div>
         </main>
       </div>

@@ -15,6 +15,7 @@ import { appUrlFromEnv, stripeConfigFromEnv } from '../_shared/env.ts';
 import { bearerToken, corsHeaders, json } from '../_shared/http.ts';
 import { reportCarName } from '../_shared/report.ts';
 import { StripeError, stripeApi, stripeLocale } from '../_shared/stripe.ts';
+import { reportError } from '../_shared/monitor.ts';
 
 /** Refusals the app translates (src/data/reports.ts). */
 const KNOWN_CODES = new Set(['not_allowed', 'account_suspended', 'car_not_found', 'booking_not_found', 'no_jobs', 'nothing_to_pay']);
@@ -101,7 +102,7 @@ Deno.serve(async (req) => {
     await api.rpc('set_history_report_session', { p_report_id: report.id, p_session_id: session.id });
     return json({ url: session.url, report_id: report.id });
   } catch (e) {
-    console.error('report-checkout failed', e instanceof Error ? e.message : e);
+    await reportError('report-checkout', e);
     return json({ error: e instanceof StripeError && e.status === 0 ? 'payments_unavailable' : 'unknown' }, 500);
   }
 });

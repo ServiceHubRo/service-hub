@@ -38,7 +38,9 @@ Ordinea contează: fiecare sarcină se sprijină pe cele de dinainte. Sarcinile 
 | T16b | Admin — unelte | Abonamente, catalog, setări platformă, anunțuri, exporturi |
 | T17 | Rapoarte pentru service | Încasări, clienți reveniți, rata devizelor, ocupare |
 | T18 | Pagina publică și lustruire | Pagina de prezentare, accesibilitate, fus orar, tipărire |
-| T19 | Lansarea | Monitorizare erori, mediu de test separat, verificarea finală, domeniul |
+| T19a | Lansarea — monitorizare și mediu de test | Erorile ajung în Sentry; linkurile de test pe un proiect Supabase separat |
+| T19b | Lansarea — documentele legale | Termeni, confidențialitate, cookies actualizate, în română și engleză |
+| T19c | Lansarea — verificarea finală și domeniul | `LAUNCH_CHECK.md`, service-hub.ro, plăți reale, admin, copii de siguranță |
 
 ---
 
@@ -622,6 +624,26 @@ Note: 1 migrare (`schema_version` = 25): `public_pricing()` — prețurile pentr
 
 **Ce testezi tu:** lista din `docs/LAUNCH_CHECK.md`, cap-coadă, cu un service și un client reali (de ex. un prieten cu service).
 
-**Pașii tăi:** ce listează Claude; mutarea domeniului o faci împreună, pas cu pas.
+**Pașii tăi:** ce listează Claude; mutarea domeniului o faci împreună, pas cu pas. Ghidul: `docs/LANSARE.md`.
+
+Împărțită în trei părți (25 sept 2026), fiecare cu pull request-ul ei:
+
+### T19a — Monitorizare și mediu de test
+
+Sentry (aplicația + Edge Functions) și proiectul Supabase de test pentru pull request-uri.
+
+- [x] Făcut
+
+Note: nicio migrare, niciun pachet nou. **Sentry** fără SDK-ul Sentry (un modul mic, al nostru, `_shared/sentry.ts`, folosit și de aplicație și de funcții — ~4 KB în plus în fișierul de start): pornește doar când există DSN-ul (`VITE_SENTRY_DSN` în Netlify, secretul GitHub `SENTRY_DSN` pentru funcții, pus în Supabase de „Deploy Supabase” împreună cu mediul — `production` / `test` — și commit-ul). **Ce ajunge în Sentry:** erorile neprinse din browser, ecranele care se strică, răspunsurile neașteptate ale bazei de date (cu numele funcției), baza de date rămasă în urmă pe site-ul publicat, orice funcție de pe server care răspunde 500 (webhook Stripe, plăți, ștergerea contului, rapoarte, notificări…), plus avertizări când Resend, SMSO sau Stripe refuză definitiv un email / SMS / o schimbare. **Nu ajung:** refuzurile normale (zi plină, limită), lipsa internetului, zgomotul browserului, erorile extensiilor. **Ce se trimite despre om:** doar id-ul contului și rolul; adresele pierd tokenurile (linkurile din email, invitațiile), iar emailurile, telefoanele și tokenurile din texte sunt înlocuite. Maxim 10 rapoarte pe încărcare de pagină, fiecare eroare o dată. **Ecran stricat:** acum apare „Ceva n-a mers pe acest ecran…” cu „Reîncarcă pagina”, meniul rămâne folosibil (înainte: pagină albă). **Mediul de test:** „Deploy Supabase” trimite pull request-urile pe proiectul de test (`SUPABASE_TEST_PROJECT_REF`, `SUPABASE_TEST_DB_PASSWORD`) și `main` pe cel real; până există proiectul de test, totul merge ca înainte (cu o avertizare); pe proiectul de test permite singur adresele linkurilor de test în Auth; rularea manuală alege proiectul. **Decizii:** (1) fără pachetul Sentry — ar fi adăugat ~25 KB și încă un furnizor de cod; modulul nostru e testat și ține datele personale departe; (2) hărțile de cod (source maps) se publică lângă fișiere, ca Sentry să arate linia exactă din cod fără pași în plus (nu conțin nimic secret; browserele le descarcă doar cu instrumentele de dezvoltator deschise); (3) un singur proiect Sentry pentru aplicație și funcții, separate prin etichetele `side` și `function` și prin mediu; (4) datele demo nu se pun pe proiectul de test (îți faci conturile de test o dată). Testat: 15 teste unitare (DSN, ștergerea tokenurilor și a datelor personale, stive Chrome/Firefox/Deno, limite), teste în browser cu un „Sentry de test” local (eroare de test, ecran stricat RO/EN la 390/820/1440, eroarea unui cont logat doar cu id și rol, webhook-ul Stripe căzut raportat de pe server); după fiecare rulare, toate rapoartele primite sunt în `test-results/sentry-reports.json`.
+
+### T19b — Documentele legale
+
+Termenii, confidențialitatea și cookies actualizate (vezi „Include” de mai sus) și versiunile în engleză, afișate în aplicație după limbă. Datele firmei de la tine; forma finală o dai cu avocatul.
+
+- [ ] Făcut
+
+### T19c — Verificarea finală și domeniul
+
+`docs/LAUNCH_CHECK.md` (lista „Final check” + FR, parcursă automat cu Playwright pe mediul de test), CAPTCHA Turnstile pornit, `APP_URL` = `https://service-hub.ro`, mutarea domeniului, Site URL și adresele în Supabase Auth, cheile Stripe live (cu webhook-ul live), contul de admin real, copii de siguranță (planul Supabase Pro are copii zilnice — decizia ta, ~25 $/lună; pe planul gratuit proiectul se oprește după 7 zile fără activitate).
 
 - [ ] Făcut

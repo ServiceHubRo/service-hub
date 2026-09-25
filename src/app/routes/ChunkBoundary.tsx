@@ -1,37 +1,25 @@
 import { Component, Suspense, type ReactNode } from 'react';
-import { Banner } from '../../components/Banner';
-import { Button } from '../../components/Button';
-import { useI18n } from '../../i18n/context';
 import { LoadingScreen } from '../LoadingScreen';
-import styles from '../SessionErrorScreen.module.css';
+import { CrashNotice } from '../ScreenErrorBoundary';
+import { ChunkLoadError } from './lazyChunk';
 
-function ChunkError() {
-  const { t } = useI18n();
-  return (
-    <div className={styles.screen}>
-      <div className={styles.box}>
-        <Banner tone="error">{t('chunk.loadError')}</Banner>
-        <Button variant="primary" block onClick={() => window.location.reload()}>
-          {t('chunk.reload')}
-        </Button>
-      </div>
-    </div>
-  );
-}
+class Boundary extends Component<{ children: ReactNode }, { error: unknown }> {
+  state: { error: unknown } = { error: null };
 
-class Boundary extends Component<{ children: ReactNode }, { failed: boolean }> {
-  state = { failed: false };
-
-  static getDerivedStateFromError() {
-    return { failed: true };
+  static getDerivedStateFromError(error: unknown) {
+    return { error };
   }
 
   render() {
-    return this.state.failed ? <ChunkError /> : this.props.children;
+    if (this.state.error === null) return this.props.children;
+    return <CrashNotice kind={this.state.error instanceof ChunkLoadError ? 'chunk' : 'crash'} fullScreen />;
   }
 }
 
-/** A part of the app loaded on demand: the loading screen meanwhile, a way out if it cannot load. */
+/**
+ * A part of the app loaded on demand: the loading screen meanwhile, a way out if it cannot load
+ * (or if it breaks before its own screens start — they have ScreenErrorBoundary inside the shell).
+ */
 export function ChunkBoundary({ children }: { children: ReactNode }) {
   return (
     <Boundary>

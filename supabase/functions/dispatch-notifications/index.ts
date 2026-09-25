@@ -28,6 +28,7 @@ import { sendSms, type SmsConfig } from '../_shared/smso.ts';
 import { StripeError, stripeApi, type StripeConfig } from '../_shared/stripe.ts';
 import { renderNotification, type NotificationEvent, type Overrides } from '../_shared/templates.ts';
 import { generateVapidKeys, sendWebPush, type PushDevice, type VapidKeys } from '../_shared/webpush.ts';
+import { reportError } from '../_shared/monitor.ts';
 
 const SUBJECT = 'https://service-hub.ro';
 const BATCH = 50;
@@ -240,6 +241,26 @@ async function deliver(e: ClaimedEvent, texts: Overrides, vapid: VapidKeys, send
   return result;
 }
 
+/**
+ * An email, SMS or Stripe call refused for good (a wrong key, a closed account): one warning per
+ * channel and round, grouped by channel in Sentry. Push is left out: a dead phone is normal.
+ */
+async function reportChannelFailures(results: Result[]): Promise<void> {
+  const failed = new Map<string, string>();
+  for (const r of results) {
+    for (const l of r.log) {
+      if (l.channel !== 'push' && l.status === 'failed' && !failed.has(l.channel)) failed.set(l.channel, l.error ?? 'failed');
+    }
+  }
+  for (const [channel, error] of failed) {
+    await reportError('dispatch-notifications', new Error(`${channel} failed: ${error}`), {
+      level: 'warning',
+      tags: { channel },
+      fingerprint: ['dispatch-notifications', channel],
+    });
+  }
+}
+
 async function dispatch(api: Api, config: Config): Promise<number> {
   const vapid: VapidKeys = { publicKey: config.vapid_public_key!, privateJwk: config.vapid_private_jwk! };
   const senders: Senders = {
@@ -272,6 +293,7 @@ async function dispatch(api: Api, config: Config): Promise<number> {
       ),
     );
     await api.rpc('finish_notifications', { p_results: results });
+    await reportChannelFailures(results);
     processed += events.length;
     if (events.length < BATCH) break;
   }
@@ -296,7 +318,7 @@ Deno.serve(async (req) => {
     const processed = await dispatch(api, config);
     return json({ processed });
   } catch (e) {
-    console.error('dispatch-notifications', e);
+    await reportError('dispatch-notifications', e);
     return json({ error: 'server_error' }, 500);
   }
 });

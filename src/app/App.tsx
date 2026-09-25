@@ -1,7 +1,9 @@
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { useEffect, type ReactNode } from 'react';
+import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom';
 import { OfflineBar } from '../components/OfflineBar';
 import { I18nProvider } from '../i18n/I18nProvider';
 import { IS_TEST_BUILD } from '../lib/env';
+import { addBreadcrumb, safePath } from '../lib/monitoring';
 import { AuthScreen } from '../screens/auth/AuthScreen';
 import { CheckEmail } from '../screens/auth/CheckEmail';
 import { ForgotPassword } from '../screens/auth/ForgotPassword';
@@ -14,6 +16,7 @@ import { NAV, type Role } from './roles';
 import { ChunkBoundary } from './routes/ChunkBoundary';
 import { lazyChunk } from './routes/lazyChunk';
 import { SchemaBar } from './SchemaBar';
+import { ScreenErrorBoundary } from './ScreenErrorBoundary';
 import { SessionProvider } from './SessionProvider';
 import styles from './App.module.css';
 
@@ -46,6 +49,22 @@ function roleRoutes(role: Role) {
   );
 }
 
+/**
+ * Every screen: a message instead of an empty page if one breaks (T19), and the screens visited
+ * remembered for the error report (addresses without tokens, in memory only).
+ */
+function RouteGuard({ children }: { children: ReactNode }) {
+  const location = useLocation();
+  useEffect(() => {
+    addBreadcrumb('navigation', safePath(window.location.href));
+  }, [location.pathname, location.search]);
+  return (
+    <ScreenErrorBoundary resetKey={location.pathname} fullScreen>
+      {children}
+    </ScreenErrorBoundary>
+  );
+}
+
 export function App() {
   return (
     <I18nProvider>
@@ -54,47 +73,49 @@ export function App() {
           <div className={styles.app}>
             <OfflineBar />
             <SchemaBar />
-            <Routes>
-              <Route path="/" element={<Landing />} />
-              <Route element={<PublicOnly />}>
-                <Route path="/intra" element={<AuthScreen tab="signin" />} />
-                <Route path="/cont-nou" element={<AuthScreen tab="signup" />} />
-                <Route path="/confirma-email" element={<CheckEmail />} />
-                <Route path="/parola-uitata" element={<ForgotPassword />} />
-              </Route>
-              <Route path="/parola-noua" element={<NewPassword />} />
-              <Route path="/invitatie/:token" element={<InviteScreen />} />
-              <Route
-                path="/legal/:doc"
-                element={
-                  <ChunkBoundary>
-                    <PublicLegal />
-                  </ChunkBoundary>
-                }
-              />
-              <Route
-                path="/verifica"
-                element={
-                  <ChunkBoundary>
-                    <VerifyScreen />
-                  </ChunkBoundary>
-                }
-              />
-              {IS_TEST_BUILD && (
+            <RouteGuard>
+              <Routes>
+                <Route path="/" element={<Landing />} />
+                <Route element={<PublicOnly />}>
+                  <Route path="/intra" element={<AuthScreen tab="signin" />} />
+                  <Route path="/cont-nou" element={<AuthScreen tab="signup" />} />
+                  <Route path="/confirma-email" element={<CheckEmail />} />
+                  <Route path="/parola-uitata" element={<ForgotPassword />} />
+                </Route>
+                <Route path="/parola-noua" element={<NewPassword />} />
+                <Route path="/invitatie/:token" element={<InviteScreen />} />
                 <Route
-                  path="/dev/componente"
+                  path="/legal/:doc"
                   element={
                     <ChunkBoundary>
-                      <ComponentGallery />
+                      <PublicLegal />
                     </ChunkBoundary>
                   }
                 />
-              )}
-              {roleRoutes('client')}
-              {roleRoutes('shop')}
-              {roleRoutes('admin')}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
+                <Route
+                  path="/verifica"
+                  element={
+                    <ChunkBoundary>
+                      <VerifyScreen />
+                    </ChunkBoundary>
+                  }
+                />
+                {IS_TEST_BUILD && (
+                  <Route
+                    path="/dev/componente"
+                    element={
+                      <ChunkBoundary>
+                        <ComponentGallery />
+                      </ChunkBoundary>
+                    }
+                  />
+                )}
+                {roleRoutes('client')}
+                {roleRoutes('shop')}
+                {roleRoutes('admin')}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </RouteGuard>
           </div>
         </BrowserRouter>
       </SessionProvider>

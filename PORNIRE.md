@@ -106,4 +106,6 @@ Nu le lipi în chat, nici în altă parte.
 - O sarcină pe sesiune. Sesiunile lungi, cu multe sarcini, fac mai multe greșeli.
 - Proiectul din Lovable nu mai e necesar.
 
+**Lansarea (T19):** pașii pentru Sentry, proiectul de test, domeniu și restul sunt în `docs/LANSARE.md`.
+
 **Cost:** GitHub, Supabase și Netlify sunt gratuite la volumul ăsta. Sesiunile din Code consumă din limitele abonamentului tău Claude; la limită, aștepți resetarea sau continui a doua zi.

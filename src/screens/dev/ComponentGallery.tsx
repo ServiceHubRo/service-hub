@@ -16,6 +16,7 @@ import { BOOKING_STATUSES } from '../../lib/status';
 import { Stepper } from '../../components/Stepper';
 import { Tabs } from '../../components/Tabs';
 import { useI18n } from '../../i18n/context';
+import { captureError, monitoringEnabled } from '../../lib/monitoring';
 import styles from './ComponentGallery.module.css';
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
@@ -29,6 +30,11 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
+/** Throws while drawing: shows the "something went wrong" screen and sends the error (T19). */
+function Broken(): never {
+  throw new Error('Service-Hub test: screen broken on purpose');
+}
+
 /** Test builds only: every shared component on one page, to check look and behavior. */
 export function ComponentGallery() {
   const i18n = useI18n();
@@ -39,6 +45,8 @@ export function ComponentGallery() {
   const [plate, setPlate] = useState('');
   const [saveCar, setSaveCar] = useState(true);
   const [sent, setSent] = useState(0);
+  const [testErrorSent, setTestErrorSent] = useState(false);
+  const [broken, setBroken] = useState(false);
 
   return (
     <div className={styles.page}>
@@ -80,6 +88,32 @@ export function ComponentGallery() {
             >
               {t('demo.actionFail')}
             </ActionButton>
+          </div>
+        </Section>
+
+        <Section title={t('demo.monitoring')}>
+          <div className={styles.stack}>
+            <Banner tone={monitoringEnabled() ? 'info' : 'warning'}>
+              {t(monitoringEnabled() ? 'demo.monitoringOn' : 'demo.monitoringOff')}
+            </Banner>
+            <div className={styles.row}>
+              <Button
+                variant="secondary"
+                onClick={() => {
+                  captureError(new Error(`Service-Hub test error ${new Date().toISOString()}`), { tags: { test: 'yes' } });
+                  setTestErrorSent(true);
+                }}
+              >
+                {t('demo.sendTestError')}
+              </Button>
+              <Button variant="danger" onClick={() => setBroken(true)}>
+                {t('demo.crashScreen')}
+              </Button>
+            </div>
+            <p className={styles.muted} aria-live="polite">
+              {testErrorSent ? t('demo.testErrorSent') : ''}
+            </p>
+            {broken && <Broken />}
           </div>
         </Section>
 

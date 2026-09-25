@@ -14,6 +14,7 @@
 // this only when the address changed, so a shop makes a handful of requests a year.
 import { adminApi } from '../_shared/admin.ts';
 import { bearerToken, corsHeaders, json } from '../_shared/http.ts';
+import { reportError } from '../_shared/monitor.ts';
 
 const NOMINATIM = 'https://nominatim.openstreetmap.org/search';
 const USER_AGENT = 'Service-Hub/1.0 (https://service-hub.ro)';
@@ -119,7 +120,7 @@ Deno.serve(async (req) => {
       longitude: place?.lng ?? null,
     });
   } catch (e) {
-    console.error('geocode failed', e instanceof Error ? e.message : e);
+    await reportError('geocode', e);
     return json({ error: 'unknown' }, 500);
   }
 });

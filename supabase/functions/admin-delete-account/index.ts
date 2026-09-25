@@ -11,6 +11,7 @@
 import { cancelStripeSubscription, removeLogin } from '../_shared/accountDeletion.ts';
 import { AdminError, adminApi } from '../_shared/admin.ts';
 import { bearerToken, corsHeaders, json } from '../_shared/http.ts';
+import { reportError } from '../_shared/monitor.ts';
 
 /** Refusals the app translates (src/data/admin.ts). */
 const KNOWN_CODES = new Set(['not_allowed', 'account_has_active_bookings', 'shop_has_active_bookings']);
@@ -48,14 +49,14 @@ Deno.serve(async (req) => {
     try {
       await cancelStripeSubscription(api, userId);
     } catch (e) {
-      console.error('admin-delete-account: Stripe subscription not cancelled', e instanceof Error ? e.message : e);
+      await reportError('admin-delete-account', e, { tags: { step: 'stripe_cancel' } });
       return json({ error: 'subscription_cancel_failed' }, 502);
     }
 
     await removeLogin(api, userId, mode);
     return json({ ok: true, mode });
   } catch (e) {
-    console.error('admin-delete-account failed', e instanceof Error ? e.message : e);
+    await reportError('admin-delete-account', e);
     return json({ error: 'unknown' }, 500);
   }
 });

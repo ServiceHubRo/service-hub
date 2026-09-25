@@ -8,6 +8,7 @@ import { AdminError, adminApi } from '../_shared/admin.ts';
 import { appUrlFromEnv } from '../_shared/env.ts';
 import { bearerToken, corsHeaders, json } from '../_shared/http.ts';
 import { generateReport, reportRow } from '../_shared/reportGenerate.ts';
+import { reportError } from '../_shared/monitor.ts';
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -37,7 +38,7 @@ Deno.serve(async (req) => {
     if (row.status === 'paid') await generateReport(api, row, appUrlFromEnv());
     return json({ status: (await reportRow(api, id))?.status ?? row.status });
   } catch (e) {
-    console.error('generate-report failed', e instanceof Error ? e.message : e);
+    await reportError('generate-report', e);
     return json({ error: 'unknown' }, 500);
   }
 });

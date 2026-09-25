@@ -1,5 +1,6 @@
 import type { Database, Json } from './database.types';
 import { reportSessionLost } from './sessionEvents';
+import { captureError } from '../lib/monitoring';
 import { supabase } from './supabase';
 import { formatKm } from '../i18n/format';
 import { ro, type MessageKey } from '../i18n/ro';
@@ -243,11 +244,29 @@ export function canRetryRpc(error: unknown): boolean {
 
 type Fns = Database['public']['Functions'];
 
-/** Converts a failure and, when it means the session is gone, tells SessionProvider. */
-export function failure(error: unknown): RpcError {
+/**
+ * Converts a failure and, when it means the session is gone, tells SessionProvider. An answer
+ * that is neither a business rule nor a lost connection is a bug somewhere: it goes to Sentry
+ * (T19), with `where` (the database function) when known.
+ */
+export function failure(error: unknown, where?: string): RpcError {
   const rpcError = toRpcError(error);
   if (rpcError.code === 'not_signed_in') reportSessionLost();
+  if (rpcError.code === 'unknown' && !isAbort(error)) {
+    captureError(error, { tags: where ? { rpc: where } : {}, fingerprint: where ? ['rpc', where, describeCode(error)] : undefined });
+  }
   return rpcError;
+}
+
+/** A request the app itself stopped (a screen closed): not an error. */
+function isAbort(error: unknown): boolean {
+  const e = error as { name?: unknown; message?: unknown } | null;
+  return !!e && (e.name === 'AbortError' || (typeof e.message === 'string' && /abort/i.test(e.message)));
+}
+
+function describeCode(error: unknown): string {
+  const code = (error as { code?: unknown } | null)?.code;
+  return typeof code === 'string' ? code : 'unknown';
 }
 
 export async function call<F extends keyof Fns>(fn: F, args: Fns[F]['Args']): Promise<Fns[F]['Returns']> {
@@ -256,9 +275,9 @@ export async function call<F extends keyof Fns>(fn: F, args: Fns[F]['Args']): Pr
   try {
     result = await supabase.rpc(fn, args as never);
   } catch (e) {
-    throw failure(e);
+    throw failure(e, fn);
   }
-  if (result.error) throw failure(result.error);
+  if (result.error) throw failure(result.error, fn);
   return result.data as Fns[F]['Returns'];
 }
 

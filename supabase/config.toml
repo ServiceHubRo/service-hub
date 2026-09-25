@@ -417,6 +417,9 @@ STRIPE_WEBHOOK_SECRET = "whsec_local_test"
 STRIPE_PRICE_ID = "price_local_monthly"
 STRIPE_SEAT_PRICE_ID = "price_local_seat"
 STRIPE_API_URL = "http://host.docker.internal:54398/stripe"
+# Error reports (T19) go to the stand-in's Sentry (tests/e2e/providers.ts).
+SENTRY_DSN = "http://e2e@host.docker.internal:54398/sentry/1"
+SENTRY_ENVIRONMENT = "local"
 
 [analytics]
 enabled = true

@@ -40,9 +40,14 @@ export default defineConfig(({ command, mode }) => {
       // The start file holds React, the router, the Supabase client and both dictionaries (RO + EN);
       // each role's screens are loaded on their own after sign-in (src/app/App.tsx).
       chunkSizeWarningLimit: 800,
+      // Published next to each file, so Sentry turns a minified stack into file, line and function
+      // (T19). Browsers fetch them only when the developer tools are open.
+      sourcemap: true,
     },
     define: {
       __APP_CONTEXT__: JSON.stringify(context),
+      // Netlify's COMMIT_REF: error reports name the exact version (T19).
+      __APP_RELEASE__: JSON.stringify(process.env.COMMIT_REF ?? ''),
     },
     test: {
       environment: 'jsdom',

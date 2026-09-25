@@ -2,23 +2,33 @@ import { useEffect, useState } from 'react';
 import { fetchSchemaVersion, type SchemaVersionCheck } from '../data/schema';
 import { useI18n } from '../i18n/context';
 import { IS_TEST_BUILD } from '../lib/env';
+import { captureMessage, monitoringEnabled } from '../lib/monitoring';
 import { EXPECTED_SCHEMA_VERSION } from '../lib/schema';
 import styles from './SchemaBar.module.css';
 
 /**
  * Test builds: red bar when the database is not at the version this build expects (ARCHITECTURE §18),
  * or when the build cannot read it at all — then it says why (missing or wrong Netlify variables,
- * or the error the database gave), so the fix is obvious. Production reports to Sentry instead (T19).
+ * or the error the database gave), so the fix is obvious. The published site shows nothing and
+ * reports a database that is not at the expected version to Sentry instead (T19).
  */
 export function SchemaBar() {
   const { t } = useI18n();
   const [check, setCheck] = useState<SchemaVersionCheck | null>(null);
 
   useEffect(() => {
-    if (!IS_TEST_BUILD || EXPECTED_SCHEMA_VERSION === 0) return;
+    if (EXPECTED_SCHEMA_VERSION === 0 || (!IS_TEST_BUILD && !monitoringEnabled())) return;
     let cancelled = false;
     void fetchSchemaVersion().then((result) => {
       if (cancelled) return;
+      if (!IS_TEST_BUILD) {
+        if (result.kind === 'ok' && result.version !== EXPECTED_SCHEMA_VERSION) {
+          captureMessage(`Database schema version ${result.version}, the app expects ${EXPECTED_SCHEMA_VERSION}`, {
+            fingerprint: ['schema-version'],
+          });
+        }
+        return;
+      }
       if (result.kind !== 'ok') console.warn('schema version check:', result.detail);
       setCheck(result);
     });

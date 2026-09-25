@@ -111,6 +111,8 @@ export const en: Record<MessageKey, string> = {
   'notFound.appHome': 'Back to the app',
   'chunk.loadError': "We couldn't load the app. Check your connection and reload the page.",
   'chunk.reload': 'Reload the page',
+  'crash.text': 'Something went wrong on this screen. Reload the page or pick another screen from the menu.',
+  'crash.textPage': 'Something went wrong on this page. Reload it; if it happens again, come back a bit later.',
 
   'common.save': 'Save',
   'common.cancel': 'Cancel',
@@ -951,6 +953,12 @@ export const en: Record<MessageKey, string> = {
   // Component gallery (test builds only)
   'demo.title': 'Components',
   'demo.subtitle': 'Every shared piece, so you can check it on your phone and laptop.',
+  'demo.monitoring': 'Error reports (Sentry)',
+  'demo.monitoringOn': 'On: errors reach Sentry.',
+  'demo.monitoringOff': 'Off: VITE_SENTRY_DSN is not set in Netlify.',
+  'demo.sendTestError': 'Send a test error',
+  'demo.testErrorSent': 'Test error sent. It shows up in Sentry within seconds.',
+  'demo.crashScreen': 'Break this screen (test)',
   'demo.buttons': 'Buttons',
   'demo.primary': 'Book now',
   'demo.secondary': 'Message',

@@ -13,6 +13,7 @@ import { bearerToken, corsHeaders, json } from '../_shared/http.ts';
 import { codeSms } from '../_shared/sms.ts';
 import { smsConfigFromEnv } from '../_shared/env.ts';
 import { sendSms, toE164 } from '../_shared/smso.ts';
+import { reportError } from '../_shared/monitor.ts';
 
 /** Refusals the app translates (rpcError.*). */
 const KNOWN_CODES = new Set(['not_allowed', 'phone_missing', 'phone_already_verified', 'limit_phone_codes', 'account_suspended']);
@@ -66,13 +67,13 @@ Deno.serve(async (req) => {
     }
     const sent = await sendSms(begin.phone!, codeSms(begin.lang ?? 'ro', code), sms);
     if (sent.outcome !== 'sent') {
-      console.error('phone-verify-start: SMS not sent', sent.error);
+      await reportError('phone-verify-start', new Error(`SMS not sent: ${sent.error ?? sent.outcome}`), { level: 'warning' });
       await api.rpc('phone_verify_cancel', { p_id: begin.id });
       return json({ error: 'sms_failed' }, 502);
     }
     return json({ status: 'sent', expires_at: begin.expires_at, resend_in: 60 });
   } catch (e) {
-    console.error('phone-verify-start failed', e instanceof Error ? e.message : e);
+    await reportError('phone-verify-start', e);
     return json({ error: 'unknown' }, 500);
   }
 });

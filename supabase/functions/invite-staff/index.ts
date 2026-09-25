@@ -15,6 +15,7 @@ import { staffInviteEmail } from '../_shared/emails.ts';
 import { bearerToken, corsHeaders, json } from '../_shared/http.ts';
 import { appUrlFromEnv, emailConfigFromEnv } from '../_shared/env.ts';
 import { sendEmail } from '../_shared/resend.ts';
+import { reportError } from '../_shared/monitor.ts';
 
 async function sha256Hex(text: string): Promise<string> {
   const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
@@ -89,7 +90,7 @@ Deno.serve(async (req) => {
       email,
     );
     if (result.outcome !== 'sent') {
-      console.error('invite-staff: email not sent', result.error);
+      await reportError('invite-staff', new Error(`email not sent: ${result.error ?? result.outcome}`), { level: 'warning' });
       // Let the owner try again right away.
       await api.update(`shop_staff?id=eq.${invite.id}&invite_emailed_hash=eq.${hash}`, {
         invite_emailed_hash: null,
@@ -99,7 +100,7 @@ Deno.serve(async (req) => {
     }
     return json({ sent: true });
   } catch (e) {
-    console.error('invite-staff failed', e instanceof Error ? e.message : e);
+    await reportError('invite-staff', e);
     return json({ error: 'unknown' }, 500);
   }
 });

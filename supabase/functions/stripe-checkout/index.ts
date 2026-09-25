@@ -20,6 +20,7 @@ import { appUrlFromEnv, stripeConfigFromEnv } from '../_shared/env.ts';
 import { bearerToken, corsHeaders, json } from '../_shared/http.ts';
 import { seatLineItem, seatPrice, type SeatInfo } from '../_shared/seats.ts';
 import { hasLiveSubscription, StripeError, stripeApi, stripeLocale, trialEndForCheckout } from '../_shared/stripe.ts';
+import { reportError } from '../_shared/monitor.ts';
 
 /** Refusals the app translates (src/data/subscription.ts). */
 const KNOWN_CODES = new Set(['not_allowed', 'account_suspended']);
@@ -120,7 +121,7 @@ Deno.serve(async (req) => {
     if (typeof session.url !== 'string') throw new Error('checkout session without url');
     return json({ url: session.url });
   } catch (e) {
-    console.error('stripe-checkout failed', e instanceof Error ? e.message : e);
+    await reportError('stripe-checkout', e);
     return json({ error: e instanceof StripeError && e.status === 0 ? 'payments_unavailable' : 'unknown' }, 500);
   }
 });
