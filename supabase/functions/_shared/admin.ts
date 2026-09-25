@@ -24,10 +24,10 @@ export function adminApi() {
   const key = env('SUPABASE_SERVICE_ROLE_KEY');
   const headers = { apikey: key, Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' };
 
-  async function request(method: string, path: string, body?: unknown): Promise<unknown> {
+  async function request(method: string, path: string, body?: unknown, extra: Record<string, string> = {}): Promise<unknown> {
     const res = await fetch(`${url}${path}`, {
       method,
-      headers,
+      headers: { ...headers, ...extra },
       body: body === undefined ? undefined : JSON.stringify(body),
     });
     const text = await res.text();
@@ -60,6 +60,12 @@ export function adminApi() {
     select: async (query: string) => (await request('GET', `/rest/v1/${query}`)) as Record<string, unknown>[],
     /** Updates the rows a REST query selects, as the service role. */
     update: (query: string, values: Record<string, unknown>) => request('PATCH', `/rest/v1/${query}`, values),
+    /** Like update, answering the rows it changed (none when the filter matched nothing). */
+    updateReturning: async (query: string, values: Record<string, unknown>) =>
+      ((await request('PATCH', `/rest/v1/${query}`, values, { Prefer: 'return=representation' })) ?? []) as Record<
+        string,
+        unknown
+      >[],
     deleteUser: (id: string) => request('DELETE', `/auth/v1/admin/users/${id}`),
     updateUser: (id: string, attributes: Record<string, unknown>) =>
       request('PUT', `/auth/v1/admin/users/${id}`, attributes),

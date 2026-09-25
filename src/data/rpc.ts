@@ -48,6 +48,7 @@ export const RPC_ERROR_CODES = [
   'limit_active_total',
   'limit_daily',
   'limit_messages',
+  'limit_phone_codes',
   'limit_quote_versions',
   'limit_staff',
   'message_empty',
@@ -61,6 +62,8 @@ export const RPC_ERROR_CODES = [
   'odometer_lower',
   'odometer_required',
   'past_slot',
+  'phone_already_verified',
+  'phone_missing',
   'push_endpoint_invalid',
   'push_subscription_invalid',
   'quote_changed',
@@ -118,6 +121,8 @@ export class RpcError extends Error {
  */
 export const RELOAD_AVAILABILITY_CODES: ReadonlySet<RpcErrorCode> = new Set([
   'past_slot',
+  'phone_already_verified',
+  'phone_missing',
   'day_full',
   'slot_full',
   'too_soon',

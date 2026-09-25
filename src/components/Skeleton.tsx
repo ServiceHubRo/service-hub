@@ -33,3 +33,15 @@ export function SkeletonGrid({ count, className }: { count: number; className?: 
     </div>
   );
 }
+
+/** One loading line (inline panels that load a single value). */
+export function SkeletonBar() {
+  const { t } = useI18n();
+  return (
+    <div className={styles.single} aria-busy="true" role="status">
+      <span className="visually-hidden">{t('common.loading')}</span>
+      <span className={`${styles.bar} ${styles.w80}`} aria-hidden="true" />
+      <span className={`${styles.bar} ${styles.w40}`} aria-hidden="true" />
+    </div>
+  );
+}

@@ -248,6 +248,21 @@ otp_expiry = 3600
 # admin_email = "admin@email.com"
 # sender_name = "Admin"
 
+# Service-Hub Auth emails (T13), RO/EN by the account language. Source:
+# supabase/functions/_shared/authEmails.ts → `node scripts/build-auth-templates.mjs`. The real
+# project gets the same templates from the "Deploy Supabase" Action (scripts/auth-email-config.mjs).
+[auth.email.template.confirmation]
+subject = '{{ if eq (printf "%v" .Data.lang) "en" }}Confirm your email address{{ else }}Confirmă adresa de email{{ end }}'
+content_path = "./supabase/templates/confirmation.html"
+
+[auth.email.template.recovery]
+subject = '{{ if eq (printf "%v" .Data.lang) "en" }}Reset your Service-Hub password{{ else }}Resetează parola Service-Hub{{ end }}'
+content_path = "./supabase/templates/recovery.html"
+
+[auth.email.template.email_change]
+subject = '{{ if eq (printf "%v" .Data.lang) "en" }}Confirm your new email address{{ else }}Confirmă noua adresă de email{{ end }}'
+content_path = "./supabase/templates/email_change.html"
+
 # Uncomment to customize email template
 # [auth.email.template.invite]
 # subject = "You have been invited"
@@ -387,8 +402,16 @@ inspector_port = 8083
 # The Deno major version to use.
 deno_version = 2
 
-# [edge_runtime.secrets]
-# secret_key = "env(SECRET_VALUE)"
+# Local stack only: stand-ins for Resend and SMSO, served by the browser tests
+# (tests/e2e/providers.ts) on the runner. The real project's secrets are set in the Supabase
+# dashboard (Edge Functions → Secrets) and never live in this file.
+[edge_runtime.secrets]
+RESEND_API_KEY = "local-test-key"
+RESEND_API_URL = "http://host.docker.internal:54398/resend"
+SMSO_API_KEY = "local-test-key"
+SMSO_SENDER = "1"
+SMSO_API_URL = "http://host.docker.internal:54398/smso"
+ADMIN_EMAIL = "admin@service-hub.test"
 
 [analytics]
 enabled = true
@@ -430,4 +453,10 @@ verify_jwt = false
 
 # Called by the database (pg_net, with its own token) and, for the public VAPID key, by the app.
 [functions.dispatch-notifications]
+verify_jwt = false
+
+[functions.phone-verify-start]
+verify_jwt = false
+
+[functions.invite-staff]
 verify_jwt = false

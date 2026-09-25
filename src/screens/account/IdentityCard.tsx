@@ -1,3 +1,4 @@
+import { CircleAlert, CircleCheck } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useSession } from '../../app/sessionContext';
 import { ActionButton } from '../../components/ActionButton';
@@ -26,6 +27,7 @@ export function IdentityCard() {
   const [name, setName] = useState(profile.name ?? '');
   const [phone, setPhone] = useState(profile.phone ? formatPhone(profile.phone) : '');
   const [errors, setErrors] = useState<{ name?: string; phone?: string }>({});
+  const verified = Boolean(profile.phone_verified_at || profile.phone_verified_by_admin);
 
   useEffect(() => {
     if (profile.role !== 'shop') return;
@@ -68,6 +70,12 @@ export function IdentityCard() {
         <div className={styles.who}>
           <span className={styles.name}>{profile.name || t('account.noName')}</span>
           {profile.phone && <span className={`mono ${styles.muted}`}>{formatPhone(profile.phone)}</span>}
+          {profile.phone && profile.role === 'shop' && (
+            <span className={verified ? styles.phoneOk : styles.phoneTodo}>
+              {verified ? <CircleCheck size={14} aria-hidden="true" /> : <CircleAlert size={14} aria-hidden="true" />}
+              {t(verified ? 'phone.verified' : 'phone.unverified')}
+            </span>
+          )}
           {shop && (
             <span className={styles.muted}>
               {shop.name}

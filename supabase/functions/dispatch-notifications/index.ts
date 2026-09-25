@@ -7,9 +7,19 @@
 //        sweep, with the x-dispatch-token header from push_config. Claims due events, renders
 //        each in the recipient's language, sends it to every device of the recipient, and records
 //        the result: dead devices (404/410) are deleted, failures are retried a few times.
-// SMS and email arrive with T13; until then those channels are logged as `not_configured`.
+//
+// Each channel (push, email, sms — T13) is finished on its own: a retry only repeats the
+// channels that did not get through, so an SMS or an email is never sent twice. Emails go
+// through Resend (RESEND_API_KEY) with the event id as idempotency key; platform events (a
+// reported review) go to ADMIN_EMAIL. SMS go through SMSO (SMSO_API_KEY), only to a verified
+// phone. A channel without its secret is logged `not_configured`.
 import { adminApi } from '../_shared/admin.ts';
+import { emailForEvent } from '../_shared/emails.ts';
 import { corsHeaders, json } from '../_shared/http.ts';
+import { adminEmailFromEnv, appUrlFromEnv, emailConfigFromEnv, smsConfigFromEnv } from '../_shared/env.ts';
+import { sendEmail, type EmailConfig, type SendOutcome } from '../_shared/resend.ts';
+import { smsForEvent } from '../_shared/sms.ts';
+import { sendSms, type SmsConfig } from '../_shared/smso.ts';
 import { renderNotification, type NotificationEvent, type Overrides } from '../_shared/templates.ts';
 import { generateVapidKeys, sendWebPush, type PushDevice, type VapidKeys } from '../_shared/webpush.ts';
 
@@ -29,9 +39,21 @@ interface Config {
 
 interface ClaimedEvent extends NotificationEvent {
   id: string;
+  /** null for platform events (to ADMIN_EMAIL). */
+  user_id: string | null;
   channels: string[];
   attempts: number;
+  email: string | null;
+  phone: string | null;
   devices: { endpoint: string; keys: { p256dh?: string; auth?: string } | null }[];
+}
+
+/** What the channels other than push need, read once per call. */
+interface Senders {
+  email: EmailConfig;
+  sms: SmsConfig;
+  adminEmail: string | null;
+  app: string;
 }
 
 interface LogEntry {
@@ -44,6 +66,7 @@ interface Result {
   id: string;
   done: boolean;
   error: string | null;
+  channels_done: string[];
   log: LogEntry[];
   gone: string[];
   delivered: string[];
@@ -94,48 +117,104 @@ function ttlFor(event: string): number {
   return 24 * 3600;
 }
 
-async function deliver(e: ClaimedEvent, texts: Overrides, vapid: VapidKeys): Promise<Result> {
-  const result: Result = { id: e.id, done: true, error: null, log: [], gone: [], delivered: [] };
+/** One channel's result: finished (logged) or to try again later. */
+type ChannelResult = { done: true; log: LogEntry } | { done: false; error: string };
 
-  if (e.channels.includes('push')) {
-    const rendered = renderNotification(e, texts);
-    if (!rendered) {
-      result.log.push({ channel: 'push', status: 'no_template' });
-    } else if (e.devices.length === 0) {
-      result.log.push({ channel: 'push', status: 'no_device' });
-    } else {
-      const payload = JSON.stringify({ title: rendered.title, body: rendered.body, url: rendered.url, tag: rendered.tag });
-      const outcomes = await Promise.all(
-        e.devices.map(async (d) => {
-          if (!d.keys?.p256dh || !d.keys.auth) return { endpoint: d.endpoint, outcome: 'failed' as const, error: 'no_keys' };
-          const r = await sendWebPush(d as PushDevice, payload, vapid, SUBJECT, {
-            ttl: ttlFor(e.event),
-            urgency: URGENT.has(e.event) ? 'high' : QUIET.has(e.event) ? 'low' : 'normal',
-          });
-          return { endpoint: d.endpoint, outcome: r.outcome, error: r.error };
-        }),
-      );
-      const sent = outcomes.filter((o) => o.outcome === 'sent');
-      const retry = outcomes.filter((o) => o.outcome === 'retry');
-      result.delivered = sent.map((o) => o.endpoint);
-      result.gone = outcomes.filter((o) => o.outcome === 'gone').map((o) => o.endpoint);
-      const errors = outcomes.filter((o) => o.error).map((o) => o.error);
-      // Retry only when nothing arrived anywhere: a device that already got it must not get it twice.
-      if (sent.length === 0 && retry.length > 0 && e.attempts < MAX_ATTEMPTS) {
-        return { ...result, done: false, error: (retry[0]?.error ?? 'retry').slice(0, 500), log: [] };
+async function pushChannel(e: ClaimedEvent, texts: Overrides, vapid: VapidKeys, result: Result): Promise<ChannelResult> {
+  const rendered = renderNotification(e, texts);
+  if (!rendered) return { done: true, log: { channel: 'push', status: 'no_template' } };
+  if (e.devices.length === 0) return { done: true, log: { channel: 'push', status: 'no_device' } };
+  const payload = JSON.stringify({ title: rendered.title, body: rendered.body, url: rendered.url, tag: rendered.tag });
+  const outcomes = await Promise.all(
+    e.devices.map(async (d) => {
+      if (!d.keys?.p256dh || !d.keys.auth) return { endpoint: d.endpoint, outcome: 'failed' as const, error: 'no_keys' };
+      const r = await sendWebPush(d as PushDevice, payload, vapid, SUBJECT, {
+        ttl: ttlFor(e.event),
+        urgency: URGENT.has(e.event) ? 'high' : QUIET.has(e.event) ? 'low' : 'normal',
+      });
+      return { endpoint: d.endpoint, outcome: r.outcome, error: r.error };
+    }),
+  );
+  const sent = outcomes.filter((o) => o.outcome === 'sent');
+  const retry = outcomes.filter((o) => o.outcome === 'retry');
+  result.delivered.push(...sent.map((o) => o.endpoint));
+  result.gone.push(...outcomes.filter((o) => o.outcome === 'gone').map((o) => o.endpoint));
+  const errors = outcomes.filter((o) => o.error).map((o) => o.error);
+  // Retry only when nothing arrived anywhere: a device that already got it must not get it twice.
+  if (sent.length === 0 && retry.length > 0 && e.attempts < MAX_ATTEMPTS) {
+    return { done: false, error: (retry[0]?.error ?? 'retry').slice(0, 500) };
+  }
+  const status = sent.length === outcomes.length ? 'sent' : sent.length > 0 ? 'partial' : 'failed';
+  return { done: true, log: { channel: 'push', status, error: errors.length ? errors.join(' | ').slice(0, 500) : undefined } };
+}
+
+/** A sender's answer as a channel result: `retry` waits for another round while attempts remain. */
+function fromOutcome(channel: string, e: ClaimedEvent, r: SendOutcome): ChannelResult {
+  if (r.outcome === 'retry' && e.attempts < MAX_ATTEMPTS) return { done: false, error: r.error ?? `${channel} retry` };
+  const status = r.outcome === 'retry' ? 'failed' : r.outcome;
+  return { done: true, log: { channel, status, error: r.error?.slice(0, 500) } };
+}
+
+async function emailChannel(e: ClaimedEvent, senders: Senders): Promise<ChannelResult> {
+  const platform = e.user_id === null;
+  const to = platform ? senders.adminEmail : e.email;
+  if (!senders.email.apiKey || (platform && !to)) return { done: true, log: { channel: 'email', status: 'not_configured' } };
+  if (!to) return { done: true, log: { channel: 'email', status: 'no_address' } };
+  const content = emailForEvent(e, senders.app);
+  if (!content) return { done: true, log: { channel: 'email', status: 'no_template' } };
+  const r = await sendEmail(
+    { to, ...content, replyTo: senders.adminEmail ?? undefined, idempotencyKey: `notification-${e.id}` },
+    senders.email,
+  );
+  return fromOutcome('email', e, r);
+}
+
+async function smsChannel(e: ClaimedEvent, senders: Senders): Promise<ChannelResult> {
+  if (!senders.sms.apiKey) return { done: true, log: { channel: 'sms', status: 'not_configured' } };
+  if (!e.phone) return { done: true, log: { channel: 'sms', status: 'no_phone' } };
+  const text = smsForEvent(e);
+  if (!text) return { done: true, log: { channel: 'sms', status: 'no_template' } };
+  return fromOutcome('sms', e, await sendSms(e.phone, text, senders.sms));
+}
+
+async function deliver(e: ClaimedEvent, texts: Overrides, vapid: VapidKeys, senders: Senders): Promise<Result> {
+  const result: Result = { id: e.id, done: true, error: null, channels_done: [], log: [], gone: [], delivered: [] };
+  const errors: string[] = [];
+  const outcomes = await Promise.all(
+    e.channels.map(async (channel): Promise<[string, ChannelResult]> => {
+      switch (channel) {
+        case 'push':
+          return [channel, await pushChannel(e, texts, vapid, result)];
+        case 'email':
+          return [channel, await emailChannel(e, senders)];
+        case 'sms':
+          return [channel, await smsChannel(e, senders)];
+        default:
+          return [channel, { done: true, log: { channel, status: 'unknown_channel' } }];
       }
-      const status = sent.length === outcomes.length ? 'sent' : sent.length > 0 ? 'partial' : 'failed';
-      result.log.push({ channel: 'push', status, error: errors.length ? errors.join(' | ').slice(0, 500) : undefined });
+    }),
+  );
+  for (const [channel, r] of outcomes) {
+    if (r.done) {
+      result.channels_done.push(channel);
+      result.log.push(r.log);
+    } else {
+      result.done = false;
+      errors.push(r.error);
     }
   }
-  for (const channel of e.channels) {
-    if (channel !== 'push') result.log.push({ channel, status: 'not_configured' });
-  }
+  result.error = errors.length ? errors.join(' | ').slice(0, 500) : null;
   return result;
 }
 
 async function dispatch(api: Api, config: Config): Promise<number> {
   const vapid: VapidKeys = { publicKey: config.vapid_public_key!, privateJwk: config.vapid_private_jwk! };
+  const senders: Senders = {
+    email: emailConfigFromEnv(),
+    sms: smsConfigFromEnv(),
+    adminEmail: adminEmailFromEnv(),
+    app: appUrlFromEnv(),
+  };
   const started = Date.now();
   let processed = 0;
   while (Date.now() - started < TIME_BUDGET_MS) {
@@ -144,11 +223,12 @@ async function dispatch(api: Api, config: Config): Promise<number> {
     if (events.length === 0) break;
     const results = await Promise.all(
       events.map((e) =>
-        deliver(e, claim.texts ?? {}, vapid).catch(
+        deliver(e, claim.texts ?? {}, vapid, senders).catch(
           (err): Result => ({
             id: e.id,
             done: e.attempts >= MAX_ATTEMPTS,
             error: err instanceof Error ? err.message.slice(0, 500) : 'error',
+            channels_done: [],
             log: [],
             gone: [],
             delivered: [],

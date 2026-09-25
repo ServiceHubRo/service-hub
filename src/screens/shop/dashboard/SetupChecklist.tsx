@@ -5,6 +5,7 @@ import { SETUP_STEPS, type SetupStep, type ShopSetup } from '../../../data/shop'
 import { useI18n } from '../../../i18n/context';
 import type { MessageKey } from '../../../i18n/ro';
 import { formatPhone } from '../../../lib/validators';
+import { PhoneVerify } from '../../phone/PhoneVerify';
 import { SETTINGS_LINKS } from '../settings/paths';
 import styles from './Dashboard.module.css';
 
@@ -16,9 +17,10 @@ const STEP_LINK: Record<Exclude<SetupStep, 'phone'>, string> = {
 
 /**
  * "Pune service-ul pe picioare" (P5d): four steps with "2 din 4". Shown until all four are done,
- * then never again (the database stamps setup_completed_at).
+ * then never again (the database stamps setup_completed_at). Step 4 is done right here: the
+ * owner asks for a code by SMS and types it (T13).
  */
-export function SetupChecklist({ setup }: { setup: ShopSetup }) {
+export function SetupChecklist({ setup, onPhoneVerified }: { setup: ShopSetup; onPhoneVerified: () => Promise<void> }) {
   const { t } = useI18n();
   const done = SETUP_STEPS.filter((s) => setup.steps[s]).length;
   const total = SETUP_STEPS.length;
@@ -51,10 +53,10 @@ export function SetupChecklist({ setup }: { setup: ShopSetup }) {
               <span className={styles.stepText}>
                 <span className={ok ? styles.stepLabelDone : undefined}>{label}</span>
                 <span className="visually-hidden"> — {t(ok ? 'dash.setup.done' : 'dash.setup.todo')}</span>
-                {step === 'phone' && !ok && (
+                {step === 'phone' && !ok && (!setup.owner_phone || !setup.is_owner) && (
                   <span className={styles.stepNote}>
                     {setup.owner_phone
-                      ? t('dash.setup.phonePending', { phone: formatPhone(setup.owner_phone) })
+                      ? t('dash.setup.phoneOwner', { phone: formatPhone(setup.owner_phone) })
                       : t('dash.setup.phoneMissing')}
                   </span>
                 )}
@@ -65,7 +67,14 @@ export function SetupChecklist({ setup }: { setup: ShopSetup }) {
             <li key={step}>
               {step === 'phone' ? (
                 setup.owner_phone || ok ? (
-                  <div className={styles.step}>{content}</div>
+                  <>
+                    <div className={styles.step}>{content}</div>
+                    {!ok && setup.is_owner && setup.owner_phone && (
+                      <div className={styles.stepPanel}>
+                        <PhoneVerify phone={setup.owner_phone} onVerified={onPhoneVerified} />
+                      </div>
+                    )}
+                  </>
                 ) : (
                   <Link to="/s/cont" className={styles.step}>
                     {content}

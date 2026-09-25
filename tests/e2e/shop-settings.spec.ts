@@ -60,7 +60,7 @@ test.describe('shop settings', () => {
     await expect(page.getByText('0 din 4', { exact: true })).toBeVisible();
     await expect(page.getByText('Service-ul tău nu apare încă în căutări.')).toBeVisible();
     await expect(page.getByText('Alege cel puțin un serviciu.')).toBeVisible();
-    await expect(page.getByText('În așteptare: confirmăm numărul 0723 375 248 în curând.')).toBeVisible();
+    await expect(page.getByText('Îți trimitem un cod de 6 cifre prin SMS la 0723 375 248.')).toBeVisible();
     await expectNoHorizontalScroll(page);
     await shot(page, 't05-panou-new', name());
 
@@ -138,7 +138,7 @@ test.describe('shop settings', () => {
     await expectNoHorizontalScroll(page);
     await shot(page, 't05-rules', name());
 
-    // Panou: 3 of 4, phone pending. After the manual phone check: checklist gone, shop visible.
+    // Panou: 3 of 4, phone not confirmed. After the manual phone check (SMS: email-sms.spec): checklist gone, shop visible.
     await page.getByRole('link', { name: 'Panou' }).filter({ visible: true }).first().click();
     await expect(page.getByText('3 din 4', { exact: true })).toBeVisible();
     await expect(page.getByText('Service-ul tău nu apare încă în căutări.')).toBeVisible();
@@ -214,10 +214,10 @@ test.describe('shop settings', () => {
 
     const colleague = uniqueEmail('coleg');
     await page.getByLabel('Emailul colegului').fill('nu-e-email');
-    await page.getByRole('button', { name: 'Creează invitația' }).click();
+    await page.getByRole('button', { name: 'Trimite invitația' }).click();
     await expect(page.getByText('Adresa de email nu pare corectă.')).toBeVisible();
     await page.getByLabel('Emailul colegului').fill(colleague);
-    await page.getByRole('button', { name: 'Creează invitația' }).click();
+    await page.getByRole('button', { name: 'Trimite invitația' }).click();
     const linkField = page.getByLabel('Linkul de invitație');
     await expect(linkField).toHaveValue(/\/invitatie\/[0-9a-f]{64}$/);
     await expect(page.getByText(/Invitat .*, încă fără cont/)).toBeVisible();

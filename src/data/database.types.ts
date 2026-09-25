@@ -569,6 +569,7 @@ export type Database = {
           attempts: number
           booking_id: string | null
           channels: string[]
+          channels_done: string[]
           created_at: string
           event: string
           id: string
@@ -576,12 +577,13 @@ export type Database = {
           locked_until: string | null
           params: Json
           processed_at: string | null
-          user_id: string
+          user_id: string | null
         }
         Insert: {
           attempts?: number
           booking_id?: string | null
           channels?: string[]
+          channels_done?: string[]
           created_at?: string
           event: string
           id?: string
@@ -589,12 +591,13 @@ export type Database = {
           locked_until?: string | null
           params?: Json
           processed_at?: string | null
-          user_id: string
+          user_id?: string | null
         }
         Update: {
           attempts?: number
           booking_id?: string | null
           channels?: string[]
+          channels_done?: string[]
           created_at?: string
           event?: string
           id?: string
@@ -602,7 +605,7 @@ export type Database = {
           locked_until?: string | null
           params?: Json
           processed_at?: string | null
-          user_id?: string
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -1378,6 +1381,8 @@ export type Database = {
           accepted_at: string | null
           created_at: string
           id: string
+          invite_emailed_at: string | null
+          invite_emailed_hash: string | null
           invite_token_hash: string | null
           invited_at: string
           invited_email: string | null
@@ -1389,6 +1394,8 @@ export type Database = {
           accepted_at?: string | null
           created_at?: string
           id?: string
+          invite_emailed_at?: string | null
+          invite_emailed_hash?: string | null
           invite_token_hash?: string | null
           invited_at?: string
           invited_email?: string | null
@@ -1400,6 +1407,8 @@ export type Database = {
           accepted_at?: string | null
           created_at?: string
           id?: string
+          invite_emailed_at?: string | null
+          invite_emailed_hash?: string | null
           invite_token_hash?: string | null
           invited_at?: string
           invited_email?: string | null
@@ -1794,6 +1803,10 @@ export type Database = {
       cancel_email_change: {
         Args: { p_request_id: string }
         Returns: undefined
+      }
+      check_phone_code: {
+        Args: { p_code: string; p_request_id: string }
+        Returns: Json
       }
       check_slot: {
         Args: {
@@ -2297,6 +2310,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      my_phone_verification: { Args: never; Returns: Json }
       my_shop_id: { Args: never; Returns: string }
       next_history_report_code: { Args: never; Returns: string }
       normalize_code: { Args: { p: string }; Returns: string }
@@ -2320,6 +2334,15 @@ export type Database = {
         }
         Returns: undefined
       }
+      phone_code_hash: {
+        Args: { p_code: string; p_id: string }
+        Returns: string
+      }
+      phone_verify_begin: {
+        Args: { p_code: string; p_user_id: string }
+        Returns: Json
+      }
+      phone_verify_cancel: { Args: { p_id: string }; Returns: undefined }
       post_booking_event: {
         Args: {
           p_booking: Database["public"]["Tables"]["bookings"]["Row"]
