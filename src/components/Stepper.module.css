@@ -57,5 +57,6 @@
 .formatted {
   min-width: 50px;
   font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
   font-size: 16px;
 }

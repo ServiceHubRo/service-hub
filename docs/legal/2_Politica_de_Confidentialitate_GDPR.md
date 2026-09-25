@@ -72,6 +72,7 @@ Aici afli ce date personale folosește Service-Hub, de ce, cine le mai vede, câ
 | Notificări despre programări și cont (email, SMS către service-uri) | Contractul cu tine |
 | Notificări push | Acordul tău, dat în browser (îl retragi oricând) și contractul |
 | Alertele pentru ITP, RCA și rovinietă | Contractul cu tine (le ceri când treci datele) |
+| Reminderul pentru următoarea revizie (după ultima lucrare de acel fel făcută prin Platformă) și cererea de recenzie după o lucrare | Contractul cu tine; reminderele de revizie le oprești din Cont |
 | Raportul oficial de istoric | Contractul cu tine |
 | Abonamentul, plățile, facturile și contabilitatea | Contractul și obligațiile legale (lit. c): Legea contabilității nr. 82/1991, Codul fiscal |
 | Recenziile publice și verificarea celor raportate | Interesul legitim (lit. f) ca recenziile să fie reale; obligațiile din Regulamentul (UE) 2022/2065 |
@@ -174,7 +175,7 @@ Platforma nu e pentru persoane sub 18 ani. Dacă aflăm că un cont e al unui mi
 
 ## 9. Mesajele pe care ți le trimitem
 
-Îți trimitem doar mesaje legate de cont și de programări (confirmări, devize, remindere, plăți) și anunțuri importante despre Platformă. Notificările push le poți opri oricând; service-urile pot opri SMS-urile la cereri noi și rezumatul zilnic din Setări → Notificări.
+Îți trimitem doar mesaje legate de cont și de programări (confirmări, devize, remindere, cererea de recenzie după o lucrare, plăți) și anunțuri importante despre Platformă. Notificările push le poți opri oricând; service-urile pot opri SMS-urile la cereri noi și rezumatul zilnic din Setări → Notificări.
 
 ---
 

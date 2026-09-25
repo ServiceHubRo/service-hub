@@ -50,6 +50,19 @@ export function formatDayMonth(lang: Lang, value: Date | string): string {
   return lang === 'ro' ? `${p.day} ${p.month}` : `${p.month} ${p.day}`;
 }
 
+/**
+ * RO `20 oct`, EN `Oct 20`, with the year when it is not the current one (`20 oct 2024`,
+ * `Oct 20, 2024`) — the app's formatDayMonth.
+ */
+export function formatDayMonthYear(lang: Lang, value: Date | string, now: Date = new Date()): string {
+  const date = typeof value === 'string' ? dateFromYmd(value) : value;
+  const p = parts(lang, date, { day: 'numeric', month: 'short', year: 'numeric' });
+  const thisYear = parts(lang, now, { year: 'numeric' }).year;
+  const year = p.year !== thisYear ? p.year : null;
+  if (lang === 'ro') return [p.day, p.month, year].filter(Boolean).join(' ');
+  return year ? `${p.month} ${p.day}, ${year}` : `${p.month} ${p.day}`;
+}
+
 /** 24-hour `09:00` in Europe/Bucharest. */
 export function formatTime(lang: Lang, date: Date): string {
   const p = parts(lang, date, { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' });

@@ -62,6 +62,8 @@ const SAMPLE: Record<string, Record<string, unknown>> = {
   payment_failed: { total: 100, final: false, expiry: '2026-10-16' },
   shop_inactive: { reason: 'trial_ended' },
   review_report_decided: { review_id: 'r-1', rating: 1, decision: 'removed' },
+  review_request: {},
+  service_due: { car_id: 'c-1', service_id: 'lichid_frana', last_done: '2024-10-20', due: '2026-10-20' },
 };
 
 const render = (event: string, role: 'client' | 'shop', lang: 'ro' | 'en', extra: Record<string, unknown> = {}) =>
@@ -158,6 +160,30 @@ describe('notification texts', () => {
     expect(render('doc_expiry', 'client', 'ro', { days: 20 })!.body).toBe('ITP-ul expiră în 20 de zile, pe 25 oct.');
   });
 
+  it('asks for a review of the job, and opens the form on the booking', () => {
+    expect(render('review_request', 'client', 'ro')).toMatchObject({
+      title: 'Atelier Unu',
+      body: 'Cum a fost la Atelier Unu? Lasă o recenzie pentru Schimb ulei și filtru. Durează un minut și îi ajută pe alți șoferi.',
+      url: '/c/programari?p=b-1&recenzie=1',
+      tag: 'review-request-b-1',
+    });
+    expect(render('review_request', 'client', 'en')!.body).toBe(
+      'How was it at Atelier Unu? Leave a review for Oil & oil filter change. It takes a minute and helps other drivers.',
+    );
+  });
+
+  it('reminds the next service and opens the booking at the same shop, the service chosen', () => {
+    expect(render('service_due', 'client', 'ro')).toMatchObject({
+      title: 'Volkswagen Golf 7: Schimb ulei și filtru',
+      body: 'Ultima dată pe 20 oct 2024, la Atelier Unu. Următoarea se apropie, pe la 20 oct. Programează-te din aplicație.',
+      url: '/c/service/s-1/programare?pas=2&serviciu=lichid_frana',
+      tag: 'service-due-c-1-lichid_frana',
+    });
+    expect(render('service_due', 'client', 'en')!.body).toBe(
+      'Last done on Oct 20, 2024 at Atelier Unu. The next one is coming up, around Oct 20. Book it in the app.',
+    );
+  });
+
   it('tells the shop who, what and when', () => {
     expect(render('booking_requested', 'shop', 'ro')).toMatchObject({
       title: 'Cerere nouă',
@@ -240,7 +266,8 @@ describe('server formatting matches the app', () => {
       expect(serverFormat.formatMoney(lang, amount)).toBe(appFormat.formatMoney(lang, amount));
     }
     expect(serverFormat.formatKm(lang, 105400)).toBe(appFormat.formatKm(lang, 105400));
-    for (const ymd of ['2026-01-05', '2026-03-29', '2026-10-14', '2026-12-31']) {
+    for (const ymd of ['2024-10-20', '2026-01-05', '2026-03-29', '2026-10-14', '2026-12-31', '2027-02-01']) {
+      expect(serverFormat.formatDayMonthYear(lang, ymd, NOW)).toBe(appFormat.formatDayMonth(lang, ymd, NOW));
       expect(serverFormat.formatDate(lang, ymd)).toBe(appFormat.formatDate(lang, ymd));
     }
     const instant = new Date('2026-10-25T00:30:00Z'); // the night the clocks go back

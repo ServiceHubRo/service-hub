@@ -49,6 +49,7 @@
 
 .distance {
   font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
   color: var(--text);
 }
 
@@ -140,6 +141,7 @@
 
 .phone {
   font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
 }
 
 .phone:hover,
@@ -150,10 +152,8 @@
 /* ---------------------------------------------------------------- services */
 .sectionTitle {
   margin-top: 10px;
-  font-size: 12px;
+  font-size: 13px;
   color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
   font-weight: 600;
 }
 
@@ -241,9 +241,7 @@
 
 .replyLabel {
   margin-bottom: 2px;
-  font-size: 12px;
+  font-size: 13px;
   color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
   font-weight: 600;
 }

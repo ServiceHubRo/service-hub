@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { App } from './app/App';
 import { ChunkLoadError } from './app/routes/lazyChunk';
 import { captureError, installGlobalHandlers } from './lib/monitoring';
+import '@fontsource-variable/inter/wght.css';
 import './styles/tokens.css';
 import './styles/global.css';
 

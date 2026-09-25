@@ -97,10 +97,8 @@
 }
 
 .groupLabel {
-  font-size: 12px;
+  font-size: 13px;
   color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
   margin-bottom: 6px;
 }
 

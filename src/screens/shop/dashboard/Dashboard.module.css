@@ -50,8 +50,7 @@
 
 .setupTitle {
   font-family: var(--font-display);
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
+  letter-spacing: -0.01em;
   font-size: 19px;
   line-height: 1.2;
 }
@@ -252,11 +251,9 @@ a.stat:active {
 }
 
 .sectionTitle {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
   color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
 }
 
 .todayList {

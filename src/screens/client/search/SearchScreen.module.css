@@ -105,10 +105,8 @@
 }
 
 .sectionTitle {
-  font-size: 12px;
+  font-size: 13px;
   color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
   font-weight: 600;
 }
 
@@ -213,4 +211,10 @@
 .expiryChevron {
   color: var(--muted);
   flex-shrink: 0;
+}
+
+/* ---------------------------------------------------------------- review request (T19d) */
+.reviewPromptService {
+  display: block;
+  color: var(--muted-strong);
 }

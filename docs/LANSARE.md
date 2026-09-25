@@ -22,7 +22,7 @@ Gratuit până la 5.000 de erori pe lună (de ajuns pentru început).
 2. La crearea organizației, la **Data Storage Location** alege **European Union (Frankfurt)**. Nu se mai poate schimba după (datele stau în UE, ca Supabase).
 3. Când îți cere primul proiect: platforma **Browser JavaScript** (fără framework), numele `service-hub`, **Create Project**. Sari peste instrucțiunile de instalare — codul e deja în aplicație.
 4. Copiază **DSN**-ul: **Settings → Projects → service-hub → Client Keys (DSN)**. Arată ca `https://abc123@o456.ingest.de.sentry.io/789`. E o adresă publică (ca cheia anon de la Supabase), nu o parolă.
-5. **Netlify** → site-ul `service-hub-app` → **Site configuration → Environment variables → Add a variable**:
+5. **Netlify** → site-ul `service-hubapp` → **Site configuration → Environment variables → Add a variable**:
    - Key: `VITE_SENTRY_DSN`, Value: DSN-ul, **Same value for all deploy contexts** → **Create variable**.
 6. **GitHub** → repo-ul `service-hub` → **Settings → Secrets and variables → Actions → New repository secret**:
    - Name: `SENTRY_DSN`, Secret: același DSN → **Add secret**. (Pentru funcțiile de pe server; „Deploy Supabase” îl pune singur în Supabase.)
@@ -31,7 +31,7 @@ Gratuit până la 5.000 de erori pe lună (de ajuns pentru început).
    - lasă bifate **Data Scrubber** și **Use Default Scrubbers**.
 8. Ca să intre în vigoare: pe un pull request deschis, în GitHub → **Actions → Deploy Supabase → Re-run all jobs**; în Netlify → **Deploys → Trigger deploy → Deploy site** (sau așteaptă următorul pull request).
 
-**Verifici:** pe linkul de test deschide `/dev/componente` (de ex. `https://deploy-preview-25--service-hub-app.netlify.app/dev/componente`). La „Raportarea erorilor (Sentry)” scrie **Pornită**. Apasă **Trimite o eroare de test**: în Sentry → **Issues** apare „Service-Hub test error …” în câteva secunde. Apasă și **Strică ecranul (test)**: vezi mesajul „Ceva n-a mers pe această pagină” (nu o pagină albă), iar în Sentry apare a doua eroare. Pagina asta nu există pe site-ul publicat.
+**Verifici:** pe linkul de test deschide `/dev/componente` (de ex. `https://deploy-preview-25--service-hubapp.netlify.app/dev/componente`). La „Raportarea erorilor (Sentry)” scrie **Pornită**. Apasă **Trimite o eroare de test**: în Sentry → **Issues** apare „Service-Hub test error …” în câteva secunde. Apasă și **Strică ecranul (test)**: vezi mesajul „Ceva n-a mers pe această pagină” (nu o pagină albă), iar în Sentry apare a doua eroare. Pagina asta nu există pe site-ul publicat.
 
 **Emailurile de la Sentry:** vin implicit la fiecare problemă nouă. Dacă vrei și un rezumat săptămânal: **User Settings → Notifications → Weekly Reports**.
 
@@ -86,7 +86,7 @@ Secretele de acum (`SUPABASE_PROJECT_REF`, `SUPABASE_DB_PASSWORD`) rămân cum s
 
 ### 5. Netlify: linkurile de test citesc proiectul de test
 
-Netlify → `service-hub-app` → **Site configuration → Environment variables**:
+Netlify → `service-hubapp` → **Site configuration → Environment variables**:
 
 1. Deschide `VITE_SUPABASE_URL` → **Options → Edit** → **Different value for each deploy context**:
    - **Production**: adresa proiectului real (cea de acum);
@@ -110,7 +110,7 @@ Proiectul de test pornește gol. Pe linkul de test fă-ți un cont nou (de clien
 select public.promote_to_admin('adresa-ta@exemplu.ro');
 ```
 
-**Verifici:** pe linkul de test nu apare bara roșie „Baza de date nu e la zi”. Un cont nou făcut pe linkul de test apare în **service-hub-test → Authentication → Users**, nu în proiectul real. Site-ul publicat (`service-hub-app.netlify.app`) arată în continuare datele reale.
+**Verifici:** pe linkul de test nu apare bara roșie „Baza de date nu e la zi”. Un cont nou făcut pe linkul de test apare în **service-hub-test → Authentication → Users**, nu în proiectul real. Site-ul publicat (`service-hubapp.netlify.app`) arată în continuare datele reale.
 
 **Ce se schimbă la testare:** conturile de pe linkurile de test sunt separate de cele reale; îți faci conturi de test (client, service) o dată, pe proiectul de test, și le folosești la toate pull request-urile.
 

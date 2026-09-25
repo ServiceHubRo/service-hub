@@ -26,9 +26,11 @@
   --blue-soft: rgba(90, 169, 255, 0.16);
   --muted-soft: rgba(138, 144, 155, 0.16);
 
-  --font-display: 'Arial Narrow', 'Helvetica Neue', sans-serif;
-  --font-body: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  --font-mono: ui-monospace, Menlo, Consolas, 'Liberation Mono', monospace;
+  /* One typeface everywhere (Inter, bundled with the app so it looks the same on every device).
+     The three roles stay as names: display = headings, mono = figures (same font, even-width digits). */
+  --font-body: 'Inter Variable', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-display: var(--font-body);
+  --font-mono: var(--font-body);
 
   --radius-card: 12px;
   --radius-button: 10px;

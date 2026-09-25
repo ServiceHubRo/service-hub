@@ -4,6 +4,7 @@
 //
 // Built with tables and inline styles, which is what email programs understand.
 import { formatDate, formatDayMonth, formatMoney, formatTime, type Lang } from './format.ts';
+import { LOGO_HEIGHT, LOGO_WIDTH } from './emailLogo.ts';
 import { REPORTS_PATH, SUBSCRIPTION_PATH } from './templates.ts';
 
 export interface EmailContent {
@@ -16,13 +17,16 @@ const C = {
   bg: '#14161A',
   surface: '#1D2026',
   border: '#2C313A',
+  borderLit: '#3A404B',
+  surface2: '#242830',
   text: '#EAE8E2',
   muted: '#8A909B',
   amber: '#F5A524',
   ink: '#151515',
 };
-const HEAD_FONT = "'Arial Narrow','Helvetica Neue',Arial,sans-serif";
-const BODY_FONT = "-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif";
+// One typeface, as in the app (Inter where installed; email programs cannot load web fonts, so
+// the system font otherwise). Capitals only in the wordmark.
+const FONT = "Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif";
 
 export function escapeHtml(s: string): string {
   return s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
@@ -51,27 +55,56 @@ const LINK_HINT: Record<Lang, string> = {
   en: "If the button doesn't work, paste this link into your browser:",
 };
 
+// Gmail on iPhone, in dark mode, inverts every color of an email (our dark card turns light
+// gray, the amber brown) except images and gradients. So: backgrounds are one-color gradients,
+// the wordmark is an image, and the text sits in two layers (Gmail only, `u + .body`) whose
+// blending turns the inverted text colors back; everywhere else those layers do nothing. The
+// amber button is the one thing Gmail on iPhone still darkens.
+const GMAIL_STYLE = `<style>
+u + .body .gm-screen{background:#000;mix-blend-mode:screen;}
+u + .body .gm-diff{background:#000;mix-blend-mode:difference;}
+u + .body .gm-link{color:${C.text} !important;}
+u + .body .gm-quote{border-left-color:${C.borderLit} !important;background:transparent !important;}
+</style>`;
+
+/** A background Gmail keeps (a one-color gradient), with the plain color for the others. */
+const fill = (color: string): string => `background-color:${color};background-image:linear-gradient(${color},${color});`;
+
+/** Text Gmail on iPhone would repaint, wrapped in the layers that paint it back. */
+const keepColors = (html: string): string => `<div class="gm-screen"><div class="gm-diff">${html}</div></div>`;
+
+/**
+ * The project's Supabase address, where the email-logo function answers: SUPABASE_URL in the Edge
+ * Functions, the local stack otherwise. The Auth templates are written with the local address; the
+ * "Deploy Supabase" Action puts the project's in its place (scripts/auth-email-config.mjs).
+ */
+export const LOCAL_SUPABASE_URL = 'http://127.0.0.1:54321';
+function supabaseUrl(): string {
+  const deno = (globalThis as { Deno?: { env: { get(name: string): string | undefined } } }).Deno;
+  return (deno?.env.get('SUPABASE_URL')?.trim() || LOCAL_SUPABASE_URL).replace(/\/+$/, '');
+}
+
 export function wordmarkHtml(): string {
   return (
-    `<span style="font-family:${HEAD_FONT};font-weight:bold;font-size:20px;letter-spacing:.04em;white-space:nowrap;">` +
-    `<span style="color:${C.text};">SERVICE-</span><span style="color:${C.amber};">HUB</span></span>`
+    `<img src="${supabaseUrl()}/functions/v1/email-logo" width="${LOGO_WIDTH}" height="${LOGO_HEIGHT}" alt="SERVICE-HUB" ` +
+    `style="display:block;border:0;outline:none;text-decoration:none;font-family:${FONT};font-size:18px;font-weight:800;line-height:${LOGO_HEIGHT}px;color:${C.amber};">`
   );
 }
 
 function blockHtml(b: Block): string {
-  const p = `margin:0 0 14px;font-family:${BODY_FONT};font-size:15px;line-height:1.55;color:${C.text};`;
+  const p = `margin:0 0 14px;font-family:${FONT};font-size:15px;line-height:1.55;color:${C.text};`;
   if ('p' in b) return `<p style="${p}">${escapeHtml(b.p)}</p>`;
   if ('quote' in b) {
     return (
-      `<p style="${p}padding:10px 14px;border-left:3px solid ${C.amber};background:#242830;white-space:pre-wrap;">` +
+      `<p class="gm-quote" style="${p}padding:10px 14px;border-left:3px solid ${C.amber};background:${C.surface2};white-space:pre-wrap;">` +
       `${escapeHtml(b.quote)}</p>`
     );
   }
   const rows = b.rows
     .map(
       ([k, v]) =>
-        `<tr><td style="padding:3px 12px 3px 0;font-family:${BODY_FONT};font-size:14px;color:${C.muted};vertical-align:top;white-space:nowrap;">${escapeHtml(k)}</td>` +
-        `<td style="padding:3px 0;font-family:${BODY_FONT};font-size:14px;color:${C.text};vertical-align:top;">${escapeHtml(v)}</td></tr>`,
+        `<tr><td style="padding:3px 12px 3px 0;font-family:${FONT};font-size:14px;color:${C.muted};vertical-align:top;white-space:nowrap;">${escapeHtml(k)}</td>` +
+        `<td style="padding:3px 0;font-family:${FONT};font-size:14px;color:${C.text};vertical-align:top;">${escapeHtml(v)}</td></tr>`,
     )
     .join('');
   return `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 14px;">${rows}</table>`;
@@ -81,10 +114,12 @@ export function renderLayout(l: Layout): string {
   const button = l.button
     ? `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:6px 0 18px;"><tr>` +
       `<td bgcolor="${C.amber}" style="background:${C.amber};border-radius:10px;">` +
-      `<a href="${escapeHtml(l.button.url)}" style="display:inline-block;padding:13px 22px;font-family:${BODY_FONT};font-size:15px;font-weight:bold;color:${C.ink};text-decoration:none;border-radius:10px;">${escapeHtml(l.button.label)}</a>` +
+      `<a href="${escapeHtml(l.button.url)}" style="display:inline-block;padding:13px 22px;font-family:${FONT};font-size:15px;font-weight:bold;color:${C.ink};text-decoration:none;border-radius:10px;">${escapeHtml(l.button.label)}</a>` +
       `</td></tr></table>` +
-      `<p style="margin:0;font-family:${BODY_FONT};font-size:12px;line-height:1.5;color:${C.muted};">${escapeHtml(LINK_HINT[l.lang])}<br>` +
-      `<a href="${escapeHtml(l.button.url)}" style="color:${C.amber};word-break:break-all;">${escapeHtml(l.button.url)}</a></p>`
+      keepColors(
+        `<p style="margin:0;font-family:${FONT};font-size:12px;line-height:1.5;color:${C.muted};">${escapeHtml(LINK_HINT[l.lang])}<br>` +
+          `<a class="gm-link" href="${escapeHtml(l.button.url)}" style="color:${C.amber};word-break:break-all;">${escapeHtml(l.button.url)}</a></p>`,
+      )
     : '';
   return `<!doctype html>
 <html lang="${l.lang}">
@@ -94,19 +129,23 @@ export function renderLayout(l: Layout): string {
 <meta name="color-scheme" content="dark">
 <meta name="supported-color-schemes" content="dark">
 <title>${escapeHtml(l.title)}</title>
+${GMAIL_STYLE}
 </head>
-<body style="margin:0;padding:0;background:${C.bg};">
+<body class="body" style="margin:0;padding:0;${fill(C.bg)}">
 <div style="display:none;max-height:0;overflow:hidden;opacity:0;">${escapeHtml(l.preheader)}</div>
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="${C.bg}" style="background:${C.bg};">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="${C.bg}" style="${fill(C.bg)}">
 <tr><td align="center" style="padding:28px 12px;">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:520px;">
 <tr><td style="padding:0 4px 16px;">${wordmarkHtml()}</td></tr>
-<tr><td bgcolor="${C.surface}" style="background:${C.surface};border:1px solid ${C.border};border-radius:12px;padding:24px 22px;">
-<h1 style="margin:0 0 14px;font-family:${HEAD_FONT};font-size:22px;line-height:1.25;font-weight:bold;text-transform:uppercase;letter-spacing:.02em;color:${C.text};">${escapeHtml(l.title)}</h1>
-${l.blocks.map(blockHtml).join('\n')}
+<tr><td bgcolor="${C.border}" style="${fill(C.border)}border-radius:12px;padding:1px;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>
+<td bgcolor="${C.surface}" style="${fill(C.surface)}border-radius:11px;padding:24px 22px;">
+${keepColors(`<h1 style="margin:0 0 14px;font-family:${FONT};font-size:22px;line-height:1.25;font-weight:bold;letter-spacing:-.01em;color:${C.text};">${escapeHtml(l.title)}</h1>
+${l.blocks.map(blockHtml).join('\n')}`)}
 ${button}
+</td></tr></table>
 </td></tr>
-<tr><td style="padding:16px 4px 0;font-family:${BODY_FONT};font-size:12px;line-height:1.5;color:${C.muted};">${escapeHtml(l.footer)}<br>${escapeHtml(FOOTER_BRAND[l.lang])}</td></tr>
+<tr><td style="padding:16px 4px 0;">${keepColors(`<p style="margin:0;font-family:${FONT};font-size:12px;line-height:1.5;color:${C.muted};">${escapeHtml(l.footer)}<br>${escapeHtml(FOOTER_BRAND[l.lang])}</p>`)}</td></tr>
 </table>
 </td></tr>
 </table>

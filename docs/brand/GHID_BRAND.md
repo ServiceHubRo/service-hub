@@ -18,8 +18,8 @@ Se scrie întotdeauna **Service-Hub**, cu cratimă. Nu „ServiceHub", nu „Ser
 | Culoarea „SERVICE-", inclusiv cratima | `#EAE8E2` |
 | Culoarea „HUB" | `#F5A524` |
 | Scriere | Majuscule, lipite, fără spații în jurul cratimei |
-| Font | Arial Narrow Bold, sau orice font îngust, gros, fără serife |
-| Spațiere între litere | Puțin mărită (2%) |
+| Font | Inter ExtraBold (800) |
+| Spațiere între litere | Puțin strânsă (−1%) |
 | Rupere pe două rânduri | **Niciodată.** Nici la cratimă. |
 
 ### În text obișnuit
@@ -84,16 +84,12 @@ Pentru fundaluri colorate discret: portocaliu la 12% pentru bannere, la 18% pent
 
 | Rol | Font | Unde |
 |---|---|---|
-| Titluri | **Arial Narrow Bold** (sau Helvetica Neue Condensed) | Titluri, numere mari, butoane principale |
-| Text | **System UI** (Segoe UI pe Windows, SF Pro pe Mac) | Tot restul |
-| Cifre tehnice | Orice font monospațiat | Ore, numere de înmatriculare, prețuri, telefoane |
+| Tot | **Inter** (gratuit, Google Fonts; e inclus în aplicație, deci arată la fel pe orice telefon și calculator) | Titluri: Bold 700, puțin strâns. Text: Regular 400 / SemiBold 600. Butoane: Bold 700 |
+| Cifre | **Inter**, cu cifre de lățime egală | Ore, prețuri, kilometri, telefoane, coduri |
 
-**Alternative gratuite**, dacă lucrează în Canva sau alt program:
-- În loc de Arial Narrow: **Oswald**, **Archivo Narrow** sau **Barlow Condensed**
-- În loc de System UI: **Inter**, **Roboto** sau **Open Sans**
-- Monospațiat: **JetBrains Mono** sau **Roboto Mono**
+Un singur font, peste tot (schimbat la cererea lui Eduard, în loc de Arial Narrow + System UI + monospațiat, care arătau diferit de la un dispozitiv la altul). În Canva: Inter.
 
-**Majusculele** se folosesc doar la titluri, la marcă și pe butoanele principale. Nicăieri altundeva.
+**Majusculele** se folosesc doar la marcă (SERVICE-HUB). Titlurile, butoanele, etichetele și stările se scriu normal, cu literă mare doar la început.
 
 ---
 
@@ -138,7 +134,7 @@ Descriere de bază pe care să o dați oricărui generator de imagini:
 
 ## 8. Exemple de aplicare
 
-**Postare pe Facebook:** fundal `#14161A`, marca sus în colț, titlu scurt cu Arial Narrow Bold alb-cald, un cuvânt-cheie în portocaliu, jos un buton portocaliu cu text negru.
+**Postare pe Facebook:** fundal `#14161A`, marca sus în colț, titlu scurt cu Inter Bold alb-cald, un cuvânt-cheie în portocaliu, jos un buton portocaliu cu text negru.
 
 **Story pe Instagram:** fundal închis sau fotografie întunecată, text mare centrat, maxim 12 cuvinte, marca jos.
 
@@ -164,6 +160,6 @@ Descriere de bază pe care să o dați oricărui generator de imagini:
 ## Rezumat de buzunar
 
 **Culori:** fundal `#14161A` · text `#EAE8E2` · accent `#F5A524` · verde `#34C759` · roșu `#FF453A`
-**Font:** Arial Narrow Bold la titluri, system-ui la text
+**Font:** Inter peste tot; majuscule doar la marcă
 **Nume:** SERVICE- alb + HUB portocaliu, lipite, niciodată rupt
 **Stil:** plat, curat, fundal întunecat, portocaliul doar ca accent

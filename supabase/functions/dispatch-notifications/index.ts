@@ -117,7 +117,7 @@ function sameToken(a: string, b: string): boolean {
 }
 
 const URGENT = new Set(['booking_requested', 'quote_sent', 'job_done', 'new_message', 'quote_expiring']);
-const QUIET = new Set(['daily_digest', 'doc_expiry']);
+const QUIET = new Set(['daily_digest', 'doc_expiry', 'review_request', 'service_due']);
 
 /** How long a push service keeps it for a device that is offline. */
 function ttlFor(event: string): number {

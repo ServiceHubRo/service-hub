@@ -75,7 +75,7 @@ describe('report texts and formats', () => {
 
   it('points buyers to the app address and names the file alike on both sides', () => {
     expect(verifyAddress('https://service-hub.ro')).toBe('service-hub.ro/verifica');
-    expect(verifyAddress('https://service-hub-app.netlify.app')).toBe('service-hub-app.netlify.app/verifica');
+    expect(verifyAddress('https://service-hubapp.netlify.app')).toBe('service-hubapp.netlify.app/verifica');
     expect(reportFileName('ro', 'SH-2026-000001')).toBe(serverFileName('ro', 'SH-2026-000001'));
     expect(reportFileName('en', 'SH-2026-000001')).toBe('report-SH-2026-000001.pdf');
   });

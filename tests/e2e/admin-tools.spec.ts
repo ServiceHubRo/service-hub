@@ -164,16 +164,26 @@ test.describe('admin tools', () => {
     await card.getByLabel('Nume în engleză').fill(`Tractor service ${t}`);
     await expect(card.getByLabel('Cod serviciu')).toHaveValue(`revizie_tractor_${t}`);
     await card.getByLabel('Iconiță').selectOption('Truck');
+    // The service reminder interval (T19d): whole months, 1–120, or empty.
+    await card.getByLabel('Reminder de revizie (luni)').fill('0');
+    await expect(card.getByText('Un număr întreg de luni, între 1 și 120, sau gol.')).toBeVisible();
+    await expect(card.getByRole('button', { name: 'Adaugă serviciul' })).toBeDisabled();
+    await card.getByLabel('Reminder de revizie (luni)').fill('18');
     await card.getByRole('button', { name: 'Adaugă serviciul' }).click();
     await expect(page.getByText('Serviciul e adăugat la sfârșitul categoriei.')).toBeVisible();
     await expect(card.getByText(`revizie_tractor_${t}`)).toBeVisible();
+    await expect(card.getByText('Reminder: la 18 luni')).toBeVisible();
     await shot(page, 't16b-catalog-new', name());
 
     // Renamed: the id stays.
     await card.getByRole('button', { name: `Editează: Revizie tractor ${t}` }).click();
+    await expect(card.getByLabel('Reminder de revizie (luni)')).toHaveValue('18');
+    await shot(page, 't19d-catalog-reminder', name());
     await card.getByLabel('Nume în română').fill(`Revizie completă tractor ${t}`);
+    await card.getByLabel('Reminder de revizie (luni)').fill('');
     await card.getByRole('button', { name: 'Salvează' }).click();
     await expect(card.getByText(`Revizie completă tractor ${t}`)).toBeVisible();
+    await expect(card.getByText(/^Reminder:/)).toHaveCount(0);
     await expect(card.getByText(`revizie_tractor_${t}`)).toBeVisible();
 
     // The category switched off takes its service with it (so other tests never see it).

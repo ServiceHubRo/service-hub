@@ -236,6 +236,32 @@ export type Database = {
           },
         ]
       }
+      client_reminders: {
+        Row: {
+          booking_id: string
+          kind: string
+          sent_at: string
+        }
+        Insert: {
+          booking_id: string
+          kind: string
+          sent_at?: string
+        }
+        Update: {
+          booking_id?: string
+          kind?: string
+          sent_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_reminders_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       favorites: {
         Row: {
           client_id: string
@@ -828,6 +854,7 @@ export type Database = {
           phone_verified_by_admin: boolean
           push_prompt_dismissed_at: string | null
           role: string
+          service_reminders: boolean
           suspended: boolean
           terms_accepted_at: string | null
           terms_version: string | null
@@ -847,6 +874,7 @@ export type Database = {
           phone_verified_by_admin?: boolean
           push_prompt_dismissed_at?: string | null
           role: string
+          service_reminders?: boolean
           suspended?: boolean
           terms_accepted_at?: string | null
           terms_version?: string | null
@@ -866,6 +894,7 @@ export type Database = {
           phone_verified_by_admin?: boolean
           push_prompt_dismissed_at?: string | null
           role?: string
+          service_reminders?: boolean
           suspended?: boolean
           terms_accepted_at?: string | null
           terms_version?: string | null
@@ -1205,6 +1234,7 @@ export type Database = {
           name_en: string
           name_ro: string
           position: number
+          reminder_months: number | null
         }
         Insert: {
           category_key: string
@@ -1214,6 +1244,7 @@ export type Database = {
           name_en: string
           name_ro: string
           position?: number
+          reminder_months?: number | null
         }
         Update: {
           category_key?: string
@@ -1223,6 +1254,7 @@ export type Database = {
           name_en?: string
           name_ro?: string
           position?: number
+          reminder_months?: number | null
         }
         Relationships: [
           {
@@ -1963,6 +1995,10 @@ export type Database = {
           p_title_en: string
           p_title_ro: string
         }
+        Returns: Json
+      }
+      admin_set_service_reminder: {
+        Args: { p_id: string; p_months: number; p_request_id: string }
         Returns: Json
       }
       admin_set_shop_suspended: {
@@ -2846,6 +2882,7 @@ export type Database = {
           phone_verified_by_admin: boolean
           push_prompt_dismissed_at: string | null
           role: string
+          service_reminders: boolean
           suspended: boolean
           terms_accepted_at: string | null
           terms_version: string | null
@@ -2874,6 +2911,7 @@ export type Database = {
           phone_verified_by_admin: boolean
           push_prompt_dismissed_at: string | null
           role: string
+          service_reminders: boolean
           suspended: boolean
           terms_accepted_at: string | null
           terms_version: string | null
@@ -3059,6 +3097,8 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      send_review_requests: { Args: { p_now?: string }; Returns: number }
+      send_service_reminders: { Args: { p_today?: string }; Returns: number }
       send_trial_warnings: { Args: { p_now?: string }; Returns: number }
       set_billed_seats: {
         Args: { p_seats: number; p_shop_id: string }

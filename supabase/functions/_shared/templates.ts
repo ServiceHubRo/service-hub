@@ -7,6 +7,7 @@ import {
   daysBetween,
   formatDate,
   formatDayMonth,
+  formatDayMonthYear,
   formatKm,
   formatMoney,
   formatTime,
@@ -90,6 +91,14 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
     'client.doc_expiry_today': { title: '{car}', body: '{doc} expiră azi.' },
     'client.doc_expiry_past': { title: '{car}', body: '{doc} a expirat pe {expiry}.' },
     'client.report_ready': { title: 'Raportul e gata', body: 'Raportul de istoric pentru {car_plate} e gata de descărcat. Cod: {code}.' },
+    'client.review_request': {
+      title: '{shop}',
+      body: 'Cum a fost la {shop}? Lasă o recenzie pentru {service}. Durează un minut și îi ajută pe alți șoferi.',
+    },
+    'client.service_due': {
+      title: '{car}: {service}',
+      body: 'Ultima dată pe {last_done}, la {shop}. Următoarea se apropie, pe la {due}. Programează-te din aplicație.',
+    },
     'client.review_report_decided': {
       title: 'Recenzie ștearsă',
       body: 'Echipa Service-Hub a șters recenzia ta pentru {shop} ({ref}), pentru că nu respectă regulile platformei.',
@@ -204,6 +213,14 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
     'client.doc_expiry_today': { title: '{car}', body: 'The {doc} expires today.' },
     'client.doc_expiry_past': { title: '{car}', body: 'The {doc} expired on {expiry}.' },
     'client.report_ready': { title: 'Your report is ready', body: 'The history report for {car_plate} is ready to download. Code: {code}.' },
+    'client.review_request': {
+      title: '{shop}',
+      body: 'How was it at {shop}? Leave a review for {service}. It takes a minute and helps other drivers.',
+    },
+    'client.service_due': {
+      title: '{car}: {service}',
+      body: 'Last done on {last_done} at {shop}. The next one is coming up, around {due}. Book it in the app.',
+    },
     'client.review_report_decided': {
       title: 'Review removed',
       body: 'The Service-Hub team removed your review of {shop} ({ref}) because it breaks the platform rules.',
@@ -337,7 +354,7 @@ export const EVENTS: Record<Side, readonly string[]> = {
     'booking_confirmed', 'booking_declined', 'booking_rescheduled', 'booking_cancelled_shop', 'booking_cancelled_admin',
     'no_show', 'inspection_started', 'quote_sent', 'quote_replaced', 'quote_withdrawn', 'quote_expiring', 'quote_expired',
     'work_started', 'job_done', 'appointment_reminder', 'new_message', 'review_reply', 'doc_expiry', 'report_ready',
-    'review_report_decided',
+    'review_report_decided', 'review_request', 'service_due',
   ],
   shop: [
     'booking_requested', 'booking_cancelled_client', 'booking_cancelled_admin', 'quote_accepted',
@@ -438,6 +455,8 @@ function vars(e: NotificationEvent, lang: Lang, side: Side, now: Date): Record<s
     doc: WORDS[lang][docKey] ?? str(p.doc).toUpperCase(),
     days: days === null ? '' : plural(lang, 'days', Math.abs(days)),
     expiry: str(p.expiry) ? formatDayMonth(lang, str(p.expiry)) : '',
+    last_done: str(p.last_done) ? formatDayMonthYear(lang, str(p.last_done), now) : '',
+    due: str(p.due) ? formatDayMonthYear(lang, str(p.due), now) : '',
     digest,
     code: str(p.code),
   };
@@ -490,6 +509,14 @@ export function urlFor(side: Side, e: NotificationEvent): string {
         return str(p.car_id) ? `/c/garaj/${str(p.car_id)}` : '/c/garaj';
       case 'report_ready':
         return REPORTS_PATH;
+      // The booking card with the review form open.
+      case 'review_request':
+        return booking ? `/c/programari?${q({ p: booking, recenzie: '1' })}` : '/c/programari';
+      // A new booking at the same shop, the service chosen: straight to the day.
+      case 'service_due':
+        return str(p.shop_id)
+          ? `/c/service/${str(p.shop_id)}/programare?${q({ pas: '2', serviciu: str(p.service_id) })}`
+          : '/c/cauta';
       default:
         return booking ? `/c/programari?${q({ p: booking })}` : '/c/programari';
     }
@@ -533,6 +560,10 @@ function tagFor(e: NotificationEvent): string {
       return `review-${str(p.review_id)}`;
     case 'report_ready':
       return `report-${str(p.report_id)}`;
+    case 'review_request':
+      return `review-request-${e.booking_id ?? str(p.booking_id)}`;
+    case 'service_due':
+      return `service-due-${str(p.car_id)}-${str(p.service_id)}`;
     case 'trial_ending':
     case 'payment_failed':
     case 'shop_inactive':
