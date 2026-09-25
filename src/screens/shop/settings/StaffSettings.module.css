@@ -42,5 +42,6 @@
   border-radius: var(--radius-input);
   font-size: 13px;
   font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
   color: var(--text);
 }

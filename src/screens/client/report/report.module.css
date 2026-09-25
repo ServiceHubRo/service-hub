@@ -37,9 +37,7 @@
 
 .facts dt {
   color: var(--muted);
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
+  font-size: 13px;
 }
 
 .facts dd {
@@ -159,7 +157,6 @@
 .code {
   color: var(--amber);
   font-weight: 700;
-  letter-spacing: 0.02em;
 }
 
 .plate {
@@ -175,10 +172,8 @@
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
   padding: 3px 9px;
   border-radius: var(--radius-pill);
   white-space: nowrap;

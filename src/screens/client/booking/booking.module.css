@@ -44,10 +44,8 @@
 }
 
 .progressText {
-  font-size: 12px;
+  font-size: 13px;
   color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
 }
 
 /* ---------------------------------------------------------------- option lists (services, cars) */
@@ -59,11 +57,9 @@
 
 .groupTitle {
   margin-bottom: 7px;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
   color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
 }
 
 .options {

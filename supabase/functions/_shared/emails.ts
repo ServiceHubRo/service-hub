@@ -21,8 +21,9 @@ const C = {
   amber: '#F5A524',
   ink: '#151515',
 };
-const HEAD_FONT = "'Arial Narrow','Helvetica Neue',Arial,sans-serif";
-const BODY_FONT = "-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif";
+// One typeface, as in the app (Inter where installed; email programs cannot load web fonts, so
+// the system font otherwise). Capitals only in the wordmark.
+const FONT = "Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif";
 
 export function escapeHtml(s: string): string {
   return s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
@@ -53,13 +54,13 @@ const LINK_HINT: Record<Lang, string> = {
 
 export function wordmarkHtml(): string {
   return (
-    `<span style="font-family:${HEAD_FONT};font-weight:bold;font-size:20px;letter-spacing:.04em;white-space:nowrap;">` +
+    `<span style="font-family:${FONT};font-weight:800;font-size:20px;letter-spacing:-.01em;white-space:nowrap;">` +
     `<span style="color:${C.text};">SERVICE-</span><span style="color:${C.amber};">HUB</span></span>`
   );
 }
 
 function blockHtml(b: Block): string {
-  const p = `margin:0 0 14px;font-family:${BODY_FONT};font-size:15px;line-height:1.55;color:${C.text};`;
+  const p = `margin:0 0 14px;font-family:${FONT};font-size:15px;line-height:1.55;color:${C.text};`;
   if ('p' in b) return `<p style="${p}">${escapeHtml(b.p)}</p>`;
   if ('quote' in b) {
     return (
@@ -70,8 +71,8 @@ function blockHtml(b: Block): string {
   const rows = b.rows
     .map(
       ([k, v]) =>
-        `<tr><td style="padding:3px 12px 3px 0;font-family:${BODY_FONT};font-size:14px;color:${C.muted};vertical-align:top;white-space:nowrap;">${escapeHtml(k)}</td>` +
-        `<td style="padding:3px 0;font-family:${BODY_FONT};font-size:14px;color:${C.text};vertical-align:top;">${escapeHtml(v)}</td></tr>`,
+        `<tr><td style="padding:3px 12px 3px 0;font-family:${FONT};font-size:14px;color:${C.muted};vertical-align:top;white-space:nowrap;">${escapeHtml(k)}</td>` +
+        `<td style="padding:3px 0;font-family:${FONT};font-size:14px;color:${C.text};vertical-align:top;">${escapeHtml(v)}</td></tr>`,
     )
     .join('');
   return `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 14px;">${rows}</table>`;
@@ -81,9 +82,9 @@ export function renderLayout(l: Layout): string {
   const button = l.button
     ? `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:6px 0 18px;"><tr>` +
       `<td bgcolor="${C.amber}" style="background:${C.amber};border-radius:10px;">` +
-      `<a href="${escapeHtml(l.button.url)}" style="display:inline-block;padding:13px 22px;font-family:${BODY_FONT};font-size:15px;font-weight:bold;color:${C.ink};text-decoration:none;border-radius:10px;">${escapeHtml(l.button.label)}</a>` +
+      `<a href="${escapeHtml(l.button.url)}" style="display:inline-block;padding:13px 22px;font-family:${FONT};font-size:15px;font-weight:bold;color:${C.ink};text-decoration:none;border-radius:10px;">${escapeHtml(l.button.label)}</a>` +
       `</td></tr></table>` +
-      `<p style="margin:0;font-family:${BODY_FONT};font-size:12px;line-height:1.5;color:${C.muted};">${escapeHtml(LINK_HINT[l.lang])}<br>` +
+      `<p style="margin:0;font-family:${FONT};font-size:12px;line-height:1.5;color:${C.muted};">${escapeHtml(LINK_HINT[l.lang])}<br>` +
       `<a href="${escapeHtml(l.button.url)}" style="color:${C.amber};word-break:break-all;">${escapeHtml(l.button.url)}</a></p>`
     : '';
   return `<!doctype html>
@@ -102,11 +103,11 @@ export function renderLayout(l: Layout): string {
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:520px;">
 <tr><td style="padding:0 4px 16px;">${wordmarkHtml()}</td></tr>
 <tr><td bgcolor="${C.surface}" style="background:${C.surface};border:1px solid ${C.border};border-radius:12px;padding:24px 22px;">
-<h1 style="margin:0 0 14px;font-family:${HEAD_FONT};font-size:22px;line-height:1.25;font-weight:bold;text-transform:uppercase;letter-spacing:.02em;color:${C.text};">${escapeHtml(l.title)}</h1>
+<h1 style="margin:0 0 14px;font-family:${FONT};font-size:22px;line-height:1.25;font-weight:bold;letter-spacing:-.01em;color:${C.text};">${escapeHtml(l.title)}</h1>
 ${l.blocks.map(blockHtml).join('\n')}
 ${button}
 </td></tr>
-<tr><td style="padding:16px 4px 0;font-family:${BODY_FONT};font-size:12px;line-height:1.5;color:${C.muted};">${escapeHtml(l.footer)}<br>${escapeHtml(FOOTER_BRAND[l.lang])}</td></tr>
+<tr><td style="padding:16px 4px 0;font-family:${FONT};font-size:12px;line-height:1.5;color:${C.muted};">${escapeHtml(l.footer)}<br>${escapeHtml(FOOTER_BRAND[l.lang])}</td></tr>
 </table>
 </td></tr>
 </table>

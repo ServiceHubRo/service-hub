@@ -67,6 +67,7 @@
 .ref {
   color: var(--muted);
   font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
   font-size: 12.5px;
 }
 
@@ -209,11 +210,9 @@
 }
 
 .stepLabel {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
   color: var(--muted);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
 }
 
 .formError {
@@ -379,6 +378,7 @@
   padding-right: 14px;
   color: var(--muted);
   font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
   font-size: 15px;
   pointer-events: none;
 }

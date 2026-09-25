@@ -93,7 +93,7 @@
 .heroTitle {
   font-size: clamp(32px, 8.4vw, 56px);
   line-height: 1.08;
-  letter-spacing: 0.01em;
+  letter-spacing: -0.03em;
 }
 
 .highlight {
@@ -257,7 +257,6 @@
   font-family: var(--font-display);
   font-weight: 700;
   font-size: 12px;
-  text-transform: uppercase;
 }
 
 .mockPill {
@@ -266,10 +265,8 @@
   border-radius: var(--radius-pill);
   background: var(--amber-soft);
   color: var(--amber);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
 }
 
 .mockLine {
@@ -282,6 +279,7 @@
 .mockLine b,
 .mockTotal span:last-child {
   font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
   color: var(--text);
 }
 
@@ -327,10 +325,8 @@
 .eyebrow {
   margin-bottom: 10px;
   color: var(--amber);
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.09em;
 }
 
 .h2 {
@@ -338,8 +334,7 @@
   font-weight: 700;
   font-size: clamp(27px, 3.4vw, 40px);
   line-height: 1.12;
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
+  letter-spacing: -0.02em;
   margin-bottom: 14px;
 }
 
@@ -466,7 +461,6 @@
   font-family: var(--font-display);
   font-size: 24px;
   font-weight: 700;
-  text-transform: uppercase;
   white-space: nowrap;
 }
 
@@ -549,8 +543,7 @@
   font-weight: 700;
   font-size: clamp(24px, 3vw, 34px);
   line-height: 1.15;
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
+  letter-spacing: -0.02em;
   margin-bottom: 8px;
 }
 
@@ -589,8 +582,6 @@
   margin-bottom: 4px;
   font-size: 13px;
   font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
   color: var(--muted);
 }
 

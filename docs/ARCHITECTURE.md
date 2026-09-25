@@ -415,7 +415,7 @@ As Prompt 16e plus §7. Report code `SH-YYYY-NNNNNN` from a sequence. Public pag
 
 **Tokens** (`src/styles/tokens.css`): `--bg #14161A`, `--surface #1D2026`, `--surface2 #242830`, `--border #2C313A`, `--border-lit #3A404B`, `--text #EAE8E2`, `--muted #8A909B`, `--amber #F5A524`, `--green #34C759`, `--red #FF453A`, `--blue #5AA9FF`, `--ink #151515` (text on amber).
 
-**Type:** headings and big numbers — `"Arial Narrow", "Helvetica Neue", sans-serif`, bold, uppercase, `letter-spacing: .02em`; body — system stack; plates, times, phones, prices, km — monospace stack.
+**Type:** one typeface, **Inter** (variable, bundled with the app: `@fontsource-variable/inter`, the browser loads only the Latin + Latin Extended files, ~130 KB once), system stack as fallback. Headings bold 700 with slightly tight letter-spacing; buttons bold; labels semibold. **Sentence case everywhere** — no forced capitals, except the wordmark (Inter 800, uppercase). Plates, times, phones, prices, km use the same font with even-width digits (`.mono` / `--font-mono` = Inter + `tabular-nums`). The tokens `--font-display` and `--font-mono` remain as names for the roles and point to the same font. (Changed after T19d at Eduard's request; overrides the reference demo's Arial Narrow uppercase.)
 
 **Shape:** cards radius 12, buttons 10, inputs 9, pills fully rounded, card padding 14 (20 on desktop), page padding 18 (32 on desktop).
 
@@ -477,6 +477,7 @@ The prompts were written to be sent to Lovable one after another, so early promp
 | Prompt | Says | Build instead |
 |---|---|---|
 | 1 | inline style objects; content max 520 px | CSS variables + CSS Modules; responsive shell from day one (§17) |
+| 1 | Arial Narrow uppercase headings and main buttons, monospace figures | Inter everywhere, sentence case, even-width digits; capitals only in the wordmark (§17) |
 | 2 | role `'service'` | role `'shop'` |
 | 2 | `shops.open_hour/close_hour/closed_days`, `services text[]`, `plan`, fiscal columns on `shops` | `shop_hours`, `shop_services`, `subscriptions`, `shop_billing` |
 | 2, 15 | partial status lists; `quotes.items jsonb` | full state machine (§3); `quote_items` table with per-line approval |

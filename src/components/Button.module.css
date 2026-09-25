@@ -27,10 +27,6 @@
 .primary {
   background: var(--amber);
   color: var(--ink);
-  font-family: var(--font-display);
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
-  font-size: 16px;
 }
 
 .secondary {
