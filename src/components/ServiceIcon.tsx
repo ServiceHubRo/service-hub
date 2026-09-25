@@ -1,4 +1,5 @@
 import { createElement } from 'react';
+import type { ServiceIconName } from '../lib/serviceIcons';
 import {
   Activity,
   Battery,
@@ -45,7 +46,7 @@ import {
  * The Lucide icons named in the service catalog (`services.icon`, docs/service-catalog.json).
  * Listed one by one so the bundle carries only these; an unknown name falls back to the wrench.
  */
-const ICONS: Record<string, LucideIcon> = {
+const ICONS: Record<ServiceIconName, LucideIcon> = {
   Activity,
   Battery,
   BatteryCharging,
@@ -87,5 +88,5 @@ const ICONS: Record<string, LucideIcon> = {
 };
 
 export function ServiceIcon({ name, size = 18, className }: { name: string | null | undefined; size?: number; className?: string }) {
-  return createElement((name && ICONS[name]) || Wrench, { size, className, 'aria-hidden': true });
+  return createElement((name && ICONS[name as ServiceIconName]) || Wrench, { size, className, 'aria-hidden': true });
 }

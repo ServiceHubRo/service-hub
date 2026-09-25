@@ -6,6 +6,14 @@ export const ADMIN_BOOKINGS_PATH = '/admin/rezervari';
 export const ADMIN_MODERATION_PATH = '/admin/moderare';
 export const ADMIN_ACCOUNT_PATH = '/admin/cont';
 export const ADMIN_AUDIT_PATH = '/admin/cont/jurnal';
+// Platform tools (T16b): tiles in the admin's Cont.
+export const ADMIN_SUBSCRIPTIONS_PATH = '/admin/cont/abonamente';
+export const ADMIN_REPORTS_PATH = '/admin/cont/rapoarte';
+export const ADMIN_CATALOG_PATH = '/admin/cont/catalog';
+export const ADMIN_SETTINGS_PATH = '/admin/cont/setari';
+export const ADMIN_TEXTS_PATH = '/admin/cont/setari/texte';
+export const ADMIN_NOTICES_PATH = '/admin/cont/anunturi';
+export const ADMIN_EXPORT_PATH = '/admin/cont/export';
 
 export const adminShopPath = (id: string) => `${ADMIN_SHOPS_PATH}/${id}`;
 export const adminClientPath = (id: string) => `${ADMIN_CLIENTS_PATH}/${id}`;

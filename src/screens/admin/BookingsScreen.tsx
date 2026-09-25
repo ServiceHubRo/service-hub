@@ -9,6 +9,7 @@ import { SelectField } from '../../components/SelectField';
 import { SkeletonList } from '../../components/Skeleton';
 import { StatusBadge } from '../../components/StatusBadge';
 import { fetchBookings } from '../../data/admin';
+import { ExportButton } from './ExportButton';
 import { useI18n } from '../../i18n/context';
 import {
   BOOKING_STATUS_FILTERS,
@@ -92,6 +93,12 @@ export function BookingsScreen() {
           />
           <Field label={t('admin.bookings.from')} type="date" value={from} max={to || undefined} onChange={(e) => setParam({ de_la: e.target.value || null })} />
           <Field label={t('admin.bookings.to')} type="date" value={to} min={from || undefined} onChange={(e) => setParam({ pana_la: e.target.value || null })} />
+        </div>
+        <div className={styles.toolbar}>
+          <ExportButton
+            kind="bookings"
+            filters={{ statuses: statusesFor(status), from: from || undefined, to: to || undefined, q: q || undefined, shop_id: shopId, client_id: clientId }}
+          />
         </div>
         {(shopId || clientId) && (
           <div className={styles.actions}>

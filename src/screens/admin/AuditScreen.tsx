@@ -11,12 +11,35 @@ import { rpcErrorMessage } from '../../data/rpc';
 import { useI18n } from '../../i18n/context';
 import { useLoad } from '../../lib/useLoad';
 import { AuditList } from './parts';
-import { ADMIN_ACCOUNT_PATH, adminBookingPath, adminClientPath, adminShopPath, ADMIN_MODERATION_PATH } from './paths';
+import {
+  ADMIN_ACCOUNT_PATH,
+  ADMIN_CATALOG_PATH,
+  ADMIN_MODERATION_PATH,
+  ADMIN_NOTICES_PATH,
+  ADMIN_REPORTS_PATH,
+  ADMIN_TEXTS_PATH,
+  adminBookingPath,
+  adminClientPath,
+  adminShopPath,
+} from './paths';
 import styles from './admin.module.css';
 
 const loadFirst = () => fetchAudit();
 
+/** A link with the entry's label to where the thing lives (T16b tools: the tool's screen). */
+function toolLink(to: string, label: string) {
+  return (
+    <Link className={styles.link} to={to}>
+      {label}
+    </Link>
+  );
+}
+
 function entityLink(e: AuditEntry) {
+  if (e.entity_type === 'settings') {
+    // The platform settings, or one push text (its key).
+    return e.entity_id ? toolLink(`${ADMIN_TEXTS_PATH}?q=${encodeURIComponent(e.entity_id)}`, e.entity_id) : null;
+  }
   if (!e.entity_id) return null;
   const label = e.label || e.entity_id.slice(0, 8);
   switch (e.entity_type) {
@@ -47,6 +70,15 @@ function entityLink(e: AuditEntry) {
       ) : (
         <span className={styles.muted}>{label}</span>
       );
+    case 'report':
+      return toolLink(`${ADMIN_REPORTS_PATH}?q=${encodeURIComponent(label)}`, label);
+    case 'notice':
+      return toolLink(ADMIN_NOTICES_PATH, label);
+    case 'category':
+    case 'service':
+      return toolLink(`${ADMIN_CATALOG_PATH}?q=${encodeURIComponent(e.entity_id)}`, label);
+    case 'export':
+      return null;
     default:
       return <span className={styles.muted}>{label}</span>;
   }

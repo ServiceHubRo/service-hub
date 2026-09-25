@@ -87,7 +87,7 @@ export function Money({ amount }: { amount: number | null | undefined }) {
 // ------------------------------------------------------------------------------------ audit log
 
 function fieldLabel(t: (key: MessageKey) => string, key: string): string {
-  const own = `admin.field.${key.replace(/^billing\./, '')}`;
+  const own = `admin.field.${key.replace(/^(billing|limits)\./, '')}`;
   return own in ro ? t(own as MessageKey) : key;
 }
 
@@ -102,6 +102,8 @@ function valueText(t: (key: MessageKey) => string, lang: Lang, key: string, valu
   }
   if (key === 'report_status' && `admin.reportStatus.${String(value)}` in ro) return t(`admin.reportStatus.${String(value)}` as MessageKey);
   if (key === 'mode' && `admin.deleteMode.${String(value)}` in ro) return t(`admin.deleteMode.${String(value)}` as MessageKey);
+  if (key === 'kind' && `admin.export.kind.${String(value)}` in ro) return t(`admin.export.kind.${String(value)}` as MessageKey);
+  if (key === 'audience' && `admin.notices.audience.${String(value)}` in ro) return t(`admin.notices.audience.${String(value)}` as MessageKey);
   if (typeof value === 'string' && /^\d{4}-\d{2}-\d{2}T/.test(value)) return dateTime(lang, value);
   return typeof value === 'object' ? JSON.stringify(value) : String(value);
 }

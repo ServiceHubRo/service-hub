@@ -14,11 +14,14 @@ import {
   setSubscriptionStatus,
   updateShop,
   type AdminShopDetail,
+  type AdminSubscription,
   type BillingEdit,
   type ManualStatus,
   type ShopEdit,
 } from '../../data/admin';
+import { setSubscriptionPrice } from '../../data/adminTools';
 import { canRetryRpc, rpcErrorMessage } from '../../data/rpc';
+import { parseNumber } from '../../lib/adminTools';
 import { useI18n } from '../../i18n/context';
 import type { MessageKey } from '../../i18n/ro';
 import { plural } from '../../i18n/translate';
@@ -95,6 +98,57 @@ export function StatusPanel({ detail, onDone, onCancel }: { detail: AdminShopDet
           canRetry={canRetryRpc}
         >
           {t('admin.status.submit', { status: t(`admin.subStatus.${status}`) })}
+        </ActionButton>
+        <Button onClick={onCancel}>{t('common.cancel')}</Button>
+      </div>
+    </InlinePanel>
+  );
+}
+
+// ------------------------------------------------------------------------------------ price (T16b)
+
+/**
+ * The monthly price of this shop's subscription (e.g. the first shops keep a fixed price). The next
+ * Stripe checkout uses it; while Stripe runs a subscription the price stays the one in Stripe.
+ */
+export function PricePanel({
+  shopId,
+  subscription,
+  onDone,
+  onCancel,
+}: {
+  shopId: string;
+  subscription: AdminSubscription;
+  onDone: () => void;
+  onCancel: () => void;
+}) {
+  const { t, lang } = useI18n();
+  const [text, setText] = useState(String(Number(subscription.price_ron)).replace('.', lang === 'ro' ? ',' : '.'));
+  const price = parseNumber(text);
+  const valid = price !== null && price >= 1 && price <= 10000;
+  return (
+    <InlinePanel title={t('admin.price.title')}>
+      <p className={styles.muted}>{t('admin.price.body')}</p>
+      {stripeRuns(subscription.stripe_status) && <p className={styles.warning}>{t('admin.price.stripe')}</p>}
+      <Field
+        label={t('admin.price.label')}
+        value={text}
+        inputMode="decimal"
+        mono
+        error={text.trim() && !valid ? t('admin.price.invalid') : null}
+        onChange={(e) => setText(e.target.value)}
+      />
+      <div className={styles.panelButtons}>
+        <ActionButton
+          disabled={!valid || stripeRuns(subscription.stripe_status)}
+          onAction={async (requestId) => {
+            await setSubscriptionPrice(shopId, price!, requestId);
+            onDone();
+          }}
+          errorMessage={(e) => rpcErrorMessage(lang, e)}
+          canRetry={canRetryRpc}
+        >
+          {t('admin.save')}
         </ActionButton>
         <Button onClick={onCancel}>{t('common.cancel')}</Button>
       </div>

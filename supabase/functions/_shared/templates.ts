@@ -547,6 +547,28 @@ function tagFor(e: NotificationEvent): string {
 const firstUpper = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 const clip = (s: string, n: number) => (s.length > n ? `${s.slice(0, n - 1)}…` : s);
 
+/** The screen where notices show (T16b): Caută for clients, Panou for shops. */
+export const NOTICE_PATHS: Record<Side, string> = { client: '/c/cauta', shop: '/s/panou' };
+
+/**
+ * A notice from the Service-Hub team (T16b): the admin wrote its title and text in both
+ * languages; the recipient gets their own (the Romanian one when the English is missing). A tap
+ * opens the screen where the notice shows.
+ */
+function renderBroadcast(e: NotificationEvent, side: Side, lang: Lang): Rendered | null {
+  const p = e.params ?? {};
+  const title = str(p[`title_${lang}`]) || str(p.title_ro);
+  const body = str(p[`body_${lang}`]) || str(p.body_ro);
+  if (!title && !body) return null;
+  return {
+    key: 'broadcast',
+    title: clip(title || BRAND, 80),
+    body: clip(body.replace(/\s+/g, ' ').trim(), 240),
+    url: NOTICE_PATHS[side],
+    tag: `notice-${str(p.notice_id)}`,
+  };
+}
+
 /**
  * The notification for one outbox event, or null when the recipient's side has no text for it
  * (the dispatcher records `no_template` and moves on).
@@ -555,6 +577,7 @@ export function renderNotification(e: NotificationEvent, overrides: Overrides = 
   const side: Side | null = e.role === 'client' ? 'client' : e.role === 'shop' ? 'shop' : null;
   if (!side) return null;
   const lang: Lang = e.lang === 'en' ? 'en' : 'ro';
+  if (e.event === 'broadcast') return renderBroadcast(e, side, lang);
   const key = templateKey(side, e);
   const base = TEMPLATES[lang][key];
   if (!base) return null;

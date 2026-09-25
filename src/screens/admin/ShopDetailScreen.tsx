@@ -18,12 +18,12 @@ import { formatPhone } from '../../lib/validators';
 import { ConfirmPanel } from './ActionPanels';
 import { AuditList, Facts, Money, Pill, SectionTitle, ShopStatePill, SubscriptionPill, Verified } from './parts';
 import { ADMIN_SHOPS_PATH, adminBookingPath, adminBookingsLink } from './paths';
-import { EditPanel, StatusPanel, TrialPanel } from './ShopPanels';
+import { EditPanel, PricePanel, StatusPanel, TrialPanel } from './ShopPanels';
 import { useLiveData } from './useLiveData';
 import { carText, dateTime, day, stripeRuns } from './format';
 import styles from './admin.module.css';
 
-type Panel = 'suspend' | 'trial' | 'status' | 'edit' | 'delete' | null;
+type Panel = 'suspend' | 'trial' | 'status' | 'price' | 'edit' | 'delete' | null;
 
 /**
  * One shop for the admin (FR §5.2, P20): state and why it is hidden, the actions (verify the phone,
@@ -144,6 +144,7 @@ export function ShopDetailScreen() {
               )}
               <Button onClick={() => setPanel('trial')}>{t('admin.trial.title')}</Button>
               <Button onClick={() => setPanel('status')}>{t('admin.status.title')}</Button>
+              {sub && <Button onClick={() => setPanel('price')}>{t('admin.price.title')}</Button>}
               <Button onClick={() => setPanel('edit')}>{t('admin.edit.title')}</Button>
               <Button variant="danger" onClick={() => setPanel('delete')}>
                 {t('admin.shop.delete')}
@@ -168,6 +169,9 @@ export function ShopDetailScreen() {
           )}
           {panel === 'trial' && <TrialPanel shopId={s.id} onDone={() => done(t('admin.done.trial'))} onCancel={() => setPanel(null)} />}
           {panel === 'status' && <StatusPanel detail={d} onDone={() => done(t('admin.done.status'))} onCancel={() => setPanel(null)} />}
+          {panel === 'price' && sub && (
+            <PricePanel shopId={s.id} subscription={sub} onDone={() => done(t('admin.done.price'))} onCancel={() => setPanel(null)} />
+          )}
           {panel === 'edit' && <EditPanel detail={d} onDone={() => done(t('admin.done.edit'))} onCancel={() => setPanel(null)} />}
           {panel === 'delete' && (
             <ConfirmPanel

@@ -467,3 +467,12 @@ a.stat:hover {
 .more {
   align-self: center;
 }
+
+/* ---------------------------------------------------------------- platform tools (T16b) */
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+}
