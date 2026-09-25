@@ -1,6 +1,7 @@
 /**
  * A small Markdown reader for the legal documents (docs/legal/*.md): headings, paragraphs,
- * lists (one nesting level), block quotes, tables, rules, **bold**, *italic* and [links](url).
+ * lists (one nesting level), block quotes, tables, rules, **bold**, *italic*, `code`, [links](url)
+ * and `{{field}}` placeholders (the operator's company data, filled in when rendered).
  * It produces plain data that React renders as elements, never as HTML strings.
  */
 
@@ -8,7 +9,9 @@ export type Inline =
   | { type: 'text'; text: string }
   | { type: 'strong'; children: Inline[] }
   | { type: 'em'; children: Inline[] }
-  | { type: 'link'; href: string; children: Inline[] };
+  | { type: 'link'; href: string; children: Inline[] }
+  | { type: 'code'; text: string }
+  | { type: 'field'; key: string };
 
 export interface ListItem {
   content: Inline[];
@@ -28,7 +31,7 @@ const SAFE_HREF = /^(https?:\/\/|mailto:)/i;
 export function parseInline(text: string): Inline[] {
   const out: Inline[] = [];
   let rest = text;
-  const pattern = /\*\*(.+?)\*\*|\[([^\]]+)\]\(([^)\s]+)\)|\*([^*\s][^*]*?)\*/;
+  const pattern = /`([^`]+)`|\{\{(\w+)\}\}|\*\*(.+?)\*\*|\[([^\]]+)\]\(([^)\s]+)\)|\*([^*\s][^*]*?)\*/;
   while (rest.length > 0) {
     const m = pattern.exec(rest);
     if (!m) {
@@ -36,11 +39,13 @@ export function parseInline(text: string): Inline[] {
       break;
     }
     if (m.index > 0) out.push({ type: 'text', text: rest.slice(0, m.index) });
-    if (m[1] !== undefined) out.push({ type: 'strong', children: parseInline(m[1]) });
-    else if (m[2] !== undefined && m[3] !== undefined) {
-      if (SAFE_HREF.test(m[3])) out.push({ type: 'link', href: m[3], children: parseInline(m[2]) });
-      else out.push(...parseInline(m[2]));
-    } else if (m[4] !== undefined) out.push({ type: 'em', children: parseInline(m[4]) });
+    if (m[1] !== undefined) out.push({ type: 'code', text: m[1] });
+    else if (m[2] !== undefined) out.push({ type: 'field', key: m[2] });
+    else if (m[3] !== undefined) out.push({ type: 'strong', children: parseInline(m[3]) });
+    else if (m[4] !== undefined && m[5] !== undefined) {
+      if (SAFE_HREF.test(m[5])) out.push({ type: 'link', href: m[5], children: parseInline(m[4]) });
+      else out.push(...parseInline(m[4]));
+    } else if (m[6] !== undefined) out.push({ type: 'em', children: parseInline(m[6]) });
     rest = rest.slice(m.index + m[0].length);
   }
   return out;

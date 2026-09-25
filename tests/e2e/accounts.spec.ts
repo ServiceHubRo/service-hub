@@ -118,10 +118,22 @@ test('legal documents are public, with tables and headings', async ({ page }) =>
   await expect(page.getByRole('table').first()).toBeVisible();
   await expectNoHorizontalScroll(page);
   await shot(page, 'legal-privacy', name());
+  // The operator's data: the contact from the landing page, a visible mark for what is not filled in yet.
+  await expect(page.getByText('contact@service-hub.ro').first()).toBeVisible();
   await page.getByRole('button', { name: 'English' }).click();
-  await expect(page.getByText('For now, this document is available in Romanian only.')).toBeVisible();
+  await expect(page.getByRole('heading', { level: 1, name: 'Privacy policy' })).toBeVisible();
+  await expect(page.getByRole('heading', { level: 2, name: '7. Your rights' })).toBeVisible();
+  await expect(page.getByText('Your position is used only on your device')).toBeVisible();
+  await expectNoHorizontalScroll(page);
+  await shot(page, 'legal-privacy-en', name());
   await page.goto('/legal/cookies');
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(/cookie/i);
+  await expect(page.getByRole('cell', { name: 'sh_lang' })).toBeVisible();
+  await page.getByRole('button', { name: 'Română' }).click();
+  await expect(page.getByRole('heading', { level: 2, name: '2. Ce păstrăm în browser' })).toBeVisible();
+  await page.goto('/legal/termeni');
+  await expect(page.getByRole('heading', { level: 2, name: '3. Pentru Clienți' })).toBeVisible();
+  await shot(page, 'legal-terms', name());
 });
 
 test('forgot password checks the address before sending', async ({ page }) => {
