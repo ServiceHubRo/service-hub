@@ -14,7 +14,7 @@ export function CheckEmail() {
   if (!email) return <Navigate to="/intra" replace />;
 
   return (
-    <AuthLayout>
+    <AuthLayout title={t('auth.checkEmail.title')}>
       <Card>
         <div className={styles.stack}>
           <div className={styles.center}>

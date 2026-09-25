@@ -63,12 +63,12 @@
 }
 
 .toneRed {
-  color: var(--red);
+  color: var(--red-text);
   background: var(--red-soft);
 }
 
 .toneMuted {
-  color: var(--muted);
+  color: var(--muted-strong);
   background: var(--muted-soft);
 }
 

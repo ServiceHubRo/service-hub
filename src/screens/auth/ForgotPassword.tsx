@@ -49,7 +49,7 @@ export function ForgotPassword() {
   }
 
   return (
-    <AuthLayout>
+    <AuthLayout title={t('auth.forgot.title')}>
       <Card>
         <form ref={formRef} className={styles.form} noValidate onSubmit={(e) => e.preventDefault()}>
           <h1 className={styles.title}>{t('auth.forgot.title')}</h1>

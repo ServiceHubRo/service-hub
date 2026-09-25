@@ -25,11 +25,11 @@
 }
 
 .red {
-  color: var(--red);
+  color: var(--red-text);
   background: var(--red-soft);
 }
 
 .muted {
-  color: var(--muted);
+  color: var(--muted-strong);
   background: var(--muted-soft);
 }

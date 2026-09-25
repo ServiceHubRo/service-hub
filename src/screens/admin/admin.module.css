@@ -130,12 +130,12 @@
 }
 
 .red {
-  color: var(--red);
+  color: var(--red-text);
   background: var(--red-soft);
 }
 
 .greyPill {
-  color: var(--muted);
+  color: var(--muted-strong);
   background: var(--muted-soft);
 }
 
@@ -264,7 +264,11 @@ a.stat:hover {
   gap: 10px;
 }
 
+/* Links to a shop, a client, a booking, a receipt: each on its own, so a full 44 px tap target. */
 .link {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap);
   color: var(--amber);
 }
 

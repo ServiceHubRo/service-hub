@@ -67,7 +67,7 @@ export function InviteScreen() {
   }
 
   return (
-    <AuthLayout>
+    <AuthLayout title={t('invite.title')}>
       <div className={styles.stack}>
         <h1 className={styles.inviteTitle}>{t('invite.title')}</h1>
         {body}

@@ -54,13 +54,12 @@ test('public pages keep the language switch below the iPhone status bar', async 
   }
 });
 
-test('landing shows the logo and "În curând" without wrapping the wordmark', async ({ page }) => {
+test('landing shows the logo without wrapping the wordmark, and the way in', async ({ page }) => {
   await page.goto('/');
   const wordmark = page.getByRole('img', { name: 'Service-Hub' });
   await expect(wordmark).toBeVisible();
   const box = await wordmark.boundingBox();
   expect(box!.height).toBeLessThan(50); // one line
-  await expect(page.getByText('În curând')).toBeVisible();
   await expect(page.getByRole('link', { name: 'Intră în cont' })).toBeVisible();
   await expect(page.getByRole('link', { name: 'Creează cont' })).toBeVisible();
   await expectNoHorizontalScroll(page);

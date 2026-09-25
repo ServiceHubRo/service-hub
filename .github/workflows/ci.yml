@@ -23,6 +23,12 @@ jobs:
       - run: npm run typecheck
       - run: npm run lint
       - run: npm test
+      # The same unit tests with the machine in the US and in Japan: no date or time may depend
+      # on the device zone (T18, P17b).
+      - name: Unit tests in other time zones
+        run: |
+          TZ=America/Los_Angeles npm test
+          TZ=Asia/Tokyo npm test
       - run: npm run build
       - name: SQL tests (local Postgres)
         run: |

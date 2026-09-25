@@ -1,9 +1,11 @@
+import { ymdInBucharest } from '../i18n/format';
+
 /** Car details typed by a client (garage form and booking step 4). Same limits as the database. */
 export const CAR_YEAR_MIN = 1900;
 
-/** Next year's models are on sale already. */
+/** Next year's models are on sale already. The year is Romania's, not the device's. */
 export function carYearMax(now: Date = new Date()): number {
-  return now.getFullYear() + 1;
+  return Number(ymdInBucharest(now).slice(0, 4)) + 1;
 }
 
 /** An empty year is fine (it is optional); otherwise 4 digits between 1900 and next year. */

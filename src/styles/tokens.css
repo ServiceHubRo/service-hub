@@ -7,6 +7,10 @@
   --border-lit: #3a404b;
   --text: #eae8e2;
   --muted: #8a909b;
+  /* Muted text on a tinted background (the grey status pills): #8A909B there is below 4.5:1. */
+  --muted-strong: #a4aab4;
+  /* Red text on the red tint (declined, no-show, overdue pills): #FF453A there is below 4.5:1. */
+  --red-text: #ff7a72;
   --amber: #f5a524;
   --green: #34c759;
   --red: #ff453a;
