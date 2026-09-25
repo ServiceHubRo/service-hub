@@ -155,14 +155,14 @@ describe('SMS texts', () => {
 
 describe('app emails', () => {
   it('the staff invitation, in both languages, with the link and escaped names', () => {
-    const d = { shop: 'Atelier <Unu>', city: 'Brașov', inviter: 'Ion Popescu', email: 'vlad@example.com', url: 'https://service-hub-app.netlify.app/invitatie/abc' };
+    const d = { shop: 'Atelier <Unu>', city: 'Brașov', inviter: 'Ion Popescu', email: 'vlad@example.com', url: 'https://service-hubapp.netlify.app/invitatie/abc' };
     const ro = staffInviteEmail('ro', d);
     expect(ro.subject).toBe('Ion Popescu te invită în Atelier <Unu> pe Service-Hub');
     expect(ro.html).toContain('Atelier &lt;Unu&gt; (Brașov)');
     expect(ro.html).not.toContain('<Unu>');
-    expect(ro.html).toContain('href="https://service-hub-app.netlify.app/invitatie/abc"');
+    expect(ro.html).toContain('href="https://service-hubapp.netlify.app/invitatie/abc"');
     expect(ro.html).toContain('<html lang="ro">');
-    expect(ro.text).toContain('Acceptă invitația: https://service-hub-app.netlify.app/invitatie/abc');
+    expect(ro.text).toContain('Acceptă invitația: https://service-hubapp.netlify.app/invitatie/abc');
     expect(ro.text).toContain('vlad@example.com');
     const en = staffInviteEmail('en', d);
     expect(en.subject).toBe('Ion Popescu invited you to Atelier <Unu> on Service-Hub');
@@ -177,7 +177,7 @@ describe('app emails', () => {
         params: { shop_name: 'Atelier Unu', shop_city: 'Brașov', shop_display_id: 'S-00001', client_name: 'Ana M.', rating: 1,
           text: 'Nu recomand <b>deloc</b>', reason: 'abusive', ref: 'P-000123', reported_at: '2026-10-14T08:30:00Z' },
       },
-      'https://service-hub-app.netlify.app',
+      'https://service-hubapp.netlify.app',
     )!;
     expect(mail.subject).toBe('Recenzie raportată: Atelier Unu (1★)');
     expect(mail.text).toContain('Motiv: Limbaj abuziv');
@@ -198,6 +198,22 @@ describe('app emails', () => {
     expect(emailForEvent({ event: 'quote_sent', lang: 'ro', params: {} }, '')).toBeNull();
   });
 
+  it('keeps our colors in the Gmail app on iPhone (dark mode inverts everything but gradients and images)', () => {
+    const { html } = staffInviteEmail('ro', { shop: 'Atelier Unu', city: '', inviter: '', email: 'a@b.ro', url: 'https://service-hub.ro/x' });
+    // The wordmark is the email-logo image (the local stack here; the project's in the functions).
+    expect(html).toContain('<img src="http://127.0.0.1:54321/functions/v1/email-logo"');
+    expect(html).toContain('alt="SERVICE-HUB"');
+    // Page and card: one-color gradients, which Gmail leaves alone.
+    expect(html).toContain('background-image:linear-gradient(#14161A,#14161A)');
+    expect(html).toContain('background-image:linear-gradient(#1D2026,#1D2026)');
+    // The text layers that paint Gmail's inverted colors back, only in Gmail (`u + .body`).
+    expect(html).toContain('<body class="body"');
+    expect(html).toContain('u + .body .gm-screen{background:#000;mix-blend-mode:screen;}');
+    expect(html).toContain('<div class="gm-screen"><div class="gm-diff"><h1');
+    // No forced capitals.
+    expect(html).not.toContain('uppercase');
+  });
+
   it('escapes HTML', () => {
     expect(escapeHtml(`<a href="x">'&'</a>`)).toBe('&lt;a href=&quot;x&quot;&gt;&#39;&amp;&#39;&lt;/a&gt;');
   });
@@ -209,12 +225,13 @@ describe('links in emails', () => {
     expect(appUrl('https://service-hub.ro/')).toBe('https://service-hub.ro');
     expect(appUrl('not a url')).toBe(DEFAULT_APP_URL);
     const app = 'https://service-hub.ro';
-    expect(linkBase('https://deploy-preview-14--service-hub-app.netlify.app', app)).toBe('https://deploy-preview-14--service-hub-app.netlify.app');
-    expect(linkBase('https://service-hub-app.netlify.app/', app)).toBe('https://service-hub-app.netlify.app');
+    expect(linkBase('https://deploy-preview-14--service-hubapp.netlify.app', app)).toBe('https://deploy-preview-14--service-hubapp.netlify.app');
+    expect(linkBase('https://service-hubapp.netlify.app/', app)).toBe('https://service-hubapp.netlify.app');
+    expect(linkBase('https://deploy-preview-3--service-hub-app.netlify.app', app)).toBe('https://deploy-preview-3--service-hub-app.netlify.app');
     expect(linkBase('https://www.service-hub.ro', app)).toBe('https://www.service-hub.ro');
     expect(linkBase('http://localhost:4173', app)).toBe('http://localhost:4173');
     expect(linkBase('https://evil.example.com', app)).toBe(app);
-    expect(linkBase('https://service-hub-app.netlify.app.evil.com', app)).toBe(app);
+    expect(linkBase('https://service-hubapp.netlify.app.evil.com', app)).toBe(app);
     expect(linkBase('https://x--other.netlify.app', app)).toBe(app);
     expect(linkBase(null, app)).toBe(app);
   });
