@@ -49,6 +49,9 @@ const BRAND = 'Service-Hub';
 /** The owner's Abonament screen (T14): where every subscription notice and email leads. */
 export const SUBSCRIPTION_PATH = '/s/cont/abonament';
 
+/** The client's Rapoartele mele (T15): where a finished history report is downloaded. */
+export const REPORTS_PATH = '/c/cont/rapoarte';
+
 export const TEMPLATES: Record<Lang, Record<string, Text>> = {
   ro: {
     // ------------------------------------------------------------------ to the client
@@ -86,6 +89,7 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
     'client.doc_expiry': { title: '{car}', body: '{doc} expiră în {days}, pe {expiry}.' },
     'client.doc_expiry_today': { title: '{car}', body: '{doc} expiră azi.' },
     'client.doc_expiry_past': { title: '{car}', body: '{doc} a expirat pe {expiry}.' },
+    'client.report_ready': { title: 'Raportul e gata', body: 'Raportul de istoric pentru {car_plate} e gata de descărcat. Cod: {code}.' },
     // ------------------------------------------------------------------ to the shop
     'shop.booking_requested': { title: 'Cerere nouă', body: '{client}: {service}, {when}. {car_plate}.' },
     'shop.booking_cancelled_client': { title: 'Programare anulată', body: '{client} a anulat programarea {ref} din {when}.' },
@@ -183,6 +187,7 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
     'client.doc_expiry': { title: '{car}', body: 'The {doc} expires in {days}, on {expiry}.' },
     'client.doc_expiry_today': { title: '{car}', body: 'The {doc} expires today.' },
     'client.doc_expiry_past': { title: '{car}', body: 'The {doc} expired on {expiry}.' },
+    'client.report_ready': { title: 'Your report is ready', body: 'The history report for {car_plate} is ready to download. Code: {code}.' },
     // ------------------------------------------------------------------ to the shop
     'shop.booking_requested': { title: 'New request', body: '{client}: {service}, {when}. {car_plate}.' },
     'shop.booking_cancelled_client': { title: 'Booking canceled', body: '{client} canceled booking {ref} on {when}.' },
@@ -299,7 +304,7 @@ export const EVENTS: Record<Side, readonly string[]> = {
   client: [
     'booking_confirmed', 'booking_declined', 'booking_rescheduled', 'booking_cancelled_shop', 'booking_cancelled_admin',
     'no_show', 'inspection_started', 'quote_sent', 'quote_replaced', 'quote_withdrawn', 'quote_expiring', 'quote_expired',
-    'work_started', 'job_done', 'appointment_reminder', 'new_message', 'review_reply', 'doc_expiry',
+    'work_started', 'job_done', 'appointment_reminder', 'new_message', 'review_reply', 'doc_expiry', 'report_ready',
   ],
   shop: [
     'booking_requested', 'booking_cancelled_client', 'booking_cancelled_admin', 'quote_accepted',
@@ -401,6 +406,7 @@ function vars(e: NotificationEvent, lang: Lang, side: Side, now: Date): Record<s
     days: days === null ? '' : plural(lang, 'days', Math.abs(days)),
     expiry: str(p.expiry) ? formatDayMonth(lang, str(p.expiry)) : '',
     digest,
+    code: str(p.code),
   };
 }
 
@@ -441,6 +447,8 @@ export function urlFor(side: Side, e: NotificationEvent): string {
         return str(p.thread_id) ? `/c/mesaje/${str(p.thread_id)}` : '/c/mesaje';
       case 'doc_expiry':
         return str(p.car_id) ? `/c/garaj/${str(p.car_id)}` : '/c/garaj';
+      case 'report_ready':
+        return REPORTS_PATH;
       default:
         return booking ? `/c/programari?${q({ p: booking })}` : '/c/programari';
     }
@@ -480,6 +488,8 @@ function tagFor(e: NotificationEvent): string {
       return `digest-${str(p.date)}`;
     case 'new_review':
       return `review-${str(p.review_id)}`;
+    case 'report_ready':
+      return `report-${str(p.report_id)}`;
     case 'trial_ending':
     case 'payment_failed':
     case 'shop_inactive':

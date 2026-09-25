@@ -287,15 +287,20 @@ export type Database = {
           generated_at: string | null
           id: string
           job_count: number
+          jobs: Json
+          lang: string
           latest_odometer: number | null
           odometer_out_of_order: boolean
           paid_at: string | null
           pdf_url: string | null
           period_from: string | null
           period_to: string | null
+          price: number
+          request_id: string | null
           status: string
           stripe_session_id: string | null
           total_amount: number
+          vehicle_key: string | null
           void_reason: string | null
           voided_at: string | null
         }
@@ -309,15 +314,20 @@ export type Database = {
           generated_at?: string | null
           id?: string
           job_count?: number
+          jobs?: Json
+          lang?: string
           latest_odometer?: number | null
           odometer_out_of_order?: boolean
           paid_at?: string | null
           pdf_url?: string | null
           period_from?: string | null
           period_to?: string | null
+          price?: number
+          request_id?: string | null
           status?: string
           stripe_session_id?: string | null
           total_amount?: number
+          vehicle_key?: string | null
           void_reason?: string | null
           voided_at?: string | null
         }
@@ -331,15 +341,20 @@ export type Database = {
           generated_at?: string | null
           id?: string
           job_count?: number
+          jobs?: Json
+          lang?: string
           latest_odometer?: number | null
           odometer_out_of_order?: boolean
           paid_at?: string | null
           pdf_url?: string | null
           period_from?: string | null
           period_to?: string | null
+          price?: number
+          request_id?: string | null
           status?: string
           stripe_session_id?: string | null
           total_amount?: number
+          vehicle_key?: string | null
           void_reason?: string | null
           voided_at?: string | null
         }
@@ -1774,6 +1789,16 @@ export type Database = {
         }
       }
       app_limit: { Args: { p_default: number; p_key: string }; Returns: number }
+      begin_history_report: {
+        Args: {
+          p_booking_id: string
+          p_car_id: string
+          p_lang: string
+          p_request_id: string
+          p_user_id: string
+        }
+        Returns: Json
+      }
       booking_event_params: {
         Args: { p_booking: Database["public"]["Tables"]["bookings"]["Row"] }
         Returns: Json
@@ -2114,6 +2139,10 @@ export type Database = {
       expire_quotes: { Args: never; Returns: number }
       export_my_data: { Args: never; Returns: Json }
       fail: { Args: { p_code: string; p_params?: Json }; Returns: undefined }
+      finish_history_report: {
+        Args: { p_generated_at?: string; p_path: string; p_report_id: string }
+        Returns: boolean
+      }
       finish_notifications: { Args: { p_results: Json }; Returns: number }
       fold_text: { Args: { p: string }; Returns: string }
       format_sequence_id: {
@@ -2134,6 +2163,14 @@ export type Database = {
       get_shop_page: { Args: { p_shop_id: string }; Returns: Json }
       get_shop_setup: { Args: never; Returns: Json }
       get_staff_invite: { Args: { p_token: string }; Returns: Json }
+      history_report_for: {
+        Args: { p_report_id: string; p_user_id: string }
+        Returns: Json
+      }
+      history_report_preview: {
+        Args: { p_booking_id?: string; p_car_id?: string }
+        Returns: Json
+      }
       insert_quote: {
         Args: {
           p_booking: Database["public"]["Tables"]["bookings"]["Row"]
@@ -2288,6 +2325,15 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      mark_history_report_paid: {
+        Args: {
+          p_amount: number
+          p_paid_at?: string
+          p_report_id: string
+          p_session_id: string
+        }
+        Returns: Json
       }
       mark_no_show: {
         Args: { p_booking_id: string; p_request_id: string }
@@ -2474,6 +2520,11 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      report_facts: { Args: { p_jobs: Json }; Returns: Json }
+      report_jobs: {
+        Args: { p_client_id: string; p_vehicle_key: string }
+        Returns: Json
+      }
       report_review: {
         Args: { p_reason: string; p_request_id: string; p_review_id: string }
         Returns: {
@@ -2501,6 +2552,10 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      report_vehicle: {
+        Args: { p_booking_id: string; p_car_id: string; p_client_id: string }
+        Returns: Json
       }
       request_begin: {
         Args: { p_fn: string; p_request_id: string }
@@ -2712,6 +2767,10 @@ export type Database = {
         }
       }
       send_trial_warnings: { Args: { p_now?: string }; Returns: number }
+      set_history_report_session: {
+        Args: { p_report_id: string; p_session_id: string }
+        Returns: undefined
+      }
       set_shop_services: {
         Args: { p_request_id: string; p_service_ids: string[] }
         Returns: Json
@@ -2932,7 +2991,9 @@ export type Database = {
         Returns: boolean
       }
       try_uuid: { Args: { p: string }; Returns: string }
+      vehicle_key: { Args: { p_car: Json }; Returns: string }
       verify_phone_manually: { Args: { p_email: string }; Returns: string }
+      verify_report: { Args: { p_code: string }; Returns: Json }
       withdraw_quote: {
         Args: { p_booking_id: string; p_request_id: string }
         Returns: {

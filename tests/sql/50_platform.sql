@@ -46,7 +46,7 @@ select test.eq(public, false, 'reports bucket private') from storage.buckets whe
 
 -- Realtime publication.
 select test.eq(array_agg(tablename::text order by tablename),
-               array['bookings', 'invoices', 'messages', 'notices', 'reviews', 'subscriptions', 'threads'], 'realtime tables')
+               array['bookings', 'history_reports', 'invoices', 'messages', 'notices', 'reviews', 'subscriptions', 'threads'], 'realtime tables')
 from pg_publication_tables where pubname = 'supabase_realtime' and schemaname = 'public';
 
 -- Logo uploads: only members of that shop, only in the shop's folder; reports never from the browser.
@@ -108,7 +108,7 @@ where grantee = 'anon' and table_schema = 'public' and privilege_type <> 'SELECT
 -- Functions callable from the API are an explicit list (a new RPC must be granted on purpose).
 select test.eq(
   string_agg(p.proname, ', ' order by p.proname) filter (where has_function_privilege('anon', p.oid, 'execute')),
-  'format_sequence_id, get_schema_version, get_staff_invite, is_valid_cui, is_valid_iban, is_valid_postal_code, is_valid_regcom, is_valid_vin, normalize_code, try_uuid',
+  'format_sequence_id, get_schema_version, get_staff_invite, is_valid_cui, is_valid_iban, is_valid_postal_code, is_valid_regcom, is_valid_vin, normalize_code, try_uuid, verify_report',
   'functions callable by anon')
 from pg_proc p where p.pronamespace = 'public'::regnamespace;
 select test.eq(
@@ -117,7 +117,7 @@ select test.eq(
       and not has_function_privilege('anon', p.oid, 'execute')),
   'admin_force_cancel, booking_thread, can_read_booking, can_read_notice, can_read_shop, can_read_thread, cancel_booking, '
   || 'cancel_email_change, check_phone_code, client_no_show_count, complete_job, confirm_booking, create_booking, decide_quote, '
-  || 'decline_booking, export_my_data, get_availability, get_shop_page, get_shop_setup, invite_staff, is_admin, is_shop_member, '
+  || 'decline_booking, export_my_data, get_availability, get_shop_page, get_shop_setup, history_report_preview, invite_staff, is_admin, is_shop_member, '
   || 'is_shop_owner, is_shop_public, last_odometer_for_booking, list_shop_bookings, list_shop_history, list_shop_staff, list_threads, '
   || 'mark_no_show, mark_thread_read, my_phone_verification, my_shop_id, replace_quote, reply_review, report_review, reschedule_booking, save_push_subscription, '
   || 'save_shop_hours, search_cities, search_shops, send_message, send_quote, set_shop_services, shop_cancel_booking, start_inspection, '

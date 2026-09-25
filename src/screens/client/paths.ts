@@ -44,3 +44,20 @@ export function bookingCarHistoryPath(bookingId: string): string {
 export interface VehicleHistoryLinkState {
   from: 'garage' | 'bookings' | 'account';
 }
+
+/** The paid history report (T15, P16e): Cont → Rapoartele mele, and the preview of one car's report. */
+export const MY_REPORTS_PATH = '/c/cont/rapoarte';
+
+export function carReportPath(carId: string): string {
+  return `${GARAGE_PATH}/${carId}/raport`;
+}
+
+/** The report of the car a booking was for (also a car no longer in the garage). */
+export function bookingReportPath(bookingId: string): string {
+  return `${BOOKINGS_PATH}/${bookingId}/raport`;
+}
+
+/** Router state of a link into the report preview: where "Înapoi" leads. */
+export interface ReportLinkState {
+  from: 'history' | 'garage' | 'reports';
+}

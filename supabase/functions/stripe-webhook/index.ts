@@ -8,12 +8,18 @@
 //    first (record_stripe_invoice / record_payment_failed), so a payment reactivates at once.
 // 4. stripe_event_done. Any failure answers 500 and Stripe delivers the event again later.
 //
+// History reports (T15): a paid one-off Checkout with metadata.kind = history_report marks that
+// report paid (mark_history_report_paid) and makes its PDF at once (reportGenerate.ts). If the
+// PDF fails, the event is answered 500 and Stripe's next delivery tries again; the client can
+// also retry from Rapoartele mele (generate-report).
+//
 // Events to send (Stripe → Developers → Webhooks): checkout.session.completed,
 // customer.subscription.created, customer.subscription.updated, customer.subscription.deleted,
 // invoice.paid, invoice.payment_failed.
 import { adminApi } from '../_shared/admin.ts';
-import { stripeConfigFromEnv } from '../_shared/env.ts';
+import { appUrlFromEnv, stripeConfigFromEnv } from '../_shared/env.ts';
 import { json } from '../_shared/http.ts';
+import { generateReport } from '../_shared/reportGenerate.ts';
 import {
   failedInvoice,
   invoiceSubscriptionId,
@@ -53,10 +59,26 @@ async function sync(api: Api, stripe: StripeApi, id: string | null, shopHint: un
   await api.rpc('sync_stripe_subscription', { p_customer: state.customer, p_shop_id: shop, p_sub: state });
 }
 
+/** A paid Checkout for a history report: paid, then its PDF. */
+async function reportPaid(api: Api, session: Obj): Promise<void> {
+  const metadata = (session.metadata ?? {}) as Obj;
+  const report = uuidOrNull(metadata.report_id);
+  if (!report || session.payment_status !== 'paid') return;
+  const row = (await api.rpc('mark_history_report_paid', {
+    p_report_id: report,
+    p_session_id: idOf(session.id),
+    p_amount: typeof session.amount_total === 'number' ? session.amount_total / 100 : null,
+    p_paid_at: typeof session.created === 'number' ? new Date(session.created * 1000).toISOString() : null,
+  })) as Obj | null;
+  if (row && row.status === 'paid') await generateReport(api, row, appUrlFromEnv());
+}
+
 async function handle(api: Api, stripe: StripeApi, type: string, object: Obj): Promise<void> {
   switch (type) {
     case 'checkout.session.completed':
+    case 'checkout.session.async_payment_succeeded':
       if (object.mode === 'subscription') await sync(api, stripe, idOf(object.subscription), object.client_reference_id);
+      else if (object.mode === 'payment' && (object.metadata as Obj | undefined)?.kind === 'history_report') await reportPaid(api, object);
       return;
     case 'customer.subscription.created':
     case 'customer.subscription.updated':

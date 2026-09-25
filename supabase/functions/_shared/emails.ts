@@ -4,7 +4,7 @@
 //
 // Built with tables and inline styles, which is what email programs understand.
 import { formatDate, formatDayMonth, formatMoney, formatTime, type Lang } from './format.ts';
-import { SUBSCRIPTION_PATH } from './templates.ts';
+import { REPORTS_PATH, SUBSCRIPTION_PATH } from './templates.ts';
 
 export interface EmailContent {
   subject: string;
@@ -401,6 +401,33 @@ export function emailForEvent(e: EmailEvent, app: string): EmailContent | null {
           { p: 'Răspunde la acest email dacă vrei să afli de ce sau crezi că e o greșeală.' },
         ],
         footer: 'Primești acest email pentru că ai un cont Service-Hub.',
+      });
+    }
+    case 'report_ready': {
+      // To the client who bought a history report (T15).
+      const en = lang === 'en';
+      const car = [str(p.make), str(p.model)].filter(Boolean).join(' ') || (en ? 'your car' : 'mașina ta');
+      const plate = str(p.plate);
+      const code = str(p.code);
+      const rows: [string, string][] = [[en ? 'Car' : 'Mașina', plate ? `${car} · ${plate}` : car]];
+      if (code) rows.push([en ? 'Report code' : 'Codul raportului', code]);
+      return email(en ? `Your history report is ready: ${code}` : `Raportul de istoric e gata: ${code}`, {
+        lang,
+        preheader: en ? 'Download it anytime from My reports, free.' : 'Îl descarci oricând din Rapoartele mele, gratuit.',
+        title: en ? 'Your report is ready' : 'Raportul e gata',
+        blocks: [
+          { p: en ? `Thank you. The history report for ${car} is ready.` : `Mulțumim. Raportul de istoric pentru ${car} e gata.` },
+          { rows },
+          {
+            p: en
+              ? 'Download it from Account → My reports, as often as you like. A buyer can check the code on the verification page, without an account.'
+              : 'Îl descarci din Cont → Rapoartele mele, de câte ori vrei. Cumpărătorul poate verifica codul pe pagina de verificare, fără cont.',
+          },
+        ],
+        button: { label: en ? 'Open My reports' : 'Deschide Rapoartele mele', url: `${app}${REPORTS_PATH}` },
+        footer: en
+          ? 'You are receiving this email because you bought a report on Service-Hub.'
+          : 'Primești acest email pentru că ai cumpărat un raport pe Service-Hub.',
       });
     }
     default:

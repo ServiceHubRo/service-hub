@@ -474,3 +474,12 @@ verify_jwt = false
 # Called by Stripe, which signs every request (checked with STRIPE_WEBHOOK_SECRET).
 [functions.stripe-webhook]
 verify_jwt = false
+
+[functions.report-checkout]
+verify_jwt = false
+
+[functions.generate-report]
+verify_jwt = false
+
+[functions.report-download]
+verify_jwt = false

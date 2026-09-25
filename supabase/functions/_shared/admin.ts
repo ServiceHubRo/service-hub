@@ -66,6 +66,24 @@ export function adminApi() {
         string,
         unknown
       >[],
+    /** Stores a file in a Storage bucket (replacing one already there), as the service role. */
+    async upload(bucket: string, path: string, bytes: Uint8Array, contentType: string): Promise<void> {
+      const res = await fetch(`${url}/storage/v1/object/${bucket}/${path}`, {
+        method: 'POST',
+        headers: { apikey: key, Authorization: `Bearer ${key}`, 'Content-Type': contentType, 'x-upsert': 'true' },
+        body: bytes,
+      });
+      if (!res.ok) throw new AdminError(res.status, `storage upload: ${(await res.text()).slice(0, 200)}`);
+    },
+    /** Reads a file from a Storage bucket, as the service role; null when it is not there. */
+    async download(bucket: string, path: string): Promise<Uint8Array | null> {
+      const res = await fetch(`${url}/storage/v1/object/${bucket}/${path}`, {
+        headers: { apikey: key, Authorization: `Bearer ${key}` },
+      });
+      if (res.status === 404 || res.status === 400) return null;
+      if (!res.ok) throw new AdminError(res.status, `storage download: ${(await res.text()).slice(0, 200)}`);
+      return new Uint8Array(await res.arrayBuffer());
+    },
     deleteUser: (id: string) => request('DELETE', `/auth/v1/admin/users/${id}`),
     updateUser: (id: string, attributes: Record<string, unknown>) =>
       request('PUT', `/auth/v1/admin/users/${id}`, attributes),
