@@ -236,7 +236,7 @@ export function SignUpForm({
         }}
         error={errors.password}
       />
-      <div>
+      <div id="signup-terms">
         <Checkbox
           checked={terms}
           aria-invalid={errors.terms ? true : undefined}

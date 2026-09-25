@@ -197,3 +197,15 @@ describe('calls', () => {
     expect(await lastOdometerForBooking('b')).toBeNull();
   });
 });
+
+describe('admin form errors (T16a)', () => {
+  it('names the field the database refused', () => {
+    expect(rpcErrorMessage('ro', pgError('field_invalid', '{"field":"iban"}'))).toBe('Verifică câmpul „IBAN”: valoarea nu e validă.');
+    expect(rpcErrorMessage('en', pgError('field_invalid', '{"field":"daily_capacity"}'))).toBe(
+      'Check the “Cars per day” field: the value is not valid.',
+    );
+    expect(rpcErrorMessage('ro', pgError('field_invalid', '{"field":"unknown"}'))).toBe(
+      'O valoare nu e validă. Verifică datele și încearcă din nou.',
+    );
+  });
+});

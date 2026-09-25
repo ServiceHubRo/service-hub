@@ -135,10 +135,15 @@ function StatusCard({ data, view }: { data: SubscriptionData; view: Subscription
       text = sub.next_payment_attempt ? t('sub.pastDue', { date: date(sub.next_payment_attempt) }) : t('sub.pastDueNoDate');
       break;
     case 'cancelled':
-      text = t('sub.cancelled');
+      text = sub.ended_reason === 'admin' ? t('sub.inactiveAdmin') : t('sub.cancelled');
       break;
     default:
-      text = sub.ended_reason === 'payment_failed' ? t('sub.inactivePayment') : t('sub.inactive');
+      text =
+        sub.ended_reason === 'payment_failed'
+          ? t('sub.inactivePayment')
+          : sub.ended_reason === 'admin'
+            ? t('sub.inactiveAdmin')
+            : t('sub.inactive');
   }
 
   const inTrial = view.daysLeft !== null && view.trialDays !== null;

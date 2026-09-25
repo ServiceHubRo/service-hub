@@ -84,18 +84,31 @@ test('sign-up refuses missing data with a specific message per field', async ({ 
   await expect(page.getByText('Scrie numele.')).toHaveCount(0);
 });
 
-test('the terms open in place and the form keeps what was typed', async ({ page }) => {
+test('the terms open as a screen of their own and the form keeps what was typed', async ({ page }) => {
   await page.goto('/cont-nou');
   await page.getByLabel('Nume și prenume').fill('Maria Pop');
   await page.getByRole('button', { name: 'Termenii și condițiile' }).click();
-  await expect(page).toHaveURL(/\/cont-nou$/);
+  await expect(page).toHaveURL(/\/cont-nou\?document=termeni$/);
   await expect(page.getByRole('heading', { level: 1, name: 'Termeni și condiții' })).toBeVisible();
   await expect(page.getByRole('heading', { name: '1. Ce este Service-Hub' })).toBeVisible();
+  // Nothing of the form under the document, even at the very end of it.
+  await expect(page.getByLabel('Nume și prenume')).toBeHidden();
+  await expect(page.getByRole('button', { name: 'Creează cont' })).toBeHidden();
+  await expect(page.getByRole('tab', { name: 'Cont nou' })).toBeHidden();
   await expectNoHorizontalScroll(page);
-  await shot(page, 'auth-terms-inline', name());
-  await page.getByRole('button', { name: 'Înapoi la formular' }).first().click();
+  await shot(page, 'auth-terms-screen', name());
+  await page.getByRole('button', { name: 'Înapoi la formular' }).last().click();
+  await expect(page).toHaveURL(/\/cont-nou$/);
   await expect(page.getByLabel('Nume și prenume')).toHaveValue('Maria Pop');
   await expect(page.getByRole('checkbox')).not.toBeChecked();
+  await expect(page.getByRole('checkbox')).toBeFocused();
+
+  // The phone's Back gesture closes the document too, and the form is still filled in.
+  await page.getByRole('button', { name: 'Politica de confidențialitate' }).click();
+  await expect(page.getByRole('heading', { level: 1, name: 'Politica de confidențialitate' })).toBeVisible();
+  await page.goBack();
+  await expect(page).toHaveURL(/\/cont-nou$/);
+  await expect(page.getByLabel('Nume și prenume')).toHaveValue('Maria Pop');
 });
 
 test('legal documents are public, with tables and headings', async ({ page }) => {

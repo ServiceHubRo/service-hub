@@ -6,6 +6,8 @@ import { Wordmark } from '../components/Wordmark';
 import { useI18n } from '../i18n/context';
 import { plural, type PluralUnit } from '../i18n/translate';
 import { quotesWaiting } from '../lib/clientBookings';
+import { useOptionalAdminCounts } from '../screens/admin/adminContext';
+import { ADMIN_MODERATION_PATH } from '../screens/admin/paths';
 import { useOptionalClientBookings } from '../screens/client/bookings/clientBookingsContext';
 import { BOOKINGS_PATH } from '../screens/client/paths';
 import { useOptionalShopBookings } from '../screens/shop/bookings/shopBookingsContext';
@@ -58,13 +60,18 @@ interface Badge {
 
 /**
  * Counts shown on navigation items: new booking requests on the shop's Programări, quotes waiting
- * for a decision on the client's, conversations with unread messages on Mesaje (both).
+ * for a decision on the client's, conversations with unread messages on Mesaje (both), reported
+ * reviews waiting on the admin's Moderare.
  */
 function useNavBadges(): Record<string, Badge> {
   const shopBookings = useOptionalShopBookings();
   const clientBookings = useOptionalClientBookings();
   const threads = useOptionalThreads();
+  const admin = useOptionalAdminCounts();
   const badges: Record<string, Badge> = {};
+  if (admin?.pendingReports != null) {
+    badges[ADMIN_MODERATION_PATH] = { count: admin.pendingReports, unit: 'unit.reportsPending' };
+  }
   if (shopBookings?.state.status === 'ready') {
     const count = shopBookings.state.data.bookings.filter((b) => b.status === 'pending').length;
     badges[SHOP_BOOKINGS_PATH] = { count, unit: 'unit.newRequests' };

@@ -1,0 +1,469 @@
+/* Admin interface (T16a): single-column lists, detail sections, stat cards, inline actions. */
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+}
+
+.sub {
+  color: var(--muted);
+  font-size: 13.5px;
+}
+
+.muted {
+  color: var(--muted);
+  font-size: 13.5px;
+  overflow-wrap: anywhere;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sectionTitle {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-top: 6px;
+}
+
+.controls {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* ---------------------------------------------------------------- list rows (whole row is a link) */
+.row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: var(--tap);
+  padding: 12px var(--card-pad);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  color: var(--text);
+  text-decoration: none;
+}
+
+.row:hover {
+  border-color: var(--border-lit);
+}
+
+.rowMain {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.rowTop {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px 8px;
+}
+
+.rowTitle {
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.rowMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 12px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.chevron {
+  color: var(--muted);
+  flex-shrink: 0;
+}
+
+.id {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+/* ---------------------------------------------------------------- pills */
+.pill {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 3px 9px;
+  border-radius: var(--radius-pill);
+  white-space: nowrap;
+}
+
+.amber {
+  color: var(--amber);
+  background: var(--amber-soft);
+}
+
+.green {
+  color: var(--green);
+  background: var(--green-soft);
+}
+
+.blue {
+  color: var(--blue);
+  background: var(--blue-soft);
+}
+
+.red {
+  color: var(--red);
+  background: var(--red-soft);
+}
+
+.greyPill {
+  color: var(--muted);
+  background: var(--muted-soft);
+}
+
+/* ---------------------------------------------------------------- verification marks (icon + text) */
+.checks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 12px;
+  font-size: 13px;
+}
+
+.check {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.ok {
+  color: var(--green);
+}
+
+.no {
+  color: var(--amber);
+}
+
+/* ---------------------------------------------------------------- stat cards */
+.stats {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+@media (min-width: 768px) {
+  .stats {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.stats li {
+  display: flex;
+}
+
+.stat {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-height: 84px;
+  padding: 10px 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  color: var(--text);
+  text-decoration: none;
+}
+
+a.stat:hover {
+  border-color: var(--border-lit);
+}
+
+.statNumber {
+  font-family: var(--font-display);
+  font-size: 30px;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.statLabel {
+  font-size: 12.5px;
+  color: var(--muted);
+  line-height: 1.3;
+}
+
+.statAlert {
+  border-color: var(--amber-line);
+}
+
+.breakdown {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  margin-top: 4px;
+  font-size: 12.5px;
+  color: var(--muted);
+}
+
+/* ---------------------------------------------------------------- facts (label : value) */
+.facts {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+  gap: 6px 12px;
+  font-size: 14px;
+}
+
+.facts dt {
+  color: var(--muted);
+}
+
+.facts dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+  min-width: 0;
+}
+
+.cardHead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.cardTitle {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  font-size: 19px;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.link {
+  color: var(--amber);
+}
+
+/* ---------------------------------------------------------------- actions */
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.actions > * {
+  flex: 1 1 200px;
+}
+
+.danger {
+  color: var(--red);
+}
+
+.warning {
+  color: var(--amber);
+  font-size: 13.5px;
+}
+
+.panelButtons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.panelButtons > * {
+  flex: 1 1 160px;
+}
+
+.fields {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 10px;
+}
+
+@media (min-width: 768px) {
+  .fields {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.fieldsTitle {
+  grid-column: 1 / -1;
+  font-weight: 700;
+  margin-top: 4px;
+}
+
+.full {
+  grid-column: 1 / -1;
+}
+
+/* ---------------------------------------------------------------- audit entries */
+.audit {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.auditItem {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  font-size: 13.5px;
+  min-width: 0;
+}
+
+.auditHead {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 4px 10px;
+}
+
+.auditAction {
+  font-weight: 700;
+}
+
+.change {
+  overflow-wrap: anywhere;
+}
+
+.changeKey {
+  color: var(--muted);
+}
+
+.arrow {
+  color: var(--muted);
+  padding: 0 4px;
+}
+
+/* ---------------------------------------------------------------- reviews and messages */
+.quote {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.reply {
+  border-left: 3px solid var(--border-lit);
+  padding-left: 10px;
+  color: var(--muted);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.messages {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.msg {
+  max-width: 85%;
+  padding: 8px 12px;
+  border-radius: 12px;
+  background: var(--surface2);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow-wrap: anywhere;
+}
+
+.msgClient {
+  align-self: flex-start;
+}
+
+.msgShop {
+  align-self: flex-end;
+  background: var(--amber-tint);
+}
+
+.msgSystem {
+  align-self: center;
+  max-width: 100%;
+  background: transparent;
+  border: 1px dashed var(--border-lit);
+  text-align: center;
+  color: var(--muted);
+}
+
+.msgWho {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.msgBody {
+  white-space: pre-wrap;
+}
+
+.lines {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 14px;
+}
+
+.line {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.lineRefused {
+  color: var(--muted);
+  text-decoration: line-through;
+}
+
+.money {
+  font-family: var(--font-mono);
+  white-space: nowrap;
+}
+
+.overdue {
+  color: var(--red);
+  font-weight: 700;
+}
+
+.dates {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 10px;
+}
+
+@media (min-width: 768px) {
+  .dates {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.more {
+  align-self: center;
+}

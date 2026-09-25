@@ -1748,6 +1748,34 @@ export type Database = {
       }
     }
     Functions: {
+      account_email: { Args: { p_user_id: string }; Returns: string }
+      admin_account_deletion: {
+        Args: { p_admin_id: string; p_user_id: string }
+        Returns: string
+      }
+      admin_audit: {
+        Args: {
+          p_action: string
+          p_after: Json
+          p_before: Json
+          p_entity_id: string
+          p_entity_type: string
+        }
+        Returns: undefined
+      }
+      admin_decide_review: {
+        Args: {
+          p_decision: string
+          p_note: string
+          p_request_id: string
+          p_review_id: string
+        }
+        Returns: Json
+      }
+      admin_extend_trial: {
+        Args: { p_days: number; p_request_id: string; p_shop_id: string }
+        Returns: Json
+      }
       admin_force_cancel: {
         Args: { p_booking_id: string; p_reason: string; p_request_id: string }
         Returns: {
@@ -1788,7 +1816,75 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      admin_get_booking: { Args: { p_booking_id: string }; Returns: Json }
+      admin_get_client: { Args: { p_user_id: string }; Returns: Json }
+      admin_get_shop: { Args: { p_shop_id: string }; Returns: Json }
+      admin_get_thread: { Args: { p_thread_id: string }; Returns: Json }
+      admin_list_audit: {
+        Args: { p_before?: string; p_limit?: number }
+        Returns: Json
+      }
+      admin_list_bookings: {
+        Args: {
+          p_client_id?: string
+          p_from?: string
+          p_limit?: number
+          p_q?: string
+          p_shop_id?: string
+          p_statuses?: string[]
+          p_to?: string
+        }
+        Returns: Json
+      }
+      admin_list_clients: { Args: never; Returns: Json }
+      admin_list_reviews: { Args: { p_q?: string }; Returns: Json }
+      admin_list_shops: { Args: never; Returns: Json }
+      admin_overview: { Args: never; Returns: Json }
+      admin_review_json: {
+        Args: { p_review: Database["public"]["Tables"]["reviews"]["Row"] }
+        Returns: Json
+      }
+      admin_set_account_suspended: {
+        Args: {
+          p_reason: string
+          p_request_id: string
+          p_suspended: boolean
+          p_user_id: string
+        }
+        Returns: Json
+      }
+      admin_set_shop_suspended: {
+        Args: {
+          p_reason: string
+          p_request_id: string
+          p_shop_id: string
+          p_suspended: boolean
+        }
+        Returns: Json
+      }
+      admin_set_subscription_status: {
+        Args: { p_request_id: string; p_shop_id: string; p_status: string }
+        Returns: Json
+      }
+      admin_thread_messages: { Args: { p_thread_id: string }; Returns: Json }
+      admin_update_shop: {
+        Args: {
+          p_billing: Json
+          p_request_id: string
+          p_shop: Json
+          p_shop_id: string
+        }
+        Returns: Json
+      }
+      admin_verify_phone: {
+        Args: { p_request_id: string; p_user_id: string }
+        Returns: Json
+      }
       app_limit: { Args: { p_default: number; p_key: string }; Returns: number }
+      audit_entries: {
+        Args: { p_entity_ids: string[]; p_limit?: number }
+        Returns: Json
+      }
       begin_history_report: {
         Args: {
           p_booking_id: string
@@ -2216,6 +2312,10 @@ export type Database = {
       is_valid_postal_code: { Args: { p: string }; Returns: boolean }
       is_valid_regcom: { Args: { p: string }; Returns: boolean }
       is_valid_vin: { Args: { p: string }; Returns: boolean }
+      jsonb_changes: {
+        Args: { p_after: Json; p_before: Json; p_keys: string[] }
+        Returns: Json
+      }
       kick_dispatcher: { Args: never; Returns: boolean }
       last_odometer_for_booking: {
         Args: { p_booking_id: string }
@@ -2225,6 +2325,7 @@ export type Database = {
         Args: { p_plate_norm: string }
         Returns: number
       }
+      last_seen: { Args: { p_user_id: string }; Returns: string }
       list_shop_bookings: { Args: never; Returns: Json }
       list_shop_history: { Args: never; Returns: Json }
       list_shop_staff: { Args: never; Returns: Json }
@@ -2565,6 +2666,34 @@ export type Database = {
         Args: { p_request_id: string; p_result: Json }
         Returns: undefined
       }
+      require_admin: {
+        Args: never
+        Returns: {
+          created_at: string
+          deleted_at: string | null
+          display_id: string
+          email_verified_at: string | null
+          id: string
+          lang: string
+          last_active_at: string | null
+          location_prompt_dismissed_at: string | null
+          name: string | null
+          phone: string | null
+          phone_verified_at: string | null
+          phone_verified_by_admin: boolean
+          push_prompt_dismissed_at: string | null
+          role: string
+          suspended: boolean
+          terms_accepted_at: string | null
+          terms_version: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "profiles"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       require_caller: {
         Args: never
         Returns: {
@@ -2823,6 +2952,8 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      shop_hidden_reasons: { Args: { p_shop_id: string }; Returns: string[] }
+      shop_state: { Args: { p_shop_id: string }; Returns: string }
       slot_starts_at: {
         Args: { p_date: string; p_slot: string }
         Returns: string
@@ -2990,6 +3121,7 @@ export type Database = {
         Args: { p_request_id: string; p_shop_id: string }
         Returns: boolean
       }
+      touch_last_active: { Args: never; Returns: undefined }
       try_uuid: { Args: { p: string }; Returns: string }
       vehicle_key: { Args: { p_car: Json }; Returns: string }
       verify_phone_manually: { Args: { p_email: string }; Returns: string }

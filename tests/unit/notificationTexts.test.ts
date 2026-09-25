@@ -61,6 +61,7 @@ const SAMPLE: Record<string, Record<string, unknown>> = {
   trial_ending: { days: 7, expiry: '2026-10-20', price: 100 },
   payment_failed: { total: 100, final: false, expiry: '2026-10-16' },
   shop_inactive: { reason: 'trial_ended' },
+  review_report_decided: { review_id: 'r-1', rating: 1, decision: 'removed' },
 };
 
 const render = (event: string, role: 'client' | 'shop', lang: 'ro' | 'en', extra: Record<string, unknown> = {}) =>
@@ -175,6 +176,23 @@ describe('notification texts', () => {
     expect(render('quote_expired', 'shop', 'ro')!.url).toBe('/s/istoric?q=P-000123');
     expect(render('booking_cancelled_client', 'shop', 'en')!.body).toBe('Ana Marin canceled booking P-000123 on Wed, Oct 14, 10:00.');
     expect(render('new_review', 'shop', 'ro')).toMatchObject({ body: 'Ana Marin ți-a dat 5 din 5 stele.', url: '/s/cont/recenzii' });
+  });
+
+  it('tells both sides how a reported review was decided (T16a)', () => {
+    expect(render('review_report_decided', 'shop', 'ro')).toMatchObject({
+      title: 'Recenzia raportată a fost ștearsă',
+      body: 'Am șters recenzia pentru P-000123 (1 din 5 stele). Nu mai apare și nu mai contează la medie.',
+      url: '/s/cont/recenzii',
+      tag: 'review-r-1',
+    });
+    expect(render('review_report_decided', 'shop', 'en', { decision: 'kept' })!.title).toBe('The review stays up');
+    expect(render('review_report_decided', 'client', 'ro')).toMatchObject({
+      body: 'Echipa Service-Hub a șters recenzia ta pentru Atelier Unu (P-000123), pentru că nu respectă regulile platformei.',
+      url: '/c/programari?p=b-1',
+    });
+    expect(render('shop_inactive', 'shop', 'ro', { reason: 'admin' })!.body).toBe(
+      'Echipa Service-Hub a oprit abonamentul. Scrie-ne dacă ai întrebări. Datele tale rămân.',
+    );
   });
 
   it('the daily summary counts in both languages', () => {

@@ -14,8 +14,8 @@ export function subscribeRows<Row extends Record<string, unknown>>(options: {
   /** Names the screen and user, e.g. `client-bookings:<uid>` (a counter is added to it). */
   channel: string;
   table: string;
-  /** PostgREST-style filter, e.g. `client_id=eq.<uid>`. */
-  filter: string;
+  /** PostgREST-style filter, e.g. `client_id=eq.<uid>`; none for the admin's platform-wide lists. */
+  filter?: string;
   onChange: (payload: RealtimePostgresChangesPayload<Row>) => void;
   onResync: () => void;
 }): () => void {
@@ -27,8 +27,10 @@ export function subscribeRows<Row extends Record<string, unknown>>(options: {
   sequence += 1;
   const channel = client
     .channel(`${options.channel}:${sequence}`)
-    .on<Row>('postgres_changes', { event: '*', schema: 'public', table: options.table, filter: options.filter }, (payload) =>
-      options.onChange(payload),
+    .on<Row>(
+      'postgres_changes',
+      { event: '*', schema: 'public', table: options.table, ...(options.filter ? { filter: options.filter } : {}) },
+      (payload) => options.onChange(payload),
     )
     // "SUBSCRIBED" only means the channel was joined; database changes flow from the moment the
     // server sends this message (seconds later on a cold server), and earlier ones are lost.

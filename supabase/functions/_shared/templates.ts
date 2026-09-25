@@ -90,6 +90,10 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
     'client.doc_expiry_today': { title: '{car}', body: '{doc} expiră azi.' },
     'client.doc_expiry_past': { title: '{car}', body: '{doc} a expirat pe {expiry}.' },
     'client.report_ready': { title: 'Raportul e gata', body: 'Raportul de istoric pentru {car_plate} e gata de descărcat. Cod: {code}.' },
+    'client.review_report_decided': {
+      title: 'Recenzie ștearsă',
+      body: 'Echipa Service-Hub a șters recenzia ta pentru {shop} ({ref}), pentru că nu respectă regulile platformei.',
+    },
     // ------------------------------------------------------------------ to the shop
     'shop.booking_requested': { title: 'Cerere nouă', body: '{client}: {service}, {when}. {car_plate}.' },
     'shop.booking_cancelled_client': { title: 'Programare anulată', body: '{client} a anulat programarea {ref} din {when}.' },
@@ -150,6 +154,18 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
       title: 'Service-ul nu mai apare în căutări',
       body: 'Abonamentul s-a încheiat. Îl poți reactiva oricând din Abonament. Datele tale rămân.',
     },
+    'shop.shop_inactive_admin': {
+      title: 'Service-ul nu mai apare în căutări',
+      body: 'Echipa Service-Hub a oprit abonamentul. Scrie-ne dacă ai întrebări. Datele tale rămân.',
+    },
+    'shop.review_report_decided': {
+      title: 'Recenzia rămâne publicată',
+      body: 'Am verificat recenzia raportată pentru {ref} ({rating} din 5 stele). Respectă regulile, așa că rămâne publicată.',
+    },
+    'shop.review_report_decided_removed': {
+      title: 'Recenzia raportată a fost ștearsă',
+      body: 'Am șters recenzia pentru {ref} ({rating} din 5 stele). Nu mai apare și nu mai contează la medie.',
+    },
   },
   en: {
     // ------------------------------------------------------------------ to the client
@@ -188,6 +204,10 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
     'client.doc_expiry_today': { title: '{car}', body: 'The {doc} expires today.' },
     'client.doc_expiry_past': { title: '{car}', body: 'The {doc} expired on {expiry}.' },
     'client.report_ready': { title: 'Your report is ready', body: 'The history report for {car_plate} is ready to download. Code: {code}.' },
+    'client.review_report_decided': {
+      title: 'Review removed',
+      body: 'The Service-Hub team removed your review of {shop} ({ref}) because it breaks the platform rules.',
+    },
     // ------------------------------------------------------------------ to the shop
     'shop.booking_requested': { title: 'New request', body: '{client}: {service}, {when}. {car_plate}.' },
     'shop.booking_cancelled_client': { title: 'Booking canceled', body: '{client} canceled booking {ref} on {when}.' },
@@ -248,6 +268,18 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
       title: 'Your shop is no longer in search',
       body: 'Your subscription has ended. You can reactivate it anytime under Subscription. Your data is kept.',
     },
+    'shop.shop_inactive_admin': {
+      title: 'Your shop is no longer in search',
+      body: 'The Service-Hub team stopped your subscription. Write to us if you have questions. Your data is kept.',
+    },
+    'shop.review_report_decided': {
+      title: 'The review stays up',
+      body: 'We checked the review you reported for {ref} ({rating} of 5 stars). It follows the rules, so it stays published.',
+    },
+    'shop.review_report_decided_removed': {
+      title: 'The reported review was removed',
+      body: 'We removed the review for {ref} ({rating} of 5 stars). It no longer shows and no longer counts toward your rating.',
+    },
   },
 };
 
@@ -305,11 +337,12 @@ export const EVENTS: Record<Side, readonly string[]> = {
     'booking_confirmed', 'booking_declined', 'booking_rescheduled', 'booking_cancelled_shop', 'booking_cancelled_admin',
     'no_show', 'inspection_started', 'quote_sent', 'quote_replaced', 'quote_withdrawn', 'quote_expiring', 'quote_expired',
     'work_started', 'job_done', 'appointment_reminder', 'new_message', 'review_reply', 'doc_expiry', 'report_ready',
+    'review_report_decided',
   ],
   shop: [
     'booking_requested', 'booking_cancelled_client', 'booking_cancelled_admin', 'quote_accepted',
     'quote_partially_accepted', 'quote_refused', 'quote_expiring', 'quote_expired', 'new_message', 'new_review',
-    'daily_digest', 'trial_ending', 'payment_failed', 'shop_inactive',
+    'daily_digest', 'trial_ending', 'payment_failed', 'shop_inactive', 'review_report_decided',
   ],
 };
 
@@ -430,7 +463,15 @@ export function templateKey(side: Side, e: NotificationEvent): string {
     case 'payment_failed':
       return p.final === true || !str(p.expiry) ? `${base}_final` : base;
     case 'shop_inactive':
-      return p.reason === 'payment_failed' ? `${base}_payment` : p.reason === 'cancelled' ? `${base}_cancelled` : base;
+      return p.reason === 'payment_failed'
+        ? `${base}_payment`
+        : p.reason === 'cancelled'
+          ? `${base}_cancelled`
+          : p.reason === 'admin'
+            ? `${base}_admin`
+            : base;
+    case 'review_report_decided':
+      return side === 'shop' && p.decision === 'removed' ? `${base}_removed` : base;
     default:
       return base;
   }
@@ -457,6 +498,7 @@ export function urlFor(side: Side, e: NotificationEvent): string {
     case 'new_message':
       return str(p.thread_id) ? `/s/mesaje/${str(p.thread_id)}` : '/s/mesaje';
     case 'new_review':
+    case 'review_report_decided':
       return '/s/cont/recenzii';
     case 'daily_digest':
       return '/s/panou';
@@ -487,6 +529,7 @@ function tagFor(e: NotificationEvent): string {
     case 'daily_digest':
       return `digest-${str(p.date)}`;
     case 'new_review':
+    case 'review_report_decided':
       return `review-${str(p.review_id)}`;
     case 'report_ready':
       return `report-${str(p.report_id)}`;

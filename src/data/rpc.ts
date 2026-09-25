@@ -2,7 +2,7 @@ import type { Database, Json } from './database.types';
 import { reportSessionLost } from './sessionEvents';
 import { supabase } from './supabase';
 import { formatKm } from '../i18n/format';
-import type { MessageKey } from '../i18n/ro';
+import { ro, type MessageKey } from '../i18n/ro';
 import { plural, translate, type Lang } from '../i18n/translate';
 
 /**
@@ -38,8 +38,11 @@ export const RPC_ERROR_CODES = [
   'car_year_invalid',
   'cost_invalid',
   'day_full',
+  'days_invalid',
+  'decision_invalid',
   'email_invalid',
   'email_not_verified',
+  'field_invalid',
   'hours_close_before_open',
   'hours_invalid',
   'invalid_slot',
@@ -94,6 +97,8 @@ export const RPC_ERROR_CODES = [
   'shop_unavailable',
   'slot_full',
   'staff_exists',
+  'status_invalid',
+  'subscription_in_stripe',
   'thread_not_found',
   'too_early',
   'too_far',
@@ -197,6 +202,13 @@ export function rpcErrorMessage(lang: Lang, error: unknown): string {
       return translate(lang, 'rpcError.hours_close_before_open', {
         day: translate(lang, `weekday.${num(p.weekday) ?? 1}` as MessageKey),
       });
+    case 'field_invalid': {
+      // The admin's shop form (T16a): the field's own label when there is one.
+      const key = `admin.field.${typeof p.field === 'string' ? p.field : ''}`;
+      return key in ro
+        ? translate(lang, 'rpcError.field_invalid_named', { field: translate(lang, key as MessageKey) })
+        : translate(lang, 'rpcError.field_invalid');
+    }
     case 'quote_item_invalid':
       return num(p.position) === null
         ? translate(lang, 'rpcError.quote_item_invalid')

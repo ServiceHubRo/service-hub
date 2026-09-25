@@ -452,6 +452,9 @@ enabled = true
 [functions.delete-account]
 verify_jwt = false
 
+[functions.admin-delete-account]
+verify_jwt = false
+
 [functions.geocode]
 verify_jwt = false
 
