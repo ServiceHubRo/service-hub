@@ -205,6 +205,6 @@ test.describe('email and SMS', () => {
       body: JSON.stringify({ email }),
     });
     const reset = await latestEmail(email, /^Resetează parola Service-Hub$/);
-    expect(reset.text).toContain('Ai cerut o parolă nouă');
+    expect(reset.text).toContain('Ai cerut resetarea parolei');
   });
 });
