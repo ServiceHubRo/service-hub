@@ -8,7 +8,7 @@ Nu lipești nicio cheie în chat — doar în locurile scrise aici.
 | 1 | Sentry: afli singur când se strică ceva | T19a |
 | 2 | Proiectul de test: linkurile de test nu mai ating datele reale | T19a |
 | 3 | Documentele legale | T19b |
-| 4 | Domeniul service-hub.ro, plățile reale, contul de admin, copiile de siguranță | T19c |
+| 4 | Copiile de siguranță, plățile reale, CAPTCHA, domeniul service-hub.ro, contul de admin | T19e (după T19c) |
 | 5 | Ștergerea conturilor de test: numerele încep de la 1 | chiar înainte de lansare |
 
 ---
@@ -150,6 +150,124 @@ Confidențialitatea spune că rapoartele de erori se păstrează „cel mult 90 
 **Verifici:** pe linkul de test deschide `/legal/termeni`: vezi datele firmei (fără chenare portocalii), apoi apasă **English** și vezi „Terms and Conditions”.
 
 **După forma finală:** spune-i lui Claude ce a schimbat avocatul. Claude actualizează fișierele și versiunea termenilor (`TERMS_VERSION`), ca să știi ce versiune a acceptat fiecare cont.
+
+---
+
+## Partea 4 — Lansarea: copiile de siguranță, plățile reale, CAPTCHA, domeniul, adminul
+
+Fă pașii în ordinea de mai jos, într-o zi liniștită (durează cam 2 ore, plus așteptarea domeniului). Fiecare pas are „Verifici”.
+
+**Înainte de toate: Partea 2 trebuie să fie gata** (proiectul de test). Pașii de aici schimbă doar proiectul **real** și site-ul publicat; fără proiectul de test, linkurile de test ar folosi și ele cheile reale Stripe și CAPTCHA-ul.
+
+Unde apare „proiectul real” mai jos: în Supabase, proiectul de acum (nu `service-hub-test`). Adresa lui e `https://ABC.supabase.co`, unde `ABC` e **ref-ul** (îl vezi în **Project Settings → General → Project ID**).
+
+### 4.1 Copiile de siguranță (decizia ta, costă bani)
+
+Pe planul gratuit Supabase **nu face copii de siguranță**: dacă se șterge ceva din greșeală, nu se mai poate recupera. Planul **Pro** (25 $/lună) face o copie în fiecare zi și le păstrează 7 zile. Recomandarea mea: Pro din ziua lansării.
+
+1. Supabase → sus, stânga, numele organizației → **Billing** (sau **Organization settings → Billing**) → **Change subscription plan** → **Pro** → cardul firmei → **Confirm**.
+2. **Atenție la proiectul de test:** planul se plătește pe organizație, iar fiecare proiect în plus dintr-o organizație Pro costă aproximativ 10 $/lună. Ca proiectul de test să rămână gratuit, mută-l într-o organizație separată, gratuită: sus, stânga → **New organization** (Free) → apoi în **service-hub-test → Project Settings → General → Transfer project** → organizația nouă. Linkurile și cheile nu se schimbă.
+
+**Verifici:** în proiectul real → **Database → Backups** apare prima copie a doua zi.
+
+### 4.2 Plățile reale (Stripe)
+
+Până acum Stripe a mers în **modul de test** (carduri de probă). Acum proiectul real primește cheile reale; proiectul de test rămâne pe cheile de test.
+
+**a) Contul Stripe activat.** Stripe → **Activate payments** (sau bannerul „Activate your account”): datele firmei, reprezentantul, contul bancar (IBAN-ul în lei al firmei). Stripe verifică datele (de obicei câteva minute, uneori 1–2 zile).
+
+**b) Produsele, în modul real.** Oprește comutatorul **Test mode** (sus, dreapta). Apoi **Product catalog → Add product**:
+
+| Produs | Preț | Ce copiezi |
+|---|---|---|
+| `Abonament Service-Hub` | **149** RON, **Recurring**, **Monthly** | ID-ul prețului (`price_…`) → `STRIPE_PRICE_ID` |
+| `Cont angajat` | **19** RON, **Recurring**, **Monthly** | ID-ul prețului (`price_…`) → `STRIPE_SEAT_PRICE_ID` |
+
+Prețul de lansare (99 lei), plata pe 3 / 6 / 12 luni cu reducere și prețul fixat al fiecărui service se calculează singure din aceste două produse, după Setări platformă. Raportul de istoric (29 lei) nu are nevoie de produs.
+
+**c) Portalul clientului, în modul real** (setarea din modul de test nu se copiază): **Settings → Billing → Customer portal** → **Activate link** → bifează: actualizarea cardului, istoricul facturilor, **anularea abonamentului la sfârșitul perioadei** → **Save**.
+
+**d) Chitanțele și datele publice:** **Settings → Business → Public details**: numele `Service-Hub`, emailul de suport `contact@service-hub.ro`, descrierea de pe extras `SERVICE-HUB`. **Settings → Customer emails**: bifează **Successful payments**.
+
+**e) Webhook-ul real:** **Developers → Webhooks → Add endpoint**:
+- URL: `https://ABC.supabase.co/functions/v1/stripe-webhook` (ref-ul proiectului real);
+- evenimentele: `checkout.session.completed`, `checkout.session.async_payment_succeeded`, `customer.subscription.created`, `customer.subscription.updated`, `customer.subscription.deleted`, `invoice.paid`, `invoice.payment_failed` → **Add endpoint**;
+- **Signing secret → Reveal** → îl copiezi pentru pasul următor.
+
+**f) Cheile în Supabase.** Proiectul real → **Edge Functions → Secrets**. Înlocuiești valorile (butonul de editare de lângă fiecare):
+
+| Nume | Valoare nouă |
+|---|---|
+| `STRIPE_SECRET_KEY` | **Developers → API keys → Secret key** (modul real, începe cu `sk_live_`) |
+| `STRIPE_PRICE_ID` | prețul de 149 lei de la pasul b |
+| `STRIPE_SEAT_PRICE_ID` | prețul de 19 lei de la pasul b |
+| `STRIPE_WEBHOOK_SECRET` | secretul de la pasul e (`whsec_…`) |
+
+**Verifici (fără să plătești nimic):** pe site-ul publicat fă-ți un service de probă (alt email decât al tău de admin) → **Cont → Setări → Facturare**: datele firmei tale → **Cont → Abonament → Activează abonamentul** → pe pagina Stripe nu se plătește nimic azi (ești în perioada gratuită), doar se salvează cardul → cardul tău real → întors în aplicație vezi „Mulțumim. Cardul este salvat, prima plată se face la sfârșitul perioadei gratuite.” În Stripe (modul real) → **Customers** apare clientul, cu abonamentul „Trialing”. Apoi: Stripe → abonamentul → **Cancel subscription → Immediately**. Service-ul de probă dispare la Partea 5.
+
+### 4.3 CAPTCHA (oprește conturile făcute automat)
+
+Cloudflare Turnstile: o căsuță „Nu sunt robot” care de obicei se bifează singură. Apare la înregistrare, logare și parola uitată, doar pe site-ul publicat. Gratuit.
+
+1. **dash.cloudflare.com** → fă-ți cont (gratuit) → **Turnstile** (în meniul din stânga; uneori sub **Application security**) → **Add widget**:
+   - Widget name: `Service-Hub`;
+   - Hostnames: `service-hub.ro` și `service-hubapp.netlify.app`;
+   - Widget mode: **Managed** → **Create**.
+   Copiezi **Site Key** (publică) și **Secret Key** (secretă).
+2. **Netlify** → `service-hubapp` → **Site configuration → Environment variables → Add a variable**: Key `VITE_TURNSTILE_SITE_KEY`, **Different value for each deploy context** → doar la **Production** pui Site Key; restul le lași goale → **Create variable**. Apoi **Deploys → Trigger deploy → Deploy site** și aștepți să fie gata (2–3 minute).
+3. Abia apoi: **Supabase**, proiectul real → **Authentication → Attack Protection** (în unele versiuni **Bot and Abuse Protection**) → **Enable CAPTCHA protection** → provider **Turnstile** → **Captcha secret**: Secret Key → **Save**.
+
+Ordinea contează: dacă pornești întâi pasul 3, logarea pe site-ul publicat refuză pe toată lumea până se termină pasul 2.
+
+**Verifici:** pe site-ul publicat, la **Intră în cont**, apare căsuța Cloudflare deasupra butonului și logarea merge. Pe un link de test căsuța nu apare (acolo e proiectul de test, fără CAPTCHA).
+
+### 4.4 Domeniul service-hub.ro
+
+Acum `service-hub.ro` arată pagina „în curând”. După pasul ăsta arată aplicația. Emailurile (`contact@service-hub.ro` și cele trimise de aplicație prin Resend) **nu se ating**.
+
+**a) În Netlify:** `service-hubapp` → **Domain management → Add a domain** → `service-hub.ro` → **Verify** → **Add domain**. Netlify adaugă singur și `www.service-hub.ro`. Pe rândul `service-hub.ro` → **Options → Set as primary domain**.
+
+**b) În DNS**, la firma unde ai domeniul (unde ai făcut pagina „în curând” și unde ai pus înregistrările Resend). Recomandarea mea: **păstrezi DNS-ul acolo** și schimbi doar două rânduri, ca emailurile să meargă neîntrerupt:
+
+| Tip | Nume | Valoare | Ce faci |
+|---|---|---|---|
+| `A` | `@` (sau gol, sau `service-hub.ro`) | `75.2.60.5` | înlocuiești valoarea de acum |
+| `AAAA` | `@` | — | **ștergi** rândul, dacă există (altfel o parte din vizitatori văd în continuare pagina veche) |
+| `CNAME` | `www` | `service-hubapp.netlify.app` | înlocuiești (sau adaugi) |
+
+**Nu atinge** rândurile `MX`, `TXT` (SPF, DMARC), `resend._domainkey`, `send` și nimic altceva — de ele depind emailurile. Fă o captură de ecran cu toate rândurile înainte să schimbi ceva.
+
+**c) HTTPS:** după ce DNS-ul s-a propagat (de la câteva minute la câteva ore), Netlify → **Domain management → HTTPS → Verify DNS configuration**, apoi **Provision certificate** dacă nu a pornit singur. Certificatul e gratuit și se reînnoiește singur.
+
+**Verifici:** `https://service-hub.ro` deschide aplicația, cu lacăt în browser; `https://www.service-hub.ro` și `https://service-hubapp.netlify.app` te duc singure pe `https://service-hub.ro`; un email de test către `contact@service-hub.ro` ajunge.
+
+### 4.5 Adresele din Supabase și din emailuri
+
+1. Proiectul real → **Authentication → URL Configuration**:
+   - **Site URL**: `https://service-hub.ro`;
+   - **Redirect URLs → Add URL**: `https://service-hub.ro/**` → **Save**. Lasă și `https://service-hubapp.netlify.app/**` câteva săptămâni (pentru emailurile trimise deja).
+2. Proiectul real → **Edge Functions → Secrets → Add new secret**: `APP_URL` = `https://service-hub.ro`. De aici iau linkurile emailurile, SMS-urile și rapoartele.
+
+**Verifici:** pe `https://service-hub.ro` → **Ai uitat parola?** cu adresa ta → linkul din email începe cu `https://service-hub.ro` și te lasă să pui parola nouă.
+
+### 4.6 Contul de admin real
+
+Conturile de admin rămân după ștergerea conturilor de test (Partea 5). Dacă vrei alt cont de admin decât cel folosit la teste:
+
+1. Pe `https://service-hub.ro` → **Creează cont** → **Sunt client**, cu adresa pe care o vrei ca admin (de exemplu `admin@service-hub.ro`) → confirmi emailul.
+2. Proiectul real → **SQL Editor** → `select public.promote_to_admin('adresa@exemplu.ro');` → **Run**.
+3. Proiectul real → **Edge Functions → Secrets**: `ADMIN_EMAIL` = aceeași adresă (acolo vin recenziile raportate și răspunsurile la emailuri).
+
+Un admin vechi pe care nu-l mai vrei: spune-mi adresa și îți dau comanda.
+
+**Verifici:** te loghezi cu contul nou și vezi **Prezentare, Service-uri, Clienți, Rezervări, Moderare**.
+
+### 4.7 După mutare
+
+- **Partea 5** (ștergerea conturilor de test), chiar înainte să anunți lansarea.
+- Lista „Ce verifici tu” din `docs/LAUNCH_CHECK.md`, cap-coadă, cu un service și un client reali.
+- Opțional, **Google Search Console** (search.google.com/search-console) → **Add property** → `service-hub.ro` → verificarea prin DNS (un rând `TXT` nou, nu schimbă nimic altceva) → **Sitemaps** → `https://service-hub.ro/sitemap.xml`. Așa apare site-ul mai repede în Google. Linkurile de test nu apar niciodată în Google (le spun motoarelor de căutare să nu le citească).
+- Bine de știut: notificările și „Ține-mă minte” țin de adresa site-ului. Cine le-a pornit pe `service-hubapp.netlify.app` le pornește din nou pe `service-hub.ro` (după Partea 5 oricum toată lumea își face cont nou).
 
 ---
 

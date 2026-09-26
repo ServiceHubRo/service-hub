@@ -23,10 +23,10 @@
   font-weight: 700;
 }
 
+/* Same color as the label: dimmed, the muted grey on a tab fell under the WCAG AA contrast. */
 .count {
   font-family: var(--font-mono);
   font-size: 12px;
-  opacity: 0.85;
 }
 
 .segmented {
