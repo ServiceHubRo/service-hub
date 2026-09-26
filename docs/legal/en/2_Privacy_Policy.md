@@ -72,7 +72,7 @@ This policy explains what personal data Service-Hub uses, why, who else sees it,
 | Notifications about bookings and your account (email, SMS to shops) | Our contract with you |
 | Push notifications | Your consent, given in the browser (withdraw it at any time), and the contract |
 | ITP, RCA and vignette alerts | Our contract with you (you ask for them by entering the dates) |
-| The reminder for your next service (after the last job of that kind done through the Platform) and the review request after a job | Our contract with you; you turn service reminders off in Account |
+| The reminder for your next service (after the last job of that kind done through the Platform) and the review request after a job | Our contract with you; you turn both off in Account |
 | Official history report | Our contract with you |
 | Subscription, payments, invoices and accounting | The contract and legal obligations (para. 1(c)): Accounting Law 82/1991, the Tax Code |
 | Public reviews and checking reported ones | Legitimate interest (para. 1(f)) in genuine reviews; obligations under Regulation (EU) 2022/2065 |

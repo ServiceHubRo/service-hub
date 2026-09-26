@@ -66,6 +66,8 @@ export function ClientBookingsScreen() {
               className={b.id === focusId ? styles.focused : undefined}
             >
               <ClientBookingCard
+                // A review request tapped while this screen is open starts the card again, form open.
+                key={reviewFocus && b.id === focusId ? 'review' : 'card'}
                 booking={b}
                 reviewWindowDays={data?.reviewWindowDays ?? 60}
                 now={now}

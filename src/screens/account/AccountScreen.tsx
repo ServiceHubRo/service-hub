@@ -27,7 +27,7 @@ import { DataSection } from './DataSection';
 import { helpPath } from './paths';
 import { IdentityCard } from './IdentityCard';
 import { LocationRow } from './LocationRow';
-import { ServiceRemindersRow } from './ServiceRemindersRow';
+import { ReminderRow } from './ReminderRow';
 import { PhoneCard } from './PhoneCard';
 import { PushRow } from '../push/PushRow';
 import { SecuritySection } from './SecuritySection';
@@ -74,7 +74,8 @@ export function AccountScreen({ role }: { role: Role }) {
       {role === 'client' && (
         <>
           <LocationRow />
-          <ServiceRemindersRow />
+          <ReminderRow setting="review_requests" />
+          <ReminderRow setting="service_reminders" />
           <div className={styles.tiles}>
             <Tile to={VEHICLE_HISTORY_PICK_PATH} icon={History} label={t('vh.title')} hint={t('vh.tileHint')} />
             <Tile to={MY_REPORTS_PATH} icon={FileCheck} label={t('reports.title')} hint={t('reports.tileHint')} />

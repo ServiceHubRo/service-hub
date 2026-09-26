@@ -512,10 +512,10 @@ export function urlFor(side: Side, e: NotificationEvent): string {
       // The booking card with the review form open.
       case 'review_request':
         return booking ? `/c/programari?${q({ p: booking, recenzie: '1' })}` : '/c/programari';
-      // A new booking at the same shop, the service chosen: straight to the day.
+      // A new booking at the same shop, the service chosen and that car picked: straight to the day.
       case 'service_due':
         return str(p.shop_id)
-          ? `/c/service/${str(p.shop_id)}/programare?${q({ pas: '2', serviciu: str(p.service_id) })}`
+          ? `/c/service/${str(p.shop_id)}/programare?${q({ pas: '2', serviciu: str(p.service_id), masina: str(p.car_id) })}`
           : '/c/cauta';
       default:
         return booking ? `/c/programari?${q({ p: booking })}` : '/c/programari';
