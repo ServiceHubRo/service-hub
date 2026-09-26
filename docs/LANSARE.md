@@ -9,6 +9,7 @@ Nu lipești nicio cheie în chat — doar în locurile scrise aici.
 | 2 | Proiectul de test: linkurile de test nu mai ating datele reale | T19a |
 | 3 | Documentele legale | T19b |
 | 4 | Domeniul service-hub.ro, plățile reale, contul de admin, copiile de siguranță | T19c |
+| 5 | Ștergerea conturilor de test: numerele încep de la 1 | chiar înainte de lansare |
 
 ---
 
@@ -149,3 +150,25 @@ Confidențialitatea spune că rapoartele de erori se păstrează „cel mult 90 
 **Verifici:** pe linkul de test deschide `/legal/termeni`: vezi datele firmei (fără chenare portocalii), apoi apasă **English** și vezi „Terms and Conditions”.
 
 **După forma finală:** spune-i lui Claude ce a schimbat avocatul. Claude actualizează fișierele și versiunea termenilor (`TERMS_VERSION`), ca să știi ce versiune a acceptat fiecare cont.
+
+---
+
+## Partea 5 — Ștergerea conturilor de test
+
+Chiar înainte de lansare: se șterg toate conturile de client și de service din **proiectul real**, cu tot ce au făcut (mașini, programări, devize, mesaje, recenzii, abonamente, rapoarte), iar numerele încep din nou: primul client va fi **C-00001**, primul service **S-00001**, prima programare **P-000001**.
+
+**Rămân:** conturile de admin (cu numărul lor), setările platformei (prețuri, reduceri, perioada gratuită), lista celor 150 de servicii. Se șterg și amprentele de cont (perioada gratuită folosită, suspendările), ca nimeni să nu fie blocat din cauza unui cont de test.
+
+Nu se poate anula. Scriptul refuză să ruleze dacă găsește peste 300 de conturi de client și service, ca să nu poată șterge din greșeală o platformă deja folosită.
+
+### 1. Pozele și rapoartele
+
+În **Supabase** → proiectul real → **Storage**. Pentru fiecare dintre folderele `logos` și `reports`: apasă cele trei puncte de lângă nume → **Empty bucket** → confirmă. (Fișierele nu se pot șterge din SQL; de aceea începi cu ele.)
+
+### 2. Conturile
+
+În **Supabase** → proiectul real → **SQL Editor** → **New query**. Copiază tot fișierul [`docs/sql/reset_before_launch.sql`](sql/reset_before_launch.sql) (pe GitHub: butonul **Copy raw file**), lipește-l și apasă **Run**. Supabase te întreabă dacă ești sigur („destructive operation”): confirmă.
+
+**Verifici:** rezultatul arată `shops 0`, `bookings 0`, iar `accounts` este egal cu `admins`. În **Authentication → Users** rămân doar conturile de admin. Fă un cont nou de client pe site: în admin → **Clienți** apare cu numărul **C-00001**.
+
+**Stripe (opțional):** clienții și abonamentele de probă din modul de test rămân acolo, dar nu contează: la lansare treci pe cheile reale, care pornesc goale.

@@ -684,6 +684,8 @@ Note: 1 migrare (`client_reminders`, `schema_version` = 29), niciun pachet nou. 
 
 `docs/LAUNCH_CHECK.md` (lista „Final check” + FR, parcursă automat cu Playwright pe mediul de test), CAPTCHA Turnstile pornit, `APP_URL` = `https://service-hub.ro`, mutarea domeniului, Site URL și adresele în Supabase Auth, cheile Stripe live (cu webhook-ul live), contul de admin real, copii de siguranță (planul Supabase Pro are copii zilnice — decizia ta, ~25 $/lună; pe planul gratuit proiectul se oprește după 7 zile fără activitate).
 
+**Ștergerea conturilor de test (pregătită, 26 sep 2026):** `docs/sql/reset_before_launch.sql`, rulat de Eduard în SQL Editor pe proiectul real (`docs/LANSARE.md`, Partea 5), după golirea folderelor `logos` și `reports`. Șterge toate conturile de client și service cu tot ce au făcut, amprentele de cont, jurnalul admin și numerele (C-00001, S-00001, P-000001 de la capăt). Rămân adminii (cu numărul lor; următorul admin vine după ei), setările și catalogul. Refuză peste 300 de conturi. Testat în `tests/sql/93_reset_before_launch.sql` și pe stack-ul Supabase local (conturi, sesiuni, abonament de probă).
+
 - [ ] Făcut
 
 ---
