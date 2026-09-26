@@ -72,8 +72,8 @@ describe('auth errors are specific and translated', () => {
       'Prea multe încercări. Încearcă din nou peste 42 secunde.',
     ],
     [{ name: 'AuthRetryableFetchError', message: 'Failed to fetch', status: 0 }, 'Nu s-a putut trimite. Verifică internetul și încearcă din nou.'],
-    [new AuthFailure('wrong_current_password'), 'Parola actuală nu e corectă.'],
-    [{ code: 'something_new', status: 500 }, 'Ceva n-a mers. Încearcă din nou.'],
+    [new AuthFailure('wrong_current_password'), 'Parola actuală nu este corectă.'],
+    [{ code: 'something_new', status: 500 }, 'A apărut o eroare. Încearcă din nou.'],
   ];
   it.each(cases)('%j', (error, text) => {
     expect(authErrorMessage('ro', error)).toBe(text);

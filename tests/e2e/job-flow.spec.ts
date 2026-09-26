@@ -183,7 +183,7 @@ test.describe('quote, work, completion, review', () => {
     await expectNoHorizontalScroll(shopPage);
     await shot(shopPage, 't09-shop-complete', name());
     await shopA.getByRole('button', { name: 'Confirmă finalizarea' }).click();
-    await expect(shopPage.getByText(`Lucrarea ${accepted.ref} e finalizată.`, { exact: false })).toBeVisible();
+    await expect(shopPage.getByText(`Lucrarea ${accepted.ref} este finalizată.`, { exact: false })).toBeVisible();
     await expect(shopA).toHaveCount(0);
 
     // Client: ready for pickup, with the odometer, the work and the amount; then the review.
@@ -254,9 +254,9 @@ test.describe('quote, work, completion, review', () => {
     await odometer.fill('160000');
     await expect(job.getByText('Sunt 54.600 km în plus față de ultima lucrare. Confirmi?')).toBeVisible();
     await expect(job.getByRole('button', { name: 'Confirmă finalizarea' })).toBeDisabled();
-    await job.getByText('Da, kilometrajul e corect').click();
+    await job.getByText('Da, kilometrajul este corect').click();
     await job.getByRole('button', { name: 'Confirmă finalizarea' }).click();
-    await expect(page.getByText(`Lucrarea ${second.ref} e finalizată.`, { exact: false })).toBeVisible();
+    await expect(page.getByText(`Lucrarea ${second.ref} este finalizată.`, { exact: false })).toBeVisible();
   });
 
   test('after the shop’s deadline the client is told to contact the shop', async ({ page }) => {

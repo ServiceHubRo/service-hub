@@ -266,7 +266,7 @@ test.describe('push notifications', () => {
         await signIn(page, client, PASSWORD);
         await expect(page.getByRole('heading', { level: 1, name: 'Caută' })).toBeVisible();
         await pushBanner(page).getByRole('button', { name: 'Activează' }).click();
-        await expect(page.getByRole('status').filter({ hasText: 'Gata. Primești notificări pe acest dispozitiv.' })).toBeVisible();
+        await expect(page.getByRole('status').filter({ hasText: 'Notificările sunt activate pe acest dispozitiv.' })).toBeVisible();
         await openAccount(page);
         await expect(pushRow(page)).toContainText('Activate pe acest dispozitiv');
         const clientId = await userIdOf(client);
@@ -286,7 +286,7 @@ test.describe('push notifications', () => {
         await rpcAs(shop, 'confirm_booking', { p_booking_id: booking.id, p_request_id: crypto.randomUUID() });
         const push = await device.next();
         expect(push.title).toMatch(/^Atelier Push/);
-        expect(push.body).toMatch(new RegExp(`^Programarea ${booking.ref} e confirmată: .+, ${slot.slice(0, 5)}\\.$`));
+        expect(push.body).toMatch(new RegExp(`^Programarea ${booking.ref} este confirmată: .+, ${slot.slice(0, 5)}\\.$`));
         expect(push.url).toBe(`/c/programari?p=${booking.id}`);
 
         // A tap: the service worker hands the address to the open app, which shows that booking.

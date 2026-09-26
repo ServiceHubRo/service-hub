@@ -105,8 +105,8 @@ test.describe('subscription', () => {
     await expect(page.getByText('Abonament: 100 lei / lună')).toBeVisible();
     await page.getByRole('button', { name: 'Plătește' }).click();
     await expect(page).toHaveURL(/\/s\/cont\/abonament\?plata=ok$/);
-    await expect(page.getByText('Mulțumim. Cardul e salvat, prima plată se face la sfârșitul perioadei gratuite.')).toBeVisible();
-    await expect(page.getByText(/^Cardul e salvat\. Prima plată, 100 lei, pe \d{1,2} [a-z]+\.$/)).toBeVisible();
+    await expect(page.getByText('Mulțumim. Cardul este salvat, prima plată se face la sfârșitul perioadei gratuite.')).toBeVisible();
+    await expect(page.getByText(/^Cardul este salvat\. Prima plată, 100 lei, pe \d{1,2} [a-z]+\.$/)).toBeVisible();
     await expect(page.getByRole('button', { name: 'Activează abonamentul' })).toHaveCount(0);
     await expect(page.getByRole('button', { name: 'Gestionează abonamentul' })).toBeVisible();
     await expect(page.getByText('Nicio plată încă.')).toBeVisible();
@@ -129,7 +129,7 @@ test.describe('subscription', () => {
     await expect(periods.getByRole('radio', { name: /^Lunar/ })).toBeChecked();
     await expect(periods.getByText('5% reducere', { exact: true })).toBeVisible();
     await expect(periods.getByText('540 lei')).toBeVisible();
-    await expect(periods.getByText('cam 85 lei pe lună')).toBeVisible();
+    await expect(periods.getByText('aproximativ 85 lei pe lună')).toBeVisible();
     await expectNoHorizontalScroll(page);
     await shot(page, 'periods-choice', name());
 
@@ -145,7 +145,7 @@ test.describe('subscription', () => {
     await expect(page.getByText('Abonament: 1020 lei / 12 luni')).toBeVisible();
     await page.getByRole('button', { name: 'Plătește' }).click();
     await expect(page).toHaveURL(/\/s\/cont\/abonament\?plata=ok$/);
-    await expect(page.getByText(/^Cardul e salvat\. Prima plată, 1\.020 lei, pe \d{1,2} [a-z]+\.$/)).toBeVisible();
+    await expect(page.getByText(/^Cardul este salvat\. Prima plată, 1\.020 lei, pe \d{1,2} [a-z]+\.$/)).toBeVisible();
     await expect(page.getByText('Plătești la 12 luni: 1.020 lei, cu 15% reducere.')).toBeVisible();
     await expect(page.getByRole('group', { name: 'Cum plătești' })).toHaveCount(0);
     await shot(page, 'periods-card-saved', name());
@@ -181,7 +181,7 @@ test.describe('subscription', () => {
     await page.getByRole('button', { name: 'Plătește abonamentul' }).click();
     await page.getByRole('button', { name: 'Plătește' }).click();
     await expect(page).toHaveURL(/\/s\/cont\/abonament\?plata=ok$/);
-    await expect(page.getByText('Mulțumim. Abonamentul e activ.')).toBeVisible();
+    await expect(page.getByText('Mulțumim. Abonamentul este activ.')).toBeVisible();
     await expect(page.getByText('Activ', { exact: true })).toBeVisible();
     await expect(page.getByText(/^Următoarea plată: 100 lei, pe /)).toBeVisible();
     await expect(page.getByRole('link', { name: /^Chitanța plății din / })).toBeVisible();
@@ -230,7 +230,7 @@ test.describe('subscription', () => {
     await expect(page.getByText('Plată restantă', { exact: true })).toBeVisible();
     await expect(page.getByText(/^Plata nu a trecut\. Reîncercăm pe .+\. Verifică sau schimbă cardul din Gestionează\.$/)).toBeVisible();
     // The thank-you from the checkout does not stay over a later failed payment.
-    await expect(page.getByText('Mulțumim. Abonamentul e activ.')).toHaveCount(0);
+    await expect(page.getByText('Mulțumim. Abonamentul este activ.')).toHaveCount(0);
     await shot(page, 't14-subscription-past-due', name());
     const failedMail = await emailWith(email, 'Plata abonamentului nu a trecut');
     expect(failedMail.text).toMatch(/Reîncercăm pe \d{1,2} [a-z]+\./);
@@ -290,7 +290,7 @@ test.describe('subscription', () => {
     // The plan's price (the monthly choice below shows the same figure).
     await expect(page.getByText('120 lei', { exact: true }).first()).toBeVisible();
     await expect(
-      page.getByText('100 lei + 1 coleg × 20 lei · Primul coleg cu cont în service e inclus în abonament.'),
+      page.getByText('100 lei + 1 coleg × 20 lei · Primul coleg cu cont în service este inclus în abonament.'),
     ).toBeVisible();
     await expectNoHorizontalScroll(page);
     await shot(page, 'seats-subscription', name());
@@ -307,7 +307,7 @@ test.describe('subscription', () => {
 
     // Personal: what a colleague costs; removing one leaves only the included one, off the Stripe bill.
     await page.goto('/s/cont/setari/personal');
-    await expect(page.getByText(/^Primul coleg cu cont în service e inclus în abonament\. Fiecare coleg în plus/)).toBeVisible();
+    await expect(page.getByText(/^Primul coleg cu cont în service este inclus în abonament\. Fiecare coleg în plus/)).toBeVisible();
     await expect(page.getByText('Acum abonamentul tău este 120 lei pe lună, cu 1 coleg în plus.', { exact: false })).toBeVisible();
     await shot(page, 'seats-staff', name());
     const card = page.locator('div').filter({ hasText: 'Coleg Plătit' }).filter({ has: page.getByRole('button', { name: 'Elimină' }) }).last();
@@ -320,7 +320,7 @@ test.describe('subscription', () => {
     await page.goto('/s/cont/abonament');
     await expect(page.getByText('100 lei', { exact: true })).toBeVisible();
     await expect(
-      page.getByText('Primul coleg cu cont în service e inclus în abonament. Fiecare coleg în plus adaugă 20 lei pe lună.'),
+      page.getByText('Primul coleg cu cont în service este inclus în abonament. Fiecare coleg în plus adaugă 20 lei pe lună.'),
     ).toBeVisible();
   });
 });

@@ -134,37 +134,37 @@ test.describe('admin', () => {
     await expectNoHorizontalScroll(page);
     await shot(page, 't16a-shop-suspend', name());
     await page.getByRole('button', { name: 'Suspendă service-ul' }).click();
-    await expect(page.getByRole('status').filter({ hasText: 'Service-ul e suspendat.' })).toBeVisible();
-    await expect(page.getByRole('listitem').filter({ hasText: 'Service-ul e suspendat.' })).toBeVisible();
+    await expect(page.getByRole('status').filter({ hasText: 'Service-ul este suspendat.' })).toBeVisible();
+    await expect(page.getByRole('listitem').filter({ hasText: 'Service-ul este suspendat.' })).toBeVisible();
     await expect(page.getByText('Nu apare în căutări:')).toBeVisible();
     expect(await inSearch(client, shopName)).toBe(false);
 
     await page.getByRole('button', { name: 'Reactivează service-ul' }).click();
-    await expect(page.getByRole('status').filter({ hasText: 'Service-ul e reactivat.' })).toBeVisible();
+    await expect(page.getByRole('status').filter({ hasText: 'Service-ul este reactivat.' })).toBeVisible();
     expect(await inSearch(client, shopName)).toBe(true);
 
     // Extend the free period by 30 days.
     await page.getByRole('button', { name: 'Prelungește perioada gratuită' }).click();
     await page.getByRole('button', { name: 'Prelungește cu 30 de zile' }).click();
-    await expect(page.getByRole('status').filter({ hasText: 'Perioada gratuită e prelungită.' })).toBeVisible();
+    await expect(page.getByRole('status').filter({ hasText: 'Perioada gratuită este prelungită.' })).toBeVisible();
 
     // Stop the subscription by hand: out of search; then active again.
     await page.getByRole('button', { name: 'Schimbă statusul abonamentului' }).click();
     await page.getByRole('button', { name: 'Inactiv', exact: true }).click();
     await page.getByRole('button', { name: 'Setează „Inactiv”' }).click();
-    await expect(page.getByRole('status').filter({ hasText: 'Statusul abonamentului e schimbat.' })).toBeVisible();
+    await expect(page.getByRole('status').filter({ hasText: 'Statusul abonamentului este schimbat.' })).toBeVisible();
     expect(await inSearch(client, shopName)).toBe(false);
     await page.getByRole('button', { name: 'Schimbă statusul abonamentului' }).click();
     await page.getByRole('button', { name: 'Activ', exact: true }).click();
     await page.getByRole('button', { name: 'Setează „Activ”' }).click();
-    await expect(page.getByRole('status').filter({ hasText: 'Statusul abonamentului e schimbat.' })).toBeVisible();
+    await expect(page.getByRole('status').filter({ hasText: 'Statusul abonamentului este schimbat.' })).toBeVisible();
     expect(await inSearch(client, shopName)).toBe(true);
 
     // Edit: an invalid IBAN is named; a valid change is saved.
     await page.getByRole('button', { name: 'Editează datele' }).click();
     await page.getByLabel('IBAN').fill('RO00 XXXX');
     await page.getByRole('button', { name: 'Salvează' }).click();
-    await expect(page.getByText('Verifică câmpul „IBAN”: valoarea nu e validă.')).toBeVisible();
+    await expect(page.getByText('Verifică câmpul „IBAN”: valoarea nu este validă.')).toBeVisible();
     await page.getByLabel('IBAN').fill('');
     await page.getByLabel('Mașini pe zi').fill('7');
     await expectNoHorizontalScroll(page);
@@ -219,7 +219,7 @@ test.describe('admin', () => {
     await page.getByLabel('Motivul anulării').fill('Service închis temporar');
     await shot(page, 't16a-booking-cancel', name());
     await page.getByRole('button', { name: 'Anulează rezervarea' }).click();
-    await expect(page.getByText('Rezervarea e anulată. Ambele părți sunt anunțate.')).toBeVisible();
+    await expect(page.getByText('Rezervarea este anulată. Ambele părți sunt anunțate.')).toBeVisible();
     await expect(page.getByText('Echipa Service-Hub', { exact: true })).toBeVisible();
     await expect(page.getByText('Rezervare anulată', { exact: true })).toBeVisible();
     const [b] = await serviceRest<{ status: string; cancelled_by: string }[]>(`bookings?id=eq.${booking.id}&select=status,cancelled_by`, 'GET');
@@ -271,7 +271,7 @@ test.describe('admin', () => {
     await expectNoHorizontalScroll(page);
     await shot(page, 't16a-moderation-remove', name());
     await card.getByRole('button', { name: 'Șterge' }).click();
-    await expect(page.getByText('Decizia e salvată. Părțile sunt anunțate.')).toBeVisible();
+    await expect(page.getByText('Decizia este salvată. Părțile sunt anunțate.')).toBeVisible();
 
     // Out of the queue; in the list as removed, with the note.
     const listed = page.locator('main li').filter({ hasText: text });
@@ -301,13 +301,13 @@ test.describe('admin', () => {
     await page.getByRole('button', { name: 'Suspendă contul' }).click();
     await page.getByLabel('Motiv').fill('Programări false');
     await page.getByRole('button', { name: 'Suspendă contul' }).click();
-    await expect(page.getByRole('status').filter({ hasText: 'Contul e suspendat.' })).toBeVisible();
+    await expect(page.getByRole('status').filter({ hasText: 'Contul este suspendat.' })).toBeVisible();
     const [p] = await serviceRest<{ suspended: boolean }[]>(`profiles?id=eq.${clientId}&select=suspended`, 'GET');
     expect(p!.suspended).toBe(true);
     await expectNoHorizontalScroll(page);
     await shot(page, 't16a-client', name());
     await page.getByRole('button', { name: 'Reactivează contul' }).click();
-    await expect(page.getByRole('status').filter({ hasText: 'Contul e reactivat.' })).toBeVisible();
+    await expect(page.getByRole('status').filter({ hasText: 'Contul este reactivat.' })).toBeVisible();
 
     await page.getByRole('button', { name: 'Șterge contul' }).click();
     await page.getByRole('button', { name: 'Șterge definitiv' }).click();

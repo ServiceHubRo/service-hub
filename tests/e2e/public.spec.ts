@@ -30,7 +30,7 @@ test('landing: every section, in Romanian and English, without horizontal scroll
   for (const card of [
     'Cauți după oraș sau intervenție',
     'Primești deviz și decizi tu',
-    'Afli când e gata mașina',
+    'Afli când mașina este gata',
     'Clienții se programează singuri',
     'Tu decizi câte mașini iei pe zi',
     'Deviz digital, acceptat de client în aplicație',
@@ -45,7 +45,7 @@ test('landing: every section, in Romanian and English, without horizontal scroll
     await expect(page.getByText('primele 90 de zile gratuite')).toBeVisible();
     await expect(page.getByText(/^Preț de lansare pentru primele \d+ de service-uri, păstrat cât timp rămâi\. După aceea, 149 lei pe lună\.$/)).toBeVisible();
     await expect(
-      page.getByText('Primul coleg cu cont în service e inclus în abonament. Fiecare coleg în plus: 19 lei pe lună. În perioada gratuită nu plătești nimic.'),
+      page.getByText('Primul coleg cu cont în service este inclus în abonament. Fiecare coleg în plus: 19 lei pe lună. În perioada gratuită nu plătești nimic.'),
     ).toBeVisible();
   }
   // Contact from the "în curând" page, legal documents and report verification in the footer.

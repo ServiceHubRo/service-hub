@@ -78,7 +78,7 @@ test.describe('client search', () => {
     await expect(page.getByText('Niciun service pentru „zzzz”.')).toBeVisible();
 
     // The order explained.
-    await page.getByRole('button', { name: 'Cum e ordonată lista?' }).click();
+    await page.getByRole('button', { name: 'Cum este ordonată lista?' }).click();
     await expect(page.getByText(/Nimeni nu plătește ca să apară mai sus/)).toBeVisible();
 
     // The filters live in the address: a reload keeps them.
@@ -164,7 +164,7 @@ test.describe('client search', () => {
 
     // An unknown shop.
     await page.goto('/c/service/00000000-0000-4000-8000-000000000000');
-    await expect(page.getByText('Service-ul nu mai e disponibil.')).toBeVisible();
+    await expect(page.getByText('Service-ul nu mai este disponibil.')).toBeVisible();
   });
 
   test.describe('with the location already allowed in the browser', () => {

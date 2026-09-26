@@ -354,7 +354,7 @@ describe('subscription notices and emails', () => {
 describe('included colleagues', () => {
   it('names the first one, or how many', () => {
     expect(includedColleagues('ro', 0)).toBe('');
-    expect(includedColleagues('ro', 1)).toBe('Primul coleg cu cont în service e inclus în abonament.');
+    expect(includedColleagues('ro', 1)).toBe('Primul coleg cu cont în service este inclus în abonament.');
     expect(includedColleagues('ro', 2)).toBe('Primii 2 colegi cu cont în service sunt incluși în abonament.');
     expect(includedColleagues('en', 1)).toBe('The first colleague with an account in the shop is included in the subscription.');
   });

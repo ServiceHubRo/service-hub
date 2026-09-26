@@ -56,7 +56,7 @@ export const REPORTS_PATH = '/c/cont/rapoarte';
 export const TEMPLATES: Record<Lang, Record<string, Text>> = {
   ro: {
     // ------------------------------------------------------------------ to the client
-    'client.booking_confirmed': { title: '{shop}', body: 'Programarea {ref} e confirmată: {when}.' },
+    'client.booking_confirmed': { title: '{shop}', body: 'Programarea {ref} este confirmată: {when}.' },
     'client.booking_declined': { title: '{shop}', body: 'Service-ul nu poate prelua programarea {ref} din {when}.' },
     'client.booking_declined_reason': {
       title: '{shop}',
@@ -72,8 +72,8 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
       body: 'Programarea {ref} la {shop} a fost anulată de echipa Service-Hub. Motiv: {reason}',
     },
     'client.no_show': { title: '{shop}', body: 'Programarea {ref} din {when} a fost marcată ca neprezentare.' },
-    'client.inspection_started': { title: '{shop}', body: '{car} e în constatare. Devizul vine în aplicație.' },
-    'client.quote_sent': { title: '{shop}', body: 'Devizul pentru {car} e gata: {total}. Răspunde până pe {deadline}.' },
+    'client.inspection_started': { title: '{shop}', body: '{car} este în constatare. Devizul vine în aplicație.' },
+    'client.quote_sent': { title: '{shop}', body: 'Devizul pentru {car} este gata: {total}. Răspunde până pe {deadline}.' },
     'client.quote_replaced': { title: '{shop}', body: 'Service-ul a modificat devizul pentru {car}: {total}.' },
     'client.quote_withdrawn': { title: '{shop}', body: 'Service-ul a retras devizul pentru {car}.' },
     'client.quote_expiring': {
@@ -82,7 +82,7 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
     },
     'client.quote_expired': { title: '{shop}', body: 'Devizul pentru {car} a expirat fără răspuns.' },
     'client.work_started': { title: '{shop}', body: 'Lucrarea la {car} a început.' },
-    'client.job_done': { title: '{shop}', body: '{car} e gata de ridicare. Total: {cost}.' },
+    'client.job_done': { title: '{shop}', body: '{car} este gata de ridicare. Total: {cost}.' },
     'client.appointment_reminder': { title: '{shop}', body: 'Mâine la {slot} ai programare la {shop}: {service}.' },
     'client.appointment_reminder_today': { title: '{shop}', body: 'Azi la {slot} ai programare la {shop}: {service}.' },
     'client.new_message': { title: '{sender}', body: '{preview}' },
@@ -90,7 +90,7 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
     'client.doc_expiry': { title: '{car}', body: '{doc} expiră în {days}, pe {expiry}.' },
     'client.doc_expiry_today': { title: '{car}', body: '{doc} expiră azi.' },
     'client.doc_expiry_past': { title: '{car}', body: '{doc} a expirat pe {expiry}.' },
-    'client.report_ready': { title: 'Raportul e gata', body: 'Raportul de istoric pentru {car_plate} e gata de descărcat. Cod: {code}.' },
+    'client.report_ready': { title: 'Raportul este gata', body: 'Raportul de istoric pentru {car_plate} este gata de descărcat. Cod: {code}.' },
     'client.review_request': {
       title: '{shop}',
       body: 'Cum a fost la {shop}? Lasă o recenzie pentru {service}. Durează un minut și îi ajută pe alți șoferi.',

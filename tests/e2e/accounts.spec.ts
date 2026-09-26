@@ -195,7 +195,7 @@ test.describe('with accounts', () => {
 
     // Before confirming, signing in explains what is missing.
     await signIn(page, email, PASSWORD);
-    await expect(page.getByText(`Adresa ${email} nu e confirmată încă.`, { exact: false })).toBeVisible();
+    await expect(page.getByText(`Adresa ${email} nu este confirmată încă.`, { exact: false })).toBeVisible();
     await page.evaluate(() => localStorage.removeItem('sh_email_log')); // skip the 60 s wait
     await page.waitForTimeout(1100); // the local Auth server allows one email per second
     await page.getByRole('button', { name: 'Retrimite emailul' }).click();
@@ -380,7 +380,7 @@ test.describe('with accounts', () => {
     await page.getByLabel('Parola nouă', { exact: true }).fill('Parola-Buna-2027');
     await page.getByLabel('Repetă parola nouă').fill('Parola-Buna-2027');
     await page.getByRole('button', { name: 'Salvează parola nouă' }).click();
-    await expect(page.getByText('Parola actuală nu e corectă.')).toBeVisible();
+    await expect(page.getByText('Parola actuală nu este corectă.')).toBeVisible();
     await shot(page, 'account-password-wrong', name());
     await page.getByLabel('Parola actuală').fill(PASSWORD);
     await page.getByRole('button', { name: 'Salvează parola nouă' }).click();
@@ -390,7 +390,7 @@ test.describe('with accounts', () => {
     await page.getByRole('button', { name: 'Schimbă emailul' }).click();
     await page.getByLabel('Emailul nou').fill(email);
     await page.getByRole('button', { name: 'Trimite verificarea' }).click();
-    await expect(page.getByText('Aceasta e adresa pe care o folosești deja.')).toBeVisible();
+    await expect(page.getByText('Aceasta este adresa pe care o folosești deja.')).toBeVisible();
     await page.getByLabel('Emailul nou').fill(next);
     await page.getByRole('button', { name: 'Trimite verificarea' }).click();
     await expect(page.getByText(`Verificare trimisă la ${next}.`, { exact: false })).toBeVisible();
@@ -408,7 +408,7 @@ test.describe('with accounts', () => {
     await page.getByRole('button', { name: 'Șterge contul' }).click();
     const confirm = page.getByRole('button', { name: 'Șterge definitiv' });
     await expect(confirm).toBeDisabled();
-    await page.getByText('Înțeleg că ștergerea e definitivă').click();
+    await page.getByText('Înțeleg că ștergerea este definitivă').click();
     await shot(page, 'account-delete-confirm', name());
     await confirm.click();
     await expect(page.getByText('Ai programări active.', { exact: false })).toBeVisible();
@@ -424,7 +424,7 @@ test.describe('with accounts', () => {
     await signIn(page, email, PASSWORD);
     await openAccount(page);
     await page.getByRole('button', { name: 'Șterge contul' }).click();
-    await page.getByText('Înțeleg că ștergerea e definitivă').click();
+    await page.getByText('Înțeleg că ștergerea este definitivă').click();
     await page.getByRole('button', { name: 'Șterge definitiv' }).click();
     await expect(page).toHaveURL(/\/$/);
     await expect(page.getByText('Contul tău a fost șters.')).toBeVisible();

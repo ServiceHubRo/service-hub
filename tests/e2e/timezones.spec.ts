@@ -75,7 +75,7 @@ for (const timezoneId of ['America/Los_Angeles', 'America/New_York', 'Asia/Tokyo
     // carries the Romanian time.
     await cx.goto(`/c/mesaje/programare/${booking.id}`);
     const log = cx.getByRole('log');
-    await expect(log).toContainText(`Programarea ${booking.ref} e confirmată:`);
+    await expect(log).toContainText(`Programarea ${booking.ref} este confirmată:`);
     await expect(log).toContainText('09:00');
     const expected = bucharestNow();
     await cx.getByLabel('Mesaj', { exact: true }).fill('Vin la 09:00.');

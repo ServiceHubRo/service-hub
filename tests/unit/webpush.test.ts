@@ -72,7 +72,7 @@ describe('Web Push encryption (RFC 8291)', () => {
     const receiver = (await crypto.subtle.generateKey({ name: 'ECDH', namedCurve: 'P-256' }, true, ['deriveBits'])) as CryptoKeyPair;
     const uaPublic = new Uint8Array(await crypto.subtle.exportKey('raw', receiver.publicKey));
     const auth = crypto.getRandomValues(new Uint8Array(16));
-    const message = JSON.stringify({ title: 'Atelier Unu', body: 'Devizul pentru mașina ta e gata: 1.250 lei.' });
+    const message = JSON.stringify({ title: 'Atelier Unu', body: 'Devizul pentru mașina ta este gata: 1.250 lei.' });
     const body = await encryptPayload(utf8(message), toBase64Url(uaPublic), toBase64Url(auth));
     expect(await decrypt(body, receiver, auth)).toBe(message);
   });

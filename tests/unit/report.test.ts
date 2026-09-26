@@ -216,8 +216,8 @@ describe('report_ready', () => {
 
   it('tells the client by push, in their language, and opens Rapoartele mele', () => {
     expect(renderNotification({ ...event, lang: 'ro' })).toMatchObject({
-      title: 'Raportul e gata',
-      body: 'Raportul de istoric pentru Volkswagen Golf 7 (BV 12 ABC) e gata de descărcat. Cod: SH-2026-000147.',
+      title: 'Raportul este gata',
+      body: 'Raportul de istoric pentru Volkswagen Golf 7 (BV 12 ABC) este gata de descărcat. Cod: SH-2026-000147.',
       url: '/c/cont/rapoarte',
       tag: 'report-r1',
     });

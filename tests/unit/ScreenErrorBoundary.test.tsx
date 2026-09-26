@@ -29,7 +29,7 @@ describe('ScreenErrorBoundary', () => {
     vi.spyOn(console, 'error').mockImplementation(() => undefined);
     localStorage.setItem('sh_lang', 'ro');
     const { rerender } = render(<Shell path="/c/programari" broken />);
-    expect(screen.getByText('Ceva n-a mers pe acest ecran. Reîncarcă pagina sau alege alt ecran din meniu.')).toBeTruthy();
+    expect(screen.getByText('A apărut o eroare pe acest ecran. Reîncarcă pagina sau alege alt ecran din meniu.')).toBeTruthy();
     expect(screen.getByRole('button', { name: 'Reîncarcă pagina' })).toBeTruthy();
     expect(screen.getByText('Meniu')).toBeTruthy();
 
