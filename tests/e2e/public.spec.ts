@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
-import { BACKEND, expectAccessible, expectNoHorizontalScroll, shot } from './support';
+import { BACKEND, expectAccessible, expectNoHorizontalScroll, expectNoRomanianText, shot } from './support';
 
 // T18: the public page at `/`, the 404 page, link previews, and the public screens checked for
 // accessibility and keyboard use (P17b, P18).
@@ -103,6 +103,12 @@ test('landing: link previews have a title, a description and an absolute image',
   expect(png.headers()['content-type']).toContain('image/png');
 });
 
+test('a test build tells search engines to stay away (T19c)', async ({ request }) => {
+  const robots = await request.get('/robots.txt');
+  expect(robots.ok()).toBe(true);
+  expect(await robots.text()).toBe('User-agent: *\nDisallow: /\n');
+});
+
 test('404: an unknown address has its own page with a way home', async ({ page }) => {
   await page.goto('/pagina-care-nu-exista');
   await expect(page.getByRole('heading', { level: 1, name: 'Pagina nu există' })).toBeVisible();
@@ -160,6 +166,9 @@ for (const lang of ['ro', 'en'] as const) {
       await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
       if (path === '/') await expect(page.locator('[aria-busy="true"]')).toHaveCount(0);
       await expectAccessible(page, `${path} (${lang})`);
+      // T19c (launch check): no sideways scroll, no Romanian left on an English screen.
+      await expectNoHorizontalScroll(page);
+      if (lang === 'en') await expectNoRomanianText(page, path);
     }
   });
 }

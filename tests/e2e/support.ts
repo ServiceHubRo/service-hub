@@ -1,4 +1,6 @@
 import { expect, type Page } from '@playwright/test';
+import { en } from '../../src/i18n/en';
+import { ro, type MessageKey } from '../../src/i18n/ro';
 
 /**
  * Browser tests that need a backend run against the local Supabase stack (CLAUDE.md §9):
@@ -199,6 +201,36 @@ export const isDesktop = (page: Page) => (page.viewportSize()?.width ?? 0) >= 10
 export async function expectNoHorizontalScroll(page: Page) {
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
   expect(overflow).toBeLessThanOrEqual(0);
+}
+
+let romanianOnly: string[] | null = null;
+
+/**
+ * Pieces of Romanian interface text that never appear in English: every ro.ts string that differs
+ * from its en.ts version, cut at its {placeholders} and line breaks. Short pieces (under 12
+ * characters) are left out: names and words such as "Service-Hub" or "ITP" are the same in both.
+ * The samples on the landing page (`landing.mock.*`) and in the component gallery (`demo.*`) are
+ * sample data with the demo shops' names, not interface text.
+ */
+function romanianPieces(): string[] {
+  if (romanianOnly) return romanianOnly;
+  const pieces = new Set<string>();
+  for (const key of Object.keys(ro) as MessageKey[]) {
+    if (ro[key] === en[key] || key.startsWith('landing.mock.') || key.startsWith('demo.')) continue;
+    for (const piece of ro[key].split(/\{[^}]+\}|\n/)) {
+      const p = piece.trim();
+      if (p.length >= 12 && /\p{L}/u.test(p) && !en[key].includes(p)) pieces.add(p);
+    }
+  }
+  romanianOnly = [...pieces];
+  return romanianOnly;
+}
+
+/** In English, no Romanian interface text is on screen (CLAUDE.md §6.4; the launch check). */
+export async function expectNoRomanianText(page: Page, label: string) {
+  const text = await page.locator('body').innerText();
+  const found = romanianPieces().filter((p) => text.includes(p));
+  expect(found, `${label}: Romanian text in English`).toEqual([]);
 }
 
 /** Opens Cont from the navigation (bottom bar, sidebar, or the admin header icon). */

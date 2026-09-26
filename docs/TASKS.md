@@ -41,7 +41,8 @@ Ordinea contează: fiecare sarcină se sprijină pe cele de dinainte. Sarcinile 
 | T19a | Lansarea — monitorizare și mediu de test | Erorile ajung în Sentry; linkurile de test pe un proiect Supabase separat |
 | T19b | Lansarea — documentele legale | Termeni, confidențialitate, cookies actualizate, în română și engleză |
 | T19d | Remindere pentru clienți | Cerere de recenzie după lucrare, reminder pentru următoarea revizie |
-| T19c | Lansarea — verificarea finală și domeniul | `LAUNCH_CHECK.md`, service-hub.ro, plăți reale, admin, copii de siguranță |
+| T19c | Lansarea — verificarea finală | `LAUNCH_CHECK.md`: fiecare punct din lista finală cu testul lui; ghidul de lansare pas cu pas |
+| T19e | Lansarea — domeniul și plățile reale | service-hub.ro, plăți reale, CAPTCHA, admin, copii de siguranță (pașii tăi, după ghid) |
 | T20 | Aplicațiile pentru iPhone și Android | Service-Hub în App Store și Google Play, cu notificări pe iPhone fără „Adaugă pe ecranul principal” |
 
 ---
@@ -632,7 +633,7 @@ Note: 1 migrare (`schema_version` = 25): `public_pricing()` — prețurile pentr
 
 **Pașii tăi:** ce listează Claude; mutarea domeniului o faci împreună, pas cu pas. Ghidul: `docs/LANSARE.md`.
 
-Împărțită în trei părți (25 sept 2026), fiecare cu pull request-ul ei:
+Împărțită în părți (25–26 sept 2026: T19a, T19b, T19d, T19c, T19e), fiecare cu pull request-ul ei:
 
 ### T19a — Monitorizare și mediu de test
 
@@ -682,11 +683,23 @@ Note: 1 migrare (`client_reminders`, `schema_version` = 29), niciun pachet nou. 
 
 **Butoanele din emailuri, aceleași culori și în Gmail pe iPhone (cerut de Eduard, făcut):** butonul portocaliu din fiecare email (confirmare, parolă, schimbare de email, invitație, abonament, raport) este acum o imagine în interiorul linkului — Gmail pe iPhone nu mai poate să-l facă maro. Se apasă la fel; cu imaginile oprite apare textul butonului (tot un link), iar linkul scris de sub buton rămâne. Imaginile se fac cu `node scripts/gen-email-buttons.mjs` din lista `emailButtonLabels.ts` și le servește aceeași funcție ca logo-ul (`email-logo?b=…`); un buton nou fără imagine rămâne buton obișnuit, iar un test unitar cere ca fiecare text de buton să aibă imagine. Nicio migrare, niciun pachet nou.
 
-### T19c — Verificarea finală și domeniul
+### T19c — Verificarea finală și pregătirea domeniului
 
-`docs/LAUNCH_CHECK.md` (lista „Final check” + FR, parcursă automat cu Playwright pe mediul de test), CAPTCHA Turnstile pornit, `APP_URL` = `https://service-hub.ro`, mutarea domeniului, Site URL și adresele în Supabase Auth, cheile Stripe live (cu webhook-ul live), contul de admin real, copii de siguranță (planul Supabase Pro are copii zilnice — decizia ta, ~25 $/lună; pe planul gratuit proiectul se oprește după 7 zile fără activitate).
+Împărțită (26 sept 2026) în două: **T19c** — ce face Claude (verificarea automată, `docs/LAUNCH_CHECK.md`, ghidul pas cu pas); **T19e** — pașii tăi de lansare, după ghid (mai jos).
+
+`docs/LAUNCH_CHECK.md` (lista „Final check” + FR, fiecare punct cu testul care îl dovedește, parcursă automat cu Playwright), plus ghidul pentru domeniu, CAPTCHA, Stripe live, admin și copii de siguranță în `docs/LANSARE.md`, Partea 4.
 
 **Ștergerea conturilor de test (pregătită, 26 sep 2026):** `docs/sql/reset_before_launch.sql`, rulat de Eduard în SQL Editor pe proiectul real (`docs/LANSARE.md`, Partea 5), după golirea folderelor `logos` și `reports`. Șterge toate conturile de client și service cu tot ce au făcut, amprentele de cont, jurnalul admin și numerele (C-00001, S-00001, P-000001 de la capăt). Rămân adminii (cu numărul lor; următorul admin vine după ei), setările și catalogul. Refuză peste 300 de conturi. Testat în `tests/sql/93_reset_before_launch.sql` și pe stack-ul Supabase local (conturi, sesiuni, abonament de probă).
+
+- [x] Făcut
+
+Note: nicio migrare, niciun pachet nou. **Lista** `docs/LAUNCH_CHECK.md`: fiecare punct din „Final check” (structură, fluxul cap-coadă, cazurile care se uită, notificări, regulile care nu se văd, prezentare) și fiecare capitol din FR, cu testul automat care îl dovedește; partea C — ce verifici tu pe site-ul real (telefon, emailuri, plată reală); partea D — ce rămâne după lansare. **Teste noi** pentru punctele care nu aveau un test direct: `e2e/launch-check` (din consola browserului nu se pot schimba abonamentul, starea service-ului, rolul, devizul sau statusul programării, service-ul nu citește mașinile și nu acceptă devizul în locul clientului; la încărcare 3 schelete, apoi ecranul gol; al 4-lea booking la același service refuzat cu mesaj; rezultatele căutării una sub alta la orice lățime; la 1440 px meniul în stânga, cu Cont și Deconectare jos) și `sql/94_launch_check` (sâmbăta 09:00–13:00 arată 09:00…12:00; catalogul nu are unde ține prețuri). Trecerea prin toate ecranele tuturor rolurilor (RO și EN, 390 / 820 / 1440 px) verifică acum și că nimic nu iese pe orizontală și că nu rămâne text românesc pe ecranele în engleză — nu s-a găsit nimic. **Reparat:** pe telefon, o eroare sub un buton aflat jos pe ecran (de exemplu „Ai deja 3 programări active la acest service.” sub „Trimite cererea”) ieșea pe jumătate din ecran; acum ecranul o aduce singur în vedere (toate butoanele de scriere); la admin → Abonamente, numărul de pe file avea contrast prea mic (se vedea doar cu abonamente restante) — acum are aceeași culoare ca eticheta. **Google:** `robots.txt` și `sitemap.xml` se fac la fiecare build: site-ul publicat poate fi găsit în Google (fără ecranele din cont), linkurile de test le spun motoarelor de căutare să nu le citească. **Ghidul** `docs/LANSARE.md`, Partea 4, pas cu pas: copiile de siguranță (planul Pro), Stripe real (produsele de 149 și 19 lei, portalul, webhook-ul, cheile), CAPTCHA Turnstile, domeniul service-hub.ro, adresele din Supabase Auth și `APP_URL`, contul de admin. **Decizii:** (1) T19c împărțit: partea automată acum, pașii tăi de lansare în T19e; (2) CAPTCHA doar pe site-ul publicat (linkurile de test folosesc proiectul de test, fără CAPTCHA), pornit în ordinea care nu blochează logarea; (3) DNS-ul rămâne la firma de acum și se schimbă doar două rânduri (A și CNAME), ca emailurile să nu se oprească; (4) recomand planul Supabase Pro din ziua lansării, cu proiectul de test mutat într-o organizație gratuită. **Rămas:** T19e (pașii tăi), T14b (facturile).
+
+### T19e — Lansarea: domeniul, plățile reale, CAPTCHA, adminul, copiile de siguranță
+
+Pașii tăi din `docs/LANSARE.md`, Partea 4 (în ordine: copiile de siguranță, Stripe live, CAPTCHA Turnstile, domeniul service-hub.ro, adresele din Supabase Auth și `APP_URL`, contul de admin), apoi Partea 5 (ștergerea conturilor de test) și lista „Ce verifici tu” din `docs/LAUNCH_CHECK.md`, partea C. Claude te ajută la fiecare pas: îi spui unde ai ajuns și ce vezi.
+
+**Gata când:** service-hub.ro deschide aplicația, iar partea C din `docs/LAUNCH_CHECK.md` e bifată.
 
 - [ ] Făcut
 
@@ -694,7 +707,7 @@ Note: 1 migrare (`client_reminders`, `schema_version` = 29), niciun pachet nou. 
 
 ## T20 — Aplicațiile pentru iPhone și Android
 
-**Scop:** Service-Hub se instalează din App Store și Google Play, pentru clienți și service-uri. Aceeași aplicație ca pe web, nu o rescriere. Se face după lansarea pe web (T19c).
+**Scop:** Service-Hub se instalează din App Store și Google Play, pentru clienți și service-uri. Aceeași aplicație ca pe web, nu o rescriere. Se face după lansarea pe web (T19e).
 
 **Include:**
 - Capacitor în jurul aplicației React de acum: același cod, aceleași ecrane, aceeași bază de date; proiectele `ios/` și `android/` în repo.
