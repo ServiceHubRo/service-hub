@@ -280,6 +280,11 @@
   background: var(--amber-tint);
 }
 
+/* Muted text on the tint: #8A909B there is below 4.5:1. */
+.period:has(.periodInput:checked) .muted {
+  color: var(--muted-strong);
+}
+
 .period:has(.periodInput:focus-visible) {
   box-shadow: var(--focus-ring);
 }
