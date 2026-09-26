@@ -103,6 +103,7 @@ function valueText(t: (key: MessageKey) => string, lang: Lang, key: string, valu
   if (key === 'report_status' && `admin.reportStatus.${String(value)}` in ro) return t(`admin.reportStatus.${String(value)}` as MessageKey);
   if (key === 'mode' && `admin.deleteMode.${String(value)}` in ro) return t(`admin.deleteMode.${String(value)}` as MessageKey);
   if (key === 'kind' && `admin.export.kind.${String(value)}` in ro) return t(`admin.export.kind.${String(value)}` as MessageKey);
+  if (key === 'matched' && Array.isArray(value)) return value.map((v) => t(`admin.matched.${String(v)}` as MessageKey)).join(', ');
   if (key === 'audience' && `admin.notices.audience.${String(value)}` in ro) return t(`admin.notices.audience.${String(value)}` as MessageKey);
   if (typeof value === 'string' && /^\d{4}-\d{2}-\d{2}T/.test(value)) return dateTime(lang, value);
   return typeof value === 'object' ? JSON.stringify(value) : String(value);
@@ -124,7 +125,9 @@ export function AuditList({ entries, entityLink }: { entries: AuditEntry[]; enti
             </div>
             {entityLink?.(e)}
             <span className={styles.muted}>
-              {t('admin.audit.by', { admin: [e.admin_display_id, e.admin_name].filter(Boolean).join(' · ') || '—' })}
+              {e.admin_display_id || e.admin_name
+                ? t('admin.audit.by', { admin: [e.admin_display_id, e.admin_name].filter(Boolean).join(' · ') })
+                : t('admin.audit.auto')}
             </span>
             {changes.map((c) =>
               c.after === undefined ? (

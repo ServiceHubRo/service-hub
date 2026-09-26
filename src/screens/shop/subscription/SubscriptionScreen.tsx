@@ -151,7 +151,9 @@ function StatusCard({ data, view }: { data: SubscriptionData; view: Subscription
           ? t('sub.inactivePayment')
           : sub.ended_reason === 'admin'
             ? t('sub.inactiveAdmin')
-            : t('sub.inactive');
+            : sub.ended_reason === 'trial_used'
+              ? t('sub.inactiveTrialUsed')
+              : t('sub.inactive');
   }
 
   const inTrial = view.daysLeft !== null && view.trialDays !== null;

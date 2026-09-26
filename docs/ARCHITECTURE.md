@@ -402,6 +402,8 @@ As Prompt 16e plus §7. Report code `SH-YYYY-NNNNNN` from a sequence. Public pag
 
 ---
 
+- **Account fingerprints (after T19d, migration `account_fingerprints`, `schema_version` 32):** `account_fingerprints` (kind email/phone, `hash` = SHA-256 of a database-only secret + the lower-case email or the phone digits with the country code, `reason` `trial_used` / `suspended_account` / `suspended_shop`, `user_id`, `released_at`), no API access. Every shop owner is fingerprinted (`trial_used`); a suspension adds `suspended_*`, lifting it removes those rows and any matching the person's current values. `signup_fingerprints()` runs after `handle_new_user` (trigger `on_auth_user_created_zz_fingerprints`): the same email or phone as a suspended account or shop → the new account is created suspended (audit `auto_suspend_account`, no admin); a shop owner whose email or phone already had a free period → subscription `inactive`, `ended_reason = 'trial_used'`, no launch price (audit `auto_no_trial`). Deleting an account releases its rows (`released_at`); `purge_account_fingerprints()` deletes them after 3 years (pg_cron `sh_purge_fingerprints`, daily). Privacy Policy §3, §5.
+
 ## 16. i18n
 
 - `src/i18n/ro.ts` exports a flat object of keys → Romanian strings; `en.ts` is typed `Record<keyof typeof ro, string>`.

@@ -60,7 +60,7 @@ test.describe('shop settings', () => {
     await expect(page.getByText('0 din 4', { exact: true })).toBeVisible();
     await expect(page.getByText('Service-ul tău nu apare încă în căutări.')).toBeVisible();
     await expect(page.getByText('Alege cel puțin un serviciu.')).toBeVisible();
-    await expect(page.getByText('Îți trimitem un cod de 6 cifre prin SMS la 0723 375 248.')).toBeVisible();
+    await expect(page.getByText(/^Îți trimitem un cod de 6 cifre prin SMS la 07\d{2} \d{3} \d{3}\.$/)).toBeVisible();
     await expectNoHorizontalScroll(page);
     await shot(page, 't05-panou-new', name());
 

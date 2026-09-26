@@ -13,6 +13,7 @@ import {
   shot,
   signIn,
   uniqueEmail,
+  uniquePhone,
 } from './support';
 
 test.beforeEach(async ({ context }) => {
@@ -208,10 +209,11 @@ test.describe('with accounts', () => {
 
   test('client: sign up, confirm the email, land on Caută, see the account ID', async ({ page }) => {
     const email = uniqueEmail('client-ui');
+    const phone = uniquePhone();
     await page.goto('/cont-nou');
     await page.getByRole('button', { name: 'Sunt client' }).click();
     await page.getByLabel('Nume și prenume').fill('Andreea Ionescu');
-    await page.getByLabel('Telefon').fill('0723 375 248');
+    await page.getByLabel('Telefon').fill(phone.national);
     await page.getByLabel('Email').fill(email);
     await page.getByLabel('Parolă', { exact: true }).fill(PASSWORD);
     await page.getByLabel('Repetă parola').fill(PASSWORD);
@@ -239,7 +241,7 @@ test.describe('with accounts', () => {
     await openAccount(page);
     await expect(page.getByText('Cont de client')).toBeVisible();
     await expect(page.getByText('Andreea Ionescu')).toBeVisible();
-    await expect(page.getByText('0723 375 248')).toBeVisible();
+    await expect(page.getByText(phone.national)).toBeVisible();
     await expect(page.getByText(/^C-\d{5}$/)).toBeVisible();
     await expectNoHorizontalScroll(page);
     await shot(page, 'account-client', name());
@@ -252,7 +254,7 @@ test.describe('with accounts', () => {
     await page.getByLabel('Nume și prenume').fill('Ion Popescu');
     await page.getByLabel('Numele service-ului').fill('Atelier Nou');
     await page.getByLabel('Oraș').fill('Codlea');
-    await page.getByLabel('Telefon').fill('0268 312 445');
+    await page.getByLabel('Telefon').fill(uniquePhone().national);
     await page.getByLabel('Email').fill(email);
     await page.getByLabel('Parolă', { exact: true }).fill(PASSWORD);
     await page.getByLabel('Repetă parola').fill(PASSWORD);
