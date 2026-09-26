@@ -1,5 +1,5 @@
 import { LogOut, User } from 'lucide-react';
-import { useRef, useEffect, type MouseEvent } from 'react';
+import { useCallback, useEffect, useRef, useState, type MouseEvent } from 'react';
 import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { LogoTile } from '../components/LogoTile';
 import { Wordmark } from '../components/Wordmark';
@@ -16,6 +16,7 @@ import { messagesPath } from '../screens/messages/paths';
 import { unreadThreads, useOptionalThreads } from '../screens/messages/threadsContext';
 import { EmailVerifyBanner } from './EmailVerifyBanner';
 import { LangSwitch } from './LangSwitch';
+import { LogoutConfirm } from './LogoutConfirm';
 import { PushBridge } from './PushBridge';
 import { ScreenErrorBoundary } from './ScreenErrorBoundary';
 import { NAV, type NavItem, type Role } from './roles';
@@ -114,6 +115,14 @@ export function AppShell({ role }: { role: Role }) {
     mainRef.current?.focus();
   }
 
+  // „Deconectare” in the sidebar asks first (LogoutConfirm); „Rămân” gives the focus back.
+  const [askLogout, setAskLogout] = useState(false);
+  const logoutRef = useRef<HTMLButtonElement>(null);
+  const cancelLogout = useCallback(() => {
+    setAskLogout(false);
+    requestAnimationFrame(() => logoutRef.current?.focus());
+  }, []);
+
   // Leave first, then end the session: otherwise the role guard would send us to sign-in.
   async function logOut() {
     navigate('/', { replace: true, state: { leaving: true } });
@@ -158,10 +167,21 @@ export function AppShell({ role }: { role: Role }) {
               <LangSwitch />
             </div>
             <SidebarLink item={nav.account} />
-            <button type="button" className={`${styles.sideLink} ${styles.logout}`} onClick={() => void logOut()}>
-              <LogOut size={20} aria-hidden="true" />
-              <span>{t('nav.logout')}</span>
-            </button>
+            {askLogout ? (
+              <div className={styles.sideConfirm}>
+                <LogoutConfirm onConfirm={() => void logOut()} onCancel={cancelLogout} />
+              </div>
+            ) : (
+              <button
+                ref={logoutRef}
+                type="button"
+                className={`${styles.sideLink} ${styles.logout}`}
+                onClick={() => setAskLogout(true)}
+              >
+                <LogOut size={20} aria-hidden="true" />
+                <span>{t('nav.logout')}</span>
+              </button>
+            )}
           </div>
         </aside>
 

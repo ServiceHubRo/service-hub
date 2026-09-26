@@ -213,6 +213,10 @@
   .logout {
     color: var(--muted);
   }
+
+  .sideConfirm {
+    padding: 8px 12px 4px;
+  }
 }
 
 @media print {

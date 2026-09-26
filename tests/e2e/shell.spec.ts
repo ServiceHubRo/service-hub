@@ -139,16 +139,38 @@ test('a shop never sees the garage', async ({ page }) => {
   await expect(page.getByText('Garaj')).toHaveCount(0);
 });
 
-test('log out returns to the public page and closes the role screens', async ({ page }) => {
+test('log out asks first, then returns to the public page and closes the role screens', async ({ page }) => {
   test.skip(!BACKEND, 'needs the local Supabase stack');
   await signIn(page, SEED.shop, SEED_PASSWORD);
   await expect(page).toHaveURL(/\/s\/panou$/);
-  if (isDesktop(page)) {
-    await page.getByRole('button', { name: 'Deconectare' }).click();
-  } else {
-    await page.getByRole('link', { name: 'Cont', exact: true }).click();
-    await page.getByRole('button', { name: 'Deconectare' }).click();
-  }
+  // Desktop: in the sidebar; phone and tablet: at the bottom of Cont.
+  if (!isDesktop(page)) await page.getByRole('link', { name: 'Cont', exact: true }).click();
+  const logout = page.getByRole('button', { name: 'Deconectare' }).filter({ visible: true });
+
+  // „Rămân conectat” keeps the session and gives the focus back to the button; so does Escape.
+  await logout.click();
+  await expect(page.getByRole('heading', { name: 'Te deconectezi?' })).toBeFocused();
+  await expect(page.getByText('Pe acest dispozitiv vei intra din nou cu emailul și parola.')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Rămân conectat' })).toBeInViewport({ ratio: 1 });
+  await expectNoHorizontalScroll(page);
+  await page.screenshot({ path: `test-results/shots/logout-confirm-${test.info().project.name}.png` });
+  await page.getByRole('button', { name: 'Rămân conectat' }).click();
+  await expect(page.getByRole('heading', { name: 'Te deconectezi?' })).toHaveCount(0);
+  await expect(logout).toBeFocused();
+  await logout.click();
+  await page.keyboard.press('Escape');
+  await expect(page.getByRole('heading', { name: 'Te deconectezi?' })).toHaveCount(0);
+  await expect(page).toHaveURL(/\/s\/(panou|cont)$/);
+
+  // English.
+  await page.route('**/rest/v1/profiles?*', (route) =>
+    route.request().method() === 'PATCH' ? route.fulfill({ status: 204 }) : route.continue(),
+  );
+  await page.getByRole('button', { name: 'English' }).filter({ visible: true }).first().click();
+  await page.getByRole('button', { name: 'Log out' }).filter({ visible: true }).click();
+  await expect(page.getByRole('heading', { name: 'Log out?' })).toBeVisible();
+  await page.screenshot({ path: `test-results/shots/logout-confirm-en-${test.info().project.name}.png` });
+  await page.getByRole('button', { name: 'Log me out' }).click();
   await expect(page).toHaveURL(/\/$/);
   await page.goto('/s/panou');
   await expect(page).toHaveURL(/\/intra$/);

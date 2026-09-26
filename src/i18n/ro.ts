@@ -17,6 +17,10 @@ export const ro = {
   'nav.admin.moderation': 'Moderare',
   'nav.skipToContent': 'Sari la conținut',
   'nav.logout': 'Deconectare',
+  'nav.logoutConfirm.title': 'Te deconectezi?',
+  'nav.logoutConfirm.body': 'Pe acest dispozitiv vei intra din nou cu emailul și parola.',
+  'nav.logoutConfirm.yes': 'Deconectează-mă',
+  'nav.logoutConfirm.no': 'Rămân conectat',
 
   'lang.switch': 'Limba',
   'lang.ro': 'Română',

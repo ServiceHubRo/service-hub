@@ -1,7 +1,9 @@
 import { CreditCard, Download, FileCheck, FileText, Globe, Heart, History, LifeBuoy, ListTree, Megaphone, ScrollText, Settings, SlidersHorizontal, Star } from 'lucide-react';
+import { useCallback, useRef, useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import type { ShellOutletContext } from '../../app/AppShell';
 import { LangSwitch } from '../../app/LangSwitch';
+import { LogoutConfirm } from '../../app/LogoutConfirm';
 import { NAV, type Role } from '../../app/roles';
 import { useSession } from '../../app/sessionContext';
 import { Button } from '../../components/Button';
@@ -49,6 +51,13 @@ export function AccountScreen({ role }: { role: Role }) {
   const { t } = useI18n();
   const session = useSession();
   const { logOut } = useOutletContext<ShellOutletContext>();
+  // „Deconectare” asks first (LogoutConfirm); „Rămân” gives the focus back to the button.
+  const [askLogout, setAskLogout] = useState(false);
+  const logoutRef = useRef<HTMLButtonElement>(null);
+  const cancelLogout = useCallback(() => {
+    setAskLogout(false);
+    requestAnimationFrame(() => logoutRef.current?.focus());
+  }, []);
   if (!session.profile) return null;
 
   return (
@@ -125,9 +134,13 @@ export function AccountScreen({ role }: { role: Role }) {
       <DataSection />
 
       <div className={styles.mobileOnly}>
-        <Button block onClick={() => void logOut()}>
-          {t('nav.logout')}
-        </Button>
+        {askLogout ? (
+          <LogoutConfirm onConfirm={() => void logOut()} onCancel={cancelLogout} />
+        ) : (
+          <Button ref={logoutRef} block onClick={() => setAskLogout(true)}>
+            {t('nav.logout')}
+          </Button>
+        )}
       </div>
     </div>
   );
