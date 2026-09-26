@@ -1,4 +1,16 @@
 /* Design tokens — the only place colors, radii and fonts are defined (ARCHITECTURE §17). */
+
+/* Inter's digits 0-9 in their even-width forms, nothing else (scripts/gen-fonts.py, ~4 KB). In front
+   of Inter for figures: prices, hours and km line up, hyphens and spaces keep their normal width. */
+@font-face {
+  font-family: 'Inter Figures';
+  font-style: normal;
+  font-display: swap;
+  font-weight: 100 900;
+  src: url('./inter-figures.woff2') format('woff2');
+  unicode-range: U+0030-0039;
+}
+
 :root {
   --bg: #14161a;
   --surface: #1d2026;
@@ -27,10 +39,11 @@
   --muted-soft: rgba(138, 144, 155, 0.16);
 
   /* One typeface everywhere (Inter, bundled with the app so it looks the same on every device).
-     The three roles stay as names: display = headings, mono = figures (same font, even-width digits). */
+     The three roles stay as names: display = headings, mono = figures (same font, even-width digits
+     from 'Inter Figures'; not `tabular-nums`, which in Inter also widens hyphens, dots and spaces). */
   --font-body: 'Inter Variable', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   --font-display: var(--font-body);
-  --font-mono: var(--font-body);
+  --font-mono: 'Inter Figures', var(--font-body);
 
   --radius-card: 12px;
   --radius-button: 10px;

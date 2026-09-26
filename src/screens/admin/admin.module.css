@@ -96,7 +96,6 @@
 
 .id {
   font-family: var(--font-mono);
-  font-variant-numeric: tabular-nums;
   font-size: 12.5px;
   color: var(--muted);
 }
@@ -457,7 +456,6 @@ a.stat:hover {
 
 .money {
   font-family: var(--font-mono);
-  font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
 

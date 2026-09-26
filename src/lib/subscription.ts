@@ -17,6 +17,9 @@ export interface SubscriptionRow {
   seat_price_ron: number;
   free_seats: number;
   seats: number;
+  /** The period the subscription is paid for (1, 3, 6 or 12 months) and its discount in percent. */
+  billing_months: number;
+  period_discount: number;
   stripe_customer_id: string | null;
   stripe_status: string | null;
   ended_reason: string | null;
@@ -27,8 +30,8 @@ export interface SubscriptionRow {
 /**
  *   trial       free period, no card given
  *   trial_card  free period, card given: charged at its end
- *   active      paid, renews every month
- *   ending      paid, stops at the end of the month (cancelled by the owner)
+ *   active      paid, renews every period (a month, or 3, 6, 12 months)
+ *   ending      paid, stops at the end of the period (cancelled by the owner)
  *   past_due    a payment failed, Stripe retries; still in search
  *   inactive    free period over without a card, or the last try failed
  *   cancelled   ended after the owner cancelled
@@ -100,9 +103,48 @@ export function subscriptionView(sub: SubscriptionRow, now: Date = new Date()): 
   };
 }
 
-/** What the shop pays a month: its price plus its colleagues (same as subscription_monthly_ron). */
+/** What the shop pays a month at the full price: its price plus its colleagues. */
 export function monthlyTotal(sub: Pick<SubscriptionRow, 'price_ron' | 'seat_price_ron' | 'seats'>): number {
   return Math.round((Number(sub.price_ron) + Number(sub.seats) * Number(sub.seat_price_ron)) * 100) / 100;
+}
+
+/** One period the owner can pay for (my_subscription_offers): prices per period, monthlyRon = total ÷ months. */
+export interface PeriodOffer {
+  months: number;
+  discountPercent: number;
+  priceRon: number;
+  seatPriceRon: number;
+  seats: number;
+  totalRon: number;
+  monthlyRon: number;
+}
+
+/**
+ * A monthly price for a period: the same for one month, else months × price less the discount,
+ * in whole lei. Mirrors subscription_period_price() in the database and periodPrice() in
+ * supabase/functions/_shared/periods.ts.
+ */
+export function periodPrice(monthly: number, months: number, discountPercent: number): number {
+  if (!(months > 1)) return Number(monthly);
+  const cents = Math.round(Number(monthly) * 100) * months * (100 - (Number(discountPercent) || 0));
+  return Math.round(cents / 10_000);
+}
+
+/** What the shop pays a month on average: its period's total ÷ months (as subscription_monthly_ron). */
+export function monthlyAverage(
+  sub: Pick<SubscriptionRow, 'price_ron' | 'seat_price_ron' | 'seats' | 'billing_months' | 'period_discount'>,
+): number {
+  return Math.round((periodTotal(sub) / (Number(sub.billing_months) || 1)) * 100) / 100;
+}
+
+/** What the shop pays each period it is on (the next charge): its price and its colleagues, discounted. */
+export function periodTotal(
+  sub: Pick<SubscriptionRow, 'price_ron' | 'seat_price_ron' | 'seats' | 'billing_months' | 'period_discount'>,
+): number {
+  const months = Number(sub.billing_months) || 1;
+  const discount = Number(sub.period_discount) || 0;
+  const total = periodPrice(sub.price_ron, months, discount) + Number(sub.seats) * periodPrice(sub.seat_price_ron, months, discount);
+  return Math.round(total * 100) / 100;
 }
 
 /** The free period shown on Panou: a warning in its last 7 days while no card is given. */

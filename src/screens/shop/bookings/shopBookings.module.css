@@ -67,7 +67,6 @@
 .ref {
   color: var(--muted);
   font-family: var(--font-mono);
-  font-variant-numeric: tabular-nums;
   font-size: 12.5px;
 }
 
@@ -140,7 +139,6 @@
 .note {
   color: var(--muted);
   font-size: 13px;
-  font-style: italic;
   white-space: pre-line;
   overflow-wrap: anywhere;
 }
@@ -378,7 +376,6 @@
   padding-right: 14px;
   color: var(--muted);
   font-family: var(--font-mono);
-  font-variant-numeric: tabular-nums;
   font-size: 15px;
   pointer-events: none;
 }

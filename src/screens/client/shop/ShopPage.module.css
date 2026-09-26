@@ -49,7 +49,6 @@
 
 .distance {
   font-family: var(--font-mono);
-  font-variant-numeric: tabular-nums;
   color: var(--text);
 }
 
@@ -141,7 +140,6 @@
 
 .phone {
   font-family: var(--font-mono);
-  font-variant-numeric: tabular-nums;
 }
 
 .phone:hover,

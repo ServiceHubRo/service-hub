@@ -1,8 +1,11 @@
 // Paid staff accounts in Stripe (ARCHITECTURE §12): the subscription carries a second item,
-// "Cont angajat" (STRIPE_SEAT_PRICE_ID, 20 lei a month), whose quantity is the shop's colleagues
-// with an account. Changes are prorated by day both ways (Stripe's create_prorations).
+// "Cont angajat" (STRIPE_SEAT_PRICE_ID, 19 lei a month), whose quantity is the shop's colleagues
+// with an account. Changes are prorated by day both ways (Stripe's create_prorations). On a
+// subscription paid for 3, 6 or 12 months the item costs the period's price per colleague (the
+// same discount) and a change is invoiced at once (always_invoice), not at the next renewal.
 //
 // No Deno here: the unit tests run it against a fake Stripe.
+import { periodPrice, recurringFor } from './periods.ts';
 import type { StripeApi } from './stripe.ts';
 import { hasLiveSubscription, StripeError } from './stripe.ts';
 
@@ -16,6 +19,9 @@ export interface SeatInfo {
   shop_id: string;
   seats: number;
   seat_price_ron: number;
+  /** The subscription's period and its discount (a month and 0 unless paid for longer). */
+  billing_months?: number;
+  period_discount?: number;
   billed_seats: number | null;
   stripe_subscription_id: string | null;
   stripe_status: string | null;
@@ -42,14 +48,15 @@ export async function seatPrice(stripe: StripeApi, priceId: string): Promise<Sea
 /**
  * The Checkout line for `seats` colleagues at the shop's price per colleague: the Stripe price when
  * the amounts match, else the same product at the shop's amount (a shop keeps the price it signed
- * up with). Null when there is nobody to pay for.
+ * up with). For 3, 6 or 12 months, the period's price per colleague on the same product. Null when
+ * there is nobody to pay for.
  */
-export function seatLineItem(price: SeatPrice, seatPriceRon: number, seats: number): Obj | null {
+export function seatLineItem(price: SeatPrice, seatPriceRon: number, seats: number, months = 1, discountPercent = 0): Obj | null {
   if (!(seats > 0)) return null;
-  const amount = Math.round(Number(seatPriceRon) * 100);
-  if (price.unitAmount === amount && price.currency === 'ron') return { price: price.id, quantity: seats };
+  const amount = Math.round(periodPrice(seatPriceRon, months, discountPercent) * 100);
+  if (months <= 1 && price.unitAmount === amount && price.currency === 'ron') return { price: price.id, quantity: seats };
   return {
-    price_data: { currency: 'ron', product: price.product, unit_amount: amount, recurring: { interval: 'month' } },
+    price_data: { currency: 'ron', product: price.product, unit_amount: amount, recurring: recurringFor(months) },
     quantity: seats,
   };
 }
@@ -97,23 +104,27 @@ export async function syncSeats(
   if (!hasLiveSubscription(String(sub.status ?? ''))) return { status: 'no_subscription', billed: null };
 
   const seats = Math.max(0, Math.floor(Number(info.seats) || 0));
+  const months = Number(info.billing_months) || 1;
+  // A month: prorated on the next invoice, as before. A longer period would leave the change for
+  // months, so it is invoiced at once.
+  const proration_behavior = months > 1 ? 'always_invoice' : 'create_prorations';
   const item = seatItem(sub, price);
   const now = item && typeof item.quantity === 'number' ? item.quantity : 0;
   if (item && now === seats) return { status: 'unchanged', billed: seats };
   if (!item && seats === 0) return { status: 'unchanged', billed: 0 };
 
   if (item && seats === 0) {
-    await stripe.del(`subscription_items/${idOf(item.id)}`, { proration_behavior: 'create_prorations' });
+    await stripe.del(`subscription_items/${idOf(item.id)}`, { proration_behavior });
     return { status: 'removed', billed: 0 };
   }
   if (item) {
-    await stripe.post(`subscription_items/${idOf(item.id)}`, { quantity: seats, proration_behavior: 'create_prorations' });
+    await stripe.post(`subscription_items/${idOf(item.id)}`, { quantity: seats, proration_behavior });
     return { status: 'updated', billed: seats };
   }
-  const line = seatLineItem(price, info.seat_price_ron, seats)!;
+  const line = seatLineItem(price, info.seat_price_ron, seats, months, Number(info.period_discount) || 0)!;
   await stripe.post(
     'subscription_items',
-    { subscription: info.stripe_subscription_id, ...line, proration_behavior: 'create_prorations' },
+    { subscription: info.stripe_subscription_id, ...line, proration_behavior },
     `seat-item-${info.stripe_subscription_id}-${requestKey}`,
   );
   return { status: 'added', billed: seats };

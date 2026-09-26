@@ -41,7 +41,7 @@ describe('automatic messages', () => {
 
   it('read from the reader side, in the reader language', () => {
     const params = { ref: 'P-000123', by: 'shop', date: '2026-10-14', slot: '10:00' };
-    expect(systemMessageText('ro', 'client', 'booking_confirmed', params)).toBe('Programarea P-000123 e confirmată: Mie 14 oct, 10:00.');
+    expect(systemMessageText('ro', 'client', 'booking_confirmed', params)).toBe('Programarea P-000123 este confirmată: Mie 14 oct, 10:00.');
     expect(systemMessageText('ro', 'shop', 'booking_confirmed', params)).toBe('Ai confirmat programarea P-000123: Mie 14 oct, 10:00.');
     expect(systemMessageText('en', 'client', 'booking_confirmed', params)).toBe('Booking P-000123 is confirmed: Wed, Oct 14, 10:00.');
   });

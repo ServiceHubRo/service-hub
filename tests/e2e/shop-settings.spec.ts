@@ -60,7 +60,7 @@ test.describe('shop settings', () => {
     await expect(page.getByText('0 din 4', { exact: true })).toBeVisible();
     await expect(page.getByText('Service-ul tău nu apare încă în căutări.')).toBeVisible();
     await expect(page.getByText('Alege cel puțin un serviciu.')).toBeVisible();
-    await expect(page.getByText('Îți trimitem un cod de 6 cifre prin SMS la 0723 375 248.')).toBeVisible();
+    await expect(page.getByText(/^Îți trimitem un cod de 6 cifre prin SMS la 07\d{2} \d{3} \d{3}\.$/)).toBeVisible();
     await expectNoHorizontalScroll(page);
     await shot(page, 't05-panou-new', name());
 
@@ -116,7 +116,7 @@ test.describe('shop settings', () => {
     await page.getByLabel('De la').fill(inDays(20));
     await page.getByLabel('Până la (inclusiv)').fill(inDays(19));
     await page.getByRole('button', { name: 'Salvează', exact: true }).click();
-    await expect(page.getByText('Data de sfârșit e înaintea celei de început.')).toBeVisible();
+    await expect(page.getByText('Data de sfârșit este înaintea celei de început.')).toBeVisible();
     await page.getByRole('button', { name: 'Renunță' }).click();
     await expectNoHorizontalScroll(page);
     await shot(page, 't05-hours', name());
@@ -182,7 +182,7 @@ test.describe('shop settings', () => {
 
     await page.getByRole('link', { name: 'Setări service' }).click();
     await page.getByRole('link', { name: /Date de facturare/ }).click();
-    await expect(page.getByText('Nu e obligatoriu acum.', { exact: false })).toBeVisible();
+    await expect(page.getByText('Nu este obligatoriu acum.', { exact: false })).toBeVisible();
     await page.getByLabel('Denumire legală').fill('AUTO TEST S.R.L.');
     await page.getByLabel('CUI / Cod fiscal').fill('14872302');
     await page.getByLabel('Nr. Registrul Comerțului').fill('J08/1234/2015');
@@ -275,7 +275,7 @@ test.describe('shop settings', () => {
     // A used link says so.
     const third = await (await browser.newContext({ locale: 'ro-RO' })).newPage();
     await third.goto(link);
-    await expect(third.getByText(/Linkul nu mai e valabil/)).toBeVisible();
+    await expect(third.getByText(/Linkul nu mai este valabil/)).toBeVisible();
 
     // The owner sees the colleague and removes them.
     await page.reload();
@@ -285,7 +285,7 @@ test.describe('shop settings', () => {
     await page.getByRole('button', { name: 'Da, elimină' }).click();
     await expect(page.getByText('Mihai Coleg')).toHaveCount(0);
     await guest.goto('/s/panou');
-    await expect(guest.getByText('Contul tău nu mai e legat de niciun service.', { exact: false })).toBeVisible();
+    await expect(guest.getByText('Contul tău nu mai este legat de niciun service.', { exact: false })).toBeVisible();
     await other.close();
   });
 
@@ -314,5 +314,5 @@ test.describe('shop settings', () => {
 test('an unknown invitation link says it is not valid', async ({ page }) => {
   test.skip(!BACKEND, 'needs the local Supabase stack');
   await page.goto(`/invitatie/${'0'.repeat(64)}`);
-  await expect(page.getByText(/Linkul nu mai e valabil/)).toBeVisible();
+  await expect(page.getByText(/Linkul nu mai este valabil/)).toBeVisible();
 });

@@ -33,13 +33,13 @@ select test.eq(count(distinct display_id), count(*), 'display ids unique') from 
 
 -- Shop sign-up also builds the shop, default hours, billing row, trial and owner row.
 select test.sign_up('shop@test.local',
-  '{"role":"shop","name":"Ion Popescu","phone":"0268312445","shop_name":"Atelier Demo","city":"Brașov","lang":"ro","terms_version":"2026-09"}');
+  '{"role":"shop","name":"Ion Popescu","phone":"0268312499","shop_name":"Atelier Demo","city":"Brașov","lang":"ro","terms_version":"2026-09"}');
 
 select test.eq(p.role, 'shop', 'shop role'),
        test.ok(p.display_id ~ '^S-[0-9]{5}$', 'shop display id S-00000'),
        test.eq(s.name, 'Atelier Demo', 'shop name from metadata'),
        test.eq(s.city, 'Brașov', 'shop city from metadata'),
-       test.eq(s.phone, '0268312445', 'shop phone from sign-up'),
+       test.eq(s.phone, '0268312499', 'shop phone from sign-up'),
        test.eq(s.daily_capacity, 5, 'default daily capacity'),
        test.eq(s.cars_per_slot, 1, 'default cars per slot'),
        test.eq(s.slot_minutes, 60, 'default slot'),

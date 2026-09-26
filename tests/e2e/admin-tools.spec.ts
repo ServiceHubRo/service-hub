@@ -105,7 +105,7 @@ test.describe('admin tools', () => {
     await expectNoHorizontalScroll(page);
     await shot(page, 't16b-notice-preview', name());
     await page.getByRole('button', { name: 'Trimite către 1 persoană' }).click();
-    await expect(page.getByText(`Anunțul „${title}” e trimis.`)).toBeVisible();
+    await expect(page.getByText(`Anunțul „${title}” este trimis.`)).toBeVisible();
     await expect(page.getByText(title).first()).toBeVisible();
     await expect(page.getByText(`Clienții din ${city}`).first()).toBeVisible();
 
@@ -135,7 +135,7 @@ test.describe('admin tools', () => {
     // Withdrawn by the admin: gone, and in the audit log.
     await page.getByRole('listitem').filter({ hasText: title }).getByRole('button', { name: 'Retrage anunțul' }).click();
     await page.getByRole('listitem').filter({ hasText: title }).getByRole('button', { name: 'Retrage anunțul' }).last().click();
-    await expect(page.getByText('Anunțul e retras.')).toBeVisible();
+    await expect(page.getByText('Anunțul este retras.')).toBeVisible();
     await openAccount(page);
     await page.getByRole('link', { name: /^Jurnal de audit/ }).click();
     await expect(page.getByText('Anunț trimis').first()).toBeVisible();
@@ -155,7 +155,7 @@ test.describe('admin tools', () => {
     await page.getByLabel('Nume în engleză').fill(`Tractors ${t}`);
     await expect(page.getByLabel('Cod categorie')).toHaveValue(`cat_tractoare_${t}`);
     await page.getByRole('button', { name: 'Adaugă categoria' }).click();
-    await expect(page.getByText('Categoria e adăugată la sfârșitul listei.')).toBeVisible();
+    await expect(page.getByText('Categoria este adăugată la sfârșitul listei.')).toBeVisible();
 
     await page.getByLabel('Caută serviciu sau categorie').fill(`Tractoare ${t}`);
     const card = page.getByRole('listitem').filter({ hasText: `cat_tractoare_${t}` });
@@ -170,7 +170,7 @@ test.describe('admin tools', () => {
     await expect(card.getByRole('button', { name: 'Adaugă serviciul' })).toBeDisabled();
     await card.getByLabel('Reminder de revizie (luni)').fill('18');
     await card.getByRole('button', { name: 'Adaugă serviciul' }).click();
-    await expect(page.getByText('Serviciul e adăugat la sfârșitul categoriei.')).toBeVisible();
+    await expect(page.getByText('Serviciul este adăugat la sfârșitul categoriei.')).toBeVisible();
     await expect(card.getByText(`revizie_tractor_${t}`)).toBeVisible();
     await expect(card.getByText('Reminder: la 18 luni')).toBeVisible();
     await shot(page, 't16b-catalog-new', name());
@@ -188,7 +188,7 @@ test.describe('admin tools', () => {
 
     // The category switched off takes its service with it (so other tests never see it).
     await card.getByRole('button', { name: `Editează: Tractoare ${t}` }).click();
-    await card.getByText('Categoria e activă').click();
+    await card.getByText('Categoria este activă').click();
     await expect(card.getByText('Oprind categoria se opresc și toate serviciile din ea.', { exact: false })).toBeVisible();
     await card.getByRole('button', { name: 'Salvează' }).click();
     await expect(card.getByText('Oprit')).toHaveCount(2);
@@ -263,7 +263,7 @@ test.describe('admin tools', () => {
     await expect(card.getByText('Scrie motivul.', { exact: false }).or(card.getByRole('alert'))).toBeVisible();
     await card.getByLabel('Motiv').fill('Emis pentru altă mașină');
     await card.getByRole('button', { name: 'Anulează raportul' }).last().click();
-    await expect(page.getByText(`Raportul ${r!.code} e anulat.`)).toBeVisible();
+    await expect(page.getByText(`Raportul ${r!.code} este anulat.`)).toBeVisible();
     await expect(card.getByText('Emis pentru altă mașină')).toBeVisible();
     const check = await rpcAs<{ void: boolean }>(client, 'verify_report', { p_code: r!.code });
     expect(check.void).toBe(true);
@@ -294,7 +294,7 @@ test.describe('admin tools', () => {
     await page.getByRole('button', { name: 'Schimbă prețul' }).click();
     await page.getByLabel('Preț pe lună (lei)').fill('79,50');
     await page.getByRole('button', { name: 'Salvează' }).click();
-    await expect(page.getByText('Prețul abonamentului e schimbat.')).toBeVisible();
+    await expect(page.getByText('Prețul abonamentului este schimbat.')).toBeVisible();
     await expect(page.getByText('79,50 lei').first()).toBeVisible();
 
     // The shops list exports what it shows.

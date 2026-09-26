@@ -5,10 +5,12 @@ import { ActionButton } from '../../components/ActionButton';
 import { Button } from '../../components/Button';
 import { Card } from '../../components/Card';
 import { Field } from '../../components/Field';
+import { PhoneField } from '../../components/PhoneField';
 import { fetchMyShop, updateProfile, type ShopSummary } from '../../data/profile';
 import { rpcErrorMessage } from '../../data/rpc';
 import { useI18n } from '../../i18n/context';
-import { formatPhone, normalizePhone } from '../../lib/validators';
+import { phoneFromInput, phoneParts } from '../../lib/phone';
+import { formatPhone } from '../../lib/validators';
 import styles from './account.module.css';
 
 function initials(name: string | null | undefined): string {
@@ -25,7 +27,8 @@ export function IdentityCard() {
   const [shop, setShop] = useState<ShopSummary | null>(null);
   const [editing, setEditing] = useState(false);
   const [name, setName] = useState(profile.name ?? '');
-  const [phone, setPhone] = useState(profile.phone ? formatPhone(profile.phone) : '');
+  const [phone, setPhone] = useState(() => phoneParts(profile.phone).national);
+  const [phoneCountry, setPhoneCountry] = useState(() => phoneParts(profile.phone).country);
   const [errors, setErrors] = useState<{ name?: string; phone?: string }>({});
   const verified = Boolean(profile.phone_verified_at || profile.phone_verified_by_admin);
 
@@ -44,7 +47,9 @@ export function IdentityCard() {
 
   function startEdit() {
     setName(profile.name ?? '');
-    setPhone(profile.phone ? formatPhone(profile.phone) : '');
+    const parts = phoneParts(profile.phone);
+    setPhone(parts.national);
+    setPhoneCountry(parts.country);
     setErrors({});
     setEditing(true);
   }
@@ -52,8 +57,8 @@ export function IdentityCard() {
   async function save() {
     const next: { name?: string; phone?: string } = {};
     if (name.trim() === '') next.name = t('auth.error.nameRequired');
-    const normalized = normalizePhone(phone);
-    if (!normalized) next.phone = t('auth.error.phoneInvalid');
+    const normalized = phoneFromInput(phoneCountry, phone);
+    if (!normalized) next.phone = t(phoneCountry === 'RO' ? 'auth.error.phoneInvalid' : 'auth.error.phoneInvalidIntl');
     setErrors(next);
     if (next.name || next.phone || !normalized) return;
     const saved = await updateProfile(profile.id, { name: name.trim(), phone: normalized });
@@ -104,14 +109,12 @@ export function IdentityCard() {
             onChange={(e) => setName(e.target.value)}
             error={errors.name}
           />
-          <Field
+          <PhoneField
             label={t('auth.phone')}
-            type="tel"
-            autoComplete="tel"
-            inputMode="tel"
-            mono
+            country={phoneCountry}
+            onCountryChange={setPhoneCountry}
             value={phone}
-            onChange={(e) => setPhone(e.target.value)}
+            onChange={setPhone}
             error={errors.phone}
             hint={profile.role === 'shop' ? t('account.phoneReverify') : undefined}
           />

@@ -158,7 +158,7 @@ test.describe('messages and reviews', () => {
 
     // A status change writes an automatic message: each side reads its own sentence.
     await rpcAs(shop, 'confirm_booking', { p_booking_id: booking.id, p_request_id: rid() });
-    await expect(log).toContainText(`Programarea ${booking.ref} e confirmată:`);
+    await expect(log).toContainText(`Programarea ${booking.ref} este confirmată:`);
     await expect(shopPage.getByRole('log')).toContainText(`Ai confirmat programarea ${booking.ref}:`);
     await expectNoHorizontalScroll(page);
     await shot(page, 't11-client-conversation', name());

@@ -13,6 +13,7 @@ import {
   shot,
   signIn,
   uniqueEmail,
+  uniquePhone,
 } from './support';
 
 test.beforeEach(async ({ context }) => {
@@ -63,7 +64,7 @@ test('sign-up refuses missing data with a specific message per field', async ({ 
   await page.getByRole('button', { name: 'Creează cont' }).click();
   await expect(page.getByText('Alege dacă ești client sau service.')).toBeVisible();
   await expect(page.getByText('Scrie numele.')).toBeVisible();
-  await expect(page.getByText('Număr de telefon invalid. Exemplu: 0723 375 248.')).toBeVisible();
+  await expect(page.getByText('Număr de telefon invalid. Exemplu: 07xx xxx xxx.')).toBeVisible();
   await expect(page.getByText('Adresa de email nu pare corectă.')).toBeVisible();
   await expect(page.getByText('Parola trebuie să aibă cel puțin 8 caractere.')).toBeVisible();
   await expect(page.getByText('Ca să creezi contul, trebuie să accepți Termenii și Politica de confidențialitate.')).toBeVisible();
@@ -175,12 +176,44 @@ test.describe('with accounts', () => {
     await page.goto(link);
   }
 
+  test('client: a phone from another country, picked with its prefix, kept and edited in Cont', async ({ page }) => {
+    const email = uniqueEmail('client-intl');
+    await page.goto('/cont-nou');
+    await page.getByRole('button', { name: 'Sunt client' }).click();
+    await page.getByLabel('Nume și prenume').fill('Anna Weber');
+    await expect(page.getByLabel('Telefon')).toHaveAttribute('placeholder', '07xx xxx xxx');
+    await page.getByLabel('Prefixul țării').selectOption('DE');
+    await expect(page.getByText('+49', { exact: true })).toBeVisible();
+    await page.getByLabel('Telefon').fill('12');
+    await page.getByRole('button', { name: 'Creează cont' }).click();
+    await expect(page.getByText('Număr de telefon invalid pentru țara aleasă.')).toBeVisible();
+    await page.getByLabel('Telefon').fill('0151 2345 6789');
+    await page.getByLabel('Email').fill(email);
+    await page.getByLabel('Parolă', { exact: true }).fill(PASSWORD);
+    await page.getByLabel('Repetă parola').fill(PASSWORD);
+    await page.getByRole('checkbox').check();
+    await expectNoHorizontalScroll(page);
+    await shot(page, 'auth-signup-intl-phone', name());
+    await page.getByRole('button', { name: 'Creează cont' }).click();
+    await expect(page).toHaveURL(/\/confirma-email$/);
+
+    await confirmFromEmail(page, email);
+    await expect(page).toHaveURL(/\/c\/cauta$/);
+    await openAccount(page);
+    await expect(page.getByText('+4915123456789')).toBeVisible();
+    // Editing opens on the same country.
+    await page.getByRole('button', { name: 'Editează numele și telefonul' }).click();
+    await expect(page.getByLabel('Prefixul țării')).toHaveValue('DE');
+    await expect(page.getByLabel('Telefon')).toHaveValue('15123456789');
+  });
+
   test('client: sign up, confirm the email, land on Caută, see the account ID', async ({ page }) => {
     const email = uniqueEmail('client-ui');
+    const phone = uniquePhone();
     await page.goto('/cont-nou');
     await page.getByRole('button', { name: 'Sunt client' }).click();
     await page.getByLabel('Nume și prenume').fill('Andreea Ionescu');
-    await page.getByLabel('Telefon').fill('0723 375 248');
+    await page.getByLabel('Telefon').fill(phone.national);
     await page.getByLabel('Email').fill(email);
     await page.getByLabel('Parolă', { exact: true }).fill(PASSWORD);
     await page.getByLabel('Repetă parola').fill(PASSWORD);
@@ -195,7 +228,7 @@ test.describe('with accounts', () => {
 
     // Before confirming, signing in explains what is missing.
     await signIn(page, email, PASSWORD);
-    await expect(page.getByText(`Adresa ${email} nu e confirmată încă.`, { exact: false })).toBeVisible();
+    await expect(page.getByText(`Adresa ${email} nu este confirmată încă.`, { exact: false })).toBeVisible();
     await page.evaluate(() => localStorage.removeItem('sh_email_log')); // skip the 60 s wait
     await page.waitForTimeout(1100); // the local Auth server allows one email per second
     await page.getByRole('button', { name: 'Retrimite emailul' }).click();
@@ -208,7 +241,7 @@ test.describe('with accounts', () => {
     await openAccount(page);
     await expect(page.getByText('Cont de client')).toBeVisible();
     await expect(page.getByText('Andreea Ionescu')).toBeVisible();
-    await expect(page.getByText('0723 375 248')).toBeVisible();
+    await expect(page.getByText(phone.national)).toBeVisible();
     await expect(page.getByText(/^C-\d{5}$/)).toBeVisible();
     await expectNoHorizontalScroll(page);
     await shot(page, 'account-client', name());
@@ -221,7 +254,7 @@ test.describe('with accounts', () => {
     await page.getByLabel('Nume și prenume').fill('Ion Popescu');
     await page.getByLabel('Numele service-ului').fill('Atelier Nou');
     await page.getByLabel('Oraș').fill('Codlea');
-    await page.getByLabel('Telefon').fill('0268 312 445');
+    await page.getByLabel('Telefon').fill(uniquePhone().national);
     await page.getByLabel('Email').fill(email);
     await page.getByLabel('Parolă', { exact: true }).fill(PASSWORD);
     await page.getByLabel('Repetă parola').fill(PASSWORD);
@@ -337,7 +370,7 @@ test.describe('with accounts', () => {
     await page.getByLabel('Nume și prenume').fill('Maria Pop-Ionescu');
     await page.getByLabel('Telefon').fill('123');
     await page.getByRole('button', { name: 'Salvează', exact: true }).click();
-    await expect(page.getByText('Număr de telefon invalid. Exemplu: 0723 375 248.')).toBeVisible();
+    await expect(page.getByText('Număr de telefon invalid. Exemplu: 07xx xxx xxx.')).toBeVisible();
     await page.getByLabel('Telefon').fill('0744 123 456');
     await page.getByRole('button', { name: 'Salvează', exact: true }).click();
     await expect(page.getByText('Maria Pop-Ionescu')).toBeVisible();
@@ -380,7 +413,7 @@ test.describe('with accounts', () => {
     await page.getByLabel('Parola nouă', { exact: true }).fill('Parola-Buna-2027');
     await page.getByLabel('Repetă parola nouă').fill('Parola-Buna-2027');
     await page.getByRole('button', { name: 'Salvează parola nouă' }).click();
-    await expect(page.getByText('Parola actuală nu e corectă.')).toBeVisible();
+    await expect(page.getByText('Parola actuală nu este corectă.')).toBeVisible();
     await shot(page, 'account-password-wrong', name());
     await page.getByLabel('Parola actuală').fill(PASSWORD);
     await page.getByRole('button', { name: 'Salvează parola nouă' }).click();
@@ -390,7 +423,7 @@ test.describe('with accounts', () => {
     await page.getByRole('button', { name: 'Schimbă emailul' }).click();
     await page.getByLabel('Emailul nou').fill(email);
     await page.getByRole('button', { name: 'Trimite verificarea' }).click();
-    await expect(page.getByText('Aceasta e adresa pe care o folosești deja.')).toBeVisible();
+    await expect(page.getByText('Aceasta este adresa pe care o folosești deja.')).toBeVisible();
     await page.getByLabel('Emailul nou').fill(next);
     await page.getByRole('button', { name: 'Trimite verificarea' }).click();
     await expect(page.getByText(`Verificare trimisă la ${next}.`, { exact: false })).toBeVisible();
@@ -408,7 +441,7 @@ test.describe('with accounts', () => {
     await page.getByRole('button', { name: 'Șterge contul' }).click();
     const confirm = page.getByRole('button', { name: 'Șterge definitiv' });
     await expect(confirm).toBeDisabled();
-    await page.getByText('Înțeleg că ștergerea e definitivă').click();
+    await page.getByText('Înțeleg că ștergerea este definitivă').click();
     await shot(page, 'account-delete-confirm', name());
     await confirm.click();
     await expect(page.getByText('Ai programări active.', { exact: false })).toBeVisible();
@@ -424,7 +457,7 @@ test.describe('with accounts', () => {
     await signIn(page, email, PASSWORD);
     await openAccount(page);
     await page.getByRole('button', { name: 'Șterge contul' }).click();
-    await page.getByText('Înțeleg că ștergerea e definitivă').click();
+    await page.getByText('Înțeleg că ștergerea este definitivă').click();
     await page.getByRole('button', { name: 'Șterge definitiv' }).click();
     await expect(page).toHaveURL(/\/$/);
     await expect(page.getByText('Contul tău a fost șters.')).toBeVisible();

@@ -6,12 +6,13 @@ import { useCaptcha } from '../../components/useCaptcha';
 import { Checkbox } from '../../components/Checkbox';
 import { Field } from '../../components/Field';
 import { PasswordField } from '../../components/PasswordField';
+import { PhoneField } from '../../components/PhoneField';
 import { AuthFailure, authErrorMessage, isRetryable, signUp } from '../../data/auth';
 import { useI18n } from '../../i18n/context';
 import { recordEmailSent } from '../../lib/cooldown';
 import { TERMS_VERSION, type LegalDocId } from '../../lib/legal';
 import { looksLikeEmail, MIN_PASSWORD_LENGTH } from '../../lib/password';
-import { normalizePhone } from '../../lib/validators';
+import { DEFAULT_PHONE_COUNTRY, phoneFromInput } from '../../lib/phone';
 import { useFocusFirstError } from './useFocusFirstError';
 import styles from './auth.module.css';
 
@@ -59,6 +60,7 @@ export function SignUpForm({
   const [shopName, setShopName] = useState('');
   const [city, setCity] = useState('');
   const [phone, setPhone] = useState('');
+  const [phoneCountry, setPhoneCountry] = useState(DEFAULT_PHONE_COUNTRY);
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
   const [terms, setTerms] = useState(false);
@@ -73,7 +75,8 @@ export function SignUpForm({
     if (name.trim() === '') next.name = t('auth.error.nameRequired');
     if (role === 'shop' && !invite && shopName.trim() === '') next.shopName = t('auth.error.shopNameRequired');
     if (role === 'shop' && !invite && city.trim() === '') next.city = t('auth.error.cityRequired');
-    if (!normalizePhone(phone)) next.phone = t('auth.error.phoneInvalid');
+    if (!phoneFromInput(phoneCountry, phone))
+      next.phone = t(phoneCountry === 'RO' ? 'auth.error.phoneInvalid' : 'auth.error.phoneInvalidIntl');
     if (!looksLikeEmail(email)) next.email = t('auth.error.emailFormat');
     if (password.length < MIN_PASSWORD_LENGTH) next.password = t('auth.error.passwordShort', { min: MIN_PASSWORD_LENGTH });
     else if (confirm !== password) next.confirm = t('auth.error.passwordMismatch');
@@ -92,7 +95,7 @@ export function SignUpForm({
       result = await signUp({
         role,
         name,
-        phone: normalizePhone(phone) ?? phone,
+        phone: phoneFromInput(phoneCountry, phone) ?? phone,
         email,
         password,
         lang,
@@ -203,16 +206,16 @@ export function SignUpForm({
           </datalist>
         </>
       )}
-      <Field
+      <PhoneField
         label={t('auth.phone')}
-        type="tel"
-        autoComplete="tel"
-        inputMode="tel"
-        mono
-        placeholder="0723 375 248"
+        country={phoneCountry}
+        onCountryChange={(code) => {
+          setPhoneCountry(code);
+          clear('phone');
+        }}
         value={phone}
-        onChange={(e) => {
-          setPhone(e.target.value);
+        onChange={(value) => {
+          setPhone(value);
           clear('phone');
         }}
         error={errors.phone}

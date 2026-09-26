@@ -11,7 +11,16 @@ import {
   verifyStripeSignature,
 } from '../../supabase/functions/_shared/stripe.ts';
 import { renderNotification } from '../../supabase/functions/_shared/templates.ts';
-import { includedColleagues, monthlyTotal, subscriptionView, trialWarningDays, type SubscriptionRow } from '../../src/lib/subscription';
+import { billingMonthsOf, isBillingMonths, periodPrice as serverPeriodPrice, recurringFor } from '../../supabase/functions/_shared/periods.ts';
+import {
+  includedColleagues,
+  monthlyTotal,
+  periodPrice,
+  periodTotal,
+  subscriptionView,
+  trialWarningDays,
+  type SubscriptionRow,
+} from '../../src/lib/subscription';
 
 describe('Stripe webhook signature', () => {
   const secret = 'whsec_test_secret';
@@ -74,7 +83,24 @@ describe('Stripe objects', () => {
       current_period_end: '2025-12-24T10:00:00.000Z',
       trial_end: null,
       cancellation_reason: null,
+      billing_months: 1,
+      discount_percent: 0,
     });
+  });
+
+  it('reads the period a subscription is paid for and the discount it was sold with', () => {
+    const s = subscriptionState({
+      id: 'sub_1',
+      customer: 'cus_1',
+      status: 'active',
+      metadata: { shop_id: 's-1', billing_months: '12', discount_percent: '15' },
+      items: { data: [{ current_period_end: 1766570400, price: { recurring: { interval: 'month', interval_count: 12 } } }] },
+    });
+    expect(s.billing_months).toBe(12);
+    expect(s.discount_percent).toBe(15);
+    expect(billingMonthsOf({ items: { data: [{ price: { recurring: { interval: 'year', interval_count: 1 } } }] } })).toBe(12);
+    expect(billingMonthsOf({ items: { data: [{ price: { recurring: { interval: 'month', interval_count: 3 } } }] } })).toBe(3);
+    expect(billingMonthsOf({})).toBe(1);
   });
 
   it('reads the older shape and a stop date set by the portal', () => {
@@ -143,6 +169,8 @@ const row = (over: Partial<SubscriptionRow> = {}): SubscriptionRow => ({
   seat_price_ron: 20,
   free_seats: 1,
   seats: 0,
+  billing_months: 1,
+  period_discount: 0,
   stripe_customer_id: null,
   stripe_status: null,
   ended_reason: null,
@@ -157,6 +185,44 @@ describe('the monthly total', () => {
     expect(monthlyTotal(row({ seats: 1 }))).toBe(120);
     expect(monthlyTotal(row({ seats: 2 }))).toBe(140);
     expect(monthlyTotal(row({ price_ron: 79.5, seats: 3, seat_price_ron: 15 }))).toBe(124.5);
+  });
+});
+
+describe('billing periods', () => {
+  // The same figures as tests/sql/91_billing_periods.sql (subscription_period_price).
+  const table: [number, number, number, number][] = [
+    [149, 1, 0, 149],
+    [149, 3, 5, 425],
+    [149, 6, 10, 805],
+    [149, 12, 15, 1520],
+    [99, 3, 5, 282],
+    [99, 6, 10, 535],
+    [99, 12, 15, 1010],
+    [19, 3, 5, 54],
+    [19, 6, 10, 103],
+    [19, 12, 15, 194],
+    [79.5, 1, 15, 79.5],
+  ];
+
+  it('prices a period in whole lei, the same in the app and on the server', () => {
+    for (const [monthly, months, discount, expected] of table) {
+      expect(periodPrice(monthly, months, discount), `${monthly} × ${months}`).toBe(expected);
+      expect(serverPeriodPrice(monthly, months, discount), `${monthly} × ${months} (server)`).toBe(expected);
+    }
+  });
+
+  it('charges the period for the shop and its paid colleagues', () => {
+    expect(periodTotal(row({ price_ron: 149, seat_price_ron: 19, seats: 2 }))).toBe(187);
+    expect(periodTotal(row({ price_ron: 149, seat_price_ron: 19, seats: 2, billing_months: 12, period_discount: 15 }))).toBe(1908);
+    expect(periodTotal(row({ price_ron: 99, billing_months: 3, period_discount: 5 }))).toBe(282);
+  });
+
+  it('knows the periods Stripe sells', () => {
+    expect([1, 3, 6, 12].every(isBillingMonths)).toBe(true);
+    expect(isBillingMonths(2)).toBe(false);
+    expect(isBillingMonths('12')).toBe(false);
+    expect(recurringFor(1)).toEqual({ interval: 'month' });
+    expect(recurringFor(6)).toEqual({ interval: 'month', interval_count: 6 });
   });
 });
 
@@ -288,7 +354,7 @@ describe('subscription notices and emails', () => {
 describe('included colleagues', () => {
   it('names the first one, or how many', () => {
     expect(includedColleagues('ro', 0)).toBe('');
-    expect(includedColleagues('ro', 1)).toBe('Primul coleg cu cont în service e inclus în abonament.');
+    expect(includedColleagues('ro', 1)).toBe('Primul coleg cu cont în service este inclus în abonament.');
     expect(includedColleagues('ro', 2)).toBe('Primii 2 colegi cu cont în service sunt incluși în abonament.');
     expect(includedColleagues('en', 1)).toBe('The first colleague with an account in the shop is included in the subscription.');
   });

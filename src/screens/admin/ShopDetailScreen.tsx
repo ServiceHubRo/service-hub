@@ -14,7 +14,7 @@ import { useI18n } from '../../i18n/context';
 import { formatMoney, formatRating } from '../../i18n/format';
 import type { MessageKey } from '../../i18n/ro';
 import { BOOKING_STATUSES } from '../../lib/status';
-import { monthlyTotal } from '../../lib/subscription';
+import { monthlyAverage } from '../../lib/subscription';
 import { formatPhone } from '../../lib/validators';
 import { ConfirmPanel } from './ActionPanels';
 import { AuditList, Facts, Money, Pill, SectionTitle, ShopStatePill, SubscriptionPill, Verified } from './parts';
@@ -291,7 +291,11 @@ export function ShopDetailScreen() {
                 [t('admin.sub.periodEnd'), sub.current_period_end ? dateTime(lang, sub.current_period_end) : null],
                 [t('admin.sub.price'), <Money key="price" amount={sub.price_ron} />],
                 [t('admin.sub.seats'), t('admin.sub.seatsValue', { n: sub.seats, price: formatMoney(lang, Number(sub.seat_price_ron)) })],
-                [t('admin.sub.monthly'), <Money key="monthly" amount={monthlyTotal(sub)} />],
+                [t('admin.sub.monthly'), <Money key="monthly" amount={monthlyAverage(sub)} />],
+                [
+                  t('admin.sub.period'),
+                  sub.billing_months > 1 ? t('admin.subs.period', { n: sub.billing_months, discount: Number(sub.period_discount) }) : null,
+                ],
                 [t('admin.sub.stripe'), sub.stripe_status],
                 [t('admin.sub.customer'), sub.stripe_customer_id ? <span className="mono">{sub.stripe_customer_id}</span> : null],
                 [t('admin.sub.paymentFailed'), sub.payment_failed_at ? dateTime(lang, sub.payment_failed_at) : null],

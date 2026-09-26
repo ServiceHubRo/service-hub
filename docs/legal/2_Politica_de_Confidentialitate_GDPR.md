@@ -1,12 +1,12 @@
 # Politica de confidențialitate — Service-Hub
 
-**Ultima actualizare:** 25 septembrie 2026
+**Ultima actualizare:** 26 septembrie 2026
 
 Aici afli ce date personale folosește Service-Hub, de ce, cine le mai vede, cât timp le păstrăm și ce drepturi ai, conform Regulamentului (UE) 2016/679 („GDPR”) și legii române.
 
 **Operatorul datelor:** {{company}}, cu sediul în {{address}}, CUI {{cui}} („Service-Hub”, „noi”). Pentru orice întrebare despre datele tale: {{email}}.
 
-> **Pe scurt.** Folosim doar datele de care e nevoie ca programările să funcționeze. Nu vindem date, nu facem reclame și nu te urmărim pe alte site-uri. Baza de date e în Uniunea Europeană (Frankfurt). Locația ta rămâne pe telefon. Îți poți descărca datele și îți poți șterge contul oricând, din aplicație.
+> **Pe scurt.** Folosim doar datele de care este nevoie ca programările să funcționeze. Nu vindem date, nu facem reclame și nu te urmărim pe alte site-uri. Baza de date este în Uniunea Europeană (Frankfurt). Locația ta rămâne pe telefon. Îți poți descărca datele și îți poți șterge contul oricând, din aplicație.
 
 ---
 
@@ -14,7 +14,7 @@ Aici afli ce date personale folosește Service-Hub, de ce, cine le mai vede, câ
 
 - **Service-Hub** este operatorul datelor din cont și din Platformă.
 - **Service-ul la care faci o programare** primește datele necesare programării (secțiunea 4.1) și devine, pentru ele, operator separat: le folosește pentru reparație și pentru obligațiile lui legale (de exemplu, evidența lucrărilor și garanția).
-- **Stripe**, care procesează plățile, e operator separat pentru datele cardului și pentru obligațiile lui legale (prevenirea fraudei, spălarea banilor). Datele cardului nu ajung niciodată la noi.
+- **Stripe**, care procesează plățile, este operator separat pentru datele cardului și pentru obligațiile lui legale (prevenirea fraudei, spălarea banilor). Datele cardului nu ajung niciodată la noi.
 
 ---
 
@@ -43,7 +43,7 @@ Aici afli ce date personale folosește Service-Hub, de ce, cine le mai vede, câ
 - **Datele de facturare:** denumirea legală, CUI, numărul de la Registrul Comerțului, sediul social, dacă plătești TVA, banca, IBAN, emailul de facturare și reprezentantul legal. Nu sunt niciodată publice.
 - **Abonamentul și plățile:** starea, datele de început și de sfârșit, prețul, câți colegi plătiți, codul de client Stripe, sumele plătite, datele plăților și chitanțele Stripe.
 - **Colegii:** adresa de email la care ai trimis invitația, numele colegului și data la care a intrat.
-- **Confirmarea telefonului:** codul trimis prin SMS e păstrat doar criptat și e valabil 10 minute.
+- **Confirmarea telefonului:** codul trimis prin SMS este păstrat doar criptat și este valabil 10 minute.
 - **Preferințele:** SMS la cerere nouă, rezumatul zilnic.
 - Programările, devizele, lucrările, recenziile și mesajele service-ului, cu datele clienților din secțiunea 4.1.
 
@@ -51,14 +51,14 @@ Aici afli ce date personale folosește Service-Hub, de ce, cine le mai vede, câ
 
 - **Notificările push** (doar dacă le activezi): adresa tehnică a dispozitivului la serviciul de notificări al browserului, cheile de criptare, tipul browserului și data ultimei notificări livrate.
 - **Jurnalul notificărilor:** ce notificare s-a trimis, pe ce canal (push, email, SMS), când și dacă a ajuns.
-- **Rapoartele de erori:** când ceva nu merge, aplicația trimite un raport tehnic cu codul intern al contului, rolul, browserul și sistemul, pagina (fără părțile secrete ale adresei) și eroarea. Emailurile, telefoanele și codurile de acces din texte sunt șterse înainte de trimitere, iar adresa IP nu se păstrează.
+- **Rapoartele de erori:** când apare o eroare, aplicația trimite un raport tehnic cu codul intern al contului, rolul, browserul și sistemul, pagina (fără părțile secrete ale adresei) și eroarea. Emailurile, telefoanele și codurile de acces din texte sunt șterse înainte de trimitere, iar adresa IP nu se păstrează.
 - **Jurnalele de server** ale furnizorilor de găzduire: adresa IP, ora și pagina cerută, păstrate de ei pentru siguranță.
 - **Verificarea anti-robot** (Cloudflare Turnstile), la înscriere și la autentificare: semnale tehnice ale browserului, ca să deosebim oamenii de programe automate.
 
 ### 2.5 Locația
 
-- **Clienți:** dacă îți dai acordul în browser, telefonul îți spune poziția ca să vezi service-urile din apropiere. **Poziția e folosită doar pe dispozitivul tău**, ca să calculeze distanțele. Nu ne este trimisă și nu o păstrăm. Acordul se retrage oricând din setările browserului.
-- **Service-uri:** adresa atelierului e transformată în coordonate prin serviciul OpenStreetMap Nominatim (se trimite doar adresa atelierului). Butonul „Folosește locația curentă” salvează poziția dispozitivului ca locație a atelierului; ea devine publică, la fel ca adresa.
+- **Clienți:** dacă îți dai acordul în browser, telefonul îți spune poziția ca să vezi service-urile din apropiere. **Poziția este folosită doar pe dispozitivul tău**, ca să calculeze distanțele. Nu ne este trimisă și nu o păstrăm. Acordul se retrage oricând din setările browserului.
+- **Service-uri:** adresa atelierului este transformată în coordonate prin serviciul OpenStreetMap Nominatim (se trimite doar adresa atelierului). Butonul „Folosește locația curentă” salvează poziția dispozitivului ca locație a atelierului; ea devine publică, la fel ca adresa.
 
 ---
 
@@ -77,6 +77,7 @@ Aici afli ce date personale folosește Service-Hub, de ce, cine le mai vede, câ
 | Abonamentul, plățile, facturile și contabilitatea | Contractul și obligațiile legale (lit. c): Legea contabilității nr. 82/1991, Codul fiscal |
 | Recenziile publice și verificarea celor raportate | Interesul legitim (lit. f) ca recenziile să fie reale; obligațiile din Regulamentul (UE) 2022/2065 |
 | Limite împotriva abuzului, indicatorul de neprezentări, verificarea anti-robot, suspendări | Interesul legitim ca Platforma să fie corectă și sigură |
+| Perioada gratuită o singură dată de persoană și împiedicarea ocolirii unei suspendări cu un cont nou (amprente criptate ale emailului și telefonului, vezi secțiunea 5) | Interesul legitim ca Platforma să fie corectă și sigură |
 | Rapoartele de erori și jurnalele tehnice | Interesul legitim ca Platforma să funcționeze și să fie sigură |
 | Anunțuri despre Platformă (schimbări, întreruperi) | Contractul și interesul legitim |
 | Răspunsuri la cererile tale; apărarea în caz de litigiu | Interesul legitim și obligațiile legale |
@@ -94,11 +95,11 @@ Aici afli ce date personale folosește Service-Hub, de ce, cine le mai vede, câ
 - La finalizarea unei lucrări, service-ul primește **ultimul kilometraj cunoscut** pentru acel număr de înmatriculare (doar cifra, din lucrările făcute prin Platformă la orice service), ca să nu se treacă din greșeală sau intenționat un kilometraj mai mic.
 - **Recenziile** sunt publice pentru utilizatorii Platformei, cu prenumele și inițiala numelui (de exemplu „Andrei M.”).
 - **Codul unui raport de istoric:** oricine îl are vede marca, modelul și numărul mașinii, câte lucrări are raportul, perioada și data raportului.
-- **Profilul unui service** e public pentru utilizatorii Platformei; datele de facturare nu.
+- **Profilul unui service** este public pentru utilizatorii Platformei; datele de facturare nu.
 
 ### 4.2 Echipa Service-Hub
 
-Administratorul Platformei vede datele necesare pentru suport, pentru verificarea recenziilor raportate, pentru plăți și pentru oprirea abuzurilor. Orice modificare făcută de administrator e înregistrată într-un jurnal.
+Administratorul Platformei vede datele necesare pentru suport, pentru verificarea recenziilor raportate, pentru plăți și pentru oprirea abuzurilor. Orice modificare făcută de administrator este înregistrată într-un jurnal.
 
 ### 4.3 Furnizorii noștri
 
@@ -114,7 +115,7 @@ Lucrăm cu furnizori care prelucrează date doar la cererea noastră, pe baza un
 | Sentry | Rapoartele de erori | Codul contului, rolul, browserul, pagina, eroarea | UE (Frankfurt) |
 | Cloudflare | Verificarea anti-robot la înscriere și autentificare | Adresa IP, semnale ale browserului | SUA și rețea globală |
 | OpenStreetMap Foundation (Nominatim) | Coordonatele adresei atelierului | Doar adresa atelierului | Regatul Unit |
-| Serviciul de notificări al browserului (Google, Apple, Mozilla, Microsoft) | Livrarea notificărilor push | Adresa tehnică a dispozitivului; conținutul notificării e criptat și nu poate fi citit de ei | După browser |
+| Serviciul de notificări al browserului (Google, Apple, Mozilla, Microsoft) | Livrarea notificărilor push | Adresa tehnică a dispozitivului; conținutul notificării este criptat și nu poate fi citit de ei | După browser |
 
 **Transferuri în afara Spațiului Economic European** (SUA, Regatul Unit) se fac doar cu garanțiile cerute de GDPR: o decizie de adecvare a Comisiei Europene (de exemplu, cadrul UE–SUA privind protecția datelor, pentru companiile certificate, sau decizia pentru Regatul Unit) ori clauzele contractuale standard aprobate de Comisie.
 
@@ -132,6 +133,7 @@ Dăm date autorităților doar când legea ne obligă (de exemplu, la o cerere a
   - **Service:** dacă service-ul nu are programări și plăți, contul se șterge complet. Dacă are, service-ul dispare din căutare, colegii sunt scoși, numele și telefonul proprietarului se șterg și contul nu mai poate fi folosit; datele de facturare și plățile se păstrează cât cere legea contabilă și fiscală (în prezent, până la 10 ani), iar istoricul lucrărilor rămâne ca evidență.
 - **Copiile de siguranță:** datele șterse dispar și din ele în cel mult 30 de zile.
 - **Codurile de confirmare prin SMS:** valabile 10 minute; păstrate doar criptat.
+- **Amprentele emailului și telefonului** (nu adresa și numărul, ci un cod criptat din care nu se pot afla): pentru proprietarii de service, ca perioada gratuită să se acorde o singură dată aceleiași persoane, și pentru conturile sau service-urile suspendate, ca suspendarea să nu poată fi ocolită cu un cont nou. Un cont nou cu aceleași date nu primește a doua perioadă gratuită, respectiv este creat suspendat până când echipa Service-Hub verifică situația. Le păstrăm cât există contul și încă 3 ani după ștergerea lui; amprentele unei suspendări se șterg când suspendarea este ridicată.
 - **Datele tehnice pentru evitarea dublei trimiteri** a unei acțiuni: 7 zile.
 - **Rapoartele de erori:** cel mult 90 de zile.
 - **Jurnalele de server** ale furnizorilor: perioade scurte, după regulile lor.
@@ -140,13 +142,13 @@ Dăm date autorităților doar când legea ne obligă (de exemplu, la o cerere a
 
 ## 6. Cum ne ocupăm de siguranța datelor
 
-- Baza de date și fișierele sunt în Uniunea Europeană (Frankfurt). Legătura cu aplicația e mereu criptată (HTTPS).
-- Regulile de acces sunt puse chiar în baza de date: un client vede doar datele lui, un service doar datele service-ului lui. Ascunderea unui buton nu e singura protecție.
+- Baza de date și fișierele sunt în Uniunea Europeană (Frankfurt). Legătura cu aplicația este mereu criptată (HTTPS).
+- Regulile de acces sunt puse chiar în baza de date: un client vede doar datele lui, un service doar datele service-ului lui. Ascunderea unui buton nu este singura protecție.
 - Parolele sunt păstrate doar criptat. Datele cardului rămân la Stripe.
 - Rapoartele PDF sunt păstrate privat și se descarcă doar de proprietarul lor, după verificare.
 - Notificările push sunt criptate de la noi până pe dispozitivul tău.
 - Rapoartele de erori nu conțin emailuri, telefoane, coduri de acces sau adresa IP.
-- Dacă datele tale ar fi expuse într-un incident de securitate, anunțăm Autoritatea Națională de Supraveghere în 72 de ore și pe tine, dacă riscul pentru tine e mare.
+- Dacă datele tale ar fi expuse într-un incident de securitate, anunțăm Autoritatea Națională de Supraveghere în 72 de ore și pe tine, dacă riscul pentru tine este mare.
 
 ---
 
@@ -159,7 +161,7 @@ Ai dreptul:
 - să **ștergi** datele (din aplicație: Cont → Datele mele → Șterge contul), cu excepțiile din secțiunea 5;
 - să ceri **restricționarea** folosirii datelor;
 - să te **opui** folosirii datelor pe baza interesului legitim;
-- la **portabilitate**: fișierul din Cont → Datele mele → Descarcă datele mele conține, într-un format structurat (JSON), contul, mașinile, programările, devizele, recenziile și mesajele tale; e gratuit;
+- la **portabilitate**: fișierul din Cont → Datele mele → Descarcă datele mele conține, într-un format structurat (JSON), contul, mașinile, programările, devizele, recenziile și mesajele tale; este gratuit;
 - să îți **retragi acordul** pentru notificările push (din Cont sau din setările browserului) și pentru locație (din setările browserului), fără să afecteze ce s-a făcut înainte;
 - să depui **plângere** la Autoritatea Națională de Supraveghere a Prelucrării Datelor cu Caracter Personal (ANSPDCP), B-dul G-ral. Gheorghe Magheru nr. 28-30, sector 1, București, [dataprotection.ro](https://www.dataprotection.ro).
 
@@ -169,7 +171,7 @@ Pentru orice cerere, scrie-ne la {{email}} de pe adresa contului tău. Răspunde
 
 ## 8. Minorii
 
-Platforma nu e pentru persoane sub 18 ani. Dacă aflăm că un cont e al unui minor, îl închidem.
+Platforma nu este pentru persoane sub 18 ani. Dacă aflăm că un cont este al unui minor, îl închidem.
 
 ---
 

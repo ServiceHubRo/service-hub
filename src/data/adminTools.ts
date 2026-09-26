@@ -30,8 +30,11 @@ export interface AdminSubscriptionRow {
   seat_price_ron: number;
   seats: number;
   billed_seats: number | null;
-  /** price_ron + seats × seat_price_ron. */
+  /** What the shop pays a month: its period's total ÷ months (price_ron + seats × seat_price_ron for a month). */
   monthly_ron: number;
+  /** Paid every month (1) or for 3, 6, 12 months at once, with this discount in percent. */
+  billing_months: number;
+  period_discount: number;
   trial_ends_at: string | null;
   current_period_end: string | null;
   cancel_at_period_end: boolean;
@@ -222,6 +225,10 @@ export interface PlatformSettings {
   /** Launch price for the first launch_shops shops (0 = no launch offer). */
   launch_price_ron: number;
   launch_shops: number;
+  /** Discount in percent (0–50) when paying for 3, 6 or 12 months at once; kept by a shop once sold. */
+  period_discount_3: number;
+  period_discount_6: number;
+  period_discount_12: number;
   trial_days: number;
   quote_expiry_days: number;
   report_price_ron: number;

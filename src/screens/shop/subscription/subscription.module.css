@@ -211,7 +211,6 @@
 
 .invoiceAmount {
   font-family: var(--font-mono);
-  font-variant-numeric: tabular-nums;
   font-weight: 700;
 }
 
@@ -240,4 +239,94 @@
 .note svg {
   flex-shrink: 0;
   margin-top: 2px;
+}
+
+/* ------------------------------------------------------------------ how often to pay */
+
+.periods {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  border: none;
+}
+
+@media (min-width: 640px) {
+  .periods {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.periodsLegend {
+  grid-column: 1 / -1;
+  margin-bottom: 8px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.period {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  min-height: var(--tap);
+  padding: 12px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-input);
+  cursor: pointer;
+}
+
+.period:has(.periodInput:checked) {
+  border-color: var(--amber-line);
+  background: var(--amber-tint);
+}
+
+/* Muted text on the tint: #8A909B there is below 4.5:1. */
+.period:has(.periodInput:checked) .muted {
+  color: var(--muted-strong);
+}
+
+.period:has(.periodInput:focus-visible) {
+  box-shadow: var(--focus-ring);
+}
+
+.periodInput {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  accent-color: var(--amber);
+}
+
+.periodInput:focus-visible {
+  box-shadow: none;
+}
+
+.periodBody {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.periodHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 8px;
+}
+
+.periodName {
+  font-weight: 700;
+}
+
+.discount {
+  color: var(--green);
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+.periodTotal {
+  font-family: var(--font-mono);
+  font-size: 17px;
+  font-weight: 700;
 }

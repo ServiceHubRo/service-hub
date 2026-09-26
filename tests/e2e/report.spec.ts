@@ -182,7 +182,7 @@ test.describe('history report', () => {
     await page.getByRole('button', { name: 'Plătește' }).click();
     await expect(page).toHaveURL(/\/c\/cont\/rapoarte\?plata=ok&raport=/);
     await expect(page.getByRole('heading', { level: 1, name: 'Rapoartele mele' })).toBeVisible();
-    await expect(page.getByText('Mulțumim. Raportul e gata de descărcat.')).toBeVisible({ timeout: 30_000 });
+    await expect(page.getByText('Mulțumim. Raportul este gata de descărcat.')).toBeVisible({ timeout: 30_000 });
     const card = page.locator('main li').filter({ hasText: plate });
     await expect(card).toContainText('Gata');
     await expect(card).toContainText('3 lucrări');
@@ -200,7 +200,7 @@ test.describe('history report', () => {
     expect(pdf.getTitle()).toContain('Volkswagen Golf 7');
 
     // The client is told by email, with the code.
-    await expect.poll(async () => (await emailsTo(client)).some((m) => m.subject === `Raportul de istoric e gata: ${code}`), { timeout: 20_000 }).toBe(true);
+    await expect.poll(async () => (await emailsTo(client)).some((m) => m.subject === `Raportul de istoric este gata: ${code}`), { timeout: 20_000 }).toBe(true);
 
     // Cont has the tile; the vehicle history has the button with the price.
     await page.goto('/c/cont');

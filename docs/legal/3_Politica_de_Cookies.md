@@ -4,7 +4,7 @@
 
 Aici afli ce informații păstrează Service-Hub în browserul tău și de ce. Operatorul Platformei este {{company}} ({{email}}).
 
-> **Pe scurt.** Service-Hub nu folosește cookie-uri de reclamă, de analiză sau de urmărire. Păstrăm în browser doar ce e strict necesar ca aplicația să funcționeze: sesiunea de autentificare și câteva alegeri ale tale. De aceea nu îți arătăm un banner de acord.
+> **Pe scurt.** Service-Hub nu folosește cookie-uri de reclamă, de analiză sau de urmărire. Păstrăm în browser doar ce este strict necesar ca aplicația să funcționeze: sesiunea de autentificare și câteva alegeri ale tale. De aceea nu îți arătăm un banner de acord.
 
 ---
 
@@ -39,7 +39,7 @@ Toate sunt **strict necesare**: fără ele nu te-ai putea autentifica sau aplica
 
 ## 3. Servicii ale altor companii
 
-- **Cloudflare Turnstile** — verificarea anti-robot din formularele de înscriere și autentificare. Se încarcă de la Cloudflare și poate păstra, pe domeniul Cloudflare, informații tehnice strict necesare acestei verificări. E necesară pentru siguranța conturilor.
+- **Cloudflare Turnstile** — verificarea anti-robot din formularele de înscriere și autentificare. Se încarcă de la Cloudflare și poate păstra, pe domeniul Cloudflare, informații tehnice strict necesare acestei verificări. Este necesară pentru siguranța conturilor.
 - **Stripe** — când plătești, ești pe pagina Stripe (checkout.stripe.com). Acolo Stripe folosește propriile cookie-uri, pentru plată și pentru prevenirea fraudei, după politica Stripe.
 - **Sentry** — rapoartele de erori nu folosesc cookie-uri și nu păstrează nimic în browser.
 
@@ -49,7 +49,7 @@ Nu folosim Google Analytics, pixeli de Facebook, reclame sau alte instrumente de
 
 ## 4. De ce nu îți cerem acordul
 
-Legea (art. 4 alin. (5) din Legea nr. 506/2004, care transpune Directiva ePrivacy) cere acordul tău doar pentru informațiile păstrate în browser care nu sunt strict necesare unui serviciu cerut de tine. Tot ce folosim e strict necesar, deci nu îți arătăm un banner. Dacă vom adăuga vreodată ceva care nu e strict necesar (de exemplu, statistici de trafic), actualizăm această politică și îți cerem acordul înainte.
+Legea (art. 4 alin. (5) din Legea nr. 506/2004, care transpune Directiva ePrivacy) cere acordul tău doar pentru informațiile păstrate în browser care nu sunt strict necesare unui serviciu cerut de tine. Tot ce folosim este strict necesar, deci nu îți arătăm un banner. Dacă vom adăuga vreodată ceva care nu este strict necesar (de exemplu, statistici de trafic), actualizăm această politică și îți cerem acordul înainte.
 
 ---
 
@@ -58,7 +58,7 @@ Legea (art. 4 alin. (5) din Legea nr. 506/2004, care transpune Directiva ePrivac
 - **Deconectarea** (Cont → Deconectare) șterge sesiunea de pe acest dispozitiv.
 - **Notificările push** le oprești din Cont sau din setările browserului.
 - **Locația** o permiți sau o blochezi din setările browserului; nu o păstrăm în browser și nu ne este trimisă.
-- **Toate datele site-ului** le ștergi din setările browserului (de obicei la „Confidențialitate” → „Date site-uri”). După aceea va trebui să te autentifici din nou; contul tău nu e afectat.
+- **Toate datele site-ului** le ștergi din setările browserului (de obicei la „Confidențialitate” → „Date site-uri”). După aceea va trebui să te autentifici din nou; contul tău nu este afectat.
 
 Dacă blochezi complet păstrarea datelor pentru service-hub.ro, nu te vei putea autentifica.
 

@@ -29,7 +29,7 @@ const TEXTS: Record<AuthEmailKind, { ro: Variant; en: Variant }> = {
         title: 'Confirmă-ți emailul',
         blocks: [
           { p: 'Bine ai venit pe Service-Hub. Apasă butonul ca să confirmi adresa {{ .Email }}.' },
-          { p: 'Linkul merge o singură dată, timp de 24 de ore.' },
+          { p: 'Linkul funcționează o singură dată, timp de 24 de ore.' },
         ],
         button: { label: 'Confirmă adresa', url: LINK },
         footer: 'Dacă nu ți-ai făcut cont pe Service-Hub, ignoră acest email.',
@@ -42,7 +42,7 @@ const TEXTS: Record<AuthEmailKind, { ro: Variant; en: Variant }> = {
         title: 'Confirm your email',
         blocks: [
           { p: 'Welcome to Service-Hub. Tap the button to confirm {{ .Email }}.' },
-          { p: 'The link works once, for 24 hours.' },
+          { p: 'The link works only once, for 24 hours.' },
         ],
         button: { label: 'Confirm my email', url: LINK },
         footer: "If you didn't sign up for Service-Hub, ignore this email.",
@@ -56,8 +56,8 @@ const TEXTS: Record<AuthEmailKind, { ro: Variant; en: Variant }> = {
         preheader: 'Alege o parolă nouă pentru contul tău.',
         title: 'Parolă nouă',
         blocks: [
-          { p: 'Ai cerut o parolă nouă pentru contul {{ .Email }}. Apasă butonul și alege-o.' },
-          { p: 'Linkul merge o singură dată. Dacă nu ai cerut tu, ignoră emailul: parola rămâne aceeași.' },
+          { p: 'Ai cerut resetarea parolei pentru contul {{ .Email }}. Apasă butonul ca să alegi una nouă.' },
+          { p: 'Linkul funcționează o singură dată. Dacă nu ai cerut resetarea, ignoră acest email: parola rămâne aceeași.' },
         ],
         button: { label: 'Alege parola nouă', url: LINK },
         footer: 'Primești acest email pentru că cineva a cerut resetarea parolei pe Service-Hub.',
@@ -69,8 +69,8 @@ const TEXTS: Record<AuthEmailKind, { ro: Variant; en: Variant }> = {
         preheader: 'Choose a new password for your account.',
         title: 'New password',
         blocks: [
-          { p: 'You asked for a new password for {{ .Email }}. Tap the button to choose it.' },
-          { p: "The link works once. If you didn't ask for this, ignore this email: your password stays the same." },
+          { p: 'You asked to reset the password for {{ .Email }}. Tap the button to choose a new one.' },
+          { p: "The link works only once. If you didn't ask for a reset, ignore this email: your password stays the same." },
         ],
         button: { label: 'Choose a new password', url: LINK },
         footer: 'You are receiving this email because someone asked to reset a Service-Hub password.',

@@ -190,7 +190,7 @@ describe('app emails', () => {
 
   it('suspension, account or shop, in the recipient’s language', () => {
     expect(emailForEvent({ event: 'account_suspended', lang: 'ro', params: { kind: 'account' } }, '')!.subject).toBe(
-      'Contul tău Service-Hub e suspendat',
+      'Contul tău Service-Hub este suspendat',
     );
     expect(emailForEvent({ event: 'account_suspended', lang: 'en', params: { kind: 'shop', shop_name: 'Atelier Unu' } }, '')!.subject).toBe(
       'Your shop Atelier Unu is suspended',

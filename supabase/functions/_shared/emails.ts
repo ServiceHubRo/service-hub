@@ -51,7 +51,7 @@ const FOOTER_BRAND: Record<Lang, string> = {
   en: 'Service-Hub · car repair bookings',
 };
 const LINK_HINT: Record<Lang, string> = {
-  ro: 'Dacă butonul nu merge, copiază linkul în browser:',
+  ro: 'Dacă butonul nu funcționează, copiază linkul în browser:',
   en: "If the button doesn't work, paste this link into your browser:",
 };
 
@@ -201,7 +201,7 @@ export function staffInviteEmail(lang: Lang, d: InviteData): EmailContent {
     title: 'Ai primit o invitație',
     blocks: [
       { p: `${who} te-a invitat să lucrezi în contul ${place} pe Service-Hub: programări, devize și mesaje de la clienți.` },
-      { p: `Invitația e pentru ${d.email} și e valabilă 14 zile. Îți faci contul din butonul de mai jos.` },
+      { p: `Invitația este pentru ${d.email} și este valabilă 14 zile. Îți faci contul din butonul de mai jos.` },
     ],
     button: { label: 'Acceptă invitația', url: d.url },
     footer: 'Dacă nu te așteptai la acest email, îl poți ignora.',
@@ -222,7 +222,7 @@ const str = (v: unknown): string => (typeof v === 'string' ? v.trim() : typeof v
 const REASONS: Record<string, string> = {
   fake: 'Recenzie falsă',
   abusive: 'Limbaj abuziv',
-  wrong_shop: 'E despre alt service',
+  wrong_shop: 'Se referă la alt service',
   personal_data: 'Conține date personale',
 };
 
@@ -271,15 +271,15 @@ function subscriptionEmail(e: EmailEvent, lang: Lang, app: string): EmailContent
       const receipt = str(p.receipt_url);
       return email(en ? `Payment received: ${total}` : `Plată primită: ${total}`, {
         lang,
-        preheader: en ? 'Your Service-Hub subscription is active.' : 'Abonamentul Service-Hub e activ.',
+        preheader: en ? 'Your Service-Hub subscription is active.' : 'Abonamentul Service-Hub este activ.',
         title: en ? 'Payment received' : 'Plată primită',
         blocks: [
-          { p: en ? `Thank you. The subscription for ${shop} is active.` : `Mulțumim. Abonamentul pentru ${shop} e activ.` },
+          { p: en ? `Thank you. The subscription for ${shop} is active.` : `Mulțumim. Abonamentul pentru ${shop} este activ.` },
           { rows },
           {
             p: en
               ? 'The invoice follows separately. The receipt is on the payment page.'
-              : 'Factura vine separat. Chitanța e pe pagina plății.',
+              : 'Factura vine separat. Chitanța este pe pagina plății.',
           },
         ],
         button: receipt ? { label: en ? 'See the receipt' : 'Vezi chitanța', url: receipt } : open,
@@ -427,7 +427,7 @@ export function emailForEvent(e: EmailEvent, app: string): EmailContent | null {
           footer: 'You are receiving this email because you have a Service-Hub account.',
         });
       }
-      return email(isShop ? `Service-ul ${shop} e suspendat` : 'Contul tău Service-Hub e suspendat', {
+      return email(isShop ? `Service-ul ${shop} este suspendat` : 'Contul tău Service-Hub este suspendat', {
         lang,
         preheader: 'Răspunde la acest email pentru detalii.',
         title: isShop ? 'Service suspendat' : 'Cont suspendat',
@@ -437,7 +437,7 @@ export function emailForEvent(e: EmailEvent, app: string): EmailContent | null {
               ? `Echipa Service-Hub a suspendat ${shop}. Nu mai apare în căutări și nu mai poate primi programări.`
               : 'Echipa Service-Hub ți-a suspendat contul. Deocamdată nu poți face sau schimba programări.',
           },
-          { p: 'Răspunde la acest email dacă vrei să afli de ce sau crezi că e o greșeală.' },
+          { p: 'Răspunde la acest email dacă vrei să afli de ce sau crezi că este o greșeală.' },
         ],
         footer: 'Primești acest email pentru că ai un cont Service-Hub.',
       });
@@ -450,12 +450,12 @@ export function emailForEvent(e: EmailEvent, app: string): EmailContent | null {
       const code = str(p.code);
       const rows: [string, string][] = [[en ? 'Car' : 'Mașina', plate ? `${car} · ${plate}` : car]];
       if (code) rows.push([en ? 'Report code' : 'Codul raportului', code]);
-      return email(en ? `Your history report is ready: ${code}` : `Raportul de istoric e gata: ${code}`, {
+      return email(en ? `Your history report is ready: ${code}` : `Raportul de istoric este gata: ${code}`, {
         lang,
         preheader: en ? 'Download it anytime from My reports, free.' : 'Îl descarci oricând din Rapoartele mele, gratuit.',
-        title: en ? 'Your report is ready' : 'Raportul e gata',
+        title: en ? 'Your report is ready' : 'Raportul este gata',
         blocks: [
-          { p: en ? `Thank you. The history report for ${car} is ready.` : `Mulțumim. Raportul de istoric pentru ${car} e gata.` },
+          { p: en ? `Thank you. The history report for ${car} is ready.` : `Mulțumim. Raportul de istoric pentru ${car} este gata.` },
           { rows },
           {
             p: en

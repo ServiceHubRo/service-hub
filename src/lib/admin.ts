@@ -128,6 +128,8 @@ export const AUDIT_ACTIONS = [
   'unsuspend_shop',
   'suspend_account',
   'unsuspend_account',
+  'auto_suspend_account',
+  'auto_no_trial',
   'update_shop',
   'extend_trial',
   'set_subscription_status',

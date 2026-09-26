@@ -69,7 +69,6 @@
 .note {
   color: var(--muted);
   font-size: 13px;
-  font-style: italic;
   white-space: pre-line;
   overflow-wrap: anywhere;
 }

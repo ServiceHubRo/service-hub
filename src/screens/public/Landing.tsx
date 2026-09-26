@@ -10,6 +10,7 @@ import {
   MessageCircle,
   Search,
   Star,
+  Percent,
   Tag,
   Users,
   type LucideIcon,
@@ -271,6 +272,7 @@ function FeatureCards({ features }: { features: Feature[] }) {
 function PriceBlock() {
   const { t, money, plural, lang } = useI18n();
   const [state, setState] = useState<PricingState>({ status: 'loading' });
+  const percent = (n: number) => (lang === 'ro' ? String(n).replace('.', ',') : String(n));
 
   useEffect(() => {
     let alive = true;
@@ -316,6 +318,18 @@ function PriceBlock() {
                   {t('landing.priceLaunch', {
                     shops: plural('unit.shops', state.pricing.launchShops),
                     price: money(state.pricing.subscriptionRon),
+                  })}
+                </span>
+              </p>
+            )}
+            {state.pricing.periodDiscounts[12] > 0 && (
+              <p className={styles.priceNote}>
+                <Percent size={16} aria-hidden="true" />
+                <span>
+                  {t('landing.pricePeriods', {
+                    d3: percent(state.pricing.periodDiscounts[3]),
+                    d6: percent(state.pricing.periodDiscounts[6]),
+                    d12: percent(state.pricing.periodDiscounts[12]),
                   })}
                 </span>
               </p>

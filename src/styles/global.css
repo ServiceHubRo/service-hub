@@ -41,7 +41,6 @@ h1 {
 
 .mono {
   font-family: var(--font-mono);
-  font-variant-numeric: tabular-nums;
 }
 
 button {

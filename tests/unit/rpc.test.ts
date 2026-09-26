@@ -69,7 +69,7 @@ describe('toRpcError', () => {
   it('never exposes a raw database error', () => {
     const e = toRpcError({ message: 'duplicate key value violates unique constraint "x"', code: '23505' });
     expect(e.code).toBe('unknown');
-    expect(rpcErrorMessage('ro', e)).toBe('Ceva n-a mers. Încearcă din nou.');
+    expect(rpcErrorMessage('ro', e)).toBe('A apărut o eroare. Încearcă din nou.');
   });
 
   it('recognizes a network failure', () => {
@@ -200,12 +200,12 @@ describe('calls', () => {
 
 describe('admin form errors (T16a)', () => {
   it('names the field the database refused', () => {
-    expect(rpcErrorMessage('ro', pgError('field_invalid', '{"field":"iban"}'))).toBe('Verifică câmpul „IBAN”: valoarea nu e validă.');
+    expect(rpcErrorMessage('ro', pgError('field_invalid', '{"field":"iban"}'))).toBe('Verifică câmpul „IBAN”: valoarea nu este validă.');
     expect(rpcErrorMessage('en', pgError('field_invalid', '{"field":"daily_capacity"}'))).toBe(
       'Check the “Cars per day” field: the value is not valid.',
     );
     expect(rpcErrorMessage('ro', pgError('field_invalid', '{"field":"unknown"}'))).toBe(
-      'O valoare nu e validă. Verifică datele și încearcă din nou.',
+      'O valoare nu este validă. Verifică datele și încearcă din nou.',
     );
   });
 });

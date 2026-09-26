@@ -51,6 +51,7 @@ function SubscriptionRow({ r }: { r: AdminSubscriptionRow }) {
           <Money amount={r.monthly_ron} />
           {t('admin.subs.perMonth')}
         </span>
+        {r.billing_months > 1 && <span>{t('admin.subs.period', { n: r.billing_months, discount: r.period_discount })}</span>}
         {r.seats > 0 && <span>{t('admin.subs.seats', { n: r.seats })}</span>}
       </span>
       {next && <span className={styles.rowMeta}>{next}</span>}

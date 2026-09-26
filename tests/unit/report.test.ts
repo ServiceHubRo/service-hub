@@ -142,10 +142,13 @@ describe('the PDF', () => {
   it('keeps Romanian letters and leaves out what the fonts cannot print', async () => {
     const doc = await PDFDocument.create();
     doc.registerFontkit(fontkit);
-    const { SANS_REGULAR } = await import('../../supabase/functions/_shared/reportFonts');
-    const font = (await doc.embedFont(Uint8Array.from(atob(SANS_REGULAR), (c) => c.charCodeAt(0)))) as unknown as PdfFont;
+    const { INTER_REGULAR } = await import('../../supabase/functions/_shared/reportFonts');
+    const font = (await doc.embedFont(Uint8Array.from(atob(INTER_REGULAR), (c) => c.charCodeAt(0)))) as unknown as PdfFont;
     const charset = new Set(font.getCharacterSet());
     for (const ch of 'șțăâîȘȚĂÂÎşţ–·„”€') expect(charset.has(ch.codePointAt(0)!), ch).toBe(true);
+    // Figures line up (even-width digits, as in the app) while a hyphen keeps its normal width.
+    for (const d of '023456789') expect(font.widthOfTextAtSize(d, 9)).toBe(font.widthOfTextAtSize('1', 9));
+    expect(font.widthOfTextAtSize('-', 9)).toBeLessThan(font.widthOfTextAtSize('0', 9) * 0.8);
     expect(printable('Frâne 🔧  față\nși spate', charset)).toBe('Frâne față și spate');
     // s + combining comma below becomes ș.
     expect(printable('ș', charset)).toBe('ș');
@@ -213,8 +216,8 @@ describe('report_ready', () => {
 
   it('tells the client by push, in their language, and opens Rapoartele mele', () => {
     expect(renderNotification({ ...event, lang: 'ro' })).toMatchObject({
-      title: 'Raportul e gata',
-      body: 'Raportul de istoric pentru Volkswagen Golf 7 (BV 12 ABC) e gata de descărcat. Cod: SH-2026-000147.',
+      title: 'Raportul este gata',
+      body: 'Raportul de istoric pentru Volkswagen Golf 7 (BV 12 ABC) este gata de descărcat. Cod: SH-2026-000147.',
       url: '/c/cont/rapoarte',
       tag: 'report-r1',
     });

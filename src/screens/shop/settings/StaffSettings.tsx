@@ -22,7 +22,7 @@ import { getSubscriptionRow } from '../../../data/subscription';
 import { useI18n } from '../../../i18n/context';
 import { formatDate, formatMoney } from '../../../i18n/format';
 import { plural } from '../../../i18n/translate';
-import { includedColleagues, monthlyTotal } from '../../../lib/subscription';
+import { includedColleagues, monthlyAverage } from '../../../lib/subscription';
 import { looksLikeEmail } from '../../../lib/password';
 import { useLoad } from '../../../lib/useLoad';
 import { LoadError } from '../../../components/LoadError';
@@ -114,7 +114,7 @@ function SeatPrice() {
   const sub = state.data;
   const seat = formatMoney(lang, sub.seat_price_ron);
   const included = includedColleagues(lang, sub.free_seats);
-  const now = { total: formatMoney(lang, monthlyTotal(sub)), colleagues: plural(lang, 'unit.colleagues', sub.seats) };
+  const now = { total: formatMoney(lang, monthlyAverage(sub)), colleagues: plural(lang, 'unit.colleagues', sub.seats) };
   return (
     <p className={styles.intro}>
       {included ? t('staff.seats.priceIncluded', { included, seat }) : t('staff.seats.price', { seat })}{' '}

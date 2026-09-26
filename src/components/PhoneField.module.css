@@ -1,0 +1,41 @@
+.row {
+  display: flex;
+  gap: 8px;
+}
+
+/* The select covers the visible "+40 ▾": the phone's own picker opens, the field stays compact. */
+.country {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.shown {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 100%;
+  min-height: var(--tap);
+  padding: 0 10px 0 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-input);
+  font-size: 16px;
+}
+
+.chevron {
+  color: var(--muted);
+}
+
+.select {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  opacity: 0;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.country:has(.select:focus-visible) .shown {
+  border-color: var(--amber);
+  box-shadow: var(--focus-ring);
+}

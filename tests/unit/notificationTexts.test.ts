@@ -53,7 +53,7 @@ const SAMPLE: Record<string, Record<string, unknown>> = {
   quote_refused: { inspection_fee: 100 },
   job_done: { cost: 1250, odometer: 105400 },
   appointment_reminder: { day: 'tomorrow' },
-  new_message: { thread_id: 't-1', sender_name: 'Atelier Unu', preview: 'Mașina e gata.' },
+  new_message: { thread_id: 't-1', sender_name: 'Atelier Unu', preview: 'Mașina este gata.' },
   review_reply: { review_id: 'r-1' },
   new_review: { review_id: 'r-1', rating: 5 },
   doc_expiry: { car_id: 'c-1', doc: 'itp', days: 12, expiry: '2026-10-25' },
@@ -122,16 +122,16 @@ describe('notification texts', () => {
   it('writes what the client needs to know, in their language', () => {
     expect(render('quote_sent', 'client', 'ro')).toMatchObject({
       title: 'Atelier Unu',
-      body: 'Devizul pentru Volkswagen Golf 7 e gata: 1.250 lei. Răspunde până pe 16 oct, ora 14:00.',
+      body: 'Devizul pentru Volkswagen Golf 7 este gata: 1.250 lei. Răspunde până pe 16 oct, ora 14:00.',
       url: '/c/programari?p=b-1',
       tag: 'booking-b-1',
     });
     expect(render('quote_sent', 'client', 'en')!.body).toBe(
       'The quote for your Volkswagen Golf 7 is ready: 1,250 RON. Please answer by Oct 16, 14:00.',
     );
-    expect(render('booking_confirmed', 'client', 'ro')!.body).toBe('Programarea P-000123 e confirmată: Mie 14 oct, 10:00.');
+    expect(render('booking_confirmed', 'client', 'ro')!.body).toBe('Programarea P-000123 este confirmată: Mie 14 oct, 10:00.');
     expect(render('booking_confirmed', 'client', 'en')!.body).toBe('Your booking P-000123 is confirmed: Wed, Oct 14, 10:00.');
-    expect(render('job_done', 'client', 'ro')!.body).toBe('Volkswagen Golf 7 e gata de ridicare. Total: 1.250 lei.');
+    expect(render('job_done', 'client', 'ro')!.body).toBe('Volkswagen Golf 7 este gata de ridicare. Total: 1.250 lei.');
     expect(render('quote_expiring', 'client', 'ro')!.body).toBe(
       'Devizul pentru Volkswagen Golf 7 expiră mâine la 14:00. Răspunde ca să-ți păstrezi locul.',
     );
@@ -143,7 +143,7 @@ describe('notification texts', () => {
       'Azi la 10:00 ai programare la Atelier Unu: Schimb ulei și filtru.',
     );
     expect(render('booking_declined', 'client', 'en', { reason: '' })!.body).toBe("The shop can't take booking P-000123 on Wed, Oct 14, 10:00.");
-    expect(render('new_message', 'client', 'ro')).toMatchObject({ title: 'Atelier Unu', body: 'Mașina e gata.', url: '/c/mesaje/t-1', tag: 'thread-t-1' });
+    expect(render('new_message', 'client', 'ro')).toMatchObject({ title: 'Atelier Unu', body: 'Mașina este gata.', url: '/c/mesaje/t-1', tag: 'thread-t-1' });
   });
 
   it('document reminders name the document, the car and the time left', () => {

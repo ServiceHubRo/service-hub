@@ -26,6 +26,15 @@ export function uniqueEmail(prefix: string): string {
   return `${prefix}-${Date.now()}-${Math.floor(Math.random() * 1e6)}@service-hub.test`;
 }
 
+/**
+ * A Romanian mobile number no other test account has: a shop owner's phone gives one free period
+ * and a suspended account's phone suspends the next one (account fingerprints), so tests never share one.
+ */
+export function uniquePhone(): { e164: string; national: string } {
+  const digits = `7${String(Math.floor(Math.random() * 1e8)).padStart(8, '0')}`;
+  return { e164: `+40${digits}`, national: `0${digits.slice(0, 3)} ${digits.slice(3, 6)} ${digits.slice(6)}` };
+}
+
 /** A confirmed account made through the Auth admin API (fast; the UI sign-up has its own test). */
 export async function createUser(role: 'client' | 'shop', extra: Record<string, string> = {}): Promise<string> {
   const email = uniqueEmail(role);
@@ -39,7 +48,7 @@ export async function createUser(role: 'client' | 'shop', extra: Record<string, 
       user_metadata: {
         role,
         name: role === 'shop' ? 'Ion Popescu' : 'Maria Pop',
-        phone: '+40723375248',
+        phone: uniquePhone().e164,
         lang: 'ro',
         terms_version: '2026-09',
         ...(role === 'shop' ? { shop_name: 'Atelier Test', city: 'Brașov' } : {}),
