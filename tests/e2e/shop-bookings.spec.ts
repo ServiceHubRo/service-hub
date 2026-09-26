@@ -13,6 +13,7 @@ import {
   serviceRest,
   shot,
   signIn,
+  uniquePhone,
 } from './support';
 
 // T08 — the shop's Panou and Programări: counters that open filtered lists, today's schedule and
@@ -161,7 +162,8 @@ test.describe('shop flow', () => {
   test('a request arrives live, one confirmation for three taps, inspection, a quote of 3 lines the client sees', async ({ page, browser }) => {
     const shopName = `Atelier T08 ${Date.now() % 100000}${Math.floor(Math.random() * 100)}`;
     const { email: shopEmail, shopId } = await createBookableShop(shopName, ['ulei'], { inspection_fee: 80 });
-    const clientEmail = await createUser('client');
+    const clientPhone = uniquePhone();
+    const clientEmail = await createUser('client', { phone: clientPhone.e164 });
 
     await signIn(page, shopEmail, PASSWORD);
     await expect(page).toHaveURL(/\/s\/panou$/);
@@ -181,7 +183,7 @@ test.describe('shop flow', () => {
     await page.getByRole('link', { name: /^\d+ Cereri noi$/ }).click();
     const c = card(page, 'Zgomot la roata din față.');
     await expect(c).toContainText('Maria Pop');
-    await expect(c).toContainText('0723 375 248');
+    await expect(c).toContainText(clientPhone.national);
     await expect(c).toContainText('BV 99 TST');
     await expect(c).toContainText(booking.ref);
 
