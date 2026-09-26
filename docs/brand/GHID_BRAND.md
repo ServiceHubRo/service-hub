@@ -85,9 +85,9 @@ Pentru fundaluri colorate discret: portocaliu la 12% pentru bannere, la 18% pent
 | Rol | Font | Unde |
 |---|---|---|
 | Tot | **Inter** (gratuit, Google Fonts; e inclus în aplicație, deci arată la fel pe orice telefon și calculator) | Titluri: Bold 700, puțin strâns. Text: Regular 400 / SemiBold 600. Butoane: Bold 700 |
-| Cifre | **Inter**, cu cifre de lățime egală | Ore, prețuri, kilometri, telefoane, coduri |
+| Cifre | **Inter**, cu cifre de lățime egală (doar cifrele; cratima, punctul și spațiul rămân normale) | Ore, prețuri, kilometri, telefoane, coduri |
 
-Un singur font, peste tot (schimbat la cererea lui Eduard, în loc de Arial Narrow + System UI + monospațiat, care arătau diferit de la un dispozitiv la altul). În Canva: Inter.
+Un singur font, peste tot — aplicație, emailuri, raportul PDF, imaginea de previzualizare (schimbat la cererea lui Eduard, în loc de Arial Narrow + System UI + monospațiat, care arătau diferit de la un dispozitiv la altul). Fără text înclinat. În Canva: Inter.
 
 **Majusculele** se folosesc doar la marcă (SERVICE-HUB). Titlurile, butoanele, etichetele și stările se scriu normal, cu literă mare doar la început.
 

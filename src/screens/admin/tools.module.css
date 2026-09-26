@@ -128,7 +128,6 @@
 
 .placeholder {
   font-family: var(--font-mono);
-  font-variant-numeric: tabular-nums;
   font-size: 12.5px;
   padding: 2px 6px;
   border-radius: var(--radius-pill);

@@ -279,7 +279,6 @@
 .mockLine b,
 .mockTotal span:last-child {
   font-family: var(--font-mono);
-  font-variant-numeric: tabular-nums;
   color: var(--text);
 }
 

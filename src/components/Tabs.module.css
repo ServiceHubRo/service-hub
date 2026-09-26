@@ -25,7 +25,6 @@
 
 .count {
   font-family: var(--font-mono);
-  font-variant-numeric: tabular-nums;
   font-size: 12px;
   opacity: 0.85;
 }

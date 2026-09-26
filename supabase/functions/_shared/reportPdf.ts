@@ -1,5 +1,5 @@
 // The history report as a PDF (T15, P16e; the look of docs/reference-report.pdf): A4, white, dark
-// text, the amber accent, Noto Sans with the Romanian letters embedded (reportFonts.ts).
+// text, the amber accent, Inter (the app's typeface) with the Romanian letters embedded (reportFonts.ts).
 //
 // pdf-lib and fontkit are handed in (`PdfLib`): the Edge Function passes `npm:pdf-lib`, the unit
 // tests the same package from node_modules, so this file imports neither and stays testable.
@@ -15,7 +15,7 @@ import {
   type ReportData,
   type ReportTextKey,
 } from './report.ts';
-import { MONO_BOLD, MONO_REGULAR, SANS_BOLD, SANS_REGULAR } from './reportFonts.ts';
+import { INTER_BOLD, INTER_REGULAR } from './reportFonts.ts';
 
 // ------------------------------------------------------------------ the parts of pdf-lib used here
 
@@ -87,11 +87,10 @@ function roundRectPath(w: number, h: number, r: number): string {
   return `M${r} 0H${w - r}A${r} ${r} 0 0 1 ${w} ${r}V${h - r}A${r} ${r} 0 0 1 ${w - r} ${h}H${r}A${r} ${r} 0 0 1 0 ${h - r}V${r}A${r} ${r} 0 0 1 ${r} 0Z`;
 }
 
+/** One typeface, as in the app; its digits are even-width, so figures line up without a mono font. */
 interface Fonts {
   sans: PdfFont;
   bold: PdfFont;
-  mono: PdfFont;
-  monoBold: PdfFont;
 }
 
 /**
@@ -165,10 +164,8 @@ export async function renderReportPdf(lib: PdfLib, data: ReportData): Promise<Ui
   doc.registerFontkit(lib.fontkit);
   // Not subset again: the fonts are already cut down, and whole fonts avoid fontkit's subsetting quirks.
   const fonts: Fonts = {
-    sans: await doc.embedFont(base64Bytes(SANS_REGULAR), { subset: false }),
-    bold: await doc.embedFont(base64Bytes(SANS_BOLD), { subset: false }),
-    mono: await doc.embedFont(base64Bytes(MONO_REGULAR), { subset: false }),
-    monoBold: await doc.embedFont(base64Bytes(MONO_BOLD), { subset: false }),
+    sans: await doc.embedFont(base64Bytes(INTER_REGULAR), { subset: false }),
+    bold: await doc.embedFont(base64Bytes(INTER_BOLD), { subset: false }),
   };
   const charset = new Set(fonts.sans.getCharacterSet());
   const clean = (s: string | null | undefined) => printable((s ?? '').trim(), charset);
@@ -227,14 +224,14 @@ export async function renderReportPdf(lib: PdfLib, data: ReportData): Promise<Ui
       return;
     }
     // Which car, which report: the identity strip under the rule.
-    const codeW = fonts.monoBold.widthOfTextAtSize(data.code, 10);
+    const codeW = fonts.bold.widthOfTextAtSize(data.code, 10);
     const room = CONTENT - codeW - 16;
     const name = clampLines(wrapText(carName, fonts.bold, 10, room), 1, fonts.bold, 10, room)[0] ?? '';
     text(name, MARGIN, y - 16, 10, fonts.bold, C.ink);
     const ids = [plate, vin].filter(Boolean).join(' · ');
     const idsLine = clampLines(wrapText(ids, fonts.sans, 8, room), 1, fonts.sans, 8, room)[0] ?? '';
     text(idsLine, MARGIN, y - 28, 8, fonts.sans, C.muted);
-    right(data.code, MARGIN + CONTENT, y - 16, 10, fonts.monoBold, C.amberText);
+    right(data.code, MARGIN + CONTENT, y - 16, 10, fonts.bold, C.amberText);
     right(t('continued'), MARGIN + CONTENT, y - 28, 7.5, fonts.sans, C.muted);
     y -= 44;
   };
@@ -266,7 +263,7 @@ export async function renderReportPdf(lib: PdfLib, data: ReportData): Promise<Ui
   facts.forEach(([label, value, font], i) => {
     const x = MARGIN + i * (factW + gap);
     box(x, y, factW, 46, C.white, C.box);
-    text(label, x + 12, y - 17, 6.5, fonts.sans, C.faint);
+    text(label, x + 12, y - 17, 7.5, fonts.sans, C.muted);
     const size = font.widthOfTextAtSize(value, 10) > factW - 24 ? 8.5 : 10;
     text(value, x + 12, y - 33, size, font, C.ink);
   });
@@ -274,9 +271,9 @@ export async function renderReportPdf(lib: PdfLib, data: ReportData): Promise<Ui
 
   // ---------------------------------------------------------------- the code
   box(MARGIN, y, CONTENT, 42, C.amberTint, C.amberLine);
-  text(t('code'), MARGIN + 12, y - 17, 7, fonts.bold, C.amberText);
+  text(t('code'), MARGIN + 12, y - 17, 8, fonts.bold, C.amberText);
   text(t('codeHint'), MARGIN + 12, y - 30, 7.5, fonts.sans, C.muted);
-  right(data.code, MARGIN + CONTENT - 12, y - 26, 15, fonts.monoBold, C.amberText);
+  right(data.code, MARGIN + CONTENT - 12, y - 26, 15, fonts.bold, C.amberText);
   y -= 42 + 16;
 
   // ---------------------------------------------------------------- the jobs, measured first
@@ -291,11 +288,11 @@ export async function renderReportPdf(lib: PdfLib, data: ReportData): Promise<Ui
   const tableHeader = () => {
     page.drawRectangle({ x: MARGIN, y: y - TABLE_HEAD, width: CONTENT, height: TABLE_HEAD, color: C.ink });
     const base = y - 14.5;
-    text(t('colDate'), colX.date + PAD, base, 7, fonts.bold, C.white);
-    text(t('colShop'), colX.shop + PAD, base, 7, fonts.bold, C.white);
-    text(t('colWork'), colX.work + PAD, base, 7, fonts.bold, C.white);
-    right(t('colKm'), colX.kmRight, base, 7, fonts.bold, C.white);
-    right(t('colCost'), colX.costRight, base, 7, fonts.bold, C.white);
+    text(t('colDate'), colX.date + PAD, base, 8, fonts.bold, C.white);
+    text(t('colShop'), colX.shop + PAD, base, 8, fonts.bold, C.white);
+    text(t('colWork'), colX.work + PAD, base, 8, fonts.bold, C.white);
+    right(t('colKm'), colX.kmRight, base, 8, fonts.bold, C.white);
+    right(t('colCost'), colX.costRight, base, 8, fonts.bold, C.white);
     y -= TABLE_HEAD;
   };
 
@@ -342,7 +339,7 @@ export async function renderReportPdf(lib: PdfLib, data: ReportData): Promise<Ui
       tableHeader();
     }
     const top = y - 16;
-    text(reportDay(lang, row.job.date), colX.date + PAD, top, 9, fonts.mono, C.ink);
+    text(reportDay(lang, row.job.date), colX.date + PAD, top, 9, fonts.sans, C.ink);
     let ly = top;
     for (const l of row.shopLines) {
       text(l, colX.shop + PAD, ly, 9, fonts.sans, C.ink);
@@ -361,8 +358,8 @@ export async function renderReportPdf(lib: PdfLib, data: ReportData): Promise<Ui
       text(l, colX.work + PAD, wy + 1.5, 7.5, fonts.sans, C.muted);
       wy -= SMALL;
     }
-    right(row.job.odometer != null ? reportKm(lang, row.job.odometer) : t('none'), colX.kmRight, top, 9, fonts.mono, C.ink);
-    right(row.job.cost != null ? reportMoney(lang, row.job.cost) : t('none'), colX.costRight, top, 9, fonts.mono, C.ink);
+    right(row.job.odometer != null ? reportKm(lang, row.job.odometer) : t('none'), colX.kmRight, top, 9, fonts.sans, C.ink);
+    right(row.job.cost != null ? reportMoney(lang, row.job.cost) : t('none'), colX.costRight, top, 9, fonts.sans, C.ink);
     y -= row.height;
     page.drawLine({ start: { x: MARGIN, y }, end: { x: MARGIN + CONTENT, y }, thickness: 0.6, color: C.line });
   });
@@ -371,7 +368,7 @@ export async function renderReportPdf(lib: PdfLib, data: ReportData): Promise<Ui
   ensure(CLOSING_H);
   page.drawLine({ start: { x: MARGIN, y }, end: { x: MARGIN + CONTENT, y }, thickness: 1, color: C.ink });
   text(t('total'), MARGIN + PAD, y - 18, 9.5, fonts.bold, C.ink);
-  right(reportMoney(lang, data.total), colX.costRight, y - 18, 11, fonts.monoBold, C.ink);
+  right(reportMoney(lang, data.total), colX.costRight, y - 18, 11, fonts.bold, C.ink);
   y -= TOTAL_H;
 
   const stats: [string, string][] = [
@@ -382,7 +379,7 @@ export async function renderReportPdf(lib: PdfLib, data: ReportData): Promise<Ui
   stats.forEach(([label, value], i) => {
     const x = MARGIN + i * (factW + gap);
     box(x, y, factW, 56, C.white, C.box);
-    center(label, x + factW / 2, y - 17, 6.5, fonts.sans, C.faint);
+    center(label, x + factW / 2, y - 17, 7.5, fonts.sans, C.muted);
     const size = fonts.bold.widthOfTextAtSize(value, 15) > factW - 16 ? 11 : 15;
     center(value, x + factW / 2, y - 40, size, fonts.bold, C.amberText);
   });
