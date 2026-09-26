@@ -19,6 +19,10 @@ export const en: Record<MessageKey, string> = {
   'nav.admin.moderation': 'Moderation',
   'nav.skipToContent': 'Skip to content',
   'nav.logout': 'Log out',
+  'nav.logoutConfirm.title': 'Log out?',
+  'nav.logoutConfirm.body': 'On this device, you will sign in again with your email and password.',
+  'nav.logoutConfirm.yes': 'Log me out',
+  'nav.logoutConfirm.no': 'Stay signed in',
 
   'lang.switch': 'Language',
   'lang.ro': 'Română',

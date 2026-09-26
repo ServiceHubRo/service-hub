@@ -238,6 +238,7 @@ test('at 1440 px the navigation is on the left, with Cont and Deconectare at the
     expect(logout.y + logout.height).toBeGreaterThan(page.viewportSize()!.height * 0.8);
     await shot(page, `t19c-sidebar-${email.split('@')[0]}`, name());
     await sidebar.getByRole('button', { name: 'Deconectare' }).click();
+    await sidebar.getByRole('button', { name: 'Deconectează-mă' }).click();
     await expect(page).toHaveURL(/\/$/);
     await page.unrouteAll({ behavior: 'ignoreErrors' });
   }

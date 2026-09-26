@@ -307,6 +307,7 @@ test.describe('push notifications', () => {
         await pushRow(page).getByRole('button', { name: 'Activează' }).click();
         await expect(pushRow(page)).toContainText('Activate pe acest dispozitiv');
         await page.getByRole('button', { name: 'Deconectare' }).filter({ visible: true }).first().click();
+        await page.getByRole('button', { name: 'Deconectează-mă' }).click();
         await expect(page).toHaveURL(/\/$/);
         await expect
           .poll(() => serviceRest(`push_subscriptions?endpoint=eq.${encodeURIComponent(device.endpoint)}`, 'GET'))

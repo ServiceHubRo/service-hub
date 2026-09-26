@@ -683,6 +683,8 @@ Note: 1 migrare (`client_reminders`, `schema_version` = 29), niciun pachet nou. 
 
 **Butoanele din emailuri, aceleași culori și în Gmail pe iPhone (cerut de Eduard, făcut):** butonul portocaliu din fiecare email (confirmare, parolă, schimbare de email, invitație, abonament, raport) este acum o imagine în interiorul linkului — Gmail pe iPhone nu mai poate să-l facă maro. Se apasă la fel; cu imaginile oprite apare textul butonului (tot un link), iar linkul scris de sub buton rămâne. Imaginile se fac cu `node scripts/gen-email-buttons.mjs` din lista `emailButtonLabels.ts` și le servește aceeași funcție ca logo-ul (`email-logo?b=…`); un buton nou fără imagine rămâne buton obișnuit, iar un test unitar cere ca fiecare text de buton să aibă imagine. Nicio migrare, niciun pachet nou.
 
+**Confirmare la deconectare (cerut de Eduard, făcut):** „Deconectare” (în meniul din stânga pe laptop, jos în Cont pe telefon și tabletă) întreabă întâi „Te deconectezi?”, cu „Deconectează-mă” și „Rămân conectat”, în panoul din pagină (nu o fereastră a browserului). „Rămân conectat” sau tasta Escape închid panoul. Nicio migrare, niciun pachet nou.
+
 ### T19c — Verificarea finală și pregătirea domeniului
 
 Împărțită (26 sept 2026) în două: **T19c** — ce face Claude (verificarea automată, `docs/LAUNCH_CHECK.md`, ghidul pas cu pas); **T19e** — pașii tăi de lansare, după ghid (mai jos).

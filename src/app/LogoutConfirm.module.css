@@ -1,0 +1,14 @@
+.wrap {
+  width: 100%;
+}
+
+.body {
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
