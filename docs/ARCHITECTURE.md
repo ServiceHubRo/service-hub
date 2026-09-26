@@ -376,7 +376,7 @@ As Prompt 16e plus §7. Report code `SH-YYYY-NNNNNN` from a sequence. Public pag
 - **Trade Register:** accept both formats — old `J08/1234/2015` (`^[JFC]\d{1,2}/\d{1,7}/\d{4}$`) and new since 2024 `J2024000123010` (`^[JFC]\d{13}$`: letter + year + 6-digit number + 2-digit county + check digit).
 - **IBAN:** `RO` + 2 digits + 20 alphanumerics (24 total), mod-97 = 1. Valid test: `RO49AAAA1B31007593840000`.
 - **Postal code:** exactly 6 digits.
-- **Phone:** Romanian numbers normalized to `+40…`; display `0723 375 248`.
+- **Phone:** Romanian numbers normalized to `+40…`; display `0723 375 248`. At sign-up and in Cont the person's own number has a country picker (`PhoneField`, `src/lib/phone.ts`: Romania first, the EU, neighbours, UK, CH, NO, TR, US, AU; names from `Intl.DisplayNames`): Romania keeps the rule above, another country takes 6–12 digits after its calling code (trunk 0 dropped; `06` in Hungary; kept in Italy); a number typed with `+` / `00` keeps its own country; stored as `+<code><number>`. Shop public phones stay Romanian. SMS (SMSO) only to Romanian numbers: a shop owner with a foreign number is confirmed by the admin.
 - **VIN:** 17 characters, `A–Z` and `0–9` without I, O, Q.
 - **Plate:** stored as typed; `plate_norm` = upper-case without spaces/dashes, used for matching.
 - Invalid values are refused with a specific translated message — never accepted silently.
