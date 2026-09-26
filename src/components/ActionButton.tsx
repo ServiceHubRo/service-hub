@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { useEffect, useRef, type ReactNode } from 'react';
 import { useI18n } from '../i18n/context';
 import { buttonClass, type ButtonVariant } from './buttonClass';
 import { Spinner } from './Spinner';
@@ -38,6 +38,13 @@ export function ActionButton({
 }: ActionButtonProps) {
   const { t } = useI18n();
   const { run, busy, error } = useAction(onAction, { errorMessage, canRetry });
+  const errorRef = useRef<HTMLDivElement>(null);
+
+  // An error under a button at the bottom of the screen would sit below the fold: bring it in
+  // (only as far as needed; nothing moves when it is already visible).
+  useEffect(() => {
+    if (error) errorRef.current?.scrollIntoView?.({ block: 'nearest' });
+  }, [error]);
 
   return (
     <div className={block ? styles.wrapBlock : styles.wrap}>
@@ -60,7 +67,7 @@ export function ActionButton({
         )}
       </button>
       {error && (
-        <div className={styles.error} role="alert">
+        <div ref={errorRef} className={styles.error} role="alert">
           <span>{error.text}</span>
           {error.retry && (
             <button type="button" className={styles.retry} onClick={() => void run()}>

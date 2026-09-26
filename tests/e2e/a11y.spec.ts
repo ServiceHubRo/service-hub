@@ -1,9 +1,20 @@
 import { expect, test, type Page } from '@playwright/test';
-import { BACKEND, SEED, SEED_PASSWORD, expectAccessible, serviceRest, signIn } from './support';
+import {
+  BACKEND,
+  SEED,
+  SEED_PASSWORD,
+  expectAccessible,
+  expectNoHorizontalScroll,
+  expectNoRomanianText,
+  serviceRest,
+  signIn,
+} from './support';
 
 // T18: every screen of every role passes the WCAG 2.1 AA checks (axe-core) and has 44 px tap
 // targets, in Romanian and English; keyboard users can skip the navigation. Read-only visits of
 // the demo accounts (conversations are not opened: that would mark them read for other tests).
+// T19c (launch check): on the same visit, nothing sticks out sideways at 390 / 820 / 1440 px and
+// no Romanian text is left on an English screen.
 
 test.skip(!BACKEND, 'needs the local Supabase stack');
 // Many screens per test.
@@ -43,6 +54,8 @@ async function checkAll(page: Page, lang: 'ro' | 'en', paths: string[]) {
   for (const path of paths) {
     await open(page, path);
     await expectAccessible(page, `${path} (${lang})`);
+    await expectNoHorizontalScroll(page);
+    if (lang === 'en') await expectNoRomanianText(page, path);
   }
 }
 

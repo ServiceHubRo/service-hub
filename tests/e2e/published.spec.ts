@@ -30,3 +30,15 @@ test('published site: the component gallery is not reachable', async ({ page }) 
   await page.goto('/dev/componente');
   await expect(page.getByRole('heading', { level: 1, name: 'Pagina nu există' })).toBeVisible();
 });
+
+test('published site: search engines may index the public pages, with a sitemap', async ({ request }) => {
+  const robots = await request.get('/robots.txt');
+  expect(robots.ok()).toBe(true);
+  const txt = await robots.text();
+  expect(txt).toContain('Allow: /');
+  expect(txt).toContain('Disallow: /c/');
+  expect(txt).toMatch(/Sitemap: https?:\/\/\S+\/sitemap\.xml/);
+  const sitemap = await request.get('/sitemap.xml');
+  expect(sitemap.ok()).toBe(true);
+  expect(await sitemap.text()).toContain('/legal/termeni</loc>');
+});
