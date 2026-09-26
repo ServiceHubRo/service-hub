@@ -6,7 +6,10 @@ import {
   authEmailSubject,
   authEmailSubjects,
 } from '../../supabase/functions/_shared/authEmails.ts';
-import { emailForEvent, escapeHtml, staffInviteEmail } from '../../supabase/functions/_shared/emails.ts';
+import { buttonSlug, EMAIL_BUTTON_LABELS } from '../../supabase/functions/_shared/emailButtonLabels.ts';
+import { EMAIL_BUTTON_PNG_BASE64 } from '../../supabase/functions/_shared/emailButtonImages.ts';
+import { EMAIL_BUTTON_SIZES } from '../../supabase/functions/_shared/emailButtonSizes.ts';
+import { buttonHtml, emailForEvent, escapeHtml, staffInviteEmail } from '../../supabase/functions/_shared/emails.ts';
 import { sendEmail } from '../../supabase/functions/_shared/resend.ts';
 import { codeSms, SMS_MAX, smsForEvent } from '../../supabase/functions/_shared/sms.ts';
 import { resetSmsSenderCache, sendSms, smsSafe, toE164 } from '../../supabase/functions/_shared/smso.ts';
@@ -212,6 +215,47 @@ describe('app emails', () => {
     expect(html).toContain('<div class="gm-screen"><div class="gm-diff"><h1');
     // No forced capitals.
     expect(html).not.toContain('uppercase');
+  });
+
+  it('draws every button as an image inside its link (Gmail on iPhone darkens an HTML button)', () => {
+    const { html } = staffInviteEmail('ro', { shop: 'Atelier Unu', city: '', inviter: '', email: 'a@b.ro', url: 'https://service-hub.ro/x' });
+    expect(html).toContain(
+      '<a href="https://service-hub.ro/x" style="display:inline-block;text-decoration:none;"><img src="http://127.0.0.1:54321/functions/v1/email-logo?b=accepta-invitatia"',
+    );
+    expect(html).toContain('alt="Acceptă invitația"');
+    // The link under the button stays, for mail programs that block images.
+    expect(html).toContain('>https://service-hub.ro/x</a>');
+    // A text without a picture still gets a working (HTML) button.
+    expect(buttonHtml('Un buton nou', 'https://service-hub.ro/y')).toContain('>Un buton nou</a>');
+    expect(buttonHtml('Un buton nou', 'https://service-hub.ro/y')).not.toContain('<img');
+  });
+
+  it('has a picture for every button text the emails use', () => {
+    expect(buttonSlug('Plătește abonamentul')).toBe('plateste-abonamentul');
+    const slugs = EMAIL_BUTTON_LABELS.map(buttonSlug);
+    expect(new Set(slugs).size).toBe(slugs.length);
+    for (const label of EMAIL_BUTTON_LABELS) {
+      const size = EMAIL_BUTTON_SIZES[label];
+      expect(size, `${label}: run node scripts/gen-email-buttons.mjs`).toBeDefined();
+      expect(size!.height).toBe(44);
+      expect(EMAIL_BUTTON_PNG_BASE64[size!.slug], label).toMatch(/^iVBORw0KGgo/);
+    }
+    // Every button text written in the email sources is in the list (and so has its picture).
+    const used = new Set<string>();
+    const sources = import.meta.glob<string>('../../supabase/functions/_shared/{emails,authEmails}.ts', {
+      query: '?raw',
+      import: 'default',
+      eager: true,
+    });
+    expect(Object.keys(sources)).toHaveLength(2);
+    for (const src of Object.values(sources)) {
+      for (const line of src.split('\n').filter((l: string) => /label/.test(l) && !/^\s*(\/\/|\*)/.test(l))) {
+        for (const m of line.matchAll(/'([^']*)'/g)) if (m[1]!.length >= 3 && !/[{}$]/.test(m[1]!)) used.add(m[1]!);
+      }
+    }
+    expect(used.size).toBeGreaterThanOrEqual(EMAIL_BUTTON_LABELS.length);
+    const labels: readonly string[] = EMAIL_BUTTON_LABELS;
+    expect([...used].filter((u) => !labels.includes(u))).toEqual([]);
   });
 
   it('escapes HTML', () => {
