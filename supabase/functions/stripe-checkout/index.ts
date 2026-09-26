@@ -1,5 +1,6 @@
 // stripe-checkout — "Activează abonamentul" (FR §4.7, ARCHITECTURE §12): answers the address of a
-// Stripe Checkout page where the shop's owner pays the monthly subscription by card.
+// Stripe Checkout page where the shop's owner pays the subscription by card, every month or for
+// 3, 6 or 12 months at once (body `months`, 1 when absent) at today's discount.
 //
 // 1. Checks the caller's access token; subscription_checkout_info (SQL, service role) answers
 //    only for the owner of a shop.
@@ -11,6 +12,9 @@
 //    card is only saved: the first charge is at the end of the free period. The colleagues with an
 //    account are a second line, "Cont angajat" × seats (STRIPE_SEAT_PRICE_ID, the shop's price per
 //    colleague); later changes reach Stripe through the outbox (seats_changed, _shared/seats.ts).
+//    A longer period: both lines at the period's price (subscription_checkout_info's offers, the
+//    same product, recurring every N months); the subscription's metadata carries the months and
+//    the discount, which the webhook records on the shop's subscription.
 // The request id of the tap is the idempotency key, so a repeated tap gets the same page.
 // Nothing here changes the subscription's status: only the webhook does (stripe-webhook).
 // Answers { url } or { error: code }.
@@ -18,6 +22,7 @@ import { AdminError, adminApi } from '../_shared/admin.ts';
 import { linkBase } from '../_shared/app.ts';
 import { appUrlFromEnv, stripeConfigFromEnv } from '../_shared/env.ts';
 import { bearerToken, corsHeaders, json } from '../_shared/http.ts';
+import { isBillingMonths, recurringFor } from '../_shared/periods.ts';
 import { seatLineItem, seatPrice, type SeatInfo } from '../_shared/seats.ts';
 import { hasLiveSubscription, StripeError, stripeApi, stripeLocale, trialEndForCheckout } from '../_shared/stripe.ts';
 import { reportError } from '../_shared/monitor.ts';
@@ -26,6 +31,13 @@ import { reportError } from '../_shared/monitor.ts';
 const KNOWN_CODES = new Set(['not_allowed', 'account_suspended']);
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
+interface Offer {
+  months: number;
+  discount_percent: number;
+  price_ron: number;
+  seat_price_ron: number;
+}
+
 interface Info {
   shop_id: string;
   shop_name: string;
@@ -33,6 +45,8 @@ interface Info {
   lang: string;
   email: string | null;
   price_ron: number;
+  /** Every period at the shop's prices and today's discounts (subscription_offers). */
+  offers: Offer[];
   status: string;
   trial_ends_at: string | null;
   stripe_customer_id: string | null;
@@ -52,8 +66,10 @@ Deno.serve(async (req) => {
     const user = await api.userFromToken(bearerToken(req));
     if (!user) return json({ error: 'not_signed_in' }, 401);
 
-    const body = (await req.json().catch(() => ({}))) as { request_id?: unknown };
+    const body = (await req.json().catch(() => ({}))) as { request_id?: unknown; months?: unknown };
     const requestId = typeof body.request_id === 'string' && UUID.test(body.request_id) ? body.request_id : crypto.randomUUID();
+    const months = body.months === undefined ? 1 : body.months;
+    if (!isBillingMonths(months)) return json({ error: 'period_invalid' }, 400);
 
     let info: Info;
     try {
@@ -67,7 +83,10 @@ Deno.serve(async (req) => {
     if (!config.secretKey || !config.priceId) return json({ error: 'payments_unavailable' }, 503);
     if (hasLiveSubscription(info.stripe_status)) return json({ error: 'subscription_exists' }, 409);
     if (!info.billing_complete) return json({ error: 'billing_incomplete' }, 409);
-    const amount = Math.round(Number(info.price_ron) * 100);
+    const offer = (info.offers ?? []).find((o) => Number(o.months) === months);
+    if (!offer) return json({ error: 'period_invalid' }, 400);
+    const discount = Number(offer.discount_percent) || 0;
+    const amount = Math.round(Number(offer.price_ron) * 100);
     if (!(amount > 0)) return json({ error: 'nothing_to_pay' }, 409);
 
     const stripe = stripeApi(config);
@@ -90,16 +109,20 @@ Deno.serve(async (req) => {
 
     const seats = (await api.rpc('stripe_seat_info', { p_shop_id: info.shop_id })) as SeatInfo;
     if (seats.seats > 0 && !config.seatPriceId) return json({ error: 'payments_unavailable' }, 503);
-    const seatLine = seats.seats > 0 ? seatLineItem(await seatPrice(stripe, config.seatPriceId!), seats.seat_price_ron, seats.seats) : null;
+    const seatLine =
+      seats.seats > 0
+        ? seatLineItem(await seatPrice(stripe, config.seatPriceId!), seats.seat_price_ron, seats.seats, months, discount)
+        : null;
 
     const price = await stripe.get(`prices/${config.priceId}`);
-    const samePrice = price.unit_amount === amount && String(price.currency).toLowerCase() === 'ron';
+    const samePrice = months === 1 && price.unit_amount === amount && String(price.currency).toLowerCase() === 'ron';
     const lineItem = samePrice
       ? { price: config.priceId, quantity: 1 }
       : {
-          price_data: { currency: 'ron', product: price.product, unit_amount: amount, recurring: { interval: 'month' } },
+          price_data: { currency: 'ron', product: price.product, unit_amount: amount, recurring: recurringFor(months) },
           quantity: 1,
         };
+    const period = { shop_id: info.shop_id, billing_months: String(months), discount_percent: String(discount) };
 
     const base = `${linkBase(req.headers.get('origin'), appUrlFromEnv())}/s/cont/abonament`;
     const trialEnd = trialEndForCheckout(info.trial_ends_at, info.status);
@@ -113,10 +136,10 @@ Deno.serve(async (req) => {
         locale,
         success_url: `${base}?plata=ok`,
         cancel_url: `${base}?plata=anulata`,
-        metadata: { shop_id: info.shop_id },
-        subscription_data: { metadata: { shop_id: info.shop_id }, ...(trialEnd ? { trial_end: trialEnd } : {}) },
+        metadata: period,
+        subscription_data: { metadata: period, ...(trialEnd ? { trial_end: trialEnd } : {}) },
       },
-      `checkout-${info.shop_id}-${requestId}`,
+      `checkout-${info.shop_id}-${requestId}-${months}`,
     );
     if (typeof session.url !== 'string') throw new Error('checkout session without url');
     return json({ url: session.url });

@@ -173,8 +173,11 @@ function stripeStandIn() {
   const subscriptions = new Map<string, Obj>();
   const invoices = new Map<string, Obj>();
   const byKey = new Map<string, Obj>();
-  const price = { id: 'price_local_monthly', object: 'price', unit_amount: 10000, currency: 'ron', product: 'prod_local' };
-  const seatPrice = { id: 'price_local_seat', object: 'price', unit_amount: 2000, currency: 'ron', product: 'prod_local_seat' };
+  const monthly = { interval: 'month', interval_count: 1 };
+  const price = { id: 'price_local_monthly', object: 'price', unit_amount: 10000, currency: 'ron', product: 'prod_local', recurring: monthly };
+  const seatPrice = { id: 'price_local_seat', object: 'price', unit_amount: 2000, currency: 'ron', product: 'prod_local_seat', recurring: monthly };
+  /** Months a Checkout line or a subscription_items call recurs over (3, 6, 12 for a longer period). */
+  const monthsOf = (line: Obj) => Number(((line.price_data ?? {}) as Obj & { recurring?: Obj }).recurring?.interval_count ?? 1) || 1;
   /** A subscription item from a Checkout line or a subscription_items call. */
   const itemFrom = (line: Obj, periodEnd: number): Obj => {
     const data = (line.price_data ?? {}) as Obj;
@@ -182,7 +185,14 @@ function stripeStandIn() {
     return {
       id: id('si'),
       object: 'subscription_item',
-      price: known ?? { id: id('price'), object: 'price', unit_amount: Number(data.unit_amount), currency: 'ron', product: data.product },
+      price: known ?? {
+        id: id('price'),
+        object: 'price',
+        unit_amount: Number(data.unit_amount),
+        currency: 'ron',
+        product: data.product,
+        recurring: { interval: 'month', interval_count: monthsOf(line) },
+      },
       quantity: Number(line.quantity ?? 1),
       current_period_end: periodEnd,
     };
@@ -277,7 +287,7 @@ function stripeStandIn() {
           if (req.method === 'POST' && path === '/v1/subscription_items') {
             const sub = subscriptions.get(String(body.subscription));
             if (!sub) return reply(404, { error: { message: 'No such subscription' } });
-            const item = itemFrom(body, now() + month);
+            const item = itemFrom(body, now() + monthsOf(body) * month);
             (sub.items as { data: Obj[] }).data.push(item);
             // Stripe announces the change on its own, after answering the call.
             void send('customer.subscription.updated', sub).catch(() => undefined);
@@ -336,7 +346,9 @@ function stripeStandIn() {
           const s = sessions.get(m[1]!);
           if (!s) return reply(404, {});
           const lei = Number(s.amount) / 100;
-          const what = s.mode === 'payment' ? `Plată unică: ${lei} lei` : `Abonament: ${lei} lei / lună`;
+          const months = monthsOf(((s.lines as Obj[] | undefined) ?? [])[0] ?? {});
+          const what =
+            s.mode === 'payment' ? `Plată unică: ${lei} lei` : `Abonament: ${lei} lei / ${months > 1 ? `${months} luni` : 'lună'}`;
           return page(
             res,
             'Stripe test checkout',
@@ -373,7 +385,11 @@ function stripeStandIn() {
             cancel_at_period_end: false,
             trial_end: trialEnd,
             metadata: data.metadata ?? {},
-            items: { data: ((s.lines as Obj[] | undefined) ?? [{ price: price.id, quantity: 1 }]).map((l) => itemFrom(l, trialEnd ?? now() + month)) },
+            items: {
+              data: ((s.lines as Obj[] | undefined) ?? [{ price: price.id, quantity: 1 }]).map((l) =>
+                itemFrom(l, trialEnd ?? now() + monthsOf(l) * month),
+              ),
+            },
             amount: s.amount,
           };
           subscriptions.set(String(sub.id), sub);

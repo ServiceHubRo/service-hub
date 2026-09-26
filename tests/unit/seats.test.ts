@@ -91,6 +91,26 @@ describe('the colleagues in Stripe', () => {
     expect((await syncSeats(f.api, price, info({ stripe_subscription_id: 'sub_gone' }), 'e')).status).toBe('no_subscription');
   });
 
+  it('bills a colleague the period price on a longer subscription, invoiced at once', async () => {
+    expect(seatLineItem(price, 19, 2, 12, 15)).toEqual({
+      price_data: { currency: 'ron', product: 'prod_seat', unit_amount: 19400, recurring: { interval: 'month', interval_count: 12 } },
+      quantity: 2,
+    });
+    // Even when the amount happens to match the monthly Stripe price, a period needs its own.
+    expect(seatLineItem({ ...price, unitAmount: 5400 }, 19, 1, 3, 5)).toMatchObject({ price_data: { unit_amount: 5400 } });
+
+    let f = fakeStripe([main]);
+    await syncSeats(f.api, price, info({ seats: 1, seat_price_ron: 19, billing_months: 3, period_discount: 5 }), 'e');
+    expect(f.calls.at(-1)!.params).toMatchObject({
+      price_data: { unit_amount: 5400, recurring: { interval: 'month', interval_count: 3 } },
+      proration_behavior: 'always_invoice',
+    });
+    const seat = { id: 'si_seat', price: { id: 'price_x', product: 'prod_seat' }, quantity: 1 };
+    f = fakeStripe([main, seat]);
+    await syncSeats(f.api, price, info({ seats: 2, billing_months: 12, period_discount: 15 }), 'e');
+    expect(f.calls.at(-1)).toMatchObject({ path: 'subscription_items/si_seat', params: { quantity: 2, proration_behavior: 'always_invoice' } });
+  });
+
   it('keeps a shop price per colleague that differs from Stripe', async () => {
     const { api, calls } = fakeStripe([main]);
     await syncSeats(api, price, info({ seats: 1, seat_price_ron: 15 }), 'e');

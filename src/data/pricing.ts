@@ -10,6 +10,8 @@ export interface PublicPricing {
   /** The launch price while places are left (null otherwise), and for how many shops in all. */
   launchRon: number | null;
   launchShops: number;
+  /** Discount in percent when paying for 3, 6 or 12 months at once (0 when not offered). */
+  periodDiscounts: { 3: number; 6: number; 12: number };
 }
 
 /** Anyone may ask, signed out too. */
@@ -24,5 +26,12 @@ export async function fetchPublicPricing(): Promise<PublicPricing> {
   };
   if (!Object.values(pricing).every(Number.isFinite)) throw new Error('public_pricing: unexpected answer');
   const launch = data?.launch_price_ron == null ? null : num(data.launch_price_ron);
-  return { ...pricing, launchRon: launch !== null && Number.isFinite(launch) && launch > 0 ? launch : null, launchShops: num(data?.launch_shops) || 0 };
+  const periods = (data?.period_discounts ?? {}) as Record<string, unknown>;
+  const discount = (m: number) => num(periods[String(m)]) || 0;
+  return {
+    ...pricing,
+    launchRon: launch !== null && Number.isFinite(launch) && launch > 0 ? launch : null,
+    launchShops: num(data?.launch_shops) || 0,
+    periodDiscounts: { 3: discount(3), 6: discount(6), 12: discount(12) },
+  };
 }

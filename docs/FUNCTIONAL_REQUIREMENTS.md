@@ -191,6 +191,7 @@ A user has exactly one role. The role decides the entire interface. A client can
 
 ### 4.7 Subscription
 - Single plan: **149 RON / month without VAT** (launch price **99 RON** for the first 50 shops, kept for as long as they subscribe), **the first colleague** whose account has joined the shop **included**, **19 RON / month for each additional colleague** (an invitation is free; removing a colleague lowers the price; changes are prorated by day), **90-day free trial** (colleagues included), cancel anytime (effective end of period). All four amounts are platform settings, fixed per shop at sign-up.
+- **Billing period** (Eduard, 26 Sep 2026): pay **monthly**, or every **3 / 6 / 12 months** at once with **5% / 10% / 15%** off (platform settings), on the shop's own prices — the launch price and paid colleagues too — rounded to whole RON (149 → 425 / 805 / 1,520; 99 → 282 / 535 / 1,010). The owner picks the period on the Subscription screen before checkout; it renews on the same period and keeps the discount it was sold with. Changing the period of a running subscription: cancel, and pick again when it ends.
 - Shows: trial days left or next billing date, status (Trial / Active / Past due / Cancelled), amount.
 - Hosted checkout to start; hosted customer portal to change card, view invoices, cancel.
 - Invoice list with download.

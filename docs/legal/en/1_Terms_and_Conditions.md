@@ -1,6 +1,6 @@
 # Terms and Conditions — Service-Hub
 
-**Last updated:** September 25, 2026
+**Last updated:** September 26, 2026
 
 These terms (the “Terms”) apply to your use of Service-Hub: the website and app at service-hub.ro (the “Platform”). By creating an account, you confirm that you have read and agree to them. How we use your data is described in the Privacy Policy, and what we keep in your browser in the Cookie Policy.
 
@@ -124,10 +124,11 @@ The owner may invite colleagues, each with their own account (colleagues do not 
 
 - **Price:** the one shown on service-hub.ro when you sign up, **excluding VAT**. Currently: 149 RON per month, with the first colleague who has joined the shop with an account included, plus 19 RON per month for each additional colleague. Invitations are free. The price is fixed at sign-up and shown on the Subscription screen.
 - **Launch price:** the first 50 shops to sign up pay 99 RON per month instead of 149 and keep it for as long as they have the subscription.
+- **Paying for several months:** instead of monthly, you can pay every 3, 6 or 12 months, with the discount shown on the Subscription screen when you choose (currently 5%, 10% and 15%), rounded to the nearest RON. The discount also applies to the launch price and to paid colleagues, and is kept at every renewal of the same period.
 - **VAT:** as long as {{company}} is not registered for VAT, no VAT is added. If it becomes registered, VAT is added to the price, and we announce the change at least 30 days in advance.
 - **Free period:** 90 days from sign-up, colleagues included. Without a card you pay nothing. If you add a card during the free period, the first payment is at its end.
-- **Payment:** monthly, recurring, by card, through Stripe. When a colleague joins or is removed, the amount is adjusted by day. You receive a receipt for each payment and the tax invoice, as required by law.
-- **Canceling:** at any time, from the Subscription screen. The subscription stays active until the end of the paid month; the current month is not refunded.
+- **Payment:** recurring, by card, through Stripe, for the period you choose (one month, 3, 6 or 12 months), paid at its start. When a colleague joins or is removed, the amount is adjusted by day (on periods longer than a month, the difference is invoiced at once). You receive a receipt for each payment and the tax invoice, as required by law.
+- **Canceling:** at any time, from the Subscription screen. The subscription stays active until the end of the paid period; the current period is not refunded.
 - **Non-payment:** if a payment fails, Stripe retries a few times and we let you know. If the free period ends without a card, or the last payment attempt fails, the shop becomes **inactive**: it no longer appears in search and receives no new requests. Existing bookings continue and all data is kept. As soon as you pay, the shop is back.
 - **Price changes:** apart from the launch price, a new price for a shop already signed up is announced by email at least 30 days in advance. If you do not agree, you can cancel before the change takes effect.
 - The subscription is a contract between professionals: the consumer right of withdrawal does not apply.

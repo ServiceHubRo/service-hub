@@ -5,6 +5,7 @@
 // colleague's account, 20 lei a month); STRIPE_API_URL only for the
 // local browser tests (a stand-in). Every call pins the API version, so the objects read here
 // always have the shape this file expects, whatever the account's default version is.
+import { billingMonthsOf } from './periods.ts';
 
 export const STRIPE_API_VERSION = '2025-08-27.basil';
 
@@ -161,6 +162,9 @@ export interface SubscriptionState {
   current_period_end: string | null;
   trial_end: string | null;
   cancellation_reason: string | null;
+  /** The period its price covers (1, 3, 6 or 12 months) and the discount it was sold with (metadata). */
+  billing_months: number;
+  discount_percent: number;
 }
 
 export function subscriptionState(sub: Obj): SubscriptionState {
@@ -175,6 +179,8 @@ export function subscriptionState(sub: Obj): SubscriptionState {
     current_period_end: iso(item.current_period_end) ?? iso(sub.current_period_end),
     trial_end: iso(sub.trial_end),
     cancellation_reason: str(obj(sub.cancellation_details).reason),
+    billing_months: billingMonthsOf(sub),
+    discount_percent: Number(obj(sub.metadata).discount_percent) || 0,
   };
 }
 

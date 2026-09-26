@@ -776,6 +776,9 @@ export type Database = {
           launch_shops: number
           limits: Json
           notification_texts: Json
+          period_discount_12: number
+          period_discount_3: number
+          period_discount_6: number
           quote_expiry_days: number
           ranking_prior_avg: number
           ranking_prior_weight: number
@@ -800,6 +803,9 @@ export type Database = {
           launch_shops?: number
           limits?: Json
           notification_texts?: Json
+          period_discount_12?: number
+          period_discount_3?: number
+          period_discount_6?: number
           quote_expiry_days?: number
           ranking_prior_avg?: number
           ranking_prior_weight?: number
@@ -824,6 +830,9 @@ export type Database = {
           launch_shops?: number
           limits?: Json
           notification_texts?: Json
+          period_discount_12?: number
+          period_discount_3?: number
+          period_discount_6?: number
           quote_expiry_days?: number
           ranking_prior_avg?: number
           ranking_prior_weight?: number
@@ -1660,6 +1669,7 @@ export type Database = {
       subscriptions: {
         Row: {
           billed_seats: number | null
+          billing_months: number
           cancel_at_period_end: boolean
           created_at: string
           current_period_end: string | null
@@ -1669,6 +1679,7 @@ export type Database = {
           next_payment_attempt: string | null
           payment_failed_at: string | null
           payment_failed_key: string | null
+          period_discount: number
           price_ron: number
           seat_price_ron: number
           seats: number
@@ -1684,6 +1695,7 @@ export type Database = {
         }
         Insert: {
           billed_seats?: number | null
+          billing_months?: number
           cancel_at_period_end?: boolean
           created_at?: string
           current_period_end?: string | null
@@ -1693,6 +1705,7 @@ export type Database = {
           next_payment_attempt?: string | null
           payment_failed_at?: string | null
           payment_failed_key?: string | null
+          period_discount?: number
           price_ron: number
           seat_price_ron?: number
           seats?: number
@@ -1708,6 +1721,7 @@ export type Database = {
         }
         Update: {
           billed_seats?: number | null
+          billing_months?: number
           cancel_at_period_end?: boolean
           created_at?: string
           current_period_end?: string | null
@@ -1717,6 +1731,7 @@ export type Database = {
           next_payment_attempt?: string | null
           payment_failed_at?: string | null
           payment_failed_key?: string | null
+          period_discount?: number
           price_ron?: number
           seat_price_ron?: number
           seats?: number
@@ -2688,6 +2703,7 @@ export type Database = {
       }
       my_phone_verification: { Args: never; Returns: Json }
       my_shop_id: { Args: never; Returns: string }
+      my_subscription_offers: { Args: never; Returns: Json }
       next_history_report_code: { Args: never; Returns: string }
       normalize_code: { Args: { p: string }; Returns: string }
       notify_shop: {
@@ -2719,6 +2735,7 @@ export type Database = {
         }
         Returns: undefined
       }
+      period_discount_now: { Args: { p_months: number }; Returns: number }
       phone_code_hash: {
         Args: { p_code: string; p_id: string }
         Returns: string
@@ -3301,6 +3318,7 @@ export type Database = {
         Args: { p_customer: string; p_shop_id?: string }
         Returns: {
           billed_seats: number | null
+          billing_months: number
           cancel_at_period_end: boolean
           created_at: string
           current_period_end: string | null
@@ -3310,6 +3328,7 @@ export type Database = {
           next_payment_attempt: string | null
           payment_failed_at: string | null
           payment_failed_key: string | null
+          period_discount: number
           price_ron: number
           seat_price_ron: number
           seats: number
@@ -3338,6 +3357,10 @@ export type Database = {
         Args: { p: Database["public"]["Tables"]["subscriptions"]["Row"] }
         Returns: string
       }
+      subscription_offers: {
+        Args: { p: Database["public"]["Tables"]["subscriptions"]["Row"] }
+        Returns: Json
+      }
       subscription_ok: {
         Args: {
           p_status: string
@@ -3345,6 +3368,10 @@ export type Database = {
           p_trial_ends_at: string
         }
         Returns: boolean
+      }
+      subscription_period_price: {
+        Args: { p_discount: number; p_monthly: number; p_months: number }
+        Returns: number
       }
       sync_stripe_subscription: {
         Args: { p_customer: string; p_shop_id: string; p_sub: Json }

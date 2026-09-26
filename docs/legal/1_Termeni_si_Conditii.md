@@ -1,6 +1,6 @@
 # Termeni și condiții — Service-Hub
 
-**Ultima actualizare:** 25 septembrie 2026
+**Ultima actualizare:** 26 septembrie 2026
 
 Acești termeni („Termenii”) se aplică folosirii Service-Hub: site-ul și aplicația de la adresa service-hub.ro („Platforma”). Când îți faci cont, confirmi că i-ai citit și că ești de acord cu ei. Cum folosim datele tale scrie în Politica de confidențialitate, iar ce păstrăm în browser, în Politica de cookies.
 
@@ -124,10 +124,11 @@ Proprietarul poate invita colegi, fiecare cu contul lui (colegii nu folosesc con
 
 - **Prețul:** cel afișat pe service-hub.ro când te înscrii, **fără TVA**. Acum: 149 lei pe lună, cu primul coleg care și-a făcut contul în service inclus, plus 19 lei pe lună pentru fiecare coleg în plus. Invitația nu costă. Prețul se fixează la înscriere și e afișat în ecranul Abonament.
 - **Prețul de lansare:** primele 50 de service-uri înscrise plătesc 99 lei pe lună în loc de 149 și îl păstrează cât timp au abonamentul.
+- **Plata pe mai multe luni:** în loc de lunar, poți plăti o dată la 3, 6 sau 12 luni, cu reducerea afișată în ecranul Abonament când alegi (acum 5%, 10%, respectiv 15%), rotunjit la leu. Reducerea se aplică și prețului de lansare și colegilor plătiți și se păstrează la fiecare reînnoire a aceleiași perioade.
 - **TVA:** cât timp {{company}} nu e plătitoare de TVA, nu se adaugă TVA. Dacă devine, TVA-ul se adaugă la preț, iar schimbarea ți-o anunțăm cu cel puțin 30 de zile înainte.
 - **Perioada gratuită:** 90 de zile de la înscriere, cu colegi cu tot. Fără card nu plătești nimic. Dacă adaugi cardul în perioada gratuită, prima plată are loc la sfârșitul ei.
-- **Plata:** lunară, recurentă, cu cardul, prin Stripe. Când un coleg intră sau e scos, suma se ajustează pe zile. Primești chitanța pentru fiecare plată și factura fiscală, conform legii.
-- **Anularea:** oricând, din ecranul Abonament. Abonamentul rămâne activ până la sfârșitul lunii plătite; suma lunii în curs nu se returnează.
+- **Plata:** recurentă, cu cardul, prin Stripe, pentru perioada aleasă (o lună, 3, 6 sau 12 luni), plătită la începutul ei. Când un coleg intră sau e scos, suma se ajustează pe zile (la perioadele mai lungi de o lună, diferența se facturează imediat). Primești chitanța pentru fiecare plată și factura fiscală, conform legii.
+- **Anularea:** oricând, din ecranul Abonament. Abonamentul rămâne activ până la sfârșitul perioadei plătite; suma perioadei în curs nu se returnează.
 - **Neplata:** dacă o plată nu reușește, Stripe mai încearcă de câteva ori și te anunțăm. Dacă perioada gratuită se termină fără card sau ultima încercare de plată nu reușește, service-ul devine **inactiv**: nu mai apare în căutare și nu mai primește cereri noi. Programările existente continuă, iar toate datele rămân. Cum plătești, service-ul revine imediat.
 - **Schimbarea prețului:** în afara prețului de lansare, un preț nou pentru un service deja înscris se anunță prin email cu cel puțin 30 de zile înainte. Dacă nu ești de acord, poți anula abonamentul înainte de data schimbării.
 - Abonamentul e un contract între profesioniști: nu se aplică dreptul de retragere al consumatorilor.

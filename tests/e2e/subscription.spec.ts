@@ -117,6 +117,50 @@ test.describe('subscription', () => {
     expect(sub.stripe_customer_id).toMatch(/^cus_/);
   });
 
+  test('paying for 12 months at once: the period and its discount, in Checkout, in Stripe and on the screen', async ({ page }) => {
+    const { email, shopId } = await shopWith();
+    await signIn(page, email, PASSWORD);
+    await expect(page).toHaveURL(/\/s\/panou$/);
+    await page.goto('/s/cont/abonament');
+
+    // Four periods; a month is chosen first. 100 lei a month: 285 / 540 / 1.020 lei.
+    const periods = page.getByRole('group', { name: 'Cum plătești' });
+    await expect(periods.getByRole('radio')).toHaveCount(4);
+    await expect(periods.getByRole('radio', { name: /^Lunar/ })).toBeChecked();
+    await expect(periods.getByText('5% reducere', { exact: true })).toBeVisible();
+    await expect(periods.getByText('540 lei')).toBeVisible();
+    await expect(periods.getByText('cam 85 lei pe lună')).toBeVisible();
+    await expectNoHorizontalScroll(page);
+    await shot(page, 'periods-choice', name());
+
+    const twelve = periods.getByRole('radio', { name: /^12 luni/ });
+    await twelve.scrollIntoViewIfNeeded();
+    const top = await page.evaluate(() => document.querySelector('main')?.scrollTop ?? 0);
+    await twelve.check();
+    await expect(twelve).toBeChecked();
+    // Choosing never moves the page.
+    expect(await page.evaluate(() => document.querySelector('main')?.scrollTop ?? 0)).toBe(top);
+
+    await page.getByRole('button', { name: 'Activează abonamentul' }).click();
+    await expect(page.getByText('Abonament: 1020 lei / 12 luni')).toBeVisible();
+    await page.getByRole('button', { name: 'Plătește' }).click();
+    await expect(page).toHaveURL(/\/s\/cont\/abonament\?plata=ok$/);
+    await expect(page.getByText(/^Cardul e salvat\. Prima plată, 1\.020 lei, pe \d{1,2} [a-z]+\.$/)).toBeVisible();
+    await expect(page.getByText('Plătești la 12 luni: 1.020 lei, cu 15% reducere.')).toBeVisible();
+    await expect(page.getByRole('group', { name: 'Cum plătești' })).toHaveCount(0);
+    await shot(page, 'periods-card-saved', name());
+
+    const [row] = await serviceRest<{ billing_months: number; period_discount: number; stripe_customer_id: string }[]>(
+      `subscriptions?shop_id=eq.${shopId}&select=billing_months,period_discount,stripe_customer_id`,
+      'GET',
+    );
+    expect(row).toMatchObject({ billing_months: 12, period_discount: 15 });
+    const inStripe = (await stripeSubscriptionOf(row!.stripe_customer_id)) as unknown as {
+      items: { data: { price: { unit_amount: number; recurring: { interval_count: number } } }[] };
+    };
+    expect(inStripe.items.data[0]!.price).toMatchObject({ unit_amount: 102000, recurring: { interval_count: 12 } });
+  });
+
   test('inactive after the free period: pay, back in search, a receipt, then cancel at the end of the month', async ({ page }) => {
     const { email, shopId } = await shopWith();
     await serviceRest(`subscriptions?shop_id=eq.${shopId}`, 'PATCH', { trial_ends_at: new Date(Date.now() - 3600_000).toISOString() });
@@ -238,7 +282,8 @@ test.describe('subscription', () => {
     await signIn(page, email, PASSWORD);
     await expect(page).toHaveURL(/\/s\/panou$/);
     await page.goto('/s/cont/abonament');
-    await expect(page.getByText('120 lei', { exact: true })).toBeVisible();
+    // The plan's price (the monthly choice below shows the same figure).
+    await expect(page.getByText('120 lei', { exact: true }).first()).toBeVisible();
     await expect(
       page.getByText('100 lei + 1 coleg × 20 lei · Primul coleg cu cont în service e inclus în abonament.'),
     ).toBeVisible();

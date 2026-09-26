@@ -1,7 +1,7 @@
 import { FunctionsFetchError, FunctionsHttpError } from '@supabase/supabase-js';
-import type { SubscriptionRow } from '../lib/subscription';
+import type { PeriodOffer, SubscriptionRow } from '../lib/subscription';
 import { subscribeRows } from './realtime';
-import { failure, RpcError } from './rpc';
+import { call, failure, RpcError } from './rpc';
 import { supabase } from './supabase';
 
 /**
@@ -33,6 +33,8 @@ export interface SubscriptionData {
   invoices: Invoice[];
   /** The billing data an invoice needs (Setări → Date de facturare) is complete. */
   billingComplete: boolean;
+  /** Every period the owner can pay for (1, 3, 6, 12 months), at the shop's prices and today's discounts. */
+  offers: PeriodOffer[];
 }
 
 function db() {
@@ -41,20 +43,30 @@ function db() {
 }
 
 const SUBSCRIPTION_COLUMNS =
-  'shop_id, status, trial_ends_at, current_period_end, cancel_at_period_end, price_ron, seat_price_ron, free_seats, seats, stripe_customer_id, stripe_status, ended_reason, next_payment_attempt, created_at';
+  'shop_id, status, trial_ends_at, current_period_end, cancel_at_period_end, price_ron, seat_price_ron, free_seats, seats, billing_months, period_discount, stripe_customer_id, stripe_status, ended_reason, next_payment_attempt, created_at';
 
 /** The caller's subscription, or null when they are not the owner of a shop. */
 export async function getSubscriptionRow(): Promise<(SubscriptionRow & { shop_id: string }) | null> {
   const { data, error } = await db().from('subscriptions').select(SUBSCRIPTION_COLUMNS).maybeSingle();
   if (error) throw failure(error);
-  return data ? { ...data, price_ron: Number(data.price_ron), seat_price_ron: Number(data.seat_price_ron), free_seats: Number(data.free_seats), seats: Number(data.seats) } : null;
+  return data
+    ? {
+        ...data,
+        price_ron: Number(data.price_ron),
+        seat_price_ron: Number(data.seat_price_ron),
+        free_seats: Number(data.free_seats),
+        seats: Number(data.seats),
+        billing_months: Number(data.billing_months),
+        period_discount: Number(data.period_discount),
+      }
+    : null;
 }
 
 /** Everything the Abonament screen shows; null for anyone but the shop's owner. */
 export async function getSubscription(): Promise<SubscriptionData | null> {
   const row = await getSubscriptionRow();
   if (!row) return null;
-  const [invoices, billing] = await Promise.all([
+  const [invoices, billing, offers] = await Promise.all([
     db()
       .from('invoices')
       .select('id, amount, currency, issued_at, period_end, status, receipt_url, pdf_url, series, number, provider_ref')
@@ -65,6 +77,7 @@ export async function getSubscription(): Promise<SubscriptionData | null> {
       .select('legal_name, vat_id, reg_com, legal_address, billing_email')
       .eq('shop_id', row.shop_id)
       .maybeSingle(),
+    call('my_subscription_offers', undefined as never),
   ]);
   if (invoices.error) throw failure(invoices.error);
   if (billing.error) throw failure(billing.error);
@@ -76,7 +89,21 @@ export async function getSubscription(): Promise<SubscriptionData | null> {
     billingComplete: Boolean(
       b && b.legal_name?.trim() && b.vat_id && b.reg_com && b.legal_address?.trim() && b.billing_email,
     ),
+    offers: parseOffers(offers),
   };
+}
+
+function parseOffers(data: unknown): PeriodOffer[] {
+  if (!Array.isArray(data)) return [];
+  return data.map((o: Record<string, unknown>) => ({
+    months: Number(o.months),
+    discountPercent: Number(o.discount_percent),
+    priceRon: Number(o.price_ron),
+    seatPriceRon: Number(o.seat_price_ron),
+    seats: Number(o.seats),
+    totalRon: Number(o.total_ron),
+    monthlyRon: Number(o.monthly_ron),
+  }));
 }
 
 /** Changes to the subscription row and new invoices, for a quiet re-read. */
@@ -88,7 +115,13 @@ export function subscribeSubscription(shopId: string, onChange: () => void): () 
 }
 
 /** Why Stripe's page could not be opened, besides the database's refusals (RpcError). */
-export type PaymentProblem = 'billing_incomplete' | 'subscription_exists' | 'payments_unavailable' | 'no_customer' | 'nothing_to_pay';
+export type PaymentProblem =
+  | 'billing_incomplete'
+  | 'subscription_exists'
+  | 'payments_unavailable'
+  | 'no_customer'
+  | 'nothing_to_pay'
+  | 'period_invalid';
 
 const PROBLEMS: ReadonlySet<string> = new Set([
   'billing_incomplete',
@@ -96,6 +129,7 @@ const PROBLEMS: ReadonlySet<string> = new Set([
   'payments_unavailable',
   'no_customer',
   'nothing_to_pay',
+  'period_invalid',
 ]);
 
 export class PaymentError extends Error {
@@ -124,9 +158,9 @@ async function stripePage(fn: 'stripe-checkout' | 'stripe-portal', body: Record<
   throw new RpcError('unknown');
 }
 
-/** The Stripe Checkout page for "Activează abonamentul". */
-export function startCheckout(requestId: string): Promise<string> {
-  return stripePage('stripe-checkout', { request_id: requestId });
+/** The Stripe Checkout page for "Activează abonamentul", for the period chosen (months). */
+export function startCheckout(requestId: string, months: number): Promise<string> {
+  return stripePage('stripe-checkout', { request_id: requestId, months });
 }
 
 /** Stripe's customer portal for "Gestionează abonamentul". */

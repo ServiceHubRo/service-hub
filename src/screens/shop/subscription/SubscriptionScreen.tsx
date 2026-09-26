@@ -1,5 +1,5 @@
 import { Check, Crown, ExternalLink, Lock, ReceiptText } from 'lucide-react';
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { ActionButton } from '../../../components/ActionButton';
 import { Banner } from '../../../components/Banner';
@@ -23,7 +23,15 @@ import { useI18n } from '../../../i18n/context';
 import { formatDate, formatDayMonth, formatMoney } from '../../../i18n/format';
 import type { MessageKey } from '../../../i18n/ro';
 import { plural } from '../../../i18n/translate';
-import { includedColleagues, monthlyTotal, STATE_TONE, subscriptionView, type SubscriptionView } from '../../../lib/subscription';
+import {
+  includedColleagues,
+  monthlyTotal,
+  periodTotal,
+  STATE_TONE,
+  subscriptionView,
+  type PeriodOffer,
+  type SubscriptionView,
+} from '../../../lib/subscription';
 import { useLoad } from '../../../lib/useLoad';
 import { useNow } from '../../../lib/useNow';
 import { SETTINGS_LINKS } from '../settings/paths';
@@ -32,9 +40,9 @@ import styles from './subscription.module.css';
 
 /**
  * Abonament (FR §4.7, P12, P12b): the owner's tile in Cont. Where the subscription stands (free
- * days left, next payment, a failed payment, inactive), the one plan, "Activează" (Stripe
- * Checkout) or "Gestionează" (Stripe's portal: card, receipts, cancelling), and the payments with
- * their receipts. The status changes only through Stripe's webhook; the screen follows it live,
+ * days left, next payment, a failed payment, inactive), the one plan, how often to pay (every
+ * month, or 3, 6, 12 months with a discount), "Activează" (Stripe Checkout) or "Gestionează"
+ * (Stripe's portal: card, receipts, cancelling), and the payments with their receipts. The status changes only through Stripe's webhook; the screen follows it live,
  * so coming back from a payment shows it without a reload.
  */
 export function SubscriptionScreen() {
@@ -114,7 +122,7 @@ function ReturnBanner({ returned, view }: { returned: string; view: Subscription
 function StatusCard({ data, view }: { data: SubscriptionData; view: SubscriptionView }) {
   const { t, lang } = useI18n();
   const sub = data.subscription;
-  const price = formatMoney(lang, monthlyTotal(sub));
+  const price = formatMoney(lang, periodTotal(sub));
   const date = (iso: string | null) => (iso ? formatDayMonth(lang, new Date(iso)) : '');
 
   let text: string;
@@ -206,9 +214,61 @@ const TONE_CLASS = { amber: 'toneAmber', green: 'toneGreen', red: 'toneRed', mut
 
 const FEATURES: MessageKey[] = ['sub.feature.all', 'sub.feature.capacity', 'sub.feature.ranking', 'sub.feature.cancel'];
 
+/** "Lunar" / "3 luni" … */
+function periodName(t: ReturnType<typeof useI18n>['t'], months: number): string {
+  return months === 1 ? t('sub.period.monthly') : t('sub.period.months', { n: months });
+}
+
+/**
+ * How often to pay, before Checkout: every month at the full price, or 3, 6, 12 months at once
+ * with the discount. Real radio buttons; the choice never moves the page.
+ */
+function PeriodChoice({ offers, months, onChange }: { offers: PeriodOffer[]; months: number; onChange: (m: number) => void }) {
+  const { t, lang } = useI18n();
+  const name = useId();
+  return (
+    <fieldset className={styles.periods}>
+      <legend className={styles.periodsLegend}>{t('sub.period.legend')}</legend>
+      {offers.map((o) => (
+        <label key={o.months} className={styles.period}>
+          <input
+            type="radio"
+            name={name}
+            value={o.months}
+            checked={months === o.months}
+            onChange={() => onChange(o.months)}
+            className={styles.periodInput}
+          />
+          <span className={styles.periodBody}>
+            <span className={styles.periodHead}>
+              <span className={styles.periodName}>{periodName(t, o.months)}</span>
+              {o.discountPercent > 0 && (
+                <span className={styles.discount}>{t('sub.period.discount', { n: formatPercent(lang, o.discountPercent) })}</span>
+              )}
+            </span>
+            <span className={styles.periodTotal}>{formatMoney(lang, o.totalRon)}</span>
+            <span className={styles.muted}>
+              {o.months === 1 ? t('sub.period.perMonth') : t('sub.period.about', { price: formatMoney(lang, Math.round(o.monthlyRon)) })}
+            </span>
+          </span>
+        </label>
+      ))}
+    </fieldset>
+  );
+}
+
+/** 5 → "5", 7.5 → "7,5" (RO) / "7.5" (EN). */
+function formatPercent(lang: string, n: number): string {
+  const text = String(Math.round(n * 100) / 100);
+  return lang === 'ro' ? text.replace('.', ',') : text;
+}
+
 function PlanCard({ data, view }: { data: SubscriptionData; view: SubscriptionView }) {
   const { t, lang } = useI18n();
   const go = (url: string) => window.location.assign(url);
+  const sub = data.subscription;
+  const [months, setMonths] = useState(1);
+  const chosen = data.offers.find((o) => o.months === months) ?? null;
   const errorMessage = (e: unknown) =>
     e instanceof PaymentError ? t(`sub.error.${e.problem}` as MessageKey) : rpcErrorMessage(lang, e);
   // Inside the free period (2+ days left) Stripe only saves the card; else it charges now.
@@ -222,6 +282,15 @@ function PlanCard({ data, view }: { data: SubscriptionData; view: SubscriptionVi
         <span className={styles.per}>{t('sub.perMonth')}</span>
       </p>
       <SeatsLine sub={data.subscription} />
+      {!view.canCheckout && sub.billing_months > 1 && (
+        <p className={styles.seats}>
+          {t('sub.period.current', {
+            period: periodName(t, sub.billing_months),
+            total: formatMoney(lang, periodTotal(sub)),
+            n: formatPercent(lang, sub.period_discount),
+          })}
+        </p>
+      )}
       <ul className={styles.features}>
         {FEATURES.map((key) => (
           <li key={key}>
@@ -239,12 +308,21 @@ function PlanCard({ data, view }: { data: SubscriptionData; view: SubscriptionVi
           </Link>
         </div>
       )}
+      {view.canCheckout && data.billingComplete && data.offers.length > 1 && (
+        <PeriodChoice offers={data.offers} months={months} onChange={setMonths} />
+      )}
       {view.canCheckout && data.billingComplete && (
         <div className={styles.action}>
-          <ActionButton onAction={async (requestId) => go(await startCheckout(requestId))} errorMessage={errorMessage}>
+          <ActionButton onAction={async (requestId) => go(await startCheckout(requestId, months))} errorMessage={errorMessage}>
             {t(view.goodStanding ? 'sub.activate' : 'sub.pay')}
           </ActionButton>
-          <p className={styles.muted}>{t(savesCardOnly ? 'sub.activate.trialHint' : 'sub.activate.nowHint')}</p>
+          <p className={styles.muted}>
+            {savesCardOnly
+              ? t('sub.activate.trialHint')
+              : months > 1 && chosen
+                ? t('sub.activate.nowHintPeriod', { total: formatMoney(lang, chosen.totalRon), n: months })
+                : t('sub.activate.nowHint')}
+          </p>
         </div>
       )}
       {view.canManage && (

@@ -153,6 +153,9 @@ export interface AdminSubscription {
   current_period_end: string | null;
   cancel_at_period_end: boolean;
   price_ron: number;
+  /** Paid every month (1) or for 3, 6, 12 months at once, with this discount in percent. */
+  billing_months: number;
+  period_discount: number;
   stripe_customer_id: string | null;
   stripe_subscription_id: string | null;
   stripe_status: string | null;
