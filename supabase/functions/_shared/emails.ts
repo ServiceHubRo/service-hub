@@ -4,6 +4,7 @@
 //
 // Built with tables and inline styles, which is what email programs understand.
 import { formatDate, formatDayMonth, formatMoney, formatTime, type Lang } from './format.ts';
+import { EMAIL_BUTTON_SIZES } from './emailButtonSizes.ts';
 import { LOGO_HEIGHT, LOGO_WIDTH } from './emailLogo.ts';
 import { REPORTS_PATH, SUBSCRIPTION_PATH } from './templates.ts';
 
@@ -57,9 +58,9 @@ const LINK_HINT: Record<Lang, string> = {
 
 // Gmail on iPhone, in dark mode, inverts every color of an email (our dark card turns light
 // gray, the amber brown) except images and gradients. So: backgrounds are one-color gradients,
-// the wordmark is an image, and the text sits in two layers (Gmail only, `u + .body`) whose
-// blending turns the inverted text colors back; everywhere else those layers do nothing. The
-// amber button is the one thing Gmail on iPhone still darkens.
+// the wordmark and the buttons are images, and the text sits in two layers (Gmail only,
+// `u + .body`) whose blending turns the inverted text colors back; everywhere else those layers
+// do nothing.
 const GMAIL_STYLE = `<style>
 u + .body .gm-screen{background:#000;mix-blend-mode:screen;}
 u + .body .gm-diff{background:#000;mix-blend-mode:difference;}
@@ -110,12 +111,25 @@ function blockHtml(b: Block): string {
   return `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 14px;">${rows}</table>`;
 }
 
+/**
+ * The button: its picture (scripts/gen-email-buttons.mjs) inside the link, the same size and look
+ * as the HTML button; with images off, its text shows in amber instead. A text without a picture
+ * (not yet in emailButtonLabels.ts) gets the HTML button.
+ */
+export function buttonHtml(label: string, url: string): string {
+  const img = EMAIL_BUTTON_SIZES[label];
+  const cell = img
+    ? `<td><a href="${escapeHtml(url)}" style="display:inline-block;text-decoration:none;">` +
+      `<img src="${supabaseUrl()}/functions/v1/email-logo?b=${img.slug}" width="${img.width}" height="${img.height}" alt="${escapeHtml(label)}" ` +
+      `style="display:block;border:0;outline:none;text-decoration:none;border-radius:10px;font-family:${FONT};font-size:15px;font-weight:bold;line-height:${img.height}px;color:${C.amber};"></a></td>`
+    : `<td bgcolor="${C.amber}" style="background:${C.amber};border-radius:10px;">` +
+      `<a href="${escapeHtml(url)}" style="display:inline-block;padding:13px 22px;font-family:${FONT};font-size:15px;font-weight:bold;color:${C.ink};text-decoration:none;border-radius:10px;">${escapeHtml(label)}</a></td>`;
+  return `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:6px 0 18px;"><tr>${cell}</tr></table>`;
+}
+
 export function renderLayout(l: Layout): string {
   const button = l.button
-    ? `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:6px 0 18px;"><tr>` +
-      `<td bgcolor="${C.amber}" style="background:${C.amber};border-radius:10px;">` +
-      `<a href="${escapeHtml(l.button.url)}" style="display:inline-block;padding:13px 22px;font-family:${FONT};font-size:15px;font-weight:bold;color:${C.ink};text-decoration:none;border-radius:10px;">${escapeHtml(l.button.label)}</a>` +
-      `</td></tr></table>` +
+    ? buttonHtml(l.button.label, l.button.url) +
       keepColors(
         `<p style="margin:0;font-family:${FONT};font-size:12px;line-height:1.5;color:${C.muted};">${escapeHtml(LINK_HINT[l.lang])}<br>` +
           `<a class="gm-link" href="${escapeHtml(l.button.url)}" style="color:${C.amber};word-break:break-all;">${escapeHtml(l.button.url)}</a></p>`,
