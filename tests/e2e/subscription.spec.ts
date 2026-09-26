@@ -256,7 +256,12 @@ test.describe('subscription', () => {
     await expect(page.getByRole('heading', { level: 1, name: 'Subscription' })).toBeVisible();
     await expect(page.getByText('Free period', { exact: true })).toBeVisible();
     await expect(page.getByText('90 free days left out of 90.')).toBeVisible();
-    await expect(page.getByText('100 RON', { exact: true })).toBeVisible();
+    // The plan's price (the monthly choice below shows the same figure).
+    await expect(page.getByText('100 RON', { exact: true }).first()).toBeVisible();
+    const periods = page.getByRole('group', { name: 'How often you pay' });
+    await expect(periods.getByRole('radio', { name: /^Monthly/ })).toBeChecked();
+    await expect(periods.getByText('1,020 RON')).toBeVisible();
+    await expect(periods.getByText('about 85 RON a month')).toBeVisible();
     await expect(page.getByRole('button', { name: 'Activate subscription' })).toBeVisible();
     await expectNoHorizontalScroll(page);
     await shot(page, 't14-subscription-en', name());
