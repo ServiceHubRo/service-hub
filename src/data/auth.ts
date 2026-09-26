@@ -1,5 +1,6 @@
 import { FunctionsFetchError, FunctionsHttpError } from '@supabase/supabase-js';
 import { translate, type Lang } from '../i18n/translate';
+import { emailLinkOrigin } from '../lib/native';
 import { setRememberMe } from '../lib/remember';
 import type { Role } from '../app/roles';
 import { call, failure, RpcError, rpcErrorMessage } from './rpc';
@@ -119,10 +120,13 @@ function auth() {
 }
 
 function origin(): string {
-  return window.location.origin;
+  return emailLinkOrigin();
 }
 
-/** Where email links land. Supabase Auth must list these under Redirect URLs (PR "Pașii tăi"). */
+/**
+ * Where email links land. Supabase Auth must list these under Redirect URLs (PR "Pașii tăi"); in
+ * the phone app they open the app itself (ro.servicehub.app://app/…, T20).
+ */
 export const LINK_TARGETS = {
   confirm: () => `${origin()}/`,
   reset: () => `${origin()}/parola-noua`,

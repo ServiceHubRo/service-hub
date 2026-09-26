@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Service-Hub</string>
+    <string name="title_activity_main">Service-Hub</string>
+    <string name="package_name">ro.servicehub.app</string>
+    <string name="custom_url_scheme">ro.servicehub.app</string>
+</resources>

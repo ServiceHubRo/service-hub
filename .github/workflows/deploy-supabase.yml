@@ -141,8 +141,9 @@ jobs:
           echo "::warning title=Notificări::dispatch-notifications nu a răspuns. Pornește singur la prima activare a notificărilor din aplicație."
 
       # The test project (T19) sends its email links to whichever deploy preview asked for them
-      # (the app passes its own address): every preview of the Netlify site is allowed. The real
-      # project's addresses stay as set in the dashboard.
+      # (the app passes its own address): every preview of the Netlify site is allowed, and the
+      # Android test app's own links (ro.servicehub.app://app/…, T20). The real project's addresses
+      # stay as set in the dashboard.
       - name: Allow the deploy previews in Auth (test project)
         if: env.TARGET == 'test'
         run: |
@@ -150,7 +151,7 @@ jobs:
             "https://api.supabase.com/v1/projects/${SUPABASE_PROJECT_REF}/config/auth" \
             -H "Authorization: Bearer ${SUPABASE_ACCESS_TOKEN}" \
             -H 'Content-Type: application/json' \
-            --data '{"site_url":"https://service-hubapp.netlify.app","uri_allow_list":"https://*--service-hubapp.netlify.app/**,https://*--service-hub-app.netlify.app/**,http://localhost:5173/**,http://localhost:4173/**"}')
+            --data '{"site_url":"https://service-hubapp.netlify.app","uri_allow_list":"https://*--service-hubapp.netlify.app/**,https://*--service-hub-app.netlify.app/**,http://localhost:5173/**,http://localhost:4173/**,ro.servicehub.app://app/**"}')
           if [ "$status" = "200" ]; then
             echo "Deploy-preview addresses allowed."
           else

@@ -15,6 +15,7 @@ import { PublicOnly, RoleGuard } from './RoleGuard';
 import { NAV, type Role } from './roles';
 import { ChunkBoundary } from './routes/ChunkBoundary';
 import { lazyChunk } from './routes/lazyChunk';
+import { NativeBridge } from './NativeBridge';
 import { SchemaBar } from './SchemaBar';
 import { ScreenErrorBoundary } from './ScreenErrorBoundary';
 import { SessionProvider } from './SessionProvider';
@@ -71,6 +72,7 @@ export function App() {
       <SessionProvider>
         <BrowserRouter>
           <div className={styles.app}>
+            <NativeBridge />
             <OfflineBar />
             <SchemaBar />
             <RouteGuard>

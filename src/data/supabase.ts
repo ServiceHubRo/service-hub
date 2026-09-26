@@ -17,6 +17,11 @@ function readAuthLinkError(): string | null {
 }
 let pendingLinkError: string | null = readAuthLinkError();
 
+/** An email-link error that reached the phone app through its own link (T20, NativeBridge). */
+export function setAuthLinkError(code: string): void {
+  pendingLinkError = code;
+}
+
 /** The email-link error, handed out once (the first screen that shows it consumes it). */
 export function takeAuthLinkError(): string | null {
   const value = pendingLinkError;

@@ -43,7 +43,9 @@ Ordinea contează: fiecare sarcină se sprijină pe cele de dinainte. Sarcinile 
 | T19d | Remindere pentru clienți | Cerere de recenzie după lucrare, reminder pentru următoarea revizie |
 | T19c | Lansarea — verificarea finală | `LAUNCH_CHECK.md`: fiecare punct din lista finală cu testul lui; ghidul de lansare pas cu pas |
 | T19e | Lansarea — domeniul și plățile reale | service-hub.ro, plăți reale, CAPTCHA, admin, copii de siguranță (pașii tăi, după ghid) |
-| T20 | Aplicațiile pentru iPhone și Android | Service-Hub în App Store și Google Play, cu notificări pe iPhone fără „Adaugă pe ecranul principal” |
+| T20a | Aplicația Android de test | Service-Hub ca aplicație pe telefonul Android, instalată direct (fără magazin), pe proiectul de test |
+| T20b | Notificările native și iPhone | Notificări în aplicație (Android, apoi iPhone fără „Adaugă pe ecranul principal”), TestFlight |
+| T20c | Magazinele | Service-Hub în App Store și Google Play |
 
 ---
 
@@ -723,5 +725,27 @@ Pașii tăi din `docs/LANSARE.md`, Partea 4 (în ordine: copiile de siguranță,
 **Gata când:** aplicația de test se instalează pe un iPhone (TestFlight) și pe un Android (testare internă), iar o programare făcută din ea aduce notificarea pe telefonul service-ului.
 
 **Pașii tăi:** contul Apple Developer (99 $/an, pe firmă — cere D-U-N-S, câteva zile) și contul Google Play Console (25 $, o dată); acceptarea contractelor; accesul pentru chei (Claude îți spune exact ce și unde).
+
+- [ ] Făcut
+
+Împărțită (26 sept 2026) în trei părți, fiecare cu pull request-ul ei. Firma se înființează luna viitoare, așa că ce nu cere firmă și bani se face înainte.
+
+### T20a — Aplicația Android de test
+
+Capacitor în jurul aplicației de acum, proiectul `android/`, iconița și ecranul de pornire, bara de sus, butonul „Înapoi”, locația; GitHub construiește la fiecare pull request un fișier `.apk` pe proiectul Supabase de test, care se instalează direct pe telefon. Linkurile din emailurile cerute din aplicație deschid aplicația. Fără cont Google Play, fără bani.
+
+- [x] Făcut
+
+Note: nicio migrare. Pachete noi: `@capacitor/core`, `@capacitor/android`, `@capacitor/cli` (aplicația de telefon din aceeași aplicație web, ales în planul T20), `@capacitor/app` (butonul „Înapoi” și linkurile care deschid aplicația), `@capacitor/status-bar` (bara de sus închisă), `@capacitor/splash-screen` (ecranul de pornire ascuns când aplicația e gata). **Aplicația** (`ro.servicehub.app`, „Service-Hub”): aceleași ecrane și aceeași bază de date ca pe web, fișierele aplicației sunt în telefon (nu se încarcă site-ul). **Butonul „Înapoi”** de pe Android te duce la ecranul anterior; de pe primul ecran închide aplicația. **Linkurile din emailuri** (confirmare, parolă nouă, schimbarea emailului) cerute din aplicație deschid aplicația, deja logat, pe ecranul potrivit (`ro.servicehub.app://app/…`; proiectul de test le permite singur, prin „Deploy Supabase”; pe proiectul real se adaugă la T20c). Linkul de invitație pentru colegi, trimis din aplicație, duce la site (`VITE_WEB_URL`, implicit `service-hubapp.netlify.app`). **Iconița și ecranul de pornire** din logo, în toate mărimile Android (`scripts/gen-android-assets.mjs`). **Construirea**: acțiunea „Android app” din GitHub face `service-hub-test-….apk` la fiecare pull request și pe `main`, pe proiectul de test (variabilele `TEST_SUPABASE_URL`, `TEST_SUPABASE_ANON_KEY`; fără ele doar avertizează). **Rămas:** notificările (în aplicație scrie deocamdată „Nu sunt disponibile în acest browser”) și iPhone-ul — T20b; Google Play și linkurile de pe service-hub.ro — T20c. Construirea Android nu poate fi verificată în mediul lui Claude fără domeniile `dl.google.com` și `maven.google.com`; o face GitHub.
+
+### T20b — Notificările native și iPhone
+
+Android: notificările prin Firebase Cloud Messaging (gratuit), în `dispatch-notifications`, lângă Web Push. iPhone (după contul Apple Developer, 99 $/an, pe firmă, cu D-U-N-S): proiectul `ios/`, notificările APNs, construirea automată și TestFlight.
+
+- [ ] Făcut
+
+### T20c — Magazinele
+
+După firmă, conturi (Google Play 25 $) și domeniul service-hub.ro: linkurile din emailuri deschid aplicația (App Links / Universal Links, plus adresele aplicației pe proiectul real), iconițele și capturile pentru magazine, textele RO + EN, declarațiile de date, testarea cerută de Google Play, trimiterea spre publicare.
 
 - [ ] Făcut

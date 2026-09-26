@@ -1,0 +1,78 @@
+name: Android app
+
+# The Android test app (T20a): the same web app, built against the TEST Supabase project and
+# wrapped by Capacitor, as an APK to install straight on a phone (no store). Built on every pull
+# request and on main; the file is under the run's "Artifacts" for 14 days.
+#
+# Needs two repository VARIABLES (public values, the same as the deploy previews use):
+#   TEST_SUPABASE_URL        https://<test-ref>.supabase.co
+#   TEST_SUPABASE_ANON_KEY   the test project's publishable (anon) key
+# Without them the app is still built (so the build itself is checked), but it cannot reach a
+# database: it shows the red bar saying so.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: android-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  apk:
+    name: Android test app (APK)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      VITE_SUPABASE_URL: ${{ vars.TEST_SUPABASE_URL }}
+      VITE_SUPABASE_ANON_KEY: ${{ vars.TEST_SUPABASE_ANON_KEY }}
+    steps:
+      - name: Check the test project's address is set
+        run: |
+          if [ -z "$VITE_SUPABASE_URL" ] || [ -z "$VITE_SUPABASE_ANON_KEY" ]; then
+            echo "::warning title=Aplicația Android::Lipsesc variabilele TEST_SUPABASE_URL și TEST_SUPABASE_ANON_KEY (GitHub → Settings → Secrets and variables → Actions → Variables): aplicația se construiește, dar nu ajunge la baza de date."
+          fi
+
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: gradle
+
+      - name: Build the web app
+        run: |
+          npm ci
+          npm run build
+
+      - name: Put it in the Android project
+        run: npx cap sync android
+
+      - name: Build the APK
+        working-directory: android
+        run: ./gradlew assembleDebug --no-daemon
+
+      - name: Name the file
+        run: |
+          mkdir -p out
+          cp android/app/build/outputs/apk/debug/app-debug.apk "out/service-hub-test-${GITHUB_SHA::7}.apk"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: service-hub-android-test
+          path: out/*.apk
+          retention-days: 14
+
+      - name: Where to find it
+        run: |
+          {
+            echo "### Aplicația Android de test"
+            echo "Descarcă **service-hub-android-test** de la *Artifacts* (mai jos pe această pagină), dezarhivează și instalează fișierul .apk pe telefon."
+            echo "Folosește proiectul Supabase **de test**."
+          } >> "$GITHUB_STEP_SUMMARY"
