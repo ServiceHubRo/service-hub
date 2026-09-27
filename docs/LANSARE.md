@@ -260,7 +260,7 @@ Conturile de admin rămân după ștergerea conturilor de test (Partea 5). Dacă
 
 Un admin vechi pe care nu-l mai vrei: spune-mi adresa și îți dau comanda.
 
-**Verifici:** te loghezi cu contul nou și vezi **Prezentare, Service-uri, Clienți, Rezervări, Moderare**.
+**Verifici:** te loghezi cu contul nou și vezi **Panou principal, Service-uri, Clienți, Rezervări, Moderare** (pe telefon, jos, primul scrie doar „Panou”).
 
 ### 4.7 După mutare
 

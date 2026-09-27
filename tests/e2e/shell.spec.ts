@@ -4,17 +4,21 @@ import { BACKEND, SEED, SEED_PASSWORD, expectNoHorizontalScroll, isDesktop, sign
 const NAV = {
   client: ['Caută', 'Garaj', 'Programări', 'Mesaje', 'Cont'],
   service: ['Panou', 'Programări', 'Istoric', 'Mesaje', 'Cont'],
-  admin: ['Prezentare', 'Service-uri', 'Clienți', 'Rezervări', 'Moderare'],
+  admin: ['Panou principal', 'Service-uri', 'Clienți', 'Rezervări', 'Moderare'],
 } as const;
 
 const NAV_EN = {
   client: ['Search', 'Garage', 'Bookings', 'Messages', 'Account'],
   service: ['Dashboard', 'Bookings', 'History', 'Messages', 'Account'],
-  admin: ['Overview', 'Shops', 'Clients', 'Bookings', 'Moderation'],
+  admin: ['Dashboard', 'Shops', 'Clients', 'Bookings', 'Moderation'],
 } as const;
 
 /** Screens whose title says more than their navigation label (P16b: "Istoric reparații"). */
 const HEADING: Partial<Record<string, string>> = { Istoric: 'Istoric reparații' };
+
+/** Labels shortened in the phone's bottom bar, where five items share 390 px. */
+const BAR_LABEL: Partial<Record<string, string>> = { 'Panou principal': 'Panou' };
+const inBar = (labels: readonly string[]) => labels.map((l) => BAR_LABEL[l] ?? l);
 
 test.beforeEach(async ({ context }) => {
   await context.addInitScript(() => {
@@ -99,7 +103,7 @@ for (const role of Object.keys(NAV) as (keyof typeof NAV)[]) {
       await expect(page.getByRole('link', { name: 'Cont' })).toBeVisible();
       await expect(page.getByRole('button', { name: 'Deconectare' })).toBeVisible();
     } else {
-      expect(labels).toEqual([...NAV[role]]);
+      expect(labels).toEqual(isDesktop(page) ? [...NAV[role]] : inBar(NAV[role]));
     }
     await expectNoHorizontalScroll(page);
     await page.screenshot({ path: `test-results/shots/${role}-ro-${test.info().project.name}.png` });
@@ -107,7 +111,8 @@ for (const role of Object.keys(NAV) as (keyof typeof NAV)[]) {
     // Every item opens its screen.
     for (const label of NAV[role]) {
       // A count badge is read out after the label ("Programări, 1 cerere nouă").
-      await page.getByRole('link', { name: new RegExp(`^${label}( ?,.*)?$`) }).filter({ visible: true }).first().click();
+      const shown = isDesktop(page) ? label : (BAR_LABEL[label] ?? label);
+      await page.getByRole('link', { name: new RegExp(`^${shown}( ?,.*)?$`) }).filter({ visible: true }).first().click();
       await expect(page.getByRole('heading', { level: 1 })).toHaveText(HEADING[label] ?? label);
     }
 
@@ -115,7 +120,7 @@ for (const role of Object.keys(NAV) as (keyof typeof NAV)[]) {
     await page.getByRole('button', { name: 'English' }).filter({ visible: true }).first().click();
     const en = await navLabels(page);
     if (isDesktop(page) && role !== 'admin') expect(en.slice(0, 4)).toEqual(NAV_EN[role].slice(0, 4));
-    else expect(en).toEqual([...NAV_EN[role]]);
+    else expect(en).toEqual(isDesktop(page) ? [...NAV_EN[role]] : inBar(NAV_EN[role]));
     await page.screenshot({ path: `test-results/shots/${role}-en-${test.info().project.name}.png` });
   });
 }

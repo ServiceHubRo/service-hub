@@ -39,7 +39,7 @@ test.beforeEach(async ({ context, page }) => {
 
 async function signInAdmin(page: Page) {
   await signIn(page, SEED.admin, SEED_PASSWORD);
-  await expect(page.getByRole('heading', { level: 1, name: 'Prezentare' })).toBeVisible();
+  await expect(page.getByRole('heading', { level: 1, name: 'Panou principal' })).toBeVisible();
 }
 
 /** Whether a client finds the shop in search. */

@@ -37,7 +37,7 @@ test.beforeEach(async ({ context, page }) => {
 
 async function signInAdmin(page: Page) {
   await signIn(page, SEED.admin, SEED_PASSWORD);
-  await expect(page.getByRole('heading', { level: 1, name: 'Prezentare' })).toBeVisible();
+  await expect(page.getByRole('heading', { level: 1, name: 'Panou principal' })).toBeVisible();
 }
 
 async function openTool(page: Page, label: string) {
@@ -315,7 +315,7 @@ test.describe('admin tools', () => {
   test('the tools in English', async ({ page }) => {
     await signInAdmin(page);
     await page.getByRole('button', { name: 'English' }).filter({ visible: true }).first().click();
-    await expect(page.getByRole('heading', { level: 1, name: 'Overview' })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1, name: 'Dashboard' })).toBeVisible();
     for (const tile of ['Subscriptions and payments', 'Service catalog', 'Platform settings', 'Notices', 'History reports', 'Export']) {
       await page.getByRole('link', { name: 'Account', exact: true }).filter({ visible: true }).first().click();
       await page.getByRole('link', { name: new RegExp(`^${tile}`) }).click();

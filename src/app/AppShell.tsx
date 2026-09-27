@@ -205,7 +205,7 @@ export function AppShell({ role }: { role: Role }) {
               className={({ isActive }) => `${styles.tab} ${isActive ? styles.tabActive : ''}`}
             >
               <NavIcon item={item} size={21} badge={badges[item.path]?.count ?? 0} />
-              <span className={styles.tabLabel}>{t(item.labelKey)}</span>
+              <span className={styles.tabLabel}>{t(item.shortLabelKey ?? item.labelKey)}</span>
               <BadgeText badge={badges[item.path]} />
             </NavLink>
           );
