@@ -294,8 +294,13 @@ export interface Notice {
   title_en: string;
   body_en: string;
   send_push: boolean;
+  /** Where it shows (T20a): the five main screens, only Caută / Panou, or only Cont. */
+  placement: NoticePlacement;
   created_at: string;
 }
+
+export const NOTICE_PLACEMENTS = ['everywhere', 'home', 'account'] as const;
+export type NoticePlacement = (typeof NOTICE_PLACEMENTS)[number];
 
 export interface AdminNotice extends Notice {
   recipients: number;
@@ -309,6 +314,7 @@ export interface NoticeDraft extends TextInput {
   audience: NoticeAudience;
   city: string;
   push: boolean;
+  placement: NoticePlacement;
 }
 
 export async function previewNotice(audience: NoticeAudience, city: string): Promise<{ recipients: number; with_push: number }> {
@@ -328,6 +334,7 @@ export async function sendNotice(d: NoticeDraft, requestId: string): Promise<Adm
     p_body_en: d.body_en,
     p_push: d.push,
     p_request_id: requestId,
+    p_placement: d.placement,
   })) as unknown as AdminNotice;
 }
 

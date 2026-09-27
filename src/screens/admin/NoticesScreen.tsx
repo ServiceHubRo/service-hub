@@ -14,6 +14,7 @@ import { TextArea } from '../../components/TextArea';
 import {
   fetchNotices,
   NOTICE_AUDIENCES,
+  NOTICE_PLACEMENTS,
   previewNotice,
   sendNotice,
   withdrawNotice,
@@ -35,7 +36,7 @@ import tools from './tools.module.css';
 
 const LIVE = [{ table: 'notices' }];
 
-const EMPTY: NoticeDraft = { audience: 'clients', city: '', title_ro: '', body_ro: '', title_en: '', body_en: '', push: false };
+const EMPTY: NoticeDraft = { audience: 'clients', city: '', title_ro: '', body_ro: '', title_en: '', body_en: '', push: false, placement: 'everywhere' };
 
 /** "Clienții din Brașov", "Toate service-urile", "Toată lumea". */
 function audienceText(t: (k: MessageKey, p?: Record<string, string | number>) => string, audience: string, city: string | null): string {
@@ -68,6 +69,13 @@ function Composer({ onSent }: { onSent: (n: AdminNotice) => void }) {
         {NOTICE_AUDIENCES.map((a) => (
           <Chip key={a} selected={draft.audience === a} onClick={() => set('audience', a)}>
             {t(`admin.notices.audience.${a}` as MessageKey)}
+          </Chip>
+        ))}
+      </ChipRow>
+      <ChipRow label={t('admin.notices.where')}>
+        {NOTICE_PLACEMENTS.map((w) => (
+          <Chip key={w} selected={draft.placement === w} onClick={() => set('placement', w)}>
+            {t(`admin.notices.placement.${w}` as MessageKey)}
           </Chip>
         ))}
       </ChipRow>
@@ -143,7 +151,9 @@ function Composer({ onSent }: { onSent: (n: AdminNotice) => void }) {
           <p className={preview.recipients === 0 ? styles.warning : styles.muted} role="status">
             {preview.recipients === 0
               ? t('admin.notices.nobody')
-              : `${audienceText(t, draft.audience, draft.city.trim() || null)}: ${plural(lang, 'unit.people', preview.recipients)}${
+              : `${audienceText(t, draft.audience, draft.city.trim() || null)}: ${plural(lang, 'unit.people', preview.recipients)} · ${t(
+                  `admin.notices.placement.${draft.placement}` as MessageKey,
+                )}${
                   draft.push ? ` · ${t('admin.notices.withPush', { n: preview.with_push })}` : ''
                 }`}
           </p>
@@ -181,6 +191,7 @@ function SentNotice({ n, onWithdrawn }: { n: AdminNotice; onWithdrawn: () => voi
       <p className={styles.quote}>{lang === 'en' ? n.body_en : n.body_ro}</p>
       <span className={styles.rowMeta}>
         <span>{audienceText(t, n.audience, n.city)}</span>
+        <span>{t(`admin.notices.placement.${n.placement}` as MessageKey)}</span>
         <span>{plural(lang, 'unit.people', n.recipients)}</span>
         <span>{t('admin.notices.reads', { n: n.reads })}</span>
         <span>{n.send_push ? t('admin.notices.pushSent', { n: n.push_recipients }) : t('admin.notices.noPush')}</span>

@@ -9,6 +9,9 @@ import { useI18n } from '../../i18n/context';
 import { formatDayMonth } from '../../i18n/format';
 import styles from './notices.module.css';
 
+/** Which main screen shows the banner: the first one (Caută / Panou), Cont, or another tab. */
+export type NoticeScreen = 'home' | 'account' | 'other';
+
 /** One notice, in the reader's language: the team's name, the date, the title and the text. */
 export function NoticeView({ notice, lang, action }: { notice: Pick<Notice, 'title_ro' | 'body_ro' | 'title_en' | 'body_en' | 'created_at'>; lang: 'ro' | 'en'; action?: ReactNode }) {
   const { t } = useI18n();
@@ -28,12 +31,14 @@ export function NoticeView({ notice, lang, action }: { notice: Pick<Notice, 'tit
 }
 
 /**
- * Notices from the Service-Hub team (T16b) at the top of Caută (clients) and Panou (shops), until
- * "Am citit". Live: a notice sent while the screen is open appears at once (Realtime on `notices`,
- * RLS decides who receives it). Nothing shows while loading or when the read fails — a notice is
- * never in the way of the screen.
+ * Notices from the Service-Hub team (T16b) at the top of the five main screens (AppShell), until
+ * "Am citit" (T20a: before, only on Caută / Panou, and testers missed them). Each notice says where
+ * it shows (`placement`): every main screen, only the first one (`home`) or only Cont (`account`).
+ * Live: a notice sent while the screen is open appears at once (Realtime on `notices`, RLS decides
+ * who receives it). Nothing shows while loading or when the read fails — a notice is never in the
+ * way of the screen.
  */
-export function NoticeBanner({ className }: { className?: string }) {
+export function NoticeBanner({ screen, className }: { screen: NoticeScreen; className?: string }) {
   const { t, lang } = useI18n();
   const session = useSession();
   const userId = session.user?.id ?? null;
@@ -57,10 +62,11 @@ export function NoticeBanner({ className }: { className?: string }) {
     return subscribeRows({ channel: `notices:${userId}`, table: 'notices', onChange: load, onResync: load });
   }, [userId, load]);
 
-  if (notices.length === 0) return null;
+  const shown = notices.filter((n) => n.placement === 'everywhere' || n.placement === screen);
+  if (shown.length === 0) return null;
   return (
     <div className={`${styles.list} ${className ?? ''}`}>
-      {notices.map((n) => (
+      {shown.map((n) => (
         <NoticeView
           key={n.id}
           notice={n}

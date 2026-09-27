@@ -646,6 +646,8 @@ const clip = (s: string, n: number) => (s.length > n ? `${s.slice(0, n - 1)}…`
 
 /** The screen where notices show (T16b): Caută for clients, Panou for shops. */
 export const NOTICE_PATHS: Record<Side, string> = { client: '/c/cauta', shop: '/s/panou' };
+/** A notice shown only in Cont (placement `account`) opens Cont. */
+export const NOTICE_ACCOUNT_PATHS: Record<Side, string> = { client: '/c/cont', shop: '/s/cont' };
 
 /**
  * A notice from the Service-Hub team (T16b): the admin wrote its title and text in both
@@ -661,7 +663,7 @@ function renderBroadcast(e: NotificationEvent, side: Side, lang: Lang): Rendered
     key: 'broadcast',
     title: clip(title || BRAND, 80),
     body: clip(body.replace(/\s+/g, ' ').trim(), 240),
-    url: NOTICE_PATHS[side],
+    url: (p.placement === 'account' ? NOTICE_ACCOUNT_PATHS : NOTICE_PATHS)[side],
     tag: `notice-${str(p.notice_id)}`,
   };
 }

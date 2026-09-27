@@ -744,6 +744,8 @@ După testare (km la fel): la finalizare, dacă kilometrajul e exact cel de la o
 
 **Butonul „Programează-te” mai sus (cerut la test):** pe pagina service-ului stă acum imediat sub cardul cu programul, telefonul și taxa, înainte de lista de servicii (înainte era după toată lista, iar testerii derulau mult după el).
 
+**Anunțurile pe toate ecranele (feedback de la test):** un anunț al echipei apărea doar pe Caută / Panou, iar testerul nu l-a mai văzut pe celelalte ecrane. Acum apare sus pe toate cele cinci ecrane principale până la „Am citit” (nu și în ecranele din interior, ca o conversație), iar adminul alege la trimitere „Unde apare”: pe toate ecranele principale (implicit, și pentru anunțurile deja trimise), doar pe Caută / Panou sau doar în Cont; o notificare push pentru un anunț „doar în Cont” deschide Cont. Migrarea `notice_placement` (`schema_version` = 36): coloana `notices.placement` și `admin_send_notice(..., p_placement)`. **Idei de la tester, nefăcute:** recomandări cu premii (cu CIF pentru service-uri, VIN pentru clienți) și un agent automat pentru abuzuri — de discutat.
+
 ### T20b — Notificările native și iPhone
 
 Android: notificările prin Firebase Cloud Messaging (gratuit), în `dispatch-notifications`, lângă Web Push. iPhone (după contul Apple Developer, 99 $/an, pe firmă, cu D-U-N-S): proiectul `ios/`, notificările APNs, construirea automată și TestFlight.

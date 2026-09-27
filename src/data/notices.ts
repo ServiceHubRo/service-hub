@@ -17,7 +17,7 @@ export async function fetchUnreadNotices(userId: string, now: Date = new Date())
   const [notices, reads] = await Promise.all([
     supabase
       .from('notices')
-      .select('id, audience, city, title_ro, body_ro, title_en, body_en, send_push, created_at')
+      .select('id, audience, city, title_ro, body_ro, title_en, body_en, send_push, placement, created_at')
       .gte('created_at', since)
       .order('created_at', { ascending: false })
       .limit(20),

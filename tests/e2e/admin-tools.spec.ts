@@ -100,7 +100,7 @@ test.describe('admin tools', () => {
     await page.getByLabel('Titlu în română').fill(title);
     await page.getByLabel('Text în română').fill('Pe 1 decembrie service-urile sunt închise.');
     await page.getByRole('button', { name: 'Previzualizează' }).click();
-    await expect(page.getByText(`Clienții din ${city}: 1 persoană`)).toBeVisible();
+    await expect(page.getByText(`Clienții din ${city}: 1 persoană · Pe toate ecranele principale`)).toBeVisible();
     // Both languages, the English falling back to the Romanian text.
     await expect(page.getByRole('region', { name: 'Anunț Service-Hub' })).toHaveCount(2);
     await expectNoHorizontalScroll(page);
@@ -117,6 +117,24 @@ test.describe('admin tools', () => {
     const notice = clientPage.getByRole('region', { name: 'Anunț Service-Hub' }).filter({ hasText: title });
     await expect(notice).toBeVisible();
     await shot(clientPage, 't16b-notice-client', name());
+    // On every main screen until read (T20a), not only on Caută.
+    await clientPage.getByRole('link', { name: /^Programări/ }).filter({ visible: true }).first().click();
+    await expect(clientPage.getByRole('heading', { level: 1, name: 'Programări' })).toBeVisible();
+    await expect(notice).toBeVisible();
+    await clientPage.goto('/c/cont');
+    await expect(notice).toBeVisible();
+    await shot(clientPage, 't20a-notice-account', name());
+    // One meant only for Cont shows there and nowhere else.
+    const accountTitle = `Doar în Cont ${tag()}`;
+    await serviceRest('notices', 'POST', {
+      audience: 'clients', city, title_ro: accountTitle, body_ro: 'Text.', title_en: accountTitle, body_en: 'Text.', placement: 'account',
+    });
+    const accountNotice = clientPage.getByRole('region', { name: 'Anunț Service-Hub' }).filter({ hasText: accountTitle });
+    await expect(accountNotice).toBeVisible();
+    await clientPage.goto('/c/cauta');
+    await expect(clientPage.getByRole('heading', { level: 1, name: 'Caută' })).toBeVisible();
+    await expect(notice).toBeVisible();
+    await expect(accountNotice).toHaveCount(0);
     await notice.getByRole('button', { name: 'Am citit' }).click();
     await expect(notice).toHaveCount(0);
     await expect

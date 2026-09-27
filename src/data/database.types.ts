@@ -12,6 +12,51 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      account_fingerprint_secret: {
+        Row: {
+          id: number
+          secret: string
+        }
+        Insert: {
+          id?: number
+          secret: string
+        }
+        Update: {
+          id?: number
+          secret?: string
+        }
+        Relationships: []
+      }
+      account_fingerprints: {
+        Row: {
+          created_at: string
+          hash: string
+          id: number
+          kind: string
+          reason: string
+          released_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          hash: string
+          id?: never
+          kind: string
+          reason: string
+          released_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          hash?: string
+          id?: never
+          kind?: string
+          reason?: string
+          released_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       admin_audit_log: {
         Row: {
           action: string
@@ -573,6 +618,7 @@ export type Database = {
           created_at: string
           created_by: string | null
           id: string
+          placement: string
           push_recipients: number
           recipients: number
           send_push: boolean
@@ -587,6 +633,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           id?: string
+          placement?: string
           push_recipients?: number
           recipients?: number
           send_push?: boolean
@@ -601,6 +648,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           id?: string
+          placement?: string
           push_recipients?: number
           recipients?: number
           send_push?: boolean
@@ -1832,6 +1880,21 @@ export type Database = {
     }
     Functions: {
       account_email: { Args: { p_user_id: string }; Returns: string }
+      account_fingerprint: {
+        Args: { p_kind: string; p_value: string }
+        Returns: string
+      }
+      account_fingerprints_of: {
+        Args: { p_user_id: string }
+        Returns: {
+          hash: string
+          kind: string
+        }[]
+      }
+      add_account_fingerprints: {
+        Args: { p_reason: string; p_user_id: string }
+        Returns: undefined
+      }
       add_local_days: {
         Args: { p_at: string; p_days: number }
         Returns: string
@@ -1988,6 +2051,7 @@ export type Database = {
           p_body_en: string
           p_body_ro: string
           p_city: string
+          p_placement?: string
           p_push: boolean
           p_request_id: string
           p_title_en: string
@@ -2757,6 +2821,7 @@ export type Database = {
       prepare_account_deletion: { Args: { p_user_id: string }; Returns: string }
       promote_to_admin: { Args: { p_email: string }; Returns: string }
       public_pricing: { Args: never; Returns: Json }
+      purge_account_fingerprints: { Args: { p_now?: string }; Returns: number }
       purge_request_log: { Args: { p_now?: string }; Returns: number }
       record_payment_failed: {
         Args: { p_customer: string; p_invoice: Json }
@@ -2766,7 +2831,15 @@ export type Database = {
         Args: { p_customer: string; p_invoice: Json }
         Returns: Json
       }
+      refresh_account_fingerprints: {
+        Args: { p_user_id: string }
+        Returns: undefined
+      }
       remind_expiring_quotes: { Args: { p_now?: string }; Returns: number }
+      remove_account_fingerprints: {
+        Args: { p_reason: string; p_user_id: string }
+        Returns: undefined
+      }
       replace_quote: {
         Args: {
           p_booking_id: string
@@ -2947,6 +3020,36 @@ export type Database = {
       }
       require_my_shop: { Args: never; Returns: string }
       require_my_shop_owner: { Args: never; Returns: string }
+      require_reader: {
+        Args: never
+        Returns: {
+          created_at: string
+          deleted_at: string | null
+          display_id: string
+          email_verified_at: string | null
+          id: string
+          lang: string
+          last_active_at: string | null
+          location_prompt_dismissed_at: string | null
+          name: string | null
+          phone: string | null
+          phone_verified_at: string | null
+          phone_verified_by_admin: boolean
+          push_prompt_dismissed_at: string | null
+          review_requests: boolean
+          role: string
+          service_reminders: boolean
+          suspended: boolean
+          terms_accepted_at: string | null
+          terms_version: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "profiles"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       require_status: {
         Args: {
           p_allowed: string[]

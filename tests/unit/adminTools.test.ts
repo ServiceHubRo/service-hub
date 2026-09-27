@@ -223,6 +223,9 @@ describe('push texts', () => {
     };
     expect(renderNotification(e)).toMatchObject({ title: 'Hours', body: 'Closed', url: '/c/cauta', tag: 'notice-n1' });
     expect(renderNotification({ ...e, role: 'shop', lang: 'ro' })).toMatchObject({ title: 'Program', url: '/s/panou' });
+    // A notice shown only in Cont opens Cont.
+    expect(renderNotification({ ...e, params: { ...e.params, placement: 'account' } })).toMatchObject({ url: '/c/cont' });
+    expect(renderNotification({ ...e, role: 'shop', params: { ...e.params, placement: 'account' } })).toMatchObject({ url: '/s/cont' });
     // English missing: the Romanian text.
     expect(renderNotification({ ...e, params: { notice_id: 'n1', title_ro: 'Program', body_ro: 'Închis' } })).toMatchObject({
       title: 'Program',

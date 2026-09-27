@@ -88,6 +88,11 @@
 }
 
 /* A screen that fills the whole content area (a conversation keeps its box at the bottom). */
+/* Notices from the team, above the screen's own title (like the email banner). */
+.notices {
+  margin-bottom: 16px;
+}
+
 .content:has(> [data-fill-screen]) {
   min-height: 100%;
   display: flex;
