@@ -172,6 +172,11 @@ test.describe('client search', () => {
 
     // "Programează-te" opens the first of the 4 booking steps (T07).
     await result(page, 'Atelier Demo').click();
+    // It sits under the shop's details, above the price list (no scrolling down past the services).
+    const bookBox = await page.getByRole('link', { name: 'Programează-te' }).boundingBox();
+    const servicesBox = await page.getByRole('heading', { name: 'Servicii oferite' }).boundingBox();
+    expect(bookBox!.y).toBeLessThan(servicesBox!.y);
+    await shot(page, 't20a-shop-book-button', name());
     await page.getByRole('link', { name: 'Programează-te' }).click();
     await expect(page.getByRole('heading', { level: 1, name: 'Ce ai nevoie?' })).toBeVisible();
 

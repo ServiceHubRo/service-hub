@@ -203,16 +203,17 @@ function ShopDetails({ page, onFavorite }: { page: ShopPageData; onFavorite: (on
         )}
       </Card>
 
-      <h2 className={styles.sectionTitle}>{t('shop.services')}</h2>
-      <ServiceGroups services={page.services} />
-      <p className={styles.muted}>{t('shop.priceNote')}</p>
-
+      {/* Right under the details, not after the whole price list (testers scrolled for it). */}
       {page.bookable && (
         <Link to={bookingPath(shop.id)} className={buttonClass('primary', true, styles.book)}>
           <CalendarPlus size={18} aria-hidden="true" />
           {t('shop.book')}
         </Link>
       )}
+
+      <h2 className={styles.sectionTitle}>{t('shop.services')}</h2>
+      <ServiceGroups services={page.services} />
+      <p className={styles.muted}>{t('shop.priceNote')}</p>
 
       {hasReviews && (
         <section id={REVIEWS_HASH} className={styles.reviews} aria-labelledby="reviews-title">
