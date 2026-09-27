@@ -22,7 +22,15 @@ export function NativeBridge() {
     if (!IS_NATIVE) return;
     void StatusBar.setStyle({ style: Style.Dark }).catch(() => undefined);
     void StatusBar.setBackgroundColor({ color: '#14161A' }).catch(() => undefined);
-    void SplashScreen.hide().catch(() => undefined);
+    // Once now and twice more: a hide that arrives before the launch screen is up does nothing.
+    const hide = () => void SplashScreen.hide().catch(() => undefined);
+    hide();
+    const timers = [400, 1200].map((ms) => window.setTimeout(hide, ms));
+    const resumed = CapApp.addListener('resume', hide);
+    return () => {
+      timers.forEach((t) => window.clearTimeout(t));
+      void resumed.then((h) => h.remove());
+    };
   }, []);
 
   useEffect(() => {

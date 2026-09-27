@@ -12,8 +12,12 @@ const config: CapacitorConfig = {
   },
   plugins: {
     SplashScreen: {
-      // Hidden by the app once its first screen is drawn (src/app/NativeBridge.tsx).
-      launchAutoHide: false,
+      // Hidden by the app once its first screen is drawn (src/app/NativeBridge.tsx), and in any case
+      // after 2.5 s: on a second start the app can be ready before the launch screen is even shown,
+      // and a launch screen waiting for the app would then stay forever (seen on testers' phones).
+      launchAutoHide: true,
+      launchShowDuration: 2500,
+      launchFadeOutDuration: 200,
       backgroundColor: '#14161A',
       showSpinner: false,
     },
