@@ -28,6 +28,11 @@ jobs:
     env:
       VITE_SUPABASE_URL: ${{ vars.TEST_SUPABASE_URL }}
       VITE_SUPABASE_ANON_KEY: ${{ vars.TEST_SUPABASE_ANON_KEY }}
+      # Errors from the phone app reach Sentry too (the same public DSN as the site; none = off),
+      # tagged as their own environment and with the commit.
+      VITE_SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+      CONTEXT: android-test
+      COMMIT_REF: ${{ github.event.pull_request.head.sha || github.sha }}
     steps:
       - name: Check the test project's address is set
         run: |

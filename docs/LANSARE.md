@@ -26,7 +26,7 @@ Gratuit până la 5.000 de erori pe lună (de ajuns pentru început).
 5. **Netlify** → site-ul `service-hubapp` → **Site configuration → Environment variables → Add a variable**:
    - Key: `VITE_SENTRY_DSN`, Value: DSN-ul, **Same value for all deploy contexts** → **Create variable**.
 6. **GitHub** → repo-ul `service-hub` → **Settings → Secrets and variables → Actions → New repository secret**:
-   - Name: `SENTRY_DSN`, Secret: același DSN → **Add secret**. (Pentru funcțiile de pe server; „Deploy Supabase” îl pune singur în Supabase.)
+   - Name: `SENTRY_DSN`, Secret: același DSN → **Add secret**. (Pentru funcțiile de pe server — „Deploy Supabase” îl pune singur în Supabase — și pentru aplicația Android, unde erorile apar în Sentry cu mediul `android-test`.)
 7. În Sentry, pentru confidențialitate: **Settings → Projects → service-hub → Security & Privacy**:
    - bifează **Prevent Storing of IP Addresses**;
    - lasă bifate **Data Scrubber** și **Use Default Scrubbers**.
