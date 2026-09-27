@@ -10,6 +10,7 @@ import {
   rpcAs,
   shot,
   signIn,
+  xlsxText,
 } from './support';
 
 // T10 — the shop's repair history (search, filters, the opened card, CSV) and the client's vehicle
@@ -193,8 +194,8 @@ test.describe('repair history', () => {
     // The CSV holds the filtered list, with the odometer.
     await page.getByRole('button', { name: 'Toate', exact: true }).click();
     const [download] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: 'Descarcă istoricul' }).click()]);
-    expect(download.suggestedFilename()).toMatch(/^istoric-reparatii-\d{4}-\d{2}-\d{2}\.csv$/);
-    const csv = await readFile((await download.path())!, 'utf8');
+    expect(download.suggestedFilename()).toMatch(/^istoric-reparatii-\d{4}-\d{2}-\d{2}\.xlsx$/);
+    const csv = xlsxText(await readFile((await download.path())!));
     expect(csv).toContain('Data;Cod programare;Status;Număr');
     expect(csv).toContain(`${done.ref};Finalizată;${plate};Dacia Logan 2019`);
     expect(csv).toContain(';105400;');

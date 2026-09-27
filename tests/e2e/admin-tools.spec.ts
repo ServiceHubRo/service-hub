@@ -13,6 +13,7 @@ import {
   shot,
   signIn,
   userIdOf,
+  xlsxText,
 } from './support';
 
 // T16b — the admin's platform tools: subscriptions and payments, history reports, the catalog,
@@ -65,7 +66,7 @@ async function freeSlot(client: string, shopId: string): Promise<{ date: string;
 async function downloadCsv(page: Page, button: ReturnType<Page['getByRole']>): Promise<{ file: string; text: string }> {
   const [download] = await Promise.all([page.waitForEvent('download'), button.click()]);
   const chunks = await (await download.createReadStream()).toArray();
-  return { file: download.suggestedFilename(), text: Buffer.concat(chunks).toString('utf8') };
+  return { file: download.suggestedFilename(), text: xlsxText(new Uint8Array(Buffer.concat(chunks))) };
 }
 
 test.describe('admin tools', () => {
@@ -280,8 +281,8 @@ test.describe('admin tools', () => {
     await expectNoHorizontalScroll(page);
     await shot(page, 't16b-subscriptions', name());
 
-    const csv = await downloadCsv(page, page.getByRole('button', { name: 'Descarcă CSV' }));
-    expect(csv.file).toMatch(/^abonamente-\d{4}-\d{2}-\d{2}\.csv$/);
+    const csv = await downloadCsv(page, page.getByRole('button', { name: 'Descarcă Excel' }));
+    expect(csv.file).toMatch(/^abonamente-\d{4}-\d{2}-\d{2}\.xlsx$/);
     expect(csv.text).toContain('Cont;Service;Oraș');
     expect(csv.text).toContain(shopName);
     expect(csv.text.trim().split('\r\n')).toHaveLength(2);
@@ -299,16 +300,16 @@ test.describe('admin tools', () => {
 
     // The shops list exports what it shows.
     await page.goto(`/admin/service-uri?q=${encodeURIComponent(shopName)}`);
-    const shops = await downloadCsv(page, page.getByRole('button', { name: 'Descarcă CSV' }));
+    const shops = await downloadCsv(page, page.getByRole('button', { name: 'Descarcă Excel' }));
     expect(shops.text.trim().split('\r\n')).toHaveLength(2);
-    expect(shops.text).toContain('79,5');
+    expect(shops.text).toContain('79.5');
 
     // The export screen and the log.
     await openTool(page, 'Export');
     await shot(page, 't16b-export', name());
     await openAccount(page);
     await page.getByRole('link', { name: /^Jurnal de audit/ }).click();
-    await expect(page.getByText('Export CSV').first()).toBeVisible();
+    await expect(page.getByText('Export Excel').first()).toBeVisible();
     await expect(page.getByText('Preț abonament schimbat').first()).toBeVisible();
   });
 

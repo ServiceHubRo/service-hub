@@ -3,7 +3,7 @@ import { canRetryRpc, rpcErrorMessage } from '../../data/rpc';
 import { useI18n } from '../../i18n/context';
 import { ymdInBucharest } from '../../i18n/format';
 import { exportFileName, exportTable } from '../../lib/adminTools';
-import { csvFormat, toCsv } from '../../lib/history';
+import { toXlsx } from '../../lib/xlsx';
 import { saveFile } from '../../lib/report';
 import { ActionButton } from '../../components/ActionButton';
 
@@ -32,7 +32,7 @@ export function ExportButton<R>({
       onAction={async () => {
         const rows = (await fetchExport(kind, filters)) as R[];
         const table = exportTable(kind, narrow ? narrow(rows) : rows, t, lang);
-        const blob = new Blob([toCsv(table, csvFormat(lang).separator)], { type: 'text/csv;charset=utf-8' });
+        const blob = toXlsx(table, t(`admin.export.kind.${kind}`));
         await saveFile(blob, exportFileName(kind, t, ymdInBucharest(new Date())));
       }}
       errorMessage={(e) => rpcErrorMessage(lang, e)}

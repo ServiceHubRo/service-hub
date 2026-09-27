@@ -25,11 +25,11 @@ import {
   historyTotals,
   isHistoryFilter,
   isHistoryPeriod,
-  toCsv,
 } from '../../../lib/history';
 import { useLoad } from '../../../lib/useLoad';
 import { useNow } from '../../../lib/useNow';
 import { saveFile } from '../../../lib/saveFile';
+import { toXlsx } from '../../../lib/xlsx';
 import { formatPhone, normalizePhone } from '../../../lib/validators';
 import { HistoryQuote } from '../../history/HistoryQuote';
 import { MessageLink } from '../../messages/MessageLink';
@@ -382,7 +382,7 @@ function PrintTable({ items }: { items: ShopHistoryItem[] }) {
 
 /** The filtered list as a CSV file for the accountant (P16b), in the interface's language. */
 function downloadCsv(items: readonly ShopHistoryItem[], lang: Lang, t: I18nValue['t'], today: string) {
-  const { separator, decimal } = csvFormat(lang);
+  const { decimal } = csvFormat(lang);
   const header = (
     ['date', 'ref', 'status', 'plate', 'car', 'client', 'service', 'odometer', 'work', 'amount'] as const
   ).map((c) => t(`hist.col.${c}`));
@@ -398,6 +398,5 @@ function downloadCsv(items: readonly ShopHistoryItem[], lang: Lang, t: I18nValue
     b.work ?? '',
     csvAmount(b.cost, decimal),
   ]);
-  const blob = new Blob([toCsv([header, ...rows], separator)], { type: 'text/csv;charset=utf-8' });
-  return saveFile(blob, `${t('hist.csv.file')}-${today}.csv`);
+  return saveFile(toXlsx([header, ...rows], t('hist.title')), `${t('hist.csv.file')}-${today}.xlsx`);
 }
