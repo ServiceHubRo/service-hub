@@ -39,6 +39,57 @@
   </head>
   <body>
     <div id="root"></div>
+    <!-- Start-up guard (T20a), plain old JavaScript on purpose: a browser or an Android System
+         WebView too old to run the app gets a message instead of a blank page or, in the phone app,
+         a launch screen that never goes away. The app sets window.__shStarted once it has drawn
+         (src/app/NativeBridge.tsx); the i18n dictionaries are not loaded yet, hence the text here. -->
+    <script>
+      (function () {
+        var done = false;
+        function native() {
+          try { return !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()); } catch (e) { return false; }
+        }
+        function fail() {
+          if (done || window.__shStarted) return;
+          done = true;
+          try { window.Capacitor.Plugins.SplashScreen.hide(); } catch (e) {}
+          var lang = 'ro';
+          try { lang = localStorage.getItem('sh_lang') || ((navigator.language || '').indexOf('ro') === 0 ? 'ro' : 'en'); } catch (e) {}
+          var m = /Chrome\/(\d+)/.exec(navigator.userAgent);
+          var version = m ? ' (' + (native() ? 'WebView ' : 'Chrome ') + m[1] + ')' : '';
+          var ro = lang !== 'en';
+          var title = native()
+            ? (ro ? 'Service-Hub nu poate porni pe acest telefon' : 'Service-Hub cannot start on this phone')
+            : (ro ? 'Service-Hub nu poate porni în acest browser' : 'Service-Hub cannot start in this browser');
+          var text = native()
+            ? (ro ? 'Componenta care afișează aplicația e prea veche. Actualizează „Android System WebView” și „Chrome” din Magazin Play (sau AppGallery), apoi deschide din nou aplicația.'
+                  : 'The part that shows the app is too old. Update “Android System WebView” and “Chrome” from the Play Store (or AppGallery), then open the app again.')
+            : (ro ? 'Browserul tău e prea vechi pentru Service-Hub. Actualizează-l sau deschide site-ul în Chrome, Safari sau Firefox.'
+                  : 'Your browser is too old for Service-Hub. Update it or open the site in Chrome, Safari or Firefox.');
+          var root = document.getElementById('root');
+          if (!root) return;
+          root.innerHTML = '';
+          var box = document.createElement('div');
+          box.setAttribute('role', 'alert');
+          box.style.cssText = 'min-height:100vh;display:flex;flex-direction:column;justify-content:center;gap:12px;padding:24px;background:#14161A;color:#EAE8E2;font:16px/1.5 system-ui,sans-serif';
+          var h = document.createElement('h1');
+          h.style.cssText = 'margin:0;font-size:22px;line-height:1.3';
+          h.textContent = title;
+          var p = document.createElement('p');
+          p.style.cssText = 'margin:0;color:#B8B5AD';
+          p.textContent = text + version;
+          box.appendChild(h);
+          box.appendChild(p);
+          root.appendChild(box);
+        }
+        // The app's code could not even be read (syntax the browser does not know).
+        window.addEventListener('error', function (e) {
+          if (e && /SyntaxError/.test(String(e.message))) fail();
+        });
+        // In the phone app: still nothing drawn after 12 seconds (the files are on the phone).
+        setTimeout(function () { if (native()) fail(); }, 12000);
+      })();
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

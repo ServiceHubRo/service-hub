@@ -17,6 +17,8 @@ export function NativeBridge() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    // The app has drawn: the start-up guard in index.html stays quiet.
+    (window as Window & { __shStarted?: boolean }).__shStarted = true;
     if (!IS_NATIVE) return;
     void StatusBar.setStyle({ style: Style.Dark }).catch(() => undefined);
     void StatusBar.setBackgroundColor({ color: '#14161A' }).catch(() => undefined);

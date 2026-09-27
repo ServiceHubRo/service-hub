@@ -210,7 +210,9 @@ function randomHex(bytes: number): string {
 /** A short, comparable signature of an error, to send the same one only once per page. */
 export function errorSignature(error: unknown): string {
   const d = describeError(error);
-  const top = parseStack(d.stack).at(-1);
+  // No Array.at: the browser build of this file runs on older phones too (vite.config.ts target).
+  const frames = parseStack(d.stack);
+  const top = frames[frames.length - 1];
   return `${d.type}|${d.value.slice(0, 200)}|${top?.filename ?? ''}:${top?.lineno ?? ''}`;
 }
 

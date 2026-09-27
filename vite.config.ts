@@ -48,6 +48,10 @@ export default defineConfig(({ command, mode }) => {
       },
     ],
     build: {
+      // Older than Vite's default (Chrome 111): phones with an Android System WebView that is not
+      // up to date (often Huawei, without Google Play) must still run the app (T20a). Only syntax is
+      // lowered; the code avoids newer built-ins (Array.at, toSorted, structuredClone, ...).
+      target: ['chrome80', 'edge80', 'firefox78', 'safari14'],
       // The start file holds React, the router, the Supabase client and both dictionaries (RO + EN);
       // each role's screens are loaded on their own after sign-in (src/app/App.tsx).
       chunkSizeWarningLimit: 800,

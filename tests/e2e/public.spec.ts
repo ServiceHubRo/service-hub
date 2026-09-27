@@ -117,6 +117,25 @@ test('404: an unknown address has its own page with a way home', async ({ page }
   await expect(page.getByRole('heading', { level: 1, name: /Programarea la service/ })).toBeVisible();
 });
 
+test('a browser that cannot read the app gets a message, not a blank page (T20a)', async ({ page }) => {
+  // The app's code as a too-old browser sees it: syntax it does not know.
+  await page.route(/\/assets\/index-[^/]*\.js$/, (route) =>
+    route.fulfill({ contentType: 'text/javascript', body: 'let a = ;' }),
+  );
+  await page.goto('/');
+  await expect(page.getByRole('heading', { level: 1, name: 'Service-Hub nu poate porni în acest browser' })).toBeVisible();
+  await expect(page.getByRole('alert')).toContainText('Browserul tău e prea vechi');
+  await expectNoHorizontalScroll(page);
+  await shot(page, 'start-guard', name());
+});
+
+test('a normal start stays quiet: no start-up message', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.getByRole('heading', { level: 1, name: /Programarea la service/ })).toBeVisible();
+  await expect(page.getByText('nu poate porni')).toHaveCount(0);
+  expect(await page.evaluate(() => (window as Window & { __shStarted?: boolean }).__shStarted)).toBe(true);
+});
+
 /** Tab until the element is focused; fails after `max` presses. */
 async function tabTo(page: Page, target: ReturnType<Page['getByRole']>, max = 40) {
   for (let i = 0; i < max; i++) {

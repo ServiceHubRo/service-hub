@@ -239,7 +239,7 @@ function HoursList({ rows }: { rows: HoursRow[] }) {
     <ul className={styles.hours}>
       {rows.map((r) => (
         <li key={r.days.join('-')} className={styles.hoursRow}>
-          <span className={styles.days}>{r.days.length === 1 ? day(r.days[0]!) : `${day(r.days[0]!)} – ${day(r.days.at(-1)!)}`}</span>
+          <span className={styles.days}>{r.days.length === 1 ? day(r.days[0]!) : `${day(r.days[0]!)} – ${day(r.days[r.days.length - 1]!)}`}</span>
           <span className={r.closed ? styles.closed : 'mono'}>{r.closed ? t('shop.closed') : `${r.open} – ${r.close}`}</span>
         </li>
       ))}
