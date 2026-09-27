@@ -612,6 +612,7 @@ export const ro = {
   'rpcError.note_too_long': 'Nota este prea lungă.',
   'rpcError.odometer_invalid': 'Kilometrajul trebuie să fie între 100 și 2.000.000 km.',
   'rpcError.odometer_jump': 'Sunt {diff} în plus față de ultima lucrare. Confirmi?',
+  'rpcError.odometer_same': 'Kilometrajul este același ca la o lucrare din altă zi ({previous}). Poate fi cifra veche: citește din nou bordul. Dacă e corect, confirmă.',
   'rpcError.odometer_lower': 'Ultima valoare înregistrată a fost {previous}. Verifică cifra.',
   'rpcError.odometer_required': 'Completează kilometrajul.',
   'rpcError.past_slot': 'Ora aleasă a trecut. Alege altă oră.',

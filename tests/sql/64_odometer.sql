@@ -65,6 +65,17 @@ select test.eq(pg_temp.complete(current_setting('test.j4')::uuid, 150000), 'odom
 select test.raw_booking(test.id('shop2'), test.id('client_b'), 'cancelled', test.today() - 20, '10:00', 'CJ 01 XYZ', 900000);
 select test.eq(pg_temp.complete(current_setting('test.j4')::uuid, 210000), 'ok', 'only done jobs set the last reading');
 
+-- The same reading as a job on another day: probably the old number, so it needs confirming.
+select test.raw_booking(test.id('shop2'), test.id('client_b'), 'done', test.today() - 60, '10:00', 'SB 02 SAM', 80000);
+select set_config('test.js', pg_temp.job('SB 02 SAM', '13:30')::text, true);
+select test.eq(pg_temp.complete(current_setting('test.js')::uuid, 80000), 'odometer_same', 'same reading as another day → needs confirmation');
+select test.login(test.id('owner1'));
+select test.eq(test.error_params(format('select public.complete_job(%L, 80000, gen_random_uuid())', current_setting('test.js'))),
+  '{"previous": 80000}'::jsonb, 'the question names the previous value');
+select test.logout();
+select test.eq(test.status_of(current_setting('test.js')::uuid), 'in_progress', 'the job stays open');
+select test.eq(pg_temp.complete(current_setting('test.js')::uuid, 80000, true), 'ok', 'confirmed same reading accepted');
+
 -- 5. First reading for a plate: anything in range.
 select set_config('test.j5', pg_temp.job('B 999 NEW', '14:00')::text, true);
 select test.eq(pg_temp.complete(current_setting('test.j5')::uuid, 100), 'ok', '5. first reading: 100 accepted');

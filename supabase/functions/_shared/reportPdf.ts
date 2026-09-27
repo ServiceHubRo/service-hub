@@ -12,6 +12,7 @@ import {
   reportMoney,
   reportPeriod,
   reportText,
+  repeatedOdometers,
   type ReportData,
   type ReportTextKey,
 } from './report.ts';
@@ -319,7 +320,13 @@ export async function renderReportPdf(lib: PdfLib, data: ReportData): Promise<Ui
   // that always travels with the last job, so it never sits alone on a page of its own.
   const TOTAL_H = 30 + 14;
   const STATS_H = 56 + 12;
-  const kmNote = data.odometerOutOfOrder ? wrapText(t('kmNote'), fonts.sans, 7.5, CONTENT - 4) : [];
+  const repeated = repeatedOdometers(data.jobs);
+  const kmNote = [
+    ...(data.odometerOutOfOrder ? wrapText(t('kmNote'), fonts.sans, 7.5, CONTENT - 4) : []),
+    ...(repeated.length
+      ? wrapText(t('kmRepeated', { km: repeated.map((km) => `${reportKm(data.lang, km)} km`).join(', ') }), fonts.sans, 7.5, CONTENT - 4)
+      : []),
+  ];
   const KM_NOTE_H = kmNote.length ? kmNote.length * 10 + 10 : 0;
   const noticeLead = t('disclaimerLead');
   const notice = clean(`${noticeLead} ${t('disclaimer', { date: generated.date, host: data.verifyAt.split('/')[0] ?? '' })}`);

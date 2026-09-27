@@ -68,6 +68,8 @@ export const REPORT_TEXT = {
     lastKm: 'Km la ultima lucrare',
     kmNote:
       'Citirile de kilometraj nu sunt în ordine crescătoare. Le-am păstrat exact cum au fost introduse de service-uri, fără să le reordonăm sau să le corectăm.',
+    kmRepeated:
+      'Lucrări din zile diferite au același kilometraj ({km}). Service-ul a confirmat cifra la introducere, dar poate să nu fie exactă: verificați kilometrajul mașinii.',
     disclaimerLead: 'Important.',
     disclaimer:
       'Acest raport conține exclusiv lucrările efectuate prin platforma Service-Hub și înregistrate de service-urile partenere. Nu reprezintă istoricul complet de service al vehiculului: lucrările efectuate în alte ateliere, în regie proprie sau înainte de înregistrarea vehiculului în aplicație nu apar aici. Datele sunt cele raportate de service-urile care au efectuat lucrările. Service-Hub este intermediar și nu răspunde pentru calitatea lucrărilor. Raport generat automat la {date} · Service-Hub · {host}',
@@ -100,6 +102,8 @@ export const REPORT_TEXT = {
     lastKm: 'Km at last job',
     kmNote:
       'The odometer readings do not increase with the dates. They are shown exactly as the shops entered them, not re-sorted or corrected.',
+    kmRepeated:
+      "Jobs on different days have the same odometer reading ({km}). The shop confirmed it when entering it, but it may not be accurate: check the car's odometer.",
     disclaimerLead: 'Important.',
     disclaimer:
       'This report covers only work carried out through the Service-Hub platform and recorded by its partner shops. It is not the complete service history of the vehicle: work done at other shops, by the owner, or before the vehicle was added to the app does not appear here. The data is as reported by the shops that did the work. Service-Hub is an intermediary and is not responsible for the quality of the work. Report generated automatically on {date} · Service-Hub · {host}',
@@ -162,6 +166,22 @@ export function reportPeriod(lang: Lang, from: string | null, to: string | null)
   const a = reportMonth(lang, (from ?? to)!);
   const b = reportMonth(lang, (to ?? from)!);
   return a === b ? a : `${a} – ${b}`;
+}
+
+/**
+ * Readings that repeat on different days (the car was driven in between, so one of them is
+ * probably the old number typed again): the distinct values, highest first. Same-day jobs may
+ * share a reading.
+ */
+export function repeatedOdometers(jobs: readonly { date: string; odometer: number | null }[]): number[] {
+  const days = new Map<number, Set<string>>();
+  for (const j of jobs) {
+    if (j.odometer === null) continue;
+    const set = days.get(j.odometer) ?? new Set<string>();
+    set.add(j.date.slice(0, 10));
+    days.set(j.odometer, set);
+  }
+  return [...days].filter(([, d]) => d.size > 1).map(([km]) => km).sort((a, b) => b - a);
 }
 
 /** A reading without the unit (the column says KM): RO `105.400`, EN `105,400`. */

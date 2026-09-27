@@ -614,6 +614,7 @@ export const en: Record<MessageKey, string> = {
   'rpcError.note_too_long': 'The note is too long.',
   'rpcError.odometer_invalid': 'The odometer reading must be between 100 and 2,000,000 km.',
   'rpcError.odometer_jump': "That's {diff} more than the last job. Confirm?",
+  'rpcError.odometer_same': "The reading is the same as on a job from another day ({previous}). It may be the old number: read the dashboard again. If it's right, confirm.",
   'rpcError.odometer_lower': 'The last recorded reading was {previous}. Check the number.',
   'rpcError.odometer_required': 'Enter the odometer reading.',
   'rpcError.past_slot': 'That time has passed. Pick another time.',

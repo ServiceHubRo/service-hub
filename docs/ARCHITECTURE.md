@@ -264,11 +264,12 @@ No-shows: `client_no_show_count(client_id, 90 days)`. At 3 or more, shops see a 
 2. `< 100` or `> 2 000 000` → `odometer_invalid`
 3. lower than the last known reading → `odometer_lower` (message names the previous value)
 4. more than 50 000 km above the last reading and `confirm_jump` is false → `odometer_jump` (UI asks "Sunt {n} km în plus față de ultima lucrare. Confirmi?" and resubmits with `confirm_jump = true`)
+4b. exactly the last reading, recorded by a `done` job on another day (Bucharest) and `confirm_jump` is false → `odometer_same` (`{"previous"}`; it may be the old number copied again, so the UI asks to read the dashboard again and resubmits with `confirm_jump = true`; two jobs on the same day may share a reading) (T20a, schema 35)
 5. first reading for the plate → any value in range
 
 Shops get the last reading through `last_odometer_for_booking(booking_id)`, which returns only the number, and only for a booking of their own shop.
 
-Shown on: completed booking cards (both sides), shop history (column + searchable), client vehicle history, the PDF report (own column + "Kilometraj la ultima lucrare"). If readings in a report are not increasing by date, the report carries the note "Citirile de kilometraj nu sunt în ordine crescătoare" — data is never re-sorted or corrected.
+Shown on: completed booking cards (both sides), shop history (column + searchable), client vehicle history, the PDF report (own column + "Kilometraj la ultima lucrare"). If readings in a report are not increasing by date, the report carries the note "Citirile de kilometraj nu sunt în ordine crescătoare" — data is never re-sorted or corrected. A reading repeated on different days adds the note "Lucrări din zile diferite au același kilometraj ({km})…" (`repeatedOdometers`).
 
 ---
 

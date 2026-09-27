@@ -9,6 +9,7 @@ import {
   reportKm,
   reportMoment,
   reportPeriod,
+  repeatedOdometers,
   reportText,
   REPORT_TEXT,
   verifyAddress,
@@ -137,6 +138,17 @@ describe('the PDF', () => {
     const doc = await PDFDocument.load(await renderReportPdf(lib, many));
     expect(doc.getPageCount()).toBeGreaterThan(1);
     expect(doc.getSubject()).toContain('Service history report');
+  });
+
+  it('flags a reading repeated on another day, not two jobs on the same day', async () => {
+    const job = (date: string, odometer: number | null) => ({ date, odometer });
+    expect(repeatedOdometers([job('2026-08-12', 105400), job('2025-09-21', 105400), job('2025-01-10', 81900)])).toEqual([105400]);
+    expect(repeatedOdometers([job('2026-08-12', 105400), job('2026-08-12', 105400)])).toEqual([]);
+    expect(repeatedOdometers([job('2026-08-12', null), job('2025-09-21', null)])).toEqual([]);
+    expect(reportText('en', 'kmRepeated', { km: '105,400 km' })).toContain('105,400 km');
+    const d = data();
+    d.jobs = [d.jobs[0]!, { ...d.jobs[1]!, odometer: 105400 }];
+    expect((await PDFDocument.load(await renderReportPdf(lib, d))).getPageCount()).toBe(1);
   });
 
   it('keeps Romanian letters and leaves out what the fonts cannot print', async () => {

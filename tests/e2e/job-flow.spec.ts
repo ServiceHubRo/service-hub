@@ -6,6 +6,7 @@ import {
   createUser,
   expectNoHorizontalScroll,
   rpcAs,
+  serviceRest,
   shot,
   signIn,
 } from './support';
@@ -254,6 +255,42 @@ test.describe('quote, work, completion, review', () => {
     await odometer.fill('160000');
     await expect(job.getByText('Sunt 54.600 km în plus față de ultima lucrare. Confirmi?')).toBeVisible();
     await expect(job.getByRole('button', { name: 'Confirmă finalizarea' })).toBeDisabled();
+    await job.getByText('Da, kilometrajul este corect').click();
+    await job.getByRole('button', { name: 'Confirmă finalizarea' }).click();
+    await expect(page.getByText(`Lucrarea ${second.ref} este finalizată.`, { exact: false })).toBeVisible();
+  });
+
+  test('odometer: the same reading as a job from another day needs a tick', async ({ page }) => {
+    const { email: shop, shopId } = await createBookableShop(`Atelier Km Egal ${Date.now()}`, ['frane']);
+    const client = await createUser('client');
+    const [a, b] = await freeSlots(client, shopId, 2);
+    const carPlate = plate();
+    const first = await book(client, shopId, a!, carPlate);
+    const second = await book(client, shopId, b!, carPlate);
+    for (const id of [first.id, second.id]) await toQuote(shop, id);
+    for (const id of [first.id, second.id]) {
+      const quote = await clientQuote(client, id);
+      await rpcAs(client, 'decide_quote', { p_booking_id: id, p_quote_id: quote.id, p_approved_item_ids: quote.items, p_request_id: rid() });
+      await rpcAs(shop, 'start_work', { p_booking_id: id, p_request_id: rid() });
+    }
+    await rpcAs(shop, 'complete_job', { p_booking_id: first.id, p_odometer: 105400, p_request_id: rid() });
+    // That job was finished two months ago.
+    await serviceRest(`bookings?id=eq.${first.id}`, 'PATCH', { done_at: new Date(Date.now() - 60 * 86_400_000).toISOString() });
+
+    await signIn(page, shop, PASSWORD);
+    await expect(page).toHaveURL(/\/s\/panou$/);
+    await page.goto('/s/programari?tab=programate&filtru=lucru');
+    const job = shopCard(page, second.ref);
+    await job.getByRole('button', { name: 'Finalizare' }).click();
+    await job.getByLabel('Kilometraj').fill('105400');
+    await job.getByRole('button', { name: 'Confirmă finalizarea' }).click();
+    await expect(job.getByText('Kilometrajul este același ca la o lucrare din altă zi (105.400 km).', { exact: false })).toBeVisible();
+    await expect(job.getByRole('button', { name: 'Confirmă finalizarea' })).toBeDisabled();
+    await shot(page, 't09-shop-odometer-same', name());
+    await page.getByRole('button', { name: 'English' }).filter({ visible: true }).first().click();
+    await expect(job.getByText('The reading is the same as on a job from another day (105,400 km).', { exact: false })).toBeVisible();
+    await shot(page, 't09-shop-odometer-same-en', name());
+    await page.getByRole('button', { name: 'Română' }).filter({ visible: true }).first().click();
     await job.getByText('Da, kilometrajul este corect').click();
     await job.getByRole('button', { name: 'Confirmă finalizarea' }).click();
     await expect(page.getByText(`Lucrarea ${second.ref} este finalizată.`, { exact: false })).toBeVisible();
