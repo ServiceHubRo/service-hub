@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { APP_LINK_ORIGIN, IS_NATIVE, emailLinkOrigin, parseAppLink, webOrigin } from '../../src/lib/native';
+import { APP_LINK_ORIGIN, IS_NATIVE, emailLinkOrigin, hasNavButtons, parseAppLink, webOrigin } from '../../src/lib/native';
 
 describe('the phone app (T20)', () => {
   it('on the web, links keep pointing at the page’s own address', () => {
@@ -25,5 +25,13 @@ describe('the phone app (T20)', () => {
   it('ignores links that are not the app’s own', () => {
     expect(parseAppLink('https://service-hub.ro/parola-noua#access_token=x')).toBeNull();
     expect(parseAppLink('ro.servicehub.app://other/parola-noua')).toBeNull();
+  });
+
+  it('puts a strip only behind Android’s three buttons, not behind a gesture bar or the iPhone’s', () => {
+    expect(hasNavButtons(48)).toBe(true);
+    expect(hasNavButtons(0)).toBe(false);
+    expect(hasNavButtons(16)).toBe(false);
+    expect(hasNavButtons(24)).toBe(false);
+    expect(hasNavButtons(34)).toBe(false);
   });
 });

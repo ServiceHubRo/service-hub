@@ -4,13 +4,14 @@ import { StatusBar, Style } from '@capacitor/status-bar';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { setAuthLinkError, supabase } from '../data/supabase';
-import { IS_NATIVE, parseAppLink } from '../lib/native';
+import { IS_NATIVE, hasNavButtons, parseAppLink } from '../lib/native';
 
 /**
  * What only the phone app needs (T20), nothing on the web: the dark status bar, the launch screen
  * hidden once the app is drawn, Android's Back button walking back through the screens (and
  * leaving the app from the first one), and the links from emails opening the right screen
- * signed in (ro.servicehub.app://app/…#access_token=…).
+ * signed in (ro.servicehub.app://app/…#access_token=…). It also marks `<html data-nav-buttons>`
+ * when Android shows its three navigation buttons, so the public pages put a strip behind them.
  */
 export function NativeBridge() {
   const navigate = useNavigate();
@@ -20,6 +21,23 @@ export function NativeBridge() {
     void StatusBar.setStyle({ style: Style.Dark }).catch(() => undefined);
     void StatusBar.setBackgroundColor({ color: '#14161A' }).catch(() => undefined);
     void SplashScreen.hide().catch(() => undefined);
+  }, []);
+
+  useEffect(() => {
+    if (!IS_NATIVE) return;
+    const probe = document.createElement('div');
+    probe.style.cssText = 'position:fixed;left:0;bottom:0;width:0;height:env(safe-area-inset-bottom);visibility:hidden;pointer-events:none';
+    document.body.appendChild(probe);
+    // Measured again when the phone turns or the navigation mode changes in the settings.
+    const measure = () => {
+      document.documentElement.toggleAttribute('data-nav-buttons', hasNavButtons(probe.getBoundingClientRect().height));
+    };
+    measure();
+    window.addEventListener('resize', measure);
+    return () => {
+      window.removeEventListener('resize', measure);
+      probe.remove();
+    };
   }, []);
 
   useEffect(() => {

@@ -14,6 +14,7 @@ export function AuthLayout({ title, children }: { title: string; children: React
   return (
     <div className={styles.page}>
       <div className="status-backdrop" aria-hidden="true" />
+      <div className="nav-backdrop" aria-hidden="true" />
       <div className={styles.top}>
         <LangSwitch />
       </div>

@@ -37,3 +37,14 @@ export function parseAppLink(url: string): { path: string; params: URLSearchPara
   const path = pathAndQuery.split('?')[0] || '/';
   return { path: path.startsWith('/') ? path : `/${path}`, params: new URLSearchParams(hash) };
 }
+
+/**
+ * Android's three navigation buttons take about 48 px at the bottom of the screen, its gesture
+ * bar about 16–24 px and the iPhone's home bar 34 px. Only the buttons get an opaque strip behind
+ * them (`.nav-backdrop`); a gesture bar lets the page run to the bottom edge.
+ */
+export const NAV_BUTTONS_MIN_INSET = 40;
+
+export function hasNavButtons(bottomInsetPx: number): boolean {
+  return bottomInsetPx >= NAV_BUTTONS_MIN_INSET;
+}

@@ -36,6 +36,7 @@ export function PublicLegal() {
   return (
     <div className={styles.page}>
       <div className="status-backdrop" aria-hidden="true" />
+      <div className="nav-backdrop" aria-hidden="true" />
       <header className={styles.header}>
         <Link to="/" className={styles.brand} aria-label={t('app.title')}>
           <LogoTile size={28} />
