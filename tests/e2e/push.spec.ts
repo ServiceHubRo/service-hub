@@ -243,7 +243,12 @@ test.describe('push notifications', () => {
     );
     await expectNoHorizontalScroll(page);
     await shot(page, 't12-banner-shop-en', name());
+    // The language is saved on the profile; the reload below must wait for it, or it opens in English.
+    const langSaved = page.waitForResponse(
+      (r) => r.url().includes('/rest/v1/profiles') && r.request().method() === 'PATCH',
+    );
     await page.getByRole('button', { name: 'Română' }).filter({ visible: true }).first().click();
+    await langSaved;
     await page.goto('/s/cont/setari/notificari');
     await expect(page.getByRole('heading', { level: 1, name: 'Notificări' })).toBeVisible();
     await expect(pushRow(page)).toContainText('Dezactivate');
