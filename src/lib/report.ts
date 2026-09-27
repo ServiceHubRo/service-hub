@@ -64,18 +64,8 @@ export function normalizeReportCode(input: string): string | null {
   return m ? `SH-${m[1]}-${m[2]}` : null;
 }
 
-/** Saves a downloaded file under its name (the browser's download, or the PDF viewer on iOS). */
-export function saveFile(blob: Blob, name: string): void {
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = name;
-  a.rel = 'noopener';
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  setTimeout(() => URL.revokeObjectURL(url), 60_000);
-}
+/** Saves a downloaded file under its name (the browser's download, the share sheet in the app). */
+export { saveFile } from './saveFile';
 
 /** `raport-SH-2026-000147.pdf` / `report-SH-2026-000147.pdf` (same as the server's name). */
 export function reportFileName(lang: Lang, code: string): string {

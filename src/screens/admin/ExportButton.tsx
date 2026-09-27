@@ -33,7 +33,7 @@ export function ExportButton<R>({
         const rows = (await fetchExport(kind, filters)) as R[];
         const table = exportTable(kind, narrow ? narrow(rows) : rows, t, lang);
         const blob = new Blob([toCsv(table, csvFormat(lang).separator)], { type: 'text/csv;charset=utf-8' });
-        saveFile(blob, exportFileName(kind, t, ymdInBucharest(new Date())));
+        await saveFile(blob, exportFileName(kind, t, ymdInBucharest(new Date())));
       }}
       errorMessage={(e) => rpcErrorMessage(lang, e)}
       canRetry={canRetryRpc}

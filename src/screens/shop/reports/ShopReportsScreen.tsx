@@ -46,6 +46,7 @@ import {
   type ReportPeriod,
 } from '../../../lib/shopReports';
 import { useLoad } from '../../../lib/useLoad';
+import { saveFile } from '../../../lib/saveFile';
 import { useNow } from '../../../lib/useNow';
 import { MonthlyChart, Meter, ServiceBars } from './Charts';
 import { ACCOUNT_PATH } from '../paths';
@@ -286,7 +287,7 @@ function Reports({ data }: { data: ReportData }) {
       </Section>
 
       <div>
-        <Button variant="ghost" className={styles.download} onClick={() => downloadCsv(data.jobs, range, period, lang, t, today)}>
+        <Button variant="ghost" className={styles.download} onClick={() => void downloadCsv(data.jobs, range, period, lang, t, today)}>
           <Download size={18} aria-hidden="true" />
           {t('rep.download')}
         </Button>
@@ -370,12 +371,5 @@ function downloadCsv(jobs: readonly ReportJob[], range: DayRange, period: Report
     csvAmount(j.cost, decimal),
   ]);
   const blob = new Blob([toCsv([header, ...rows], separator)], { type: 'text/csv;charset=utf-8' });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = `${t('rep.csv.file')}-${t(`rep.period.${period}`).toLowerCase().replace(/\s+/g, '-')}-${today}.csv`;
-  document.body.appendChild(link);
-  link.click();
-  link.remove();
-  window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+  return saveFile(blob, `${t('rep.csv.file')}-${t(`rep.period.${period}`).toLowerCase().replace(/\s+/g, '-')}-${today}.csv`);
 }

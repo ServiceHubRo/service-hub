@@ -29,6 +29,7 @@ import {
 } from '../../../lib/history';
 import { useLoad } from '../../../lib/useLoad';
 import { useNow } from '../../../lib/useNow';
+import { saveFile } from '../../../lib/saveFile';
 import { formatPhone, normalizePhone } from '../../../lib/validators';
 import { HistoryQuote } from '../../history/HistoryQuote';
 import { MessageLink } from '../../messages/MessageLink';
@@ -200,7 +201,7 @@ export function ShopHistoryScreen() {
             {shown.length > 0 && (
               <div className={styles.tools}>
                 {isOwner && (
-                  <Button variant="ghost" className={styles.tool} onClick={() => downloadCsv(shown, lang, t, today)}>
+                  <Button variant="ghost" className={styles.tool} onClick={() => void downloadCsv(shown, lang, t, today)}>
                     <Download size={18} aria-hidden="true" />
                     {t('hist.download')}
                   </Button>
@@ -398,12 +399,5 @@ function downloadCsv(items: readonly ShopHistoryItem[], lang: Lang, t: I18nValue
     csvAmount(b.cost, decimal),
   ]);
   const blob = new Blob([toCsv([header, ...rows], separator)], { type: 'text/csv;charset=utf-8' });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = `${t('hist.csv.file')}-${today}.csv`;
-  document.body.appendChild(link);
-  link.click();
-  link.remove();
-  window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+  return saveFile(blob, `${t('hist.csv.file')}-${today}.csv`);
 }
