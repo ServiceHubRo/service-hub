@@ -213,7 +213,7 @@ describe('push texts', () => {
     expect(Object.keys(TEMPLATES.en).sort()).toEqual(Object.keys(TEMPLATES.ro).sort());
   });
 
-  it('a notice push is in the recipient language and opens the screen where notices show', () => {
+  it('a notice push is in the recipient language and opens the notice in Mesaje', () => {
     const e = {
       event: 'broadcast',
       role: 'client',
@@ -221,11 +221,8 @@ describe('push texts', () => {
       booking_id: null,
       params: { notice_id: 'n1', title_ro: 'Program', body_ro: 'Închis', title_en: 'Hours', body_en: 'Closed' },
     };
-    expect(renderNotification(e)).toMatchObject({ title: 'Hours', body: 'Closed', url: '/c/cauta', tag: 'notice-n1' });
-    expect(renderNotification({ ...e, role: 'shop', lang: 'ro' })).toMatchObject({ title: 'Program', url: '/s/panou' });
-    // A notice shown only in Cont opens Cont.
-    expect(renderNotification({ ...e, params: { ...e.params, placement: 'account' } })).toMatchObject({ url: '/c/cont' });
-    expect(renderNotification({ ...e, role: 'shop', params: { ...e.params, placement: 'account' } })).toMatchObject({ url: '/s/cont' });
+    expect(renderNotification(e)).toMatchObject({ title: 'Hours', body: 'Closed', url: '/c/mesaje?anunt=n1', tag: 'notice-n1' });
+    expect(renderNotification({ ...e, role: 'shop', lang: 'ro' })).toMatchObject({ title: 'Program', url: '/s/mesaje?anunt=n1' });
     // English missing: the Romanian text.
     expect(renderNotification({ ...e, params: { notice_id: 'n1', title_ro: 'Program', body_ro: 'Închis' } })).toMatchObject({
       title: 'Program',

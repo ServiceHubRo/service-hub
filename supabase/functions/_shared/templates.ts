@@ -645,14 +645,13 @@ const firstUpper = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 const clip = (s: string, n: number) => (s.length > n ? `${s.slice(0, n - 1)}…` : s);
 
 /** The screen where notices show (T16b): Caută for clients, Panou for shops. */
-export const NOTICE_PATHS: Record<Side, string> = { client: '/c/cauta', shop: '/s/panou' };
-/** A notice shown only in Cont (placement `account`) opens Cont. */
-export const NOTICE_ACCOUNT_PATHS: Record<Side, string> = { client: '/c/cont', shop: '/s/cont' };
+/** Notices live at the top of Mesaje (T20a); a push opens the notice there. */
+export const NOTICE_PATHS: Record<Side, string> = { client: '/c/mesaje', shop: '/s/mesaje' };
 
 /**
  * A notice from the Service-Hub team (T16b): the admin wrote its title and text in both
  * languages; the recipient gets their own (the Romanian one when the English is missing). A tap
- * opens the screen where the notice shows.
+ * opens the notice in Mesaje.
  */
 function renderBroadcast(e: NotificationEvent, side: Side, lang: Lang): Rendered | null {
   const p = e.params ?? {};
@@ -663,7 +662,7 @@ function renderBroadcast(e: NotificationEvent, side: Side, lang: Lang): Rendered
     key: 'broadcast',
     title: clip(title || BRAND, 80),
     body: clip(body.replace(/\s+/g, ' ').trim(), 240),
-    url: (p.placement === 'account' ? NOTICE_ACCOUNT_PATHS : NOTICE_PATHS)[side],
+    url: `${NOTICE_PATHS[side]}?anunt=${encodeURIComponent(str(p.notice_id))}`,
     tag: `notice-${str(p.notice_id)}`,
   };
 }

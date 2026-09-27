@@ -618,7 +618,6 @@ export type Database = {
           created_at: string
           created_by: string | null
           id: string
-          placement: string
           push_recipients: number
           recipients: number
           send_push: boolean
@@ -633,7 +632,6 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           id?: string
-          placement?: string
           push_recipients?: number
           recipients?: number
           send_push?: boolean
@@ -648,7 +646,6 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           id?: string
-          placement?: string
           push_recipients?: number
           recipients?: number
           send_push?: boolean
@@ -2051,7 +2048,6 @@ export type Database = {
           p_body_en: string
           p_body_ro: string
           p_city: string
-          p_placement?: string
           p_push: boolean
           p_request_id: string
           p_title_en: string

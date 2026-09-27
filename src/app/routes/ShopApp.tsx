@@ -1,6 +1,7 @@
 import { Route, Routes } from 'react-router-dom';
 import { MessagesScreen } from '../../screens/messages/MessagesScreen';
 import { ThreadsProvider } from '../../screens/messages/ThreadsProvider';
+import { NoticesProvider } from '../../screens/notices/NoticesProvider';
 import { ShopBookingsProvider } from '../../screens/shop/bookings/ShopBookingsProvider';
 import { ShopBookingsScreen } from '../../screens/shop/bookings/ShopBookingsScreen';
 import { Dashboard } from '../../screens/shop/dashboard/Dashboard';
@@ -35,7 +36,9 @@ export default function ShopApp() {
           <ShopRoleProvider>
             <ShopBookingsProvider>
               <ThreadsProvider side="shop">
-                <AppShell role="shop" />
+                <NoticesProvider>
+                  <AppShell role="shop" />
+                </NoticesProvider>
               </ThreadsProvider>
             </ShopBookingsProvider>
           </ShopRoleProvider>

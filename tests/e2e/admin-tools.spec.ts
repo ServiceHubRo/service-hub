@@ -92,7 +92,8 @@ test.describe('admin tools', () => {
     await signInAdmin(page);
     await openTool(page, 'Anunțuri');
     await page.getByRole('button', { name: 'Toți clienții' }).click();
-    await page.getByLabel('Oraș (opțional)').fill(city);
+    // The city is picked from the cities that have shops.
+    await page.getByRole('group', { name: 'Oraș' }).getByRole('button', { name: city }).click();
     const title = `Program de sărbători ${tag()}`;
     // Nothing written yet: the preview asks for the text first.
     await page.getByRole('button', { name: 'Previzualizează' }).click();
@@ -100,7 +101,7 @@ test.describe('admin tools', () => {
     await page.getByLabel('Titlu în română').fill(title);
     await page.getByLabel('Text în română').fill('Pe 1 decembrie service-urile sunt închise.');
     await page.getByRole('button', { name: 'Previzualizează' }).click();
-    await expect(page.getByText(`Clienții din ${city}: 1 persoană · Pe toate ecranele principale`)).toBeVisible();
+    await expect(page.getByText(`Clienții din ${city}: 1 persoană`)).toBeVisible();
     // Both languages, the English falling back to the Romanian text.
     await expect(page.getByRole('region', { name: 'Anunț Service-Hub' })).toHaveCount(2);
     await expectNoHorizontalScroll(page);
@@ -110,45 +111,43 @@ test.describe('admin tools', () => {
     await expect(page.getByText(title).first()).toBeVisible();
     await expect(page.getByText(`Clienții din ${city}`).first()).toBeVisible();
 
-    // The client who booked there sees it on Caută, marks it read, and it stays gone.
+    // The client who booked there finds it in Mesaje (T20a), counted on the tab, new until opened.
     const clientPage = await (await browser.newContext()).newPage();
     await clientPage.addInitScript(() => localStorage.setItem('sh_lang', 'ro'));
     await signIn(clientPage, client, PASSWORD);
-    const notice = clientPage.getByRole('region', { name: 'Anunț Service-Hub' }).filter({ hasText: title });
-    await expect(notice).toBeVisible();
-    await shot(clientPage, 't16b-notice-client', name());
-    // On every main screen until read (T20a), not only on Caută.
-    await clientPage.getByRole('link', { name: /^Programări/ }).filter({ visible: true }).first().click();
-    await expect(clientPage.getByRole('heading', { level: 1, name: 'Programări' })).toBeVisible();
-    await expect(notice).toBeVisible();
-    await clientPage.goto('/c/cont');
-    await expect(notice).toBeVisible();
-    await shot(clientPage, 't20a-notice-account', name());
-    // One meant only for Cont shows there and nowhere else.
-    const accountTitle = `Doar în Cont ${tag()}`;
-    await serviceRest('notices', 'POST', {
-      audience: 'clients', city, title_ro: accountTitle, body_ro: 'Text.', title_en: accountTitle, body_en: 'Text.', placement: 'account',
-    });
-    const accountNotice = clientPage.getByRole('region', { name: 'Anunț Service-Hub' }).filter({ hasText: accountTitle });
-    await expect(accountNotice).toBeVisible();
-    await clientPage.goto('/c/cauta');
     await expect(clientPage.getByRole('heading', { level: 1, name: 'Caută' })).toBeVisible();
-    await expect(notice).toBeVisible();
-    await expect(accountNotice).toHaveCount(0);
-    await notice.getByRole('button', { name: 'Am citit' }).click();
+    const notice = clientPage.getByRole('region', { name: 'Anunț Service-Hub' }).filter({ hasText: title });
     await expect(notice).toHaveCount(0);
+    const messagesTab = clientPage.getByRole('link', { name: /^Mesaje/ }).filter({ visible: true }).first();
+    await expect(messagesTab).toHaveAccessibleName(/(noutate|noutăți) necitit/);
+    await messagesTab.click();
+    await expect(clientPage.getByRole('heading', { level: 1, name: 'Mesaje' })).toBeVisible();
+    await expect(notice).toBeVisible();
+    await expect(notice.getByText('Nou', { exact: true })).toBeVisible();
+    await expectNoHorizontalScroll(clientPage);
+    await shot(clientPage, 't20a-notice-messages', name());
+    const head = notice.getByRole('button');
+    await expect(head).toHaveAttribute('aria-expanded', 'false');
+    await head.click();
+    await expect(head).toHaveAttribute('aria-expanded', 'true');
+    await expect(notice.getByText('Pe 1 decembrie service-urile sunt închise.')).toBeVisible();
+    await expect(notice.getByText('Nou', { exact: true })).toHaveCount(0);
+    await shot(clientPage, 't20a-notice-open', name());
     await expect
       .poll(async () => (await serviceRest<unknown[]>(`notice_reads?user_id=eq.${await userIdOf(client)}`, 'GET')).length)
       .toBeGreaterThan(0);
+    // Read stays read, and the notice stays in Mesaje for its 30 days.
     await clientPage.reload();
-    await expect(clientPage.getByRole('heading', { level: 1, name: 'Caută' })).toBeVisible();
-    await expect(clientPage.getByRole('region', { name: 'Anunț Service-Hub' }).filter({ hasText: title })).toHaveCount(0);
+    await expect(notice).toBeVisible();
+    await expect(notice.getByText('Nou', { exact: true })).toHaveCount(0);
 
     // A client who never booked in that city never sees it.
     const otherPage = await (await browser.newContext()).newPage();
     await otherPage.addInitScript(() => localStorage.setItem('sh_lang', 'ro'));
     await signIn(otherPage, other, PASSWORD);
     await expect(otherPage.getByRole('heading', { level: 1, name: 'Caută' })).toBeVisible();
+    await otherPage.goto('/c/mesaje');
+    await expect(otherPage.getByRole('heading', { level: 1, name: 'Mesaje' })).toBeVisible();
     await expect(otherPage.getByRole('region', { name: 'Anunț Service-Hub' }).filter({ hasText: title })).toHaveCount(0);
 
     // Withdrawn by the admin: gone, and in the audit log.

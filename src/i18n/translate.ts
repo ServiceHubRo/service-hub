@@ -38,6 +38,7 @@ export type PluralUnit =
   | 'unit.newRequests'
   | 'unit.quotesToDecide'
   | 'unit.unreadConversations'
+  | 'unit.unreadItems'
   | 'unit.repairs'
   | 'unit.jobs'
   | 'unit.trialLeft'

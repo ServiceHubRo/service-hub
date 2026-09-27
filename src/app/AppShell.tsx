@@ -14,13 +14,13 @@ import { useOptionalShopBookings } from '../screens/shop/bookings/shopBookingsCo
 import { SHOP_BOOKINGS_PATH } from '../screens/shop/paths';
 import { messagesPath } from '../screens/messages/paths';
 import { unreadThreads, useOptionalThreads } from '../screens/messages/threadsContext';
+import { useOptionalNotices } from '../screens/notices/noticesContext';
 import { EmailVerifyBanner } from './EmailVerifyBanner';
 import { LangSwitch } from './LangSwitch';
 import { LogoutConfirm } from './LogoutConfirm';
 import { PushBridge } from './PushBridge';
 import { ScreenErrorBoundary } from './ScreenErrorBoundary';
 import { NAV, type NavItem, type Role } from './roles';
-import { NoticeBanner, type NoticeScreen } from '../screens/notices/NoticeBanner';
 import { useSession } from './sessionContext';
 import { useDocumentTitle } from './useDocumentTitle';
 import styles from './AppShell.module.css';
@@ -64,13 +64,15 @@ interface Badge {
 
 /**
  * Counts shown on navigation items: new booking requests on the shop's Programări, quotes waiting
- * for a decision on the client's, conversations with unread messages on Mesaje (both), reported
+ * for a decision on the client's, conversations with unread messages and new team notices on Mesaje
+ * (both), reported
  * reviews waiting on the admin's Moderare.
  */
 function useNavBadges(): Record<string, Badge> {
   const shopBookings = useOptionalShopBookings();
   const clientBookings = useOptionalClientBookings();
   const threads = useOptionalThreads();
+  const notices = useOptionalNotices();
   const admin = useOptionalAdminCounts();
   const badges: Record<string, Badge> = {};
   if (admin?.pendingReports != null) {
@@ -84,7 +86,12 @@ function useNavBadges(): Record<string, Badge> {
     badges[BOOKINGS_PATH] = { count: quotesWaiting(clientBookings.state.data.bookings), unit: 'unit.quotesToDecide' };
   }
   if (threads?.state.status === 'ready') {
-    badges[messagesPath(threads.side)] = { count: unreadThreads(threads.state.data.threads), unit: 'unit.unreadConversations' };
+    // New notices from the team count too (they are at the top of Mesaje, T20a).
+    const newNotices = notices?.unread ?? 0;
+    badges[messagesPath(threads.side)] = {
+      count: unreadThreads(threads.state.data.threads) + newNotices,
+      unit: newNotices > 0 ? 'unit.unreadItems' : 'unit.unreadConversations',
+    };
   }
   return badges;
 }
@@ -104,15 +111,6 @@ export function AppShell({ role }: { role: Role }) {
   // The tab title follows the navigation item the screen belongs to (Cont for its tiles).
   const current = [...nav.main, nav.account].find((item) => pathname === item.path || pathname.startsWith(`${item.path}/`));
   useDocumentTitle(current ? t(current.labelKey) : null);
-  // Notices from the team show at the top of the five main screens (not on the screens inside them).
-  const noticeScreen: NoticeScreen | null =
-    role === 'admin' || !nav.bottomBar.some((item) => item.path === pathname)
-      ? null
-      : pathname === nav.main[0]!.path
-        ? 'home'
-        : pathname === nav.account.path
-          ? 'account'
-          : 'other';
 
   // A new screen starts at the top; only the content area scrolls.
   useEffect(() => {
@@ -199,7 +197,6 @@ export function AppShell({ role }: { role: Role }) {
           <div className={styles.content}>
             <EmailVerifyBanner role={role} />
             {role !== 'admin' && <PushBridge />}
-            {noticeScreen && <NoticeBanner screen={noticeScreen} className={`${styles.notices} no-print`} />}
             <ScreenErrorBoundary resetKey={pathname}>
               <Outlet context={{ logOut } satisfies ShellOutletContext} />
             </ScreenErrorBoundary>

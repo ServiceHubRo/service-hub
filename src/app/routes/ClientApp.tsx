@@ -14,6 +14,7 @@ import { SearchScreen } from '../../screens/client/search/SearchScreen';
 import { ShopPage } from '../../screens/client/shop/ShopPage';
 import { MessagesScreen } from '../../screens/messages/MessagesScreen';
 import { ThreadsProvider } from '../../screens/messages/ThreadsProvider';
+import { NoticesProvider } from '../../screens/notices/NoticesProvider';
 import { AppShell } from '../AppShell';
 import { commonRoutes, messageRoutes } from './shared';
 
@@ -26,7 +27,9 @@ export default function ClientApp() {
           // The client's bookings, live, for Programări and the badge on its tab.
           <ClientBookingsProvider>
             <ThreadsProvider side="client">
-              <AppShell role="client" />
+              <NoticesProvider>
+                <AppShell role="client" />
+              </NoticesProvider>
             </ThreadsProvider>
           </ClientBookingsProvider>
         }

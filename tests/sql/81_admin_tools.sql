@@ -246,15 +246,6 @@ where event = 'broadcast' and user_id = test.id('client_b') and params->>'notice
   and channels = array['push'] and params->>'title_en' = 'Program de sărbători';
 select test.eq(count(*), 1::bigint, 'the notice is logged with its audience')
 from public.admin_audit_log where action = 'send_notice' and after->>'audience' = 'clients' and after->>'city' = 'Codlea';
-select test.eq(placement, 'everywhere', 'shown on every main screen unless the admin chooses')
-from public.notices where id = current_setting('test.notice')::uuid;
-select test.eq(test.error_params($$select public.admin_send_notice('all', null, 'X', 'Y', null, null, false, test.rid(), 'banner')$$)->>'field',
-               'notice_placement', 'an unknown placement is refused');
-select set_config('test.notice_acc', (public.admin_send_notice('clients', 'Codlea', 'Factura', 'Vezi factura în Cont.',
-  null, null, true, test.rid(), p_placement => 'account'))->>'id', true);
-select test.eq(placement, 'account', 'only in Cont') from public.notices where id = current_setting('test.notice_acc')::uuid;
-select test.eq(params->>'placement', 'account', 'the push knows where it shows (a tap opens Cont)')
-from public.notification_events where event = 'broadcast' and params->>'notice_id' = current_setting('test.notice_acc');
 
 select test.login(test.id('client_b'));
 select test.eq(test.count(format($$select 1 from public.notices where id = '%s'$$, current_setting('test.notice'))), 1::bigint,
