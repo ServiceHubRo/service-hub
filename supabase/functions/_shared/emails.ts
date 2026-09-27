@@ -246,7 +246,7 @@ function when(lang: Lang, iso: string): string {
 }
 
 /** Events sent by email only (no push text). */
-export const EMAIL_EVENTS: readonly string[] = ['account_suspended', 'review_reported', 'invoice_paid'];
+export const EMAIL_EVENTS: readonly string[] = ['account_suspended', 'account_reactivated', 'review_reported', 'invoice_paid'];
 
 const num = (v: unknown): number | null => {
   const n = typeof v === 'number' ? v : typeof v === 'string' && v.trim() !== '' ? Number(v) : NaN;
@@ -453,6 +453,40 @@ export function emailForEvent(e: EmailEvent, app: string): EmailContent | null {
           },
           { p: 'Răspunde la acest email dacă vrei să afli de ce sau crezi că este o greșeală.' },
         ],
+        footer: 'Primești acest email pentru că ai un cont Service-Hub.',
+      });
+    }
+    case 'account_reactivated': {
+      const shop = str(p.shop_name);
+      const isShop = str(p.kind) === 'shop';
+      if (lang === 'en') {
+        return email(isShop ? `Your shop ${shop} is active again` : 'Your Service-Hub account is active again', {
+          lang,
+          preheader: isShop ? 'It appears in search and can take bookings.' : 'You can use Service-Hub as before.',
+          title: isShop ? 'Shop reactivated' : 'Account reactivated',
+          blocks: [
+            {
+              p: isShop
+                ? `The Service-Hub team reactivated ${shop}. It appears in search again and can take bookings.`
+                : 'The Service-Hub team reactivated your account. You can book, send messages and write reviews as before.',
+            },
+          ],
+          button: { label: 'Open Service-Hub', url: `${app}/intra` },
+          footer: 'You are receiving this email because you have a Service-Hub account.',
+        });
+      }
+      return email(isShop ? `Service-ul ${shop} este din nou activ` : 'Contul tău Service-Hub este din nou activ', {
+        lang,
+        preheader: isShop ? 'Apare în căutări și poate primi programări.' : 'Poți folosi Service-Hub ca înainte.',
+        title: isShop ? 'Service reactivat' : 'Cont reactivat',
+        blocks: [
+          {
+            p: isShop
+              ? `Echipa Service-Hub a reactivat ${shop}. Apare din nou în căutări și poate primi programări.`
+              : 'Echipa Service-Hub ți-a reactivat contul. Poți face programări, trimite mesaje și lăsa recenzii ca înainte.',
+          },
+        ],
+        button: { label: 'Deschide Service-Hub', url: `${app}/intra` },
         footer: 'Primești acest email pentru că ai un cont Service-Hub.',
       });
     }

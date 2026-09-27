@@ -85,6 +85,11 @@ export const EMAIL_BUTTON_SIZES: Record<string, { slug: string; width: number; h
     "width": 208,
     "height": 44
   },
+  "Open Service-Hub": {
+    "slug": "open-service-hub",
+    "width": 179,
+    "height": 44
+  },
   "Deschide Rapoartele mele": {
     "slug": "deschide-rapoartele-mele",
     "width": 236,
