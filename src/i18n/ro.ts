@@ -35,8 +35,6 @@ export const ro = {
   'landing.heroHighlight': '2 minute.',
   'landing.heroText':
     'Fără cinci telefoane date în pauza de prânz, doar ca să afli că nu mai este loc săptămâna aceasta. Cauți un service, te programezi din telefon și primești devizul înainte să înceapă lucrarea.',
-  'landing.imClient': 'Sunt client',
-  'landing.imShop': 'Sunt service',
   'landing.drivers': 'Pentru șoferi, gratuit. Plătești doar reparația, direct la service.',
   'landing.mock.search': 'Frâne, Brașov',
   'landing.mock.shop1': 'Atelier Demo',

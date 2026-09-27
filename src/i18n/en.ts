@@ -37,8 +37,6 @@ export const en: Record<MessageKey, string> = {
   'landing.heroHighlight': '2 minutes.',
   'landing.heroText':
     "Not five calls on your lunch break, only to be told there's nothing open until next week. Find a shop, book from your phone, and get the quote before any work starts.",
-  'landing.imClient': "I'm a driver",
-  'landing.imShop': 'I run a shop',
   'landing.drivers': 'Free for drivers. You only pay for the repair, directly to the shop.',
   'landing.mock.search': 'Brakes, Brașov',
   'landing.mock.shop1': 'Demo Auto Shop',
