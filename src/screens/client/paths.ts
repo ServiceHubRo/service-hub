@@ -13,6 +13,13 @@ export function shopPath(shopId: string): string {
   return `/c/service/${shopId}`;
 }
 
+/** The reviews section of the shop page (the stars on a search card open it). */
+export const REVIEWS_HASH = 'recenzii';
+
+export function shopReviewsPath(shopId: string): string {
+  return `${shopPath(shopId)}#${REVIEWS_HASH}`;
+}
+
 export function bookingPath(shopId: string): string {
   return `/c/service/${shopId}/programare`;
 }

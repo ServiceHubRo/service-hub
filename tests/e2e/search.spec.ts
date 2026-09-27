@@ -146,7 +146,27 @@ test.describe('client search', () => {
     await expectNoHorizontalScroll(page);
     await shot(page, 't06-shop-page', name());
 
+    // The rating in the header goes straight to the reviews (no scrolling down past the services).
+    // Back at the top of the page (the app scrolls inside <main>), the reviews are out of sight.
+    await page.evaluate(() => {
+      window.scrollTo(0, 0);
+      document.querySelectorAll('main').forEach((m) => m.scrollTo(0, 0));
+    });
+    await expect(page.getByRole('heading', { name: 'Recenzii' })).not.toBeInViewport();
+    await shot(page, 't20a-shop-header', name());
+    await page.getByRole('button', { name: /recenzi/ }).click();
+    await expect(page.getByRole('heading', { name: 'Recenzii' })).toBeFocused();
+    await expect(page.getByRole('heading', { name: 'Recenzii' })).toBeInViewport();
+    await shot(page, 't20a-shop-reviews', name());
+
     // Back keeps the search.
+    await page.getByRole('link', { name: 'Toate service-urile' }).click();
+    await expect(search(page)).toHaveValue('frane');
+
+    // The stars on a search card open the shop page at its reviews.
+    await result(page, 'Atelier Demo').locator('[data-reviews]').click();
+    await expect(page).toHaveURL(/#recenzii$/);
+    await expect(page.getByRole('heading', { name: 'Recenzii' })).toBeInViewport();
     await page.getByRole('link', { name: 'Toate service-urile' }).click();
     await expect(search(page)).toHaveValue('frane');
 

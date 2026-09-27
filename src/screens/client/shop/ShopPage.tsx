@@ -1,5 +1,5 @@
 import { CalendarPlus, Globe, MapPin, Phone, Store } from 'lucide-react';
-import { useCallback, useEffect, type ReactNode } from 'react';
+import { useCallback, useEffect, useRef, type ReactNode } from 'react';
 import { Link, useLocation as useRouterLocation, useParams } from 'react-router-dom';
 import { BackLink } from '../../../components/BackLink';
 import { Banner } from '../../../components/Banner';
@@ -23,7 +23,7 @@ import { distanceTo } from '../../../lib/geo';
 import { groupHours, type HoursRow } from '../../../lib/hours';
 import { useLocation } from '../../../lib/location';
 import { useLoad } from '../../../lib/useLoad';
-import { bookingPath, SEARCH_PATH, type ShopLinkState } from '../paths';
+import { bookingPath, REVIEWS_HASH, SEARCH_PATH, type ShopLinkState } from '../paths';
 import { groupServices, serviceName } from './serviceGroups';
 import styles from './ShopPage.module.css';
 
@@ -101,6 +101,23 @@ function ShopDetails({ page, onFavorite }: { page: ShopPageData; onFavorite: (on
   const { coords } = useLocation();
   const { shop, rating } = page;
   const distance = distanceTo(coords, shop);
+  const reviewsRef = useRef<HTMLHeadingElement>(null);
+  const hasReviews = page.reviews.length > 0;
+  const routerHash = useRouterLocation().hash;
+
+  /** Straight to the reviews: the heading takes the focus, so a screen reader starts there too. */
+  const showReviews = useCallback((smooth: boolean) => {
+    const heading = reviewsRef.current;
+    if (!heading) return;
+    const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    heading.scrollIntoView?.({ block: 'start', behavior: smooth && !reduce ? 'smooth' : 'auto' });
+    heading.focus({ preventScroll: true });
+  }, []);
+
+  // Opened from the stars on a search card (…#recenzii).
+  useEffect(() => {
+    if (routerHash === `#${REVIEWS_HASH}` && hasReviews) showReviews(false);
+  }, [routerHash, hasReviews, showReviews]);
   const address = [shop.street, shop.city].filter(Boolean).join(', ');
 
   return (
@@ -109,17 +126,25 @@ function ShopDetails({ page, onFavorite }: { page: ShopPageData; onFavorite: (on
         <ShopAvatar name={shop.name} logoUrl={shop.logo_url} size={56} />
         <div className={styles.headText}>
           <h1 className={styles.name}>{shop.name}</h1>
-          <p className={styles.rating}>
-            {rating.review_count > 0 && rating.average !== null ? (
-              <>
-                <Stars value={rating.average} />
-                <span className={styles.ratingValue}>{formatRating(lang, rating.average)}</span>
-                <span>· {plural(lang, 'unit.reviews', rating.review_count)}</span>
-              </>
-            ) : (
-              <span>{t('rating.none')}</span>
-            )}
-          </p>
+          {hasReviews && rating.review_count > 0 && rating.average !== null ? (
+            <button type="button" className={`${styles.rating} ${styles.ratingButton}`} onClick={() => showReviews(true)}>
+              <Stars value={rating.average} />
+              <span className={styles.ratingValue}>{formatRating(lang, rating.average)}</span>
+              <span className={styles.ratingLink}>· {plural(lang, 'unit.reviews', rating.review_count)}</span>
+            </button>
+          ) : (
+            <p className={styles.rating}>
+              {rating.review_count > 0 && rating.average !== null ? (
+                <>
+                  <Stars value={rating.average} />
+                  <span className={styles.ratingValue}>{formatRating(lang, rating.average)}</span>
+                  <span>· {plural(lang, 'unit.reviews', rating.review_count)}</span>
+                </>
+              ) : (
+                <span>{t('rating.none')}</span>
+              )}
+            </p>
+          )}
         </div>
         <FavoriteButton shopId={shop.id} shopName={shop.name} on={page.is_favorite} onChange={onFavorite} />
       </header>
@@ -189,9 +214,9 @@ function ShopDetails({ page, onFavorite }: { page: ShopPageData; onFavorite: (on
         </Link>
       )}
 
-      {page.reviews.length > 0 && (
-        <section className={styles.reviews} aria-labelledby="reviews-title">
-          <h2 id="reviews-title" className={styles.sectionTitle}>
+      {hasReviews && (
+        <section id={REVIEWS_HASH} className={styles.reviews} aria-labelledby="reviews-title">
+          <h2 id="reviews-title" ref={reviewsRef} tabIndex={-1} className={`${styles.sectionTitle} ${styles.reviewsTitle}`}>
             {t('shop.reviews')}
           </h2>
           <ul className={styles.plainList}>

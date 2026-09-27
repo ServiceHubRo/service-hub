@@ -1,5 +1,5 @@
 import { ChevronRight, MapPin } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { FavoriteButton } from '../../../components/FavoriteButton';
 import { ShopAvatar } from '../../../components/ShopAvatar';
 import { Stars } from '../../../components/Stars';
@@ -7,7 +7,7 @@ import type { ShopSearchResult } from '../../../data/rpc';
 import { useI18n } from '../../../i18n/context';
 import { formatDistance, formatRating } from '../../../i18n/format';
 import { plural } from '../../../i18n/translate';
-import { shopPath, type ShopLinkState } from '../paths';
+import { shopPath, shopReviewsPath, type ShopLinkState } from '../paths';
 import styles from './ShopCard.module.css';
 
 export interface ShopCardProps {
@@ -22,15 +22,28 @@ export interface ShopCardProps {
 export function ShopCard({ shop, distanceKm, back, onFavorite }: ShopCardProps) {
   const { t, lang } = useI18n();
   const matched = lang === 'ro' ? shop.matched_service_ro : shop.matched_service_en;
+  const navigate = useNavigate();
+  const hasReviews = shop.review_count > 0 && shop.average !== null;
 
   return (
     <article className={styles.card}>
-      <Link to={shopPath(shop.shop_id)} state={back} className={styles.link}>
+      <Link
+        to={shopPath(shop.shop_id)}
+        state={back}
+        className={styles.link}
+        onClick={(e) => {
+          // A tap on the stars opens the shop page at its reviews; anywhere else, at the top.
+          if (hasReviews && (e.target as HTMLElement).closest('[data-reviews]')) {
+            e.preventDefault();
+            navigate(shopReviewsPath(shop.shop_id), { state: back });
+          }
+        }}
+      >
         <ShopAvatar name={shop.name} logoUrl={shop.logo_url} />
         <span className={styles.body}>
           <span className={styles.name}>{shop.name}</span>
-          <span className={styles.meta}>
-            {shop.review_count > 0 && shop.average !== null ? (
+          <span className={styles.meta} data-reviews="">
+            {hasReviews ? (
               <>
                 <Stars value={Number(shop.average)} />
                 <span className={styles.rating}>{formatRating(lang, Number(shop.average))}</span>
