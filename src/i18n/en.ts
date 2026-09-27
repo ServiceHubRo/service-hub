@@ -1238,6 +1238,8 @@ export const en: Record<MessageKey, string> = {
   'push.hint': 'You turn them on separately on each phone or computer.',
   'push.hint.denied': 'You can allow them in your browser settings for this site.',
   'push.hint.unsupported': 'Open Service-Hub in Chrome, Edge, Firefox or Safari to get notifications.',
+  'push.status.appSoon': 'Coming soon to the app',
+  'push.hint.appSoon': 'Notifications in the app are coming in a future version. Until then, you can get them by opening the Service-Hub website in Chrome, on your phone or computer.',
   'unit.trialLeft.one': '1 free day left',
   'unit.trialLeft.few': '{n} free days left',
   'unit.trialLeft.other': '{n} free days left',

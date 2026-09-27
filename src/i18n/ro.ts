@@ -1236,6 +1236,8 @@ export const ro = {
   'push.hint': 'Le activezi separat pe fiecare telefon sau calculator.',
   'push.hint.denied': 'Le poți activa din setările browserului pentru acest site.',
   'push.hint.unsupported': 'Deschide Service-Hub în Chrome, Edge, Firefox sau Safari ca să primești notificări.',
+  'push.status.appSoon': 'În curând și în aplicație',
+  'push.hint.appSoon': 'Notificările în aplicație vin într-o versiune următoare. Până atunci le poți primi dacă deschizi site-ul Service-Hub în Chrome, pe telefon sau pe calculator.',
   'unit.trialLeft.one': 'Mai ai o zi gratuită',
   'unit.trialLeft.few': 'Mai ai {n} zile gratuite',
   'unit.trialLeft.other': 'Mai ai {n} de zile gratuite',
