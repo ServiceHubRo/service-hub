@@ -11,6 +11,12 @@ const config: CapacitorConfig = {
     backgroundColor: '#14161A',
   },
   plugins: {
+    SystemBars: {
+      // The bars are handled by MainActivity.java: Capacitor's handling left Android's three
+      // buttons over the tab bar on some phones. Light icons and buttons on the dark bars.
+      insetsHandling: 'disable',
+      style: 'DARK',
+    },
     SplashScreen: {
       // Hidden by the app once its first screen is drawn (src/app/NativeBridge.tsx), and in any case
       // after 2.5 s: on a second start the app can be ready before the launch screen is even shown,

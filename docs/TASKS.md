@@ -740,6 +740,8 @@ Note: nicio migrare. Pachete noi: `@capacitor/core`, `@capacitor/android`, `@cap
 
 După testare (km la fel): la finalizare, dacă kilometrajul e exact cel de la o lucrare terminată în altă zi, baza de date cere confirmare (`odometer_same`, migrarea `odometer_same`, schema 35) — service-ul citește din nou bordul și bifează „Da, kilometrajul este corect”; două lucrări în aceeași zi pot avea același kilometraj fără întrebare. Raportul PDF pune o notă când același kilometraj apare la lucrări din zile diferite (datele nu se corectează).
 
+**Butoanele Android tot peste meniu pe Huawei (a doua încercare):** tokenii CSS n-au ajuns, pentru că Capacitor (SystemBars) înlocuia felul în care fereastra își face loc pentru bare, iar pe acel telefon rezultatul era aplicația desenată sub butoane. SystemBars are acum `insetsHandling: 'disable'` și `style: 'DARK'`, iar `MainActivity.java` se ocupă singur: până la Android 14 fereastra rămâne așezată normal între bare (bara de jos vopsită închis); de la Android 15 (unde toate aplicațiile sunt desenate sub bare) vederea aplicației primește margini egale cu bara de sus, lateralele și, jos, cele trei butoane sau tastatura; bara de gesturi rămâne a paginii (`--safe-area-inset-bottom`), ca până acum. Nu se poate construi Android în mediul lui Claude; verificat de acțiunea „Android app”.
+
 ### T20b — Notificările native și iPhone
 
 Android: notificările prin Firebase Cloud Messaging (gratuit), în `dispatch-notifications`, lângă Web Push. iPhone (după contul Apple Developer, 99 $/an, pe firmă, cu D-U-N-S): proiectul `ios/`, notificările APNs, construirea automată și TestFlight.
