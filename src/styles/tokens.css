@@ -12,6 +12,14 @@
 }
 
 :root {
+  /* The phone's safe areas (status bar, notch, navigation buttons). Browsers give env(); the
+     Android app also gets --safe-area-inset-* from Capacitor, the only source on phones whose
+     WebView reports env() as 0 while drawing under the navigation buttons (Huawei, T20a). */
+  --safe-top: max(env(safe-area-inset-top, 0px), var(--safe-area-inset-top, 0px));
+  --safe-right: max(env(safe-area-inset-right, 0px), var(--safe-area-inset-right, 0px));
+  --safe-bottom: max(env(safe-area-inset-bottom, 0px), var(--safe-area-inset-bottom, 0px));
+  --safe-left: max(env(safe-area-inset-left, 0px), var(--safe-area-inset-left, 0px));
+
   --bg: #14161a;
   --surface: #1d2026;
   --surface2: #242830;

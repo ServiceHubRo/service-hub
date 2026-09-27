@@ -36,7 +36,7 @@ export function NativeBridge() {
   useEffect(() => {
     if (!IS_NATIVE) return;
     const probe = document.createElement('div');
-    probe.style.cssText = 'position:fixed;left:0;bottom:0;width:0;height:env(safe-area-inset-bottom);visibility:hidden;pointer-events:none';
+    probe.style.cssText = 'position:fixed;left:0;bottom:0;width:0;height:var(--safe-bottom);visibility:hidden;pointer-events:none';
     document.body.appendChild(probe);
     // Measured again when the phone turns or the navigation mode changes in the settings.
     const measure = () => {
@@ -44,8 +44,12 @@ export function NativeBridge() {
     };
     measure();
     window.addEventListener('resize', measure);
+    // Capacitor writes --safe-area-inset-* on <html> after the page shows (and when bars change).
+    const insets = new MutationObserver(measure);
+    insets.observe(document.documentElement, { attributes: true, attributeFilter: ['style'] });
     return () => {
       window.removeEventListener('resize', measure);
+      insets.disconnect();
       probe.remove();
     };
   }, []);
