@@ -192,6 +192,15 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
       title: 'Service reactivat',
       body: '{shop} este din nou activ: apare în căutări și poate primi programări.',
     },
+    // ------------------------------------------------------------------ shop referrals
+    'shop.referral_reward': {
+      title: 'Ai primit o lună gratuită',
+      body: '{referred} a plătit abonamentul, recomandat de tine. Perioada ta gratuită s-a prelungit cu {days}, până pe {expiry}.',
+    },
+    'shop.referral_reward_credit': {
+      title: 'Ai primit o lună gratuită',
+      body: '{referred} a plătit abonamentul, recomandat de tine. Următoarea ta plată scade cu {total}.',
+    },
     // ------------------------------------------------------------------ account suspended / reactivated
     'client.account_suspended': {
       title: 'Cont suspendat',
@@ -340,6 +349,15 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
       title: 'Shop reactivated',
       body: '{shop} is active again: it appears in search and can take bookings.',
     },
+    // ------------------------------------------------------------------ shop referrals
+    'shop.referral_reward': {
+      title: 'You got a free month',
+      body: '{referred}, the shop you referred, paid its subscription. Your free period is {days} longer, until {expiry}.',
+    },
+    'shop.referral_reward_credit': {
+      title: 'You got a free month',
+      body: '{referred}, the shop you referred, paid its subscription. Your next payment is {total} lower.',
+    },
     // ------------------------------------------------------------------ account suspended / reactivated
     'client.account_suspended': {
       title: 'Account suspended',
@@ -359,6 +377,7 @@ const WORDS: Record<Lang, Record<string, string>> = {
     car: 'mașina ta',
     carShop: 'mașina',
     client: 'Clientul',
+    aShop: 'Un service',
     today: 'azi',
     tomorrow: 'mâine',
     relAt: '{day} la {time}',
@@ -382,6 +401,7 @@ const WORDS: Record<Lang, Record<string, string>> = {
     car: 'car',
     carShop: 'car',
     client: 'The client',
+    aShop: 'A shop',
     today: 'today',
     tomorrow: 'tomorrow',
     relAt: '{day} at {time}',
@@ -414,7 +434,7 @@ export const EVENTS: Record<Side, readonly string[]> = {
     'booking_requested', 'booking_cancelled_client', 'booking_cancelled_admin', 'quote_accepted',
     'quote_partially_accepted', 'quote_refused', 'quote_expiring', 'quote_expired', 'new_message', 'new_review',
     'daily_digest', 'trial_ending', 'payment_failed', 'shop_inactive', 'review_report_decided', 'account_suspended',
-    'account_reactivated',
+    'account_reactivated', 'referral_reward',
   ],
 };
 
@@ -524,6 +544,7 @@ function vars(e: NotificationEvent, lang: Lang, side: Side, now: Date): Record<s
     due: str(p.due) ? formatDayMonthYear(lang, str(p.due), now) : '',
     digest,
     code: str(p.code),
+    referred: str(p.referred_name) || word(lang, 'aShop'),
   };
 }
 
@@ -546,6 +567,8 @@ export function templateKey(side: Side, e: NotificationEvent): string {
       return (num(p.days) ?? 0) <= 0 ? `${base}_today` : base;
     case 'payment_failed':
       return p.final === true || !str(p.expiry) ? `${base}_final` : base;
+    case 'referral_reward':
+      return p.kind === 'stripe_credit' ? `${base}_credit` : base;
     case 'shop_inactive':
       return p.reason === 'payment_failed'
         ? `${base}_payment`
@@ -606,6 +629,7 @@ export function urlFor(side: Side, e: NotificationEvent): string {
     case 'trial_ending':
     case 'payment_failed':
     case 'shop_inactive':
+    case 'referral_reward':
       return SUBSCRIPTION_PATH;
     case 'booking_requested':
       return booking ? `/s/programari?${q({ tab: 'cereri', p: booking })}` : '/s/programari?tab=cereri';
@@ -638,6 +662,8 @@ function tagFor(e: NotificationEvent): string {
       return `review-request-${e.booking_id ?? str(p.booking_id)}`;
     case 'service_due':
       return `service-due-${str(p.car_id)}-${str(p.service_id)}`;
+    case 'referral_reward':
+      return `referral-${str(p.referral_shop_id)}`;
     case 'trial_ending':
     case 'payment_failed':
     case 'shop_inactive':

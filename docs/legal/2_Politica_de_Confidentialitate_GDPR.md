@@ -1,6 +1,6 @@
 # Politica de confidențialitate — Service-Hub
 
-**Ultima actualizare:** 26 septembrie 2026
+**Ultima actualizare:** 28 septembrie 2026
 
 Aici afli ce date personale folosește Service-Hub, de ce, cine le mai vede, cât timp le păstrăm și ce drepturi ai, conform Regulamentului (UE) 2016/679 („GDPR”) și legii române.
 
@@ -133,7 +133,7 @@ Dăm date autorităților doar când legea ne obligă (de exemplu, la o cerere a
   - **Service:** dacă service-ul nu are programări și plăți, contul se șterge complet. Dacă are, service-ul dispare din căutare, colegii sunt scoși, numele și telefonul proprietarului se șterg și contul nu mai poate fi folosit; datele de facturare și plățile se păstrează cât cere legea contabilă și fiscală (în prezent, până la 10 ani), iar istoricul lucrărilor rămâne ca evidență.
 - **Copiile de siguranță:** datele șterse dispar și din ele în cel mult 30 de zile.
 - **Codurile de confirmare prin SMS:** valabile 10 minute; păstrate doar criptat.
-- **Amprentele emailului și telefonului** (nu adresa și numărul, ci un cod criptat din care nu se pot afla): pentru proprietarii de service, ca perioada gratuită să se acorde o singură dată aceleiași persoane, și pentru conturile sau service-urile suspendate, ca suspendarea să nu poată fi ocolită cu un cont nou. Un cont nou cu aceleași date nu primește a doua perioadă gratuită, respectiv este creat suspendat până când echipa Service-Hub verifică situația. Le păstrăm cât există contul și încă 3 ani după ștergerea lui; amprentele unei suspendări se șterg când suspendarea este ridicată.
+- **Amprentele emailului și telefonului** (nu adresa și numărul, ci un cod criptat din care nu se pot afla): pentru proprietarii de service, ca perioada gratuită să se acorde o singură dată aceleiași persoane și ca o recomandare către propriul service să nu aducă o lună gratuită, și pentru conturile sau service-urile suspendate, ca suspendarea să nu poată fi ocolită cu un cont nou. Un cont nou cu aceleași date nu primește a doua perioadă gratuită, respectiv este creat suspendat până când echipa Service-Hub verifică situația. Le păstrăm cât există contul și încă 3 ani după ștergerea lui; amprentele unei suspendări se șterg când suspendarea este ridicată.
 - **Datele tehnice pentru evitarea dublei trimiteri** a unei acțiuni: 7 zile.
 - **Rapoartele de erori:** cel mult 90 de zile.
 - **Jurnalele de server** ale furnizorilor: perioade scurte, după regulile lor.

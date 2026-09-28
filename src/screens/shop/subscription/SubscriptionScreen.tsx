@@ -36,14 +36,17 @@ import { useLoad } from '../../../lib/useLoad';
 import { useNow } from '../../../lib/useNow';
 import { SETTINGS_LINKS } from '../settings/paths';
 import { ACCOUNT_PATH } from '../paths';
+import { ReferralCard } from './ReferralCard';
 import styles from './subscription.module.css';
 
 /**
  * Abonament (FR §4.7, P12, P12b): the owner's tile in Cont. Where the subscription stands (free
  * days left, next payment, a failed payment, inactive), the one plan, how often to pay (every
  * month, or 3, 6, 12 months with a discount), "Activează" (Stripe Checkout) or "Gestionează"
- * (Stripe's portal: card, receipts, cancelling), and the payments with their receipts. The status changes only through Stripe's webhook; the screen follows it live,
- * so coming back from a payment shows it without a reload.
+ * (Stripe's portal: card, receipts, cancelling), "Recomandă Service-Hub" (the referral code and
+ * the shops brought), and the payments with their receipts. The status changes only through
+ * Stripe's webhook; the screen follows it live, so coming back from a payment shows it without a
+ * reload.
  */
 export function SubscriptionScreen() {
   const { t, lang } = useI18n();
@@ -55,7 +58,9 @@ export function SubscriptionScreen() {
 
   // Quiet re-read on every change (a newer read always wins).
   const generation = useRef(0);
+  const [changes, setChanges] = useState(0);
   const refresh = useCallback(() => {
+    setChanges((n) => n + 1);
     const mine = ++generation.current;
     getSubscription().then(
       (data) => {
@@ -80,6 +85,7 @@ export function SubscriptionScreen() {
         {returned && <ReturnBanner returned={returned} view={view} />}
         <StatusCard data={data} view={view} />
         <PlanCard data={data} view={view} />
+        <ReferralCard version={changes} />
         <h2 className={styles.section}>{t('sub.invoices')}</h2>
         {data.invoices.length === 0 ? (
           <EmptyState icon={ReceiptText} title={t('sub.invoices.empty')} body={t('sub.invoices.emptyBody')} />

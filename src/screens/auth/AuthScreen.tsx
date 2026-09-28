@@ -5,7 +5,7 @@ import { Tabs } from '../../components/Tabs';
 import { useI18n } from '../../i18n/context';
 import { AuthLayout } from './AuthLayout';
 import { LegalDocScreen } from './LegalDocScreen';
-import { SIGNUP_ROLE_PARAM } from './paths';
+import { REFERRAL_CODE_PARAM, SIGNUP_ROLE_PARAM } from './paths';
 import { useLegalDoc } from './useLegalDoc';
 import { SignInForm } from './SignInForm';
 import { SignUpForm } from './SignUpForm';
@@ -33,6 +33,7 @@ export function AuthScreen({ tab }: { tab: AuthTab }) {
   const [params] = useSearchParams();
   const roleParam = params.get(SIGNUP_ROLE_PARAM);
   const initialRole = roleParam === 'client' ? 'client' : roleParam === 'service' ? 'shop' : undefined;
+  const referralCode = params.get(REFERRAL_CODE_PARAM)?.slice(0, 16) ?? undefined;
   const [email, setEmail] = useState(state.email ?? '');
   const { doc, open: openDoc, close: closeDoc } = useLegalDoc();
 
@@ -50,14 +51,21 @@ export function AuthScreen({ tab }: { tab: AuthTab }) {
           ]}
           value={tab}
           onChange={(next) =>
-            navigate(next === 'signin' ? '/intra' : '/cont-nou', { replace: true, state: { ...state, email } })
+            // The role and a referral code stay in the address, for coming back to Cont nou.
+            navigate(`${next === 'signin' ? '/intra' : '/cont-nou'}${location.search}`, { replace: true, state: { ...state, email } })
           }
         />
         {state.linkError && <Banner tone="warning">{t('auth.linkExpired')}</Banner>}
         {tab === 'signin' ? (
           <SignInForm email={email} setEmail={setEmail} />
         ) : (
-          <SignUpForm email={email} setEmail={setEmail} onOpenDoc={openDoc} initialRole={initialRole} />
+          <SignUpForm
+            email={email}
+            setEmail={setEmail}
+            onOpenDoc={openDoc}
+            initialRole={initialRole}
+            initialReferral={referralCode}
+          />
         )}
       </div>
     </AuthLayout>

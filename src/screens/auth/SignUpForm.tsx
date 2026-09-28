@@ -8,6 +8,7 @@ import { Field } from '../../components/Field';
 import { PasswordField } from '../../components/PasswordField';
 import { PhoneField } from '../../components/PhoneField';
 import { AuthFailure, authErrorMessage, isRetryable, signUp } from '../../data/auth';
+import { checkReferralCode } from '../../data/referrals';
 import { useI18n } from '../../i18n/context';
 import { recordEmailSent } from '../../lib/cooldown';
 import { TERMS_VERSION, type LegalDocId } from '../../lib/legal';
@@ -28,6 +29,7 @@ interface Errors {
   password?: string;
   confirm?: string;
   terms?: string;
+  referral?: string;
 }
 
 /** Suggestions only; any city can be typed. Service-Hub starts in Brașov county. */
@@ -36,13 +38,17 @@ const CITY_SUGGESTIONS = [
   'Hărman', 'Sânpetru', 'Cristian', 'Rupea', 'Victoria', 'Sibiu', 'București', 'Cluj-Napoca',
 ];
 
-/** P4b sign-up: role cards, name, shop name + city (shops), phone, email, password twice, terms. */
+/**
+ * P4b sign-up: role cards, name, shop name + city (shops), phone, email, password twice, terms.
+ * A new shop can also give another shop's referral code (optional; filled in from a referral link).
+ */
 export function SignUpForm({
   email,
   setEmail,
   onOpenDoc,
   invite,
   initialRole,
+  initialReferral,
 }: {
   email: string;
   setEmail: (email: string) => void;
@@ -51,6 +57,8 @@ export function SignUpForm({
   invite?: { token: string; email: string };
   /** Chosen before arriving ("Sunt client" / "Sunt service" on the landing page); still changeable. */
   initialRole?: SignUpRole;
+  /** From a referral link (`?cod=S-00042`); still editable. */
+  initialReferral?: string;
 }) {
   const { t, lang } = useI18n();
   const navigate = useNavigate();
@@ -64,6 +72,7 @@ export function SignUpForm({
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
   const [terms, setTerms] = useState(false);
+  const [referral, setReferral] = useState(initialReferral ?? '');
   const [errors, setErrors] = useState<Errors>({});
   const [attempt, setAttempt] = useState(0);
   const captcha = useCaptcha();
@@ -89,6 +98,12 @@ export function SignUpForm({
     setErrors(next);
     setAttempt((a) => a + 1);
     if (Object.keys(next).length > 0 || !role) return;
+    const referralCode = role === 'shop' && !invite ? referral.trim() : '';
+    if (referralCode && !(await checkReferralCode(referralCode))) {
+      setErrors({ referral: t('auth.error.referralInvalid') });
+      setAttempt((a) => a + 1);
+      return;
+    }
     if (!captcha.ready) throw new AuthFailure('captcha_failed');
     let result;
     try {
@@ -103,6 +118,7 @@ export function SignUpForm({
         shopName: role === 'shop' ? shopName : undefined,
         city: role === 'shop' ? city : undefined,
         inviteToken: invite?.token,
+        referralCode: referralCode || undefined,
         captchaToken: captcha.token,
       });
     } finally {
@@ -204,6 +220,22 @@ export function SignUpForm({
               <option key={c} value={c} />
             ))}
           </datalist>
+          <Field
+            label={t('auth.referral')}
+            hint={t('auth.referralHint')}
+            autoComplete="off"
+            autoCapitalize="characters"
+            spellCheck={false}
+            mono
+            upper
+            maxLength={16}
+            value={referral}
+            onChange={(e) => {
+              setReferral(e.target.value.toUpperCase());
+              clear('referral');
+            }}
+            error={errors.referral}
+          />
         </>
       )}
       <PhoneField

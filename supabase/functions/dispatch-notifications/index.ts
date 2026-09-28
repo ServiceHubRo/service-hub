@@ -16,12 +16,15 @@
 //
 // The `stripe` channel is not a message: a `seats_changed` event (a colleague joined or left a
 // shop whose subscription Stripe runs) sets the quantity of the colleagues' item in Stripe to the
-// shop's count at that moment (_shared/seats.ts), and records what Stripe now charges.
+// shop's count at that moment (_shared/seats.ts), and records what Stripe now charges; a
+// `referral_credit` event gives a shop that brought another one a month of credit on its Stripe
+// customer (_shared/referrals.ts) and records it.
 import { adminApi } from '../_shared/admin.ts';
 import { emailForEvent } from '../_shared/emails.ts';
 import { corsHeaders, json } from '../_shared/http.ts';
 import { adminEmailFromEnv, appUrlFromEnv, emailConfigFromEnv, smsConfigFromEnv, stripeConfigFromEnv } from '../_shared/env.ts';
 import { sendEmail, type EmailConfig, type SendOutcome } from '../_shared/resend.ts';
+import { giveReferralCredit, type ReferralCreditInfo } from '../_shared/referrals.ts';
 import { seatPrice, syncSeats, type SeatInfo } from '../_shared/seats.ts';
 import { smsForEvent } from '../_shared/sms.ts';
 import { sendSms, type SmsConfig } from '../_shared/smso.ts';
@@ -187,19 +190,38 @@ async function smsChannel(e: ClaimedEvent, senders: Senders): Promise<ChannelRes
 }
 
 /** Sets the colleagues' quantity in Stripe for the shop of a `seats_changed` event. */
-async function stripeChannel(e: ClaimedEvent, senders: Senders): Promise<ChannelResult> {
-  if (e.event !== 'seats_changed') return { done: true, log: { channel: 'stripe', status: 'no_template' } };
+async function syncSeatsFor(e: ClaimedEvent, senders: Senders): Promise<LogEntry> {
   const config = senders.stripe;
-  if (!config.secretKey || !config.seatPriceId) return { done: true, log: { channel: 'stripe', status: 'not_configured' } };
+  if (!config.seatPriceId) return { channel: 'stripe', status: 'not_configured' };
   const shopId = typeof e.params?.shop_id === 'string' ? e.params.shop_id : null;
-  if (!shopId) return { done: true, log: { channel: 'stripe', status: 'failed', error: 'no shop' } };
+  if (!shopId) return { channel: 'stripe', status: 'failed', error: 'no shop' };
+  const info = (await senders.api.rpc('stripe_seat_info', { p_shop_id: shopId })) as SeatInfo | null;
+  if (!info) return { channel: 'stripe', status: 'no_subscription' };
+  const stripe = stripeApi(config);
+  const r = await syncSeats(stripe, await seatPrice(stripe, config.seatPriceId), info, `event-${e.id}`);
+  if (r.billed !== null) await senders.api.rpc('set_billed_seats', { p_shop_id: shopId, p_seats: r.billed });
+  return { channel: 'stripe', status: r.status };
+}
+
+/** Gives the month of credit of a `referral_credit` event and records it. */
+async function creditReferral(e: ClaimedEvent, senders: Senders): Promise<LogEntry> {
+  const referral = typeof e.params?.referral_shop_id === 'string' ? e.params.referral_shop_id : null;
+  if (!referral) return { channel: 'stripe', status: 'failed', error: 'no referral' };
+  const info = (await senders.api.rpc('referral_credit_info', { p_referral_shop_id: referral })) as ReferralCreditInfo | null;
+  if (!info) return { channel: 'stripe', status: 'no_referral' };
+  const r = await giveReferralCredit(stripeApi(senders.stripe), referral, info);
+  if (r.status === 'credited') {
+    await senders.api.rpc('mark_referral_credit_applied', { p_referral_shop_id: referral, p_transaction: r.transaction });
+  }
+  return { channel: 'stripe', status: r.status };
+}
+
+async function stripeChannel(e: ClaimedEvent, senders: Senders): Promise<ChannelResult> {
+  const run = e.event === 'seats_changed' ? syncSeatsFor : e.event === 'referral_credit' ? creditReferral : null;
+  if (!run) return { done: true, log: { channel: 'stripe', status: 'no_template' } };
+  if (!senders.stripe.secretKey) return { done: true, log: { channel: 'stripe', status: 'not_configured' } };
   try {
-    const info = (await senders.api.rpc('stripe_seat_info', { p_shop_id: shopId })) as SeatInfo | null;
-    if (!info) return { done: true, log: { channel: 'stripe', status: 'no_subscription' } };
-    const stripe = stripeApi(config);
-    const r = await syncSeats(stripe, await seatPrice(stripe, config.seatPriceId), info, `event-${e.id}`);
-    if (r.billed !== null) await senders.api.rpc('set_billed_seats', { p_shop_id: shopId, p_seats: r.billed });
-    return { done: true, log: { channel: 'stripe', status: r.status } };
+    return { done: true, log: await run(e, senders) };
   } catch (err) {
     const message = (err instanceof Error ? err.message : String(err)).slice(0, 500);
     // Stripe unreachable or busy: try again later; a refusal (4xx) will not change on a retry.

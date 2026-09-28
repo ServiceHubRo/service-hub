@@ -300,6 +300,39 @@ function subscriptionEmail(e: EmailEvent, lang: Lang, app: string): EmailContent
         footer,
       });
     }
+    case 'referral_reward': {
+      const referred = str(p.referred_name) || (en ? 'A shop' : 'Un service');
+      const credit = str(p.kind) === 'stripe_credit';
+      const days = num(p.days) ?? 30;
+      const until = day(p.expiry);
+      const reward = credit
+        ? en
+          ? `Your next payment is ${total} lower: we took one month off.`
+          : `Următoarea ta plată scade cu ${total}: am scăzut o lună.`
+        : en
+          ? `Your free period is ${days} days longer${until ? `, until ${until}` : ''}.`
+          : `Perioada ta gratuită s-a prelungit cu ${days} de zile${until ? `, până pe ${until}` : ''}.`;
+      return email(en ? 'You got a free month' : 'Ai primit o lună gratuită', {
+        lang,
+        preheader: en ? `${referred} paid its subscription.` : `${referred} a plătit abonamentul.`,
+        title: en ? 'Thank you for the referral' : 'Mulțumim pentru recomandare',
+        blocks: [
+          {
+            p: en
+              ? `${referred} joined Service-Hub with your code and paid its first subscription.`
+              : `${referred} s-a înscris pe Service-Hub cu codul tău și a plătit primul abonament.`,
+          },
+          { p: reward },
+          {
+            p: en
+              ? 'Every shop you bring that pays brings you another free month, up to 12.'
+              : 'Fiecare service adus de tine care plătește îți aduce încă o lună gratuită, până la 12.',
+          },
+        ],
+        button: open,
+        footer,
+      });
+    }
     case 'trial_ending': {
       const days = num(p.days) ?? 0;
       const price = num(p.price);

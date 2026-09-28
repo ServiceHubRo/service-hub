@@ -1,6 +1,6 @@
 # Privacy Policy — Service-Hub
 
-**Last updated:** September 26, 2026
+**Last updated:** September 28, 2026
 
 This policy explains what personal data Service-Hub uses, why, who else sees it, how long we keep it and what rights you have, under Regulation (EU) 2016/679 (the “GDPR”) and Romanian law.
 
@@ -133,7 +133,7 @@ We share data with authorities only when the law requires us to (for example, a 
   - **Shop:** if the shop has no bookings and no payments, the account is deleted completely. If it has, the shop disappears from search, colleagues are removed, the owner’s name and phone are deleted and the account can no longer be used; billing data and payments are kept as long as accounting and tax law requires (currently up to 10 years), and the job history stays as a record.
 - **Backups:** deleted data also disappears from backups within 30 days at most.
 - **SMS confirmation codes:** valid for 10 minutes; kept only in encrypted form.
-- **Fingerprints of the email and phone** (not the address or the number, but an encrypted code they cannot be recovered from): for shop owners, so the free period is given only once to the same person, and for suspended accounts or shops, so a suspension cannot be avoided with a new account. A new account with the same details gets no second free period, or is created suspended until the Service-Hub team looks into it. We keep them while the account exists and for 3 years after it is deleted; the fingerprints of a suspension are deleted when the suspension is lifted.
+- **Fingerprints of the email and phone** (not the address or the number, but an encrypted code they cannot be recovered from): for shop owners, so the free period is given only once to the same person and a referral of one's own shop brings no free month, and for suspended accounts or shops, so a suspension cannot be avoided with a new account. A new account with the same details gets no second free period, or is created suspended until the Service-Hub team looks into it. We keep them while the account exists and for 3 years after it is deleted; the fingerprints of a suspension are deleted when the suspension is lifted.
 - **Technical data that prevents an action from being sent twice:** 7 days.
 - **Error reports:** 90 days at most.
 - **Server logs** of our providers: short periods, under their own rules.

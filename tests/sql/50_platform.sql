@@ -112,7 +112,7 @@ where grantee = 'anon' and table_schema = 'public' and privilege_type <> 'SELECT
 -- Functions callable from the API are an explicit list (a new RPC must be granted on purpose).
 select test.eq(
   string_agg(p.proname, ', ' order by p.proname) filter (where has_function_privilege('anon', p.oid, 'execute')),
-  'format_sequence_id, get_schema_version, get_staff_invite, is_valid_cui, is_valid_iban, is_valid_postal_code, is_valid_regcom, is_valid_vin, normalize_code, public_pricing, try_uuid, verify_report',
+  'check_referral_code, format_sequence_id, get_schema_version, get_staff_invite, is_valid_cui, is_valid_iban, is_valid_postal_code, is_valid_regcom, is_valid_vin, normalize_code, public_pricing, try_uuid, verify_report',
   'functions callable by anon')
 from pg_proc p where p.pronamespace = 'public'::regnamespace;
 select test.eq(
@@ -129,7 +129,7 @@ select test.eq(
   || 'cancel_email_change, check_phone_code, client_no_show_count, complete_job, confirm_booking, create_booking, decide_quote, '
   || 'decline_booking, export_my_data, get_availability, get_shop_page, get_shop_setup, history_report_preview, invite_staff, is_admin, is_shop_member, '
   || 'is_shop_owner, is_shop_public, last_odometer_for_booking, list_shop_bookings, list_shop_history, list_shop_staff, list_threads, '
-  || 'mark_no_show, mark_thread_read, my_phone_verification, my_shop_id, my_subscription_offers, replace_quote, reply_review, report_review, reschedule_booking, save_push_subscription, '
+  || 'mark_no_show, mark_thread_read, my_phone_verification, my_referrals, my_shop_id, my_subscription_offers, replace_quote, reply_review, report_review, reschedule_booking, save_push_subscription, '
   || 'save_shop_hours, search_cities, search_shops, send_message, send_quote, set_shop_services, shop_cancel_booking, shop_reports, start_inspection, '
   || 'start_work, submit_review, toggle_favorite, touch_last_active, withdraw_quote',
   'functions callable only when signed in')
