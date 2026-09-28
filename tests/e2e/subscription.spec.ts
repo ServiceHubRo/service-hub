@@ -83,7 +83,7 @@ test.describe('subscription', () => {
 
     await expect(page.getByText('Perioadă gratuită', { exact: true })).toBeVisible();
     await expect(page.getByText('Mai ai 90 de zile gratuite din 90.')).toBeVisible();
-    await expect(page.getByRole('meter')).toHaveAttribute('aria-valuenow', '90');
+    await expect(page.getByRole('meter', { name: 'Mai ai 90 de zile gratuite' })).toHaveAttribute('aria-valuenow', '90');
     await expect(page.getByText('100 lei', { exact: true })).toBeVisible();
     await expect(page.getByText('Fără contract, anulezi oricând')).toBeVisible();
     await expect(page.getByText('Nicio plată încă.')).toBeVisible();
