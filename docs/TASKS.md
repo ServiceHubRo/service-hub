@@ -648,6 +648,8 @@ Note: nicio migrare, niciun pachet nou. **Sentry** fără SDK-ul Sentry (un modu
 
 **După T19a (cerut de Eduard):** eroarea „permission denied” prinsă de Sentry-ul de test la testele automate nu era a aplicației: testul „Ține-mă minte” ștergea singur sesiunea (ca să simuleze browserul închis) cât timp pagina Caută încă își încărca datele; acum așteaptă întâi încărcarea. Rapoartele Sentry arată acum și pașii dinainte (logare, delogare, verificarea sesiunii, cererile refuzate), iar la „permission denied” și dacă sesiunea mai era pe dispozitiv — așa s-a găsit cauza. Rulare completă după reparare: niciun raport neașteptat.
 
+**Sentry pornit (Eduard, 28 sept):** cont Sentry în UE (Frankfurt), proiectul `service-hub` (Browser JavaScript), fără legătura cu GitHub; `VITE_SENTRY_DSN` în Netlify și `SENTRY_DSN` în secretele GitHub (funcțiile de pe server prin „Deploy Supabase”, aplicația Android prin acțiunea „Android app”); adresele IP nu se păstrează.
+
 ### T19b — Documentele legale
 
 Termenii, confidențialitatea și cookies actualizate (vezi „Include” de mai sus) și versiunile în engleză, afișate în aplicație după limbă. Datele firmei de la tine; forma finală o dai cu avocatul.
