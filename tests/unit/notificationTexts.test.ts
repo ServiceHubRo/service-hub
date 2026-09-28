@@ -204,6 +204,11 @@ describe('notification texts', () => {
       body: 'Ana Marin: Schimb ulei și filtru, Mie 14 oct, 10:00. Volkswagen Golf 7 (BV 12 ABC).',
       url: '/s/programari?tab=cereri&p=b-1',
     });
+    // Several services in one booking (T21): the first one and how many more.
+    expect(render('booking_requested', 'shop', 'ro', { extra_count: 2 })!.body).toBe(
+      'Ana Marin: Schimb ulei și filtru și încă 2, Mie 14 oct, 10:00. Volkswagen Golf 7 (BV 12 ABC).',
+    );
+    expect(render('booking_requested', 'shop', 'en', { extra_count: 1 })!.body).toContain('Oil & oil filter change and 1 more');
     expect(render('quote_refused', 'shop', 'ro')!.body).toBe(
       'Ana Marin a refuzat devizul pentru Volkswagen Golf 7 (BV 12 ABC). Taxa de constatare: 100 lei.',
     );

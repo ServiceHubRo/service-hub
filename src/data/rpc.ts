@@ -103,6 +103,7 @@ export const RPC_ERROR_CODES = [
   'review_window_closed',
   'service_not_found',
   'service_unavailable',
+  'too_many_services',
   'shop_closed',
   'shop_has_active_bookings',
   'shop_not_found',
@@ -405,6 +406,8 @@ export interface CarInput {
 export interface CreateBookingInput {
   shopId: string;
   serviceId: string;
+  /** The other services of the same booking (T21), in the order they were ticked. */
+  extraServiceIds?: string[];
   date: string; // YYYY-MM-DD
   slot: string; // HH:MM
   car: { carId: string } | { car: CarInput; saveCar: boolean };
@@ -423,6 +426,7 @@ export function createBooking(input: CreateBookingInput, requestId: string): Pro
       ? { p_car_id: car.carId }
       : { p_car: car.car as unknown as Json, p_save_car: car.saveCar }),
     p_note: input.note,
+    p_extra_service_ids: input.extraServiceIds ?? [],
   });
 }
 

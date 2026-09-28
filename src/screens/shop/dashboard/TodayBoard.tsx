@@ -8,6 +8,7 @@ import { useI18n } from '../../../i18n/context';
 import { formatDate } from '../../../i18n/format';
 import type { MessageKey } from '../../../i18n/ro';
 import { plural } from '../../../i18n/translate';
+import { rowServicesText } from '../../../lib/bookingServices';
 import { dashboardCounts, todaySchedule, type ShopFilter, type ShopTab } from '../../../lib/shopBookings';
 import { formatPhone } from '../../../lib/validators';
 import { shopBookingsLink } from '../paths';
@@ -103,7 +104,7 @@ export function TodayBoard({ data, today }: { data: ShopBookingsData; today: str
                   <Link to={shopBookingsLink({ tab: 'programate', booking: b.id })} className={styles.todayRow}>
                     <span className={`mono ${styles.todayTime}`}>{b.slot}</span>
                     <span className={styles.todayWhat}>
-                      <span className={styles.todayService}>{lang === 'ro' ? b.service_ro : b.service_en}</span>
+                      <span className={styles.todayService}>{rowServicesText(lang, b)}</span>
                       <span className={styles.todayMeta}>
                         {[carText(b), b.car_snapshot.plate, b.client_name].filter(Boolean).join(' · ')}
                       </span>
@@ -128,7 +129,7 @@ export function TodayBoard({ data, today }: { data: ShopBookingsData; today: str
                 {schedule.map((b) => (
                   <tr key={b.id}>
                     <td className="mono">{b.slot}</td>
-                    <td>{lang === 'ro' ? b.service_ro : b.service_en}</td>
+                    <td>{rowServicesText(lang, b)}</td>
                     <td>
                       {carText(b)}
                       {b.car_snapshot.plate && <div className="mono">{b.car_snapshot.plate}</div>}

@@ -11,6 +11,7 @@ import { toRpcError, type Booking } from '../../../data/rpc';
 import { fetchShopPage, type ShopPage } from '../../../data/search';
 import { useI18n } from '../../../i18n/context';
 import { formatDate } from '../../../i18n/format';
+import { parseServiceIds, servicesLine, toggleServiceId } from '../../../lib/bookingServices';
 import { useLoad } from '../../../lib/useLoad';
 import { bookingPath, bookingSentPath, SEARCH_PATH, shopPath } from '../paths';
 import { serviceName } from '../shop/serviceGroups';
@@ -24,7 +25,8 @@ import styles from './booking.module.css';
 
 /**
  * The booking flow (FR §3.3, P6): service → day → time → car, with a four-part progress bar.
- * The choices live in the address (`?pas=2&serviciu=ulei&zi=2026-10-14&ora=10:00`), so the phone's
+ * The choices live in the address (`?pas=2&serviciu=ulei,frane&zi=2026-10-14&ora=10:00`; several
+ * services go in one booking, T21), so the phone's
  * Back goes one step back and a reload keeps them. Every rule — past times, notice, capacity,
  * limits — is checked again by create_booking when the request is sent.
  */
@@ -72,11 +74,16 @@ function Flow({ page }: { page: ShopPage }) {
   const [params] = useSearchParams();
   const { shop } = page;
 
-  const service = page.services.find((s) => s.id === params.get('serviciu')) ?? null;
+  // The services picked, in the order they were ticked; only those this shop offers.
+  const serviceIds = parseServiceIds(params.get('serviciu')).filter((id) => page.services.some((s) => s.id === id));
+  const services = serviceIds.map((id) => page.services.find((s) => s.id === id)!);
+  const service = services[0] ?? null;
+  // Step 1 is left only with "Continuă" (`pas` above 1), not with the first tick.
+  const picking = (Number(params.get('pas')) || 1) <= 1;
   const day = YMD.test(params.get('zi') ?? '') ? params.get('zi') : null;
   const time = HM.test(params.get('ora') ?? '') ? params.get('ora') : null;
   const asked = Math.min(Math.max(Number(params.get('pas')) || 1, 1), 4);
-  const step = Math.min(asked, !service ? 1 : !day ? 2 : !time ? 3 : 4);
+  const step = Math.min(asked, !service || picking ? 1 : !day ? 2 : !time ? 3 : 4);
 
   /** Why the client was sent back to the days (the time went while the screen was open). */
   const [notice, setNotice] = useState<string | null>(null);
@@ -107,7 +114,7 @@ function Flow({ page }: { page: ShopPage }) {
     const sent: SentState = {
       ref: booking.ref,
       shopName: shop.name,
-      service: { name_ro: service.name_ro, name_en: service.name_en },
+      services: services.map((x) => ({ name_ro: x.name_ro, name_en: x.name_en })),
       date: day,
       time,
       car,
@@ -120,7 +127,10 @@ function Flow({ page }: { page: ShopPage }) {
     navigate(urlFor({ zi: null, ora: null, pas: '2' }));
   }
 
-  const svc = service ? serviceName(service, lang) : '';
+  const svc = servicesLine(
+    services.map((x) => serviceName(x, lang)),
+    (first, n) => t('booking.servicesMore', { first, n }),
+  );
   const subtitle =
     step === 1
       ? shop.name
@@ -146,7 +156,13 @@ function Flow({ page }: { page: ShopPage }) {
       </div>
 
       {step === 1 && (
-        <ServiceStep services={page.services} selected={service?.id ?? null} onPick={(id) => navigate(urlFor({ serviciu: id, pas: '2' }))} />
+        <ServiceStep
+          services={page.services}
+          selected={serviceIds}
+          // Ticks change the address in place: Back leaves step 1, not one tick.
+          onToggle={(id) => navigate(urlFor({ serviciu: toggleServiceId(serviceIds, id).join(','), pas: null }), { replace: true })}
+          onContinue={() => navigate(urlFor({ pas: '2' }))}
+        />
       )}
       {step === 2 && (
         <DayStep
@@ -165,7 +181,7 @@ function Flow({ page }: { page: ShopPage }) {
       {step === 4 && service && day && time && (
         <CarStep
           shop={shop}
-          service={service}
+          services={services}
           day={day}
           time={time}
           draft={carDraft}

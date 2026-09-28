@@ -20,6 +20,7 @@ import {
   ymdInBucharest,
 } from '../../../i18n/format';
 import { plural, type Lang } from '../../../i18n/translate';
+import { rowServicesText } from '../../../lib/bookingServices';
 import { csvAmount, csvFormat } from '../../../lib/history';
 import {
   byService,
@@ -368,7 +369,7 @@ function downloadCsv(jobs: readonly ReportJob[], range: DayRange, period: Report
     j.car_snapshot.plate ?? '',
     [j.car_snapshot.make, j.car_snapshot.model, j.car_snapshot.year].filter(Boolean).join(' '),
     j.client_name ?? '',
-    (lang === 'ro' ? j.service_ro : j.service_en) ?? j.service_id,
+    rowServicesText(lang, j),
     csvAmount(j.cost, decimal),
   ]);
   return saveFile(

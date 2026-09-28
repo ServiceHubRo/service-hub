@@ -2,7 +2,7 @@
 // Service-Hub, with the way to stop them, in one 160-character message without diacritics.
 import { smsSafe } from './smso.ts';
 import { formatDate, type Lang } from './format.ts';
-import type { NotificationEvent } from './templates.ts';
+import { servicesText, type NotificationEvent } from './templates.ts';
 
 export const SMS_MAX = 160;
 
@@ -27,7 +27,7 @@ export function smsForEvent(e: NotificationEvent): string | null {
   const date = str(p.date);
   const when = smsSafe([date ? formatDate(lang, date) : '', str(p.slot)].filter(Boolean).join(', '));
   let client = smsSafe(str(p.client_name)) || t.client;
-  let service = smsSafe(e.service ? e.service[lang] : '');
+  let service = smsSafe(servicesText(e, lang));
   const build = () => `${t.head} ${client}${when ? `, ${when}` : ''}${service ? `: ${service}` : ''}. ${t.tail}`;
   let text = build();
   if (text.length > SMS_MAX && service) {

@@ -1,6 +1,7 @@
 import { ymdInBucharest } from '../i18n/format';
 import type { CarSnapshot } from '../data/bookings';
 import { monthsBefore, periodStart, sumCosts } from './history';
+import type { ExtraService } from './bookingServices';
 
 /**
  * Rapoarte (FR §4.9, P22): pure logic for the shop owner's reports. The database answers the raw
@@ -20,6 +21,8 @@ export interface ReportJob {
   service_id: string;
   service_ro: string | null;
   service_en: string | null;
+  /** The other services of the same booking (T21); the charts count a job by its first service. */
+  extra_services?: ExtraService[];
   /** The client's account; null once the account was deleted. */
   client: string | null;
   client_name: string | null;

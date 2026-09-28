@@ -1,6 +1,7 @@
 import { call } from './rpc';
 import type { CarSnapshot } from './bookings';
 import type { BookingStatus } from '../lib/status';
+import type { ExtraService } from '../lib/bookingServices';
 
 /**
  * The shop's active bookings for Panou and Programări (FR §4.1, §4.2; T08), in one read:
@@ -43,6 +44,8 @@ export interface ShopBooking {
   service_ro: string | null;
   service_en: string | null;
   service_icon: string | null;
+  /** The other services of the same booking (T21), in the order they were ticked. */
+  extra_services?: ExtraService[];
   client_name: string | null;
   client_phone: string | null;
   /** Account id (`C-00012`); null when the client deleted the account. */

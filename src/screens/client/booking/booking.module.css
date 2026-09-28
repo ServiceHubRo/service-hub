@@ -124,6 +124,41 @@
   flex-shrink: 0;
 }
 
+/* The tick box of a service (several can be picked, T21): a filled amber square when picked. */
+.tick {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border: 2px solid var(--border-lit);
+  border-radius: 6px;
+}
+
+.tickOn {
+  border-color: var(--amber);
+  background: var(--amber);
+  color: var(--ink);
+}
+
+.option:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* "Continuă" stays in sight while the list scrolls under it. */
+.stickyAction {
+  position: sticky;
+  bottom: 0;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0 calc(-1 * var(--page-pad));
+  padding: 10px var(--page-pad) 12px;
+  background: linear-gradient(to bottom, transparent, var(--bg) 14px);
+}
+
 .chevron {
   color: var(--muted);
   flex-shrink: 0;

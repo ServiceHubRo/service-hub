@@ -14,6 +14,7 @@ import { getReportPrice } from '../../../data/reports';
 import { useI18n } from '../../../i18n/context';
 import { formatDayMonth, formatKm, formatMoney } from '../../../i18n/format';
 import { plural } from '../../../i18n/translate';
+import { bookingServicesText } from '../../../lib/bookingServices';
 import { jobDay, jobsOf, sameVehicle, sumCosts, type VehicleFields } from '../../../lib/history';
 import { useLoad } from '../../../lib/useLoad';
 import { HistoryQuote } from '../../history/HistoryQuote';
@@ -30,7 +31,6 @@ import {
   type ReportLinkState,
   type VehicleHistoryLinkState,
 } from '../paths';
-import { serviceName } from '../shop/serviceGroups';
 import styles from '../../history/history.module.css';
 
 /**
@@ -189,7 +189,7 @@ function JobCard({ booking: b, open, onToggle }: { booking: ClientBooking; open:
         <span className={styles.top}>
           <ServiceIcon name={b.service?.icon} className={styles.icon} />
           <span className={styles.what}>
-            <span className={`${styles.service} ${styles.block}`}>{b.service ? serviceName(b.service, lang) : b.service_id}</span>
+            <span className={`${styles.service} ${styles.block}`}>{bookingServicesText(lang, b.service, b.extra_services, b.service_id)}</span>
             {b.shop && (
               <span className={`${styles.muted} ${styles.block}`}>
                 {b.shop.name} · {b.shop.city}
@@ -224,7 +224,7 @@ function JobCard({ booking: b, open, onToggle }: { booking: ClientBooking; open:
           <div className={styles.actions}>
             {b.shop && (
               <Link
-                to={`${bookingPath(b.shop_id)}?pas=2&serviciu=${encodeURIComponent(b.service_id)}`}
+                to={`${bookingPath(b.shop_id)}?pas=2&serviciu=${[b.service_id, ...b.extra_service_ids].map(encodeURIComponent).join(',')}`}
                 className={buttonClass('primary')}
               >
                 {t('cb.bookAgain')}

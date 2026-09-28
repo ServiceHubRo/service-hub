@@ -93,6 +93,7 @@ Settings writes (T05): public data, booking rules, fee, preferences, closures an
 
 **bookings**
 - `ref text unique` (short human reference, e.g. `P-004213`), `shop_id`, `client_id`, `service_id`
+- `extra_service_ids text[]` (T21, schema 38): the other services of the same booking, in the order the client ticked them, at most 4 (5 services in all). Still one car, one time, one place of the day's capacity. `service_id` stays the first one (search matches, reviews and the service charts use it). `service_names(ids)` → `[{id, name_ro, name_en, icon}]` and `services_label(service_id, extra, lang)` → one line (`"Schimb ulei + filtru ulei, Plăcuțe de frână"`, a comma between services) feed every read: shop lists and history (`extra_services`), admin lists and Excel export, the PDF report. Notifications carry `extra_count` ("… și încă 2"). Service reminders (T19d) count every service of a booking; `client_reminders` is keyed by `(booking_id, kind, service_id)`.
 - Snapshots: `client_name`, `client_phone`, `client_lang`, `car_id` (on delete set null), `car_snapshot jsonb` (`make, model, year, plate, plate_norm, vin`)
 - `date date`, `slot time` (local Europe/Bucharest), `note`
 - `status` — see §3
@@ -175,7 +176,7 @@ Side exits:
 
 | RPC function | Caller | From → To | Rules and side effects |
 |---|---|---|---|
-| `create_booking(shop_id, service_id, date, slot, car_id \| car jsonb, save_car, note, request_id)` | client | — → `pending` | client email verified, not suspended; shop public (§5); service offered and enabled; **slot strictly in the future** and available (§4); limits (§6); snapshots; creates thread if missing; event `booking_requested` → shop (+SMS if enabled) |
+| `create_booking(shop_id, service_id, date, slot, car_id \| car jsonb, save_car, note, request_id, extra_service_ids)` | client | — → `pending` | client email verified, not suspended; shop public (§5); service offered and enabled (and each added one: offered, enabled, once, not the first again → `service_unavailable`; more than 5 in all → `too_many_services {limit}`); **slot strictly in the future** and available (§4); limits (§6); snapshots; creates thread if missing; event `booking_requested` → shop (+SMS if enabled) |
 | `confirm_booking(id)` | shop | `pending → confirmed` | event `booking_confirmed` → client |
 | `decline_booking(id, reason?)` | shop | `pending → declined` | event → client |
 | `reschedule_booking(id, date, slot)` | shop | `pending/confirmed → confirmed` | re-checks that the new slot is in the future and re-checks capacity at submit; fails safely with `past_slot`/`day_full`/`slot_full`, booking unchanged; event → client |

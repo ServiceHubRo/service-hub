@@ -26,6 +26,7 @@ import {
   isHistoryFilter,
   isHistoryPeriod,
 } from '../../../lib/history';
+import { rowServicesText } from '../../../lib/bookingServices';
 import { useLoad } from '../../../lib/useLoad';
 import { useNow } from '../../../lib/useNow';
 import { saveFile } from '../../../lib/saveFile';
@@ -41,7 +42,7 @@ function carText(b: ShopHistoryItem): string {
 }
 
 function serviceText(b: ShopHistoryItem, lang: Lang): string {
-  return (lang === 'ro' ? b.service_ro : b.service_en) ?? b.service_id;
+  return rowServicesText(lang, b);
 }
 
 /**
