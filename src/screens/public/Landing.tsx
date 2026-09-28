@@ -293,8 +293,6 @@ function PriceBlock() {
               <span className={styles.priceFigure}>
                 {t('landing.priceMain', { price: money(state.pricing.launchRon ?? state.pricing.subscriptionRon) })}
               </span>
-              <span aria-hidden="true"> · </span>
-              <span>{t('landing.priceNoVat')}</span>
               {state.pricing.trialDays > 0 && (
                 <>
                   <span aria-hidden="true"> · </span>

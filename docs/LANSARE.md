@@ -141,7 +141,7 @@ Dă-i avocatului cele șase fișiere (`docs/legal/*.md` și `docs/legal/en/*.md`
 3. **Transferurile în afara UE** (Netlify, Resend, Cloudflare, Stripe — SUA): avocatul confirmă că formularea e bună și că ai acceptat contractele de prelucrare (DPA) ale fiecărui furnizor. Le găsești în contul fiecăruia (de obicei **Settings → Legal** sau **Privacy**); Supabase, Stripe, Resend, Netlify și Sentry le au gata de semnat online.
 4. **Păstrarea datelor:** conturile nefolosite nu se șterg singure. Vrei o regulă (de exemplu, ștergere după 3 ani fără activitate)?
 5. **Litigii:** platforma europeană SOL (ODR) s-a închis în iulie 2025, așa că documentele trimit la ANPC și la SAL. Avocatul confirmă.
-6. **TVA:** Termenii spun că factura se emite „conform legii”; după ce decizi cu contabilul (T14b), avocatul poate adăuga dacă prețurile includ TVA.
+6. **TVA:** la început firma nu e plătitoare de TVA: prețurile apar fără nicio mențiune de TVA și nu se adaugă nimic. Termenii (§4.5) spun că, dacă firma devine plătitoare, TVA-ul se adaugă cu anunț cu 30 de zile înainte; avocatul poate verifica formularea.
 
 ### 3. În Sentry
 

@@ -249,5 +249,5 @@ La 10 ateliere plătitoare, venitul e 1.000 lei/lună. Costurile de infrastructu
 2. **SMS:** confirmi SMSO, sau vrei să testezi întâi fără SMS în pilot?
 3. **Procesator de plăți:** Stripe sau un procesator românesc?
 4. **Facturare:** SmartBill, Oblio sau altceva ce folosește deja contabilul tău?
-5. **TVA:** firma va fi plătitoare de TVA de la început?
+5. **TVA:** firma va fi plătitoare de TVA de la început? **Răspuns (Eduard):** nu; până devine, TVA-ul nu apare nicăieri lângă prețuri și nu se adaugă.
 6. **Adresa de administrare** pentru recenzii raportate: care e?
