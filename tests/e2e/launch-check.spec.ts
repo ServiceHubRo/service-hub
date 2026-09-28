@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
+import { ymdInBucharest } from '../../src/i18n/format';
 import {
   BACKEND,
   PASSWORD,
@@ -164,7 +165,9 @@ test('the fourth active booking at the same shop is refused with a clear message
 
   // Three active bookings already (the default limit per shop).
   const av = await rpcAs<{ days: { date: string; bookable: boolean }[] }>(client, 'get_availability', { p_shop_id: shopId, p_days: 30 });
-  const days = av.days.filter((d) => d.bookable).map((d) => d.date);
+  // From tomorrow on: today's 10:00 may already be inside the shop's notice (a run in the morning).
+  const today = ymdInBucharest(new Date());
+  const days = av.days.filter((d) => d.bookable && d.date > today).map((d) => d.date);
   for (let i = 0; i < 3; i++) {
     await rpcAs(client, 'create_booking', {
       p_shop_id: shopId,
