@@ -1,6 +1,6 @@
 # Terms and Conditions — Service-Hub
 
-**Last updated:** September 26, 2026
+**Last updated:** September 28, 2026
 
 These terms (the “Terms”) apply to your use of Service-Hub: the website and app at service-hub.ro (the “Platform”). By creating an account, you confirm that you have read and agree to them. How we use your data is described in the Privacy Policy, and what we keep in your browser in the Cookie Policy.
 
@@ -132,6 +132,15 @@ The owner may invite colleagues, each with their own account (colleagues do not 
 - **Non-payment:** if a payment fails, Stripe retries a few times and we let you know. If the free period ends without a card, or the last payment attempt fails, the shop becomes **inactive**: it no longer appears in search and receives no new requests. Existing bookings continue and all data is kept. As soon as you pay, the shop is back.
 - **Price changes:** apart from the launch price, a new price for a shop already signed up is announced by email at least 30 days in advance. If you do not agree, you can cancel before the change takes effect.
 - The subscription is a contract between professionals: the consumer right of withdrawal does not apply.
+
+### 4.5a Referrals
+
+- **Your referral code** is your shop's number (like S-00042). You find it on the Subscription screen, with a sign-up link you can send to other shops.
+- **The free month:** a new shop that enters your code when signing up (or signs up from your link) and pays its first subscription brings you a free month. If you are still in your free period, it gets 30 days longer. Otherwise, your next payment drops by one month of your subscription, as it is on the day the new shop pays.
+- **Limits:** at most 12 free months per shop and at most one per company brought (tax ID). None is given for a shop of the same person (same email or phone) or the same company, or for a shop that had an account on the Platform before. The code can only be given when signing up.
+- **What you see:** on the Subscription screen you see the name and city of the shops that signed up with your code and whether they paid their first subscription; nothing else about them.
+- **A returned payment:** if the referred shop's first payment is refunded in full or disputed at the bank, and it has no other valid payment, the free month is canceled. Only what you have not used yet is taken back (the free days left or the credit left); nothing extra is charged.
+- A free month cannot be turned into money or transferred. We may change or stop the program for future referrals, announced in the app; months already earned stay.
 
 ### 4.6 Customer data
 

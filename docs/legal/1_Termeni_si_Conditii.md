@@ -1,6 +1,6 @@
 # Termeni și condiții — Service-Hub
 
-**Ultima actualizare:** 26 septembrie 2026
+**Ultima actualizare:** 28 septembrie 2026
 
 Acești termeni („Termenii”) se aplică folosirii Service-Hub: site-ul și aplicația de la adresa service-hub.ro („Platforma”). Când îți faci cont, confirmi că i-ai citit și că ești de acord cu ei. Cum folosim datele tale scrie în Politica de confidențialitate, iar ce păstrăm în browser, în Politica de cookies.
 
@@ -132,6 +132,15 @@ Proprietarul poate invita colegi, fiecare cu contul lui (colegii nu folosesc con
 - **Neplata:** dacă o plată nu reușește, Stripe mai încearcă de câteva ori și te anunțăm. Dacă perioada gratuită se termină fără card sau ultima încercare de plată nu reușește, service-ul devine **inactiv**: nu mai apare în căutare și nu mai primește cereri noi. Programările existente continuă, iar toate datele rămân. Cum plătești, service-ul revine imediat.
 - **Schimbarea prețului:** în afara prețului de lansare, un preț nou pentru un service deja înscris se anunță prin email cu cel puțin 30 de zile înainte. Dacă nu ești de acord, poți anula abonamentul înainte de data schimbării.
 - Abonamentul este un contract între profesioniști: nu se aplică dreptul de retragere al consumatorilor.
+
+### 4.5a Recomandările
+
+- **Codul tău** de recomandare este numărul service-ului (de forma S-00042) și îl găsești în ecranul Abonament, cu un link de înscriere pe care îl poți trimite altor service-uri.
+- **Luna gratuită:** un service nou care scrie codul tău la înscriere (sau se înscrie din linkul tău) și plătește primul abonament îți aduce o lună gratuită. Dacă ești încă în perioada gratuită, ea se prelungește cu 30 de zile. Altfel, următoarea plată scade cu prețul unei luni din abonamentul tău, așa cum este în ziua în care service-ul nou plătește.
+- **Limite:** cel mult 12 luni gratuite pentru un service și cel mult una pentru fiecare firmă adusă (CUI). Nu se acordă pentru un service al aceleiași persoane (același email sau telefon) sau al aceleiași firme, nici pentru un service care a mai avut cont pe Platformă. Codul se poate da doar la înscriere.
+- **Ce vezi:** în ecranul Abonament vezi numele și orașul service-urilor înscrise cu codul tău și dacă au plătit primul abonament; nimic altceva despre ele.
+- **Plata returnată:** dacă prima plată a service-ului adus îi este returnată integral sau o contestă la bancă, și nu mai are altă plată valabilă, luna gratuită se anulează. Se retrage doar ce nu ai folosit încă (zilele gratuite rămase sau creditul rămas); nu plătești nimic în plus.
+- Luna gratuită nu se transformă în bani și nu se transferă. Putem schimba sau opri programul pentru recomandările viitoare, anunțat în aplicație; lunile deja primite rămân.
 
 ### 4.6 Datele clienților
 

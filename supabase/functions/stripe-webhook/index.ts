@@ -17,9 +17,13 @@
 // against the shop's count now (someone may have joined while Checkout was open) and set if it
 // differs (_shared/seats.ts); what Stripe charges is recorded as billed_seats.
 //
+// Shop referrals: a subscription payment refunded in full (charge.refunded) or disputed at the
+// bank (charge.dispute.created) is recorded on its invoice (record_invoice_reversed), which takes
+// back a free month that payment earned (_shared/referrals.ts).
+//
 // Events to send (Stripe → Developers → Webhooks): checkout.session.completed,
 // customer.subscription.created, customer.subscription.updated, customer.subscription.deleted,
-// invoice.paid, invoice.payment_failed.
+// invoice.paid, invoice.payment_failed, charge.refunded, charge.dispute.created.
 //
 // Any API version on the endpoint works: only the event's type and the object's id are taken from
 // the event; the Checkout session, subscription or invoice is read back from the API, which
@@ -27,6 +31,7 @@
 import { adminApi } from '../_shared/admin.ts';
 import { appUrlFromEnv, stripeConfigFromEnv } from '../_shared/env.ts';
 import { json } from '../_shared/http.ts';
+import { reversedPayment } from '../_shared/referrals.ts';
 import { generateReport } from '../_shared/reportGenerate.ts';
 import { seatPrice, syncSeats, type SeatInfo } from '../_shared/seats.ts';
 import {
@@ -138,6 +143,13 @@ async function handle(api: Api, stripe: StripeApi, seatPriceId: string | undefin
       const customer = idOf(object.customer);
       if (customer) await api.rpc('record_payment_failed', { p_customer: customer, p_invoice: failedInvoice(object) });
       await sync(api, stripe, invoiceSubscriptionId(object), null);
+      return;
+    }
+    case 'charge.refunded':
+    case 'charge.dispute.created': {
+      const reason = type === 'charge.refunded' ? 'refunded' : 'disputed';
+      const paid = await reversedPayment(stripe, reason, sent);
+      if (paid) await api.rpc('record_invoice_reversed', { p_customer: paid.customer, p_invoice_id: paid.invoice, p_reason: reason });
       return;
     }
     default:

@@ -25,7 +25,7 @@ begin
     public.history_reports, public.invoices, public.cars, public.favorites, public.shops,
     public.shop_billing, public.shop_hours, public.shop_closures, public.shop_services,
     public.shop_staff, public.subscriptions, public.notices, public.notice_reads,
-    public.admin_audit_log, public.request_log, public.stripe_events
+    public.admin_audit_log, public.request_log, public.stripe_events, public.shop_referrals
     restart identity cascade;
 
   -- The accounts themselves (their profiles, push subscriptions, phone codes and sign-ins go with them).

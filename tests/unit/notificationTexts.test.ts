@@ -64,6 +64,8 @@ const SAMPLE: Record<string, Record<string, unknown>> = {
   review_report_decided: { review_id: 'r-1', rating: 1, decision: 'removed' },
   review_request: {},
   service_due: { car_id: 'c-1', service_id: 'lichid_frana', last_done: '2024-10-20', due: '2026-10-20' },
+  referral_reward: { kind: 'trial_days', referral_shop_id: 's-9', referred_name: 'Auto Nou', days: 30, expiry: '2026-11-20' },
+  referral_revoked: { kind: 'trial_days', referral_shop_id: 's-9', referred_name: 'Auto Nou', reason: 'refunded' },
 };
 
 const render = (event: string, role: 'client' | 'shop', lang: 'ro' | 'en', extra: Record<string, unknown> = {}) =>
@@ -117,6 +119,24 @@ describe('notification texts', () => {
         }
       }
     }
+  });
+
+  it('a referral reward says which shop paid and what the owner got', () => {
+    expect(render('referral_reward', 'shop', 'ro')).toMatchObject({
+      title: 'Ai primit o lună gratuită',
+      body: 'Auto Nou a plătit abonamentul, recomandat de tine. Perioada ta gratuită s-a prelungit cu 30 de zile, până pe 20 nov.',
+      url: '/s/cont/abonament',
+      tag: 'referral-s-9',
+    });
+    expect(render('referral_reward', 'shop', 'en', { kind: 'stripe_credit', total: 149 })!.body).toBe(
+      'Auto Nou, the shop you referred, paid its subscription. Your next payment is 149 RON lower.',
+    );
+    const mail = emailForEvent({ event: 'referral_reward', lang: 'ro', params: { ...SAMPLE.referral_reward, kind: 'stripe_credit', total: 149 } }, 'https://x');
+    expect(mail!.subject).toBe('Ai primit o lună gratuită');
+    expect(mail!.text).toContain('Următoarea ta plată scade cu 149 lei');
+    expect(render('referral_revoked', 'shop', 'ro')).toMatchObject({ title: 'Luna gratuită s-a anulat', tag: 'referral-s-9' });
+    const revoked = emailForEvent({ event: 'referral_revoked', lang: 'en', params: { ...SAMPLE.referral_revoked, reason: 'disputed' } }, 'https://x');
+    expect(revoked!.text).toContain('Auto Nou disputed its first payment at the bank.');
   });
 
   it('suspension and reactivation reach the phone too, account or shop', () => {

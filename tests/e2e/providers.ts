@@ -281,6 +281,13 @@ function stripeStandIn() {
             customers.set(m[1]!, c);
             return reply(200, c);
           }
+          // A referral's month of credit: kept as the customer's balance (the stand-in's invoices ignore it).
+          if (req.method === 'POST' && (m = /^\/v1\/customers\/([^/]+)\/balance_transactions$/.exec(path))) {
+            const c = customers.get(m[1]!) ?? { id: m[1] };
+            c.balance = Number(c.balance ?? 0) + Number(body.amount ?? 0);
+            customers.set(m[1]!, c);
+            return remember({ id: id('cbtxn'), object: 'customer_balance_transaction', customer: m[1], ...body });
+          }
           if (req.method === 'GET' && path === `/v1/prices/${price.id}`) return reply(200, price);
           if (req.method === 'GET' && path === `/v1/prices/${seatPrice.id}`) return reply(200, seatPrice);
           // The colleagues' item: added, its quantity changed, removed (announced as an update).

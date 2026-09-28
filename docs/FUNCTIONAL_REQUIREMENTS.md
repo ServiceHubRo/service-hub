@@ -195,6 +195,7 @@ A user has exactly one role. The role decides the entire interface. A client can
 - Shows: trial days left or next billing date, status (Trial / Active / Past due / Cancelled), amount.
 - Hosted checkout to start; hosted customer portal to change card, view invoices, cancel.
 - Invoice list with download.
+- **Referrals** (Eduard, 28 Sep 2026, T22): the owner's code is the shop account ID (S-00042), shown on Subscription with a WhatsApp button and a copyable sign-up link (`/cont-nou?rol=service&cod=…`). A new shop may enter a code at sign-up (optional, pre-filled from the link, a wrong code is refused on the form). When the new shop pays its first subscription, the referrer gets **one free month**: 30 more free days while still in its trial, otherwise one month of its subscription off its next Stripe invoice. At most 12; never for the same person (email/phone) or company (CUI), nor for a shop that had an account before. The owner sees the shops brought (name, city, where each stands) and is notified (push + email). Shop to shop only.
 - **Rule:** when the trial ends without payment, or after final failed payment retry, the shop becomes **inactive**: hidden from search and unable to receive new bookings. Existing bookings continue. All data kept. Paying reactivates immediately.
 
 ### 4.8 Account
