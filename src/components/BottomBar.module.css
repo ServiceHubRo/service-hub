@@ -1,0 +1,13 @@
+/* Main action at the bottom, above the menu (asked by Eduard at testing). */
+.bar {
+  position: sticky;
+  bottom: 0;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  /* Pushed to the foot of a short screen; over the content area's padding, so it sits on the menu. */
+  margin: auto calc(-1 * var(--page-pad)) calc(-1 * var(--page-pad));
+  padding: 14px var(--page-pad) 12px;
+  background: linear-gradient(to bottom, transparent, var(--bg) 14px);
+}

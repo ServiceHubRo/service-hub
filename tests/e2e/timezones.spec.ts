@@ -88,6 +88,7 @@ for (const timezoneId of ['America/Los_Angeles', 'America/New_York', 'Asia/Tokyo
     await cx.goto(`/c/service/${shopId}`);
     await cx.getByRole('link', { name: 'Programează-te' }).click();
     await cx.getByRole('button', { name: 'Plăcuțe de frână' }).click();
+    await cx.getByRole('button', { name: /^Continuă/ }).click();
     await cx.getByRole('button', { name: new RegExp(`^${day}:`) }).click();
     await expect(cx.getByRole('button', { name: /^09:00/ })).toBeVisible();
     await expect(cx.getByRole('button', { name: /^08:00/ })).toBeVisible();

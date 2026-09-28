@@ -355,6 +355,7 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
 /** Words the texts are built from (not overridable). */
 const WORDS: Record<Lang, Record<string, string>> = {
   ro: {
+    servicesMore: '{service} și încă {n}',
     car: 'mașina ta',
     carShop: 'mașina',
     client: 'Clientul',
@@ -377,6 +378,7 @@ const WORDS: Record<Lang, Record<string, string>> = {
     'digest.pending.other': '{n} de cereri noi așteaptă răspuns.',
   },
   en: {
+    servicesMore: '{service} and {n} more',
     car: 'car',
     carShop: 'car',
     client: 'The client',
@@ -441,6 +443,16 @@ const num = (v: unknown): number | null => {
   return Number.isFinite(n) ? n : null;
 };
 
+/**
+ * The booking's service for a notification: its name, and how many more were booked with it
+ * (T21, `extra_count`): "Schimb ulei + filtru ulei și încă 2".
+ */
+export function servicesText(e: Pick<NotificationEvent, 'service' | 'params'>, lang: Lang): string {
+  const name = e.service ? e.service[lang] : '';
+  const more = num((e.params ?? {}).extra_count) ?? 0;
+  return name && more > 0 ? word(lang, 'servicesMore', { service: name, n: more }) : name;
+}
+
 /** "mâine la 14:00", "azi la 09:30", else "pe 26 sept, la 14:00". */
 function relativeDeadline(lang: Lang, iso: string, now: Date): string {
   const at = new Date(iso);
@@ -490,7 +502,7 @@ function vars(e: NotificationEvent, lang: Lang, side: Side, now: Date): Record<s
     preview: str(p.preview),
     car,
     car_plate: plate ? `${car} (${plate})` : car,
-    service: e.service ? e.service[lang] : '',
+    service: servicesText(e, lang),
     when,
     slot,
     reason: str(p.reason),

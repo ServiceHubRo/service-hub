@@ -119,7 +119,7 @@ describe('calls', () => {
   it('createBooking sends a garage car by id', async () => {
     rpc.mockResolvedValue({ data: { id: 'b1', status: 'pending' }, error: null });
     const booking = await createBooking(
-      { shopId: 's1', serviceId: 'ulei', date: '2026-10-14', slot: '09:00', car: { carId: 'c1' }, note: 'Lichide' },
+      { shopId: 's1', serviceId: 'ulei', extraServiceIds: ['frane', 'itp'], date: '2026-10-14', slot: '09:00', car: { carId: 'c1' }, note: 'Lichide' },
       'r1',
     );
     expect(booking).toEqual({ id: 'b1', status: 'pending' });
@@ -131,6 +131,7 @@ describe('calls', () => {
       p_request_id: 'r1',
       p_car_id: 'c1',
       p_note: 'Lichide',
+      p_extra_service_ids: ['frane', 'itp'],
     });
   });
 

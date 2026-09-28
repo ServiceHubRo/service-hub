@@ -21,6 +21,7 @@ import {
 import type { ShopBooking } from '../../../data/shopBookings';
 import { useI18n } from '../../../i18n/context';
 import { daysFromToday, formatDate, formatMoney, formatTime, ymdInBucharest } from '../../../i18n/format';
+import { rowServicesText } from '../../../lib/bookingServices';
 import { slotStarted } from '../../../lib/shopBookings';
 import { formatPhone, normalizePhone } from '../../../lib/validators';
 import { ConfirmPanel, ReasonPanel } from './BookingPanels';
@@ -74,7 +75,7 @@ export function ShopBookingCard({ booking: b, shopId, fee, expiryDays, now, onDo
   }
 
   const close = () => setPanel(null);
-  const service = (lang === 'ro' ? b.service_ro : b.service_en) ?? b.service_id;
+  const service = rowServicesText(lang, b);
   const car = [b.car_snapshot.make, b.car_snapshot.model, b.car_snapshot.year].filter(Boolean).join(' ');
   const plate = b.car_snapshot.plate;
   const phone = b.client_phone;

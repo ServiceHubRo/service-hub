@@ -124,7 +124,7 @@ test.describe('booking', () => {
 
   test('four steps, success, Programări; with capacity 1 the day turns grey for the next client', async ({ page, browser }) => {
     const shopName = `Atelier T07 ${Date.now() % 100000}${Math.floor(Math.random() * 100)}`;
-    const { shopId } = await createBookableShop(shopName, ['ulei', 'frane'], { daily_capacity: 1, inspection_fee: 80 });
+    const { email: shopEmail, shopId } = await createBookableShop(shopName, ['ulei', 'frane'], { daily_capacity: 1, inspection_fee: 80 });
 
     await signInClient(page);
     await page.goto(`/c/service/${shopId}`);
@@ -134,8 +134,16 @@ test.describe('booking', () => {
     await expect(page.getByRole('heading', { level: 1, name: 'Ce ai nevoie?' })).toBeVisible();
     await expect(page.getByText('Pasul 1 din 4')).toBeVisible();
     await expectNoHorizontalScroll(page);
-    await shot(page, 't07-step1', name());
+    // Several services in one booking (T21): each tap ticks one; "Continuă" names how many.
+    const continueButton = page.getByRole('button', { name: /^Continuă/ });
+    await expect(page.getByRole('button', { name: 'Alege cel puțin un serviciu' })).toBeDisabled();
     await page.getByRole('button', { name: 'Schimb ulei + filtru ulei' }).click();
+    await page.getByRole('button', { name: 'Plăcuțe de frână' }).click();
+    await expect(page.getByRole('button', { name: 'Plăcuțe de frână', pressed: true })).toBeVisible();
+    await expect(continueButton).toHaveText('Continuă · 2 servicii');
+    await expect(continueButton).toBeInViewport();
+    await shot(page, 't07-step1', name());
+    await continueButton.click();
 
     // 2 — the next open days with places left.
     await expect(page.getByRole('heading', { level: 1, name: 'Alege ziua' })).toBeVisible();
@@ -170,6 +178,7 @@ test.describe('booking', () => {
     await expect(page.getByLabel('Salvează mașina în garaj')).toBeChecked();
     await page.getByLabel('Observație (opțional)').fill('Aș vrea și verificarea lichidelor.');
     await expect(page.getByText('Dacia Duster · BV 07 DUS')).toBeVisible();
+    await expect(page.getByText('Schimb ulei + filtru ulei, Plăcuțe de frână', { exact: true })).toBeVisible();
     await expect(page.getByText('80 lei')).toBeVisible();
     await expectNoHorizontalScroll(page);
     await shot(page, 't07-step4', name());
@@ -181,13 +190,35 @@ test.describe('booking', () => {
     await page.getByRole('link', { name: 'Vezi programările' }).click();
     await expect(page).toHaveURL(/\/c\/programari$/);
     const card = page.locator('li').filter({ hasText: shopName });
-    await expect(card).toContainText('Schimb ulei + filtru ulei');
+    await expect(card).toContainText('Schimb ulei + filtru ulei, Plăcuțe de frână');
     await expect(card).toContainText('În așteptare');
     await expect(card).toContainText('Dacia Duster · BV 07 DUS');
     await shot(page, 't07-bookings', name());
 
     // Live: the shop confirms (T08 adds its screen) and the card changes without a reload.
-    const [booking] = await serviceRest<{ id: string }[]>(`bookings?shop_id=eq.${shopId}&select=id`, 'GET');
+    const [booking] = await serviceRest<{ id: string; ref: string; service_id: string; extra_service_ids: string[] }[]>(
+      `bookings?shop_id=eq.${shopId}&select=id,ref,service_id,extra_service_ids`,
+      'GET',
+    );
+    // One booking with both services, in the order they were ticked.
+    expect(booking!.service_id).toBe('ulei');
+    expect(booking!.extra_service_ids).toEqual(['frane']);
+
+    // The shop sees every service on the request, in both languages.
+    const shopContext = await browser.newContext({ viewport: page.viewportSize() ?? undefined });
+    await shopContext.addInitScript(() => localStorage.setItem('sh_lang', 'ro'));
+    const shopPage = await shopContext.newPage();
+    await signIn(shopPage, shopEmail, PASSWORD);
+    await expect(shopPage).toHaveURL(/\/s\//);
+    await shopPage.goto('/s/programari?tab=cereri');
+    const request = shopPage.locator('main ul[aria-label] > li').filter({ hasText: booking!.ref });
+    await expect(request).toContainText('Schimb ulei + filtru ulei, Plăcuțe de frână');
+    await expectNoHorizontalScroll(shopPage);
+    await shot(shopPage, 't21-shop-request', name());
+    await shopPage.getByRole('button', { name: 'English' }).filter({ visible: true }).first().click();
+    await expect(request).toContainText('Oil & oil filter change, Brake pads');
+    await shot(shopPage, 't21-shop-request-en', name());
+    await shopContext.close();
     await serviceRest(`bookings?id=eq.${booking!.id}`, 'PATCH', { status: 'confirmed', confirmed_at: new Date().toISOString() });
     await expect(card).toContainText('Confirmată');
     await expect(card).not.toContainText('În așteptare');

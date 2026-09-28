@@ -3,6 +3,7 @@ import type { BookingStatus } from '../lib/status';
 import type { Json } from './database.types';
 import { call, failure, RpcError, type ReportReason } from './rpc';
 import { supabase } from './supabase';
+import type { ExtraService } from '../lib/bookingServices';
 
 /**
  * The admin interface (T16a, FR §5.1–5.5, §5.8). Every screen reads one admin-only database
@@ -405,6 +406,8 @@ export interface AdminBookingDetail {
     odometer: number | null;
   };
   service: { id: string; name_ro: string; name_en: string; icon: string } | null;
+  /** The other services of the same booking (T21). */
+  extra_services?: ExtraService[];
   shop: { id: string; name: string; city: string; phone: string | null; display_id: string } | null;
   client: { id: string; display_id: string; name: string | null; phone: string | null; email: string | null; no_shows: number } | null;
   quotes: AdminQuote[];

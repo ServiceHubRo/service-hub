@@ -132,6 +132,10 @@ describe('SMS texts', () => {
     );
   });
 
+  it('says how many services came with the first one (T21)', () => {
+    expect(smsForEvent(request('ro', { extra_count: 2 }))).toContain(': Schimb ulei + filtru ulei si inca 2. ');
+  });
+
   it('always fits one message', () => {
     const long = request('ro', { client_name: 'Ștefănescu-Țăranu Alexandra-Mădălina Georgiana' }, {
       ro: 'Diagnoză computerizată completă a sistemului de injecție și a turbosuflantei',

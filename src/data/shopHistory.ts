@@ -2,6 +2,7 @@ import { call } from './rpc';
 import type { CarSnapshot } from './bookings';
 import type { Quote } from '../lib/clientBookings';
 import type { HistoryStatus } from '../lib/history';
+import type { ExtraService } from '../lib/bookingServices';
 
 /**
  * The shop's repair history (FR §4.3, P16b; T10), in one read: `list_shop_history()` answers only
@@ -22,6 +23,8 @@ export interface ShopHistoryItem {
   service_ro: string | null;
   service_en: string | null;
   service_icon: string | null;
+  /** The other services of the same booking (T21), in the order they were ticked. */
+  extra_services?: ExtraService[];
   client_name: string | null;
   client_phone: string | null;
   /** False once the client deleted the account (no conversation to open). */

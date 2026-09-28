@@ -12,6 +12,7 @@ import { adminForceCancel, toRpcError } from '../../data/rpc';
 import { useI18n } from '../../i18n/context';
 import { formatKm } from '../../i18n/format';
 import type { MessageKey } from '../../i18n/ro';
+import { bookingServicesText } from '../../lib/bookingServices';
 import { NO_SHOW_FLAG } from '../../lib/admin';
 import { isActiveStatus } from '../../lib/status';
 import { formatPhone } from '../../lib/validators';
@@ -87,7 +88,7 @@ export function BookingDetailScreen() {
   }
   const d = state.data;
   const b = d.booking;
-  const service = d.service ? (lang === 'ro' ? d.service.name_ro : d.service.name_en) : '';
+  const service = bookingServicesText(lang, d.service, d.extra_services, '');
   const clientName = b.client_name || d.client?.name || t('admin.deletedAccount');
 
   return (

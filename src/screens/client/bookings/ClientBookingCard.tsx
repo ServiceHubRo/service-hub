@@ -12,11 +12,11 @@ import { quoteOf, type ClientBooking } from '../../../data/bookings';
 import { cancelBooking, canRetryRpc, rpcErrorMessage, toRpcError, type Booking, type RpcErrorCode } from '../../../data/rpc';
 import { useI18n } from '../../../i18n/context';
 import { daysFromToday, formatDate, formatKm, formatMoney, formatTime, ymdInBucharest } from '../../../i18n/format';
+import { bookingServicesText } from '../../../lib/bookingServices';
 import { cancelState, reviewState, type Quote } from '../../../lib/clientBookings';
 import { formatPhone, normalizePhone } from '../../../lib/validators';
 import { MessageLink } from '../../messages/MessageLink';
 import { bookingCarHistoryPath, bookingPath, type VehicleHistoryLinkState } from '../paths';
-import { serviceName } from '../shop/serviceGroups';
 import { QuoteDecision } from './QuoteDecision';
 import { ReviewForm } from './ReviewForm';
 import styles from './bookings.module.css';
@@ -87,7 +87,7 @@ export function ClientBookingCard({
       <div className={styles.top}>
         <ServiceIcon name={b.service?.icon} className={styles.icon} />
         <div className={styles.what}>
-          <p className={styles.service}>{b.service ? serviceName(b.service, lang) : b.service_id}</p>
+          <p className={styles.service}>{bookingServicesText(lang, b.service, b.extra_services, b.service_id)}</p>
           {b.shop && (
             <p className={styles.muted}>
               {b.shop.name} · {b.shop.city}
@@ -125,7 +125,7 @@ export function ClientBookingCard({
             </Button>
           )}
           {bookAgain && (
-            <Link to={`${bookingPath(b.shop_id)}?pas=2&serviciu=${encodeURIComponent(b.service_id)}`} className={buttonClass('secondary')}>
+            <Link to={`${bookingPath(b.shop_id)}?pas=2&serviciu=${[b.service_id, ...b.extra_service_ids].map(encodeURIComponent).join(',')}`} className={buttonClass('secondary')}>
               {t('cb.bookAgain')}
             </Link>
           )}

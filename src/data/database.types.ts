@@ -107,6 +107,7 @@ export type Database = {
           date: string
           decline_reason: string | null
           done_at: string | null
+          extra_service_ids: string[]
           id: string
           inspection_started_at: string | null
           note: string | null
@@ -138,6 +139,7 @@ export type Database = {
           date: string
           decline_reason?: string | null
           done_at?: string | null
+          extra_service_ids?: string[]
           id?: string
           inspection_started_at?: string | null
           note?: string | null
@@ -169,6 +171,7 @@ export type Database = {
           date?: string
           decline_reason?: string | null
           done_at?: string | null
+          extra_service_ids?: string[]
           id?: string
           inspection_started_at?: string | null
           note?: string | null
@@ -286,16 +289,19 @@ export type Database = {
           booking_id: string
           kind: string
           sent_at: string
+          service_id: string
         }
         Insert: {
           booking_id: string
           kind: string
           sent_at?: string
+          service_id?: string
         }
         Update: {
           booking_id?: string
           kind?: string
           sent_at?: string
+          service_id?: string
         }
         Relationships: [
           {
@@ -1975,6 +1981,7 @@ export type Database = {
           date: string
           decline_reason: string | null
           done_at: string | null
+          extra_service_ids: string[]
           id: string
           inspection_started_at: string | null
           note: string | null
@@ -2191,6 +2198,7 @@ export type Database = {
           date: string
           decline_reason: string | null
           done_at: string | null
+          extra_service_ids: string[]
           id: string
           inspection_started_at: string | null
           note: string | null
@@ -2275,6 +2283,7 @@ export type Database = {
           date: string
           decline_reason: string | null
           done_at: string | null
+          extra_service_ids: string[]
           id: string
           inspection_started_at: string | null
           note: string | null
@@ -2315,6 +2324,7 @@ export type Database = {
           date: string
           decline_reason: string | null
           done_at: string | null
+          extra_service_ids: string[]
           id: string
           inspection_started_at: string | null
           note: string | null
@@ -2342,6 +2352,7 @@ export type Database = {
           p_car?: Json
           p_car_id?: string
           p_date: string
+          p_extra_service_ids?: string[]
           p_note?: string
           p_request_id: string
           p_save_car?: boolean
@@ -2365,6 +2376,7 @@ export type Database = {
           date: string
           decline_reason: string | null
           done_at: string | null
+          extra_service_ids: string[]
           id: string
           inspection_started_at: string | null
           note: string | null
@@ -2435,6 +2447,7 @@ export type Database = {
           date: string
           decline_reason: string | null
           done_at: string | null
+          extra_service_ids: string[]
           id: string
           inspection_started_at: string | null
           note: string | null
@@ -2475,6 +2488,7 @@ export type Database = {
           date: string
           decline_reason: string | null
           done_at: string | null
+          extra_service_ids: string[]
           id: string
           inspection_started_at: string | null
           note: string | null
@@ -2641,6 +2655,7 @@ export type Database = {
           date: string
           decline_reason: string | null
           done_at: string | null
+          extra_service_ids: string[]
           id: string
           inspection_started_at: string | null
           note: string | null
@@ -2681,6 +2696,7 @@ export type Database = {
           date: string
           decline_reason: string | null
           done_at: string | null
+          extra_service_ids: string[]
           id: string
           inspection_started_at: string | null
           note: string | null
@@ -2730,6 +2746,7 @@ export type Database = {
           date: string
           decline_reason: string | null
           done_at: string | null
+          extra_service_ids: string[]
           id: string
           inspection_started_at: string | null
           note: string | null
@@ -2859,6 +2876,7 @@ export type Database = {
           date: string
           decline_reason: string | null
           done_at: string | null
+          extra_service_ids: string[]
           id: string
           inspection_started_at: string | null
           note: string | null
@@ -3076,6 +3094,7 @@ export type Database = {
           date: string
           decline_reason: string | null
           done_at: string | null
+          extra_service_ids: string[]
           id: string
           inspection_started_at: string | null
           note: string | null
@@ -3196,6 +3215,7 @@ export type Database = {
           date: string
           decline_reason: string | null
           done_at: string | null
+          extra_service_ids: string[]
           id: string
           inspection_started_at: string | null
           note: string | null
@@ -3221,6 +3241,11 @@ export type Database = {
       send_review_requests: { Args: { p_now?: string }; Returns: number }
       send_service_reminders: { Args: { p_today?: string }; Returns: number }
       send_trial_warnings: { Args: { p_now?: string }; Returns: number }
+      service_names: { Args: { p_ids: string[] }; Returns: Json }
+      services_label: {
+        Args: { p_extra: string[]; p_lang: string; p_service_id: string }
+        Returns: string
+      }
       set_billed_seats: {
         Args: { p_seats: number; p_shop_id: string }
         Returns: undefined
@@ -3259,6 +3284,7 @@ export type Database = {
           date: string
           decline_reason: string | null
           done_at: string | null
+          extra_service_ids: string[]
           id: string
           inspection_started_at: string | null
           note: string | null
@@ -3308,6 +3334,7 @@ export type Database = {
           date: string
           decline_reason: string | null
           done_at: string | null
+          extra_service_ids: string[]
           id: string
           inspection_started_at: string | null
           note: string | null
@@ -3348,6 +3375,7 @@ export type Database = {
           date: string
           decline_reason: string | null
           done_at: string | null
+          extra_service_ids: string[]
           id: string
           inspection_started_at: string | null
           note: string | null
@@ -3503,6 +3531,7 @@ export type Database = {
           date: string
           decline_reason: string | null
           done_at: string | null
+          extra_service_ids: string[]
           id: string
           inspection_started_at: string | null
           note: string | null

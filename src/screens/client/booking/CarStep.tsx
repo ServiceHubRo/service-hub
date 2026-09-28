@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useSession } from '../../../app/sessionContext';
 import { ActionButton } from '../../../components/ActionButton';
 import { Banner } from '../../../components/Banner';
+import { BottomBar } from '../../../components/BottomBar';
 import { Card } from '../../../components/Card';
 import { Checkbox } from '../../../components/Checkbox';
 import { Field } from '../../../components/Field';
@@ -24,6 +25,7 @@ import { formatDate, formatMoney } from '../../../i18n/format';
 import { carYearMax, isValidCarYear } from '../../../lib/car';
 import { useLoad } from '../../../lib/useLoad';
 import { ResendConfirmation } from '../../auth/ResendConfirmation';
+import { SERVICE_SEPARATOR } from '../../../lib/bookingServices';
 import { serviceName } from '../shop/serviceGroups';
 import { SummaryRow } from './BookingSent';
 import type { CarDraft } from './carDraft';
@@ -38,7 +40,7 @@ const NOTE_MAX = 1000;
  */
 export function CarStep({
   shop,
-  service,
+  services,
   day,
   time,
   draft,
@@ -47,7 +49,7 @@ export function CarStep({
   onStale,
 }: {
   shop: ShopPageShop;
-  service: ShopPageService;
+  services: ShopPageService[];
   day: string;
   time: string;
   draft: CarDraft;
@@ -78,7 +80,8 @@ export function CarStep({
       const booking = await createBooking(
         {
           shopId: shop.id,
-          serviceId: service.id,
+          serviceId: services[0]!.id,
+          extraServiceIds: services.slice(1).map((x) => x.id),
           date: day,
           slot: time,
           car: manual
@@ -196,7 +199,10 @@ export function CarStep({
       <Card className={styles.summary}>
         <h2 className={styles.groupTitle}>{t('booking.summary')}</h2>
         <SummaryRow label={t('booking.summary.shop')} value={shop.name} />
-        <SummaryRow label={t('booking.summary.service')} value={serviceName(service, lang)} />
+        <SummaryRow
+          label={t(services.length > 1 ? 'booking.summary.services' : 'booking.summary.service')}
+          value={services.map((x) => serviceName(x, lang)).join(SERVICE_SEPARATOR)}
+        />
         <SummaryRow label={t('booking.summary.when')} value={`${formatDate(lang, day)}, ${time}`} mono />
         {carText && <SummaryRow label={t('booking.summary.car')} value={carText} />}
         {shop.inspection_fee > 0 && (
@@ -208,12 +214,12 @@ export function CarStep({
       </Card>
 
       {session.emailVerified ? (
-        <>
+        <BottomBar>
           {manual && !typedOk && <p className={styles.muted}>{t('car.required')}</p>}
           <ActionButton onAction={send} disabled={!ready} errorMessage={(e) => rpcErrorMessage(lang, e)} canRetry={canRetryRpc}>
             {t('booking.submit')}
           </ActionButton>
-        </>
+        </BottomBar>
       ) : (
         <Banner tone="warning">
           <div className={styles.stack}>

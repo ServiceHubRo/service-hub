@@ -40,6 +40,9 @@ export interface ClientBooking {
   decline_reason: string | null;
   shop: { name: string; city: string; phone: string | null; cancel_deadline_hours: number } | null;
   service: { name_ro: string; name_en: string; icon: string | null } | null;
+  /** The other services of the same booking (T21), in the order they were ticked. */
+  extra_service_ids: string[];
+  extra_services: { id: string; name_ro: string; name_en: string; icon: string | null }[];
   /** Every version the shop sent, with its lines (the card picks one with `currentQuote`). */
   quotes: Quote[];
   /** The client's review of this booking, once sent. */
@@ -53,7 +56,7 @@ export interface ClientBookingsData {
 }
 
 const COLUMNS = [
-  'id, ref, status, date, slot, note, car_id, car_snapshot, created_at, shop_id, service_id',
+  'id, ref, status, date, slot, note, car_id, car_snapshot, created_at, shop_id, service_id, extra_service_ids',
   'inspection_started_at, started_at, done_at, odometer, work, cost, cancelled_by, cancel_reason, decline_reason',
   'shop:shops(name, city, phone, cancel_deadline_hours)',
   'service:services(name_ro, name_en, icon)',
@@ -103,7 +106,18 @@ export async function fetchClientBookings(clientId: string): Promise<ClientBooki
     .order('date', { ascending: false })
     .order('slot', { ascending: false });
   if (error) throw failure(error);
-  return (data as unknown as ClientBooking[]).map(normalize);
+  const rows = (data as unknown as ClientBooking[]).map(normalize);
+  // The names of the services added to a booking (T21), from the catalog (readable by everyone).
+  const ids = [...new Set(rows.flatMap((b) => b.extra_service_ids ?? []))];
+  if (ids.length === 0) return rows.map((b) => ({ ...b, extra_service_ids: b.extra_service_ids ?? [], extra_services: [] }));
+  const names = await db().from('services').select('id, name_ro, name_en, icon').in('id', ids);
+  if (names.error) throw failure(names.error);
+  const byId = new Map(names.data.map((s) => [s.id, s]));
+  return rows.map((b) => ({
+    ...b,
+    extra_service_ids: b.extra_service_ids ?? [],
+    extra_services: (b.extra_service_ids ?? []).flatMap((id) => (byId.has(id) ? [byId.get(id)!] : [])),
+  }));
 }
 
 async function fetchReviewWindowDays(): Promise<number> {

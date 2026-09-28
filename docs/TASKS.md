@@ -46,6 +46,7 @@ Ordinea contează: fiecare sarcină se sprijină pe cele de dinainte. Sarcinile 
 | T20a | Aplicația Android de test | Service-Hub ca aplicație pe telefonul Android, instalată direct (fără magazin), pe proiectul de test |
 | T20b | Notificările native și iPhone | Notificări în aplicație (Android, apoi iPhone fără „Adaugă pe ecranul principal”), TestFlight |
 | T20c | Magazinele | Service-Hub în App Store și Google Play |
+| T21 | Mai multe servicii la o programare | Clientul bifează până la 5 servicii la aceeași programare; service-ul le vede pe toate |
 
 ---
 
@@ -757,3 +758,14 @@ Android: notificările prin Firebase Cloud Messaging (gratuit), în `dispatch-no
 După firmă, conturi (Google Play 25 $) și domeniul service-hub.ro: linkurile din emailuri deschid aplicația (App Links / Universal Links, plus adresele aplicației pe proiectul real), iconițele și capturile pentru magazine, textele RO + EN, declarațiile de date, testarea cerută de Google Play, trimiterea spre publicare.
 
 - [ ] Făcut
+
+---
+
+## T21 — Mai multe servicii la o programare
+
+**Scop (cerut după feedback de la test):** clientul nu mai face câte o programare pentru fiecare lucrare. La pasul 1 bifează unul sau mai multe servicii, cel mult 5; e tot o singură programare: o mașină, o oră, un singur loc din capacitatea zilei.
+
+- [x] Făcut
+
+Note: migrarea `booking_services` (`schema_version` = 38). **Baza de date:** `bookings.extra_service_ids` (celelalte servicii, în ordinea bifării; primul rămâne în `service_id`); `create_booking(..., p_extra_service_ids)` verifică fiecare serviciu (oferit de service, activ, o singură dată, nu primul din nou → `service_unavailable`; peste 5 → `too_many_services`). Clientul nu le poate schimba după trimitere. `service_names()` și `services_label()` dau numele; toate citirile le includ: programările și istoricul service-ului, Panoul (lista de azi și tipărirea), adminul (listă, fișa programării, fișele clientului și ale service-ului), exportul Excel, rapoartele service-ului (exportul), raportul PDF de istoric. **Notificările** (push, SMS) spun primul serviciu „și încă N”. **Reminderul de revizie** (T19d) ține cont de fiecare serviciu al programării (`client_reminders` e acum pe serviciu). **Ecranul:** pasul 1 are bife și butonul „Continuă · N servicii”, care stă la vedere jos cât derulezi lista; al 6-lea serviciu nu se mai poate bifa. Adresa păstrează alegerea (`?serviciu=ulei,frane`); linkurile vechi cu un singur serviciu (reminder, „Programează din nou”) merg la fel, iar „Programează din nou” reia toate serviciile. Între servicii apare o virgulă, pentru că unele nume au deja „+” („Schimb ulei + filtru ulei, Plăcuțe de frână”). **Tot aici (cerut de Eduard):** acțiunea principală stă mereu jos, lipită de meniu, și pe un ecran scurt, și cât derulezi unul lung: „Programează-te” pe pagina service-ului (la T20a era doar mutat sub cardul cu detalii), „Continuă · N servicii” la pasul 1 și „Trimite cererea” la pasul 4 (componenta `BottomBar`; ecranul are `data-fill-screen`). **Decizii:** graficul „Lucrări pe tip de serviciu” din Rapoarte numără o lucrare după primul ei serviciu (suma lucrării nu se poate împărți pe servicii); recenzia rămâne una pe programare.
+
