@@ -72,7 +72,7 @@ Adresele permise pentru linkurile din email le pune „Deploy Supabase” singur
 | `STRIPE_SEAT_PRICE_ID` | același `price_…` de test pentru colegi |
 | `STRIPE_WEBHOOK_SECRET` | de la webhook-ul nou, mai jos |
 
-Webhook-ul Stripe pentru proiectul de test: Stripe → **Developers → Webhooks** (în **Test mode**) → **Add endpoint** → URL `https://xyzxyz.supabase.co/functions/v1/stripe-webhook` (cu ref-ul proiectului de test) → aceleași evenimente ca la cel existent (`checkout.session.completed`, `checkout.session.async_payment_succeeded`, `customer.subscription.created`, `customer.subscription.updated`, `customer.subscription.deleted`, `invoice.paid`, `invoice.payment_failed`) → **Add endpoint** → **Signing secret → Reveal** → îl pui ca `STRIPE_WEBHOOK_SECRET` în proiectul de test.
+Webhook-ul Stripe pentru proiectul de test: Stripe → **Developers → Webhooks** (în **Test mode**) → **Add endpoint** → URL `https://xyzxyz.supabase.co/functions/v1/stripe-webhook` (cu ref-ul proiectului de test) → aceleași evenimente ca la cel existent (`checkout.session.completed`, `checkout.session.async_payment_succeeded`, `customer.subscription.created`, `customer.subscription.updated`, `customer.subscription.deleted`, `invoice.paid`, `invoice.payment_failed`, `charge.refunded`, `charge.dispute.created`) → **Add endpoint** → **Signing secret → Reveal** → îl pui ca `STRIPE_WEBHOOK_SECRET` în proiectul de test.
 
 SMS-ul (`SMSO_API_KEY`) îl poți lăsa deoparte pe proiectul de test: aplicația merge și fără, doar că nu trimite SMS-uri (verificarea telefonului o faci din admin). Dacă vrei să testezi și SMS-urile, pune aceeași cheie ca la proiectul real.
 
@@ -191,7 +191,7 @@ Prețul de lansare (99 lei), plata pe 3 / 6 / 12 luni cu reducere și prețul fi
 
 **e) Webhook-ul real:** **Developers → Webhooks → Add endpoint**:
 - URL: `https://ABC.supabase.co/functions/v1/stripe-webhook` (ref-ul proiectului real);
-- evenimentele: `checkout.session.completed`, `checkout.session.async_payment_succeeded`, `customer.subscription.created`, `customer.subscription.updated`, `customer.subscription.deleted`, `invoice.paid`, `invoice.payment_failed` → **Add endpoint**;
+- evenimentele: `checkout.session.completed`, `checkout.session.async_payment_succeeded`, `customer.subscription.created`, `customer.subscription.updated`, `customer.subscription.deleted`, `invoice.paid`, `invoice.payment_failed`, `charge.refunded`, `charge.dispute.created` → **Add endpoint**;
 - **Signing secret → Reveal** → îl copiezi pentru pasul următor.
 
 **f) Cheile în Supabase.** Proiectul real → **Edge Functions → Secrets**. Înlocuiești valorile (butonul de editare de lângă fiecare):

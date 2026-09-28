@@ -95,7 +95,7 @@ function Referrals({ data }: { data: MyReferrals }) {
   );
 }
 
-const STATE_TONE = { trial: 'toneAmber', waiting: 'toneMuted', rewarded: 'toneGreen', refused: 'toneMuted' } as const;
+const STATE_TONE = { trial: 'toneAmber', waiting: 'toneMuted', rewarded: 'toneGreen', refused: 'toneMuted', revoked: 'toneRed' } as const;
 
 function ReferralRow({ item, max }: { item: ReferralItem; max: number }) {
   const { t, lang } = useI18n();
@@ -105,7 +105,7 @@ function ReferralRow({ item, max }: { item: ReferralItem; max: number }) {
       item.reward_kind === 'trial_days'
         ? t('ref.reward.days', { days: plural(lang, 'unit.days', item.reward_days ?? 0) })
         : t('ref.reward.credit', { amount: formatMoney(lang, item.reward_amount ?? 0) });
-  } else if (item.state === 'refused' && item.reason) {
+  } else if ((item.state === 'refused' || item.state === 'revoked') && item.reason) {
     detail = t(`ref.reason.${item.reason}`, { max });
   }
   return (

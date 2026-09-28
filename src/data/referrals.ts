@@ -6,8 +6,9 @@ import { call } from './rpc';
  * decided in the database; the browser only checks a code at sign-up and shows the owner's list.
  */
 
-export type ReferralState = 'trial' | 'waiting' | 'rewarded' | 'refused';
-export type ReferralRefusal = 'same_person' | 'trial_used' | 'same_company' | 'referrer_gone' | 'limit';
+export type ReferralState = 'trial' | 'waiting' | 'rewarded' | 'refused' | 'revoked';
+/** Why nothing was given (refused), or why it was taken back (revoked: refunded, disputed). */
+export type ReferralRefusal = 'same_person' | 'trial_used' | 'same_company' | 'referrer_gone' | 'limit' | 'refunded' | 'disputed';
 
 export interface ReferralItem {
   name: string;

@@ -139,6 +139,7 @@ Proprietarul poate invita colegi, fiecare cu contul lui (colegii nu folosesc con
 - **Luna gratuită:** un service nou care scrie codul tău la înscriere (sau se înscrie din linkul tău) și plătește primul abonament îți aduce o lună gratuită. Dacă ești încă în perioada gratuită, ea se prelungește cu 30 de zile. Altfel, următoarea plată scade cu prețul unei luni din abonamentul tău, așa cum este în ziua în care service-ul nou plătește.
 - **Limite:** cel mult 12 luni gratuite pentru un service și cel mult una pentru fiecare firmă adusă (CUI). Nu se acordă pentru un service al aceleiași persoane (același email sau telefon) sau al aceleiași firme, nici pentru un service care a mai avut cont pe Platformă. Codul se poate da doar la înscriere.
 - **Ce vezi:** în ecranul Abonament vezi numele și orașul service-urilor înscrise cu codul tău și dacă au plătit primul abonament; nimic altceva despre ele.
+- **Plata returnată:** dacă prima plată a service-ului adus îi este returnată integral sau o contestă la bancă, și nu mai are altă plată valabilă, luna gratuită se anulează. Se retrage doar ce nu ai folosit încă (zilele gratuite rămase sau creditul rămas); nu plătești nimic în plus.
 - Luna gratuită nu se transformă în bani și nu se transferă. Putem schimba sau opri programul pentru recomandările viitoare, anunțat în aplicație; lunile deja primite rămân.
 
 ### 4.6 Datele clienților

@@ -465,6 +465,8 @@ export type Database = {
           provider: string | null
           provider_ref: string | null
           receipt_url: string | null
+          reversed_at: string | null
+          reversed_reason: string | null
           series: string | null
           shop_id: string
           status: string
@@ -483,6 +485,8 @@ export type Database = {
           provider?: string | null
           provider_ref?: string | null
           receipt_url?: string | null
+          reversed_at?: string | null
+          reversed_reason?: string | null
           series?: string | null
           shop_id: string
           status?: string
@@ -501,6 +505,8 @@ export type Database = {
           provider?: string | null
           provider_ref?: string | null
           receipt_url?: string | null
+          reversed_at?: string | null
+          reversed_reason?: string | null
           series?: string | null
           shop_id?: string
           status?: string
@@ -1479,12 +1485,17 @@ export type Database = {
           referred_vat_id: string | null
           referrer_shop_id: string
           refused_reason: string | null
+          reversed_amount: number | null
+          reversed_at: string | null
+          revoked_at: string | null
+          revoked_reason: string | null
           reward_amount: number | null
           reward_days: number | null
           reward_kind: string | null
           shop_id: string
           status: string
           stripe_balance_transaction: string | null
+          stripe_reversal_transaction: string | null
         }
         Insert: {
           applied_at?: string | null
@@ -1494,12 +1505,17 @@ export type Database = {
           referred_vat_id?: string | null
           referrer_shop_id: string
           refused_reason?: string | null
+          reversed_amount?: number | null
+          reversed_at?: string | null
+          revoked_at?: string | null
+          revoked_reason?: string | null
           reward_amount?: number | null
           reward_days?: number | null
           reward_kind?: string | null
           shop_id: string
           status?: string
           stripe_balance_transaction?: string | null
+          stripe_reversal_transaction?: string | null
         }
         Update: {
           applied_at?: string | null
@@ -1509,12 +1525,17 @@ export type Database = {
           referred_vat_id?: string | null
           referrer_shop_id?: string
           refused_reason?: string | null
+          reversed_amount?: number | null
+          reversed_at?: string | null
+          revoked_at?: string | null
+          revoked_reason?: string | null
           reward_amount?: number | null
           reward_days?: number | null
           reward_kind?: string | null
           shop_id?: string
           status?: string
           stripe_balance_transaction?: string | null
+          stripe_reversal_transaction?: string | null
         }
         Relationships: [
           {
@@ -2595,6 +2616,10 @@ export type Database = {
         Args: { p_referral_shop_id: string }
         Returns: undefined
       }
+      enqueue_referral_reversal: {
+        Args: { p_referral_shop_id: string }
+        Returns: undefined
+      }
       ensure_thread: {
         Args: { p_client_id: string; p_shop_id: string }
         Returns: string
@@ -2856,6 +2881,14 @@ export type Database = {
         Args: { p_referral_shop_id: string; p_transaction: string }
         Returns: undefined
       }
+      mark_referral_reversed: {
+        Args: {
+          p_amount: number
+          p_referral_shop_id: string
+          p_transaction: string
+        }
+        Returns: undefined
+      }
       mark_thread_read: { Args: { p_thread_id: string }; Returns: string }
       message_is_own_side: {
         Args: {
@@ -2924,6 +2957,10 @@ export type Database = {
       public_pricing: { Args: never; Returns: Json }
       purge_account_fingerprints: { Args: { p_now?: string }; Returns: number }
       purge_request_log: { Args: { p_now?: string }; Returns: number }
+      record_invoice_reversed: {
+        Args: { p_customer: string; p_invoice_id: string; p_reason: string }
+        Returns: boolean
+      }
       record_payment_failed: {
         Args: { p_customer: string; p_invoice: Json }
         Returns: boolean
@@ -2934,6 +2971,10 @@ export type Database = {
       }
       referral_code_shop: { Args: { p_code: string }; Returns: string }
       referral_credit_info: {
+        Args: { p_referral_shop_id: string }
+        Returns: Json
+      }
+      referral_reversal_info: {
         Args: { p_referral_shop_id: string }
         Returns: Json
       }
@@ -3212,6 +3253,10 @@ export type Database = {
         }
       }
       review_display_name: { Args: { p_name: string }; Returns: string }
+      revoke_referral_reward: {
+        Args: { p_reason: string; p_shop_id: string }
+        Returns: undefined
+      }
       run_hourly_jobs: { Args: { p_now?: string }; Returns: Json }
       run_quote_jobs: { Args: { p_now?: string }; Returns: Json }
       save_push_subscription: {

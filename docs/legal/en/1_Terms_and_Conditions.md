@@ -139,6 +139,7 @@ The owner may invite colleagues, each with their own account (colleagues do not 
 - **The free month:** a new shop that enters your code when signing up (or signs up from your link) and pays its first subscription brings you a free month. If you are still in your free period, it gets 30 days longer. Otherwise, your next payment drops by one month of your subscription, as it is on the day the new shop pays.
 - **Limits:** at most 12 free months per shop and at most one per company brought (tax ID). None is given for a shop of the same person (same email or phone) or the same company, or for a shop that had an account on the Platform before. The code can only be given when signing up.
 - **What you see:** on the Subscription screen you see the name and city of the shops that signed up with your code and whether they paid their first subscription; nothing else about them.
+- **A returned payment:** if the referred shop's first payment is refunded in full or disputed at the bank, and it has no other valid payment, the free month is canceled. Only what you have not used yet is taken back (the free days left or the credit left); nothing extra is charged.
 - A free month cannot be turned into money or transferred. We may change or stop the program for future referrals, announced in the app; months already earned stay.
 
 ### 4.6 Customer data

@@ -333,6 +333,32 @@ function subscriptionEmail(e: EmailEvent, lang: Lang, app: string): EmailContent
         footer,
       });
     }
+    case 'referral_revoked': {
+      const referred = str(p.referred_name) || (en ? 'A shop' : 'Un service');
+      const why =
+        str(p.reason) === 'disputed'
+          ? en
+            ? `${referred} disputed its first payment at the bank.`
+            : `${referred} a contestat prima plată la bancă.`
+          : en
+            ? `${referred}'s first payment was refunded.`
+            : `Prima plată a lui ${referred} a fost returnată.`;
+      return email(en ? 'Your free month was canceled' : 'Luna gratuită s-a anulat', {
+        lang,
+        preheader: why,
+        title: en ? 'Free month canceled' : 'Lună gratuită anulată',
+        blocks: [
+          { p: why },
+          {
+            p: en
+              ? 'So the free month for the referral was canceled. We only took back what you had not used yet; nothing extra is charged.'
+              : 'Așa că luna gratuită pentru recomandare s-a anulat. Am retras doar ce nu folosiseși încă; nu plătești nimic în plus.',
+          },
+        ],
+        button: open,
+        footer,
+      });
+    }
     case 'trial_ending': {
       const days = num(p.days) ?? 0;
       const price = num(p.price);

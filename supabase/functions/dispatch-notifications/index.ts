@@ -18,13 +18,19 @@
 // shop whose subscription Stripe runs) sets the quantity of the colleagues' item in Stripe to the
 // shop's count at that moment (_shared/seats.ts), and records what Stripe now charges; a
 // `referral_credit` event gives a shop that brought another one a month of credit on its Stripe
-// customer (_shared/referrals.ts) and records it.
+// customer (_shared/referrals.ts) and records it; a `referral_reversal` takes back what is still
+// unused of it when the payment that earned it was refunded or disputed.
 import { adminApi } from '../_shared/admin.ts';
 import { emailForEvent } from '../_shared/emails.ts';
 import { corsHeaders, json } from '../_shared/http.ts';
 import { adminEmailFromEnv, appUrlFromEnv, emailConfigFromEnv, smsConfigFromEnv, stripeConfigFromEnv } from '../_shared/env.ts';
 import { sendEmail, type EmailConfig, type SendOutcome } from '../_shared/resend.ts';
-import { giveReferralCredit, type ReferralCreditInfo } from '../_shared/referrals.ts';
+import {
+  giveReferralCredit,
+  takeBackReferralCredit,
+  type ReferralCreditInfo,
+  type ReferralReversalInfo,
+} from '../_shared/referrals.ts';
 import { seatPrice, syncSeats, type SeatInfo } from '../_shared/seats.ts';
 import { smsForEvent } from '../_shared/sms.ts';
 import { sendSms, type SmsConfig } from '../_shared/smso.ts';
@@ -216,8 +222,31 @@ async function creditReferral(e: ClaimedEvent, senders: Senders): Promise<LogEnt
   return { channel: 'stripe', status: r.status };
 }
 
+/** Takes back the unused part of a referral's credit (`referral_reversal`) and records it. */
+async function reverseReferral(e: ClaimedEvent, senders: Senders): Promise<LogEntry> {
+  const referral = typeof e.params?.referral_shop_id === 'string' ? e.params.referral_shop_id : null;
+  if (!referral) return { channel: 'stripe', status: 'failed', error: 'no referral' };
+  const info = (await senders.api.rpc('referral_reversal_info', { p_referral_shop_id: referral })) as ReferralReversalInfo | null;
+  if (!info) return { channel: 'stripe', status: 'no_referral' };
+  const r = await takeBackReferralCredit(stripeApi(senders.stripe), referral, info);
+  if (r.status === 'reversed' || r.status === 'used') {
+    await senders.api.rpc('mark_referral_reversed', {
+      p_referral_shop_id: referral,
+      p_amount: r.status === 'reversed' ? r.amount : 0,
+      p_transaction: r.status === 'reversed' ? r.transaction : '',
+    });
+  }
+  return { channel: 'stripe', status: r.status };
+}
+
+const STRIPE_JOBS: Record<string, (e: ClaimedEvent, senders: Senders) => Promise<LogEntry>> = {
+  seats_changed: syncSeatsFor,
+  referral_credit: creditReferral,
+  referral_reversal: reverseReferral,
+};
+
 async function stripeChannel(e: ClaimedEvent, senders: Senders): Promise<ChannelResult> {
-  const run = e.event === 'seats_changed' ? syncSeatsFor : e.event === 'referral_credit' ? creditReferral : null;
+  const run = STRIPE_JOBS[e.event];
   if (!run) return { done: true, log: { channel: 'stripe', status: 'no_template' } };
   if (!senders.stripe.secretKey) return { done: true, log: { channel: 'stripe', status: 'not_configured' } };
   try {

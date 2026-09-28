@@ -201,6 +201,10 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
       title: 'Ai primit o lună gratuită',
       body: '{referred} a plătit abonamentul, recomandat de tine. Următoarea ta plată scade cu {total}.',
     },
+    'shop.referral_revoked': {
+      title: 'Luna gratuită s-a anulat',
+      body: 'Plata lui {referred} a fost returnată, așa că luna gratuită pentru recomandare s-a anulat. Ce ai folosit deja rămâne.',
+    },
     // ------------------------------------------------------------------ account suspended / reactivated
     'client.account_suspended': {
       title: 'Cont suspendat',
@@ -358,6 +362,10 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
       title: 'You got a free month',
       body: '{referred}, the shop you referred, paid its subscription. Your next payment is {total} lower.',
     },
+    'shop.referral_revoked': {
+      title: 'Your free month was canceled',
+      body: "{referred}'s payment was returned, so the free month for the referral was canceled. What you already used is yours.",
+    },
     // ------------------------------------------------------------------ account suspended / reactivated
     'client.account_suspended': {
       title: 'Account suspended',
@@ -434,7 +442,7 @@ export const EVENTS: Record<Side, readonly string[]> = {
     'booking_requested', 'booking_cancelled_client', 'booking_cancelled_admin', 'quote_accepted',
     'quote_partially_accepted', 'quote_refused', 'quote_expiring', 'quote_expired', 'new_message', 'new_review',
     'daily_digest', 'trial_ending', 'payment_failed', 'shop_inactive', 'review_report_decided', 'account_suspended',
-    'account_reactivated', 'referral_reward',
+    'account_reactivated', 'referral_reward', 'referral_revoked',
   ],
 };
 
@@ -630,6 +638,7 @@ export function urlFor(side: Side, e: NotificationEvent): string {
     case 'payment_failed':
     case 'shop_inactive':
     case 'referral_reward':
+    case 'referral_revoked':
       return SUBSCRIPTION_PATH;
     case 'booking_requested':
       return booking ? `/s/programari?${q({ tab: 'cereri', p: booking })}` : '/s/programari?tab=cereri';
@@ -663,6 +672,7 @@ function tagFor(e: NotificationEvent): string {
     case 'service_due':
       return `service-due-${str(p.car_id)}-${str(p.service_id)}`;
     case 'referral_reward':
+    case 'referral_revoked':
       return `referral-${str(p.referral_shop_id)}`;
     case 'trial_ending':
     case 'payment_failed':
