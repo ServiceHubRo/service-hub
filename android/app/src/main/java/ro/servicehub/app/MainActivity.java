@@ -7,7 +7,9 @@ import android.view.View;
 import android.webkit.WebView;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.core.view.WindowInsetsControllerCompat;
 import com.getcapacitor.BridgeActivity;
 import com.getcapacitor.WebViewListener;
 import java.util.Locale;
@@ -22,6 +24,11 @@ import java.util.Locale;
  * the app's view is padded by them here: the status bar and the sides always, the bottom when the
  * three buttons (or the keyboard) are there. A gesture bar is left to the page, which receives its
  * height as --safe-area-inset-bottom and lets content run under it.
+ *
+ * The bars always get light icons on the app's dark color, whatever the phone's own light or dark
+ * mode. From Android 15 the system also lays a translucent scrim over the three buttons, light when
+ * the phone is in light mode (a white bar under the tab bar on a Samsung): it is turned off, so the
+ * app's dark background shows behind the buttons.
  */
 public class MainActivity extends BridgeActivity {
 
@@ -37,11 +44,15 @@ public class MainActivity extends BridgeActivity {
         super.onCreate(savedInstanceState);
         View content = findViewById(android.R.id.content);
         content.setBackgroundColor(DARK);
+        WindowInsetsControllerCompat appearance = WindowCompat.getInsetsController(getWindow(), getWindow().getDecorView());
+        appearance.setAppearanceLightStatusBars(false);
+        appearance.setAppearanceLightNavigationBars(false);
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.VANILLA_ICE_CREAM) {
             getWindow().setNavigationBarColor(DARK);
             return;
         }
+        getWindow().setNavigationBarContrastEnforced(false);
 
         float density = getResources().getDisplayMetrics().density;
         ViewCompat.setOnApplyWindowInsetsListener(content, (v, insets) -> {
