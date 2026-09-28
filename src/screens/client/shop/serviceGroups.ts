@@ -11,7 +11,7 @@ export interface ServiceGroup {
 export function groupServices(services: readonly ShopPageService[], lang: Lang): ServiceGroup[] {
   const groups: ServiceGroup[] = [];
   for (const s of services) {
-    const last = groups.at(-1);
+    const last = groups[groups.length - 1];
     if (last && last.key === s.category_key) last.items.push(s);
     else groups.push({ key: s.category_key, name: lang === 'ro' ? s.category_ro : s.category_en, items: [s] });
   }

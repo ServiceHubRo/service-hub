@@ -32,7 +32,7 @@ export function groupHours(hours: DayHours[]): HoursRow[] {
     const closed = h.is_closed || !h.open_time || !h.close_time;
     const open = closed ? null : h.open_time;
     const close = closed ? null : h.close_time;
-    const last = rows.at(-1);
+    const last = rows[rows.length - 1];
     if (last && previousIndex === index - 1 && last.closed === closed && last.open === open && last.close === close) {
       last.days.push(weekday);
     } else {

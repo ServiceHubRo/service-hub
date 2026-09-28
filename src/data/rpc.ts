@@ -75,6 +75,7 @@ export const RPC_ERROR_CODES = [
   'notice_not_found',
   'odometer_invalid',
   'odometer_jump',
+  'odometer_same',
   'odometer_lower',
   'odometer_required',
   'past_slot',
@@ -203,6 +204,8 @@ export function rpcErrorMessage(lang: Lang, error: unknown): string {
       return translate(lang, 'rpcError.odometer_lower', { previous: formatKm(lang, num(p.previous) ?? 0) });
     case 'odometer_jump':
       return translate(lang, 'rpcError.odometer_jump', { diff: formatKm(lang, num(p.diff) ?? 0) });
+    case 'odometer_same':
+      return translate(lang, 'rpcError.odometer_same', { previous: formatKm(lang, num(p.previous) ?? 0) });
     case 'too_soon':
     case 'cancel_deadline_passed':
       return translate(lang, `rpcError.${code}`, { hours: plural(lang, 'unit.hours', num(p.hours) ?? 0) });
@@ -512,7 +515,7 @@ export interface CompleteJobInput {
   work?: string;
   /** Defaults to the approved total. */
   cost?: number;
-  /** Set after the user confirmed an `odometer_jump`. */
+  /** Set after the user confirmed an `odometer_jump` or an `odometer_same`. */
   confirmJump?: boolean;
 }
 

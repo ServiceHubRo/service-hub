@@ -14,6 +14,7 @@ import { useOptionalShopBookings } from '../screens/shop/bookings/shopBookingsCo
 import { SHOP_BOOKINGS_PATH } from '../screens/shop/paths';
 import { messagesPath } from '../screens/messages/paths';
 import { unreadThreads, useOptionalThreads } from '../screens/messages/threadsContext';
+import { useOptionalNotices } from '../screens/notices/noticesContext';
 import { EmailVerifyBanner } from './EmailVerifyBanner';
 import { LangSwitch } from './LangSwitch';
 import { LogoutConfirm } from './LogoutConfirm';
@@ -63,13 +64,15 @@ interface Badge {
 
 /**
  * Counts shown on navigation items: new booking requests on the shop's Programări, quotes waiting
- * for a decision on the client's, conversations with unread messages on Mesaje (both), reported
+ * for a decision on the client's, conversations with unread messages and new team notices on Mesaje
+ * (both), reported
  * reviews waiting on the admin's Moderare.
  */
 function useNavBadges(): Record<string, Badge> {
   const shopBookings = useOptionalShopBookings();
   const clientBookings = useOptionalClientBookings();
   const threads = useOptionalThreads();
+  const notices = useOptionalNotices();
   const admin = useOptionalAdminCounts();
   const badges: Record<string, Badge> = {};
   if (admin?.pendingReports != null) {
@@ -83,7 +86,12 @@ function useNavBadges(): Record<string, Badge> {
     badges[BOOKINGS_PATH] = { count: quotesWaiting(clientBookings.state.data.bookings), unit: 'unit.quotesToDecide' };
   }
   if (threads?.state.status === 'ready') {
-    badges[messagesPath(threads.side)] = { count: unreadThreads(threads.state.data.threads), unit: 'unit.unreadConversations' };
+    // New notices from the team count too (they are at the top of Mesaje, T20a).
+    const newNotices = notices?.unread ?? 0;
+    badges[messagesPath(threads.side)] = {
+      count: unreadThreads(threads.state.data.threads) + newNotices,
+      unit: newNotices > 0 ? 'unit.unreadItems' : 'unit.unreadConversations',
+    };
   }
   return badges;
 }
@@ -205,7 +213,7 @@ export function AppShell({ role }: { role: Role }) {
               className={({ isActive }) => `${styles.tab} ${isActive ? styles.tabActive : ''}`}
             >
               <NavIcon item={item} size={21} badge={badges[item.path]?.count ?? 0} />
-              <span className={styles.tabLabel}>{t(item.labelKey)}</span>
+              <span className={styles.tabLabel}>{t(item.shortLabelKey ?? item.labelKey)}</span>
               <BadgeText badge={badges[item.path]} />
             </NavLink>
           );

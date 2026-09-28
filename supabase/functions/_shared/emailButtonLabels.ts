@@ -23,8 +23,9 @@ export const EMAIL_BUTTON_LABELS = [
   'Activate the subscription',
   'Plătește abonamentul',
   'Pay the subscription',
-  // Reported review (to the admin)
+  // Reported review (to the admin); account reactivated
   'Deschide Service-Hub',
+  'Open Service-Hub',
   // History report
   'Deschide Rapoartele mele',
   'Open My reports',

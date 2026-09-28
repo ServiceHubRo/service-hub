@@ -146,7 +146,7 @@ test.describe('subscription', () => {
     await page.getByRole('button', { name: 'Plătește' }).click();
     await expect(page).toHaveURL(/\/s\/cont\/abonament\?plata=ok$/);
     await expect(page.getByText(/^Cardul este salvat\. Prima plată, 1\.020 lei, pe \d{1,2} [a-z]+\.$/)).toBeVisible();
-    await expect(page.getByText('Plătești la 12 luni: 1.020 lei, cu 15% reducere.')).toBeVisible();
+    await expect(page.getByText('Plătești o dată la 12 luni: 1.020 lei, cu 15% reducere.')).toBeVisible();
     await expect(page.getByRole('group', { name: 'Cum plătești' })).toHaveCount(0);
     await shot(page, 'periods-card-saved', name());
 

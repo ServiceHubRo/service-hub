@@ -4,6 +4,7 @@ import { Card } from '../../components/Card';
 import { disablePush, enablePush, usePushStatus } from '../../data/push';
 import { rpcErrorMessage } from '../../data/rpc';
 import { useI18n } from '../../i18n/context';
+import { IS_NATIVE } from '../../lib/native';
 import styles from './push.module.css';
 
 /**
@@ -21,6 +22,9 @@ export function PushRow() {
   if (status === 'denied') hint = t('push.hint.denied');
   else if (status === 'ios_install') hint = t('push.banner.ios');
   else if (status === 'unsupported') hint = t('push.hint.unsupported');
+  // The phone app (T20a) has no web push; its own notifications come in T20b.
+  const appSoon = IS_NATIVE && status === 'unsupported';
+  if (appSoon) hint = t('push.hint.appSoon');
 
   return (
     <Card role="group" aria-label={t('push.title')}>
@@ -34,7 +38,7 @@ export function PushRow() {
           <span className={styles.who}>
             <span>{t('push.title')}</span>
             <span className={styles.status}>
-              {t(`push.status.${status}`)}
+              {appSoon ? t('push.status.appSoon') : t(`push.status.${status}`)}
             </span>
           </span>
         </span>

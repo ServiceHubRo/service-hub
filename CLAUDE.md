@@ -12,7 +12,7 @@ Three roles, three completely separate interfaces:
 |---|---|---|
 | **Client** | Caută · Garaj · Programări · Mesaje · Cont | Garage exists only here |
 | **Shop** | Panou · Programări · Istoric · Mesaje · Cont | Setări, Abonament, Recenzii, Rapoarte are tiles inside Cont |
-| **Admin** | Prezentare · Service-uri · Clienți · Rezervări · Moderare | Platform tools are tiles inside the admin Cont. Admin accounts are created only in the database |
+| **Admin** | Panou principal · Service-uri · Clienți · Rezervări · Moderare | Platform tools are tiles inside the admin Cont. Admin accounts are created only in the database |
 
 A user has exactly one role, fixed at sign-up. The role decides the whole navigation and every reachable route. A client can never reach a shop screen and vice versa; this is enforced in routing **and** in the database.
 

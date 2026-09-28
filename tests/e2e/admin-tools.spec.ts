@@ -13,6 +13,7 @@ import {
   shot,
   signIn,
   userIdOf,
+  xlsxText,
 } from './support';
 
 // T16b — the admin's platform tools: subscriptions and payments, history reports, the catalog,
@@ -37,7 +38,7 @@ test.beforeEach(async ({ context, page }) => {
 
 async function signInAdmin(page: Page) {
   await signIn(page, SEED.admin, SEED_PASSWORD);
-  await expect(page.getByRole('heading', { level: 1, name: 'Prezentare' })).toBeVisible();
+  await expect(page.getByRole('heading', { level: 1, name: 'Panou principal' })).toBeVisible();
 }
 
 async function openTool(page: Page, label: string) {
@@ -65,7 +66,7 @@ async function freeSlot(client: string, shopId: string): Promise<{ date: string;
 async function downloadCsv(page: Page, button: ReturnType<Page['getByRole']>): Promise<{ file: string; text: string }> {
   const [download] = await Promise.all([page.waitForEvent('download'), button.click()]);
   const chunks = await (await download.createReadStream()).toArray();
-  return { file: download.suggestedFilename(), text: Buffer.concat(chunks).toString('utf8') };
+  return { file: download.suggestedFilename(), text: xlsxText(new Uint8Array(Buffer.concat(chunks))) };
 }
 
 test.describe('admin tools', () => {
@@ -91,7 +92,8 @@ test.describe('admin tools', () => {
     await signInAdmin(page);
     await openTool(page, 'Anunțuri');
     await page.getByRole('button', { name: 'Toți clienții' }).click();
-    await page.getByLabel('Oraș (opțional)').fill(city);
+    // The city is picked from the cities that have shops.
+    await page.getByRole('group', { name: 'Oraș' }).getByRole('button', { name: city }).click();
     const title = `Program de sărbători ${tag()}`;
     // Nothing written yet: the preview asks for the text first.
     await page.getByRole('button', { name: 'Previzualizează' }).click();
@@ -109,27 +111,43 @@ test.describe('admin tools', () => {
     await expect(page.getByText(title).first()).toBeVisible();
     await expect(page.getByText(`Clienții din ${city}`).first()).toBeVisible();
 
-    // The client who booked there sees it on Caută, marks it read, and it stays gone.
+    // The client who booked there finds it in Mesaje (T20a), counted on the tab, new until opened.
     const clientPage = await (await browser.newContext()).newPage();
     await clientPage.addInitScript(() => localStorage.setItem('sh_lang', 'ro'));
     await signIn(clientPage, client, PASSWORD);
+    await expect(clientPage.getByRole('heading', { level: 1, name: 'Caută' })).toBeVisible();
     const notice = clientPage.getByRole('region', { name: 'Anunț Service-Hub' }).filter({ hasText: title });
-    await expect(notice).toBeVisible();
-    await shot(clientPage, 't16b-notice-client', name());
-    await notice.getByRole('button', { name: 'Am citit' }).click();
     await expect(notice).toHaveCount(0);
+    const messagesTab = clientPage.getByRole('link', { name: /^Mesaje/ }).filter({ visible: true }).first();
+    await expect(messagesTab).toHaveAccessibleName(/(noutate|noutăți) necitit/);
+    await messagesTab.click();
+    await expect(clientPage.getByRole('heading', { level: 1, name: 'Mesaje' })).toBeVisible();
+    await expect(notice).toBeVisible();
+    await expect(notice.getByText('Nou', { exact: true })).toBeVisible();
+    await expectNoHorizontalScroll(clientPage);
+    await shot(clientPage, 't20a-notice-messages', name());
+    const head = notice.getByRole('button');
+    await expect(head).toHaveAttribute('aria-expanded', 'false');
+    await head.click();
+    await expect(head).toHaveAttribute('aria-expanded', 'true');
+    await expect(notice.getByText('Pe 1 decembrie service-urile sunt închise.')).toBeVisible();
+    await expect(notice.getByText('Nou', { exact: true })).toHaveCount(0);
+    await shot(clientPage, 't20a-notice-open', name());
     await expect
       .poll(async () => (await serviceRest<unknown[]>(`notice_reads?user_id=eq.${await userIdOf(client)}`, 'GET')).length)
       .toBeGreaterThan(0);
+    // Read stays read, and the notice stays in Mesaje for its 30 days.
     await clientPage.reload();
-    await expect(clientPage.getByRole('heading', { level: 1, name: 'Caută' })).toBeVisible();
-    await expect(clientPage.getByRole('region', { name: 'Anunț Service-Hub' }).filter({ hasText: title })).toHaveCount(0);
+    await expect(notice).toBeVisible();
+    await expect(notice.getByText('Nou', { exact: true })).toHaveCount(0);
 
     // A client who never booked in that city never sees it.
     const otherPage = await (await browser.newContext()).newPage();
     await otherPage.addInitScript(() => localStorage.setItem('sh_lang', 'ro'));
     await signIn(otherPage, other, PASSWORD);
     await expect(otherPage.getByRole('heading', { level: 1, name: 'Caută' })).toBeVisible();
+    await otherPage.goto('/c/mesaje');
+    await expect(otherPage.getByRole('heading', { level: 1, name: 'Mesaje' })).toBeVisible();
     await expect(otherPage.getByRole('region', { name: 'Anunț Service-Hub' }).filter({ hasText: title })).toHaveCount(0);
 
     // Withdrawn by the admin: gone, and in the audit log.
@@ -280,8 +298,8 @@ test.describe('admin tools', () => {
     await expectNoHorizontalScroll(page);
     await shot(page, 't16b-subscriptions', name());
 
-    const csv = await downloadCsv(page, page.getByRole('button', { name: 'Descarcă CSV' }));
-    expect(csv.file).toMatch(/^abonamente-\d{4}-\d{2}-\d{2}\.csv$/);
+    const csv = await downloadCsv(page, page.getByRole('button', { name: 'Descarcă Excel' }));
+    expect(csv.file).toMatch(/^abonamente-\d{4}-\d{2}-\d{2}\.xlsx$/);
     expect(csv.text).toContain('Cont;Service;Oraș');
     expect(csv.text).toContain(shopName);
     expect(csv.text.trim().split('\r\n')).toHaveLength(2);
@@ -299,23 +317,23 @@ test.describe('admin tools', () => {
 
     // The shops list exports what it shows.
     await page.goto(`/admin/service-uri?q=${encodeURIComponent(shopName)}`);
-    const shops = await downloadCsv(page, page.getByRole('button', { name: 'Descarcă CSV' }));
+    const shops = await downloadCsv(page, page.getByRole('button', { name: 'Descarcă Excel' }));
     expect(shops.text.trim().split('\r\n')).toHaveLength(2);
-    expect(shops.text).toContain('79,5');
+    expect(shops.text).toContain('79.5');
 
     // The export screen and the log.
     await openTool(page, 'Export');
     await shot(page, 't16b-export', name());
     await openAccount(page);
     await page.getByRole('link', { name: /^Jurnal de audit/ }).click();
-    await expect(page.getByText('Export CSV').first()).toBeVisible();
+    await expect(page.getByText('Export Excel').first()).toBeVisible();
     await expect(page.getByText('Preț abonament schimbat').first()).toBeVisible();
   });
 
   test('the tools in English', async ({ page }) => {
     await signInAdmin(page);
     await page.getByRole('button', { name: 'English' }).filter({ visible: true }).first().click();
-    await expect(page.getByRole('heading', { level: 1, name: 'Overview' })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1, name: 'Dashboard' })).toBeVisible();
     for (const tile of ['Subscriptions and payments', 'Service catalog', 'Platform settings', 'Notices', 'History reports', 'Export']) {
       await page.getByRole('link', { name: 'Account', exact: true }).filter({ visible: true }).first().click();
       await page.getByRole('link', { name: new RegExp(`^${tile}`) }).click();

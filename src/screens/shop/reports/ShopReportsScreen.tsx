@@ -20,7 +20,7 @@ import {
   ymdInBucharest,
 } from '../../../i18n/format';
 import { plural, type Lang } from '../../../i18n/translate';
-import { csvAmount, csvFormat, toCsv } from '../../../lib/history';
+import { csvAmount, csvFormat } from '../../../lib/history';
 import {
   byService,
   change,
@@ -46,6 +46,8 @@ import {
   type ReportPeriod,
 } from '../../../lib/shopReports';
 import { useLoad } from '../../../lib/useLoad';
+import { saveFile } from '../../../lib/saveFile';
+import { toXlsx } from '../../../lib/xlsx';
 import { useNow } from '../../../lib/useNow';
 import { MonthlyChart, Meter, ServiceBars } from './Charts';
 import { ACCOUNT_PATH } from '../paths';
@@ -286,7 +288,7 @@ function Reports({ data }: { data: ReportData }) {
       </Section>
 
       <div>
-        <Button variant="ghost" className={styles.download} onClick={() => downloadCsv(data.jobs, range, period, lang, t, today)}>
+        <Button variant="ghost" className={styles.download} onClick={() => void downloadCsv(data.jobs, range, period, lang, t, today)}>
           <Download size={18} aria-hidden="true" />
           {t('rep.download')}
         </Button>
@@ -348,7 +350,7 @@ function formatDuration(lang: Lang, ms: number): string {
 
 /** The period's takings for the accountant: finished jobs and inspection fees, one row each. */
 function downloadCsv(jobs: readonly ReportJob[], range: DayRange, period: ReportPeriod, lang: Lang, t: I18nValue['t'], today: string) {
-  const { separator, decimal } = csvFormat(lang);
+  const { decimal } = csvFormat(lang);
   const header = [
     t('hist.col.date'),
     t('hist.col.ref'),
@@ -369,13 +371,8 @@ function downloadCsv(jobs: readonly ReportJob[], range: DayRange, period: Report
     (lang === 'ro' ? j.service_ro : j.service_en) ?? j.service_id,
     csvAmount(j.cost, decimal),
   ]);
-  const blob = new Blob([toCsv([header, ...rows], separator)], { type: 'text/csv;charset=utf-8' });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = `${t('rep.csv.file')}-${t(`rep.period.${period}`).toLowerCase().replace(/\s+/g, '-')}-${today}.csv`;
-  document.body.appendChild(link);
-  link.click();
-  link.remove();
-  window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+  return saveFile(
+    toXlsx([header, ...rows], t('rep.title')),
+    `${t('rep.csv.file')}-${t(`rep.period.${period}`).toLowerCase().replace(/\s+/g, '-')}-${today}.xlsx`,
+  );
 }

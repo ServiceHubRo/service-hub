@@ -201,6 +201,15 @@ describe('app emails', () => {
     expect(emailForEvent({ event: 'quote_sent', lang: 'ro', params: {} }, '')).toBeNull();
   });
 
+  it('reactivation, account or shop, in the recipient’s language', () => {
+    const ro = emailForEvent({ event: 'account_reactivated', lang: 'ro', params: { kind: 'account' } }, 'https://app.ro')!;
+    expect(ro.subject).toBe('Contul tău Service-Hub este din nou activ');
+    expect(ro.text).toContain('https://app.ro/intra');
+    expect(emailForEvent({ event: 'account_reactivated', lang: 'en', params: { kind: 'shop', shop_name: 'Atelier Unu' } }, '')!.subject).toBe(
+      'Your shop Atelier Unu is active again',
+    );
+  });
+
   it('keeps our colors in the Gmail app on iPhone (dark mode inverts everything but gradients and images)', () => {
     const { html } = staffInviteEmail('ro', { shop: 'Atelier Unu', city: '', inviter: '', email: 'a@b.ro', url: 'https://service-hub.ro/x' });
     // The wordmark is the email-logo image (the local stack here; the project's in the functions).

@@ -1,11 +1,15 @@
 import { MessageSquare } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import { EmptyState } from '../../components/EmptyState';
 import { LoadError } from '../../components/LoadError';
 import { SkeletonList } from '../../components/Skeleton';
 import { useI18n } from '../../i18n/context';
 import { counterpartName, formatListTime, systemMessageText } from '../../lib/messages';
 import { useNow } from '../../lib/useNow';
+import { NoticeItem } from '../notices/NoticeItem';
+import { useOptionalNotices } from '../notices/noticesContext';
+import noticeStyles from '../notices/notices.module.css';
 import { threadPath } from './paths';
 import { ThreadAvatar } from './ThreadAvatar';
 import { useThreads } from './threadsContext';
@@ -14,15 +18,43 @@ import styles from './messages.module.css';
 /**
  * Mesaje (FR §3.7, §4.4, P9): one conversation per client–shop pair, the newest message on top,
  * with the last message and the number of unread messages. Live through ThreadsProvider.
+ * Above them, the notices from the Service-Hub team (T20a): marked new until opened, then kept for
+ * their 30 days; a push about one opens it (`?anunt=<id>`).
  */
 export function MessagesScreen() {
   const { t, lang } = useI18n();
   const { side, state, reload } = useThreads();
   const now = useNow();
+  const notices = useOptionalNotices();
+  const [params] = useSearchParams();
+  const [openNotice, setOpenNotice] = useState<string | null>(() => params.get('anunt'));
+  const list = notices?.notices ?? [];
+  const opened = list.find((n) => n.id === openNotice);
+
+  // An opened notice (tapped, or opened by a push once the list has arrived) is no longer new.
+  useEffect(() => {
+    if (opened && !opened.read) notices?.markRead(opened.id);
+  }, [opened, notices]);
 
   return (
     <div className={styles.page}>
       <h1>{t('nav.messages')}</h1>
+      {list.length > 0 && (
+        <ul className={noticeStyles.list} aria-label={t('notices.listLabel')}>
+          {list.map((n) => (
+            <li key={n.id}>
+              <NoticeItem
+                id={`anunt-${n.id}`}
+                notice={n}
+                lang={lang}
+                isNew={!n.read}
+                open={openNotice === n.id}
+                onToggle={() => setOpenNotice((current) => (current === n.id ? null : n.id))}
+              />
+            </li>
+          ))}
+        </ul>
+      )}
       {state.status === 'loading' && <SkeletonList />}
       {state.status === 'error' && <LoadError message={t('msg.loadError')} onRetry={reload} />}
       {state.status === 'ready' &&

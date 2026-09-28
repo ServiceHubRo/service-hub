@@ -70,25 +70,22 @@ test('landing: every section, in Romanian and English, without horizontal scroll
   await shot(page, 'landing-en', name());
 });
 
-test('landing: "Sunt client" and "Sunt service" open sign-up with the role chosen', async ({ page }) => {
+test('landing: the way in is "Intră în cont" and "Creează cont"; the shops section opens sign-up as a shop', async ({ page }) => {
   await page.goto('/');
-  await page.getByRole('link', { name: 'Sunt client' }).click();
-  await expect(page).toHaveURL(/\/cont-nou\?rol=client$/);
-  await expect(page.getByRole('button', { name: 'Sunt client' })).toHaveAttribute('aria-pressed', 'true');
-  await expect(page.getByLabel('Numele service-ului')).toHaveCount(0);
-
-  await page.goto('/');
-  await page.getByRole('link', { name: 'Sunt service' }).click();
-  await expect(page).toHaveURL(/\/cont-nou\?rol=service$/);
-  await expect(page.getByRole('button', { name: 'Sunt service' })).toHaveAttribute('aria-pressed', 'true');
+  // Only the two buttons at the top (Eduard, T20a): no role buttons in the first screen.
+  await expect(page.getByRole('link', { name: 'Sunt client' })).toHaveCount(0);
+  await expect(page.getByRole('link', { name: 'Sunt service' })).toHaveCount(0);
+  await page.getByRole('link', { name: 'Creează cont' }).first().click();
+  await expect(page).toHaveURL(/\/cont-nou$/);
+  // The role is chosen on the form.
+  await expect(page.getByRole('button', { name: 'Sunt client' })).toBeVisible();
+  await page.getByRole('button', { name: 'Sunt service' }).click();
   await expect(page.getByLabel('Numele service-ului')).toBeVisible();
-  // Still changeable.
-  await page.getByRole('button', { name: 'Sunt client' }).click();
-  await expect(page.getByLabel('Numele service-ului')).toHaveCount(0);
 
   await page.goto('/');
   await page.getByRole('link', { name: 'Înscrie-ți service-ul' }).click();
   await expect(page).toHaveURL(/\/cont-nou\?rol=service$/);
+  await expect(page.getByRole('button', { name: 'Sunt service' })).toHaveAttribute('aria-pressed', 'true');
 });
 
 test('landing: link previews have a title, a description and an absolute image', async ({ page, request }) => {
@@ -117,7 +114,26 @@ test('404: an unknown address has its own page with a way home', async ({ page }
   await shot(page, 'not-found', name());
   await page.getByRole('link', { name: 'Mergi la pagina principală' }).click();
   await expect(page).toHaveURL(/\/$/);
-  await expect(page.getByRole('link', { name: 'Sunt client' })).toBeVisible();
+  await expect(page.getByRole('heading', { level: 1, name: /Programarea la service/ })).toBeVisible();
+});
+
+test('a browser that cannot read the app gets a message, not a blank page (T20a)', async ({ page }) => {
+  // The app's code as a too-old browser sees it: syntax it does not know.
+  await page.route(/\/assets\/index-[^/]*\.js$/, (route) =>
+    route.fulfill({ contentType: 'text/javascript', body: 'let a = ;' }),
+  );
+  await page.goto('/');
+  await expect(page.getByRole('heading', { level: 1, name: 'Service-Hub nu poate porni în acest browser' })).toBeVisible();
+  await expect(page.getByRole('alert')).toContainText('Browserul tău e prea vechi');
+  await expectNoHorizontalScroll(page);
+  await shot(page, 'start-guard', name());
+});
+
+test('a normal start stays quiet: no start-up message', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.getByRole('heading', { level: 1, name: /Programarea la service/ })).toBeVisible();
+  await expect(page.getByText('nu poate porni')).toHaveCount(0);
+  expect(await page.evaluate(() => (window as Window & { __shStarted?: boolean }).__shStarted)).toBe(true);
 });
 
 /** Tab until the element is focused; fails after `max` presses. */
@@ -137,11 +153,11 @@ async function expectFocusRing(target: ReturnType<Page['getByRole']>) {
 
 test('keyboard only: from the landing page to the sign-up form, with a visible focus ring', async ({ page }) => {
   await page.goto('/');
-  const signUp = page.getByRole('link', { name: 'Sunt service' });
+  const signUp = page.getByRole('link', { name: 'Creează cont' }).first();
   await tabTo(page, signUp);
   await expectFocusRing(signUp);
   await page.keyboard.press('Enter');
-  await expect(page).toHaveURL(/\/cont-nou\?rol=service$/);
+  await expect(page).toHaveURL(/\/cont-nou$/);
 
   // The form is filled and its checkbox ticked without a mouse.
   const nameField = page.getByLabel('Nume și prenume');

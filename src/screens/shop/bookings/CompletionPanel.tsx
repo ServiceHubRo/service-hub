@@ -44,6 +44,8 @@ export function CompletionPanel({
     quote?.total_approved !== null && quote?.total_approved !== undefined ? priceText(quote.total_approved, decimal) : '',
   );
   const [jumpOk, setJumpOk] = useState(false);
+  // The server found the same reading on a job from another day: shown until the shop confirms it.
+  const [same, setSame] = useState<number | null>(null);
   const [odometerError, setOdometerError] = useState<string | null>(null);
   const [costError, setCostError] = useState<string | null>(null);
   const odometerRef = useRef<HTMLInputElement>(null);
@@ -68,7 +70,7 @@ export function CompletionPanel({
       odometerRef.current?.focus();
       return;
     }
-    if (check.jump !== null && !jumpOk) {
+    if ((check.jump !== null || same !== null) && !jumpOk) {
       odometerRef.current?.focus();
       return;
     }
@@ -93,7 +95,8 @@ export function CompletionPanel({
       // A reading recorded meanwhile (another job on the same plate): show it next to the field.
       const error = toRpcError(e);
       const previous = Number(error.params.previous);
-      if ((error.code === 'odometer_lower' || error.code === 'odometer_jump') && Number.isFinite(previous)) setLast(previous);
+      if ((error.code === 'odometer_lower' || error.code === 'odometer_jump' || error.code === 'odometer_same') && Number.isFinite(previous))
+        setLast(previous);
       if (error.code === 'odometer_lower' || error.code === 'odometer_invalid' || error.code === 'odometer_required') {
         setOdometerError(rpcErrorMessage(lang, e));
         odometerRef.current?.focus();
@@ -101,6 +104,12 @@ export function CompletionPanel({
       }
       if (error.code === 'odometer_jump') {
         setJumpOk(false);
+        odometerRef.current?.focus();
+        return;
+      }
+      if (error.code === 'odometer_same') {
+        setJumpOk(false);
+        setSame(Number.isFinite(previous) ? previous : check.km);
         odometerRef.current?.focus();
         return;
       }
@@ -137,6 +146,7 @@ export function CompletionPanel({
             setOdometer(e.target.value);
             setOdometerError(null);
             setJumpOk(false);
+            setSame(null);
           }}
           onBlur={() => {
             if (odometer.trim() !== '' && !check.ok) setOdometerError(messageOf(check));
@@ -145,9 +155,13 @@ export function CompletionPanel({
         {/* A "lower" error already names the last reading. */}
         {!(odometerError && !check.ok && check.error === 'odometer_lower') && <p className={styles.muted}>{lastLine}</p>}
       </div>
-      {jump !== null && (
+      {(jump !== null || same !== null) && (
         <div className={styles.jump} role="alert">
-          <p>{t('rpcError.odometer_jump', { diff: formatKm(lang, jump) })}</p>
+          <p>
+            {jump !== null
+              ? t('rpcError.odometer_jump', { diff: formatKm(lang, jump) })
+              : t('rpcError.odometer_same', { previous: formatKm(lang, same ?? 0) })}
+          </p>
           <Checkbox checked={jumpOk} onChange={(e) => setJumpOk(e.target.checked)}>
             {t('sb.complete.jumpConfirm')}
           </Checkbox>
@@ -178,7 +192,7 @@ export function CompletionPanel({
       <PanelButtons
         label={t('sb.complete.submit')}
         variant="success"
-        disabled={!check.ok || (jump !== null && !jumpOk)}
+        disabled={!check.ok || ((jump !== null || same !== null) && !jumpOk)}
         onAction={submit}
         onClose={onClose}
       />

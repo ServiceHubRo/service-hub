@@ -1,5 +1,5 @@
 import { Megaphone } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ActionButton } from '../../components/ActionButton';
 import { BackLink } from '../../components/BackLink';
 import { Button } from '../../components/Button';
@@ -21,10 +21,11 @@ import {
   type NoticeDraft,
 } from '../../data/adminTools';
 import { canRetryRpc, rpcErrorMessage } from '../../data/rpc';
+import { fetchCities, type SearchCity } from '../../data/search';
 import { useI18n } from '../../i18n/context';
 import type { MessageKey } from '../../i18n/ro';
 import { plural } from '../../i18n/translate';
-import { NoticeView } from '../notices/NoticeBanner';
+import { NoticeItem } from '../notices/NoticeItem';
 import { ConfirmPanel } from './ActionPanels';
 import { SectionTitle } from './parts';
 import { ADMIN_ACCOUNT_PATH } from './paths';
@@ -48,6 +49,11 @@ function Composer({ onSent }: { onSent: (n: AdminNotice) => void }) {
   const [draft, setDraft] = useState<NoticeDraft>(EMPTY);
   const [missing, setMissing] = useState(false);
   const [preview, setPreview] = useState<{ recipients: number; with_push: number } | null>(null);
+  const [cities, setCities] = useState<SearchCity[]>([]);
+  useEffect(() => {
+    // Without the list (a failed read) the notice can still go to every city.
+    fetchCities().then(setCities, () => {});
+  }, []);
   const set = <K extends keyof NoticeDraft>(key: K, value: NoticeDraft[K]) => {
     setDraft((d) => ({ ...d, [key]: value }));
     setPreview(null);
@@ -71,13 +77,20 @@ function Composer({ onSent }: { onSent: (n: AdminNotice) => void }) {
           </Chip>
         ))}
       </ChipRow>
-      <Field
-        label={t('admin.notices.city')}
-        hint={t(draft.audience === 'shops' ? 'admin.notices.cityHintShops' : 'admin.notices.cityHint')}
-        value={draft.city}
-        maxLength={80}
-        onChange={(e) => set('city', e.target.value)}
-      />
+      {/* The cities that have shops, as in the client's search: nothing to type or know. */}
+      <div className={styles.stack}>
+        <ChipRow label={t('admin.notices.city')}>
+          <Chip selected={draft.city === ''} onClick={() => set('city', '')}>
+            {t('search.allCities')}
+          </Chip>
+          {cities.map((c) => (
+            <Chip key={c.city} selected={draft.city === c.city} onClick={() => set('city', c.city)}>
+              {c.city}
+            </Chip>
+          ))}
+        </ChipRow>
+        <p className={styles.muted}>{t(draft.audience === 'shops' ? 'admin.notices.cityHintShops' : 'admin.notices.cityHint')}</p>
+      </div>
       <div className={styles.fields}>
         <Field
           label={t('admin.notices.titleRo')}
@@ -136,7 +149,7 @@ function Composer({ onSent }: { onSent: (n: AdminNotice) => void }) {
             {(['ro', 'en'] as const).map((l) => (
               <div key={l} className={styles.stack}>
                 <span className={tools.previewLabel}>{t(l === 'en' ? 'admin.lang.en' : 'admin.lang.ro')}</span>
-                <NoticeView notice={shownNotice} lang={l} />
+                <NoticeItem notice={shownNotice} lang={l} isNew open />
               </div>
             ))}
           </div>

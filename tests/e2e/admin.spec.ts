@@ -39,7 +39,7 @@ test.beforeEach(async ({ context, page }) => {
 
 async function signInAdmin(page: Page) {
   await signIn(page, SEED.admin, SEED_PASSWORD);
-  await expect(page.getByRole('heading', { level: 1, name: 'Prezentare' })).toBeVisible();
+  await expect(page.getByRole('heading', { level: 1, name: 'Panou principal' })).toBeVisible();
 }
 
 /** Whether a client finds the shop in search. */
@@ -108,7 +108,7 @@ test.describe('admin', () => {
     await page.getByRole('button', { name: 'English' }).filter({ visible: true }).first().click();
     await expect(page.getByRole('heading', { level: 1, name: 'Moderation' })).toBeVisible();
     await expect(page.getByText('All reviews')).toBeVisible();
-    await navLink(page, /^Overview/).click();
+    await navLink(page, /^Dashboard/).click();
     await expect(page.getByText('Monthly recurring revenue')).toBeVisible();
     await expectNoHorizontalScroll(page);
     await shot(page, 't16a-overview-en', name());

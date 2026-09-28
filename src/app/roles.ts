@@ -19,6 +19,8 @@ export type Role = 'client' | 'shop' | 'admin';
 export interface NavItem {
   path: string;
   labelKey: MessageKey;
+  /** A shorter label for the mobile bottom bar, where five items share 390 px. */
+  shortLabelKey?: MessageKey;
   icon: LucideIcon;
 }
 
@@ -51,7 +53,7 @@ const shopMain: NavItem[] = [
 
 // Admin has five main items; its Cont (platform tools) is reached from the header/sidebar.
 const adminMain: NavItem[] = [
-  { path: '/admin/prezentare', labelKey: 'nav.admin.overview', icon: LayoutDashboard },
+  { path: '/admin/prezentare', labelKey: 'nav.admin.overview', shortLabelKey: 'nav.admin.overviewShort', icon: LayoutDashboard },
   { path: '/admin/service-uri', labelKey: 'nav.admin.shops', icon: Store },
   { path: '/admin/clienti', labelKey: 'nav.admin.clients', icon: Users },
   { path: '/admin/rezervari', labelKey: 'nav.admin.bookings', icon: ClipboardList },

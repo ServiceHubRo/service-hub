@@ -175,6 +175,32 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
       title: 'Recenzia raportată a fost ștearsă',
       body: 'Am șters recenzia pentru {ref} ({rating} din 5 stele). Nu mai apare și nu mai contează la medie.',
     },
+    // ------------------------------------------------------------------ account / shop suspended, reactivated
+    'shop.account_suspended': {
+      title: 'Cont suspendat',
+      body: 'Echipa Service-Hub ți-a suspendat contul. Service-ul nu mai apare în căutări și nu primește programări noi. Detalii în emailul primit.',
+    },
+    'shop.account_suspended_shop': {
+      title: 'Service suspendat',
+      body: 'Echipa Service-Hub a suspendat {shop}. Nu mai apare în căutări și nu primește programări noi. Detalii în emailul primit.',
+    },
+    'shop.account_reactivated': {
+      title: 'Cont reactivat',
+      body: 'Contul tău Service-Hub este din nou activ. Service-ul poate apărea din nou în căutări.',
+    },
+    'shop.account_reactivated_shop': {
+      title: 'Service reactivat',
+      body: '{shop} este din nou activ: apare în căutări și poate primi programări.',
+    },
+    // ------------------------------------------------------------------ account suspended / reactivated
+    'client.account_suspended': {
+      title: 'Cont suspendat',
+      body: 'Echipa Service-Hub ți-a suspendat contul. Poți vedea ce ai, dar nu poți face programări, trimite mesaje sau recenzii. Detalii în emailul primit.',
+    },
+    'client.account_reactivated': {
+      title: 'Cont reactivat',
+      body: 'Contul tău Service-Hub este din nou activ. Poți face programări ca înainte.',
+    },
   },
   en: {
     // ------------------------------------------------------------------ to the client
@@ -297,6 +323,32 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
       title: 'The reported review was removed',
       body: 'We removed the review for {ref} ({rating} of 5 stars). It no longer shows and no longer counts toward your rating.',
     },
+    // ------------------------------------------------------------------ account / shop suspended, reactivated
+    'shop.account_suspended': {
+      title: 'Account suspended',
+      body: 'The Service-Hub team suspended your account. Your shop no longer appears in search and takes no new bookings. Details in the email we sent.',
+    },
+    'shop.account_suspended_shop': {
+      title: 'Shop suspended',
+      body: 'The Service-Hub team suspended {shop}. It no longer appears in search and takes no new bookings. Details in the email we sent.',
+    },
+    'shop.account_reactivated': {
+      title: 'Account reactivated',
+      body: 'Your Service-Hub account is active again. Your shop can appear in search again.',
+    },
+    'shop.account_reactivated_shop': {
+      title: 'Shop reactivated',
+      body: '{shop} is active again: it appears in search and can take bookings.',
+    },
+    // ------------------------------------------------------------------ account suspended / reactivated
+    'client.account_suspended': {
+      title: 'Account suspended',
+      body: "The Service-Hub team suspended your account. You can still see your data, but you can't book, send messages or write reviews. Details in the email we sent.",
+    },
+    'client.account_reactivated': {
+      title: 'Account reactivated',
+      body: 'Your Service-Hub account is active again. You can book as before.',
+    },
   },
 };
 
@@ -354,12 +406,13 @@ export const EVENTS: Record<Side, readonly string[]> = {
     'booking_confirmed', 'booking_declined', 'booking_rescheduled', 'booking_cancelled_shop', 'booking_cancelled_admin',
     'no_show', 'inspection_started', 'quote_sent', 'quote_replaced', 'quote_withdrawn', 'quote_expiring', 'quote_expired',
     'work_started', 'job_done', 'appointment_reminder', 'new_message', 'review_reply', 'doc_expiry', 'report_ready',
-    'review_report_decided', 'review_request', 'service_due',
+    'review_report_decided', 'review_request', 'service_due', 'account_suspended', 'account_reactivated',
   ],
   shop: [
     'booking_requested', 'booking_cancelled_client', 'booking_cancelled_admin', 'quote_accepted',
     'quote_partially_accepted', 'quote_refused', 'quote_expiring', 'quote_expired', 'new_message', 'new_review',
-    'daily_digest', 'trial_ending', 'payment_failed', 'shop_inactive', 'review_report_decided',
+    'daily_digest', 'trial_ending', 'payment_failed', 'shop_inactive', 'review_report_decided', 'account_suspended',
+    'account_reactivated',
   ],
 };
 
@@ -491,6 +544,10 @@ export function templateKey(side: Side, e: NotificationEvent): string {
             : base;
     case 'review_report_decided':
       return side === 'shop' && p.decision === 'removed' ? `${base}_removed` : base;
+    // A shop suspended (shops.suspended) rather than its owner's account.
+    case 'account_suspended':
+    case 'account_reactivated':
+      return side === 'shop' && p.kind === 'shop' ? `${base}_shop` : base;
     default:
       return base;
   }
@@ -509,6 +566,9 @@ export function urlFor(side: Side, e: NotificationEvent): string {
         return str(p.car_id) ? `/c/garaj/${str(p.car_id)}` : '/c/garaj';
       case 'report_ready':
         return REPORTS_PATH;
+      case 'account_suspended':
+      case 'account_reactivated':
+        return '/c/cauta';
       // The booking card with the review form open.
       case 'review_request':
         return booking ? `/c/programari?${q({ p: booking, recenzie: '1' })}` : '/c/programari';
@@ -528,6 +588,8 @@ export function urlFor(side: Side, e: NotificationEvent): string {
     case 'review_report_decided':
       return '/s/cont/recenzii';
     case 'daily_digest':
+    case 'account_suspended':
+    case 'account_reactivated':
       return '/s/panou';
     case 'trial_ending':
     case 'payment_failed':
@@ -568,6 +630,10 @@ function tagFor(e: NotificationEvent): string {
     case 'payment_failed':
     case 'shop_inactive':
       return 'subscription';
+    // The newer one replaces the older (suspended, then reactivated).
+    case 'account_suspended':
+    case 'account_reactivated':
+      return 'account';
     default: {
       const booking = e.booking_id ?? str(p.booking_id);
       return booking ? `booking-${booking}` : e.event;
@@ -579,12 +645,13 @@ const firstUpper = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 const clip = (s: string, n: number) => (s.length > n ? `${s.slice(0, n - 1)}…` : s);
 
 /** The screen where notices show (T16b): Caută for clients, Panou for shops. */
-export const NOTICE_PATHS: Record<Side, string> = { client: '/c/cauta', shop: '/s/panou' };
+/** Notices live at the top of Mesaje (T20a); a push opens the notice there. */
+export const NOTICE_PATHS: Record<Side, string> = { client: '/c/mesaje', shop: '/s/mesaje' };
 
 /**
  * A notice from the Service-Hub team (T16b): the admin wrote its title and text in both
  * languages; the recipient gets their own (the Romanian one when the English is missing). A tap
- * opens the screen where the notice shows.
+ * opens the notice in Mesaje.
  */
 function renderBroadcast(e: NotificationEvent, side: Side, lang: Lang): Rendered | null {
   const p = e.params ?? {};
@@ -595,7 +662,7 @@ function renderBroadcast(e: NotificationEvent, side: Side, lang: Lang): Rendered
     key: 'broadcast',
     title: clip(title || BRAND, 80),
     body: clip(body.replace(/\s+/g, ' ').trim(), 240),
-    url: NOTICE_PATHS[side],
+    url: `${NOTICE_PATHS[side]}?anunt=${encodeURIComponent(str(p.notice_id))}`,
     tag: `notice-${str(p.notice_id)}`,
   };
 }

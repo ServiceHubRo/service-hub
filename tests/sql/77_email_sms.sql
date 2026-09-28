@@ -90,14 +90,24 @@ update public.profiles set suspended = true where id = test.id('client_a');
 update public.shops set suspended = true where id = test.id('shop2');
 select test.eq(test.count($$select 1 from public.notification_events
                             where event = 'account_suspended' and user_id = test.id('client_a')
-                              and params->>'kind' = 'account' and channels = '{email}'$$), 1::bigint,
-  'a suspended account gets one email');
+                              and params->>'kind' = 'account' and channels = '{email,push}'$$), 1::bigint,
+  'a suspended account gets one email and one push');
 select test.eq(test.count($$select 1 from public.notification_events
                             where event = 'account_suspended' and user_id = test.id('owner2')
                               and params->>'shop_name' = 'Atelier Doi'$$), 1::bigint,
   'a suspended shop: its owner gets the email');
 update public.profiles set suspended = false where id = test.id('client_a');
 update public.shops set suspended = false where id = test.id('shop2');
+-- Reactivation: an email and a push too, once.
+update public.profiles set suspended = false where id = test.id('client_a');
+select test.eq(test.count($$select 1 from public.notification_events
+                            where event = 'account_reactivated' and user_id = test.id('client_a')
+                              and params->>'kind' = 'account' and channels = '{email,push}'$$), 1::bigint,
+  'a reactivated account gets one email and one push');
+select test.eq(test.count($$select 1 from public.notification_events
+                            where event = 'account_reactivated' and user_id = test.id('owner2')
+                              and params->>'kind' = 'shop' and params->>'shop_name' = 'Atelier Doi'$$), 1::bigint,
+  'a reactivated shop: its owner is told');
 
 -- ------------------------------------------------------------------ language → Auth metadata
 select test.login(test.id('client_a'));

@@ -5,13 +5,17 @@ import { supabase } from './supabase';
 /**
  * Notices from the Service-Hub team (T16b, FR §5.9), as clients and shops see them: RLS lets each
  * person read only the notices meant for them (their role and, for a city notice, a shop in that
- * city or a client who booked there). A notice shows until the person marks it read, for 30 days.
+ * city or a client who booked there). A notice shows in Mesaje for 30 days, marked new until the person opens it.
  */
 
 /** How long a notice stays in the app. */
 export const NOTICE_DAYS = 30;
 
-export async function fetchUnreadNotices(userId: string, now: Date = new Date()): Promise<Notice[]> {
+/** A notice as its reader sees it in Mesaje: read or still new. */
+export type MyNotice = Notice & { read: boolean };
+
+/** The notices of the last 30 days meant for this person, newest first, each marked read or new. */
+export async function fetchMyNotices(userId: string, now: Date = new Date()): Promise<MyNotice[]> {
   if (!supabase) throw new RpcError('network');
   const since = new Date(now.getTime() - NOTICE_DAYS * 86_400_000).toISOString();
   const [notices, reads] = await Promise.all([
@@ -26,10 +30,10 @@ export async function fetchUnreadNotices(userId: string, now: Date = new Date())
   if (notices.error) throw failure(notices.error);
   if (reads.error) throw failure(reads.error);
   const read = new Set(reads.data.map((r) => r.notice_id));
-  return (notices.data as Notice[]).filter((n) => !read.has(n.id));
+  return (notices.data as Notice[]).map((n) => ({ ...n, read: read.has(n.id) }));
 }
 
-/** "Am citit": the notice no longer shows for this person (on every device). Harmless to repeat. */
+/** Opened in Mesaje: the notice is no longer new for this person (on every device). Harmless to repeat. */
 export async function markNoticeRead(noticeId: string): Promise<void> {
   if (!supabase) throw new RpcError('network');
   const { error } = await supabase

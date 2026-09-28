@@ -12,6 +12,7 @@ import {
   serviceRest,
   shot,
   signIn,
+  userIdOf,
 } from './support';
 
 // T11 — messages between a client and a shop, live on both sides, with automatic messages in the
@@ -85,6 +86,13 @@ async function doneAndReviewed(shop: string, client: string, bookingId: string, 
   await rpcAs(client, 'submit_review', { p_booking_id: bookingId, p_rating: rating, p_text: text, p_request_id: rid() });
 }
 
+/** The team's notices (the seed has one for everyone) are read, so Mesaje counts conversations only. */
+async function readAllNotices(email: string): Promise<void> {
+  const userId = await userIdOf(email);
+  const notices = await serviceRest<{ id: string }[]>('notices?select=id', 'GET');
+  if (notices.length > 0) await serviceRest('notice_reads', 'POST', notices.map((n) => ({ user_id: userId, notice_id: n.id })));
+}
+
 async function signedIn(browser: Browser, page: Page, email: string): Promise<Page> {
   const context = await browser.newContext({ viewport: page.viewportSize() ?? undefined, timezoneId: 'Europe/Berlin' });
   await context.addInitScript(() => {
@@ -110,6 +118,7 @@ test.describe('messages and reviews', () => {
     const booking = await book(client, shopId, slot!);
 
     // Shop: the new request is an unread conversation, on the tab and in the list.
+    await readAllNotices(shop);
     const shopPage = await signedIn(browser, page, shop);
     await expect(navLink(shopPage, /^Mesaje/)).toHaveAccessibleName(/o conversație necitită/);
     await navLink(shopPage, /^Mesaje/).click();

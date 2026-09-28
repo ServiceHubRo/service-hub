@@ -1,4 +1,5 @@
 import { expect, type Page } from '@playwright/test';
+import { strFromU8, unzipSync } from 'fflate';
 import { en } from '../../src/i18n/en';
 import { ro, type MessageKey } from '../../src/i18n/ro';
 
@@ -286,4 +287,25 @@ export async function expectAccessible(page: Page, label: string) {
     return out;
   });
   expect(small, `${label}: tap targets under 44 px`).toEqual([]);
+}
+
+/**
+ * A downloaded Excel file (src/lib/xlsx.ts) as text: one line per row, cells joined by `;`, so a
+ * test reads it like the CSV it replaced. Numbers come back as written (`79.5`, `105400`).
+ */
+export function xlsxText(file: Uint8Array): string {
+  const sheet = strFromU8(unzipSync(file)['xl/worksheets/sheet1.xml']!);
+  const unescape = (s: string) =>
+    s.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&amp;/g, '&');
+  const col = (ref: string) => [...ref.replace(/\d+$/, '')].reduce((n, ch) => n * 26 + ch.charCodeAt(0) - 64, 0) - 1;
+  return [...sheet.matchAll(/<row r="\d+">(.*?)<\/row>/g)]
+    .map(([, row]) => {
+      const cells: string[] = [];
+      for (const [, ref, body] of row!.matchAll(/<c r="([A-Z]+\d+)"[^>]*>(.*?)<\/c>/g)) {
+        const text = /<t[^>]*>([\s\S]*?)<\/t>/.exec(body!)?.[1] ?? /<v>(.*?)<\/v>/.exec(body!)?.[1] ?? '';
+        cells[col(ref!)] = unescape(text);
+      }
+      return Array.from(cells, (c) => c ?? '').join(';');
+    })
+    .join('\r\n');
 }

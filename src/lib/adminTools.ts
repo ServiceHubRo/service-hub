@@ -367,7 +367,7 @@ export function exportTable(kind: ExportKind, rows: readonly unknown[], t: T, la
 
 /** `service-uri-2026-10-14.csv` / `shops-2026-10-14.csv`. */
 export function exportFileName(kind: ExportKind, t: T, today: string): string {
-  return `${t(`admin.export.file.${kind}`)}-${today}.csv`;
+  return `${t(`admin.export.file.${kind}`)}-${today}.xlsx`;
 }
 
 /** The service reminder field (T19d): empty = no reminder, else whole months 1–120; `invalid` otherwise. */

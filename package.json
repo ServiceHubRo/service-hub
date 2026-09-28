@@ -17,11 +17,21 @@
     "test:sql": "bash scripts/test-sql.sh",
     "test:e2e": "playwright test",
     "icons": "node scripts/gen-icons.mjs",
-    "db:types": "bash scripts/db-types.sh"
+    "db:types": "bash scripts/db-types.sh",
+    "android:sync": "npm run build && cap sync android",
+    "android:assets": "node scripts/gen-android-assets.mjs"
   },
   "dependencies": {
+    "@capacitor/android": "^8.5.2",
+    "@capacitor/app": "^8.1.1",
+    "@capacitor/core": "^8.5.2",
+    "@capacitor/filesystem": "^8.1.3",
+    "@capacitor/share": "^8.0.2",
+    "@capacitor/splash-screen": "^8.0.2",
+    "@capacitor/status-bar": "^8.0.3",
     "@fontsource-variable/inter": "^5.3.0",
     "@supabase/supabase-js": "^2.117.1",
+    "fflate": "^0.8.3",
     "lucide-react": "^1.47.0",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
@@ -29,6 +39,7 @@
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.13.0",
+    "@capacitor/cli": "^8.5.2",
     "@eslint/js": "^10.0.1",
     "@pdf-lib/fontkit": "^1.1.1",
     "@playwright/test": "1.56",

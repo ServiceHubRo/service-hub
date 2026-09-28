@@ -93,6 +93,7 @@ export function Landing() {
   return (
     <div className={styles.page}>
       <div className="status-backdrop" aria-hidden="true" />
+      <div className="nav-backdrop" aria-hidden="true" />
       <header className={styles.header}>
         <div className={`${styles.wrap} ${styles.headerRow}`}>
           <Link to="/" className={styles.brand} aria-label={t('app.title')}>
@@ -122,14 +123,6 @@ export function Landing() {
                 {t('landing.heroTitle')} <span className={styles.highlight}>{t('landing.heroHighlight')}</span>
               </h1>
               <p className={styles.lead}>{t('landing.heroText')}</p>
-              <div className={styles.heroActions}>
-                <Link to={signUpPath('client')} className={buttonClass('primary', false, styles.bigButton)}>
-                  {t('landing.imClient')}
-                </Link>
-                <Link to={signUpPath('shop')} className={buttonClass('secondary', false, styles.bigButton)}>
-                  {t('landing.imShop')}
-                </Link>
-              </div>
               <p className={styles.free}>
                 <Check size={18} aria-hidden="true" className={styles.freeIcon} />
                 <span>{t('landing.drivers')}</span>

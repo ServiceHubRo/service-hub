@@ -14,6 +14,7 @@ import {
   shot,
   signIn,
   userIdOf,
+  xlsxText,
 } from './support';
 
 // T17 — Rapoarte: the owner's tile in Cont, the periods, figures that match Istoric, the CSV; the
@@ -79,11 +80,11 @@ test.describe('demo shop', () => {
     // The CSV of the period, for the accountant: finished jobs and inspection fees.
     const [download] = await Promise.all([
       page.waitForEvent('download'),
-      page.getByRole('button', { name: 'Descarcă datele (CSV)' }).click(),
+      page.getByRole('button', { name: 'Descarcă datele (Excel)' }).click(),
     ]);
-    expect(download.suggestedFilename()).toMatch(/^rapoarte-ultimele-3-luni-\d{4}-\d{2}-\d{2}\.csv$/);
-    const csv = await readFile((await download.path())!, 'utf8');
-    expect(csv.split('\r\n')[0]).toBe('﻿Data;Cod programare;Tip;Număr;Mașină;Client;Serviciu;Sumă (lei)');
+    expect(download.suggestedFilename()).toMatch(/^rapoarte-ultimele-3-luni-\d{4}-\d{2}-\d{2}\.xlsx$/);
+    const csv = xlsxText(await readFile((await download.path())!));
+    expect(csv.split('\r\n')[0]).toBe('Data;Cod programare;Tip;Număr;Mașină;Client;Serviciu;Sumă (lei)');
     expect(csv.match(/;Lucrare;/g)?.length).toBe(Number(jobs));
     expect(csv).toContain(';Taxă de constatare;');
 

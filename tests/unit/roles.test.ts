@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { NAV, homeOf } from '../../src/app/roles';
 import { translate } from '../../src/i18n/translate';
 
-const labels = (role: keyof typeof NAV) => NAV[role].bottomBar.map((i) => translate('ro', i.labelKey));
+const labels = (role: keyof typeof NAV) => NAV[role].bottomBar.map((i) => translate('ro', i.shortLabelKey ?? i.labelKey));
 
 describe('navigation per role (CLAUDE.md §1)', () => {
   it('client has exactly its five items', () => {
@@ -12,7 +12,9 @@ describe('navigation per role (CLAUDE.md §1)', () => {
     expect(labels('shop')).toEqual(['Panou', 'Programări', 'Istoric', 'Mesaje', 'Cont']);
   });
   it('admin has exactly its five items', () => {
-    expect(labels('admin')).toEqual(['Prezentare', 'Service-uri', 'Clienți', 'Rezervări', 'Moderare']);
+    expect(labels('admin')).toEqual(['Panou', 'Service-uri', 'Clienți', 'Rezervări', 'Moderare']);
+    // The full name on the desktop sidebar and as the screen's title.
+    expect(translate('ro', NAV.admin.main[0]!.labelKey)).toBe('Panou principal');
   });
   it('every route stays under its role prefix', () => {
     for (const nav of Object.values(NAV)) {

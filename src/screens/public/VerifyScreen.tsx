@@ -62,6 +62,7 @@ export function VerifyScreen() {
   return (
     <div className={legal.page}>
       <div className="status-backdrop" aria-hidden="true" />
+      <div className="nav-backdrop" aria-hidden="true" />
       <header className={legal.header}>
         <Link to="/" className={legal.brand} aria-label={t('app.title')}>
           <LogoTile size={28} />

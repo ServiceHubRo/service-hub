@@ -119,6 +119,20 @@ describe('notification texts', () => {
     }
   });
 
+  it('suspension and reactivation reach the phone too, account or shop', () => {
+    expect(render('account_suspended', 'client', 'ro', { kind: 'account' })).toMatchObject({ title: 'Cont suspendat', url: '/c/cauta', tag: 'account' });
+    expect(render('account_reactivated', 'client', 'en', { kind: 'account' })!.body).toBe(
+      'Your Service-Hub account is active again. You can book as before.',
+    );
+    expect(render('account_suspended', 'shop', 'ro', { kind: 'shop', shop_name: 'Atelier Unu' })).toMatchObject({
+      title: 'Service suspendat',
+      url: '/s/panou',
+    });
+    expect(render('account_reactivated', 'shop', 'ro', { kind: 'shop', shop_name: 'Atelier Unu' })!.body).toBe(
+      'Atelier Unu este din nou activ: apare în căutări și poate primi programări.',
+    );
+  });
+
   it('writes what the client needs to know, in their language', () => {
     expect(render('quote_sent', 'client', 'ro')).toMatchObject({
       title: 'Atelier Unu',

@@ -1,4 +1,5 @@
 import { FunctionsFetchError, FunctionsHttpError } from '@supabase/supabase-js';
+import { webOrigin } from '../lib/native';
 import type { Database } from './database.types';
 import { call, failure, RpcError } from './rpc';
 import { supabase } from './supabase';
@@ -283,7 +284,7 @@ export function newInviteToken(): string {
 }
 
 export function inviteLink(token: string): string {
-  return `${window.location.origin}/invitatie/${token}`;
+  return `${webOrigin()}/invitatie/${token}`;
 }
 
 export async function inviteStaff(email: string, token: string, requestId: string): Promise<void> {
@@ -302,7 +303,7 @@ export async function emailInvite(token: string, lang: 'ro' | 'en'): Promise<Inv
   try {
     const { data, error } = await supabase.functions.invoke('invite-staff', {
       method: 'POST',
-      body: { token, lang, origin: window.location.origin },
+      body: { token, lang, origin: webOrigin() },
     });
     if (error) return 'failed';
     const d = data as { sent?: boolean; reason?: string };
