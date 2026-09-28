@@ -197,7 +197,16 @@
 
 .book {
   gap: 8px;
-  margin-top: 4px;
+}
+
+/* "Programează-te" stays in sight at the bottom while the page scrolls under it. */
+.bookBar {
+  position: sticky;
+  bottom: 0;
+  z-index: 1;
+  margin: 0 calc(-1 * var(--page-pad));
+  padding: 12px var(--page-pad) 12px;
+  background: linear-gradient(to bottom, transparent, var(--bg) 14px);
 }
 
 /* ---------------------------------------------------------------- reviews */
