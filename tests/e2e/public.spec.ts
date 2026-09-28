@@ -38,10 +38,10 @@ test('landing: every section, in Romanian and English, without horizontal scroll
     await expect(page.getByRole('heading', { level: 3, name: card })).toBeVisible();
   }
   if (BACKEND) {
-    // The prices come from Setări platformă: the launch price while places are left, without VAT,
-    // the first colleague included.
+    // The prices come from Setări platformă: the launch price while places are left, the first
+    // colleague included. No VAT mention: the company is not a VAT payer yet (nothing is added).
     await expect(page.getByText('99 lei pe lună')).toBeVisible();
-    await expect(page.getByText('fără TVA')).toBeVisible();
+    await expect(page.getByText(/TVA/)).toHaveCount(0);
     await expect(page.getByText('primele 90 de zile gratuite')).toBeVisible();
     await expect(page.getByText(/^Preț de lansare pentru primele \d+ de service-uri, păstrat cât timp rămâi\. După aceea, 149 lei pe lună\.$/)).toBeVisible();
     await expect(
@@ -63,7 +63,7 @@ test('landing: every section, in Romanian and English, without horizontal scroll
   await expect(page.getByRole('heading', { level: 2, name: 'Own a shop in Brașov?' })).toBeVisible();
   if (BACKEND) {
     await expect(page.getByText('99 RON a month')).toBeVisible();
-    await expect(page.getByText('excl. VAT')).toBeVisible();
+    await expect(page.getByText(/VAT/)).toHaveCount(0);
     await expect(page.getByText(/^Launch price for the first \d+ shops, kept for as long as you stay\. After that, 149 RON a month\.$/)).toBeVisible();
   }
   await expectNoHorizontalScroll(page);

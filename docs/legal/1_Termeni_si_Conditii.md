@@ -122,7 +122,7 @@ Proprietarul poate invita colegi, fiecare cu contul lui (colegii nu folosesc con
 
 ### 4.5 Abonamentul
 
-- **Prețul:** cel afișat pe service-hub.ro când te înscrii, **fără TVA**. Acum: 149 lei pe lună, cu primul coleg care și-a făcut contul în service inclus, plus 19 lei pe lună pentru fiecare coleg în plus. Invitația nu costă. Prețul se fixează la înscriere și este afișat în ecranul Abonament.
+- **Prețul:** cel afișat pe service-hub.ro când te înscrii. Acum: 149 lei pe lună, cu primul coleg care și-a făcut contul în service inclus, plus 19 lei pe lună pentru fiecare coleg în plus. Invitația nu costă. Prețul se fixează la înscriere și este afișat în ecranul Abonament.
 - **Prețul de lansare:** primele 50 de service-uri înscrise plătesc 99 lei pe lună în loc de 149 și îl păstrează cât timp au abonamentul.
 - **Plata pe mai multe luni:** în loc de lunar, poți plăti o dată la 3, 6 sau 12 luni, cu reducerea afișată în ecranul Abonament când alegi (acum 5%, 10%, respectiv 15%), rotunjit la leu. Reducerea se aplică și prețului de lansare și colegilor plătiți și se păstrează la fiecare reînnoire a aceleiași perioade.
 - **TVA:** cât timp {{company}} nu este plătitoare de TVA, nu se adaugă TVA. Dacă devine, TVA-ul se adaugă la preț, iar schimbarea ți-o anunțăm cu cel puțin 30 de zile înainte.
