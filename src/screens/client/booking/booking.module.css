@@ -2,6 +2,8 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
+  /* Fills the content area, so the main action can sit at its foot (BottomBar). */
+  flex: 1;
 }
 
 .title {
@@ -146,18 +148,6 @@
   cursor: not-allowed;
 }
 
-/* "Continuă" stays in sight while the list scrolls under it. */
-.stickyAction {
-  position: sticky;
-  bottom: 0;
-  z-index: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin: 0 calc(-1 * var(--page-pad));
-  padding: 10px var(--page-pad) 12px;
-  background: linear-gradient(to bottom, transparent, var(--bg) 14px);
-}
 
 .chevron {
   color: var(--muted);

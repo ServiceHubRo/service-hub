@@ -39,7 +39,7 @@ export function BookingFlow() {
   if (state.status === 'ready' && state.data.bookable) return <Flow page={state.data} />;
 
   return (
-    <div className={styles.page}>
+    <div className={styles.page} data-fill-screen>
       <BackLink to={shopPath(shopId)} label={t('booking.backToShop')} />
       <h1>{t('booking.title')}</h1>
       {state.status === 'loading' && <SkeletonList count={3} />}
@@ -141,7 +141,7 @@ function Flow({ page }: { page: ShopPage }) {
           : `${svc} · ${formatDate(lang, day!)}, ${time}`;
 
   return (
-    <div className={styles.page}>
+    <div className={styles.page} data-fill-screen>
       {step === 1 ? (
         <BackLink to={shopPath(shop.id)} label={t('booking.backToShop')} />
       ) : (

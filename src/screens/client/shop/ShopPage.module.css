@@ -2,6 +2,8 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
+  /* Fills the content area, so the main action can sit at its foot (BottomBar). */
+  flex: 1;
 }
 
 .header {
@@ -199,15 +201,6 @@
   gap: 8px;
 }
 
-/* "Programează-te" stays in sight at the bottom while the page scrolls under it. */
-.bookBar {
-  position: sticky;
-  bottom: 0;
-  z-index: 1;
-  margin: 0 calc(-1 * var(--page-pad));
-  padding: 12px var(--page-pad) 12px;
-  background: linear-gradient(to bottom, transparent, var(--bg) 14px);
-}
 
 /* ---------------------------------------------------------------- reviews */
 .reviews {

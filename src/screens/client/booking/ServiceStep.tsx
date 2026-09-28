@@ -1,4 +1,5 @@
 import { Check } from 'lucide-react';
+import { BottomBar } from '../../../components/BottomBar';
 import { buttonClass } from '../../../components/buttonClass';
 import { ServiceIcon } from '../../../components/ServiceIcon';
 import type { ShopPageService } from '../../../data/search';
@@ -59,7 +60,7 @@ export function ServiceStep({
         ))}
       </div>
       <p className={styles.muted}>{t('shop.priceNote')}</p>
-      <div className={styles.stickyAction}>
+      <BottomBar>
         {full && (
           <p className={styles.muted} role="status">
             {t('booking.servicesMax')}
@@ -70,7 +71,7 @@ export function ServiceStep({
             ? t('booking.servicesPick')
             : t('booking.servicesContinue', { services: plural(lang, 'unit.services', selected.length) })}
         </button>
-      </div>
+      </BottomBar>
     </>
   );
 }

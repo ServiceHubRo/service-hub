@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useSession } from '../../../app/sessionContext';
 import { ActionButton } from '../../../components/ActionButton';
 import { Banner } from '../../../components/Banner';
+import { BottomBar } from '../../../components/BottomBar';
 import { Card } from '../../../components/Card';
 import { Checkbox } from '../../../components/Checkbox';
 import { Field } from '../../../components/Field';
@@ -213,12 +214,12 @@ export function CarStep({
       </Card>
 
       {session.emailVerified ? (
-        <>
+        <BottomBar>
           {manual && !typedOk && <p className={styles.muted}>{t('car.required')}</p>}
           <ActionButton onAction={send} disabled={!ready} errorMessage={(e) => rpcErrorMessage(lang, e)} canRetry={canRetryRpc}>
             {t('booking.submit')}
           </ActionButton>
-        </>
+        </BottomBar>
       ) : (
         <Banner tone="warning">
           <div className={styles.stack}>
