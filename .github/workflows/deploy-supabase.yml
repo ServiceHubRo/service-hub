@@ -14,6 +14,7 @@ name: Deploy Supabase
 #   SUPABASE_TEST_PROJECT_REF    the test project's ref (T19)
 #   SUPABASE_TEST_DB_PASSWORD    the test project's database password (T19)
 #   SENTRY_DSN                   optional (T19): the Edge Functions report their errors to Sentry
+#   FCM_SERVICE_ACCOUNT          optional (T20b): the Firebase key; notifications also reach the phone app
 
 on:
   pull_request:
@@ -44,6 +45,7 @@ jobs:
       TEST_PROJECT_REF: ${{ secrets.SUPABASE_TEST_PROJECT_REF }}
       TEST_DB_PASSWORD: ${{ secrets.SUPABASE_TEST_DB_PASSWORD }}
       SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+      FCM_SERVICE_ACCOUNT: ${{ secrets.FCM_SERVICE_ACCOUNT }}
       WANTED: ${{ github.event_name == 'pull_request' && 'test' || inputs.target || 'real' }}
       # The commit the deploy preview is built from (Netlify's COMMIT_REF), for error reports.
       RELEASE: ${{ github.event.pull_request.head.sha || github.sha }}
@@ -116,6 +118,22 @@ jobs:
           fi
           supabase secrets set --project-ref "$SUPABASE_PROJECT_REF" \
             "SENTRY_DSN=$SENTRY_DSN" "SENTRY_ENVIRONMENT=$SENTRY_ENVIRONMENT" "SENTRY_RELEASE=$RELEASE"
+
+      # Notifications in the phone app (T20b): dispatch-notifications sends them through Firebase
+      # with this service account key (the FCM_SERVICE_ACCOUNT secret, one line). Without it,
+      # notifications reach browsers only.
+      - name: Notifications in the phone app (Firebase)
+        run: |
+          if [ -z "$FCM_SERVICE_ACCOUNT" ]; then
+            echo "No FCM_SERVICE_ACCOUNT secret: notifications reach browsers only, not the phone app."
+            exit 0
+          fi
+          if ! compact=$(printf '%s' "$FCM_SERVICE_ACCOUNT" | jq -ce 'select(.type == "service_account" and .private_key and .client_email and .project_id)'); then
+            echo "::error title=Notificări în aplicație::FCM_SERVICE_ACCOUNT nu este cheia unui cont de serviciu Firebase (Project settings → Service accounts → Generate new private key)."
+            exit 1
+          fi
+          supabase secrets set --project-ref "$SUPABASE_PROJECT_REF" "FCM_SERVICE_ACCOUNT=$compact" > /dev/null
+          echo "Firebase key set for the Edge Functions."
 
       - name: Deploy Edge Functions
         run: |

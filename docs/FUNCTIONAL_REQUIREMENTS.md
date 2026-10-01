@@ -57,6 +57,7 @@ A user has exactly one role. The role decides the entire interface. A client can
 - **Push permission** banner on first visit (see §7).
 - **Review request** card while the newest finished job can still be reviewed (60 days): "Lasă recenzia" opens the booking with the review form open; "Nu acum" hides it for the session.
 - **Favorites:** heart icon on each result and on the shop page; "Favorites" filter chip.
+- **New-client offer** (T23): when the shop offers a discount and the client has never booked there, the card shows "-10% on labor on your first booking". It never changes the order.
 
 ### 3.2 Shop page
 - Logo, name, rating + count, description, address, city, distance if known.
@@ -67,6 +68,7 @@ A user has exactly one role. The role decides the entire interface. A client can
 - Services offered (no prices) + line "Price is set through a quote after the shop inspects the car."
 - Reviews with the shop's public replies.
 - Favorite toggle.
+- **New-client offer** box when the shop has one and the client is new there (T23).
 - **Book** button.
 
 ### 3.3 Booking flow (4 steps with progress bar)
@@ -185,6 +187,7 @@ A user has exactly one role. The role decides the entire interface. A client can
 - **Hours per weekday** (open/close or closed), **special closed dates** (single days or ranges, with label).
 - **Cars per day** (1–100, no platform limit). **Cars per slot** (how many cars may start at the same time, default 1). **Slot length** (30 / 60 min). **Minimum notice** (e.g. 2 h). **Maximum advance** (e.g. 30 days). **Cancellation deadline** for clients (e.g. 2 h before; 0 = anytime).
 - **Inspection fee** (RON, may be 0).
+- **New-client offer** (T23, owner only): no offer, or 5 / 10 / 15 / 20 / 25 / 30 % off labor on a client's first booking at this shop. The shop pays for it and takes it off the quote; the booking remembers the promise (the card and the quote form remind the shop). It never affects search order.
 - **Services offered:** searchable catalog with checkboxes, select all / clear all. No prices.
 - **Staff accounts:** invite by email, list, remove.
 - Notifications: push status, SMS on/off for new requests, daily digest on/off.

@@ -9,6 +9,7 @@ import { Card } from '../../../components/Card';
 import { EmptyState } from '../../../components/EmptyState';
 import { FavoriteButton } from '../../../components/FavoriteButton';
 import { LoadError } from '../../../components/LoadError';
+import { OfferNote } from '../../../components/OfferNote';
 import { ServiceIcon } from '../../../components/ServiceIcon';
 import { ShopAvatar } from '../../../components/ShopAvatar';
 import { SkeletonList } from '../../../components/Skeleton';
@@ -161,6 +162,11 @@ function ShopDetails({ page, onFavorite }: { page: ShopPageData; onFavorite: (on
       {shop.description && <p className={styles.description}>{shop.description}</p>}
 
       {!page.bookable && <Banner tone="warning">{t('shop.notBookable')}</Banner>}
+      {page.bookable && page.offer !== null && (
+        <OfferNote>
+          <strong>{t('offer.title')}</strong> · {t('offer.page', { n: page.offer })}
+        </OfferNote>
+      )}
 
       <Card className={styles.info}>
         <InfoRow label={t('shop.hours')}>

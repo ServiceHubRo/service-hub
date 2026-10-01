@@ -69,6 +69,10 @@
   font-size: 13px;
 }
 
+.newClient {
+  margin-top: 6px;
+}
+
 .chevron {
   flex-shrink: 0;
   color: var(--muted);

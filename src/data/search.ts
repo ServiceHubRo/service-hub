@@ -1,4 +1,4 @@
-import { call, failure, RpcError } from './rpc';
+import { call, failure, fetchNewClientOffers, RpcError } from './rpc';
 import { supabase } from './supabase';
 import type { DayHours } from '../lib/hours';
 
@@ -98,11 +98,18 @@ export interface ShopPage {
   closures: ShopClosurePublic[];
   services: ShopPageService[];
   reviews: ShopPageReview[];
+  /** The discount on labor the caller would get on a first booking here (T23); null without one. */
+  offer: number | null;
 }
 
 /** Everything the shop page shows, public columns only (get_shop_page). */
 export async function fetchShopPage(shopId: string): Promise<ShopPage> {
-  const page = (await call('get_shop_page', { p_shop_id: shopId })) as unknown as ShopPage;
+  const [read, offers] = await Promise.all([
+    call('get_shop_page', { p_shop_id: shopId }),
+    fetchNewClientOffers([shopId]).catch(() => new Map<string, number>()),
+  ]);
+  const page = read as unknown as ShopPage;
+  page.offer = offers.get(shopId) ?? null;
   // numeric columns arrive as numbers from jsonb; keep them numbers even if a driver sends text.
   page.shop.inspection_fee = Number(page.shop.inspection_fee);
   page.rating.average = page.rating.average === null ? null : Number(page.rating.average);

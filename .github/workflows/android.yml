@@ -51,6 +51,23 @@ jobs:
           java-version: '21'
           cache: gradle
 
+      # Notifications in the app (T20b): Firebase's config for this app, from the
+      # GOOGLE_SERVICES_JSON secret. Without it the app is built without notifications.
+      - name: Firebase config (notifications)
+        env:
+          GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
+        run: |
+          if [ -z "$GOOGLE_SERVICES_JSON" ]; then
+            echo "::warning title=Notificări în aplicație::Lipsește secretul GOOGLE_SERVICES_JSON (GitHub → Settings → Secrets and variables → Actions): aplicația se construiește fără notificări."
+            exit 0
+          fi
+          printf '%s' "$GOOGLE_SERVICES_JSON" > android/app/google-services.json
+          if ! jq -e '.project_info.project_id and (.client[] | select(.client_info.android_client_info.package_name == "ro.servicehub.app"))' android/app/google-services.json > /dev/null; then
+            echo "::error title=Notificări în aplicație::GOOGLE_SERVICES_JSON nu este fișierul google-services.json al aplicației ro.servicehub.app din Firebase."
+            exit 1
+          fi
+          echo "Firebase config for ro.servicehub.app in place."
+
       - name: Build the web app
         run: |
           npm ci

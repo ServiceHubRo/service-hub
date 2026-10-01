@@ -5,6 +5,7 @@ import { ActionButton } from '../../../components/ActionButton';
 import { Button } from '../../../components/Button';
 import { buttonClass } from '../../../components/buttonClass';
 import { Card } from '../../../components/Card';
+import { OfferNote } from '../../../components/OfferNote';
 import { InlinePanel } from '../../../components/InlinePanel';
 import { ServiceIcon } from '../../../components/ServiceIcon';
 import { StatusBadge } from '../../../components/StatusBadge';
@@ -41,6 +42,9 @@ export interface ClientBookingCardProps {
   /** The booking changed under this card: read the list again. */
   onStale: () => void;
 }
+
+/** Requests that never reached the shop's work: the offer no longer applies to them. */
+const OFFER_GONE = new Set(['declined', 'cancelled', 'expired']);
 
 /**
  * One booking in the client's Programări (FR §3.5, P10b, P15, P15c): service, shop, day and time,
@@ -105,6 +109,7 @@ export function ClientBookingCard({
         {car && <span className={styles.muted}> · {car}</span>}
       </p>
       {b.note && <p className={styles.note}>{b.note}</p>}
+      {b.offer_percent !== null && !OFFER_GONE.has(b.status) && <OfferNote>{t('offer.client', { n: b.offer_percent })}</OfferNote>}
 
       <StatusDetail booking={b} quote={quote} now={now} />
       {b.status === 'quote_sent' && quote && (

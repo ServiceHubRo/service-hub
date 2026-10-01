@@ -5,6 +5,7 @@ import { Button } from '../../../components/Button';
 import { Card } from '../../../components/Card';
 import { ServiceIcon } from '../../../components/ServiceIcon';
 import { StatusBadge } from '../../../components/StatusBadge';
+import { OfferNote } from '../../../components/OfferNote';
 import {
   canRetryRpc,
   confirmBooking,
@@ -121,6 +122,7 @@ export function ShopBookingCard({ booking: b, shopId, fee, expiryDays, now, onDo
           <p className={styles.muted}>{t('sb.card.noShows', { n: b.client_no_shows })}</p>
         )}
         {b.note && <p className={styles.note}>{b.note}</p>}
+        {b.offer_percent ? <OfferNote>{t('offer.shop', { n: b.offer_percent })}</OfferNote> : null}
       </Card>
 
       <StatusDetail booking={b} started={started} />

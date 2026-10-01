@@ -1,6 +1,7 @@
 // Settings of the email and SMS senders from the Edge Function secrets (Deno only; the shared
 // modules they configure stay free of Deno so the unit tests can load them).
 import { appUrl } from './app.ts';
+import { parseServiceAccount, type FcmConfig } from './fcm.ts';
 import type { EmailConfig } from './resend.ts';
 import type { SmsConfig } from './smso.ts';
 import type { StripeConfig } from './stripe.ts';
@@ -34,4 +35,9 @@ export function stripeConfigFromEnv(): StripeConfig {
     seatPriceId: secret('STRIPE_SEAT_PRICE_ID'),
     url: secret('STRIPE_API_URL'),
   };
+}
+
+/** Firebase Cloud Messaging (T20b): the service account key, for notifications to the phone app. */
+export function fcmConfigFromEnv(): FcmConfig {
+  return { account: parseServiceAccount(secret('FCM_SERVICE_ACCOUNT')), apiUrl: secret('FCM_API_URL') };
 }

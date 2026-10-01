@@ -52,6 +52,8 @@ export interface ShopBooking {
   client_account: string | null;
   /** No-shows in the last 90 days, at any shop (§6). */
   client_no_shows: number;
+  /** The new-client discount on labor this booking was promised (T23). */
+  offer_percent?: number | null;
   car_snapshot: CarSnapshot;
   created_at: string;
   confirmed_at: string | null;

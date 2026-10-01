@@ -370,6 +370,8 @@ export interface ShopSearchResult {
   matched_service_en: string | null;
   distance_km: number | null;
   is_favorite: boolean;
+  /** The shop's discount on labor for the caller's first booking there (T23); null without one. */
+  offer: number | null;
 }
 
 /** Public shops in rating order (ARCHITECTURE §8). The location is sent for this query only, never stored. */
@@ -389,7 +391,17 @@ export async function searchShops(params: {
     p_lng: params.lng,
     p_sort: params.sort,
   });
-  return data as unknown as ShopSearchResult[];
+  const shops = data as unknown as Omit<ShopSearchResult, 'offer'>[];
+  // The offers come separately and never change the order; without them the list still shows.
+  const offers = await fetchNewClientOffers(shops.map((s) => s.shop_id)).catch(() => new Map<string, number>());
+  return shops.map((s) => ({ ...s, offer: offers.get(s.shop_id) ?? null }));
+}
+
+/** New-client offers the caller would get now at these shops (T23), shop id → percent. */
+export async function fetchNewClientOffers(shopIds: string[]): Promise<Map<string, number>> {
+  if (shopIds.length === 0) return new Map();
+  const rows = await call('new_client_offers', { p_shop_ids: shopIds.slice(0, 100) });
+  return new Map((rows ?? []).map((r) => [r.shop_id, r.percent]));
 }
 
 // ------------------------------------------------------------------------------------ bookings

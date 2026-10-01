@@ -17,6 +17,8 @@ export interface SentState {
   date: string;
   time: string;
   car: string;
+  /** The new-client offer the booking got (T23). */
+  offer?: number | null;
 }
 
 /** After "Trimite cererea" (P6): a green check, what happens next, one way on. */
@@ -41,6 +43,7 @@ export function BookingSent() {
           />
           <SummaryRow label={t('booking.summary.when')} value={`${formatDate(lang, sent.date)}, ${sent.time}`} mono />
           {sent.car && <SummaryRow label={t('booking.summary.car')} value={sent.car} />}
+          {sent.offer ? <SummaryRow label={t('offer.summary')} value={t('offer.short', { n: sent.offer })} /> : null}
           <SummaryRow label={t('booking.sent.ref')} value={sent.ref} mono />
         </Card>
       )}

@@ -42,6 +42,8 @@ export interface ClientBooking {
   service: { name_ro: string; name_en: string; icon: string | null } | null;
   /** The other services of the same booking (T21), in the order they were ticked. */
   extra_service_ids: string[];
+  /** The new-client discount on labor this booking was promised (T23). */
+  offer_percent: number | null;
   extra_services: { id: string; name_ro: string; name_en: string; icon: string | null }[];
   /** Every version the shop sent, with its lines (the card picks one with `currentQuote`). */
   quotes: Quote[];
@@ -56,7 +58,7 @@ export interface ClientBookingsData {
 }
 
 const COLUMNS = [
-  'id, ref, status, date, slot, note, car_id, car_snapshot, created_at, shop_id, service_id, extra_service_ids',
+  'id, ref, status, date, slot, note, car_id, car_snapshot, created_at, shop_id, service_id, extra_service_ids, offer_percent',
   'inspection_started_at, started_at, done_at, odometer, work, cost, cancelled_by, cancel_reason, decline_reason',
   'shop:shops(name, city, phone, cancel_deadline_hours)',
   'service:services(name_ro, name_en, icon)',

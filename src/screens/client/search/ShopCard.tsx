@@ -1,6 +1,7 @@
 import { ChevronRight, MapPin } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FavoriteButton } from '../../../components/FavoriteButton';
+import { OfferNote } from '../../../components/OfferNote';
 import { ShopAvatar } from '../../../components/ShopAvatar';
 import { Stars } from '../../../components/Stars';
 import type { ShopSearchResult } from '../../../data/rpc';
@@ -64,6 +65,11 @@ export function ShopCard({ shop, distanceKm, back, onFavorite }: ShopCardProps) 
             <span>· {plural(lang, 'unit.services', shop.service_count)}</span>
           </span>
           {matched && <span className={styles.offers}>{t('search.offers', { service: matched })}</span>}
+          {shop.offer !== null && (
+            <span className={styles.newClient}>
+              <OfferNote compact>{t('offer.card', { n: shop.offer })}</OfferNote>
+            </span>
+          )}
         </span>
         <ChevronRight size={18} className={styles.chevron} aria-hidden="true" />
       </Link>

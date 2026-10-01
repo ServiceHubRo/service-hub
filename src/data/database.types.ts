@@ -112,6 +112,7 @@ export type Database = {
           inspection_started_at: string | null
           note: string | null
           odometer: number | null
+          offer_percent: number | null
           ref: string
           reminder_sent_at: string | null
           service_id: string
@@ -144,6 +145,7 @@ export type Database = {
           inspection_started_at?: string | null
           note?: string | null
           odometer?: number | null
+          offer_percent?: number | null
           ref?: string
           reminder_sent_at?: string | null
           service_id: string
@@ -176,6 +178,7 @@ export type Database = {
           inspection_started_at?: string | null
           note?: string | null
           odometer?: number | null
+          offer_percent?: number | null
           ref?: string
           reminder_sent_at?: string | null
           service_id?: string
@@ -1696,6 +1699,7 @@ export type Database = {
           max_advance_days: number
           min_notice_hours: number
           name: string
+          new_client_offer: number | null
           owner_id: string
           phone: string | null
           phone2: string | null
@@ -1732,6 +1736,7 @@ export type Database = {
           max_advance_days?: number
           min_notice_hours?: number
           name: string
+          new_client_offer?: number | null
           owner_id: string
           phone?: string | null
           phone2?: string | null
@@ -1768,6 +1773,7 @@ export type Database = {
           max_advance_days?: number
           min_notice_hours?: number
           name?: string
+          new_client_offer?: number | null
           owner_id?: string
           phone?: string | null
           phone2?: string | null
@@ -2084,6 +2090,7 @@ export type Database = {
           inspection_started_at: string | null
           note: string | null
           odometer: number | null
+          offer_percent: number | null
           ref: string
           reminder_sent_at: string | null
           service_id: string
@@ -2301,6 +2308,7 @@ export type Database = {
           inspection_started_at: string | null
           note: string | null
           odometer: number | null
+          offer_percent: number | null
           ref: string
           reminder_sent_at: string | null
           service_id: string
@@ -2387,6 +2395,7 @@ export type Database = {
           inspection_started_at: string | null
           note: string | null
           odometer: number | null
+          offer_percent: number | null
           ref: string
           reminder_sent_at: string | null
           service_id: string
@@ -2428,6 +2437,7 @@ export type Database = {
           inspection_started_at: string | null
           note: string | null
           odometer: number | null
+          offer_percent: number | null
           ref: string
           reminder_sent_at: string | null
           service_id: string
@@ -2480,6 +2490,7 @@ export type Database = {
           inspection_started_at: string | null
           note: string | null
           odometer: number | null
+          offer_percent: number | null
           ref: string
           reminder_sent_at: string | null
           service_id: string
@@ -2551,6 +2562,7 @@ export type Database = {
           inspection_started_at: string | null
           note: string | null
           odometer: number | null
+          offer_percent: number | null
           ref: string
           reminder_sent_at: string | null
           service_id: string
@@ -2592,6 +2604,7 @@ export type Database = {
           inspection_started_at: string | null
           note: string | null
           odometer: number | null
+          offer_percent: number | null
           ref: string
           reminder_sent_at: string | null
           service_id: string
@@ -2700,6 +2713,15 @@ export type Database = {
       invite_token_hash: { Args: { p_token: string }; Returns: string }
       is_active_status: { Args: { p_status: string }; Returns: boolean }
       is_admin: { Args: never; Returns: boolean }
+      is_new_client: {
+        Args: {
+          p_client_id: string
+          p_except?: string
+          p_plate_norm: string
+          p_shop_id: string
+        }
+        Returns: boolean
+      }
       is_push_endpoint: { Args: { p_url: string }; Returns: boolean }
       is_shop_member: { Args: { p_shop_id: string }; Returns: boolean }
       is_shop_owner: { Args: { p_shop_id: string }; Returns: boolean }
@@ -2768,6 +2790,7 @@ export type Database = {
           inspection_started_at: string | null
           note: string | null
           odometer: number | null
+          offer_percent: number | null
           ref: string
           reminder_sent_at: string | null
           service_id: string
@@ -2809,6 +2832,7 @@ export type Database = {
           inspection_started_at: string | null
           note: string | null
           odometer: number | null
+          offer_percent: number | null
           ref: string
           reminder_sent_at: string | null
           service_id: string
@@ -2859,6 +2883,7 @@ export type Database = {
           inspection_started_at: string | null
           note: string | null
           odometer: number | null
+          offer_percent: number | null
           ref: string
           reminder_sent_at: string | null
           service_id: string
@@ -2902,6 +2927,13 @@ export type Database = {
       my_referrals: { Args: never; Returns: Json }
       my_shop_id: { Args: never; Returns: string }
       my_subscription_offers: { Args: never; Returns: Json }
+      new_client_offers: {
+        Args: { p_shop_ids: string[] }
+        Returns: {
+          percent: number
+          shop_id: string
+        }[]
+      }
       next_history_report_code: { Args: never; Returns: string }
       normalize_code: { Args: { p: string }; Returns: string }
       notify_shop: {
@@ -3016,6 +3048,7 @@ export type Database = {
           inspection_started_at: string | null
           note: string | null
           odometer: number | null
+          offer_percent: number | null
           ref: string
           reminder_sent_at: string | null
           service_id: string
@@ -3234,6 +3267,7 @@ export type Database = {
           inspection_started_at: string | null
           note: string | null
           odometer: number | null
+          offer_percent: number | null
           ref: string
           reminder_sent_at: string | null
           service_id: string
@@ -3259,6 +3293,10 @@ export type Database = {
       }
       run_hourly_jobs: { Args: { p_now?: string }; Returns: Json }
       run_quote_jobs: { Args: { p_now?: string }; Returns: Json }
+      save_native_push_token: {
+        Args: { p_platform: string; p_token: string; p_user_agent?: string }
+        Returns: undefined
+      }
       save_push_subscription: {
         Args: {
           p_endpoint: string
@@ -3359,6 +3397,7 @@ export type Database = {
           inspection_started_at: string | null
           note: string | null
           odometer: number | null
+          offer_percent: number | null
           ref: string
           reminder_sent_at: string | null
           service_id: string
@@ -3428,6 +3467,7 @@ export type Database = {
           inspection_started_at: string | null
           note: string | null
           odometer: number | null
+          offer_percent: number | null
           ref: string
           reminder_sent_at: string | null
           service_id: string
@@ -3478,6 +3518,7 @@ export type Database = {
           inspection_started_at: string | null
           note: string | null
           odometer: number | null
+          offer_percent: number | null
           ref: string
           reminder_sent_at: string | null
           service_id: string
@@ -3519,6 +3560,7 @@ export type Database = {
           inspection_started_at: string | null
           note: string | null
           odometer: number | null
+          offer_percent: number | null
           ref: string
           reminder_sent_at: string | null
           service_id: string
@@ -3675,6 +3717,7 @@ export type Database = {
           inspection_started_at: string | null
           note: string | null
           odometer: number | null
+          offer_percent: number | null
           ref: string
           reminder_sent_at: string | null
           service_id: string
