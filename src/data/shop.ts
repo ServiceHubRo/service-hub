@@ -38,6 +38,7 @@ export type ShopUpdate = Partial<
     | 'max_advance_days'
     | 'cancel_deadline_hours'
     | 'inspection_fee'
+    | 'new_client_offer'
     | 'sms_on_new_booking'
     | 'daily_digest'
     | 'capacity_reviewed_at'

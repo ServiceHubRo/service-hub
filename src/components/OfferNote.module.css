@@ -1,0 +1,27 @@
+.note {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  border: 1px solid var(--amber-line);
+  background: var(--amber-tint);
+  border-radius: var(--radius-button);
+  padding: 9px 12px;
+  font-size: 13.5px;
+  color: var(--text);
+  overflow-wrap: anywhere;
+}
+
+.icon {
+  flex-shrink: 0;
+  margin-top: 1px;
+  color: var(--amber);
+}
+
+.compact {
+  border: 0;
+  background: none;
+  padding: 0;
+  gap: 5px;
+  font-size: 13px;
+  color: var(--amber);
+}

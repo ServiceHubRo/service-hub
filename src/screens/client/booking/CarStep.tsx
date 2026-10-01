@@ -8,6 +8,7 @@ import { Card } from '../../../components/Card';
 import { Checkbox } from '../../../components/Checkbox';
 import { Field } from '../../../components/Field';
 import { LoadError } from '../../../components/LoadError';
+import { OfferNote } from '../../../components/OfferNote';
 import { SkeletonList } from '../../../components/Skeleton';
 import { TextArea } from '../../../components/TextArea';
 import { fetchCars, type Car } from '../../../data/garage';
@@ -41,6 +42,7 @@ const NOTE_MAX = 1000;
 export function CarStep({
   shop,
   services,
+  offer,
   day,
   time,
   draft,
@@ -50,6 +52,8 @@ export function CarStep({
 }: {
   shop: ShopPageShop;
   services: ShopPageService[];
+  /** The new-client offer this booking should get (T23); the database decides when it is made. */
+  offer: number | null;
   day: string;
   time: string;
   draft: CarDraft;
@@ -205,6 +209,7 @@ export function CarStep({
         />
         <SummaryRow label={t('booking.summary.when')} value={`${formatDate(lang, day)}, ${time}`} mono />
         {carText && <SummaryRow label={t('booking.summary.car')} value={carText} />}
+        {offer !== null && <OfferNote>{t('offer.booking', { n: offer })}</OfferNote>}
         {shop.inspection_fee > 0 && (
           <>
             <SummaryRow label={t('shop.fee')} value={formatMoney(lang, shop.inspection_fee)} mono />

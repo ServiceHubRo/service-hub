@@ -118,6 +118,7 @@ function Flow({ page }: { page: ShopPage }) {
       date: day,
       time,
       car,
+      offer: booking.offer_percent,
     };
     navigate(bookingSentPath(shop.id), { replace: true, state: sent });
   }
@@ -182,6 +183,7 @@ function Flow({ page }: { page: ShopPage }) {
         <CarStep
           shop={shop}
           services={services}
+          offer={page.offer}
           day={day}
           time={time}
           draft={carDraft}

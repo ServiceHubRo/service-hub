@@ -19,6 +19,8 @@ const NOTICE_HOURS = [0, 1, 2, 3, 4, 6, 12, 24, 48, 72];
 const ADVANCE_DAYS = [7, 14, 21, 30, 45, 60, 90, 180, 365];
 const CANCEL_HOURS = [0, 1, 2, 3, 4, 6, 12, 24, 48];
 const MAX_FEE = 10000;
+/** The discounts a shop can promise new clients (the database allows exactly these). */
+const OFFERS = [5, 10, 15, 20, 25, 30];
 
 /** The preset choices plus the shop's current value when it is not one of them. */
 const withCurrent = (presets: number[], current: number) => [...new Set([...presets, current])].sort((a, b) => a - b);
@@ -41,6 +43,7 @@ interface Rules {
   max_advance_days: number;
   cancel_deadline_hours: number;
   fee: string;
+  offer: number | null;
 }
 
 const toRules = (shop: Shop): Rules => ({
@@ -51,9 +54,13 @@ const toRules = (shop: Shop): Rules => ({
   max_advance_days: shop.max_advance_days,
   cancel_deadline_hours: shop.cancel_deadline_hours,
   fee: feeText(shop.inspection_fee),
+  offer: shop.new_client_offer,
 });
 
-/** Reguli de programare (P5, P5b): capacity, cars per slot, slot length, notice, advance, cancellation, fee. */
+/**
+ * Reguli de programare (P5, P5b): capacity, cars per slot, slot length, notice, advance, cancellation,
+ * fee, and the new-client offer (T23).
+ */
 export function RulesSettings() {
   const { t, lang } = useI18n();
   const { shop, setShop } = useShopSettings();
@@ -87,6 +94,7 @@ export function RulesSettings() {
       max_advance_days: rules.max_advance_days,
       cancel_deadline_hours: rules.cancel_deadline_hours,
       inspection_fee: fee,
+      new_client_offer: rules.offer,
       // Checklist step 3; the database stores its own time.
       capacity_reviewed_at: new Date().toISOString(),
     });
@@ -190,6 +198,25 @@ export function RulesSettings() {
             }}
             error={feeError}
           />
+        </div>
+      </Card>
+
+      <Card>
+        <div role="group" aria-labelledby="rules-offer">
+          <p id="rules-offer" className={styles.cardTitle}>
+            {t('rules.offer')}
+          </p>
+          <p className={`${styles.hint} ${own.feeHint}`}>{t('rules.offer.hint')}</p>
+          <div className={own.offerChips}>
+            <Chip selected={rules.offer === null} onClick={() => set('offer', null)}>
+              {t('rules.offer.none')}
+            </Chip>
+            {OFFERS.map((n) => (
+              <Chip key={n} selected={rules.offer === n} onClick={() => set('offer', n)}>
+                {t('rules.offer.value', { n })}
+              </Chip>
+            ))}
+          </div>
         </div>
       </Card>
 

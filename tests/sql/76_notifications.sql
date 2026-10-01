@@ -107,9 +107,10 @@ select test.eq(public.dispatch_sweep(), false, 'no address yet: the sweep does n
 
 -- ------------------------------------------------------------------ the outbox
 delete from public.notification_events;
-insert into public.notification_events (id, user_id, event, params, channels) values
-  ('00000000-0000-0000-0000-0000000000e1', test.id('client_a'), 'booking_confirmed', '{"service_id":"ulei"}', '{push}'),
-  ('00000000-0000-0000-0000-0000000000e4', test.id('owner1'), 'booking_requested', '{}', '{push,sms}');
+-- e4 a moment later: one statement gives both rows the same time, and the order would be luck.
+insert into public.notification_events (id, user_id, event, params, channels, created_at) values
+  ('00000000-0000-0000-0000-0000000000e1', test.id('client_a'), 'booking_confirmed', '{"service_id":"ulei"}', '{push}', now()),
+  ('00000000-0000-0000-0000-0000000000e4', test.id('owner1'), 'booking_requested', '{}', '{push,sms}', now() + interval '1 second');
 insert into public.notification_events (id, user_id, event, created_at)
 values ('00000000-0000-0000-0000-0000000000e2', test.id('client_a'), 'job_done', now() - interval '13 hours');
 insert into public.notification_events (id, user_id, event, attempts, last_error)
