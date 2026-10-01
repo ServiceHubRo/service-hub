@@ -24,11 +24,14 @@ export async function updateProfile(userId: string, fields: { name: string; phon
   return data;
 }
 
-/** The client's reminders in Cont (T19d): the review request and the service reminders. */
-export type ReminderSetting = 'review_requests' | 'service_reminders';
+/**
+ * The client's reminders in Cont: the review request and the service reminders (T19d), the tire
+ * season and the tips and offers (T24).
+ */
+export type ReminderSetting = 'review_requests' | 'service_reminders' | 'season_reminders' | 'promo_notifications';
 
 export async function setReminder(userId: string, setting: ReminderSetting, on: boolean): Promise<Profile> {
-  const fields = setting === 'review_requests' ? { review_requests: on } : { service_reminders: on };
+  const fields: Partial<Record<ReminderSetting, boolean>> = { [setting]: on };
   const { data, error } = await db().from('profiles').update(fields).eq('id', userId).select('*').single();
   if (error) throw failure(error);
   return data;

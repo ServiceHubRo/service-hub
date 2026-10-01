@@ -316,6 +316,35 @@ export type Database = {
           },
         ]
       }
+      engagement_log: {
+        Row: {
+          key: string
+          kind: string
+          sent_at: string
+          user_id: string | null
+        }
+        Insert: {
+          key: string
+          kind: string
+          sent_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          key?: string
+          kind?: string
+          sent_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "engagement_log_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       favorites: {
         Row: {
           client_id: string
@@ -688,6 +717,7 @@ export type Database = {
           id: string
           last_error: string | null
           locked_until: string | null
+          not_before: string | null
           params: Json
           processed_at: string | null
           user_id: string | null
@@ -702,6 +732,7 @@ export type Database = {
           id?: string
           last_error?: string | null
           locked_until?: string | null
+          not_before?: string | null
           params?: Json
           processed_at?: string | null
           user_id?: string | null
@@ -716,6 +747,7 @@ export type Database = {
           id?: string
           last_error?: string | null
           locked_until?: string | null
+          not_before?: string | null
           params?: Json
           processed_at?: string | null
           user_id?: string | null
@@ -921,9 +953,11 @@ export type Database = {
           phone: string | null
           phone_verified_at: string | null
           phone_verified_by_admin: boolean
+          promo_notifications: boolean
           push_prompt_dismissed_at: string | null
           review_requests: boolean
           role: string
+          season_reminders: boolean
           service_reminders: boolean
           suspended: boolean
           terms_accepted_at: string | null
@@ -942,9 +976,11 @@ export type Database = {
           phone?: string | null
           phone_verified_at?: string | null
           phone_verified_by_admin?: boolean
+          promo_notifications?: boolean
           push_prompt_dismissed_at?: string | null
           review_requests?: boolean
           role: string
+          season_reminders?: boolean
           service_reminders?: boolean
           suspended?: boolean
           terms_accepted_at?: string | null
@@ -963,9 +999,11 @@ export type Database = {
           phone?: string | null
           phone_verified_at?: string | null
           phone_verified_by_admin?: boolean
+          promo_notifications?: boolean
           push_prompt_dismissed_at?: string | null
           review_requests?: boolean
           role?: string
+          season_reminders?: boolean
           service_reminders?: boolean
           suspended?: boolean
           terms_accepted_at?: string | null
@@ -1698,6 +1736,7 @@ export type Database = {
           longitude: number | null
           max_advance_days: number
           min_notice_hours: number
+          monthly_report: boolean
           name: string
           new_client_offer: number | null
           owner_id: string
@@ -1735,6 +1774,7 @@ export type Database = {
           longitude?: number | null
           max_advance_days?: number
           min_notice_hours?: number
+          monthly_report?: boolean
           name: string
           new_client_offer?: number | null
           owner_id: string
@@ -1772,6 +1812,7 @@ export type Database = {
           longitude?: number | null
           max_advance_days?: number
           min_notice_hours?: number
+          monthly_report?: boolean
           name?: string
           new_client_offer?: number | null
           owner_id?: string
@@ -2723,6 +2764,7 @@ export type Database = {
         Returns: boolean
       }
       is_push_endpoint: { Args: { p_url: string }; Returns: boolean }
+      is_quiet_event: { Args: { p_event: string }; Returns: boolean }
       is_shop_member: { Args: { p_shop_id: string }; Returns: boolean }
       is_shop_owner: { Args: { p_shop_id: string }; Returns: boolean }
       is_shop_public: { Args: { p_shop_id: string }; Returns: boolean }
@@ -2989,6 +3031,7 @@ export type Database = {
       public_pricing: { Args: never; Returns: Json }
       purge_account_fingerprints: { Args: { p_now?: string }; Returns: number }
       purge_request_log: { Args: { p_now?: string }; Returns: number }
+      quiet_until: { Args: { p_now?: string }; Returns: string }
       record_invoice_reversed: {
         Args: { p_customer: string; p_invoice_id: string; p_reason: string }
         Returns: boolean
@@ -3155,9 +3198,11 @@ export type Database = {
           phone: string | null
           phone_verified_at: string | null
           phone_verified_by_admin: boolean
+          promo_notifications: boolean
           push_prompt_dismissed_at: string | null
           review_requests: boolean
           role: string
+          season_reminders: boolean
           service_reminders: boolean
           suspended: boolean
           terms_accepted_at: string | null
@@ -3185,9 +3230,11 @@ export type Database = {
           phone: string | null
           phone_verified_at: string | null
           phone_verified_by_admin: boolean
+          promo_notifications: boolean
           push_prompt_dismissed_at: string | null
           review_requests: boolean
           role: string
+          season_reminders: boolean
           service_reminders: boolean
           suspended: boolean
           terms_accepted_at: string | null
@@ -3217,9 +3264,11 @@ export type Database = {
           phone: string | null
           phone_verified_at: string | null
           phone_verified_by_admin: boolean
+          promo_notifications: boolean
           push_prompt_dismissed_at: string | null
           review_requests: boolean
           role: string
+          season_reminders: boolean
           service_reminders: boolean
           suspended: boolean
           terms_accepted_at: string | null
@@ -3369,6 +3418,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      send_monthly_reports: { Args: { p_now?: string }; Returns: number }
       send_quote: {
         Args: {
           p_booking_id: string
@@ -3416,9 +3466,26 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      send_request_waiting_reminders: {
+        Args: { p_now?: string }
+        Returns: number
+      }
       send_review_requests: { Args: { p_now?: string }; Returns: number }
       send_service_reminders: { Args: { p_today?: string }; Returns: number }
+      send_tip: {
+        Args: {
+          p_event: string
+          p_key: string
+          p_kind: string
+          p_now?: string
+          p_params: Json
+          p_user: string
+        }
+        Returns: boolean
+      }
+      send_tire_season_reminders: { Args: { p_now?: string }; Returns: number }
       send_trial_warnings: { Args: { p_now?: string }; Returns: number }
+      send_welcome_tips: { Args: { p_now?: string }; Returns: number }
       service_names: { Args: { p_ids: string[] }; Returns: Json }
       services_label: {
         Args: { p_extra: string[]; p_lang: string; p_service_id: string }
@@ -3488,6 +3555,10 @@ export type Database = {
       }
       shop_colleague_count: { Args: { p_shop_id: string }; Returns: number }
       shop_hidden_reasons: { Args: { p_shop_id: string }; Returns: string[] }
+      shop_month_numbers: {
+        Args: { p_month: string; p_shop_id: string }
+        Returns: Json
+      }
       shop_reports: { Args: never; Returns: Json }
       shop_seat_count: { Args: { p_shop_id: string }; Returns: number }
       shop_state: { Args: { p_shop_id: string }; Returns: string }
@@ -3685,6 +3756,7 @@ export type Database = {
         Args: { p_customer: string; p_shop_id: string; p_sub: Json }
         Returns: Json
       }
+      tire_season: { Args: { p_today: string }; Returns: string }
       toggle_favorite: {
         Args: { p_request_id: string; p_shop_id: string }
         Returns: boolean

@@ -90,6 +90,16 @@ export const EMAIL_BUTTON_SIZES: Record<string, { slug: string; width: number; h
     "width": 179,
     "height": 44
   },
+  "Deschide Rapoarte": {
+    "slug": "deschide-rapoarte",
+    "width": 183,
+    "height": 44
+  },
+  "Open Reports": {
+    "slug": "open-reports",
+    "width": 144,
+    "height": 44
+  },
   "Deschide Rapoartele mele": {
     "slug": "deschide-rapoartele-mele",
     "width": 236,

@@ -288,9 +288,10 @@ select test.eq(public.send_daily_digests(pg_temp.at_local(current_setting('test.
 -- ------------------------------------------------------------------ the hourly and quarter-hour jobs
 insert into public.request_log (request_id, user_id, fn, created_at)
 values (gen_random_uuid(), test.id('client_a'), 'create_booking', now() - interval '8 days');
-select test.ok(not (public.run_hourly_jobs(pg_temp.at_local(test.today() + 1, '12:05')) ? 'doc_reminders'), 'documents only at 07:00');
-select test.ok(r ? 'doc_reminders' and (r->>'request_log_purged')::int >= 1, 'at 07:00 documents and the purge run')
+select test.ok(not (public.run_hourly_jobs(pg_temp.at_local(test.today() + 1, '12:05')) ? 'doc_reminders'), 'documents only at 10:00');
+select test.ok(not (r ? 'doc_reminders') and (r->>'request_log_purged')::int >= 1, 'at 07:00 the purge runs (documents wait, T24)')
 from (select public.run_hourly_jobs(pg_temp.at_local(test.today() + 1, '07:05')) as r) x;
+select test.ok(public.run_hourly_jobs(pg_temp.at_local(test.today() + 1, '10:05')) ? 'doc_reminders', 'at 10:00 the documents');
 select test.eq((select count(*) from public.request_log where created_at < now() - interval '7 days'), 0::bigint, 'old request ids purged');
 select test.ok(r ? 'expired' and r ? 'reminded', 'the quarter-hour job expires and reminds')
 from (select public.run_quote_jobs() as r) x;

@@ -6,7 +6,7 @@
 import { formatDate, formatDayMonth, formatMoney, formatTime, type Lang } from './format.ts';
 import { EMAIL_BUTTON_SIZES } from './emailButtonSizes.ts';
 import { LOGO_HEIGHT, LOGO_WIDTH } from './emailLogo.ts';
-import { REPORTS_PATH, SUBSCRIPTION_PATH } from './templates.ts';
+import { monthName, REPORTS_PATH, SHOP_REPORTS_PATH, SUBSCRIPTION_PATH } from './templates.ts';
 
 export interface EmailContent {
   subject: string;
@@ -576,7 +576,48 @@ export function emailForEvent(e: EmailEvent, app: string): EmailContent | null {
           : 'Primești acest email pentru că ai cumpărat un raport pe Service-Hub.',
       });
     }
+    case 'monthly_report':
+      return monthlyReportEmail(p, lang, app);
     default:
       return subscriptionEmail(e, lang, app);
   }
+}
+
+/** The month before, to the owner on the 1st (T24): what came through Service-Hub. */
+function monthlyReportEmail(p: Record<string, unknown>, lang: Lang, app: string): EmailContent {
+  const en = lang === 'en';
+  const shop = str(p.shop_name) || 'Service-Hub';
+  const month = monthName(lang, str(p.month));
+  const n = (v: unknown) => String(num(v) ?? 0);
+  const rows: [string, string][] = [
+    [en ? 'Requests' : 'Cereri primite', n(p.requests)],
+    [en ? 'Jobs done' : 'Lucrări terminate', n(p.done)],
+    [en ? 'Revenue from those jobs' : 'Încasări din aceste lucrări', formatMoney(lang, num(p.revenue) ?? 0)],
+    [en ? 'New clients' : 'Clienți noi', n(p.new_clients)],
+  ];
+  const reviews = num(p.reviews) ?? 0;
+  const rating = num(p.rating);
+  rows.push([
+    en ? 'New reviews' : 'Recenzii noi',
+    reviews > 0 && rating !== null ? `${reviews} (${en ? 'average' : 'media'} ${rating.toLocaleString(en ? 'en-US' : 'ro-RO')})` : String(reviews),
+  ]);
+  const title = en ? `Your ${month} on Service-Hub` : `Luna ${month} pe Service-Hub`;
+  return email(en ? `${shop}: your ${month} on Service-Hub` : `${shop}: luna ${month} pe Service-Hub`, {
+    lang,
+    preheader: en ? `Jobs done in ${month}: ${n(p.done)}.` : `Lucrări terminate în ${month}: ${n(p.done)}.`,
+    title,
+    blocks: [
+      { p: en ? `Here is what came to ${shop} through Service-Hub in ${month}.` : `Iată ce a venit la ${shop} prin Service-Hub în ${month}.` },
+      { rows },
+      {
+        p: en
+          ? 'The full report, with charts and the comparison with the month before, is under Account → Reports.'
+          : 'Raportul complet, cu grafice și comparația cu luna dinainte, este în Cont → Rapoarte.',
+      },
+    ],
+    button: { label: en ? 'Open Reports' : 'Deschide Rapoarte', url: `${app}${SHOP_REPORTS_PATH}` },
+    footer: en
+      ? `You are receiving this email as the owner of ${shop} on Service-Hub. Turn it off under Settings → Notifications.`
+      : `Primești acest email ca proprietar al ${shop} pe Service-Hub. Îl poți opri din Setări → Notificări.`,
+  });
 }

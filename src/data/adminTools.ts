@@ -200,7 +200,8 @@ export function moveCatalogItem(kind: 'category' | 'service', id: string, direct
 
 // ------------------------------------------------------------------------------------ platform settings
 
-export const LIMIT_KEYS = [
+/** The abuse limits (ARCHITECTURE §6). */
+export const ABUSE_LIMIT_KEYS = [
   'active_bookings_per_shop',
   'active_bookings_total',
   'new_bookings_per_24h',
@@ -208,6 +209,9 @@ export const LIMIT_KEYS = [
   'review_window_days',
   'quote_versions_max',
 ] as const;
+/** The notification limits (T24): quiet hours, tips a week, when a waiting request is recalled. */
+export const NOTIFICATION_LIMIT_KEYS = ['quiet_hours_start', 'quiet_hours_end', 'promo_per_week', 'request_reminder_hours'] as const;
+export const LIMIT_KEYS = [...ABUSE_LIMIT_KEYS, ...NOTIFICATION_LIMIT_KEYS] as const;
 export type LimitKey = (typeof LIMIT_KEYS)[number];
 
 export interface NotificationTextOverride {

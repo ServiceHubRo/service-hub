@@ -26,6 +26,9 @@ export const EMAIL_BUTTON_LABELS = [
   // Reported review (to the admin); account reactivated
   'Deschide Service-Hub',
   'Open Service-Hub',
+  // Monthly report to the owner (T24)
+  'Deschide Rapoarte',
+  'Open Reports',
   // History report
   'Deschide Rapoartele mele',
   'Open My reports',

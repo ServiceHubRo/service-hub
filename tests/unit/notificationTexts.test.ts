@@ -66,6 +66,11 @@ const SAMPLE: Record<string, Record<string, unknown>> = {
   service_due: { car_id: 'c-1', service_id: 'lichid_frana', last_done: '2024-10-20', due: '2026-10-20' },
   referral_reward: { kind: 'trial_days', referral_shop_id: 's-9', referred_name: 'Auto Nou', days: 30, expiry: '2026-11-20' },
   referral_revoked: { kind: 'trial_days', referral_shop_id: 's-9', referred_name: 'Auto Nou', reason: 'refunded' },
+  tire_season: { season: 'winter', car_id: 'c-1' },
+  welcome: { day: 3, has_car: false },
+  favorite_offer: { percent: 15 },
+  booking_request_waiting: {},
+  monthly_report: { month: '2026-09', requests: 14, done: 9, revenue: 6450, new_clients: 5, reviews: 3, rating: 4.7 },
 };
 
 const render = (event: string, role: 'client' | 'shop', lang: 'ro' | 'en', extra: Record<string, unknown> = {}) =>
@@ -173,9 +178,12 @@ describe('notification texts', () => {
       'The quote for your Volkswagen Golf 7 expires today at 21:00. Answer to keep your slot.',
     );
     expect(render('appointment_reminder', 'client', 'ro')!.body).toBe('Mâine la 10:00 ai programare la Atelier Unu: Schimb ulei și filtru.');
-    expect(render('appointment_reminder', 'client', 'ro', { day: 'today' })!.body).toBe(
+    expect(render('appointment_reminder', 'client', 'ro', { date: '2026-10-13' })!.body).toBe(
       'Azi la 10:00 ai programare la Atelier Unu: Schimb ulei și filtru.',
     );
+    // Sent the evening before and held by the quiet hours (T24): the day is the one on the phone.
+    expect(render('appointment_reminder', 'client', 'ro', { day: 'tomorrow', date: '2026-10-13' })!.body).toMatch(/^Azi/);
+    expect(render('appointment_reminder', 'client', 'en', { date: '', day: 'today' })!.body).toMatch(/today/);
     expect(render('booking_declined', 'client', 'en', { reason: '' })!.body).toBe("The shop can't take booking P-000123 on Wed, Oct 14, 10:00.");
     expect(render('new_message', 'client', 'ro')).toMatchObject({ title: 'Atelier Unu', body: 'Mașina este gata.', url: '/c/mesaje/t-1', tag: 'thread-t-1' });
   });
@@ -192,6 +200,54 @@ describe('notification texts', () => {
     expect(render('doc_expiry', 'client', 'ro', { days: -3 })!.body).toBe('ITP-ul a expirat pe 25 oct.');
     expect(render('doc_expiry', 'client', 'en', { doc: 'vignette', days: 30 })!.body).toBe('The road vignette expires in 30 days, on Oct 25.');
     expect(render('doc_expiry', 'client', 'ro', { days: 20 })!.body).toBe('ITP-ul expiră în 20 de zile, pe 25 oct.');
+  });
+
+  it('tips and offers (T24): tires, welcome, a favorite shop, and where a tap leads', () => {
+    expect(render('tire_season', 'client', 'ro', { make: '', model: '', shop_id: '', shop_name: '' })).toMatchObject({
+      title: 'Anvelopele de iarnă',
+      body: 'E timpul pentru anvelopele de iarnă la mașina ta. Programează schimbul din aplicație, înainte de aglomerație.',
+      url: '/c/cauta?cat=cat_anv',
+      tag: 'tire_season',
+    });
+    expect(render('tire_season', 'client', 'en', { season: 'summer', shop_id: 's-1' })).toMatchObject({
+      title: 'Summer tires',
+      body: 'Time for summer tires on your Volkswagen Golf 7. Last time you had them changed at Atelier Unu; you can book in the app.',
+      url: '/c/service/s-1',
+    });
+    expect(render('welcome', 'client', 'ro')).toMatchObject({ url: '/c/cauta' });
+    expect(render('welcome', 'client', 'ro', { day: 14 })).toMatchObject({ title: 'Adaugă mașina în Garaj', url: '/c/garaj' });
+    expect(render('welcome', 'client', 'en', { day: 14, has_car: true })!.body).toBe(
+      'When your car needs a shop, compare the reviews and book in the app. It takes a minute.',
+    );
+    expect(render('favorite_offer', 'client', 'ro')).toMatchObject({
+      title: 'Atelier Unu',
+      body: 'Atelier Unu îți oferă 15% reducere la manoperă la prima programare.',
+      url: '/c/service/s-1',
+      tag: 'offer-s-1',
+    });
+  });
+
+  it('to the shop (T24): a request still waiting, and the month before', () => {
+    expect(render('booking_request_waiting', 'shop', 'ro')).toMatchObject({
+      title: 'Cerere fără răspuns',
+      body: 'Ana Marin așteaptă răspuns pentru Mie 14 oct, 10:00: Schimb ulei și filtru. Confirmă sau propune altă oră.',
+      url: '/s/programari?tab=cereri&p=b-1',
+    });
+    expect(render('monthly_report', 'shop', 'ro')).toMatchObject({
+      title: 'Luna septembrie pe Service-Hub',
+      body: 'Lucrări terminate: 9. Încasări: 6.450 lei. Cereri primite: 14. Vezi raportul complet.',
+      url: '/s/cont/rapoarte',
+      tag: 'monthly-2026-09',
+    });
+    expect(render('monthly_report', 'shop', 'en')!.title).toBe('Your September on Service-Hub');
+    const mail = emailForEvent({ event: 'monthly_report', lang: 'ro', params: { ...SAMPLE.monthly_report, shop_name: 'Atelier Unu' } }, 'https://x');
+    expect(mail!.subject).toBe('Atelier Unu: luna septembrie pe Service-Hub');
+    expect(mail!.text).toContain('6.450 lei');
+    expect(mail!.text).toContain('3 (media 4,7)');
+    expect(mail!.html).toContain('https://x/s/cont/rapoarte');
+    const en = emailForEvent({ event: 'monthly_report', lang: 'en', params: { ...SAMPLE.monthly_report, reviews: 0 } }, 'https://x');
+    expect(en!.text).toContain('6,450 RON');
+    expect(en!.text).toContain('Settings → Notifications');
   });
 
   it('asks for a review of the job, and opens the form on the booking', () => {

@@ -1,4 +1,4 @@
-import { CalendarClock, Star } from 'lucide-react';
+import { CalendarClock, CircleDot, Lightbulb, Star } from 'lucide-react';
 import { useSession } from '../../app/sessionContext';
 import { ActionButton } from '../../components/ActionButton';
 import { Card } from '../../components/Card';
@@ -23,9 +23,23 @@ const ROWS = {
     on: 'serviceReminders.on',
     off: 'serviceReminders.off',
   },
+  // T24: winter and summer tires, once a season.
+  season_reminders: {
+    icon: CircleDot,
+    title: 'seasonReminders.title',
+    on: 'seasonReminders.on',
+    off: 'seasonReminders.off',
+  },
+  // T24: tips after sign-up and the offers of favorite shops.
+  promo_notifications: {
+    icon: Lightbulb,
+    title: 'promoNotifications.title',
+    on: 'promoNotifications.on',
+    off: 'promoNotifications.off',
+  },
 } as const;
 
-/** Cont → one of the client's reminders (T19d): on by default, the client turns it off here. */
+/** Cont → one of the client's reminders (T19d, T24): on by default, the client turns it off here. */
 export function ReminderRow({ setting }: { setting: ReminderSetting }) {
   const { t, lang } = useI18n();
   const session = useSession();

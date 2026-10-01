@@ -41,6 +41,7 @@ export type ShopUpdate = Partial<
     | 'new_client_offer'
     | 'sms_on_new_booking'
     | 'daily_digest'
+    | 'monthly_report'
     | 'capacity_reviewed_at'
     | 'billing_reminder_dismissed_at'
   >
