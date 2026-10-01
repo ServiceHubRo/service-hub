@@ -4,7 +4,7 @@
 // a file), the client's "Încearcă din nou" in Rapoartele mele calls this. Only the report's
 // owner (or admin), only a paid report; a generated one is simply answered.
 // Answers { status } or { error: code }.
-import { AdminError, adminApi } from '../_shared/admin.ts';
+import { AdminError, adminApi, tokenAal } from '../_shared/admin.ts';
 import { appUrlFromEnv } from '../_shared/env.ts';
 import { bearerToken, corsHeaders, json } from '../_shared/http.ts';
 import { generateReport, reportRow } from '../_shared/reportGenerate.ts';
@@ -18,14 +18,15 @@ Deno.serve(async (req) => {
 
   try {
     const api = adminApi();
-    const user = await api.userFromToken(bearerToken(req));
+    const token = bearerToken(req);
+    const user = await api.userFromToken(token);
     if (!user) return json({ error: 'not_signed_in' }, 401);
     const body = (await req.json().catch(() => ({}))) as { report_id?: unknown };
     const id = typeof body.report_id === 'string' && UUID.test(body.report_id) ? body.report_id : null;
     if (!id) return json({ error: 'not_found' }, 404);
 
     try {
-      await api.rpc('history_report_for', { p_user_id: user.id, p_report_id: id });
+      await api.rpc('history_report_for', { p_user_id: user.id, p_report_id: id, p_aal: tokenAal(token) });
     } catch (e) {
       if (e instanceof AdminError && (e.message === 'not_found' || e.message === 'report_void')) {
         return json({ error: e.message }, 404);

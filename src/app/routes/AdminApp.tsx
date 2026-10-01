@@ -7,6 +7,7 @@ import { CatalogScreen } from '../../screens/admin/CatalogScreen';
 import { ClientDetailScreen } from '../../screens/admin/ClientDetailScreen';
 import { ClientsScreen } from '../../screens/admin/ClientsScreen';
 import { ExportScreen } from '../../screens/admin/ExportScreen';
+import { MfaGate } from '../../screens/admin/MfaGate';
 import { ModerationScreen } from '../../screens/admin/ModerationScreen';
 import { NoticesScreen } from '../../screens/admin/NoticesScreen';
 import { OverviewScreen } from '../../screens/admin/OverviewScreen';
@@ -26,10 +27,13 @@ export default function AdminApp() {
     <Routes>
       <Route
         element={
-          // The reported reviews waiting, live, for the badge on Moderare (T16a).
-          <AdminProvider>
-            <AppShell role="admin" />
-          </AdminProvider>
+          // The second step of sign-in first (T25); then the reported reviews waiting, live, for
+          // the badge on Moderare (T16a).
+          <MfaGate>
+            <AdminProvider>
+              <AppShell role="admin" />
+            </AdminProvider>
+          </MfaGate>
         }
       >
         {commonRoutes('admin', {

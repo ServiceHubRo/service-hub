@@ -160,6 +160,7 @@ describe('settings form', () => {
       messages_per_thread_per_hour: 30,
       review_window_days: 60,
       quote_versions_max: 20,
+      no_shows_before_phone: 2,
       quiet_hours_start: 21,
       quiet_hours_end: 9,
       promo_per_week: 2,

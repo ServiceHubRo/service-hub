@@ -13,9 +13,10 @@
 create table test.original_settings as select * from public.platform_settings;
 update public.platform_settings set subscription_price_ron = 100, staff_seat_price_ron = 20, launch_price_ron = 0 where id = 1;
 -- No quiet hours (T24): the tests run at any hour and expect every event due at once.
--- 101_engagement.sql turns them on where it tests them.
+-- 101_engagement.sql turns them on where it tests them. No-shows never ask for a phone code
+-- (T25) unless 102_fraud_checks.sql lowers the limit.
 update public.platform_settings
-  set limits = limits || '{"quiet_hours_start": 0, "quiet_hours_end": 0}'::jsonb
+  set limits = limits || '{"quiet_hours_start": 0, "quiet_hours_end": 0, "no_shows_before_phone": 20}'::jsonb
 where id = 1;
 
 create table test.ids (name text primary key, id uuid not null);

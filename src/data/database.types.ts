@@ -1224,6 +1224,7 @@ export type Database = {
           report_status: string | null
           reported_at: string | null
           shop_id: string
+          signals_cleared_at: string | null
           text: string | null
           updated_at: string
         }
@@ -1243,6 +1244,7 @@ export type Database = {
           report_status?: string | null
           reported_at?: string | null
           shop_id: string
+          signals_cleared_at?: string | null
           text?: string | null
           updated_at?: string
         }
@@ -1262,6 +1264,7 @@ export type Database = {
           report_status?: string | null
           reported_at?: string | null
           shop_id?: string
+          signals_cleared_at?: string | null
           text?: string | null
           updated_at?: string
         }
@@ -1378,6 +1381,13 @@ export type Database = {
       }
       shop_billing: {
         Row: {
+          anaf_address: string | null
+          anaf_checked_at: string | null
+          anaf_cui: string | null
+          anaf_name: string | null
+          anaf_name_match: boolean | null
+          anaf_status: string | null
+          anaf_vat_payer: boolean | null
           bank_name: string | null
           billing_email: string | null
           created_at: string
@@ -1392,6 +1402,13 @@ export type Database = {
           vat_payer: boolean
         }
         Insert: {
+          anaf_address?: string | null
+          anaf_checked_at?: string | null
+          anaf_cui?: string | null
+          anaf_name?: string | null
+          anaf_name_match?: boolean | null
+          anaf_status?: string | null
+          anaf_vat_payer?: boolean | null
           bank_name?: string | null
           billing_email?: string | null
           created_at?: string
@@ -1406,6 +1423,13 @@ export type Database = {
           vat_payer?: boolean
         }
         Update: {
+          anaf_address?: string | null
+          anaf_checked_at?: string | null
+          anaf_cui?: string | null
+          anaf_name?: string | null
+          anaf_name_match?: boolean | null
+          anaf_status?: string | null
+          anaf_vat_payer?: boolean | null
           bank_name?: string | null
           billing_email?: string | null
           created_at?: string
@@ -2100,6 +2124,15 @@ export type Database = {
         }
         Returns: Json
       }
+      admin_decide_suspect_review: {
+        Args: {
+          p_decision: string
+          p_note: string
+          p_request_id: string
+          p_review_id: string
+        }
+        Returns: Json
+      }
       admin_export: {
         Args: { p_filters?: Json; p_kind: string }
         Returns: Json
@@ -2177,6 +2210,7 @@ export type Database = {
       admin_list_reviews: { Args: { p_q?: string }; Returns: Json }
       admin_list_shops: { Args: never; Returns: Json }
       admin_list_subscriptions: { Args: never; Returns: Json }
+      admin_list_suspect_reviews: { Args: never; Returns: Json }
       admin_move_catalog_item: {
         Args: {
           p_direction: number
@@ -2319,6 +2353,7 @@ export type Database = {
       }
       booking_thread: { Args: { p_booking_id: string }; Returns: string }
       bucharest_today: { Args: never; Returns: string }
+      caller_aal: { Args: never; Returns: string }
       can_read_booking: { Args: { p_booking_id: string }; Returns: boolean }
       can_read_notice: {
         Args: { p_audience: string; p_city: string }
@@ -2405,6 +2440,10 @@ export type Database = {
       client_no_show_count: {
         Args: { p_client_id: string; p_days?: number }
         Returns: number
+      }
+      company_check_target: {
+        Args: { p_aal: string; p_shop_id: string; p_user_id: string }
+        Returns: Json
       }
       complete_job: {
         Args: {
@@ -2707,7 +2746,7 @@ export type Database = {
       get_staff_invite: { Args: { p_token: string }; Returns: Json }
       grant_referral_reward: { Args: { p_shop_id: string }; Returns: undefined }
       history_report_for: {
-        Args: { p_report_id: string; p_user_id: string }
+        Args: { p_aal?: string; p_report_id: string; p_user_id: string }
         Returns: Json
       }
       history_report_preview: {
@@ -2768,6 +2807,7 @@ export type Database = {
       is_shop_member: { Args: { p_shop_id: string }; Returns: boolean }
       is_shop_owner: { Args: { p_shop_id: string }; Returns: boolean }
       is_shop_public: { Args: { p_shop_id: string }; Returns: boolean }
+      is_suspect_review: { Args: { p_signals: string[] }; Returns: boolean }
       is_valid_cui: { Args: { p: string }; Returns: boolean }
       is_valid_iban: { Args: { p: string }; Returns: boolean }
       is_valid_postal_code: { Args: { p: string }; Returns: boolean }
@@ -3032,6 +3072,10 @@ export type Database = {
       purge_account_fingerprints: { Args: { p_now?: string }; Returns: number }
       purge_request_log: { Args: { p_now?: string }; Returns: number }
       quiet_until: { Args: { p_now?: string }; Returns: string }
+      record_company_check: {
+        Args: { p_cui: string; p_result: Json; p_shop_id: string }
+        Returns: Json
+      }
       record_invoice_reversed: {
         Args: { p_customer: string; p_invoice_id: string; p_reason: string }
         Returns: boolean
@@ -3128,6 +3172,7 @@ export type Database = {
           report_status: string | null
           reported_at: string | null
           shop_id: string
+          signals_cleared_at: string | null
           text: string | null
           updated_at: string
         }
@@ -3161,6 +3206,7 @@ export type Database = {
           report_status: string | null
           reported_at: string | null
           shop_id: string
+          signals_cleared_at: string | null
           text: string | null
           updated_at: string
         }
@@ -3336,6 +3382,10 @@ export type Database = {
         }
       }
       review_display_name: { Args: { p_name: string }; Returns: string }
+      review_signals: {
+        Args: { p_review: Database["public"]["Tables"]["reviews"]["Row"] }
+        Returns: string[]
+      }
       revoke_referral_reward: {
         Args: { p_reason: string; p_shop_id: string }
         Returns: undefined
@@ -3682,6 +3732,7 @@ export type Database = {
           report_status: string | null
           reported_at: string | null
           shop_id: string
+          signals_cleared_at: string | null
           text: string | null
           updated_at: string
         }

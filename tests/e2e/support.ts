@@ -1,4 +1,5 @@
 import { expect, type Page } from '@playwright/test';
+import { createHmac } from 'node:crypto';
 import { strFromU8, unzipSync } from 'fflate';
 import { en } from '../../src/i18n/en';
 import { ro, type MessageKey } from '../../src/i18n/ro';
@@ -24,6 +25,23 @@ export const SEED = {
 } as const;
 
 export const PASSWORD = 'Parola-Noua-2026';
+
+/** The demo admin's authenticator key (supabase/seed/dev_seed.sql, T25). */
+export const SEED_ADMIN_TOTP = 'JBSWY3DPEHPK3PXPJBSWY3DPEHPK3PXP';
+
+/** The 6-digit code an authenticator app shows for a base32 key right now (RFC 6238, 30 s). */
+export function totp(key: string, at: number = Date.now()): string {
+  const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+  let bits = '';
+  for (const ch of key.replace(/=+$/, '').toUpperCase()) bits += alphabet.indexOf(ch).toString(2).padStart(5, '0');
+  const bytes = Buffer.from(bits.match(/.{8}/g)!.map((b) => parseInt(b, 2)));
+  const counter = Buffer.alloc(8);
+  counter.writeBigUInt64BE(BigInt(Math.floor(at / 1000 / 30)));
+  const h = createHmac('sha1', bytes).update(counter).digest();
+  const offset = h[h.length - 1]! & 0xf;
+  const n = (h.readUInt32BE(offset) & 0x7fffffff) % 1_000_000;
+  return String(n).padStart(6, '0');
+}
 
 export function uniqueEmail(prefix: string): string {
   return `${prefix}-${Date.now()}-${Math.floor(Math.random() * 1e6)}@service-hub.test`;
@@ -195,6 +213,44 @@ export async function signIn(page: Page, email: string, password: string, option
   await page.getByLabel('Parolă', { exact: true }).fill(password);
   if (options.remember === false) await page.getByText('Ține-mă minte').click();
   await page.getByRole('button', { name: 'Intră în cont' }).click();
+  if (email === SEED.admin) await secondStep(page, password, options);
+}
+
+/**
+ * The admin's second step (T25): the code from the authenticator app. An admin passing it ends
+ * that admin's other sessions still waiting for it, so tests signing in at the same time may lose
+ * theirs: then the test signs in again (a few times at most).
+ */
+async function secondStep(page: Page, password: string, options: { remember?: boolean }, attempt = 1): Promise<void> {
+  const code = page.getByLabel(/^(Codul de 6 cifre|6-digit code)$/);
+  // The session ended before the code was typed: the expired-session panel or the gate's retry.
+  const lost = page
+    .getByRole('dialog', { name: /^(Sesiunea a expirat|Your session has expired)$/ })
+    .or(page.getByRole('button', { name: /^(Încearcă din nou|Try again)$/ }));
+  try {
+    await expect(code.or(lost).first()).toBeVisible({ timeout: 15_000 });
+    if (await code.isVisible()) {
+      await code.fill(totp(SEED_ADMIN_TOTP));
+      await page.getByRole('button', { name: /^(Confirmă|Confirm)$/ }).click();
+      await expect(code).toHaveCount(0, { timeout: 8_000 });
+      if (!(await lost.first().isVisible())) return;
+    }
+  } catch (e) {
+    if (attempt >= 6) throw e;
+  }
+  if (attempt >= 6) throw new Error('the admin could not pass the second step');
+  await page.context().clearCookies();
+  await page.evaluate(() => {
+    for (const k of Object.keys(localStorage)) if (k.startsWith('sb-')) localStorage.removeItem(k);
+    for (const k of Object.keys(sessionStorage)) if (k.startsWith('sb-')) sessionStorage.removeItem(k);
+  });
+  await page.waitForTimeout(400 * attempt);
+  await page.goto('/intra');
+  await page.getByLabel('Email').fill(SEED.admin);
+  await page.getByLabel('Parolă', { exact: true }).fill(password);
+  if (options.remember === false) await page.getByText('Ține-mă minte').click();
+  await page.getByRole('button', { name: 'Intră în cont' }).click();
+  await secondStep(page, password, options, attempt + 1);
 }
 
 export const isDesktop = (page: Page) => (page.viewportSize()?.width ?? 0) >= 1024;

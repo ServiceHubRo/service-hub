@@ -74,12 +74,15 @@ begin
 end
 $$;
 
-create function test.login(uid uuid) returns void
+-- Signed in as after the second step (aal2, T25): what an admin needs; clients and shops do not care.
+create function test.login(uid uuid, aal text default 'aal2') returns void
 language plpgsql
 as $$
 begin
   perform set_config('request.jwt.claim.sub', uid::text, true);
   perform set_config('request.jwt.claim.role', 'authenticated', true);
+  perform set_config('request.jwt.claims',
+    jsonb_build_object('sub', uid, 'role', 'authenticated', 'aal', aal)::text, true);
   perform set_config('role', 'authenticated', true);
 end
 $$;
@@ -88,6 +91,7 @@ create function test.login_anon() returns void
 language plpgsql
 as $$
 begin
+  perform set_config('request.jwt.claims', '', true);
   perform set_config('request.jwt.claim.sub', '', true);
   perform set_config('request.jwt.claim.role', 'anon', true);
   perform set_config('role', 'anon', true);
@@ -98,6 +102,7 @@ create function test.logout() returns void
 language plpgsql
 as $$
 begin
+  perform set_config('request.jwt.claims', '', true);
   perform set_config('request.jwt.claim.sub', '', true);
   perform set_config('request.jwt.claim.role', '', true);
   perform set_config('role', 'none', true);

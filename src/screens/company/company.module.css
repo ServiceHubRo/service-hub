@@ -1,0 +1,44 @@
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 16px;
+}
+
+.ok {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 0;
+  color: var(--text);
+}
+
+.ok svg {
+  flex: none;
+  margin-top: 2px;
+  color: var(--green);
+}
+
+.muted {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.warning {
+  margin: 0;
+  color: var(--amber);
+  font-size: 14px;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-start;
+}

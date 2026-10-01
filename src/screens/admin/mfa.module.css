@@ -1,0 +1,41 @@
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  font-size: 22px;
+}
+
+.title svg {
+  color: var(--amber);
+}
+
+.muted {
+  margin: 0;
+  color: var(--muted-strong);
+  font-size: 15px;
+}
+
+/* The code is dark on white so every authenticator app can read it, in both themes. */
+.qr {
+  align-self: center;
+  width: 200px;
+  height: 200px;
+  padding: 10px;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.secret {
+  margin: 0;
+  font-size: 15px;
+  letter-spacing: 0.08em;
+  overflow-wrap: anywhere;
+  user-select: all;
+}

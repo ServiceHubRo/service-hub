@@ -25,6 +25,7 @@ import { useI18n } from '../../../i18n/context';
 import { formatDate, formatMoney } from '../../../i18n/format';
 import { carYearMax, isValidCarYear } from '../../../lib/car';
 import { useLoad } from '../../../lib/useLoad';
+import { PhoneVerify } from '../../phone/PhoneVerify';
 import { ResendConfirmation } from '../../auth/ResendConfirmation';
 import { SERVICE_SEPARATOR } from '../../../lib/bookingServices';
 import { serviceName } from '../shop/serviceGroups';
@@ -37,7 +38,8 @@ const NOTE_MAX = 1000;
 /**
  * Step 4: a car from the garage in one tap, or typed in (saved to the garage unless unticked),
  * an optional note, the summary and "Trimite cererea". A client whose email is not confirmed gets
- * the explanation instead of the button (create_booking refuses them anyway).
+ * the explanation instead of the button (create_booking refuses them anyway). After repeated
+ * no-shows the database asks for a phone confirmed by SMS (T25): the code panel opens right here.
  */
 export function CarStep({
   shop,
@@ -65,6 +67,9 @@ export function CarStep({
   const session = useSession();
   const { state, reload } = useLoad(fetchCars);
   const [yearTouched, setYearTouched] = useState(false);
+  /** null, or why the phone must be confirmed first: the number of no-shows (T25). */
+  const [phoneNeeded, setPhoneNeeded] = useState<number | null>(null);
+  const [phoneDone, setPhoneDone] = useState(false);
   const set = (changes: Partial<CarDraft>) => onDraft({ ...draft, ...changes });
 
   if (state.status === 'loading') return <SkeletonList count={2} />;
@@ -108,6 +113,12 @@ export function CarStep({
       // The day filled up or the time went while the screen was open: back to a fresh calendar.
       if (RELOAD_AVAILABILITY_CODES.has(toRpcError(e).code)) {
         onStale(rpcErrorMessage(lang, e));
+        return;
+      }
+      const err = toRpcError(e);
+      if (err.code === 'phone_verification_required') {
+        setPhoneNeeded(Number(err.params.no_shows) || 2);
+        setPhoneDone(false);
         return;
       }
       throw e;
@@ -218,7 +229,31 @@ export function CarStep({
         )}
       </Card>
 
-      {session.emailVerified ? (
+      {phoneNeeded !== null && (
+        <Card>
+          <section aria-labelledby="booking-phone-title" className={styles.stack}>
+            <h2 id="booking-phone-title" className={styles.groupTitle}>
+              {t('booking.phone.title')}
+            </h2>
+            <p className={styles.muted}>{t('booking.phone.why', { n: phoneNeeded })}</p>
+            {phoneDone ? (
+              <p role="status">{t('booking.phone.done')}</p>
+            ) : session.profile?.phone ? (
+              <PhoneVerify
+                phone={session.profile.phone}
+                onVerified={async () => {
+                  setPhoneDone(true);
+                  await session.refreshProfile();
+                }}
+              />
+            ) : (
+              <p>{t('booking.phone.missing')}</p>
+            )}
+          </section>
+        </Card>
+      )}
+
+      {phoneNeeded !== null && !phoneDone ? null : session.emailVerified ? (
         <BottomBar>
           {manual && !typedOk && <p className={styles.muted}>{t('car.required')}</p>}
           <ActionButton onAction={send} disabled={!ready} errorMessage={(e) => rpcErrorMessage(lang, e)} canRetry={canRetryRpc}>

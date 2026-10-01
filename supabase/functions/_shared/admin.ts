@@ -19,6 +19,8 @@ function env(name: string): string {
   return value;
 }
 
+export { tokenAal } from './jwt.ts';
+
 export function adminApi() {
   const url = env('SUPABASE_URL');
   const key = env('SUPABASE_SERVICE_ROLE_KEY');

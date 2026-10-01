@@ -8,7 +8,16 @@ import { LoadError } from '../../components/LoadError';
 import { SearchField } from '../../components/SearchField';
 import { SkeletonList } from '../../components/Skeleton';
 import { Stars } from '../../components/Stars';
-import { decideReview, fetchReviews, type AdminReview, type ReviewDecision } from '../../data/admin';
+import {
+  decideReview,
+  decideSuspectReview,
+  fetchReviews,
+  fetchSuspectReviews,
+  type AdminReview,
+  type ReviewDecision,
+  type SuspectDecision,
+  type SuspectReview,
+} from '../../data/admin';
 import { useI18n } from '../../i18n/context';
 import { plural } from '../../i18n/translate';
 import { reportAge } from '../../lib/admin';
@@ -96,6 +105,55 @@ function QueueCard({ r, now, onDecided }: { r: AdminReview; now: Date; onDecided
   );
 }
 
+/** A review that looks staged (T25): why, and "E în regulă" or "Șterge recenzia". */
+function SuspectCard({ r, onDecided }: { r: SuspectReview; onDecided: () => void }) {
+  const { t } = useI18n();
+  const [panel, setPanel] = useState<SuspectDecision | null>(null);
+  return (
+    <Card highlight className={styles.stack}>
+      <div className={styles.rowTop}>
+        {r.signals.map((s) => (
+          <Pill key={s} tone={s === 'same_phone' || s === 'quick_job' ? 'red' : 'amber'}>
+            {t(`admin.signal.${s}`)}
+          </Pill>
+        ))}
+      </div>
+      <ul className={styles.signalList}>
+        {r.signals.map((s) => (
+          <li key={s} className={styles.muted}>
+            {t(`admin.signal.${s}.why`)}
+          </li>
+        ))}
+      </ul>
+      <ReviewBody r={r} />
+      {panel === null ? (
+        <div className={styles.panelButtons}>
+          <Button variant="success" onClick={() => setPanel('clear')}>
+            {t('admin.suspect.clear')}
+          </Button>
+          <Button variant="danger" onClick={() => setPanel('remove')}>
+            {t('admin.suspect.remove')}
+          </Button>
+        </div>
+      ) : (
+        <ConfirmPanel
+          title={panel === 'clear' ? t('admin.suspect.clearTitle') : t('admin.moderation.removeTitle')}
+          body={panel === 'clear' ? t('admin.suspect.clearBody') : t('admin.suspect.removeBody')}
+          textLabel={t('admin.moderation.note')}
+          textHint={t('admin.moderation.noteHint')}
+          confirmLabel={panel === 'clear' ? t('admin.suspect.clear') : t('admin.suspect.remove')}
+          danger={panel === 'remove'}
+          onConfirm={async (note, requestId) => {
+            await decideSuspectReview(r.id, panel, note, requestId);
+            onDecided();
+          }}
+          onCancel={() => setPanel(null)}
+        />
+      )}
+    </Card>
+  );
+}
+
 function statusPill(r: AdminReview, t: (k: 'admin.reportStatus.removed' | 'admin.reportStatus.kept' | 'admin.reportStatus.pending' | 'admin.moderation.visible') => string) {
   if (r.removed_at) return <Pill tone="grey">{t('admin.reportStatus.removed')}</Pill>;
   if (r.report_status === 'pending') return <Pill tone="amber">{t('admin.reportStatus.pending')}</Pill>;
@@ -107,15 +165,18 @@ function statusPill(r: AdminReview, t: (k: 'admin.reportStatus.removed' | 'admin
  * Moderare (FR §5.5, P20): the reported reviews first, oldest first, each with the reason, the
  * shop, the text and how long it has waited — the platform promises a decision within 5 working
  * days. "Păstrează" dismisses the report, "Șterge" removes the review (the shop's average is
- * recalculated); an optional note is kept in the log; both sides are told. Below, every review,
- * searchable. Live.
+ * recalculated); an optional note is kept in the log; both sides are told. Then the reviews that
+ * look staged (T25), with why. Below, every review, searchable. Live.
  */
 export function ModerationScreen() {
   const { t } = useI18n();
   const now = useNow();
   const { params, setParam, text, setText } = useUrlParams();
   const q = params.get('q') ?? '';
-  const load = useCallback(() => fetchReviews(q), [q]);
+  const load = useCallback(
+    () => Promise.all([fetchReviews(q), fetchSuspectReviews()]).then(([reviews, suspects]) => ({ ...reviews, suspects })),
+    [q],
+  );
   const { state, reload, refetch } = useLiveData(load, LIVE, 'admin-moderation');
   const [notice, setNotice] = useState<string | null>(null);
 
@@ -149,6 +210,28 @@ export function ModerationScreen() {
                 </li>
               ))}
             </ul>
+          )}
+
+          <SectionTitle>{t('admin.suspect.title', { n: state.data.suspects.length })}</SectionTitle>
+          {state.data.suspects.length === 0 ? (
+            <p className={styles.muted}>{t('admin.suspect.empty')}</p>
+          ) : (
+            <>
+              <p className={styles.muted}>{t('admin.suspect.intro')}</p>
+              <ul className={styles.list}>
+                {state.data.suspects.map((r) => (
+                  <li key={r.id}>
+                    <SuspectCard
+                      r={r}
+                      onDecided={() => {
+                        setNotice(t('admin.done.decided'));
+                        void refetch().catch(() => {});
+                      }}
+                    />
+                  </li>
+                ))}
+              </ul>
+            </>
           )}
 
           <SectionTitle>{t('admin.moderation.all')}</SectionTitle>

@@ -9,7 +9,7 @@
 //    (_shared/accountDeletion.ts). Safe to retry: an account already gone answers ok.
 // Body: { user_id }. Answers { ok: true, mode } or { error }.
 import { cancelStripeSubscription, removeLogin } from '../_shared/accountDeletion.ts';
-import { AdminError, adminApi } from '../_shared/admin.ts';
+import { AdminError, adminApi, tokenAal } from '../_shared/admin.ts';
 import { bearerToken, corsHeaders, json } from '../_shared/http.ts';
 import { reportError } from '../_shared/monitor.ts';
 
@@ -24,8 +24,11 @@ Deno.serve(async (req) => {
 
   try {
     const api = adminApi();
-    const caller = await api.userFromToken(bearerToken(req));
+    const token = bearerToken(req);
+    const caller = await api.userFromToken(token);
     if (!caller) return json({ error: 'not_signed_in' }, 401);
+    // Only admins call this, and only after the second step of sign-in (T25).
+    if (tokenAal(token) !== 'aal2') return json({ error: 'mfa_required' }, 403);
 
     let body: { user_id?: unknown };
     try {

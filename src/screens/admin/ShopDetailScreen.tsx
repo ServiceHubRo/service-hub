@@ -10,12 +10,14 @@ import { StatusBadge } from '../../components/StatusBadge';
 import { Stars } from '../../components/Stars';
 import { deleteAccount, fetchShop, setShopSuspended, verifyPhone, type AdminShopDetail } from '../../data/admin';
 import { canRetryRpc, rpcErrorMessage, toRpcError } from '../../data/rpc';
+import { verifyCompany } from '../../data/shop';
 import { useI18n } from '../../i18n/context';
 import { formatMoney, formatRating } from '../../i18n/format';
 import type { MessageKey } from '../../i18n/ro';
 import { BOOKING_STATUSES } from '../../lib/status';
 import { monthlyAverage } from '../../lib/subscription';
 import { formatPhone } from '../../lib/validators';
+import { CompanyCheckCard } from '../company/CompanyCheckCard';
 import { ConfirmPanel } from './ActionPanels';
 import { AuditList, Facts, Money, Pill, SectionTitle, ShopStatePill, SubscriptionPill, Verified } from './parts';
 import { ADMIN_SHOPS_PATH, adminBookingPath, adminBookingsLink } from './paths';
@@ -46,6 +48,7 @@ export function ShopDetailScreen() {
   const { state, reload, refetch } = useLiveData(load, live, `admin-shop:${shopId}`);
   const [panel, setPanel] = useState<Panel>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  const [anafUnavailable, setAnafUnavailable] = useState(false);
 
   const done = (message: string) => {
     setPanel(null);
@@ -276,6 +279,19 @@ export function ShopDetailScreen() {
           <p className={styles.muted}>—</p>
         )}
       </Card>
+      {d.billing && !deleted && (
+        <CompanyCheckCard
+          check={d.billing}
+          unavailable={anafUnavailable}
+          vatPayerTyped={d.billing.vat_payer}
+          hasCui={Boolean(d.billing.vat_id)}
+          onCheck={async () => {
+            const result = await verifyCompany(s.id);
+            setAnafUnavailable('unavailable' in result);
+            await refetch();
+          }}
+        />
+      )}
 
       <SectionTitle>{t('admin.shop.subscription')}</SectionTitle>
       <Card className={styles.stack}>

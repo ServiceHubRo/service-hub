@@ -3,7 +3,7 @@ import http from 'node:http';
 import { expect } from '@playwright/test';
 
 /**
- * Stand-ins for Resend (email), SMSO (SMS) and Stripe (T13, T14) for the browser tests. The local
+ * Stand-ins for Resend (email), SMSO (SMS), Stripe (T13, T14) and ANAF (T25) for the browser tests. The local
  * stack's Edge Functions send to them (supabase/config.toml → [edge_runtime.secrets] points at
  * host.docker.internal:54398); the server runs once for the whole test run (global-setup.ts) and
  * the tests read what arrived through GET /_log.
@@ -82,6 +82,30 @@ export function startProviders(): Promise<() => Promise<void>> {
         if (key) seenKeys.add(key);
         log.push({ kind: 'email', to: m.to[0]!, subject: m.subject, html: m.html, text: m.text, reply_to: m.reply_to, idempotencyKey: key });
         return reply(200, { id: crypto.randomUUID() });
+      }
+      if (req.method === 'POST' && url === '/anaf') {
+        // ANAF's register (T25): 160796 is unknown, 18000011 is inactive, any other CUI is
+        // "AUTO TEST S.R.L.", active and a VAT payer.
+        const [ask] = JSON.parse(body) as { cui: number }[];
+        const cui = Number(ask?.cui);
+        if (cui === 160796) return reply(200, { cod: 200, message: 'SUCCESS', found: [], notFound: [cui] });
+        return reply(200, {
+          cod: 200,
+          message: 'SUCCESS',
+          found: [
+            {
+              date_generale: {
+                cui,
+                denumire: 'AUTO TEST S.R.L.',
+                adresa: 'JUD. BRAŞOV, MUN. BRAŞOV, STR. TEST, NR.1',
+                stare_inregistrare: 'INREGISTRAT din data 01.01.2015',
+              },
+              inregistrare_scop_Tva: { scpTVA: true },
+              stare_inactiv: { statusInactivi: cui === 18000011, dataRadiere: '' },
+            },
+          ],
+          notFound: [],
+        });
       }
       if (req.method === 'POST' && url === '/smso/send') {
         if (req.headers['x-authorization'] !== 'local-test-key') return reply(401, { status: 401 });

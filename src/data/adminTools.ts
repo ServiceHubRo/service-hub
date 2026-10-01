@@ -208,6 +208,7 @@ export const ABUSE_LIMIT_KEYS = [
   'messages_per_thread_per_hour',
   'review_window_days',
   'quote_versions_max',
+  'no_shows_before_phone',
 ] as const;
 /** The notification limits (T24): quiet hours, tips a week, when a waiting request is recalled. */
 export const NOTIFICATION_LIMIT_KEYS = ['quiet_hours_start', 'quiet_hours_end', 'promo_per_week', 'request_reminder_hours'] as const;
