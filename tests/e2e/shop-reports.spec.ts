@@ -51,7 +51,8 @@ test.describe('demo shop', () => {
 
     // This month by default, against the same days of last month.
     await expect(page.getByRole('button', { name: 'Luna aceasta', pressed: true })).toBeVisible();
-    await expect(page.getByText(/^Comparat cu \d+ \S+ – \d+ \S+\.$/)).toBeVisible();
+    // On the 1st of the month both periods are one day: "Comparat cu 1 sept."
+    await expect(page.getByText(/^Comparat cu \d+ \S+( – \d+ \S+)?\.$/)).toBeVisible();
     await expect(page.getByRole('heading', { name: /Încasări pe lună/ })).toBeVisible();
     // The chart's figures are there for screen readers too: always 12 months.
     await expect(page.locator('main table tbody tr')).toHaveCount(12);
