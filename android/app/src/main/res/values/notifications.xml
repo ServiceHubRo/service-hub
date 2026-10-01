@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- The brand amber, for the notification icon in the shade (T20b). -->
+    <color name="notification_amber">#F5A524</color>
+</resources>

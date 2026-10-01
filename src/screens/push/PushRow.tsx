@@ -19,12 +19,10 @@ export function PushRow() {
   const blocked = status === 'denied' || status === 'unsupported';
 
   let hint = t('push.hint');
-  if (status === 'denied') hint = t('push.hint.denied');
+  // In the phone app (T20b) a refusal is undone in Android's settings, not the browser's.
+  if (status === 'denied') hint = t(IS_NATIVE ? 'push.hint.deniedApp' : 'push.hint.denied');
   else if (status === 'ios_install') hint = t('push.banner.ios');
   else if (status === 'unsupported') hint = t('push.hint.unsupported');
-  // The phone app (T20a) has no web push; its own notifications come in T20b.
-  const appSoon = IS_NATIVE && status === 'unsupported';
-  if (appSoon) hint = t('push.hint.appSoon');
 
   return (
     <Card role="group" aria-label={t('push.title')}>
@@ -38,7 +36,7 @@ export function PushRow() {
           <span className={styles.who}>
             <span>{t('push.title')}</span>
             <span className={styles.status}>
-              {appSoon ? t('push.status.appSoon') : t(`push.status.${status}`)}
+              {IS_NATIVE && status === 'denied' ? t('push.status.deniedApp') : t(`push.status.${status}`)}
             </span>
           </span>
         </span>

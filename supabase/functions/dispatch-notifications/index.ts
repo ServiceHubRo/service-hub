@@ -8,7 +8,9 @@
 //        each in the recipient's language, sends it to every device of the recipient, and records
 //        the result: dead devices (404/410) are deleted, failures are retried a few times.
 //
-// Each channel (push, email, sms — T13) is finished on its own: a retry only repeats the
+// Push goes to each device of the recipient: browsers through Web Push, the phone app through
+// Firebase Cloud Messaging (T20b, FCM_SERVICE_ACCOUNT; a device saved by the app has an
+// `fcm_token`). Each channel (push, email, sms — T13) is finished on its own: a retry only repeats the
 // channels that did not get through, so an SMS or an email is never sent twice. Emails go
 // through Resend (RESEND_API_KEY) with the event id as idempotency key; platform events (a
 // reported review) go to ADMIN_EMAIL. SMS go through SMSO (SMSO_API_KEY), only to a verified
@@ -22,8 +24,16 @@
 // unused of it when the payment that earned it was refunded or disputed.
 import { adminApi } from '../_shared/admin.ts';
 import { emailForEvent } from '../_shared/emails.ts';
+import { sendFcm, type FcmConfig } from '../_shared/fcm.ts';
 import { corsHeaders, json } from '../_shared/http.ts';
-import { adminEmailFromEnv, appUrlFromEnv, emailConfigFromEnv, smsConfigFromEnv, stripeConfigFromEnv } from '../_shared/env.ts';
+import {
+  adminEmailFromEnv,
+  appUrlFromEnv,
+  emailConfigFromEnv,
+  fcmConfigFromEnv,
+  smsConfigFromEnv,
+  stripeConfigFromEnv,
+} from '../_shared/env.ts';
 import { sendEmail, type EmailConfig, type SendOutcome } from '../_shared/resend.ts';
 import {
   giveReferralCredit,
@@ -61,7 +71,8 @@ interface ClaimedEvent extends NotificationEvent {
   attempts: number;
   email: string | null;
   phone: string | null;
-  devices: { endpoint: string; keys: { p256dh?: string; auth?: string } | null }[];
+  /** Browsers (endpoint + keys) and phones with the app (fcm_token). */
+  devices: { endpoint: string; keys: { p256dh?: string; auth?: string } | null; fcm_token?: string | null }[];
 }
 
 /** What the channels other than push need, read once per call. */
@@ -70,6 +81,7 @@ interface Senders {
   email: EmailConfig;
   sms: SmsConfig;
   stripe: StripeConfig;
+  fcm: FcmConfig;
   adminEmail: string | null;
   app: string;
 }
@@ -138,13 +150,24 @@ function ttlFor(event: string): number {
 /** One channel's result: finished (logged) or to try again later. */
 type ChannelResult = { done: true; log: LogEntry } | { done: false; error: string };
 
-async function pushChannel(e: ClaimedEvent, texts: Overrides, vapid: VapidKeys, result: Result): Promise<ChannelResult> {
+async function pushChannel(e: ClaimedEvent, texts: Overrides, vapid: VapidKeys, fcm: FcmConfig, result: Result): Promise<ChannelResult> {
   const rendered = renderNotification(e, texts);
   if (!rendered) return { done: true, log: { channel: 'push', status: 'no_template' } };
   if (e.devices.length === 0) return { done: true, log: { channel: 'push', status: 'no_device' } };
   const payload = JSON.stringify({ title: rendered.title, body: rendered.body, url: rendered.url, tag: rendered.tag });
   const outcomes = await Promise.all(
     e.devices.map(async (d) => {
+      if (d.fcm_token) {
+        const r = await sendFcm(fcm, d.fcm_token, {
+          title: rendered.title,
+          body: rendered.body,
+          url: rendered.url,
+          tag: rendered.tag,
+          urgent: URGENT.has(e.event),
+          ttlSeconds: ttlFor(e.event),
+        });
+        return { endpoint: d.endpoint, outcome: r.outcome, error: r.error };
+      }
       if (!d.keys?.p256dh || !d.keys.auth) return { endpoint: d.endpoint, outcome: 'failed' as const, error: 'no_keys' };
       const r = await sendWebPush(d as PushDevice, payload, vapid, SUBJECT, {
         ttl: ttlFor(e.event),
@@ -267,7 +290,7 @@ async function deliver(e: ClaimedEvent, texts: Overrides, vapid: VapidKeys, send
     e.channels.map(async (channel): Promise<[string, ChannelResult]> => {
       switch (channel) {
         case 'push':
-          return [channel, await pushChannel(e, texts, vapid, result)];
+          return [channel, await pushChannel(e, texts, vapid, senders.fcm, result)];
         case 'email':
           return [channel, await emailChannel(e, senders)];
         case 'sms':
@@ -319,6 +342,7 @@ async function dispatch(api: Api, config: Config): Promise<number> {
     email: emailConfigFromEnv(),
     sms: smsConfigFromEnv(),
     stripe: stripeConfigFromEnv(),
+    fcm: fcmConfigFromEnv(),
     adminEmail: adminEmailFromEnv(),
     app: appUrlFromEnv(),
   };

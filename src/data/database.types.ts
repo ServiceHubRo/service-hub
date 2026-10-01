@@ -3259,6 +3259,10 @@ export type Database = {
       }
       run_hourly_jobs: { Args: { p_now?: string }; Returns: Json }
       run_quote_jobs: { Args: { p_now?: string }; Returns: Json }
+      save_native_push_token: {
+        Args: { p_platform: string; p_token: string; p_user_agent?: string }
+        Returns: undefined
+      }
       save_push_subscription: {
         Args: {
           p_endpoint: string

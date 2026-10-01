@@ -17,6 +17,10 @@ const config: CapacitorConfig = {
       insetsHandling: 'disable',
       style: 'DARK',
     },
+    PushNotifications: {
+      // A notification that arrives while the app is open is shown too (sound and banner).
+      presentationOptions: ['sound', 'alert'],
+    },
     SplashScreen: {
       // Hidden by the app once its first screen is drawn (src/app/NativeBridge.tsx), and in any case
       // after 2.5 s: on a second start the app can be ready before the launch screen is even shown,

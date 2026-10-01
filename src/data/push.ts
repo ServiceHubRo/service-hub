@@ -1,13 +1,16 @@
 import { FunctionsFetchError } from '@supabase/supabase-js';
 import { useEffect, useSyncExternalStore } from 'react';
 import { keyBytes, needsHomeScreen, pushSupported, sameKey, SERVICE_WORKER_URL } from '../lib/push';
+import { IS_NATIVE } from '../lib/native';
+import { nativeDisable, nativeEnable, nativeForget, nativeStatus, nativeSync } from './nativePush';
 import { call, failure, RpcError } from './rpc';
 import { supabase } from './supabase';
 
 /**
  * Push notifications on this device (T12, P15b, ARCHITECTURE §9): the state for the banner and
  * the Cont row, turning them on (the browser's own prompt appears only then, after a tap) and off,
- * and keeping the device linked to whoever is signed in on it.
+ * and keeping the device linked to whoever is signed in on it. Inside the phone app (T20b) the same
+ * functions go through Firebase instead (`nativePush.ts`).
  */
 export type PushStatus =
   /** Not checked yet. */
@@ -48,6 +51,14 @@ async function currentSubscription(): Promise<PushSubscription | null> {
 
 /** Reads the browser's permission and this device's subscription. */
 export async function refreshPush(): Promise<PushStatus> {
+  if (IS_NATIVE) {
+    try {
+      set(await nativeStatus());
+    } catch {
+      set('unsupported');
+    }
+    return status;
+  }
   if (needsHomeScreen()) {
     set('ios_install');
   } else if (!pushSupported()) {
@@ -70,6 +81,13 @@ function start() {
   if (started) return;
   started = true;
   void refreshPush();
+  if (IS_NATIVE) {
+    // The permission can change in Android's settings while the app is in the background.
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') void refreshPush();
+    });
+    return;
+  }
   // The permission can change in the browser settings while the app is open.
   navigator.permissions?.query({ name: 'notifications' as PermissionName }).then(
     (permission) => {
@@ -118,6 +136,17 @@ export type EnableOutcome = 'on' | 'denied' | 'dismissed';
  * signed-in person. Network or save failures are thrown (the button shows them with a retry).
  */
 export async function enablePush(): Promise<EnableOutcome> {
+  if (IS_NATIVE) {
+    set('working');
+    try {
+      const outcome = await nativeEnable();
+      await refreshPush();
+      return outcome;
+    } catch (e) {
+      await refreshPush();
+      throw e instanceof RpcError ? e : new RpcError('push_subscription_invalid');
+    }
+  }
   if (!pushSupported()) {
     await refreshPush();
     return 'dismissed';
@@ -156,6 +185,16 @@ export async function enablePush(): Promise<EnableOutcome> {
 /** "Dezactivează" in Cont: this device stops getting notifications (other devices keep them). */
 export async function disablePush(): Promise<void> {
   set('working');
+  if (IS_NATIVE) {
+    try {
+      await nativeDisable();
+      set('off');
+    } catch (e) {
+      await refreshPush();
+      throw e instanceof RpcError ? e : new RpcError('unknown');
+    }
+    return;
+  }
   try {
     const sub = await currentSubscription();
     if (sub) {
@@ -174,6 +213,11 @@ export async function disablePush(): Promise<void> {
  * signed in now (the same browser may have been used by another account). Best effort.
  */
 export async function syncPushDevice(): Promise<void> {
+  if (IS_NATIVE) {
+    await nativeSync();
+    await refreshPush();
+    return;
+  }
   if (!pushSupported() || Notification.permission !== 'granted') return;
   try {
     // Also picks up a newer service worker after a deploy.
@@ -191,6 +235,7 @@ export async function syncPushDevice(): Promise<void> {
  * gets theirs. Best effort, at most a couple of seconds.
  */
 export async function forgetPushDevice(): Promise<void> {
+  if (IS_NATIVE) return nativeForget();
   if (!pushSupported() || !supabase) return;
   try {
     const sub = await currentSubscription();

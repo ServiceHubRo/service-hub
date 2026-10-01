@@ -32,6 +32,18 @@
 
         </activity>
 
+        <!-- Notifications through Firebase (T20b): the wrench in the status bar, amber in the shade,
+             on the channel the app creates at start (src/data/nativePush.ts). -->
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/ic_stat_service_hub" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_color"
+            android:resource="@color/notification_amber" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="service-hub" />
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"
@@ -46,6 +58,8 @@
     <!-- Permissions -->
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Notifications (T20b): Android 13+ asks the person first, after a tap on "Activează". -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <!-- "Aproape de tine" and the shop's map pin ask for the location, as on the web. -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />

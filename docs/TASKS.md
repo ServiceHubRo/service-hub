@@ -44,7 +44,8 @@ Ordinea contează: fiecare sarcină se sprijină pe cele de dinainte. Sarcinile 
 | T19c | Lansarea — verificarea finală | `LAUNCH_CHECK.md`: fiecare punct din lista finală cu testul lui; ghidul de lansare pas cu pas |
 | T19e | Lansarea — domeniul și plățile reale | service-hub.ro, plăți reale, CAPTCHA, admin, copii de siguranță (pașii tăi, după ghid) |
 | T20a | Aplicația Android de test | Service-Hub ca aplicație pe telefonul Android, instalată direct (fără magazin), pe proiectul de test |
-| T20b | Notificările native și iPhone | Notificări în aplicație (Android, apoi iPhone fără „Adaugă pe ecranul principal”), TestFlight |
+| T20b | Notificările în aplicația Android | Notificări în aplicație pe Android, prin Firebase |
+| T20d | iPhone: aplicația și notificările | După contul Apple: aplicația iPhone, notificări fără „Adaugă pe ecranul principal”, TestFlight |
 | T20c | Magazinele | Service-Hub în App Store și Google Play |
 | T21 | Mai multe servicii la o programare | Clientul bifează până la 5 servicii la aceeași programare; service-ul le vede pe toate |
 
@@ -749,9 +750,17 @@ După testare (km la fel): la finalizare, dacă kilometrajul e exact cel de la o
 
 **Anunțurile echipei stau în Mesaje (Eduard, după feedback de la test):** un anunț apărea doar sus pe Caută / Panou și se pierdea. Acum e în Mesaje, deasupra conversațiilor, cu megafon și „Echipa Service-Hub”; până e deschis are chenar portocaliu și „Nou” și se numără pe butonul Mesaje din meniu (vizibil de pe orice ecran). Deschis, arată tot textul și nu mai e nou; rămâne în listă 30 de zile. Notificarea push a unui anunț îl deschide acolo (`?anunt=<id>`). Nu am folosit roșu: în aplicație roșul înseamnă eroare. Orașul unui anunț se alege dintre orașele cu service-uri (butoane, cele cu mai multe service-uri primele), nu se mai scrie de mână. **De făcut când sunt multe orașe (peste ~15–20):** alegerea pe județ, apoi oraș (`shops.county` există deja). O încercare intermediară („Unde apare”: toate ecranele / doar Caută-Panou / doar Cont, migrarea `notice_placement`, schema 36) a fost scoasă de migrarea `notices_in_messages` (schema 37), înainte de Merge. **Idei de la tester, nefăcute:** recomandări cu premii (cu CIF pentru service-uri, VIN pentru clienți) și un agent automat pentru abuzuri — de discutat.
 
-### T20b — Notificările native și iPhone
+### T20b — Notificările în aplicația Android
 
-Android: notificările prin Firebase Cloud Messaging (gratuit), în `dispatch-notifications`, lângă Web Push. iPhone (după contul Apple Developer, 99 $/an, pe firmă, cu D-U-N-S): proiectul `ios/`, notificările APNs, construirea automată și TestFlight.
+Android: notificările prin Firebase Cloud Messaging (gratuit), în `dispatch-notifications`, lângă Web Push. (Partea de iPhone a fost mutată în T20d, după contul Apple.)
+
+- [x] Făcut
+
+Note: migrarea `native_push` (`schema_version` = 41). Pachet nou: `@capacitor/push-notifications` (notificările native în aplicație, prin Firebase). **În aplicație:** rândul „Notificări push” din Cont și bannerul merg ca pe site: Android cere voie doar după „Activează” (Android 13+); telefonul se salvează pentru cine e logat (`save_native_push_token`, rând `fcm:<token>` în `push_subscriptions`, cel mult 10 dispozitive de persoană, ca la browsere); „Dezactivează” îl scoate și rămâne oprit pe telefonul acela; la fiecare pornire se înregistrează din nou (Firebase schimbă codul din când în când, cel vechi se șterge); la deconectare se șterge. Refuzat: „Blocate în setările telefonului” și unde se activează (Setări → Aplicații → Service-Hub → Notificări). O notificare apăsată deschide ecranul ei, și când pornește aplicația; cu aplicația deschisă apare și ea (sunet + banner). Iconița din bara de sus e cheia din logo, portocalie în lista de notificări; canalul Android se numește „Service-Hub”. **Pe server:** `dispatch-notifications` trimite dispozitivelor cu `fcm_token` prin Firebase (`_shared/fcm.ts`, cheia `FCM_SERVICE_ACCOUNT`), celorlalte prin Web Push, aceleași texte, aceeași prioritate și durată; un telefon pe care aplicația a fost ștearsă se scoate singur. **Configurare:** „Android app” scrie `google-services.json` din secretul `GOOGLE_SERVICES_JSON` (verifică să fie al aplicației `ro.servicehub.app`); „Deploy Supabase” pune `FCM_SERVICE_ACCOUNT` în secretele funcțiilor (fără el, notificările merg doar în browsere). Același proiect Firebase pentru proiectul de test și cel real. **Teste:** `sql/99_native_push`, `unit/fcm` (semnătura cheii, mesajul, răspunsurile Firebase), `unit/nativePush`. Construirea Android și o notificare reală pe telefon nu se pot verifica în mediul lui Claude: le verifică acțiunea „Android app” și Eduard pe telefon.
+
+### T20d — iPhone: aplicația și notificările
+
+După contul Apple Developer (99 $/an, pe firmă, cu D-U-N-S): proiectul `ios/`, notificările APNs (prin același Firebase sau direct), construirea automată pe GitHub (Mac) și TestFlight.
 
 - [ ] Făcut
 
