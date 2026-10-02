@@ -448,9 +448,9 @@ test.describe('Raport ANAF', () => {
     expect(await events('company_problem')).toBe(1);
     await signIn(page, email, PASSWORD);
     await expect(page).toHaveURL(/\/s\/panou/);
-    const banner = page.getByText('Nu am găsit în registrul ANAF nicio firmă cu CUI-ul din Date de facturare.');
+    const banner = page.getByText('Nu am găsit CUI-ul din Date de facturare în registrul ANAF. Poate e doar o greșeală de scriere.');
     await expect(banner).toBeVisible();
-    await expect(page.getByText(/Corectează datele până pe .+, altfel service-ul nu va mai apărea în căutări\./)).toBeVisible();
+    await expect(page.getByText(/Te rugăm să verifici datele până pe .+, ca service-ul să rămână vizibil în căutări\./)).toBeVisible();
     await expectNoHorizontalScroll(page);
     await shot(page, 'anaf-deadline-banner', name());
 
@@ -464,7 +464,7 @@ test.describe('Raport ANAF', () => {
     expect(await events('company_problem')).toBe(1);
     expect(await events('company_hidden')).toBe(1);
     await page.reload();
-    await expect(page.getByText('Firma nu a putut fi confirmată la ANAF în termen. Corectează CUI-ul în Date de facturare.')).toBeVisible();
+    await expect(page.getByText('Nu am putut confirma încă firma la ANAF. Verifică CUI-ul în Date de facturare și service-ul revine automat.')).toBeVisible();
     await expect(banner).toHaveCount(0);
     await shot(page, 'anaf-hidden-banner', name());
 
@@ -475,7 +475,7 @@ test.describe('Raport ANAF', () => {
     expect(await billing()).toMatchObject({ anaf_status: 'active', anaf_problem_since: null });
     expect(await events('company_ok')).toBe(1);
     await page.reload();
-    await expect(page.getByText('Firma nu a putut fi confirmată la ANAF în termen.', { exact: false })).toHaveCount(0);
+    await expect(page.getByText('Nu am putut confirma încă firma la ANAF.', { exact: false })).toHaveCount(0);
     await expect(banner).toHaveCount(0);
   });
 });

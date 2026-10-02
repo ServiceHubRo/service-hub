@@ -255,28 +255,28 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
     },
     // ------------------------------------------------------------------ the company at ANAF (Raport ANAF, automated)
     'shop.company_problem': {
-      title: 'Firma nu a fost confirmată',
-      body: 'Nu am găsit în registrul ANAF nicio firmă cu CUI-ul {cui}. Corectează CUI-ul în Date de facturare până pe {expiry}, altfel service-ul nu va mai apărea în căutări.',
+      title: 'Verifică CUI-ul firmei',
+      body: 'Nu am găsit CUI-ul {cui} în registrul ANAF. Poate s-a strecurat o greșeală de scriere. Te rugăm să îl verifici în Date de facturare până pe {expiry}, ca service-ul să rămână vizibil în căutări.',
     },
     'shop.company_problem_inactive': {
-      title: 'Firma apare inactivă',
-      body: 'La ANAF, firma cu CUI-ul {cui} apare inactivă fiscal. Rezolvă situația sau corectează CUI-ul în Date de facturare până pe {expiry}, altfel service-ul nu va mai apărea în căutări.',
+      title: 'Verifică datele firmei',
+      body: 'La ANAF, firma cu CUI-ul {cui} apare inactivă fiscal. Poate e o confuzie sau ai rezolvat deja. Te rugăm să verifici datele în Date de facturare până pe {expiry}, ca service-ul să rămână vizibil în căutări.',
     },
     'shop.company_problem_deregistered': {
-      title: 'Firma apare radiată',
-      body: 'La ANAF, firma cu CUI-ul {cui} apare radiată. Corectează CUI-ul în Date de facturare până pe {expiry}, altfel service-ul nu va mai apărea în căutări.',
+      title: 'Verifică datele firmei',
+      body: 'La ANAF, firma cu CUI-ul {cui} apare radiată. Poate e un CUI vechi. Te rugăm să verifici datele în Date de facturare până pe {expiry}, ca service-ul să rămână vizibil în căutări.',
     },
     'shop.company_name_mismatch': {
-      title: 'Denumirea firmei diferă',
-      body: 'La ANAF, CUI-ul {cui} este al firmei „{anaf_name}”. Verifică denumirea legală în Date de facturare.',
+      title: 'O mică verificare',
+      body: 'La ANAF, CUI-ul {cui} apare pe numele „{anaf_name}”. Dacă e cazul, actualizează denumirea legală în Date de facturare.',
     },
     'shop.company_hidden': {
-      title: 'Service-ul nu mai apare în căutări',
-      body: 'Firma cu CUI-ul {cui} nu a putut fi confirmată la ANAF în termen. Corectează datele în Date de facturare: service-ul revine în căutări imediat ce firma este confirmată.',
+      title: 'Service-ul e ascuns temporar din căutări',
+      body: 'Nu am reușit încă să confirmăm la ANAF firma cu CUI-ul {cui}. Contul și programările merg în continuare. După ce verifici datele în Date de facturare, service-ul revine automat în căutări.',
     },
     'shop.company_ok': {
-      title: 'Firma a fost confirmată',
-      body: 'Firma cu CUI-ul {cui} este confirmată la ANAF. Service-ul apare din nou în căutări.',
+      title: 'Totul e în regulă',
+      body: 'Firma cu CUI-ul {cui} a fost confirmată la ANAF. Mulțumim. Service-ul apare din nou în căutări.',
     },
     // ------------------------------------------------------------------ account suspended / reactivated
     'client.account_suspended': {
@@ -483,28 +483,28 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
     },
     // ------------------------------------------------------------------ the company at ANAF (ANAF report, automated)
     'shop.company_problem': {
-      title: 'Company not confirmed',
-      body: "ANAF's register has no company with tax ID {cui}. Fix the tax ID under Billing details by {expiry}, or the shop will no longer show in search.",
+      title: 'Please check your tax ID',
+      body: "We couldn't find tax ID {cui} in ANAF's register. It may just be a typo. Please check it under Billing details by {expiry} so your shop stays visible in search.",
     },
     'shop.company_problem_inactive': {
-      title: 'Company shows as inactive',
-      body: 'At ANAF, the company with tax ID {cui} is inactive for tax purposes. Sort it out or fix the tax ID under Billing details by {expiry}, or the shop will no longer show in search.',
+      title: 'Please check your company details',
+      body: 'At ANAF, the company with tax ID {cui} shows as inactive for tax purposes. It may be a mix-up, or already sorted. Please check your details under Billing details by {expiry} so your shop stays visible in search.',
     },
     'shop.company_problem_deregistered': {
-      title: 'Company shows as struck off',
-      body: 'At ANAF, the company with tax ID {cui} is struck off. Fix the tax ID under Billing details by {expiry}, or the shop will no longer show in search.',
+      title: 'Please check your company details',
+      body: 'At ANAF, the company with tax ID {cui} shows as struck off. It may be an old tax ID. Please check your details under Billing details by {expiry} so your shop stays visible in search.',
     },
     'shop.company_name_mismatch': {
-      title: 'Company name differs',
-      body: 'At ANAF, tax ID {cui} belongs to "{anaf_name}". Check the legal name under Billing details.',
+      title: 'A quick check',
+      body: 'At ANAF, tax ID {cui} is registered as "{anaf_name}". If needed, update the legal name under Billing details.',
     },
     'shop.company_hidden': {
-      title: 'Shop no longer in search',
-      body: 'The company with tax ID {cui} could not be confirmed at ANAF in time. Fix it under Billing details: the shop is back in search as soon as the company is confirmed.',
+      title: 'Your shop is temporarily hidden from search',
+      body: "We haven't been able to confirm the company with tax ID {cui} at ANAF yet. Your account and bookings keep working. Once you check your details under Billing details, your shop comes back to search on its own.",
     },
     'shop.company_ok': {
-      title: 'Company confirmed',
-      body: 'The company with tax ID {cui} is confirmed at ANAF. The shop shows in search again.',
+      title: 'All set',
+      body: 'The company with tax ID {cui} is confirmed at ANAF. Thank you. Your shop shows in search again.',
     },
     // ------------------------------------------------------------------ account suspended / reactivated
     'client.account_suspended': {
