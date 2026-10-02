@@ -2,6 +2,7 @@ import { ChevronDown } from 'lucide-react';
 import { useId, useMemo } from 'react';
 import { useI18n } from '../i18n/context';
 import { phoneCountryOptions, PHONE_COUNTRIES } from '../lib/phone';
+import { useTouchSelect } from '../lib/touchSelect';
 import fieldStyles from './Field.module.css';
 import styles from './PhoneField.module.css';
 
@@ -26,6 +27,7 @@ export function PhoneField({ label, country, onCountryChange, value, onChange, h
   const errorId = error ? `${id}-error` : undefined;
   const options = useMemo(() => phoneCountryOptions(lang), [lang]);
   const dial = PHONE_COUNTRIES.find((c) => c.code === country)?.dial ?? '40';
+  const touch = useTouchSelect((e) => onCountryChange(e.target.value));
   return (
     <div className={fieldStyles.field}>
       <label htmlFor={id} className={fieldStyles.label}>
@@ -41,7 +43,7 @@ export function PhoneField({ label, country, onCountryChange, value, onChange, h
             className={styles.select}
             aria-label={t('auth.phoneCountry')}
             value={country}
-            onChange={(e) => onCountryChange(e.target.value)}
+            {...touch}
           >
             {options.map((o) => (
               <option key={o.code} value={o.code}>

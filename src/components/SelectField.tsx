@@ -1,5 +1,6 @@
 import { ChevronDown } from 'lucide-react';
 import { useId, type SelectHTMLAttributes } from 'react';
+import { useTouchSelect } from '../lib/touchSelect';
 import styles from './Field.module.css';
 
 export interface SelectFieldProps extends Omit<SelectHTMLAttributes<HTMLSelectElement>, 'id'> {
@@ -8,9 +9,10 @@ export interface SelectFieldProps extends Omit<SelectHTMLAttributes<HTMLSelectEl
   options: { value: string; label: string }[];
 }
 
-/** Label + native select (the phone's own picker) + hint. */
-export function SelectField({ label, hint, options, className, ...rest }: SelectFieldProps) {
+/** Label + native select (the phone's own picker) + hint. Lets go of the focus after a tap choice (useTouchSelect). */
+export function SelectField({ label, hint, options, className, onChange, ...rest }: SelectFieldProps) {
   const id = useId();
+  const touch = useTouchSelect(onChange);
   const hintId = hint ? `${id}-hint` : undefined;
   return (
     <div className={`${styles.field} ${className ?? ''}`}>
@@ -18,7 +20,7 @@ export function SelectField({ label, hint, options, className, ...rest }: Select
         {label}
       </label>
       <div className={styles.selectWrap}>
-        <select id={id} className={`${styles.input} ${styles.select}`} aria-describedby={hintId} {...rest}>
+        <select id={id} className={`${styles.input} ${styles.select}`} aria-describedby={hintId} {...rest} {...touch}>
           {options.map((o) => (
             <option key={o.value} value={o.value}>
               {o.label}
