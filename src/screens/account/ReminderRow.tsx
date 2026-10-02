@@ -1,4 +1,4 @@
-import { CalendarClock, CircleDot, Lightbulb, Star } from 'lucide-react';
+import { BadgePercent, CalendarClock, CircleDot, Lightbulb, Star } from 'lucide-react';
 import { useSession } from '../../app/sessionContext';
 import { ActionButton } from '../../components/ActionButton';
 import { Card } from '../../components/Card';
@@ -30,16 +30,23 @@ const ROWS = {
     on: 'seasonReminders.on',
     off: 'seasonReminders.off',
   },
-  // T24: tips after sign-up and the offers of favorite shops.
-  promo_notifications: {
+  // T24: two tips in the first two weeks, while the client has not booked yet.
+  app_tips: {
     icon: Lightbulb,
+    title: 'appTips.title',
+    on: 'appTips.on',
+    off: 'appTips.off',
+  },
+  // T24: the offers of favorite shops — marketing, so off until the client turns them on.
+  promo_notifications: {
+    icon: BadgePercent,
     title: 'promoNotifications.title',
     on: 'promoNotifications.on',
     off: 'promoNotifications.off',
   },
 } as const;
 
-/** Cont → one of the client's reminders (T19d, T24): on by default, the client turns it off here. */
+/** Cont → one of the client's reminders (T19d, T24): on by default (offers: off), switched here. */
 export function ReminderRow({ setting }: { setting: ReminderSetting }) {
   const { t, lang } = useI18n();
   const session = useSession();

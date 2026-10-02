@@ -26,9 +26,9 @@ export async function updateProfile(userId: string, fields: { name: string; phon
 
 /**
  * The client's reminders in Cont: the review request and the service reminders (T19d), the tire
- * season and the tips and offers (T24).
+ * season, the first tips and the favorite shops' offers (T24).
  */
-export type ReminderSetting = 'review_requests' | 'service_reminders' | 'season_reminders' | 'promo_notifications';
+export type ReminderSetting = 'review_requests' | 'service_reminders' | 'season_reminders' | 'app_tips' | 'promo_notifications';
 
 export async function setReminder(userId: string, setting: ReminderSetting, on: boolean): Promise<Profile> {
   const fields: Partial<Record<ReminderSetting, boolean>> = { [setting]: on };

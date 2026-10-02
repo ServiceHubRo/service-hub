@@ -1,6 +1,6 @@
 # Privacy Policy — Service-Hub
 
-**Last updated:** September 28, 2026
+**Last updated:** October 1, 2026
 
 This policy explains what personal data Service-Hub uses, why, who else sees it, how long we keep it and what rights you have, under Regulation (EU) 2016/679 (the “GDPR”) and Romanian law.
 
@@ -36,15 +36,18 @@ This policy explains what personal data Service-Hub uses, why, who else sees it,
 - Your **reviews** and **messages**; your **favorite** shops.
 - **History reports** you bought: the code, the car, the jobs included, the price, the payment status and the PDF file.
 - The number of **no-shows** in the last 90 days (calculated from bookings).
+- **Phone confirmation**, only if we ask for it (after 2 no-shows in 90 days): the code sent by SMS is kept only in encrypted form and is valid for 10 minutes.
+- **Preferences:** the review request, the service and tire reminders, the getting-started tips and your favorite shops’ offers (on or off).
 
 ### 2.3 If you have a Shop account
 
 - **Public profile:** the name, description, logo, workshop address and its map coordinates, phone numbers, website, Facebook page, year established, hours, closed days, booking rules, inspection fee and services offered.
 - **Billing data:** legal name, tax ID, Trade Register number, registered office, VAT status, bank, IBAN, billing email and legal representative. Never public.
+- **Company check at ANAF:** what ANAF’s public register says about your tax ID (official name, address, whether the company is active and pays VAT) and when we checked. Seen by you and the administrator.
 - **Subscription and payments:** status, start and end dates, price, number of paid colleagues, Stripe customer ID, amounts paid, payment dates and Stripe receipts.
 - **Colleagues:** the email address you sent the invitation to, the colleague’s name and when they joined.
 - **Phone confirmation:** the code sent by SMS is kept only in encrypted form and is valid for 10 minutes.
-- **Preferences:** SMS on new request, daily summary.
+- **Preferences:** SMS on new request, daily summary, monthly report.
 - The shop’s bookings, quotes, jobs, reviews and messages, with the customer data from section 4.1.
 
 ### 2.4 Technical data
@@ -73,16 +76,20 @@ This policy explains what personal data Service-Hub uses, why, who else sees it,
 | Push notifications | Your consent, given in the browser (withdraw it at any time), and the contract |
 | ITP, RCA and vignette alerts | Our contract with you (you ask for them by entering the dates) |
 | The reminder for your next service (after the last job of that kind done through the Platform) and the review request after a job | Our contract with you; you turn both off in Account |
+| The seasonal tire reminder (for the cars in your Garage) and the two tips in your first two weeks | Our contract with you; you turn them off in Account |
+| Your favorite shops’ offers | Your consent: you get them only if you turn them on in Account, and you can turn them off at any time |
+| The monthly report for shops | Our contract with you; turned off in Settings → Notifications |
 | Official history report | Our contract with you |
 | Subscription, payments, invoices and accounting | The contract and legal obligations (para. 1(c)): Accounting Law 82/1991, the Tax Code |
 | Public reviews and checking reported ones | Legitimate interest (para. 1(f)) in genuine reviews; obligations under Regulation (EU) 2022/2065 |
-| Limits against abuse, the no-show indicator, the bot check, suspensions | Legitimate interest in a fair and safe Platform |
+| Limits against abuse, the no-show indicator, the phone confirmation after no-shows, the bot check, suspensions | Legitimate interest in a fair and safe Platform |
+| Checking shops’ tax IDs in ANAF’s public register and flagging reviews that look written by the shop (for example, the customer used the shop’s phone) | Legitimate interest in real companies and genuine reviews on the Platform |
 | One free period per person, and no way around a suspension with a new account (encrypted fingerprints of the email and phone, see section 5) | Legitimate interest in a fair and safe Platform |
 | Error reports and technical logs | Legitimate interest in a Platform that works and is secure |
 | Announcements about the Platform (changes, outages) | The contract and legitimate interest |
 | Answering your requests; defending legal claims | Legitimate interest and legal obligations |
 
-**We do not use your data for advertising**, we do not sell it and we do not build marketing profiles. We do not send newsletters; if we ever do, only with your consent. We make no automated decisions with legal effects on you: search order depends on shops, not customers, and the no-show indicator does not block anyone automatically.
+**We do not use your data for advertising**, we do not sell it and we do not build marketing profiles. We do not send newsletters; you get your favorite shops’ offers only if you turn them on in Account. We make no automated decisions with legal effects on you: search order depends on shops, not customers, and the no-show indicator blocks no one; after 2 no-shows in 90 days we only ask you to confirm your phone by SMS before your next booking.
 
 ---
 
@@ -110,11 +117,12 @@ We work with providers that process data only on our instructions, under a data 
 | Supabase | Database, accounts, files, server functions | All Platform data | EU (Frankfurt) |
 | Netlify | Hosting the web app | IP address, browser, pages requested | US and global network |
 | Resend | Emails (account confirmation, password, invitations, payments, report ready) | Email address, email text | US |
-| SMSO | Text messages to shops (confirmation code, new requests if turned on) | The shop’s phone, the text (customer name, service, day) | Romania |
+| SMSO | Text messages: the phone confirmation code (shops; customers after no-shows) and new requests to shops, if turned on | The phone, the text (the code; for requests: customer name, service, day) | Romania |
 | Stripe | Payment of the subscription and the report | Name, email, amount; you enter card details directly with Stripe | EU and US |
 | Sentry | Error reports | Account ID, role, browser, page, error | EU (Frankfurt) |
 | Cloudflare | Bot check at sign-up and sign-in | IP address, browser signals | US and global network |
 | OpenStreetMap Foundation (Nominatim) | Coordinates of the workshop address | The workshop address only | United Kingdom |
+| ANAF (the public register of taxpayers) | Checking a shop’s company | The tax ID only | Romania |
 | Your browser’s notification service (Google, Apple, Mozilla, Microsoft) | Delivering push notifications | Your device’s technical address; the notification content is encrypted and they cannot read it | Depends on the browser |
 
 **Transfers outside the European Economic Area** (US, United Kingdom) happen only with the safeguards the GDPR requires: a European Commission adequacy decision (for example, the EU–US Data Privacy Framework, for certified companies, or the decision for the United Kingdom) or the standard contractual clauses approved by the Commission.
@@ -177,7 +185,7 @@ The Platform is not for people under 18. If we learn that an account belongs to 
 
 ## 9. Messages we send you
 
-We only send you messages about your account and bookings (confirmations, quotes, reminders, the review request after a job, payments) and important announcements about the Platform. You can turn push notifications off at any time; shops can turn off SMS on new requests and the daily summary in Settings → Notifications.
+We send you messages about your account and bookings (confirmations, quotes, reminders, the review request after a job, payments), reminders about your car (ITP, RCA, vignette, your next service, the seasonal tire change), two tips in your first two weeks if you haven’t booked yet, and important announcements about the Platform. You get your favorite shops’ offers only if you turn them on in Account; tips and offers are at most two a week. Automatic reminders are not sent at night (between 9 PM and 9 AM, Romanian time): you get them in the morning. You can turn each kind off in Account, and push notifications at any time. Shops can turn off SMS on new requests, the daily summary and the monthly report in Settings → Notifications.
 
 ---
 

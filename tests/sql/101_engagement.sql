@@ -120,6 +120,9 @@ select test.eq((params->>'day')::int, 3, 'the first one'),
 from public.notification_events where event = 'welcome';
 select test.eq(public.send_welcome_tips(now() + interval '1 day'), 0, 'once');
 update public.profiles set created_at = now() - interval '14 days' where id = current_setting('test.new')::uuid;
+update public.profiles set app_tips = false where id = current_setting('test.new')::uuid;
+select test.eq(public.send_welcome_tips(now()), 0, 'tips turned off in Cont');
+update public.profiles set app_tips = true where id = current_setting('test.new')::uuid;
 select test.eq(public.send_welcome_tips(now()), 1, 'and at 14 days');
 update public.profiles set created_at = now() - interval '30 days' where id = current_setting('test.new')::uuid;
 delete from public.engagement_log;
@@ -133,6 +136,14 @@ delete from public.notification_events;
 -- ------------------------------------------------------------------ a favorite's offer
 insert into public.favorites (client_id, shop_id) values (current_setting('test.new')::uuid, test.id('shop1')),
                                                          (test.id('client_a'), test.id('shop1'));
+-- Offers are off until the client turns them on (consent).
+select test.login(test.id('owner1'));
+update public.shops set new_client_offer = 5 where id = test.id('shop1');
+select test.logout();
+select test.eq(pg_temp.events('favorite_offer', current_setting('test.new')::uuid), 0::bigint, 'offers are off by default');
+update public.shops set new_client_offer = null where id = test.id('shop1');
+delete from public.engagement_log where kind = 'favorite_offer';
+update public.profiles set promo_notifications = true where id in (current_setting('test.new')::uuid, test.id('client_a'));
 select test.login(test.id('owner1'));
 update public.shops set new_client_offer = 10 where id = test.id('shop1');
 select test.logout();
@@ -203,9 +214,9 @@ from (select public.run_hourly_jobs(pg_temp.at_local(test.today(), '10:05')) as 
 select test.login(test.id('client_a'));
 select test.fails($$select 1 from public.engagement_log$$, 'permission denied', 'the log is server only');
 select test.fails($$select public.send_tip(auth.uid(), 'welcome', 'k', 'welcome', '{}')$$, 'permission denied', 'tips are not callable');
-update public.profiles set season_reminders = false, promo_notifications = false where id = test.id('client_a');
-select test.ok((select not season_reminders and not promo_notifications from public.profiles where id = test.id('client_a')),
-  'the client turns both off');
+update public.profiles set season_reminders = false, app_tips = false, promo_notifications = false where id = test.id('client_a');
+select test.ok((select not season_reminders and not app_tips and not promo_notifications from public.profiles where id = test.id('client_a')),
+  'the client turns each off');
 select test.logout();
 
 select test.login(test.id('admin'));

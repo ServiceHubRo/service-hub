@@ -941,6 +941,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          app_tips: boolean
           created_at: string
           deleted_at: string | null
           display_id: string
@@ -964,6 +965,7 @@ export type Database = {
           terms_version: string | null
         }
         Insert: {
+          app_tips?: boolean
           created_at?: string
           deleted_at?: string | null
           display_id: string
@@ -987,6 +989,7 @@ export type Database = {
           terms_version?: string | null
         }
         Update: {
+          app_tips?: boolean
           created_at?: string
           deleted_at?: string | null
           display_id?: string
@@ -3232,6 +3235,7 @@ export type Database = {
       require_admin: {
         Args: never
         Returns: {
+          app_tips: boolean
           created_at: string
           deleted_at: string | null
           display_id: string
@@ -3264,6 +3268,7 @@ export type Database = {
       require_caller: {
         Args: never
         Returns: {
+          app_tips: boolean
           created_at: string
           deleted_at: string | null
           display_id: string
@@ -3298,6 +3303,7 @@ export type Database = {
       require_reader: {
         Args: never
         Returns: {
+          app_tips: boolean
           created_at: string
           deleted_at: string | null
           display_id: string

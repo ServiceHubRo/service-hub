@@ -40,15 +40,17 @@ test.describe('T24 notifications', () => {
   test.skip(!BACKEND, 'needs the local Supabase stack');
   test.setTimeout(90_000);
 
-  test('Cont: seasonal tires and tips off and on, saved on the account', async ({ page }) => {
+  test('Cont: seasonal tires and tips on, offers off until turned on, saved on the account', async ({ page }) => {
     const client = await createUser('client');
     await signIn(page, client, PASSWORD);
     await openAccount(page);
     const tires = page.getByRole('group', { name: 'Anvelopele de sezon' });
-    const tips = page.getByRole('group', { name: 'Sfaturi și oferte' });
+    const tips = page.getByRole('group', { name: 'Sfaturi pentru început' });
+    const offers = page.getByRole('group', { name: 'Ofertele service-urilor favorite' });
     await expect(tires).toContainText('Pornite.');
-    await expect(tips).toContainText('cel mult două notificări pe săptămână, niciodată noaptea');
-    await tips.scrollIntoViewIfNeeded();
+    await expect(tips).toContainText('Pornite.');
+    await expect(offers).toContainText('Oprite.');
+    await offers.scrollIntoViewIfNeeded();
     await expectNoHorizontalScroll(page);
     await shot(page, 't24-account-reminders', name());
 
@@ -56,19 +58,23 @@ test.describe('T24 notifications', () => {
     await expect(tires).toContainText('Oprite.');
     await tips.getByRole('button', { name: 'Oprește' }).click();
     await expect(tips).toContainText('Oprite.');
-    const [profile] = await serviceRest<{ season_reminders: boolean; promo_notifications: boolean; service_reminders: boolean }[]>(
-      `profiles?id=eq.${await userIdOf(client)}&select=season_reminders,promo_notifications,service_reminders`,
+    await offers.getByRole('button', { name: 'Pornește' }).click();
+    await expect(offers).toContainText('cel mult două pe săptămână, niciodată noaptea', { ignoreCase: true });
+    const [profile] = await serviceRest<{ season_reminders: boolean; app_tips: boolean; promo_notifications: boolean; service_reminders: boolean }[]>(
+      `profiles?id=eq.${await userIdOf(client)}&select=season_reminders,app_tips,promo_notifications,service_reminders`,
       'GET',
     );
-    expect(profile).toEqual({ season_reminders: false, promo_notifications: false, service_reminders: true });
+    expect(profile).toEqual({ season_reminders: false, app_tips: false, promo_notifications: true, service_reminders: true });
 
     await page.reload();
     await expect(tires).toContainText('Oprite.');
     await setLanguage(page, 'en');
     const tiresEn = page.getByRole('group', { name: 'Seasonal tires' });
     await expect(tiresEn).toContainText('Off.');
-    await expect(page.getByRole('group', { name: 'Tips and offers' })).toContainText('Off.');
-    await page.getByRole('group', { name: 'Tips and offers' }).scrollIntoViewIfNeeded();
+    await expect(page.getByRole('group', { name: 'Getting-started tips' })).toContainText('Off.');
+    const offersEn = page.getByRole('group', { name: 'Favorite shops’ offers' });
+    await expect(offersEn).toContainText('On.');
+    await offersEn.scrollIntoViewIfNeeded();
     await expectNoHorizontalScroll(page);
     await shot(page, 't24-account-reminders-en', name());
     await tiresEn.getByRole('button', { name: 'Turn on' }).click();

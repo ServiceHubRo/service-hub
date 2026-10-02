@@ -5,11 +5,15 @@
 --   not_before). What a person just did (a quote sent, the car ready, a message) still goes at once.
 --   The hours are platform limits (quiet_hours_start / quiet_hours_end; equal = no quiet hours).
 -- · Tips and offers (push only, at most promo_per_week a week per person, only to someone with a
---   device that can show them, each turned off in Cont):
+--   device that can show them, each with its switch in Cont):
 --     tire_season  — winter tires from 15 Oct, summer tires from 25 Mar, once a season, to clients
---                    with a car in the garage and no tire job booked or done lately;
---     welcome      — 3 and 14 days after sign-up, to a client who has never booked;
---     favorite_offer — a favorite shop starts (or raises) its new-client offer.
+--                    with a car in the garage and no tire job booked or done lately (on by default,
+--                    like the other reminders about the car: season_reminders);
+--     welcome      — 3 and 14 days after sign-up, to a client who has never booked: how to use the
+--                    account (on by default: app_tips);
+--     favorite_offer — a favorite shop starts (or raises) its new-client offer. An offer is
+--                    marketing, so only for clients who turned it on (promo_notifications, off by
+--                    default; Privacy Policy §9).
 -- · To the shop: a request still without an answer after request_reminder_hours (once), and on
 --   the 1st of the month a report of the month before to the owner (push + email; Setări →
 --   Notificări turns it off).
@@ -56,11 +60,13 @@ as $$
 $$;
 revoke execute on function public.limit_range(text) from public, anon, authenticated;
 
--- The client's switches in Cont (on by default, like the T19d reminders).
+-- The client's switches in Cont: the reminders and tips on by default (like the T19d reminders),
+-- the offers only when the client turns them on.
 alter table public.profiles
   add column season_reminders boolean not null default true,
-  add column promo_notifications boolean not null default true;
-grant update (season_reminders, promo_notifications) on public.profiles to authenticated;
+  add column app_tips boolean not null default true,
+  add column promo_notifications boolean not null default false;
+grant update (season_reminders, app_tips, promo_notifications) on public.profiles to authenticated;
 
 -- The owner's switch in Setări → Notificări (shops_update_owner: owner only).
 alter table public.shops add column monthly_report boolean not null default true;
@@ -361,7 +367,7 @@ begin
            case when v_today - (p.created_at at time zone 'Europe/Bucharest')::date between 14 and 16 then 14 else 3 end as day,
            exists (select 1 from public.cars c where c.owner_id = p.id) as has_car
     from public.profiles p
-    where p.role = 'client' and p.deleted_at is null and not p.suspended and p.promo_notifications
+    where p.role = 'client' and p.deleted_at is null and not p.suspended and p.app_tips
       and (v_today - (p.created_at at time zone 'Europe/Bucharest')::date between 3 and 5
            or v_today - (p.created_at at time zone 'Europe/Bucharest')::date between 14 and 16)
       and not exists (select 1 from public.bookings b where b.client_id = p.id)
@@ -376,8 +382,8 @@ end
 $$;
 revoke execute on function public.send_welcome_tips(timestamptz) from public, anon, authenticated;
 
--- A shop starts (or raises) its new-client offer: the clients who keep it in favorites and would
--- get it are told, at most once a month per shop.
+-- A shop starts (or raises) its new-client offer: the clients who keep it in favorites, turned the
+-- offers on and would get it are told, at most once a month per shop.
 create function public.shops_after_offer()
 returns trigger
 language plpgsql
