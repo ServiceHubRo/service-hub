@@ -229,7 +229,9 @@ test.describe('T25 fraud checks', () => {
     );
     await signIn(page, SEED.admin, SEED_PASSWORD);
     await expect(page.getByRole('heading', { level: 1, name: 'Panou principal' })).toBeVisible();
-    await page.getByRole('link', { name: 'Moderare', exact: true }).filter({ visible: true }).first().click();
+    // The link carries the number of reported reviews when other tests reported some: go straight there.
+    await page.goto('/admin/moderare');
+    await expect(page.getByRole('heading', { level: 1, name: 'Moderare' })).toBeVisible();
     const card = page.getByRole('listitem').filter({ hasText: shopName }).filter({ hasText: 'Lucrare în câteva minute' });
     await expect(card).toBeVisible();
     await expect(card).toContainText('Lucrarea a fost terminată la mai puțin de 3 ore după ce s-a făcut programarea.');
