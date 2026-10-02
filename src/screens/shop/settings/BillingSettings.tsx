@@ -7,13 +7,12 @@ import { Chip } from '../../../components/Chip';
 import { EmptyState } from '../../../components/EmptyState';
 import { Field } from '../../../components/Field';
 import { SkeletonList } from '../../../components/Skeleton';
-import { fetchBilling, updateBilling, verifyCompany, type CompanyCheck, type ShopBilling } from '../../../data/shop';
+import { fetchBilling, updateBilling, verifyCompany, type ShopBilling } from '../../../data/shop';
 import { useI18n } from '../../../i18n/context';
 import { looksLikeEmail } from '../../../lib/password';
 import { useLoad } from '../../../lib/useLoad';
 import { isValidCui, isValidIban, isValidRegCom, normalizeCode } from '../../../lib/validators';
 import { LoadError } from '../../../components/LoadError';
-import { CompanyCheckCard } from '../../company/CompanyCheckCard';
 import { SETTINGS_PATH } from './paths';
 import { SaveButton } from './SaveButton';
 import { useShopSettings } from './shopSettingsContext';
@@ -47,17 +46,6 @@ const toForm = (b: ShopBilling | null): Form => ({
 
 const nullable = (v: string) => (v.trim() === '' ? null : v.trim());
 
-const checkOf = (b: ShopBilling | null): CompanyCheck | null =>
-  b && {
-    anaf_cui: b.anaf_cui,
-    anaf_status: b.anaf_status,
-    anaf_name: b.anaf_name,
-    anaf_address: b.anaf_address,
-    anaf_vat_payer: b.anaf_vat_payer,
-    anaf_name_match: b.anaf_name_match,
-    anaf_checked_at: b.anaf_checked_at,
-  };
-
 /** Date de facturare (P5c group B): fiscal data for our invoices, never public, owner only. */
 export function BillingSettings() {
   const { t } = useI18n();
@@ -90,20 +78,6 @@ function BillingForm({ initial }: { initial: ShopBilling | null }) {
   const [form, setForm] = useState<Form>(() => toForm(initial));
   const [errors, setErrors] = useState<Errors>({});
   const formRef = useRef<HTMLFormElement>(null);
-  // T25: what ANAF says about the saved CUI; asked again after a save that changed the CUI or name.
-  const [saved, setSaved] = useState<ShopBilling | null>(initial);
-  const [check, setCheck] = useState<CompanyCheck | null>(() => checkOf(initial));
-  const [unavailable, setUnavailable] = useState(false);
-
-  async function runCheck() {
-    const result = await verifyCompany();
-    if ('unavailable' in result) {
-      setUnavailable(true);
-      return;
-    }
-    setUnavailable(false);
-    setCheck(result);
-  }
 
   function set<K extends keyof Form>(key: K, value: Form[K]) {
     setForm((f) => ({ ...f, [key]: value }));
@@ -142,10 +116,9 @@ function BillingForm({ initial }: { initial: ShopBilling | null }) {
       legal_rep: nullable(form.legal_rep),
     });
     setForm(toForm(saved));
-    setSaved(saved);
-    setCheck(checkOf(saved));
-    // Best effort: the data is saved whatever ANAF answers.
-    if (saved.vat_id && !saved.anaf_status) void runCheck().catch(() => setUnavailable(true));
+    // T25: ANAF is asked about a new CUI or name in the background; only the admin sees the answer
+    // (Raport ANAF, the shop's page). Best effort: the data is saved whatever ANAF answers.
+    if (saved.vat_id && !saved.anaf_status) void verifyCompany().catch(() => {});
     return true;
   }
 
@@ -239,14 +212,6 @@ function BillingForm({ initial }: { initial: ShopBilling | null }) {
         error={errors.billing_email}
       />
       <SaveButton onSave={save}>{t('billing.save')}</SaveButton>
-      {/* Under the button: the answer shows where the owner just tapped. */}
-      <CompanyCheckCard
-        check={check}
-        unavailable={unavailable}
-        vatPayerTyped={saved?.vat_payer ?? false}
-        hasCui={Boolean(saved?.vat_id)}
-        onCheck={runCheck}
-      />
     </form>
   );
 }
