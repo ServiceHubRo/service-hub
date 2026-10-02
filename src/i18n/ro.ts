@@ -240,7 +240,6 @@ export const ro = {
   'account.noName': 'Fără nume',
   'account.edit': 'Editează numele și telefonul',
   'account.phoneReverify': 'Un număr nou trebuie confirmat cu un cod primit prin SMS. Până atunci, service-ul nu apare în căutări.',
-  'account.language': 'Limbă',
   'account.security': 'Autentificare',
   'account.email.change': 'Schimbă emailul',
   'account.email.new': 'Emailul nou',

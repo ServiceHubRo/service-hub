@@ -242,7 +242,6 @@ export const en: Record<MessageKey, string> = {
   'account.noName': 'No name',
   'account.edit': 'Edit name and phone',
   'account.phoneReverify': 'A new number has to be confirmed again with a code by text message. Until then the shop does not appear in search.',
-  'account.language': 'Language',
   'account.security': 'Sign-in',
   'account.email.change': 'Change email',
   'account.email.new': 'New email',
