@@ -53,6 +53,9 @@ export const SUBSCRIPTION_PATH = '/s/cont/abonament';
 /** The client's Rapoartele mele (T15): where a finished history report is downloaded. */
 export const REPORTS_PATH = '/c/cont/rapoarte';
 
+/** The owner's Rapoarte (T17): where the monthly report (T24) leads. */
+export const SHOP_REPORTS_PATH = '/s/cont/rapoarte';
+
 export const TEMPLATES: Record<Lang, Record<string, Text>> = {
   ro: {
     // ------------------------------------------------------------------ to the client
@@ -99,6 +102,39 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
       title: '{car}: {service}',
       body: 'Ultima dată pe {last_done}, la {shop}. Următoarea se apropie, pe la {due}. Programează-te din aplicație.',
     },
+    // ------------------------------------------------------------------ tips and offers (T24, push only)
+    'client.tire_season': {
+      title: 'Anvelopele de iarnă',
+      body: 'E timpul pentru anvelopele de iarnă la {car}. Programează schimbul din aplicație, înainte de aglomerație.',
+    },
+    'client.tire_season_shop': {
+      title: 'Anvelopele de iarnă',
+      body: 'E timpul pentru anvelopele de iarnă la {car}. Data trecută le-ai schimbat la {shop}; te poți programa din aplicație.',
+    },
+    'client.tire_season_summer': {
+      title: 'Anvelopele de vară',
+      body: 'E timpul pentru anvelopele de vară la {car}. Programează schimbul din aplicație, înainte de aglomerație.',
+    },
+    'client.tire_season_summer_shop': {
+      title: 'Anvelopele de vară',
+      body: 'E timpul pentru anvelopele de vară la {car}. Data trecută le-ai schimbat la {shop}; te poți programa din aplicație.',
+    },
+    'client.welcome': {
+      title: 'Service-Hub',
+      body: 'Găsește un service aproape de tine și programează-te online. Devizul vine în aplicație, înainte să înceapă lucrarea.',
+    },
+    'client.welcome_garage': {
+      title: 'Adaugă mașina în Garaj',
+      body: 'Îți amintim din timp de ITP, RCA și rovinietă, iar la programare nu mai completezi nimic.',
+    },
+    'client.welcome_later': {
+      title: 'Service-Hub',
+      body: 'Când mașina are nevoie de un service, compari recenziile și te programezi din aplicație. Durează un minut.',
+    },
+    'client.favorite_offer': {
+      title: '{shop}',
+      body: '{shop} îți oferă {percent} reducere la manoperă la prima programare.',
+    },
     'client.review_report_decided': {
       title: 'Recenzie ștearsă',
       body: 'Echipa Service-Hub a șters recenzia ta pentru {shop} ({ref}), pentru că nu respectă regulile platformei.',
@@ -134,6 +170,15 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
     'shop.new_message': { title: '{sender}', body: '{preview}' },
     'shop.new_review': { title: 'Recenzie nouă', body: '{client} ți-a dat {rating} din 5 stele.' },
     'shop.daily_digest': { title: 'Programul de azi', body: '{digest}' },
+    // T24
+    'shop.booking_request_waiting': {
+      title: 'Cerere fără răspuns',
+      body: '{client} așteaptă răspuns pentru {when}: {service}. Confirmă sau propune altă oră.',
+    },
+    'shop.monthly_report': {
+      title: 'Luna {month} pe Service-Hub',
+      body: 'Lucrări terminate: {done}. Încasări: {revenue}. Cereri primite: {requests}. Vezi raportul complet.',
+    },
     // ------------------------------------------------------------------ to the shop's owner (T14)
     'shop.trial_ending': {
       title: 'Perioada gratuită se termină',
@@ -260,6 +305,39 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
       title: '{car}: {service}',
       body: 'Last done on {last_done} at {shop}. The next one is coming up, around {due}. Book it in the app.',
     },
+    // ------------------------------------------------------------------ tips and offers (T24, push only)
+    'client.tire_season': {
+      title: 'Winter tires',
+      body: 'Time for winter tires on your {car}. Book the change in the app before the rush.',
+    },
+    'client.tire_season_shop': {
+      title: 'Winter tires',
+      body: 'Time for winter tires on your {car}. Last time you had them changed at {shop}; you can book in the app.',
+    },
+    'client.tire_season_summer': {
+      title: 'Summer tires',
+      body: 'Time for summer tires on your {car}. Book the change in the app before the rush.',
+    },
+    'client.tire_season_summer_shop': {
+      title: 'Summer tires',
+      body: 'Time for summer tires on your {car}. Last time you had them changed at {shop}; you can book in the app.',
+    },
+    'client.welcome': {
+      title: 'Service-Hub',
+      body: 'Find a shop near you and book online. The quote comes in the app before any work starts.',
+    },
+    'client.welcome_garage': {
+      title: 'Add your car to the Garage',
+      body: "We'll remind you of the ITP, RCA and road vignette in time, and booking takes no typing.",
+    },
+    'client.welcome_later': {
+      title: 'Service-Hub',
+      body: 'When your car needs a shop, compare the reviews and book in the app. It takes a minute.',
+    },
+    'client.favorite_offer': {
+      title: '{shop}',
+      body: '{shop} offers you {percent} off labor on your first booking.',
+    },
     'client.review_report_decided': {
       title: 'Review removed',
       body: 'The Service-Hub team removed your review of {shop} ({ref}) because it breaks the platform rules.',
@@ -295,6 +373,15 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
     'shop.new_message': { title: '{sender}', body: '{preview}' },
     'shop.new_review': { title: 'New review', body: '{client} gave you {rating} out of 5 stars.' },
     'shop.daily_digest': { title: "Today's schedule", body: '{digest}' },
+    // T24
+    'shop.booking_request_waiting': {
+      title: 'Request waiting',
+      body: '{client} is waiting for an answer for {when}: {service}. Confirm it or suggest another time.',
+    },
+    'shop.monthly_report': {
+      title: 'Your {month} on Service-Hub',
+      body: 'Jobs done: {done}. Revenue: {revenue}. Requests: {requests}. See the full report.',
+    },
     // ------------------------------------------------------------------ to the shop's owner (T14)
     'shop.trial_ending': {
       title: 'Your free period is ending',
@@ -437,12 +524,13 @@ export const EVENTS: Record<Side, readonly string[]> = {
     'no_show', 'inspection_started', 'quote_sent', 'quote_replaced', 'quote_withdrawn', 'quote_expiring', 'quote_expired',
     'work_started', 'job_done', 'appointment_reminder', 'new_message', 'review_reply', 'doc_expiry', 'report_ready',
     'review_report_decided', 'review_request', 'service_due', 'account_suspended', 'account_reactivated',
+    'tire_season', 'welcome', 'favorite_offer',
   ],
   shop: [
     'booking_requested', 'booking_cancelled_client', 'booking_cancelled_admin', 'quote_accepted',
     'quote_partially_accepted', 'quote_refused', 'quote_expiring', 'quote_expired', 'new_message', 'new_review',
     'daily_digest', 'trial_ending', 'payment_failed', 'shop_inactive', 'review_report_decided', 'account_suspended',
-    'account_reactivated', 'referral_reward', 'referral_revoked',
+    'account_reactivated', 'referral_reward', 'referral_revoked', 'booking_request_waiting', 'monthly_report',
   ],
 };
 
@@ -491,6 +579,14 @@ function relativeDeadline(lang: Lang, iso: string, now: Date): string {
   if (diff === 0) return word(lang, 'relAt', { day: word(lang, 'today'), time });
   if (diff === 1) return word(lang, 'relAt', { day: word(lang, 'tomorrow'), time });
   return word(lang, 'relOn', { date, time });
+}
+
+/** "septembrie" / "September" for a month written YYYY-MM. */
+export function monthName(lang: Lang, ym: string): string {
+  if (!/^\d{4}-\d{2}$/.test(ym)) return '';
+  return new Intl.DateTimeFormat(lang === 'en' ? 'en-US' : 'ro-RO', { month: 'long', timeZone: 'UTC' }).format(
+    new Date(`${ym}-15T12:00:00Z`),
+  );
 }
 
 /** Every placeholder a text may use, always defined (an unknown value becomes empty). */
@@ -553,11 +649,16 @@ function vars(e: NotificationEvent, lang: Lang, side: Side, now: Date): Record<s
     digest,
     code: str(p.code),
     referred: str(p.referred_name) || word(lang, 'aShop'),
+    percent: num(p.percent) === null ? '' : `${num(p.percent)}%`,
+    month: monthName(lang, str(p.month)),
+    done: String(num(p.done) ?? 0),
+    revenue: money(num(p.revenue) ?? 0),
+    requests: String(num(p.requests) ?? 0),
   };
 }
 
 /** Which text: the event, with a variant where the parameters change the sentence. */
-export function templateKey(side: Side, e: NotificationEvent): string {
+export function templateKey(side: Side, e: NotificationEvent, now: Date = new Date()): string {
   const p = e.params ?? {};
   const base = `${side}.${e.event}`;
   switch (e.event) {
@@ -565,8 +666,16 @@ export function templateKey(side: Side, e: NotificationEvent): string {
       return str(p.reason) ? `${base}_reason` : base;
     case 'quote_refused':
       return (num(p.inspection_fee) ?? 0) > 0 ? `${base}_fee` : base;
+    // Today or tomorrow as the phone shows it: a reminder that waited out the quiet hours (T24)
+    // may arrive on the day itself.
     case 'appointment_reminder':
+      if (str(p.date)) return str(p.date) === ymdInBucharest(now) ? `${base}_today` : base;
       return p.day === 'today' ? `${base}_today` : base;
+    case 'tire_season':
+      return `${base}${p.season === 'summer' ? '_summer' : ''}${str(p.shop_name) ? '_shop' : ''}`;
+    case 'welcome':
+      if (num(p.day) === 14) return p.has_car === true ? `${base}_later` : `${base}_garage`;
+      return base;
     case 'doc_expiry': {
       const days = num(p.days) ?? 0;
       return days < 0 ? `${base}_past` : days === 0 ? `${base}_today` : base;
@@ -620,6 +729,13 @@ export function urlFor(side: Side, e: NotificationEvent): string {
         return str(p.shop_id)
           ? `/c/service/${str(p.shop_id)}/programare?${q({ pas: '2', serviciu: str(p.service_id), masina: str(p.car_id) })}`
           : '/c/cauta';
+      // The shop that did the tires last time, else the tire shops.
+      case 'tire_season':
+        return str(p.shop_id) ? `/c/service/${str(p.shop_id)}` : `/c/cauta?${q({ cat: 'cat_anv' })}`;
+      case 'welcome':
+        return num(p.day) === 14 && p.has_car !== true ? '/c/garaj' : '/c/cauta';
+      case 'favorite_offer':
+        return str(p.shop_id) ? `/c/service/${str(p.shop_id)}` : '/c/cauta';
       default:
         return booking ? `/c/programari?${q({ p: booking })}` : '/c/programari';
     }
@@ -641,7 +757,10 @@ export function urlFor(side: Side, e: NotificationEvent): string {
     case 'referral_revoked':
       return SUBSCRIPTION_PATH;
     case 'booking_requested':
+    case 'booking_request_waiting':
       return booking ? `/s/programari?${q({ tab: 'cereri', p: booking })}` : '/s/programari?tab=cereri';
+    case 'monthly_report':
+      return SHOP_REPORTS_PATH;
     // Ended bookings are in the history, found by their code.
     case 'booking_cancelled_client':
     case 'booking_cancelled_admin':
@@ -671,6 +790,13 @@ function tagFor(e: NotificationEvent): string {
       return `review-request-${e.booking_id ?? str(p.booking_id)}`;
     case 'service_due':
       return `service-due-${str(p.car_id)}-${str(p.service_id)}`;
+    case 'tire_season':
+    case 'welcome':
+      return e.event;
+    case 'favorite_offer':
+      return `offer-${str(p.shop_id)}`;
+    case 'monthly_report':
+      return `monthly-${str(p.month)}`;
     case 'referral_reward':
     case 'referral_revoked':
       return `referral-${str(p.referral_shop_id)}`;
@@ -724,7 +850,7 @@ export function renderNotification(e: NotificationEvent, overrides: Overrides = 
   if (!side) return null;
   const lang: Lang = e.lang === 'en' ? 'en' : 'ro';
   if (e.event === 'broadcast') return renderBroadcast(e, side, lang);
-  const key = templateKey(side, e);
+  const key = templateKey(side, e, now);
   const base = TEMPLATES[lang][key];
   if (!base) return null;
   const custom = overrides?.[key]?.[lang];

@@ -262,6 +262,21 @@ Un admin vechi pe care nu-l mai vrei: spune-mi adresa și îți dau comanda.
 
 **Verifici:** te loghezi cu contul nou și vezi **Panou principal, Service-uri, Clienți, Rezervări, Moderare** (pe telefon, jos, primul scrie doar „Panou”).
 
+### 4.6b Codul din telefon pentru admin (din T25)
+
+Contul de admin cere, după parolă, un cod de 6 cifre dintr-o aplicație de autentificare de pe telefon (Google Authenticator, Microsoft Authenticator sau 1Password). Prima dată când intri după T25, aplicația îți arată un cod QR: îl scanezi cu aplicația de pe telefon și scrii codul afișat. De atunci, la fiecare intrare ca admin scrii codul din aplicație. Fără cod, baza de date nu lasă contul de admin să vadă sau să schimbe nimic, chiar dacă parola e corectă.
+
+**Verifici o dată:** Supabase → proiectul (real și de test) → **Authentication → Multi-Factor** (sau **Sign In / Providers → Multi-Factor Authentication**): **TOTP (App Authenticator)** este **Enabled**. Este pornit implicit; dacă nu e, îl pornești și apeși **Save**.
+
+**Ai pierdut telefonul sau ai schimbat aplicația:** Supabase → proiectul → **SQL Editor** → rulezi (cu adresa ta):
+
+```sql
+delete from auth.mfa_factors
+where user_id = (select id from auth.users where email = 'adresa-ta@exemplu.ro');
+```
+
+La următoarea intrare ca admin, aplicația îți cere să o configurezi din nou (cod QR nou). Nu da comanda nimănui: cine o poate rula are deja acces la tot proiectul.
+
 ### 4.7 După mutare
 
 - **Partea 5** (ștergerea conturilor de test), chiar înainte să anunți lansarea.

@@ -316,6 +316,35 @@ export type Database = {
           },
         ]
       }
+      engagement_log: {
+        Row: {
+          key: string
+          kind: string
+          sent_at: string
+          user_id: string | null
+        }
+        Insert: {
+          key: string
+          kind: string
+          sent_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          key?: string
+          kind?: string
+          sent_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "engagement_log_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       favorites: {
         Row: {
           client_id: string
@@ -688,6 +717,7 @@ export type Database = {
           id: string
           last_error: string | null
           locked_until: string | null
+          not_before: string | null
           params: Json
           processed_at: string | null
           user_id: string | null
@@ -702,6 +732,7 @@ export type Database = {
           id?: string
           last_error?: string | null
           locked_until?: string | null
+          not_before?: string | null
           params?: Json
           processed_at?: string | null
           user_id?: string | null
@@ -716,6 +747,7 @@ export type Database = {
           id?: string
           last_error?: string | null
           locked_until?: string | null
+          not_before?: string | null
           params?: Json
           processed_at?: string | null
           user_id?: string | null
@@ -909,6 +941,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          app_tips: boolean
           created_at: string
           deleted_at: string | null
           display_id: string
@@ -921,15 +954,18 @@ export type Database = {
           phone: string | null
           phone_verified_at: string | null
           phone_verified_by_admin: boolean
+          promo_notifications: boolean
           push_prompt_dismissed_at: string | null
           review_requests: boolean
           role: string
+          season_reminders: boolean
           service_reminders: boolean
           suspended: boolean
           terms_accepted_at: string | null
           terms_version: string | null
         }
         Insert: {
+          app_tips?: boolean
           created_at?: string
           deleted_at?: string | null
           display_id: string
@@ -942,15 +978,18 @@ export type Database = {
           phone?: string | null
           phone_verified_at?: string | null
           phone_verified_by_admin?: boolean
+          promo_notifications?: boolean
           push_prompt_dismissed_at?: string | null
           review_requests?: boolean
           role: string
+          season_reminders?: boolean
           service_reminders?: boolean
           suspended?: boolean
           terms_accepted_at?: string | null
           terms_version?: string | null
         }
         Update: {
+          app_tips?: boolean
           created_at?: string
           deleted_at?: string | null
           display_id?: string
@@ -963,9 +1002,11 @@ export type Database = {
           phone?: string | null
           phone_verified_at?: string | null
           phone_verified_by_admin?: boolean
+          promo_notifications?: boolean
           push_prompt_dismissed_at?: string | null
           review_requests?: boolean
           role?: string
+          season_reminders?: boolean
           service_reminders?: boolean
           suspended?: boolean
           terms_accepted_at?: string | null
@@ -1186,6 +1227,7 @@ export type Database = {
           report_status: string | null
           reported_at: string | null
           shop_id: string
+          signals_cleared_at: string | null
           text: string | null
           updated_at: string
         }
@@ -1205,6 +1247,7 @@ export type Database = {
           report_status?: string | null
           reported_at?: string | null
           shop_id: string
+          signals_cleared_at?: string | null
           text?: string | null
           updated_at?: string
         }
@@ -1224,6 +1267,7 @@ export type Database = {
           report_status?: string | null
           reported_at?: string | null
           shop_id?: string
+          signals_cleared_at?: string | null
           text?: string | null
           updated_at?: string
         }
@@ -1340,6 +1384,13 @@ export type Database = {
       }
       shop_billing: {
         Row: {
+          anaf_address: string | null
+          anaf_checked_at: string | null
+          anaf_cui: string | null
+          anaf_name: string | null
+          anaf_name_match: boolean | null
+          anaf_status: string | null
+          anaf_vat_payer: boolean | null
           bank_name: string | null
           billing_email: string | null
           created_at: string
@@ -1354,6 +1405,13 @@ export type Database = {
           vat_payer: boolean
         }
         Insert: {
+          anaf_address?: string | null
+          anaf_checked_at?: string | null
+          anaf_cui?: string | null
+          anaf_name?: string | null
+          anaf_name_match?: boolean | null
+          anaf_status?: string | null
+          anaf_vat_payer?: boolean | null
           bank_name?: string | null
           billing_email?: string | null
           created_at?: string
@@ -1368,6 +1426,13 @@ export type Database = {
           vat_payer?: boolean
         }
         Update: {
+          anaf_address?: string | null
+          anaf_checked_at?: string | null
+          anaf_cui?: string | null
+          anaf_name?: string | null
+          anaf_name_match?: boolean | null
+          anaf_status?: string | null
+          anaf_vat_payer?: boolean | null
           bank_name?: string | null
           billing_email?: string | null
           created_at?: string
@@ -1698,6 +1763,7 @@ export type Database = {
           longitude: number | null
           max_advance_days: number
           min_notice_hours: number
+          monthly_report: boolean
           name: string
           new_client_offer: number | null
           owner_id: string
@@ -1735,6 +1801,7 @@ export type Database = {
           longitude?: number | null
           max_advance_days?: number
           min_notice_hours?: number
+          monthly_report?: boolean
           name: string
           new_client_offer?: number | null
           owner_id: string
@@ -1772,6 +1839,7 @@ export type Database = {
           longitude?: number | null
           max_advance_days?: number
           min_notice_hours?: number
+          monthly_report?: boolean
           name?: string
           new_client_offer?: number | null
           owner_id?: string
@@ -2059,6 +2127,15 @@ export type Database = {
         }
         Returns: Json
       }
+      admin_decide_suspect_review: {
+        Args: {
+          p_decision: string
+          p_note: string
+          p_request_id: string
+          p_review_id: string
+        }
+        Returns: Json
+      }
       admin_export: {
         Args: { p_filters?: Json; p_kind: string }
         Returns: Json
@@ -2136,6 +2213,7 @@ export type Database = {
       admin_list_reviews: { Args: { p_q?: string }; Returns: Json }
       admin_list_shops: { Args: never; Returns: Json }
       admin_list_subscriptions: { Args: never; Returns: Json }
+      admin_list_suspect_reviews: { Args: never; Returns: Json }
       admin_move_catalog_item: {
         Args: {
           p_direction: number
@@ -2278,6 +2356,7 @@ export type Database = {
       }
       booking_thread: { Args: { p_booking_id: string }; Returns: string }
       bucharest_today: { Args: never; Returns: string }
+      caller_aal: { Args: never; Returns: string }
       can_read_booking: { Args: { p_booking_id: string }; Returns: boolean }
       can_read_notice: {
         Args: { p_audience: string; p_city: string }
@@ -2364,6 +2443,10 @@ export type Database = {
       client_no_show_count: {
         Args: { p_client_id: string; p_days?: number }
         Returns: number
+      }
+      company_check_target: {
+        Args: { p_aal: string; p_shop_id: string; p_user_id: string }
+        Returns: Json
       }
       complete_job: {
         Args: {
@@ -2666,7 +2749,7 @@ export type Database = {
       get_staff_invite: { Args: { p_token: string }; Returns: Json }
       grant_referral_reward: { Args: { p_shop_id: string }; Returns: undefined }
       history_report_for: {
-        Args: { p_report_id: string; p_user_id: string }
+        Args: { p_aal?: string; p_report_id: string; p_user_id: string }
         Returns: Json
       }
       history_report_preview: {
@@ -2723,9 +2806,11 @@ export type Database = {
         Returns: boolean
       }
       is_push_endpoint: { Args: { p_url: string }; Returns: boolean }
+      is_quiet_event: { Args: { p_event: string }; Returns: boolean }
       is_shop_member: { Args: { p_shop_id: string }; Returns: boolean }
       is_shop_owner: { Args: { p_shop_id: string }; Returns: boolean }
       is_shop_public: { Args: { p_shop_id: string }; Returns: boolean }
+      is_suspect_review: { Args: { p_signals: string[] }; Returns: boolean }
       is_valid_cui: { Args: { p: string }; Returns: boolean }
       is_valid_iban: { Args: { p: string }; Returns: boolean }
       is_valid_postal_code: { Args: { p: string }; Returns: boolean }
@@ -2989,6 +3074,11 @@ export type Database = {
       public_pricing: { Args: never; Returns: Json }
       purge_account_fingerprints: { Args: { p_now?: string }; Returns: number }
       purge_request_log: { Args: { p_now?: string }; Returns: number }
+      quiet_until: { Args: { p_now?: string }; Returns: string }
+      record_company_check: {
+        Args: { p_cui: string; p_result: Json; p_shop_id: string }
+        Returns: Json
+      }
       record_invoice_reversed: {
         Args: { p_customer: string; p_invoice_id: string; p_reason: string }
         Returns: boolean
@@ -3085,6 +3175,7 @@ export type Database = {
           report_status: string | null
           reported_at: string | null
           shop_id: string
+          signals_cleared_at: string | null
           text: string | null
           updated_at: string
         }
@@ -3118,6 +3209,7 @@ export type Database = {
           report_status: string | null
           reported_at: string | null
           shop_id: string
+          signals_cleared_at: string | null
           text: string | null
           updated_at: string
         }
@@ -3143,6 +3235,7 @@ export type Database = {
       require_admin: {
         Args: never
         Returns: {
+          app_tips: boolean
           created_at: string
           deleted_at: string | null
           display_id: string
@@ -3155,9 +3248,11 @@ export type Database = {
           phone: string | null
           phone_verified_at: string | null
           phone_verified_by_admin: boolean
+          promo_notifications: boolean
           push_prompt_dismissed_at: string | null
           review_requests: boolean
           role: string
+          season_reminders: boolean
           service_reminders: boolean
           suspended: boolean
           terms_accepted_at: string | null
@@ -3173,6 +3268,7 @@ export type Database = {
       require_caller: {
         Args: never
         Returns: {
+          app_tips: boolean
           created_at: string
           deleted_at: string | null
           display_id: string
@@ -3185,9 +3281,11 @@ export type Database = {
           phone: string | null
           phone_verified_at: string | null
           phone_verified_by_admin: boolean
+          promo_notifications: boolean
           push_prompt_dismissed_at: string | null
           review_requests: boolean
           role: string
+          season_reminders: boolean
           service_reminders: boolean
           suspended: boolean
           terms_accepted_at: string | null
@@ -3205,6 +3303,7 @@ export type Database = {
       require_reader: {
         Args: never
         Returns: {
+          app_tips: boolean
           created_at: string
           deleted_at: string | null
           display_id: string
@@ -3217,9 +3316,11 @@ export type Database = {
           phone: string | null
           phone_verified_at: string | null
           phone_verified_by_admin: boolean
+          promo_notifications: boolean
           push_prompt_dismissed_at: string | null
           review_requests: boolean
           role: string
+          season_reminders: boolean
           service_reminders: boolean
           suspended: boolean
           terms_accepted_at: string | null
@@ -3287,6 +3388,10 @@ export type Database = {
         }
       }
       review_display_name: { Args: { p_name: string }; Returns: string }
+      review_signals: {
+        Args: { p_review: Database["public"]["Tables"]["reviews"]["Row"] }
+        Returns: string[]
+      }
       revoke_referral_reward: {
         Args: { p_reason: string; p_shop_id: string }
         Returns: undefined
@@ -3369,6 +3474,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      send_monthly_reports: { Args: { p_now?: string }; Returns: number }
       send_quote: {
         Args: {
           p_booking_id: string
@@ -3416,9 +3522,26 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      send_request_waiting_reminders: {
+        Args: { p_now?: string }
+        Returns: number
+      }
       send_review_requests: { Args: { p_now?: string }; Returns: number }
       send_service_reminders: { Args: { p_today?: string }; Returns: number }
+      send_tip: {
+        Args: {
+          p_event: string
+          p_key: string
+          p_kind: string
+          p_now?: string
+          p_params: Json
+          p_user: string
+        }
+        Returns: boolean
+      }
+      send_tire_season_reminders: { Args: { p_now?: string }; Returns: number }
       send_trial_warnings: { Args: { p_now?: string }; Returns: number }
+      send_welcome_tips: { Args: { p_now?: string }; Returns: number }
       service_names: { Args: { p_ids: string[] }; Returns: Json }
       services_label: {
         Args: { p_extra: string[]; p_lang: string; p_service_id: string }
@@ -3488,6 +3611,10 @@ export type Database = {
       }
       shop_colleague_count: { Args: { p_shop_id: string }; Returns: number }
       shop_hidden_reasons: { Args: { p_shop_id: string }; Returns: string[] }
+      shop_month_numbers: {
+        Args: { p_month: string; p_shop_id: string }
+        Returns: Json
+      }
       shop_reports: { Args: never; Returns: Json }
       shop_seat_count: { Args: { p_shop_id: string }; Returns: number }
       shop_state: { Args: { p_shop_id: string }; Returns: string }
@@ -3611,6 +3738,7 @@ export type Database = {
           report_status: string | null
           reported_at: string | null
           shop_id: string
+          signals_cleared_at: string | null
           text: string | null
           updated_at: string
         }
@@ -3685,6 +3813,7 @@ export type Database = {
         Args: { p_customer: string; p_shop_id: string; p_sub: Json }
         Returns: Json
       }
+      tire_season: { Args: { p_today: string }; Returns: string }
       toggle_favorite: {
         Args: { p_request_id: string; p_shop_id: string }
         Returns: boolean

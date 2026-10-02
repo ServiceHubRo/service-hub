@@ -488,3 +488,12 @@ a.stat:hover {
   flex-wrap: wrap;
   gap: 8px 12px;
 }
+
+/* Why a review looks staged (T25): one short line per sign. */
+.signalList {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0;
+  padding-left: 18px;
+}

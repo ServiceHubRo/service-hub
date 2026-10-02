@@ -320,8 +320,8 @@ max_enrolled_factors = 10
 
 # Control MFA via App Authenticator (TOTP)
 [auth.mfa.totp]
-enroll_enabled = false
-verify_enabled = false
+enroll_enabled = true
+verify_enabled = true
 
 # Configure MFA via Phone Messaging
 [auth.mfa.phone]
@@ -420,6 +420,8 @@ STRIPE_API_URL = "http://host.docker.internal:54398/stripe"
 # Error reports (T19) go to the stand-in's Sentry (tests/e2e/providers.ts).
 SENTRY_DSN = "http://e2e@host.docker.internal:54398/sentry/1"
 SENTRY_ENVIRONMENT = "local"
+# ANAF's public company register (T25), answered by the stand-in.
+ANAF_API_URL = "http://host.docker.internal:54398/anaf"
 
 [analytics]
 enabled = true
@@ -460,6 +462,9 @@ verify_jwt = false
 verify_jwt = false
 
 [functions.geocode]
+verify_jwt = false
+
+[functions.verify-company]
 verify_jwt = false
 
 # Called by the database (pg_net, with its own token) and, for the public VAPID key, by the app.

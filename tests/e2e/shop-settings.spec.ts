@@ -261,7 +261,7 @@ test.describe('shop settings', () => {
       await expect(guest.getByText('Doar proprietarul service-ului vede această secțiune.')).toBeVisible();
     }
     await guest.goto('/s/cont/setari/notificari');
-    await expect(guest.getByText('SMS-ul la cerere nouă și rezumatul zilnic le alege proprietarul service-ului.')).toBeVisible();
+    await expect(guest.getByText('SMS-ul la cerere nouă, rezumatul zilnic și raportul lunii le alege proprietarul service-ului.')).toBeVisible();
     await expect(guest.getByRole('checkbox')).toHaveCount(0);
     // Istoric: the jobs, no total of the takings, no CSV; Recenzii: read, no reply.
     await guest.goto('/s/istoric');

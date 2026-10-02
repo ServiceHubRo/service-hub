@@ -1,6 +1,6 @@
 # Politica de confidențialitate — Service-Hub
 
-**Ultima actualizare:** 28 septembrie 2026
+**Ultima actualizare:** 1 octombrie 2026
 
 Aici afli ce date personale folosește Service-Hub, de ce, cine le mai vede, cât timp le păstrăm și ce drepturi ai, conform Regulamentului (UE) 2016/679 („GDPR”) și legii române.
 
@@ -36,15 +36,18 @@ Aici afli ce date personale folosește Service-Hub, de ce, cine le mai vede, câ
 - **Recenziile** și **mesajele** tale; service-urile **favorite**.
 - **Rapoartele de istoric** cumpărate: codul, mașina, lucrările incluse, prețul, starea plății și fișierul PDF.
 - Numărul de **neprezentări** din ultimele 90 de zile (calculat din programări).
+- **Confirmarea telefonului**, doar dacă ți se cere (după 2 neprezentări în 90 de zile): codul trimis prin SMS este păstrat doar criptat și este valabil 10 minute.
+- **Preferințele:** cererea de recenzie, reminderele de revizie și de anvelope, sfaturile de început și ofertele service-urilor favorite (pornite sau oprite).
 
 ### 2.3 Dacă ai cont de Service
 
 - **Profilul public:** numele, descrierea, logo-ul, adresa atelierului și coordonatele ei pe hartă, telefoanele, site-ul, pagina de Facebook, anul înființării, programul, zilele închise, regulile de programare, taxa de constatare și serviciile oferite.
 - **Datele de facturare:** denumirea legală, CUI, numărul de la Registrul Comerțului, sediul social, dacă plătești TVA, banca, IBAN, emailul de facturare și reprezentantul legal. Nu sunt niciodată publice.
+- **Verificarea firmei la ANAF:** ce spune registrul public ANAF despre CUI-ul tău (denumirea oficială, adresa, dacă firma este activă și dacă plătește TVA) și când am verificat. Le vezi tu și administratorul.
 - **Abonamentul și plățile:** starea, datele de început și de sfârșit, prețul, câți colegi plătiți, codul de client Stripe, sumele plătite, datele plăților și chitanțele Stripe.
 - **Colegii:** adresa de email la care ai trimis invitația, numele colegului și data la care a intrat.
 - **Confirmarea telefonului:** codul trimis prin SMS este păstrat doar criptat și este valabil 10 minute.
-- **Preferințele:** SMS la cerere nouă, rezumatul zilnic.
+- **Preferințele:** SMS la cerere nouă, rezumatul zilnic, raportul lunii.
 - Programările, devizele, lucrările, recenziile și mesajele service-ului, cu datele clienților din secțiunea 4.1.
 
 ### 2.4 Date tehnice
@@ -73,16 +76,20 @@ Aici afli ce date personale folosește Service-Hub, de ce, cine le mai vede, câ
 | Notificări push | Acordul tău, dat în browser (îl retragi oricând) și contractul |
 | Alertele pentru ITP, RCA și rovinietă | Contractul cu tine (le ceri când treci datele) |
 | Reminderul pentru următoarea revizie (după ultima lucrare de acel fel făcută prin Platformă) și cererea de recenzie după o lucrare | Contractul cu tine; pe amândouă le oprești din Cont |
+| Reminderul pentru schimbul anvelopelor de sezon (pentru mașinile din Garaj) și cele două sfaturi din primele două săptămâni | Contractul cu tine; le oprești din Cont |
+| Ofertele service-urilor din favorite | Acordul tău: le primești doar dacă le pornești din Cont și le oprești oricând |
+| Raportul lunii pentru service | Contractul cu tine; îl oprești din Setări → Notificări |
 | Raportul oficial de istoric | Contractul cu tine |
 | Abonamentul, plățile, facturile și contabilitatea | Contractul și obligațiile legale (lit. c): Legea contabilității nr. 82/1991, Codul fiscal |
 | Recenziile publice și verificarea celor raportate | Interesul legitim (lit. f) ca recenziile să fie reale; obligațiile din Regulamentul (UE) 2022/2065 |
-| Limite împotriva abuzului, indicatorul de neprezentări, verificarea anti-robot, suspendări | Interesul legitim ca Platforma să fie corectă și sigură |
+| Limite împotriva abuzului, indicatorul de neprezentări, confirmarea telefonului după neprezentări, verificarea anti-robot, suspendări | Interesul legitim ca Platforma să fie corectă și sigură |
+| Verificarea CUI-ului service-urilor în registrul public ANAF și semnalarea recenziilor care par făcute de service (de exemplu, clientul a folosit telefonul service-ului) | Interesul legitim ca pe Platformă să fie firme reale și recenzii reale |
 | Perioada gratuită o singură dată de persoană și împiedicarea ocolirii unei suspendări cu un cont nou (amprente criptate ale emailului și telefonului, vezi secțiunea 5) | Interesul legitim ca Platforma să fie corectă și sigură |
 | Rapoartele de erori și jurnalele tehnice | Interesul legitim ca Platforma să funcționeze și să fie sigură |
 | Anunțuri despre Platformă (schimbări, întreruperi) | Contractul și interesul legitim |
 | Răspunsuri la cererile tale; apărarea în caz de litigiu | Interesul legitim și obligațiile legale |
 
-**Nu folosim datele tale pentru reclame**, nu le vindem și nu facem profiluri de marketing. Nu îți trimitem newslettere; dacă vom face asta vreodată, doar cu acordul tău. Nu luăm decizii automate cu efecte juridice asupra ta: ordinea din căutare ține de service-uri, nu de clienți, iar indicatorul de neprezentări nu blochează pe nimeni automat.
+**Nu folosim datele tale pentru reclame**, nu le vindem și nu facem profiluri de marketing. Nu îți trimitem newslettere; ofertele service-urilor din favorite le primești doar dacă le pornești din Cont. Nu luăm decizii automate cu efecte juridice asupra ta: ordinea din căutare ține de service-uri, nu de clienți, iar indicatorul de neprezentări nu blochează pe nimeni; după 2 neprezentări în 90 de zile îți cerem doar să îți confirmi telefonul prin SMS înainte de o nouă programare.
 
 ---
 
@@ -110,11 +117,12 @@ Lucrăm cu furnizori care prelucrează date doar la cererea noastră, pe baza un
 | Supabase | Baza de date, conturile, fișierele, funcțiile de pe server | Toate datele Platformei | UE (Frankfurt) |
 | Netlify | Găzduirea aplicației web | Adresa IP, browserul, paginile cerute | SUA și rețea globală |
 | Resend | Emailuri (confirmarea contului, parolă, invitații, plăți, raport gata) | Adresa de email, textul emailului | SUA |
-| SMSO | SMS-uri către service-uri (codul de confirmare, cereri noi, dacă sunt activate) | Telefonul service-ului, textul SMS-ului (numele clientului, serviciul, ziua) | România |
+| SMSO | SMS-uri: codul de confirmare a telefonului (service-uri; clienți după neprezentări) și cererile noi către service-uri, dacă sunt activate | Telefonul, textul SMS-ului (codul; la cereri: numele clientului, serviciul, ziua) | România |
 | Stripe | Plata abonamentului și a raportului | Numele, emailul, suma; datele cardului le introduci direct la Stripe | UE și SUA |
 | Sentry | Rapoartele de erori | Codul contului, rolul, browserul, pagina, eroarea | UE (Frankfurt) |
 | Cloudflare | Verificarea anti-robot la înscriere și autentificare | Adresa IP, semnale ale browserului | SUA și rețea globală |
 | OpenStreetMap Foundation (Nominatim) | Coordonatele adresei atelierului | Doar adresa atelierului | Regatul Unit |
+| ANAF (registrul public al contribuabililor) | Verificarea firmei unui service | Doar CUI-ul | România |
 | Serviciul de notificări al browserului (Google, Apple, Mozilla, Microsoft) | Livrarea notificărilor push | Adresa tehnică a dispozitivului; conținutul notificării este criptat și nu poate fi citit de ei | După browser |
 
 **Transferuri în afara Spațiului Economic European** (SUA, Regatul Unit) se fac doar cu garanțiile cerute de GDPR: o decizie de adecvare a Comisiei Europene (de exemplu, cadrul UE–SUA privind protecția datelor, pentru companiile certificate, sau decizia pentru Regatul Unit) ori clauzele contractuale standard aprobate de Comisie.
@@ -177,7 +185,7 @@ Platforma nu este pentru persoane sub 18 ani. Dacă aflăm că un cont este al u
 
 ## 9. Mesajele pe care ți le trimitem
 
-Îți trimitem doar mesaje legate de cont și de programări (confirmări, devize, remindere, cererea de recenzie după o lucrare, plăți) și anunțuri importante despre Platformă. Notificările push le poți opri oricând; service-urile pot opri SMS-urile la cereri noi și rezumatul zilnic din Setări → Notificări.
+Îți trimitem mesaje legate de cont și de programări (confirmări, devize, remindere, cererea de recenzie după o lucrare, plăți), remindere pentru mașină (ITP, RCA, rovinietă, următoarea revizie, schimbul anvelopelor de sezon), două sfaturi în primele două săptămâni dacă încă nu ai făcut o programare și anunțuri importante despre Platformă. Ofertele service-urilor din favorite le primești doar dacă le pornești din Cont; sfaturile și ofertele sunt cel mult două pe săptămână. Mementourile automate nu pleacă noaptea (între 21:00 și 9:00, ora României): le primești dimineața. Fiecare tip se oprește din Cont, iar notificările push le poți opri oricând. Service-urile pot opri SMS-urile la cereri noi, rezumatul zilnic și raportul lunii din Setări → Notificări.
 
 ---
 

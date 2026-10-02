@@ -12,20 +12,23 @@ import styles from './settings.module.css';
 
 /**
  * Notificări (P5b): push on this device (the same row as in Cont, T12), SMS on a new request
- * (sending starts in T13) and the daily summary (a push at opening time, T12). A colleague turns
- * push on for their own phone; the shop's SMS and summary are the owner's.
+ * (sending starts in T13), the daily summary (a push at opening time, T12) and the monthly report
+ * (push + email on the 1st, T24). A colleague turns push on for their own phone; the shop's SMS,
+ * summary and report are the owner's.
  */
 export function NotificationSettings() {
   const { t } = useI18n();
   const { shop, setShop, isOwner } = useShopSettings();
   const [sms, setSms] = useState(shop.sms_on_new_booking);
   const [digest, setDigest] = useState(shop.daily_digest);
+  const [monthly, setMonthly] = useState(shop.monthly_report);
 
   async function save() {
-    const saved = await updateShop(shop.id, { sms_on_new_booking: sms, daily_digest: digest });
+    const saved = await updateShop(shop.id, { sms_on_new_booking: sms, daily_digest: digest, monthly_report: monthly });
     setShop(saved);
     setSms(saved.sms_on_new_booking);
     setDigest(saved.daily_digest);
+    setMonthly(saved.monthly_report);
   }
 
   return (
@@ -51,6 +54,14 @@ export function NotificationSettings() {
               </Checkbox>
               <p id="notif-digest-hint" className={styles.hint}>
                 {t('notif.digest.hint')}
+              </p>
+            </div>
+            <div>
+              <Checkbox checked={monthly} onChange={(e) => setMonthly(e.target.checked)} aria-describedby="notif-monthly-hint">
+                {t('notif.monthly')}
+              </Checkbox>
+              <p id="notif-monthly-hint" className={styles.hint}>
+                {t('notif.monthly.hint')}
               </p>
             </div>
           </Card>

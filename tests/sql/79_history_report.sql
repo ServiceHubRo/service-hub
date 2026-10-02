@@ -128,8 +128,10 @@ from public.history_reports where id = current_setting('test.report')::uuid;
 -- ------------------------------------------------------------------ who may download
 select test.eq(public.history_report_for(test.id('client_a'), current_setting('test.report')::uuid)->>'pdf_url', 'x/SH.pdf',
   'the client gets the file');
-select test.eq(public.history_report_for(test.id('admin'), current_setting('test.report')::uuid)->>'pdf_url', 'x/SH.pdf',
+select test.eq(public.history_report_for(test.id('admin'), current_setting('test.report')::uuid, 'aal2')->>'pdf_url', 'x/SH.pdf',
   'the admin too');
+select test.fails(format($$select public.history_report_for(%L, %L, 'aal1')$$, test.id('admin'), current_setting('test.report')),
+  'not_found', 'an admin without the second step reads no one else''s report (T25)');
 select test.fails(format($$select public.history_report_for(%L, %L)$$, test.id('client_b'), current_setting('test.report')),
   'not_found', 'nobody else');
 
@@ -159,7 +161,7 @@ where id = current_setting('test.report')::uuid;
 select test.eq((public.verify_report(current_setting('test.code'))->>'void')::boolean, true, 'a void report says so');
 select test.fails(format($$select public.history_report_for(%L, %L)$$, test.id('client_a'), current_setting('test.report')),
   'report_void', 'the client no longer downloads a void report');
-select test.eq(public.history_report_for(test.id('admin'), current_setting('test.report')::uuid)->>'status', 'void',
+select test.eq(public.history_report_for(test.id('admin'), current_setting('test.report')::uuid, 'aal2')->>'status', 'void',
   'the admin still can');
 update public.history_reports set status = 'generated' where id = current_setting('test.report')::uuid;
 

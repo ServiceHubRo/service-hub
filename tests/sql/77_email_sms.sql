@@ -127,7 +127,7 @@ select test.eq(public.check_phone_code('123456', gen_random_uuid())->>'status', 
 select test.eq(public.my_phone_verification()->>'verified', 'false', 'not verified yet');
 select test.logout();
 
-select test.fails($$select public.phone_verify_begin(test.id('client_a'), '123456')$$, 'not_allowed', 'shops only');
+select test.fails($$select public.phone_verify_begin(test.id('admin'), '123456')$$, 'not_allowed', 'shops and clients only (T25)');
 select test.fails($$select public.phone_verify_begin(test.id('owner1'), '123456')$$, 'phone_already_verified',
   'nothing to do for a verified phone');
 select test.fails($$select public.phone_verify_begin(test.id('owner2'), '12a456')$$, 'must be 6 digits', 'six digits');

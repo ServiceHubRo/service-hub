@@ -160,6 +160,11 @@ describe('settings form', () => {
       messages_per_thread_per_hour: 30,
       review_window_days: 60,
       quote_versions_max: 20,
+      no_shows_before_phone: 2,
+      quiet_hours_start: 21,
+      quiet_hours_end: 9,
+      promo_per_week: 2,
+      request_reminder_hours: 2,
     },
     notification_texts: {},
     updated_at: '2026-09-25T10:00:00Z',
@@ -180,9 +185,11 @@ describe('settings form', () => {
       report_price_ron: '35,50',
       review_window_days: '30',
       quote_versions_max: '20',
+      quiet_hours_start: '0',
+      quiet_hours_end: '9',
     });
     expect(invalid).toEqual([]);
-    expect(change).toEqual({ quote_expiry_days: 7, report_price_ron: 35.5, limits: { review_window_days: 30 } });
+    expect(change).toEqual({ quote_expiry_days: 7, report_price_ron: 35.5, limits: { review_window_days: 30, quiet_hours_start: 0 } });
   });
 
   it('refuses text and decimals where whole numbers are needed', () => {

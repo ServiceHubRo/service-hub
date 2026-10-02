@@ -41,6 +41,7 @@ export type ShopUpdate = Partial<
     | 'new_client_offer'
     | 'sms_on_new_booking'
     | 'daily_digest'
+    | 'monthly_report'
     | 'capacity_reviewed_at'
     | 'billing_reminder_dismissed_at'
   >
@@ -259,6 +260,54 @@ export async function updateBilling(shopId: string, fields: BillingUpdate): Prom
   const { data, error } = await db().from('shop_billing').update(fields).eq('shop_id', shopId).select('*').single();
   if (error) throw failure(error);
   return data;
+}
+
+// ------------------------------------------------------------------------------------ company at ANAF (T25)
+
+export type CompanyStatus = 'active' | 'inactive' | 'deregistered' | 'not_found';
+
+/** What ANAF said about the saved CUI (the shop_billing columns); every field null = not checked. */
+export type CompanyCheck = Pick<
+  ShopBilling,
+  'anaf_cui' | 'anaf_status' | 'anaf_name' | 'anaf_address' | 'anaf_vat_payer' | 'anaf_name_match' | 'anaf_checked_at'
+>;
+
+/**
+ * Edge Function `verify-company`: asks ANAF about the saved CUI and stores the answer. Without a
+ * shop: the caller's own (the owner); an admin names the shop. `unavailable` when ANAF did not
+ * answer (nothing changed).
+ */
+export async function verifyCompany(shopId?: string): Promise<CompanyCheck | { unavailable: true }> {
+  const { data, error } = await db().functions.invoke('verify-company', {
+    method: 'POST',
+    body: shopId ? { shop_id: shopId } : {},
+  });
+  if (!error) {
+    const d = data as Partial<CompanyCheck> & { unavailable?: boolean };
+    if (d.unavailable) return { unavailable: true };
+    return {
+      anaf_cui: d.anaf_cui ?? null,
+      anaf_status: d.anaf_status ?? null,
+      anaf_name: d.anaf_name ?? null,
+      anaf_address: d.anaf_address ?? null,
+      anaf_vat_payer: d.anaf_vat_payer ?? null,
+      anaf_name_match: d.anaf_name_match ?? null,
+      anaf_checked_at: d.anaf_checked_at ?? null,
+    };
+  }
+  if (error instanceof FunctionsFetchError) throw new RpcError('network');
+  if (error instanceof FunctionsHttpError) {
+    const res = error.context as Response;
+    if (res.status === 401) throw failure({ code: 'PGRST301' });
+    let code: unknown = null;
+    try {
+      code = ((await res.json()) as { error?: unknown }).error;
+    } catch {
+      // no body
+    }
+    if (code === 'no_vat_id' || code === 'not_allowed') throw new RpcError(code);
+  }
+  throw new RpcError('unknown');
 }
 
 // ------------------------------------------------------------------------------------ staff

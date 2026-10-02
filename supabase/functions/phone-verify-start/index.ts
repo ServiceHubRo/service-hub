@@ -1,9 +1,10 @@
-// phone-verify-start — sends a 6-digit code by SMS to the signed-in shop account's phone
+// phone-verify-start — sends a 6-digit code by SMS to the signed-in account's phone (shops; clients
+// after repeated no-shows, T25)
 // (FR §2, ARCHITECTURE §11). The app then checks it with the RPC check_phone_code.
 //
 // 1. Checks the caller's access token with the Auth server.
 // 2. Makes a random code; phone_verify_begin (SQL, service role) stores only its hash and applies
-//    the rules: shops only, one code a minute, 5 a day per account and per number. A second tap
+//    the rules: shops and clients, one code a minute, 5 a day per account and per number. A second tap
 //    within the minute sends nothing and answers when a new code may be asked for.
 // 3. Sends the SMS through SMSO. When it cannot be sent the code is forgotten
 //    (phone_verify_cancel), so it neither blocks nor counts.

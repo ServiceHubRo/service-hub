@@ -11,7 +11,8 @@
 --   vulcanizare@service-hub.test  shop  Vulcanizare Roți Expres (Brașov)
 --   precis@service-hub.test       shop  Auto Precis (Codlea)
 --   client@service-hub.test       client Andrei Marin — Golf 7 + Duster, bookings in every status
---   admin@service-hub.test        admin
+--   admin@service-hub.test        admin — second step: the authenticator key at the end of this file
+--   admin-nou@service-hub.test    admin without an authenticator app yet (the first setup, T25)
 
 -- Creates a confirmed email/password account; the sign-up trigger builds profile and shop.
 create function pg_temp.seed_user(p_id uuid, p_email text, p_meta jsonb) returns uuid
@@ -356,5 +357,31 @@ begin
   insert into public.notices (audience, title_ro, body_ro, title_en, body_en, created_by)
   values ('all', 'Bine ai venit pe Service-Hub', 'Aceasta este o versiune de test.',
           'Welcome to Service-Hub', 'This is a test version.', u_admin);
+end
+$$;
+
+-- A second admin who has not set up the authenticator app yet (T25): the browser test of the
+-- first setup uses it.
+do $$
+begin
+  perform pg_temp.seed_user('30000000-0000-4000-8000-000000000002', 'admin-nou@service-hub.test',
+    '{"role":"client","name":"Admin Nou","lang":"ro","terms_version":"2026-09"}');
+  perform public.promote_to_admin('admin-nou@service-hub.test');
+end
+$$;
+
+-- The demo admin's authenticator app (T25): admin work needs the second step of sign-in. The
+-- browser tests type codes made from this key (tests/e2e/support.ts, SEED_ADMIN_TOTP). Local
+-- stack only (the SQL tests' stand-in has no auth.mfa_factors).
+do $$
+begin
+  if to_regclass('auth.mfa_factors') is not null then
+    execute $sql$
+      insert into auth.mfa_factors (id, user_id, friendly_name, factor_type, status, created_at, updated_at, secret)
+      values ('30000000-0000-4000-8000-0000000000f1', '30000000-0000-4000-8000-000000000001', 'Service-Hub',
+              'totp', 'verified', now(), now(), 'JBSWY3DPEHPK3PXPJBSWY3DPEHPK3PXP')
+      on conflict (id) do nothing
+    $sql$;
+  end if;
 end
 $$;

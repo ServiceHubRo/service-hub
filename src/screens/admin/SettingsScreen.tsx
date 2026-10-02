@@ -7,7 +7,12 @@ import { Field } from '../../components/Field';
 import { LoadError } from '../../components/LoadError';
 import { SkeletonList } from '../../components/Skeleton';
 import { Tile } from '../../components/Tile';
-import { fetchSettings, LIMIT_KEYS, updateSettings, type LimitKey, type PlatformSettings, type SettingKey } from '../../data/adminTools';
+import {
+  ABUSE_LIMIT_KEYS,
+  fetchSettings,
+  LIMIT_KEYS,
+  NOTIFICATION_LIMIT_KEYS,
+  updateSettings, type LimitKey, type PlatformSettings, type SettingKey } from '../../data/adminTools';
 import { canRetryRpc, rpcErrorMessage } from '../../data/rpc';
 import { useI18n } from '../../i18n/context';
 import type { MessageKey } from '../../i18n/ro';
@@ -72,7 +77,15 @@ function SettingsForm({ settings, onSaved }: { settings: PlatformSettings; onSav
           <span id="settings-limits">{t('admin.settings.section.limits')}</span>
         </SectionTitle>
         <Card>
-          <div className={styles.fields}>{LIMIT_KEYS.map(field)}</div>
+          <div className={styles.fields}>{ABUSE_LIMIT_KEYS.map(field)}</div>
+        </Card>
+      </section>
+      <section className={styles.section} aria-labelledby="settings-notifications">
+        <SectionTitle>
+          <span id="settings-notifications">{t('admin.settings.section.notifications')}</span>
+        </SectionTitle>
+        <Card>
+          <div className={styles.fields}>{NOTIFICATION_LIMIT_KEYS.map(field)}</div>
         </Card>
       </section>
       <p className={styles.muted}>{t('admin.settings.onlyFuture')}</p>

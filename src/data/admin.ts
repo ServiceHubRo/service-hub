@@ -2,6 +2,7 @@ import { FunctionsFetchError, FunctionsHttpError } from '@supabase/supabase-js';
 import type { BookingStatus } from '../lib/status';
 import type { Json } from './database.types';
 import { call, failure, RpcError, type ReportReason } from './rpc';
+import type { CompanyStatus } from './shop';
 import { supabase } from './supabase';
 import type { ExtraService } from '../lib/bookingServices';
 
@@ -143,6 +144,14 @@ export interface AdminBilling {
   iban: string | null;
   billing_email: string | null;
   legal_rep: string | null;
+  /** What ANAF said about the CUI (T25); null fields = not checked. */
+  anaf_cui: string | null;
+  anaf_status: CompanyStatus | null;
+  anaf_name: string | null;
+  anaf_address: string | null;
+  anaf_vat_payer: boolean | null;
+  anaf_name_match: boolean | null;
+  anaf_checked_at: string | null;
 }
 
 export interface AdminSubscription {
@@ -479,6 +488,29 @@ export interface AdminReviews {
 
 export async function fetchReviews(q?: string): Promise<AdminReviews> {
   return (await call('admin_list_reviews', { p_q: q?.trim() ? q.trim() : undefined })) as unknown as AdminReviews;
+}
+
+/** Why a review looks staged (T25), strongest first. */
+export type ReviewSignal = 'same_phone' | 'quick_job' | 'burst' | 'new_account';
+
+export interface SuspectReview extends AdminReview {
+  signals: ReviewSignal[];
+}
+
+/** Reviews of the last 180 days with a strong sign, or two weaker ones, not yet marked as fine. */
+export async function fetchSuspectReviews(): Promise<SuspectReview[]> {
+  return (await call('admin_list_suspect_reviews', {} as never)) as unknown as SuspectReview[];
+}
+
+export type SuspectDecision = 'clear' | 'remove';
+
+export async function decideSuspectReview(reviewId: string, decision: SuspectDecision, note: string, requestId: string): Promise<AdminReview> {
+  return (await call('admin_decide_suspect_review', {
+    p_review_id: reviewId,
+    p_decision: decision,
+    p_note: note,
+    p_request_id: requestId,
+  })) as unknown as AdminReview;
 }
 
 /** Reported reviews waiting for a decision: the badge on Moderare (RLS lets the admin count them). */
