@@ -207,6 +207,11 @@ test.describe('T25 fraud checks', () => {
     await expect(card).toContainText('ANAF nu are nicio firmă cu acest CUI.');
 
     await setLanguage(page, 'en');
+    // The language is saved on the profile in the background; the reload below reads it from there.
+    const ownerId = await userIdOf(owner);
+    await expect
+      .poll(async () => (await serviceRest<{ lang: string }[]>(`profiles?id=eq.${ownerId}&select=lang`, 'GET'))[0]?.lang)
+      .toBe('en');
     await page.goto('/s/cont/setari/facturare');
     const cardEn = page.getByRole('region', { name: 'Company at ANAF' });
     await expect(cardEn).toContainText('ANAF has no company with this CUI.');
