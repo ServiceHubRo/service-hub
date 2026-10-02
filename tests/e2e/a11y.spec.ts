@@ -84,12 +84,15 @@ for (const lang of ['ro', 'en'] as const) {
   });
 
   test(`shop screens are accessible (${lang})`, async ({ page }) => {
+    const shopId = await seedId('shops?name=eq.Atelier%20Demo&select=id');
+    const doneId = await seedId(`bookings?shop_id=eq.${shopId}&status=eq.done&select=id&order=done_at.desc&limit=1`);
     await signInAs(page, SEED.shop, lang);
     await checkAll(page, lang, [
       '/s/panou',
       '/s/programari',
       '/s/programari?tab=programate',
       '/s/istoric',
+      `/s/istoric/fisa/${doneId}`,
       '/s/mesaje',
       '/s/cont',
       '/s/cont/setari',

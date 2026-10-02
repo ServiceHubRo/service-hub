@@ -116,6 +116,8 @@ export type Database = {
           ref: string
           reminder_sent_at: string | null
           service_id: string
+          share_history: boolean
+          share_history_at: string | null
           shop_id: string
           slot: string
           started_at: string | null
@@ -149,6 +151,8 @@ export type Database = {
           ref?: string
           reminder_sent_at?: string | null
           service_id: string
+          share_history?: boolean
+          share_history_at?: string | null
           shop_id: string
           slot: string
           started_at?: string | null
@@ -182,6 +186,8 @@ export type Database = {
           ref?: string
           reminder_sent_at?: string | null
           service_id?: string
+          share_history?: boolean
+          share_history_at?: string | null
           shop_id?: string
           slot?: string
           started_at?: string | null
@@ -2054,6 +2060,7 @@ export type Database = {
       }
     }
     Functions: {
+      accepted_quote_lines: { Args: { p_booking_id: string }; Returns: Json }
       account_email: { Args: { p_user_id: string }; Returns: string }
       account_fingerprint: {
         Args: { p_kind: string; p_value: string }
@@ -2171,6 +2178,8 @@ export type Database = {
           ref: string
           reminder_sent_at: string | null
           service_id: string
+          share_history: boolean
+          share_history_at: string | null
           shop_id: string
           slot: string
           started_at: string | null
@@ -2391,6 +2400,8 @@ export type Database = {
           ref: string
           reminder_sent_at: string | null
           service_id: string
+          share_history: boolean
+          share_history_at: string | null
           shop_id: string
           slot: string
           started_at: string | null
@@ -2482,6 +2493,8 @@ export type Database = {
           ref: string
           reminder_sent_at: string | null
           service_id: string
+          share_history: boolean
+          share_history_at: string | null
           shop_id: string
           slot: string
           started_at: string | null
@@ -2524,6 +2537,8 @@ export type Database = {
           ref: string
           reminder_sent_at: string | null
           service_id: string
+          share_history: boolean
+          share_history_at: string | null
           shop_id: string
           slot: string
           started_at: string | null
@@ -2549,6 +2564,7 @@ export type Database = {
           p_request_id: string
           p_save_car?: boolean
           p_service_id: string
+          p_share_history?: boolean
           p_shop_id: string
           p_slot: string
         }
@@ -2577,6 +2593,8 @@ export type Database = {
           ref: string
           reminder_sent_at: string | null
           service_id: string
+          share_history: boolean
+          share_history_at: string | null
           shop_id: string
           slot: string
           started_at: string | null
@@ -2649,6 +2667,8 @@ export type Database = {
           ref: string
           reminder_sent_at: string | null
           service_id: string
+          share_history: boolean
+          share_history_at: string | null
           shop_id: string
           slot: string
           started_at: string | null
@@ -2691,6 +2711,8 @@ export type Database = {
           ref: string
           reminder_sent_at: string | null
           service_id: string
+          share_history: boolean
+          share_history_at: string | null
           shop_id: string
           slot: string
           started_at: string | null
@@ -2879,6 +2901,8 @@ export type Database = {
           ref: string
           reminder_sent_at: string | null
           service_id: string
+          share_history: boolean
+          share_history_at: string | null
           shop_id: string
           slot: string
           started_at: string | null
@@ -2921,6 +2945,8 @@ export type Database = {
           ref: string
           reminder_sent_at: string | null
           service_id: string
+          share_history: boolean
+          share_history_at: string | null
           shop_id: string
           slot: string
           started_at: string | null
@@ -2972,6 +2998,8 @@ export type Database = {
           ref: string
           reminder_sent_at: string | null
           service_id: string
+          share_history: boolean
+          share_history_at: string | null
           shop_id: string
           slot: string
           started_at: string | null
@@ -3142,6 +3170,8 @@ export type Database = {
           ref: string
           reminder_sent_at: string | null
           service_id: string
+          share_history: boolean
+          share_history_at: string | null
           shop_id: string
           slot: string
           started_at: string | null
@@ -3372,6 +3402,8 @@ export type Database = {
           ref: string
           reminder_sent_at: string | null
           service_id: string
+          share_history: boolean
+          share_history_at: string | null
           shop_id: string
           slot: string
           started_at: string | null
@@ -3507,6 +3539,8 @@ export type Database = {
           ref: string
           reminder_sent_at: string | null
           service_id: string
+          share_history: boolean
+          share_history_at: string | null
           shop_id: string
           slot: string
           started_at: string | null
@@ -3551,6 +3585,50 @@ export type Database = {
         Args: { p_seats: number; p_shop_id: string }
         Returns: undefined
       }
+      set_booking_history_share: {
+        Args: { p_booking_id: string; p_request_id: string; p_share: boolean }
+        Returns: {
+          cancel_reason: string | null
+          cancelled_at: string | null
+          cancelled_by: string | null
+          car_id: string | null
+          car_snapshot: Json
+          client_id: string | null
+          client_lang: string
+          client_name: string | null
+          client_phone: string | null
+          confirmed_at: string | null
+          cost: number | null
+          created_at: string
+          date: string
+          decline_reason: string | null
+          done_at: string | null
+          extra_service_ids: string[]
+          id: string
+          inspection_started_at: string | null
+          note: string | null
+          odometer: number | null
+          offer_percent: number | null
+          ref: string
+          reminder_sent_at: string | null
+          service_id: string
+          share_history: boolean
+          share_history_at: string | null
+          shop_id: string
+          slot: string
+          started_at: string | null
+          status: string
+          status_changed_at: string
+          updated_at: string
+          work: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "bookings"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       set_history_report_session: {
         Args: { p_report_id: string; p_session_id: string }
         Returns: undefined
@@ -3594,6 +3672,8 @@ export type Database = {
           ref: string
           reminder_sent_at: string | null
           service_id: string
+          share_history: boolean
+          share_history_at: string | null
           shop_id: string
           slot: string
           started_at: string | null
@@ -3618,6 +3698,7 @@ export type Database = {
       shop_reports: { Args: never; Returns: Json }
       shop_seat_count: { Args: { p_shop_id: string }; Returns: number }
       shop_state: { Args: { p_shop_id: string }; Returns: string }
+      shop_vehicle_file: { Args: { p_booking_id: string }; Returns: Json }
       slot_starts_at: {
         Args: { p_date: string; p_slot: string }
         Returns: string
@@ -3649,6 +3730,8 @@ export type Database = {
           ref: string
           reminder_sent_at: string | null
           service_id: string
+          share_history: boolean
+          share_history_at: string | null
           shop_id: string
           slot: string
           started_at: string | null
@@ -3691,6 +3774,8 @@ export type Database = {
           ref: string
           reminder_sent_at: string | null
           service_id: string
+          share_history: boolean
+          share_history_at: string | null
           shop_id: string
           slot: string
           started_at: string | null
@@ -3850,6 +3935,8 @@ export type Database = {
           ref: string
           reminder_sent_at: string | null
           service_id: string
+          share_history: boolean
+          share_history_at: string | null
           shop_id: string
           slot: string
           started_at: string | null

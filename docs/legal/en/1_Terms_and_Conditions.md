@@ -1,6 +1,6 @@
 # Terms and Conditions — Service-Hub
 
-**Last updated:** September 28, 2026
+**Last updated:** October 2, 2026
 
 These terms (the “Terms”) apply to your use of Service-Hub: the website and app at service-hub.ro (the “Platform”). By creating an account, you confirm that you have read and agree to them. How we use your data is described in the Privacy Policy, and what we keep in your browser in the Cookie Policy.
 
@@ -145,6 +145,8 @@ The owner may invite colleagues, each with their own account (colleagues do not 
 ### 4.6 Customer data
 
 For the data you receive about customers (name, phone, car, notes, messages), you are a data controller in your own right, separate from us. Use it only for the booking, the quote, the job and the shop’s legal obligations, keep it safe, and do not use it for advertising without the customer’s consent. The history and exports in the app are for your own records.
+
+In the **Vehicle file** you see the jobs done on that car at other shops only if the customer chose to show them to you, and only while the booking is open, without prices and without the other shops’ names. Use them only to work on the customer’s car: do not copy them into other records, do not show them to anyone else and do not try to find out which shop did the work.
 
 ### 4.7 What every business on the Platform should know
 

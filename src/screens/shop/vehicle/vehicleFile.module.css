@@ -1,0 +1,52 @@
+/* Fișa mașinii (T27): the car, then the jobs here and at other shops, single column at every width. */
+.head {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  overflow-wrap: anywhere;
+}
+
+.carName {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.plateRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 12px;
+}
+
+.client {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 12px;
+  font-size: 15px;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  margin-top: 6px;
+}
+
+.sectionTitle {
+  font-size: 17px;
+}
+
+.hidden {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+.hiddenIcon {
+  flex-shrink: 0;
+  margin-top: 1px;
+  color: var(--muted);
+}

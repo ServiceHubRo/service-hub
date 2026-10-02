@@ -1,7 +1,9 @@
-import { Phone, TriangleAlert } from 'lucide-react';
+import { ClipboardList, Phone, TriangleAlert } from 'lucide-react';
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { ActionButton } from '../../../components/ActionButton';
 import { Button } from '../../../components/Button';
+import { buttonClass } from '../../../components/buttonClass';
 import { Card } from '../../../components/Card';
 import { ServiceIcon } from '../../../components/ServiceIcon';
 import { StatusBadge } from '../../../components/StatusBadge';
@@ -31,6 +33,7 @@ import { QuoteComposer } from './QuoteComposer';
 import { QuoteLines } from './QuoteLines';
 import { ReschedulePanel } from './ReschedulePanel';
 import { MessageLink } from '../../messages/MessageLink';
+import { vehicleFilePath } from '../paths';
 import styles from './shopBookings.module.css';
 
 type PanelKind = 'decline' | 'reschedule' | 'cancel' | 'noShow' | 'quote' | 'editQuote' | 'withdraw' | 'complete';
@@ -123,6 +126,7 @@ export function ShopBookingCard({ booking: b, shopId, fee, expiryDays, now, onDo
         )}
         {b.note && <p className={styles.note}>{b.note}</p>}
         {b.offer_percent ? <OfferNote>{t('offer.shop', { n: b.offer_percent })}</OfferNote> : null}
+        {b.share_history && <p className={styles.muted}>{t('sb.card.shared')}</p>}
       </Card>
 
       <StatusDetail booking={b} started={started} />
@@ -194,6 +198,10 @@ export function ShopBookingCard({ booking: b, shopId, fee, expiryDays, now, onDo
           )}
           {/* A deleted client account has no conversation. */}
           {b.client_account && <MessageLink side="shop" bookingId={b.id} />}
+          <Link to={vehicleFilePath(b.id, 'bookings')} className={buttonClass('secondary')}>
+            <ClipboardList size={18} aria-hidden="true" />
+            {t('vf.title')}
+          </Link>
         </div>
       )}
 

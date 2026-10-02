@@ -40,6 +40,7 @@ const NOTE_MAX = 1000;
  * an optional note, the summary and "Trimite cererea". A client whose email is not confirmed gets
  * the explanation instead of the button (create_booking refuses them anyway). After repeated
  * no-shows the database asks for a phone confirmed by SMS (T25): the code panel opens right here.
+ * The client may let the shop see what was done on the car at other shops (T27), unticked by default.
  */
 export function CarStep({
   shop,
@@ -105,6 +106,7 @@ export function CarStep({
               }
             : { carId: picked!.id },
           note: draft.note.trim() || undefined,
+          shareHistory: draft.share,
         },
         requestId,
       );
@@ -210,6 +212,16 @@ export function CarStep({
         rows={3}
         onChange={(e) => set({ note: e.target.value })}
       />
+
+      {/* T27: the client's agreement, never ticked for them. */}
+      <div className={styles.share}>
+        <Checkbox checked={draft.share} onChange={(e) => set({ share: e.target.checked })} aria-describedby="booking-share-hint">
+          {t('booking.share.label')}
+        </Checkbox>
+        <p id="booking-share-hint" className={styles.muted}>
+          {t('booking.share.hint')}
+        </p>
+      </div>
 
       <Card className={styles.summary}>
         <h2 className={styles.groupTitle}>{t('booking.summary')}</h2>

@@ -21,3 +21,18 @@ export const SUBSCRIPTION_PATH = '/s/cont/abonament';
 
 /** Rapoarte, the owner's tile in Cont (T17): the period lives in the address (`?perioada=`). */
 export const REPORTS_PATH = '/s/cont/rapoarte';
+
+/** Istoric of the shop (T10). */
+export const SHOP_HISTORY_PATH = '/s/istoric';
+
+/**
+ * Fișa mașinii (T27), opened from a booking card or a history card: the same screen under the tab it
+ * came from, so the tab stays lit and "back" returns there.
+ */
+export type VehicleFileFrom = 'bookings' | 'history';
+export const VEHICLE_FILE_SEGMENT = 'fisa';
+
+export function vehicleFilePath(bookingId: string, from: VehicleFileFrom): string {
+  const base = from === 'history' ? SHOP_HISTORY_PATH : SHOP_BOOKINGS_PATH;
+  return `${base}/${VEHICLE_FILE_SEGMENT}/${encodeURIComponent(bookingId)}`;
+}

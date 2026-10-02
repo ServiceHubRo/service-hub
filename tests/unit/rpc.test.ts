@@ -15,6 +15,7 @@ const {
   lastOdometerForBooking,
   rpcErrorMessage,
   searchShops,
+  setBookingHistoryShare,
   toRpcError,
 } = await import('../../src/data/rpc');
 
@@ -132,6 +133,7 @@ describe('calls', () => {
       p_car_id: 'c1',
       p_note: 'Lichide',
       p_extra_service_ids: ['frane', 'itp'],
+      p_share_history: false,
     });
   });
 
@@ -144,14 +146,22 @@ describe('calls', () => {
         date: '2026-10-14',
         slot: '09:00',
         car: { car: { make: 'Dacia', model: 'Logan', plate: 'BV 01 ABC' }, saveCar: true },
+        shareHistory: true,
       },
       'r2',
     );
     expect(rpc.mock.calls[0]![1]).toMatchObject({
       p_car: { make: 'Dacia', model: 'Logan', plate: 'BV 01 ABC' },
       p_save_car: true,
+      p_share_history: true,
     });
     expect(rpc.mock.calls[0]![1]).not.toHaveProperty('p_car_id');
+  });
+
+  it('setBookingHistoryShare sends the booking, the choice and the request id (T27)', async () => {
+    rpc.mockResolvedValue({ data: { id: 'b3', share_history: true }, error: null });
+    await setBookingHistoryShare('b3', true, 'r3');
+    expect(rpc).toHaveBeenCalledWith('set_booking_history_share', { p_booking_id: 'b3', p_share: true, p_request_id: 'r3' });
   });
 
   it('throws an RpcError with the code the database raised', async () => {

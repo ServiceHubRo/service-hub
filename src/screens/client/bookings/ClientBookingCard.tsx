@@ -1,4 +1,4 @@
-import { Phone, Star } from 'lucide-react';
+import { History, Phone, Star } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ActionButton } from '../../../components/ActionButton';
@@ -10,11 +10,20 @@ import { InlinePanel } from '../../../components/InlinePanel';
 import { ServiceIcon } from '../../../components/ServiceIcon';
 import { StatusBadge } from '../../../components/StatusBadge';
 import { quoteOf, type ClientBooking } from '../../../data/bookings';
-import { cancelBooking, canRetryRpc, rpcErrorMessage, toRpcError, type Booking, type RpcErrorCode } from '../../../data/rpc';
+import {
+  cancelBooking,
+  canRetryRpc,
+  rpcErrorMessage,
+  setBookingHistoryShare,
+  toRpcError,
+  type Booking,
+  type RpcErrorCode,
+} from '../../../data/rpc';
 import { useI18n } from '../../../i18n/context';
 import { daysFromToday, formatDate, formatKm, formatMoney, formatTime, ymdInBucharest } from '../../../i18n/format';
 import { bookingServicesText } from '../../../lib/bookingServices';
 import { cancelState, reviewState, type Quote } from '../../../lib/clientBookings';
+import { isActiveStatus } from '../../../lib/status';
 import { formatPhone, normalizePhone } from '../../../lib/validators';
 import { MessageLink } from '../../messages/MessageLink';
 import { bookingCarHistoryPath, bookingPath, type VehicleHistoryLinkState } from '../paths';
@@ -41,6 +50,33 @@ export interface ClientBookingCardProps {
   openReview?: boolean;
   /** The booking changed under this card: read the list again. */
   onStale: () => void;
+}
+
+/**
+ * T27: whether the shop may see what was done on this car at other shops (no prices, no shop names),
+ * while the booking is open; the client turns it on or off here at any time.
+ */
+function ShareRow({ booking: b, act }: { booking: ClientBooking; act: (run: () => Promise<Booking>) => Promise<void> }) {
+  const { t, lang } = useI18n();
+  const on = b.share_history;
+  return (
+    <div className={styles.share} role="group" aria-label={t('cb.share.title')}>
+      <History size={18} aria-hidden="true" className={styles.shareIcon} />
+      <p className={styles.shareText}>
+        <span className={styles.shareTitle}>{t('cb.share.title')}</span>
+        <span className={styles.muted}>{t(on ? 'cb.share.on' : 'cb.share.off')}</span>
+      </p>
+      <ActionButton
+        variant="secondary"
+        block={false}
+        onAction={(rid) => act(() => setBookingHistoryShare(b.id, !on, rid))}
+        errorMessage={(e) => rpcErrorMessage(lang, e)}
+        canRetry={canRetryRpc}
+      >
+        {t(on ? 'cb.share.turnOff' : 'cb.share.turnOn')}
+      </ActionButton>
+    </div>
+  );
 }
 
 /** Requests that never reached the shop's work: the offer no longer applies to them. */
@@ -112,6 +148,7 @@ export function ClientBookingCard({
       {b.offer_percent !== null && !OFFER_GONE.has(b.status) && <OfferNote>{t('offer.client', { n: b.offer_percent })}</OfferNote>}
 
       <StatusDetail booking={b} quote={quote} now={now} />
+      {isActiveStatus(b.status) && panel === null && <ShareRow booking={b} act={act} />}
       {b.status === 'quote_sent' && quote && (
         // A replaced quote starts with every line ticked again.
         <QuoteDecision key={quote.id} bookingId={b.id} quote={quote} act={act} />

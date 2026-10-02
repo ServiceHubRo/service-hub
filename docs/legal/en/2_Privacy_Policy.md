@@ -1,6 +1,6 @@
 # Privacy Policy — Service-Hub
 
-**Last updated:** October 1, 2026
+**Last updated:** October 2, 2026
 
 This policy explains what personal data Service-Hub uses, why, who else sees it, how long we keep it and what rights you have, under Regulation (EU) 2016/679 (the “GDPR”) and Romanian law.
 
@@ -79,6 +79,7 @@ This policy explains what personal data Service-Hub uses, why, who else sees it,
 | The seasonal tire reminder (for the cars in your Garage) and the two tips in your first two weeks | Our contract with you; you turn them off in Account |
 | Your favorite shops’ offers | Your consent: you get them only if you turn them on in Account, and you can turn them off at any time |
 | The monthly report for shops | Our contract with you; turned off in Settings → Notifications |
+| Showing the shop you booked with what was done on your car at other shops (Vehicle file) | Your consent (para. 1(a)): you give it when booking or from Bookings, and withdraw it at any time, also from Bookings |
 | Official history report | Our contract with you |
 | Subscription, payments, invoices and accounting | The contract and legal obligations (para. 1(c)): Accounting Law 82/1991, the Tax Code |
 | Public reviews and checking reported ones | Legitimate interest (para. 1(f)) in genuine reviews; obligations under Regulation (EU) 2022/2065 |
@@ -99,6 +100,7 @@ This policy explains what personal data Service-Hub uses, why, who else sees it,
 
 - **The shop you book with** (the owner and colleagues) sees your name, phone, language and account code, the car in the booking (make, model, year, license plate, VIN), your note, your messages and your review, and, once the job is done, the odometer reading. If you have 3 or more no-shows in the last 90 days, it also sees that number.
 - The shop **does not see** your email, your Garage, your ITP, RCA and vignette dates, or your bookings at other shops.
+- **One exception, only with your consent:** if you tick “Show the shop what was done on this car at other shops” when booking (or choose it later in Bookings), the shop sees, while the booking is open, the jobs completed through the Platform on that car at other shops: the date, the odometer reading, the services, the accepted quote lines and the description of the work. It **does not see** the prices or the other shops’ names or cities. The box is never ticked for you, and you withdraw your consent at any time in Bookings; once the booking ends, the shop no longer sees them.
 - When finishing a job, the shop receives the **last known odometer reading** for that license plate (the number only, from jobs done through the Platform at any shop), so that a lower reading is not entered by mistake or on purpose.
 - **Reviews** are public to users of the Platform, with your first name and last initial (for example “Andrei M.”).
 - **A history report code:** anyone who has it sees the car’s make, model and license plate, how many jobs the report has, the period and the report date.
@@ -170,7 +172,7 @@ You have the right to:
 - ask us to **restrict** the use of your data;
 - **object** to the use of your data based on legitimate interest;
 - **data portability**: the file from Account → My data → Download my data contains, in a structured format (JSON), your account, cars, bookings, quotes, reviews and messages; it is free;
-- **withdraw your consent** for push notifications (in Account or in your browser settings) and for location (in your browser settings), without affecting what was done before;
+- **withdraw your consent** for push notifications (in Account or in your browser settings), for location (in your browser settings) and for showing your car's history to a shop (in Bookings), without affecting what was done before;
 - **complain** to the Romanian data protection authority (ANSPDCP), B-dul G-ral. Gheorghe Magheru nr. 28-30, sector 1, Bucharest, [dataprotection.ro](https://www.dataprotection.ro).
 
 For any request, write to us at {{email}} from your account’s email address. We answer within one month (in complex cases we may extend this by two more months, with an explanation). For data a shop keeps in its own records, you can also contact the shop; we will help you get in touch.

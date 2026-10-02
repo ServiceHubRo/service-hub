@@ -1,6 +1,6 @@
 # Termeni și condiții — Service-Hub
 
-**Ultima actualizare:** 28 septembrie 2026
+**Ultima actualizare:** 2 octombrie 2026
 
 Acești termeni („Termenii”) se aplică folosirii Service-Hub: site-ul și aplicația de la adresa service-hub.ro („Platforma”). Când îți faci cont, confirmi că i-ai citit și că ești de acord cu ei. Cum folosim datele tale scrie în Politica de confidențialitate, iar ce păstrăm în browser, în Politica de cookies.
 
@@ -145,6 +145,8 @@ Proprietarul poate invita colegi, fiecare cu contul lui (colegii nu folosesc con
 ### 4.6 Datele clienților
 
 Pentru datele pe care le primiți despre clienți (nume, telefon, mașină, note, mesaje) sunteți operator de date, separat de noi. Le folosiți doar pentru programare, deviz, lucrare și obligațiile legale ale service-ului, le păstrați în siguranță și nu le folosiți pentru reclame fără acordul clientului. Istoricul și exporturile din aplicație sunt pentru evidența voastră.
+
+În **Fișa mașinii** vedeți lucrările făcute la acea mașină la alte service-uri doar dacă clientul a ales să vi le arate și doar cât programarea este deschisă, fără prețuri și fără numele celorlalte service-uri. Le folosiți doar ca să lucrați la mașina clientului: nu le copiați în altă evidență, nu le arătați altcuiva și nu încercați să aflați la ce service s-au făcut.
 
 ### 4.7 Ce trebuie să știe orice afacere de pe Platformă
 
