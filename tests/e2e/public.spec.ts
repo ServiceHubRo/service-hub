@@ -88,6 +88,29 @@ test('landing: the way in is "Intră în cont" and "Creează cont"; the shops se
   await expect(page.getByRole('button', { name: 'Sunt service' })).toHaveAttribute('aria-pressed', 'true');
 });
 
+test('landing: the logo, the language switch and the two account buttons stay at the top while scrolling', async ({ page }) => {
+  await page.goto('/');
+  const header = page.getByRole('banner');
+  const signUp = header.getByRole('link', { name: 'Creează cont' });
+  await expect(signUp).toBeVisible();
+  const top = (await header.boundingBox())!.y;
+  // Halfway down the page, then to the end: the bar is still at the top, and the page runs under it.
+  for (const to of [0.5, 1]) {
+    await page.locator('main').evaluate((main, f) => {
+      const scroller = main.parentElement!;
+      scroller.scrollTop = (scroller.scrollHeight - scroller.clientHeight) * f;
+    }, to);
+    await expect.poll(async () => (await header.boundingBox())!.y).toBe(top);
+    await expect(signUp).toBeInViewport();
+    await expect(header.getByRole('link', { name: 'Intră în cont' })).toBeInViewport();
+    await expect(header.getByRole('button', { name: 'English' })).toBeInViewport();
+  }
+  await expectNoHorizontalScroll(page);
+  await shot(page, 'landing-sticky-header', name());
+  await header.getByRole('link', { name: 'Intră în cont' }).click();
+  await expect(page).toHaveURL(/\/intra$/);
+});
+
 test('landing: link previews have a title, a description and an absolute image', async ({ page, request }) => {
   await page.goto('/');
   const meta = (selector: string) => page.locator(selector).getAttribute('content');
