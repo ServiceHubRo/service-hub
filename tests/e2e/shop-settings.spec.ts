@@ -79,7 +79,7 @@ test.describe('shop settings', () => {
     await page.getByRole('button', { name: 'Șterge căutarea' }).click();
     await page.getByLabel('Caută un serviciu').fill('frâne');
     const brakes = await page.getByRole('checkbox').count();
-    await page.getByRole('button', { name: 'Selectează tot' }).click();
+    await page.getByRole('button', { name: 'Selectează tot', exact: true }).click();
     await expect(page.getByText(`Selectate: ${brakes + 2} din 150`)).toBeVisible();
     await page.getByRole('button', { name: 'Deselectează tot' }).click();
     await expect(page.getByText('Selectate: 2 din 150')).toBeVisible();
