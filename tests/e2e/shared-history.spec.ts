@@ -137,10 +137,10 @@ test.describe('Fișa mașinii', () => {
     await expect(page.getByRole('link', { name: 'Fișa mașinii' })).toHaveCount(0);
     await expect(page.getByText(plate)).toBeVisible();
     await expect(page.getByText('Ultimul kilometraj cunoscut: 101.250 km')).toBeVisible();
-    const own = page.getByRole('region', { name: /La tine/ });
+    const own = page.getByRole('region', { name: new RegExp(`La ${shopName}`) });
     await expect(own).toContainText('Ulei și filtre');
     await expect(own).toContainText('389 lei');
-    const others = page.getByRole('region', { name: /La alte service-uri/ });
+    const others = page.getByRole('region', { name: /Reparații anterioare la alte service-uri/ });
     await expect(others).toContainText('Plăcuțe față schimbate');
     await expect(others).toContainText('98.300 km');
     await expect(others).toContainText('Plăcuțe frână față');
@@ -176,23 +176,23 @@ test.describe('Fișa mașinii', () => {
     await job.getByRole('button').first().click();
     await job.getByRole('link', { name: 'Fișa mașinii' }).click();
     await expect(page).toHaveURL(/\/s\/istoric\/fisa\//);
-    await expect(page.getByRole('region', { name: /La alte service-uri/ })).toContainText('Plăcuțe față schimbate');
+    await expect(page.getByRole('region', { name: /Reparații anterioare la alte service-uri/ })).toContainText('Plăcuțe față schimbate');
     await page.getByRole('link', { name: 'Istoric' }).first().click();
     await expect(page).toHaveURL(/\/s\/istoric$/);
 
     await serviceRest(`profiles?id=eq.${await userIdOf(shopEmail)}`, 'PATCH', { lang: 'en' });
     await openFileFromBookingsEn(page);
     await expect(page.getByText('Last known odometer: 101,250 km')).toBeVisible();
-    await expect(page.getByRole('region', { name: /At other shops/ })).toContainText('No prices and no shop names.');
-    await expect(page.getByRole('region', { name: /At your shop/ })).toContainText('389 RON');
+    await expect(page.getByRole('region', { name: /Previous repairs at other shops/ })).toContainText('No prices and no shop names.');
+    await expect(page.getByRole('region', { name: new RegExp(`At ${shopName}`) })).toContainText('389 RON');
     await expectNoHorizontalScroll(page);
     await shot(page, 't27-vehicle-file-en', name());
 
     // The client cancels: nothing of the other shops stays visible.
     await client.locator('li').filter({ hasText: shopName }).getByRole('button', { name: 'Anulează', exact: true }).click();
     await client.getByRole('button', { name: 'Anulează programarea' }).click();
-    await expect(page.getByRole('region', { name: /At other shops/ })).toContainText('only while you have an open booking');
-    await expect(page.getByRole('region', { name: /At other shops/ })).not.toContainText('Plăcuțe față schimbate');
+    await expect(page.getByRole('region', { name: /Previous repairs at other shops/ })).toContainText('only while you have an open booking');
+    await expect(page.getByRole('region', { name: /Previous repairs at other shops/ })).not.toContainText('Plăcuțe față schimbate');
     await clientContext.close();
   });
 });

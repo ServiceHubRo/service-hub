@@ -78,6 +78,7 @@ export function VehicleFileScreen({ from }: { from: VehicleFileFrom }) {
   const name = [car.make, car.model].filter(Boolean).join(' ');
   const km = lastKnownOdometer(file);
   const phone = file.client_phone;
+  const shopName = bookingsState.status === 'ready' ? bookingsState.data.shop.name : '';
 
   return (
     <div className={history.page}>
@@ -115,7 +116,7 @@ export function VehicleFileScreen({ from }: { from: VehicleFileFrom }) {
 
       <section className={styles.section} aria-labelledby="vf-own">
         <h2 id="vf-own" className={styles.sectionTitle}>
-          {t('vf.own')}
+          {shopName ? t('vf.own', { shop: shopName }) : t('vf.ownFallback')}
           {file.own.length > 0 && <span className={history.muted}> · {plural(lang, 'unit.jobs', file.own.length)}</span>}
         </h2>
         {file.own.length === 0 ? (

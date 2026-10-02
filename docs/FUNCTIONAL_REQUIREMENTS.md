@@ -170,8 +170,8 @@ A user has exactly one role. The role decides the entire interface. A client can
 
 ### 4.3b Vehicle file (T27)
 - From a booking card or an opened history job: the car (make, model, year, plate, VIN), the client with tap-to-call, the last known odometer.
-- **At your shop:** every completed job on this car here — date, odometer, services, accepted quote lines, work, amount.
-- **At other shops:** only while the client has an open booking for this car here and chose to share — date, odometer, services, accepted quote lines and work; never prices, shop names or cities. Otherwise a line says why it is hidden.
+- **At <shop name>:** every completed job on this car here — date, odometer, services, accepted quote lines, work, amount.
+- **Previous repairs at other shops:** only while the client has an open booking for this car here and chose to share — date, odometer, services, accepted quote lines and work; never prices, shop names or cities. Otherwise a line says why it is hidden.
 - Updates live when the client turns sharing on or off.
 
 ### 4.4 Messages
