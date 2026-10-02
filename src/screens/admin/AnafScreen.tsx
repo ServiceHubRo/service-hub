@@ -15,6 +15,7 @@ import { canRetryRpc, rpcErrorMessage } from '../../data/rpc';
 import { verifyCompany } from '../../data/shop';
 import { useI18n } from '../../i18n/context';
 import type { MessageKey } from '../../i18n/ro';
+import { formatDayMonth } from '../../i18n/format';
 import { plural } from '../../i18n/translate';
 import {
   COMPANY_FILTERS,
@@ -59,6 +60,17 @@ function CompanyCard({ r, onChecked }: { r: CompanyCheckRow; onChecked: (unavail
       <p className={styles.muted}>
         <span className="mono">{r.display_id}</span> · {r.city} · <ShopStatePill state={r.state} />
       </p>
+      {r.hidden_at ? (
+        <p className={styles.muted} role="note">
+          <Pill tone="red">{t('anaf.hidden')}</Pill> {t('anaf.hiddenSince', { date: dateTime(lang, r.hidden_at) })}
+        </p>
+      ) : (
+        r.deadline && (
+          <p className={styles.muted} role="note">
+            <Pill tone="amber">{t('anaf.waiting')}</Pill> {t('anaf.deadline', { date: formatDayMonth(lang, r.deadline) })}
+          </p>
+        )
+      )}
       {r.vat_mismatch && (
         <p className={styles.muted} role="note">
           <Pill tone="amber">{t('anaf.vatMismatch')}</Pill> {t('anaf.vatMismatchBody')}
@@ -98,7 +110,8 @@ function CompanyCard({ r, onChecked }: { r: CompanyCheckRow; onChecked: (unavail
  * Raport ANAF (Eduard, 2 oct): every shop's company as ANAF answered it — code, CUI, the declared and
  * the official name, active / inactive / struck off / unknown, the VAT question, when it was checked —
  * in categories (problems first), with "Verifică din nou" on each and the list as an Excel file.
- * Nothing is blocked automatically: the admin opens the shop and decides.
+ * The consequences are automatic (company_enforcement): the owner is told, gets a deadline, and the
+ * shop leaves the search after it until ANAF confirms the company; each card shows the deadline or since when.
  */
 export function AnafScreen() {
   const { t, lang } = useI18n();

@@ -85,27 +85,21 @@ export function startProviders(): Promise<() => Promise<void>> {
       }
       if (req.method === 'POST' && url === '/anaf') {
         // ANAF's register (T25): 160796 is unknown, 18000011 is inactive, any other CUI is
-        // "AUTO TEST S.R.L.", active and a VAT payer.
-        const [ask] = JSON.parse(body) as { cui: number }[];
-        const cui = Number(ask?.cui);
-        if (cui === 160796) return reply(200, { cod: 200, message: 'SUCCESS', found: [], notFound: [cui] });
-        return reply(200, {
-          cod: 200,
-          message: 'SUCCESS',
-          found: [
-            {
-              date_generale: {
-                cui,
-                denumire: 'AUTO TEST S.R.L.',
-                adresa: 'JUD. BRAŞOV, MUN. BRAŞOV, STR. TEST, NR.1',
-                stare_inregistrare: 'INREGISTRAT din data 01.01.2015',
-              },
-              inregistrare_scop_Tva: { scpTVA: true },
-              stare_inactiv: { statusInactivi: cui === 18000011, dataRadiere: '' },
+        // "AUTO TEST S.R.L.", active and a VAT payer. Several CUIs in one request (the daily batch).
+        const asked = (JSON.parse(body) as { cui: number }[]).map((a) => Number(a?.cui));
+        const found = asked
+          .filter((cui) => cui !== 160796)
+          .map((cui) => ({
+            date_generale: {
+              cui,
+              denumire: 'AUTO TEST S.R.L.',
+              adresa: 'JUD. BRAŞOV, MUN. BRAŞOV, STR. TEST, NR.1',
+              stare_inregistrare: 'INREGISTRAT din data 01.01.2015',
             },
-          ],
-          notFound: [],
-        });
+            inregistrare_scop_Tva: { scpTVA: true },
+            stare_inactiv: { statusInactivi: cui === 18000011, dataRadiere: '' },
+          }));
+        return reply(200, { cod: 200, message: 'SUCCESS', found, notFound: asked.filter((cui) => cui === 160796) });
       }
       if (req.method === 'POST' && url === '/smso/send') {
         if (req.headers['x-authorization'] !== 'local-test-key') return reply(401, { status: 401 });

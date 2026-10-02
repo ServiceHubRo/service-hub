@@ -17,6 +17,9 @@ const row = (over: Partial<CompanyCheckRow>): CompanyCheckRow => ({
   anaf_vat_payer: true,
   anaf_name_match: true,
   anaf_checked_at: '2026-10-02T10:00:00Z',
+  problem_since: null,
+  deadline: null,
+  hidden_at: null,
   category: 'ok',
   vat_mismatch: false,
   ...over,
@@ -28,17 +31,19 @@ const rows = [
   row({ shop_name: 'Service Trei', display_id: 'S-00003', vat_mismatch: true }),
   row({ shop_name: 'Service Patru', display_id: 'S-00004', vat_id: '160796', category: 'not_found' }),
   row({ shop_name: 'Service Cinci', display_id: 'S-00005', vat_id: null, category: 'no_cui' }),
+  row({ shop_name: 'Service Sase', display_id: 'S-00006', category: 'unchecked', vat_id: 'RO18000003', anaf_status: null, hidden_at: '2026-10-02T06:00:00Z' }),
 ];
 
 describe('Raport ANAF', () => {
-  it('problems: gone, unknown, inactive, another name, or VAT ticked otherwise than at ANAF', () => {
-    expect(rows.map(isCompanyProblem)).toEqual([false, true, true, true, false]);
+  it('problems: gone, unknown, inactive, another name, VAT ticked otherwise than at ANAF, or out of search', () => {
+    expect(rows.map(isCompanyProblem)).toEqual([false, true, true, true, false, true]);
   });
 
   it('each chip holds its shops', () => {
     const counts = companyFilterCounts(rows);
-    expect(counts.all).toBe(5);
-    expect(counts.problems).toBe(3);
+    expect(counts.all).toBe(6);
+    expect(counts.problems).toBe(4);
+    expect(counts.hidden).toBe(1);
     expect(counts.ok).toBe(2);
     expect(counts.vat_mismatch).toBe(1);
     expect(counts.not_found).toBe(1);

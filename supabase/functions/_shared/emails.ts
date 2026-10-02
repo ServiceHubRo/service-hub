@@ -6,7 +6,7 @@
 import { formatDate, formatDayMonth, formatMoney, formatTime, type Lang } from './format.ts';
 import { EMAIL_BUTTON_SIZES } from './emailButtonSizes.ts';
 import { LOGO_HEIGHT, LOGO_WIDTH } from './emailLogo.ts';
-import { monthName, REPORTS_PATH, SHOP_REPORTS_PATH, SUBSCRIPTION_PATH } from './templates.ts';
+import { BILLING_PATH, monthName, renderNotification, REPORTS_PATH, SHOP_REPORTS_PATH, SUBSCRIPTION_PATH } from './templates.ts';
 
 export interface EmailContent {
   subject: string;
@@ -578,6 +578,11 @@ export function emailForEvent(e: EmailEvent, app: string): EmailContent | null {
     }
     case 'monthly_report':
       return monthlyReportEmail(p, lang, app);
+    case 'company_problem':
+    case 'company_name_mismatch':
+    case 'company_hidden':
+    case 'company_ok':
+      return companyEmail(e, lang, app);
     default:
       return subscriptionEmail(e, lang, app);
   }
@@ -619,5 +624,27 @@ function monthlyReportEmail(p: Record<string, unknown>, lang: Lang, app: string)
     footer: en
       ? `You are receiving this email as the owner of ${shop} on Service-Hub. Turn it off under Settings → Notifications.`
       : `Primești acest email ca proprietar al service-ului ${shop} pe Service-Hub. Îl poți opri din Setări → Notificări.`,
+  });
+}
+
+/**
+ * The company at ANAF (Raport ANAF, automated): the same words as the push — not confirmed (with the
+ * deadline), another name, out of the search, confirmed again — and the way to Date de facturare.
+ */
+function companyEmail(e: EmailEvent, lang: Lang, app: string): EmailContent | null {
+  const en = lang === 'en';
+  const p = e.params ?? {};
+  const shop = str(p.shop_name) || 'Service-Hub';
+  const text = renderNotification({ event: e.event, role: 'shop', lang, params: p, booking_id: null });
+  if (!text) return null;
+  return email(`${shop}: ${text.title}`, {
+    lang,
+    preheader: text.body,
+    title: text.title,
+    blocks: [{ p: text.body }],
+    button: { label: en ? 'Open Billing details' : 'Deschide Date de facturare', url: `${app}${BILLING_PATH}` },
+    footer: en
+      ? `You are receiving this email as the owner of ${shop} on Service-Hub.`
+      : `Primești acest email ca proprietar al service-ului ${shop} pe Service-Hub.`,
   });
 }

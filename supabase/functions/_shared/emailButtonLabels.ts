@@ -32,6 +32,9 @@ export const EMAIL_BUTTON_LABELS = [
   // History report
   'Deschide Rapoartele mele',
   'Open My reports',
+  // The company at ANAF (Raport ANAF, automated)
+  'Deschide Date de facturare',
+  'Open Billing details',
 ] as const;
 
 /** The address-safe name of a button image: „Plătește abonamentul” → `plateste-abonamentul`. */

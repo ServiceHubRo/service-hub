@@ -105,6 +105,7 @@ Un Service se înscrie de proprietarul sau reprezentantul unei afaceri autorizat
 
 - Numele, descrierea, logo-ul, adresa, telefoanele, site-ul, pagina de Facebook, anul înființării, programul, zilele închise, câte mașini primiți pe zi, preavizul minim, taxa de constatare, serviciile oferite, recenziile și răspunsurile voastre sunt vizibile pentru utilizatorii Platformei.
 - Datele de facturare (denumire legală, CUI, Registrul Comerțului, sediu social, IBAN, reprezentant) nu sunt niciodată publice. Le văd doar proprietarul și administratorul Platformei.
+- Verificăm periodic CUI-ul din datele de facturare în registrul public ANAF. Dacă firma nu apare acolo, este inactivă fiscal sau radiată, vă anunțăm și aveți 14 zile să corectați datele. Dacă nici după acest termen firma nu poate fi confirmată, Service-ul nu mai apare în căutări până la confirmare; contul, programările și istoricul rămân neschimbate.
 - Răspundeți pentru corectitudinea profilului și aveți dreptul să folosiți logo-ul și textele puse. Ne dați dreptul, gratuit și cât timp contul există, să le afișăm pe Platformă.
 - Pe Platformă nu se afișează prețuri pe servicii: prețul se stabilește prin deviz, după constatare.
 

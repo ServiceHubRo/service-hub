@@ -1393,8 +1393,11 @@ export type Database = {
           anaf_address: string | null
           anaf_checked_at: string | null
           anaf_cui: string | null
+          anaf_hidden_at: string | null
           anaf_name: string | null
           anaf_name_match: boolean | null
+          anaf_name_notified_at: string | null
+          anaf_problem_since: string | null
           anaf_status: string | null
           anaf_vat_payer: boolean | null
           bank_name: string | null
@@ -1414,8 +1417,11 @@ export type Database = {
           anaf_address?: string | null
           anaf_checked_at?: string | null
           anaf_cui?: string | null
+          anaf_hidden_at?: string | null
           anaf_name?: string | null
           anaf_name_match?: boolean | null
+          anaf_name_notified_at?: string | null
+          anaf_problem_since?: string | null
           anaf_status?: string | null
           anaf_vat_payer?: boolean | null
           bank_name?: string | null
@@ -1435,8 +1441,11 @@ export type Database = {
           anaf_address?: string | null
           anaf_checked_at?: string | null
           anaf_cui?: string | null
+          anaf_hidden_at?: string | null
           anaf_name?: string | null
           anaf_name_match?: boolean | null
+          anaf_name_notified_at?: string | null
+          anaf_problem_since?: string | null
           anaf_status?: string | null
           anaf_vat_payer?: boolean | null
           bank_name?: string | null
@@ -2456,10 +2465,48 @@ export type Database = {
         Args: { p_client_id: string; p_days?: number }
         Returns: number
       }
+      company_check_consequences: {
+        Args: { p_billing: Database["public"]["Tables"]["shop_billing"]["Row"] }
+        Returns: {
+          anaf_address: string | null
+          anaf_checked_at: string | null
+          anaf_cui: string | null
+          anaf_hidden_at: string | null
+          anaf_name: string | null
+          anaf_name_match: boolean | null
+          anaf_name_notified_at: string | null
+          anaf_problem_since: string | null
+          anaf_status: string | null
+          anaf_vat_payer: boolean | null
+          bank_name: string | null
+          billing_email: string | null
+          created_at: string
+          iban: string | null
+          legal_address: string | null
+          legal_name: string | null
+          legal_rep: string | null
+          reg_com: string | null
+          shop_id: string
+          updated_at: string
+          vat_id: string | null
+          vat_payer: boolean
+        }
+        SetofOptions: {
+          from: "shop_billing"
+          to: "shop_billing"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       company_check_target: {
         Args: { p_aal: string; p_shop_id: string; p_user_id: string }
         Returns: Json
       }
+      company_checks_due: {
+        Args: { p_limit?: number; p_now?: string }
+        Returns: Json
+      }
+      company_fix_deadline: { Args: { p_since: string }; Returns: string }
       complete_job: {
         Args: {
           p_booking_id: string
@@ -2731,6 +2778,7 @@ export type Database = {
       }
       dispatch_sweep: { Args: never; Returns: boolean }
       end_expired_trials: { Args: { p_now?: string }; Returns: number }
+      enforce_company_deadlines: { Args: { p_now?: string }; Returns: number }
       enqueue_referral_credit: {
         Args: { p_referral_shop_id: string }
         Returns: undefined
@@ -2819,6 +2867,7 @@ export type Database = {
       invite_token_hash: { Args: { p_token: string }; Returns: string }
       is_active_status: { Args: { p_status: string }; Returns: boolean }
       is_admin: { Args: never; Returns: boolean }
+      is_dispatch_token: { Args: { p_token: string }; Returns: boolean }
       is_new_client: {
         Args: {
           p_client_id: string
@@ -2843,6 +2892,7 @@ export type Database = {
         Args: { p_after: Json; p_before: Json; p_keys: string[] }
         Returns: Json
       }
+      kick_company_checks: { Args: never; Returns: boolean }
       kick_dispatcher: { Args: never; Returns: boolean }
       last_odometer_for_booking: {
         Args: { p_booking_id: string }

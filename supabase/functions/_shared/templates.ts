@@ -53,6 +53,9 @@ export const SUBSCRIPTION_PATH = '/s/cont/abonament';
 /** The client's Rapoartele mele (T15): where a finished history report is downloaded. */
 export const REPORTS_PATH = '/c/cont/rapoarte';
 
+/** The owner's Date de facturare: where every notice about the company at ANAF leads. */
+export const BILLING_PATH = '/s/cont/setari/facturare';
+
 /** The owner's Rapoarte (T17): where the monthly report (T24) leads. */
 export const SHOP_REPORTS_PATH = '/s/cont/rapoarte';
 
@@ -249,6 +252,31 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
     'shop.referral_revoked': {
       title: 'Luna gratuită s-a anulat',
       body: 'Plata service-ului {referred} a fost returnată, așa că luna gratuită pentru recomandare s-a anulat. Ce ai folosit deja rămâne.',
+    },
+    // ------------------------------------------------------------------ the company at ANAF (Raport ANAF, automated)
+    'shop.company_problem': {
+      title: 'Firma nu a fost confirmată',
+      body: 'Nu am găsit în registrul ANAF nicio firmă cu CUI-ul {cui}. Corectează CUI-ul în Date de facturare până pe {expiry}, altfel service-ul nu va mai apărea în căutări.',
+    },
+    'shop.company_problem_inactive': {
+      title: 'Firma apare inactivă',
+      body: 'La ANAF, firma cu CUI-ul {cui} apare inactivă fiscal. Rezolvă situația sau corectează CUI-ul în Date de facturare până pe {expiry}, altfel service-ul nu va mai apărea în căutări.',
+    },
+    'shop.company_problem_deregistered': {
+      title: 'Firma apare radiată',
+      body: 'La ANAF, firma cu CUI-ul {cui} apare radiată. Corectează CUI-ul în Date de facturare până pe {expiry}, altfel service-ul nu va mai apărea în căutări.',
+    },
+    'shop.company_name_mismatch': {
+      title: 'Denumirea firmei diferă',
+      body: 'La ANAF, CUI-ul {cui} este al firmei „{anaf_name}”. Verifică denumirea legală în Date de facturare.',
+    },
+    'shop.company_hidden': {
+      title: 'Service-ul nu mai apare în căutări',
+      body: 'Firma cu CUI-ul {cui} nu a putut fi confirmată la ANAF în termen. Corectează datele în Date de facturare: service-ul revine în căutări imediat ce firma este confirmată.',
+    },
+    'shop.company_ok': {
+      title: 'Firma a fost confirmată',
+      body: 'Firma cu CUI-ul {cui} este confirmată la ANAF. Service-ul apare din nou în căutări.',
     },
     // ------------------------------------------------------------------ account suspended / reactivated
     'client.account_suspended': {
@@ -453,6 +481,31 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
       title: 'Your free month was canceled',
       body: "{referred}'s payment was returned, so the free month for the referral was canceled. What you already used is yours.",
     },
+    // ------------------------------------------------------------------ the company at ANAF (ANAF report, automated)
+    'shop.company_problem': {
+      title: 'Company not confirmed',
+      body: "ANAF's register has no company with tax ID {cui}. Fix the tax ID under Billing details by {expiry}, or the shop will no longer show in search.",
+    },
+    'shop.company_problem_inactive': {
+      title: 'Company shows as inactive',
+      body: 'At ANAF, the company with tax ID {cui} is inactive for tax purposes. Sort it out or fix the tax ID under Billing details by {expiry}, or the shop will no longer show in search.',
+    },
+    'shop.company_problem_deregistered': {
+      title: 'Company shows as struck off',
+      body: 'At ANAF, the company with tax ID {cui} is struck off. Fix the tax ID under Billing details by {expiry}, or the shop will no longer show in search.',
+    },
+    'shop.company_name_mismatch': {
+      title: 'Company name differs',
+      body: 'At ANAF, tax ID {cui} belongs to "{anaf_name}". Check the legal name under Billing details.',
+    },
+    'shop.company_hidden': {
+      title: 'Shop no longer in search',
+      body: 'The company with tax ID {cui} could not be confirmed at ANAF in time. Fix it under Billing details: the shop is back in search as soon as the company is confirmed.',
+    },
+    'shop.company_ok': {
+      title: 'Company confirmed',
+      body: 'The company with tax ID {cui} is confirmed at ANAF. The shop shows in search again.',
+    },
     // ------------------------------------------------------------------ account suspended / reactivated
     'client.account_suspended': {
       title: 'Account suspended',
@@ -531,6 +584,7 @@ export const EVENTS: Record<Side, readonly string[]> = {
     'quote_partially_accepted', 'quote_refused', 'quote_expiring', 'quote_expired', 'new_message', 'new_review',
     'daily_digest', 'trial_ending', 'payment_failed', 'shop_inactive', 'review_report_decided', 'account_suspended',
     'account_reactivated', 'referral_reward', 'referral_revoked', 'booking_request_waiting', 'monthly_report',
+    'company_problem', 'company_name_mismatch', 'company_hidden', 'company_ok',
   ],
 };
 
@@ -654,6 +708,8 @@ function vars(e: NotificationEvent, lang: Lang, side: Side, now: Date): Record<s
     done: String(num(p.done) ?? 0),
     revenue: money(num(p.revenue) ?? 0),
     requests: String(num(p.requests) ?? 0),
+    cui: str(p.cui),
+    anaf_name: str(p.anaf_name),
   };
 }
 
@@ -696,6 +752,8 @@ export function templateKey(side: Side, e: NotificationEvent, now: Date = new Da
             : base;
     case 'review_report_decided':
       return side === 'shop' && p.decision === 'removed' ? `${base}_removed` : base;
+    case 'company_problem':
+      return p.status === 'inactive' || p.status === 'deregistered' ? `${base}_${p.status}` : base;
     // A shop suspended (shops.suspended) rather than its owner's account.
     case 'account_suspended':
     case 'account_reactivated':
@@ -761,6 +819,11 @@ export function urlFor(side: Side, e: NotificationEvent): string {
       return booking ? `/s/programari?${q({ tab: 'cereri', p: booking })}` : '/s/programari?tab=cereri';
     case 'monthly_report':
       return SHOP_REPORTS_PATH;
+    case 'company_problem':
+    case 'company_name_mismatch':
+    case 'company_hidden':
+    case 'company_ok':
+      return BILLING_PATH;
     // Ended bookings are in the history, found by their code.
     case 'booking_cancelled_client':
     case 'booking_cancelled_admin':
@@ -797,6 +860,11 @@ function tagFor(e: NotificationEvent): string {
       return `offer-${str(p.shop_id)}`;
     case 'monthly_report':
       return `monthly-${str(p.month)}`;
+    case 'company_problem':
+    case 'company_name_mismatch':
+    case 'company_hidden':
+    case 'company_ok':
+      return 'company';
     case 'referral_reward':
     case 'referral_revoked':
       return `referral-${str(p.referral_shop_id)}`;

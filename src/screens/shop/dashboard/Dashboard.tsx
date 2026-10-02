@@ -10,7 +10,7 @@ import { RpcError, rpcErrorMessage } from '../../../data/rpc';
 import { dismissBillingReminder, getShopSetup, type ShopSetup } from '../../../data/shop';
 import { useI18n } from '../../../i18n/context';
 import type { MessageKey } from '../../../i18n/ro';
-import { ymdInBucharest } from '../../../i18n/format';
+import { formatDayMonth, ymdInBucharest } from '../../../i18n/format';
 import { dashboardCounts } from '../../../lib/shopBookings';
 import { useLoad } from '../../../lib/useLoad';
 import { useNow } from '../../../lib/useNow';
@@ -72,6 +72,7 @@ export function Dashboard() {
           </div>
         )}
         <SubscriptionBanner setup={setup} />
+        <CompanyBanner setup={setup} />
         {setup.billing?.reminder && (
           <div className="no-print">
             <Banner tone="info">
@@ -165,12 +166,45 @@ function SubscriptionBanner({ setup }: { setup: ShopSetup }) {
   );
 }
 
+/**
+ * The owner's company could not be confirmed at ANAF (Raport ANAF, automated): why, and the day to fix
+ * the CUI by before the shop leaves the search. Once hidden, the reason is in HiddenBanner.
+ */
+function CompanyBanner({ setup }: { setup: ShopSetup }) {
+  const { t, lang } = useI18n();
+  const company = setup.company;
+  if (!company || company.hidden) return null;
+  const why =
+    company.status === 'inactive' ? 'dash.company.inactive' : company.status === 'deregistered' ? 'dash.company.deregistered' : 'dash.company.not_found';
+  return (
+    <div className="no-print">
+      <Banner tone="warning">
+        <div className={styles.reminder}>
+          <span>
+            {t(why)} {t('dash.company.deadline', { date: formatDayMonth(lang, company.deadline) })}
+          </span>
+          <div className={styles.reminderButtons}>
+            <Link to={SETTINGS_LINKS.billing} className={styles.reminderLink}>
+              {t('dash.company.open')}
+            </Link>
+          </div>
+        </div>
+      </Banner>
+    </div>
+  );
+}
+
 /** "Service-ul tău nu apare încă în căutări." with every reason, in the order to fix them. */
 function HiddenBanner({ setup }: { setup: ShopSetup }) {
   const { t } = useI18n();
   // The settings and the subscription are the owner's: a colleague reads the reasons, no links.
   const link: Partial<Record<ShopSetup['reasons'][number], string>> = setup.is_owner
-    ? { no_services: SETTINGS_LINKS.services, no_open_days: SETTINGS_LINKS.hours, subscription_inactive: SUBSCRIPTION_PATH }
+    ? {
+        no_services: SETTINGS_LINKS.services,
+        no_open_days: SETTINGS_LINKS.hours,
+        subscription_inactive: SUBSCRIPTION_PATH,
+        company_unconfirmed: SETTINGS_LINKS.billing,
+      }
     : {};
   return (
     <Banner tone="warning">

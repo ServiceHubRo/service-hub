@@ -28,10 +28,11 @@ type T = (key: MessageKey, params?: Params) => string;
 
 // ------------------------------------------------------------------------------------ Raport ANAF
 
-export type CompanyFilter = 'all' | 'problems' | CompanyCategory | 'vat_mismatch';
+export type CompanyFilter = 'all' | 'problems' | 'hidden' | CompanyCategory | 'vat_mismatch';
 export const COMPANY_FILTERS: readonly CompanyFilter[] = [
   'all',
   'problems',
+  'hidden',
   'ok',
   'name_mismatch',
   'vat_mismatch',
@@ -49,13 +50,14 @@ export function isCompanyFilter(value: string | null): value is CompanyFilter {
   return value !== null && (COMPANY_FILTERS as readonly string[]).includes(value);
 }
 
-export function isCompanyProblem(r: Pick<CompanyCheckRow, 'category' | 'vat_mismatch'>): boolean {
-  return PROBLEM_CATEGORIES.has(r.category) || r.vat_mismatch;
+export function isCompanyProblem(r: Pick<CompanyCheckRow, 'category' | 'vat_mismatch' | 'hidden_at'>): boolean {
+  return PROBLEM_CATEGORIES.has(r.category) || r.vat_mismatch || r.hidden_at !== null;
 }
 
 function inCompanyFilter(r: CompanyCheckRow, filter: CompanyFilter): boolean {
   if (filter === 'all') return true;
   if (filter === 'problems') return isCompanyProblem(r);
+  if (filter === 'hidden') return r.hidden_at !== null;
   if (filter === 'vat_mismatch') return r.vat_mismatch;
   return r.category === filter;
 }
@@ -416,6 +418,8 @@ const COMPANY_COLUMNS: Column<CompanyCheckRow>[] = [
   ['admin.csv.vatAnaf', (r, t) => (r.anaf_vat_payer === null ? '' : yesNo(t, r.anaf_vat_payer))],
   ['admin.csv.anafAddress', (r) => r.anaf_address ?? ''],
   ['admin.csv.checkedAt', (r) => csvDateTime(r.anaf_checked_at)],
+  ['admin.csv.fixBy', (r) => r.deadline ?? ''],
+  ['admin.csv.hiddenAt', (r) => csvDateTime(r.hidden_at)],
 ];
 
 const COLUMNS: Record<ExportKind, Column<never>[]> = {

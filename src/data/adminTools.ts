@@ -209,6 +209,8 @@ export const ABUSE_LIMIT_KEYS = [
   'review_window_days',
   'quote_versions_max',
   'no_shows_before_phone',
+  'company_fix_days',
+  'company_recheck_days',
 ] as const;
 /** The notification limits (T24): quiet hours, tips a week, when a waiting request is recalled. */
 export const NOTIFICATION_LIMIT_KEYS = ['quiet_hours_start', 'quiet_hours_end', 'promo_per_week', 'request_reminder_hours'] as const;
@@ -364,6 +366,12 @@ export interface CompanyCheckRow {
   anaf_vat_payer: boolean | null;
   anaf_name_match: boolean | null;
   anaf_checked_at: string | null;
+  /** The company could not be confirmed since then (not found, struck off, inactive). */
+  problem_since: string | null;
+  /** The day it must be fixed by (YYYY-MM-DD, Bucharest), while there is a problem. */
+  deadline: string | null;
+  /** Out of the search since then, because it stayed unconfirmed past the deadline. */
+  hidden_at: string | null;
   category: CompanyCategory;
   /** The shop's "Plătitor de TVA" says otherwise than ANAF. */
   vat_mismatch: boolean;

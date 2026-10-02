@@ -105,6 +105,7 @@ A Shop is listed by the owner or representative of a business authorized to prov
 
 - The name, description, logo, address, phone numbers, website, Facebook page, year established, hours, closed days, cars per day, minimum notice, inspection fee, services offered, reviews and your replies are visible to users of the Platform.
 - Billing data (legal name, tax ID, Trade Register number, registered office, IBAN, legal representative) is never public. Only the owner and the Platform administrator see it.
+- We periodically check the tax ID in your billing data against ANAF's public register. If the company is not listed there, is fiscally inactive or has been struck off, we notify you and you have 14 days to correct the data. If the company still cannot be confirmed after that, the Shop stops appearing in search results until it is confirmed; the account, bookings and history stay unchanged.
 - You are responsible for the accuracy of your profile and must have the right to use the logo and texts you add. You grant us the right, free of charge and while the account exists, to display them on the Platform.
 - The Platform does not show prices per service: the price is set through a quote, after the inspection.
 
