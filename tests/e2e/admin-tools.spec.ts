@@ -343,3 +343,65 @@ test.describe('admin tools', () => {
     }
   });
 });
+
+test.describe('Raport ANAF', () => {
+  test.skip(!BACKEND, 'needs the local Supabase stack');
+  test.setTimeout(120_000);
+
+  test('every shop by category, a check from the list, the Excel file', async ({ page }) => {
+    const id = tag();
+    const unknownName = `Anaf Negasit ${id}`;
+    const mismatchName = `Anaf Nume ${id}`;
+    const { shopId: unknown } = await createBookableShop(unknownName, ['ulei']);
+    const { shopId: mismatch } = await createBookableShop(mismatchName, ['ulei']);
+    // A new CUI forgets ANAF's answer (trigger): the CUI first, then what ANAF said.
+    await serviceRest(`shop_billing?shop_id=eq.${unknown}`, 'PATCH', { vat_id: '160796', legal_name: 'Negasit SRL' });
+    await serviceRest(`shop_billing?shop_id=eq.${unknown}`, 'PATCH', {
+      anaf_cui: '160796',
+      anaf_status: 'not_found',
+      anaf_checked_at: new Date().toISOString(),
+    });
+    await serviceRest(`shop_billing?shop_id=eq.${mismatch}`, 'PATCH', { vat_id: 'RO18000003', legal_name: 'Alt Nume SRL', vat_payer: false });
+
+    await signInAdmin(page);
+    await openTool(page, 'Raport ANAF');
+    await page.getByLabel('Caută după service, cod, CUI sau denumire').fill(id);
+    const unknownCard = page.locator('li').filter({ hasText: unknownName });
+    const mismatchCard = page.locator('li').filter({ hasText: mismatchName });
+    await expect(unknownCard).toContainText('Negăsită la ANAF');
+    await expect(unknownCard).toContainText('160796');
+    await expect(mismatchCard).toContainText('Neverificată');
+    await expectNoHorizontalScroll(page);
+    await shot(page, 'anaf-report', name());
+
+    // Checked from the list: ANAF knows the CUI under another name, as a VAT payer.
+    await mismatchCard.getByRole('button', { name: 'Verifică la ANAF' }).click();
+    await expect(page.getByText(`Am verificat din nou ${mismatchName} la ANAF.`)).toBeVisible();
+    await expect(mismatchCard).toContainText('Nume diferit');
+    await expect(mismatchCard).toContainText('AUTO TEST S.R.L.');
+    await expect(mismatchCard).toContainText('TVA diferit');
+    await expect(mismatchCard.getByRole('button', { name: 'Verifică din nou' })).toBeVisible();
+
+    // The chips.
+    await page.getByRole('button', { name: /^Negăsită · \d+$/ }).click();
+    await expect(unknownCard).toBeVisible();
+    await expect(mismatchCard).toHaveCount(0);
+    await page.getByRole('button', { name: /^Probleme · \d+$/ }).click();
+    await expect(unknownCard).toBeVisible();
+    await expect(mismatchCard).toBeVisible();
+    await page.getByRole('button', { name: /^Firmă activă · \d+$/ }).click();
+    await expect(page.getByText('Niciun rezultat pentru filtrele alese.')).toBeVisible();
+    await page.getByRole('button', { name: /^Toate · \d+$/ }).click();
+
+    // The Excel file holds what the screen shows.
+    const file = await downloadCsv(page, page.getByRole('button', { name: 'Descarcă Excel' }));
+    expect(file.file).toMatch(/^raport-anaf-\d{4}-\d{2}-\d{2}\.xlsx$/);
+    expect(file.text).toContain(unknownName);
+    expect(file.text).toContain('AUTO TEST S.R.L.');
+    expect(file.text).toContain('Negăsită la ANAF');
+
+    // A card opens the shop.
+    await unknownCard.getByRole('link', { name: unknownName }).click();
+    await expect(page.getByRole('heading', { level: 1, name: unknownName })).toBeVisible();
+  });
+});

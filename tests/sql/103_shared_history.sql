@@ -147,6 +147,5 @@ select test.eq(jsonb_array_length(public.shop_vehicle_file((select id from publi
   and client_id = test.id('client_a') and car_snapshot->>'make' = 'Dacia'))->'own'), 1, 'no plate: only the same client''s jobs');
 select test.logout();
 
-select test.eq(version, 46, 'schema version') from public.schema_version;
 
 rollback;

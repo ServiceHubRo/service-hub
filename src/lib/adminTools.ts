@@ -3,6 +3,8 @@ import type {
   AdminReportRow,
   AdminSubscriptionRow,
   CatalogCategory,
+  CompanyCategory,
+  CompanyCheckRow,
   ExportBookingRow,
   ExportKind,
   ExportReviewRow,
@@ -23,6 +25,58 @@ import { fold, matchesWords, searchWords } from './text';
  */
 
 type T = (key: MessageKey, params?: Params) => string;
+
+// ------------------------------------------------------------------------------------ Raport ANAF
+
+export type CompanyFilter = 'all' | 'problems' | CompanyCategory | 'vat_mismatch';
+export const COMPANY_FILTERS: readonly CompanyFilter[] = [
+  'all',
+  'problems',
+  'ok',
+  'name_mismatch',
+  'vat_mismatch',
+  'inactive',
+  'deregistered',
+  'not_found',
+  'unchecked',
+  'no_cui',
+];
+
+/** Categories that need the admin's eye: the company is gone, unknown, inactive or named otherwise. */
+const PROBLEM_CATEGORIES: ReadonlySet<CompanyCategory> = new Set(['name_mismatch', 'inactive', 'deregistered', 'not_found']);
+
+export function isCompanyFilter(value: string | null): value is CompanyFilter {
+  return value !== null && (COMPANY_FILTERS as readonly string[]).includes(value);
+}
+
+export function isCompanyProblem(r: Pick<CompanyCheckRow, 'category' | 'vat_mismatch'>): boolean {
+  return PROBLEM_CATEGORIES.has(r.category) || r.vat_mismatch;
+}
+
+function inCompanyFilter(r: CompanyCheckRow, filter: CompanyFilter): boolean {
+  if (filter === 'all') return true;
+  if (filter === 'problems') return isCompanyProblem(r);
+  if (filter === 'vat_mismatch') return r.vat_mismatch;
+  return r.category === filter;
+}
+
+/** Shops matching every word (name, code, city, CUI with or without RO, both company names) and the chip. */
+export function filterCompanyChecks(rows: readonly CompanyCheckRow[], query: string, filter: CompanyFilter): CompanyCheckRow[] {
+  const words = searchWords(query);
+  return rows.filter((r) => {
+    if (!inCompanyFilter(r, filter)) return false;
+    if (words.length === 0) return true;
+    const cui = (r.vat_id ?? '').replace(/^RO/i, '');
+    return matchesWords(words, r.shop_name, r.display_id, r.city, r.vat_id ?? '', cui, r.legal_name ?? '', r.anaf_name ?? '');
+  });
+}
+
+/** How many shops each chip holds. */
+export function companyFilterCounts(rows: readonly CompanyCheckRow[]): Record<CompanyFilter, number> {
+  const counts = Object.fromEntries(COMPANY_FILTERS.map((f) => [f, 0])) as Record<CompanyFilter, number>;
+  for (const r of rows) for (const f of COMPANY_FILTERS) if (inCompanyFilter(r, f)) counts[f] += 1;
+  return counts;
+}
 
 // ------------------------------------------------------------------------------------ subscriptions
 
@@ -350,12 +404,27 @@ const SUBSCRIPTION_COLUMNS: Column<AdminSubscriptionRow>[] = [
   ['admin.csv.stripeSubscription', (r) => r.stripe_subscription_id ?? ''],
 ];
 
+const COMPANY_COLUMNS: Column<CompanyCheckRow>[] = [
+  ['admin.csv.account', (r) => r.display_id],
+  ['admin.csv.shop', (r) => r.shop_name],
+  ['admin.csv.city', (r) => r.city],
+  ['admin.csv.cui', (r) => r.vat_id ?? ''],
+  ['admin.csv.legalName', (r) => r.legal_name ?? ''],
+  ['admin.csv.anafName', (r) => r.anaf_name ?? ''],
+  ['admin.csv.anafStatus', (r, t) => t(`anaf.category.${r.category}`)],
+  ['admin.csv.vatDeclared', (r, t) => (r.vat_payer === null ? '' : yesNo(t, r.vat_payer))],
+  ['admin.csv.vatAnaf', (r, t) => (r.anaf_vat_payer === null ? '' : yesNo(t, r.anaf_vat_payer))],
+  ['admin.csv.anafAddress', (r) => r.anaf_address ?? ''],
+  ['admin.csv.checkedAt', (r) => csvDateTime(r.anaf_checked_at)],
+];
+
 const COLUMNS: Record<ExportKind, Column<never>[]> = {
   shops: SHOP_COLUMNS as Column<never>[],
   clients: CLIENT_COLUMNS as Column<never>[],
   bookings: BOOKING_COLUMNS as Column<never>[],
   reviews: REVIEW_COLUMNS as Column<never>[],
   subscriptions: SUBSCRIPTION_COLUMNS as Column<never>[],
+  company_checks: COMPANY_COLUMNS as Column<never>[],
 };
 
 /** The rows of an export as a table (header first), in the interface language. */

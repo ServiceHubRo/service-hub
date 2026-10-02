@@ -121,7 +121,7 @@ select test.eq(
       and not has_function_privilege('anon', p.oid, 'execute')),
   'admin_create_category, admin_create_service, admin_decide_review, admin_decide_suspect_review, admin_export, admin_extend_trial, admin_force_cancel, '
   || 'admin_get_booking, admin_get_client, admin_get_shop, admin_get_thread, admin_list_audit, admin_list_bookings, '
-  || 'admin_list_catalog, admin_list_clients, admin_list_history_reports, admin_list_notices, admin_list_reviews, '
+  || 'admin_list_catalog, admin_list_clients, admin_list_company_checks, admin_list_history_reports, admin_list_notices, admin_list_reviews, '
   || 'admin_list_shops, admin_list_subscriptions, admin_list_suspect_reviews, admin_move_catalog_item, admin_notice_preview, admin_overview, '
   || 'admin_send_notice, admin_set_account_suspended, admin_set_notification_text, admin_set_service_reminder, admin_set_shop_suspended, '
   || 'admin_set_subscription_price, admin_set_subscription_status, admin_update_category, admin_update_service, '

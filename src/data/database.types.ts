@@ -2217,6 +2217,7 @@ export type Database = {
       }
       admin_list_catalog: { Args: never; Returns: Json }
       admin_list_clients: { Args: never; Returns: Json }
+      admin_list_company_checks: { Args: never; Returns: Json }
       admin_list_history_reports: { Args: never; Returns: Json }
       admin_list_notices: { Args: never; Returns: Json }
       admin_list_reviews: { Args: { p_q?: string }; Returns: Json }

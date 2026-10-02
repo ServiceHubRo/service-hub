@@ -132,6 +132,7 @@ for (const lang of ['ro', 'en'] as const) {
       '/admin/cont/setari/texte',
       '/admin/cont/anunturi',
       '/admin/cont/export',
+      '/admin/cont/anaf',
     ]);
   });
 }
