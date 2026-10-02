@@ -49,6 +49,9 @@ select test.ok((select not_before > now() from public.notification_events where 
   'a reminder waits for the end of the quiet hours');
 select test.ok((select not_before is null from public.notification_events where event = 'booking_confirmed'),
   'a confirmation goes at once');
+select public.notify_shop_owner(test.id('shop1'), 'invoice_paid', '{}');
+select test.ok((select not_before is null from public.notification_events where event = 'invoice_paid'),
+  'the payment receipt goes at once (an email the payer waits for)');
 select test.eq((select count(*) from jsonb_array_elements(public.claim_notifications(50)->'events') e
                 where e->>'event' = 'review_request'), 0::bigint, 'the waiting one is not claimed');
 -- Due: claimed. Waited from 21:00 to 9:00 (12 hours) and still sent, not closed as old.
