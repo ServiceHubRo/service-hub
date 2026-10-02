@@ -70,7 +70,7 @@ test.describe('demo shop', () => {
     await page.getByRole('button', { name: 'Ultimele 3 luni' }).click();
     await expect(page).toHaveURL(/perioada=quarter/);
     await expect(page.getByRole('button', { name: 'Ultimele 3 luni', pressed: true })).toBeVisible();
-    await expect(page.getByText(/Crește cu|Scade cu|La fel|Înainte: 0/).first()).toBeVisible();
+    await expect(page.getByText(/Crește cu|Scade cu|Fără schimbare|Înainte: 0/).first()).toBeVisible();
     await expect(page.getByText(/\d+ acceptate din \d+/)).toBeVisible();
     const revenue = (await stat(page, 'Încasat (lei)').textContent())!.trim();
     const jobs = (await stat(page, 'Lucrări').textContent())!.trim();
@@ -90,7 +90,7 @@ test.describe('demo shop', () => {
     expect(csv).toContain(';Taxă de constatare;');
 
     // "Tot" has nothing to compare with.
-    await page.getByRole('button', { name: 'Tot', exact: true }).click();
+    await page.getByRole('button', { name: 'Toată perioada', exact: true }).click();
     await expect(page).toHaveURL(/perioada=all/);
     await expect(page.getByText(/^Comparat cu/)).toHaveCount(0);
 
@@ -102,7 +102,7 @@ test.describe('demo shop', () => {
 
     // Back to Rapoarte: the period stayed in the address.
     await page.goBack();
-    await expect(page.getByRole('button', { name: 'Tot', pressed: true })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Toată perioada', pressed: true })).toBeVisible();
   });
 });
 

@@ -75,7 +75,7 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
       body: 'Programarea {ref} la {shop} a fost anulată de echipa Service-Hub. Motiv: {reason}',
     },
     'client.no_show': { title: '{shop}', body: 'Programarea {ref} din {when} a fost marcată ca neprezentare.' },
-    'client.inspection_started': { title: '{shop}', body: '{car} este în constatare. Devizul vine în aplicație.' },
+    'client.inspection_started': { title: '{shop}', body: '{car} este în constatare. Vei primi devizul în aplicație.' },
     'client.quote_sent': { title: '{shop}', body: 'Devizul pentru {car} este gata: {total}. Răspunde până pe {deadline}.' },
     'client.quote_replaced': { title: '{shop}', body: 'Service-ul a modificat devizul pentru {car}: {total}.' },
     'client.quote_withdrawn': { title: '{shop}', body: 'Service-ul a retras devizul pentru {car}.' },
@@ -100,24 +100,24 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
     },
     'client.service_due': {
       title: '{car}: {service}',
-      body: 'Ultima dată pe {last_done}, la {shop}. Următoarea se apropie, pe la {due}. Programează-te din aplicație.',
+      body: 'Ultima dată pe {last_done}, la {shop}. Următoarea este recomandată în jurul datei de {due}. Programează-te din aplicație.',
     },
     // ------------------------------------------------------------------ tips and offers (T24, push only)
     'client.tire_season': {
       title: 'Anvelopele de iarnă',
-      body: 'E timpul pentru anvelopele de iarnă la {car}. Programează schimbul din aplicație, înainte de aglomerație.',
+      body: 'Este momentul pentru anvelopele de iarnă la {car}. Programează schimbul din aplicație, înainte de aglomerație.',
     },
     'client.tire_season_shop': {
       title: 'Anvelopele de iarnă',
-      body: 'E timpul pentru anvelopele de iarnă la {car}. Data trecută le-ai schimbat la {shop}; te poți programa din aplicație.',
+      body: 'Este momentul pentru anvelopele de iarnă la {car}. Data trecută le-ai schimbat la {shop}; te poți programa din aplicație.',
     },
     'client.tire_season_summer': {
       title: 'Anvelopele de vară',
-      body: 'E timpul pentru anvelopele de vară la {car}. Programează schimbul din aplicație, înainte de aglomerație.',
+      body: 'Este momentul pentru anvelopele de vară la {car}. Programează schimbul din aplicație, înainte de aglomerație.',
     },
     'client.tire_season_summer_shop': {
       title: 'Anvelopele de vară',
-      body: 'E timpul pentru anvelopele de vară la {car}. Data trecută le-ai schimbat la {shop}; te poți programa din aplicație.',
+      body: 'Este momentul pentru anvelopele de vară la {car}. Data trecută le-ai schimbat la {shop}; te poți programa din aplicație.',
     },
     'client.welcome': {
       title: 'Service-Hub',
@@ -177,7 +177,7 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
     },
     'shop.monthly_report': {
       title: 'Luna {month} pe Service-Hub',
-      body: 'Lucrări terminate: {done}. Încasări: {revenue}. Cereri primite: {requests}. Vezi raportul complet.',
+      body: 'Lucrări finalizate: {done}. Încasări: {revenue}. Cereri primite: {requests}. Vezi raportul complet.',
     },
     // ------------------------------------------------------------------ to the shop's owner (T14)
     'shop.trial_ending': {
@@ -189,11 +189,11 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
       body: 'Perioada gratuită se termină azi. Activează abonamentul ca service-ul să rămână în căutări.',
     },
     'shop.payment_failed': {
-      title: 'Plata nu a trecut',
+      title: 'Plata nu a reușit',
       body: 'Nu am putut încasa abonamentul de {total}. Verifică sau schimbă cardul din Abonament. Reîncercăm pe {expiry}.',
     },
     'shop.payment_failed_final': {
-      title: 'Plata nu a trecut',
+      title: 'Plata nu a reușit',
       body: 'Nu am putut încasa abonamentul de {total}. A fost ultima încercare: plătește din Abonament ca service-ul să rămână în căutări.',
     },
     'shop.shop_inactive': {
@@ -202,7 +202,7 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
     },
     'shop.shop_inactive_payment': {
       title: 'Service-ul nu mai apare în căutări',
-      body: 'Plata abonamentului nu a trecut. Plătește din Abonament ca să primești din nou programări. Datele tale rămân.',
+      body: 'Plata abonamentului nu a reușit. Plătește din Abonament ca să primești din nou programări. Datele tale rămân.',
     },
     'shop.shop_inactive_cancelled': {
       title: 'Service-ul nu mai apare în căutări',
@@ -240,20 +240,20 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
     // ------------------------------------------------------------------ shop referrals
     'shop.referral_reward': {
       title: 'Ai primit o lună gratuită',
-      body: '{referred} a plătit abonamentul, recomandat de tine. Perioada ta gratuită s-a prelungit cu {days}, până pe {expiry}.',
+      body: '{referred}, service-ul recomandat de tine, a plătit abonamentul. Perioada ta gratuită s-a prelungit cu {days}, până pe {expiry}.',
     },
     'shop.referral_reward_credit': {
       title: 'Ai primit o lună gratuită',
-      body: '{referred} a plătit abonamentul, recomandat de tine. Următoarea ta plată scade cu {total}.',
+      body: '{referred}, service-ul recomandat de tine, a plătit abonamentul. Următoarea ta plată scade cu {total}.',
     },
     'shop.referral_revoked': {
       title: 'Luna gratuită s-a anulat',
-      body: 'Plata lui {referred} a fost returnată, așa că luna gratuită pentru recomandare s-a anulat. Ce ai folosit deja rămâne.',
+      body: 'Plata service-ului {referred} a fost returnată, așa că luna gratuită pentru recomandare s-a anulat. Ce ai folosit deja rămâne.',
     },
     // ------------------------------------------------------------------ account suspended / reactivated
     'client.account_suspended': {
       title: 'Cont suspendat',
-      body: 'Echipa Service-Hub ți-a suspendat contul. Poți vedea ce ai, dar nu poți face programări, trimite mesaje sau recenzii. Detalii în emailul primit.',
+      body: 'Echipa Service-Hub ți-a suspendat contul. Poți vedea datele tale, dar nu poți face programări, trimite mesaje sau recenzii. Detalii în emailul primit.',
     },
     'client.account_reactivated': {
       title: 'Cont reactivat',

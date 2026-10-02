@@ -184,7 +184,7 @@ test.describe('admin tools', () => {
     await card.getByLabel('Iconiță').selectOption('Truck');
     // The service reminder interval (T19d): whole months, 1–120, or empty.
     await card.getByLabel('Reminder de revizie (luni)').fill('0');
-    await expect(card.getByText('Un număr întreg de luni, între 1 și 120, sau gol.')).toBeVisible();
+    await expect(card.getByText('Scrie un număr întreg de luni, între 1 și 120, sau lasă câmpul gol.')).toBeVisible();
     await expect(card.getByRole('button', { name: 'Adaugă serviciul' })).toBeDisabled();
     await card.getByLabel('Reminder de revizie (luni)').fill('18');
     await card.getByRole('button', { name: 'Adaugă serviciul' }).click();

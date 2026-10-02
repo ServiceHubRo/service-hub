@@ -168,7 +168,7 @@ test.describe('quote, work, completion, review', () => {
 
     // Shop: În lucru → the client sees it live.
     await shopA.getByRole('button', { name: 'În lucru' }).click();
-    await expect(shopPage.getByText(`Lucrarea la ${accepted.ref} a început. Clientul a aflat.`)).toBeVisible();
+    await expect(shopPage.getByText(`Lucrarea pentru ${accepted.ref} a început. Clientul a fost anunțat.`)).toBeVisible();
     await expect(clientCard(page, accepted.ref)).toContainText('Mașina ta este în lucru');
 
     // Finalizare: prefilled from the approved lines only; no completion without the odometer.
@@ -253,7 +253,7 @@ test.describe('quote, work, completion, review', () => {
 
     // More than 50 000 km above: an explicit confirmation before the button works.
     await odometer.fill('160000');
-    await expect(job.getByText('Sunt 54.600 km în plus față de ultima lucrare. Confirmi?')).toBeVisible();
+    await expect(job.getByText('Kilometrajul are cu 54.600 km mai mult decât la ultima lucrare. Confirmi?')).toBeVisible();
     await expect(job.getByRole('button', { name: 'Confirmă finalizarea' })).toBeDisabled();
     await job.getByText('Da, kilometrajul este corect').click();
     await job.getByRole('button', { name: 'Confirmă finalizarea' }).click();

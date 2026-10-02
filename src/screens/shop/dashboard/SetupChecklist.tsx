@@ -16,7 +16,7 @@ const STEP_LINK: Record<Exclude<SetupStep, 'phone'>, string> = {
 };
 
 /**
- * "Pune service-ul pe picioare" (P5d): four steps with "2 din 4". Shown until all four are done,
+ * "Pregătește service-ul pentru programări" (P5d): four steps with "2 din 4". Shown until all four are done,
  * then never again (the database stamps setup_completed_at). Step 4 is done right here: the
  * owner asks for a code by SMS and types it (T13). The steps are the owner's: a colleague sees how
  * far it is, without links, and who does it.

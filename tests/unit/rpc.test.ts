@@ -89,7 +89,7 @@ describe('rpcErrorMessage', () => {
       'The last recorded reading was 105,400 km. Check the number.',
     );
     expect(rpcErrorMessage('ro', pgError('odometer_jump', '{"previous":105400,"diff":61000}'))).toBe(
-      'Sunt 61.000 km în plus față de ultima lucrare. Confirmi?',
+      'Kilometrajul are cu 61.000 km mai mult decât la ultima lucrare. Confirmi?',
     );
   });
 

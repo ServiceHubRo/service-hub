@@ -228,15 +228,15 @@ test.describe('subscription', () => {
     const customer = (await subscriptionOf(shopId)).stripe_customer_id!;
     await stripeFailPayment(customer);
     await expect(page.getByText('Plată restantă', { exact: true })).toBeVisible();
-    await expect(page.getByText(/^Plata nu a trecut\. Reîncercăm pe .+\. Verifică sau schimbă cardul din Gestionează\.$/)).toBeVisible();
+    await expect(page.getByText(/^Plata nu a reușit\. Reîncercăm pe .+\. Verifică sau schimbă cardul din Gestionează\.$/)).toBeVisible();
     // The thank-you from the checkout does not stay over a later failed payment.
     await expect(page.getByText('Mulțumim. Abonamentul este activ.')).toHaveCount(0);
     await shot(page, 't14-subscription-past-due', name());
-    const failedMail = await emailWith(email, 'Plata abonamentului nu a trecut');
+    const failedMail = await emailWith(email, 'Plata abonamentului nu a reușit');
     expect(failedMail.text).toMatch(/Reîncercăm pe \d{1,2} [a-z]+\./);
 
     await page.goto('/s/panou');
-    await expect(page.getByText('Plata abonamentului nu a trecut. Verifică cardul ca service-ul să rămână în căutări.')).toBeVisible();
+    await expect(page.getByText('Plata abonamentului nu a reușit. Verifică cardul ca service-ul să rămână în căutări.')).toBeVisible();
     await expectNoHorizontalScroll(page);
     await shot(page, 't14-panou-past-due', name());
     expect((await rpcAs<{ public: boolean }>(email, 'get_shop_setup', {})).public).toBe(true);
@@ -244,7 +244,7 @@ test.describe('subscription', () => {
     await stripeFailPayment(customer, true);
     await page.goto('/s/cont/abonament');
     await expect(page.getByText('Inactiv', { exact: true })).toBeVisible();
-    await expect(page.getByText('Plata abonamentului nu a trecut. Service-ul tău nu mai apare în căutări.')).toBeVisible();
+    await expect(page.getByText('Plata abonamentului nu a reușit. Service-ul tău nu mai apare în căutări.')).toBeVisible();
     expect(await subscriptionOf(shopId)).toMatchObject({ status: 'inactive', stripe_status: 'unpaid' });
   });
 

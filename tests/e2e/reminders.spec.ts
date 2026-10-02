@@ -95,14 +95,14 @@ test.describe('client reminders', () => {
 
     await signIn(page, client, PASSWORD);
     await expect(page).toHaveURL(/\/c\/cauta/);
-    const card = page.getByRole('region', { name: 'Recenzie de lăsat' });
+    const card = page.getByRole('region', { name: 'Recenzie în așteptare' });
     await expect(card).toContainText(`Cum a fost la ${shopName}? Lasă o recenzie.`);
     await expect(card).toContainText('Schimb ulei');
     await expectNoHorizontalScroll(page);
     await shot(page, 't19d-review-card', name());
 
     await setLanguage(page, 'en', 'Search');
-    const cardEn = page.getByRole('region', { name: 'A review to leave' });
+    const cardEn = page.getByRole('region', { name: 'Review waiting' });
     await expect(cardEn).toContainText(`How was it at ${shopName}? Leave a review.`);
     await expectNoHorizontalScroll(page);
     await shot(page, 't19d-review-card-en', name());
@@ -170,7 +170,7 @@ test.describe('client reminders', () => {
 
     await signIn(page, client, PASSWORD);
     await expect(page).toHaveURL(/\/c\/cauta/);
-    const card = page.getByRole('region', { name: 'Recenzie de lăsat' });
+    const card = page.getByRole('region', { name: 'Recenzie în așteptare' });
     await expect(card).toBeVisible();
 
     await openAccount(page);

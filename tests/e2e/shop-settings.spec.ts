@@ -56,7 +56,7 @@ test.describe('shop settings', () => {
     await expect(page).toHaveURL(/\/s\/panou$/);
 
     // Panou: checklist 0 of 4 and why the shop is not in search.
-    await expect(page.getByRole('heading', { name: 'Pune service-ul pe picioare' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Pregătește service-ul pentru programări' })).toBeVisible();
     await expect(page.getByText('0 din 4', { exact: true })).toBeVisible();
     await expect(page.getByText('Service-ul tău nu apare încă în căutări.')).toBeVisible();
     await expect(page.getByText('Alege cel puțin un serviciu.')).toBeVisible();
@@ -79,9 +79,9 @@ test.describe('shop settings', () => {
     await page.getByRole('button', { name: 'Șterge căutarea' }).click();
     await page.getByLabel('Caută un serviciu').fill('frâne');
     const brakes = await page.getByRole('checkbox').count();
-    await page.getByRole('button', { name: 'Alege tot' }).click();
+    await page.getByRole('button', { name: 'Selectează tot' }).click();
     await expect(page.getByText(`Selectate: ${brakes + 2} din 150`)).toBeVisible();
-    await page.getByRole('button', { name: 'Scoate tot' }).click();
+    await page.getByRole('button', { name: 'Deselectează tot' }).click();
     await expect(page.getByText('Selectate: 2 din 150')).toBeVisible();
     await clickInPlace(page, page.getByRole('checkbox', { name: 'Plăcuțe de frână' }));
     await expect(page.getByText('Ai modificări nesalvate.')).toBeVisible();
@@ -127,7 +127,7 @@ test.describe('shop settings', () => {
     // 3. Rules: 6 cars a day, inspection fee 80 lei.
     await page.getByRole('link', { name: 'Setări service' }).click();
     await page.getByRole('link', { name: /Reguli de programare/ }).click();
-    await clickInPlace(page, page.getByRole('button', { name: 'Crește: Comenzi pe zi' }));
+    await clickInPlace(page, page.getByRole('button', { name: 'Crește: Mașini pe zi' }));
     await expect(page.locator('#capacitate output')).toHaveText('6');
     await page.getByLabel('Suma (lei)').fill('8o');
     await page.getByRole('button', { name: 'Salvează regulile' }).click();
@@ -146,7 +146,7 @@ test.describe('shop settings', () => {
     await verifyPhoneByAdmin(email);
     await page.reload();
     await expect(page.getByText('Mașini pe zi: 6')).toBeVisible();
-    await expect(page.getByRole('heading', { name: 'Pune service-ul pe picioare' })).toHaveCount(0);
+    await expect(page.getByRole('heading', { name: 'Pregătește service-ul pentru programări' })).toHaveCount(0);
     await expect(page.getByText('Service-ul tău nu apare încă în căutări.')).toHaveCount(0);
     await shot(page, 't05-panou-done', name());
 
@@ -281,7 +281,7 @@ test.describe('shop settings', () => {
     await page.reload();
     await expect(page.getByText('Mihai Coleg')).toBeVisible();
     await page.getByRole('button', { name: 'Elimină' }).click();
-    await expect(page.getByText('Elimini pe Mihai Coleg din echipă?', { exact: false })).toBeVisible();
+    await expect(page.getByText('Elimini din echipă: Mihai Coleg?', { exact: false })).toBeVisible();
     await page.getByRole('button', { name: 'Da, elimină' }).click();
     await expect(page.getByText('Mihai Coleg')).toHaveCount(0);
     await guest.goto('/s/panou');
@@ -293,7 +293,7 @@ test.describe('shop settings', () => {
     const email = await createUser('shop', { lang: 'en' });
     await signIn(page, email, PASSWORD);
     await expect(page).toHaveURL(/\/s\/panou$/);
-    await expect(page.getByRole('heading', { name: 'Get your shop up and running' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Get your shop ready for bookings' })).toBeVisible();
     await expect(page.getByText('0 of 4', { exact: true })).toBeVisible();
     await expect(page.getByText("Your shop doesn't appear in search yet.")).toBeVisible();
     await shot(page, 't05-panou-en', name());

@@ -215,7 +215,7 @@ export function staffInviteEmail(lang: Lang, d: InviteData): EmailContent {
     title: 'Ai primit o invitație',
     blocks: [
       { p: `${who} te-a invitat să lucrezi în contul ${place} pe Service-Hub: programări, devize și mesaje de la clienți.` },
-      { p: `Invitația este pentru ${d.email} și este valabilă 14 zile. Îți faci contul din butonul de mai jos.` },
+      { p: `Invitația este pentru ${d.email} și este valabilă 14 zile. Îți poți crea contul din butonul de mai jos.` },
     ],
     button: { label: 'Acceptă invitația', url: d.url },
     footer: 'Dacă nu te așteptai la acest email, îl poți ignora.',
@@ -270,7 +270,7 @@ function subscriptionEmail(e: EmailEvent, lang: Lang, app: string): EmailContent
   const footer =
     lang === 'en'
       ? `You are receiving this email as the owner of ${shop} on Service-Hub.`
-      : `Primești acest email ca proprietar al ${shop} pe Service-Hub.`;
+      : `Primești acest email ca proprietar al service-ului ${shop} pe Service-Hub.`;
   const en = lang === 'en';
 
   switch (e.event) {
@@ -308,7 +308,7 @@ function subscriptionEmail(e: EmailEvent, lang: Lang, app: string): EmailContent
       const reward = credit
         ? en
           ? `Your next payment is ${total} lower: we took one month off.`
-          : `Următoarea ta plată scade cu ${total}: am scăzut o lună.`
+          : `Următoarea ta plată este mai mică cu ${total}, valoarea unei luni de abonament.`
         : en
           ? `Your free period is ${days} days longer${until ? `, until ${until}` : ''}.`
           : `Perioada ta gratuită s-a prelungit cu ${days} de zile${until ? `, până pe ${until}` : ''}.`;
@@ -326,7 +326,7 @@ function subscriptionEmail(e: EmailEvent, lang: Lang, app: string): EmailContent
           {
             p: en
               ? 'Every shop you bring that pays brings you another free month, up to 12.'
-              : 'Fiecare service adus de tine care plătește îți aduce încă o lună gratuită, până la 12.',
+              : 'Pentru fiecare service recomandat de tine care plătește abonamentul primești încă o lună gratuită, până la 12.',
           },
         ],
         button: open,
@@ -342,7 +342,7 @@ function subscriptionEmail(e: EmailEvent, lang: Lang, app: string): EmailContent
             : `${referred} a contestat prima plată la bancă.`
           : en
             ? `${referred}'s first payment was refunded.`
-            : `Prima plată a lui ${referred} a fost returnată.`;
+            : `Prima plată a service-ului ${referred} a fost returnată.`;
       return email(en ? 'Your free month was canceled' : 'Luna gratuită s-a anulat', {
         lang,
         preheader: why,
@@ -352,7 +352,7 @@ function subscriptionEmail(e: EmailEvent, lang: Lang, app: string): EmailContent
           {
             p: en
               ? 'So the free month for the referral was canceled. We only took back what you had not used yet; nothing extra is charged.'
-              : 'Așa că luna gratuită pentru recomandare s-a anulat. Am retras doar ce nu folosiseși încă; nu plătești nimic în plus.',
+              : 'Prin urmare, luna gratuită pentru recomandare s-a anulat. Am retras doar zilele pe care nu le folosiseși încă; nu plătești nimic în plus.',
           },
         ],
         button: open,
@@ -390,10 +390,10 @@ function subscriptionEmail(e: EmailEvent, lang: Lang, app: string): EmailContent
     case 'payment_failed': {
       const next = day(p.expiry);
       const final = p.final === true || !next;
-      return email(en ? 'Your subscription payment failed' : 'Plata abonamentului nu a trecut', {
+      return email(en ? 'Your subscription payment failed' : 'Plata abonamentului nu a reușit', {
         lang,
         preheader: en ? 'Check or change your card.' : 'Verifică sau schimbă cardul.',
-        title: en ? 'Payment failed' : 'Plata nu a trecut',
+        title: en ? 'Payment failed' : 'Plata nu a reușit',
         blocks: [
           {
             p: en
@@ -420,7 +420,7 @@ function subscriptionEmail(e: EmailEvent, lang: Lang, app: string): EmailContent
         reason === 'payment_failed'
           ? en
             ? "The subscription payment didn't go through."
-            : 'Plata abonamentului nu a trecut.'
+            : 'Plata abonamentului nu a reușit.'
           : reason === 'cancelled'
             ? en
               ? 'Your subscription has ended.'
@@ -475,7 +475,7 @@ export function emailForEvent(e: EmailEvent, app: string): EmailContent | null {
           { p: `${shop} a raportat o recenzie. Recenzia rămâne publică până decizi.` },
           { rows },
           ...(str(p.text) ? [{ quote: str(p.text) }] : [{ p: 'Recenzia nu are text.' }]),
-          { p: 'Service-ului i-am promis un răspuns în maximum 5 zile lucrătoare.' },
+          { p: 'Service-ului i-am promis un răspuns în cel mult 5 zile lucrătoare.' },
         ],
         button: { label: 'Deschide Service-Hub', url: `${app}/intra` },
         footer: 'Primești acest email ca administrator Service-Hub (ADMIN_EMAIL).',
@@ -591,7 +591,7 @@ function monthlyReportEmail(p: Record<string, unknown>, lang: Lang, app: string)
   const n = (v: unknown) => String(num(v) ?? 0);
   const rows: [string, string][] = [
     [en ? 'Requests' : 'Cereri primite', n(p.requests)],
-    [en ? 'Jobs done' : 'Lucrări terminate', n(p.done)],
+    [en ? 'Jobs done' : 'Lucrări finalizate', n(p.done)],
     [en ? 'Revenue from those jobs' : 'Încasări din aceste lucrări', formatMoney(lang, num(p.revenue) ?? 0)],
     [en ? 'New clients' : 'Clienți noi', n(p.new_clients)],
   ];
@@ -604,10 +604,10 @@ function monthlyReportEmail(p: Record<string, unknown>, lang: Lang, app: string)
   const title = en ? `Your ${month} on Service-Hub` : `Luna ${month} pe Service-Hub`;
   return email(en ? `${shop}: your ${month} on Service-Hub` : `${shop}: luna ${month} pe Service-Hub`, {
     lang,
-    preheader: en ? `Jobs done in ${month}: ${n(p.done)}.` : `Lucrări terminate în ${month}: ${n(p.done)}.`,
+    preheader: en ? `Jobs done in ${month}: ${n(p.done)}.` : `Lucrări finalizate în ${month}: ${n(p.done)}.`,
     title,
     blocks: [
-      { p: en ? `Here is what came to ${shop} through Service-Hub in ${month}.` : `Iată ce a venit la ${shop} prin Service-Hub în ${month}.` },
+      { p: en ? `Here is what came to ${shop} through Service-Hub in ${month}.` : `Iată activitatea service-ului ${shop} prin Service-Hub în luna ${month}.` },
       { rows },
       {
         p: en
@@ -618,6 +618,6 @@ function monthlyReportEmail(p: Record<string, unknown>, lang: Lang, app: string)
     button: { label: en ? 'Open Reports' : 'Deschide Rapoarte', url: `${app}${SHOP_REPORTS_PATH}` },
     footer: en
       ? `You are receiving this email as the owner of ${shop} on Service-Hub. Turn it off under Settings → Notifications.`
-      : `Primești acest email ca proprietar al ${shop} pe Service-Hub. Îl poți opri din Setări → Notificări.`,
+      : `Primești acest email ca proprietar al service-ului ${shop} pe Service-Hub. Îl poți opri din Setări → Notificări.`,
   });
 }

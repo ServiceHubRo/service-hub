@@ -37,7 +37,7 @@ test.describe('shop referrals', () => {
     await page.goto('/s/cont/abonament');
     await expect(page.getByRole('heading', { name: 'Recomandă Service-Hub' })).toBeVisible();
     const code = (await page.locator('span.mono').filter({ hasText: /^S-\d{5,}$/ }).textContent())!.trim();
-    await expect(page.getByText('Niciun service adus încă.')).toBeVisible();
+    await expect(page.getByText('Niciun service recomandat încă.')).toBeVisible();
     await expect(page.getByText('Luni gratuite primite: 0 din 12')).toBeVisible();
     const whatsapp = page.getByRole('link', { name: 'Trimite pe WhatsApp' });
     await expect(whatsapp).toHaveAttribute('href', new RegExp(`^https://wa\\.me/\\?text=.*${code}`));
@@ -101,7 +101,7 @@ test.describe('shop referrals', () => {
     await expect(page.getByText('A plătit', { exact: true })).toBeVisible();
     await expect(page.getByText(/Perioada ta gratuită: \+30 de zile/)).toBeVisible();
     await expect(page.getByText(/Mai ai 1[12]\d de zile gratuite/)).toBeVisible();
-    await page.getByRole('heading', { name: 'Service-urile aduse' }).scrollIntoViewIfNeeded();
+    await page.getByRole('heading', { name: 'Service-uri recomandate' }).scrollIntoViewIfNeeded();
     await expectNoHorizontalScroll(page);
     await shot(page, 'referral-card-rewarded', name());
 

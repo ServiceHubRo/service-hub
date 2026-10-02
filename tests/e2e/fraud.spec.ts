@@ -216,7 +216,7 @@ test.describe('T25 fraud checks', () => {
     await shot(page, 't25-anaf-en', name());
   });
 
-  test('Moderare: a review that looks staged is listed with why; "E în regulă" takes it off', async ({ page }) => {
+  test('Moderare: a review that looks staged is listed with why; "Este în regulă" takes it off', async ({ page }) => {
     const shopName = `Atelier T25 ${Date.now()}`;
     const { email: shop, shopId } = await createBookableShop(shopName, ['ulei']);
     const client = await createUser('client');
@@ -232,16 +232,16 @@ test.describe('T25 fraud checks', () => {
     // The link carries the number of reported reviews when other tests reported some: go straight there.
     await page.goto('/admin/moderare');
     await expect(page.getByRole('heading', { level: 1, name: 'Moderare' })).toBeVisible();
-    const card = page.getByRole('listitem').filter({ hasText: shopName }).filter({ hasText: 'Lucrare în câteva minute' });
+    const card = page.getByRole('listitem').filter({ hasText: shopName }).filter({ hasText: 'Lucrare foarte rapidă' });
     await expect(card).toBeVisible();
     await expect(card).toContainText('Lucrarea a fost terminată la mai puțin de 3 ore după ce s-a făcut programarea.');
     await card.scrollIntoViewIfNeeded();
     await expectNoHorizontalScroll(page);
     await shot(page, 't25-suspect', name());
 
-    await card.getByRole('button', { name: 'E în regulă' }).click();
+    await card.getByRole('button', { name: 'Este în regulă' }).click();
     await expect(card.getByText('Recenzia rămâne publicată și iese din această listă.')).toBeVisible();
-    await card.getByRole('button', { name: 'E în regulă' }).click();
+    await card.getByRole('button', { name: 'Este în regulă' }).click();
     await expect(card).toHaveCount(0);
     const [review] = await serviceRest<{ signals_cleared_at: string | null; removed_at: string | null }[]>(
       `reviews?booking_id=eq.${booking.id}&select=signals_cleared_at,removed_at`,

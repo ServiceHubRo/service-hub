@@ -254,7 +254,7 @@ test.describe('messages and reviews', () => {
     await shot(page, 't11-shop-report', name());
     await bad.getByRole('button', { name: 'Trimite raportarea' }).click();
     await expect(bad).toContainText('Raportată');
-    await expect(bad).toContainText('Primești răspuns în maximum 5 zile lucrătoare.');
+    await expect(bad).toContainText('Primești răspuns în cel mult 5 zile lucrătoare.');
     await expect(bad.getByRole('button', { name: 'Raportează' })).toHaveCount(0);
     await shot(page, 't11-shop-reviews', name());
 
