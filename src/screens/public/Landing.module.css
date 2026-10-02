@@ -18,6 +18,12 @@
 
 /* ------------------------------------------------------------------ header */
 .header {
+  /* Stays at the top while the page scrolls under it: the way in is always at hand, and Safari
+     on the iPhone colors the status bar with this solid band instead of blurring the page. */
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: var(--bg);
   border-bottom: 1px solid var(--border);
   /* Below the iPhone status bar in the Home Screen app (viewport-fit=cover). */
   padding-top: max(12px, calc(var(--safe-top) + 6px));
