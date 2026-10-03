@@ -172,6 +172,9 @@ describe('app emails', () => {
     expect(shop.subject).toBe('Atelier Unu: A request closed without an answer');
     expect(shop.text).toContain('(Oil change)');
     expect(shop.html).toContain('https://app.ro/s/programari?tab=cereri');
+    const last = emailForEvent({ event: 'booking_request_last_call', lang: 'ro', role: 'shop', params, service } as never, 'https://app.ro')!;
+    expect(last.subject).toBe('Atelier Unu: Ultima reamintire pentru o cerere');
+    expect(last.text).toContain('Dacă nu răspunzi până atunci, cererea se închide automat.');
   });
 
   it("sends the admin a morning email with only what waits", () => {

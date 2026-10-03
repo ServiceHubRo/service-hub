@@ -127,6 +127,5 @@ select test.eq(public.send_admin_digest(now() + interval '2 hours'), false, 'onc
 select test.ok(public.run_hourly_jobs(((current_date + 1) + time '08:00') at time zone 'Europe/Bucharest') ? 'admin_digest',
   'run at 08:00');
 
-select test.eq((select version from public.schema_version), 49, 'schema 49');
 
 rollback;

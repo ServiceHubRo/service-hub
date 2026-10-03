@@ -179,8 +179,12 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
     'shop.daily_digest': { title: 'Programul de azi', body: '{digest}' },
     // T24
     'shop.booking_request_waiting': {
-      title: 'Cerere fără răspuns',
-      body: '{client} așteaptă răspuns pentru {when}: {service}. Confirmă sau propune altă oră.',
+      title: 'O cerere așteaptă răspunsul tău',
+      body: '{client} așteaptă răspuns pentru {when}: {service}. Confirmă programarea sau propune altă oră.',
+    },
+    'shop.booking_request_last_call': {
+      title: 'Ultima reamintire pentru o cerere',
+      body: '{client} așteaptă încă răspuns pentru {when}: {service}. Dacă nu răspunzi până atunci, cererea se închide automat. Confirmă programarea sau propune altă oră.',
     },
     'shop.request_expired': {
       title: 'O cerere s-a închis fără răspuns',
@@ -423,8 +427,12 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
     'shop.daily_digest': { title: "Today's schedule", body: '{digest}' },
     // T24
     'shop.booking_request_waiting': {
-      title: 'Request waiting',
+      title: 'A request is waiting for you',
       body: '{client} is waiting for an answer for {when}: {service}. Confirm it or suggest another time.',
+    },
+    'shop.booking_request_last_call': {
+      title: 'Last reminder for a request',
+      body: "{client} is still waiting for an answer for {when}: {service}. If you don't answer by then, the request closes automatically. Confirm it or suggest another time.",
     },
     'shop.request_expired': {
       title: 'A request closed without an answer',
@@ -615,7 +623,7 @@ export const EVENTS: Record<Side, readonly string[]> = {
     'booking_requested', 'booking_cancelled_client', 'booking_cancelled_admin', 'quote_accepted',
     'quote_partially_accepted', 'quote_refused', 'quote_expiring', 'quote_expired', 'new_message', 'new_review',
     'daily_digest', 'trial_ending', 'payment_failed', 'shop_inactive', 'review_report_decided', 'account_suspended',
-    'account_reactivated', 'referral_reward', 'referral_revoked', 'booking_request_waiting', 'monthly_report',
+    'account_reactivated', 'referral_reward', 'referral_revoked', 'booking_request_waiting', 'booking_request_last_call', 'monthly_report',
     'company_problem', 'company_name_mismatch', 'company_hidden', 'company_ok', 'request_expired', 'booking_followup',
     'booking_auto_closed',
   ],
@@ -854,6 +862,7 @@ export function urlFor(side: Side, e: NotificationEvent): string {
       return SUBSCRIPTION_PATH;
     case 'booking_requested':
     case 'booking_request_waiting':
+    case 'booking_request_last_call':
       return booking ? `/s/programari?${q({ tab: 'cereri', p: booking })}` : '/s/programari?tab=cereri';
     case 'monthly_report':
       return SHOP_REPORTS_PATH;

@@ -70,6 +70,7 @@ const SAMPLE: Record<string, Record<string, unknown>> = {
   welcome: { day: 3, has_car: false },
   favorite_offer: { percent: 15 },
   booking_request_waiting: {},
+  booking_request_last_call: {},
   monthly_report: { month: '2026-09', requests: 14, done: 9, revenue: 6450, new_clients: 5, reviews: 3, rating: 4.7 },
 };
 
@@ -229,10 +230,16 @@ describe('notification texts', () => {
 
   it('to the shop (T24): a request still waiting, and the month before', () => {
     expect(render('booking_request_waiting', 'shop', 'ro')).toMatchObject({
-      title: 'Cerere fără răspuns',
-      body: 'Ana Marin așteaptă răspuns pentru Mie 14 oct, 10:00: Schimb ulei și filtru. Confirmă sau propune altă oră.',
+      title: 'O cerere așteaptă răspunsul tău',
+      body: 'Ana Marin așteaptă răspuns pentru Mie 14 oct, 10:00: Schimb ulei și filtru. Confirmă programarea sau propune altă oră.',
       url: '/s/programari?tab=cereri&p=b-1',
     });
+    expect(render('booking_request_last_call', 'shop', 'ro')).toMatchObject({
+      title: 'Ultima reamintire pentru o cerere',
+      body: 'Ana Marin așteaptă încă răspuns pentru Mie 14 oct, 10:00: Schimb ulei și filtru. Dacă nu răspunzi până atunci, cererea se închide automat. Confirmă programarea sau propune altă oră.',
+      url: '/s/programari?tab=cereri&p=b-1',
+    });
+    expect(render('booking_request_last_call', 'shop', 'en')!.title).toBe('Last reminder for a request');
     expect(render('monthly_report', 'shop', 'ro')).toMatchObject({
       title: 'Luna septembrie pe Service-Hub',
       body: 'Lucrări finalizate: 9. Încasări: 6.450 lei. Cereri primite: 14. Vezi raportul complet.',

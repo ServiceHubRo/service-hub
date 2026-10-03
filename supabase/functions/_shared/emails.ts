@@ -595,6 +595,7 @@ export function emailForEvent(e: EmailEvent, app: string): EmailContent | null {
     case 'company_ok':
       return companyEmail(e, lang, app);
     case 'request_expired':
+    case 'booking_request_last_call':
       return requestExpiredEmail(e, lang, app);
     case 'admin_digest':
       return adminDigestEmail(p, app);
@@ -666,7 +667,8 @@ function companyEmail(e: EmailEvent, lang: Lang, app: string): EmailContent | nu
 
 /**
  * A request that closed because the shop never answered: to the client, with other shops for the
- * same kind of work nearby; to the shop's owner, with the way to the requests.
+ * same kind of work nearby; to the shop's owner, with the way to the requests. The last reminder
+ * before it closes (booking_request_last_call) reaches the owner the same way.
  */
 function requestExpiredEmail(e: EmailEvent, lang: Lang, app: string): EmailContent | null {
   const en = lang === 'en';
