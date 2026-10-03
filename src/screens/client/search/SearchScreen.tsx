@@ -1,16 +1,19 @@
-import { Heart, SearchX, X } from 'lucide-react';
+import { CalendarDays, Heart, SearchX, X, Zap } from 'lucide-react';
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Button } from '../../../components/Button';
 import { Chip, ChipRow } from '../../../components/Chip';
 import { EmptyState } from '../../../components/EmptyState';
+import { Field } from '../../../components/Field';
 import { LoadError } from '../../../components/LoadError';
 import { SearchField } from '../../../components/SearchField';
 import { SkeletonList } from '../../../components/Skeleton';
 import { searchShops, type ShopSearchResult } from '../../../data/rpc';
 import { fetchCategories, fetchCities, type SearchCategory, type SearchCity } from '../../../data/search';
 import { useI18n } from '../../../i18n/context';
+import { formatDate, ymdInBucharest } from '../../../i18n/format';
 import { plural } from '../../../i18n/translate';
+import { resolveDay } from '../../../lib/freePlace';
 import { distanceTo, nearby, sortByDistance } from '../../../lib/geo';
 import { useLocation } from '../../../lib/location';
 import { cityNamedBy, fold } from '../../../lib/text';
@@ -41,7 +44,9 @@ const cache = new Map<string, ShopSearchResult[]>();
  * Caută (FR §3.1; P11, P16, P16d): one field for name, city or service; category and city chips;
  * favorites; "Aproape de tine" when the client shares their location. The order is the weighted
  * rating from the database — filters only narrow it, distance is a separate section and sort.
- * The filters live in the address (?q=&cat=&oras=&fav=1&sort=aproape), so Back restores them.
+ * The filters live in the address (?q=&cat=&oras=&fav=1&sort=aproape&zi=&instant=1), so Back restores
+ * them. A day (T28a: azi, maine or a date) keeps only shops with a free place that day; "Confirmare
+ * instantă" only shops that confirm at once — both narrow, neither reorders.
  */
 export function SearchScreen() {
   const { t, lang } = useI18n();
@@ -51,6 +56,12 @@ export function SearchScreen() {
   const city = params.get('oras') ?? '';
   const favOnly = params.get('fav') === '1';
   const byDistance = params.get('sort') === 'aproape';
+  const dayParam = params.get('zi');
+  const day = resolveDay(dayParam);
+  const instantOnly = params.get('instant') === '1';
+  /** "Altă zi" open: the date field shows (also while a date is picked). */
+  const [pickDay, setPickDay] = useState(false);
+  const datePicked = Boolean(day && dayParam !== 'azi' && dayParam !== 'maine');
   const location = useLocation();
   const coords = location.coords;
 
@@ -99,7 +110,7 @@ export function SearchScreen() {
   }, [text, cities, setParam]);
 
   // ------------------------------------------------------------------ results
-  const key = JSON.stringify([q.trim(), category, city]);
+  const key = JSON.stringify([q.trim(), category, city, day ?? '']);
   const [results, setResults] = useState<{ key: string; data: ShopSearchResult[] } | null>(() => {
     const cached = cache.get(key);
     return cached ? { key, data: cached } : null;
@@ -112,8 +123,8 @@ export function SearchScreen() {
 
   useEffect(() => {
     let cancelled = false;
-    const [query, cat, town] = JSON.parse(key) as [string, string, string];
-    searchShops({ q: query || undefined, category: cat || undefined, city: town || undefined }).then(
+    const [query, cat, town, onDay] = JSON.parse(key) as [string, string, string, string];
+    searchShops({ q: query || undefined, category: cat || undefined, city: town || undefined, day: onDay || undefined }).then(
       (data) => {
         if (cancelled) return;
         cache.set(key, data);
@@ -142,12 +153,12 @@ export function SearchScreen() {
   const distance = useCallback((s: ShopSearchResult) => distanceTo(coords, s), [coords]);
   const list = useMemo(() => {
     const all = results?.data ?? [];
-    const narrowed = favOnly ? all.filter((s) => s.is_favorite) : all;
+    const narrowed = all.filter((s) => (!favOnly || s.is_favorite) && (!instantOnly || s.auto_confirm));
     return byDistance && coords ? sortByDistance(narrowed, distance) : narrowed;
-  }, [results, favOnly, byDistance, coords, distance]);
+  }, [results, favOnly, instantOnly, byDistance, coords, distance]);
   const near = useMemo(() => (coords && !byDistance ? nearby(list, distance) : []), [coords, byDistance, list, distance]);
 
-  const filtersOn = Boolean(category || city || favOnly);
+  const filtersOn = Boolean(category || city || favOnly || day || instantOnly);
   const [explainOpen, setExplainOpen] = useState(false);
   const explainId = useId();
   // What is typed right now, even if the address has not caught up yet (a result tapped quickly).
@@ -158,7 +169,8 @@ export function SearchScreen() {
 
   function clearFilters() {
     autoCity.current = null;
-    setParam({ cat: null, oras: null, fav: null });
+    setPickDay(false);
+    setParam({ cat: null, oras: null, fav: null, zi: null, instant: null });
   }
 
   function clearQuery() {
@@ -232,6 +244,53 @@ export function SearchScreen() {
                 );
               })}
             </ChipRow>
+          )}
+          <ChipRow label={t('search.when')}>
+            <Chip
+              selected={!day && !pickDay}
+              onClick={() => {
+                setPickDay(false);
+                setParam({ zi: null });
+              }}
+            >
+              {t('search.when.any')}
+            </Chip>
+            <Chip
+              selected={dayParam === 'azi'}
+              onClick={() => {
+                setPickDay(false);
+                setParam({ zi: dayParam === 'azi' ? null : 'azi' });
+              }}
+            >
+              {t('search.when.today')}
+            </Chip>
+            <Chip
+              selected={dayParam === 'maine'}
+              onClick={() => {
+                setPickDay(false);
+                setParam({ zi: dayParam === 'maine' ? null : 'maine' });
+              }}
+            >
+              {t('search.when.tomorrow')}
+            </Chip>
+            <Chip selected={datePicked || pickDay} onClick={() => setPickDay((o) => !o)}>
+              <CalendarDays size={14} aria-hidden="true" />
+              {datePicked && day ? formatDate(lang, day) : t('search.when.pick')}
+            </Chip>
+            <Chip selected={instantOnly} onClick={() => setParam({ instant: instantOnly ? null : '1' })}>
+              <Zap size={14} aria-hidden="true" />
+              {t('instant.badge')}
+            </Chip>
+          </ChipRow>
+          {(pickDay || datePicked) && (
+            <Field
+              className={styles.dayField}
+              type="date"
+              label={t('search.when.date')}
+              min={ymdInBucharest(new Date())}
+              value={datePicked && day ? day : ''}
+              onChange={(e) => setParam({ zi: e.target.value || null })}
+            />
           )}
           <ChipRow label={t('search.more')}>
             <Chip selected={favOnly} onClick={() => setParam({ fav: favOnly ? null : '1' })}>
@@ -308,7 +367,7 @@ export function SearchScreen() {
                   <ul className={styles.list}>
                     {near.map((s) => (
                       <li key={s.shop_id}>
-                        <ShopCard shop={s} distanceKm={distance(s)} back={back} onFavorite={onFavorite} />
+                        <ShopCard shop={s} distanceKm={distance(s)} back={back} onFavorite={onFavorite} day={day} />
                       </li>
                     ))}
                   </ul>
@@ -323,7 +382,7 @@ export function SearchScreen() {
                 <ul className={styles.list}>
                   {list.map((s) => (
                     <li key={s.shop_id}>
-                      <ShopCard shop={s} distanceKm={distance(s)} back={back} onFavorite={onFavorite} />
+                      <ShopCard shop={s} distanceKm={distance(s)} back={back} onFavorite={onFavorite} day={day} />
                     </li>
                   ))}
                 </ul>

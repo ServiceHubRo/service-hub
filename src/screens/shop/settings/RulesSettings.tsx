@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { BackLink } from '../../../components/BackLink';
 import { Card } from '../../../components/Card';
+import { Checkbox } from '../../../components/Checkbox';
 import { Chip } from '../../../components/Chip';
 import { Field } from '../../../components/Field';
 import { SelectField } from '../../../components/SelectField';
@@ -44,6 +45,7 @@ interface Rules {
   cancel_deadline_hours: number;
   fee: string;
   offer: number | null;
+  instant: boolean;
 }
 
 const toRules = (shop: Shop): Rules => ({
@@ -55,11 +57,12 @@ const toRules = (shop: Shop): Rules => ({
   cancel_deadline_hours: shop.cancel_deadline_hours,
   fee: feeText(shop.inspection_fee),
   offer: shop.new_client_offer,
+  instant: shop.auto_confirm,
 });
 
 /**
  * Reguli de programare (P5, P5b): capacity, cars per slot, slot length, notice, advance, cancellation,
- * fee, and the new-client offer (T23).
+ * fee, the new-client offer (T23) and instant confirmation (T28a).
  */
 export function RulesSettings() {
   const { t, lang } = useI18n();
@@ -95,6 +98,7 @@ export function RulesSettings() {
       cancel_deadline_hours: rules.cancel_deadline_hours,
       inspection_fee: fee,
       new_client_offer: rules.offer,
+      auto_confirm: rules.instant,
       // Checklist step 3; the database stores its own time.
       capacity_reviewed_at: new Date().toISOString(),
     });
@@ -180,6 +184,15 @@ export function RulesSettings() {
             label: h === 0 ? t('rules.cancel.anytime') : t('rules.cancel.before', { hours: plural(lang, 'unit.hours', h) }),
           }))}
         />
+      </Card>
+
+      <Card>
+        <Checkbox checked={rules.instant} onChange={(e) => set('instant', e.target.checked)} aria-describedby="rules-instant-hint">
+          {t('rules.instant')}
+        </Checkbox>
+        <p id="rules-instant-hint" className={styles.hint}>
+          {t('rules.instant.hint')}
+        </p>
       </Card>
 
       <Card>

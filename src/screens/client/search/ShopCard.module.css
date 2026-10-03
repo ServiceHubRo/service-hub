@@ -73,6 +73,10 @@
   margin-top: 6px;
 }
 
+.free {
+  margin-top: 4px;
+}
+
 .chevron {
   flex-shrink: 0;
   color: var(--muted);

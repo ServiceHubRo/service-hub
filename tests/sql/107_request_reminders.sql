@@ -86,6 +86,5 @@ select test.fails('select public.send_request_daily_reminders(now())', 'permissi
 select test.fails('select public.send_request_last_calls(now())', 'permission denied', 'no API access (last call)');
 select test.logout();
 
-select test.eq((select version from public.schema_version), 50, 'schema 50');
 
 rollback;

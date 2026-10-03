@@ -112,6 +112,7 @@ A Shop is listed by the owner or representative of a business authorized to prov
 ### 4.3 Bookings, quotes and jobs
 
 - Answer requests promptly: confirm, decline or reschedule. A request still unanswered at the booking time closes automatically, and the customer is notified.
+- You can turn on instant confirmation: requests for free slots are then confirmed automatically, and a booking confirmed this way binds you just like one you confirmed yourself. Customers with a no-show in the last 90 days still send a request.
 - Update bookings after their time (inspection started or no-show). A confirmed booking left without an update for 7 days after its date closes automatically, without being recorded as a no-show.
 - A quote must be clear, itemized and with final prices. Once sent it can no longer be changed; you can send a new version or withdraw it.
 - The inspection fee may be charged only if the customer refuses the quote, and only up to the amount shown on your profile at the time of booking.

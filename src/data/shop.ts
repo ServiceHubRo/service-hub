@@ -39,6 +39,7 @@ export type ShopUpdate = Partial<
     | 'cancel_deadline_hours'
     | 'inspection_fee'
     | 'new_client_offer'
+    | 'auto_confirm'
     | 'sms_on_new_booking'
     | 'daily_digest'
     | 'monthly_report'

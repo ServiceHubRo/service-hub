@@ -1,7 +1,10 @@
 import { Check } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { buttonClass } from '../../../components/buttonClass';
+import { CalendarLinks } from '../../../components/CalendarLinks';
 import { Card } from '../../../components/Card';
+import type { CalendarEvent } from '../../../lib/calendar';
+import type { MapPlace } from '../../../lib/maps';
 import { useI18n } from '../../../i18n/context';
 import { formatDate } from '../../../i18n/format';
 import { BOOKINGS_PATH, SEARCH_PATH } from '../paths';
@@ -19,6 +22,12 @@ export interface SentState {
   car: string;
   /** The new-client offer the booking got (T23). */
   offer?: number | null;
+  /** Confirmed at once (T28a): no waiting for the shop. */
+  confirmed?: boolean;
+  shopId?: string;
+  bookingId?: string;
+  /** For "Adaugă în calendar" and "Indicații" once confirmed. */
+  calendar?: { event: CalendarEvent; place: MapPlace };
 }
 
 /** After "Trimite cererea" (P6): a green check, what happens next, one way on. */
@@ -32,8 +41,8 @@ export function BookingSent() {
       <span className={styles.sentIcon} aria-hidden="true">
         <Check size={34} strokeWidth={3} />
       </span>
-      <h1 className={styles.sentTitle}>{t('booking.sent.title')}</h1>
-      <p className={styles.sentBody}>{t('booking.sent.body')}</p>
+      <h1 className={styles.sentTitle}>{t(sent?.confirmed ? 'booking.sent.confirmedTitle' : 'booking.sent.title')}</h1>
+      <p className={styles.sentBody}>{t(sent?.confirmed ? 'booking.sent.confirmedBody' : 'booking.sent.body')}</p>
       {sent && (
         <Card className={styles.summary}>
           <SummaryRow label={t('booking.summary.shop')} value={sent.shopName} />
@@ -46,6 +55,11 @@ export function BookingSent() {
           {sent.offer ? <SummaryRow label={t('offer.summary')} value={t('offer.short', { n: sent.offer })} /> : null}
           <SummaryRow label={t('booking.sent.ref')} value={sent.ref} mono />
         </Card>
+      )}
+      {sent?.confirmed && sent.calendar && (
+        <div className={styles.sentLinks}>
+          <CalendarLinks event={sent.calendar.event} place={sent.calendar.place} />
+        </div>
       )}
       <div className={styles.sentActions}>
         <Link to={BOOKINGS_PATH} className={buttonClass('primary', true)}>

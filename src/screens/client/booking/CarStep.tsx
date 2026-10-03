@@ -268,8 +268,9 @@ export function CarStep({
       {phoneNeeded !== null && !phoneDone ? null : session.emailVerified ? (
         <BottomBar>
           {manual && !typedOk && <p className={styles.muted}>{t('car.required')}</p>}
+          {shop.auto_confirm && <p className={styles.muted}>{t('booking.instantNote')}</p>}
           <ActionButton onAction={send} disabled={!ready} errorMessage={(e) => rpcErrorMessage(lang, e)} canRetry={canRetryRpc}>
-            {t('booking.submit')}
+            {t(shop.auto_confirm ? 'booking.submitInstant' : 'booking.submit')}
           </ActionButton>
         </BottomBar>
       ) : (

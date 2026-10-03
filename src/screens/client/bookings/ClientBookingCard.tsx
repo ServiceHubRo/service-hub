@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { ActionButton } from '../../../components/ActionButton';
 import { Button } from '../../../components/Button';
 import { buttonClass } from '../../../components/buttonClass';
+import { CalendarLinks } from '../../../components/CalendarLinks';
 import { Card } from '../../../components/Card';
 import { OfferNote } from '../../../components/OfferNote';
 import { InlinePanel } from '../../../components/InlinePanel';
@@ -172,6 +173,20 @@ export function ClientBookingCard({
             <Link to={`${bookingPath(b.shop_id)}?pas=2&serviciu=${[b.service_id, ...b.extra_service_ids].map(encodeURIComponent).join(',')}`} className={buttonClass('secondary')}>
               {t('cb.bookAgain')}
             </Link>
+          )}
+          {b.status === 'confirmed' && b.shop && (
+            <CalendarLinks
+              event={{
+                uid: b.id,
+                title: `${bookingServicesText(lang, b.service, b.extra_services, b.service_id)} · ${b.shop.name}`,
+                date: b.date,
+                slot: b.slot,
+                minutes: b.shop.slot_minutes,
+                location: [b.shop.name, b.shop.street, b.shop.city].filter(Boolean).join(', '),
+                description: t('calendar.description', { ref: b.ref }),
+              }}
+              place={b.shop}
+            />
           )}
           {findAnother && (
             <Link to={otherShopsPath(b)} className={buttonClass('primary')}>

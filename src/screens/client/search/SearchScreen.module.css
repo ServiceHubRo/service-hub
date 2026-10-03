@@ -218,3 +218,7 @@
   display: block;
   color: var(--muted-strong);
 }
+
+.dayField {
+  max-width: 260px;
+}

@@ -1,4 +1,4 @@
-import { call, failure, fetchNewClientOffers, RpcError } from './rpc';
+import { call, failure, fetchNewClientOffers, fetchSearchExtras, RpcError, type FreePlace } from './rpc';
 import { supabase } from './supabase';
 import type { DayHours } from '../lib/hours';
 
@@ -60,6 +60,9 @@ export interface ShopPageShop {
   max_advance_days: number;
   cancel_deadline_hours: number;
   inspection_fee: number;
+  /** Free places are confirmed at once (T28a). */
+  auto_confirm: boolean;
+  slot_minutes: number;
 }
 
 export interface ShopPageService {
@@ -100,16 +103,20 @@ export interface ShopPage {
   reviews: ShopPageReview[];
   /** The discount on labor the caller would get on a first booking here (T23); null without one. */
   offer: number | null;
+  /** The first free place on the day asked, else within the next 14 days (T28a); null when none. */
+  free: FreePlace | null;
 }
 
-/** Everything the shop page shows, public columns only (get_shop_page). */
-export async function fetchShopPage(shopId: string): Promise<ShopPage> {
-  const [read, offers] = await Promise.all([
+/** Everything the shop page shows, public columns only (get_shop_page); `day` for its free place. */
+export async function fetchShopPage(shopId: string, day?: string | null): Promise<ShopPage> {
+  const [read, offers, extras] = await Promise.all([
     call('get_shop_page', { p_shop_id: shopId }),
     fetchNewClientOffers([shopId]).catch(() => new Map<string, number>()),
+    fetchSearchExtras([shopId], day ?? undefined).catch(() => null),
   ]);
   const page = read as unknown as ShopPage;
   page.offer = offers.get(shopId) ?? null;
+  page.free = extras?.get(shopId)?.free ?? null;
   // numeric columns arrive as numbers from jsonb; keep them numbers even if a driver sends text.
   page.shop.inspection_fee = Number(page.shop.inspection_fee);
   page.rating.average = page.rating.average === null ? null : Number(page.rating.average);

@@ -1764,6 +1764,7 @@ export type Database = {
       shops: {
         Row: {
           active: boolean
+          auto_confirm: boolean
           billing_reminder_dismissed_at: string | null
           cancel_deadline_hours: number
           capacity_reviewed_at: string | null
@@ -1802,6 +1803,7 @@ export type Database = {
         }
         Insert: {
           active?: boolean
+          auto_confirm?: boolean
           billing_reminder_dismissed_at?: string | null
           cancel_deadline_hours?: number
           capacity_reviewed_at?: string | null
@@ -1840,6 +1842,7 @@ export type Database = {
         }
         Update: {
           active?: boolean
+          auto_confirm?: boolean
           billing_reminder_dismissed_at?: string | null
           cancel_deadline_hours?: number
           capacity_reviewed_at?: string | null
@@ -2883,6 +2886,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      instant_for_client: { Args: { p_client_id: string }; Returns: boolean }
       invite_staff: {
         Args: { p_email: string; p_request_id: string; p_token: string }
         Returns: Json
@@ -3531,6 +3535,15 @@ export type Database = {
         Returns: Json
       }
       schedule_notification_jobs: { Args: never; Returns: string }
+      search_card_extras: {
+        Args: { p_day?: string; p_shop_ids: string[] }
+        Returns: {
+          auto_confirm: boolean
+          free_date: string
+          free_slot: string
+          shop_id: string
+        }[]
+      }
       search_cities: {
         Args: never
         Returns: {
@@ -3644,6 +3657,11 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      send_request_daily_reminders: {
+        Args: { p_now?: string }
+        Returns: number
+      }
+      send_request_last_calls: { Args: { p_now?: string }; Returns: number }
       send_request_waiting_reminders: {
         Args: { p_now?: string }
         Returns: number

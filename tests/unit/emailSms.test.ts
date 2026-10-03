@@ -132,6 +132,15 @@ describe('SMS texts', () => {
     );
   });
 
+  it('a booking confirmed at once (T28a): nothing to answer, only to know', () => {
+    const sms = smsForEvent({ ...request('ro'), event: 'booking_auto_confirmed' })!;
+    expect(sms).toBe(
+      'Service-Hub: programare confirmata automat, Maria Pop, Mie 14 oct, 10:00: Schimb ulei + filtru ulei. Detalii in aplicatie. Oprire SMS: Setari > Notificari',
+    );
+    expect(sms.length).toBeLessThanOrEqual(SMS_MAX);
+    expect(smsForEvent({ ...request('en'), event: 'booking_auto_confirmed' })).toMatch(/^Service-Hub: booking confirmed automatically, Maria Pop/);
+  });
+
   it('says how many services came with the first one (T21)', () => {
     expect(smsForEvent(request('ro', { extra_count: 2 }))).toContain(': Schimb ulei + filtru ulei si inca 2. ');
   });

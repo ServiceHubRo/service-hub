@@ -17,6 +17,7 @@ export type JsonParams = Record<string, unknown>;
 const EVENTS = [
   'booking_requested',
   'booking_confirmed',
+  'booking_auto_confirmed',
   'booking_declined',
   'booking_rescheduled',
   'booking_cancelled_client',

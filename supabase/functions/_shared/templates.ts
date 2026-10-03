@@ -148,6 +148,10 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
     },
     // ------------------------------------------------------------------ to the shop
     'shop.booking_requested': { title: 'Cerere nouă', body: '{client}: {service}, {when}. {car_plate}.' },
+    'shop.booking_auto_confirmed': {
+      title: 'Programare nouă, confirmată automat',
+      body: '{client} vine {when}: {service}. {car_plate}.',
+    },
     'shop.booking_cancelled_client': { title: 'Programare anulată', body: '{client} a anulat programarea {ref} din {when}.' },
     'shop.booking_cancelled_admin': {
       title: 'Programare anulată',
@@ -396,6 +400,10 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
     },
     // ------------------------------------------------------------------ to the shop
     'shop.booking_requested': { title: 'New request', body: '{client}: {service}, {when}. {car_plate}.' },
+    'shop.booking_auto_confirmed': {
+      title: 'New booking, confirmed automatically',
+      body: '{client} is coming {when}: {service}. {car_plate}.',
+    },
     'shop.booking_cancelled_client': { title: 'Booking canceled', body: '{client} canceled booking {ref} on {when}.' },
     'shop.booking_cancelled_admin': {
       title: 'Booking canceled',
@@ -620,7 +628,7 @@ export const EVENTS: Record<Side, readonly string[]> = {
     'tire_season', 'welcome', 'favorite_offer', 'request_expired',
   ],
   shop: [
-    'booking_requested', 'booking_cancelled_client', 'booking_cancelled_admin', 'quote_accepted',
+    'booking_requested', 'booking_auto_confirmed', 'booking_cancelled_client', 'booking_cancelled_admin', 'quote_accepted',
     'quote_partially_accepted', 'quote_refused', 'quote_expiring', 'quote_expired', 'new_message', 'new_review',
     'daily_digest', 'trial_ending', 'payment_failed', 'shop_inactive', 'review_report_decided', 'account_suspended',
     'account_reactivated', 'referral_reward', 'referral_revoked', 'booking_request_waiting', 'booking_request_last_call', 'monthly_report',
@@ -860,6 +868,8 @@ export function urlFor(side: Side, e: NotificationEvent): string {
     case 'referral_reward':
     case 'referral_revoked':
       return SUBSCRIPTION_PATH;
+    case 'booking_auto_confirmed':
+      return booking ? `/s/programari?${q({ tab: 'programate', p: booking })}` : '/s/programari?tab=programate';
     case 'booking_requested':
     case 'booking_request_waiting':
     case 'booking_request_last_call':

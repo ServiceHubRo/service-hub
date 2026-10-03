@@ -38,7 +38,8 @@
 
 .address {
   display: flex;
-  align-items: flex-start;
+  flex-wrap: wrap;
+  align-items: center;
   gap: 6px;
   color: var(--muted);
   font-size: 13.5px;
@@ -199,6 +200,34 @@
 
 .book {
   gap: 8px;
+}
+
+.freePlace {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.freeBook {
+  gap: 6px;
+}
+
+.directions {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 44px;
+  margin-left: auto;
+  color: var(--amber);
+  font-weight: 600;
+  font-size: 14px;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.directions:hover {
+  text-decoration: underline;
 }
 
 

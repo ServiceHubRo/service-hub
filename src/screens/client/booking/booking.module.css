@@ -329,3 +329,10 @@
 .share > p {
   padding-left: 34px;
 }
+
+.sentLinks {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}

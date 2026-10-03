@@ -112,6 +112,7 @@ Un Service se înscrie de proprietarul sau reprezentantul unei afaceri autorizat
 ### 4.3 Programările, devizele și lucrările
 
 - Răspundeți la cereri cât mai repede: confirmați, refuzați sau mutați. O cerere rămasă fără răspuns până la ora programării se închide automat, iar clientul este anunțat.
+- Puteți activa confirmarea instantă: cererile pentru locurile libere se confirmă atunci automat, iar o programare confirmată astfel vă obligă la fel ca una confirmată de voi. Clienții cu o neprezentare în ultimele 90 de zile trimit în continuare o cerere.
 - Actualizați programările după ora lor (în constatare sau neprezentat). O programare confirmată care rămâne neactualizată 7 zile după data ei se încheie automat, fără să fie trecută ca neprezentare.
 - Devizul trebuie să fie clar, pe poziții, cu prețuri finale. După trimitere nu se mai poate modifica; puteți trimite o versiune nouă sau îl puteți retrage.
 - Taxa de constatare se poate cere doar dacă clientul refuză devizul și doar în valoarea afișată pe profil la momentul programării.

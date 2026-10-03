@@ -1,6 +1,6 @@
-import { CalendarPlus, Globe, MapPin, Phone, Store } from 'lucide-react';
+import { CalendarPlus, Globe, MapPin, Navigation, Phone, Store } from 'lucide-react';
 import { useCallback, useEffect, useRef, type ReactNode } from 'react';
-import { Link, useLocation as useRouterLocation, useParams } from 'react-router-dom';
+import { Link, useLocation as useRouterLocation, useParams, useSearchParams } from 'react-router-dom';
 import { BackLink } from '../../../components/BackLink';
 import { Banner } from '../../../components/Banner';
 import { BottomBar } from '../../../components/BottomBar';
@@ -8,6 +8,7 @@ import { buttonClass } from '../../../components/buttonClass';
 import { Card } from '../../../components/Card';
 import { EmptyState } from '../../../components/EmptyState';
 import { FavoriteButton } from '../../../components/FavoriteButton';
+import { FreePlaceNote } from '../../../components/FreePlaceNote';
 import { LoadError } from '../../../components/LoadError';
 import { OfferNote } from '../../../components/OfferNote';
 import { ServiceIcon } from '../../../components/ServiceIcon';
@@ -18,10 +19,12 @@ import { subscribeRows } from '../../../data/realtime';
 import { toRpcError } from '../../../data/rpc';
 import { fetchShopPage, type ShopPage as ShopPageData, type ShopPageService } from '../../../data/search';
 import { useI18n } from '../../../i18n/context';
-import { formatDateRange, formatDayMonth, formatDistance, formatMoney, formatRating } from '../../../i18n/format';
+import { formatDate, formatDateRange, formatDayMonth, formatDistance, formatMoney, formatRating } from '../../../i18n/format';
 import type { MessageKey } from '../../../i18n/ro';
 import { plural } from '../../../i18n/translate';
+import { resolveDay } from '../../../lib/freePlace';
 import { distanceTo } from '../../../lib/geo';
+import { directionsUrl } from '../../../lib/maps';
 import { groupHours, type HoursRow } from '../../../lib/hours';
 import { useLocation } from '../../../lib/location';
 import { useLoad } from '../../../lib/useLoad';
@@ -41,7 +44,10 @@ export function ShopPage() {
   const back = routerState?.backTo ?? SEARCH_PATH;
   const backLabel = routerState?.backLabel === 'favorites' ? t('favorites.title') : t('shop.allShops');
 
-  const load = useCallback(() => fetchShopPage(shopId), [shopId]);
+  // Opened from a search for a day (T28a): the free place shown is on that day.
+  const [params] = useSearchParams();
+  const day = resolveDay(params.get('zi'));
+  const load = useCallback(() => fetchShopPage(shopId, day), [shopId, day]);
   const { state, reload, setData } = useLoad(load);
 
   // Reviews and replies arrive live (T11): a change to this shop's reviews reads the page again
@@ -53,7 +59,7 @@ export function ShopPage() {
     const refresh = () => {
       window.clearTimeout(timer);
       timer = window.setTimeout(() => {
-        fetchShopPage(shopId).then(
+        fetchShopPage(shopId, day).then(
           (page) => setData((prev) => ({ ...page, is_favorite: prev.is_favorite })),
           () => {},
         );
@@ -70,7 +76,7 @@ export function ShopPage() {
       window.clearTimeout(timer);
       unsubscribe();
     };
-  }, [ready, shopId, setData]);
+  }, [ready, shopId, day, setData]);
 
   return (
     <div className={styles.page} data-fill-screen>
@@ -92,13 +98,13 @@ export function ShopPage() {
           <LoadError message={t('shop.loadError')} onRetry={reload} />
         ))}
       {state.status === 'ready' && (
-        <ShopDetails page={state.data} onFavorite={(on) => setData((p) => ({ ...p, is_favorite: on }))} />
+        <ShopDetails page={state.data} day={day} onFavorite={(on) => setData((p) => ({ ...p, is_favorite: on }))} />
       )}
     </div>
   );
 }
 
-function ShopDetails({ page, onFavorite }: { page: ShopPageData; onFavorite: (on: boolean) => void }) {
+function ShopDetails({ page, day, onFavorite }: { page: ShopPageData; day: string | null; onFavorite: (on: boolean) => void }) {
   const { t, lang } = useI18n();
   const { coords } = useLocation();
   const { shop, rating } = page;
@@ -157,11 +163,28 @@ function ShopDetails({ page, onFavorite }: { page: ShopPageData; onFavorite: (on
           {address}
           {distance !== null && <span className={styles.distance}> · {t('shop.distance', { distance: formatDistance(lang, distance) })}</span>}
         </span>
+        <a className={styles.directions} href={directionsUrl(shop)} target="_blank" rel="noopener noreferrer">
+          <Navigation size={14} aria-hidden="true" />
+          {t('shop.directions')}
+        </a>
       </p>
 
       {shop.description && <p className={styles.description}>{shop.description}</p>}
 
       {!page.bookable && <Banner tone="warning">{t('shop.notBookable')}</Banner>}
+      {page.bookable && (
+        <div className={styles.freePlace}>
+          {page.free || shop.auto_confirm ? <FreePlaceNote free={page.free} instant={shop.auto_confirm} /> : null}
+          {page.free ? (
+            // Straight to that day and time; "Programează-te" below still lets the client choose.
+            <Link to={`${bookingPath(shop.id)}?zi=${page.free.date}&ora=${page.free.slot}`} className={buttonClass('secondary', false, styles.freeBook)}>
+              {t('free.bookThis', { when: `${formatDate(lang, page.free.date)}, ${page.free.slot}` })}
+            </Link>
+          ) : (
+            <p className={styles.muted}>{t(day ? 'free.noneDay' : 'free.none')}</p>
+          )}
+        </div>
+      )}
       {page.bookable && page.offer !== null && (
         <OfferNote>
           <strong>{t('offer.title')}</strong> · {t('offer.page', { n: page.offer })}
@@ -245,7 +268,10 @@ function ShopDetails({ page, onFavorite }: { page: ShopPageData; onFavorite: (on
       {/* Always at hand (asked at testing): at the bottom, just above the menu. */}
       {page.bookable && (
         <BottomBar>
-          <Link to={bookingPath(shop.id)} className={buttonClass('primary', true, styles.book)}>
+          <Link
+            to={day ? `${bookingPath(shop.id)}?zi=${day}` : bookingPath(shop.id)}
+            className={buttonClass('primary', true, styles.book)}
+          >
             <CalendarPlus size={18} aria-hidden="true" />
             {t('shop.book')}
           </Link>
