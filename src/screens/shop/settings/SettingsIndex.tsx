@@ -1,4 +1,4 @@
-import { Bell, Building2, CalendarClock, ListChecks, SlidersHorizontal, Store, Users } from 'lucide-react';
+import { Bell, Building2, CalendarClock, Images, ListChecks, SlidersHorizontal, Store, Users } from 'lucide-react';
 import { BackLink } from '../../../components/BackLink';
 import { Tile } from '../../../components/Tile';
 import { useI18n } from '../../../i18n/context';
@@ -22,6 +22,7 @@ export function SettingsIndex() {
         {isOwner && (
           <>
             <Tile to={SETTINGS_LINKS.profile} icon={Store} label={t('settings.profile')} hint={t('settings.profile.hint')} />
+            <Tile to={SETTINGS_LINKS.showcase} icon={Images} label={t('settings.showcase')} hint={t('settings.showcase.hint')} />
             <Tile to={SETTINGS_LINKS.hours} icon={CalendarClock} label={t('settings.hours')} hint={t('settings.hours.hint')} />
             <Tile to={SETTINGS_LINKS.rules} icon={SlidersHorizontal} label={t('settings.rules')} hint={t('settings.rules.hint')} />
             <Tile to={SETTINGS_LINKS.services} icon={ListChecks} label={t('settings.services')} hint={t('settings.services.hint')} />

@@ -302,3 +302,31 @@
 .reviewsTitle:focus {
   outline: none;
 }
+
+.amenities {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  text-align: right;
+}
+
+.amenities li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.amenities svg {
+  color: var(--amber);
+  flex-shrink: 0;
+}
+
+.mapLoading {
+  height: 200px;
+  border-radius: var(--radius-card);
+  background: var(--surface);
+}

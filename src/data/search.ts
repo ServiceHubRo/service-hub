@@ -1,4 +1,4 @@
-import { call, failure, fetchNewClientOffers, fetchSearchExtras, RpcError, type FreePlace } from './rpc';
+import { call, failure, fetchNewClientOffers, fetchSearchExtras, RpcError, type FreePlace, type ResponseBadge } from './rpc';
 import { supabase } from './supabase';
 import type { DayHours } from '../lib/hours';
 
@@ -63,6 +63,8 @@ export interface ShopPageShop {
   /** Free places are confirmed at once (T28a). */
   auto_confirm: boolean;
   slot_minutes: number;
+  /** Facilities ticked by the shop (T28b). */
+  amenities: string[];
 }
 
 export interface ShopPageService {
@@ -105,6 +107,10 @@ export interface ShopPage {
   offer: number | null;
   /** The first free place on the day asked, else within the next 14 days (T28a); null when none. */
   free: FreePlace | null;
+  /** How quickly the shop usually answers (T28b). */
+  response: ResponseBadge;
+  /** Photos of the workshop, in the shop's order (T28b). */
+  photos: { id: string; url: string }[];
 }
 
 /** Everything the shop page shows, public columns only (get_shop_page); `day` for its free place. */

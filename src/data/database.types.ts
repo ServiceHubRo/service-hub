@@ -1565,6 +1565,48 @@ export type Database = {
           },
         ]
       }
+      shop_photos: {
+        Row: {
+          created_at: string
+          id: string
+          path: string
+          position: number
+          shop_id: string
+          url: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          path: string
+          position?: number
+          shop_id: string
+          url: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          path?: string
+          position?: number
+          shop_id?: string
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shop_photos_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shop_ratings"
+            referencedColumns: ["shop_id"]
+          },
+          {
+            foreignKeyName: "shop_photos_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       shop_referrals: {
         Row: {
           applied_at: string | null
@@ -1764,6 +1806,7 @@ export type Database = {
       shops: {
         Row: {
           active: boolean
+          amenities: string[]
           auto_confirm: boolean
           billing_reminder_dismissed_at: string | null
           cancel_deadline_hours: number
@@ -1803,6 +1846,7 @@ export type Database = {
         }
         Insert: {
           active?: boolean
+          amenities?: string[]
           auto_confirm?: boolean
           billing_reminder_dismissed_at?: string | null
           cancel_deadline_hours?: number
@@ -1842,6 +1886,7 @@ export type Database = {
         }
         Update: {
           active?: boolean
+          amenities?: string[]
           auto_confirm?: boolean
           billing_reminder_dismissed_at?: string | null
           cancel_deadline_hours?: number
@@ -3538,9 +3583,11 @@ export type Database = {
       search_card_extras: {
         Args: { p_day?: string; p_shop_ids: string[] }
         Returns: {
+          amenities: string[]
           auto_confirm: boolean
           free_date: string
           free_slot: string
+          response: string
           shop_id: string
         }[]
       }
@@ -3806,6 +3853,7 @@ export type Database = {
         Returns: Json
       }
       shop_reports: { Args: never; Returns: Json }
+      shop_response_badge: { Args: { p_shop_id: string }; Returns: string }
       shop_seat_count: { Args: { p_shop_id: string }; Returns: number }
       shop_state: { Args: { p_shop_id: string }; Returns: string }
       shop_vehicle_file: { Args: { p_booking_id: string }; Returns: Json }

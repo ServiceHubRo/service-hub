@@ -118,6 +118,7 @@ export const RPC_ERROR_CODES = [
   'too_early',
   'too_far',
   'too_many_services',
+  'too_many_photos',
   'too_soon',
   'work_too_long',
   'wrong_status',
@@ -379,7 +380,13 @@ export interface ShopSearchResult {
   auto_confirm: boolean;
   /** The first free place: on the day asked, else within the next 14 days; null when none. */
   free: FreePlace | null;
+  /** Facilities the shop ticked (T28b). */
+  amenities: string[];
+  /** How quickly the shop usually answers (T28b): within an hour, within a few hours, or unknown. */
+  response: ResponseBadge;
 }
+
+export type ResponseBadge = 'hour' | 'hours' | null;
 
 /** A free place: `YYYY-MM-DD` and `HH:MM`, Europe/Bucharest. */
 export interface FreePlace {
@@ -390,6 +397,8 @@ export interface FreePlace {
 export interface SearchExtras {
   auto_confirm: boolean;
   free: FreePlace | null;
+  amenities: string[];
+  response: ResponseBadge;
 }
 
 /** Public shops in rating order (ARCHITECTURE §8). The location is sent for this query only, never stored. */
@@ -411,7 +420,7 @@ export async function searchShops(params: {
     p_lng: params.lng,
     p_sort: params.sort,
   });
-  const shops = data as unknown as Omit<ShopSearchResult, 'offer' | 'auto_confirm' | 'free'>[];
+  const shops = data as unknown as Omit<ShopSearchResult, 'offer' | 'auto_confirm' | 'free' | 'amenities' | 'response'>[];
   const ids = shops.map((s) => s.shop_id);
   // The offers and the free places come separately and never change the order. Without them the
   // list still shows — unless a day was asked: then a shop shows only with a free place that day.
@@ -424,6 +433,8 @@ export async function searchShops(params: {
     offer: offers.get(s.shop_id) ?? null,
     auto_confirm: extras.get(s.shop_id)?.auto_confirm ?? false,
     free: extras.get(s.shop_id)?.free ?? null,
+    amenities: extras.get(s.shop_id)?.amenities ?? [],
+    response: extras.get(s.shop_id)?.response ?? null,
   }));
   return params.day ? all.filter((s) => s.free !== null) : all;
 }
@@ -435,7 +446,12 @@ export async function fetchSearchExtras(shopIds: string[], day?: string): Promis
   return new Map(
     (rows ?? []).map((r) => [
       r.shop_id,
-      { auto_confirm: r.auto_confirm, free: r.free_date && r.free_slot ? { date: r.free_date, slot: r.free_slot } : null },
+      {
+        auto_confirm: r.auto_confirm,
+        free: r.free_date && r.free_slot ? { date: r.free_date, slot: r.free_slot } : null,
+        amenities: r.amenities ?? [],
+        response: r.response === 'hour' || r.response === 'hours' ? r.response : null,
+      },
     ]),
   );
 }

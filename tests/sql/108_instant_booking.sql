@@ -100,6 +100,5 @@ select test.login_anon();
 select test.fails('select * from public.search_card_extras(array[gen_random_uuid()])', 'permission denied', 'signed in only');
 select test.logout();
 
-select test.eq((select version from public.schema_version), 51, 'schema 51');
 
 rollback;

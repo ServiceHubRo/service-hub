@@ -1,5 +1,5 @@
 import { CalendarPlus, Globe, MapPin, Navigation, Phone, Store } from 'lucide-react';
-import { useCallback, useEffect, useRef, type ReactNode } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useRef, type ReactNode } from 'react';
 import { Link, useLocation as useRouterLocation, useParams, useSearchParams } from 'react-router-dom';
 import { BackLink } from '../../../components/BackLink';
 import { Banner } from '../../../components/Banner';
@@ -11,6 +11,7 @@ import { FavoriteButton } from '../../../components/FavoriteButton';
 import { FreePlaceNote } from '../../../components/FreePlaceNote';
 import { LoadError } from '../../../components/LoadError';
 import { OfferNote } from '../../../components/OfferNote';
+import { PhotoGallery } from '../../../components/PhotoGallery';
 import { ServiceIcon } from '../../../components/ServiceIcon';
 import { ShopAvatar } from '../../../components/ShopAvatar';
 import { SkeletonList } from '../../../components/Skeleton';
@@ -22,6 +23,7 @@ import { useI18n } from '../../../i18n/context';
 import { formatDate, formatDateRange, formatDayMonth, formatDistance, formatMoney, formatRating } from '../../../i18n/format';
 import type { MessageKey } from '../../../i18n/ro';
 import { plural } from '../../../i18n/translate';
+import { AMENITIES, AMENITY_ICONS } from '../../../lib/amenities';
 import { resolveDay } from '../../../lib/freePlace';
 import { distanceTo } from '../../../lib/geo';
 import { directionsUrl } from '../../../lib/maps';
@@ -31,6 +33,9 @@ import { useLoad } from '../../../lib/useLoad';
 import { bookingPath, REVIEWS_HASH, SEARCH_PATH, type ShopLinkState } from '../paths';
 import { groupServices, serviceName } from './serviceGroups';
 import styles from './ShopPage.module.css';
+
+/** The small map under the address (T28b), loaded only for a shop with coordinates. */
+const ShopsMap = lazy(() => import('../../../components/map/ShopsMap'));
 
 /**
  * The shop page a client opens from search (FR §3.2, P11b): who they are, when they work, what
@@ -157,6 +162,8 @@ function ShopDetails({ page, day, onFavorite }: { page: ShopPageData; day: strin
         <FavoriteButton shopId={shop.id} shopName={shop.name} on={page.is_favorite} onChange={onFavorite} />
       </header>
 
+      <PhotoGallery photos={page.photos ?? []} shopName={shop.name} />
+
       <p className={styles.address}>
         <MapPin size={15} aria-hidden="true" />
         <span>
@@ -174,7 +181,9 @@ function ShopDetails({ page, day, onFavorite }: { page: ShopPageData; day: strin
       {!page.bookable && <Banner tone="warning">{t('shop.notBookable')}</Banner>}
       {page.bookable && (
         <div className={styles.freePlace}>
-          {page.free || shop.auto_confirm ? <FreePlaceNote free={page.free} instant={shop.auto_confirm} /> : null}
+          {page.free || shop.auto_confirm || page.response ? (
+            <FreePlaceNote free={page.free} instant={shop.auto_confirm} response={page.response} />
+          ) : null}
           {page.free ? (
             // Straight to that day and time; "Programează-te" below still lets the client choose.
             <Link to={`${bookingPath(shop.id)}?zi=${page.free.date}&ora=${page.free.slot}`} className={buttonClass('secondary', false, styles.freeBook)}>
@@ -207,6 +216,21 @@ function ShopDetails({ page, day, onFavorite }: { page: ShopPageData; day: strin
             </ul>
           </InfoRow>
         )}
+        {(shop.amenities ?? []).length > 0 && (
+          <InfoRow label={t('shop.amenities')}>
+            <ul className={styles.amenities}>
+              {AMENITIES.filter((a) => shop.amenities.includes(a)).map((a) => {
+                const Icon = AMENITY_ICONS[a];
+                return (
+                  <li key={a}>
+                    <Icon size={15} aria-hidden="true" />
+                    {t(`amenity.${a}` as MessageKey)}
+                  </li>
+                );
+              })}
+            </ul>
+          </InfoRow>
+        )}
         <InfoRow label={t('shop.capacity')}>
           <span className="mono">{shop.daily_capacity}</span>
         </InfoRow>
@@ -232,6 +256,16 @@ function ShopDetails({ page, day, onFavorite }: { page: ShopPageData; day: strin
           </InfoRow>
         )}
       </Card>
+
+      {shop.latitude !== null && shop.longitude !== null && (
+        <Suspense fallback={<div className={styles.mapLoading} />}>
+          <ShopsMap
+            compact
+            label={t('shop.map', { name: shop.name })}
+            shops={[{ id: shop.id, name: shop.name, latitude: shop.latitude, longitude: shop.longitude }]}
+          />
+        </Suspense>
+      )}
 
       <h2 className={styles.sectionTitle}>{t('shop.services')}</h2>
       <ServiceGroups services={page.services} />

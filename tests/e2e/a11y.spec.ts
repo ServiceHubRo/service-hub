@@ -66,6 +66,7 @@ for (const lang of ['ro', 'en'] as const) {
     await signInAs(page, SEED.client, lang);
     await checkAll(page, lang, [
       '/c/cauta',
+      '/c/cauta?vedere=harta&zi=maine&fac=wifi',
       `/c/service/${shopId}`,
       `/c/service/${shopId}/programare`,
       '/c/garaj',
@@ -100,6 +101,7 @@ for (const lang of ['ro', 'en'] as const) {
       '/s/cont/setari/program',
       '/s/cont/setari/reguli',
       '/s/cont/setari/servicii',
+      '/s/cont/setari/vitrina',
       '/s/cont/setari/facturare',
       '/s/cont/setari/personal',
       '/s/cont/setari/notificari',

@@ -67,9 +67,9 @@ export function ShopCard({ shop, distanceKm, back, onFavorite, day }: ShopCardPr
             )}
             <span>· {plural(lang, 'unit.services', shop.service_count)}</span>
           </span>
-          {(shop.free || shop.auto_confirm) && (
+          {(shop.free || shop.auto_confirm || shop.response) && (
             <span className={styles.free}>
-              <FreePlaceNote free={shop.free} instant={shop.auto_confirm} />
+              <FreePlaceNote free={shop.free} instant={shop.auto_confirm} response={shop.response} />
             </span>
           )}
           {matched && <span className={styles.offers}>{t('search.offers', { service: matched })}</span>}
