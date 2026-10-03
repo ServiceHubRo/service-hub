@@ -126,6 +126,7 @@ export function ShopBookingCard({ booking: b, shopId, fee, expiryDays, now, onDo
         )}
         {b.note && <p className={styles.note}>{b.note}</p>}
         {b.offer_percent ? <OfferNote>{t('offer.shop', { n: b.offer_percent })}</OfferNote> : null}
+        {b.loyalty_percent ? <OfferNote>{t('loyalty.shop', { n: b.loyalty_percent, level: b.loyalty_level ?? 1 })}</OfferNote> : null}
         {b.share_history && <p className={styles.muted}>{t('sb.card.shared')}</p>}
       </Card>
 

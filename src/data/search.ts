@@ -111,6 +111,8 @@ export interface ShopPage {
   response: ResponseBadge;
   /** Photos of the workshop, in the shop's order (T28b). */
   photos: { id: string; url: string }[];
+  /** The shop's loyalty discounts and the caller's own (T28c). */
+  loyalty: { l1: number | null; l2: number | null; yours: number | null };
 }
 
 /** Everything the shop page shows, public columns only (get_shop_page); `day` for its free place. */

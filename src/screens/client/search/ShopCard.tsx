@@ -73,11 +73,19 @@ export function ShopCard({ shop, distanceKm, back, onFavorite, day }: ShopCardPr
             </span>
           )}
           {matched && <span className={styles.offers}>{t('search.offers', { service: matched })}</span>}
-          {shop.offer !== null && (
+          {shop.offer !== null ? (
             <span className={styles.newClient}>
               <OfferNote compact>{t('offer.card', { n: shop.offer })}</OfferNote>
             </span>
-          )}
+          ) : shop.loyalty !== null ? (
+            <span className={styles.newClient}>
+              <OfferNote compact>{t('loyalty.card', { n: shop.loyalty })}</OfferNote>
+            </span>
+          ) : shop.loyalty_offered ? (
+            <span className={styles.newClient}>
+              <OfferNote compact>{t('loyalty.offered')}</OfferNote>
+            </span>
+          ) : null}
         </span>
         <ChevronRight size={18} className={styles.chevron} aria-hidden="true" />
       </Link>

@@ -112,6 +112,8 @@ export type Database = {
           followup_sent_at: string | null
           id: string
           inspection_started_at: string | null
+          loyalty_level: number | null
+          loyalty_percent: number | null
           note: string | null
           odometer: number | null
           offer_percent: number | null
@@ -149,6 +151,8 @@ export type Database = {
           followup_sent_at?: string | null
           id?: string
           inspection_started_at?: string | null
+          loyalty_level?: number | null
+          loyalty_percent?: number | null
           note?: string | null
           odometer?: number | null
           offer_percent?: number | null
@@ -186,6 +190,8 @@ export type Database = {
           followup_sent_at?: string | null
           id?: string
           inspection_started_at?: string | null
+          loyalty_level?: number | null
+          loyalty_percent?: number | null
           note?: string | null
           odometer?: number | null
           offer_percent?: number | null
@@ -1826,6 +1832,8 @@ export type Database = {
           latitude: number | null
           logo_url: string | null
           longitude: number | null
+          loyalty_l1: number | null
+          loyalty_l2: number | null
           max_advance_days: number
           min_notice_hours: number
           monthly_report: boolean
@@ -1866,6 +1874,8 @@ export type Database = {
           latitude?: number | null
           logo_url?: string | null
           longitude?: number | null
+          loyalty_l1?: number | null
+          loyalty_l2?: number | null
           max_advance_days?: number
           min_notice_hours?: number
           monthly_report?: boolean
@@ -1906,6 +1916,8 @@ export type Database = {
           latitude?: number | null
           logo_url?: string | null
           longitude?: number | null
+          loyalty_l1?: number | null
+          loyalty_l2?: number | null
           max_advance_days?: number
           min_notice_hours?: number
           monthly_report?: boolean
@@ -2238,6 +2250,8 @@ export type Database = {
           followup_sent_at: string | null
           id: string
           inspection_started_at: string | null
+          loyalty_level: number | null
+          loyalty_percent: number | null
           note: string | null
           odometer: number | null
           offer_percent: number | null
@@ -2463,6 +2477,8 @@ export type Database = {
           followup_sent_at: string | null
           id: string
           inspection_started_at: string | null
+          loyalty_level: number | null
+          loyalty_percent: number | null
           note: string | null
           odometer: number | null
           offer_percent: number | null
@@ -2520,6 +2536,7 @@ export type Database = {
         }[]
       }
       clean_text: { Args: { p: string }; Returns: string }
+      client_jobs_done: { Args: { p_client_id: string }; Returns: number }
       client_no_show_count: {
         Args: { p_client_id: string; p_days?: number }
         Returns: number
@@ -2597,6 +2614,8 @@ export type Database = {
           followup_sent_at: string | null
           id: string
           inspection_started_at: string | null
+          loyalty_level: number | null
+          loyalty_percent: number | null
           note: string | null
           odometer: number | null
           offer_percent: number | null
@@ -2643,6 +2662,8 @@ export type Database = {
           followup_sent_at: string | null
           id: string
           inspection_started_at: string | null
+          loyalty_level: number | null
+          loyalty_percent: number | null
           note: string | null
           odometer: number | null
           offer_percent: number | null
@@ -2701,6 +2722,8 @@ export type Database = {
           followup_sent_at: string | null
           id: string
           inspection_started_at: string | null
+          loyalty_level: number | null
+          loyalty_percent: number | null
           note: string | null
           odometer: number | null
           offer_percent: number | null
@@ -2777,6 +2800,8 @@ export type Database = {
           followup_sent_at: string | null
           id: string
           inspection_started_at: string | null
+          loyalty_level: number | null
+          loyalty_percent: number | null
           note: string | null
           odometer: number | null
           offer_percent: number | null
@@ -2823,6 +2848,8 @@ export type Database = {
           followup_sent_at: string | null
           id: string
           inspection_started_at: string | null
+          loyalty_level: number | null
+          loyalty_percent: number | null
           note: string | null
           odometer: number | null
           offer_percent: number | null
@@ -3020,6 +3047,8 @@ export type Database = {
           followup_sent_at: string | null
           id: string
           inspection_started_at: string | null
+          loyalty_level: number | null
+          loyalty_percent: number | null
           note: string | null
           odometer: number | null
           offer_percent: number | null
@@ -3066,6 +3095,8 @@ export type Database = {
           followup_sent_at: string | null
           id: string
           inspection_started_at: string | null
+          loyalty_level: number | null
+          loyalty_percent: number | null
           note: string | null
           odometer: number | null
           offer_percent: number | null
@@ -3088,6 +3119,11 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      loyalty_level_for: { Args: { p_jobs: number }; Returns: number }
+      loyalty_percent_at: {
+        Args: { p_l1: number; p_l2: number; p_level: number }
+        Returns: number
       }
       mark_history_report_paid: {
         Args: {
@@ -3121,6 +3157,8 @@ export type Database = {
           followup_sent_at: string | null
           id: string
           inspection_started_at: string | null
+          loyalty_level: number | null
+          loyalty_percent: number | null
           note: string | null
           odometer: number | null
           offer_percent: number | null
@@ -3165,6 +3203,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      my_loyalty: { Args: never; Returns: Json }
       my_phone_verification: { Args: never; Returns: Json }
       my_referrals: { Args: never; Returns: Json }
       my_shop_id: { Args: never; Returns: string }
@@ -3295,6 +3334,8 @@ export type Database = {
           followup_sent_at: string | null
           id: string
           inspection_started_at: string | null
+          loyalty_level: number | null
+          loyalty_percent: number | null
           note: string | null
           odometer: number | null
           offer_percent: number | null
@@ -3529,6 +3570,8 @@ export type Database = {
           followup_sent_at: string | null
           id: string
           inspection_started_at: string | null
+          loyalty_level: number | null
+          loyalty_percent: number | null
           note: string | null
           odometer: number | null
           offer_percent: number | null
@@ -3587,6 +3630,8 @@ export type Database = {
           auto_confirm: boolean
           free_date: string
           free_slot: string
+          loyalty: number
+          loyalty_offered: boolean
           response: string
           shop_id: string
         }[]
@@ -3681,6 +3726,8 @@ export type Database = {
           followup_sent_at: string | null
           id: string
           inspection_started_at: string | null
+          loyalty_level: number | null
+          loyalty_percent: number | null
           note: string | null
           odometer: number | null
           offer_percent: number | null
@@ -3761,6 +3808,8 @@ export type Database = {
           followup_sent_at: string | null
           id: string
           inspection_started_at: string | null
+          loyalty_level: number | null
+          loyalty_percent: number | null
           note: string | null
           odometer: number | null
           offer_percent: number | null
@@ -3823,6 +3872,8 @@ export type Database = {
           followup_sent_at: string | null
           id: string
           inspection_started_at: string | null
+          loyalty_level: number | null
+          loyalty_percent: number | null
           note: string | null
           odometer: number | null
           offer_percent: number | null
@@ -3884,6 +3935,8 @@ export type Database = {
           followup_sent_at: string | null
           id: string
           inspection_started_at: string | null
+          loyalty_level: number | null
+          loyalty_percent: number | null
           note: string | null
           odometer: number | null
           offer_percent: number | null
@@ -3930,6 +3983,8 @@ export type Database = {
           followup_sent_at: string | null
           id: string
           inspection_started_at: string | null
+          loyalty_level: number | null
+          loyalty_percent: number | null
           note: string | null
           odometer: number | null
           offer_percent: number | null
@@ -4093,6 +4148,8 @@ export type Database = {
           followup_sent_at: string | null
           id: string
           inspection_started_at: string | null
+          loyalty_level: number | null
+          loyalty_percent: number | null
           note: string | null
           odometer: number | null
           offer_percent: number | null

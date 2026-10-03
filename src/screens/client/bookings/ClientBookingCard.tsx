@@ -149,6 +149,7 @@ export function ClientBookingCard({
       </p>
       {b.note && <p className={styles.note}>{b.note}</p>}
       {b.offer_percent !== null && !OFFER_GONE.has(b.status) && <OfferNote>{t('offer.client', { n: b.offer_percent })}</OfferNote>}
+      {b.loyalty_percent !== null && !OFFER_GONE.has(b.status) && <OfferNote>{t('loyalty.client', { n: b.loyalty_percent })}</OfferNote>}
 
       <StatusDetail booking={b} quote={quote} now={now} />
       {isActiveStatus(b.status) && panel === null && <ShareRow booking={b} act={act} />}

@@ -77,6 +77,7 @@ for (const lang of ['ro', 'en'] as const) {
       '/c/mesaje',
       '/c/cont',
       '/c/cont/favorite',
+      '/c/cont/fidelitate',
       '/c/cont/istoric',
       '/c/cont/rapoarte',
       '/c/cont/legal/termeni',

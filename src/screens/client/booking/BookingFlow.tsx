@@ -119,6 +119,7 @@ function Flow({ page }: { page: ShopPage }) {
       time,
       car,
       offer: booking.offer_percent,
+      loyalty: booking.loyalty_percent,
       confirmed: booking.status === 'confirmed',
       shopId: shop.id,
       bookingId: booking.id,
@@ -200,6 +201,7 @@ function Flow({ page }: { page: ShopPage }) {
           shop={shop}
           services={services}
           offer={page.offer}
+          loyalty={page.loyalty?.yours ?? null}
           day={day}
           time={time}
           draft={carDraft}

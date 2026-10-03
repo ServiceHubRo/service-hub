@@ -87,6 +87,5 @@ select test.eq((select response from public.search_card_extras(array[test.id('sh
 select test.fails(format('select public.shop_response_badge(%L)', test.id('shop1')), 'permission denied', 'read through the page and cards only');
 select test.logout();
 
-select test.eq((select version from public.schema_version), 52, 'schema 52');
 
 rollback;

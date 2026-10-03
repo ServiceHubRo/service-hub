@@ -54,6 +54,9 @@ export interface ShopBooking {
   client_no_shows: number;
   /** The new-client discount on labor this booking was promised (T23). */
   offer_percent?: number | null;
+  /** The loyalty discount promised (T28c) and the client's level then. */
+  loyalty_percent?: number | null;
+  loyalty_level?: number | null;
   /** The client lets the shop see the car's jobs at other shops (T27). */
   share_history?: boolean;
   car_snapshot: CarSnapshot;

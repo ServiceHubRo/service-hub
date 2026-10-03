@@ -22,6 +22,8 @@ export interface SentState {
   car: string;
   /** The new-client offer the booking got (T23). */
   offer?: number | null;
+  /** The loyalty discount promised (T28c). */
+  loyalty?: number | null;
   /** Confirmed at once (T28a): no waiting for the shop. */
   confirmed?: boolean;
   shopId?: string;
@@ -53,6 +55,7 @@ export function BookingSent() {
           <SummaryRow label={t('booking.summary.when')} value={`${formatDate(lang, sent.date)}, ${sent.time}`} mono />
           {sent.car && <SummaryRow label={t('booking.summary.car')} value={sent.car} />}
           {sent.offer ? <SummaryRow label={t('offer.summary')} value={t('offer.short', { n: sent.offer })} /> : null}
+          {sent.loyalty ? <SummaryRow label={t('loyalty.summary')} value={t('offer.short', { n: sent.loyalty })} /> : null}
           <SummaryRow label={t('booking.sent.ref')} value={sent.ref} mono />
         </Card>
       )}
