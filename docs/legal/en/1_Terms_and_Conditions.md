@@ -1,6 +1,6 @@
 # Terms and Conditions — Service-Hub
 
-**Last updated:** October 2, 2026
+**Last updated:** October 3, 2026
 
 These terms (the “Terms”) apply to your use of Service-Hub: the website and app at service-hub.ro (the “Platform”). By creating an account, you confirm that you have read and agree to them. How we use your data is described in the Privacy Policy, and what we keep in your browser in the Cookie Policy.
 
@@ -111,7 +111,8 @@ A Shop is listed by the owner or representative of a business authorized to prov
 
 ### 4.3 Bookings, quotes and jobs
 
-- Answer requests promptly: confirm, decline or reschedule.
+- Answer requests promptly: confirm, decline or reschedule. A request still unanswered at the booking time closes automatically, and the customer is notified.
+- Update bookings after their time (inspection started or no-show). A confirmed booking left without an update for 7 days after its date closes automatically, without being recorded as a no-show.
 - A quote must be clear, itemized and with final prices. Once sent it can no longer be changed; you can send a new version or withdraw it.
 - The inspection fee may be charged only if the customer refuses the quote, and only up to the amount shown on your profile at the time of booking.
 - When finishing a job, the odometer reading is mandatory and must be the one read on the dashboard. **Entering a false odometer reading is prohibited.** Odometer readings and jobs appear in the customer’s history and reports. The Platform refuses a reading lower than the last known one for that license plate and asks for confirmation for a jump of more than 50,000 km.

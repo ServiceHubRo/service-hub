@@ -31,6 +31,8 @@ const EVENTS = [
   'quote_partially_accepted',
   'quote_refused',
   'quote_expired',
+  'request_expired',
+  'booking_auto_closed',
   'work_started',
   'job_done',
 ] as const;

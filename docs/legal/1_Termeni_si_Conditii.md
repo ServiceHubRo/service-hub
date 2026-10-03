@@ -1,6 +1,6 @@
 # Termeni și condiții — Service-Hub
 
-**Ultima actualizare:** 2 octombrie 2026
+**Ultima actualizare:** 3 octombrie 2026
 
 Acești termeni („Termenii”) se aplică folosirii Service-Hub: site-ul și aplicația de la adresa service-hub.ro („Platforma”). Când îți faci cont, confirmi că i-ai citit și că ești de acord cu ei. Cum folosim datele tale scrie în Politica de confidențialitate, iar ce păstrăm în browser, în Politica de cookies.
 
@@ -111,7 +111,8 @@ Un Service se înscrie de proprietarul sau reprezentantul unei afaceri autorizat
 
 ### 4.3 Programările, devizele și lucrările
 
-- Răspundeți la cereri cât mai repede: confirmați, refuzați sau mutați.
+- Răspundeți la cereri cât mai repede: confirmați, refuzați sau mutați. O cerere rămasă fără răspuns până la ora programării se închide automat, iar clientul este anunțat.
+- Actualizați programările după ora lor (în constatare sau neprezentat). O programare confirmată care rămâne neactualizată 7 zile după data ei se încheie automat, fără să fie trecută ca neprezentare.
 - Devizul trebuie să fie clar, pe poziții, cu prețuri finale. După trimitere nu se mai poate modifica; puteți trimite o versiune nouă sau îl puteți retrage.
 - Taxa de constatare se poate cere doar dacă clientul refuză devizul și doar în valoarea afișată pe profil la momentul programării.
 - La finalizare, kilometrajul este obligatoriu și trebuie să fie cel citit în bord. **Este interzisă trecerea unui kilometraj fals.** Kilometrajul și lucrările apar în istoricul și în rapoartele clientului. Platforma refuză un kilometraj mai mic decât ultimul cunoscut pentru acel număr de înmatriculare și cere confirmare pentru un salt de peste 50.000 km.

@@ -36,6 +36,8 @@ export interface ShopHistoryItem {
   done_at: string | null;
   cancelled_by: 'client' | 'shop' | 'admin' | null;
   cancel_reason: string | null;
+  /** `not_updated` when the system closed a confirmed booking left open for 7 days. */
+  closed_reason: 'unanswered' | 'not_updated' | null;
   /** When it ended: finished, canceled, or the last status change. */
   ended_at: string;
   /** The accepted version of a finished job, the refused or the expired one; else null. */

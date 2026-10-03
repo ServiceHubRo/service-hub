@@ -348,6 +348,35 @@ describe('notification texts', () => {
     expect(renderNotification(ev('broadcast', 'client', 'ro'), {}, NOW)).toBeNull();
   });
 
+  it('closes an unanswered request kindly, and points the client to other shops nearby', () => {
+    const params = { shop_name: 'Atelier Unu', client_name: 'Ana Marin', category: 'cat_rev', city: 'Brașov' };
+    expect(renderNotification(ev('request_expired', 'client', 'ro', params), {}, NOW)).toMatchObject({
+      title: 'Cererea ta s-a închis',
+      body: 'Ne pare rău, Atelier Unu nu a reușit să răspundă la timp pentru Mie 14 oct, 10:00. Îți arătăm acum alte service-uri din zonă care te pot ajuta.',
+    });
+    expect(renderNotification(ev('request_expired', 'client', 'en', params), {}, NOW)!.title).toBe('Your request has closed');
+    expect(renderNotification(ev('request_expired', 'shop', 'ro', params), {}, NOW)!.body).toBe(
+      'Cererea de la Ana Marin pentru Mie 14 oct, 10:00 (Schimb ulei și filtru) s-a închis automat, pentru că ora programării a trecut. Un răspuns rapid aduce mai mulți clienți în service.',
+    );
+    expect(urlFor('client', ev('request_expired', 'client', 'ro', params))).toBe('/c/cauta?cat=cat_rev&oras=Bra%C8%99ov');
+    expect(urlFor('client', ev('request_expired', 'client', 'ro'))).toBe('/c/cauta');
+    expect(urlFor('shop', ev('request_expired', 'shop', 'ro', params))).toBe('/s/programari?tab=cereri');
+  });
+
+  it('asks the shop how a past appointment went, and says when it closed on its own', () => {
+    const params = { client_name: 'Ana Marin', ref: 'P-000123' };
+    expect(renderNotification(ev('booking_followup', 'shop', 'ro', params), {}, NOW)).toMatchObject({
+      title: 'Cum a decurs programarea?',
+      body: 'Ana Marin avea programare Mie 14 oct, 10:00, pentru Volkswagen Golf 7 (BV 12 ABC). Spune-ne ce s-a întâmplat: dacă mașina a venit, apasă „În constatare”, iar dacă nu, „Neprezentat”.',
+    });
+    expect(renderNotification(ev('booking_auto_closed', 'shop', 'en', params), {}, NOW)!.body).toBe(
+      'Booking P-000123 with Ana Marin on Wed, Oct 14, 10:00 closed automatically because it was not updated for 7 days. The customer was not marked as a no-show.',
+    );
+    expect(urlFor('shop', ev('booking_auto_closed', 'shop', 'ro', params))).toBe('/s/istoric?q=P-000123');
+    expect(urlFor('shop', ev('booking_followup', 'shop', 'ro', params))).toBe('/s/programari?p=b-1');
+    expect(renderNotification(ev('booking_followup', 'client', 'ro', params), {}, NOW)).toBeNull();
+  });
+
   it('opens the right screen', () => {
     expect(urlFor('client', ev('review_reply', 'client', 'ro'))).toBe('/c/programari?p=b-1');
     expect(urlFor('shop', ev('quote_accepted', 'shop', 'ro'))).toBe('/s/programari?p=b-1');

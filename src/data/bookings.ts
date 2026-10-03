@@ -38,8 +38,10 @@ export interface ClientBooking {
   cancelled_by: 'client' | 'shop' | 'admin' | null;
   cancel_reason: string | null;
   decline_reason: string | null;
+  /** Why the system closed it: a request the shop never answered, or a booking never updated. */
+  closed_reason: 'unanswered' | 'not_updated' | null;
   shop: { name: string; city: string; phone: string | null; cancel_deadline_hours: number } | null;
-  service: { name_ro: string; name_en: string; icon: string | null } | null;
+  service: { name_ro: string; name_en: string; icon: string | null; category_key: string } | null;
   /** The other services of the same booking (T21), in the order they were ticked. */
   extra_service_ids: string[];
   /** The new-client discount on labor this booking was promised (T23). */
@@ -61,9 +63,9 @@ export interface ClientBookingsData {
 
 const COLUMNS = [
   'id, ref, status, date, slot, note, car_id, car_snapshot, created_at, shop_id, service_id, extra_service_ids, offer_percent, share_history',
-  'inspection_started_at, started_at, done_at, odometer, work, cost, cancelled_by, cancel_reason, decline_reason',
+  'inspection_started_at, started_at, done_at, odometer, work, cost, cancelled_by, cancel_reason, decline_reason, closed_reason',
   'shop:shops(name, city, phone, cancel_deadline_hours)',
-  'service:services(name_ro, name_en, icon)',
+  'service:services(name_ro, name_en, icon, category_key)',
   'quotes(id, version, status, note, inspection_fee, total_sent, total_approved, sent_at, expires_at, decided_at, items:quote_items(id, position, name, price, approved))',
   'review:reviews(id, rating)',
 ].join(', ');
