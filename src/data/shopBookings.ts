@@ -54,6 +54,8 @@ export interface ShopBooking {
   client_no_shows: number;
   /** The new-client discount on labor this booking was promised (T23). */
   offer_percent?: number | null;
+  /** The client lets the shop see the car's jobs at other shops (T27). */
+  share_history?: boolean;
   car_snapshot: CarSnapshot;
   created_at: string;
   confirmed_at: string | null;

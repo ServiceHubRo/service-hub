@@ -6,7 +6,14 @@ import { ShopBookingsProvider } from '../../screens/shop/bookings/ShopBookingsPr
 import { ShopBookingsScreen } from '../../screens/shop/bookings/ShopBookingsScreen';
 import { Dashboard } from '../../screens/shop/dashboard/Dashboard';
 import { ShopHistoryScreen } from '../../screens/shop/history/ShopHistoryScreen';
-import { REPORTS_PATH, REVIEWS_PATH, SUBSCRIPTION_PATH } from '../../screens/shop/paths';
+import {
+  REPORTS_PATH,
+  REVIEWS_PATH,
+  SHOP_BOOKINGS_PATH,
+  SHOP_HISTORY_PATH,
+  SUBSCRIPTION_PATH,
+  VEHICLE_FILE_SEGMENT,
+} from '../../screens/shop/paths';
 import { ShopReportsScreen } from '../../screens/shop/reports/ShopReportsScreen';
 import { ShopReviewsScreen } from '../../screens/shop/reviews/ShopReviewsScreen';
 import { ShopRoleProvider } from '../../screens/shop/ShopRoleProvider';
@@ -22,6 +29,7 @@ import { SettingsIndex } from '../../screens/shop/settings/SettingsIndex';
 import { ShopSettingsLayout } from '../../screens/shop/settings/ShopSettingsLayout';
 import { StaffSettings } from '../../screens/shop/settings/StaffSettings';
 import { SubscriptionScreen } from '../../screens/shop/subscription/SubscriptionScreen';
+import { VehicleFileScreen } from '../../screens/shop/vehicle/VehicleFileScreen';
 import { AppShell } from '../AppShell';
 import { commonRoutes, messageRoutes, rel } from './shared';
 
@@ -51,6 +59,15 @@ export default function ShopApp() {
           '/s/mesaje': <MessagesScreen />,
         })}
         {messageRoutes('shop')}
+        {/* Fișa mașinii (T27), under the tab it was opened from. */}
+        <Route
+          path={`${rel('shop', SHOP_BOOKINGS_PATH)}/${VEHICLE_FILE_SEGMENT}/:bookingId`}
+          element={<VehicleFileScreen from="bookings" />}
+        />
+        <Route
+          path={`${rel('shop', SHOP_HISTORY_PATH)}/${VEHICLE_FILE_SEGMENT}/:bookingId`}
+          element={<VehicleFileScreen from="history" />}
+        />
         <Route path={rel('shop', REVIEWS_PATH)} element={<ShopReviewsScreen />} />
         <Route path={rel('shop', SUBSCRIPTION_PATH)} element={<SubscriptionScreen />} />
         <Route path={rel('shop', REPORTS_PATH)} element={<ShopReportsScreen />} />

@@ -14,6 +14,8 @@ export const ADMIN_SETTINGS_PATH = '/admin/cont/setari';
 export const ADMIN_TEXTS_PATH = '/admin/cont/setari/texte';
 export const ADMIN_NOTICES_PATH = '/admin/cont/anunturi';
 export const ADMIN_EXPORT_PATH = '/admin/cont/export';
+/** Raport ANAF: every shop's company as ANAF answered it. */
+export const ADMIN_ANAF_PATH = '/admin/cont/anaf';
 
 export const adminShopPath = (id: string) => `${ADMIN_SHOPS_PATH}/${id}`;
 export const adminClientPath = (id: string) => `${ADMIN_CLIENTS_PATH}/${id}`;

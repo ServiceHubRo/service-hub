@@ -316,7 +316,7 @@ describe('subscription notices and emails', () => {
     expect(renderNotification(ev('payment_failed', 'en', { total: 100, final: true, expiry: null }), {}, NOW)!.body).toBe(
       "We couldn't charge the 100 RON subscription. That was the last try: pay under Subscription to stay in search results.",
     );
-    expect(renderNotification(ev('shop_inactive', 'ro', { reason: 'payment_failed' }), {}, NOW)!.body).toMatch(/^Plata abonamentului nu a trecut/);
+    expect(renderNotification(ev('shop_inactive', 'ro', { reason: 'payment_failed' }), {}, NOW)!.body).toMatch(/^Plata abonamentului nu a reușit/);
     expect(renderNotification(ev('shop_inactive', 'en', { reason: 'cancelled' }), {}, NOW)!.body).toMatch(/^Your subscription has ended/);
     expect(renderNotification(ev('shop_inactive', 'ro', { reason: 'trial_ended' }), {}, NOW)!.body).toMatch(/^Perioada gratuită s-a încheiat/);
   });

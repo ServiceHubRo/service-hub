@@ -1,7 +1,8 @@
-import { ChevronDown, Download, History as HistoryIcon, Phone, Printer, SearchX } from 'lucide-react';
+import { ChevronDown, ClipboardList, Download, History as HistoryIcon, Phone, Printer, SearchX } from 'lucide-react';
 import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { Button } from '../../../components/Button';
+import { buttonClass } from '../../../components/buttonClass';
 import { Card } from '../../../components/Card';
 import { Chip, ChipRow } from '../../../components/Chip';
 import { EmptyState } from '../../../components/EmptyState';
@@ -35,6 +36,7 @@ import { formatPhone, normalizePhone } from '../../../lib/validators';
 import { HistoryQuote } from '../../history/HistoryQuote';
 import { MessageLink } from '../../messages/MessageLink';
 import styles from '../../history/history.module.css';
+import { vehicleFilePath } from '../paths';
 import { useIsShopOwner } from '../shopRole';
 
 function carText(b: ShopHistoryItem): string {
@@ -311,6 +313,10 @@ function HistoryCard({ item: b, open, onToggle }: { item: ShopHistoryItem; open:
               </a>
             )}
             {b.has_client && <MessageLink side="shop" bookingId={b.id} />}
+            <Link to={vehicleFilePath(b.id, 'history')} className={buttonClass('secondary')}>
+              <ClipboardList size={18} aria-hidden="true" />
+              {t('vf.title')}
+            </Link>
           </div>
         </div>
       )}

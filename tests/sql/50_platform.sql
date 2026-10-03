@@ -121,7 +121,7 @@ select test.eq(
       and not has_function_privilege('anon', p.oid, 'execute')),
   'admin_create_category, admin_create_service, admin_decide_review, admin_decide_suspect_review, admin_export, admin_extend_trial, admin_force_cancel, '
   || 'admin_get_booking, admin_get_client, admin_get_shop, admin_get_thread, admin_list_audit, admin_list_bookings, '
-  || 'admin_list_catalog, admin_list_clients, admin_list_history_reports, admin_list_notices, admin_list_reviews, '
+  || 'admin_list_catalog, admin_list_clients, admin_list_company_checks, admin_list_history_reports, admin_list_notices, admin_list_reviews, '
   || 'admin_list_shops, admin_list_subscriptions, admin_list_suspect_reviews, admin_move_catalog_item, admin_notice_preview, admin_overview, '
   || 'admin_send_notice, admin_set_account_suspended, admin_set_notification_text, admin_set_service_reminder, admin_set_shop_suspended, '
   || 'admin_set_subscription_price, admin_set_subscription_status, admin_update_category, admin_update_service, '
@@ -130,7 +130,7 @@ select test.eq(
   || 'decline_booking, export_my_data, get_availability, get_shop_page, get_shop_setup, history_report_preview, invite_staff, is_admin, is_shop_member, '
   || 'is_shop_owner, is_shop_public, last_odometer_for_booking, list_shop_bookings, list_shop_history, list_shop_staff, list_threads, '
   || 'mark_no_show, mark_thread_read, my_phone_verification, my_referrals, my_shop_id, my_subscription_offers, new_client_offers, replace_quote, reply_review, report_review, reschedule_booking, save_native_push_token, save_push_subscription, '
-  || 'save_shop_hours, search_cities, search_shops, send_message, send_quote, set_shop_services, shop_cancel_booking, shop_reports, start_inspection, '
+  || 'save_shop_hours, search_cities, search_shops, send_message, send_quote, set_booking_history_share, set_shop_services, shop_cancel_booking, shop_reports, shop_vehicle_file, start_inspection, '
   || 'start_work, submit_review, toggle_favorite, touch_last_active, withdraw_quote',
   'functions callable only when signed in')
 from pg_proc p where p.pronamespace = 'public'::regnamespace;

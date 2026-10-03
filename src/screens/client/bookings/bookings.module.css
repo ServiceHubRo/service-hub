@@ -328,3 +328,31 @@
   outline: 2px solid var(--amber);
   outline-offset: 3px;
 }
+
+/* T27: the car's history for the shop — on or off, with the switch. */
+.share {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+
+.shareIcon {
+  flex-shrink: 0;
+  color: var(--muted);
+}
+
+.shareText {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 180px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.shareTitle {
+  font-weight: 600;
+  font-size: 14.5px;
+}

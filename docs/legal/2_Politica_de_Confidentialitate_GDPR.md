@@ -1,6 +1,6 @@
 # Politica de confidențialitate — Service-Hub
 
-**Ultima actualizare:** 1 octombrie 2026
+**Ultima actualizare:** 2 octombrie 2026
 
 Aici afli ce date personale folosește Service-Hub, de ce, cine le mai vede, cât timp le păstrăm și ce drepturi ai, conform Regulamentului (UE) 2016/679 („GDPR”) și legii române.
 
@@ -79,6 +79,7 @@ Aici afli ce date personale folosește Service-Hub, de ce, cine le mai vede, câ
 | Reminderul pentru schimbul anvelopelor de sezon (pentru mașinile din Garaj) și cele două sfaturi din primele două săptămâni | Contractul cu tine; le oprești din Cont |
 | Ofertele service-urilor din favorite | Acordul tău: le primești doar dacă le pornești din Cont și le oprești oricând |
 | Raportul lunii pentru service | Contractul cu tine; îl oprești din Setări → Notificări |
+| Arătarea lucrărilor făcute la mașina ta la alte service-uri către service-ul la care ai o programare (Fișa mașinii) | Acordul tău (lit. a): îl dai la programare sau din Programări și îl retragi oricând, tot din Programări |
 | Raportul oficial de istoric | Contractul cu tine |
 | Abonamentul, plățile, facturile și contabilitatea | Contractul și obligațiile legale (lit. c): Legea contabilității nr. 82/1991, Codul fiscal |
 | Recenziile publice și verificarea celor raportate | Interesul legitim (lit. f) ca recenziile să fie reale; obligațiile din Regulamentul (UE) 2022/2065 |
@@ -99,6 +100,7 @@ Aici afli ce date personale folosește Service-Hub, de ce, cine le mai vede, câ
 
 - **Service-ul la care faci o programare** (proprietarul și colegii lui) vede: numele, telefonul, limba și codul contului tău, mașina din programare (marcă, model, an, număr, serie de șasiu), nota, mesajele și recenzia ta, iar după finalizare, kilometrajul. Dacă ai 3 sau mai multe neprezentări în ultimele 90 de zile, vede și acest număr.
 - Service-ul **nu vede** emailul tău, Garajul, datele de ITP, RCA și rovinietă, nici programările tale la alte service-uri.
+- **Excepție, doar cu acordul tău:** dacă bifezi la programare (sau alegi apoi din Programări) „Arată service-ului ce s-a făcut la mașină la alte service-uri”, service-ul vede, cât timp programarea este deschisă, lucrările finalizate prin Platformă la acea mașină la alte service-uri: data, kilometrajul, serviciile, pozițiile acceptate din deviz și descrierea lucrării. **Nu vede** prețurile și nici numele sau orașul celorlalte service-uri. Bifa nu este pusă din oficiu, iar acordul îl retragi oricând din Programări; după ce programarea se încheie, service-ul nu le mai vede.
 - La finalizarea unei lucrări, service-ul primește **ultimul kilometraj cunoscut** pentru acel număr de înmatriculare (doar cifra, din lucrările făcute prin Platformă la orice service), ca să nu se treacă din greșeală sau intenționat un kilometraj mai mic.
 - **Recenziile** sunt publice pentru utilizatorii Platformei, cu prenumele și inițiala numelui (de exemplu „Andrei M.”).
 - **Codul unui raport de istoric:** oricine îl are vede marca, modelul și numărul mașinii, câte lucrări are raportul, perioada și data raportului.
@@ -170,7 +172,7 @@ Ai dreptul:
 - să ceri **restricționarea** folosirii datelor;
 - să te **opui** folosirii datelor pe baza interesului legitim;
 - la **portabilitate**: fișierul din Cont → Datele mele → Descarcă datele mele conține, într-un format structurat (JSON), contul, mașinile, programările, devizele, recenziile și mesajele tale; este gratuit;
-- să îți **retragi acordul** pentru notificările push (din Cont sau din setările browserului) și pentru locație (din setările browserului), fără să afecteze ce s-a făcut înainte;
+- să îți **retragi acordul** pentru notificările push (din Cont sau din setările browserului), pentru locație (din setările browserului) și pentru arătarea istoricului mașinii către un service (din Programări), fără să afecteze ce s-a făcut înainte;
 - să depui **plângere** la Autoritatea Națională de Supraveghere a Prelucrării Datelor cu Caracter Personal (ANSPDCP), B-dul G-ral. Gheorghe Magheru nr. 28-30, sector 1, București, [dataprotection.ro](https://www.dataprotection.ro).
 
 Pentru orice cerere, scrie-ne la {{email}} de pe adresa contului tău. Răspundem în cel mult o lună (în cazuri complicate putem prelungi cu încă două luni, cu explicație). Pentru datele pe care un service le păstrează în evidența lui, te poți adresa și service-ului; te ajutăm să iei legătura.

@@ -19,6 +19,7 @@ import {
 // T16b — the admin's platform tools: subscriptions and payments, history reports, the catalog,
 // platform settings and push texts, notices (seen by the client they were meant for), exports.
 
+const API = process.env.VITE_SUPABASE_URL ?? 'http://127.0.0.1:54321';
 const name = () => test.info().project.name;
 const rid = () => crypto.randomUUID();
 const tag = () => `${Date.now() % 1_000_000}${Math.floor(Math.random() * 100)}`;
@@ -184,7 +185,7 @@ test.describe('admin tools', () => {
     await card.getByLabel('Iconiță').selectOption('Truck');
     // The service reminder interval (T19d): whole months, 1–120, or empty.
     await card.getByLabel('Reminder de revizie (luni)').fill('0');
-    await expect(card.getByText('Un număr întreg de luni, între 1 și 120, sau gol.')).toBeVisible();
+    await expect(card.getByText('Scrie un număr întreg de luni, între 1 și 120, sau lasă câmpul gol.')).toBeVisible();
     await expect(card.getByRole('button', { name: 'Adaugă serviciul' })).toBeDisabled();
     await card.getByLabel('Reminder de revizie (luni)').fill('18');
     await card.getByRole('button', { name: 'Adaugă serviciul' }).click();
@@ -341,5 +342,140 @@ test.describe('admin tools', () => {
       await expectNoHorizontalScroll(page);
       await shot(page, `t16b-en-${tile.split(' ')[0]!.toLowerCase()}`, name());
     }
+  });
+});
+
+test.describe('Raport ANAF', () => {
+  test.skip(!BACKEND, 'needs the local Supabase stack');
+  test.setTimeout(120_000);
+
+  test('every shop by category, a check from the list, the Excel file', async ({ page }) => {
+    const id = tag();
+    const unknownName = `Anaf Negasit ${id}`;
+    const mismatchName = `Anaf Nume ${id}`;
+    const { shopId: unknown } = await createBookableShop(unknownName, ['ulei']);
+    const { shopId: mismatch } = await createBookableShop(mismatchName, ['ulei']);
+    // A new CUI forgets ANAF's answer (trigger): the CUI first, then what ANAF said.
+    await serviceRest(`shop_billing?shop_id=eq.${unknown}`, 'PATCH', { vat_id: '160796', legal_name: 'Negasit SRL' });
+    await serviceRest(`shop_billing?shop_id=eq.${unknown}`, 'PATCH', {
+      anaf_cui: '160796',
+      anaf_status: 'not_found',
+      anaf_checked_at: new Date().toISOString(),
+    });
+    await serviceRest(`shop_billing?shop_id=eq.${mismatch}`, 'PATCH', { vat_id: 'RO18000003', legal_name: 'Alt Nume SRL', vat_payer: false });
+
+    await signInAdmin(page);
+    await openTool(page, 'Raport ANAF');
+    await page.getByLabel('Caută după service, cod, CUI sau denumire').fill(id);
+    const unknownCard = page.locator('li').filter({ hasText: unknownName });
+    const mismatchCard = page.locator('li').filter({ hasText: mismatchName });
+    await expect(unknownCard).toContainText('Negăsită la ANAF');
+    await expect(unknownCard).toContainText('160796');
+    // (The daily batch of another test may have checked it already.)
+    await expect(mismatchCard).toContainText(/Neverificată|Nume diferit/);
+    await expectNoHorizontalScroll(page);
+    await shot(page, 'anaf-report', name());
+
+    // Checked from the list: ANAF knows the CUI under another name, as a VAT payer; the VAT tick follows ANAF.
+    await mismatchCard.getByRole('button', { name: /^Verifică (la ANAF|din nou)$/ }).click();
+    await expect(page.getByText(`Am verificat din nou ${mismatchName} la ANAF.`)).toBeVisible();
+    await expect(mismatchCard).toContainText('Nume diferit');
+    await expect(mismatchCard).toContainText('AUTO TEST S.R.L.');
+    await expect(mismatchCard).not.toContainText('TVA diferit');
+    await expect(mismatchCard.getByRole('button', { name: 'Verifică din nou' })).toBeVisible();
+
+    // The chips.
+    await page.getByRole('button', { name: /^Negăsită · \d+$/ }).click();
+    await expect(unknownCard).toBeVisible();
+    await expect(mismatchCard).toHaveCount(0);
+    await page.getByRole('button', { name: /^Probleme · \d+$/ }).click();
+    await expect(unknownCard).toBeVisible();
+    await expect(mismatchCard).toBeVisible();
+    await page.getByRole('button', { name: /^Firmă activă · \d+$/ }).click();
+    await expect(page.getByText('Niciun rezultat pentru filtrele alese.')).toBeVisible();
+    await page.getByRole('button', { name: /^Toate · \d+$/ }).click();
+
+    // The Excel file holds what the screen shows.
+    const file = await downloadCsv(page, page.getByRole('button', { name: 'Descarcă Excel' }));
+    expect(file.file).toMatch(/^raport-anaf-\d{4}-\d{2}-\d{2}\.xlsx$/);
+    expect(file.text).toContain(unknownName);
+    expect(file.text).toContain('AUTO TEST S.R.L.');
+    expect(file.text).toContain('Negăsită la ANAF');
+
+    // A card opens the shop.
+    await unknownCard.getByRole('link', { name: unknownName }).click();
+    await expect(page.getByRole('heading', { level: 1, name: unknownName })).toBeVisible();
+  });
+
+  test('a company ANAF does not confirm: the owner is told, 14 days later out of search, back on its own', async ({ page }) => {
+    const shopName = `Anaf Termen ${tag()}`;
+    const { email, shopId } = await createBookableShop(shopName, ['ulei']);
+    const owner = await userIdOf(email);
+    await serviceRest(`shop_billing?shop_id=eq.${shopId}`, 'PATCH', { vat_id: '160796', legal_name: 'Negasit SRL' });
+    const [config] = await serviceRest<{ dispatch_token: string }[]>('push_config?id=eq.1&select=dispatch_token', 'GET');
+    /** The daily run, as pg_cron starts it: the companies due, one request to ANAF, the deadlines. */
+    const dailyRun = async () => {
+      const res = await fetch(`${API}/functions/v1/verify-company`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json', 'x-dispatch-token': config!.dispatch_token },
+        body: JSON.stringify({ batch: true }),
+      });
+      expect(res.status).toBe(200);
+      return (await res.json()) as { due: number; recorded: number; hidden: number };
+    };
+    const billing = async () =>
+      (
+        await serviceRest<{ anaf_status: string | null; anaf_problem_since: string | null; anaf_hidden_at: string | null }[]>(
+          `shop_billing?shop_id=eq.${shopId}&select=anaf_status,anaf_problem_since,anaf_hidden_at`,
+          'GET',
+        )
+      )[0]!;
+    const events = async (event: string) =>
+      (await serviceRest<unknown[]>(`notification_events?user_id=eq.${owner}&event=eq.${event}&select=id`, 'GET')).length;
+
+    // Without the token the run is refused.
+    const refused = await fetch(`${API}/functions/v1/verify-company`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'x-dispatch-token': 'wrong' },
+      body: JSON.stringify({ batch: true }),
+    });
+    expect(refused.status).toBeGreaterThanOrEqual(400);
+
+    // ANAF does not know the CUI: the owner is told once and has 14 days.
+    expect((await dailyRun()).recorded).toBeGreaterThan(0);
+    await expect.poll(async () => (await billing()).anaf_status).toBe('not_found');
+    expect((await billing()).anaf_problem_since).not.toBeNull();
+    expect(await events('company_problem')).toBe(1);
+    await signIn(page, email, PASSWORD);
+    await expect(page).toHaveURL(/\/s\/panou/);
+    const banner = page.getByText('Nu am găsit CUI-ul din Date de facturare în registrul ANAF. Poate e doar o greșeală de scriere.');
+    await expect(banner).toBeVisible();
+    await expect(page.getByText(/Te rugăm să verifici datele până pe .+, ca service-ul să rămână vizibil în căutări\./)).toBeVisible();
+    await expectNoHorizontalScroll(page);
+    await shot(page, 'anaf-deadline-banner', name());
+
+    // 15 days later, ANAF still does not know it: out of search, the owner is told.
+    await serviceRest(`shop_billing?shop_id=eq.${shopId}`, 'PATCH', {
+      anaf_problem_since: new Date(Date.now() - 15 * 86_400_000).toISOString(),
+      anaf_checked_at: new Date(Date.now() - 86_400_000).toISOString(),
+    });
+    await dailyRun();
+    await expect.poll(async () => (await billing()).anaf_hidden_at).not.toBeNull();
+    expect(await events('company_problem')).toBe(1);
+    expect(await events('company_hidden')).toBe(1);
+    await page.reload();
+    await expect(page.getByText('Nu am putut confirma încă firma la ANAF. Verifică CUI-ul în Date de facturare și service-ul revine automat.')).toBeVisible();
+    await expect(banner).toHaveCount(0);
+    await shot(page, 'anaf-hidden-banner', name());
+
+    // The owner fixes the CUI: the next run confirms it and the shop is back.
+    await serviceRest(`shop_billing?shop_id=eq.${shopId}`, 'PATCH', { vat_id: 'RO18000003', legal_name: 'Auto Test SRL' });
+    await dailyRun();
+    await expect.poll(async () => (await billing()).anaf_hidden_at).toBeNull();
+    expect(await billing()).toMatchObject({ anaf_status: 'active', anaf_problem_since: null });
+    expect(await events('company_ok')).toBe(1);
+    await page.reload();
+    await expect(page.getByText('Nu am putut confirma încă firma la ANAF.', { exact: false })).toHaveCount(0);
+    await expect(banner).toHaveCount(0);
   });
 });

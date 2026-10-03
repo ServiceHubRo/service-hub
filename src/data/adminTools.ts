@@ -209,6 +209,8 @@ export const ABUSE_LIMIT_KEYS = [
   'review_window_days',
   'quote_versions_max',
   'no_shows_before_phone',
+  'company_fix_days',
+  'company_recheck_days',
 ] as const;
 /** The notification limits (T24): quiet hours, tips a week, when a waiting request is recalled. */
 export const NOTIFICATION_LIMIT_KEYS = ['quiet_hours_start', 'quiet_hours_end', 'promo_per_week', 'request_reminder_hours'] as const;
@@ -344,10 +346,46 @@ export function withdrawNotice(noticeId: string, requestId: string): Promise<Jso
   return call('admin_withdraw_notice', { p_notice_id: noticeId, p_request_id: requestId });
 }
 
+// ------------------------------------------------------------------------------------ Raport ANAF
+
+/** How a shop's company stands at ANAF (admin_list_company_checks). */
+export type CompanyCategory = 'no_cui' | 'unchecked' | 'ok' | 'name_mismatch' | 'inactive' | 'deregistered' | 'not_found';
+
+export interface CompanyCheckRow {
+  shop_id: string;
+  shop_name: string;
+  city: string;
+  display_id: string;
+  state: ShopState;
+  vat_id: string | null;
+  legal_name: string | null;
+  vat_payer: boolean | null;
+  anaf_status: 'active' | 'inactive' | 'deregistered' | 'not_found' | null;
+  anaf_name: string | null;
+  anaf_address: string | null;
+  anaf_vat_payer: boolean | null;
+  anaf_name_match: boolean | null;
+  anaf_checked_at: string | null;
+  /** The company could not be confirmed since then (not found, struck off, inactive). */
+  problem_since: string | null;
+  /** The day it must be fixed by (YYYY-MM-DD, Bucharest), while there is a problem. */
+  deadline: string | null;
+  /** Out of the search since then, because it stayed unconfirmed past the deadline. */
+  hidden_at: string | null;
+  category: CompanyCategory;
+  /** The shop's "Plătitor de TVA" says otherwise than ANAF. */
+  vat_mismatch: boolean;
+}
+
+/** Every shop's company as ANAF answered it, problems first (admins only). */
+export async function fetchCompanyChecks(): Promise<CompanyCheckRow[]> {
+  return (await call('admin_list_company_checks', {} as never)) as unknown as CompanyCheckRow[];
+}
+
 // ------------------------------------------------------------------------------------ exports
 
-export type ExportKind = 'shops' | 'clients' | 'bookings' | 'reviews' | 'subscriptions';
-export const EXPORT_KINDS: readonly ExportKind[] = ['shops', 'clients', 'bookings', 'reviews', 'subscriptions'];
+export type ExportKind = 'shops' | 'clients' | 'bookings' | 'reviews' | 'subscriptions' | 'company_checks';
+export const EXPORT_KINDS: readonly ExportKind[] = ['shops', 'clients', 'bookings', 'reviews', 'subscriptions', 'company_checks'];
 
 export interface BookingExportFilters {
   statuses?: BookingStatus[];

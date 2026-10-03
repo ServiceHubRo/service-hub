@@ -129,7 +129,7 @@ describe('notification texts', () => {
   it('a referral reward says which shop paid and what the owner got', () => {
     expect(render('referral_reward', 'shop', 'ro')).toMatchObject({
       title: 'Ai primit o lună gratuită',
-      body: 'Auto Nou a plătit abonamentul, recomandat de tine. Perioada ta gratuită s-a prelungit cu 30 de zile, până pe 20 nov.',
+      body: 'Auto Nou, service-ul recomandat de tine, a plătit abonamentul. Perioada ta gratuită s-a prelungit cu 30 de zile, până pe 20 nov.',
       url: '/s/cont/abonament',
       tag: 'referral-s-9',
     });
@@ -138,7 +138,7 @@ describe('notification texts', () => {
     );
     const mail = emailForEvent({ event: 'referral_reward', lang: 'ro', params: { ...SAMPLE.referral_reward, kind: 'stripe_credit', total: 149 } }, 'https://x');
     expect(mail!.subject).toBe('Ai primit o lună gratuită');
-    expect(mail!.text).toContain('Următoarea ta plată scade cu 149 lei');
+    expect(mail!.text).toContain('Următoarea ta plată este mai mică cu 149 lei');
     expect(render('referral_revoked', 'shop', 'ro')).toMatchObject({ title: 'Luna gratuită s-a anulat', tag: 'referral-s-9' });
     const revoked = emailForEvent({ event: 'referral_revoked', lang: 'en', params: { ...SAMPLE.referral_revoked, reason: 'disputed' } }, 'https://x');
     expect(revoked!.text).toContain('Auto Nou disputed its first payment at the bank.');
@@ -205,7 +205,7 @@ describe('notification texts', () => {
   it('tips and offers (T24): tires, welcome, a favorite shop, and where a tap leads', () => {
     expect(render('tire_season', 'client', 'ro', { make: '', model: '', shop_id: '', shop_name: '' })).toMatchObject({
       title: 'Anvelopele de iarnă',
-      body: 'E timpul pentru anvelopele de iarnă la mașina ta. Programează schimbul din aplicație, înainte de aglomerație.',
+      body: 'Este momentul pentru anvelopele de iarnă la mașina ta. Programează schimbul din aplicație, înainte de aglomerație.',
       url: '/c/cauta?cat=cat_anv',
       tag: 'tire_season',
     });
@@ -235,7 +235,7 @@ describe('notification texts', () => {
     });
     expect(render('monthly_report', 'shop', 'ro')).toMatchObject({
       title: 'Luna septembrie pe Service-Hub',
-      body: 'Lucrări terminate: 9. Încasări: 6.450 lei. Cereri primite: 14. Vezi raportul complet.',
+      body: 'Lucrări finalizate: 9. Încasări: 6.450 lei. Cereri primite: 14. Vezi raportul complet.',
       url: '/s/cont/rapoarte',
       tag: 'monthly-2026-09',
     });
@@ -265,7 +265,7 @@ describe('notification texts', () => {
   it('reminds the next service and opens the booking at the same shop, the service and the car chosen', () => {
     expect(render('service_due', 'client', 'ro')).toMatchObject({
       title: 'Volkswagen Golf 7: Schimb ulei și filtru',
-      body: 'Ultima dată pe 20 oct 2024, la Atelier Unu. Următoarea se apropie, pe la 20 oct. Programează-te din aplicație.',
+      body: 'Ultima dată pe 20 oct 2024, la Atelier Unu. Următoarea este recomandată în jurul datei de 20 oct. Programează-te din aplicație.',
       url: '/c/service/s-1/programare?pas=2&serviciu=lichid_frana&masina=c-1',
       tag: 'service-due-c-1-lichid_frana',
     });

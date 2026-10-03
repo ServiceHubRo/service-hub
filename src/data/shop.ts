@@ -392,7 +392,8 @@ export type HiddenReason =
   | 'email_unverified'
   | 'phone_unverified'
   | 'no_services'
-  | 'no_open_days';
+  | 'no_open_days'
+  | 'company_unconfirmed';
 
 export interface ShopSetup {
   shop_id: string;
@@ -410,6 +411,11 @@ export interface ShopSetup {
   billing?: { complete: boolean; reminder: boolean };
   /** Owner only (T14): where the subscription stands, for the Panou banners. */
   subscription?: { status: string; trial_ends_at: string | null; card_given: boolean; ended_reason: string | null };
+  /**
+   * Owner only: the company could not be confirmed at ANAF (null when it is fine): why, the day to
+   * fix it by (YYYY-MM-DD, Bucharest), and whether the shop already left the search.
+   */
+  company?: { status: 'not_found' | 'deregistered' | 'inactive' | null; since: string; deadline: string; hidden: boolean } | null;
 }
 
 export async function getShopSetup(): Promise<ShopSetup> {

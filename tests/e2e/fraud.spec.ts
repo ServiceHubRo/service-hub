@@ -78,12 +78,6 @@ async function finishedJob(client: string, shop: string, shopId: string): Promis
   return booking;
 }
 
-async function setLanguage(page: Page, lang: 'ro' | 'en') {
-  await page.getByRole('link', { name: lang === 'en' ? 'Cont' : 'Account', exact: true }).filter({ visible: true }).first().click();
-  await page.getByRole('button', { name: lang === 'en' ? 'English' : 'Română' }).filter({ visible: true }).first().click();
-  await expect(page.getByRole('heading', { level: 1, name: lang === 'en' ? 'Account' : 'Cont' })).toBeVisible();
-}
-
 /** The access token the app keeps for the signed-in user. */
 async function accessToken(page: Page): Promise<string> {
   return page.evaluate(() => {
@@ -108,7 +102,7 @@ test.describe('T25 fraud checks', () => {
     );
     await signIn(page, admin, SEED_PASSWORD);
     await expect(page.getByRole('heading', { level: 1, name: 'Verificarea în doi pași' })).toBeVisible();
-    await expect(page.getByText('o parolă furată nu ajunge')).toBeVisible();
+    await expect(page.getByText('o parolă furată nu este suficientă')).toBeVisible();
     await page.setViewportSize({ width: 390, height: 844 });
     await expectNoHorizontalScroll(page);
     await shot(page, 't25-mfa-intro', 'mobile-390');
@@ -174,49 +168,46 @@ test.describe('T25 fraud checks', () => {
     }
   });
 
-  test('Date de facturare: the company is checked at ANAF after saving', async ({ page }) => {
-    const { email: owner } = await createBookableShop(`Atelier T25 ${Date.now()}`, ['ulei']);
+  test('Date de facturare: the company is checked at ANAF after saving, quietly (only the admin sees it)', async ({ page }) => {
+    const { email: owner, shopId } = await createBookableShop(`Atelier T25 ${Date.now()}`, ['ulei']);
     await signIn(page, owner, PASSWORD);
     await expect(page).toHaveURL(/\/s\/panou/);
     await page.goto('/s/cont/setari/facturare');
-    const card = page.getByRole('region', { name: 'Firma la ANAF' });
-    await expect(card).toContainText('După ce completezi CUI-ul și salvezi');
+    await expect(page.getByRole('heading', { level: 1, name: 'Date de facturare' })).toBeVisible();
+    /** What ANAF answered, as stored for the admin. */
+    const anaf = async () =>
+      (
+        await serviceRest<{ anaf_status: string | null; anaf_name: string | null; anaf_name_match: boolean | null }[]>(
+          `shop_billing?shop_id=eq.${shopId}&select=anaf_status,anaf_name,anaf_name_match`,
+          'GET',
+        )
+      )[0];
+    const save = () => page.getByRole('button', { name: 'Salvează datele de facturare' }).click();
 
     await page.getByLabel('Denumire legală').fill('Auto Test SRL');
     await page.getByLabel('CUI / Cod fiscal').fill('RO18000003');
-    await page.getByRole('button', { name: 'Salvează datele de facturare' }).click();
-    await expect(card).toContainText('Verificat la ANAF: AUTO TEST S.R.L., firmă activă.');
-    await expect(card).toContainText('La ANAF firma este plătitoare de TVA.');
-    await card.scrollIntoViewIfNeeded();
+    await save();
+    await expect.poll(anaf).toMatchObject({ anaf_status: 'active', anaf_name: 'AUTO TEST S.R.L.', anaf_name_match: true });
+    // The shop is not told it was checked.
+    await expect(page.getByRole('region', { name: 'Firma la ANAF' })).toHaveCount(0);
+    await expect(page.getByText('ANAF')).toHaveCount(0);
     await expectNoHorizontalScroll(page);
-    await shot(page, 't25-anaf-ok', name());
+    await shot(page, 't25-anaf-quiet', name());
 
-    // Another legal name: ANAF knows the CUI under its own name.
+    // Another legal name, an inactive company, an unknown CUI: each answer is stored.
     await page.getByLabel('Denumire legală').fill('Alt Nume SRL');
-    await page.getByRole('button', { name: 'Salvează datele de facturare' }).click();
-    await expect(card).toContainText('La ANAF, CUI-ul acesta este al firmei „AUTO TEST S.R.L.”.');
-    await card.scrollIntoViewIfNeeded();
-    await shot(page, 't25-anaf-mismatch', name());
-
-    // An inactive company, then an unknown CUI.
+    await save();
+    await expect.poll(anaf).toMatchObject({ anaf_status: 'active', anaf_name_match: false });
     await page.getByLabel('CUI / Cod fiscal').fill('18000011');
-    await page.getByRole('button', { name: 'Salvează datele de facturare' }).click();
-    await expect(card).toContainText('apare inactivă fiscal');
+    await save();
+    await expect.poll(anaf).toMatchObject({ anaf_status: 'inactive' });
     await page.getByLabel('CUI / Cod fiscal').fill('160796');
-    await page.getByRole('button', { name: 'Salvează datele de facturare' }).click();
-    await expect(card).toContainText('ANAF nu are nicio firmă cu acest CUI.');
-
-    await setLanguage(page, 'en');
-    await page.goto('/s/cont/setari/facturare');
-    const cardEn = page.getByRole('region', { name: 'Company at ANAF' });
-    await expect(cardEn).toContainText('ANAF has no company with this CUI.');
-    await expect(cardEn.getByRole('button', { name: 'Check again' })).toBeVisible();
-    await cardEn.scrollIntoViewIfNeeded();
-    await expectNoHorizontalScroll(page);
-    await shot(page, 't25-anaf-en', name());
+    await save();
+    await expect.poll(anaf).toMatchObject({ anaf_status: 'not_found' });
+    await expect(page.getByText('ANAF')).toHaveCount(0);
   });
 
-  test('Moderare: a review that looks staged is listed with why; "E în regulă" takes it off', async ({ page }) => {
+  test('Moderare: a review that looks staged is listed with why; "Este în regulă" takes it off', async ({ page }) => {
     const shopName = `Atelier T25 ${Date.now()}`;
     const { email: shop, shopId } = await createBookableShop(shopName, ['ulei']);
     const client = await createUser('client');
@@ -232,16 +223,16 @@ test.describe('T25 fraud checks', () => {
     // The link carries the number of reported reviews when other tests reported some: go straight there.
     await page.goto('/admin/moderare');
     await expect(page.getByRole('heading', { level: 1, name: 'Moderare' })).toBeVisible();
-    const card = page.getByRole('listitem').filter({ hasText: shopName }).filter({ hasText: 'Lucrare în câteva minute' });
+    const card = page.getByRole('listitem').filter({ hasText: shopName }).filter({ hasText: 'Lucrare foarte rapidă' });
     await expect(card).toBeVisible();
     await expect(card).toContainText('Lucrarea a fost terminată la mai puțin de 3 ore după ce s-a făcut programarea.');
     await card.scrollIntoViewIfNeeded();
     await expectNoHorizontalScroll(page);
     await shot(page, 't25-suspect', name());
 
-    await card.getByRole('button', { name: 'E în regulă' }).click();
+    await card.getByRole('button', { name: 'Este în regulă' }).click();
     await expect(card.getByText('Recenzia rămâne publicată și iese din această listă.')).toBeVisible();
-    await card.getByRole('button', { name: 'E în regulă' }).click();
+    await card.getByRole('button', { name: 'Este în regulă' }).click();
     await expect(card).toHaveCount(0);
     const [review] = await serviceRest<{ signals_cleared_at: string | null; removed_at: string | null }[]>(
       `reviews?booking_id=eq.${booking.id}&select=signals_cleared_at,removed_at`,

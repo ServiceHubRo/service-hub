@@ -105,7 +105,7 @@ function QueueCard({ r, now, onDecided }: { r: AdminReview; now: Date; onDecided
   );
 }
 
-/** A review that looks staged (T25): why, and "E în regulă" or "Șterge recenzia". */
+/** A review that looks staged (T25): why, and "Este în regulă" or "Șterge recenzia". */
 function SuspectCard({ r, onDecided }: { r: SuspectReview; onDecided: () => void }) {
   const { t } = useI18n();
   const [panel, setPanel] = useState<SuspectDecision | null>(null);

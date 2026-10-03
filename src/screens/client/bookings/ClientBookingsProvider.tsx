@@ -73,6 +73,7 @@ export function ClientBookingsProvider({ children }: { children: ReactNode }) {
         cancelled_by: row.cancelled_by as ClientBooking['cancelled_by'],
         cancel_reason: row.cancel_reason,
         decline_reason: row.decline_reason,
+        share_history: row.share_history,
       });
       refresh();
     },

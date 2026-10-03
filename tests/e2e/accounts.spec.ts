@@ -89,7 +89,7 @@ test('sign-up refuses missing data with a specific message per field', async ({ 
   await page.getByLabel('Oraș').fill('Codlea');
   await page.getByLabel('Repetă parola').fill('parolalunga2');
   await page.getByRole('button', { name: 'Creează cont' }).click();
-  await expect(page.getByText('Parolele nu sunt la fel.')).toBeVisible();
+  await expect(page.getByText('Parolele nu coincid.')).toBeVisible();
   await expect(page.getByLabel('Repetă parola')).toBeFocused();
   await shot(page, 'auth-signup-mismatch', name());
 });
@@ -347,7 +347,7 @@ test.describe('with accounts', () => {
     await page.getByLabel('Parola nouă', { exact: true }).fill('Alta-Parola-2026!');
     await page.getByLabel('Repetă parola nouă').fill('Alta-Parola-2026?');
     await page.getByRole('button', { name: 'Salvează parola' }).click();
-    await expect(page.getByText('Parolele nu sunt la fel.')).toBeVisible();
+    await expect(page.getByText('Parolele nu coincid.')).toBeVisible();
     await page.getByLabel('Repetă parola nouă').fill('Alta-Parola-2026!');
     await shot(page, 'auth-new-password', name());
     await page.getByRole('button', { name: 'Salvează parola' }).click();

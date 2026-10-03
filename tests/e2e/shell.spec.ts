@@ -155,7 +155,7 @@ test('log out asks first, then returns to the public page and closes the role sc
   // „Rămân conectat” keeps the session and gives the focus back to the button; so does Escape.
   await logout.click();
   await expect(page.getByRole('heading', { name: 'Te deconectezi?' })).toBeFocused();
-  await expect(page.getByText('Pe acest dispozitiv vei intra din nou cu emailul și parola.')).toBeVisible();
+  await expect(page.getByText('Ca să intri din nou pe acest dispozitiv, vei avea nevoie de email și parolă.')).toBeVisible();
   await expect(page.getByRole('button', { name: 'Rămân conectat' })).toBeInViewport({ ratio: 1 });
   await expectNoHorizontalScroll(page);
   await page.screenshot({ path: `test-results/shots/logout-confirm-${test.info().project.name}.png` });

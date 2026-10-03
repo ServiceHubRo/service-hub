@@ -1,13 +1,11 @@
-import { CreditCard, Download, FileCheck, FileText, Globe, Heart, History, LifeBuoy, ListTree, Megaphone, ScrollText, Settings, SlidersHorizontal, Star } from 'lucide-react';
+import { CreditCard, Download, FileCheck, FileText, Heart, Landmark, History, LifeBuoy, ListTree, Megaphone, ScrollText, Settings, SlidersHorizontal, Star } from 'lucide-react';
 import { useCallback, useRef, useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import type { ShellOutletContext } from '../../app/AppShell';
-import { LangSwitch } from '../../app/LangSwitch';
 import { LogoutConfirm } from '../../app/LogoutConfirm';
 import { NAV, type Role } from '../../app/roles';
 import { useSession } from '../../app/sessionContext';
 import { Button } from '../../components/Button';
-import { Card } from '../../components/Card';
 import { Tile } from '../../components/Tile';
 import { useI18n } from '../../i18n/context';
 import type { MessageKey } from '../../i18n/ro';
@@ -15,6 +13,7 @@ import { LEGAL_DOCS } from '../../lib/legal';
 import {
   ADMIN_AUDIT_PATH,
   ADMIN_CATALOG_PATH,
+  ADMIN_ANAF_PATH,
   ADMIN_EXPORT_PATH,
   ADMIN_NOTICES_PATH,
   ADMIN_REPORTS_PATH,
@@ -68,16 +67,6 @@ export function AccountScreen({ role }: { role: Role }) {
       <IdentityCard />
       {role === 'shop' && <PhoneCard />}
 
-      <Card>
-        <div className={styles.row}>
-          <span className={styles.rowLabel}>
-            <Globe size={20} aria-hidden="true" />
-            {t('account.language')}
-          </span>
-          <LangSwitch />
-        </div>
-      </Card>
-
       {role !== 'admin' && <PushRow />}
 
       {role === 'client' && (
@@ -111,6 +100,7 @@ export function AccountScreen({ role }: { role: Role }) {
           <Tile to={ADMIN_CATALOG_PATH} icon={ListTree} label={t('admin.catalog.title')} hint={t('admin.catalog.tileHint')} />
           <Tile to={ADMIN_SETTINGS_PATH} icon={SlidersHorizontal} label={t('admin.settings.title')} hint={t('admin.settings.tileHint')} />
           <Tile to={ADMIN_NOTICES_PATH} icon={Megaphone} label={t('admin.notices.title')} hint={t('admin.notices.tileHint')} />
+          <Tile to={ADMIN_ANAF_PATH} icon={Landmark} label={t('anaf.title')} hint={t('anaf.tileHint')} />
           <Tile to={ADMIN_EXPORT_PATH} icon={Download} label={t('admin.export.title')} hint={t('admin.export.tileHint')} />
           <Tile to={ADMIN_AUDIT_PATH} icon={ScrollText} label={t('admin.audit.title')} hint={t('admin.audit.tileHint')} />
         </div>

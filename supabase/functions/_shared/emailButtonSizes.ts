@@ -109,5 +109,15 @@ export const EMAIL_BUTTON_SIZES: Record<string, { slug: string; width: number; h
     "slug": "open-my-reports",
     "width": 167,
     "height": 44
+  },
+  "Deschide Date de facturare": {
+    "slug": "deschide-date-de-facturare",
+    "width": 246,
+    "height": 44
+  },
+  "Open Billing details": {
+    "slug": "open-billing-details",
+    "width": 184,
+    "height": 44
   }
 };

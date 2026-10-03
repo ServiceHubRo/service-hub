@@ -10,6 +10,8 @@ export interface CarDraft {
   /** "Salvează mașina în garaj", ticked by default (P6). */
   save: boolean;
   note: string;
+  /** "Arată service-ului ce s-a făcut la mașină la alte service-uri" (T27): off unless ticked (consent). */
+  share: boolean;
 }
 
-export const EMPTY_CAR_DRAFT: CarDraft = { carId: null, manual: false, make: '', model: '', year: '', plate: '', save: true, note: '' };
+export const EMPTY_CAR_DRAFT: CarDraft = { carId: null, manual: false, make: '', model: '', year: '', plate: '', save: true, note: '', share: false };

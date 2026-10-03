@@ -94,6 +94,7 @@ A user has exactly one role. The role decides the entire interface. A client can
 - After Done: **Leave review** (once). Shows "Review sent" afterwards.
 - Message button on every card.
 - Book again from any Done booking.
+- **Car history for the shop (T27):** on every active booking, "Show" / "Hide" whether the shop sees what was done on this car at other shops (no prices, no shop names). Also offered as an unticked checkbox on the last booking step.
 
 ### 3.6 Vehicle history (per car)
 - **Three entry points, all opening the same screen:** the car card in Garaj; a "My vehicle history" tile in Cont; and a "See vehicle history" link on every completed booking. A client must never have to guess where their history lives.
@@ -166,6 +167,12 @@ A user has exactly one role. The role decides the entire interface. A client can
 - Expand a job → quote, work performed, client note, messages link.
 - **Export CSV** of the filtered list (including odometer).
 - Printable (navigation and buttons hidden, dark on white).
+
+### 4.3b Vehicle file (T27)
+- From a booking card or an opened history job: the car (make, model, year, plate, VIN), the client with tap-to-call, the last known odometer.
+- **At <shop name>:** every completed job on this car here — date, odometer, services, accepted quote lines, work, amount.
+- **Previous repairs at other shops:** only while the client has an open booking for this car here and chose to share — date, odometer, services, accepted quote lines and work; never prices, shop names or cities. Otherwise a line says why it is hidden.
+- Updates live when the client turns sharing on or off.
 
 ### 4.4 Messages
 - Same as client side, from the shop's perspective. Unread badge on tab.

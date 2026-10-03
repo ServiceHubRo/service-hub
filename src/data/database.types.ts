@@ -116,6 +116,8 @@ export type Database = {
           ref: string
           reminder_sent_at: string | null
           service_id: string
+          share_history: boolean
+          share_history_at: string | null
           shop_id: string
           slot: string
           started_at: string | null
@@ -149,6 +151,8 @@ export type Database = {
           ref?: string
           reminder_sent_at?: string | null
           service_id: string
+          share_history?: boolean
+          share_history_at?: string | null
           shop_id: string
           slot: string
           started_at?: string | null
@@ -182,6 +186,8 @@ export type Database = {
           ref?: string
           reminder_sent_at?: string | null
           service_id?: string
+          share_history?: boolean
+          share_history_at?: string | null
           shop_id?: string
           slot?: string
           started_at?: string | null
@@ -1387,8 +1393,11 @@ export type Database = {
           anaf_address: string | null
           anaf_checked_at: string | null
           anaf_cui: string | null
+          anaf_hidden_at: string | null
           anaf_name: string | null
           anaf_name_match: boolean | null
+          anaf_name_notified_at: string | null
+          anaf_problem_since: string | null
           anaf_status: string | null
           anaf_vat_payer: boolean | null
           bank_name: string | null
@@ -1408,8 +1417,11 @@ export type Database = {
           anaf_address?: string | null
           anaf_checked_at?: string | null
           anaf_cui?: string | null
+          anaf_hidden_at?: string | null
           anaf_name?: string | null
           anaf_name_match?: boolean | null
+          anaf_name_notified_at?: string | null
+          anaf_problem_since?: string | null
           anaf_status?: string | null
           anaf_vat_payer?: boolean | null
           bank_name?: string | null
@@ -1429,8 +1441,11 @@ export type Database = {
           anaf_address?: string | null
           anaf_checked_at?: string | null
           anaf_cui?: string | null
+          anaf_hidden_at?: string | null
           anaf_name?: string | null
           anaf_name_match?: boolean | null
+          anaf_name_notified_at?: string | null
+          anaf_problem_since?: string | null
           anaf_status?: string | null
           anaf_vat_payer?: boolean | null
           bank_name?: string | null
@@ -2054,6 +2069,7 @@ export type Database = {
       }
     }
     Functions: {
+      accepted_quote_lines: { Args: { p_booking_id: string }; Returns: Json }
       account_email: { Args: { p_user_id: string }; Returns: string }
       account_fingerprint: {
         Args: { p_kind: string; p_value: string }
@@ -2171,6 +2187,8 @@ export type Database = {
           ref: string
           reminder_sent_at: string | null
           service_id: string
+          share_history: boolean
+          share_history_at: string | null
           shop_id: string
           slot: string
           started_at: string | null
@@ -2208,6 +2226,7 @@ export type Database = {
       }
       admin_list_catalog: { Args: never; Returns: Json }
       admin_list_clients: { Args: never; Returns: Json }
+      admin_list_company_checks: { Args: never; Returns: Json }
       admin_list_history_reports: { Args: never; Returns: Json }
       admin_list_notices: { Args: never; Returns: Json }
       admin_list_reviews: { Args: { p_q?: string }; Returns: Json }
@@ -2391,6 +2410,8 @@ export type Database = {
           ref: string
           reminder_sent_at: string | null
           service_id: string
+          share_history: boolean
+          share_history_at: string | null
           shop_id: string
           slot: string
           started_at: string | null
@@ -2444,10 +2465,48 @@ export type Database = {
         Args: { p_client_id: string; p_days?: number }
         Returns: number
       }
+      company_check_consequences: {
+        Args: { p_billing: Database["public"]["Tables"]["shop_billing"]["Row"] }
+        Returns: {
+          anaf_address: string | null
+          anaf_checked_at: string | null
+          anaf_cui: string | null
+          anaf_hidden_at: string | null
+          anaf_name: string | null
+          anaf_name_match: boolean | null
+          anaf_name_notified_at: string | null
+          anaf_problem_since: string | null
+          anaf_status: string | null
+          anaf_vat_payer: boolean | null
+          bank_name: string | null
+          billing_email: string | null
+          created_at: string
+          iban: string | null
+          legal_address: string | null
+          legal_name: string | null
+          legal_rep: string | null
+          reg_com: string | null
+          shop_id: string
+          updated_at: string
+          vat_id: string | null
+          vat_payer: boolean
+        }
+        SetofOptions: {
+          from: "shop_billing"
+          to: "shop_billing"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       company_check_target: {
         Args: { p_aal: string; p_shop_id: string; p_user_id: string }
         Returns: Json
       }
+      company_checks_due: {
+        Args: { p_limit?: number; p_now?: string }
+        Returns: Json
+      }
+      company_fix_deadline: { Args: { p_since: string }; Returns: string }
       complete_job: {
         Args: {
           p_booking_id: string
@@ -2482,6 +2541,8 @@ export type Database = {
           ref: string
           reminder_sent_at: string | null
           service_id: string
+          share_history: boolean
+          share_history_at: string | null
           shop_id: string
           slot: string
           started_at: string | null
@@ -2524,6 +2585,8 @@ export type Database = {
           ref: string
           reminder_sent_at: string | null
           service_id: string
+          share_history: boolean
+          share_history_at: string | null
           shop_id: string
           slot: string
           started_at: string | null
@@ -2549,6 +2612,7 @@ export type Database = {
           p_request_id: string
           p_save_car?: boolean
           p_service_id: string
+          p_share_history?: boolean
           p_shop_id: string
           p_slot: string
         }
@@ -2577,6 +2641,8 @@ export type Database = {
           ref: string
           reminder_sent_at: string | null
           service_id: string
+          share_history: boolean
+          share_history_at: string | null
           shop_id: string
           slot: string
           started_at: string | null
@@ -2649,6 +2715,8 @@ export type Database = {
           ref: string
           reminder_sent_at: string | null
           service_id: string
+          share_history: boolean
+          share_history_at: string | null
           shop_id: string
           slot: string
           started_at: string | null
@@ -2691,6 +2759,8 @@ export type Database = {
           ref: string
           reminder_sent_at: string | null
           service_id: string
+          share_history: boolean
+          share_history_at: string | null
           shop_id: string
           slot: string
           started_at: string | null
@@ -2708,6 +2778,7 @@ export type Database = {
       }
       dispatch_sweep: { Args: never; Returns: boolean }
       end_expired_trials: { Args: { p_now?: string }; Returns: number }
+      enforce_company_deadlines: { Args: { p_now?: string }; Returns: number }
       enqueue_referral_credit: {
         Args: { p_referral_shop_id: string }
         Returns: undefined
@@ -2796,6 +2867,7 @@ export type Database = {
       invite_token_hash: { Args: { p_token: string }; Returns: string }
       is_active_status: { Args: { p_status: string }; Returns: boolean }
       is_admin: { Args: never; Returns: boolean }
+      is_dispatch_token: { Args: { p_token: string }; Returns: boolean }
       is_new_client: {
         Args: {
           p_client_id: string
@@ -2820,6 +2892,7 @@ export type Database = {
         Args: { p_after: Json; p_before: Json; p_keys: string[] }
         Returns: Json
       }
+      kick_company_checks: { Args: never; Returns: boolean }
       kick_dispatcher: { Args: never; Returns: boolean }
       last_odometer_for_booking: {
         Args: { p_booking_id: string }
@@ -2879,6 +2952,8 @@ export type Database = {
           ref: string
           reminder_sent_at: string | null
           service_id: string
+          share_history: boolean
+          share_history_at: string | null
           shop_id: string
           slot: string
           started_at: string | null
@@ -2921,6 +2996,8 @@ export type Database = {
           ref: string
           reminder_sent_at: string | null
           service_id: string
+          share_history: boolean
+          share_history_at: string | null
           shop_id: string
           slot: string
           started_at: string | null
@@ -2972,6 +3049,8 @@ export type Database = {
           ref: string
           reminder_sent_at: string | null
           service_id: string
+          share_history: boolean
+          share_history_at: string | null
           shop_id: string
           slot: string
           started_at: string | null
@@ -3142,6 +3221,8 @@ export type Database = {
           ref: string
           reminder_sent_at: string | null
           service_id: string
+          share_history: boolean
+          share_history_at: string | null
           shop_id: string
           slot: string
           started_at: string | null
@@ -3372,6 +3453,8 @@ export type Database = {
           ref: string
           reminder_sent_at: string | null
           service_id: string
+          share_history: boolean
+          share_history_at: string | null
           shop_id: string
           slot: string
           started_at: string | null
@@ -3507,6 +3590,8 @@ export type Database = {
           ref: string
           reminder_sent_at: string | null
           service_id: string
+          share_history: boolean
+          share_history_at: string | null
           shop_id: string
           slot: string
           started_at: string | null
@@ -3551,6 +3636,50 @@ export type Database = {
         Args: { p_seats: number; p_shop_id: string }
         Returns: undefined
       }
+      set_booking_history_share: {
+        Args: { p_booking_id: string; p_request_id: string; p_share: boolean }
+        Returns: {
+          cancel_reason: string | null
+          cancelled_at: string | null
+          cancelled_by: string | null
+          car_id: string | null
+          car_snapshot: Json
+          client_id: string | null
+          client_lang: string
+          client_name: string | null
+          client_phone: string | null
+          confirmed_at: string | null
+          cost: number | null
+          created_at: string
+          date: string
+          decline_reason: string | null
+          done_at: string | null
+          extra_service_ids: string[]
+          id: string
+          inspection_started_at: string | null
+          note: string | null
+          odometer: number | null
+          offer_percent: number | null
+          ref: string
+          reminder_sent_at: string | null
+          service_id: string
+          share_history: boolean
+          share_history_at: string | null
+          shop_id: string
+          slot: string
+          started_at: string | null
+          status: string
+          status_changed_at: string
+          updated_at: string
+          work: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "bookings"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       set_history_report_session: {
         Args: { p_report_id: string; p_session_id: string }
         Returns: undefined
@@ -3594,6 +3723,8 @@ export type Database = {
           ref: string
           reminder_sent_at: string | null
           service_id: string
+          share_history: boolean
+          share_history_at: string | null
           shop_id: string
           slot: string
           started_at: string | null
@@ -3618,6 +3749,7 @@ export type Database = {
       shop_reports: { Args: never; Returns: Json }
       shop_seat_count: { Args: { p_shop_id: string }; Returns: number }
       shop_state: { Args: { p_shop_id: string }; Returns: string }
+      shop_vehicle_file: { Args: { p_booking_id: string }; Returns: Json }
       slot_starts_at: {
         Args: { p_date: string; p_slot: string }
         Returns: string
@@ -3649,6 +3781,8 @@ export type Database = {
           ref: string
           reminder_sent_at: string | null
           service_id: string
+          share_history: boolean
+          share_history_at: string | null
           shop_id: string
           slot: string
           started_at: string | null
@@ -3691,6 +3825,8 @@ export type Database = {
           ref: string
           reminder_sent_at: string | null
           service_id: string
+          share_history: boolean
+          share_history_at: string | null
           shop_id: string
           slot: string
           started_at: string | null
@@ -3850,6 +3986,8 @@ export type Database = {
           ref: string
           reminder_sent_at: string | null
           service_id: string
+          share_history: boolean
+          share_history_at: string | null
           shop_id: string
           slot: string
           started_at: string | null

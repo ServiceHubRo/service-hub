@@ -5,7 +5,7 @@ import { supabase } from './supabase';
 /**
  * Phone verification by SMS code (FR §2, T13): the Edge Function `phone-verify-start` sends a
  * code, the database function `check_phone_code` checks it. A verified phone ticks step 4 of
- * "Pune service-ul pe picioare" and lets the shop appear in search.
+ * "Pregătește service-ul pentru programări" and lets the shop appear in search.
  */
 
 export interface PhoneVerification {

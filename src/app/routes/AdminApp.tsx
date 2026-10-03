@@ -1,5 +1,6 @@
 import { Route, Routes } from 'react-router-dom';
 import { AdminProvider } from '../../screens/admin/AdminProvider';
+import { AnafScreen } from '../../screens/admin/AnafScreen';
 import { AuditScreen } from '../../screens/admin/AuditScreen';
 import { BookingDetailScreen } from '../../screens/admin/BookingDetailScreen';
 import { BookingsScreen } from '../../screens/admin/BookingsScreen';
@@ -55,6 +56,7 @@ export default function AdminApp() {
         <Route path="cont/setari/texte" element={<TextsScreen />} />
         <Route path="cont/anunturi" element={<NoticesScreen />} />
         <Route path="cont/export" element={<ExportScreen />} />
+        <Route path="cont/anaf" element={<AnafScreen />} />
       </Route>
     </Routes>
   );

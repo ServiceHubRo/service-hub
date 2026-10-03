@@ -27,6 +27,14 @@ export function anafRequest(cui: number, now: Date = new Date()): [{ cui: number
   return [{ cui, data: day }];
 }
 
+/** ANAF answers up to 100 CUIs in one request: the daily batch (each CUI once). */
+export const ANAF_BATCH = 100;
+
+export function anafRequestMany(cuis: readonly number[], now: Date = new Date()): { cui: number; data: string }[] {
+  const day = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Bucharest' }).format(now);
+  return [...new Set(cuis)].slice(0, ANAF_BATCH).map((cui) => ({ cui, data: day }));
+}
+
 const LEGAL_FORMS = new Set(['SRL', 'SRLD', 'SA', 'PFA', 'II', 'IF', 'SNC', 'SCS', 'SCA', 'RA', 'SC']);
 
 /** A company name to compare: no diacritics, case, punctuation or legal form ("S.R.L.", "SC"). */
