@@ -24,6 +24,7 @@ import { OwnerOnlySettings } from '../../screens/shop/settings/OwnerOnlySettings
 import { SETTINGS_PATH } from '../../screens/shop/settings/paths';
 import { ProfileSettings } from '../../screens/shop/settings/ProfileSettings';
 import { RulesSettings } from '../../screens/shop/settings/RulesSettings';
+import { ShowcaseSettings } from '../../screens/shop/settings/ShowcaseSettings';
 import { ServicesSettings } from '../../screens/shop/settings/ServicesSettings';
 import { SettingsIndex } from '../../screens/shop/settings/SettingsIndex';
 import { ShopSettingsLayout } from '../../screens/shop/settings/ShopSettingsLayout';
@@ -78,6 +79,7 @@ export default function ShopApp() {
             <Route path="program" element={<HoursSettings />} />
             <Route path="reguli" element={<RulesSettings />} />
             <Route path="servicii" element={<ServicesSettings />} />
+            <Route path="vitrina" element={<ShowcaseSettings />} />
           </Route>
           <Route path="facturare" element={<BillingSettings />} />
           <Route path="personal" element={<StaffSettings />} />

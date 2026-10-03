@@ -21,7 +21,9 @@ Versiunea 1.0 · [ZZ.LL.AAAA]
 | 8 | **Canal pentru recenzii raportate** | Promisiunea de 5 zile lucrătoare | Obligație asumată public | Pilot |
 | 9 | **Monitorizare erori** | Să afli când se strică ceva | Nimic, dar economisește timp | Recomandat |
 
-**Nu sunt necesare:** hărți interactive, verificare VIN, brokeri de asigurări, integrare cu case de marcat. (Geocodarea adreselor — adresă → coordonate, pentru „Aproape de tine” — e necesară; gratuită cu Nominatim.)
+**Nu sunt necesare:** verificare VIN, brokeri de asigurări, integrare cu case de marcat.
+
+**Hărți (T28b):** aplicația are o hartă în Caută și pe pagina service-ului. Pentru teste folosește serverul OpenStreetMap, care nu e gândit pentru traficul unei aplicații publice. Înainte de lansare: cont gratuit la **MapTiler** (100.000 de încărcări de hartă pe lună gratuit; apoi de la ~25 $/lună), apoi adresa hărții cu cheia publică în Netlify → Environment variables → `VITE_MAP_TILE_URL` (de forma `https://api.maptiler.com/maps/streets-v2-dark/{z}/{x}/{y}.png?key=…`) și `VITE_MAP_ATTRIBUTION` (textul de credit cerut de MapTiler). Cheia e publică prin natura ei, ca la Turnstile. (Geocodarea adreselor — adresă → coordonate, pentru „Aproape de tine” — e necesară; gratuită cu Nominatim.)
 
 ---
 

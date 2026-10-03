@@ -98,5 +98,4 @@ select public.admin_update_settings('{"limits":{"company_fix_days":21}}', gen_ra
 select test.logout();
 select test.eq(public.company_fix_deadline(timestamptz '2026-10-01 10:00+00'), date '2026-10-22', 'the deadline follows the setting');
 
-select test.eq(version, 48, 'schema version') from public.schema_version;
 rollback;

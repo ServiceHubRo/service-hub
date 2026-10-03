@@ -46,6 +46,7 @@ export function CarStep({
   shop,
   services,
   offer,
+  loyalty = null,
   day,
   time,
   draft,
@@ -57,6 +58,8 @@ export function CarStep({
   services: ShopPageService[];
   /** The new-client offer this booking should get (T23); the database decides when it is made. */
   offer: number | null;
+  /** The loyalty discount it should get instead (T28c), when there is no offer. */
+  loyalty?: number | null;
   day: string;
   time: string;
   draft: CarDraft;
@@ -233,6 +236,7 @@ export function CarStep({
         <SummaryRow label={t('booking.summary.when')} value={`${formatDate(lang, day)}, ${time}`} mono />
         {carText && <SummaryRow label={t('booking.summary.car')} value={carText} />}
         {offer !== null && <OfferNote>{t('offer.booking', { n: offer })}</OfferNote>}
+        {offer === null && loyalty !== null && <OfferNote>{t('loyalty.booking', { n: loyalty })}</OfferNote>}
         {shop.inspection_fee > 0 && (
           <>
             <SummaryRow label={t('shop.fee')} value={formatMoney(lang, shop.inspection_fee)} mono />
@@ -268,8 +272,9 @@ export function CarStep({
       {phoneNeeded !== null && !phoneDone ? null : session.emailVerified ? (
         <BottomBar>
           {manual && !typedOk && <p className={styles.muted}>{t('car.required')}</p>}
+          {shop.auto_confirm && <p className={styles.muted}>{t('booking.instantNote')}</p>}
           <ActionButton onAction={send} disabled={!ready} errorMessage={(e) => rpcErrorMessage(lang, e)} canRetry={canRetryRpc}>
-            {t('booking.submit')}
+            {t(shop.auto_confirm ? 'booking.submitInstant' : 'booking.submit')}
           </ActionButton>
         </BottomBar>
       ) : (

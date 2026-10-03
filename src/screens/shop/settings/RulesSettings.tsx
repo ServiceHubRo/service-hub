@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { BackLink } from '../../../components/BackLink';
 import { Card } from '../../../components/Card';
+import { Checkbox } from '../../../components/Checkbox';
 import { Chip } from '../../../components/Chip';
 import { Field } from '../../../components/Field';
 import { SelectField } from '../../../components/SelectField';
@@ -21,6 +22,9 @@ const CANCEL_HOURS = [0, 1, 2, 3, 4, 6, 12, 24, 48];
 const MAX_FEE = 10000;
 /** The discounts a shop can promise new clients (the database allows exactly these). */
 const OFFERS = [5, 10, 15, 20, 25, 30];
+/** Loyal clients' discounts (T28c), as the database allows them. */
+const LOYALTY_L1 = [5, 10];
+const LOYALTY_L2 = [5, 10, 15];
 
 /** The preset choices plus the shop's current value when it is not one of them. */
 const withCurrent = (presets: number[], current: number) => [...new Set([...presets, current])].sort((a, b) => a - b);
@@ -44,6 +48,9 @@ interface Rules {
   cancel_deadline_hours: number;
   fee: string;
   offer: number | null;
+  instant: boolean;
+  l1: number | null;
+  l2: number | null;
 }
 
 const toRules = (shop: Shop): Rules => ({
@@ -55,11 +62,14 @@ const toRules = (shop: Shop): Rules => ({
   cancel_deadline_hours: shop.cancel_deadline_hours,
   fee: feeText(shop.inspection_fee),
   offer: shop.new_client_offer,
+  instant: shop.auto_confirm,
+  l1: shop.loyalty_l1,
+  l2: shop.loyalty_l2,
 });
 
 /**
  * Reguli de programare (P5, P5b): capacity, cars per slot, slot length, notice, advance, cancellation,
- * fee, and the new-client offer (T23).
+ * fee, the new-client offer (T23) and instant confirmation (T28a).
  */
 export function RulesSettings() {
   const { t, lang } = useI18n();
@@ -95,6 +105,9 @@ export function RulesSettings() {
       cancel_deadline_hours: rules.cancel_deadline_hours,
       inspection_fee: fee,
       new_client_offer: rules.offer,
+      auto_confirm: rules.instant,
+      loyalty_l1: rules.l1,
+      loyalty_l2: rules.l2,
       // Checklist step 3; the database stores its own time.
       capacity_reviewed_at: new Date().toISOString(),
     });
@@ -183,6 +196,15 @@ export function RulesSettings() {
       </Card>
 
       <Card>
+        <Checkbox checked={rules.instant} onChange={(e) => set('instant', e.target.checked)} aria-describedby="rules-instant-hint">
+          {t('rules.instant')}
+        </Checkbox>
+        <p id="rules-instant-hint" className={styles.hint}>
+          {t('rules.instant.hint')}
+        </p>
+      </Card>
+
+      <Card>
         <p className={styles.cardTitle}>{t('rules.fee')}</p>
         <p className={`${styles.hint} ${own.feeHint}`}>{t('rules.fee.hint')}</p>
         <div ref={feeRef}>
@@ -213,6 +235,47 @@ export function RulesSettings() {
             </Chip>
             {OFFERS.map((n) => (
               <Chip key={n} selected={rules.offer === n} onClick={() => set('offer', n)}>
+                {t('rules.offer.value', { n })}
+              </Chip>
+            ))}
+          </div>
+        </div>
+      </Card>
+
+      <Card className={styles.stack}>
+        <div>
+          <p className={styles.cardTitle}>{t('rules.loyalty')}</p>
+          <p className={`${styles.hint} ${own.feeHint}`}>{t('rules.loyalty.hint')}</p>
+        </div>
+        <div role="group" aria-labelledby="rules-l1">
+          <p id="rules-l1" className={own.loyaltyLabel}>
+            {t('rules.loyalty.l1')}
+          </p>
+          <div className={own.offerChips}>
+            <Chip
+              selected={rules.l1 === null}
+              onClick={() => setRules((r) => ({ ...r, l1: null }))}
+            >
+              {t('rules.loyalty.none')}
+            </Chip>
+            {LOYALTY_L1.map((n) => (
+              // Level 2 never gets less than level 1: it follows up when needed.
+              <Chip key={n} selected={rules.l1 === n} onClick={() => setRules((r) => ({ ...r, l1: n, l2: r.l2 !== null && r.l2 < n ? n : r.l2 }))}>
+                {t('rules.offer.value', { n })}
+              </Chip>
+            ))}
+          </div>
+        </div>
+        <div role="group" aria-labelledby="rules-l2">
+          <p id="rules-l2" className={own.loyaltyLabel}>
+            {t('rules.loyalty.l2')}
+          </p>
+          <div className={own.offerChips}>
+            <Chip selected={rules.l2 === null} onClick={() => set('l2', null)}>
+              {rules.l1 !== null ? t('rules.loyalty.same', { n: rules.l1 }) : t('rules.loyalty.none')}
+            </Chip>
+            {LOYALTY_L2.filter((n) => rules.l1 === null || n >= rules.l1).map((n) => (
+              <Chip key={n} selected={rules.l2 === n} onClick={() => set('l2', n)}>
                 {t('rules.offer.value', { n })}
               </Chip>
             ))}

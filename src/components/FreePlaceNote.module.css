@@ -1,0 +1,26 @@
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  font-size: 13px;
+}
+
+.free,
+.instant {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.free {
+  color: var(--green);
+  font-weight: 600;
+}
+
+.instant {
+  color: var(--text);
+}
+
+.instant svg {
+  color: var(--amber);
+}

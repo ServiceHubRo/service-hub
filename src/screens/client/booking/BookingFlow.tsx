@@ -119,6 +119,22 @@ function Flow({ page }: { page: ShopPage }) {
       time,
       car,
       offer: booking.offer_percent,
+      loyalty: booking.loyalty_percent,
+      confirmed: booking.status === 'confirmed',
+      shopId: shop.id,
+      bookingId: booking.id,
+      calendar: {
+        event: {
+          uid: booking.id,
+          title: `${svc} · ${shop.name}`,
+          date: day,
+          slot: time,
+          minutes: shop.slot_minutes,
+          location: [shop.name, shop.street, shop.city].filter(Boolean).join(', '),
+          description: t('calendar.description', { ref: booking.ref }),
+        },
+        place: shop,
+      },
     };
     navigate(bookingSentPath(shop.id), { replace: true, state: sent });
   }
@@ -162,7 +178,8 @@ function Flow({ page }: { page: ShopPage }) {
           selected={serviceIds}
           // Ticks change the address in place: Back leaves step 1, not one tick.
           onToggle={(id) => navigate(urlFor({ serviciu: toggleServiceId(serviceIds, id).join(','), pas: null }), { replace: true })}
-          onContinue={() => navigate(urlFor({ pas: '2' }))}
+          // Come with a day and a time (a free place from search or the shop page, T28a): straight on.
+          onContinue={() => navigate(urlFor({ pas: day && time ? '4' : day ? '3' : '2' }))}
         />
       )}
       {step === 2 && (
@@ -184,6 +201,7 @@ function Flow({ page }: { page: ShopPage }) {
           shop={shop}
           services={services}
           offer={page.offer}
+          loyalty={page.loyalty?.yours ?? null}
           day={day}
           time={time}
           draft={carDraft}

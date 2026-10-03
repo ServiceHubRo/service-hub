@@ -8,6 +8,7 @@ export const SETTINGS_LINKS = {
   /** Straight to the "Mașini pe zi" stepper. */
   capacity: `${SETTINGS_PATH}/reguli#capacitate`,
   services: `${SETTINGS_PATH}/servicii`,
+  showcase: `${SETTINGS_PATH}/vitrina`,
   billing: `${SETTINGS_PATH}/facturare`,
   staff: `${SETTINGS_PATH}/personal`,
   notifications: `${SETTINGS_PATH}/notificari`,

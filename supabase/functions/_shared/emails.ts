@@ -6,7 +6,16 @@
 import { formatDate, formatDayMonth, formatMoney, formatTime, type Lang } from './format.ts';
 import { EMAIL_BUTTON_SIZES } from './emailButtonSizes.ts';
 import { LOGO_HEIGHT, LOGO_WIDTH } from './emailLogo.ts';
-import { BILLING_PATH, monthName, renderNotification, REPORTS_PATH, SHOP_REPORTS_PATH, SUBSCRIPTION_PATH } from './templates.ts';
+import {
+  BILLING_PATH,
+  monthName,
+  renderNotification,
+  REPORTS_PATH,
+  SHOP_REPORTS_PATH,
+  SUBSCRIPTION_PATH,
+  urlFor,
+  type NotificationEvent,
+} from './templates.ts';
 
 export interface EmailContent {
   subject: string;
@@ -229,6 +238,8 @@ export interface EmailEvent {
   event: string;
   lang: string;
   params: Record<string, unknown>;
+  /** The recipient's side, for an event that reaches both (a request that closed unanswered). */
+  role?: string;
 }
 
 const str = (v: unknown): string => (typeof v === 'string' ? v.trim() : typeof v === 'number' ? String(v) : '');
@@ -583,6 +594,11 @@ export function emailForEvent(e: EmailEvent, app: string): EmailContent | null {
     case 'company_hidden':
     case 'company_ok':
       return companyEmail(e, lang, app);
+    case 'request_expired':
+    case 'booking_request_last_call':
+      return requestExpiredEmail(e, lang, app);
+    case 'admin_digest':
+      return adminDigestEmail(p, app);
     default:
       return subscriptionEmail(e, lang, app);
   }
@@ -646,5 +662,97 @@ function companyEmail(e: EmailEvent, lang: Lang, app: string): EmailContent | nu
     footer: en
       ? `You are receiving this email as the owner of ${shop} on Service-Hub.`
       : `Primești acest email ca proprietar al service-ului ${shop} pe Service-Hub.`,
+  });
+}
+
+/**
+ * A request that closed because the shop never answered: to the client, with other shops for the
+ * same kind of work nearby; to the shop's owner, with the way to the requests. The last reminder
+ * before it closes (booking_request_last_call) reaches the owner the same way.
+ */
+function requestExpiredEmail(e: EmailEvent, lang: Lang, app: string): EmailContent | null {
+  const en = lang === 'en';
+  const p = e.params ?? {};
+  const side = e.role === 'shop' ? 'shop' : 'client';
+  // The dispatcher's event carries the service's names (for "({service})").
+  const service = (e as { service?: NotificationEvent['service'] }).service ?? null;
+  const n: NotificationEvent = { event: e.event, role: side, lang, params: p, booking_id: null, service };
+  const text = renderNotification(n);
+  if (!text) return null;
+  const shop = str(p.shop_name) || 'Service-Hub';
+  if (side === 'client') {
+    const search = `${app}${urlFor('client', n)}`;
+    return email(en ? 'Your request has closed: other shops can help' : 'Cererea ta s-a închis: alte service-uri te pot ajuta', {
+      lang,
+      preheader: text.body,
+      title: text.title,
+      blocks: [
+        { p: text.body },
+        {
+          p: en
+            ? 'Booking again takes less than a minute, and your car details are already saved.'
+            : 'O nouă programare durează mai puțin de un minut, iar datele mașinii tale sunt deja salvate.',
+        },
+      ],
+      button: { label: en ? 'Find another shop' : 'Caută alt service', url: search },
+      footer: en
+        ? 'You are receiving this email because you sent a booking request on Service-Hub.'
+        : 'Primești acest email pentru că ai trimis o cerere de programare pe Service-Hub.',
+    });
+  }
+  return email(`${shop}: ${text.title}`, {
+    lang,
+    preheader: text.body,
+    title: text.title,
+    blocks: [
+      { p: text.body },
+      {
+        p: en
+          ? 'Tip: turn on notifications on your phone, so every new request reaches you right away.'
+          : 'Un sfat: activează notificările pe telefon, ca fiecare cerere nouă să ajungă imediat la tine.',
+      },
+    ],
+    button: { label: en ? 'Open Bookings' : 'Deschide Programări', url: `${app}/s/programari?tab=cereri` },
+    footer: en
+      ? `You are receiving this email as the owner of ${shop} on Service-Hub.`
+      : `Primești acest email ca proprietar al service-ului ${shop} pe Service-Hub.`,
+  });
+}
+
+/**
+ * The admin's morning email (to ADMIN_EMAIL, in Romanian): what waits, then the last 24 hours.
+ * Sent only when something waits (send_admin_digest).
+ */
+function adminDigestEmail(p: Record<string, unknown>, app: string): EmailContent {
+  const n = (v: unknown) => num(v) ?? 0;
+  const waiting: [string, number][] = [
+    ['Recenzii raportate', n(p.reports)],
+    ['Recenzii suspecte', n(p.suspect)],
+    ['Plăți eșuate la abonament', n(p.past_due)],
+    ['Firme în termenul de corectare (ANAF)', n(p.company_waiting)],
+    ['Service-uri ascunse din căutări (ANAF)', n(p.company_hidden)],
+    ['Cereri închise fără răspuns (ultimele 24 de ore)', n(p.unanswered)],
+  ];
+  const rows: [string, string][] = waiting.filter(([, count]) => count > 0).map(([what, count]) => [what, String(count)]);
+  const total = waiting.reduce((sum, [, count]) => sum + count, 0);
+  const day: [string, string][] = [
+    ['Service-uri noi', String(n(p.new_shops))],
+    ['Clienți noi', String(n(p.new_clients))],
+    ['Programări noi', String(n(p.new_bookings))],
+    ['Lucrări finalizate', String(n(p.done))],
+  ];
+  return email(`Service-Hub: ${total === 1 ? 'un lucru te așteaptă' : `${total} lucruri te așteaptă`} azi`, {
+    lang: 'ro',
+    preheader: rows.map(([what, count]) => `${what}: ${count}`).join(' · '),
+    title: 'Bună dimineața',
+    blocks: [
+      { p: 'Iată ce te așteaptă azi pe Service-Hub:' },
+      { rows },
+      { p: 'Ultimele 24 de ore pe platformă:' },
+      { rows: day },
+      { p: 'Le găsești pe toate în panoul de admin: Moderare, Abonamente și Raport ANAF.' },
+    ],
+    button: { label: 'Deschide Service-Hub', url: `${app}/intra` },
+    footer: 'Primești acest email ca administrator Service-Hub (ADMIN_EMAIL), doar în zilele în care ceva te așteaptă.',
   });
 }

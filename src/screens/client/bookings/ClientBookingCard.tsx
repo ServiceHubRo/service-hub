@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { ActionButton } from '../../../components/ActionButton';
 import { Button } from '../../../components/Button';
 import { buttonClass } from '../../../components/buttonClass';
+import { CalendarLinks } from '../../../components/CalendarLinks';
 import { Card } from '../../../components/Card';
 import { OfferNote } from '../../../components/OfferNote';
 import { InlinePanel } from '../../../components/InlinePanel';
@@ -26,7 +27,7 @@ import { cancelState, reviewState, type Quote } from '../../../lib/clientBooking
 import { isActiveStatus } from '../../../lib/status';
 import { formatPhone, normalizePhone } from '../../../lib/validators';
 import { MessageLink } from '../../messages/MessageLink';
-import { bookingCarHistoryPath, bookingPath, type VehicleHistoryLinkState } from '../paths';
+import { bookingCarHistoryPath, bookingPath, SEARCH_PATH, type VehicleHistoryLinkState } from '../paths';
 import { QuoteDecision } from './QuoteDecision';
 import { ReviewForm } from './ReviewForm';
 import styles from './bookings.module.css';
@@ -119,6 +120,8 @@ export function ClientBookingCard({
   }
 
   const bookAgain = b.status === 'done' && b.shop;
+  // A request the shop never answered: other shops for the same work, in the same city.
+  const findAnother = b.status === 'expired' && b.closed_reason === 'unanswered';
   // "Mesaj" is on every card, so the actions row always shows while no panel is open.
   const hasActions = panel === null;
 
@@ -146,6 +149,7 @@ export function ClientBookingCard({
       </p>
       {b.note && <p className={styles.note}>{b.note}</p>}
       {b.offer_percent !== null && !OFFER_GONE.has(b.status) && <OfferNote>{t('offer.client', { n: b.offer_percent })}</OfferNote>}
+      {b.loyalty_percent !== null && !OFFER_GONE.has(b.status) && <OfferNote>{t('loyalty.client', { n: b.loyalty_percent })}</OfferNote>}
 
       <StatusDetail booking={b} quote={quote} now={now} />
       {isActiveStatus(b.status) && panel === null && <ShareRow booking={b} act={act} />}
@@ -169,6 +173,25 @@ export function ClientBookingCard({
           {bookAgain && (
             <Link to={`${bookingPath(b.shop_id)}?pas=2&serviciu=${[b.service_id, ...b.extra_service_ids].map(encodeURIComponent).join(',')}`} className={buttonClass('secondary')}>
               {t('cb.bookAgain')}
+            </Link>
+          )}
+          {b.status === 'confirmed' && b.shop && (
+            <CalendarLinks
+              event={{
+                uid: b.id,
+                title: `${bookingServicesText(lang, b.service, b.extra_services, b.service_id)} · ${b.shop.name}`,
+                date: b.date,
+                slot: b.slot,
+                minutes: b.shop.slot_minutes,
+                location: [b.shop.name, b.shop.street, b.shop.city].filter(Boolean).join(', '),
+                description: t('calendar.description', { ref: b.ref }),
+              }}
+              place={b.shop}
+            />
+          )}
+          {findAnother && (
+            <Link to={otherShopsPath(b)} className={buttonClass('primary')}>
+              {t('cb.unanswered.find')}
             </Link>
           )}
           {b.status === 'done' && (
@@ -237,6 +260,15 @@ export function ClientBookingCard({
 }
 
 /** "Gata de ridicare" while the job is fresh (finished today or in the last 2 days), then "Lucrare finalizată". */
+/** The search for the same kind of work in the shop's city. */
+function otherShopsPath(b: ClientBooking): string {
+  const q = new URLSearchParams();
+  if (b.service?.category_key) q.set('cat', b.service.category_key);
+  if (b.shop?.city) q.set('oras', b.shop.city);
+  const search = q.toString();
+  return search ? `${SEARCH_PATH}?${search}` : SEARCH_PATH;
+}
+
 function pickupState(doneAt: string | null, now: Date): boolean {
   return doneAt !== null && daysFromToday(ymdInBucharest(new Date(doneAt)), now) >= -PICKUP_DAYS;
 }
@@ -350,7 +382,11 @@ function StatusDetail({ booking: b, quote, now }: { booking: ClientBooking; quot
       );
     }
     case 'expired':
-      return <p className={styles.muted}>{t('cb.expired')}</p>;
+      return (
+        <p className={styles.muted}>
+          {t(b.closed_reason === 'unanswered' ? 'cb.unanswered' : b.closed_reason === 'not_updated' ? 'cb.notUpdated' : 'cb.expired')}
+        </p>
+      );
     case 'no_show':
       return <p className={styles.muted}>{t('cb.noShow')}</p>;
     case 'declined':

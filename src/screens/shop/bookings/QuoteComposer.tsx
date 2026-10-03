@@ -138,6 +138,7 @@ export function QuoteComposer({
     <Panel title={mode === 'send' ? t('sb.quote.title') : t('sb.quote.editTitle')}>
       {mode === 'replace' && <p className={styles.panelBody}>{t('sb.quote.editBody')}</p>}
       {booking.offer_percent ? <OfferNote>{t('offer.quote', { n: booking.offer_percent })}</OfferNote> : null}
+      {booking.loyalty_percent ? <OfferNote>{t('loyalty.quote', { n: booking.loyalty_percent, level: booking.loyalty_level ?? 1 })}</OfferNote> : null}
       <div ref={container} className={styles.composer}>
         <ol className={styles.composerRows}>
           {rows.map((row, i) => {

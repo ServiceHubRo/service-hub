@@ -132,6 +132,15 @@ describe('SMS texts', () => {
     );
   });
 
+  it('a booking confirmed at once (T28a): nothing to answer, only to know', () => {
+    const sms = smsForEvent({ ...request('ro'), event: 'booking_auto_confirmed' })!;
+    expect(sms).toBe(
+      'Service-Hub: programare confirmata automat, Maria Pop, Mie 14 oct, 10:00: Schimb ulei + filtru ulei. Detalii in aplicatie. Oprire SMS: Setari > Notificari',
+    );
+    expect(sms.length).toBeLessThanOrEqual(SMS_MAX);
+    expect(smsForEvent({ ...request('en'), event: 'booking_auto_confirmed' })).toMatch(/^Service-Hub: booking confirmed automatically, Maria Pop/);
+  });
+
   it('says how many services came with the first one (T21)', () => {
     expect(smsForEvent(request('ro', { extra_count: 2 }))).toContain(': Schimb ulei + filtru ulei si inca 2. ');
   });
@@ -161,6 +170,35 @@ describe('SMS texts', () => {
 });
 
 describe('app emails', () => {
+  it('tells the client kindly that a request closed, with other shops nearby', () => {
+    const params = { shop_name: 'Atelier Unu', client_name: 'Ana Marin', date: '2026-10-14', slot: '10:00', category: 'cat_rev', city: 'Brașov' };
+    const service = { ro: 'Schimb ulei', en: 'Oil change' };
+    const client = emailForEvent({ event: 'request_expired', lang: 'ro', role: 'client', params, service } as never, 'https://app.ro')!;
+    expect(client.subject).toBe('Cererea ta s-a închis: alte service-uri te pot ajuta');
+    expect(client.text).toContain('Ne pare rău, Atelier Unu nu a reușit să răspundă la timp');
+    expect(client.html).toContain('https://app.ro/c/cauta?cat=cat_rev&amp;oras=Bra%C8%99ov');
+    const shop = emailForEvent({ event: 'request_expired', lang: 'en', role: 'shop', params, service } as never, 'https://app.ro')!;
+    expect(shop.subject).toBe('Atelier Unu: A request closed without an answer');
+    expect(shop.text).toContain('(Oil change)');
+    expect(shop.html).toContain('https://app.ro/s/programari?tab=cereri');
+    const last = emailForEvent({ event: 'booking_request_last_call', lang: 'ro', role: 'shop', params, service } as never, 'https://app.ro')!;
+    expect(last.subject).toBe('Atelier Unu: Ultima reamintire pentru o cerere');
+    expect(last.text).toContain('Dacă nu răspunzi până atunci, cererea se închide automat.');
+  });
+
+  it("sends the admin a morning email with only what waits", () => {
+    const mail = emailForEvent(
+      { event: 'admin_digest', lang: 'ro', params: { reports: 2, suspect: 0, past_due: 1, company_waiting: 0, company_hidden: 0, unanswered: 1, new_shops: 3, new_clients: 12, new_bookings: 20, done: 7 } },
+      'https://app.ro',
+    )!;
+    expect(mail.subject).toBe('Service-Hub: 4 lucruri te așteaptă azi');
+    expect(mail.text).toContain('Recenzii raportate: 2');
+    expect(mail.text).toContain('Plăți eșuate la abonament: 1');
+    expect(mail.text).toContain('Cereri închise fără răspuns (ultimele 24 de ore): 1');
+    expect(mail.text).not.toContain('suspecte');
+    expect(mail.text).toContain('Clienți noi');
+  });
+
   it('the staff invitation, in both languages, with the link and escaped names', () => {
     const d = { shop: 'Atelier <Unu>', city: 'Brașov', inviter: 'Ion Popescu', email: 'vlad@example.com', url: 'https://service-hubapp.netlify.app/invitatie/abc' };
     const ro = staffInviteEmail('ro', d);
