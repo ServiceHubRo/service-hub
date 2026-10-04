@@ -1,6 +1,6 @@
 # Politica de confidențialitate — Service-Hub
 
-**Ultima actualizare:** 2 octombrie 2026
+**Ultima actualizare:** 4 octombrie 2026
 
 Aici afli ce date personale folosește Service-Hub, de ce, cine le mai vede, cât timp le păstrăm și ce drepturi ai, conform Regulamentului (UE) 2016/679 („GDPR”) și legii române.
 
@@ -37,7 +37,7 @@ Aici afli ce date personale folosește Service-Hub, de ce, cine le mai vede, câ
 - **Rapoartele de istoric** cumpărate: codul, mașina, lucrările incluse, prețul, starea plății și fișierul PDF.
 - Numărul de **neprezentări** din ultimele 90 de zile (calculat din programări).
 - **Confirmarea telefonului**, doar dacă ți se cere (după 2 neprezentări în 90 de zile): codul trimis prin SMS este păstrat doar criptat și este valabil 10 minute.
-- **Preferințele:** cererea de recenzie, reminderele de revizie și de anvelope, sfaturile de început și ofertele service-urilor favorite (pornite sau oprite).
+- **Preferințele:** cererea de recenzie, reminderele de revizie și de anvelope și ofertele service-urilor favorite (pornite sau oprite).
 
 ### 2.3 Dacă ai cont de Service
 
@@ -76,7 +76,7 @@ Aici afli ce date personale folosește Service-Hub, de ce, cine le mai vede, câ
 | Notificări push | Acordul tău, dat în browser (îl retragi oricând) și contractul |
 | Alertele pentru ITP, RCA și rovinietă | Contractul cu tine (le ceri când treci datele) |
 | Reminderul pentru următoarea revizie (după ultima lucrare de acel fel făcută prin Platformă) și cererea de recenzie după o lucrare | Contractul cu tine; pe amândouă le oprești din Cont |
-| Reminderul pentru schimbul anvelopelor de sezon (pentru mașinile din Garaj) și cele două sfaturi din primele două săptămâni | Contractul cu tine; le oprești din Cont |
+| Reminderul pentru schimbul anvelopelor de sezon (pentru mașinile din Garaj) și cele două sfaturi din primele două săptămâni | Contractul cu tine; reminderul de anvelope îl oprești din Cont, iar sfaturile din setările de notificări ale telefonului |
 | Ofertele service-urilor din favorite | Acordul tău: le primești doar dacă le pornești din Cont și le oprești oricând |
 | Raportul lunii pentru service | Contractul cu tine; îl oprești din Setări → Notificări |
 | Arătarea lucrărilor făcute la mașina ta la alte service-uri către service-ul la care ai o programare (Fișa mașinii) | Acordul tău (lit. a): îl dai la programare sau din Programări și îl retragi oricând, tot din Programări |
@@ -187,7 +187,7 @@ Platforma nu este pentru persoane sub 18 ani. Dacă aflăm că un cont este al u
 
 ## 9. Mesajele pe care ți le trimitem
 
-Îți trimitem mesaje legate de cont și de programări (confirmări, devize, remindere, cererea de recenzie după o lucrare, plăți), remindere pentru mașină (ITP, RCA, rovinietă, următoarea revizie, schimbul anvelopelor de sezon), două sfaturi în primele două săptămâni dacă încă nu ai făcut o programare și anunțuri importante despre Platformă. Ofertele service-urilor din favorite le primești doar dacă le pornești din Cont; sfaturile și ofertele sunt cel mult două pe săptămână. Mementourile automate nu pleacă noaptea (între 21:00 și 9:00, ora României): le primești dimineața. Fiecare tip se oprește din Cont, iar notificările push le poți opri oricând. Service-urile pot opri SMS-urile la cereri noi, rezumatul zilnic și raportul lunii din Setări → Notificări.
+Îți trimitem mesaje legate de cont și de programări (confirmări, devize, remindere, cererea de recenzie după o lucrare, plăți), remindere pentru mașină (ITP, RCA, rovinietă, următoarea revizie, schimbul anvelopelor de sezon), două sfaturi în primele două săptămâni dacă încă nu ai făcut o programare și anunțuri importante despre Platformă. Ofertele service-urilor din favorite le primești doar dacă le pornești din Cont; sfaturile și ofertele sunt cel mult două pe săptămână. Mementourile automate nu pleacă noaptea (între 21:00 și 9:00, ora României): le primești dimineața. Fiecare tip se oprește din Cont, în afară de cele două sfaturi, iar notificările push le poți opri oricând din setările telefonului. Service-urile pot opri SMS-urile la cereri noi, rezumatul zilnic și raportul lunii din Setări → Notificări.
 
 ---
 

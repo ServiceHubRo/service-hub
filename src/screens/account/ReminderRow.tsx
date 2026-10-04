@@ -30,7 +30,8 @@ const ROWS = {
     on: 'seasonReminders.on',
     off: 'seasonReminders.off',
   },
-  // T24: two tips in the first two weeks, while the client has not booked yet.
+  // T24: two tips in the first two weeks, while the client has not booked yet. No row in Cont since
+  // 4 Oct (Eduard): on for everyone; the phone's notification settings still stop them.
   app_tips: {
     icon: Lightbulb,
     title: 'appTips.title',
