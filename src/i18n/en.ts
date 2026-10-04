@@ -39,7 +39,7 @@ export const en: Record<MessageKey, string> = {
   'landing.heroText':
     "Not five calls on your lunch break, only to be told there's nothing open until next week. Find a shop, book from your phone, and get the quote before any work starts.",
   'landing.drivers': 'Free for drivers. You only pay for the repair, directly to the shop.',
-  'landing.mock.search': 'Brakes, Brașov',
+  'landing.mock.search': 'Brakes',
   'landing.mock.shop1': 'Demo Auto Shop',
   'landing.mock.shop2': 'Sample Garage',
   'landing.mock.slot': 'Available tomorrow, 09:00',
@@ -58,7 +58,7 @@ export const en: Record<MessageKey, string> = {
   'landing.driver3.title': "Know when your car's ready",
   'landing.driver3.text': "You get a message when you can pick it up. Every job stays in the car's history, in your garage.",
   'landing.forShops': 'For auto repair shops',
-  'landing.shopsTitle': 'Own a shop in Brașov?',
+  'landing.shopsTitle': 'Own an auto repair shop?',
   'landing.shopsText':
     "We're looking for the first shops to join us from day one. Sign up now and keep the launch price for as long as you stay.",
   'landing.shop1.title': 'Customers book themselves',
@@ -90,7 +90,7 @@ export const en: Record<MessageKey, string> = {
   'landing.step4.text': "You get a message the moment your car's ready for pickup.",
   'landing.trustTitle': 'Reviews from real customers.',
   'landing.trustText': 'A shop earns its place in the list from the ratings it gets after finished jobs. No one can pay to rank higher.',
-  'landing.footerNote': 'Service-Hub · online booking for auto repair shops. Starting in Brașov, then city by city.',
+  'landing.footerNote': 'Service-Hub · online booking for auto repair shops across Romania.',
   'landing.contact': 'Contact',
   'landing.verifyReport': 'Verify a history report',
   'landing.phoneLabel': 'Phone and WhatsApp: {phone}',

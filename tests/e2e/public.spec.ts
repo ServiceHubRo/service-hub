@@ -21,7 +21,7 @@ test('landing: every section, in Romanian and English, without horizontal scroll
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Programarea la service ar trebui să dureze 2 minute.');
   for (const heading of [
     'Știi ce plătești înainte să se lucreze',
-    'Ai atelier în Brașov?',
+    'Ai un service auto?',
     'Patru pași',
     'Recenzii de la clienți reali.',
   ]) {
@@ -60,7 +60,7 @@ test('landing: every section, in Romanian and English, without horizontal scroll
   await page.getByRole('button', { name: 'English' }).click();
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Booking a car repair should take 2 minutes.');
   await expect(page.getByRole('link', { name: 'Sign in' })).toBeVisible();
-  await expect(page.getByRole('heading', { level: 2, name: 'Own a shop in Brașov?' })).toBeVisible();
+  await expect(page.getByRole('heading', { level: 2, name: 'Own an auto repair shop?' })).toBeVisible();
   if (BACKEND) {
     await expect(page.getByText('99 RON a month')).toBeVisible();
     await expect(page.getByText(/VAT/)).toHaveCount(0);
