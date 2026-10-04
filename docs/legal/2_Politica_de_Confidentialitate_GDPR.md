@@ -48,7 +48,7 @@ Aici afli ce date personale folosește Service-Hub, de ce, cine le mai vede, câ
 - **Abonamentul și plățile:** starea, datele de început și de sfârșit, prețul, câți colegi plătiți, codul de client Stripe, sumele plătite, datele plăților și chitanțele Stripe.
 - **Colegii:** adresa de email la care ai trimis invitația, numele colegului și data la care a intrat.
 - **Confirmarea telefonului:** codul trimis prin SMS este păstrat doar criptat și este valabil 10 minute.
-- **Preferințele:** SMS la cerere nouă, rezumatul zilnic, raportul lunii.
+- **Preferințele:** rezumatul zilnic, raportul lunii.
 - Programările, devizele, lucrările, recenziile și mesajele service-ului, cu datele clienților din secțiunea 4.1.
 
 ### 2.4 Date tehnice
@@ -73,7 +73,7 @@ Aici afli ce date personale folosește Service-Hub, de ce, cine le mai vede, câ
 | Contul: înscriere, autentificare, siguranța contului | Contractul cu tine (alin. 1 lit. b) |
 | Căutare, programare, deviz, lucrare, mesaje, istoric | Contractul cu tine |
 | Trimiterea datelor programării către service-ul ales | Contractul cu tine |
-| Notificări despre programări și cont (email, SMS către service-uri) | Contractul cu tine |
+| Notificări despre programări și cont (push, email) | Contractul cu tine |
 | Programarea trecută de service pentru tine (fără cont) și SMS-ul sau emailul cu linkul ei | Pașii ceruți de tine pentru programarea la service (alin. 1 lit. b); service-ul poate trimite mesajul doar dacă ai fost de acord |
 | Notificări push | Acordul tău, dat în browser (îl retragi oricând) și contractul |
 | Alertele pentru ITP, RCA și rovinietă | Contractul cu tine (le ceri când treci datele) |
@@ -121,7 +121,7 @@ Lucrăm cu furnizori care prelucrează date doar la cererea noastră, pe baza un
 | Supabase | Baza de date, conturile, fișierele, funcțiile de pe server | Toate datele Platformei | UE (Frankfurt) |
 | Netlify | Găzduirea aplicației web | Adresa IP, browserul, paginile cerute | SUA și rețea globală |
 | Resend | Emailuri (confirmarea contului, parolă, invitații, plăți, raport gata, linkul programării trecute de service) | Adresa de email, textul emailului | SUA |
-| SMSO | SMS-uri: codul de confirmare a telefonului (service-uri; clienți după neprezentări), cererile noi către service-uri, dacă sunt activate, și linkul programării trecute de service pentru un client fără cont | Telefonul, textul SMS-ului (codul; la cereri: numele clientului, serviciul, ziua; la programarea trecută de service: service-ul, ziua, ora și linkul) | România |
+| SMSO | SMS-uri: codul de confirmare a telefonului (service-uri; clienți după neprezentări) și linkul programării trecute de service pentru un client fără cont | Telefonul, textul SMS-ului (codul; la programarea trecută de service: service-ul, ziua, ora și linkul) | România |
 | Stripe | Plata abonamentului și a raportului | Numele, emailul, suma; datele cardului le introduci direct la Stripe | UE și SUA |
 | Sentry | Rapoartele de erori | Codul contului, rolul, browserul, pagina, eroarea | UE (Frankfurt) |
 | Cloudflare | Verificarea anti-robot la înscriere și autentificare | Adresa IP, semnale ale browserului | SUA și rețea globală |
@@ -189,7 +189,7 @@ Platforma nu este pentru persoane sub 18 ani. Dacă aflăm că un cont este al u
 
 ## 9. Mesajele pe care ți le trimitem
 
-Îți trimitem mesaje legate de cont și de programări (confirmări, devize, remindere, cererea de recenzie după o lucrare, plăți), remindere pentru mașină (ITP, RCA, rovinietă, următoarea revizie, schimbul anvelopelor de sezon), două sfaturi în primele două săptămâni dacă încă nu ai făcut o programare și anunțuri importante despre Platformă. Ofertele service-urilor din favorite le primești doar dacă le pornești din Cont; sfaturile și ofertele sunt cel mult două pe săptămână. Mementourile automate nu pleacă noaptea (între 21:00 și 9:00, ora României): le primești dimineața. Fiecare tip se oprește din Cont, în afară de cele două sfaturi, iar notificările push le poți opri oricând din setările telefonului. Service-urile pot opri SMS-urile la cereri noi, rezumatul zilnic și raportul lunii din Setări → Notificări.
+Îți trimitem mesaje legate de cont și de programări (confirmări, devize, remindere, cererea de recenzie după o lucrare, plăți), remindere pentru mașină (ITP, RCA, rovinietă, următoarea revizie, schimbul anvelopelor de sezon), două sfaturi în primele două săptămâni dacă încă nu ai făcut o programare și anunțuri importante despre Platformă. Ofertele service-urilor din favorite le primești doar dacă le pornești din Cont; sfaturile și ofertele sunt cel mult două pe săptămână. Mementourile automate nu pleacă noaptea (între 21:00 și 9:00, ora României): le primești dimineața. Fiecare tip se oprește din Cont, în afară de cele două sfaturi, iar notificările push le poți opri oricând din setările telefonului. Service-urile pot opri rezumatul zilnic și raportul lunii din Setări → Notificări.
 
 ---
 

@@ -117,12 +117,9 @@ test.describe('email and SMS', () => {
     await expect(card).toHaveCount(0);
   });
 
-  test('a shop with SMS on gets a text for a new request', async () => {
-    // The database wakes the dispatcher only once it knows its address (first GET).
-    await fetch(`${API}/functions/v1/dispatch-notifications`);
+  test('a new request reaches the shop by push only, never by a paid text (Eduard, 4 Oct)', async () => {
     const phone = uniquePhone();
-    const { shopId } = await createBookableShop('Atelier SMS', ['ulei'], {}, { phone: phone.e164 });
-    await serviceRest(`shops?id=eq.${shopId}`, 'PATCH', { sms_on_new_booking: true });
+    const { shopId } = await createBookableShop('Atelier Fara SMS', ['ulei'], {}, { phone: phone.e164 });
     const client = await createUser('client', { name: 'Radu Sms' });
     const av = await rpcAs<{ days: { date: string; bookable: boolean }[] }>(client, 'get_availability', { p_shop_id: shopId, p_days: 30 });
     const day = av.days.find((d) => d.bookable)!.date;
@@ -133,7 +130,7 @@ test.describe('email and SMS', () => {
       p_slots_for: day,
     });
     const slot = slots.slots.find((s) => s.available)!.time;
-    await rpcAs(client, 'create_booking', {
+    const booking = await rpcAs<{ id: string }>(client, 'create_booking', {
       p_shop_id: shopId,
       p_service_id: 'ulei',
       p_date: day,
@@ -141,11 +138,11 @@ test.describe('email and SMS', () => {
       p_car: { make: 'Dacia', model: 'Logan', plate: 'BV 12 SMS' },
       p_request_id: crypto.randomUUID(),
     });
-    const sms = await nextSms(phone.e164);
-    expect(sms.body).toMatch(
-      new RegExp(`^Service-Hub: cerere noua de la Radu Sms, .+, ${slot.slice(0, 5)}: Schimb ulei.*\\. Raspunde in aplicatie\\. Oprire SMS: Setari > Notificari$`),
+    const events = await serviceRest<{ channels: string[] }[]>(
+      `notification_events?booking_id=eq.${booking.id}&event=eq.booking_requested&select=channels`,
+      'GET',
     );
-    expect(sms.body.length).toBeLessThanOrEqual(160);
+    expect(events.map((e) => e.channels)).toEqual([['push']]);
   });
 
   test('the staff invitation arrives by email with a link to this app', async ({ page, browser }) => {

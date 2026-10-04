@@ -49,7 +49,7 @@ All tables have RLS enabled. `id uuid primary key default gen_random_uuid()` unl
 - `owner_id unique` → profiles
 - Public: `name`, `description`, `logo_url`, `street`, `city not null`, `county`, `postal_code`, `phone`, `phone2`, `website`, `facebook`, `year_established`, `latitude`, `longitude`, `lang`
 - Rules: `daily_capacity int not null default 5 check (between 1 and 100)`, `cars_per_slot int not null default 1 check (between 1 and 20)`, `slot_minutes int not null default 60 check (slot_minutes in (30,60))`, `min_notice_hours int default 2`, `max_advance_days int default 30`, `cancel_deadline_hours int default 2` (0 = anytime), `inspection_fee numeric(10,2) default 0`
-- Preferences: `sms_on_new_booking boolean default false`, `daily_digest boolean default false`
+- Preferences: `daily_digest boolean default false`. `sms_on_new_booking` stays in the table but is always false (schema 59, check constraint, no update grant): no SMS to shops for a new request (Eduard, 4 Oct — every text costs money; the push is enough)
 - Controlled by system/admin only: `active boolean default true`, `suspended boolean default false`, `setup_completed_at`, `hours_reviewed_at` (set by `save_shop_hours`)
 - First-run checklist and Panou (T05): `capacity_reviewed_at`, `billing_reminder_dismissed_at` — the browser may set them, but a trigger (`shops_stamp_times`) always stores the server time and never clears them
 - Read access: any signed-in user when `is_shop_public(id)`; always for the shop's members, admin, and clients who have a booking with that shop (so history keeps showing the shop even if it later becomes inactive).
