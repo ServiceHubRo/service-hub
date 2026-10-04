@@ -156,9 +156,9 @@ select test.eq((params->>'percent')::int, 10, 'with the percentage')
 from public.notification_events where event = 'favorite_offer';
 select test.eq(pg_temp.events('favorite_offer', test.id('client_a')), 0::bigint, 'not to a client already known there');
 select test.login(test.id('owner1'));
-update public.shops set new_client_offer = 20 where id = test.id('shop1');
+update public.shops set new_client_offer = 15 where id = test.id('shop1');
 update public.shops set new_client_offer = null where id = test.id('shop1');
-update public.shops set new_client_offer = 30 where id = test.id('shop1');
+update public.shops set new_client_offer = 15 where id = test.id('shop1');
 select test.logout();
 select test.eq(pg_temp.events('favorite_offer', current_setting('test.new')::uuid), 1::bigint, 'once a month per shop');
 delete from public.notification_events;

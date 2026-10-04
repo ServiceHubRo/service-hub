@@ -54,11 +54,11 @@ select test.fails(format('update public.bookings set loyalty_percent = 50 where 
 select test.logout();
 
 -- A new client at a shop with both: the new-client offer wins, they never add up.
-update public.shops set new_client_offer = 20, loyalty_l1 = 5 where id = test.id('shop2');
+update public.shops set new_client_offer = 15, loyalty_l1 = 5 where id = test.id('shop2');
 insert into public.bookings (shop_id, client_id, service_id, client_name, car_snapshot, date, slot, status)
 values (test.id('shop2'), test.id('client_a'), 'ulei', 'Ana Marin', '{"plate_norm":"BV12ABC"}', test.workday(3), '09:00', 'pending')
 returning id as b3 \gset
-select test.eq(offer_percent::int, 20, 'new here: the offer') from public.bookings where id = :'b3';
+select test.eq(offer_percent::int, 15, 'new here: the offer') from public.bookings where id = :'b3';
 select test.eq(loyalty_percent, null::smallint, 'and not the loyalty discount on top') from public.bookings where id = :'b3';
 -- Once she is no longer new there, the loyalty discount applies.
 insert into public.bookings (shop_id, client_id, service_id, client_name, car_snapshot, date, slot, status)
