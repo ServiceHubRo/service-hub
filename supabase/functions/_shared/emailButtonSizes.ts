@@ -119,5 +119,25 @@ export const EMAIL_BUTTON_SIZES: Record<string, { slug: string; width: number; h
     "slug": "open-billing-details",
     "width": 184,
     "height": 44
+  },
+  "Caută alt service": {
+    "slug": "cauta-alt-service",
+    "width": 169,
+    "height": 44
+  },
+  "Find another shop": {
+    "slug": "find-another-shop",
+    "width": 175,
+    "height": 44
+  },
+  "Deschide Programări": {
+    "slug": "deschide-programari",
+    "width": 198,
+    "height": 44
+  },
+  "Open Bookings": {
+    "slug": "open-bookings",
+    "width": 154,
+    "height": 44
   }
 };

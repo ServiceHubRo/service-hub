@@ -1,6 +1,6 @@
 # Termeni și condiții — Service-Hub
 
-**Ultima actualizare:** 2 octombrie 2026
+**Ultima actualizare:** 3 octombrie 2026
 
 Acești termeni („Termenii”) se aplică folosirii Service-Hub: site-ul și aplicația de la adresa service-hub.ro („Platforma”). Când îți faci cont, confirmi că i-ai citit și că ești de acord cu ei. Cum folosim datele tale scrie în Politica de confidențialitate, iar ce păstrăm în browser, în Politica de cookies.
 
@@ -56,6 +56,7 @@ Service-urile apar în ordinea notei ponderate din recenzii: media stelelor, câ
 - Fiecare Service își stabilește programul, câte mașini primește pe zi și la aceeași oră, cu cât timp înainte se poate programa și până când poți anula. Platforma respectă automat aceste limite.
 - Ca să nu fie blocate locurile, există limite rezonabile pentru programările active și pentru cererile noi pe zi. Dacă ajungi la o limită, aplicația îți spune.
 - La trimitere, Service-ul primește numele, telefonul și limba ta, datele mașinii (marcă, model, an, număr, serie de șasiu dacă ai trecut-o) și nota ta. Dacă modifici sau ștergi mai târziu mașina din Garaj, programarea păstrează datele de la momentul trimiterii.
+- Unele Service-uri oferă o reducere la manoperă clienților noi (la prima programare acolo) sau clienților fideli. Ești client fidel de la 2 lucrări terminate prin Platformă în ultimii 2 ani, la orice Service (Nivelul 1), și de la 5 lucrări (Nivelul 2); nivelul tău apare în Cont → Fidelitate. Reducerea pe care o ai la trimitere rămâne trecută pe programare, iar Service-ul o scade din manoperă în deviz. Cele două reduceri nu se adună. Platforma nu plătește și nu încasează nimic din aceste reduceri.
 
 ### 3.3 Anularea și neprezentarea
 
@@ -111,7 +112,10 @@ Un Service se înscrie de proprietarul sau reprezentantul unei afaceri autorizat
 
 ### 4.3 Programările, devizele și lucrările
 
-- Răspundeți la cereri cât mai repede: confirmați, refuzați sau mutați.
+- Răspundeți la cereri cât mai repede: confirmați, refuzați sau mutați. O cerere rămasă fără răspuns până la ora programării se închide automat, iar clientul este anunțat.
+- Puteți activa confirmarea instantă: cererile pentru locurile libere se confirmă atunci automat, iar o programare confirmată astfel vă obligă la fel ca una confirmată de voi. Clienții cu o neprezentare în ultimele 90 de zile trimit în continuare o cerere.
+- Puteți promite o reducere la manoperă clienților noi (la prima lor programare la voi) și clienților fideli (Nivelul 1: cel puțin 2 lucrări terminate prin Platformă în ultimii 2 ani, la orice Service; Nivelul 2: cel puțin 5). Reducerea valabilă la trimiterea cererii rămâne trecută pe programare și o scădeți din manoperă în deviz, chiar dacă între timp o schimbați. Cele două reduceri nu se adună. Reducerile nu schimbă ordinea din căutare, iar Platforma nu plătește și nu încasează nimic din ele.
+- Actualizați programările după ora lor (în constatare sau neprezentat). O programare confirmată care rămâne neactualizată 7 zile după data ei se încheie automat, fără să fie trecută ca neprezentare.
 - Devizul trebuie să fie clar, pe poziții, cu prețuri finale. După trimitere nu se mai poate modifica; puteți trimite o versiune nouă sau îl puteți retrage.
 - Taxa de constatare se poate cere doar dacă clientul refuză devizul și doar în valoarea afișată pe profil la momentul programării.
 - La finalizare, kilometrajul este obligatoriu și trebuie să fie cel citit în bord. **Este interzisă trecerea unui kilometraj fals.** Kilometrajul și lucrările apar în istoricul și în rapoartele clientului. Platforma refuză un kilometraj mai mic decât ultimul cunoscut pentru acel număr de înmatriculare și cere confirmare pentru un salt de peste 50.000 km.

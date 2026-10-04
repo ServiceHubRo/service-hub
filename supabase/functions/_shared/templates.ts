@@ -87,6 +87,10 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
       body: 'Devizul pentru {car} expiră {deadline_rel}. Răspunde ca să-ți păstrezi locul.',
     },
     'client.quote_expired': { title: '{shop}', body: 'Devizul pentru {car} a expirat fără răspuns.' },
+    'client.request_expired': {
+      title: 'Cererea ta s-a închis',
+      body: 'Ne pare rău, {shop} nu a reușit să răspundă la timp pentru {when}. Îți arătăm acum alte service-uri din zonă care te pot ajuta.',
+    },
     'client.work_started': { title: '{shop}', body: 'Lucrarea la {car} a început.' },
     'client.job_done': { title: '{shop}', body: '{car} este gata de ridicare. Total: {cost}.' },
     'client.appointment_reminder': { title: '{shop}', body: 'Mâine la {slot} ai programare la {shop}: {service}.' },
@@ -144,6 +148,10 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
     },
     // ------------------------------------------------------------------ to the shop
     'shop.booking_requested': { title: 'Cerere nouă', body: '{client}: {service}, {when}. {car_plate}.' },
+    'shop.booking_auto_confirmed': {
+      title: 'Programare nouă, confirmată automat',
+      body: '{client} vine {when}: {service}. {car_plate}.',
+    },
     'shop.booking_cancelled_client': { title: 'Programare anulată', body: '{client} a anulat programarea {ref} din {when}.' },
     'shop.booking_cancelled_admin': {
       title: 'Programare anulată',
@@ -175,8 +183,24 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
     'shop.daily_digest': { title: 'Programul de azi', body: '{digest}' },
     // T24
     'shop.booking_request_waiting': {
-      title: 'Cerere fără răspuns',
-      body: '{client} așteaptă răspuns pentru {when}: {service}. Confirmă sau propune altă oră.',
+      title: 'O cerere așteaptă răspunsul tău',
+      body: '{client} așteaptă răspuns pentru {when}: {service}. Confirmă programarea sau propune altă oră.',
+    },
+    'shop.booking_request_last_call': {
+      title: 'Ultima reamintire pentru o cerere',
+      body: '{client} așteaptă încă răspuns pentru {when}: {service}. Dacă nu răspunzi până atunci, cererea se închide automat. Confirmă programarea sau propune altă oră.',
+    },
+    'shop.request_expired': {
+      title: 'O cerere s-a închis fără răspuns',
+      body: 'Cererea de la {client} pentru {when} ({service}) s-a închis automat, pentru că ora programării a trecut. Un răspuns rapid aduce mai mulți clienți în service.',
+    },
+    'shop.booking_followup': {
+      title: 'Cum a decurs programarea?',
+      body: '{client} avea programare {when}, pentru {car_plate}. Spune-ne ce s-a întâmplat: dacă mașina a venit, apasă „În constatare”, iar dacă nu, „Neprezentat”.',
+    },
+    'shop.booking_auto_closed': {
+      title: 'Programare încheiată automat',
+      body: 'Programarea {ref} cu {client} din {when} s-a încheiat automat, pentru că nu a fost actualizată timp de 7 zile. Clientul nu a fost trecut ca neprezentat.',
     },
     'shop.monthly_report': {
       title: 'Luna {month} pe Service-Hub',
@@ -315,6 +339,10 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
       body: 'The quote for your {car} expires {deadline_rel}. Answer to keep your slot.',
     },
     'client.quote_expired': { title: '{shop}', body: 'The quote for your {car} expired without an answer.' },
+    'client.request_expired': {
+      title: 'Your request has closed',
+      body: "We're sorry, {shop} couldn't get back to you in time for {when}. Here are other shops nearby that can help.",
+    },
     'client.work_started': { title: '{shop}', body: 'Work on your {car} has started.' },
     'client.job_done': { title: '{shop}', body: 'Your {car} is ready for pickup. Total: {cost}.' },
     'client.appointment_reminder': { title: '{shop}', body: 'Reminder: your booking at {shop} is tomorrow at {slot} ({service}).' },
@@ -372,6 +400,10 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
     },
     // ------------------------------------------------------------------ to the shop
     'shop.booking_requested': { title: 'New request', body: '{client}: {service}, {when}. {car_plate}.' },
+    'shop.booking_auto_confirmed': {
+      title: 'New booking, confirmed automatically',
+      body: '{client} is coming {when}: {service}. {car_plate}.',
+    },
     'shop.booking_cancelled_client': { title: 'Booking canceled', body: '{client} canceled booking {ref} on {when}.' },
     'shop.booking_cancelled_admin': {
       title: 'Booking canceled',
@@ -403,8 +435,24 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
     'shop.daily_digest': { title: "Today's schedule", body: '{digest}' },
     // T24
     'shop.booking_request_waiting': {
-      title: 'Request waiting',
+      title: 'A request is waiting for you',
       body: '{client} is waiting for an answer for {when}: {service}. Confirm it or suggest another time.',
+    },
+    'shop.booking_request_last_call': {
+      title: 'Last reminder for a request',
+      body: "{client} is still waiting for an answer for {when}: {service}. If you don't answer by then, the request closes automatically. Confirm it or suggest another time.",
+    },
+    'shop.request_expired': {
+      title: 'A request closed without an answer',
+      body: 'The request from {client} for {when} ({service}) closed automatically because the time has passed. A quick answer brings more customers to your shop.',
+    },
+    'shop.booking_followup': {
+      title: 'How did the appointment go?',
+      body: '{client} had an appointment {when} for {car_plate}. Let us know what happened: if the car came in, tap Start inspection; if not, tap No-show.',
+    },
+    'shop.booking_auto_closed': {
+      title: 'Booking closed automatically',
+      body: 'Booking {ref} with {client} on {when} closed automatically because it was not updated for 7 days. The customer was not marked as a no-show.',
     },
     'shop.monthly_report': {
       title: 'Your {month} on Service-Hub',
@@ -577,14 +625,15 @@ export const EVENTS: Record<Side, readonly string[]> = {
     'no_show', 'inspection_started', 'quote_sent', 'quote_replaced', 'quote_withdrawn', 'quote_expiring', 'quote_expired',
     'work_started', 'job_done', 'appointment_reminder', 'new_message', 'review_reply', 'doc_expiry', 'report_ready',
     'review_report_decided', 'review_request', 'service_due', 'account_suspended', 'account_reactivated',
-    'tire_season', 'welcome', 'favorite_offer',
+    'tire_season', 'welcome', 'favorite_offer', 'request_expired',
   ],
   shop: [
-    'booking_requested', 'booking_cancelled_client', 'booking_cancelled_admin', 'quote_accepted',
+    'booking_requested', 'booking_auto_confirmed', 'booking_cancelled_client', 'booking_cancelled_admin', 'quote_accepted',
     'quote_partially_accepted', 'quote_refused', 'quote_expiring', 'quote_expired', 'new_message', 'new_review',
     'daily_digest', 'trial_ending', 'payment_failed', 'shop_inactive', 'review_report_decided', 'account_suspended',
-    'account_reactivated', 'referral_reward', 'referral_revoked', 'booking_request_waiting', 'monthly_report',
-    'company_problem', 'company_name_mismatch', 'company_hidden', 'company_ok',
+    'account_reactivated', 'referral_reward', 'referral_revoked', 'booking_request_waiting', 'booking_request_last_call', 'monthly_report',
+    'company_problem', 'company_name_mismatch', 'company_hidden', 'company_ok', 'request_expired', 'booking_followup',
+    'booking_auto_closed',
   ],
 };
 
@@ -794,6 +843,11 @@ export function urlFor(side: Side, e: NotificationEvent): string {
         return num(p.day) === 14 && p.has_car !== true ? '/c/garaj' : '/c/cauta';
       case 'favorite_offer':
         return str(p.shop_id) ? `/c/service/${str(p.shop_id)}` : '/c/cauta';
+      // Other shops for the same kind of work, in the same city.
+      case 'request_expired': {
+        const search = q(Object.fromEntries([['cat', str(p.category)], ['oras', str(p.city)]].filter(([, v]) => v)));
+        return search ? `/c/cauta?${search}` : '/c/cauta';
+      }
       default:
         return booking ? `/c/programari?${q({ p: booking })}` : '/c/programari';
     }
@@ -814,8 +868,11 @@ export function urlFor(side: Side, e: NotificationEvent): string {
     case 'referral_reward':
     case 'referral_revoked':
       return SUBSCRIPTION_PATH;
+    case 'booking_auto_confirmed':
+      return booking ? `/s/programari?${q({ tab: 'programate', p: booking })}` : '/s/programari?tab=programate';
     case 'booking_requested':
     case 'booking_request_waiting':
+    case 'booking_request_last_call':
       return booking ? `/s/programari?${q({ tab: 'cereri', p: booking })}` : '/s/programari?tab=cereri';
     case 'monthly_report':
       return SHOP_REPORTS_PATH;
@@ -825,10 +882,13 @@ export function urlFor(side: Side, e: NotificationEvent): string {
     case 'company_ok':
       return BILLING_PATH;
     // Ended bookings are in the history, found by their code.
+    case 'request_expired':
+      return '/s/programari?tab=cereri';
     case 'booking_cancelled_client':
     case 'booking_cancelled_admin':
     case 'quote_refused':
     case 'quote_expired':
+    case 'booking_auto_closed':
       return str(p.ref) ? `/s/istoric?${q({ q: str(p.ref) })}` : '/s/istoric';
     default:
       return booking ? `/s/programari?${q({ p: booking })}` : '/s/programari';

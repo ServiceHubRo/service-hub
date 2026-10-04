@@ -333,7 +333,7 @@ function Outcome({ item: b }: { item: ShopHistoryItem }) {
       return <p className={styles.muted}>{fee > 0 ? t('hist.card.fee', { fee: formatMoney(lang, fee) }) : t('hist.card.noFee')}</p>;
     }
     case 'expired':
-      return <p className={styles.muted}>{t('hist.card.expired')}</p>;
+      return <p className={styles.muted}>{t(b.closed_reason === 'not_updated' ? 'hist.card.notUpdated' : 'hist.card.expired')}</p>;
     case 'no_show':
       return <p className={styles.muted}>{t('hist.card.noShow')}</p>;
     case 'cancelled':

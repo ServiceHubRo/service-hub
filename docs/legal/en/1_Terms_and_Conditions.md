@@ -1,6 +1,6 @@
 # Terms and Conditions — Service-Hub
 
-**Last updated:** October 2, 2026
+**Last updated:** October 3, 2026
 
 These terms (the “Terms”) apply to your use of Service-Hub: the website and app at service-hub.ro (the “Platform”). By creating an account, you confirm that you have read and agree to them. How we use your data is described in the Privacy Policy, and what we keep in your browser in the Cookie Policy.
 
@@ -56,6 +56,7 @@ Search only shows Shops with a confirmed email and phone, at least one service s
 - Each Shop sets its own hours, how many cars it takes per day and at the same time, how far in advance you can book and until when you can cancel. The Platform enforces these limits automatically.
 - So that slots are not blocked, there are reasonable limits on active bookings and on new requests per day. If you reach a limit, the app tells you.
 - When you book, the Shop receives your name, phone and language, the car details (make, model, year, license plate, VIN if you entered it) and your note. If you later edit or delete the car in your Garage, the booking keeps the details from the moment it was made.
+- Some Shops give a discount on labor to new customers (on their first booking there) or to loyal customers. You are a loyal customer from 2 jobs finished through the Platform in the last 2 years, at any Shop (Level 1), and from 5 jobs (Level 2); your level is shown in Account → Loyalty. The discount you have when you book stays noted on the booking, and the Shop takes it off labor in the quote. The two discounts do not stack. The Platform neither pays nor collects anything for these discounts.
 
 ### 3.3 Canceling and no-shows
 
@@ -111,7 +112,10 @@ A Shop is listed by the owner or representative of a business authorized to prov
 
 ### 4.3 Bookings, quotes and jobs
 
-- Answer requests promptly: confirm, decline or reschedule.
+- Answer requests promptly: confirm, decline or reschedule. A request still unanswered at the booking time closes automatically, and the customer is notified.
+- You can turn on instant confirmation: requests for free slots are then confirmed automatically, and a booking confirmed this way binds you just like one you confirmed yourself. Customers with a no-show in the last 90 days still send a request.
+- You can promise a discount on labor to new customers (on their first booking with you) and to loyal customers (Level 1: at least 2 jobs finished through the Platform in the last 2 years, at any Shop; Level 2: at least 5). The discount in effect when the request is sent stays noted on the booking, and you take it off labor in the quote, even if you have changed it since. The two discounts do not stack. Discounts do not change the order in search, and the Platform neither pays nor collects anything for them.
+- Update bookings after their time (inspection started or no-show). A confirmed booking left without an update for 7 days after its date closes automatically, without being recorded as a no-show.
 - A quote must be clear, itemized and with final prices. Once sent it can no longer be changed; you can send a new version or withdraw it.
 - The inspection fee may be charged only if the customer refuses the quote, and only up to the amount shown on your profile at the time of booking.
 - When finishing a job, the odometer reading is mandatory and must be the one read on the dashboard. **Entering a false odometer reading is prohibited.** Odometer readings and jobs appear in the customer’s history and reports. The Platform refuses a reading lower than the last known one for that license plate and asks for confirmation for a jump of more than 50,000 km.

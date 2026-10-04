@@ -1,0 +1,84 @@
+.map {
+  width: 100%;
+  height: min(62vh, 560px);
+  min-height: 320px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  background: var(--surface);
+  /* Leaflet's own layers sit under the app's bars and dialogs. */
+  z-index: 0;
+  isolation: isolate;
+}
+
+.compact {
+  height: 200px;
+  min-height: 200px;
+}
+
+.pin {
+  background: none;
+  border: 0;
+}
+
+.pin::before {
+  content: '';
+  position: absolute;
+  left: 8px;
+  top: 6px;
+  width: 28px;
+  height: 28px;
+  box-sizing: border-box;
+  background: var(--amber);
+  border: 3px solid #14161a;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.45);
+}
+
+.pin:focus-visible {
+  outline: 3px solid var(--amber);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+/* Leaflet's controls in the app's colors, with 44 px targets and readable credits. */
+.map :global(.leaflet-bar a) {
+  width: 44px;
+  height: 44px;
+  line-height: 44px;
+  font-size: 22px;
+  background: var(--surface);
+  color: var(--text);
+  border-color: var(--border);
+}
+
+.map :global(.leaflet-control-attribution) {
+  background: rgba(20, 22, 26, 0.88);
+  color: #c9ccd2;
+  font-size: 11px;
+}
+
+.map :global(.leaflet-control-attribution a) {
+  color: #f5a524;
+}
+
+.bubble {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 160px;
+  font: 14px/1.35 var(--font-sans, system-ui);
+  color: #14161a;
+}
+
+.open {
+  margin-top: 4px;
+  min-height: 36px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--amber);
+  color: #14161a;
+  font-weight: 650;
+  cursor: pointer;
+}

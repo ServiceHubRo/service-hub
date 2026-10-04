@@ -1,6 +1,6 @@
-import { CalendarPlus, Globe, MapPin, Phone, Store } from 'lucide-react';
-import { useCallback, useEffect, useRef, type ReactNode } from 'react';
-import { Link, useLocation as useRouterLocation, useParams } from 'react-router-dom';
+import { CalendarPlus, Globe, MapPin, Navigation, Phone, Store } from 'lucide-react';
+import { lazy, Suspense, useCallback, useEffect, useRef, type ReactNode } from 'react';
+import { Link, useLocation as useRouterLocation, useParams, useSearchParams } from 'react-router-dom';
 import { BackLink } from '../../../components/BackLink';
 import { Banner } from '../../../components/Banner';
 import { BottomBar } from '../../../components/BottomBar';
@@ -8,8 +8,10 @@ import { buttonClass } from '../../../components/buttonClass';
 import { Card } from '../../../components/Card';
 import { EmptyState } from '../../../components/EmptyState';
 import { FavoriteButton } from '../../../components/FavoriteButton';
+import { FreePlaceNote } from '../../../components/FreePlaceNote';
 import { LoadError } from '../../../components/LoadError';
 import { OfferNote } from '../../../components/OfferNote';
+import { PhotoGallery } from '../../../components/PhotoGallery';
 import { ServiceIcon } from '../../../components/ServiceIcon';
 import { ShopAvatar } from '../../../components/ShopAvatar';
 import { SkeletonList } from '../../../components/Skeleton';
@@ -18,16 +20,22 @@ import { subscribeRows } from '../../../data/realtime';
 import { toRpcError } from '../../../data/rpc';
 import { fetchShopPage, type ShopPage as ShopPageData, type ShopPageService } from '../../../data/search';
 import { useI18n } from '../../../i18n/context';
-import { formatDateRange, formatDayMonth, formatDistance, formatMoney, formatRating } from '../../../i18n/format';
+import { formatDate, formatDateRange, formatDayMonth, formatDistance, formatMoney, formatRating } from '../../../i18n/format';
 import type { MessageKey } from '../../../i18n/ro';
 import { plural } from '../../../i18n/translate';
+import { AMENITIES, AMENITY_ICONS } from '../../../lib/amenities';
+import { resolveDay } from '../../../lib/freePlace';
 import { distanceTo } from '../../../lib/geo';
+import { directionsUrl } from '../../../lib/maps';
 import { groupHours, type HoursRow } from '../../../lib/hours';
 import { useLocation } from '../../../lib/location';
 import { useLoad } from '../../../lib/useLoad';
 import { bookingPath, REVIEWS_HASH, SEARCH_PATH, type ShopLinkState } from '../paths';
 import { groupServices, serviceName } from './serviceGroups';
 import styles from './ShopPage.module.css';
+
+/** The small map under the address (T28b), loaded only for a shop with coordinates. */
+const ShopsMap = lazy(() => import('../../../components/map/ShopsMap'));
 
 /**
  * The shop page a client opens from search (FR §3.2, P11b): who they are, when they work, what
@@ -41,7 +49,10 @@ export function ShopPage() {
   const back = routerState?.backTo ?? SEARCH_PATH;
   const backLabel = routerState?.backLabel === 'favorites' ? t('favorites.title') : t('shop.allShops');
 
-  const load = useCallback(() => fetchShopPage(shopId), [shopId]);
+  // Opened from a search for a day (T28a): the free place shown is on that day.
+  const [params] = useSearchParams();
+  const day = resolveDay(params.get('zi'));
+  const load = useCallback(() => fetchShopPage(shopId, day), [shopId, day]);
   const { state, reload, setData } = useLoad(load);
 
   // Reviews and replies arrive live (T11): a change to this shop's reviews reads the page again
@@ -53,7 +64,7 @@ export function ShopPage() {
     const refresh = () => {
       window.clearTimeout(timer);
       timer = window.setTimeout(() => {
-        fetchShopPage(shopId).then(
+        fetchShopPage(shopId, day).then(
           (page) => setData((prev) => ({ ...page, is_favorite: prev.is_favorite })),
           () => {},
         );
@@ -70,7 +81,7 @@ export function ShopPage() {
       window.clearTimeout(timer);
       unsubscribe();
     };
-  }, [ready, shopId, setData]);
+  }, [ready, shopId, day, setData]);
 
   return (
     <div className={styles.page} data-fill-screen>
@@ -92,19 +103,20 @@ export function ShopPage() {
           <LoadError message={t('shop.loadError')} onRetry={reload} />
         ))}
       {state.status === 'ready' && (
-        <ShopDetails page={state.data} onFavorite={(on) => setData((p) => ({ ...p, is_favorite: on }))} />
+        <ShopDetails page={state.data} day={day} onFavorite={(on) => setData((p) => ({ ...p, is_favorite: on }))} />
       )}
     </div>
   );
 }
 
-function ShopDetails({ page, onFavorite }: { page: ShopPageData; onFavorite: (on: boolean) => void }) {
+function ShopDetails({ page, day, onFavorite }: { page: ShopPageData; day: string | null; onFavorite: (on: boolean) => void }) {
   const { t, lang } = useI18n();
   const { coords } = useLocation();
   const { shop, rating } = page;
   const distance = distanceTo(coords, shop);
   const reviewsRef = useRef<HTMLHeadingElement>(null);
   const hasReviews = page.reviews.length > 0;
+  const loyaltyText = loyaltyExplain(t, page.loyalty);
   const routerHash = useRouterLocation().hash;
 
   /** Straight to the reviews: the heading takes the focus, so a screen reader starts there too. */
@@ -151,20 +163,51 @@ function ShopDetails({ page, onFavorite }: { page: ShopPageData; onFavorite: (on
         <FavoriteButton shopId={shop.id} shopName={shop.name} on={page.is_favorite} onChange={onFavorite} />
       </header>
 
+      <PhotoGallery photos={page.photos ?? []} shopName={shop.name} />
+
       <p className={styles.address}>
         <MapPin size={15} aria-hidden="true" />
         <span>
           {address}
           {distance !== null && <span className={styles.distance}> · {t('shop.distance', { distance: formatDistance(lang, distance) })}</span>}
         </span>
+        <a className={styles.directions} href={directionsUrl(shop)} target="_blank" rel="noopener noreferrer">
+          <Navigation size={14} aria-hidden="true" />
+          {t('shop.directions')}
+        </a>
       </p>
 
       {shop.description && <p className={styles.description}>{shop.description}</p>}
 
       {!page.bookable && <Banner tone="warning">{t('shop.notBookable')}</Banner>}
+      {page.bookable && (
+        <div className={styles.freePlace}>
+          {page.free || shop.auto_confirm || page.response ? (
+            <FreePlaceNote free={page.free} instant={shop.auto_confirm} response={page.response} />
+          ) : null}
+          {page.free ? (
+            // Straight to that day and time; "Programează-te" below still lets the client choose.
+            <Link to={`${bookingPath(shop.id)}?zi=${page.free.date}&ora=${page.free.slot}`} className={buttonClass('secondary', false, styles.freeBook)}>
+              {t('free.bookThis', { when: `${formatDate(lang, page.free.date)}, ${page.free.slot}` })}
+            </Link>
+          ) : (
+            <p className={styles.muted}>{t(day ? 'free.noneDay' : 'free.none')}</p>
+          )}
+        </div>
+      )}
       {page.bookable && page.offer !== null && (
         <OfferNote>
           <strong>{t('offer.title')}</strong> · {t('offer.page', { n: page.offer })}
+        </OfferNote>
+      )}
+      {page.bookable && page.offer === null && page.loyalty?.yours != null && (
+        <OfferNote>
+          <strong>{t('loyalty.title')}</strong> · {t('loyalty.page', { n: page.loyalty.yours })}
+        </OfferNote>
+      )}
+      {page.bookable && page.offer === null && page.loyalty?.yours == null && loyaltyText && (
+        <OfferNote>
+          <strong>{t('loyalty.title')}</strong> · {loyaltyText}
         </OfferNote>
       )}
 
@@ -181,6 +224,21 @@ function ShopDetails({ page, onFavorite }: { page: ShopPageData; onFavorite: (on
                   {c.label && <span className={styles.muted}> · {c.label}</span>}
                 </li>
               ))}
+            </ul>
+          </InfoRow>
+        )}
+        {(shop.amenities ?? []).length > 0 && (
+          <InfoRow label={t('shop.amenities')}>
+            <ul className={styles.amenities}>
+              {AMENITIES.filter((a) => shop.amenities.includes(a)).map((a) => {
+                const Icon = AMENITY_ICONS[a];
+                return (
+                  <li key={a}>
+                    <Icon size={15} aria-hidden="true" />
+                    {t(`amenity.${a}` as MessageKey)}
+                  </li>
+                );
+              })}
             </ul>
           </InfoRow>
         )}
@@ -209,6 +267,16 @@ function ShopDetails({ page, onFavorite }: { page: ShopPageData; onFavorite: (on
           </InfoRow>
         )}
       </Card>
+
+      {shop.latitude !== null && shop.longitude !== null && (
+        <Suspense fallback={<div className={styles.mapLoading} />}>
+          <ShopsMap
+            compact
+            label={t('shop.map', { name: shop.name })}
+            shops={[{ id: shop.id, name: shop.name, latitude: shop.latitude, longitude: shop.longitude }]}
+          />
+        </Suspense>
+      )}
 
       <h2 className={styles.sectionTitle}>{t('shop.services')}</h2>
       <ServiceGroups services={page.services} />
@@ -245,7 +313,10 @@ function ShopDetails({ page, onFavorite }: { page: ShopPageData; onFavorite: (on
       {/* Always at hand (asked at testing): at the bottom, just above the menu. */}
       {page.bookable && (
         <BottomBar>
-          <Link to={bookingPath(shop.id)} className={buttonClass('primary', true, styles.book)}>
+          <Link
+            to={day ? `${bookingPath(shop.id)}?zi=${day}` : bookingPath(shop.id)}
+            className={buttonClass('primary', true, styles.book)}
+          >
             <CalendarPlus size={18} aria-hidden="true" />
             {t('shop.book')}
           </Link>
@@ -321,4 +392,13 @@ function ServiceGroups({ services }: { services: ShopPageService[] }) {
 /** Links typed without a scheme ("atelier.ro") open as https. */
 function websiteUrl(site: string): string {
   return /^https?:\/\//i.test(site) ? site : `https://${site}`;
+}
+
+/** What a shop gives loyal clients, for someone without a level there yet (T28c). */
+function loyaltyExplain(t: ReturnType<typeof useI18n>['t'], loyalty: ShopPageData['loyalty'] | undefined): string | null {
+  const l1 = loyalty?.l1 ?? null;
+  const l2 = loyalty?.l2 ?? null;
+  if (l1 === null) return l2 === null ? null : t('loyalty.explainL2', { n: l2 });
+  // Level 2 falls back to level 1's discount when the shop set only that.
+  return l2 === null || l2 === l1 ? t('loyalty.explainOne', { n: l1 }) : t('loyalty.explain', { l1, l2 });
 }

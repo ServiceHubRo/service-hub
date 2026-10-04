@@ -1,6 +1,7 @@
 import { ChevronRight, MapPin } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FavoriteButton } from '../../../components/FavoriteButton';
+import { FreePlaceNote } from '../../../components/FreePlaceNote';
 import { OfferNote } from '../../../components/OfferNote';
 import { ShopAvatar } from '../../../components/ShopAvatar';
 import { Stars } from '../../../components/Stars';
@@ -17,10 +18,12 @@ export interface ShopCardProps {
   /** Where "Înapoi" on the shop page leads (this list, with its filters). */
   back: ShopLinkState;
   onFavorite: (shopId: string, on: boolean) => void;
+  /** The day the search asked for (`YYYY-MM-DD`): the shop page opens on it. */
+  day?: string | null;
 }
 
 /** One search result (FR §3.1): one shop per row, whole card opens the shop page. */
-export function ShopCard({ shop, distanceKm, back, onFavorite }: ShopCardProps) {
+export function ShopCard({ shop, distanceKm, back, onFavorite, day }: ShopCardProps) {
   const { t, lang } = useI18n();
   const matched = lang === 'ro' ? shop.matched_service_ro : shop.matched_service_en;
   const navigate = useNavigate();
@@ -29,7 +32,7 @@ export function ShopCard({ shop, distanceKm, back, onFavorite }: ShopCardProps) 
   return (
     <article className={styles.card}>
       <Link
-        to={shopPath(shop.shop_id)}
+        to={day ? `${shopPath(shop.shop_id)}?zi=${day}` : shopPath(shop.shop_id)}
         state={back}
         className={styles.link}
         onClick={(e) => {
@@ -64,12 +67,25 @@ export function ShopCard({ shop, distanceKm, back, onFavorite }: ShopCardProps) 
             )}
             <span>· {plural(lang, 'unit.services', shop.service_count)}</span>
           </span>
+          {(shop.free || shop.auto_confirm || shop.response) && (
+            <span className={styles.free}>
+              <FreePlaceNote free={shop.free} instant={shop.auto_confirm} response={shop.response} />
+            </span>
+          )}
           {matched && <span className={styles.offers}>{t('search.offers', { service: matched })}</span>}
-          {shop.offer !== null && (
+          {shop.offer !== null ? (
             <span className={styles.newClient}>
               <OfferNote compact>{t('offer.card', { n: shop.offer })}</OfferNote>
             </span>
-          )}
+          ) : shop.loyalty !== null ? (
+            <span className={styles.newClient}>
+              <OfferNote compact>{t('loyalty.card', { n: shop.loyalty })}</OfferNote>
+            </span>
+          ) : shop.loyalty_offered ? (
+            <span className={styles.newClient}>
+              <OfferNote compact>{t('loyalty.offered')}</OfferNote>
+            </span>
+          ) : null}
         </span>
         <ChevronRight size={18} className={styles.chevron} aria-hidden="true" />
       </Link>

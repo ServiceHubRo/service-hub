@@ -12,6 +12,10 @@ interface ImportMetaEnv {
   readonly VITE_SENTRY_DSN?: string;
   /** The published site, for links the phone app hands to others (T20). Defaults to the Netlify site. */
   readonly VITE_WEB_URL?: string;
+  /** Map tiles (T28b), `{z}/{x}/{y}` template; OpenStreetMap's own server when unset. Public. */
+  readonly VITE_MAP_TILE_URL?: string;
+  /** The map provider's credit line (HTML), shown on the map. */
+  readonly VITE_MAP_ATTRIBUTION?: string;
 }
 
 interface ImportMeta {

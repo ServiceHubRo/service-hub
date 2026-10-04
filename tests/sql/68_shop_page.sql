@@ -90,8 +90,8 @@ from page;
 -- Public columns only: nothing fiscal, no preferences, no internal stamps.
 select test.eq(
   (select string_agg(k, ',' order by k) from jsonb_object_keys((select p->'shop' from page)) k),
-  'cancel_deadline_hours,cars_per_slot,city,county,daily_capacity,description,facebook,id,inspection_fee,latitude,'
-  || 'logo_url,longitude,max_advance_days,min_notice_hours,name,phone,phone2,street,website,year_established',
+  'amenities,auto_confirm,cancel_deadline_hours,cars_per_slot,city,county,daily_capacity,description,facebook,id,inspection_fee,latitude,'
+  || 'logo_url,longitude,max_advance_days,min_notice_hours,name,phone,phone2,slot_minutes,street,website,year_established',
   'exact list of shop fields on the page');
 select test.ok(position('RO14872301' in (select p::text from page)) = 0
                and position('RO49AAAA' in (select p::text from page)) = 0

@@ -101,6 +101,7 @@ export type Database = {
           client_lang: string
           client_name: string | null
           client_phone: string | null
+          closed_reason: string | null
           confirmed_at: string | null
           cost: number | null
           created_at: string
@@ -108,8 +109,11 @@ export type Database = {
           decline_reason: string | null
           done_at: string | null
           extra_service_ids: string[]
+          followup_sent_at: string | null
           id: string
           inspection_started_at: string | null
+          loyalty_level: number | null
+          loyalty_percent: number | null
           note: string | null
           odometer: number | null
           offer_percent: number | null
@@ -136,6 +140,7 @@ export type Database = {
           client_lang?: string
           client_name?: string | null
           client_phone?: string | null
+          closed_reason?: string | null
           confirmed_at?: string | null
           cost?: number | null
           created_at?: string
@@ -143,8 +148,11 @@ export type Database = {
           decline_reason?: string | null
           done_at?: string | null
           extra_service_ids?: string[]
+          followup_sent_at?: string | null
           id?: string
           inspection_started_at?: string | null
+          loyalty_level?: number | null
+          loyalty_percent?: number | null
           note?: string | null
           odometer?: number | null
           offer_percent?: number | null
@@ -171,6 +179,7 @@ export type Database = {
           client_lang?: string
           client_name?: string | null
           client_phone?: string | null
+          closed_reason?: string | null
           confirmed_at?: string | null
           cost?: number | null
           created_at?: string
@@ -178,8 +187,11 @@ export type Database = {
           decline_reason?: string | null
           done_at?: string | null
           extra_service_ids?: string[]
+          followup_sent_at?: string | null
           id?: string
           inspection_started_at?: string | null
+          loyalty_level?: number | null
+          loyalty_percent?: number | null
           note?: string | null
           odometer?: number | null
           offer_percent?: number | null
@@ -1559,6 +1571,48 @@ export type Database = {
           },
         ]
       }
+      shop_photos: {
+        Row: {
+          created_at: string
+          id: string
+          path: string
+          position: number
+          shop_id: string
+          url: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          path: string
+          position?: number
+          shop_id: string
+          url: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          path?: string
+          position?: number
+          shop_id?: string
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shop_photos_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shop_ratings"
+            referencedColumns: ["shop_id"]
+          },
+          {
+            foreignKeyName: "shop_photos_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       shop_referrals: {
         Row: {
           applied_at: string | null
@@ -1758,6 +1812,8 @@ export type Database = {
       shops: {
         Row: {
           active: boolean
+          amenities: string[]
+          auto_confirm: boolean
           billing_reminder_dismissed_at: string | null
           cancel_deadline_hours: number
           capacity_reviewed_at: string | null
@@ -1776,6 +1832,8 @@ export type Database = {
           latitude: number | null
           logo_url: string | null
           longitude: number | null
+          loyalty_l1: number | null
+          loyalty_l2: number | null
           max_advance_days: number
           min_notice_hours: number
           monthly_report: boolean
@@ -1796,6 +1854,8 @@ export type Database = {
         }
         Insert: {
           active?: boolean
+          amenities?: string[]
+          auto_confirm?: boolean
           billing_reminder_dismissed_at?: string | null
           cancel_deadline_hours?: number
           capacity_reviewed_at?: string | null
@@ -1814,6 +1874,8 @@ export type Database = {
           latitude?: number | null
           logo_url?: string | null
           longitude?: number | null
+          loyalty_l1?: number | null
+          loyalty_l2?: number | null
           max_advance_days?: number
           min_notice_hours?: number
           monthly_report?: boolean
@@ -1834,6 +1896,8 @@ export type Database = {
         }
         Update: {
           active?: boolean
+          amenities?: string[]
+          auto_confirm?: boolean
           billing_reminder_dismissed_at?: string | null
           cancel_deadline_hours?: number
           capacity_reviewed_at?: string | null
@@ -1852,6 +1916,8 @@ export type Database = {
           latitude?: number | null
           logo_url?: string | null
           longitude?: number | null
+          loyalty_l1?: number | null
+          loyalty_l2?: number | null
           max_advance_days?: number
           min_notice_hours?: number
           monthly_report?: boolean
@@ -2152,6 +2218,7 @@ export type Database = {
         }
         Returns: Json
       }
+      admin_digest_counts: { Args: { p_now?: string }; Returns: Json }
       admin_export: {
         Args: { p_filters?: Json; p_kind: string }
         Returns: Json
@@ -2172,6 +2239,7 @@ export type Database = {
           client_lang: string
           client_name: string | null
           client_phone: string | null
+          closed_reason: string | null
           confirmed_at: string | null
           cost: number | null
           created_at: string
@@ -2179,8 +2247,11 @@ export type Database = {
           decline_reason: string | null
           done_at: string | null
           extra_service_ids: string[]
+          followup_sent_at: string | null
           id: string
           inspection_started_at: string | null
+          loyalty_level: number | null
+          loyalty_percent: number | null
           note: string | null
           odometer: number | null
           offer_percent: number | null
@@ -2395,6 +2466,7 @@ export type Database = {
           client_lang: string
           client_name: string | null
           client_phone: string | null
+          closed_reason: string | null
           confirmed_at: string | null
           cost: number | null
           created_at: string
@@ -2402,8 +2474,11 @@ export type Database = {
           decline_reason: string | null
           done_at: string | null
           extra_service_ids: string[]
+          followup_sent_at: string | null
           id: string
           inspection_started_at: string | null
+          loyalty_level: number | null
+          loyalty_percent: number | null
           note: string | null
           odometer: number | null
           offer_percent: number | null
@@ -2461,10 +2536,12 @@ export type Database = {
         }[]
       }
       clean_text: { Args: { p: string }; Returns: string }
+      client_jobs_done: { Args: { p_client_id: string }; Returns: number }
       client_no_show_count: {
         Args: { p_client_id: string; p_days?: number }
         Returns: number
       }
+      close_stale_bookings: { Args: { p_now?: string }; Returns: number }
       company_check_consequences: {
         Args: { p_billing: Database["public"]["Tables"]["shop_billing"]["Row"] }
         Returns: {
@@ -2526,6 +2603,7 @@ export type Database = {
           client_lang: string
           client_name: string | null
           client_phone: string | null
+          closed_reason: string | null
           confirmed_at: string | null
           cost: number | null
           created_at: string
@@ -2533,8 +2611,11 @@ export type Database = {
           decline_reason: string | null
           done_at: string | null
           extra_service_ids: string[]
+          followup_sent_at: string | null
           id: string
           inspection_started_at: string | null
+          loyalty_level: number | null
+          loyalty_percent: number | null
           note: string | null
           odometer: number | null
           offer_percent: number | null
@@ -2570,6 +2651,7 @@ export type Database = {
           client_lang: string
           client_name: string | null
           client_phone: string | null
+          closed_reason: string | null
           confirmed_at: string | null
           cost: number | null
           created_at: string
@@ -2577,8 +2659,11 @@ export type Database = {
           decline_reason: string | null
           done_at: string | null
           extra_service_ids: string[]
+          followup_sent_at: string | null
           id: string
           inspection_started_at: string | null
+          loyalty_level: number | null
+          loyalty_percent: number | null
           note: string | null
           odometer: number | null
           offer_percent: number | null
@@ -2626,6 +2711,7 @@ export type Database = {
           client_lang: string
           client_name: string | null
           client_phone: string | null
+          closed_reason: string | null
           confirmed_at: string | null
           cost: number | null
           created_at: string
@@ -2633,8 +2719,11 @@ export type Database = {
           decline_reason: string | null
           done_at: string | null
           extra_service_ids: string[]
+          followup_sent_at: string | null
           id: string
           inspection_started_at: string | null
+          loyalty_level: number | null
+          loyalty_percent: number | null
           note: string | null
           odometer: number | null
           offer_percent: number | null
@@ -2700,6 +2789,7 @@ export type Database = {
           client_lang: string
           client_name: string | null
           client_phone: string | null
+          closed_reason: string | null
           confirmed_at: string | null
           cost: number | null
           created_at: string
@@ -2707,8 +2797,11 @@ export type Database = {
           decline_reason: string | null
           done_at: string | null
           extra_service_ids: string[]
+          followup_sent_at: string | null
           id: string
           inspection_started_at: string | null
+          loyalty_level: number | null
+          loyalty_percent: number | null
           note: string | null
           odometer: number | null
           offer_percent: number | null
@@ -2744,6 +2837,7 @@ export type Database = {
           client_lang: string
           client_name: string | null
           client_phone: string | null
+          closed_reason: string | null
           confirmed_at: string | null
           cost: number | null
           created_at: string
@@ -2751,8 +2845,11 @@ export type Database = {
           decline_reason: string | null
           done_at: string | null
           extra_service_ids: string[]
+          followup_sent_at: string | null
           id: string
           inspection_started_at: string | null
+          loyalty_level: number | null
+          loyalty_percent: number | null
           note: string | null
           odometer: number | null
           offer_percent: number | null
@@ -2792,6 +2889,7 @@ export type Database = {
         Returns: string
       }
       expire_quotes: { Args: never; Returns: number }
+      expire_unanswered_requests: { Args: { p_now?: string }; Returns: number }
       export_my_data: { Args: never; Returns: Json }
       fail: { Args: { p_code: string; p_params?: Json }; Returns: undefined }
       finish_history_report: {
@@ -2860,6 +2958,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      instant_for_client: { Args: { p_client_id: string }; Returns: boolean }
       invite_staff: {
         Args: { p_email: string; p_request_id: string; p_token: string }
         Returns: Json
@@ -2937,6 +3036,7 @@ export type Database = {
           client_lang: string
           client_name: string | null
           client_phone: string | null
+          closed_reason: string | null
           confirmed_at: string | null
           cost: number | null
           created_at: string
@@ -2944,8 +3044,11 @@ export type Database = {
           decline_reason: string | null
           done_at: string | null
           extra_service_ids: string[]
+          followup_sent_at: string | null
           id: string
           inspection_started_at: string | null
+          loyalty_level: number | null
+          loyalty_percent: number | null
           note: string | null
           odometer: number | null
           offer_percent: number | null
@@ -2981,6 +3084,7 @@ export type Database = {
           client_lang: string
           client_name: string | null
           client_phone: string | null
+          closed_reason: string | null
           confirmed_at: string | null
           cost: number | null
           created_at: string
@@ -2988,8 +3092,11 @@ export type Database = {
           decline_reason: string | null
           done_at: string | null
           extra_service_ids: string[]
+          followup_sent_at: string | null
           id: string
           inspection_started_at: string | null
+          loyalty_level: number | null
+          loyalty_percent: number | null
           note: string | null
           odometer: number | null
           offer_percent: number | null
@@ -3013,6 +3120,11 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      loyalty_level_for: { Args: { p_jobs: number }; Returns: number }
+      loyalty_percent_at: {
+        Args: { p_l1: number; p_l2: number; p_level: number }
+        Returns: number
+      }
       mark_history_report_paid: {
         Args: {
           p_amount: number
@@ -3034,6 +3146,7 @@ export type Database = {
           client_lang: string
           client_name: string | null
           client_phone: string | null
+          closed_reason: string | null
           confirmed_at: string | null
           cost: number | null
           created_at: string
@@ -3041,8 +3154,11 @@ export type Database = {
           decline_reason: string | null
           done_at: string | null
           extra_service_ids: string[]
+          followup_sent_at: string | null
           id: string
           inspection_started_at: string | null
+          loyalty_level: number | null
+          loyalty_percent: number | null
           note: string | null
           odometer: number | null
           offer_percent: number | null
@@ -3087,6 +3203,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      my_loyalty: { Args: never; Returns: Json }
       my_phone_verification: { Args: never; Returns: Json }
       my_referrals: { Args: never; Returns: Json }
       my_shop_id: { Args: never; Returns: string }
@@ -3206,6 +3323,7 @@ export type Database = {
           client_lang: string
           client_name: string | null
           client_phone: string | null
+          closed_reason: string | null
           confirmed_at: string | null
           cost: number | null
           created_at: string
@@ -3213,8 +3331,11 @@ export type Database = {
           decline_reason: string | null
           done_at: string | null
           extra_service_ids: string[]
+          followup_sent_at: string | null
           id: string
           inspection_started_at: string | null
+          loyalty_level: number | null
+          loyalty_percent: number | null
           note: string | null
           odometer: number | null
           offer_percent: number | null
@@ -3438,6 +3559,7 @@ export type Database = {
           client_lang: string
           client_name: string | null
           client_phone: string | null
+          closed_reason: string | null
           confirmed_at: string | null
           cost: number | null
           created_at: string
@@ -3445,8 +3567,11 @@ export type Database = {
           decline_reason: string | null
           done_at: string | null
           extra_service_ids: string[]
+          followup_sent_at: string | null
           id: string
           inspection_started_at: string | null
+          loyalty_level: number | null
+          loyalty_percent: number | null
           note: string | null
           odometer: number | null
           offer_percent: number | null
@@ -3498,6 +3623,19 @@ export type Database = {
         Returns: Json
       }
       schedule_notification_jobs: { Args: never; Returns: string }
+      search_card_extras: {
+        Args: { p_day?: string; p_shop_ids: string[] }
+        Returns: {
+          amenities: string[]
+          auto_confirm: boolean
+          free_date: string
+          free_slot: string
+          loyalty: number
+          loyalty_offered: boolean
+          response: string
+          shop_id: string
+        }[]
+      }
       search_cities: {
         Args: never
         Returns: {
@@ -3534,7 +3672,9 @@ export type Database = {
         }[]
       }
       search_words: { Args: { p_q: string }; Returns: string[] }
+      send_admin_digest: { Args: { p_now?: string }; Returns: boolean }
       send_appointment_reminders: { Args: { p_now?: string }; Returns: number }
+      send_booking_followups: { Args: { p_now?: string }; Returns: number }
       send_daily_digests: { Args: { p_now?: string }; Returns: number }
       send_doc_expiry_reminders: { Args: { p_today?: string }; Returns: number }
       send_message: {
@@ -3575,6 +3715,7 @@ export type Database = {
           client_lang: string
           client_name: string | null
           client_phone: string | null
+          closed_reason: string | null
           confirmed_at: string | null
           cost: number | null
           created_at: string
@@ -3582,8 +3723,11 @@ export type Database = {
           decline_reason: string | null
           done_at: string | null
           extra_service_ids: string[]
+          followup_sent_at: string | null
           id: string
           inspection_started_at: string | null
+          loyalty_level: number | null
+          loyalty_percent: number | null
           note: string | null
           odometer: number | null
           offer_percent: number | null
@@ -3607,6 +3751,11 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      send_request_daily_reminders: {
+        Args: { p_now?: string }
+        Returns: number
+      }
+      send_request_last_calls: { Args: { p_now?: string }; Returns: number }
       send_request_waiting_reminders: {
         Args: { p_now?: string }
         Returns: number
@@ -3648,6 +3797,7 @@ export type Database = {
           client_lang: string
           client_name: string | null
           client_phone: string | null
+          closed_reason: string | null
           confirmed_at: string | null
           cost: number | null
           created_at: string
@@ -3655,8 +3805,11 @@ export type Database = {
           decline_reason: string | null
           done_at: string | null
           extra_service_ids: string[]
+          followup_sent_at: string | null
           id: string
           inspection_started_at: string | null
+          loyalty_level: number | null
+          loyalty_percent: number | null
           note: string | null
           odometer: number | null
           offer_percent: number | null
@@ -3708,6 +3861,7 @@ export type Database = {
           client_lang: string
           client_name: string | null
           client_phone: string | null
+          closed_reason: string | null
           confirmed_at: string | null
           cost: number | null
           created_at: string
@@ -3715,8 +3869,11 @@ export type Database = {
           decline_reason: string | null
           done_at: string | null
           extra_service_ids: string[]
+          followup_sent_at: string | null
           id: string
           inspection_started_at: string | null
+          loyalty_level: number | null
+          loyalty_percent: number | null
           note: string | null
           odometer: number | null
           offer_percent: number | null
@@ -3747,6 +3904,7 @@ export type Database = {
         Returns: Json
       }
       shop_reports: { Args: never; Returns: Json }
+      shop_response_badge: { Args: { p_shop_id: string }; Returns: string }
       shop_seat_count: { Args: { p_shop_id: string }; Returns: number }
       shop_state: { Args: { p_shop_id: string }; Returns: string }
       shop_vehicle_file: { Args: { p_booking_id: string }; Returns: Json }
@@ -3766,6 +3924,7 @@ export type Database = {
           client_lang: string
           client_name: string | null
           client_phone: string | null
+          closed_reason: string | null
           confirmed_at: string | null
           cost: number | null
           created_at: string
@@ -3773,8 +3932,11 @@ export type Database = {
           decline_reason: string | null
           done_at: string | null
           extra_service_ids: string[]
+          followup_sent_at: string | null
           id: string
           inspection_started_at: string | null
+          loyalty_level: number | null
+          loyalty_percent: number | null
           note: string | null
           odometer: number | null
           offer_percent: number | null
@@ -3810,6 +3972,7 @@ export type Database = {
           client_lang: string
           client_name: string | null
           client_phone: string | null
+          closed_reason: string | null
           confirmed_at: string | null
           cost: number | null
           created_at: string
@@ -3817,8 +3980,11 @@ export type Database = {
           decline_reason: string | null
           done_at: string | null
           extra_service_ids: string[]
+          followup_sent_at: string | null
           id: string
           inspection_started_at: string | null
+          loyalty_level: number | null
+          loyalty_percent: number | null
           note: string | null
           odometer: number | null
           offer_percent: number | null
@@ -3971,6 +4137,7 @@ export type Database = {
           client_lang: string
           client_name: string | null
           client_phone: string | null
+          closed_reason: string | null
           confirmed_at: string | null
           cost: number | null
           created_at: string
@@ -3978,8 +4145,11 @@ export type Database = {
           decline_reason: string | null
           done_at: string | null
           extra_service_ids: string[]
+          followup_sent_at: string | null
           id: string
           inspection_started_at: string | null
+          loyalty_level: number | null
+          loyalty_percent: number | null
           note: string | null
           odometer: number | null
           offer_percent: number | null

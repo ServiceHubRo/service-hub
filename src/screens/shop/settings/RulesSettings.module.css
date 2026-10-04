@@ -38,3 +38,9 @@
   flex-wrap: wrap;
   gap: 6px;
 }
+
+.loyaltyLabel {
+  margin: 0 0 6px;
+  font-size: 14px;
+  font-weight: 600;
+}
