@@ -50,13 +50,15 @@ test.describe("loyal clients", () => {
     await expect(
       l1.getByRole("button", { name: "Fără reducere", pressed: true }),
     ).toBeVisible();
-    await l1.getByRole("button", { name: "-10%" }).click();
+    await l1.getByRole("button", { name: "-5%" }).click();
     // Level 2 can never give less than level 1.
-    await expect(l2.getByRole("button", { name: "-5%" })).toHaveCount(0);
     await expect(
-      l2.getByRole("button", { name: "Ca la Nivelul 1 (-10%)", pressed: true }),
+      l2.getByRole("button", { name: "-5%", exact: true }),
+    ).toHaveCount(0);
+    await expect(
+      l2.getByRole("button", { name: "Ca la Nivelul 1 (-5%)", pressed: true }),
     ).toBeVisible();
-    await l2.getByRole("button", { name: "-15%" }).click();
+    await l2.getByRole("button", { name: "-7%" }).click();
     await page.getByRole("button", { name: "Salvează regulile" }).click();
     await expect(page.getByRole("button", { name: "✓ Salvat" })).toBeVisible();
     await l2.scrollIntoViewIfNeeded();
@@ -65,7 +67,7 @@ test.describe("loyal clients", () => {
     const [saved] = await serviceRest<
       { loyalty_l1: number; loyalty_l2: number }[]
     >(`shops?id=eq.${shopId}&select=loyalty_l1,loyalty_l2`, "GET");
-    expect(saved).toEqual({ loyalty_l1: 10, loyalty_l2: 15 });
+    expect(saved).toEqual({ loyalty_l1: 5, loyalty_l2: 7 });
 
     // A client without finished jobs: no level yet, the shop's discounts explained.
     const client = await createUser("client");
@@ -90,7 +92,7 @@ test.describe("loyal clients", () => {
     await card.getByRole("link").first().click();
     await expect(
       c.getByText(
-        "-10% la manoperă de la 2 lucrări pe Service-Hub, -15% de la 5 lucrări.",
+        "-5% la manoperă de la 2 lucrări pe Service-Hub, -7% de la 5 lucrări.",
       ),
     ).toBeVisible();
 
@@ -123,11 +125,11 @@ test.describe("loyal clients", () => {
 
     // Search card, shop page, step 4: the client's own discount.
     await c.goto(`/c/cauta?q=${encodeURIComponent(shopName)}`);
-    await expect(card).toContainText("-10% la manoperă, client fidel");
+    await expect(card).toContainText("-5% la manoperă, client fidel");
     await shot(c, "t28c-search-card", name());
     await card.getByRole("link").first().click();
     await expect(
-      c.getByText("ai -10% la manoperă aici.", { exact: false }),
+      c.getByText("ai -5% la manoperă aici.", { exact: false }),
     ).toBeVisible();
     await expectNoHorizontalScroll(c);
     await shot(c, "t28c-shop-page", name());
@@ -146,7 +148,7 @@ test.describe("loyal clients", () => {
     await c.getByLabel("Model").fill("Focus");
     await expect(
       c.getByText(
-        "Ca client fidel, ai -10% la manoperă la această programare.",
+        "Ca client fidel, ai -5% la manoperă la această programare.",
         { exact: false },
       ),
     ).toBeVisible();
@@ -164,12 +166,12 @@ test.describe("loyal clients", () => {
       `bookings?shop_id=eq.${shopId}&status=eq.pending&select=loyalty_percent,loyalty_level`,
       "GET",
     );
-    expect(booking).toEqual({ loyalty_percent: 10, loyalty_level: 1 });
+    expect(booking).toEqual({ loyalty_percent: 5, loyalty_level: 1 });
 
     await c.getByRole("link", { name: "Vezi programările" }).click();
     await expect(
       c.locator("li").filter({ hasText: "Ford Focus" }),
-    ).toContainText("Client fidel: -10% la manoperă");
+    ).toContainText("Client fidel: -5% la manoperă");
 
     // In English too.
     await c.goto("/c/cont/fidelitate");
@@ -189,7 +191,7 @@ test.describe("loyal clients", () => {
     await page.goto("/s/programari");
     const shopCard = page.locator("li").filter({ hasText: "Ford Focus" });
     await expect(shopCard).toContainText(
-      "Client fidel (Nivelul 1): i-ai promis -10% la manoperă",
+      "Client fidel (Nivelul 1): i-ai promis -5% la manoperă",
     );
     await expectNoHorizontalScroll(page);
     await shot(page, "t28c-shop-booking", name());

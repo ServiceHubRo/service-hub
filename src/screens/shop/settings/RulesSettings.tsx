@@ -23,8 +23,8 @@ const MAX_FEE = 10000;
 /** The discounts a shop can promise new clients (the database allows exactly these). */
 const OFFERS = [5, 10, 15, 20, 25, 30];
 /** Loyal clients' discounts (T28c), as the database allows them. */
-const LOYALTY_L1 = [5, 10];
-const LOYALTY_L2 = [5, 10, 15];
+const LOYALTY_L1 = [3, 5];
+const LOYALTY_L2 = [5, 7];
 
 /** The preset choices plus the shop's current value when it is not one of them. */
 const withCurrent = (presets: number[], current: number) => [...new Set([...presets, current])].sort((a, b) => a - b);
@@ -64,7 +64,8 @@ const toRules = (shop: Shop): Rules => ({
   offer: shop.new_client_offer,
   instant: shop.auto_confirm,
   l1: shop.loyalty_l1,
-  l2: shop.loyalty_l2,
+  // Level 2 equal to level 1 is the same as "like level 1".
+  l2: shop.loyalty_l2 === shop.loyalty_l1 ? null : shop.loyalty_l2,
 });
 
 /**
@@ -259,8 +260,8 @@ export function RulesSettings() {
               {t('rules.loyalty.none')}
             </Chip>
             {LOYALTY_L1.map((n) => (
-              // Level 2 never gets less than level 1: it follows up when needed.
-              <Chip key={n} selected={rules.l1 === n} onClick={() => setRules((r) => ({ ...r, l1: n, l2: r.l2 !== null && r.l2 < n ? n : r.l2 }))}>
+              // Level 2 never gets less than level 1: it falls back to "like level 1" when needed.
+              <Chip key={n} selected={rules.l1 === n} onClick={() => setRules((r) => ({ ...r, l1: n, l2: r.l2 !== null && r.l2 <= n ? null : r.l2 }))}>
                 {t('rules.offer.value', { n })}
               </Chip>
             ))}
@@ -274,7 +275,7 @@ export function RulesSettings() {
             <Chip selected={rules.l2 === null} onClick={() => set('l2', null)}>
               {rules.l1 !== null ? t('rules.loyalty.same', { n: rules.l1 }) : t('rules.loyalty.none')}
             </Chip>
-            {LOYALTY_L2.filter((n) => rules.l1 === null || n >= rules.l1).map((n) => (
+            {LOYALTY_L2.filter((n) => rules.l1 === null || n > rules.l1).map((n) => (
               <Chip key={n} selected={rules.l2 === n} onClick={() => set('l2', n)}>
                 {t('rules.offer.value', { n })}
               </Chip>
