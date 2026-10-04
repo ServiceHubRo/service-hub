@@ -1,4 +1,4 @@
-import { Award, CreditCard, Download, FileCheck, FileText, Heart, Landmark, History, LifeBuoy, ListTree, Megaphone, ScrollText, Settings, SlidersHorizontal, Star } from 'lucide-react';
+import { CreditCard, Download, FileCheck, FileText, Heart, Landmark, History, LifeBuoy, ListTree, Megaphone, ScrollText, Settings, SlidersHorizontal, Star } from 'lucide-react';
 import { useCallback, useRef, useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import type { ShellOutletContext } from '../../app/AppShell';
@@ -20,7 +20,7 @@ import {
   ADMIN_SETTINGS_PATH,
   ADMIN_SUBSCRIPTIONS_PATH,
 } from '../admin/paths';
-import { FAVORITES_PATH, LOYALTY_PATH, MY_REPORTS_PATH, VEHICLE_HISTORY_PICK_PATH } from '../client/paths';
+import { FAVORITES_PATH, MY_REPORTS_PATH, VEHICLE_HISTORY_PICK_PATH } from '../client/paths';
 import { REVIEWS_PATH } from '../shop/paths';
 import { SETTINGS_PATH } from '../shop/settings/paths';
 import { OwnerTiles } from '../shop/OwnerTiles';
@@ -80,7 +80,6 @@ export function AccountScreen({ role }: { role: Role }) {
             <Tile to={VEHICLE_HISTORY_PICK_PATH} icon={History} label={t('vh.title')} hint={t('vh.tileHint')} />
             <Tile to={MY_REPORTS_PATH} icon={FileCheck} label={t('reports.title')} hint={t('reports.tileHint')} />
             <Tile to={FAVORITES_PATH} icon={Heart} label={t('favorites.title')} hint={t('favorites.hint')} />
-            <Tile to={LOYALTY_PATH} icon={Award} label={t('loyalty.screen')} hint={t('loyalty.tileHint')} />
           </div>
         </>
       )}

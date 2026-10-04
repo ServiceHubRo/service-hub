@@ -116,7 +116,6 @@ function ShopDetails({ page, day, onFavorite }: { page: ShopPageData; day: strin
   const distance = distanceTo(coords, shop);
   const reviewsRef = useRef<HTMLHeadingElement>(null);
   const hasReviews = page.reviews.length > 0;
-  const loyaltyText = loyaltyExplain(t, page.loyalty);
   const routerHash = useRouterLocation().hash;
 
   /** Straight to the reviews: the heading takes the focus, so a screen reader starts there too. */
@@ -198,16 +197,6 @@ function ShopDetails({ page, day, onFavorite }: { page: ShopPageData; day: strin
       {page.bookable && page.offer !== null && (
         <OfferNote>
           <strong>{t('offer.title')}</strong> · {t('offer.page', { n: page.offer })}
-        </OfferNote>
-      )}
-      {page.bookable && page.offer === null && page.loyalty?.yours != null && (
-        <OfferNote>
-          <strong>{t('loyalty.title')}</strong> · {t('loyalty.page', { n: page.loyalty.yours })}
-        </OfferNote>
-      )}
-      {page.bookable && page.offer === null && page.loyalty?.yours == null && loyaltyText && (
-        <OfferNote>
-          <strong>{t('loyalty.offered')}</strong> · {loyaltyText}
         </OfferNote>
       )}
 
@@ -392,13 +381,4 @@ function ServiceGroups({ services }: { services: ShopPageService[] }) {
 /** Links typed without a scheme ("atelier.ro") open as https. */
 function websiteUrl(site: string): string {
   return /^https?:\/\//i.test(site) ? site : `https://${site}`;
-}
-
-/** What a shop gives loyal clients, for someone without a level there yet (T28c). */
-function loyaltyExplain(t: ReturnType<typeof useI18n>['t'], loyalty: ShopPageData['loyalty'] | undefined): string | null {
-  const l1 = loyalty?.l1 ?? null;
-  const l2 = loyalty?.l2 ?? null;
-  if (l1 === null) return l2 === null ? null : t('loyalty.explainL2', { n: l2 });
-  // Level 2 falls back to level 1's discount when the shop set only that.
-  return l2 === null || l2 === l1 ? t('loyalty.explainOne', { n: l1 }) : t('loyalty.explain', { l1, l2 });
 }

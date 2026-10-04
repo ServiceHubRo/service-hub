@@ -1,8 +1,6 @@
 /** Client routes of the search area (T06). */
 export const SEARCH_PATH = '/c/cauta';
 export const FAVORITES_PATH = '/c/cont/favorite';
-/** Cont → Fidelitate (T28c). */
-export const LOYALTY_PATH = '/c/cont/fidelitate';
 export const GARAGE_PATH = '/c/garaj';
 export const NEW_CAR_PATH = '/c/garaj/nou';
 export const BOOKINGS_PATH = '/c/programari';

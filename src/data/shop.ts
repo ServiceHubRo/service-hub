@@ -41,8 +41,6 @@ export type ShopUpdate = Partial<
     | 'new_client_offer'
     | 'auto_confirm'
     | 'amenities'
-    | 'loyalty_l1'
-    | 'loyalty_l2'
     | 'sms_on_new_booking'
     | 'daily_digest'
     | 'monthly_report'
