@@ -365,3 +365,15 @@ export function xlsxText(file: Uint8Array): string {
     })
     .join('\r\n');
 }
+
+/** Caută: opens the "Filtre" panel (every filter lives there). */
+export async function openFilters(page: Page) {
+  await page.getByRole('button', { name: /^(Filtre|Filters)/ }).click();
+  await expect(page.getByRole('dialog', { name: /^(Filtre|Filters)$/ })).toBeVisible();
+}
+
+/** Caută: closes the "Filtre" panel with its "Arată …" button. */
+export async function closeFilters(page: Page) {
+  await page.getByRole('dialog').getByRole('button', { name: /^(Arată|Show|Gata|Done)/ }).click();
+  await expect(page.getByRole('dialog')).toBeHidden();
+}

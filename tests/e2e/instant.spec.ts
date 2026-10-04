@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { BACKEND, PASSWORD, createBookableShop, createUser, expectNoHorizontalScroll, rpcAs, serviceRest, shot, signIn, userIdOf } from './support';
+import { BACKEND, PASSWORD, closeFilters, createBookableShop, createUser, expectNoHorizontalScroll, openFilters, rpcAs, serviceRest, shot, signIn, userIdOf } from './support';
 
 // T28a — "like Booking, for car shops": the owner turns on instant confirmation; a client sees in
 // search which shops are free on a day and which confirm at once, opens the shop on its first
@@ -57,11 +57,13 @@ test.describe('instant booking', () => {
     const card = c.locator('main li').filter({ hasText: shopName });
     await expect(card).toContainText('Confirmare instantă');
     await expect(card).toContainText(/Liber .+, de la \d{2}:\d{2}/);
-    await c.getByRole('button', { name: 'Confirmare instantă' }).click();
-    await expect(card).toBeVisible();
+    await openFilters(c);
+    await c.getByRole('button', { name: 'Confirmare instantă', exact: true }).click();
     await c.getByRole('button', { name: 'Altă zi' }).click();
     await c.getByLabel('Ziua').fill(free.free_date);
     await expect(c).toHaveURL(new RegExp(`zi=${free.free_date}`));
+    await closeFilters(c);
+    await expect(c.getByRole('button', { name: 'Scoate filtrul Confirmare instantă' })).toBeVisible();
     await expect(card).toContainText(`de la ${free.free_slot}`);
     await expectNoHorizontalScroll(c);
     await shot(c, 't28-search-day', name());

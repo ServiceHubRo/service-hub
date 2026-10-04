@@ -47,7 +47,7 @@ A user has exactly one role. The role decides the entire interface. A client can
 
 ### 3.1 Search (home)
 - One search field matching shop name, city, or any service the shop offers. Case- and diacritic-insensitive.
-- Category filter chips (one per catalog category) + city filter chips (derived from actual shops).
+- A "Filtre" button (with the number of filters on) opens one panel: day, instant confirmation, favorites, category (one chip per catalog category), city (derived from actual shops), facilities and, with location on, the order. Filters on show above the list as chips with ✕, plus "Șterge filtrele". "Listă · Hartă" sits next to the button.
 - Result list, **one shop per row**, showing: logo/initials, name, star rating, review count, city, distance (if location known), service count, and "Offers: X" when matched by service.
 - Result count line.
 - Ranking: weighted rating (see §6). Filters narrow; they never reorder.
