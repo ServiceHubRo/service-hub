@@ -1,8 +1,8 @@
-import { CalendarDays, Heart, List, Map as MapIcon, SearchX, X, Zap } from 'lucide-react';
-import { lazy, Suspense, useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
+import { CalendarDays, Heart, List, Map as MapIcon, SearchX, SlidersHorizontal, X, Zap } from 'lucide-react';
+import { lazy, Suspense, useCallback, useEffect, useId, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '../../../components/Button';
-import { Chip, ChipRow } from '../../../components/Chip';
+import { Chip } from '../../../components/Chip';
 import { EmptyState } from '../../../components/EmptyState';
 import { Field } from '../../../components/Field';
 import { LoadError } from '../../../components/LoadError';
@@ -48,8 +48,9 @@ const ShopsMap = lazy(() => import('../../../components/map/ShopsMap'));
 const cache = new Map<string, ShopSearchResult[]>();
 
 /**
- * Caută (FR §3.1; P11, P16, P16d): one field for name, city or service; category and city chips;
- * favorites; "Aproape de tine" when the client shares their location. The order is the weighted
+ * Caută (FR §3.1; P11, P16, P16d): one field for name, city or service; everything else (day,
+ * instant confirmation, favorites, category, city, facilities, order) sits in the "Filtre" panel,
+ * and what is on shows above the list with its own ✕; "Aproape de tine" when the client shares their location. The order is the weighted
  * rating from the database — filters only narrow it, distance is a separate section and sort.
  * The filters live in the address (?q=&cat=&oras=&fav=1&sort=aproape&zi=&instant=1&fac=), so Back restores
  * them. A day (T28a: azi, maine or a date) keeps only shops with a free place that day; "Confirmare
@@ -196,6 +197,46 @@ export function SearchScreen() {
   }
 
   const cityName = cities?.find((c) => fold(c.city) === fold(city))?.city ?? city;
+
+  // ------------------------------------------------------------------ the filters panel
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const dialogRef = useRef<HTMLDialogElement>(null);
+  useEffect(() => {
+    const d = dialogRef.current;
+    if (!d) return;
+    if (filtersOpen && !d.open) d.showModal?.();
+    if (!filtersOpen && d.open) d.close();
+  }, [filtersOpen]);
+
+  /** What narrows or reorders the list now, each with its own ✕ above the results. */
+  const categoryName = (() => {
+    const c = meta.status === 'ready' ? meta.data.categories.find((x) => x.key === category) : undefined;
+    return c ? (lang === 'ro' ? c.name_ro : c.name_en) : null;
+  })();
+  const active: { key: string; label: string }[] = [];
+  if (day) {
+    active.push({
+      key: 'zi',
+      label: dayParam === 'azi' ? t('search.when.today') : dayParam === 'maine' ? t('search.when.tomorrow') : formatDate(lang, day),
+    });
+  }
+  if (instantOnly) active.push({ key: 'instant', label: t('instant.badge') });
+  if (favOnly) active.push({ key: 'fav', label: t('search.favorites') });
+  if (category && categoryName) active.push({ key: 'cat', label: categoryName });
+  if (city) active.push({ key: 'oras', label: cityName });
+  for (const a of wanted) active.push({ key: `fac:${a}`, label: t(`amenity.${a}` as MessageKey) });
+  if (byDistance && coords) active.push({ key: 'sort', label: t('search.sort.nearest') });
+
+  function removeFilter(key: string) {
+    if (key.startsWith('fac:')) {
+      const next = wanted.filter((x) => x !== key.slice(4));
+      setParam({ fac: next.length ? next.join(',') : null });
+      return;
+    }
+    if (key === 'zi') setPickDay(false);
+    if (key === 'oras') autoCity.current = null;
+    setParam({ [key]: null });
+  }
   const countText = city
     ? t('search.countIn', { count: plural(lang, 'unit.shops', list.length), city: cityName })
     : plural(lang, 'unit.shops', list.length);
@@ -219,138 +260,206 @@ export function SearchScreen() {
         clearLabel={t('search.clearQuery')}
       />
 
-      {meta.status === 'error' && <LoadError message={t('search.loadError')} onRetry={reloadMeta} />}
-      {meta.status === 'ready' && (
-        <div className={styles.filters}>
-          <ChipRow label={t('search.categories')}>
-            <Chip selected={!category} onClick={() => setParam({ cat: null })}>
-              {t('search.allCategories')}
-            </Chip>
-            {meta.data.categories.map((c) => (
-              <Chip key={c.key} selected={category === c.key} onClick={() => setParam({ cat: category === c.key ? null : c.key })}>
-                {lang === 'ro' ? c.name_ro : c.name_en}
-              </Chip>
-            ))}
-          </ChipRow>
-          {meta.data.cities.length > 0 && (
-            <ChipRow label={t('search.cities')}>
-              <Chip
-                selected={!city}
-                onClick={() => {
-                  autoCity.current = null;
-                  setParam({ oras: null });
-                }}
-              >
-                {t('search.allCities')}
-              </Chip>
-              {meta.data.cities.map((c) => {
-                const on = fold(city) === fold(c.city);
-                return (
-                  <Chip
-                    key={c.city}
-                    selected={on}
-                    onClick={() => {
-                      autoCity.current = null;
-                      setParam({ oras: on ? null : c.city });
-                    }}
-                  >
-                    {c.city}
-                  </Chip>
-                );
-              })}
-            </ChipRow>
+      <div className={styles.toolbar}>
+        <button
+          type="button"
+          className={`${styles.filtersButton} ${active.length > 0 ? styles.filtersButtonOn : ''}`}
+          onClick={() => setFiltersOpen(true)}
+          aria-haspopup="dialog"
+        >
+          <SlidersHorizontal size={16} aria-hidden="true" />
+          {t('search.filters')}
+          {active.length > 0 && <span className={styles.badge}>{active.length}</span>}
+        </button>
+        <div className={styles.viewToggle} role="group" aria-label={t('search.view')}>
+          <Chip selected={!asMap} onClick={() => setParam({ vedere: null })}>
+            <List size={14} aria-hidden="true" />
+            {t('search.view.list')}
+          </Chip>
+          <Chip selected={asMap} onClick={() => setParam({ vedere: 'harta' })}>
+            <MapIcon size={14} aria-hidden="true" />
+            {t('search.view.map')}
+          </Chip>
+        </div>
+      </div>
+
+      {active.length > 0 && (
+        <div className={styles.active} role="group" aria-label={t('search.filters.active')}>
+          {active.map((f) => (
+            <button
+              key={f.key}
+              type="button"
+              className={styles.activeChip}
+              onClick={() => removeFilter(f.key)}
+              aria-label={t('search.filters.remove', { name: f.label })}
+            >
+              {f.label}
+              <X size={14} aria-hidden="true" />
+            </button>
+          ))}
+          {filtersOn && (
+            <button type="button" className={styles.clearAll} onClick={clearFilters}>
+              {t('search.clearFilters')}
+            </button>
           )}
-          <ChipRow label={t('search.when')}>
-            <Chip
-              selected={!day && !pickDay}
-              onClick={() => {
-                setPickDay(false);
-                setParam({ zi: null });
-              }}
-            >
-              {t('search.when.any')}
-            </Chip>
-            <Chip
-              selected={dayParam === 'azi'}
-              onClick={() => {
-                setPickDay(false);
-                setParam({ zi: dayParam === 'azi' ? null : 'azi' });
-              }}
-            >
-              {t('search.when.today')}
-            </Chip>
-            <Chip
-              selected={dayParam === 'maine'}
-              onClick={() => {
-                setPickDay(false);
-                setParam({ zi: dayParam === 'maine' ? null : 'maine' });
-              }}
-            >
-              {t('search.when.tomorrow')}
-            </Chip>
-            <Chip selected={datePicked || pickDay} onClick={() => setPickDay((o) => !o)}>
-              <CalendarDays size={14} aria-hidden="true" />
-              {datePicked && day ? formatDate(lang, day) : t('search.when.pick')}
-            </Chip>
-            <Chip selected={instantOnly} onClick={() => setParam({ instant: instantOnly ? null : '1' })}>
-              <Zap size={14} aria-hidden="true" />
-              {t('instant.badge')}
-            </Chip>
-          </ChipRow>
-          {(pickDay || datePicked) && (
-            <Field
-              className={styles.dayField}
-              type="date"
-              label={t('search.when.date')}
-              min={ymdInBucharest(new Date())}
-              value={datePicked && day ? day : ''}
-              onChange={(e) => setParam({ zi: e.target.value || null })}
-            />
-          )}
-          <ChipRow label={t('search.amenities')}>
-            {AMENITIES.map((a) => {
-              const on = wanted.includes(a);
-              const Icon = AMENITY_ICONS[a];
-              return (
-                <Chip
-                  key={a}
-                  selected={on}
-                  onClick={() => {
-                    const next = on ? wanted.filter((x) => x !== a) : AMENITIES.filter((x) => x === a || wanted.includes(x));
-                    setParam({ fac: next.length ? next.join(',') : null });
-                  }}
-                >
-                  <Icon size={14} aria-hidden="true" />
-                  {t(`amenity.${a}` as MessageKey)}
-                </Chip>
-              );
-            })}
-          </ChipRow>
-          <ChipRow label={t('search.more')}>
-            <Chip selected={favOnly} onClick={() => setParam({ fav: favOnly ? null : '1' })}>
-              <Heart size={14} aria-hidden="true" className={favOnly ? styles.heartOn : undefined} />
-              {t('search.favorites')}
-            </Chip>
-            {filtersOn && (
-              <Chip onClick={clearFilters}>
-                <X size={14} aria-hidden="true" />
-                {t('search.clearFilters')}
-              </Chip>
-            )}
-            {coords && (
-              <>
-                <span className={styles.divider} aria-hidden="true" />
-                <Chip selected={!byDistance} onClick={() => setParam({ sort: null })}>
-                  {t('search.sort.recommended')}
-                </Chip>
-                <Chip selected={byDistance} onClick={() => setParam({ sort: 'aproape' })}>
-                  {t('search.sort.nearest')}
-                </Chip>
-              </>
-            )}
-          </ChipRow>
         </div>
       )}
+
+      {meta.status === 'error' && <LoadError message={t('search.loadError')} onRetry={reloadMeta} />}
+
+      <dialog
+        ref={dialogRef}
+        className={styles.sheet}
+        aria-labelledby="filters-title"
+        onClose={() => setFiltersOpen(false)}
+        onClick={(e) => {
+          if (e.target === e.currentTarget) setFiltersOpen(false);
+        }}
+      >
+        <div className={styles.sheetHead}>
+          <h2 id="filters-title" className={styles.sheetTitle}>
+            {t('search.filters')}
+          </h2>
+          <button type="button" className={styles.sheetClose} onClick={() => setFiltersOpen(false)} aria-label={t('search.filters.close')}>
+            <X size={20} aria-hidden="true" />
+          </button>
+        </div>
+        <div className={styles.sheetBody}>
+          {meta.status === 'loading' && <SkeletonList count={2} />}
+          {meta.status === 'ready' && (
+            <>
+              <FilterGroup title={t('search.when')}>
+                <Chip
+                  selected={!day && !pickDay}
+                  onClick={() => {
+                    setPickDay(false);
+                    setParam({ zi: null });
+                  }}
+                >
+                  {t('search.when.any')}
+                </Chip>
+                <Chip
+                  selected={dayParam === 'azi'}
+                  onClick={() => {
+                    setPickDay(false);
+                    setParam({ zi: dayParam === 'azi' ? null : 'azi' });
+                  }}
+                >
+                  {t('search.when.today')}
+                </Chip>
+                <Chip
+                  selected={dayParam === 'maine'}
+                  onClick={() => {
+                    setPickDay(false);
+                    setParam({ zi: dayParam === 'maine' ? null : 'maine' });
+                  }}
+                >
+                  {t('search.when.tomorrow')}
+                </Chip>
+                <Chip selected={datePicked || pickDay} onClick={() => setPickDay((o) => !o)}>
+                  <CalendarDays size={14} aria-hidden="true" />
+                  {datePicked && day ? formatDate(lang, day) : t('search.when.pick')}
+                </Chip>
+              </FilterGroup>
+              {(pickDay || datePicked) && (
+                <Field
+                  className={styles.dayField}
+                  type="date"
+                  label={t('search.when.date')}
+                  min={ymdInBucharest(new Date())}
+                  value={datePicked && day ? day : ''}
+                  onChange={(e) => setParam({ zi: e.target.value || null })}
+                />
+              )}
+              <FilterGroup title={t('search.more')}>
+                <Chip selected={instantOnly} onClick={() => setParam({ instant: instantOnly ? null : '1' })}>
+                  <Zap size={14} aria-hidden="true" />
+                  {t('instant.badge')}
+                </Chip>
+                <Chip selected={favOnly} onClick={() => setParam({ fav: favOnly ? null : '1' })}>
+                  <Heart size={14} aria-hidden="true" className={favOnly ? styles.heartOn : undefined} />
+                  {t('search.favorites')}
+                </Chip>
+              </FilterGroup>
+              <FilterGroup title={t('search.categories')}>
+                <Chip selected={!category} onClick={() => setParam({ cat: null })}>
+                  {t('search.allCategories')}
+                </Chip>
+                {meta.data.categories.map((c) => (
+                  <Chip key={c.key} selected={category === c.key} onClick={() => setParam({ cat: category === c.key ? null : c.key })}>
+                    {lang === 'ro' ? c.name_ro : c.name_en}
+                  </Chip>
+                ))}
+              </FilterGroup>
+              {meta.data.cities.length > 0 && (
+                <FilterGroup title={t('search.cities')}>
+                  <Chip
+                    selected={!city}
+                    onClick={() => {
+                      autoCity.current = null;
+                      setParam({ oras: null });
+                    }}
+                  >
+                    {t('search.allCities')}
+                  </Chip>
+                  {meta.data.cities.map((c) => {
+                    const on = fold(city) === fold(c.city);
+                    return (
+                      <Chip
+                        key={c.city}
+                        selected={on}
+                        onClick={() => {
+                          autoCity.current = null;
+                          setParam({ oras: on ? null : c.city });
+                        }}
+                      >
+                        {c.city}
+                      </Chip>
+                    );
+                  })}
+                </FilterGroup>
+              )}
+              <FilterGroup title={t('search.amenities')}>
+                {AMENITIES.map((a) => {
+                  const on = wanted.includes(a);
+                  const Icon = AMENITY_ICONS[a];
+                  return (
+                    <Chip
+                      key={a}
+                      selected={on}
+                      onClick={() => {
+                        const next = on ? wanted.filter((x) => x !== a) : AMENITIES.filter((x) => x === a || wanted.includes(x));
+                        setParam({ fac: next.length ? next.join(',') : null });
+                      }}
+                    >
+                      <Icon size={14} aria-hidden="true" />
+                      {t(`amenity.${a}` as MessageKey)}
+                    </Chip>
+                  );
+                })}
+              </FilterGroup>
+              {coords && (
+                <FilterGroup title={t('search.sortBy')}>
+                  <Chip selected={!byDistance} onClick={() => setParam({ sort: null })}>
+                    {t('search.sort.recommended')}
+                  </Chip>
+                  <Chip selected={byDistance} onClick={() => setParam({ sort: 'aproape' })}>
+                    {t('search.sort.nearest')}
+                  </Chip>
+                </FilterGroup>
+              )}
+            </>
+          )}
+        </div>
+        <div className={styles.sheetFoot}>
+          <Button variant="ghost" onClick={clearFilters} disabled={!filtersOn}>
+            {t('search.clearFilters')}
+          </Button>
+          <Button variant="primary" onClick={() => setFiltersOpen(false)}>
+            {status === 'ready' || results ? t('search.filters.show', { count: plural(lang, 'unit.shops', list.length) }) : t('search.filters.done')}
+          </Button>
+        </div>
+      </dialog>
 
       {status === 'error' && <LoadError message={t('search.resultsError')} onRetry={() => setAttempt((a) => a + 1)} />}
       {status !== 'error' && !results && <SkeletonList />}
@@ -360,16 +469,6 @@ export function SearchScreen() {
             <p className={styles.count} role="status">
               {countText}
             </p>
-            <div className={styles.viewToggle} role="group" aria-label={t('search.view')}>
-              <Chip selected={!asMap} onClick={() => setParam({ vedere: null })}>
-                <List size={14} aria-hidden="true" />
-                {t('search.view.list')}
-              </Chip>
-              <Chip selected={asMap} onClick={() => setParam({ vedere: 'harta' })}>
-                <MapIcon size={14} aria-hidden="true" />
-                {t('search.view.map')}
-              </Chip>
-            </div>
             <RankingToggle open={explainOpen} onToggle={() => setExplainOpen((o) => !o)} controls={explainId} />
           </div>
           {explainOpen && <RankingExplanation id={explainId} />}
@@ -465,5 +564,20 @@ export function SearchScreen() {
         </div>
       )}
     </div>
+  );
+}
+
+/** One titled group of chips in the filters panel; the chips wrap instead of scrolling sideways. */
+function FilterGroup({ title, children }: { title: string; children: ReactNode }) {
+  const id = useId();
+  return (
+    <section className={styles.group} aria-labelledby={id}>
+      <h3 id={id} className={styles.groupTitle}>
+        {title}
+      </h3>
+      <div className={styles.groupChips} role="group" aria-labelledby={id}>
+        {children}
+      </div>
+    </section>
   );
 }

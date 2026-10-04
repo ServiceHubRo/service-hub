@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { BACKEND, PASSWORD, createBookableShop, createUser, expectNoHorizontalScroll, serviceRest, shot, signIn, userIdOf } from './support';
+import { BACKEND, PASSWORD, closeFilters, createBookableShop, createUser, expectNoHorizontalScroll, openFilters, serviceRest, shot, signIn, userIdOf } from './support';
 
 // T28b — the shop's window: photos and facilities set by the owner, seen by clients on the shop
 // page; facility filters and a map in search; the "answers quickly" note.
@@ -96,11 +96,15 @@ test.describe('the shop window', () => {
     await c.goto(`/c/cauta?q=${encodeURIComponent(shopName)}`);
     const card = c.locator('main li').filter({ hasText: shopName });
     await expect(card).toContainText('Răspunde de obicei în mai puțin de o oră');
-    await c.getByRole('button', { name: 'Mașină la schimb' }).click();
+    await openFilters(c);
+    await c.getByRole('button', { name: 'Mașină la schimb', exact: true }).click();
+    await closeFilters(c);
     await expect(card).toBeVisible();
-    await c.getByRole('button', { name: 'Cafea și apă' }).click();
+    await openFilters(c);
+    await c.getByRole('button', { name: 'Cafea și apă', exact: true }).click();
+    await closeFilters(c);
     await expect(card).toHaveCount(0);
-    await c.getByRole('button', { name: 'Cafea și apă' }).click();
+    await c.getByRole('button', { name: 'Scoate filtrul Cafea și apă' }).click();
     await expect(card).toBeVisible();
 
     await c.getByRole('button', { name: 'Hartă' }).click();

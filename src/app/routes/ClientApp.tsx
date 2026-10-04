@@ -8,7 +8,6 @@ import { CarFormScreen } from '../../screens/client/garage/CarFormScreen';
 import { GarageScreen } from '../../screens/client/garage/GarageScreen';
 import { VehicleHistoryScreen } from '../../screens/client/history/VehicleHistoryScreen';
 import { VehiclePickScreen } from '../../screens/client/history/VehiclePickScreen';
-import { LoyaltyScreen } from '../../screens/client/loyalty/LoyaltyScreen';
 import { MyReportsScreen } from '../../screens/client/report/MyReportsScreen';
 import { ReportPreviewScreen } from '../../screens/client/report/ReportPreviewScreen';
 import { SearchScreen } from '../../screens/client/search/SearchScreen';
@@ -49,7 +48,6 @@ export default function ClientApp() {
         <Route path="garaj/:carId/istoric" element={<VehicleHistoryScreen />} />
         <Route path="programari/:bookingId/istoric" element={<VehicleHistoryScreen />} />
         <Route path="cont/favorite" element={<FavoritesScreen />} />
-        <Route path="cont/fidelitate" element={<LoyaltyScreen />} />
         <Route path="cont/istoric" element={<VehiclePickScreen />} />
         <Route path="garaj/:carId/raport" element={<ReportPreviewScreen />} />
         <Route path="programari/:bookingId/raport" element={<ReportPreviewScreen />} />

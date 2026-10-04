@@ -384,10 +384,6 @@ export interface ShopSearchResult {
   amenities: string[];
   /** How quickly the shop usually answers (T28b): within an hour, within a few hours, or unknown. */
   response: ResponseBadge;
-  /** The shop gives loyal clients a discount (T28c). */
-  loyalty_offered: boolean;
-  /** The caller's own loyalty discount here, by their level now; null when none. */
-  loyalty: number | null;
 }
 
 export type ResponseBadge = 'hour' | 'hours' | null;
@@ -403,8 +399,6 @@ export interface SearchExtras {
   free: FreePlace | null;
   amenities: string[];
   response: ResponseBadge;
-  loyalty_offered: boolean;
-  loyalty: number | null;
 }
 
 /** Public shops in rating order (ARCHITECTURE §8). The location is sent for this query only, never stored. */
@@ -426,10 +420,7 @@ export async function searchShops(params: {
     p_lng: params.lng,
     p_sort: params.sort,
   });
-  const shops = data as unknown as Omit<
-    ShopSearchResult,
-    'offer' | 'auto_confirm' | 'free' | 'amenities' | 'response' | 'loyalty_offered' | 'loyalty'
-  >[];
+  const shops = data as unknown as Omit<ShopSearchResult, 'offer' | 'auto_confirm' | 'free' | 'amenities' | 'response'>[];
   const ids = shops.map((s) => s.shop_id);
   // The offers and the free places come separately and never change the order. Without them the
   // list still shows — unless a day was asked: then a shop shows only with a free place that day.
@@ -444,8 +435,6 @@ export async function searchShops(params: {
     free: extras.get(s.shop_id)?.free ?? null,
     amenities: extras.get(s.shop_id)?.amenities ?? [],
     response: extras.get(s.shop_id)?.response ?? null,
-    loyalty_offered: extras.get(s.shop_id)?.loyalty_offered ?? false,
-    loyalty: extras.get(s.shop_id)?.loyalty ?? null,
   }));
   return params.day ? all.filter((s) => s.free !== null) : all;
 }
@@ -462,25 +451,9 @@ export async function fetchSearchExtras(shopIds: string[], day?: string): Promis
         free: r.free_date && r.free_slot ? { date: r.free_date, slot: r.free_slot } : null,
         amenities: r.amenities ?? [],
         response: r.response === 'hour' || r.response === 'hours' ? r.response : null,
-        loyalty_offered: r.loyalty_offered ?? false,
-        loyalty: r.loyalty ?? null,
       },
     ]),
   );
-}
-
-/** The client's loyalty level (T28c): finished jobs in the last 24 months and what is next. */
-export interface MyLoyalty {
-  jobs: number;
-  level: 0 | 1 | 2;
-  next_level: 1 | 2 | null;
-  jobs_to_next: number | null;
-  /** Public shops that give loyal clients a discount. */
-  shops: number;
-}
-
-export async function fetchMyLoyalty(): Promise<MyLoyalty> {
-  return (await call('my_loyalty', {} as never)) as unknown as MyLoyalty;
 }
 
 /** New-client offers the caller would get now at these shops (T23), shop id → percent. */
