@@ -252,7 +252,7 @@ test.describe('push notifications', () => {
     await page.goto('/s/cont/setari/notificari');
     await expect(page.getByRole('heading', { level: 1, name: 'Notificări' })).toBeVisible();
     await expect(pushRow(page)).toContainText('Dezactivate');
-    await expect(page.getByText('Rezumatul zilei ajunge pe dispozitivele unde ai activat notificările push.')).toBeVisible();
+    await expect(page.getByText('Notificările vin pe dispozitivele unde le-ai activat.')).toBeVisible();
   });
 
   test.describe('delivered for real', () => {
