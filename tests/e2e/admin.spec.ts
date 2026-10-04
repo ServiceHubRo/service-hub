@@ -13,6 +13,7 @@ import {
   shot,
   signIn,
   userIdOf,
+  pickFilter,
 } from './support';
 
 // T16a — the admin: overview, shops, clients, bookings, moderation, the audit log. Every action
@@ -83,9 +84,9 @@ test.describe('admin', () => {
     await page.getByLabel('Caută după nume, oraș, email, telefon sau S-00001').fill(shopName);
     await expect(page.getByRole('link', { name: new RegExp(shopName) })).toHaveCount(1);
     await expect(page).toHaveURL(/q=Atelier/);
-    await page.getByRole('button', { name: 'Suspendate' }).click();
+    await pickFilter(page, 'Suspendate');
     await expect(page.getByText('Niciun rezultat pentru filtrele alese.')).toBeVisible();
-    await page.getByRole('button', { name: 'Șterge filtrele' }).click();
+    await page.getByRole('button', { name: 'Șterge filtrele' }).first().click();
     await expectNoHorizontalScroll(page);
     await shot(page, 't16a-shops', name());
 

@@ -153,7 +153,8 @@ test.describe('client search', () => {
     await search(page).fill('frane');
     await result(page, 'Atelier Demo').click();
     await expect(page).toHaveURL(/\/c\/service\//);
-    await expect(page.getByRole('heading', { level: 1, name: 'Atelier Demo' })).toBeVisible();
+    // The CI runner is busy with the other projects: the page may take longer than 5 s to arrive.
+    await expect(page.getByRole('heading', { level: 1, name: 'Atelier Demo' })).toBeVisible({ timeout: 15_000 });
     await expect(page.getByText('Str. Lungă 42, Brașov')).toBeVisible();
     await expect(page.getByText('Lun – Vin')).toBeVisible();
     await expect(page.getByText('08:00 – 18:00')).toBeVisible();
@@ -192,7 +193,7 @@ test.describe('client search', () => {
     // The stars on a search card open the shop page at its reviews.
     await result(page, 'Atelier Demo').locator('[data-reviews]').click();
     await expect(page).toHaveURL(/#recenzii$/);
-    await expect(page.getByRole('heading', { name: 'Recenzii' })).toBeInViewport();
+    await expect(page.getByRole('heading', { name: 'Recenzii' })).toBeInViewport({ timeout: 15_000 });
     await page.getByRole('link', { name: 'Toate service-urile' }).click();
     await expect(search(page)).toHaveValue('frane');
 

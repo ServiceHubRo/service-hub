@@ -4,8 +4,8 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { Button } from '../../../components/Button';
 import { buttonClass } from '../../../components/buttonClass';
 import { Card } from '../../../components/Card';
-import { Chip, ChipRow } from '../../../components/Chip';
 import { EmptyState } from '../../../components/EmptyState';
+import { ChoiceFilters } from '../../../components/Filters';
 import { LoadError } from '../../../components/LoadError';
 import { SearchField } from '../../../components/SearchField';
 import { ServiceIcon } from '../../../components/ServiceIcon';
@@ -185,36 +185,44 @@ export function ShopHistoryScreen() {
               }}
               clearLabel={t('hist.search.clear')}
             />
-            <div className={styles.filters}>
-              <ChipRow label={t('hist.filter.label')}>
-                {HISTORY_FILTERS.map((f) => (
-                  <Chip key={f} selected={filter === f} onClick={() => setParam({ filtru: f === 'all' ? null : f })}>
-                    {t(`hist.filter.${f}`)}
-                  </Chip>
-                ))}
-              </ChipRow>
-              <ChipRow label={t('hist.period.label')}>
-                {HISTORY_PERIODS.map((p) => (
-                  <Chip key={p} selected={period === p} onClick={() => setParam({ perioada: p === 'all' ? null : p })}>
-                    {t(`hist.period.${p}`)}
-                  </Chip>
-                ))}
-              </ChipRow>
-            </div>
-            {shown.length > 0 && (
-              <div className={styles.tools}>
-                {isOwner && (
-                  <Button variant="ghost" className={styles.tool} onClick={() => void downloadCsv(shown, lang, t, today)}>
-                    <Download size={18} aria-hidden="true" />
-                    {t('hist.download')}
-                  </Button>
-                )}
-                <Button variant="ghost" className={styles.tool} onClick={() => window.print()}>
-                  <Printer size={18} aria-hidden="true" />
-                  {t('hist.print')}
-                </Button>
-              </div>
-            )}
+            <ChoiceFilters
+              groups={[
+                {
+                  key: 'filtru',
+                  title: t('hist.filter.label'),
+                  options: HISTORY_FILTERS.map((f) => ({ value: f, label: t(`hist.filter.${f}`) })),
+                  value: filter,
+                  defaultValue: 'all',
+                  onChange: (v) => setParam({ filtru: v === 'all' ? null : v }),
+                },
+                {
+                  key: 'perioada',
+                  title: t('hist.period.label'),
+                  options: HISTORY_PERIODS.map((p) => ({ value: p, label: t(`hist.period.${p}`) })),
+                  value: period,
+                  defaultValue: 'all',
+                  onChange: (v) => setParam({ perioada: v === 'all' ? null : v }),
+                },
+              ]}
+              onClearAll={() => setParam({ filtru: null, perioada: null })}
+              doneLabel={t('filters.show', { count: plural(lang, 'unit.repairs', shown.length) })}
+              end={
+                shown.length > 0 ? (
+                  <div className={styles.tools}>
+                    {isOwner && (
+                      <Button variant="ghost" className={styles.tool} onClick={() => void downloadCsv(shown, lang, t, today)}>
+                        <Download size={18} aria-hidden="true" />
+                        {t('hist.download')}
+                      </Button>
+                    )}
+                    <Button variant="ghost" className={styles.tool} onClick={() => window.print()}>
+                      <Printer size={18} aria-hidden="true" />
+                      {t('hist.print')}
+                    </Button>
+                  </div>
+                ) : undefined
+              }
+            />
           </div>
 
           {shown.length === 0 ? (
@@ -330,10 +338,14 @@ function Outcome({ item: b }: { item: ShopHistoryItem }) {
   switch (b.status) {
     case 'quote_refused': {
       const fee = b.cost ?? b.quote?.inspection_fee ?? 0;
-      return <p className={styles.muted}>{fee > 0 ? t('hist.card.fee', { fee: formatMoney(lang, fee) }) : t('hist.card.noFee')}</p>;
+      return (
+        <p className={styles.muted}>{fee > 0 ? t('hist.card.fee', { fee: formatMoney(lang, fee) }) : t('hist.card.noFee')}</p>
+      );
     }
     case 'expired':
-      return <p className={styles.muted}>{t(b.closed_reason === 'not_updated' ? 'hist.card.notUpdated' : 'hist.card.expired')}</p>;
+      return (
+        <p className={styles.muted}>{t(b.closed_reason === 'not_updated' ? 'hist.card.notUpdated' : 'hist.card.expired')}</p>
+      );
     case 'no_show':
       return <p className={styles.muted}>{t('hist.card.noShow')}</p>;
     case 'cancelled':
@@ -390,9 +402,9 @@ function PrintTable({ items }: { items: ShopHistoryItem[] }) {
 /** The filtered list as a CSV file for the accountant (P16b), in the interface's language. */
 function downloadCsv(items: readonly ShopHistoryItem[], lang: Lang, t: I18nValue['t'], today: string) {
   const { decimal } = csvFormat(lang);
-  const header = (
-    ['date', 'ref', 'status', 'plate', 'car', 'client', 'service', 'odometer', 'work', 'amount'] as const
-  ).map((c) => t(`hist.col.${c}`));
+  const header = (['date', 'ref', 'status', 'plate', 'car', 'client', 'service', 'odometer', 'work', 'amount'] as const).map(
+    (c) => t(`hist.col.${c}`),
+  );
   const rows = items.map((b) => [
     endedDay(b),
     b.ref,

@@ -11,6 +11,7 @@ import {
   shot,
   signIn,
   xlsxText,
+  pickFilter,
 } from './support';
 
 // T10 — the shop's repair history (search, filters, the opened card, CSV) and the client's vehicle
@@ -185,14 +186,14 @@ test.describe('repair history', () => {
     await shot(page, 't10-shop-history', name());
 
     // Status chip: the refused quote alone, with its inspection fee.
-    await page.getByRole('button', { name: 'Deviz refuzat', exact: true }).click();
+    await pickFilter(page, 'Deviz refuzat');
     await expect(jobCards(page)).toHaveCount(1);
     await expect(jobCards(page).first()).toContainText('Deviz refuzat');
     await jobCards(page).first().getByRole('button', { expanded: false }).click();
     await expect(jobCards(page).first()).toContainText('Taxă de constatare: 100 lei');
 
     // The CSV holds the filtered list, with the odometer.
-    await page.getByRole('button', { name: 'Toate', exact: true }).click();
+    await pickFilter(page, 'Toate');
     const [download] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: 'Descarcă istoricul' }).click()]);
     expect(download.suggestedFilename()).toMatch(/^istoric-reparatii-\d{4}-\d{2}-\d{2}\.xlsx$/);
     const csv = xlsxText(await readFile((await download.path())!));

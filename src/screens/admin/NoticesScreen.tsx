@@ -6,6 +6,7 @@ import { Button } from '../../components/Button';
 import { Card } from '../../components/Card';
 import { Checkbox } from '../../components/Checkbox';
 import { Chip, ChipRow } from '../../components/Chip';
+import { SelectField } from '../../components/SelectField';
 import { EmptyState } from '../../components/EmptyState';
 import { Field } from '../../components/Field';
 import { LoadError } from '../../components/LoadError';
@@ -79,16 +80,12 @@ function Composer({ onSent }: { onSent: (n: AdminNotice) => void }) {
       </ChipRow>
       {/* The cities that have shops, as in the client's search: nothing to type or know. */}
       <div className={styles.stack}>
-        <ChipRow label={t('admin.notices.city')}>
-          <Chip selected={draft.city === ''} onClick={() => set('city', '')}>
-            {t('search.allCities')}
-          </Chip>
-          {cities.map((c) => (
-            <Chip key={c.city} selected={draft.city === c.city} onClick={() => set('city', c.city)}>
-              {c.city}
-            </Chip>
-          ))}
-        </ChipRow>
+        <SelectField
+          label={t('admin.notices.city')}
+          value={draft.city}
+          options={[{ value: '', label: t('search.allCities') }, ...cities.map((c) => ({ value: c.city, label: c.city }))]}
+          onChange={(e) => set('city', e.target.value)}
+        />
         <p className={styles.muted}>{t(draft.audience === 'shops' ? 'admin.notices.cityHintShops' : 'admin.notices.cityHint')}</p>
       </div>
       <div className={styles.fields}>

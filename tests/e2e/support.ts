@@ -377,3 +377,10 @@ export async function closeFilters(page: Page) {
   await page.getByRole('dialog').getByRole('button', { name: /^(Arată|Show|Gata|Done)/ }).click();
   await expect(page.getByRole('dialog')).toBeHidden();
 }
+
+/** Any list with a "Filtre" panel (Istoric, the admin lists): opens it, picks one choice, closes it. */
+export async function pickFilter(page: Page, name: string | RegExp) {
+  await openFilters(page);
+  await page.getByRole('dialog').getByRole('button', { name, exact: typeof name === 'string' }).click();
+  await closeFilters(page);
+}

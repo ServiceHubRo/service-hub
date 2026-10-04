@@ -14,6 +14,7 @@ import {
   signIn,
   userIdOf,
   xlsxText,
+  pickFilter,
 } from './support';
 
 // T16b — the admin's platform tools: subscriptions and payments, history reports, the catalog,
@@ -94,7 +95,7 @@ test.describe('admin tools', () => {
     await openTool(page, 'Anunțuri');
     await page.getByRole('button', { name: 'Toți clienții' }).click();
     // The city is picked from the cities that have shops.
-    await page.getByRole('group', { name: 'Oraș' }).getByRole('button', { name: city }).click();
+    await page.getByRole('combobox', { name: 'Oraș' }).selectOption(city);
     const title = `Program de sărbători ${tag()}`;
     // Nothing written yet: the preview asks for the text first.
     await page.getByRole('button', { name: 'Previzualizează' }).click();
@@ -385,15 +386,15 @@ test.describe('Raport ANAF', () => {
     await expect(mismatchCard.getByRole('button', { name: 'Verifică din nou' })).toBeVisible();
 
     // The chips.
-    await page.getByRole('button', { name: /^Negăsită · \d+$/ }).click();
+    await pickFilter(page, /^Negăsită · \d+$/);
     await expect(unknownCard).toBeVisible();
     await expect(mismatchCard).toHaveCount(0);
-    await page.getByRole('button', { name: /^Probleme · \d+$/ }).click();
+    await pickFilter(page, /^Probleme · \d+$/);
     await expect(unknownCard).toBeVisible();
     await expect(mismatchCard).toBeVisible();
-    await page.getByRole('button', { name: /^Firmă activă · \d+$/ }).click();
+    await pickFilter(page, /^Firmă activă · \d+$/);
     await expect(page.getByText('Niciun rezultat pentru filtrele alese.')).toBeVisible();
-    await page.getByRole('button', { name: /^Toate · \d+$/ }).click();
+    await pickFilter(page, /^Toate · \d+$/);
 
     // The Excel file holds what the screen shows.
     const file = await downloadCsv(page, page.getByRole('button', { name: 'Descarcă Excel' }));

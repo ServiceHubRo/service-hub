@@ -306,3 +306,8 @@
   gap: 8px;
 }
 
+
+/* The period: one select instead of a row of buttons; not wider than it needs. */
+.period {
+  max-width: 320px;
+}
