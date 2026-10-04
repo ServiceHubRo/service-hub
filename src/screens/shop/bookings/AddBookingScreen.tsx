@@ -305,7 +305,6 @@ export function AddBookingScreen() {
           <Checkbox checked={draft.sendInvite} onChange={(e) => set({ sendInvite: e.target.checked })}>
             {t('wi.sms')}
           </Checkbox>
-          <p className={styles.hint}>{t('wi.smsHint')}</p>
           {draft.sendInvite && (
             <SelectField
               label={t('wi.lang')}

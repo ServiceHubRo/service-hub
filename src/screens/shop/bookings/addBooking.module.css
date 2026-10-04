@@ -37,9 +37,3 @@
   color: var(--red-text);
   font-size: 13.5px;
 }
-
-.hint {
-  color: var(--muted);
-  font-size: 13px;
-  margin-top: -6px;
-}

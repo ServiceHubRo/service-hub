@@ -2513,7 +2513,6 @@ export const ro = {
   'wi.when': 'Ziua și ora',
   'wi.note': 'Notă (opțional)',
   'wi.sms': 'Trimite clientului programarea prin SMS',
-  'wi.smsHint': 'Doar dacă clientul e de acord. Primește linkul și pe email, dacă l-ai trecut.',
   'wi.lang': 'Limba mesajului',
   'wi.lang.ro': 'Română',
   'wi.lang.en': 'English',

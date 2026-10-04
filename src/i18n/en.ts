@@ -2516,7 +2516,6 @@ export const en: Record<MessageKey, string> = {
   'wi.when': 'Day and time',
   'wi.note': 'Note (optional)',
   'wi.sms': 'Text the booking to the client',
-  'wi.smsHint': 'Only if the client agrees. They also get the link by email, if given.',
   'wi.lang': 'Message language',
   'wi.lang.ro': 'Română',
   'wi.lang.en': 'English',
