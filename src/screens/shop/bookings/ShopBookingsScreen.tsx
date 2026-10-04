@@ -38,7 +38,11 @@ const FILTER_LABEL: Record<ShopFilter, MessageKey> = {
 
 /** What happened after an action, and where the booking went. */
 interface Notice {
-  text: string;
+  /** Kept as a key, not a sentence, so it follows a language switch. */
+  key: MessageKey;
+  ref: string;
+  date: string;
+  slot: string;
   /** Set when the booking left the list on screen but is still active. */
   show?: { tab: ShopTab; booking: string };
 }
@@ -101,17 +105,18 @@ export function ShopBookingsScreen() {
     apply(after);
     const status = after.status as BookingStatus;
     const moved = before.date !== after.date || before.slot !== after.slot.slice(0, 5);
-    const when = `${formatDate(lang, after.date)}, ${after.slot.slice(0, 5)}`;
     const key = doneMessage(before.status, status, moved);
     if (!key) return;
-    const text = t(key, { ref: after.ref, when });
     // Still active but no longer in the list on screen (a request confirmed from Cereri, a
     // booking moved off today's filter): offer the way to it.
     const stillShown =
       onlyId === after.id ||
       (tabOf(status) === tab && (!filter || matchesFilter({ status, date: after.date, slot: after.slot }, filter, today)));
     setNotice({
-      text,
+      key,
+      ref: after.ref,
+      date: after.date,
+      slot: after.slot.slice(0, 5),
       show: isActiveStatus(status) && !stillShown ? { tab: tabOf(status), booking: after.id } : undefined,
     });
   }
@@ -177,7 +182,7 @@ export function ShopBookingsScreen() {
               </div>
             }
           >
-            {notice.text}
+            {t(notice.key, { ref: notice.ref, when: `${formatDate(lang, notice.date)}, ${notice.slot}` })}
           </Banner>
         )}
         {list.length === 0 ? (

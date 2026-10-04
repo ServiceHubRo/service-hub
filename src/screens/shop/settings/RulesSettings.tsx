@@ -9,7 +9,7 @@ import { SelectField } from '../../../components/SelectField';
 import { Stepper } from '../../../components/Stepper';
 import { updateShop, type Shop } from '../../../data/shop';
 import { useI18n } from '../../../i18n/context';
-import { plural } from '../../../i18n/translate';
+import { plural, type Msg } from '../../../i18n/translate';
 import { SETTINGS_PATH } from './paths';
 import { SaveButton } from './SaveButton';
 import { useShopSettings } from './shopSettingsContext';
@@ -69,7 +69,7 @@ export function RulesSettings() {
   const { shop, setShop } = useShopSettings();
   const location = useLocation();
   const [rules, setRules] = useState<Rules>(() => toRules(shop));
-  const [feeError, setFeeError] = useState<string | null>(null);
+  const [feeError, setFeeError] = useState<Msg | null>(null);
   const capacityRef = useRef<HTMLDivElement>(null);
   const feeRef = useRef<HTMLDivElement>(null);
 
@@ -85,7 +85,7 @@ export function RulesSettings() {
   async function save(): Promise<boolean> {
     const fee = parseFee(rules.fee);
     if (fee === null) {
-      setFeeError(t('rules.fee.error'));
+      setFeeError({ key: 'rules.fee.error' });
       feeRef.current?.querySelector('input')?.focus();
       return false;
     }
@@ -209,7 +209,7 @@ export function RulesSettings() {
               set('fee', e.target.value);
               setFeeError(null);
             }}
-            error={feeError}
+            error={feeError ? t(feeError.key, feeError.params) : null}
           />
         </div>
       </Card>

@@ -15,6 +15,7 @@ import {
   updateSettings, type LimitKey, type PlatformSettings, type SettingKey } from '../../data/adminTools';
 import { canRetryRpc, rpcErrorMessage } from '../../data/rpc';
 import { useI18n } from '../../i18n/context';
+import type { Msg } from '../../i18n/translate';
 import type { MessageKey } from '../../i18n/ro';
 import { DECIMAL_SETTINGS, SETTING_SECTIONS, settingsChange, type SettingsDraft } from '../../lib/adminTools';
 import { useLoad } from '../../lib/useLoad';
@@ -40,7 +41,7 @@ function SettingsForm({ settings, onSaved }: { settings: PlatformSettings; onSav
   const { t, lang } = useI18n();
   const [draft, setDraft] = useState<SettingsDraft>(() => draftOf(settings, lang));
   const [invalid, setInvalid] = useState<string[]>([]);
-  const [message, setMessage] = useState<string | null>(null);
+  const [message, setMessage] = useState<Msg | null>(null);
 
   const field = (key: SettingKey | LimitKey) => (
     <Field
@@ -95,17 +96,17 @@ function SettingsForm({ settings, onSaved }: { settings: PlatformSettings; onSav
           const { change, invalid: bad } = settingsChange(settings, draft);
           setInvalid(bad);
           if (bad.length > 0) {
-            setMessage(t('admin.settings.fix'));
+            setMessage({ key: 'admin.settings.fix' });
             return;
           }
           if (Object.keys(change).length === 0) {
-            setMessage(t('admin.settings.nothing'));
+            setMessage({ key: 'admin.settings.nothing' });
             return;
           }
           const saved = await updateSettings(change, requestId);
           onSaved(saved);
           setDraft(draftOf(saved, lang));
-          setMessage(t('admin.settings.saved'));
+          setMessage({ key: 'admin.settings.saved' });
         }}
         errorMessage={(e) => rpcErrorMessage(lang, e)}
         canRetry={canRetryRpc}
@@ -114,7 +115,7 @@ function SettingsForm({ settings, onSaved }: { settings: PlatformSettings; onSav
       </ActionButton>
       {message && (
         <p className={invalid.length > 0 ? styles.warning : styles.muted} role="status">
-          {message}
+          {t(message.key, message.params)}
         </p>
       )}
     </form>

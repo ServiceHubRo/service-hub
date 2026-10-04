@@ -24,7 +24,7 @@ import { canRetryRpc, rpcErrorMessage } from '../../data/rpc';
 import { fetchCities, type SearchCity } from '../../data/search';
 import { useI18n } from '../../i18n/context';
 import type { MessageKey } from '../../i18n/ro';
-import { plural } from '../../i18n/translate';
+import { plural, type Msg } from '../../i18n/translate';
 import { NoticeItem } from '../notices/NoticeItem';
 import { ConfirmPanel } from './ActionPanels';
 import { SectionTitle } from './parts';
@@ -230,7 +230,7 @@ function SentNotice({ n, onWithdrawn }: { n: AdminNotice; onWithdrawn: () => voi
 export function NoticesScreen() {
   const { t } = useI18n();
   const { state, reload, refetch } = useLiveData(fetchNotices, LIVE, 'admin-notices');
-  const [message, setMessage] = useState<string | null>(null);
+  const [message, setMessage] = useState<Msg | null>(null);
   const [composer, setComposer] = useState(0);
 
   return (
@@ -245,13 +245,13 @@ export function NoticesScreen() {
         key={composer}
         onSent={(n) => {
           setComposer((k) => k + 1);
-          setMessage(t('admin.notices.sent', { title: n.title_ro }));
+          setMessage({ key: 'admin.notices.sent', params: { title: n.title_ro } });
           void refetch().catch(() => {});
         }}
       />
       {message && (
         <p className={styles.muted} role="status">
-          {message}
+          {t(message.key, message.params)}
         </p>
       )}
       <SectionTitle>{t('admin.notices.sentTitle')}</SectionTitle>
@@ -267,7 +267,7 @@ export function NoticesScreen() {
                 <SentNotice
                   n={n}
                   onWithdrawn={() => {
-                    setMessage(t('admin.notices.withdrawn'));
+                    setMessage({ key: 'admin.notices.withdrawn' });
                     void refetch().catch(() => {});
                   }}
                 />

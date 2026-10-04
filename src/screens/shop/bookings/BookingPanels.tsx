@@ -5,6 +5,7 @@ import { InlinePanel } from '../../../components/InlinePanel';
 import { TextArea } from '../../../components/TextArea';
 import { canRetryRpc, rpcErrorMessage } from '../../../data/rpc';
 import { useI18n } from '../../../i18n/context';
+import type { Msg } from '../../../i18n/translate';
 import styles from './shopBookings.module.css';
 
 export const REASON_MAX = 500;
@@ -86,7 +87,7 @@ export function ReasonPanel({
 }) {
   const { t } = useI18n();
   const [reason, setReason] = useState('');
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<Msg | null>(null);
   return (
     <Panel title={title}>
       <p className={styles.panelBody}>{body}</p>
@@ -96,7 +97,7 @@ export function ReasonPanel({
         value={reason}
         maxLength={REASON_MAX}
         rows={3}
-        error={error}
+        error={error ? t(error.key, error.params) : null}
         onChange={(e) => {
           setReason(e.target.value);
           if (error) setError(null);
@@ -108,7 +109,7 @@ export function ReasonPanel({
         onAction={async (requestId) => {
           const text = reason.trim();
           if (required && text === '') {
-            setError(t('sb.reason.missing'));
+            setError({ key: 'sb.reason.missing' });
             return;
           }
           await onAction(text, requestId);

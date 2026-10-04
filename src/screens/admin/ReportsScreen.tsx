@@ -15,7 +15,7 @@ import { downloadReport, ReportError } from '../../data/reports';
 import { canRetryRpc, rpcErrorMessage } from '../../data/rpc';
 import { useI18n } from '../../i18n/context';
 import type { MessageKey } from '../../i18n/ro';
-import { plural } from '../../i18n/translate';
+import { plural, type Msg } from '../../i18n/translate';
 import { filterReports, isReportFilter, REPORT_FILTERS } from '../../lib/adminTools';
 import { reportFileName, saveFile } from '../../lib/report';
 import { ConfirmPanel } from './ActionPanels';
@@ -122,7 +122,7 @@ export function ReportsScreen() {
   const query = useDeferredValue(text);
   const all = state.status === 'ready' ? state.data : null;
   const shown = useMemo(() => (all ? filterReports(all, query, filter) : []), [all, query, filter]);
-  const [notice, setNotice] = useState<string | null>(null);
+  const [notice, setNotice] = useState<Msg | null>(null);
 
   return (
     <div className={styles.page}>
@@ -159,7 +159,7 @@ export function ReportsScreen() {
           </div>
           {notice && (
             <p className={styles.muted} role="status">
-              {notice}
+              {t(notice.key, notice.params)}
             </p>
           )}
           {shown.length === 0 ? (
@@ -185,7 +185,7 @@ export function ReportsScreen() {
                   <ReportCard
                     r={r}
                     onVoided={() => {
-                      setNotice(t('admin.reports.voided', { code: r.code }));
+                      setNotice({ key: 'admin.reports.voided', params: { code: r.code } });
                       void refetch().catch(() => {});
                     }}
                   />

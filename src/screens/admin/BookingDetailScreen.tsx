@@ -10,6 +10,7 @@ import { StatusBadge } from '../../components/StatusBadge';
 import { fetchBooking, type AdminQuote } from '../../data/admin';
 import { adminForceCancel, toRpcError } from '../../data/rpc';
 import { useI18n } from '../../i18n/context';
+import type { Msg } from '../../i18n/translate';
 import { formatKm } from '../../i18n/format';
 import type { MessageKey } from '../../i18n/ro';
 import { bookingServicesText } from '../../lib/bookingServices';
@@ -72,7 +73,7 @@ export function BookingDetailScreen() {
   const load = useCallback(() => fetchBooking(bookingId), [bookingId]);
   const { state, reload, refetch } = useLiveData(load, [{ table: 'bookings', filter: `id=eq.${bookingId}` }], `admin-booking:${bookingId}`);
   const [cancelling, setCancelling] = useState(false);
-  const [notice, setNotice] = useState<string | null>(null);
+  const [notice, setNotice] = useState<Msg | null>(null);
 
   if (state.status === 'loading') return <SkeletonList />;
   if (state.status === 'error') {
@@ -138,7 +139,7 @@ export function BookingDetailScreen() {
 
       {notice && (
         <p className={styles.muted} role="status">
-          {notice}
+          {t(notice.key, notice.params)}
         </p>
       )}
 
@@ -155,7 +156,7 @@ export function BookingDetailScreen() {
             onConfirm={async (reason, requestId) => {
               await adminForceCancel(b.id, reason, requestId);
               setCancelling(false);
-              setNotice(t('admin.done.cancelled'));
+              setNotice({ key: 'admin.done.cancelled' });
               void refetch().catch(() => {});
             }}
             onCancel={() => setCancelling(false)}

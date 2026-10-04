@@ -5,6 +5,7 @@ import { TextArea } from '../../../components/TextArea';
 import { completeJob, lastOdometerForBooking, rpcErrorMessage, toRpcError, type Booking } from '../../../data/rpc';
 import type { ShopBooking } from '../../../data/shopBookings';
 import { useI18n } from '../../../i18n/context';
+import type { Msg } from '../../../i18n/translate';
 import { formatKm } from '../../../i18n/format';
 import { parsePriceBani, priceText } from '../../../lib/quoteDraft';
 import { useLoad } from '../../../lib/useLoad';
@@ -47,7 +48,7 @@ export function CompletionPanel({
   // The server found the same reading on a job from another day: shown until the shop confirms it.
   const [same, setSame] = useState<number | null>(null);
   const [odometerError, setOdometerError] = useState<string | null>(null);
-  const [costError, setCostError] = useState<string | null>(null);
+  const [costError, setCostError] = useState<Msg | null>(null);
   const odometerRef = useRef<HTMLInputElement>(null);
   const costRef = useRef<HTMLInputElement>(null);
 
@@ -78,7 +79,7 @@ export function CompletionPanel({
     if (cost.trim() !== '') {
       const bani = parsePriceBani(cost);
       if (bani === null) {
-        setCostError(t('sb.quote.error.price_invalid'));
+        setCostError({ key: 'sb.quote.error.price_invalid' });
         costRef.current?.focus();
         return;
       }
@@ -183,7 +184,7 @@ export function CompletionPanel({
         inputMode="decimal"
         autoComplete="off"
         mono
-        error={costError}
+        error={costError ? t(costError.key, costError.params) : null}
         onChange={(e) => {
           setCost(e.target.value);
           setCostError(null);
