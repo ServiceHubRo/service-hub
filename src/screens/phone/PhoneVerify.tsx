@@ -12,6 +12,7 @@ import {
 } from '../../data/phone';
 import { rpcErrorMessage } from '../../data/rpc';
 import { useI18n } from '../../i18n/context';
+import type { Msg } from '../../i18n/translate';
 import { formatPhone } from '../../lib/validators';
 import styles from './phone.module.css';
 
@@ -41,8 +42,8 @@ export function PhoneVerify({ phone, onVerified }: { phone: string; onVerified: 
   const { t, lang } = useI18n();
   const [stage, setStage] = useState<Stage>('loading');
   const [code, setCode] = useState('');
-  const [fieldError, setFieldError] = useState<string | null>(null);
-  const [notice, setNotice] = useState<string | null>(null);
+  const [fieldError, setFieldError] = useState<Msg | null>(null);
+  const [notice, setNotice] = useState<Msg | null>(null);
   const [resendAt, setResendAt] = useState(0);
   const wait = useCountdown(resendAt);
   const codeRef = useRef<HTMLInputElement>(null);
@@ -95,7 +96,7 @@ export function PhoneVerify({ phone, onVerified }: { phone: string; onVerified: 
       <div className={styles.box}>
         {notice && (
           <p className={styles.notice} role="status">
-            {notice}
+            {t(notice.key, notice.params)}
           </p>
         )}
         <p className={styles.text}>{t('phone.intro', { phone: shown })}</p>
@@ -122,7 +123,7 @@ export function PhoneVerify({ phone, onVerified }: { phone: string; onVerified: 
           setFieldError(null);
         }}
         hint={t('phone.codeHint', { phone: shown })}
-        error={fieldError}
+        error={fieldError ? t(fieldError.key, fieldError.params) : null}
       />
       <ActionButton
         submit
@@ -130,7 +131,7 @@ export function PhoneVerify({ phone, onVerified }: { phone: string; onVerified: 
         onAction={async (requestId) => {
           const typed = code.replace(/\s/g, '');
           if (!/^\d{6}$/.test(typed)) {
-            setFieldError(t('phone.error.format'));
+            setFieldError({ key: 'phone.error.format' });
             return;
           }
           const r = await checkPhoneCode(typed, requestId);
@@ -138,13 +139,13 @@ export function PhoneVerify({ phone, onVerified }: { phone: string; onVerified: 
             await onVerified();
           } else if (r.status === 'wrong') {
             setFieldError(
-              r.attempts_left === 1 ? t('phone.error.wrongLast') : t('phone.error.wrong', { n: r.attempts_left }),
+              r.attempts_left === 1 ? { key: 'phone.error.wrongLast' } : { key: 'phone.error.wrong', params: { n: r.attempts_left } },
             );
             // Straight back to the field, ready to type the code again.
             codeRef.current?.focus();
             codeRef.current?.select();
           } else {
-            setNotice(t(r.status === 'locked' ? 'phone.error.locked' : 'phone.error.expired'));
+            setNotice({ key: r.status === 'locked' ? 'phone.error.locked' : 'phone.error.expired' });
             setResendAt(0);
             setStage('ask');
           }

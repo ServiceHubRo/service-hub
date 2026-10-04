@@ -21,7 +21,7 @@ import {
 import { getSubscriptionRow } from '../../../data/subscription';
 import { useI18n } from '../../../i18n/context';
 import { formatDate, formatMoney } from '../../../i18n/format';
-import { plural } from '../../../i18n/translate';
+import { plural, type Msg } from '../../../i18n/translate';
 import { includedColleagues, monthlyAverage } from '../../../lib/subscription';
 import { looksLikeEmail } from '../../../lib/password';
 import { useLoad } from '../../../lib/useLoad';
@@ -130,7 +130,7 @@ function InviteForm({
 }) {
   const { t, lang } = useI18n();
   const [email, setEmail] = useState('');
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<Msg | null>(null);
   const tokenFor = useTokenPerRequest();
 
   return (
@@ -148,14 +148,14 @@ function InviteForm({
             setEmail(e.target.value);
             setError(null);
           }}
-          error={error}
+          error={error ? t(error.key, error.params) : null}
         />
         <ActionButton
           submit
           errorMessage={(e) => rpcErrorMessage(lang, e)}
           onAction={async (requestId) => {
             if (!looksLikeEmail(email)) {
-              setError(t('auth.error.emailFormat'));
+              setError({ key: 'auth.error.emailFormat' });
               return;
             }
             const token = tokenFor(requestId);

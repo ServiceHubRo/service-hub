@@ -6,6 +6,7 @@ import { InlinePanel } from '../../../components/InlinePanel';
 import { TextArea } from '../../../components/TextArea';
 import { canRetryRpc, rpcErrorMessage, submitReview, toRpcError, type Review } from '../../../data/rpc';
 import { useI18n } from '../../../i18n/context';
+import type { Msg } from '../../../i18n/translate';
 import styles from './bookings.module.css';
 
 const REVIEW_MAX = 2000;
@@ -32,13 +33,13 @@ export function ReviewForm({
   const { t, lang } = useI18n();
   const [rating, setRating] = useState(0);
   const [text, setText] = useState('');
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<Msg | null>(null);
   const labelId = useId();
   const errorId = useId();
 
   async function send(requestId: string) {
     if (rating < 1) {
-      setError(t('cb.review.pick'));
+      setError({ key: 'cb.review.pick' });
       return;
     }
     try {
@@ -80,7 +81,7 @@ export function ReviewForm({
         </div>
         {error && (
           <p id={errorId} className={styles.error} role="alert">
-            {error}
+            {t(error.key, error.params)}
           </p>
         )}
       </div>

@@ -23,6 +23,9 @@ export const EMAIL_BUTTON_LABELS = [
   'Activate the subscription',
   'Plătește abonamentul',
   'Pay the subscription',
+  // A booking the shop added (T29)
+  'Vezi programarea',
+  'See the booking',
   // Reported review (to the admin); account reactivated
   'Deschide Service-Hub',
   'Open Service-Hub',

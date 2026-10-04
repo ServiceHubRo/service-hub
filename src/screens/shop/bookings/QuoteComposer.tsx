@@ -8,7 +8,7 @@ import type { ShopBooking } from '../../../data/shopBookings';
 import { useI18n } from '../../../i18n/context';
 import { formatMoney } from '../../../i18n/format';
 import type { MessageKey } from '../../../i18n/ro';
-import { plural } from '../../../i18n/translate';
+import { plural, type Msg } from '../../../i18n/translate';
 import {
   checkDraft,
   draftTotalBani,
@@ -66,7 +66,7 @@ export function QuoteComposer({
   );
   const [note, setNote] = useState(() => (mode === 'replace' ? (booking.quote?.note ?? '') : ''));
   const [errors, setErrors] = useState<Record<string, QuoteRowError>>({});
-  const [formError, setFormError] = useState<string | null>(null);
+  const [formError, setFormError] = useState<Msg | null>(null);
   const container = useRef<HTMLDivElement>(null);
   const focusRow = useRef<{ key: string; field: 'name' | 'price' } | null>(null);
 
@@ -123,7 +123,7 @@ export function QuoteComposer({
       return;
     }
     if (checked.items.length === 0 || checked.items.every((i) => i.price === 0)) {
-      setFormError(t('rpcError.quote_total_zero'));
+      setFormError({ key: 'rpcError.quote_total_zero' });
       return;
     }
     const text = note.trim() || undefined;
@@ -204,7 +204,7 @@ export function QuoteComposer({
         </p>
         {formError && (
           <p className={styles.formError} role="alert">
-            {formError}
+            {t(formError.key, formError.params)}
           </p>
         )}
       </div>

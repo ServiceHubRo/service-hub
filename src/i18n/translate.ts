@@ -4,6 +4,15 @@ import { ro, type MessageKey } from './ro';
 export type Lang = 'ro' | 'en';
 export type Params = Record<string, string | number>;
 
+/**
+ * A message kept in state as its key (and values), not as a sentence, so it is translated when shown
+ * and follows a language switch.
+ */
+export interface Msg {
+  key: MessageKey;
+  params?: Params;
+}
+
 const dictionaries: Record<Lang, Record<MessageKey, string>> = { ro, en };
 
 export const LANG_STORAGE_KEY = 'sh_lang';

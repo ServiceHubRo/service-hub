@@ -18,6 +18,7 @@ import {
   type Shop,
 } from '../../../data/shop';
 import { useI18n } from '../../../i18n/context';
+import type { Msg } from '../../../i18n/translate';
 import type { MessageKey } from '../../../i18n/ro';
 import { formatPhone, isValidPostalCode, normalizePhone } from '../../../lib/validators';
 import { normalizeUrl } from '../../../lib/url';
@@ -346,7 +347,7 @@ function LogoCard() {
   const { shop, setShop } = useShopSettings();
   const inputRef = useRef<HTMLInputElement>(null);
   const [picked, setPicked] = useState<{ file: File; url: string } | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<Msg | null>(null);
 
   // The preview's object URL is freed when it is replaced, cancelled or the screen closes.
   const pickedRef = useRef(picked);
@@ -361,11 +362,11 @@ function LogoCard() {
     if (inputRef.current) inputRef.current.value = '';
     if (!f) return;
     if (!(LOGO_TYPES as readonly string[]).includes(f.type)) {
-      setError(t('profile.logo.wrongType'));
+      setError({ key: 'profile.logo.wrongType' });
       return;
     }
     if (f.size > LOGO_MAX_BYTES) {
-      setError(t('profile.logo.tooBig'));
+      setError({ key: 'profile.logo.tooBig' });
       return;
     }
     setError(null);
@@ -414,7 +415,7 @@ function LogoCard() {
       />
       {error && (
         <p className={own.logoError} role="alert">
-          {error}
+          {t(error.key, error.params)}
         </p>
       )}
       <div className={`${styles.rowButtons} ${own.logoButtons}`}>

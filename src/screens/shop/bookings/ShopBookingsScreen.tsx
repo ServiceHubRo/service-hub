@@ -1,8 +1,9 @@
-import { CalendarCheck, Inbox, Unlink, X } from 'lucide-react';
+import { CalendarCheck, CalendarPlus, Inbox, Unlink, X } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { Link, useLocation, useSearchParams } from 'react-router-dom';
 import { Banner } from '../../../components/Banner';
 import { Button } from '../../../components/Button';
+import { buttonClass } from '../../../components/buttonClass';
 import { Chip } from '../../../components/Chip';
 import { EmptyState } from '../../../components/EmptyState';
 import { LoadError } from '../../../components/LoadError';
@@ -24,6 +25,8 @@ import {
 } from '../../../lib/shopBookings';
 import { isActiveStatus, type BookingStatus } from '../../../lib/status';
 import { useNow } from '../../../lib/useNow';
+import { ADD_BOOKING_PATH } from '../paths';
+import type { AddedBookingState } from './AddBookingScreen';
 import { ShopBookingCard } from './ShopBookingCard';
 import { useShopBookings } from './shopBookingsContext';
 import styles from './shopBookings.module.css';
@@ -38,7 +41,11 @@ const FILTER_LABEL: Record<ShopFilter, MessageKey> = {
 
 /** What happened after an action, and where the booking went. */
 interface Notice {
-  text: string;
+  /** Kept as a key, not a sentence, so it follows a language switch. */
+  key: MessageKey;
+  ref: string;
+  date: string;
+  slot: string;
   /** Set when the booking left the list on screen but is still active. */
   show?: { tab: ShopTab; booking: string };
 }
@@ -52,6 +59,8 @@ const DONE_MESSAGE: Partial<Record<BookingStatus, MessageKey>> = {
   quote_sent: 'sb.done.quote_sent',
   in_progress: 'sb.done.in_progress',
   done: 'sb.done.done',
+  approved: 'sb.done.approved',
+  quote_refused: 'sb.done.quote_refused',
 };
 
 function doneMessage(before: BookingStatus, after: BookingStatus, moved: boolean): MessageKey | null {
@@ -73,7 +82,14 @@ export function ShopBookingsScreen() {
   const [params, setParams] = useSearchParams();
   const now = useNow();
   const today = ymdInBucharest(now);
-  const [notice, setNotice] = useState<Notice | null>(null);
+  const location = useLocation();
+  // Back from "Adaugă programare": say where the new booking went.
+  const [notice, setNotice] = useState<Notice | null>(() => {
+    const added = (location.state as Partial<AddedBookingState> | null)?.added;
+    return added
+      ? { key: added.invited ? 'sb.done.addedSms' : 'sb.done.added', ref: added.ref, date: added.date, slot: added.slot }
+      : null;
+  });
 
   // Arriving here reads the list again quietly (settings such as the fee may have changed).
   useEffect(() => {
@@ -101,17 +117,18 @@ export function ShopBookingsScreen() {
     apply(after);
     const status = after.status as BookingStatus;
     const moved = before.date !== after.date || before.slot !== after.slot.slice(0, 5);
-    const when = `${formatDate(lang, after.date)}, ${after.slot.slice(0, 5)}`;
     const key = doneMessage(before.status, status, moved);
     if (!key) return;
-    const text = t(key, { ref: after.ref, when });
     // Still active but no longer in the list on screen (a request confirmed from Cereri, a
     // booking moved off today's filter): offer the way to it.
     const stillShown =
       onlyId === after.id ||
       (tabOf(status) === tab && (!filter || matchesFilter({ status, date: after.date, slot: after.slot }, filter, today)));
     setNotice({
-      text,
+      key,
+      ref: after.ref,
+      date: after.date,
+      slot: after.slot.slice(0, 5),
       show: isActiveStatus(status) && !stillShown ? { tab: tabOf(status), booking: after.id } : undefined,
     });
   }
@@ -177,7 +194,7 @@ export function ShopBookingsScreen() {
               </div>
             }
           >
-            {notice.text}
+            {t(notice.key, { ref: notice.ref, when: `${formatDate(lang, notice.date)}, ${notice.slot}` })}
           </Banner>
         )}
         {list.length === 0 ? (
@@ -221,7 +238,15 @@ export function ShopBookingsScreen() {
 
   return (
     <div className={styles.page}>
-      <h1>{t('nav.bookings')}</h1>
+      <div className={styles.head}>
+        <h1>{t('nav.bookings')}</h1>
+        {state.status === 'ready' && (
+          <Link to={ADD_BOOKING_PATH} className={buttonClass('secondary')}>
+            <CalendarPlus size={18} aria-hidden="true" />
+            {t('wi.add')}
+          </Link>
+        )}
+      </div>
       {body}
     </div>
   );

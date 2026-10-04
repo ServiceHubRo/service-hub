@@ -19,7 +19,7 @@ import {
   type SuspectReview,
 } from '../../data/admin';
 import { useI18n } from '../../i18n/context';
-import { plural } from '../../i18n/translate';
+import { plural, type Msg } from '../../i18n/translate';
 import { reportAge } from '../../lib/admin';
 import { useNow } from '../../lib/useNow';
 import { ConfirmPanel } from './ActionPanels';
@@ -178,7 +178,7 @@ export function ModerationScreen() {
     [q],
   );
   const { state, reload, refetch } = useLiveData(load, LIVE, 'admin-moderation');
-  const [notice, setNotice] = useState<string | null>(null);
+  const [notice, setNotice] = useState<Msg | null>(null);
 
   return (
     <div className={styles.page}>
@@ -190,7 +190,7 @@ export function ModerationScreen() {
           <SectionTitle>{t('admin.moderation.queue', { n: state.data.queue.length })}</SectionTitle>
           {notice && (
             <p className={styles.muted} role="status">
-              {notice}
+              {t(notice.key, notice.params)}
             </p>
           )}
           {state.data.queue.length === 0 ? (
@@ -203,7 +203,7 @@ export function ModerationScreen() {
                     r={r}
                     now={now}
                     onDecided={() => {
-                      setNotice(t('admin.done.decided'));
+                      setNotice({ key: 'admin.done.decided' });
                       void refetch().catch(() => {});
                     }}
                   />
@@ -224,7 +224,7 @@ export function ModerationScreen() {
                     <SuspectCard
                       r={r}
                       onDecided={() => {
-                        setNotice(t('admin.done.decided'));
+                        setNotice({ key: 'admin.done.decided' });
                         void refetch().catch(() => {});
                       }}
                     />

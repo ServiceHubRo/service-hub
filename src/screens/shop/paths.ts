@@ -12,6 +12,9 @@ export function shopBookingsLink(options: { tab?: ShopTab; filter?: ShopFilter; 
   return query ? `${SHOP_BOOKINGS_PATH}?${query}` : SHOP_BOOKINGS_PATH;
 }
 
+/** "Adaugă programare" (T29): a client who called or walked in. */
+export const ADD_BOOKING_PATH = `${SHOP_BOOKINGS_PATH}/nou`;
+
 /** Cont of the shop and the Recenzii tile inside it (T11). */
 export const ACCOUNT_PATH = '/s/cont';
 export const REVIEWS_PATH = '/s/cont/recenzii';

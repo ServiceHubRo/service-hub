@@ -92,6 +92,7 @@ for (const lang of ['ro', 'en'] as const) {
       '/s/panou',
       '/s/programari',
       '/s/programari?tab=programate',
+      '/s/programari/nou',
       '/s/istoric',
       `/s/istoric/fisa/${doneId}`,
       '/s/mesaje',

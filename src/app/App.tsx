@@ -29,6 +29,9 @@ const ROLE_APPS: Record<Role, ReturnType<typeof lazyChunk>> = {
   admin: lazyChunk(() => import('./routes/AdminApp')),
 };
 const PublicLegal = lazyChunk(() => import('../screens/legal/LegalPages').then((m) => ({ default: m.PublicLegal })));
+const BookingLinkScreen = lazyChunk(() =>
+  import('../screens/public/BookingLinkScreen').then((m) => ({ default: m.BookingLinkScreen })),
+);
 const VerifyScreen = lazyChunk(() => import('../screens/public/VerifyScreen').then((m) => ({ default: m.VerifyScreen })));
 const ComponentGallery = lazyChunk(() =>
   import('../screens/dev/ComponentGallery').then((m) => ({ default: m.ComponentGallery })),
@@ -86,6 +89,15 @@ export function App() {
                 </Route>
                 <Route path="/parola-noua" element={<NewPassword />} />
                 <Route path="/invitatie/:token" element={<InviteScreen />} />
+                {/* The link in the SMS of a booking the shop added (T29). */}
+                <Route
+                  path="/p/:token"
+                  element={
+                    <ChunkBoundary>
+                      <BookingLinkScreen />
+                    </ChunkBoundary>
+                  }
+                />
                 <Route
                   path="/legal/:doc"
                   element={

@@ -7,10 +7,12 @@ export interface SelectFieldProps extends Omit<SelectHTMLAttributes<HTMLSelectEl
   label: string;
   hint?: string;
   options: { value: string; label: string }[];
+  /** Options under headings (`<optgroup>`), after `options`. */
+  groups?: { label: string; options: { value: string; label: string }[] }[];
 }
 
 /** Label + native select (the phone's own picker) + hint. Lets go of the focus after a tap choice (useTouchSelect). */
-export function SelectField({ label, hint, options, className, onChange, ...rest }: SelectFieldProps) {
+export function SelectField({ label, hint, options, groups, className, onChange, ...rest }: SelectFieldProps) {
   const id = useId();
   const touch = useTouchSelect(onChange);
   const hintId = hint ? `${id}-hint` : undefined;
@@ -25,6 +27,15 @@ export function SelectField({ label, hint, options, className, onChange, ...rest
             <option key={o.value} value={o.value}>
               {o.label}
             </option>
+          ))}
+          {groups?.map((g) => (
+            <optgroup key={g.label} label={g.label}>
+              {g.options.map((o) => (
+                <option key={o.value} value={o.value}>
+                  {o.label}
+                </option>
+              ))}
+            </optgroup>
           ))}
         </select>
         <ChevronDown size={18} className={styles.selectIcon} aria-hidden="true" />

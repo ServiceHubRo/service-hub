@@ -32,6 +32,7 @@ This policy explains what personal data Service-Hub uses, why, who else sees it,
 
 - **Cars in your Garage:** make, model, year, license plate, VIN (if you enter it) and the expiry dates for ITP, RCA and the vignette (if you enter them).
 - **Bookings:** the shop, service, day and time, your note, the status, plus a copy of your name, phone and car details at the time of booking.
+- **Bookings a shop enters for you**, when you call or walk in without an account: your name, phone, email (if you gave it), car and day, which the shop types into Service-Hub. You get a text (and an email, if you gave one) with a link to the booking. The link shows only the shop, day, service, car and status, with no name or phone. If you create an account with the same phone or email, confirmed, the booking and the car move into your account. Until then, only the shop and the Service-Hub team see this data.
 - **Quotes and jobs:** the lines and prices, what you accepted or refused, the work done, the cost and the **odometer reading** recorded by the shop when finishing the job.
 - Your **reviews** and **messages**; your **favorite** shops.
 - **History reports** you bought: the code, the car, the jobs included, the price, the payment status and the PDF file.
@@ -73,6 +74,7 @@ This policy explains what personal data Service-Hub uses, why, who else sees it,
 | Search, booking, quote, job, messages, history | Our contract with you |
 | Sending the booking details to the shop you chose | Our contract with you |
 | Notifications about bookings and your account (email, SMS to shops) | Our contract with you |
+| A booking the shop enters for you (no account) and the text or email with its link | Steps you asked for to book at the shop (para. 1(b)); the shop may send the message only if you agreed |
 | Push notifications | Your consent, given in the browser (withdraw it at any time), and the contract |
 | ITP, RCA and vignette alerts | Our contract with you (you ask for them by entering the dates) |
 | The reminder for your next service (after the last job of that kind done through the Platform) and the review request after a job | Our contract with you; you turn both off in Account |
@@ -118,8 +120,8 @@ We work with providers that process data only on our instructions, under a data 
 |---|---|---|---|
 | Supabase | Database, accounts, files, server functions | All Platform data | EU (Frankfurt) |
 | Netlify | Hosting the web app | IP address, browser, pages requested | US and global network |
-| Resend | Emails (account confirmation, password, invitations, payments, report ready) | Email address, email text | US |
-| SMSO | Text messages: the phone confirmation code (shops; customers after no-shows) and new requests to shops, if turned on | The phone, the text (the code; for requests: customer name, service, day) | Romania |
+| Resend | Emails (account confirmation, password, invitations, payments, report ready, the link to a booking a shop entered) | Email address, email text | US |
+| SMSO | Text messages: the phone confirmation code (shops; customers after no-shows), new requests to shops, if turned on, and the link to a booking a shop entered for a customer without an account | The phone, the text (the code; for requests: customer name, service, day; for a booking the shop entered: the shop, day, time and link) | Romania |
 | Stripe | Payment of the subscription and the report | Name, email, amount; you enter card details directly with Stripe | EU and US |
 | Sentry | Error reports | Account ID, role, browser, page, error | EU (Frankfurt) |
 | Cloudflare | Bot check at sign-up and sign-in | IP address, browser signals | US and global network |

@@ -599,6 +599,8 @@ export function emailForEvent(e: EmailEvent, app: string): EmailContent | null {
       return requestExpiredEmail(e, lang, app);
     case 'admin_digest':
       return adminDigestEmail(p, app);
+    case 'walk_in_invite':
+      return walkInInviteEmail(p, lang, app);
     default:
       return subscriptionEmail(e, lang, app);
   }
@@ -754,5 +756,39 @@ function adminDigestEmail(p: Record<string, unknown>, app: string): EmailContent
     ],
     button: { label: 'Deschide Service-Hub', url: `${app}/intra` },
     footer: 'Primești acest email ca administrator Service-Hub (ADMIN_EMAIL), doar în zilele în care ceva te așteaptă.',
+  });
+}
+
+/**
+ * A booking the shop added for a client without an account (T29): when and where, and the way to
+ * see it, with the car's history, in an account.
+ */
+function walkInInviteEmail(p: Record<string, unknown>, lang: Lang, app: string): EmailContent | null {
+  const token = str(p.token);
+  if (!token) return null;
+  const en = lang === 'en';
+  const shop = str(p.shop_name) || 'Service-Hub';
+  const date = str(p.date);
+  const at = [date ? formatDate(lang, date) : '', str(p.slot)].filter(Boolean).join(', ');
+  return email(en ? `Your booking at ${shop}` : `Programarea ta la ${shop}`, {
+    lang,
+    preheader: at,
+    title: en ? 'Your booking' : 'Programarea ta',
+    blocks: [
+      {
+        p: en
+          ? `${shop} booked you in for ${at} on Service-Hub.`
+          : `${shop} ți-a făcut programarea pentru ${at} pe Service-Hub.`,
+      },
+      {
+        p: en
+          ? 'With a free account you see the quote and the progress, talk to the shop and keep your car’s history in one place.'
+          : 'Cu un cont gratuit vezi devizul și stadiul lucrării, vorbești cu service-ul și ai istoricul mașinii într-un singur loc.',
+      },
+    ],
+    button: { label: en ? 'See the booking' : 'Vezi programarea', url: `${app}/p/${token}` },
+    footer: en
+      ? `You are receiving this email because ${shop} entered your booking on Service-Hub.`
+      : `Primești acest email pentru că ${shop} ți-a trecut programarea pe Service-Hub.`,
   });
 }
