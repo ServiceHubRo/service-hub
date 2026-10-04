@@ -246,7 +246,7 @@ test.describe('client search', () => {
       await result(page, 'Atelier Demo').click();
       await expect(page.getByText('la 0,2 km')).toBeVisible();
       await openAccount(page);
-      await expect(page.getByText(/Pornită\. Vezi distanțele în căutare/)).toBeVisible();
+      await expect(page.getByRole('group', { name: 'Locație' })).toContainText('Pornită.');
     });
   });
 

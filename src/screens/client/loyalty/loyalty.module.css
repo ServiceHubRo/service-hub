@@ -20,13 +20,8 @@
 
 .levelRow {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 12px;
-}
-
-.level {
-  font-size: 20px;
-  font-weight: 700;
 }
 
 .iconOn {
@@ -84,4 +79,51 @@
 
 .how li svg {
   margin-top: 2px;
+}
+
+.list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0;
+  margin: 0;
+}
+
+.shopText {
+  flex: 1;
+  min-width: 0;
+}
+
+.shopName {
+  display: inline-block;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+  overflow-wrap: anywhere;
+}
+
+a.shopName {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap);
+  text-decoration: underline;
+  text-decoration-color: var(--border-lit);
+  text-underline-offset: 3px;
+}
+
+.percent {
+  display: inline-block;
+  margin-top: 6px;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  background: var(--amber-tint);
+  color: var(--amber);
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.levelRow > svg {
+  margin-top: 10px;
 }

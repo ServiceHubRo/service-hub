@@ -470,13 +470,26 @@ export async function fetchSearchExtras(shopIds: string[], day?: string): Promis
 }
 
 /** The client's loyalty level (T28c): finished jobs in the last 24 months and what is next. */
-export interface MyLoyalty {
+export interface MyLoyaltyShop {
+  shop_id: string;
+  name: string;
+  /** Finished jobs there in the last 24 months. */
   jobs: number;
   level: 0 | 1 | 2;
   next_level: 1 | 2 | null;
   jobs_to_next: number | null;
+  /** The discount the shop gives at that level now. */
+  percent: number | null;
+  l1: number | null;
+  l2: number | null;
+  bookable: boolean;
+}
+
+/** The caller's loyalty, shop by shop (T28c): only jobs at the same shop count. */
+export interface MyLoyalty {
   /** Public shops that give loyal clients a discount. */
-  shops: number;
+  offering: number;
+  shops: MyLoyaltyShop[];
 }
 
 export async function fetchMyLoyalty(): Promise<MyLoyalty> {

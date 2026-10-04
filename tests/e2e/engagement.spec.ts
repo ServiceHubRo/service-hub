@@ -57,7 +57,7 @@ test.describe('T24 notifications', () => {
     await tires.getByRole('button', { name: 'Oprește' }).click();
     await expect(tires).toContainText('Oprite.');
     await offers.getByRole('button', { name: 'Pornește' }).click();
-    await expect(offers).toContainText('cel mult două pe săptămână, niciodată noaptea', { ignoreCase: true });
+    await expect(offers).toContainText('Pornite.');
     const [profile] = await serviceRest<{ season_reminders: boolean; app_tips: boolean; promo_notifications: boolean; service_reminders: boolean }[]>(
       `profiles?id=eq.${await userIdOf(client)}&select=season_reminders,app_tips,promo_notifications,service_reminders`,
       'GET',

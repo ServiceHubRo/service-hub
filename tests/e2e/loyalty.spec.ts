@@ -45,8 +45,8 @@ test.describe("loyal clients", () => {
     await signIn(page, owner, PASSWORD);
     await expect(page).toHaveURL(/\/s\/panou/);
     await page.goto("/s/cont/setari/reguli");
-    const l1 = page.getByRole("group", { name: "Nivelul 1 (de la 2 lucrări)" });
-    const l2 = page.getByRole("group", { name: "Nivelul 2 (de la 5 lucrări)" });
+    const l1 = page.getByRole("group", { name: "Nivelul 1 (de la 3 lucrări la tine)" });
+    const l2 = page.getByRole("group", { name: "Nivelul 2 (de la 6 lucrări la tine)" });
     await expect(
       l1.getByRole("button", { name: "Fără reducere", pressed: true }),
     ).toBeVisible();
@@ -84,20 +84,19 @@ test.describe("loyal clients", () => {
     await expect(
       c.getByRole("heading", { level: 1, name: "Fidelitate" }),
     ).toBeVisible();
-    await expect(c.getByText("Încă fără nivel")).toBeVisible();
-    await expect(c.getByText("Încă 2 lucrări până la Nivelul 1")).toBeVisible();
+    await expect(c.getByText("Încă nu ai lucrări terminate")).toBeVisible();
     await c.goto(`/c/cauta?q=${encodeURIComponent(shopName)}`);
     const card = c.locator("main li").filter({ hasText: shopName });
     await expect(card).toContainText("Reduceri pentru clienți fideli");
     await card.getByRole("link").first().click();
     await expect(
       c.getByText(
-        "-5% la manoperă de la 2 lucrări pe Service-Hub, -7% de la 5 lucrări.",
+        "-5% la manoperă de la 3 lucrări aici, -7% de la 6.",
       ),
     ).toBeVisible();
 
-    // Two finished jobs (anywhere on Service-Hub): Level 1.
-    for (const daysAgo of [40, 90]) {
+    // Three finished jobs at this shop: Level 1 here.
+    for (const daysAgo of [40, 90, 150]) {
       const day = new Date(Date.now() - daysAgo * 86_400_000);
       await serviceRest("bookings", "POST", {
         shop_id: shopId,
@@ -108,18 +107,18 @@ test.describe("loyal clients", () => {
         date: day.toISOString().slice(0, 10),
         slot: "10:00",
         status: "done",
+        created_at: new Date(day.getTime() - 86_400_000).toISOString(),
         done_at: day.toISOString(),
       });
     }
     await c.goto("/c/cont/fidelitate");
-    await expect(c.getByText("Nivelul 1", { exact: true })).toBeVisible();
+    const mine = c.locator("main li").filter({ hasText: shopName });
+    await expect(mine).toContainText("Nivelul 1 · Lucrări aici: 3");
+    await expect(mine).toContainText("-5% la manoperă");
+    await expect(mine).toContainText("Încă 3 lucrări până la Nivelul 2");
     await expect(
-      c.getByText("Lucrări terminate în ultimii 2 ani: 2"),
-    ).toBeVisible();
-    await expect(c.getByText("Încă 3 lucrări până la Nivelul 2")).toBeVisible();
-    await expect(
-      c.getByRole("progressbar", { name: "Drumul până la Nivelul 2" }),
-    ).toHaveAttribute("aria-valuenow", "2");
+      c.getByRole("progressbar", { name: `Drumul până la Nivelul 2 la ${shopName}` }),
+    ).toHaveAttribute("aria-valuenow", "3");
     await expectNoHorizontalScroll(c);
     await shot(c, "t28c-loyalty-screen", name());
 
@@ -148,7 +147,7 @@ test.describe("loyal clients", () => {
     await c.getByLabel("Model").fill("Focus");
     await expect(
       c.getByText(
-        "Ca client fidel, ai -5% la manoperă la această programare.",
+        "Client fidel: -5% la manoperă.",
         { exact: false },
       ),
     ).toBeVisible();

@@ -207,7 +207,7 @@ function ShopDetails({ page, day, onFavorite }: { page: ShopPageData; day: strin
       )}
       {page.bookable && page.offer === null && page.loyalty?.yours == null && loyaltyText && (
         <OfferNote>
-          <strong>{t('loyalty.title')}</strong> · {loyaltyText}
+          <strong>{t('loyalty.offered')}</strong> · {loyaltyText}
         </OfferNote>
       )}
 
