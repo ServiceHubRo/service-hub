@@ -24,8 +24,9 @@ export interface ShopsMapProps {
   compact?: boolean;
 }
 
-/** Brașov, where Service-Hub starts: the view when no shop has coordinates. */
-const FALLBACK: L.LatLngTuple = [45.6427, 25.5887];
+/** The whole of Romania: the view when no shop has coordinates. */
+const FALLBACK: L.LatLngTuple = [45.94, 24.97];
+const FALLBACK_ZOOM = 6;
 const TILE_URL = import.meta.env.VITE_MAP_TILE_URL || 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
 const ATTRIBUTION =
   import.meta.env.VITE_MAP_ATTRIBUTION || '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>';
@@ -48,7 +49,7 @@ export default function ShopsMap({ shops, openLabel, onOpen, label, compact }: S
     if (!boxRef.current) return;
     const map = L.map(boxRef.current, {
       center: FALLBACK,
-      zoom: 12,
+      zoom: FALLBACK_ZOOM,
       scrollWheelZoom: !compact,
       // The small map only shows where the shop is: no zoom buttons, no pins to press.
       zoomControl: !compact,

@@ -32,10 +32,14 @@ interface Errors {
   referral?: string;
 }
 
-/** Suggestions only; any city can be typed. Service-Hub starts in Brașov county. */
+/** Suggestions only; any city can be typed: the county seats of Romania, largest first. */
 const CITY_SUGGESTIONS = [
-  'Brașov', 'Codlea', 'Săcele', 'Râșnov', 'Ghimbav', 'Zărnești', 'Făgăraș', 'Predeal', 'Prejmer',
-  'Hărman', 'Sânpetru', 'Cristian', 'Rupea', 'Victoria', 'Sibiu', 'București', 'Cluj-Napoca',
+  'București', 'Cluj-Napoca', 'Iași', 'Timișoara', 'Constanța', 'Craiova', 'Brașov', 'Galați', 'Ploiești',
+  'Oradea', 'Brăila', 'Arad', 'Pitești', 'Bacău', 'Sibiu', 'Târgu Mureș', 'Baia Mare', 'Buzău',
+  'Botoșani', 'Satu Mare', 'Râmnicu Vâlcea', 'Suceava', 'Piatra Neamț', 'Drobeta-Turnu Severin',
+  'Târgu Jiu', 'Focșani', 'Bistrița', 'Tulcea', 'Reșița', 'Târgoviște', 'Slatina', 'Alba Iulia',
+  'Deva', 'Hunedoara', 'Giurgiu', 'Vaslui', 'Zalău', 'Sfântu Gheorghe', 'Slobozia', 'Alexandria',
+  'Călărași', 'Miercurea Ciuc',
 ];
 
 /**

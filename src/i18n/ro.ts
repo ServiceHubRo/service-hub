@@ -37,7 +37,7 @@ export const ro = {
   'landing.heroText':
     'Fără cinci telefoane date în pauza de prânz, doar ca să afli că nu mai este loc săptămâna aceasta. Cauți un service, te programezi din telefon și primești devizul înainte să înceapă lucrarea.',
   'landing.drivers': 'Pentru șoferi, gratuit. Plătești doar reparația, direct la service.',
-  'landing.mock.search': 'Frâne, Brașov',
+  'landing.mock.search': 'Frâne',
   'landing.mock.shop1': 'Atelier Demo',
   'landing.mock.shop2': 'Service Exemplu',
   'landing.mock.slot': 'Liber mâine, 09:00',
@@ -56,7 +56,7 @@ export const ro = {
   'landing.driver3.title': 'Afli când mașina este gata',
   'landing.driver3.text': 'Primești mesaj când poți veni după ea. Lucrările rămân în istoricul mașinii, în garajul tău.',
   'landing.forShops': 'Pentru service-uri auto',
-  'landing.shopsTitle': 'Ai atelier în Brașov?',
+  'landing.shopsTitle': 'Ai un service auto?',
   'landing.shopsText':
     'Căutăm primele service-uri care intră cu noi de la început. Cine intră acum păstrează prețul de lansare cât timp rămâne.',
   'landing.shop1.title': 'Clienții se programează singuri',
@@ -88,7 +88,7 @@ export const ro = {
   'landing.step4.text': 'Primești un mesaj când mașina este gata de ridicare.',
   'landing.trustTitle': 'Recenzii de la clienți reali.',
   'landing.trustText': 'Poziția în listă se câștigă din notele primite după lucrări finalizate. Nimeni nu poate plăti ca să apară mai sus.',
-  'landing.footerNote': 'Service-Hub · programări online la service-uri auto. Pornim în Brașov, apoi oraș cu oraș.',
+  'landing.footerNote': 'Service-Hub · programări online la service-uri auto din toată România.',
   'landing.contact': 'Contact',
   'landing.verifyReport': 'Verifică un raport de istoric',
   'landing.phoneLabel': 'Telefon și WhatsApp: {phone}',
