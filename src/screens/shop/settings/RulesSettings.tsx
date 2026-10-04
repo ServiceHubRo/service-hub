@@ -21,7 +21,7 @@ const ADVANCE_DAYS = [7, 14, 21, 30, 45, 60, 90, 180, 365];
 const CANCEL_HOURS = [0, 1, 2, 3, 4, 6, 12, 24, 48];
 const MAX_FEE = 10000;
 /** The discounts a shop can promise new clients (the database allows exactly these). */
-const OFFERS = [5, 10, 15, 20, 25, 30];
+const OFFERS = [5, 10, 15];
 /** Loyal clients' discounts (T28c), as the database allows them. */
 const LOYALTY_L1 = [3, 5];
 const LOYALTY_L2 = [5, 7];

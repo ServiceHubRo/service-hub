@@ -26,14 +26,16 @@ select test.login(test.id('owner1'));
 update public.shops set new_client_offer = 10 where id = test.id('shop1');
 select test.fails($$update public.shops set new_client_offer = 12 where id = test.id('shop1')$$,
   'new_client_offer', 'only the listed percentages');
+select test.fails($$update public.shops set new_client_offer = 20 where id = test.id('shop1')$$,
+  'new_client_offer', 'at most 15%');
 select test.logout();
 select test.eq(new_client_offer, 10, 'the owner sets the offer') from public.shops where id = test.id('shop1');
 
 select test.login(test.id('staff1'));
-update public.shops set new_client_offer = 30 where id = test.id('shop1');
+update public.shops set new_client_offer = 15 where id = test.id('shop1');
 select test.logout();
 select test.login(current_setting('test.client_c')::uuid);
-update public.shops set new_client_offer = 30 where id = test.id('shop1');
+update public.shops set new_client_offer = 15 where id = test.id('shop1');
 select test.fails($$update public.bookings set offer_percent = 50$$, 'permission denied', 'a client cannot write an offer on a booking');
 select test.logout();
 select test.eq(new_client_offer, 10, 'neither a colleague nor a client changes it') from public.shops where id = test.id('shop1');
