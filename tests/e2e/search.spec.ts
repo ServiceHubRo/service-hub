@@ -20,6 +20,15 @@ const name = () => test.info().project.name;
 const result = (page: Page, shop: string) => page.getByRole('link', { name: new RegExp(`^${shop}`) });
 const search = (page: Page) => page.getByLabel('Caută un service');
 
+/**
+ * The list for the query on screen has arrived. Until then the previous list shows (dimmed) and is
+ * replaced when the answer comes, so a tap would land on whatever card moves under it.
+ */
+async function resultsSettled(page: Page) {
+  await expect(page).toHaveURL(/[?&]q=/);
+  await expect(page.locator('main [aria-busy="true"]')).toHaveCount(0, { timeout: 15_000 });
+}
+
 async function signInNewClient(page: Page) {
   const email = await createUser('client');
   await signIn(page, email, PASSWORD);
@@ -151,10 +160,10 @@ test.describe('client search', () => {
   test('shop page: hours, rules, phone, services, fee, reviews with replies; no fiscal data', async ({ page }) => {
     await signInNewClient(page);
     await search(page).fill('frane');
+    await resultsSettled(page);
     await result(page, 'Atelier Demo').click();
     await expect(page).toHaveURL(/\/c\/service\//);
-    // The CI runner is busy with the other projects: the page may take longer than 5 s to arrive.
-    await expect(page.getByRole('heading', { level: 1, name: 'Atelier Demo' })).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByRole('heading', { level: 1, name: 'Atelier Demo' })).toBeVisible();
     await expect(page.getByText('Str. Lungă 42, Brașov')).toBeVisible();
     await expect(page.getByText('Lun – Vin')).toBeVisible();
     await expect(page.getByText('08:00 – 18:00')).toBeVisible();
@@ -191,13 +200,15 @@ test.describe('client search', () => {
     await expect(search(page)).toHaveValue('frane');
 
     // The stars on a search card open the shop page at its reviews.
+    await resultsSettled(page);
     await result(page, 'Atelier Demo').locator('[data-reviews]').click();
     await expect(page).toHaveURL(/#recenzii$/);
-    await expect(page.getByRole('heading', { name: 'Recenzii' })).toBeInViewport({ timeout: 15_000 });
+    await expect(page.getByRole('heading', { name: 'Recenzii' })).toBeInViewport();
     await page.getByRole('link', { name: 'Toate service-urile' }).click();
     await expect(search(page)).toHaveValue('frane');
 
     // "Programează-te" opens the first of the 4 booking steps (T07).
+    await resultsSettled(page);
     await result(page, 'Atelier Demo').click();
     // Always at hand: fixed at the bottom while the page scrolls, at the top of the page and further down.
     const book = page.getByRole('link', { name: 'Programează-te' });
