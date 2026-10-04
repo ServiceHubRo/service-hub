@@ -32,6 +32,7 @@ Aici afli ce date personale folosește Service-Hub, de ce, cine le mai vede, câ
 
 - **Mașinile din Garaj:** marca, modelul, anul, numărul de înmatriculare, seria de șasiu (dacă o treci) și datele de expirare pentru ITP, RCA și rovinietă (dacă le treci).
 - **Programările:** service-ul, serviciul, ziua și ora, nota ta, starea, plus o copie a numelui, telefonului și a datelor mașinii de la momentul programării.
+- **Programările trecute de service pentru tine**, când suni sau mergi direct la service și nu ai cont: numele, telefonul, emailul (dacă l-ai dat), mașina și ziua, pe care service-ul le scrie în Service-Hub. Primești un SMS (și un email, dacă l-ai dat) cu un link spre programare. Linkul arată doar service-ul, ziua, serviciul, mașina și starea, fără nume sau telefon. Dacă îți faci cont cu același telefon sau email, confirmat, programarea și mașina trec în contul tău. Până atunci, datele le văd doar service-ul și echipa Service-Hub.
 - **Devizele și lucrările:** pozițiile și prețurile, ce ai acceptat sau refuzat, lucrarea făcută, costul și **kilometrajul** trecut de service la finalizare.
 - **Recenziile** și **mesajele** tale; service-urile **favorite**.
 - **Rapoartele de istoric** cumpărate: codul, mașina, lucrările incluse, prețul, starea plății și fișierul PDF.
@@ -73,6 +74,7 @@ Aici afli ce date personale folosește Service-Hub, de ce, cine le mai vede, câ
 | Căutare, programare, deviz, lucrare, mesaje, istoric | Contractul cu tine |
 | Trimiterea datelor programării către service-ul ales | Contractul cu tine |
 | Notificări despre programări și cont (email, SMS către service-uri) | Contractul cu tine |
+| Programarea trecută de service pentru tine (fără cont) și SMS-ul sau emailul cu linkul ei | Pașii ceruți de tine pentru programarea la service (alin. 1 lit. b); service-ul poate trimite mesajul doar dacă ai fost de acord |
 | Notificări push | Acordul tău, dat în browser (îl retragi oricând) și contractul |
 | Alertele pentru ITP, RCA și rovinietă | Contractul cu tine (le ceri când treci datele) |
 | Reminderul pentru următoarea revizie (după ultima lucrare de acel fel făcută prin Platformă) și cererea de recenzie după o lucrare | Contractul cu tine; pe amândouă le oprești din Cont |
@@ -118,8 +120,8 @@ Lucrăm cu furnizori care prelucrează date doar la cererea noastră, pe baza un
 |---|---|---|---|
 | Supabase | Baza de date, conturile, fișierele, funcțiile de pe server | Toate datele Platformei | UE (Frankfurt) |
 | Netlify | Găzduirea aplicației web | Adresa IP, browserul, paginile cerute | SUA și rețea globală |
-| Resend | Emailuri (confirmarea contului, parolă, invitații, plăți, raport gata) | Adresa de email, textul emailului | SUA |
-| SMSO | SMS-uri: codul de confirmare a telefonului (service-uri; clienți după neprezentări) și cererile noi către service-uri, dacă sunt activate | Telefonul, textul SMS-ului (codul; la cereri: numele clientului, serviciul, ziua) | România |
+| Resend | Emailuri (confirmarea contului, parolă, invitații, plăți, raport gata, linkul programării trecute de service) | Adresa de email, textul emailului | SUA |
+| SMSO | SMS-uri: codul de confirmare a telefonului (service-uri; clienți după neprezentări), cererile noi către service-uri, dacă sunt activate, și linkul programării trecute de service pentru un client fără cont | Telefonul, textul SMS-ului (codul; la cereri: numele clientului, serviciul, ziua; la programarea trecută de service: service-ul, ziua, ora și linkul) | România |
 | Stripe | Plata abonamentului și a raportului | Numele, emailul, suma; datele cardului le introduci direct la Stripe | UE și SUA |
 | Sentry | Rapoartele de erori | Codul contului, rolul, browserul, pagina, eroarea | UE (Frankfurt) |
 | Cloudflare | Verificarea anti-robot la înscriere și autentificare | Adresa IP, semnale ale browserului | SUA și rețea globală |

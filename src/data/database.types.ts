@@ -97,6 +97,8 @@ export type Database = {
           cancelled_by: string | null
           car_id: string | null
           car_snapshot: Json
+          claimed_at: string | null
+          client_email: string | null
           client_id: string | null
           client_lang: string
           client_name: string | null
@@ -112,6 +114,8 @@ export type Database = {
           followup_sent_at: string | null
           id: string
           inspection_started_at: string | null
+          invite_sent_at: string | null
+          invite_token: string | null
           loyalty_level: number | null
           loyalty_percent: number | null
           note: string | null
@@ -124,6 +128,7 @@ export type Database = {
           share_history_at: string | null
           shop_id: string
           slot: string
+          source: string
           started_at: string | null
           status: string
           status_changed_at: string
@@ -136,6 +141,8 @@ export type Database = {
           cancelled_by?: string | null
           car_id?: string | null
           car_snapshot?: Json
+          claimed_at?: string | null
+          client_email?: string | null
           client_id?: string | null
           client_lang?: string
           client_name?: string | null
@@ -151,6 +158,8 @@ export type Database = {
           followup_sent_at?: string | null
           id?: string
           inspection_started_at?: string | null
+          invite_sent_at?: string | null
+          invite_token?: string | null
           loyalty_level?: number | null
           loyalty_percent?: number | null
           note?: string | null
@@ -163,6 +172,7 @@ export type Database = {
           share_history_at?: string | null
           shop_id: string
           slot: string
+          source?: string
           started_at?: string | null
           status?: string
           status_changed_at?: string
@@ -175,6 +185,8 @@ export type Database = {
           cancelled_by?: string | null
           car_id?: string | null
           car_snapshot?: Json
+          claimed_at?: string | null
+          client_email?: string | null
           client_id?: string | null
           client_lang?: string
           client_name?: string | null
@@ -190,6 +202,8 @@ export type Database = {
           followup_sent_at?: string | null
           id?: string
           inspection_started_at?: string | null
+          invite_sent_at?: string | null
+          invite_token?: string | null
           loyalty_level?: number | null
           loyalty_percent?: number | null
           note?: string | null
@@ -202,6 +216,7 @@ export type Database = {
           share_history_at?: string | null
           shop_id?: string
           slot?: string
+          source?: string
           started_at?: string | null
           status?: string
           status_changed_at?: string
@@ -1143,6 +1158,7 @@ export type Database = {
           booking_id: string
           created_at: string
           decided_at: string | null
+          decided_by: string | null
           expires_at: string | null
           expiry_reminded_at: string | null
           id: string
@@ -1159,6 +1175,7 @@ export type Database = {
           booking_id: string
           created_at?: string
           decided_at?: string | null
+          decided_by?: string | null
           expires_at?: string | null
           expiry_reminded_at?: string | null
           id?: string
@@ -1175,6 +1192,7 @@ export type Database = {
           booking_id?: string
           created_at?: string
           decided_at?: string | null
+          decided_by?: string | null
           expires_at?: string | null
           expiry_reminded_at?: string | null
           id?: string
@@ -2235,6 +2253,8 @@ export type Database = {
           cancelled_by: string | null
           car_id: string | null
           car_snapshot: Json
+          claimed_at: string | null
+          client_email: string | null
           client_id: string | null
           client_lang: string
           client_name: string | null
@@ -2250,6 +2270,8 @@ export type Database = {
           followup_sent_at: string | null
           id: string
           inspection_started_at: string | null
+          invite_sent_at: string | null
+          invite_token: string | null
           loyalty_level: number | null
           loyalty_percent: number | null
           note: string | null
@@ -2262,6 +2284,7 @@ export type Database = {
           share_history_at: string | null
           shop_id: string
           slot: string
+          source: string
           started_at: string | null
           status: string
           status_changed_at: string
@@ -2462,6 +2485,8 @@ export type Database = {
           cancelled_by: string | null
           car_id: string | null
           car_snapshot: Json
+          claimed_at: string | null
+          client_email: string | null
           client_id: string | null
           client_lang: string
           client_name: string | null
@@ -2477,6 +2502,8 @@ export type Database = {
           followup_sent_at: string | null
           id: string
           inspection_started_at: string | null
+          invite_sent_at: string | null
+          invite_token: string | null
           loyalty_level: number | null
           loyalty_percent: number | null
           note: string | null
@@ -2489,6 +2516,7 @@ export type Database = {
           share_history_at: string | null
           shop_id: string
           slot: string
+          source: string
           started_at: string | null
           status: string
           status_changed_at: string
@@ -2526,6 +2554,7 @@ export type Database = {
         }
         Returns: undefined
       }
+      claim_booking: { Args: { p_token: string }; Returns: Json }
       claim_notifications: { Args: { p_limit?: number }; Returns: Json }
       clean_quote_items: {
         Args: { p_items: Json }
@@ -2598,6 +2627,8 @@ export type Database = {
           cancelled_by: string | null
           car_id: string | null
           car_snapshot: Json
+          claimed_at: string | null
+          client_email: string | null
           client_id: string | null
           client_lang: string
           client_name: string | null
@@ -2613,6 +2644,8 @@ export type Database = {
           followup_sent_at: string | null
           id: string
           inspection_started_at: string | null
+          invite_sent_at: string | null
+          invite_token: string | null
           loyalty_level: number | null
           loyalty_percent: number | null
           note: string | null
@@ -2625,6 +2658,7 @@ export type Database = {
           share_history_at: string | null
           shop_id: string
           slot: string
+          source: string
           started_at: string | null
           status: string
           status_changed_at: string
@@ -2646,6 +2680,8 @@ export type Database = {
           cancelled_by: string | null
           car_id: string | null
           car_snapshot: Json
+          claimed_at: string | null
+          client_email: string | null
           client_id: string | null
           client_lang: string
           client_name: string | null
@@ -2661,6 +2697,8 @@ export type Database = {
           followup_sent_at: string | null
           id: string
           inspection_started_at: string | null
+          invite_sent_at: string | null
+          invite_token: string | null
           loyalty_level: number | null
           loyalty_percent: number | null
           note: string | null
@@ -2673,6 +2711,7 @@ export type Database = {
           share_history_at: string | null
           shop_id: string
           slot: string
+          source: string
           started_at: string | null
           status: string
           status_changed_at: string
@@ -2706,6 +2745,8 @@ export type Database = {
           cancelled_by: string | null
           car_id: string | null
           car_snapshot: Json
+          claimed_at: string | null
+          client_email: string | null
           client_id: string | null
           client_lang: string
           client_name: string | null
@@ -2721,6 +2762,8 @@ export type Database = {
           followup_sent_at: string | null
           id: string
           inspection_started_at: string | null
+          invite_sent_at: string | null
+          invite_token: string | null
           loyalty_level: number | null
           loyalty_percent: number | null
           note: string | null
@@ -2733,6 +2776,7 @@ export type Database = {
           share_history_at: string | null
           shop_id: string
           slot: string
+          source: string
           started_at: string | null
           status: string
           status_changed_at: string
@@ -2752,6 +2796,7 @@ export type Database = {
           booking_id: string
           created_at: string
           decided_at: string | null
+          decided_by: string | null
           expires_at: string | null
           expiry_reminded_at: string | null
           id: string
@@ -2784,6 +2829,8 @@ export type Database = {
           cancelled_by: string | null
           car_id: string | null
           car_snapshot: Json
+          claimed_at: string | null
+          client_email: string | null
           client_id: string | null
           client_lang: string
           client_name: string | null
@@ -2799,6 +2846,8 @@ export type Database = {
           followup_sent_at: string | null
           id: string
           inspection_started_at: string | null
+          invite_sent_at: string | null
+          invite_token: string | null
           loyalty_level: number | null
           loyalty_percent: number | null
           note: string | null
@@ -2811,6 +2860,7 @@ export type Database = {
           share_history_at: string | null
           shop_id: string
           slot: string
+          source: string
           started_at: string | null
           status: string
           status_changed_at: string
@@ -2832,6 +2882,8 @@ export type Database = {
           cancelled_by: string | null
           car_id: string | null
           car_snapshot: Json
+          claimed_at: string | null
+          client_email: string | null
           client_id: string | null
           client_lang: string
           client_name: string | null
@@ -2847,6 +2899,8 @@ export type Database = {
           followup_sent_at: string | null
           id: string
           inspection_started_at: string | null
+          invite_sent_at: string | null
+          invite_token: string | null
           loyalty_level: number | null
           loyalty_percent: number | null
           note: string | null
@@ -2859,6 +2913,7 @@ export type Database = {
           share_history_at: string | null
           shop_id: string
           slot: string
+          source: string
           started_at: string | null
           status: string
           status_changed_at: string
@@ -2938,6 +2993,7 @@ export type Database = {
           booking_id: string
           created_at: string
           decided_at: string | null
+          decided_by: string | null
           expires_at: string | null
           expiry_reminded_at: string | null
           id: string
@@ -2958,6 +3014,7 @@ export type Database = {
         }
       }
       instant_for_client: { Args: { p_client_id: string }; Returns: boolean }
+      invite_preview: { Args: { p_token: string }; Returns: Json }
       invite_staff: {
         Args: { p_email: string; p_request_id: string; p_token: string }
         Returns: Json
@@ -3031,6 +3088,8 @@ export type Database = {
           cancelled_by: string | null
           car_id: string | null
           car_snapshot: Json
+          claimed_at: string | null
+          client_email: string | null
           client_id: string | null
           client_lang: string
           client_name: string | null
@@ -3046,6 +3105,8 @@ export type Database = {
           followup_sent_at: string | null
           id: string
           inspection_started_at: string | null
+          invite_sent_at: string | null
+          invite_token: string | null
           loyalty_level: number | null
           loyalty_percent: number | null
           note: string | null
@@ -3058,6 +3119,7 @@ export type Database = {
           share_history_at: string | null
           shop_id: string
           slot: string
+          source: string
           started_at: string | null
           status: string
           status_changed_at: string
@@ -3079,6 +3141,8 @@ export type Database = {
           cancelled_by: string | null
           car_id: string | null
           car_snapshot: Json
+          claimed_at: string | null
+          client_email: string | null
           client_id: string | null
           client_lang: string
           client_name: string | null
@@ -3094,6 +3158,8 @@ export type Database = {
           followup_sent_at: string | null
           id: string
           inspection_started_at: string | null
+          invite_sent_at: string | null
+          invite_token: string | null
           loyalty_level: number | null
           loyalty_percent: number | null
           note: string | null
@@ -3106,6 +3172,7 @@ export type Database = {
           share_history_at: string | null
           shop_id: string
           slot: string
+          source: string
           started_at: string | null
           status: string
           status_changed_at: string
@@ -3136,6 +3203,8 @@ export type Database = {
           cancelled_by: string | null
           car_id: string | null
           car_snapshot: Json
+          claimed_at: string | null
+          client_email: string | null
           client_id: string | null
           client_lang: string
           client_name: string | null
@@ -3151,6 +3220,8 @@ export type Database = {
           followup_sent_at: string | null
           id: string
           inspection_started_at: string | null
+          invite_sent_at: string | null
+          invite_token: string | null
           loyalty_level: number | null
           loyalty_percent: number | null
           note: string | null
@@ -3163,6 +3234,7 @@ export type Database = {
           share_history_at: string | null
           shop_id: string
           slot: string
+          source: string
           started_at: string | null
           status: string
           status_changed_at: string
@@ -3312,6 +3384,8 @@ export type Database = {
           cancelled_by: string | null
           car_id: string | null
           car_snapshot: Json
+          claimed_at: string | null
+          client_email: string | null
           client_id: string | null
           client_lang: string
           client_name: string | null
@@ -3327,6 +3401,8 @@ export type Database = {
           followup_sent_at: string | null
           id: string
           inspection_started_at: string | null
+          invite_sent_at: string | null
+          invite_token: string | null
           loyalty_level: number | null
           loyalty_percent: number | null
           note: string | null
@@ -3339,6 +3415,7 @@ export type Database = {
           share_history_at: string | null
           shop_id: string
           slot: string
+          source: string
           started_at: string | null
           status: string
           status_changed_at: string
@@ -3548,6 +3625,8 @@ export type Database = {
           cancelled_by: string | null
           car_id: string | null
           car_snapshot: Json
+          claimed_at: string | null
+          client_email: string | null
           client_id: string | null
           client_lang: string
           client_name: string | null
@@ -3563,6 +3642,8 @@ export type Database = {
           followup_sent_at: string | null
           id: string
           inspection_started_at: string | null
+          invite_sent_at: string | null
+          invite_token: string | null
           loyalty_level: number | null
           loyalty_percent: number | null
           note: string | null
@@ -3575,6 +3656,7 @@ export type Database = {
           share_history_at: string | null
           shop_id: string
           slot: string
+          source: string
           started_at: string | null
           status: string
           status_changed_at: string
@@ -3702,6 +3784,8 @@ export type Database = {
           cancelled_by: string | null
           car_id: string | null
           car_snapshot: Json
+          claimed_at: string | null
+          client_email: string | null
           client_id: string | null
           client_lang: string
           client_name: string | null
@@ -3717,6 +3801,8 @@ export type Database = {
           followup_sent_at: string | null
           id: string
           inspection_started_at: string | null
+          invite_sent_at: string | null
+          invite_token: string | null
           loyalty_level: number | null
           loyalty_percent: number | null
           note: string | null
@@ -3729,6 +3815,7 @@ export type Database = {
           share_history_at: string | null
           shop_id: string
           slot: string
+          source: string
           started_at: string | null
           status: string
           status_changed_at: string
@@ -3784,6 +3871,8 @@ export type Database = {
           cancelled_by: string | null
           car_id: string | null
           car_snapshot: Json
+          claimed_at: string | null
+          client_email: string | null
           client_id: string | null
           client_lang: string
           client_name: string | null
@@ -3799,6 +3888,8 @@ export type Database = {
           followup_sent_at: string | null
           id: string
           inspection_started_at: string | null
+          invite_sent_at: string | null
+          invite_token: string | null
           loyalty_level: number | null
           loyalty_percent: number | null
           note: string | null
@@ -3811,6 +3902,7 @@ export type Database = {
           share_history_at: string | null
           shop_id: string
           slot: string
+          source: string
           started_at: string | null
           status: string
           status_changed_at: string
@@ -3848,6 +3940,8 @@ export type Database = {
           cancelled_by: string | null
           car_id: string | null
           car_snapshot: Json
+          claimed_at: string | null
+          client_email: string | null
           client_id: string | null
           client_lang: string
           client_name: string | null
@@ -3863,6 +3957,8 @@ export type Database = {
           followup_sent_at: string | null
           id: string
           inspection_started_at: string | null
+          invite_sent_at: string | null
+          invite_token: string | null
           loyalty_level: number | null
           loyalty_percent: number | null
           note: string | null
@@ -3875,6 +3971,7 @@ export type Database = {
           share_history_at: string | null
           shop_id: string
           slot: string
+          source: string
           started_at: string | null
           status: string
           status_changed_at: string
@@ -3889,6 +3986,130 @@ export type Database = {
         }
       }
       shop_colleague_count: { Args: { p_shop_id: string }; Returns: number }
+      shop_create_booking: {
+        Args: {
+          p_car: Json
+          p_client_email?: string
+          p_client_lang?: string
+          p_client_name: string
+          p_client_phone: string
+          p_date: string
+          p_extra_service_ids?: string[]
+          p_note?: string
+          p_request_id: string
+          p_send_invite?: boolean
+          p_service_id: string
+          p_slot: string
+        }
+        Returns: {
+          cancel_reason: string | null
+          cancelled_at: string | null
+          cancelled_by: string | null
+          car_id: string | null
+          car_snapshot: Json
+          claimed_at: string | null
+          client_email: string | null
+          client_id: string | null
+          client_lang: string
+          client_name: string | null
+          client_phone: string | null
+          closed_reason: string | null
+          confirmed_at: string | null
+          cost: number | null
+          created_at: string
+          date: string
+          decline_reason: string | null
+          done_at: string | null
+          extra_service_ids: string[]
+          followup_sent_at: string | null
+          id: string
+          inspection_started_at: string | null
+          invite_sent_at: string | null
+          invite_token: string | null
+          loyalty_level: number | null
+          loyalty_percent: number | null
+          note: string | null
+          odometer: number | null
+          offer_percent: number | null
+          ref: string
+          reminder_sent_at: string | null
+          service_id: string
+          share_history: boolean
+          share_history_at: string | null
+          shop_id: string
+          slot: string
+          source: string
+          started_at: string | null
+          status: string
+          status_changed_at: string
+          updated_at: string
+          work: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "bookings"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      shop_decide_quote: {
+        Args: {
+          p_approved_item_ids: string[]
+          p_booking_id: string
+          p_quote_id: string
+          p_request_id: string
+        }
+        Returns: {
+          cancel_reason: string | null
+          cancelled_at: string | null
+          cancelled_by: string | null
+          car_id: string | null
+          car_snapshot: Json
+          claimed_at: string | null
+          client_email: string | null
+          client_id: string | null
+          client_lang: string
+          client_name: string | null
+          client_phone: string | null
+          closed_reason: string | null
+          confirmed_at: string | null
+          cost: number | null
+          created_at: string
+          date: string
+          decline_reason: string | null
+          done_at: string | null
+          extra_service_ids: string[]
+          followup_sent_at: string | null
+          id: string
+          inspection_started_at: string | null
+          invite_sent_at: string | null
+          invite_token: string | null
+          loyalty_level: number | null
+          loyalty_percent: number | null
+          note: string | null
+          odometer: number | null
+          offer_percent: number | null
+          ref: string
+          reminder_sent_at: string | null
+          service_id: string
+          share_history: boolean
+          share_history_at: string | null
+          shop_id: string
+          slot: string
+          source: string
+          started_at: string | null
+          status: string
+          status_changed_at: string
+          updated_at: string
+          work: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "bookings"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       shop_hidden_reasons: { Args: { p_shop_id: string }; Returns: string[] }
       shop_month_numbers: {
         Args: { p_month: string; p_shop_id: string }
@@ -3911,6 +4132,8 @@ export type Database = {
           cancelled_by: string | null
           car_id: string | null
           car_snapshot: Json
+          claimed_at: string | null
+          client_email: string | null
           client_id: string | null
           client_lang: string
           client_name: string | null
@@ -3926,6 +4149,8 @@ export type Database = {
           followup_sent_at: string | null
           id: string
           inspection_started_at: string | null
+          invite_sent_at: string | null
+          invite_token: string | null
           loyalty_level: number | null
           loyalty_percent: number | null
           note: string | null
@@ -3938,6 +4163,7 @@ export type Database = {
           share_history_at: string | null
           shop_id: string
           slot: string
+          source: string
           started_at: string | null
           status: string
           status_changed_at: string
@@ -3959,6 +4185,8 @@ export type Database = {
           cancelled_by: string | null
           car_id: string | null
           car_snapshot: Json
+          claimed_at: string | null
+          client_email: string | null
           client_id: string | null
           client_lang: string
           client_name: string | null
@@ -3974,6 +4202,8 @@ export type Database = {
           followup_sent_at: string | null
           id: string
           inspection_started_at: string | null
+          invite_sent_at: string | null
+          invite_token: string | null
           loyalty_level: number | null
           loyalty_percent: number | null
           note: string | null
@@ -3986,6 +4216,7 @@ export type Database = {
           share_history_at: string | null
           shop_id: string
           slot: string
+          source: string
           started_at: string | null
           status: string
           status_changed_at: string
@@ -4124,6 +4355,8 @@ export type Database = {
           cancelled_by: string | null
           car_id: string | null
           car_snapshot: Json
+          claimed_at: string | null
+          client_email: string | null
           client_id: string | null
           client_lang: string
           client_name: string | null
@@ -4139,6 +4372,8 @@ export type Database = {
           followup_sent_at: string | null
           id: string
           inspection_started_at: string | null
+          invite_sent_at: string | null
+          invite_token: string | null
           loyalty_level: number | null
           loyalty_percent: number | null
           note: string | null
@@ -4151,6 +4386,7 @@ export type Database = {
           share_history_at: string | null
           shop_id: string
           slot: string
+          source: string
           started_at: string | null
           status: string
           status_changed_at: string

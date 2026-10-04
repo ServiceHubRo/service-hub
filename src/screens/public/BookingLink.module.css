@@ -1,0 +1,36 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.shop {
+  font-weight: 700;
+  font-size: 17px;
+}
+
+.rows {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 6px 14px;
+  font-size: 14.5px;
+}
+
+.rows dt {
+  color: var(--muted);
+}
+
+.rows dd {
+  overflow-wrap: anywhere;
+}
+
+.why {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}

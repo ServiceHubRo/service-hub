@@ -199,7 +199,8 @@ function fromOutcome(channel: string, e: ClaimedEvent, r: SendOutcome): ChannelR
 }
 
 async function emailChannel(e: ClaimedEvent, senders: Senders): Promise<ChannelResult> {
-  const platform = e.user_id === null;
+  // No user: a platform event to ADMIN_EMAIL, or the invitation to a client without an account (T29).
+  const platform = e.user_id === null && e.event !== 'walk_in_invite';
   const to = platform ? senders.adminEmail : e.email;
   if (!senders.email.apiKey || (platform && !to)) return { done: true, log: { channel: 'email', status: 'not_configured' } };
   if (!to) return { done: true, log: { channel: 'email', status: 'no_address' } };
@@ -215,7 +216,7 @@ async function emailChannel(e: ClaimedEvent, senders: Senders): Promise<ChannelR
 async function smsChannel(e: ClaimedEvent, senders: Senders): Promise<ChannelResult> {
   if (!senders.sms.apiKey) return { done: true, log: { channel: 'sms', status: 'not_configured' } };
   if (!e.phone) return { done: true, log: { channel: 'sms', status: 'no_phone' } };
-  const text = smsForEvent(e);
+  const text = smsForEvent(e, senders.app);
   if (!text) return { done: true, log: { channel: 'sms', status: 'no_template' } };
   return fromOutcome('sms', e, await sendSms(e.phone, text, senders.sms));
 }

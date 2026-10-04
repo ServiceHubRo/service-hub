@@ -80,6 +80,16 @@ export const EMAIL_BUTTON_SIZES: Record<string, { slug: string; width: number; h
     "width": 194,
     "height": 44
   },
+  "Vezi programarea": {
+    "slug": "vezi-programarea",
+    "width": 175,
+    "height": 44
+  },
+  "See the booking": {
+    "slug": "see-the-booking",
+    "width": 162,
+    "height": 44
+  },
   "Deschide Service-Hub": {
     "slug": "deschide-service-hub",
     "width": 208,

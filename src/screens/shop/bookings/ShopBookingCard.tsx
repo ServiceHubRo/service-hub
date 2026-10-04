@@ -1,4 +1,4 @@
-import { ClipboardList, Phone, TriangleAlert } from 'lucide-react';
+import { ClipboardList, Phone, Store, TriangleAlert } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ActionButton } from '../../../components/ActionButton';
@@ -21,13 +21,14 @@ import {
   withdrawQuote,
   type Booking,
 } from '../../../data/rpc';
-import type { ShopBooking } from '../../../data/shopBookings';
+import { isUnclaimedWalkIn, type ShopBooking } from '../../../data/shopBookings';
 import { useI18n } from '../../../i18n/context';
 import { daysFromToday, formatDate, formatMoney, formatTime, ymdInBucharest } from '../../../i18n/format';
 import { rowServicesText } from '../../../lib/bookingServices';
 import { slotStarted } from '../../../lib/shopBookings';
 import { formatPhone, normalizePhone } from '../../../lib/validators';
 import { ConfirmPanel, ReasonPanel } from './BookingPanels';
+import { ClientAnswerPanel } from './ClientAnswerPanel';
 import { CompletionPanel } from './CompletionPanel';
 import { QuoteComposer } from './QuoteComposer';
 import { QuoteLines } from './QuoteLines';
@@ -36,7 +37,7 @@ import { MessageLink } from '../../messages/MessageLink';
 import { vehicleFilePath } from '../paths';
 import styles from './shopBookings.module.css';
 
-type PanelKind = 'decline' | 'reschedule' | 'cancel' | 'noShow' | 'quote' | 'editQuote' | 'withdraw' | 'complete';
+type PanelKind = 'decline' | 'reschedule' | 'cancel' | 'noShow' | 'quote' | 'editQuote' | 'withdraw' | 'complete' | 'answer';
 
 /** From 3 no-shows in 90 days shops see a discreet line (ARCHITECTURE §6); no automatic block. */
 const NO_SHOW_MARK = 3;
@@ -83,6 +84,7 @@ export function ShopBookingCard({ booking: b, shopId, fee, expiryDays, now, onDo
   const car = [b.car_snapshot.make, b.car_snapshot.model, b.car_snapshot.year].filter(Boolean).join(' ');
   const plate = b.car_snapshot.plate;
   const phone = b.client_phone;
+  const walkIn = isUnclaimedWalkIn(b);
 
   return (
     <Card highlight={b.status === 'pending'} className={styles.card}>
@@ -128,6 +130,13 @@ export function ShopBookingCard({ booking: b, shopId, fee, expiryDays, now, onDo
         {b.offer_percent ? <OfferNote>{t('offer.shop', { n: b.offer_percent })}</OfferNote> : null}
         {b.loyalty_percent ? <OfferNote>{t('loyalty.shop', { n: b.loyalty_percent, level: b.loyalty_level ?? 1 })}</OfferNote> : null}
         {b.share_history && <p className={styles.muted}>{t('sb.card.shared')}</p>}
+        {b.source === 'shop' && (
+          <p className={styles.walkIn}>
+            <Store size={14} aria-hidden="true" />
+            {t('sb.card.walkIn')} ·{' '}
+            {b.claimed ? t('sb.card.inAccount') : b.invite_sent_at ? t('sb.card.smsSent') : t('sb.card.noAccount')}
+          </p>
+        )}
       </Card>
 
       <StatusDetail booking={b} started={started} />
@@ -175,6 +184,11 @@ export function ShopBookingCard({ booking: b, shopId, fee, expiryDays, now, onDo
           )}
           {b.status === 'quote_sent' && (
             <>
+              {walkIn && b.quote && (
+                <Button variant="primary" onClick={() => setPanel('answer')}>
+                  {t('sb.action.clientAnswer')}
+                </Button>
+              )}
               <Button onClick={() => setPanel('editQuote')}>{t('sb.action.editQuote')}</Button>
               <Button variant="ghost" onClick={() => setPanel('withdraw')}>
                 {t('sb.action.withdrawQuote')}
@@ -246,6 +260,7 @@ export function ShopBookingCard({ booking: b, shopId, fee, expiryDays, now, onDo
       )}
       {panel === 'reschedule' && <ReschedulePanel booking={b} shopId={shopId} act={act} onClose={close} />}
       {panel === 'complete' && <CompletionPanel booking={b} act={act} onClose={close} />}
+      {panel === 'answer' && b.quote && <ClientAnswerPanel booking={b} quote={b.quote} act={act} onClose={close} />}
       {(panel === 'quote' || panel === 'editQuote') && (
         <QuoteComposer
           booking={b}
@@ -288,7 +303,7 @@ function StatusDetail({ booking: b, started }: { booking: ShopBooking; started: 
         <>
           {b.quote && <QuoteLines quote={b.quote} />}
           <p className={styles.muted}>
-            {t('sb.detail.quoteWaiting')}
+            {isUnclaimedWalkIn(b) ? t('sb.detail.quoteAtShop') : t('sb.detail.quoteWaiting')}
             {b.quote?.expires_at && <> {t('sb.detail.quoteExpires', { when: at(b.quote.expires_at) })}</>}
           </p>
         </>
@@ -300,12 +315,14 @@ function StatusDetail({ booking: b, started }: { booking: ShopBooking; started: 
           {b.quote && (
             <p className={styles.ok}>
               {b.quote.status === 'partially_accepted'
-                ? t('sb.detail.approvedPartial', {
+                ? t(b.quote.decided_by === 'shop' ? 'sb.detail.approvedPartialAtShop' : 'sb.detail.approvedPartial', {
                     n: b.quote.items.filter((i) => i.approved).length,
                     total: b.quote.items.length,
                     amount: formatMoney(lang, b.quote.total_approved ?? 0),
                   })
-                : t('sb.detail.approved', { amount: formatMoney(lang, b.quote.total_approved ?? b.quote.total_sent) })}{' '}
+                : t(b.quote.decided_by === 'shop' ? 'sb.detail.approvedAtShop' : 'sb.detail.approved', {
+                    amount: formatMoney(lang, b.quote.total_approved ?? b.quote.total_sent),
+                  })}{' '}
               {t('sb.detail.approvedNext')}
             </p>
           )}

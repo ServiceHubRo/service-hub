@@ -4,6 +4,14 @@
   gap: 12px;
 }
 
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
 .list {
   list-style: none;
   display: flex;
@@ -284,6 +292,11 @@
   line-height: 1.2;
 }
 
+/* On the amber tint of a picked tile the muted grey is too faint to read. */
+.tileOn .tileSmall {
+  color: var(--muted-strong);
+}
+
 .tileBig {
   font-family: var(--font-display);
   font-size: 22px;
@@ -389,4 +402,26 @@
   border-radius: var(--radius-input);
   background: var(--amber-tint);
   font-size: 14px;
+}
+
+/* ---------------------------------------------------------------- added by the shop (T29) */
+.walkIn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted-strong);
+  font-size: 13px;
+}
+
+.answerLines {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.answerLine {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
 }

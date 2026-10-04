@@ -112,7 +112,7 @@ where grantee = 'anon' and table_schema = 'public' and privilege_type <> 'SELECT
 -- Functions callable from the API are an explicit list (a new RPC must be granted on purpose).
 select test.eq(
   string_agg(p.proname, ', ' order by p.proname) filter (where has_function_privilege('anon', p.oid, 'execute')),
-  'check_referral_code, format_sequence_id, get_schema_version, get_staff_invite, is_valid_cui, is_valid_iban, is_valid_postal_code, is_valid_regcom, is_valid_vin, normalize_code, public_pricing, try_uuid, verify_report',
+  'check_referral_code, format_sequence_id, get_schema_version, get_staff_invite, invite_preview, is_valid_cui, is_valid_iban, is_valid_postal_code, is_valid_regcom, is_valid_vin, normalize_code, public_pricing, try_uuid, verify_report',
   'functions callable by anon')
 from pg_proc p where p.pronamespace = 'public'::regnamespace;
 select test.eq(
@@ -126,11 +126,11 @@ select test.eq(
   || 'admin_send_notice, admin_set_account_suspended, admin_set_notification_text, admin_set_service_reminder, admin_set_shop_suspended, '
   || 'admin_set_subscription_price, admin_set_subscription_status, admin_update_category, admin_update_service, '
   || 'admin_update_settings, admin_update_shop, admin_verify_phone, admin_void_history_report, admin_withdraw_notice, booking_thread, can_read_booking, can_read_notice, can_read_shop, can_read_thread, cancel_booking, '
-  || 'cancel_email_change, check_phone_code, client_no_show_count, complete_job, confirm_booking, create_booking, decide_quote, '
+  || 'cancel_email_change, check_phone_code, claim_booking, client_no_show_count, complete_job, confirm_booking, create_booking, decide_quote, '
   || 'decline_booking, export_my_data, get_availability, get_shop_page, get_shop_setup, history_report_preview, invite_staff, is_admin, is_shop_member, '
   || 'is_shop_owner, is_shop_public, last_odometer_for_booking, list_shop_bookings, list_shop_history, list_shop_staff, list_threads, '
   || 'mark_no_show, mark_thread_read, my_phone_verification, my_referrals, my_shop_id, my_subscription_offers, new_client_offers, replace_quote, reply_review, report_review, reschedule_booking, save_native_push_token, save_push_subscription, '
-  || 'save_shop_hours, search_card_extras, search_cities, search_shops, send_message, send_quote, set_booking_history_share, set_shop_services, shop_cancel_booking, shop_reports, shop_vehicle_file, start_inspection, '
+  || 'save_shop_hours, search_card_extras, search_cities, search_shops, send_message, send_quote, set_booking_history_share, set_shop_services, shop_cancel_booking, shop_create_booking, shop_decide_quote, shop_reports, shop_vehicle_file, start_inspection, '
   || 'start_work, submit_review, toggle_favorite, touch_last_active, withdraw_quote',
   'functions callable only when signed in')
 from pg_proc p where p.pronamespace = 'public'::regnamespace;

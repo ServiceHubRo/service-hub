@@ -491,7 +491,7 @@ export async function fetchReviews(q?: string): Promise<AdminReviews> {
 }
 
 /** Why a review looks staged (T25), strongest first. */
-export type ReviewSignal = 'same_phone' | 'quick_job' | 'burst' | 'new_account';
+export type ReviewSignal = 'same_phone' | 'quick_job' | 'burst' | 'new_account' | 'shop_added';
 
 export interface SuspectReview extends AdminReview {
   signals: ReviewSignal[];

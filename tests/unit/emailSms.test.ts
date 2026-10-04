@@ -162,6 +162,26 @@ describe('SMS texts', () => {
     expect(smsForEvent({ ...request('ro'), role: 'client' })).toBeNull();
   });
 
+  it('the invitation of a booking the shop added (T29): where, when and the link', () => {
+    const invite = (lang: 'ro' | 'en', shop = 'Atelier Demo'): NotificationEvent => ({
+      event: 'walk_in_invite',
+      role: 'client',
+      lang,
+      booking_id: 'b',
+      params: { shop_name: shop, date: '2026-10-12', slot: '10:00', token: 'abcdef0123456789' },
+    });
+    expect(smsForEvent(invite('ro'), 'https://service-hub.ro')).toBe(
+      'Service-Hub: programarea ta la Atelier Demo, Lun 12 oct, 10:00. Vezi-o in aplicatie: https://service-hub.ro/p/abcdef0123456789',
+    );
+    expect(smsForEvent(invite('en'), 'https://service-hub.ro')).toBe(
+      'Service-Hub: your booking at Atelier Demo, Mon, Oct 12, 10:00. See it in the app: https://service-hub.ro/p/abcdef0123456789',
+    );
+    const long = smsForEvent(invite('ro', 'Service Auto Ștefănescu și Fiii Reparații Complete Diesel Benzină Hibride'), 'https://service-hub.ro')!;
+    expect(long.length).toBeLessThanOrEqual(SMS_MAX);
+    expect(long).toMatch(/https:\/\/service-hub\.ro\/p\/abcdef0123456789$/);
+    expect(smsForEvent({ ...invite('ro'), params: { shop_name: 'x' } })).toBeNull();
+  });
+
   it('the code message', () => {
     expect(codeSms('ro', '482913')).toBe('Codul tau Service-Hub: 482913. Expira in 10 minute. Nu il da nimanui.');
     expect(codeSms('en', '482913')).toContain('Your Service-Hub code: 482913.');
@@ -170,6 +190,16 @@ describe('SMS texts', () => {
 });
 
 describe('app emails', () => {
+  it('invites the client of a booking the shop added (T29), with the link', () => {
+    const params = { shop_name: 'Atelier Unu', date: '2026-10-12', slot: '10:00', token: 'abcdef0123456789' };
+    const ro = emailForEvent({ event: 'walk_in_invite', lang: 'ro', role: 'client', params } as never, 'https://app.ro')!;
+    expect(ro.subject).toBe('Programarea ta la Atelier Unu');
+    expect(ro.html).toContain('https://app.ro/p/abcdef0123456789');
+    expect(ro.text).toContain('Lun 12 oct, 10:00');
+    const en = emailForEvent({ event: 'walk_in_invite', lang: 'en', role: 'client', params } as never, 'https://app.ro')!;
+    expect(en.subject).toBe('Your booking at Atelier Unu');
+  });
+
   it('tells the client kindly that a request closed, with other shops nearby', () => {
     const params = { shop_name: 'Atelier Unu', client_name: 'Ana Marin', date: '2026-10-14', slot: '10:00', category: 'cat_rev', city: 'Brașov' };
     const service = { ro: 'Schimb ulei', en: 'Oil change' };

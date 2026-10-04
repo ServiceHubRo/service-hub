@@ -1,4 +1,5 @@
-import { call } from './rpc';
+import type { Json } from './database.types';
+import { call, type Booking } from './rpc';
 import type { CarSnapshot } from './bookings';
 import type { BookingStatus } from '../lib/status';
 import type { ExtraService } from '../lib/bookingServices';
@@ -30,6 +31,8 @@ export interface ShopQuote {
   total_approved: number | null;
   sent_at: string;
   expires_at: string | null;
+  /** Who answered (T29): the client in the app, or the shop for a client without an account. */
+  decided_by?: 'client' | 'shop' | null;
   items: ShopQuoteItem[];
 }
 
@@ -59,6 +62,14 @@ export interface ShopBooking {
   loyalty_level?: number | null;
   /** The client lets the shop see the car's jobs at other shops (T27). */
   share_history?: boolean;
+  /** Booked in the app, or added by the shop for a client who called or walked in (T29). */
+  source?: BookingSource;
+  /** The email the shop typed for such a client (optional). */
+  client_email?: string | null;
+  /** When the SMS with the link went out; null when the shop chose not to send it. */
+  invite_sent_at?: string | null;
+  /** The client has an account on this booking (always for app bookings). */
+  claimed?: boolean;
   car_snapshot: CarSnapshot;
   created_at: string;
   confirmed_at: string | null;
@@ -66,6 +77,13 @@ export interface ShopBooking {
   started_at: string | null;
   /** From quote_sent on: the waiting or the accepted version. */
   quote: ShopQuote | null;
+}
+
+export type BookingSource = 'app' | 'shop';
+
+/** A booking the shop typed in itself and the client has no account (T29). */
+export function isUnclaimedWalkIn(b: Pick<ShopBooking, 'source' | 'claimed'>): boolean {
+  return b.source === 'shop' && b.claimed === false;
 }
 
 export interface ShopBookingsData {
@@ -100,4 +118,49 @@ function normalize(data: ShopBookingsData): ShopBookingsData {
 export async function fetchShopBookings(): Promise<ShopBookingsData> {
   const data = await call('list_shop_bookings', {} as never);
   return normalize(data as unknown as ShopBookingsData);
+}
+
+export interface WalkInInput {
+  serviceId: string;
+  date: string; // YYYY-MM-DD
+  slot: string; // HH:MM
+  clientName: string;
+  clientPhone: string;
+  clientEmail?: string;
+  car: { make: string; model: string; plate: string; year?: number | null };
+  note?: string;
+  /** SMS (and email, when given) with the link to the booking. */
+  sendInvite: boolean;
+  /** The language of that message. */
+  clientLang: 'ro' | 'en';
+}
+
+/** A booking for a client who called or walked in (T29): confirmed at once, takes its place in the day. */
+export function shopCreateBooking(input: WalkInInput, requestId: string): Promise<Booking> {
+  return call('shop_create_booking', {
+    p_service_id: input.serviceId,
+    p_date: input.date,
+    p_slot: input.slot,
+    p_client_name: input.clientName,
+    p_client_phone: input.clientPhone,
+    p_car: input.car as unknown as Json,
+    p_request_id: requestId,
+    p_client_email: input.clientEmail,
+    p_note: input.note,
+    p_send_invite: input.sendInvite,
+    p_client_lang: input.clientLang,
+  });
+}
+
+/**
+ * The client's answer to the quote, given at the shop and recorded by it (T29) — only for a booking
+ * the shop added whose client has no account. Same outcome as the client's own answer.
+ */
+export function shopDecideQuote(bookingId: string, quoteId: string, approvedItemIds: string[], requestId: string): Promise<Booking> {
+  return call('shop_decide_quote', {
+    p_booking_id: bookingId,
+    p_quote_id: quoteId,
+    p_approved_item_ids: approvedItemIds,
+    p_request_id: requestId,
+  });
 }

@@ -25,7 +25,8 @@ const clip = (s: string, n: number) => (s.length > n ? `${s.slice(0, Math.max(0,
  * "Service-Hub: cerere noua de la Maria Pop, Dum 27 sept, 10:00: Schimb ulei. Raspunde in …".
  * The service name gives way first when it is too long, then the client's name.
  */
-export function smsForEvent(e: NotificationEvent): string | null {
+export function smsForEvent(e: NotificationEvent, app = 'https://service-hub.ro'): string | null {
+  if (e.event === 'walk_in_invite') return walkInSms(e, app);
   if ((e.event !== 'booking_requested' && e.event !== 'booking_auto_confirmed') || e.role !== 'shop') return null;
   const lang: Lang = e.lang === 'en' ? 'en' : 'ro';
   const t = (e.event === 'booking_auto_confirmed' ? NEW_CONFIRMED : NEW_REQUEST)[lang];
@@ -45,6 +46,35 @@ export function smsForEvent(e: NotificationEvent): string | null {
     text = build();
   }
   return text.slice(0, SMS_MAX);
+}
+
+/** The invitation of a booking the shop added (T29): where, when, and the link to it. */
+const WALK_IN: Record<Lang, { head: string; tail: string }> = {
+  ro: { head: 'Service-Hub: programarea ta la', tail: 'Vezi-o in aplicatie:' },
+  en: { head: 'Service-Hub: your booking at', tail: 'See it in the app:' },
+};
+
+/**
+ * "Service-Hub: programarea ta la Atelier Demo, Lun 12 oct, 10:00. Vezi-o in aplicatie:
+ * https://service-hub.ro/p/…". The shop's name gives way when the message would be too long.
+ */
+export function walkInSms(e: NotificationEvent, app: string): string | null {
+  const p = e.params ?? {};
+  const token = str(p.token);
+  if (!token) return null;
+  const lang: Lang = e.lang === 'en' ? 'en' : 'ro';
+  const t = WALK_IN[lang];
+  const date = str(p.date);
+  const when = smsSafe([date ? formatDate(lang, date) : '', str(p.slot)].filter(Boolean).join(', '));
+  const link = `${app}/p/${token}`;
+  let shop = smsSafe(str(p.shop_name)) || 'Service-Hub';
+  const build = () => `${t.head} ${shop}${when ? `, ${when}` : ''}. ${t.tail} ${link}`;
+  let text = build();
+  if (text.length > SMS_MAX) {
+    shop = clip(shop, Math.max(6, shop.length - (text.length - SMS_MAX)));
+    text = build();
+  }
+  return text.length > SMS_MAX ? `${t.head} ${shop}. ${link}`.slice(0, SMS_MAX) : text;
 }
 
 /** The verification code message. */
