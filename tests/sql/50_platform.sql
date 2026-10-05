@@ -128,7 +128,7 @@ select test.eq(
   || 'admin_update_settings, admin_update_shop, admin_verify_phone, admin_void_history_report, admin_withdraw_notice, booking_thread, can_read_booking, can_read_notice, can_read_shop, can_read_thread, cancel_booking, '
   || 'cancel_email_change, check_phone_code, claim_booking, client_no_show_count, complete_job, confirm_booking, create_booking, decide_quote, '
   || 'decline_booking, export_my_data, get_availability, get_shop_page, get_shop_setup, history_report_preview, invite_staff, is_admin, is_shop_member, '
-  || 'is_shop_owner, is_shop_public, last_odometer_for_booking, list_shop_bookings, list_shop_history, list_shop_staff, list_threads, '
+  || 'is_shop_owner, is_shop_public, last_odometer_for_booking, list_imported_jobs, list_shop_bookings, list_shop_history, list_shop_staff, list_threads, '
   || 'mark_no_show, mark_thread_read, my_phone_verification, my_referrals, my_shop_id, my_subscription_offers, new_client_offers, replace_quote, reply_review, report_review, reschedule_booking, save_native_push_token, save_push_subscription, '
   || 'save_shop_hours, search_card_extras, search_cities, search_shops, send_message, send_quote, set_booking_history_share, set_shop_services, shop_cancel_booking, shop_create_booking, shop_decide_quote, shop_import_add, shop_import_begin, shop_import_undo, shop_reports, shop_vehicle_file, start_inspection, '
   || 'start_work, submit_review, toggle_favorite, touch_last_active, withdraw_quote',

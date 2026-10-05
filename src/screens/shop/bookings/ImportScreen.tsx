@@ -24,7 +24,7 @@ import { SHOP_BOOKINGS_PATH, SHOP_HISTORY_PATH } from '../paths';
 import { useIsShopOwner } from '../shopRole';
 import styles from './import.module.css';
 
-const MAX_BYTES = 10 * 1024 * 1024;
+const MAX_BYTES = 25 * 1024 * 1024;
 const SKIPPED_SHOWN = 8;
 const PREVIEW_ROWS = 5;
 

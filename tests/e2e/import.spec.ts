@@ -6,6 +6,7 @@ import {
   expectAccessible,
   expectNoHorizontalScroll,
   serviceRest,
+  rpcAs,
   shot,
   signIn,
   uniquePhone,
@@ -53,10 +54,14 @@ test.describe('import from another program', () => {
     await expect(page.getByText('Clienților nu le trimitem nimic.', { exact: false })).toBeVisible();
 
     // A file that is not a table says so.
-    await page.getByTestId('import-file').setInputFiles({ name: 'vechi.xls', mimeType: 'application/vnd.ms-excel', buffer: Buffer.from([0xd0, 0xcf, 0x11, 0xe0]) });
+    await page
+      .getByTestId('import-file')
+      .setInputFiles({ name: 'vechi.xls', mimeType: 'application/vnd.ms-excel', buffer: Buffer.from([0xd0, 0xcf, 0x11, 0xe0]) });
     await expect(page.getByText('Fișierul e în formatul vechi Excel (.xls).', { exact: false })).toBeVisible();
 
-    await page.getByTestId('import-file').setInputFiles({ name: 'clienti.csv', mimeType: 'text/csv', buffer: Buffer.from(csv, 'utf8') });
+    await page
+      .getByTestId('import-file')
+      .setInputFiles({ name: 'clienti.csv', mimeType: 'text/csv', buffer: Buffer.from(csv, 'utf8') });
     await expect(page.getByText('Am găsit 4 rânduri în clienti.csv.', { exact: false })).toBeVisible();
     // The columns were recognized from the header.
     await expect(page.getByRole('combobox', { name: 'Nume client' })).toHaveValue('0');
@@ -94,7 +99,10 @@ test.describe('import from another program', () => {
     await page.getByLabel('Telefon').fill(ion.national);
     await expect(page.getByText('Client cunoscut: am completat numele.')).toBeVisible();
     await expect(page.getByLabel('Nume')).toHaveValue('Ion Pop');
-    await page.getByRole('group', { name: 'Mașinile lui:' }).getByRole('button', { name: new RegExp(`Dacia Logan ${plate}`) }).click();
+    await page
+      .getByRole('group', { name: 'Mașinile lui:' })
+      .getByRole('button', { name: new RegExp(`Dacia Logan ${plate}`) })
+      .click();
     await expect(page.getByLabel('Marcă')).toHaveValue('Dacia');
     await expect(page.getByLabel('Nr. înmatriculare')).toHaveValue(plate);
     await expectAccessible(page, 'add booking known client');
@@ -118,5 +126,45 @@ test.describe('import from another program', () => {
     await expect(page.locator('main')).not.toContainText('Importă');
     await expectNoHorizontalScroll(page);
     await shot(page, 't31a-import-en', name());
+  });
+
+  test('a long imported history comes in pages; the search finds the older jobs too', async ({ page }) => {
+    const shop = await createBookableShop('Atelier Arhiva', ['ulei']);
+    const imp = await rpcAs<{ id: string }>(shop.email, 'shop_import_begin', {
+      p_file_name: 'arhiva.csv',
+      p_request_id: crypto.randomUUID(),
+    });
+    // 150 jobs, one a day back from 2024-12-31; the oldest is on a plate of its own.
+    const rows = Array.from({ length: 150 }, (_, i) => {
+      const day = new Date(Date.UTC(2024, 11, 31 - i)).toISOString().slice(0, 10);
+      return {
+        row: i + 2,
+        name: `Client ${i}`,
+        make: 'Dacia',
+        model: 'Logan',
+        plate: i === 149 ? 'CJ 99 OLD' : `BV ${10 + (i % 80)} ARH`,
+        day,
+        work: `Lucrare ${i}`,
+        cost: 100 + i,
+      };
+    });
+    await rpcAs(shop.email, 'shop_import_add', { p_import_id: imp.id, p_rows: rows, p_request_id: crypto.randomUUID() });
+
+    await signIn(page, shop.email, PASSWORD);
+    await expect(page).toHaveURL(/\/s\/panou$/);
+    await page.goto('/s/istoric');
+    const cards = page.locator('main ul li');
+    await expect(cards).toHaveCount(100);
+    await expect(page.getByText('Lucrare 149', { exact: true })).toHaveCount(0);
+    await page.getByRole('button', { name: 'Arată mai multe lucrări importate' }).click();
+    await expect(cards).toHaveCount(150);
+    await expect(page.getByRole('button', { name: 'Arată mai multe lucrări importate' })).toHaveCount(0);
+    await expectNoHorizontalScroll(page);
+
+    // The search runs in the database: a fresh page finds the oldest job by its plate.
+    await page.goto('/s/istoric?q=cj99old');
+    await expect(cards).toHaveCount(1);
+    await expect(cards.first()).toContainText('CJ 99 OLD');
+    await shot(page, 't31a-history-search', name());
   });
 });

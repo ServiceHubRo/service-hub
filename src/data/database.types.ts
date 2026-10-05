@@ -537,6 +537,7 @@ export type Database = {
           id: string
           import_id: string
           odometer: number | null
+          search_text: string | null
           shop_id: string
           work: string | null
         }
@@ -553,6 +554,7 @@ export type Database = {
           id?: string
           import_id: string
           odometer?: number | null
+          search_text?: string | null
           shop_id: string
           work?: string | null
         }
@@ -569,6 +571,7 @@ export type Database = {
           id?: string
           import_id?: string
           odometer?: number | null
+          search_text?: string | null
           shop_id?: string
           work?: string | null
         }
@@ -3256,6 +3259,10 @@ export type Database = {
         Args: { p_booking_id?: string; p_car_id?: string }
         Returns: Json
       }
+      imported_job_json: {
+        Args: { j: Database["public"]["Tables"]["imported_jobs"]["Row"] }
+        Returns: Json
+      }
       in_notice_audience: {
         Args: { p_audience: string; p_city: string; p_user_id: string }
         Returns: boolean
@@ -3336,6 +3343,15 @@ export type Database = {
       }
       last_seen: { Args: { p_user_id: string }; Returns: string }
       limit_range: { Args: { p_key: string }; Returns: unknown }
+      list_imported_jobs: {
+        Args: {
+          p_before_day?: string
+          p_before_id?: string
+          p_limit?: number
+          p_query?: string
+        }
+        Returns: Json
+      }
       list_shop_bookings: { Args: never; Returns: Json }
       list_shop_history: { Args: never; Returns: Json }
       list_shop_staff: { Args: never; Returns: Json }
@@ -3994,6 +4010,7 @@ export type Database = {
           shop_count: number
         }[]
       }
+      search_fold: { Args: { p_text: string }; Returns: string }
       search_shops: {
         Args: {
           p_category?: string

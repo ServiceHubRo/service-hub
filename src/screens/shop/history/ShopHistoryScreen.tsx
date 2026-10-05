@@ -12,7 +12,7 @@ import { ServiceIcon } from '../../../components/ServiceIcon';
 import { SkeletonList } from '../../../components/Skeleton';
 import { StatusBadge } from '../../../components/StatusBadge';
 import { subscribeRows } from '../../../data/realtime';
-import { fetchShopHistory, type ShopHistoryItem } from '../../../data/shopHistory';
+import { fetchImportedPage, fetchShopHistory, mergeHistory, type ShopHistoryItem } from '../../../data/shopHistory';
 import { useI18n, type I18nValue } from '../../../i18n/context';
 import { formatDayMonth, formatKm, formatMoney, ymdInBucharest } from '../../../i18n/format';
 import { plural, type Lang } from '../../../i18n/translate';
@@ -129,11 +129,66 @@ export function ShopHistoryScreen() {
     };
   }, [shopId, setData]);
 
-  const all = state.status === 'ready' ? state.data.bookings : null;
+  // T31a: imported jobs come in pages; with a search, the database searches them (the address's
+  // `q`, already debounced). `pages` holds what was read beyond the first page, for one search.
+  const data = state.status === 'ready' ? state.data : null;
+  const serverQuery = (params.get('q') ?? '').trim();
+  const hasImported = (data?.importedTotal ?? 0) > 0;
+  const [pages, setPages] = useState<{ key: string; items: ShopHistoryItem[]; more: boolean } | null>(null);
+  const [pageState, setPageState] = useState<'idle' | 'loading' | 'error'>('idle');
+  useEffect(() => {
+    if (!serverQuery || !hasImported) return;
+    let alive = true;
+    fetchImportedPage(serverQuery).then(
+      (page) => {
+        if (alive) setPages({ key: serverQuery, ...page });
+      },
+      () => {
+        if (alive) setPages({ key: serverQuery, items: [], more: false });
+      },
+    );
+    return () => {
+      alive = false;
+    };
+  }, [serverQuery, hasImported]);
+  const imported = useMemo(() => {
+    if (!data) return { items: [] as ShopHistoryItem[], more: false };
+    const extra = pages?.key === serverQuery ? pages : null;
+    if (serverQuery) return extra ?? { items: [], more: false };
+    return {
+      items: [...data.imported, ...(extra?.items ?? [])],
+      more: extra ? extra.more : data.imported.length < data.importedTotal,
+    };
+  }, [data, pages, serverQuery]);
+  const loadMore = () => {
+    const last = imported.items[imported.items.length - 1];
+    setPageState('loading');
+    fetchImportedPage(serverQuery, last).then(
+      (page) => {
+        setPages((prev) => ({
+          key: serverQuery,
+          items: [...(prev?.key === serverQuery ? prev.items : []), ...page.items],
+          more: page.more,
+        }));
+        setPageState('idle');
+      },
+      () => setPageState('error'),
+    );
+  };
+
+  const all = data ? data.bookings : null;
   const shown = useMemo(
-    () => (all ? filterHistory(all, { query, filter, period, today }) : []),
-    [all, query, filter, period, today],
+    () =>
+      all
+        ? mergeHistory(
+            filterHistory(all, { query, filter, period, today }),
+            // The database already matched the search; the status and period apply here.
+            filterHistory(imported.items, { query: '', filter, period, today }),
+          )
+        : [],
+    [all, imported, query, filter, period, today],
   );
+  const anything = !!data && (data.bookings.length > 0 || data.importedTotal > 0);
   const totals = historyTotals(shown);
   // The takings are the owner's: a colleague sees how many jobs, each job's amount, no total, no CSV.
   const isOwner = useIsShopOwner();
@@ -158,7 +213,7 @@ export function ShopHistoryScreen() {
     <div className={styles.page}>
       <div>
         <h1>{t('hist.title')}</h1>
-        {all && all.length > 0 && (
+        {anything && (
           <p className={styles.sub}>
             {isOwner
               ? t('hist.totals', { jobs: plural(lang, 'unit.repairs', totals.jobs), amount: formatMoney(lang, totals.revenue) })
@@ -175,9 +230,9 @@ export function ShopHistoryScreen() {
 
       {state.status === 'loading' && <SkeletonList />}
       {state.status === 'error' && <LoadError message={t('hist.loadError')} onRetry={reload} />}
-      {all && all.length === 0 && <EmptyState icon={HistoryIcon} title={t('hist.empty')} body={t('hist.emptyBody')} />}
+      {data && !anything && <EmptyState icon={HistoryIcon} title={t('hist.empty')} body={t('hist.emptyBody')} />}
 
-      {all && all.length > 0 && (
+      {anything && (
         <>
           <div className={`${styles.controls} no-print`}>
             <SearchField
@@ -255,6 +310,18 @@ export function ShopHistoryScreen() {
               </ul>
               <PrintTable items={shown} />
             </>
+          )}
+          {imported.more && (
+            <div className={`${styles.more} no-print`}>
+              <Button variant="secondary" onClick={loadMore} disabled={pageState === 'loading'}>
+                {t('imp.more')}
+              </Button>
+              {pageState === 'error' && (
+                <p className={styles.sub} role="alert">
+                  {t('imp.moreError')}
+                </p>
+              )}
+            </div>
           )}
         </>
       )}

@@ -60,8 +60,18 @@ interface ImportedJob {
 
 export interface ShopHistoryData {
   shop: { id: string; name: string };
-  /** The bookings that ended and the imported jobs, newest first. */
+  /** The bookings that ended, newest first. */
   bookings: ShopHistoryItem[];
+  /** T31a: the newest imported jobs (a page); older ones through `fetchImportedPage`. */
+  imported: ShopHistoryItem[];
+  /** How many imported jobs the shop has in all. */
+  importedTotal: number;
+}
+
+/** One page of imported jobs and whether there is another after it. */
+export interface ImportedPage {
+  items: ShopHistoryItem[];
+  more: boolean;
 }
 
 /** An imported job in the shape of a finished one, marked `imported`. */
@@ -104,21 +114,52 @@ function toNumberOrNull(value: unknown): number | null {
   return value === null || value === undefined ? null : toNumber(value);
 }
 
+type RawHistory = Omit<ShopHistoryData, 'imported' | 'importedTotal'> & { imported?: ImportedJob[]; imported_total?: number };
+
 /** Amounts arrive as JSON numbers from numeric columns; normalized once here. */
-function normalize(data: ShopHistoryData & { imported?: ImportedJob[] }): ShopHistoryData {
-  const bookings = data.bookings.map((b) => ({
-    ...b,
-    cost: toNumberOrNull(b.cost),
-    quote: b.quote && {
-      ...b.quote,
-      inspection_fee: toNumber(b.quote.inspection_fee),
-      total_sent: toNumber(b.quote.total_sent),
-      total_approved: toNumberOrNull(b.quote.total_approved),
-      items: b.quote.items.map((i) => ({ ...i, price: toNumber(i.price) })),
-    },
-  }));
-  const imported = (data.imported ?? []).map(fromImported);
-  // Both lists come newest first; merged by the day they ended (a booking first on the same day).
+function normalize(data: RawHistory): ShopHistoryData {
+  return {
+    shop: data.shop,
+    bookings: data.bookings.map((b) => ({
+      ...b,
+      cost: toNumberOrNull(b.cost),
+      quote: b.quote && {
+        ...b.quote,
+        inspection_fee: toNumber(b.quote.inspection_fee),
+        total_sent: toNumber(b.quote.total_sent),
+        total_approved: toNumberOrNull(b.quote.total_approved),
+        items: b.quote.items.map((i) => ({ ...i, price: toNumber(i.price) })),
+      },
+    })),
+    imported: (data.imported ?? []).map(fromImported),
+    importedTotal: data.imported_total ?? 0,
+  };
+}
+
+export async function fetchShopHistory(): Promise<ShopHistoryData> {
+  const data = await call('list_shop_history', {} as never);
+  return normalize(data as unknown as RawHistory);
+}
+
+const PAGE = 100;
+
+/**
+ * Imported jobs newest first, after `after` (the last one shown), holding every word of `query`
+ * (searched in the database: plate, client, phone, car, work, odometer).
+ */
+export async function fetchImportedPage(query: string, after?: ShopHistoryItem): Promise<ImportedPage> {
+  const data = (await call('list_imported_jobs', {
+    p_query: query.trim() || undefined,
+    p_before_day: after?.date,
+    p_before_id: after?.id,
+    p_limit: PAGE,
+  })) as unknown as { jobs: ImportedJob[] };
+  const items = data.jobs.map(fromImported);
+  return { items: items.slice(0, PAGE), more: items.length > PAGE };
+}
+
+/** Both lists newest first, merged by the day they ended (a booking first on the same day). */
+export function mergeHistory(bookings: readonly ShopHistoryItem[], imported: readonly ShopHistoryItem[]): ShopHistoryItem[] {
   const merged: ShopHistoryItem[] = [];
   let i = 0;
   let j = 0;
@@ -128,10 +169,5 @@ function normalize(data: ShopHistoryData & { imported?: ImportedJob[] }): ShopHi
     if (b && (!m || endedDay(b) >= m.date)) merged.push(bookings[i++]!);
     else merged.push(imported[j++]!);
   }
-  return { shop: data.shop, bookings: merged };
-}
-
-export async function fetchShopHistory(): Promise<ShopHistoryData> {
-  const data = await call('list_shop_history', {} as never);
-  return normalize(data as unknown as ShopHistoryData & { imported?: ImportedJob[] });
+  return merged;
 }

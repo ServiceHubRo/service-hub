@@ -69,6 +69,16 @@ select test.eq(jsonb_array_length(public.list_shop_history()->'imported'), 3, 'I
 select test.eq(public.list_shop_history()->'imported'->0->>'day', '2025-02-01', 'newest first');
 select test.ok(not exists (select 1 from jsonb_array_elements(public.list_shop_history()->'bookings') b
                            where b->'car_snapshot'->>'plate_norm' = 'BV01ION'), 'not among the bookings');
+-- A long history comes in pages; the search runs in the database (T31a at scale).
+select test.eq((public.list_shop_history()->>'imported_total')::int, 3, 'how many there are');
+select test.eq(jsonb_array_length(public.list_imported_jobs('plăcuțe', null, null, 10)->'jobs'), 1, 'search without diacritics or case');
+select test.eq(jsonb_array_length(public.list_imported_jobs('bv01ion', null, null, 10)->'jobs'), 2, 'the plate without spaces');
+select test.eq(jsonb_array_length(public.list_imported_jobs('BV 01 ION ulei', null, null, 10)->'jobs'), 1, 'every word');
+select test.eq(jsonb_array_length(public.list_imported_jobs('0722 111 222', null, null, 10)->'jobs'), 2, 'the phone as typed locally');
+select test.eq(jsonb_array_length(public.list_imported_jobs('+4072211', null, null, 10)->'jobs'), 2, 'the phone');
+select test.eq(jsonb_array_length(public.list_imported_jobs(null, null, null, 1)->'jobs'), 2, 'one page and one more (there is a next page)');
+select test.eq(public.list_imported_jobs(null, '2025-02-01', (select id from public.imported_jobs where day = '2025-02-01'), 10)->'jobs'->0->>'day',
+  '2024-03-10', 'the next page starts after the last one');
 select test.logout();
 
 -- A booking of the same plate at this shop shows them in Fișa mașinii.
@@ -91,6 +101,7 @@ select test.eq((select count(*) from public.shop_clients), 0::bigint, 'another s
 select test.eq((select count(*) from public.imported_jobs), 0::bigint, 'nor jobs');
 select test.eq((select count(*) from public.shop_imports), 0::bigint, 'nor imports');
 select test.eq(jsonb_array_length(public.list_shop_history()->'imported'), 0, 'nor in its Istoric');
+select test.eq(jsonb_array_length(public.list_imported_jobs(null, null, null, 10)->'jobs'), 0, 'nor in its pages');
 select test.fails($$select public.shop_import_add(current_setting('test.imp')::uuid, '[{"row":1,"name":"X"}]'::jsonb, gen_random_uuid())$$,
   'import_not_found', 'nor adds to it');
 select test.fails($$select public.shop_import_undo(current_setting('test.imp')::uuid, gen_random_uuid())$$,
