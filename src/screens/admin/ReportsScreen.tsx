@@ -5,8 +5,8 @@ import { ActionButton } from '../../components/ActionButton';
 import { BackLink } from '../../components/BackLink';
 import { Button } from '../../components/Button';
 import { Card } from '../../components/Card';
-import { Chip, ChipRow } from '../../components/Chip';
 import { EmptyState } from '../../components/EmptyState';
+import { ChoiceFilters } from '../../components/Filters';
 import { LoadError } from '../../components/LoadError';
 import { SearchField } from '../../components/SearchField';
 import { SkeletonList } from '../../components/Skeleton';
@@ -73,7 +73,9 @@ function ReportCard({ r, onVoided }: { r: AdminReportRow; onVoided: () => void }
             <ActionButton
               variant="secondary"
               onAction={async () => saveFile(await downloadReport(r.id), reportFileName(r.lang, r.code))}
-              errorMessage={(e) => (e instanceof ReportError ? t(`report.error.${e.problem}` as MessageKey) : rpcErrorMessage(lang, e))}
+              errorMessage={(e) =>
+                e instanceof ReportError ? t(`report.error.${e.problem}` as MessageKey) : rpcErrorMessage(lang, e)
+              }
               canRetry={canRetryRpc}
             >
               {t('reports.download')}
@@ -149,13 +151,19 @@ export function ReportsScreen() {
               }}
               clearLabel={t('admin.search.clear')}
             />
-            <ChipRow label={t('admin.filter.state')}>
-              {REPORT_FILTERS.map((f) => (
-                <Chip key={f} selected={filter === f} onClick={() => setParam({ stare: f === 'all' ? null : f })}>
-                  {t(`admin.reports.filter.${f}` as MessageKey)}
-                </Chip>
-              ))}
-            </ChipRow>
+            <ChoiceFilters
+              groups={[
+                {
+                  key: 'stare',
+                  title: t('admin.filter.state'),
+                  options: REPORT_FILTERS.map((f) => ({ value: f, label: t(`admin.reports.filter.${f}` as MessageKey) })),
+                  value: filter,
+                  defaultValue: 'all',
+                  onChange: (v) => setParam({ stare: v === 'all' ? null : v }),
+                },
+              ]}
+              onClearAll={() => setParam({ stare: null })}
+            />
           </div>
           {notice && (
             <p className={styles.muted} role="status">

@@ -13,7 +13,7 @@ Versiunea 1.0 · [ZZ.LL.AAAA]
 |---|---|---|---|---|
 | 1 | **Email tranzacțional** | Confirmarea contului, resetare parolă | **Înregistrarea nu funcționează fără el** | Imediat |
 | 2 | **Notificări push web** | Deviz trimis, mașina e gata | Valoarea produsului | Imediat |
-| 3 | **SMS** | Cerere nouă către service | Viteza de răspuns a atelierului | Pilot |
+| 3 | **SMS** | Codul de confirmare a telefonului; linkul programării trecute de service (T29) | Confirmarea telefonului | Pilot |
 | 4 | **Procesator de plăți** | Abonamentul de 100 lei | Încasarea banilor | Înainte de facturare |
 | 5 | **Facturare + e-Factura** | Obligație fiscală | Emiterea legală de facturi | Odată cu plățile |
 | 6 | **Găzduire frontend** | Publicarea aplicației | Accesul public | Imediat |
@@ -88,7 +88,7 @@ Fără push, timpul de răspuns la un deviz crește de la minute la ore, iar ma�
 
 **Pe iPhone, notificările push funcționează doar dacă utilizatorul adaugă aplicația pe ecranul de start** (iOS 16.4 sau mai nou). Nu merge dintr-o filă de Safari.
 
-Consecința practică: un patron de service cu iPhone care folosește aplicația din browser **nu va primi notificări**. De aceea SMS-ul de la punctul următor nu e opțional pentru partea de service.
+Consecința practică: un patron de service cu iPhone care folosește aplicația din browser **nu va primi notificări** decât după ce o adaugă pe ecranul de start (sau instalează aplicația, T20). SMS la cerere nouă **nu** trimitem (decizia lui Eduard, 4 oct: fiecare SMS costă).
 
 Aplicația trebuie să detecteze situația și să afișeze instrucțiunea „Adaugă pe ecranul de start ca să primești notificări".
 
@@ -98,9 +98,7 @@ Aplicația trebuie să detecteze situația și să afișeze instrucțiunea „Ad
 
 ### Când e necesar
 
-Pentru **service-uri, la cerere nouă**. Un patron nu stă cu aplicația deschisă; e sub o mașină. Dacă află de o cerere abia seara, valoarea produsului dispare — exact viteza de răspuns o vindem.
-
-Pentru clienți, push-ul e suficient.
+Doar unde nu se poate altfel: **codul de confirmare a telefonului** și **linkul programării trecute de service** pentru un client fără cont (T29). Cererile noi ajung la service-uri prin push (aplicație), nu prin SMS: Eduard a scos opțiunea pe 4 oct, ca să nu plătim SMS-uri pentru fiecare cerere.
 
 ### Opțiuni în România
 
@@ -110,7 +108,7 @@ Pentru clienți, push-ul e suficient.
 | **Twilio** | ~0,25–0,35 lei | Internațional, mai scump pentru România |
 | **Vonage** | Similar Twilio | — |
 
-**Recomandare:** SMSO. La 10 ateliere cu câte 5 cereri pe zi, costul lunar e sub 100 de lei.
+**Recomandare:** SMSO. Fără SMS la cerere nouă, costul vine doar din coduri și din programările trecute de service (cel mult 30 pe zi de service).
 
 ### Reguli de respectat
 

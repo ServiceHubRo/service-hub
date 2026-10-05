@@ -74,6 +74,9 @@ test.describe('bookings added by the shop', () => {
     const card = cards(page).filter({ hasText: 'Dan Marin' });
     await expect(card).toContainText('Adăugată de service · SMS trimis');
     await expect(card).toContainText('BV 07 DAN');
+    // "Adaugă programare" sits in the same place in both languages (under the title on a phone).
+    await expectNoHorizontalScroll(page);
+    await shot(page, 'walkin-list', name());
 
     const [booking] = await serviceRest<{ id: string; ref: string; invite_token: string; status: string }[]>(
       `bookings?client_phone=eq.${encodeURIComponent(phone.e164)}&select=id,ref,invite_token,status`,
@@ -199,5 +202,6 @@ test.describe('bookings added by the shop', () => {
     await shot(page, 'walkin-form-en', name());
     await page.goto('/s/programari?tab=programate');
     await expect(cards(page).filter({ hasText: 'Ana Pop' })).toContainText('Added by the shop · no account');
+    await shot(page, 'walkin-list-en', name());
   });
 });

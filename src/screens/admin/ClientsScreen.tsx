@@ -1,8 +1,8 @@
 import { SearchX, Users } from 'lucide-react';
 import { useDeferredValue, useMemo } from 'react';
 import { Button } from '../../components/Button';
-import { Chip, ChipRow } from '../../components/Chip';
 import { EmptyState } from '../../components/EmptyState';
+import { ChoiceFilters } from '../../components/Filters';
 import { LoadError } from '../../components/LoadError';
 import { SearchField } from '../../components/SearchField';
 import { SkeletonList } from '../../components/Skeleton';
@@ -59,13 +59,19 @@ export function ClientsScreen() {
               }}
               clearLabel={t('admin.search.clear')}
             />
-            <ChipRow label={t('admin.filter.label')}>
-              {CLIENT_FILTERS.map((f) => (
-                <Chip key={f} selected={filter === f} onClick={() => setParam({ filtru: f === 'all' ? null : f })}>
-                  {t(`admin.clientFilter.${f}`)}
-                </Chip>
-              ))}
-            </ChipRow>
+            <ChoiceFilters
+              groups={[
+                {
+                  key: 'filtru',
+                  title: t('admin.filter.label'),
+                  options: CLIENT_FILTERS.map((f) => ({ value: f, label: t(`admin.clientFilter.${f}`) })),
+                  value: filter,
+                  defaultValue: 'all',
+                  onChange: (v) => setParam({ filtru: v === 'all' ? null : v }),
+                },
+              ]}
+              onClearAll={() => setParam({ filtru: null })}
+            />
             <div className={styles.toolbar}>
               <ExportButton<AdminClientRow>
                 kind="clients"
@@ -112,7 +118,9 @@ export function ClientsScreen() {
                       <span>{t('admin.clients.bookings', { n: c.bookings })}</span>
                       <span>{t('admin.clients.noShows', { n: c.no_shows })}</span>
                       <span>{t('admin.createdOn', { date: day(lang, c.created_at) })}</span>
-                      <span>{t('admin.lastActive', { date: c.last_active_at ? day(lang, c.last_active_at) : t('admin.never') })}</span>
+                      <span>
+                        {t('admin.lastActive', { date: c.last_active_at ? day(lang, c.last_active_at) : t('admin.never') })}
+                      </span>
                     </span>
                   </RowLink>
                 </li>

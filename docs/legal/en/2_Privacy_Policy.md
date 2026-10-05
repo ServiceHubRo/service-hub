@@ -48,7 +48,7 @@ This policy explains what personal data Service-Hub uses, why, who else sees it,
 - **Subscription and payments:** status, start and end dates, price, number of paid colleagues, Stripe customer ID, amounts paid, payment dates and Stripe receipts.
 - **Colleagues:** the email address you sent the invitation to, the colleague’s name and when they joined.
 - **Phone confirmation:** the code sent by SMS is kept only in encrypted form and is valid for 10 minutes.
-- **Preferences:** SMS on new request, daily summary, monthly report.
+- **Preferences:** daily summary, monthly report.
 - The shop’s bookings, quotes, jobs, reviews and messages, with the customer data from section 4.1.
 
 ### 2.4 Technical data
@@ -73,7 +73,7 @@ This policy explains what personal data Service-Hub uses, why, who else sees it,
 | Your account: sign-up, sign-in, account security | Our contract with you (para. 1(b)) |
 | Search, booking, quote, job, messages, history | Our contract with you |
 | Sending the booking details to the shop you chose | Our contract with you |
-| Notifications about bookings and your account (email, SMS to shops) | Our contract with you |
+| Notifications about bookings and your account (push, email) | Our contract with you |
 | A booking the shop enters for you (no account) and the text or email with its link | Steps you asked for to book at the shop (para. 1(b)); the shop may send the message only if you agreed |
 | Push notifications | Your consent, given in the browser (withdraw it at any time), and the contract |
 | ITP, RCA and vignette alerts | Our contract with you (you ask for them by entering the dates) |
@@ -121,7 +121,7 @@ We work with providers that process data only on our instructions, under a data 
 | Supabase | Database, accounts, files, server functions | All Platform data | EU (Frankfurt) |
 | Netlify | Hosting the web app | IP address, browser, pages requested | US and global network |
 | Resend | Emails (account confirmation, password, invitations, payments, report ready, the link to a booking a shop entered) | Email address, email text | US |
-| SMSO | Text messages: the phone confirmation code (shops; customers after no-shows), new requests to shops, if turned on, and the link to a booking a shop entered for a customer without an account | The phone, the text (the code; for requests: customer name, service, day; for a booking the shop entered: the shop, day, time and link) | Romania |
+| SMSO | Text messages: the phone confirmation code (shops; customers after no-shows) and the link to a booking a shop entered for a customer without an account | The phone, the text (the code; for a booking the shop entered: the shop, day, time and link) | Romania |
 | Stripe | Payment of the subscription and the report | Name, email, amount; you enter card details directly with Stripe | EU and US |
 | Sentry | Error reports | Account ID, role, browser, page, error | EU (Frankfurt) |
 | Cloudflare | Bot check at sign-up and sign-in | IP address, browser signals | US and global network |
@@ -189,7 +189,7 @@ The Platform is not for people under 18. If we learn that an account belongs to 
 
 ## 9. Messages we send you
 
-We send you messages about your account and bookings (confirmations, quotes, reminders, the review request after a job, payments), reminders about your car (ITP, RCA, vignette, your next service, the seasonal tire change), two tips in your first two weeks if you haven’t booked yet, and important announcements about the Platform. You get your favorite shops’ offers only if you turn them on in Account; tips and offers are at most two a week. Automatic reminders are not sent at night (between 9 PM and 9 AM, Romanian time): you get them in the morning. You can turn each kind off in Account, except the two tips, and push notifications at any time in your phone’s settings. Shops can turn off SMS on new requests, the daily summary and the monthly report in Settings → Notifications.
+We send you messages about your account and bookings (confirmations, quotes, reminders, the review request after a job, payments), reminders about your car (ITP, RCA, vignette, your next service, the seasonal tire change), two tips in your first two weeks if you haven’t booked yet, and important announcements about the Platform. You get your favorite shops’ offers only if you turn them on in Account; tips and offers are at most two a week. Automatic reminders are not sent at night (between 9 PM and 9 AM, Romanian time): you get them in the morning. You can turn each kind off in Account, except the two tips, and push notifications at any time in your phone’s settings. Shops can turn off the daily summary and the monthly report in Settings → Notifications.
 
 ---
 

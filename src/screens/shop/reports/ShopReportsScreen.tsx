@@ -4,7 +4,7 @@ import { useSearchParams } from 'react-router-dom';
 import { BackLink } from '../../../components/BackLink';
 import { Button } from '../../../components/Button';
 import { Card } from '../../../components/Card';
-import { Chip, ChipRow } from '../../../components/Chip';
+import { SelectField } from '../../../components/SelectField';
 import { EmptyState } from '../../../components/EmptyState';
 import { LoadError } from '../../../components/LoadError';
 import { SkeletonList } from '../../../components/Skeleton';
@@ -154,13 +154,13 @@ function Reports({ data }: { data: ReportData }) {
 
   return (
     <>
-      <ChipRow label={t('rep.period.label')}>
-        {REPORT_PERIODS.map((p) => (
-          <Chip key={p} selected={period === p} onClick={() => setPeriod(p)}>
-            {t(`rep.period.${p}`)}
-          </Chip>
-        ))}
-      </ChipRow>
+      <SelectField
+        className={styles.period}
+        label={t('rep.period.label')}
+        value={period}
+        options={REPORT_PERIODS.map((p) => ({ value: p, label: t(`rep.period.${p}`) }))}
+        onChange={(e) => setPeriod(isReportPeriod(e.target.value) ? e.target.value : 'month')}
+      />
 
       <section>
         <ul className={styles.stats}>

@@ -5,8 +5,8 @@ import { ActionButton } from '../../components/ActionButton';
 import { BackLink } from '../../components/BackLink';
 import { Button } from '../../components/Button';
 import { Card } from '../../components/Card';
-import { Chip, ChipRow } from '../../components/Chip';
 import { EmptyState } from '../../components/EmptyState';
+import { ChoiceFilters } from '../../components/Filters';
 import { LoadError } from '../../components/LoadError';
 import { SearchField } from '../../components/SearchField';
 import { SkeletonList } from '../../components/Skeleton';
@@ -78,7 +78,14 @@ function CompanyCard({ r, onChecked }: { r: CompanyCheckRow; onChecked: (unavail
       )}
       <Facts
         rows={[
-          [t('anaf.cui'), r.vat_id ? <span key="cui" className="mono">{r.vat_id}</span> : null],
+          [
+            t('anaf.cui'),
+            r.vat_id ? (
+              <span key="cui" className="mono">
+                {r.vat_id}
+              </span>
+            ) : null,
+          ],
           [t('anaf.declaredName'), r.legal_name],
           [t('anaf.officialName'), r.anaf_name],
           [t('anaf.address'), r.anaf_address],
@@ -151,13 +158,22 @@ export function AnafScreen() {
               }}
               clearLabel={t('admin.search.clear')}
             />
-            <ChipRow label={t('anaf.categories')}>
-              {COMPANY_FILTERS.map((f) => (
-                <Chip key={f} selected={filter === f} onClick={() => setParam({ categorie: f === 'all' ? null : f })}>
-                  {t(`anaf.filter.${f}` as MessageKey)} · {counts[f]}
-                </Chip>
-              ))}
-            </ChipRow>
+            <ChoiceFilters
+              groups={[
+                {
+                  key: 'categorie',
+                  title: t('anaf.categories'),
+                  options: COMPANY_FILTERS.map((f) => ({
+                    value: f,
+                    label: `${t(`anaf.filter.${f}` as MessageKey)} · ${counts[f]}`,
+                  })),
+                  value: filter,
+                  defaultValue: 'all',
+                  onChange: (v) => setParam({ categorie: v === 'all' ? null : v }),
+                },
+              ]}
+              onClearAll={() => setParam({ categorie: null })}
+            />
             <div>
               <ExportButton<CompanyCheckRow> kind="company_checks" narrow={(rows) => filterCompanyChecks(rows, query, filter)} />
             </div>

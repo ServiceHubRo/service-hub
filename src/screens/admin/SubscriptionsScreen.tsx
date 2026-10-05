@@ -4,8 +4,8 @@ import { Link } from 'react-router-dom';
 import { BackLink } from '../../components/BackLink';
 import { Button } from '../../components/Button';
 import { Card } from '../../components/Card';
-import { Chip, ChipRow } from '../../components/Chip';
 import { EmptyState } from '../../components/EmptyState';
+import { ChoiceFilters } from '../../components/Filters';
 import { LoadError } from '../../components/LoadError';
 import { SearchField } from '../../components/SearchField';
 import { SkeletonList } from '../../components/Skeleton';
@@ -151,13 +151,22 @@ export function SubscriptionsScreen() {
                   }}
                   clearLabel={t('admin.search.clear')}
                 />
-                <ChipRow label={t('admin.filter.state')}>
-                  {SUBSCRIPTION_FILTERS.map((f) => (
-                    <Chip key={f} selected={filter === f} onClick={() => setParam({ stare: f === 'all' ? null : f })}>
-                      {f === 'all' ? t('admin.shopFilter.all') : t(`admin.subStatus.${f}`)}
-                    </Chip>
-                  ))}
-                </ChipRow>
+                <ChoiceFilters
+                  groups={[
+                    {
+                      key: 'stare',
+                      title: t('admin.filter.state'),
+                      options: SUBSCRIPTION_FILTERS.map((f) => ({
+                        value: f,
+                        label: f === 'all' ? t('admin.shopFilter.all') : t(`admin.subStatus.${f}`),
+                      })),
+                      value: filter,
+                      defaultValue: 'all',
+                      onChange: (v) => setParam({ stare: v === 'all' ? null : v }),
+                    },
+                  ]}
+                  onClearAll={() => setParam({ stare: null })}
+                />
                 <div className={styles.toolbar}>
                   <span className={styles.sub}>{plural(lang, 'unit.subscriptions', shown.length)}</span>
                   <ExportButton<AdminSubscriptionRow>

@@ -6,7 +6,7 @@ select test.make_world();
 
 -- ------------------------------------------------------------------ settings: the colleague cannot
 select test.login(test.id('staff1'));
-update public.shops set inspection_fee = 1, name = 'Schimbat de coleg', sms_on_new_booking = true, daily_capacity = 99
+update public.shops set inspection_fee = 1, name = 'Schimbat de coleg', daily_digest = true, daily_capacity = 99
 where id = test.id('shop1');
 update public.shop_hours set is_closed = true where shop_id = test.id('shop1');
 select test.fails(format($$insert into public.shop_closures (shop_id, start_date, end_date, label) values (%L, current_date, current_date, 'x')$$,
@@ -22,7 +22,7 @@ select test.ok(jsonb_typeof(public.list_shop_history()) is not null, 'reads the 
 select test.ok(jsonb_typeof(public.list_shop_bookings()) is not null, 'reads the bookings');
 select test.logout();
 
-select test.ok(s.name <> 'Schimbat de coleg' and s.inspection_fee <> 1 and not s.sms_on_new_booking and s.daily_capacity <> 99,
+select test.ok(s.name <> 'Schimbat de coleg' and s.inspection_fee <> 1 and not s.daily_digest and s.daily_capacity <> 99,
   'the public profile, the fee, the preferences and the capacity are unchanged')
 from public.shops s where s.id = test.id('shop1');
 select test.eq(count(*) filter (where is_closed), 2::bigint, 'the week is unchanged (Saturday and Sunday closed)')

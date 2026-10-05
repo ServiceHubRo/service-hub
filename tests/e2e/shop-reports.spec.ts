@@ -15,6 +15,7 @@ import {
   signIn,
   userIdOf,
   xlsxText,
+  pickFilter,
 } from './support';
 
 // T17 — Rapoarte: the owner's tile in Cont, the periods, figures that match Istoric, the CSV; the
@@ -50,7 +51,7 @@ test.describe('demo shop', () => {
     await expect(page.getByRole('heading', { level: 1, name: 'Rapoarte' })).toBeVisible();
 
     // This month by default, against the same days of last month.
-    await expect(page.getByRole('button', { name: 'Luna aceasta', pressed: true })).toBeVisible();
+    await expect(page.getByRole('combobox', { name: 'Perioadă' })).toHaveValue('month');
     // On the 1st of the month both periods are one day: "Comparat cu 1 sept."
     await expect(page.getByText(/^Comparat cu \d+ \S+( – \d+ \S+)?\.$/)).toBeVisible();
     await expect(page.getByRole('heading', { name: /Încasări pe lună/ })).toBeVisible();
@@ -67,9 +68,9 @@ test.describe('demo shop', () => {
     await scrollMain(page, 'top');
 
     // "Ultimele 3 luni": a year of work in the demo data, so every section has figures.
-    await page.getByRole('button', { name: 'Ultimele 3 luni' }).click();
+    await page.getByRole('combobox', { name: 'Perioadă' }).selectOption({ label: 'Ultimele 3 luni' });
     await expect(page).toHaveURL(/perioada=quarter/);
-    await expect(page.getByRole('button', { name: 'Ultimele 3 luni', pressed: true })).toBeVisible();
+    await expect(page.getByRole('combobox', { name: 'Perioadă' })).toHaveValue('quarter');
     await expect(page.getByText(/Crește cu|Scade cu|Fără schimbare|Înainte: 0/).first()).toBeVisible();
     await expect(page.getByText(/\d+ acceptate din \d+/)).toBeVisible();
     const revenue = (await stat(page, 'Încasat (lei)').textContent())!.trim();
@@ -90,19 +91,19 @@ test.describe('demo shop', () => {
     expect(csv).toContain(';Taxă de constatare;');
 
     // "Tot" has nothing to compare with.
-    await page.getByRole('button', { name: 'Toată perioada', exact: true }).click();
+    await page.getByRole('combobox', { name: 'Perioadă' }).selectOption({ label: 'Toată perioada' });
     await expect(page).toHaveURL(/perioada=all/);
     await expect(page.getByText(/^Comparat cu/)).toHaveCount(0);
 
     // Istoric on the same period shows the same takings and the same number of jobs.
     await navLink(page, 'Istoric').click();
-    await page.getByRole('button', { name: 'Ultimele 3 luni' }).click();
+    await pickFilter(page, 'Ultimele 3 luni');
     const escaped = revenue.replace(/\./g, '\\.');
     await expect(page.getByText(new RegExp(`^${jobs} (de )?reparații · ${escaped} lei încasat$`))).toBeVisible();
 
     // Back to Rapoarte: the period stayed in the address.
     await page.goBack();
-    await expect(page.getByRole('button', { name: 'Toată perioada', pressed: true })).toBeVisible();
+    await expect(page.getByRole('combobox', { name: 'Perioadă' })).toHaveValue('all');
   });
 });
 
@@ -187,7 +188,7 @@ test.describe('new shop', () => {
 
     // The third job finished on another device: the reports appear without a reload.
     await job(shop, client, shopId, d!, true, 102000);
-    await expect(page.getByRole('button', { name: 'This month', pressed: true })).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByRole('combobox', { name: 'Period' })).toHaveValue('month', { timeout: 15_000 });
     // Revenue and average in RON; one returning customer (three jobs); three of five quotes accepted.
     await expect(stat(page, 'Revenue (RON)')).toHaveText('1,290');
     await expect(stat(page, 'Jobs')).toHaveText('3');

@@ -4,12 +4,21 @@
   gap: 12px;
 }
 
+/* The title, then "Adaugă programare": on a phone always under the title, full width, so the
+   button sits in the same place whatever the language; beside the title from 600 px on. */
 .head {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
+  align-items: stretch;
   gap: 10px;
-  flex-wrap: wrap;
+}
+
+@media (min-width: 600px) {
+  .head {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
 }
 
 .list {

@@ -235,21 +235,6 @@
   gap: 8px;
 }
 
-.filters {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-/* Chip rows scroll sideways to the screen edge on phones and tablets. */
-@media (max-width: 1023px) {
-  .filters > [role='group'] {
-    margin: 0 calc(var(--page-pad) * -1);
-    padding-left: var(--page-pad);
-    padding-right: var(--page-pad);
-  }
-}
-
 /* ---------------------------------------------------------------- print (P17b) */
 .printTable {
   width: 100%;
@@ -281,7 +266,6 @@
   display: flex;
   flex-wrap: wrap;
   gap: 4px;
-  margin-left: -8px;
 }
 
 .tools .tool {
