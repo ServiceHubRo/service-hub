@@ -6,12 +6,13 @@ import { EmptyState } from '../../../components/EmptyState';
 import { LoadError } from '../../../components/LoadError';
 import { SkeletonList } from '../../../components/Skeleton';
 import { fetchCars, fetchOilStandard, type Car } from '../../../data/garage';
+import { fetchMyImportedJobsQuietly } from '../../../data/myImported';
 import { useI18n } from '../../../i18n/context';
 import { daysFromToday, formatDayMonth, formatMonthLong } from '../../../i18n/format';
 import type { MessageKey } from '../../../i18n/ro';
 import { plural } from '../../../i18n/translate';
 import { CAR_DOCS, urgencyOf, type CarDoc } from '../../../lib/expiry';
-import { jobsOf } from '../../../lib/history';
+import { jobsOf, sameVehicle } from '../../../lib/history';
 import { lastOilChange, oilDue } from '../../../lib/oil';
 import { useLoad } from '../../../lib/useLoad';
 import { useClientBookings } from '../bookings/clientBookingsContext';
@@ -29,6 +30,9 @@ export function GarageScreen() {
   const bookings = bookingsState.status === 'ready' ? bookingsState.data.bookings : null;
   const { state: oilState } = useLoad(fetchOilStandard);
   const oilStandard = oilState.status === 'ready' ? oilState.data : null;
+  // T31b: jobs the shops imported for this client count in each car's history.
+  const { state: importedState } = useLoad(fetchMyImportedJobsQuietly);
+  const imported = importedState.status === 'ready' ? importedState.data : [];
 
   return (
     <div className={styles.page}>
@@ -61,6 +65,7 @@ export function GarageScreen() {
                   <CarCard
                     car={car}
                     jobs={bookings ? jobsOf(bookings, car).length : null}
+                    importedJobs={imported.filter((j) => sameVehicle(car, j.car_snapshot)).length}
                     oilDue={
                       bookings && oilStandard?.enabled
                         ? oilDue(lastOilChange(car, bookings), car.oil_change_months ?? oilStandard.months)
@@ -87,7 +92,17 @@ const REPORT_FROM_GARAGE: ReportLinkState = { from: 'garage' };
  * `jobs`: finished jobs on this car (P16c), null while the bookings load (or did not). `oilDue`: when
  * the next oil change is due (T30), null when unknown.
  */
-function CarCard({ car, jobs, oilDue }: { car: Car; jobs: number | null; oilDue: string | null }) {
+function CarCard({
+  car,
+  jobs,
+  importedJobs,
+  oilDue,
+}: {
+  car: Car;
+  jobs: number | null;
+  importedJobs: number;
+  oilDue: string | null;
+}) {
   const { t, lang } = useI18n();
   const name = `${car.make} ${car.model}`;
   const anyDate = CAR_DOCS.some(({ column }) => car[column]) || oilDue !== null;
@@ -107,19 +122,21 @@ function CarCard({ car, jobs, oilDue }: { car: Car; jobs: number | null; oilDue:
           <Pencil size={18} aria-hidden="true" />
         </Link>
       </div>
-      {jobs === null ? null : jobs > 0 ? (
+      {jobs === null ? null : jobs + importedJobs > 0 ? (
         <>
           <Link to={carHistoryPath(car.id)} state={FROM_GARAGE} className={styles.history}>
             <History size={16} aria-hidden="true" />
-            <span className={styles.historyText}>{t('vh.garageRow', { jobs: plural(lang, 'unit.jobs', jobs) })}</span>
+            <span className={styles.historyText}>{t('vh.garageRow', { jobs: plural(lang, 'unit.jobs', jobs + importedJobs) })}</span>
             <ChevronRight size={18} aria-hidden="true" />
           </Link>
-          {/* The paid report (T15, P16e): a secondary action, only for a car with finished jobs. */}
-          <Link to={carReportPath(car.id)} state={REPORT_FROM_GARAGE} className={`${styles.history} ${styles.report}`}>
-            <FileCheck size={16} aria-hidden="true" />
-            <span className={styles.historyText}>{t('report.garageRow')}</span>
-            <ChevronRight size={18} aria-hidden="true" />
-          </Link>
+          {/* The paid report (T15, P16e): a secondary action, only for a car with jobs done through Service-Hub. */}
+          {jobs > 0 && (
+            <Link to={carReportPath(car.id)} state={REPORT_FROM_GARAGE} className={`${styles.history} ${styles.report}`}>
+              <FileCheck size={16} aria-hidden="true" />
+              <span className={styles.historyText}>{t('report.garageRow')}</span>
+              <ChevronRight size={18} aria-hidden="true" />
+            </Link>
+          )}
         </>
       ) : (
         <p className={styles.historyNone}>{t('vh.noJobs')}</p>

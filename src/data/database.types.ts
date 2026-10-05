@@ -1606,6 +1606,7 @@ export type Database = {
       }
       shop_client_cars: {
         Row: {
+          added_to_garage_at: string | null
           client_id: string | null
           created_at: string
           id: string
@@ -1619,6 +1620,7 @@ export type Database = {
           year: number | null
         }
         Insert: {
+          added_to_garage_at?: string | null
           client_id?: string | null
           created_at?: string
           id?: string
@@ -1632,6 +1634,7 @@ export type Database = {
           year?: number | null
         }
         Update: {
+          added_to_garage_at?: string | null
           client_id?: string | null
           created_at?: string
           id?: string
@@ -1677,6 +1680,7 @@ export type Database = {
       }
       shop_clients: {
         Row: {
+          client_id: string | null
           created_at: string
           email: string | null
           id: string
@@ -1686,6 +1690,7 @@ export type Database = {
           shop_id: string
         }
         Insert: {
+          client_id?: string | null
           created_at?: string
           email?: string | null
           id?: string
@@ -1695,6 +1700,7 @@ export type Database = {
           shop_id: string
         }
         Update: {
+          client_id?: string | null
           created_at?: string
           email?: string | null
           id?: string
@@ -1704,6 +1710,13 @@ export type Database = {
           shop_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "shop_clients_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "shop_clients_import_id_fkey"
             columns: ["import_id"]
@@ -3343,6 +3356,10 @@ export type Database = {
       }
       last_seen: { Args: { p_user_id: string }; Returns: string }
       limit_range: { Args: { p_key: string }; Returns: unknown }
+      link_imported: {
+        Args: { p_profile: string; p_shop: string }
+        Returns: number
+      }
       list_imported_jobs: {
         Args: {
           p_before_day?: string
@@ -3562,6 +3579,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      my_imported_jobs: { Args: never; Returns: Json }
       my_phone_verification: { Args: never; Returns: Json }
       my_referrals: { Args: never; Returns: Json }
       my_shop_id: { Args: never; Returns: string }
@@ -3610,6 +3628,7 @@ export type Database = {
         Args: { p_code: string; p_id: string }
         Returns: string
       }
+      phone_digits: { Args: { p_phone: string }; Returns: string }
       phone_verify_begin: {
         Args: { p_code: string; p_user_id: string }
         Returns: Json
@@ -4469,6 +4488,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      shop_link_preview: { Args: { p_shop_id: string }; Returns: Json }
       shop_month_numbers: {
         Args: { p_month: string; p_shop_id: string }
         Returns: Json

@@ -1,4 +1,4 @@
-import { CreditCard, Download, FileCheck, FileText, Heart, Landmark, History, LifeBuoy, ListTree, Megaphone, ScrollText, Settings, SlidersHorizontal, Star } from 'lucide-react';
+import { CreditCard, Download, FileCheck, FileText, Heart, Landmark, History, LifeBuoy, ListTree, Megaphone, QrCode, ScrollText, Settings, SlidersHorizontal, Star } from 'lucide-react';
 import { useCallback, useRef, useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import type { ShellOutletContext } from '../../app/AppShell';
@@ -21,7 +21,7 @@ import {
   ADMIN_SUBSCRIPTIONS_PATH,
 } from '../admin/paths';
 import { FAVORITES_PATH, MY_REPORTS_PATH, VEHICLE_HISTORY_PICK_PATH } from '../client/paths';
-import { REVIEWS_PATH } from '../shop/paths';
+import { REVIEWS_PATH, SHOP_LINK_PATH } from '../shop/paths';
 import { SETTINGS_PATH } from '../shop/settings/paths';
 import { OwnerTiles } from '../shop/OwnerTiles';
 import { DataSection } from './DataSection';
@@ -88,6 +88,7 @@ export function AccountScreen({ role }: { role: Role }) {
         <div className={styles.tiles}>
           <Tile to={SETTINGS_PATH} icon={Settings} label={t('account.tile.settings')} />
           <Tile to={REVIEWS_PATH} icon={Star} label={t('reviews.title')} />
+          <Tile to={SHOP_LINK_PATH} icon={QrCode} label={t('slk.title')} hint={t('slk.tileHint')} />
           <OwnerTiles />
         </div>
       )}

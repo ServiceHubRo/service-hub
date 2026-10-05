@@ -3,6 +3,7 @@ import {
   BACKEND,
   PASSWORD,
   createBookableShop,
+  createUser,
   expectAccessible,
   expectNoHorizontalScroll,
   serviceRest,
@@ -11,6 +12,7 @@ import {
   signIn,
   uniquePhone,
   userIdOf,
+  verifyPhoneByAdmin,
 } from './support';
 
 // T31a — a shop imports its clients, cars and past jobs from another program: the file, the
@@ -166,5 +168,117 @@ test.describe('import from another program', () => {
     await expect(cards).toHaveCount(1);
     await expect(cards.first()).toContainText('CJ 99 OLD');
     await shot(page, 't31a-history-search', name());
+  });
+
+  test('T31b: a client with the same confirmed phone gets the imported cars and history; the shop shares its link', async ({
+    page,
+    browser,
+  }) => {
+    const shop = await createBookableShop('Atelier Link', ['ulei']);
+    const phone = uniquePhone();
+    const tag = Array.from({ length: 3 }, () => 'ABCDEFGHJKLMNPRSTUVWXZ'[Math.floor(Math.random() * 22)]).join('');
+    const logan = `BV 21 ${tag}`;
+    const golf = `BV 22 ${tag}`;
+    const imp = await rpcAs<{ id: string }>(shop.email, 'shop_import_begin', {
+      p_file_name: 'clienti.csv',
+      p_request_id: crypto.randomUUID(),
+    });
+    await rpcAs(shop.email, 'shop_import_add', {
+      p_import_id: imp.id,
+      p_rows: [
+        {
+          row: 2,
+          name: 'Ion Pop',
+          phone: phone.e164,
+          make: 'Dacia',
+          model: 'Logan',
+          plate: logan,
+          day: '2023-04-10',
+          work: 'Schimb ulei',
+          odometer: 98000,
+          cost: 320,
+        },
+        {
+          row: 3,
+          name: 'Ion Pop',
+          phone: phone.e164,
+          make: 'Dacia',
+          model: 'Logan',
+          plate: logan,
+          day: '2024-05-02',
+          work: 'Plăcuțe frână',
+          cost: 480,
+        },
+        { row: 4, name: 'Ion Pop', phone: phone.e164, make: 'VW', model: 'Golf', plate: golf },
+      ],
+      p_request_id: crypto.randomUUID(),
+    });
+
+    // The client makes an account with the same phone and confirms it.
+    const client = await createUser('client', { phone: phone.e164, name: 'Ion Pop' });
+    await verifyPhoneByAdmin(client);
+    await signIn(page, client, PASSWORD);
+    await expect(page).toHaveURL(/\/c\//);
+    await page.goto('/c/garaj');
+    const loganCard = page.locator('main li').filter({ hasText: logan });
+    await expect(loganCard).toContainText('Dacia Logan');
+    await expect(page.locator('main li').filter({ hasText: golf })).toContainText('VW Golf');
+    await expect(loganCard.getByRole('link', { name: /2 lucrări/ })).toBeVisible();
+    // No paid report for a car with imported jobs only.
+    await expect(loganCard.getByRole('link', { name: /raport/i })).toHaveCount(0);
+    await expectNoHorizontalScroll(page);
+    await shot(page, 't31b-garage', name());
+    await loganCard.getByRole('link', { name: /2 lucrări/ }).click();
+    await expect(page.getByText('Plăcuțe frână')).toBeVisible();
+    await expect(page.getByText('Importat de Atelier Link').first()).toBeVisible();
+    await expect(
+      page.getByText('Lucrările marcate „Importat” vin din programul folosit înainte de service.', { exact: false }),
+    ).toBeVisible();
+    await expectAccessible(page, 'imported history');
+    await shot(page, 't31b-history', name());
+
+    // A signed-in client opening the shop's link lands on its page.
+    await page.goto(`/atelier/${shop.shopId}`);
+    await expect(page).toHaveURL(new RegExp(`/c/service/${shop.shopId}$`));
+
+    // The shop: Cont → Linkul service-ului, with the QR code.
+    const shopContext = await browser.newContext({ viewport: page.viewportSize() ?? undefined });
+    await shopContext.addInitScript(() => localStorage.setItem('sh_lang', 'ro'));
+    const s = await shopContext.newPage();
+    await signIn(s, shop.email, PASSWORD);
+    await expect(s).toHaveURL(/\/s\/panou$/);
+    await s.goto('/s/cont');
+    await s.getByRole('link', { name: /Linkul service-ului/ }).click();
+    await expect(s).toHaveURL(/\/s\/cont\/link$/);
+    await expect(s.getByLabel('Linkul tău')).toContainText(`/atelier/${shop.shopId}`);
+    await expect(s.getByRole('img', { name: 'Codul QR al linkului Atelier Link' })).toBeVisible();
+    await expect(s.getByRole('button', { name: 'Tipărește afișul' })).toBeVisible();
+    const download = s.waitForEvent('download');
+    await s.getByRole('button', { name: 'Descarcă codul QR' }).click();
+    expect((await download).suggestedFilename()).toBe('service-hub-qr.svg');
+    await expectNoHorizontalScroll(s);
+    await expectAccessible(s, 'shop link');
+    await shot(s, 't31b-shop-link', name());
+    await s.emulateMedia({ media: 'print' });
+    await expect(s.getByText('Programează-te online', { exact: true })).toBeVisible();
+    await shot(s, 't31b-poster', name());
+    await shopContext.close();
+
+    // A visitor: the shop's card and the way in.
+    const visitor = await browser.newContext({ viewport: page.viewportSize() ?? undefined });
+    await visitor.addInitScript(() => localStorage.setItem('sh_lang', 'ro'));
+    const v = await visitor.newPage();
+    await v.goto(`/atelier/${shop.shopId}`);
+    await expect(v.getByRole('heading', { level: 1, name: 'Programează-te la Atelier Link' })).toBeVisible();
+    await expect(v.getByText('Fără recenzii încă')).toBeVisible();
+    await expectNoHorizontalScroll(v);
+    await expectAccessible(v, 'shop link visitor');
+    await shot(v, 't31b-visitor', name());
+    await v.getByRole('link', { name: 'Creează cont' }).click();
+    await expect(v).toHaveURL(/\/cont-nou/);
+    expect(await v.evaluate(() => Object.keys(localStorage).some((k) => localStorage.getItem(k)?.includes('-')))).toBe(true);
+    await v.goto('/atelier/00000000-0000-4000-8000-000000000000');
+    await expect(v.getByText('Linkul nu mai este valabil.')).toBeVisible();
+    await visitor.close();
   });
 });

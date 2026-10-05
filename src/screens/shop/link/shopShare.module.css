@@ -1,0 +1,92 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-width: 640px;
+  min-width: 0;
+}
+
+.muted {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+.label {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.url {
+  font-size: 15px;
+  overflow-wrap: anywhere;
+  color: var(--amber);
+}
+
+.buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.qr {
+  width: min(240px, 100%);
+  height: auto;
+  border-radius: var(--radius-input);
+  align-self: center;
+}
+
+/* The poster (print only). */
+.poster {
+  text-align: center;
+  color: #000;
+  padding-top: 24mm;
+}
+
+.posterBrand {
+  font-size: 18pt;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.posterTitle {
+  margin-top: 14mm;
+  font-size: 30pt;
+  font-weight: 800;
+  line-height: 1.15;
+}
+
+.posterShop {
+  margin-top: 4mm;
+  font-size: 22pt;
+  font-weight: 600;
+}
+
+.posterQr {
+  display: block;
+  width: 110mm;
+  height: 110mm;
+  margin: 12mm auto 8mm;
+}
+
+.posterHow {
+  font-size: 16pt;
+}
+
+.posterUrl {
+  margin-top: 4mm;
+  font-size: 12pt;
+  overflow-wrap: anywhere;
+}
+
+@media print {
+  .page {
+    max-width: none;
+  }
+}

@@ -22,6 +22,9 @@ export const IMPORT_PATH = `${SHOP_BOOKINGS_PATH}/import`;
 export const ACCOUNT_PATH = '/s/cont';
 export const REVIEWS_PATH = '/s/cont/recenzii';
 
+/** The shop's own link, QR code and poster (T31b), a tile in Cont. */
+export const SHOP_LINK_PATH = '/s/cont/link';
+
 /** Abonament, the owner's tile in Cont (T14). Every subscription notice and email leads here. */
 export const SUBSCRIPTION_PATH = '/s/cont/abonament';
 

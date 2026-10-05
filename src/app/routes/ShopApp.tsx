@@ -4,6 +4,7 @@ import { ThreadsProvider } from '../../screens/messages/ThreadsProvider';
 import { NoticesProvider } from '../../screens/notices/NoticesProvider';
 import { AddBookingScreen } from '../../screens/shop/bookings/AddBookingScreen';
 import { ImportScreen } from '../../screens/shop/bookings/ImportScreen';
+import { ShopShareScreen } from '../../screens/shop/link/ShopShareScreen';
 import { ShopBookingsProvider } from '../../screens/shop/bookings/ShopBookingsProvider';
 import { ShopBookingsScreen } from '../../screens/shop/bookings/ShopBookingsScreen';
 import { Dashboard } from '../../screens/shop/dashboard/Dashboard';
@@ -11,6 +12,7 @@ import { ShopHistoryScreen } from '../../screens/shop/history/ShopHistoryScreen'
 import {
   ADD_BOOKING_PATH,
   IMPORT_PATH,
+  SHOP_LINK_PATH,
   REPORTS_PATH,
   REVIEWS_PATH,
   SHOP_BOOKINGS_PATH,
@@ -76,6 +78,7 @@ export default function ShopApp() {
           element={<VehicleFileScreen from="history" />}
         />
         <Route path={rel('shop', REVIEWS_PATH)} element={<ShopReviewsScreen />} />
+        <Route path={rel('shop', SHOP_LINK_PATH)} element={<ShopShareScreen />} />
         <Route path={rel('shop', SUBSCRIPTION_PATH)} element={<SubscriptionScreen />} />
         <Route path={rel('shop', REPORTS_PATH)} element={<ShopReportsScreen />} />
         <Route path={rel('shop', SETTINGS_PATH)} element={<ShopSettingsLayout />}>
