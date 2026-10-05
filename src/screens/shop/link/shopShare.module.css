@@ -42,6 +42,12 @@
   align-self: center;
 }
 
+.choices {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 10px;
+}
+
 /* The poster: one design for the preview and the printed A4 page (container units). */
 .previewFrame {
   width: min(320px, 100%);
@@ -84,6 +90,19 @@
   font-weight: 800;
   line-height: 1.1;
   color: #f5a524;
+}
+
+.posterTitleSecond {
+  margin-top: 1cqw;
+  font-size: 5.5cqw;
+  font-weight: 700;
+  color: #f5a524;
+}
+
+.posterHowSecond {
+  margin-top: 1cqw;
+  font-size: 3.6cqw;
+  color: #a4aab4;
 }
 
 .posterShop {

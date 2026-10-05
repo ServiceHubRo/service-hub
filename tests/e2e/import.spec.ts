@@ -268,7 +268,18 @@ test.describe('import from another program', () => {
     // One A4 page, edge to edge (Chromium prints PDF; the file stays with the screenshots).
     const pdf = await s.pdf({ preferCSSPageSize: true, printBackground: true });
     expect(pdf.toString('latin1').match(/\/Type\s*\/Page[^s]/g)).toHaveLength(1);
+    expect(pdf.toString('latin1')).toMatch(/\/MediaBox \[0 0 595\.\d+ 841\.\d+\]/);
     writeFileSync(`test-results/shots/t31b-poster-${name()}.pdf`, pdf);
+
+    // In both languages, on A6 for the counter.
+    await s.emulateMedia({ media: 'screen' });
+    await s.getByRole('combobox', { name: 'Limba afișului' }).selectOption('both');
+    await s.getByRole('combobox', { name: 'Mărime' }).selectOption('A6');
+    await expect(s.getByText('Book online', { exact: true }).first()).toBeAttached();
+    await s.emulateMedia({ media: 'print' });
+    const small = await s.pdf({ preferCSSPageSize: true, printBackground: true });
+    expect(small.toString('latin1')).toMatch(/\/MediaBox \[0 0 29[78]\.\d+ 419\.\d+\]/);
+    writeFileSync(`test-results/shots/t31b-poster-a6-${name()}.pdf`, small);
     await shot(s, 't31b-poster', name());
     await shopContext.close();
 
