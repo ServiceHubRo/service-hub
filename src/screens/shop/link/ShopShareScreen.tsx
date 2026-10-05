@@ -4,7 +4,9 @@ import { BackLink } from '../../../components/BackLink';
 import { Button } from '../../../components/Button';
 import { Card } from '../../../components/Card';
 import { LoadError } from '../../../components/LoadError';
+import { LogoTile } from '../../../components/LogoTile';
 import { SkeletonList } from '../../../components/Skeleton';
+import { Wordmark } from '../../../components/Wordmark';
 import { fetchOwnShop } from '../../../data/shop';
 import { shopLinkUrl } from '../../../data/shopLink';
 import { useI18n } from '../../../i18n/context';
@@ -96,17 +98,46 @@ export function ShopShareScreen() {
             </div>
           </Card>
 
-          {/* The poster, as it prints: black on white, one page. */}
-          <section className={`${styles.poster} print-only`} aria-hidden="true">
-            <p className={styles.posterBrand}>Service-Hub</p>
-            <p className={styles.posterTitle}>{t('slk.posterTitle')}</p>
-            <p className={styles.posterShop}>{shop.name}</p>
-            <QrImage size={qr.size} path={qr.path} label="" className={styles.posterQr} />
-            <p className={styles.posterHow}>{t('slk.posterHow')}</p>
-            <p className={`mono ${styles.posterUrl}`}>{url}</p>
-          </section>
+          <Card className={`${styles.section} no-print`}>
+            <p className={styles.label}>{t('slk.posterPreview')}</p>
+            <div className={styles.previewFrame}>
+              <Poster shopName={shop.name} url={url} qr={qr} />
+            </div>
+          </Card>
+
+          {/* The poster as it prints: the whole page, in the platform's colors. The page rule lives
+              only while this screen is open, so Istoric and the other prints keep their margins. */}
+          <style>{'@page { size: A4 portrait; margin: 0; }'}</style>
+          <div className={`${styles.printPage} print-only`}>
+            <Poster shopName={shop.name} url={url} qr={qr} />
+          </div>
         </>
       )}
+    </div>
+  );
+}
+
+/**
+ * The front-desk poster (T31b): the platform's dark background, the logo and wordmark, the title
+ * in amber, the QR code dark on white (so every phone reads it) in an amber frame, the address.
+ * Sized in container units, so the preview and the printed A4 page are the same design.
+ */
+function Poster({ shopName, url, qr }: { shopName: string; url: string; qr: { size: number; path: string } }) {
+  const { t } = useI18n();
+  return (
+    <div className={styles.poster} aria-hidden="true">
+      <div className={styles.posterBrand}>
+        <LogoTile size="10cqw" />
+        <Wordmark size="7cqw" />
+      </div>
+      <p className={styles.posterTagline}>{t('auth.tagline')}</p>
+      <p className={styles.posterTitle}>{t('slk.posterTitle')}</p>
+      <p className={styles.posterShop}>{shopName}</p>
+      <div className={styles.posterQrFrame}>
+        <QrImage size={qr.size} path={qr.path} label="" className={styles.posterQr} />
+      </div>
+      <p className={styles.posterHow}>{t('slk.posterHow')}</p>
+      <p className={`mono ${styles.posterUrl}`}>{url}</p>
     </div>
   );
 }

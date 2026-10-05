@@ -1,3 +1,4 @@
+import { writeFileSync } from 'node:fs';
 import { expect, test } from '@playwright/test';
 import {
   BACKEND,
@@ -259,8 +260,15 @@ test.describe('import from another program', () => {
     await expectNoHorizontalScroll(s);
     await expectAccessible(s, 'shop link');
     await shot(s, 't31b-shop-link', name());
+    // The poster: previewed on the screen, alone on the printed page.
+    await expect(s.getByText('Programează-te online', { exact: true })).toHaveCount(2);
     await s.emulateMedia({ media: 'print' });
-    await expect(s.getByText('Programează-te online', { exact: true })).toBeVisible();
+    await expect(s.getByText('Programează-te online', { exact: true }).filter({ visible: true })).toHaveCount(1);
+    await expect(s.getByRole('button', { name: 'Tipărește afișul' })).toBeHidden();
+    // One A4 page, edge to edge (Chromium prints PDF; the file stays with the screenshots).
+    const pdf = await s.pdf({ preferCSSPageSize: true, printBackground: true });
+    expect(pdf.toString('latin1').match(/\/Type\s*\/Page[^s]/g)).toHaveLength(1);
+    writeFileSync(`test-results/shots/t31b-poster-${name()}.pdf`, pdf);
     await shot(s, 't31b-poster', name());
     await shopContext.close();
 

@@ -2531,6 +2531,7 @@ export const ro = {
   'slk.qrLabel': 'Codul QR al linkului {shop}',
   'slk.download': 'Descarcă codul QR',
   'slk.print': 'Tipărește afișul',
+  'slk.posterPreview': 'Afișul',
   'slk.posterTitle': 'Programează-te online',
   'slk.posterHow': 'Scanează codul cu camera telefonului.',
   'slk.loadError': 'Linkul nu s-a încărcat.',

@@ -2534,6 +2534,7 @@ export const en: Record<MessageKey, string> = {
   'slk.qrLabel': 'QR code of the {shop} link',
   'slk.download': 'Download the QR code',
   'slk.print': 'Print the poster',
+  'slk.posterPreview': 'The poster',
   'slk.posterTitle': 'Book online',
   'slk.posterHow': "Scan the code with your phone's camera.",
   'slk.loadError': "The link didn't load.",

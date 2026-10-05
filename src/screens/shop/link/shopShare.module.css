@@ -42,51 +42,102 @@
   align-self: center;
 }
 
-/* The poster (print only). */
+/* The poster: one design for the preview and the printed A4 page (container units). */
+.previewFrame {
+  width: min(320px, 100%);
+  align-self: center;
+}
+
 .poster {
+  container-type: inline-size;
+  aspect-ratio: 210 / 297;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   text-align: center;
-  color: #000;
-  padding-top: 24mm;
+  padding: 7cqw 7cqw 6cqw;
+  background: #14161a;
+  color: #eae8e2;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  overflow: hidden;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
 }
 
 .posterBrand {
-  font-size: 18pt;
-  font-weight: 800;
-  letter-spacing: 0.02em;
+  display: flex;
+  align-items: center;
+  gap: 3cqw;
+}
+
+.posterTagline {
+  margin-top: 2cqw;
+  font-size: 3.4cqw;
+  color: #a4aab4;
 }
 
 .posterTitle {
-  margin-top: 14mm;
-  font-size: 30pt;
+  margin-top: 7cqw;
+  font-size: 8cqw;
   font-weight: 800;
-  line-height: 1.15;
+  line-height: 1.1;
+  color: #f5a524;
 }
 
 .posterShop {
-  margin-top: 4mm;
-  font-size: 22pt;
-  font-weight: 600;
+  margin-top: 2cqw;
+  font-size: 6cqw;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.posterQrFrame {
+  margin-top: 7cqw;
+  width: 58cqw;
+  padding: 2.5cqw;
+  background: #ffffff;
+  border: 1.2cqw solid #f5a524;
+  border-radius: 5cqw;
 }
 
 .posterQr {
   display: block;
-  width: 110mm;
-  height: 110mm;
-  margin: 12mm auto 8mm;
+  width: 100%;
+  height: auto;
 }
 
 .posterHow {
-  font-size: 16pt;
+  margin-top: 6cqw;
+  font-size: 4.2cqw;
 }
 
 .posterUrl {
-  margin-top: 4mm;
-  font-size: 12pt;
+  margin-top: auto;
+  padding-top: 3cqw;
+  font-size: 2.8cqw;
+  color: #f5a524;
   overflow-wrap: anywhere;
 }
 
+/* Printing: the poster alone fills the page, without margins (the screen adds the @page rule). */
 @media print {
   .page {
     max-width: none;
+  }
+
+  .printPage {
+    display: block;
+    position: fixed;
+    inset: 0;
+  }
+
+  .printPage .poster {
+    width: 100%;
+    height: 100%;
+    aspect-ratio: auto;
+    border: none;
+    border-radius: 0;
   }
 }
