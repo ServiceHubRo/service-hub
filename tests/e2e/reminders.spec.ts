@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
-import { ymdInBucharest } from '../../src/i18n/format';
+import { formatMonthLong, ymdInBucharest } from '../../src/i18n/format';
 import { addMonths } from '../../src/lib/oil';
 import {
   BACKEND,
@@ -266,8 +266,8 @@ test.describe('client reminders', () => {
     await page.getByRole('button', { name: 'Salvează' }).click();
 
     await expect(page).toHaveURL(/\/c\/garaj$/);
-    const pill = page.getByText(/^Schimb ulei: pe la /);
-    await expect(pill).toBeVisible();
+    const pill = page.getByText(/^Schimb ulei: în /);
+    await expect(pill).toHaveText(`Schimb ulei: în ${formatMonthLong('ro', addMonths(lastDay, 6))}`);
     await expectNoHorizontalScroll(page);
     await shot(page, 't30-garage-oil', name());
     const [saved] = await serviceRest<{ oil_change_months: number; last_oil_change: string }[]>(
@@ -279,7 +279,7 @@ test.describe('client reminders', () => {
     // In English.
     await serviceRest(`profiles?id=eq.${owner}`, 'PATCH', { lang: 'en' });
     await page.reload();
-    await expect(page.getByText(/^Oil change: around /)).toBeVisible();
+    await expect(page.getByText(/^Oil change: in /)).toHaveText(`Oil change: in ${formatMonthLong('en', addMonths(lastDay, 6))}`);
     await page.getByRole('link', { name: 'Edit Dacia Logan' }).click();
     await expect(page.getByRole('combobox', { name: 'Change the oil every' })).toHaveValue('6');
     await expect(page.getByRole('combobox', { name: 'Change the oil every' }).locator('option').first()).toHaveText('Standard (12 months)');

@@ -7,7 +7,7 @@ import { LoadError } from '../../../components/LoadError';
 import { SkeletonList } from '../../../components/Skeleton';
 import { fetchCars, fetchOilStandard, type Car } from '../../../data/garage';
 import { useI18n } from '../../../i18n/context';
-import { daysFromToday, formatDayMonth } from '../../../i18n/format';
+import { daysFromToday, formatDayMonth, formatMonthLong } from '../../../i18n/format';
 import type { MessageKey } from '../../../i18n/ro';
 import { plural } from '../../../i18n/translate';
 import { CAR_DOCS, urgencyOf, type CarDoc } from '../../../lib/expiry';
@@ -166,17 +166,17 @@ function DocPill({ doc, date }: { doc: CarDoc; date: string | null }) {
   );
 }
 
-/** "Schimb ulei: pe la 20 oct" — amber within 30 days, red once the day has passed (T30). */
+/** "Schimb ulei: în octombrie" — the month only; amber within 30 days, red once the day has passed (T30). */
 function OilPill({ due }: { due: string }) {
   const { t, lang } = useI18n();
   const days = daysFromToday(due);
   const urgency = urgencyOf(days);
-  const date = formatDayMonth(lang, due);
+  const month = formatMonthLong(lang, due);
   const cls = urgency === 'expired' ? styles.pillRed : urgency === 'soon' ? styles.pillAmber : styles.pillMuted;
   return (
     <span className={cls}>
       {urgency !== 'ok' && <Bell size={13} aria-hidden="true" />}
-      {days < 0 ? t('garage.oilPast', { date }) : t('garage.oilDue', { date })}
+      {days < 0 ? t('garage.oilPast', { month }) : t('garage.oilDue', { month })}
     </span>
   );
 }

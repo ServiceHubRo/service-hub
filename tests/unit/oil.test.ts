@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { formatMonthLong } from '../../src/i18n/format';
 import { addMonths, lastOilChange, oilDue, type OilJob } from '../../src/lib/oil';
 
 const job = (over: Partial<OilJob>): OilJob => ({
@@ -41,5 +42,13 @@ describe('the next oil change (T30)', () => {
     expect(oilDue('2026-04-20', 6)).toBe('2026-10-20');
     expect(oilDue(null, 6)).toBeNull();
     expect(oilDue('2026-04-20', null)).toBeNull();
+  });
+
+  it('the Garage card says the month only, with the year when it is not this one', () => {
+    const now = new Date('2026-10-05T09:00:00Z');
+    expect(formatMonthLong('ro', '2026-10-20', now)).toBe('octombrie');
+    expect(formatMonthLong('ro', '2027-01-10', now)).toBe('ianuarie 2027');
+    expect(formatMonthLong('en', '2026-10-20', now)).toBe('October');
+    expect(formatMonthLong('en', '2027-01-10', now)).toBe('January 2027');
   });
 });
