@@ -149,6 +149,9 @@ export interface HistoryEntry {
   car_snapshot: VehicleFields;
   odometer: number | null;
   cost: number | null;
+  /** T31a: a job brought from another program (Istoric only; never in the totals). */
+  imported?: boolean;
+  work?: string | null;
 }
 
 /** The day (Bucharest) a job ended: finished, canceled, refused, expired, not shown. */
@@ -177,6 +180,7 @@ export function matchesHistory(entry: HistoryEntry, query: string): boolean {
     entry.service_en ?? '',
     entry.odometer !== null ? String(entry.odometer) : '',
     entry.ref,
+    entry.imported ? (entry.work ?? '') : '',
   );
 }
 
@@ -194,9 +198,12 @@ export function filterHistory<T extends HistoryEntry>(
   );
 }
 
-/** "{n} reparații · {sum} încasat": the finished jobs and what they brought in (P16b). */
+/**
+ * "{n} reparații · {sum} încasat": the finished jobs and what they brought in (P16b). Imported jobs
+ * (T31a) are left out, so the figures stay those of Rapoarte.
+ */
 export function historyTotals(entries: readonly HistoryEntry[]): { jobs: number; revenue: number } {
-  const done = entries.filter((e) => e.status === 'done');
+  const done = entries.filter((e) => e.status === 'done' && !e.imported);
   return { jobs: done.length, revenue: sumCosts(done) };
 }
 

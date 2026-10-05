@@ -176,11 +176,11 @@ function JobCard({ job, own, currentClient }: { job: VehicleFileJob; own?: OwnVe
       <div className={history.top}>
         <ServiceIcon name={job.service_icon} className={history.icon} />
         <div className={history.what}>
-          <p className={history.service}>{lang === 'ro' ? job.service_ro : job.service_en}</p>
+          <p className={history.service}>{own?.imported ? t('imp.badge') : lang === 'ro' ? job.service_ro : job.service_en}</p>
           <p className={history.muted}>
             {formatDayMonth(lang, job.date)}
             {job.odometer !== null && <span className={`mono ${history.nowrap}`}> · {formatKm(lang, job.odometer)}</span>}
-            {own && <span className={`mono ${history.nowrap}`}> · {own.ref}</span>}
+            {own && !own.imported && <span className={`mono ${history.nowrap}`}> · {own.ref}</span>}
           </p>
           {otherOwner && <p className={history.muted}>{otherOwner}</p>}
         </div>

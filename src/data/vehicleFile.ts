@@ -27,6 +27,17 @@ export interface OwnVehicleFileJob extends VehicleFileJob {
   ref: string;
   cost: number | null;
   client_name: string | null;
+  /** T31a: a job this shop brought from another program (no booking, code or quote). */
+  imported?: boolean;
+}
+
+interface ImportedFileJob {
+  id: string;
+  date: string;
+  work: string | null;
+  odometer: number | null;
+  cost: number | null;
+  client_name: string | null;
 }
 
 export interface VehicleFile {
@@ -36,17 +47,38 @@ export interface VehicleFile {
   client_phone: string | null;
   has_client: boolean;
   share: VehicleFileShare;
-  /** Newest first. */
+  /** Newest first, the imported jobs (T31a) among them. */
   own: OwnVehicleFileJob[];
   /** Newest first; empty unless `share` is 'shared'. */
   others: VehicleFileJob[];
 }
 
 export async function fetchVehicleFile(bookingId: string): Promise<VehicleFile> {
-  const data = (await call('shop_vehicle_file', { p_booking_id: bookingId })) as unknown as VehicleFile;
+  const data = (await call('shop_vehicle_file', { p_booking_id: bookingId })) as unknown as VehicleFile & {
+    imported?: ImportedFileJob[];
+  };
+  const imported: OwnVehicleFileJob[] = (data.imported ?? []).map((j) => ({
+    ...j,
+    service_ro: '',
+    service_en: '',
+    service_icon: null,
+    items: [],
+    ref: '',
+    imported: true,
+  }));
+  const own = [...data.own, ...imported]
+    .map((j) => ({ ...j, cost: j.cost === null ? null : Number(j.cost) }))
+    // Newest first; a Service-Hub job before an imported one of the same day.
+    .sort((a, b) => b.date.localeCompare(a.date) || Number(!!a.imported) - Number(!!b.imported));
   return {
-    ...data,
-    own: data.own.map((j) => ({ ...j, cost: j.cost === null ? null : Number(j.cost) })),
+    booking_id: data.booking_id,
+    car: data.car,
+    client_name: data.client_name,
+    client_phone: data.client_phone,
+    has_client: data.has_client,
+    share: data.share,
+    own,
+    others: data.others,
   };
 }
 

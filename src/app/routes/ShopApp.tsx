@@ -3,12 +3,14 @@ import { MessagesScreen } from '../../screens/messages/MessagesScreen';
 import { ThreadsProvider } from '../../screens/messages/ThreadsProvider';
 import { NoticesProvider } from '../../screens/notices/NoticesProvider';
 import { AddBookingScreen } from '../../screens/shop/bookings/AddBookingScreen';
+import { ImportScreen } from '../../screens/shop/bookings/ImportScreen';
 import { ShopBookingsProvider } from '../../screens/shop/bookings/ShopBookingsProvider';
 import { ShopBookingsScreen } from '../../screens/shop/bookings/ShopBookingsScreen';
 import { Dashboard } from '../../screens/shop/dashboard/Dashboard';
 import { ShopHistoryScreen } from '../../screens/shop/history/ShopHistoryScreen';
 import {
   ADD_BOOKING_PATH,
+  IMPORT_PATH,
   REPORTS_PATH,
   REVIEWS_PATH,
   SHOP_BOOKINGS_PATH,
@@ -63,6 +65,7 @@ export default function ShopApp() {
         })}
         {messageRoutes('shop')}
         <Route path={rel('shop', ADD_BOOKING_PATH)} element={<AddBookingScreen />} />
+        <Route path={rel('shop', IMPORT_PATH)} element={<ImportScreen />} />
         {/* Fișa mașinii (T27), under the tab it was opened from. */}
         <Route
           path={`${rel('shop', SHOP_BOOKINGS_PATH)}/${VEHICLE_FILE_SEGMENT}/:bookingId`}

@@ -276,3 +276,9 @@
 .nowrap {
   white-space: nowrap;
 }
+
+/* T31a: a job imported from another program. */
+.importedBadge {
+  color: var(--muted-strong);
+  font-weight: 600;
+}

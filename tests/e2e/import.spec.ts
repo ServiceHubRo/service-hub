@@ -1,0 +1,122 @@
+import { expect, test } from '@playwright/test';
+import {
+  BACKEND,
+  PASSWORD,
+  createBookableShop,
+  expectAccessible,
+  expectNoHorizontalScroll,
+  serviceRest,
+  shot,
+  signIn,
+  uniquePhone,
+  userIdOf,
+} from './support';
+
+// T31a — a shop imports its clients, cars and past jobs from another program: the file, the
+// columns, what comes in, Istoric and Fișa mașinii, the phone filling "Adaugă programare", undo.
+
+test.beforeEach(async ({ context }) => {
+  await context.addInitScript(() => {
+    if (!sessionStorage.getItem('sh_test_init')) {
+      sessionStorage.setItem('sh_test_init', '1');
+      localStorage.setItem('sh_lang', 'ro');
+    }
+  });
+});
+
+const name = () => test.info().project.name;
+
+test.describe('import from another program', () => {
+  test.skip(!BACKEND, 'needs the local Supabase stack');
+  test.setTimeout(120_000);
+
+  test('the owner imports a CSV; the jobs show in Istoric; the phone fills a new booking; undo', async ({ page }) => {
+    const shop = await createBookableShop('Atelier Import', ['ulei']);
+    const ion = uniquePhone();
+    const maria = uniquePhone();
+    const tag = Array.from({ length: 3 }, () => 'ABCDEFGHJKLMNPRSTUVWXZ'[Math.floor(Math.random() * 22)]).join('');
+    const plate = `BV 77 ${tag.slice(0, 3)}`;
+    const csv = [
+      'Nume client;Telefon;Mașina;Nr. înmatriculare;Data;Lucrare;Km;Total (lei)',
+      `Ion Pop;${ion.national};Dacia Logan;${plate};14.03.2024;Schimb ulei și filtre;120.500;"1.250,50"`,
+      `Ion Pop;${ion.national};Dacia Logan;${plate};02.02.2025;Plăcuțe frână;131.000;420`,
+      `Maria Ene;${maria.national};Skoda Fabia;B 12 ${tag.slice(0, 3)};;;;`,
+      'Vasile;;;;ieri;Revizie;;',
+    ].join('\r\n');
+
+    await signIn(page, shop.email, PASSWORD);
+    await expect(page).toHaveURL(/\/s\/panou$/);
+    await page.goto('/s/programari/nou');
+    await page.getByRole('link', { name: 'Ai clienții în alt program? Importă-i' }).click();
+    await expect(page).toHaveURL(/\/s\/programari\/import$/);
+    await expect(page.getByRole('heading', { level: 1, name: 'Importă clienți' })).toBeVisible();
+    await expect(page.getByText('Clienților nu le trimitem nimic.', { exact: false })).toBeVisible();
+
+    // A file that is not a table says so.
+    await page.getByTestId('import-file').setInputFiles({ name: 'vechi.xls', mimeType: 'application/vnd.ms-excel', buffer: Buffer.from([0xd0, 0xcf, 0x11, 0xe0]) });
+    await expect(page.getByText('Fișierul e în formatul vechi Excel (.xls).', { exact: false })).toBeVisible();
+
+    await page.getByTestId('import-file').setInputFiles({ name: 'clienti.csv', mimeType: 'text/csv', buffer: Buffer.from(csv, 'utf8') });
+    await expect(page.getByText('Am găsit 4 rânduri în clienti.csv.', { exact: false })).toBeVisible();
+    // The columns were recognized from the header.
+    await expect(page.getByRole('combobox', { name: 'Nume client' })).toHaveValue('0');
+    await expect(page.getByRole('combobox', { name: 'Nr. înmatriculare' })).toHaveValue('3');
+    await expect(page.getByRole('combobox', { name: 'Suma' })).toHaveValue('7');
+    await expect(page.getByRole('combobox', { name: 'Model' })).toHaveValue('');
+    await expect(page.getByText('2 clienți · 2 mașini · 2 lucrări')).toBeVisible();
+    await expect(page.getByText('rândul 5: data nu se poate citi sau e în viitor')).toBeVisible();
+    await expect(page.getByRole('region', { name: 'Primele rânduri' })).toBeVisible();
+    await expectNoHorizontalScroll(page);
+    await expectAccessible(page, 'import');
+    await shot(page, 't31a-import-check', name());
+
+    await page.getByRole('button', { name: 'Importă', exact: true }).click();
+    await expect(page.getByText('Import gata: 2 clienți, 2 mașini și 2 lucrări noi.', { exact: false })).toBeVisible();
+    const past = page.locator('main li').filter({ hasText: 'clienti.csv' });
+    await expect(past).toContainText('2 clienți · 2 mașini · 2 lucrări');
+    await shot(page, 't31a-import-done', name());
+
+    // Istoric: the imported jobs, marked, outside the total.
+    await page.getByRole('link', { name: 'Vezi Istoricul' }).click();
+    await expect(page).toHaveURL(/\/s\/istoric/);
+    const card = page.locator('main ul li').filter({ hasText: 'Plăcuțe frână' });
+    await expect(card).toContainText('Importat');
+    await expect(card).toContainText(plate);
+    await expect(card).toContainText('420 lei');
+    await expect(page.getByText('Lucrările importate nu intră în total.')).toBeVisible();
+    await card.getByRole('button').first().click();
+    await expect(card.getByRole('link', { name: 'Fișa mașinii' })).toHaveCount(0);
+    await expectNoHorizontalScroll(page);
+    await shot(page, 't31a-history', name());
+
+    // Adaugă programare: the phone fills the name and offers the car.
+    await page.goto('/s/programari/nou');
+    await page.getByLabel('Telefon').fill(ion.national);
+    await expect(page.getByText('Client cunoscut: am completat numele.')).toBeVisible();
+    await expect(page.getByLabel('Nume')).toHaveValue('Ion Pop');
+    await page.getByRole('group', { name: 'Mașinile lui:' }).getByRole('button', { name: new RegExp(`Dacia Logan ${plate}`) }).click();
+    await expect(page.getByLabel('Marcă')).toHaveValue('Dacia');
+    await expect(page.getByLabel('Nr. înmatriculare')).toHaveValue(plate);
+    await expectAccessible(page, 'add booking known client');
+    await shot(page, 't31a-known-client', name());
+
+    // Undo: everything it brought goes.
+    await page.goto('/s/programari/import');
+    await past.getByRole('button', { name: 'Anulează importul' }).click();
+    await past.getByRole('button', { name: 'Da, anulează' }).click();
+    await expect(past).toContainText('Anulat');
+    const left = await serviceRest<unknown[]>(`imported_jobs?select=id&shop_id=eq.${shop.shopId}`, 'GET');
+    expect(left).toHaveLength(0);
+    await page.goto('/s/istoric');
+    await expect(page.locator('main').getByText('Plăcuțe frână')).toHaveCount(0);
+
+    // In English.
+    await serviceRest(`profiles?id=eq.${await userIdOf(shop.email)}`, 'PATCH', { lang: 'en' });
+    await page.goto('/s/programari/import');
+    await expect(page.getByRole('heading', { level: 1, name: 'Import clients' })).toBeVisible();
+    await expect(page.locator('main').getByText('Undone')).toBeVisible();
+    await expect(page.locator('main')).not.toContainText('Importă');
+    await expectNoHorizontalScroll(page);
+    await shot(page, 't31a-import-en', name());
+  });
+});

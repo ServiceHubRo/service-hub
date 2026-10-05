@@ -47,6 +47,12 @@ function serviceText(b: ShopHistoryItem, lang: Lang): string {
   return rowServicesText(lang, b);
 }
 
+/** A row's title: the services of a booking; for an imported job (T31a) its work, else "Importat". */
+function titleText(b: ShopHistoryItem, lang: Lang, t: I18nValue['t']): string {
+  if (b.imported) return b.work?.split('\n')[0]?.trim() || t('imp.badge');
+  return serviceText(b, lang);
+}
+
 /**
  * Istoric reparații (FR §4.3, P16b): every finished job of the shop — done, quote refused or
  * expired, canceled, no-show — newest first. Search by plate, car, client, service or odometer;
@@ -159,6 +165,7 @@ export function ShopHistoryScreen() {
               : plural(lang, 'unit.repairs', totals.jobs)}
           </p>
         )}
+        {shown.some((b) => b.imported) && <p className={`${styles.sub} no-print`}>{t('imp.histNote')}</p>}
         {state.status === 'ready' && (
           <p className={`${styles.sub} print-only`}>
             {t('hist.printedOn', { shop: state.data.shop.name, date: formatDayMonth(lang, now) })}
@@ -269,8 +276,11 @@ function HistoryCard({ item: b, open, onToggle }: { item: ShopHistoryItem; open:
         <span className={styles.top}>
           <ServiceIcon name={b.service_icon} className={styles.icon} />
           <span className={styles.what}>
-            <span className={`${styles.service} ${styles.block}`}>{serviceText(b, lang)}</span>
-            <span className={`${styles.muted} ${styles.block}`}>{formatDayMonth(lang, endedDay(b))}</span>
+            <span className={`${styles.service} ${styles.block}`}>{titleText(b, lang, t)}</span>
+            <span className={`${styles.muted} ${styles.block}`}>
+              {formatDayMonth(lang, endedDay(b))}
+              {b.imported && <span className={styles.importedBadge}> · {t('imp.badge')}</span>}
+            </span>
           </span>
           <span className={styles.side}>
             {b.status === 'done' ? (
@@ -290,7 +300,7 @@ function HistoryCard({ item: b, open, onToggle }: { item: ShopHistoryItem; open:
             {b.client_name || t('sb.card.deletedClient')}
             {b.odometer !== null && <span className={`mono ${styles.nowrap}`}> · {formatKm(lang, b.odometer)}</span>}
           </span>
-          {b.work && <span className={`${styles.work} ${styles.block}`}>{b.work}</span>}
+          {b.work && !b.imported && <span className={`${styles.work} ${styles.block}`}>{b.work}</span>}
         </span>
       </button>
 
@@ -306,9 +316,14 @@ function HistoryCard({ item: b, open, onToggle }: { item: ShopHistoryItem; open:
               </div>
             </dl>
           )}
-          <p className={`mono ${styles.muted}`}>
-            {t('hist.card.booking', { ref: b.ref, when: `${formatDayMonth(lang, b.date)}, ${b.slot}` })}
-          </p>
+          {b.imported ? (
+            // The whole work, when it is more than the first line already shown as the title.
+            b.work && b.work.trim() !== titleText(b, lang, t) && <p className={styles.work}>{b.work}</p>
+          ) : (
+            <p className={`mono ${styles.muted}`}>
+              {t('hist.card.booking', { ref: b.ref, when: `${formatDayMonth(lang, b.date)}, ${b.slot}` })}
+            </p>
+          )}
           <div className={styles.actions}>
             {phone && (
               <a
@@ -321,10 +336,12 @@ function HistoryCard({ item: b, open, onToggle }: { item: ShopHistoryItem; open:
               </a>
             )}
             {b.has_client && <MessageLink side="shop" bookingId={b.id} />}
-            <Link to={vehicleFilePath(b.id, 'history')} className={buttonClass('secondary')}>
-              <ClipboardList size={18} aria-hidden="true" />
-              {t('vf.title')}
-            </Link>
+            {!b.imported && (
+              <Link to={vehicleFilePath(b.id, 'history')} className={buttonClass('secondary')}>
+                <ClipboardList size={18} aria-hidden="true" />
+                {t('vf.title')}
+              </Link>
+            )}
           </div>
         </div>
       )}
@@ -386,7 +403,7 @@ function PrintTable({ items }: { items: ShopHistoryItem[] }) {
             </td>
             <td>{b.client_name}</td>
             <td>
-              {serviceText(b, lang)}
+              {b.imported ? t('imp.badge') : serviceText(b, lang)}
               {b.status !== 'done' && <div>{t(`status.${b.status}`)}</div>}
             </td>
             <td className="mono">{b.odometer !== null ? formatKm(lang, b.odometer) : ''}</td>
@@ -408,11 +425,11 @@ function downloadCsv(items: readonly ShopHistoryItem[], lang: Lang, t: I18nValue
   const rows = items.map((b) => [
     endedDay(b),
     b.ref,
-    t(`status.${b.status}`),
+    b.imported ? t('imp.badge') : t(`status.${b.status}`),
     b.car_snapshot.plate ?? '',
     carText(b),
     b.client_name ?? '',
-    serviceText(b, lang),
+    b.imported ? '' : serviceText(b, lang),
     b.odometer !== null ? String(b.odometer) : '',
     b.work ?? '',
     csvAmount(b.cost, decimal),
