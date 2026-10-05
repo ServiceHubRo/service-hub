@@ -30,7 +30,7 @@ This policy explains what personal data Service-Hub uses, why, who else sees it,
 
 ### 2.2 If you are a Customer
 
-- **Cars in your Garage:** make, model, year, license plate, VIN (if you enter it) and the expiry dates for ITP, RCA and the vignette (if you enter them).
+- **Cars in your Garage:** make, model, year, license plate, VIN (if you enter it), the expiry dates for ITP, RCA and the vignette and, for the oil change, how often you change it and when you last did (if you enter them).
 - **Bookings:** the shop, service, day and time, your note, the status, plus a copy of your name, phone and car details at the time of booking.
 - **Bookings a shop enters for you**, when you call or walk in without an account: your name, phone, email (if you gave it), car and day, which the shop types into Service-Hub. You get a text (and an email, if you gave one) with a link to the booking. The link shows only the shop, day, service, car and status, with no name or phone. If you create an account with the same phone or email, confirmed, the booking and the car move into your account. Until then, only the shop and the Service-Hub team see this data.
 - **Quotes and jobs:** the lines and prices, what you accepted or refused, the work done, the cost and the **odometer reading** recorded by the shop when finishing the job.

@@ -266,8 +266,10 @@ export type Database = {
           created_at: string
           id: string
           itp_expiry: string | null
+          last_oil_change: string | null
           make: string
           model: string
+          oil_change_months: number | null
           owner_id: string
           plate: string | null
           plate_norm: string | null
@@ -282,8 +284,10 @@ export type Database = {
           created_at?: string
           id?: string
           itp_expiry?: string | null
+          last_oil_change?: string | null
           make: string
           model: string
+          oil_change_months?: number | null
           owner_id?: string
           plate?: string | null
           plate_norm?: string | null
@@ -298,8 +302,10 @@ export type Database = {
           created_at?: string
           id?: string
           itp_expiry?: string | null
+          last_oil_change?: string | null
           make?: string
           model?: string
+          oil_change_months?: number | null
           owner_id?: string
           plate?: string | null
           plate_norm?: string | null
@@ -3311,6 +3317,7 @@ export type Database = {
         }
         Returns: undefined
       }
+      oil_service_ids: { Args: never; Returns: string[] }
       period_discount_now: { Args: { p_months: number }; Returns: number }
       phone_code_hash: {
         Args: { p_code: string; p_id: string }

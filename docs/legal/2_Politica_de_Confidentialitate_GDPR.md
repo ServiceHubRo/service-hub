@@ -30,7 +30,7 @@ Aici afli ce date personale folosește Service-Hub, de ce, cine le mai vede, câ
 
 ### 2.2 Dacă ești Client
 
-- **Mașinile din Garaj:** marca, modelul, anul, numărul de înmatriculare, seria de șasiu (dacă o treci) și datele de expirare pentru ITP, RCA și rovinietă (dacă le treci).
+- **Mașinile din Garaj:** marca, modelul, anul, numărul de înmatriculare, seria de șasiu (dacă o treci), datele de expirare pentru ITP, RCA și rovinietă și, pentru schimbul de ulei, la câte luni îl faci și data ultimului schimb (dacă le treci).
 - **Programările:** service-ul, serviciul, ziua și ora, nota ta, starea, plus o copie a numelui, telefonului și a datelor mașinii de la momentul programării.
 - **Programările trecute de service pentru tine**, când suni sau mergi direct la service și nu ai cont: numele, telefonul, emailul (dacă l-ai dat), mașina și ziua, pe care service-ul le scrie în Service-Hub. Primești un SMS (și un email, dacă l-ai dat) cu un link spre programare. Linkul arată doar service-ul, ziua, serviciul, mașina și starea, fără nume sau telefon. Dacă îți faci cont cu același telefon sau email, confirmat, programarea și mașina trec în contul tău. Până atunci, datele le văd doar service-ul și echipa Service-Hub.
 - **Devizele și lucrările:** pozițiile și prețurile, ce ai acceptat sau refuzat, lucrarea făcută, costul și **kilometrajul** trecut de service la finalizare.

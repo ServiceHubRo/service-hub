@@ -36,6 +36,7 @@ export function translate(lang: Lang, key: MessageKey, params?: Params): string 
 
 export type PluralUnit =
   | 'unit.days'
+  | 'unit.months'
   | 'unit.hours'
   | 'unit.minutes'
   | 'unit.shops'

@@ -36,6 +36,7 @@ export const RPC_ERROR_CODES = [
   'cannot_move',
   'car_invalid',
   'car_not_found',
+  'car_oil_date_invalid',
   'car_plate_invalid',
   'car_plate_required',
   'car_required',

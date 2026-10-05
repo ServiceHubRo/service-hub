@@ -19,9 +19,13 @@ export interface CarFields {
   itp_expiry: string | null;
   rca_expiry: string | null;
   vignette_expiry: string | null;
+  /** T30: how often the owner changes the oil (months, 1–24); null = the catalog's interval. */
+  oil_change_months: number | null;
+  /** T30: the last oil change, when made outside Service-Hub (no later than today). */
+  last_oil_change: string | null;
 }
 
-const COLUMNS = 'id, make, model, year, plate, plate_norm, vin, itp_expiry, rca_expiry, vignette_expiry, created_at, updated_at, owner_id, reminded';
+const COLUMNS = 'id, make, model, year, plate, plate_norm, vin, itp_expiry, rca_expiry, vignette_expiry, oil_change_months, last_oil_change, created_at, updated_at, owner_id, reminded';
 
 function db() {
   if (!supabase) throw new RpcError('network');
@@ -60,6 +64,16 @@ export async function updateCar(id: string, fields: CarFields): Promise<Car> {
   if (error) throw failure(error);
   if (!data) throw new RpcError('car_not_found');
   return data;
+}
+
+/**
+ * The catalog's oil-change interval (T30) for the Garage's "Standard": null when the catalog has
+ * none, or the oil change is switched off (then no oil reminder goes, whatever the client set).
+ */
+export async function fetchOilStandard(): Promise<{ enabled: boolean; months: number | null }> {
+  const { data, error } = await db().from('services').select('enabled, reminder_months').eq('id', 'ulei').maybeSingle();
+  if (error) throw failure(error);
+  return { enabled: data?.enabled ?? false, months: data?.reminder_months ?? null };
 }
 
 /** Deleting twice is harmless: the second time there is simply nothing left to delete. */
