@@ -9,7 +9,6 @@ import { buttonClass } from '../../../components/buttonClass';
 import { Card } from '../../../components/Card';
 import { LoadError } from '../../../components/LoadError';
 import { SelectField } from '../../../components/SelectField';
-import { SkeletonList } from '../../../components/Skeleton';
 import { canRetryRpc, rpcErrorMessage } from '../../../data/rpc';
 import { addImportRows, beginImport, fetchImports, undoImport, type ShopImport } from '../../../data/shopImport';
 import { useI18n } from '../../../i18n/context';
@@ -227,13 +226,12 @@ export function ImportScreen() {
             </>
           )}
 
-          <section className={styles.section} aria-labelledby="imports-title">
-            <h2 id="imports-title" className={styles.sectionTitle}>
-              {t('imp.past')}
-            </h2>
-            {imports.state.status === 'loading' && <SkeletonList count={3} />}
-            {imports.state.status === 'error' && <LoadError message={t('imp.loadError')} onRetry={imports.reload} />}
-            {imports.state.status === 'ready' && imports.state.data.length > 0 && (
+          {imports.state.status === 'error' && <LoadError message={t('imp.loadError')} onRetry={imports.reload} />}
+          {imports.state.status === 'ready' && imports.state.data.length > 0 && (
+            <section className={styles.section} aria-labelledby="imports-title">
+              <h2 id="imports-title" className={styles.sectionTitle}>
+                {t('imp.past')}
+              </h2>
               <ul className={styles.list}>
                 {imports.state.data.map((imp) => (
                   <li key={imp.id}>
@@ -241,8 +239,8 @@ export function ImportScreen() {
                   </li>
                 ))}
               </ul>
-            )}
-          </section>
+            </section>
+          )}
         </>
       )}
     </div>

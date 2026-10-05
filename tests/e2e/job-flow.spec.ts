@@ -284,11 +284,11 @@ test.describe('quote, work, completion, review', () => {
     await job.getByRole('button', { name: 'Finalizare' }).click();
     await job.getByLabel('Kilometraj').fill('105400');
     await job.getByRole('button', { name: 'Confirmă finalizarea' }).click();
-    await expect(job.getByText('Kilometrajul este același ca la o lucrare din altă zi (105.400 km).', { exact: false })).toBeVisible();
+    await expect(job.getByText('Același kilometraj ca la o lucrare din altă zi (105.400 km).', { exact: false })).toBeVisible();
     await expect(job.getByRole('button', { name: 'Confirmă finalizarea' })).toBeDisabled();
     await shot(page, 't09-shop-odometer-same', name());
     await page.getByRole('button', { name: 'English' }).filter({ visible: true }).first().click();
-    await expect(job.getByText('The reading is the same as on a job from another day (105,400 km).', { exact: false })).toBeVisible();
+    await expect(job.getByText('Same odometer as a job on another day (105,400 km).', { exact: false })).toBeVisible();
     await shot(page, 't09-shop-odometer-same-en', name());
     await page.getByRole('button', { name: 'Română' }).filter({ visible: true }).first().click();
     await job.getByText('Da, kilometrajul este corect').click();

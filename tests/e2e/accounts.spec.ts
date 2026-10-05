@@ -221,7 +221,7 @@ test.describe('with accounts', () => {
     await page.getByRole('button', { name: 'Creează cont' }).click();
 
     await expect(page).toHaveURL(/\/confirma-email$/);
-    await expect(page.getByText(`Ți-am trimis un link de confirmare la ${email}.`, { exact: false })).toBeVisible();
+    await expect(page.getByText(`Ți-am trimis un link la ${email}.`, { exact: false })).toBeVisible();
     await shot(page, 'auth-check-email', name());
     // "Retrimite" waits 60 s after the first email.
     await expect(page.getByRole('button', { name: /Retrimite emailul în \d+ s/ })).toBeDisabled();
@@ -426,7 +426,7 @@ test.describe('with accounts', () => {
     await expect(page.getByText('Aceasta este adresa pe care o folosești deja.')).toBeVisible();
     await page.getByLabel('Emailul nou').fill(next);
     await page.getByRole('button', { name: 'Trimite verificarea' }).click();
-    await expect(page.getByText(`Verificare trimisă la ${next}.`, { exact: false })).toBeVisible();
+    await expect(page.getByText(`Deschide linkul trimis la ${next}.`, { exact: false })).toBeVisible();
     await shot(page, 'account-email-pending', name());
     await latestEmail(next, /email/i);
     await page.getByRole('button', { name: 'Anulează schimbarea' }).click();

@@ -51,35 +51,35 @@ test.describe('import from another program', () => {
     await signIn(page, shop.email, PASSWORD);
     await expect(page).toHaveURL(/\/s\/panou$/);
     await page.goto('/s/programari/nou');
-    await page.getByRole('link', { name: 'Ai clienții în alt program? Importă-i' }).click();
+    await page.getByRole('link', { name: 'Importă clienți din alt program' }).click();
     await expect(page).toHaveURL(/\/s\/programari\/import$/);
     await expect(page.getByRole('heading', { level: 1, name: 'Importă clienți' })).toBeVisible();
-    await expect(page.getByText('Clienților nu le trimitem nimic.', { exact: false })).toBeVisible();
+    await expect(page.getByText('Adu-ți clienții din programul vechi', { exact: false })).toBeVisible();
 
     // A file that is not a table says so.
     await page
       .getByTestId('import-file')
       .setInputFiles({ name: 'vechi.xls', mimeType: 'application/vnd.ms-excel', buffer: Buffer.from([0xd0, 0xcf, 0x11, 0xe0]) });
-    await expect(page.getByText('Fișierul e în formatul vechi Excel (.xls).', { exact: false })).toBeVisible();
+    await expect(page.getByText('E un Excel vechi (.xls).', { exact: false })).toBeVisible();
 
     await page
       .getByTestId('import-file')
       .setInputFiles({ name: 'clienti.csv', mimeType: 'text/csv', buffer: Buffer.from(csv, 'utf8') });
-    await expect(page.getByText('Am găsit 4 rânduri în clienti.csv.', { exact: false })).toBeVisible();
+    await expect(page.getByText('4 rânduri în clienti.csv.', { exact: false })).toBeVisible();
     // The columns were recognized from the header.
     await expect(page.getByRole('combobox', { name: 'Nume client' })).toHaveValue('0');
     await expect(page.getByRole('combobox', { name: 'Nr. înmatriculare' })).toHaveValue('3');
     await expect(page.getByRole('combobox', { name: 'Suma' })).toHaveValue('7');
     await expect(page.getByRole('combobox', { name: 'Model' })).toHaveValue('');
     await expect(page.getByText('2 clienți · 2 mașini · 2 lucrări')).toBeVisible();
-    await expect(page.getByText('rândul 5: data nu se poate citi sau e în viitor')).toBeVisible();
+    await expect(page.getByText('rândul 5: dată greșită')).toBeVisible();
     await expect(page.getByRole('region', { name: 'Primele rânduri' })).toBeVisible();
     await expectNoHorizontalScroll(page);
     await expectAccessible(page, 'import');
     await shot(page, 't31a-import-check', name());
 
     await page.getByRole('button', { name: 'Importă', exact: true }).click();
-    await expect(page.getByText('Import gata: 2 clienți, 2 mașini și 2 lucrări noi.', { exact: false })).toBeVisible();
+    await expect(page.getByText('Gata: 2 clienți, 2 mașini, 2 lucrări.', { exact: false })).toBeVisible();
     const past = page.locator('main li').filter({ hasText: 'clienti.csv' });
     await expect(past).toContainText('2 clienți · 2 mașini · 2 lucrări');
     await shot(page, 't31a-import-done', name());
@@ -100,7 +100,7 @@ test.describe('import from another program', () => {
     // Adaugă programare: the phone fills the name and offers the car.
     await page.goto('/s/programari/nou');
     await page.getByLabel('Telefon').fill(ion.national);
-    await expect(page.getByText('Client cunoscut: am completat numele.')).toBeVisible();
+    await expect(page.getByText('Client cunoscut.')).toBeVisible();
     await expect(page.getByLabel('Nume')).toHaveValue('Ion Pop');
     await page
       .getByRole('group', { name: 'Mașinile lui:' })
@@ -159,9 +159,9 @@ test.describe('import from another program', () => {
     const cards = page.locator('main ul li');
     await expect(cards).toHaveCount(100);
     await expect(page.getByText('Lucrare 149', { exact: true })).toHaveCount(0);
-    await page.getByRole('button', { name: 'Arată mai multe lucrări importate' }).click();
+    await page.getByRole('button', { name: 'Arată mai multe' }).click();
     await expect(cards).toHaveCount(150);
-    await expect(page.getByRole('button', { name: 'Arată mai multe lucrări importate' })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Arată mai multe' })).toHaveCount(0);
     await expectNoHorizontalScroll(page);
 
     // The search runs in the database: a fresh page finds the oldest job by its plate.
@@ -233,7 +233,7 @@ test.describe('import from another program', () => {
     await expect(page.getByText('Plăcuțe frână')).toBeVisible();
     await expect(page.getByText('Importat de Atelier Link').first()).toBeVisible();
     await expect(
-      page.getByText('Lucrările marcate „Importat” vin din programul folosit înainte de service.', { exact: false }),
+      page.getByText('Lucrările importate nu intră în raportul oficial.', { exact: false }),
     ).toBeVisible();
     await expectAccessible(page, 'imported history');
     await shot(page, 't31b-history', name());
@@ -286,7 +286,7 @@ test.describe('import from another program', () => {
     await expect(v).toHaveURL(/\/cont-nou/);
     expect(await v.evaluate(() => Object.keys(localStorage).some((k) => localStorage.getItem(k)?.includes('-')))).toBe(true);
     await v.goto('/atelier/00000000-0000-4000-8000-000000000000');
-    await expect(v.getByText('Linkul nu mai este valabil.')).toBeVisible();
+    await expect(v.getByText('Linkul nu mai merge.')).toBeVisible();
     await visitor.close();
   });
 });
