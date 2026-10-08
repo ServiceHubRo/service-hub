@@ -26,6 +26,8 @@ import styles from './shopShare.module.css';
 type PosterLang = 'ro' | 'en' | 'both';
 type Paper = 'A4' | 'A5' | 'A6';
 const PAPERS: readonly Paper[] = ['A4', 'A5', 'A6'];
+// In millimeters: not every browser knows the name A6 (Chromium prints it on Letter).
+const PAPER_MM: Record<Paper, string> = { A4: '210mm 297mm', A5: '148mm 210mm', A6: '105mm 148mm' };
 
 export function ShopShareScreen() {
   const { t, lang } = useI18n();
@@ -134,7 +136,7 @@ export function ShopShareScreen() {
 
           {/* The poster as it prints: the whole page, in the platform's colors. The page rule lives
               only while this screen is open, so Istoric and the other prints keep their margins. */}
-          <style>{`@page { size: ${paper} portrait; margin: 0; }`}</style>
+          <style>{`@page { size: ${PAPER_MM[paper]}; margin: 0; }`}</style>
           <div className={`${styles.printPage} print-only`}>
             <Poster shopName={shop.name} url={url} qr={qr} lang={posterLang} />
           </div>

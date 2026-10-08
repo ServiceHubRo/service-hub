@@ -278,8 +278,8 @@ test.describe('import from another program', () => {
     await expect(s.getByText('Book online', { exact: true }).first()).toBeAttached();
     await s.emulateMedia({ media: 'print' });
     const small = await s.pdf({ preferCSSPageSize: true, printBackground: true });
-    expect(small.toString('latin1')).toMatch(/\/MediaBox\s*\[\s*0\s+0\s+29\d(\.\d+)?\s+4[12]\d(\.\d+)?\s*\]/);
     writeFileSync(`test-results/shots/t31b-poster-a6-${name()}.pdf`, small);
+    expect(small.toString('latin1')).toMatch(/\/MediaBox\s*\[\s*0\s+0\s+29\d(\.\d+)?\s+4[12]\d(\.\d+)?\s*\]/);
     await shot(s, 't31b-poster', name());
     await shopContext.close();
 

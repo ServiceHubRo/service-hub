@@ -191,7 +191,7 @@ test.describe('Fișa mașinii', () => {
     // The client cancels: nothing of the other shops stays visible.
     await client.locator('li').filter({ hasText: shopName }).getByRole('button', { name: 'Anulează', exact: true }).click();
     await client.getByRole('button', { name: 'Anulează programarea' }).click();
-    await expect(page.getByRole('region', { name: /Previous repairs at other shops/ })).toContainText('only while you have an open booking');
+    await expect(page.getByRole('region', { name: /Previous repairs at other shops/ })).toContainText('while they have an open booking');
     await expect(page.getByRole('region', { name: /Previous repairs at other shops/ })).not.toContainText('Plăcuțe față schimbate');
     await clientContext.close();
   });
