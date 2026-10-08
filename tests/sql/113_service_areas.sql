@@ -32,6 +32,17 @@ update public.shops set county = null where id = test.id('shop2');
 select test.login(test.id('owner2'));
 select test.fails(format('update public.shops set area = %L where id = %L', 'CJ', test.id('shop2')),
   'permission denied', 'the owner cannot set the zone');
+-- The owner's own save of the address works and moves the zone. Through the API each save is a new
+-- transaction, where the trigger's call is checked against the owner's rights; inside this one test
+-- transaction Postgres checked it once already (as the fixture), so the trigger's rights are
+-- asserted on their own too.
+select test.ok((select prosecdef from pg_proc where oid = 'public.shops_set_area()'::regprocedure),
+  'the zone trigger runs with its definer''s rights (the owner cannot call the lookups)');
+update public.shops set city = 'Cluj-Napoca' where id = test.id('shop2');
+select test.logout();
+select test.eq((select area from public.shops where id = test.id('shop2')), 'CJ', 'the owner moved to Cluj');
+select test.login(test.id('owner2'));
+update public.shops set city = 'Codlea' where id = test.id('shop2');
 select test.logout();
 
 -- ------------------------------------------------------------------ what the client sees
