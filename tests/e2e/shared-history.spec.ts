@@ -113,7 +113,7 @@ test.describe('Fișa mașinii', () => {
     await client.getByLabel('Nr. înmatriculare').fill(plate);
     const agree = client.getByRole('checkbox', { name: 'Arată service-ului ce s-a făcut la mașină la alte service-uri' });
     await expect(agree).not.toBeChecked();
-    await expect(client.getByText('fără prețuri și fără numele service-urilor', { exact: false })).toBeVisible();
+    await expect(client.getByText('fără prețuri sau nume de service-uri', { exact: false })).toBeVisible();
     await agree.check();
     await agree.scrollIntoViewIfNeeded();
     await expectNoHorizontalScroll(client);

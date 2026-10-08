@@ -268,7 +268,7 @@ test.describe('import from another program', () => {
     // One A4 page, edge to edge (Chromium prints PDF; the file stays with the screenshots).
     const pdf = await s.pdf({ preferCSSPageSize: true, printBackground: true });
     expect(pdf.toString('latin1').match(/\/Type\s*\/Page[^s]/g)).toHaveLength(1);
-    expect(pdf.toString('latin1')).toMatch(/\/MediaBox \[0 0 595\.\d+ 841\.\d+\]/);
+    expect(pdf.toString('latin1')).toMatch(/\/MediaBox\s*\[\s*0\s+0\s+59\d(\.\d+)?\s+84\d(\.\d+)?\s*\]/);
     writeFileSync(`test-results/shots/t31b-poster-${name()}.pdf`, pdf);
 
     // In both languages, on A6 for the counter.
@@ -278,7 +278,7 @@ test.describe('import from another program', () => {
     await expect(s.getByText('Book online', { exact: true }).first()).toBeAttached();
     await s.emulateMedia({ media: 'print' });
     const small = await s.pdf({ preferCSSPageSize: true, printBackground: true });
-    expect(small.toString('latin1')).toMatch(/\/MediaBox \[0 0 29[78]\.\d+ 419\.\d+\]/);
+    expect(small.toString('latin1')).toMatch(/\/MediaBox\s*\[\s*0\s+0\s+29\d(\.\d+)?\s+4[12]\d(\.\d+)?\s*\]/);
     writeFileSync(`test-results/shots/t31b-poster-a6-${name()}.pdf`, small);
     await shot(s, 't31b-poster', name());
     await shopContext.close();

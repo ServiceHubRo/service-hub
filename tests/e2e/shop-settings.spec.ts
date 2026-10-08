@@ -275,7 +275,7 @@ test.describe('shop settings', () => {
     // A used link says so.
     const third = await (await browser.newContext({ locale: 'ro-RO' })).newPage();
     await third.goto(link);
-    await expect(third.getByText(/Linkul nu mai este valabil/)).toBeVisible();
+    await expect(third.getByText(/Linkul nu mai e valabil/)).toBeVisible();
 
     // The owner sees the colleague and removes them.
     await page.reload();
@@ -314,5 +314,5 @@ test.describe('shop settings', () => {
 test('an unknown invitation link says it is not valid', async ({ page }) => {
   test.skip(!BACKEND, 'needs the local Supabase stack');
   await page.goto(`/invitatie/${'0'.repeat(64)}`);
-  await expect(page.getByText(/Linkul nu mai este valabil/)).toBeVisible();
+  await expect(page.getByText(/Linkul nu mai e valabil/)).toBeVisible();
 });
