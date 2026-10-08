@@ -126,12 +126,12 @@ test.describe('Bookings that look after themselves', () => {
     await expect(page).toHaveURL(/\/c\/cauta/);
     await page.goto('/c/programari');
     const card = page.locator('main li').filter({ hasText: shopName });
-    await expect(card.getByText('Ne pare rău, service-ul nu a răspuns la timp, așa că cererea s-a închis.', { exact: false })).toBeVisible();
+    await expect(card.getByText('Service-ul nu a răspuns la timp.', { exact: false })).toBeVisible();
     await expectNoHorizontalScroll(page);
     await shot(page, 'request-unanswered', name());
     // In English too.
     await page.getByRole('button', { name: 'English' }).filter({ visible: true }).first().click();
-    await expect(card.getByText("We're sorry, the shop didn't answer in time, so the request has closed.", { exact: false })).toBeVisible();
+    await expect(card.getByText("The shop didn't answer in time.", { exact: false })).toBeVisible();
     await expectNoHorizontalScroll(page);
     await shot(page, 'request-unanswered-en', name());
     await page.getByRole('button', { name: 'Română' }).filter({ visible: true }).first().click();

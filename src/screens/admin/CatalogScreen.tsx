@@ -294,9 +294,7 @@ function ServiceRow({
           <span className={styles.rowTitle}>{lang === 'en' ? s.name_en : s.name_ro}</span>
           {!s.enabled && <Pill tone="grey">{t('admin.catalog.off')}</Pill>}
         </span>
-        <span className={styles.muted}>{lang === 'en' ? s.name_ro : s.name_en}</span>
         <span className={styles.rowMeta}>
-          <span className="mono">{s.id}</span>
           <span>{t('admin.catalog.usage', { shops: s.shops, bookings: s.bookings })}</span>
           {s.reminder_months !== null && <span>{t('admin.catalog.reminderShort', { months: s.reminder_months })}</span>}
         </span>
@@ -423,8 +421,6 @@ export function CatalogScreen() {
                               {!c.enabled && <Pill tone="grey">{t('admin.catalog.off')}</Pill>}
                             </span>
                             <span className={styles.rowMeta}>
-                              <span>{lang === 'en' ? c.name_ro : c.name_en}</span>
-                              <span className="mono">{c.key}</span>
                               <span>{t('admin.catalog.servicesCount', { n: c.services.length })}</span>
                             </span>
                           </span>

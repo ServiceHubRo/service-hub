@@ -71,6 +71,8 @@ test.describe('instant booking', () => {
     // The shop page, on that day: the free place, directions, and the button straight to it.
     await card.getByRole('link').first().click();
     await expect(c).toHaveURL(new RegExp(`/c/service/${shopId}\\?zi=${free.free_date}`));
+    // The shop page itself, loaded (the search card under it also says "de la …" until it is replaced).
+    await expect(c.getByRole('heading', { level: 1, name: shopName })).toBeVisible({ timeout: 15_000 });
     await expect(c.getByText(`de la ${free.free_slot}`).first()).toBeVisible();
     await expect(c.getByRole('link', { name: 'Indicații' })).toHaveAttribute('href', /^https:\/\/www\.google\.com\/maps\/dir\/\?api=1&destination=/);
     await expectNoHorizontalScroll(c);

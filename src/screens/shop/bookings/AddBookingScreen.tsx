@@ -1,10 +1,11 @@
-import { useCallback, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useCallback, useRef, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { ActionButton } from '../../../components/ActionButton';
 import { BackLink } from '../../../components/BackLink';
 import { Banner } from '../../../components/Banner';
 import { Card } from '../../../components/Card';
 import { Checkbox } from '../../../components/Checkbox';
+import { Chip } from '../../../components/Chip';
 import { EmptyState } from '../../../components/EmptyState';
 import { Field } from '../../../components/Field';
 import { LoadError } from '../../../components/LoadError';
@@ -14,14 +15,16 @@ import { TextArea } from '../../../components/TextArea';
 import { canRetryRpc, RELOAD_AVAILABILITY_CODES, rpcErrorMessage, toRpcError } from '../../../data/rpc';
 import { fetchCatalog, fetchShopServices } from '../../../data/shop';
 import { shopCreateBooking } from '../../../data/shopBookings';
+import { findShopClient, type KnownClient } from '../../../data/shopImport';
 import { useI18n } from '../../../i18n/context';
 import type { MessageKey } from '../../../i18n/ro';
 import type { Lang, Msg } from '../../../i18n/translate';
 import { carYearMax, isValidCarYear } from '../../../lib/car';
 import { useLoad } from '../../../lib/useLoad';
 import { normalizePhone } from '../../../lib/validators';
-import { CalendarPlus } from 'lucide-react';
-import { shopBookingsLink, SHOP_BOOKINGS_PATH } from '../paths';
+import { CalendarPlus, FileUp } from 'lucide-react';
+import { IMPORT_PATH, shopBookingsLink, SHOP_BOOKINGS_PATH } from '../paths';
+import { useIsShopOwner } from '../shopRole';
 import { SlotPicker } from './SlotPicker';
 import { useShopBookings } from './shopBookingsContext';
 import styles from './addBooking.module.css';
@@ -102,6 +105,31 @@ export function AddBookingScreen() {
   const [stale, setStale] = useState<Msg | null>(null);
   const [tried, setTried] = useState(false);
   const set = (changes: Partial<Draft>) => setDraft((d) => ({ ...d, ...changes }));
+  const isOwner = useIsShopOwner();
+
+  // T31a: a phone the shop already knows (imported) fills the name and offers the cars.
+  const [knownFor, setKnownFor] = useState<{ phone: string; client: KnownClient } | null>(null);
+  const lookedUp = useRef<string | null>(null);
+  function onPhone(value: string) {
+    set({ phone: value });
+    const phone = normalizePhone(value);
+    if (!phone || phone === lookedUp.current) return;
+    lookedUp.current = phone;
+    findShopClient(phone).then(
+      (client) => {
+        if (lookedUp.current !== phone) return;
+        setKnownFor(client ? { phone, client } : null);
+        if (client)
+          setDraft((d) => ({
+            ...d,
+            name: d.name.trim() ? d.name : client.name,
+            email: d.email.trim() ? d.email : (client.email ?? ''),
+          }));
+      },
+      () => {}, // only a help: the form works the same without it
+    );
+  }
+  const known = knownFor && normalizePhone(draft.phone) === knownFor.phone ? knownFor.client : null;
 
   const found = problems(draft, day, time);
   const err = (name: FieldName) => (tried && found[name] ? t(found[name]!, { max: carYearMax() }) : null);
@@ -194,8 +222,13 @@ export function AddBookingScreen() {
             mono
             autoComplete="off"
             error={err('phone')}
-            onChange={(e) => set({ phone: e.target.value })}
+            onChange={(e) => onPhone(e.target.value)}
           />
+          {known && (
+            <p className={styles.known} role="status">
+              {t('imp.known')}
+            </p>
+          )}
           <Field
             label={t('wi.email')}
             type="email"
@@ -210,6 +243,20 @@ export function AddBookingScreen() {
 
         <Card className={styles.section}>
           <h2 className={styles.sectionTitle}>{t('wi.car')}</h2>
+          {known && known.cars.length > 0 && (
+            <div className={styles.knownCars} role="group" aria-label={t('imp.knownCars')}>
+              <span className={styles.intro}>{t('imp.knownCars')}</span>
+              {known.cars.map((c, i) => (
+                <Chip
+                  key={i}
+                  selected={draft.plate.trim().toUpperCase() === (c.plate ?? '').toUpperCase() && draft.make === c.make}
+                  onClick={() => set({ make: c.make, model: c.model, plate: c.plate ?? '', year: c.year ? String(c.year) : '' })}
+                >
+                  {[c.make, c.model, c.plate].filter(Boolean).join(' ')}
+                </Chip>
+              ))}
+            </div>
+          )}
           <div className={styles.pair}>
             <Field
               label={t('car.make')}
@@ -334,6 +381,12 @@ export function AddBookingScreen() {
     <div className={styles.page}>
       <BackLink to={SHOP_BOOKINGS_PATH} label={t('nav.bookings')} />
       <h1>{t('wi.title')}</h1>
+      {isOwner && (
+        <Link to={IMPORT_PATH} className={styles.importLink}>
+          <FileUp size={16} aria-hidden="true" />
+          {t('imp.link')}
+        </Link>
+      )}
       {body}
     </div>
   );

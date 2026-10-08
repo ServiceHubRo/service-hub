@@ -5,13 +5,15 @@ import { Card } from '../../../components/Card';
 import { EmptyState } from '../../../components/EmptyState';
 import { LoadError } from '../../../components/LoadError';
 import { SkeletonList } from '../../../components/Skeleton';
-import { fetchCars, type Car } from '../../../data/garage';
+import { fetchCars, fetchOilStandard, type Car } from '../../../data/garage';
+import { fetchMyImportedJobsQuietly } from '../../../data/myImported';
 import { useI18n } from '../../../i18n/context';
-import { daysFromToday, formatDayMonth } from '../../../i18n/format';
+import { daysFromToday, formatDayMonth, formatMonthLong } from '../../../i18n/format';
 import type { MessageKey } from '../../../i18n/ro';
 import { plural } from '../../../i18n/translate';
 import { CAR_DOCS, urgencyOf, type CarDoc } from '../../../lib/expiry';
-import { jobsOf } from '../../../lib/history';
+import { jobsOf, sameVehicle } from '../../../lib/history';
+import { lastOilChange, oilDue } from '../../../lib/oil';
 import { useLoad } from '../../../lib/useLoad';
 import { useClientBookings } from '../bookings/clientBookingsContext';
 import { carHistoryPath, carPath, carReportPath, NEW_CAR_PATH, type ReportLinkState, type VehicleHistoryLinkState } from '../paths';
@@ -26,6 +28,11 @@ export function GarageScreen() {
   const { state, reload } = useLoad(fetchCars);
   const { state: bookingsState } = useClientBookings();
   const bookings = bookingsState.status === 'ready' ? bookingsState.data.bookings : null;
+  const { state: oilState } = useLoad(fetchOilStandard);
+  const oilStandard = oilState.status === 'ready' ? oilState.data : null;
+  // T31b: jobs the shops imported for this client count in each car's history.
+  const { state: importedState } = useLoad(fetchMyImportedJobsQuietly);
+  const imported = importedState.status === 'ready' ? importedState.data : [];
 
   return (
     <div className={styles.page}>
@@ -55,7 +62,16 @@ export function GarageScreen() {
             <ul className={styles.list}>
               {state.data.map((car) => (
                 <li key={car.id}>
-                  <CarCard car={car} jobs={bookings ? jobsOf(bookings, car).length : null} />
+                  <CarCard
+                    car={car}
+                    jobs={bookings ? jobsOf(bookings, car).length : null}
+                    importedJobs={imported.filter((j) => sameVehicle(car, j.car_snapshot)).length}
+                    oilDue={
+                      bookings && oilStandard?.enabled
+                        ? oilDue(lastOilChange(car, bookings), car.oil_change_months ?? oilStandard.months)
+                        : null
+                    }
+                  />
                 </li>
               ))}
             </ul>
@@ -72,11 +88,24 @@ export function GarageScreen() {
 const FROM_GARAGE: VehicleHistoryLinkState = { from: 'garage' };
 const REPORT_FROM_GARAGE: ReportLinkState = { from: 'garage' };
 
-/** `jobs`: finished jobs on this car (P16c), null while the bookings load (or did not). */
-function CarCard({ car, jobs }: { car: Car; jobs: number | null }) {
+/**
+ * `jobs`: finished jobs on this car (P16c), null while the bookings load (or did not). `oilDue`: when
+ * the next oil change is due (T30), null when unknown.
+ */
+function CarCard({
+  car,
+  jobs,
+  importedJobs,
+  oilDue,
+}: {
+  car: Car;
+  jobs: number | null;
+  importedJobs: number;
+  oilDue: string | null;
+}) {
   const { t, lang } = useI18n();
   const name = `${car.make} ${car.model}`;
-  const anyDate = CAR_DOCS.some(({ column }) => car[column]);
+  const anyDate = CAR_DOCS.some(({ column }) => car[column]) || oilDue !== null;
   return (
     <Card>
       <div className={styles.head}>
@@ -93,19 +122,21 @@ function CarCard({ car, jobs }: { car: Car; jobs: number | null }) {
           <Pencil size={18} aria-hidden="true" />
         </Link>
       </div>
-      {jobs === null ? null : jobs > 0 ? (
+      {jobs === null ? null : jobs + importedJobs > 0 ? (
         <>
           <Link to={carHistoryPath(car.id)} state={FROM_GARAGE} className={styles.history}>
             <History size={16} aria-hidden="true" />
-            <span className={styles.historyText}>{t('vh.garageRow', { jobs: plural(lang, 'unit.jobs', jobs) })}</span>
+            <span className={styles.historyText}>{t('vh.garageRow', { jobs: plural(lang, 'unit.jobs', jobs + importedJobs) })}</span>
             <ChevronRight size={18} aria-hidden="true" />
           </Link>
-          {/* The paid report (T15, P16e): a secondary action, only for a car with finished jobs. */}
-          <Link to={carReportPath(car.id)} state={REPORT_FROM_GARAGE} className={`${styles.history} ${styles.report}`}>
-            <FileCheck size={16} aria-hidden="true" />
-            <span className={styles.historyText}>{t('report.garageRow')}</span>
-            <ChevronRight size={18} aria-hidden="true" />
-          </Link>
+          {/* The paid report (T15, P16e): a secondary action, only for a car with jobs done through Service-Hub. */}
+          {jobs > 0 && (
+            <Link to={carReportPath(car.id)} state={REPORT_FROM_GARAGE} className={`${styles.history} ${styles.report}`}>
+              <FileCheck size={16} aria-hidden="true" />
+              <span className={styles.historyText}>{t('report.garageRow')}</span>
+              <ChevronRight size={18} aria-hidden="true" />
+            </Link>
+          )}
         </>
       ) : (
         <p className={styles.historyNone}>{t('vh.noJobs')}</p>
@@ -117,6 +148,11 @@ function CarCard({ car, jobs }: { car: Car; jobs: number | null }) {
               <DocPill doc={doc} date={car[column]} />
             </li>
           ))}
+          {oilDue && (
+            <li>
+              <OilPill due={oilDue} />
+            </li>
+          )}
         </ul>
       )}
     </Card>
@@ -143,6 +179,21 @@ function DocPill({ doc, date }: { doc: CarDoc; date: string | null }) {
     <span className={cls}>
       {urgency !== 'ok' && <Bell size={13} aria-hidden="true" />}
       {text}
+    </span>
+  );
+}
+
+/** "Schimb ulei: în octombrie" — the month only; amber within 30 days, red once the day has passed (T30). */
+function OilPill({ due }: { due: string }) {
+  const { t, lang } = useI18n();
+  const days = daysFromToday(due);
+  const urgency = urgencyOf(days);
+  const month = formatMonthLong(lang, due);
+  const cls = urgency === 'expired' ? styles.pillRed : urgency === 'soon' ? styles.pillAmber : styles.pillMuted;
+  return (
+    <span className={cls}>
+      {urgency !== 'ok' && <Bell size={13} aria-hidden="true" />}
+      {days < 0 ? t('garage.oilPast', { month }) : t('garage.oilDue', { month })}
     </span>
   );
 }

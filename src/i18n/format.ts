@@ -81,6 +81,14 @@ export function formatMonthYear(lang: Lang, ymd: string): string {
   return `${(p.month ?? '').replace(/\.$/, '')} ${p.year}`;
 }
 
+/** The month in full, the year only when it is not the current one: RO `octombrie`, `ianuarie 2027`; EN `October`, `January 2027`. */
+export function formatMonthLong(lang: Lang, ymd: string, now: Date = new Date()): string {
+  const p = parts(lang, dateFromYmd(ymd), { month: 'long', year: 'numeric' });
+  const thisYear = parts(lang, now, { year: 'numeric' }).year;
+  const month = lang === 'en' ? capitalize(p.month ?? '') : (p.month ?? '');
+  return p.year !== thisYear ? `${month} ${p.year}` : month;
+}
+
 /** A closed period: `20 oct – 22 oct`, or one day `20 oct`. */
 export function formatDateRange(lang: Lang, start: string, end: string, now: Date = new Date()): string {
   return start === end ? formatDayMonth(lang, start, now) : `${formatDayMonth(lang, start, now)} – ${formatDayMonth(lang, end, now)}`;

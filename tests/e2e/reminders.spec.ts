@@ -1,9 +1,12 @@
 import { expect, test, type Page } from '@playwright/test';
+import { formatMonthLong, ymdInBucharest } from '../../src/i18n/format';
+import { addMonths } from '../../src/lib/oil';
 import {
   BACKEND,
   PASSWORD,
   createBookableShop,
   createUser,
+  expectAccessible,
   expectNoHorizontalScroll,
   openAccount,
   rpcAs,
@@ -228,5 +231,59 @@ test.describe('client reminders', () => {
     await expect(page.getByRole('button', { name: /Dacia Logan/ })).toHaveAttribute('aria-pressed', 'false');
     await expectNoHorizontalScroll(page);
     await shot(page, 't19d-service-reminder-car', name());
+  });
+
+  test('Garaj: the client sets the oil interval and the last change; the card says when the next one is due', async ({ page }) => {
+    const client = await createUser('client');
+    const owner = await userIdOf(client);
+    const [car] = await serviceRest<{ id: string }[]>('cars', 'POST', { owner_id: owner, make: 'Dacia', model: 'Logan', year: 2019, plate: plate() });
+    await signIn(page, client, PASSWORD);
+    await expect(page).toHaveURL(/\/c\/cauta/);
+    await page.goto('/c/garaj');
+    await expect(page.getByText(/Schimb ulei:/)).toHaveCount(0);
+    await page.getByRole('link', { name: 'Editează Dacia Logan' }).click();
+
+    // Six months, the last change 6 months minus 5 days ago: due in 5 days.
+    const today = ymdInBucharest(new Date());
+    const last = addMonths(today, -6);
+    const lastPlus5 = new Date(`${last}T12:00:00Z`);
+    lastPlus5.setUTCDate(lastPlus5.getUTCDate() + 5);
+    const lastDay = lastPlus5.toISOString().slice(0, 10);
+    const every = page.getByRole('combobox', { name: 'La câte luni schimbi uleiul' });
+    await expect(every).toHaveValue('');
+    await expect(every.locator('option').first()).toHaveText('Standard (12 luni)');
+    await every.selectOption('6');
+    // A day in the future is refused before saving.
+    const lastField = page.getByLabel('Ultimul schimb de ulei');
+    await lastField.fill(addMonths(today, 1));
+    await expect(page.getByText('Data ultimului schimb de ulei nu poate fi în viitor.')).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Salvează' })).toBeDisabled();
+    await lastField.fill(lastDay);
+    await expect(page.getByText('Data ultimului schimb de ulei nu poate fi în viitor.')).toHaveCount(0);
+    await expectNoHorizontalScroll(page);
+    await expectAccessible(page, 'car form oil');
+    await shot(page, 't30-car-oil', name());
+    await page.getByRole('button', { name: 'Salvează' }).click();
+
+    await expect(page).toHaveURL(/\/c\/garaj$/);
+    const pill = page.getByText(/^Schimb ulei: în /);
+    await expect(pill).toHaveText(`Schimb ulei: în ${formatMonthLong('ro', addMonths(lastDay, 6))}`);
+    await expectNoHorizontalScroll(page);
+    await shot(page, 't30-garage-oil', name());
+    const [saved] = await serviceRest<{ oil_change_months: number; last_oil_change: string }[]>(
+      `cars?id=eq.${car!.id}&select=oil_change_months,last_oil_change`,
+      'GET',
+    );
+    expect(saved).toEqual({ oil_change_months: 6, last_oil_change: lastDay });
+
+    // In English.
+    await serviceRest(`profiles?id=eq.${owner}`, 'PATCH', { lang: 'en' });
+    await page.reload();
+    await expect(page.getByText(/^Oil change: in /)).toHaveText(`Oil change: in ${formatMonthLong('en', addMonths(lastDay, 6))}`);
+    await page.getByRole('link', { name: 'Edit Dacia Logan' }).click();
+    await expect(page.getByRole('combobox', { name: 'Change the oil every' })).toHaveValue('6');
+    await expect(page.getByRole('combobox', { name: 'Change the oil every' }).locator('option').first()).toHaveText('Standard (12 months)');
+    await expect(page.locator('main')).not.toContainText('ulei');
+    await shot(page, 't30-car-oil-en', name());
   });
 });
