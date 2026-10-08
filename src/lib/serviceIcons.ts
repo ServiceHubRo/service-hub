@@ -34,6 +34,7 @@ export const SERVICE_ICON_NAMES = [
   'Shield',
   'Snowflake',
   'Sparkles',
+  'Stethoscope',
   'Sun',
   'Thermometer',
   'Truck',

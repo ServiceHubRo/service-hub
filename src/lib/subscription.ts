@@ -164,3 +164,12 @@ export function includedColleagues(lang: Lang, freeSeats: number): string {
   if (!(freeSeats > 0)) return '';
   return freeSeats === 1 ? translate(lang, 'seats.included.one') : translate(lang, 'seats.included.many', { n: freeSeats });
 }
+
+/**
+ * The launch offer's saving in whole percent, rounded down (99 instead of 149 → 33), so the page
+ * never shows more than the real one; 0 when there is none.
+ */
+export function launchSaving(launchRon: number, regularRon: number): number {
+  if (!(regularRon > 0) || !(launchRon >= 0) || launchRon >= regularRon) return 0;
+  return Math.floor(((regularRon - launchRon) / regularRon) * 100 + 1e-9);
+}

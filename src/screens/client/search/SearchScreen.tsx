@@ -25,6 +25,7 @@ import { PushBanner } from '../../push/PushBanner';
 import { SEARCH_PATH, shopPath, type ShopLinkState } from '../paths';
 import { useFreePlaceText } from '../../../lib/useFreePlaceText';
 import { formatRating } from '../../../i18n/format';
+import { AreaCard } from './AreaCard';
 import { ExpiryBanner } from './ExpiryBanner';
 import { LocationBanner } from './LocationBanner';
 import { ReviewPrompt } from './ReviewPrompt';
@@ -244,6 +245,7 @@ export function SearchScreen() {
       <ReviewPrompt />
       <PushBanner role="client" />
       <LocationBanner />
+      <AreaCard />
 
       <SearchField
         id="search-q"

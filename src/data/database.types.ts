@@ -90,6 +90,36 @@ export type Database = {
         }
         Relationships: []
       }
+      area_waitlist: {
+        Row: {
+          area: string
+          categories: string[]
+          client_id: string
+          created_at: string
+          locality: string | null
+          notified_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          area: string
+          categories?: string[]
+          client_id: string
+          created_at?: string
+          locality?: string | null
+          notified_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          area?: string
+          categories?: string[]
+          client_id?: string
+          created_at?: string
+          locality?: string | null
+          notified_at?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       bookings: {
         Row: {
           cancel_reason: string | null
@@ -2122,6 +2152,7 @@ export type Database = {
       }
       shops: {
         Row: {
+          area: string | null
           active: boolean
           amenities: string[]
           auto_confirm: boolean
@@ -2164,6 +2195,7 @@ export type Database = {
           year_established: number | null
         }
         Insert: {
+          area?: string | null
           active?: boolean
           amenities?: string[]
           auto_confirm?: boolean
@@ -2206,6 +2238,7 @@ export type Database = {
           year_established?: number | null
         }
         Update: {
+          area?: string | null
           active?: boolean
           amenities?: string[]
           auto_confirm?: boolean
@@ -2617,6 +2650,7 @@ export type Database = {
       admin_list_history_reports: { Args: never; Returns: Json }
       admin_list_notices: { Args: never; Returns: Json }
       admin_list_reviews: { Args: { p_q?: string }; Returns: Json }
+      admin_list_service_areas: { Args: never; Returns: Json }
       admin_list_shops: { Args: never; Returns: Json }
       admin_list_subscriptions: { Args: never; Returns: Json }
       admin_list_suspect_reviews: { Args: never; Returns: Json }
@@ -2658,6 +2692,10 @@ export type Database = {
           p_suspended: boolean
           p_user_id: string
         }
+        Returns: Json
+      }
+      admin_set_area_mode: {
+        Args: { p_code: string; p_mode: string; p_request_id: string }
         Returns: Json
       }
       admin_set_notification_text: {
@@ -3340,6 +3378,15 @@ export type Database = {
       is_valid_postal_code: { Args: { p: string }; Returns: boolean }
       is_valid_regcom: { Args: { p: string }; Returns: boolean }
       is_valid_vin: { Args: { p: string }; Returns: boolean }
+      join_area_waitlist: {
+        Args: {
+          p_area: string
+          p_categories: string[]
+          p_locality: string
+          p_request_id: string
+        }
+        Returns: Json
+      }
       jsonb_changes: {
         Args: { p_after: Json; p_before: Json; p_keys: string[] }
         Returns: Json
@@ -3355,6 +3402,7 @@ export type Database = {
         Returns: number
       }
       last_seen: { Args: { p_user_id: string }; Returns: string }
+      leave_area_waitlist: { Args: { p_request_id: string }; Returns: Json }
       limit_range: { Args: { p_key: string }; Returns: unknown }
       link_imported: {
         Args: { p_profile: string; p_shop: string }
@@ -3369,6 +3417,7 @@ export type Database = {
         }
         Returns: Json
       }
+      list_service_areas: { Args: never; Returns: Json }
       list_shop_bookings: { Args: never; Returns: Json }
       list_shop_history: { Args: never; Returns: Json }
       list_shop_staff: { Args: never; Returns: Json }

@@ -40,10 +40,17 @@ test('landing: every section, in Romanian and English, without horizontal scroll
   if (BACKEND) {
     // The prices come from Setări platformă: the launch price while places are left, the first
     // colleague included. No VAT mention: the company is not a VAT payer yet (nothing is added).
+    // The launch offer (Eduard, 8 Oct): the badge, the regular price struck through, the saving,
+    // never how many places are left.
+    await expect(page.getByText('Ofertă de lansare · Locuri limitate')).toBeVisible();
     await expect(page.getByText('99 lei pe lună')).toBeVisible();
+    await expect(page.locator('s').filter({ hasText: '149 lei' })).toBeVisible();
+    await expect(page.getByText('−33%', { exact: true })).toBeVisible();
+    await expect(page.getByText('Reducere de 33%')).toHaveCount(1);
     await expect(page.getByText(/TVA/)).toHaveCount(0);
     await expect(page.getByText('primele 90 de zile gratuite')).toBeVisible();
-    await expect(page.getByText(/^Preț de lansare pentru primele \d+ de service-uri, păstrat cât timp rămâi\. După aceea, 149 lei pe lună\.$/)).toBeVisible();
+    await expect(page.getByText('Exclusiv pentru primele service-uri partenere. Prețul de lansare rămâne al tău cât timp ești cu noi.')).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Profită de prețul de lansare' })).toBeVisible();
     await expect(
       page.getByText('Primul coleg cu cont în service este inclus în abonament. Fiecare coleg în plus: 19 lei pe lună. În perioada gratuită nu plătești nimic.'),
     ).toBeVisible();
@@ -64,7 +71,9 @@ test('landing: every section, in Romanian and English, without horizontal scroll
   if (BACKEND) {
     await expect(page.getByText('99 RON a month')).toBeVisible();
     await expect(page.getByText(/VAT/)).toHaveCount(0);
-    await expect(page.getByText(/^Launch price for the first \d+ shops, kept for as long as you stay\. After that, 149 RON a month\.$/)).toBeVisible();
+    await expect(page.getByText('Launch offer · Limited places')).toBeVisible();
+    await expect(page.getByText('33% off')).toHaveCount(1);
+    await expect(page.getByText("Exclusive to our first partner shops. The launch price stays yours for as long as you're with us.")).toBeVisible();
   }
   await expectNoHorizontalScroll(page);
   await shot(page, 'landing-en', name());
@@ -83,9 +92,14 @@ test('landing: the way in is "Intră în cont" and "Creează cont"; the shops se
   await expect(page.getByLabel('Numele service-ului')).toBeVisible();
 
   await page.goto('/');
-  await page.getByRole('link', { name: 'Înscrie-ți service-ul' }).click();
+  // While launch places are left the button says so (needs the backend for the price).
+  await page.getByRole('link', { name: /^(Înscrie-ți service-ul|Profită de prețul de lansare)$/ }).click();
   await expect(page).toHaveURL(/\/cont-nou\?rol=service$/);
   await expect(page.getByRole('button', { name: 'Sunt service' })).toHaveAttribute('aria-pressed', 'true');
+  if (BACKEND) {
+    await expect(page.getByText('Ofertă de lansare, locuri limitate: 99 lei pe lună în loc de 149 lei, păstrat cât timp rămâi cu noi.')).toBeVisible();
+    await shot(page, 'signup-shop-launch', name());
+  }
 });
 
 test('landing: the logo, the language switch and the two account buttons stay at the top while scrolling', async ({ page }) => {

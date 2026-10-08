@@ -7,6 +7,7 @@ import { formatDate, formatDayMonth, formatMoney, formatTime, type Lang } from '
 import { EMAIL_BUTTON_SIZES } from './emailButtonSizes.ts';
 import { LOGO_HEIGHT, LOGO_WIDTH } from './emailLogo.ts';
 import {
+  areaName,
   BILLING_PATH,
   monthName,
   renderNotification,
@@ -601,9 +602,42 @@ export function emailForEvent(e: EmailEvent, app: string): EmailContent | null {
       return adminDigestEmail(p, app);
     case 'walk_in_invite':
       return walkInInviteEmail(p, lang, app);
+    case 'area_launched':
+      return areaLaunchedEmail(p, lang, app);
     default:
       return subscriptionEmail(e, lang, app);
   }
+}
+
+/**
+ * To a client who asked to be told when Service-Hub starts in their zone (Eduard, 8 Oct). By email
+ * too, because the app may be long gone from the phone.
+ */
+function areaLaunchedEmail(p: Record<string, unknown>, lang: Lang, app: string): EmailContent | null {
+  const area = areaName(lang, p);
+  if (!area) return null;
+  const en = lang === 'en';
+  return email(en ? `Service-Hub is now in ${area}` : `Service-Hub a ajuns în ${area}`, {
+    lang,
+    preheader: en ? 'You can book a car shop near you online.' : 'Te poți programa online la un service aproape de tine.',
+    title: en ? 'We are in your area now' : 'Am ajuns și în zona ta',
+    blocks: [
+      {
+        p: en
+          ? `You asked us to let you know when Service-Hub reaches ${area}. Starting today, shops there take bookings in the app.`
+          : `Ne-ai cerut să te anunțăm când Service-Hub ajunge în ${area}. De azi, service-urile de acolo primesc programări prin aplicație.`,
+      },
+      {
+        p: en
+          ? 'Pick a time that suits you, get the quote in the app and approve it before any work starts.'
+          : 'Alegi ora care îți convine, primești devizul în aplicație și îl aprobi înainte să înceapă lucrarea.',
+      },
+    ],
+    button: { label: en ? 'Find a shop' : 'Caută un service', url: `${app}/c/cauta` },
+    footer: en
+      ? 'You are receiving this email because you asked to be told when Service-Hub reaches your area. This is the only one.'
+      : 'Primești acest email pentru că ai cerut să fii anunțat când Service-Hub ajunge în zona ta. Este singurul.',
+  });
 }
 
 /** The month before, to the owner on the 1st (T24): what came through Service-Hub. */

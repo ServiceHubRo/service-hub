@@ -43,6 +43,9 @@ export const EMAIL_BUTTON_LABELS = [
   'Find another shop',
   'Deschide Programări',
   'Open Bookings',
+  // Service-Hub started in the client's zone
+  'Caută un service',
+  'Find a shop',
 ] as const;
 
 /** The address-safe name of a button image: „Plătește abonamentul” → `plateste-abonamentul`. */

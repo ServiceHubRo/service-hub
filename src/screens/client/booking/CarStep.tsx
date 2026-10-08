@@ -25,6 +25,7 @@ import { useI18n } from '../../../i18n/context';
 import { formatDate, formatMoney } from '../../../i18n/format';
 import { carYearMax, isValidCarYear } from '../../../lib/car';
 import { useLoad } from '../../../lib/useLoad';
+import { composeUnsureNote, unsureDescribed, type Symptom } from '../../../lib/symptoms';
 import { PhoneVerify } from '../../phone/PhoneVerify';
 import { ResendConfirmation } from '../../auth/ResendConfirmation';
 import { SERVICE_SEPARATOR } from '../../../lib/bookingServices';
@@ -34,6 +35,8 @@ import type { CarDraft } from './carDraft';
 import styles from './booking.module.css';
 
 const NOTE_MAX = 1000;
+/** Room left in the note for the line of selected symptoms. */
+const SYMPTOMS_LINE_MAX = 300;
 
 /**
  * Step 4: a car from the garage in one tap, or typed in (saved to the garage unless unticked),
@@ -41,10 +44,14 @@ const NOTE_MAX = 1000;
  * the explanation instead of the button (create_booking refuses them anyway). After repeated
  * no-shows the database asks for a phone confirmed by SMS (T25): the code panel opens right here.
  * The client may let the shop see what was done on the car at other shops (T27), unticked by default.
+ * For a constatare tehnică the note describes the symptoms: a selected symptom or a few words are
+ * needed, and the selected ones go first in the note ("Simptome semnalate: …").
  */
 export function CarStep({
   shop,
   services,
+  unsure,
+  symptoms,
   offer,
   day,
   time,
@@ -55,6 +62,9 @@ export function CarStep({
 }: {
   shop: ShopPageShop;
   services: ShopPageService[];
+  /** A constatare tehnică is among the services. */
+  unsure: boolean;
+  symptoms: readonly Symptom[];
   /** The new-client offer this booking should get (T23); the database decides when it is made. */
   offer: number | null;
   day: string;
@@ -81,7 +91,12 @@ export function CarStep({
   const picked = manual ? null : (cars.find((c) => c.id === draft.carId) ?? null);
   const yearProblem = manual && !isValidCarYear(draft.year) ? t('car.yearInvalid', { max: carYearMax() }) : null;
   const typedOk = draft.make.trim() !== '' && draft.model.trim() !== '' && !yearProblem;
-  const ready = manual ? typedOk : picked !== null;
+  const described = !unsure || unsureDescribed(symptoms, draft.note);
+  const ready = (manual ? typedOk : picked !== null) && described;
+  const symptomNames = symptoms.map((s) => t(`booking.symptom.${s}`));
+  const symptomsLine = symptomNames.length
+    ? t('booking.unsure.notePrefix', { symptoms: symptomNames.map(lowerFirst).join(', ') })
+    : null;
   const carText = manual ? typedCarText(draft) : picked ? carLabel(picked) : '';
 
   async function send(requestId: string) {
@@ -105,7 +120,7 @@ export function CarStep({
                 saveCar: draft.save,
               }
             : { carId: picked!.id },
-          note: draft.note.trim() || undefined,
+          note: composeUnsureNote(symptomsLine, draft.note, NOTE_MAX) || undefined,
           shareHistory: draft.share,
         },
         requestId,
@@ -205,10 +220,10 @@ export function CarStep({
       )}
 
       <TextArea
-        label={t('booking.note')}
-        placeholder={t('booking.notePlaceholder')}
+        label={t(unsure ? 'booking.unsure.noteLabel' : 'booking.note')}
+        placeholder={t(unsure ? 'booking.unsure.notePlaceholder' : 'booking.notePlaceholder')}
         value={draft.note}
-        maxLength={NOTE_MAX}
+        maxLength={unsure ? NOTE_MAX - SYMPTOMS_LINE_MAX : NOTE_MAX}
         rows={3}
         onChange={(e) => set({ note: e.target.value })}
       />
@@ -230,6 +245,7 @@ export function CarStep({
           label={t(services.length > 1 ? 'booking.summary.services' : 'booking.summary.service')}
           value={services.map((x) => serviceName(x, lang)).join(SERVICE_SEPARATOR)}
         />
+        {symptomNames.length > 0 && <SummaryRow label={t('booking.summary.symptoms')} value={symptomNames.join(', ')} />}
         <SummaryRow label={t('booking.summary.when')} value={`${formatDate(lang, day)}, ${time}`} mono />
         {carText && <SummaryRow label={t('booking.summary.car')} value={carText} />}
         {offer !== null && <OfferNote>{t('offer.booking', { n: offer })}</OfferNote>}
@@ -268,6 +284,7 @@ export function CarStep({
       {phoneNeeded !== null && !phoneDone ? null : session.emailVerified ? (
         <BottomBar>
           {manual && !typedOk && <p className={styles.muted}>{t('car.required')}</p>}
+          {!described && <p className={styles.muted}>{t('booking.unsure.required')}</p>}
           {shop.auto_confirm && <p className={styles.muted}>{t('booking.instantNote')}</p>}
           <ActionButton onAction={send} disabled={!ready} errorMessage={(e) => rpcErrorMessage(lang, e)} canRetry={canRetryRpc}>
             {t(shop.auto_confirm ? 'booking.submitInstant' : 'booking.submit')}
@@ -283,6 +300,11 @@ export function CarStep({
       )}
     </>
   );
+}
+
+/** "Zgomote neobișnuite" → "zgomote neobișnuite" inside the sentence. */
+function lowerFirst(s: string): string {
+  return s.charAt(0).toLocaleLowerCase() + s.slice(1);
 }
 
 function carLabel(c: Pick<Car, 'make' | 'model' | 'plate'>): string {

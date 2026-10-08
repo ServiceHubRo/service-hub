@@ -9,6 +9,7 @@ import {
   Mail,
   MessageCircle,
   Search,
+  Sparkles,
   Star,
   Percent,
   Tag,
@@ -34,7 +35,7 @@ import type { MessageKey } from '../../i18n/ro';
 import { CONTACT, whatsappLink } from '../../lib/contact';
 import { IS_TEST_BUILD } from '../../lib/env';
 import { LEGAL_DOCS } from '../../lib/legal';
-import { includedColleagues } from '../../lib/subscription';
+import { includedColleagues, launchSaving } from '../../lib/subscription';
 import { formatPhone } from '../../lib/validators';
 import { signUpPath } from '../auth/paths';
 import styles from './Landing.module.css';
@@ -266,6 +267,12 @@ function PriceBlock() {
   const { t, money, plural, lang } = useI18n();
   const [state, setState] = useState<PricingState>({ status: 'loading' });
   const percent = (n: number) => (lang === 'ro' ? String(n).replace('.', ',') : String(n));
+  // The launch offer while places are left: the regular price struck through and the saving,
+  // rounded down so it is never more than the real one. It ends on its own (public_pricing).
+  const launch =
+    state.status === 'ready' && state.pricing.launchRon !== null && state.pricing.launchRon < state.pricing.subscriptionRon
+      ? { regular: state.pricing.subscriptionRon, off: launchSaving(state.pricing.launchRon, state.pricing.subscriptionRon) }
+      : null;
 
   useEffect(() => {
     let alive = true;
@@ -289,10 +296,33 @@ function PriceBlock() {
         )}
         {state.status === 'ready' && (
           <>
+            {launch && (
+              <p className={styles.launchBadge}>
+                <Sparkles size={15} aria-hidden="true" />
+                {t('landing.launchBadge')}
+              </p>
+            )}
             <p className={styles.priceMain}>
+              {launch && (
+                <>
+                  <s className={styles.priceOld} aria-hidden="true">
+                    {money(launch.regular)}
+                  </s>{' '}
+                  <span className="visually-hidden">{t('landing.launchRegular', { price: money(launch.regular) })} · </span>
+                </>
+              )}
               <span className={styles.priceFigure}>
                 {t('landing.priceMain', { price: money(state.pricing.launchRon ?? state.pricing.subscriptionRon) })}
               </span>
+              {launch && launch.off > 0 && (
+                <>
+                  {' '}
+                  <span className={styles.priceSave} aria-hidden="true">
+                    {t('landing.launchSave', { n: launch.off })}
+                  </span>
+                  <span className="visually-hidden"> · {t('landing.launchSaveLabel', { n: launch.off })}</span>
+                </>
+              )}
               {state.pricing.trialDays > 0 && (
                 <>
                   <span aria-hidden="true"> · </span>
@@ -305,12 +335,7 @@ function PriceBlock() {
             {state.pricing.launchRon !== null && (
               <p className={styles.priceNote}>
                 <Tag size={16} aria-hidden="true" />
-                <span>
-                  {t('landing.priceLaunch', {
-                    shops: plural('unit.shops', state.pricing.launchShops),
-                    price: money(state.pricing.subscriptionRon),
-                  })}
-                </span>
+                <span>{t('landing.priceLaunch')}</span>
               </p>
             )}
             {state.pricing.periodDiscounts[12] > 0 && (
@@ -348,7 +373,7 @@ function PriceBlock() {
       </div>
       <div className={styles.priceActions}>
         <Link to={signUpPath('shop')} className={buttonClass('primary', false, styles.bigButton)}>
-          {t('landing.joinShop')}
+          {t(launch ? 'landing.launchCta' : 'landing.joinShop')}
         </Link>
         <a href={whatsappLink(CONTACT.phone)} className={buttonClass('secondary', false, styles.bigButton)}>
           <MessageCircle size={18} aria-hidden="true" />

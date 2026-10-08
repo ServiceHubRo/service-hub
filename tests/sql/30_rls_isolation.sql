@@ -169,7 +169,7 @@ select test.fails('select * from public.profiles', 'permission denied', 'anon ca
 select test.fails('select * from public.shops', 'permission denied', 'anon cannot read shops');
 select test.fails('select * from public.bookings', 'permission denied', 'anon cannot read bookings');
 select test.fails('select * from public.platform_settings', 'permission denied', 'anon cannot read settings');
-select test.eq(test.count('select 1 from public.services'), 150::bigint, 'anon reads the catalog');
+select test.eq(test.count('select 1 from public.services'), 151::bigint, 'anon reads the catalog (150 + constatare)');
 select test.eq(public.get_schema_version() > 0, true, 'anon reads the schema version');
 select test.logout();
 

@@ -336,3 +336,36 @@
   justify-content: center;
   gap: 8px;
 }
+
+/* Constatare tehnică (Eduard, 8 Oct): first on step 1, apart from the categories. */
+.unsure {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.unsureOption {
+  align-items: flex-start;
+  border-style: dashed;
+  border-color: var(--amber-line);
+}
+
+.unsureOption.optionOn {
+  border-style: solid;
+}
+
+.unsureTitle {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.symptoms {
+  padding: 0 2px;
+}
+
+.symptomChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}

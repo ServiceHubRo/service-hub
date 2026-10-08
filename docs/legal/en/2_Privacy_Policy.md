@@ -63,6 +63,7 @@ This policy explains what personal data Service-Hub uses, why, who else sees it,
 ### 2.5 Location
 
 - **Customers:** if you allow it in your browser, your phone tells the app your position so you can see nearby shops. **Your position is used only on your device**, to calculate distances. It is not sent to us and we do not keep it. You can withdraw the permission at any time in your browser settings.
+- **If we are not in your area yet:** your phone works out your county from your position, on the device. If you tap “Let me know”, we keep only the **county** (and, if you fill them in, your town and the kinds of work you need), so we can send you one email and one notification when Service-Hub gets there. You can leave the list at any time from the same card, with “Don’t notify me”.
 - **Shops:** the workshop address is converted to coordinates through the OpenStreetMap Nominatim service (only the workshop address is sent). The “Use my current location” button saves the device’s position as the workshop location; like the address, it becomes public.
 
 ---
@@ -190,7 +191,7 @@ The Platform is not for people under 18. If we learn that an account belongs to 
 
 ## 9. Messages we send you
 
-We send you messages about your account and bookings (confirmations, quotes, reminders, the review request after a job, payments), reminders about your car (ITP, RCA, vignette, your next service, the seasonal tire change), two tips in your first two weeks if you haven’t booked yet, and important announcements about the Platform. You get your favorite shops’ offers only if you turn them on in Account; tips and offers are at most two a week. Automatic reminders are not sent at night (between 9 PM and 9 AM, Romanian time): you get them in the morning. You can turn each kind off in Account, except the two tips, and push notifications at any time in your phone’s settings. Shops can turn off the daily summary and the monthly report in Settings → Notifications.
+We send you messages about your account and bookings (confirmations, quotes, reminders, the review request after a job, payments), reminders about your car (ITP, RCA, vignette, your next service, the seasonal tire change), two tips in your first two weeks if you haven’t booked yet, the news that Service-Hub has reached your area (once, only if you asked for it), and important announcements about the Platform. You get your favorite shops’ offers only if you turn them on in Account; tips and offers are at most two a week. Automatic reminders are not sent at night (between 9 PM and 9 AM, Romanian time): you get them in the morning. You can turn each kind off in Account, except the two tips, and push notifications at any time in your phone’s settings. Shops can turn off the daily summary and the monthly report in Settings → Notifications.
 
 ---
 
