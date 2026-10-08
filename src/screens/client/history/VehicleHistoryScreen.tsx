@@ -10,6 +10,7 @@ import { ServiceIcon } from '../../../components/ServiceIcon';
 import { SkeletonList } from '../../../components/Skeleton';
 import { quoteOf, type ClientBooking } from '../../../data/bookings';
 import { fetchCars } from '../../../data/garage';
+import { fetchMyImportedJobsQuietly, type MyImportedJob } from '../../../data/myImported';
 import { getReportPrice } from '../../../data/reports';
 import { useI18n } from '../../../i18n/context';
 import { formatDayMonth, formatKm, formatMoney } from '../../../i18n/format';
@@ -60,6 +61,8 @@ export function VehicleHistoryScreen() {
   const { state: bookingsState, reload: reloadBookings } = useClientBookings();
   const { state: carsState, reload: reloadCars } = useLoad(fetchCars);
   const { state: priceState } = useLoad(getReportPrice);
+  // T31b: jobs the shops imported for this client (by the confirmed phone).
+  const { state: importedState } = useLoad(fetchMyImportedJobsQuietly);
 
   const loading = bookingsState.status === 'loading' || carsState.status === 'loading';
   const failed = bookingsState.status === 'error' || carsState.status === 'error';
@@ -80,6 +83,13 @@ export function VehicleHistoryScreen() {
   }, [bookings, cars, carId, bookingId]);
 
   const jobs = useMemo(() => (bookings && vehicle ? jobsOf(bookings, vehicle.fields) : []), [bookings, vehicle]);
+  const imported = useMemo(
+    () =>
+      importedState.status === 'ready' && vehicle && !vehicle.missing
+        ? importedState.data.filter((j) => sameVehicle(vehicle.fields, j.car_snapshot))
+        : [],
+    [importedState, vehicle],
+  );
   const [open, setOpen] = useState<ReadonlySet<string>>(() => new Set());
   const toggle = (id: string) =>
     setOpen((prev) => {
@@ -138,7 +148,7 @@ export function VehicleHistoryScreen() {
         )}
       </div>
 
-      {jobs.length === 0 ? (
+      {jobs.length === 0 && imported.length === 0 ? (
         <EmptyState
           icon={Wrench}
           title={t('vh.empty')}
@@ -151,25 +161,41 @@ export function VehicleHistoryScreen() {
         />
       ) : (
         <>
-          <ul className={styles.list}>
-            {jobs.map((b) => (
-              <li key={b.id}>
-                <JobCard booking={b} open={open.has(b.id)} onToggle={() => toggle(b.id)} />
-              </li>
-            ))}
-          </ul>
+          {jobs.length > 0 && (
+            <ul className={styles.list}>
+              {jobs.map((b) => (
+                <li key={b.id}>
+                  <JobCard booking={b} open={open.has(b.id)} onToggle={() => toggle(b.id)} />
+                </li>
+              ))}
+            </ul>
+          )}
+          {imported.length > 0 && (
+            <>
+              <ul className={styles.list}>
+                {imported.map((j) => (
+                  <li key={j.id}>
+                    <ImportedCard job={j} />
+                  </li>
+                ))}
+              </ul>
+              <p className={styles.sub}>{t('vh.importedNote')}</p>
+            </>
+          )}
           <p className={styles.sub}>{t('vh.onlyServiceHub')}</p>
-          {/* The paid report of this car (T15, P16e). */}
-          <Link
-            to={carId ? carReportPath(carId) : bookingReportPath(bookingId ?? '')}
-            state={FROM_HISTORY}
-            className={buttonClass('secondary', true)}
-          >
-            <FileCheck size={18} aria-hidden="true" />
-            {priceState.status === 'ready' && priceState.data !== null
-              ? t('report.buy', { price: formatMoney(lang, priceState.data) })
-              : t('report.buyShort')}
-          </Link>
+          {/* The paid report of this car (T15, P16e): only jobs done through Service-Hub. */}
+          {jobs.length > 0 && (
+            <Link
+              to={carId ? carReportPath(carId) : bookingReportPath(bookingId ?? '')}
+              state={FROM_HISTORY}
+              className={buttonClass('secondary', true)}
+            >
+              <FileCheck size={18} aria-hidden="true" />
+              {priceState.status === 'ready' && priceState.data !== null
+                ? t('report.buy', { price: formatMoney(lang, priceState.data) })
+                : t('report.buyShort')}
+            </Link>
+          )}
         </>
       )}
     </div>
@@ -177,6 +203,30 @@ export function VehicleHistoryScreen() {
 }
 
 const FROM_HISTORY: ReportLinkState = { from: 'history' };
+
+/** A job a shop imported from its old program (T31b): the day, the shop, the work and the amount. */
+function ImportedCard({ job: j }: { job: MyImportedJob }) {
+  const { t, lang } = useI18n();
+  return (
+    <Card className={styles.card}>
+      <div className={styles.top}>
+        <ServiceIcon name={null} className={styles.icon} />
+        <div className={styles.what}>
+          <p className={styles.service}>{j.work?.split('\n')[0]?.trim() || t('imp.badge')}</p>
+          <p className={styles.muted}>
+            {j.shop_name} · {j.shop_city}
+          </p>
+          <p className={styles.muted}>
+            {formatDayMonth(lang, j.day)}
+            {j.odometer !== null && <span className={`mono ${styles.nowrap}`}> · {formatKm(lang, j.odometer)}</span>}
+            <span className={styles.importedBadge}> · {t('vh.imported', { shop: j.shop_name })}</span>
+          </p>
+        </div>
+        {j.cost !== null && <span className={`mono ${styles.amount}`}>{formatMoney(lang, j.cost)}</span>}
+      </div>
+    </Card>
+  );
+}
 
 /** One finished job (P16c): summary as a button; opened, the quote, the work and "book again". */
 function JobCard({ booking: b, open, onToggle }: { booking: ClientBooking; open: boolean; onToggle: () => void }) {
@@ -189,7 +239,9 @@ function JobCard({ booking: b, open, onToggle }: { booking: ClientBooking; open:
         <span className={styles.top}>
           <ServiceIcon name={b.service?.icon} className={styles.icon} />
           <span className={styles.what}>
-            <span className={`${styles.service} ${styles.block}`}>{bookingServicesText(lang, b.service, b.extra_services, b.service_id)}</span>
+            <span className={`${styles.service} ${styles.block}`}>
+              {bookingServicesText(lang, b.service, b.extra_services, b.service_id)}
+            </span>
             {b.shop && (
               <span className={`${styles.muted} ${styles.block}`}>
                 {b.shop.name} · {b.shop.city}

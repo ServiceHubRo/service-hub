@@ -15,9 +15,15 @@ export function shopBookingsLink(options: { tab?: ShopTab; filter?: ShopFilter; 
 /** "Adaugă programare" (T29): a client who called or walked in. */
 export const ADD_BOOKING_PATH = `${SHOP_BOOKINGS_PATH}/nou`;
 
+/** "Importă clienți" (T31a): clients, cars and jobs from another program. */
+export const IMPORT_PATH = `${SHOP_BOOKINGS_PATH}/import`;
+
 /** Cont of the shop and the Recenzii tile inside it (T11). */
 export const ACCOUNT_PATH = '/s/cont';
 export const REVIEWS_PATH = '/s/cont/recenzii';
+
+/** The shop's own link, QR code and poster (T31b), a tile in Cont. */
+export const SHOP_LINK_PATH = '/s/cont/link';
 
 /** Abonament, the owner's tile in Cont (T14). Every subscription notice and email leads here. */
 export const SUBSCRIPTION_PATH = '/s/cont/abonament';

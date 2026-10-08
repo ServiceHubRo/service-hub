@@ -249,7 +249,7 @@ test.describe('shop settings', () => {
     await expect(guest.getByText('Atelier Test · Brașov')).toBeVisible();
     // A colleague works with bookings, quotes, messages and the history; the settings are the owner's.
     await guest.getByRole('link', { name: /Setări service/ }).click();
-    await expect(guest.getByText(/^Programul, serviciile, regulile, taxa de constatare și profilul public le schimbă proprietarul/)).toBeVisible();
+    await expect(guest.getByText(/^Setările le schimbă proprietarul/)).toBeVisible();
     await expect(guest.getByRole('link', { name: /Notificări/ })).toBeVisible();
     for (const section of [/Program și zile libere/, /Servicii oferite/, /Date de facturare/, /Personal/]) {
       await expect(guest.getByRole('link', { name: section })).toHaveCount(0);
@@ -275,7 +275,7 @@ test.describe('shop settings', () => {
     // A used link says so.
     const third = await (await browser.newContext({ locale: 'ro-RO' })).newPage();
     await third.goto(link);
-    await expect(third.getByText(/Linkul nu mai este valabil/)).toBeVisible();
+    await expect(third.getByText(/Linkul nu mai e valabil/)).toBeVisible();
 
     // The owner sees the colleague and removes them.
     await page.reload();
@@ -314,5 +314,5 @@ test.describe('shop settings', () => {
 test('an unknown invitation link says it is not valid', async ({ page }) => {
   test.skip(!BACKEND, 'needs the local Supabase stack');
   await page.goto(`/invitatie/${'0'.repeat(64)}`);
-  await expect(page.getByText(/Linkul nu mai este valabil/)).toBeVisible();
+  await expect(page.getByText(/Linkul nu mai e valabil/)).toBeVisible();
 });

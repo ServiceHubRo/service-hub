@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { areaForPoint } from '../../src/lib/areas';
 
 // A few towns of the database's list (supabase/migrations/*_service_areas.sql); the same positions
-// are checked against area_for_point() in tests/sql/113_service_areas.sql.
+// are checked against area_for_point() in tests/sql/116_service_areas.sql.
 const AREAS = [
   { code: 'BV', anchors: [{ n: 'Brașov', lat: 45.65, lng: 25.61 }, { n: 'Codlea', lat: 45.7, lng: 25.45 }] },
   { code: 'CV', anchors: [{ n: 'Sfântu Gheorghe', lat: 45.86, lng: 25.79 }, { n: 'Covasna', lat: 45.85, lng: 26.18 }] },

@@ -37,3 +37,31 @@
   color: var(--red-text);
   font-size: 13.5px;
 }
+
+.importLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  align-self: flex-start;
+  min-height: 44px;
+  color: var(--amber);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.importLink:hover {
+  text-decoration: underline;
+}
+
+.known {
+  color: var(--green);
+  font-size: 13.5px;
+}
+
+.knownCars {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}

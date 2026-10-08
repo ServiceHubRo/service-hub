@@ -7,4 +7,4 @@ alter function public.shops_set_area() security definer;
 alter function public.area_for_point(double precision, double precision) security definer;
 alter function public.area_for_address(text, text, double precision, double precision) security definer;
 
-update public.schema_version set version = 61;
+update public.schema_version set version = 65;

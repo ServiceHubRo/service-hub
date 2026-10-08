@@ -574,4 +574,4 @@ join public.services s on s.id = ss.service_id
 where s.category_key in ('cat_rev', 'cat_mot', 'cat_tra', 'cat_fra', 'cat_sus', 'cat_esa', 'cat_rac', 'cat_ele', 'cat_ev')
 on conflict do nothing;
 
-update public.schema_version set version = 60;
+update public.schema_version set version = 64;

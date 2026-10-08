@@ -1,4 +1,4 @@
-import { BarChart3, CreditCard } from 'lucide-react';
+import { BarChart3, CreditCard, FileUp } from 'lucide-react';
 import { useCallback } from 'react';
 import { Tile } from '../../components/Tile';
 import { getSubscriptionRow } from '../../data/subscription';
@@ -6,10 +6,10 @@ import { useI18n } from '../../i18n/context';
 import { plural } from '../../i18n/translate';
 import { subscriptionView } from '../../lib/subscription';
 import { useLoad } from '../../lib/useLoad';
-import { REPORTS_PATH, SUBSCRIPTION_PATH } from './paths';
+import { IMPORT_PATH, REPORTS_PATH, SUBSCRIPTION_PATH } from './paths';
 
 /**
- * The owner's tiles in the shop's Cont: Abonament (T14) and Rapoarte (T17). The subscription row is
+ * The owner's tiles in the shop's Cont: Abonament (T14), Rapoarte (T17) and Importă clienți (T31a). The subscription row is
  * readable by the owner alone (RLS), so it tells who the owner is: staff simply get no tiles. The
  * Abonament hint says where it stands ("Perioadă gratuită · 74 de zile", "Activ", "Plată restantă").
  */
@@ -27,6 +27,7 @@ export function OwnerTiles() {
     <>
       <Tile to={SUBSCRIPTION_PATH} icon={CreditCard} label={t('sub.title')} hint={hint} />
       <Tile to={REPORTS_PATH} icon={BarChart3} label={t('rep.title')} hint={t('rep.tileHint')} />
+      <Tile to={IMPORT_PATH} icon={FileUp} label={t('imp.title')} hint={t('imp.tileHint')} />
     </>
   );
 }

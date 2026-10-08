@@ -105,9 +105,18 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
       title: '{shop}',
       body: 'Cum a fost la {shop}? Lasă o recenzie pentru {service}. Durează un minut și îi ajută pe alți șoferi.',
     },
+    // T30: the catalog's interval is only a heads-up; the oil follows the client's own interval.
     'client.service_due': {
       title: '{car}: {service}',
-      body: 'Ultima dată pe {last_done}, la {shop}. Următoarea este recomandată în jurul datei de {due}. Programează-te din aplicație.',
+      body: 'Ca să știi: ultima dată pe {last_done}, la {shop}. De obicei se verifică pe la {due}. Poate nu e cazul încă, tu decizi.',
+    },
+    'client.service_due_oil': {
+      title: '{car}: {service}',
+      body: 'Ultimul schimb: {last_done}, la {shop}. La fiecare {months}, următorul vine pe la {due}. Programează-te din aplicație.',
+    },
+    'client.service_due_oil_noshop': {
+      title: '{car}: {service}',
+      body: 'Ultimul schimb: {last_done}. La fiecare {months}, următorul vine pe la {due}. Programează-te din aplicație.',
     },
     // ------------------------------------------------------------------ tips and offers (T24, push only)
     'client.tire_season': {
@@ -363,7 +372,15 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
     },
     'client.service_due': {
       title: '{car}: {service}',
-      body: 'Last done on {last_done} at {shop}. The next one is coming up, around {due}. Book it in the app.',
+      body: 'Just a heads-up: last done on {last_done} at {shop}. It is usually checked around {due}. It may not be needed yet; your call.',
+    },
+    'client.service_due_oil': {
+      title: '{car}: {service}',
+      body: 'Last changed on {last_done} at {shop}. Every {months}, so the next one is due around {due}. Book it in the app.',
+    },
+    'client.service_due_oil_noshop': {
+      title: '{car}: {service}',
+      body: 'Last changed on {last_done}. Every {months}, so the next one is due around {due}. Book it in the app.',
     },
     // ------------------------------------------------------------------ tips and offers (T24, push only)
     'client.tire_season': {
@@ -593,6 +610,9 @@ const WORDS: Record<Lang, Record<string, string>> = {
     'days.one': '{n} zi',
     'days.few': '{n} zile',
     'days.other': '{n} de zile',
+    'months.one': '{n} lună',
+    'months.few': '{n} luni',
+    'months.other': '{n} de luni',
     'digest.one': 'Azi ai o programare, la {first}.',
     'digest.few': 'Azi ai {n} programări, prima la {first}.',
     'digest.other': 'Azi ai {n} de programări, prima la {first}.',
@@ -617,6 +637,9 @@ const WORDS: Record<Lang, Record<string, string>> = {
     'days.one': '{n} day',
     'days.few': '{n} days',
     'days.other': '{n} days',
+    'months.one': '{n} month',
+    'months.few': '{n} months',
+    'months.other': '{n} months',
     'digest.one': 'You have 1 booking today, at {first}.',
     'digest.few': 'You have {n} bookings today, the first at {first}.',
     'digest.other': 'You have {n} bookings today, the first at {first}.',
@@ -727,6 +750,7 @@ function vars(e: NotificationEvent, lang: Lang, side: Side, now: Date): Record<s
     .filter(Boolean)
     .join(' ');
   const odometer = num(p.odometer);
+  const months = num(p.months);
   const docKey = `doc.${str(p.doc)}`;
 
   return {
@@ -757,6 +781,7 @@ function vars(e: NotificationEvent, lang: Lang, side: Side, now: Date): Record<s
     expiry: str(p.expiry) ? formatDayMonth(lang, str(p.expiry)) : '',
     last_done: str(p.last_done) ? formatDayMonthYear(lang, str(p.last_done), now) : '',
     due: str(p.due) ? formatDayMonthYear(lang, str(p.due), now) : '',
+    months: months === null ? '' : plural(lang, 'months', months),
     digest,
     code: str(p.code),
     referred: str(p.referred_name) || word(lang, 'aShop'),
@@ -798,6 +823,10 @@ export function templateKey(side: Side, e: NotificationEvent, now: Date = new Da
     case 'welcome':
       if (num(p.day) === 14) return p.has_car === true ? `${base}_later` : `${base}_garage`;
       return base;
+    // T30: the oil, with the client's interval (and no shop when the date came from the Garage).
+    case 'service_due':
+      if (p.kind !== 'oil') return base;
+      return str(p.shop_id) ? `${base}_oil` : `${base}_oil_noshop`;
     case 'doc_expiry': {
       const days = num(p.days) ?? 0;
       return days < 0 ? `${base}_past` : days === 0 ? `${base}_today` : base;
@@ -849,10 +878,11 @@ export function urlFor(side: Side, e: NotificationEvent): string {
       case 'review_request':
         return booking ? `/c/programari?${q({ p: booking, recenzie: '1' })}` : '/c/programari';
       // A new booking at the same shop, the service chosen and that car picked: straight to the day.
+      // An oil change dated in the Garage has no shop: the shops for maintenance.
       case 'service_due':
         return str(p.shop_id)
           ? `/c/service/${str(p.shop_id)}/programare?${q({ pas: '2', serviciu: str(p.service_id), masina: str(p.car_id) })}`
-          : '/c/cauta';
+          : `/c/cauta?${q({ cat: 'cat_rev' })}`;
       // The shop that did the tires last time, else the tire shops.
       case 'tire_season':
         return str(p.shop_id) ? `/c/service/${str(p.shop_id)}` : `/c/cauta?${q({ cat: 'cat_anv' })}`;

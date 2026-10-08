@@ -19,12 +19,13 @@ interface Slot {
   available: boolean;
 }
 
-/** The first day with 09:00 free. */
+/** The first day with 09:00 free and 08:00 still offered (early in the morning, today has only 09:00). */
 async function nineOClock(email: string, shopId: string): Promise<string> {
   const av = await rpcAs<{ days: Day[] }>(email, 'get_availability', { p_shop_id: shopId, p_days: 30 });
   for (const day of av.days.filter((d) => d.bookable)) {
     const s = await rpcAs<{ slots: Slot[] }>(email, 'get_availability', { p_shop_id: shopId, p_from: day.date, p_days: 1, p_slots_for: day.date });
-    if (s.slots.some((x) => x.time === '09:00' && x.available)) return day.date;
+    const free = (time: string) => s.slots.some((x) => x.time === time && x.available);
+    if (free('09:00') && free('08:00')) return day.date;
   }
   throw new Error('no free 09:00');
 }

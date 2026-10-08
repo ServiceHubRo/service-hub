@@ -32,6 +32,7 @@ const PublicLegal = lazyChunk(() => import('../screens/legal/LegalPages').then((
 const BookingLinkScreen = lazyChunk(() =>
   import('../screens/public/BookingLinkScreen').then((m) => ({ default: m.BookingLinkScreen })),
 );
+const ShopLinkScreen = lazyChunk(() => import('../screens/public/ShopLinkScreen').then((m) => ({ default: m.ShopLinkScreen })));
 const VerifyScreen = lazyChunk(() => import('../screens/public/VerifyScreen').then((m) => ({ default: m.VerifyScreen })));
 const ComponentGallery = lazyChunk(() =>
   import('../screens/dev/ComponentGallery').then((m) => ({ default: m.ComponentGallery })),
@@ -95,6 +96,15 @@ export function App() {
                   element={
                     <ChunkBoundary>
                       <BookingLinkScreen />
+                    </ChunkBoundary>
+                  }
+                />
+                {/* The shop's own link (T31b), shared by the shop or scanned from its poster. */}
+                <Route
+                  path="/atelier/:shopId"
+                  element={
+                    <ChunkBoundary>
+                      <ShopLinkScreen />
                     </ChunkBoundary>
                   }
                 />

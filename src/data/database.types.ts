@@ -296,8 +296,10 @@ export type Database = {
           created_at: string
           id: string
           itp_expiry: string | null
+          last_oil_change: string | null
           make: string
           model: string
+          oil_change_months: number | null
           owner_id: string
           plate: string | null
           plate_norm: string | null
@@ -312,8 +314,10 @@ export type Database = {
           created_at?: string
           id?: string
           itp_expiry?: string | null
+          last_oil_change?: string | null
           make: string
           model: string
+          oil_change_months?: number | null
           owner_id?: string
           plate?: string | null
           plate_norm?: string | null
@@ -328,8 +332,10 @@ export type Database = {
           created_at?: string
           id?: string
           itp_expiry?: string | null
+          last_oil_change?: string | null
           make?: string
           model?: string
+          oil_change_months?: number | null
           owner_id?: string
           plate?: string | null
           plate_norm?: string | null
@@ -543,6 +549,96 @@ export type Database = {
             columns: ["client_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      imported_jobs: {
+        Row: {
+          car_id: string | null
+          car_snapshot: Json
+          client_id: string | null
+          client_name: string | null
+          client_phone: string | null
+          cost: number | null
+          created_at: string
+          day: string
+          dedupe_key: string
+          id: string
+          import_id: string
+          odometer: number | null
+          search_text: string | null
+          shop_id: string
+          work: string | null
+        }
+        Insert: {
+          car_id?: string | null
+          car_snapshot?: Json
+          client_id?: string | null
+          client_name?: string | null
+          client_phone?: string | null
+          cost?: number | null
+          created_at?: string
+          day: string
+          dedupe_key: string
+          id?: string
+          import_id: string
+          odometer?: number | null
+          search_text?: string | null
+          shop_id: string
+          work?: string | null
+        }
+        Update: {
+          car_id?: string | null
+          car_snapshot?: Json
+          client_id?: string | null
+          client_name?: string | null
+          client_phone?: string | null
+          cost?: number | null
+          created_at?: string
+          day?: string
+          dedupe_key?: string
+          id?: string
+          import_id?: string
+          odometer?: number | null
+          search_text?: string | null
+          shop_id?: string
+          work?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "imported_jobs_car_id_fkey"
+            columns: ["car_id"]
+            isOneToOne: false
+            referencedRelation: "shop_client_cars"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "imported_jobs_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "shop_clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "imported_jobs_import_id_fkey"
+            columns: ["import_id"]
+            isOneToOne: false
+            referencedRelation: "shop_imports"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "imported_jobs_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shop_ratings"
+            referencedColumns: ["shop_id"]
+          },
+          {
+            foreignKeyName: "imported_jobs_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shops"
             referencedColumns: ["id"]
           },
         ]
@@ -1538,6 +1634,142 @@ export type Database = {
           },
         ]
       }
+      shop_client_cars: {
+        Row: {
+          added_to_garage_at: string | null
+          client_id: string | null
+          created_at: string
+          id: string
+          import_id: string | null
+          make: string
+          model: string
+          plate: string | null
+          plate_norm: string | null
+          shop_id: string
+          vin: string | null
+          year: number | null
+        }
+        Insert: {
+          added_to_garage_at?: string | null
+          client_id?: string | null
+          created_at?: string
+          id?: string
+          import_id?: string | null
+          make: string
+          model?: string
+          plate?: string | null
+          plate_norm?: string | null
+          shop_id: string
+          vin?: string | null
+          year?: number | null
+        }
+        Update: {
+          added_to_garage_at?: string | null
+          client_id?: string | null
+          created_at?: string
+          id?: string
+          import_id?: string | null
+          make?: string
+          model?: string
+          plate?: string | null
+          plate_norm?: string | null
+          shop_id?: string
+          vin?: string | null
+          year?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shop_client_cars_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "shop_clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shop_client_cars_import_id_fkey"
+            columns: ["import_id"]
+            isOneToOne: false
+            referencedRelation: "shop_imports"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shop_client_cars_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shop_ratings"
+            referencedColumns: ["shop_id"]
+          },
+          {
+            foreignKeyName: "shop_client_cars_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      shop_clients: {
+        Row: {
+          client_id: string | null
+          created_at: string
+          email: string | null
+          id: string
+          import_id: string | null
+          name: string
+          phone: string | null
+          shop_id: string
+        }
+        Insert: {
+          client_id?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          import_id?: string | null
+          name: string
+          phone?: string | null
+          shop_id: string
+        }
+        Update: {
+          client_id?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          import_id?: string | null
+          name?: string
+          phone?: string | null
+          shop_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shop_clients_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shop_clients_import_id_fkey"
+            columns: ["import_id"]
+            isOneToOne: false
+            referencedRelation: "shop_imports"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shop_clients_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shop_ratings"
+            referencedColumns: ["shop_id"]
+          },
+          {
+            foreignKeyName: "shop_clients_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       shop_closures: {
         Row: {
           created_at: string
@@ -1612,6 +1844,67 @@ export type Database = {
           },
           {
             foreignKeyName: "shop_hours_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      shop_imports: {
+        Row: {
+          cars: number
+          clients: number
+          created_at: string
+          created_by: string | null
+          file_name: string | null
+          id: string
+          jobs: number
+          row_count: number
+          shop_id: string
+          undone_at: string | null
+        }
+        Insert: {
+          cars?: number
+          clients?: number
+          created_at?: string
+          created_by?: string | null
+          file_name?: string | null
+          id?: string
+          jobs?: number
+          row_count?: number
+          shop_id: string
+          undone_at?: string | null
+        }
+        Update: {
+          cars?: number
+          clients?: number
+          created_at?: string
+          created_by?: string | null
+          file_name?: string | null
+          id?: string
+          jobs?: number
+          row_count?: number
+          shop_id?: string
+          undone_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shop_imports_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shop_imports_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shop_ratings"
+            referencedColumns: ["shop_id"]
+          },
+          {
+            foreignKeyName: "shop_imports_shop_id_fkey"
             columns: ["shop_id"]
             isOneToOne: false
             referencedRelation: "shops"
@@ -3017,6 +3310,10 @@ export type Database = {
         Args: { p_booking_id?: string; p_car_id?: string }
         Returns: Json
       }
+      imported_job_json: {
+        Args: { j: Database["public"]["Tables"]["imported_jobs"]["Row"] }
+        Returns: Json
+      }
       in_notice_audience: {
         Args: { p_audience: string; p_city: string; p_user_id: string }
         Returns: boolean
@@ -3107,6 +3404,19 @@ export type Database = {
       last_seen: { Args: { p_user_id: string }; Returns: string }
       leave_area_waitlist: { Args: { p_request_id: string }; Returns: Json }
       limit_range: { Args: { p_key: string }; Returns: unknown }
+      link_imported: {
+        Args: { p_profile: string; p_shop: string }
+        Returns: number
+      }
+      list_imported_jobs: {
+        Args: {
+          p_before_day?: string
+          p_before_id?: string
+          p_limit?: number
+          p_query?: string
+        }
+        Returns: Json
+      }
       list_service_areas: { Args: never; Returns: Json }
       list_shop_bookings: { Args: never; Returns: Json }
       list_shop_history: { Args: never; Returns: Json }
@@ -3318,6 +3628,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      my_imported_jobs: { Args: never; Returns: Json }
       my_phone_verification: { Args: never; Returns: Json }
       my_referrals: { Args: never; Returns: Json }
       my_shop_id: { Args: never; Returns: string }
@@ -3360,11 +3671,13 @@ export type Database = {
         }
         Returns: undefined
       }
+      oil_service_ids: { Args: never; Returns: string[] }
       period_discount_now: { Args: { p_months: number }; Returns: number }
       phone_code_hash: {
         Args: { p_code: string; p_id: string }
         Returns: string
       }
+      phone_digits: { Args: { p_phone: string }; Returns: string }
       phone_verify_begin: {
         Args: { p_code: string; p_user_id: string }
         Returns: Json
@@ -3765,6 +4078,7 @@ export type Database = {
           shop_count: number
         }[]
       }
+      search_fold: { Args: { p_text: string }; Returns: string }
       search_shops: {
         Args: {
           p_category?: string
@@ -4160,6 +4474,70 @@ export type Database = {
         }
       }
       shop_hidden_reasons: { Args: { p_shop_id: string }; Returns: string[] }
+      shop_import_add: {
+        Args: { p_import_id: string; p_request_id: string; p_rows: Json }
+        Returns: {
+          cars: number
+          clients: number
+          created_at: string
+          created_by: string | null
+          file_name: string | null
+          id: string
+          jobs: number
+          row_count: number
+          shop_id: string
+          undone_at: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "shop_imports"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      shop_import_begin: {
+        Args: { p_file_name: string; p_request_id: string }
+        Returns: {
+          cars: number
+          clients: number
+          created_at: string
+          created_by: string | null
+          file_name: string | null
+          id: string
+          jobs: number
+          row_count: number
+          shop_id: string
+          undone_at: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "shop_imports"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      shop_import_undo: {
+        Args: { p_import_id: string; p_request_id: string }
+        Returns: {
+          cars: number
+          clients: number
+          created_at: string
+          created_by: string | null
+          file_name: string | null
+          id: string
+          jobs: number
+          row_count: number
+          shop_id: string
+          undone_at: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "shop_imports"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      shop_link_preview: { Args: { p_shop_id: string }; Returns: Json }
       shop_month_numbers: {
         Args: { p_month: string; p_shop_id: string }
         Returns: Json

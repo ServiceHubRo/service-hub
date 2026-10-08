@@ -10,3 +10,8 @@
 .tile svg {
   stroke: currentColor;
 }
+
+.fluid svg {
+  width: 55%;
+  height: 55%;
+}

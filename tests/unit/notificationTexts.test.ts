@@ -279,16 +279,33 @@ describe('notification texts', () => {
     );
   });
 
-  it('reminds the next service and opens the booking at the same shop, the service and the car chosen', () => {
+  it('reminds the next service as a heads-up and opens the booking at the same shop, the service and the car chosen', () => {
     expect(render('service_due', 'client', 'ro')).toMatchObject({
       title: 'Volkswagen Golf 7: Schimb ulei și filtru',
-      body: 'Ultima dată pe 20 oct 2024, la Atelier Unu. Următoarea este recomandată în jurul datei de 20 oct. Programează-te din aplicație.',
+      body: 'Ca să știi: ultima dată pe 20 oct 2024, la Atelier Unu. De obicei se verifică pe la 20 oct. Poate nu e cazul încă, tu decizi.',
       url: '/c/service/s-1/programare?pas=2&serviciu=lichid_frana&masina=c-1',
       tag: 'service-due-c-1-lichid_frana',
     });
     expect(render('service_due', 'client', 'en')!.body).toBe(
-      'Last done on Oct 20, 2024 at Atelier Unu. The next one is coming up, around Oct 20. Book it in the app.',
+      'Just a heads-up: last done on Oct 20, 2024 at Atelier Unu. It is usually checked around Oct 20. It may not be needed yet; your call.',
     );
+  });
+
+  it('reminds the oil change with the client\'s own interval (T30)', () => {
+    const oil = { kind: 'oil', months: 6, service_id: 'ulei', last_done: '2026-04-20', due: '2026-10-20' };
+    expect(render('service_due', 'client', 'ro', oil)).toMatchObject({
+      body: 'Ultimul schimb: 20 apr, la Atelier Unu. La fiecare 6 luni, următorul vine pe la 20 oct. Programează-te din aplicație.',
+      url: '/c/service/s-1/programare?pas=2&serviciu=ulei&masina=c-1',
+    });
+    expect(render('service_due', 'client', 'en', { ...oil, months: 24 })!.body).toBe(
+      'Last changed on Apr 20 at Atelier Unu. Every 24 months, so the next one is due around Oct 20. Book it in the app.',
+    );
+    expect(render('service_due', 'client', 'ro', { ...oil, months: 24 })!.body).toContain('La fiecare 24 de luni,');
+    // The date written in the Garage: no shop, the maintenance shops.
+    expect(render('service_due', 'client', 'ro', { ...oil, shop_id: null, shop_name: null })).toMatchObject({
+      body: 'Ultimul schimb: 20 apr. La fiecare 6 luni, următorul vine pe la 20 oct. Programează-te din aplicație.',
+      url: '/c/cauta?cat=cat_rev',
+    });
   });
 
   it('tells the shop who, what and when', () => {

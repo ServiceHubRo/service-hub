@@ -271,7 +271,7 @@ test.describe('T25 fraud checks', () => {
     await page.getByRole('button', { name: 'Trimite cererea' }).click();
 
     const panel = page.getByRole('region', { name: 'Confirmă numărul de telefon' });
-    await expect(panel).toContainText('Ai lipsit de la 2 programări în ultimele 90 de zile');
+    await expect(panel).toContainText('Ai lipsit de la 2 programări fără să anulezi');
     await panel.scrollIntoViewIfNeeded();
     await expectNoHorizontalScroll(page);
     await shot(page, 't25-noshow-phone', name());

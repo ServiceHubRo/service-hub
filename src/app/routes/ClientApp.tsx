@@ -1,6 +1,8 @@
 import { useEffect } from 'react';
 import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 import { claimPath, pendingClaim } from '../../data/claim';
+import { forgetShop, pendingShop } from '../../data/shopLink';
+import { shopPath } from '../../screens/client/paths';
 import { BookingFlow } from '../../screens/client/booking/BookingFlow';
 import { BookingSent } from '../../screens/client/booking/BookingSent';
 import { ClaimScreen } from '../../screens/client/claim/ClaimScreen';
@@ -30,7 +32,16 @@ function PendingClaim() {
   const { pathname } = useLocation();
   useEffect(() => {
     const token = pendingClaim();
-    if (token && pathname !== claimPath(token)) navigate(claimPath(token), { replace: true });
+    if (token && pathname !== claimPath(token)) {
+      navigate(claimPath(token), { replace: true });
+      return;
+    }
+    // The shop's own link (T31b): its page, once.
+    const shopId = pendingShop();
+    if (shopId) {
+      forgetShop();
+      if (pathname !== shopPath(shopId)) navigate(shopPath(shopId), { replace: true });
+    }
     // Only on arrival.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

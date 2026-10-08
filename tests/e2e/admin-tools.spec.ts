@@ -178,7 +178,7 @@ test.describe('admin tools', () => {
     await expect(page.getByText('Categoria este adăugată la sfârșitul listei.')).toBeVisible();
 
     await page.getByLabel('Caută serviciu sau categorie').fill(`Tractoare ${t}`);
-    const card = page.getByRole('listitem').filter({ hasText: `cat_tractoare_${t}` });
+    const card = page.getByRole('listitem').filter({ hasText: `Tractoare ${t}` });
     await card.getByRole('button', { name: new RegExp(`^Serviciu nou în Tractoare ${t}`) }).click();
     await card.getByLabel('Nume în română').fill(`Revizie tractor ${t}`);
     await card.getByLabel('Nume în engleză').fill(`Tractor service ${t}`);
@@ -191,7 +191,7 @@ test.describe('admin tools', () => {
     await card.getByLabel('Reminder de revizie (luni)').fill('18');
     await card.getByRole('button', { name: 'Adaugă serviciul' }).click();
     await expect(page.getByText('Serviciul este adăugat la sfârșitul categoriei.')).toBeVisible();
-    await expect(card.getByText(`revizie_tractor_${t}`)).toBeVisible();
+    await expect(card.getByText(`Revizie tractor ${t}`, { exact: true })).toBeVisible();
     await expect(card.getByText('Reminder: la 18 luni')).toBeVisible();
     await shot(page, 't16b-catalog-new', name());
 
@@ -204,7 +204,10 @@ test.describe('admin tools', () => {
     await card.getByRole('button', { name: 'Salvează' }).click();
     await expect(card.getByText(`Revizie completă tractor ${t}`)).toBeVisible();
     await expect(card.getByText(/^Reminder:/)).toHaveCount(0);
-    await expect(card.getByText(`revizie_tractor_${t}`)).toBeVisible();
+    // The list shows the name in the screen's language only; the code stays.
+    const [renamed] = await serviceRest<{ name_ro: string }[]>(`services?id=eq.revizie_tractor_${t}&select=name_ro`, 'GET');
+    expect(renamed!.name_ro).toBe(`Revizie completă tractor ${t}`);
+    await expect(card.getByText(`Tractor service ${t}`)).toHaveCount(0);
 
     // The category switched off takes its service with it (so other tests never see it).
     await card.getByRole('button', { name: `Editează: Tractoare ${t}` }).click();
