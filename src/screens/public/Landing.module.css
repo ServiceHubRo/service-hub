@@ -601,3 +601,37 @@
     text-align: right;
   }
 }
+
+/* ------------------------------------------------------------------ launch offer (Eduard, 8 Oct) */
+.launchBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  align-self: flex-start;
+  padding: 5px 12px;
+  border-radius: var(--radius-pill);
+  background: var(--amber);
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.priceOld {
+  color: var(--muted);
+  font-size: 18px;
+  font-weight: 600;
+  text-decoration-thickness: 2px;
+  white-space: nowrap;
+}
+
+.priceSave {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  background: var(--green-soft);
+  color: var(--green);
+  font-size: 14px;
+  font-weight: 700;
+  vertical-align: middle;
+  white-space: nowrap;
+}

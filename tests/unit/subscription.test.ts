@@ -14,6 +14,7 @@ import { renderNotification } from '../../supabase/functions/_shared/templates.t
 import { billingMonthsOf, isBillingMonths, periodPrice as serverPeriodPrice, recurringFor } from '../../supabase/functions/_shared/periods.ts';
 import {
   includedColleagues,
+  launchSaving,
   monthlyTotal,
   periodPrice,
   periodTotal,
@@ -357,5 +358,15 @@ describe('included colleagues', () => {
     expect(includedColleagues('ro', 1)).toBe('Primul coleg cu cont în service este inclus în abonament.');
     expect(includedColleagues('ro', 2)).toBe('Primii 2 colegi cu cont în service sunt incluși în abonament.');
     expect(includedColleagues('en', 1)).toBe('The first colleague with an account in the shop is included in the subscription.');
+  });
+});
+
+describe('the launch offer on the landing page', () => {
+  it('shows the saving rounded down, never more than the real one', () => {
+    expect(launchSaving(99, 149)).toBe(33);
+    expect(launchSaving(75, 150)).toBe(50);
+    expect(launchSaving(149, 149)).toBe(0);
+    expect(launchSaving(199, 149)).toBe(0);
+    expect(launchSaving(99, 0)).toBe(0);
   });
 });

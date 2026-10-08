@@ -14,6 +14,7 @@ import { recordEmailSent } from '../../lib/cooldown';
 import { TERMS_VERSION, type LegalDocId } from '../../lib/legal';
 import { looksLikeEmail, MIN_PASSWORD_LENGTH } from '../../lib/password';
 import { DEFAULT_PHONE_COUNTRY, phoneFromInput } from '../../lib/phone';
+import { LaunchOfferNote } from './LaunchOfferNote';
 import { useFocusFirstError } from './useFocusFirstError';
 import styles from './auth.module.css';
 
@@ -196,6 +197,7 @@ export function SignUpForm({
       />
       {role === 'shop' && !invite && (
         <>
+          <LaunchOfferNote />
           <Field
             label={t('auth.shopName')}
             autoComplete="organization"
