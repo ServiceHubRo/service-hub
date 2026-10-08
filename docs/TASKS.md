@@ -58,6 +58,7 @@ Ordinea contează: fiecare sarcină se sprijină pe cele de dinainte. Sarcinile 
 | T31 | Import din alt program | Service-ul își aduce clienții, mașinile și lucrările dintr-un fișier Excel/CSV (T31a); linkul și codul QR ale service-ului, istoricul importat în contul clientului (T31b) |
 | T30 | Schimbul de ulei al clientului | Clientul alege la câte luni schimbă uleiul și când l-a schimbat ultima dată; celelalte remindere devin un „heads-up” |
 | T32 | Zone și constatare tehnică | „În curând și în zona ta” cu email la pornire, Admin → Zone, „Constatare tehnică” la programare |
+| T33 | Prețul de lansare pe oraș | Primele service-uri din fiecare oraș (numărul îl setează adminul) plătesc prețul de lansare și primesc insigna „Partener fondator” |
 
 ---
 
@@ -909,3 +910,13 @@ Note: migrarea `shared_history` (`schema_version` = 46), fără pachete noi, fă
 Migrările `service_areas` (`schema_version` = 64) și `service_areas_definer` (65: corecție ca proprietarul să-și poată salva adresa — calculul zonei rula cu drepturile lui), fără pachete noi. Politica de confidențialitate (RO/EN §2.5, §9) actualizată. Teste: `tests/sql/116_service_areas.sql`, `tests/e2e/areas.spec.ts`, `tests/unit/areas.test.ts`, `tests/unit/symptoms.test.ts`, textele în `notificationTexts.test.ts` și `emailSms.test.ts`. **Oferta de lansare mai vizibilă (Eduard, 8 oct):** pe pagina de prezentare, eticheta „Ofertă de lansare · Locuri limitate”, prețul normal tăiat lângă cel de lansare și reducerea („−33%”, rotunjită în jos, ca să nu arate niciodată mai mult decât e), textul „Exclusiv pentru primele service-uri partenere…” (fără numărul de locuri) și butonul „Profită de prețul de lansare”. La înscrierea unui service, nota cu oferta. Când locurile se termină, totul revine singur la prețul normal. Fără cronometre sau „doar azi”: doar afirmații adevărate.
 
 Decizii: zona = județul (București separat); pornire automată la primul service public, cu posibilitatea de a o forța; zonele sunt fixe (nu se adaugă din admin). Rămas: localitățile din listă sunt aproximative la granița dintre județe (clientul își poate corecta județul).
+
+## T33 — Prețul de lansare pe oraș ✅
+
+**Locuri pe oraș (Eduard, 8 oct):** prețul de lansare nu mai merge la primele 50 de service-uri din țară, ci la primele service-uri din **fiecare oraș**. Numărul îl setezi în Admin → Setări platformă → „Locuri la prețul de lansare, în fiecare oraș” (10 la început). Orașul e cel scris la înscriere; „Brașov”, „Brasov” și „BRAȘOV” sunt același oraș, la fel „Cluj-Napoca” și „Cluj Napoca”. Service-urile deja înscrise își păstrează prețul și ocupă locuri în orașul lor. Când locurile unui oraș se ocupă, următorul service de acolo plătește prețul standard, iar în alt oraș se primește tot prețul de lansare.
+
+**Fără cifre pe site:** pagina de prezentare spune „Ofertă de lansare · Locuri limitate”, arată prețul tăiat și „−33%”, textul „Exclusiv pentru primele service-uri partenere din fiecare oraș…” și butonul „Profită acum”. La „Cont nou” service, sub câmpul Oraș apare „Ofertă de lansare în {oraș}, locuri limitate…”, doar dacă orașul mai are locuri. Baza de date nu spune nimănui câte locuri au rămas sau câte s-au ocupat.
+
+**Partener fondator:** service-urile cu preț de lansare au insigna pe cardul din căutare și pe pagina service-ului. Nu schimbă ordinea din căutare și nu se poate pune din aplicație.
+
+Migrarea `launch_per_city` (`schema_version` = 66). Termenii RO/EN §4.5 actualizați, `TERMS_VERSION` = `2026-10-08`. Teste: `tests/sql/117_launch_per_city.sql`, `tests/e2e/launch.spec.ts`, `public.spec.ts`. Fără pachete noi.

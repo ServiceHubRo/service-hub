@@ -400,6 +400,8 @@ export interface ShopSearchResult {
   amenities: string[];
   /** How quickly the shop usually answers (T28b): within an hour, within a few hours, or unknown. */
   response: ResponseBadge;
+  /** Partener fondator: signed up at the launch price (never part of the order). */
+  founder: boolean;
 }
 
 export type ResponseBadge = 'hour' | 'hours' | null;
@@ -436,13 +438,14 @@ export async function searchShops(params: {
     p_lng: params.lng,
     p_sort: params.sort,
   });
-  const shops = data as unknown as Omit<ShopSearchResult, 'offer' | 'auto_confirm' | 'free' | 'amenities' | 'response'>[];
+  const shops = data as unknown as Omit<ShopSearchResult, 'offer' | 'auto_confirm' | 'free' | 'amenities' | 'response' | 'founder'>[];
   const ids = shops.map((s) => s.shop_id);
   // The offers and the free places come separately and never change the order. Without them the
   // list still shows — unless a day was asked: then a shop shows only with a free place that day.
-  const [offers, extras] = await Promise.all([
+  const [offers, extras, founders] = await Promise.all([
     fetchNewClientOffers(ids).catch(() => new Map<string, number>()),
     params.day ? fetchSearchExtras(ids, params.day) : fetchSearchExtras(ids).catch(() => new Map<string, SearchExtras>()),
+    fetchFounders(ids).catch(() => new Set<string>()),
   ]);
   const all = shops.map((s) => ({
     ...s,
@@ -451,8 +454,17 @@ export async function searchShops(params: {
     free: extras.get(s.shop_id)?.free ?? null,
     amenities: extras.get(s.shop_id)?.amenities ?? [],
     response: extras.get(s.shop_id)?.response ?? null,
+    founder: founders.has(s.shop_id),
   }));
   return params.day ? all.filter((s) => s.free !== null) : all;
+}
+
+/** The founding partners among these shops (shops.founder, readable with the shop). */
+export async function fetchFounders(shopIds: string[]): Promise<Set<string>> {
+  if (shopIds.length === 0 || !supabase) return new Set();
+  const { data, error } = await supabase.from('shops').select('id').in('id', shopIds.slice(0, 200)).eq('founder', true);
+  if (error) throw failure(error);
+  return new Set(data.map((r) => r.id));
 }
 
 /** Whether each shop confirms at once and its first free place (T28a), shop id → extras. */

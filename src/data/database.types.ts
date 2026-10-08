@@ -1025,6 +1025,7 @@ export type Database = {
           id: number
           launch_price_ron: number
           launch_shops: number
+          launch_slots_per_city: number
           limits: Json
           notification_texts: Json
           period_discount_12: number
@@ -1052,6 +1053,7 @@ export type Database = {
           id?: number
           launch_price_ron?: number
           launch_shops?: number
+          launch_slots_per_city?: number
           limits?: Json
           notification_texts?: Json
           period_discount_12?: number
@@ -1079,6 +1081,7 @@ export type Database = {
           id?: number
           launch_price_ron?: number
           launch_shops?: number
+          launch_slots_per_city?: number
           limits?: Json
           notification_texts?: Json
           period_discount_12?: number
@@ -2167,6 +2170,7 @@ export type Database = {
           daily_digest: boolean
           description: string | null
           facebook: string | null
+          founder: boolean
           hours_reviewed_at: string | null
           id: string
           inspection_fee: number
@@ -2210,6 +2214,7 @@ export type Database = {
           daily_digest?: boolean
           description?: string | null
           facebook?: string | null
+          founder?: boolean
           hours_reviewed_at?: string | null
           id?: string
           inspection_fee?: number
@@ -2253,6 +2258,7 @@ export type Database = {
           daily_digest?: boolean
           description?: string | null
           facebook?: string | null
+          founder?: boolean
           hours_reviewed_at?: string | null
           id?: string
           inspection_fee?: number
@@ -3694,7 +3700,7 @@ export type Database = {
       }
       prepare_account_deletion: { Args: { p_user_id: string }; Returns: string }
       promote_to_admin: { Args: { p_email: string }; Returns: string }
-      public_pricing: { Args: never; Returns: Json }
+      public_pricing: { Args: { p_city?: string }; Returns: Json }
       purge_account_fingerprints: { Args: { p_now?: string }; Returns: number }
       purge_request_log: { Args: { p_now?: string }; Returns: number }
       quiet_until: { Args: { p_now?: string }; Returns: string }

@@ -1,6 +1,6 @@
 # Terms and Conditions — Service-Hub
 
-**Last updated:** October 4, 2026
+**Last updated:** October 8, 2026
 
 These terms (the “Terms”) apply to your use of Service-Hub: the website and app at service-hub.ro (the “Platform”). By creating an account, you confirm that you have read and agree to them. How we use your data is described in the Privacy Policy, and what we keep in your browser in the Cookie Policy.
 
@@ -130,7 +130,7 @@ The owner may invite colleagues, each with their own account (colleagues do not 
 ### 4.5 Subscription
 
 - **Price:** the one shown on service-hub.ro when you sign up, **excluding VAT**. Currently: 149 RON per month, with the first colleague who has joined the shop with an account included, plus 19 RON per month for each additional colleague. Invitations are free. The price is fixed at sign-up and shown on the Subscription screen.
-- **Launch price:** the first 50 shops to sign up pay 99 RON per month instead of 149 and keep it for as long as they have the subscription.
+- **Launch price:** in each city, the first shops to sign up, up to a number of places set by Service-Hub, pay 99 RON per month instead of 149 and keep it for as long as they have the subscription. The city is the one given at sign-up (regardless of diacritics or capital letters). Once a city's places are taken, new shops there pay the standard price. Shops paying the launch price are shown as “Founding partner”; this never affects the order of search results.
 - **Paying for several months:** instead of monthly, you can pay every 3, 6 or 12 months, with the discount shown on the Subscription screen when you choose (currently 5%, 10% and 15%), rounded to the nearest RON. The discount also applies to the launch price and to paid colleagues, and is kept at every renewal of the same period.
 - **VAT:** as long as {{company}} is not registered for VAT, no VAT is added. If it becomes registered, VAT is added to the price, and we announce the change at least 30 days in advance.
 - **Free period:** 90 days from sign-up, colleagues included. Without a card you pay nothing. If you add a card during the free period, the first payment is at its end.

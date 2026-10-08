@@ -137,7 +137,7 @@ describe('settings form', () => {
     staff_seat_price_ron: 20,
     staff_free_seats: 1,
     launch_price_ron: 99,
-    launch_shops: 50,
+    launch_slots_per_city: 10,
     period_discount_3: 5,
     period_discount_6: 10,
     period_discount_12: 15,

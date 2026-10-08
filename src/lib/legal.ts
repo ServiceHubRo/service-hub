@@ -8,7 +8,7 @@ import { formatPhone } from './validators';
  * Version of the Terms and Privacy Policy a new account accepts (stored on the profile as
  * terms_version + terms_accepted_at). Change it whenever docs/legal changes in substance.
  */
-export const TERMS_VERSION = '2026-10-02';
+export const TERMS_VERSION = '2026-10-08';
 
 export type LegalDocId = 'termeni' | 'confidentialitate' | 'cookies';
 

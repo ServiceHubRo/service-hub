@@ -13,6 +13,7 @@ import { LoadError } from '../../../components/LoadError';
 import { OfferNote } from '../../../components/OfferNote';
 import { PhotoGallery } from '../../../components/PhotoGallery';
 import { ServiceIcon } from '../../../components/ServiceIcon';
+import { FounderBadge } from '../../../components/FounderBadge';
 import { ShopAvatar } from '../../../components/ShopAvatar';
 import { SkeletonList } from '../../../components/Skeleton';
 import { Stars } from '../../../components/Stars';
@@ -139,6 +140,11 @@ function ShopDetails({ page, day, onFavorite }: { page: ShopPageData; day: strin
         <ShopAvatar name={shop.name} logoUrl={shop.logo_url} size={56} />
         <div className={styles.headText}>
           <h1 className={styles.name}>{shop.name}</h1>
+          {page.founder && (
+            <p className={styles.founder}>
+              <FounderBadge withHint />
+            </p>
+          )}
           {hasReviews && rating.review_count > 0 && rating.average !== null ? (
             <button type="button" className={`${styles.rating} ${styles.ratingButton}`} onClick={() => showReviews(true)}>
               <Stars value={rating.average} />

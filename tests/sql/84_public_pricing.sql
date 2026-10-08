@@ -5,7 +5,7 @@ begin;
 
 select test.login_anon();
 select test.eq(public.public_pricing(),
-  '{"subscription_price_ron": 100.00, "seat_price_ron": 20.00, "free_seats": 1, "trial_days": 90, "launch_price_ron": null, "launch_shops": 50,
+  '{"subscription_price_ron": 100.00, "seat_price_ron": 20.00, "free_seats": 1, "trial_days": 90, "launch_price_ron": null,
     "period_discounts": {"3": 5.00, "6": 10.00, "12": 15.00}}'::jsonb,
   'a visitor reads the shop prices');
 select test.fails('select vat_rate_percent from public.platform_settings', 'permission denied',

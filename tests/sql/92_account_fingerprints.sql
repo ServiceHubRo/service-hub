@@ -36,7 +36,7 @@ select test.ok(exists (select 1 from public.account_fingerprints where user_id i
   'after deletion the fingerprints remain, released');
 
 -- Signing up again with the same email: no free period, no launch price.
-update public.platform_settings set launch_price_ron = 99, launch_shops = 1000 where id = 1;
+update public.platform_settings set launch_price_ron = 99, launch_slots_per_city = 1000 where id = 1;
 select test.sign_up('prima@test.local',
   '{"role":"shop","name":"Prima","phone":"+40799000111","shop_name":"A Doua Oară","city":"Brașov","lang":"ro","terms_version":"2026-09-26"}');
 select test.eq(sub.status, 'inactive', 'same email: the subscription starts inactive'),

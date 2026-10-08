@@ -199,7 +199,7 @@ export const SETTING_SECTIONS: readonly { key: string; fields: readonly SettingK
     fields: [
       'subscription_price_ron',
       'launch_price_ron',
-      'launch_shops',
+      'launch_slots_per_city',
       'staff_seat_price_ron',
       'staff_free_seats',
       'period_discount_3',

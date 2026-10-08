@@ -197,7 +197,6 @@ export function SignUpForm({
       />
       {role === 'shop' && !invite && (
         <>
-          <LaunchOfferNote />
           <Field
             label={t('auth.shopName')}
             autoComplete="organization"
@@ -226,6 +225,8 @@ export function SignUpForm({
               <option key={c} value={c} />
             ))}
           </datalist>
+          {/* Under the city, so the field being typed in never moves (Eduard, 8 Oct: places per city). */}
+          <LaunchOfferNote city={city} />
           <Field
             label={t('auth.referral')}
             hint={t('auth.referralHint')}

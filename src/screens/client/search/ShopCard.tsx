@@ -1,6 +1,7 @@
 import { ChevronRight, MapPin } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FavoriteButton } from '../../../components/FavoriteButton';
+import { FounderBadge } from '../../../components/FounderBadge';
 import { FreePlaceNote } from '../../../components/FreePlaceNote';
 import { OfferNote } from '../../../components/OfferNote';
 import { ShopAvatar } from '../../../components/ShopAvatar';
@@ -46,6 +47,7 @@ export function ShopCard({ shop, distanceKm, back, onFavorite, day }: ShopCardPr
         <ShopAvatar name={shop.name} logoUrl={shop.logo_url} />
         <span className={styles.body}>
           <span className={styles.name}>{shop.name}</span>
+          {shop.founder && <FounderBadge />}
           <span className={styles.meta} data-reviews="">
             {hasReviews ? (
               <>

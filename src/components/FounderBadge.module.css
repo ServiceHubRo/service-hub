@@ -1,0 +1,13 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  align-self: flex-start;
+  padding: 2px 8px;
+  border: 1px solid var(--amber-line);
+  border-radius: var(--radius-pill);
+  color: var(--amber);
+  font-size: 12px;
+  font-weight: 650;
+  white-space: nowrap;
+}

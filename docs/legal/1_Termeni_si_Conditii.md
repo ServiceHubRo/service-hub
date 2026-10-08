@@ -1,6 +1,6 @@
 # Termeni și condiții — Service-Hub
 
-**Ultima actualizare:** 4 octombrie 2026
+**Ultima actualizare:** 8 octombrie 2026
 
 Acești termeni („Termenii”) se aplică folosirii Service-Hub: site-ul și aplicația de la adresa service-hub.ro („Platforma”). Când îți faci cont, confirmi că i-ai citit și că ești de acord cu ei. Cum folosim datele tale scrie în Politica de confidențialitate, iar ce păstrăm în browser, în Politica de cookies.
 
@@ -130,7 +130,7 @@ Proprietarul poate invita colegi, fiecare cu contul lui (colegii nu folosesc con
 ### 4.5 Abonamentul
 
 - **Prețul:** cel afișat pe service-hub.ro când te înscrii. Acum: 149 lei pe lună, cu primul coleg care și-a făcut contul în service inclus, plus 19 lei pe lună pentru fiecare coleg în plus. Invitația nu costă. Prețul se fixează la înscriere și este afișat în ecranul Abonament.
-- **Prețul de lansare:** primele 50 de service-uri înscrise plătesc 99 lei pe lună în loc de 149 și îl păstrează cât timp au abonamentul.
+- **Prețul de lansare:** în fiecare oraș, primele service-uri înscrise, într-un număr de locuri stabilit de Service-Hub, plătesc 99 lei pe lună în loc de 149 și îl păstrează cât timp au abonamentul. Orașul este cel declarat la înscriere (fără deosebire de diacritice sau majuscule). După ocuparea locurilor dintr-un oraș, service-urile noi de acolo plătesc prețul standard. Service-urile care plătesc prețul de lansare apar cu mențiunea „Partener fondator”; mențiunea nu influențează ordinea din căutare.
 - **Plata pe mai multe luni:** în loc de lunar, poți plăti o dată la 3, 6 sau 12 luni, cu reducerea afișată în ecranul Abonament când alegi (acum 5%, 10%, respectiv 15%), rotunjit la leu. Reducerea se aplică și prețului de lansare și colegilor plătiți și se păstrează la fiecare reînnoire a aceleiași perioade.
 - **TVA:** cât timp {{company}} nu este plătitoare de TVA, nu se adaugă TVA. Dacă devine, TVA-ul se adaugă la preț, iar schimbarea ți-o anunțăm cu cel puțin 30 de zile înainte.
 - **Perioada gratuită:** 90 de zile de la înscriere, cu colegi cu tot. Fără card nu plătești nimic. Dacă adaugi cardul în perioada gratuită, prima plată are loc la sfârșitul ei.
