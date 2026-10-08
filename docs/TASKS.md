@@ -59,6 +59,7 @@ Ordinea contează: fiecare sarcină se sprijină pe cele de dinainte. Sarcinile 
 | T30 | Schimbul de ulei al clientului | Clientul alege la câte luni schimbă uleiul și când l-a schimbat ultima dată; celelalte remindere devin un „heads-up” |
 | T32 | Zone și constatare tehnică | „În curând și în zona ta” cu email la pornire, Admin → Zone, „Constatare tehnică” la programare |
 | T33 | Prețul de lansare pe oraș | Primele service-uri din fiecare oraș (numărul îl setează adminul) plătesc prețul de lansare și primesc insigna „Partener fondator” |
+| T34 | Oferte: termen, servicii, zile liniștite | Oferta pentru clienți noi cu dată de sfârșit și servicii alese, reducere în zilele mai liniștite, filtrul „Doar cu ofertă” |
 
 ---
 
@@ -920,3 +921,15 @@ Decizii: zona = județul (București separat); pornire automată la primul servi
 **Partener fondator:** service-urile cu preț de lansare au insigna pe cardul din căutare și pe pagina service-ului. Nu schimbă ordinea din căutare și nu se poate pune din aplicație.
 
 Migrarea `launch_per_city` (`schema_version` = 66). Termenii RO/EN §4.5 actualizați, `TERMS_VERSION` = `2026-10-08`. Teste: `tests/sql/117_launch_per_city.sql`, `tests/e2e/launch.spec.ts`, `public.spec.ts`. Fără pachete noi.
+
+## T34 — Oferte: termen, servicii, zile liniștite ✅
+
+**Oferta pentru clienți noi, completată (Eduard, 8 oct):** în Setări → Reguli, proprietarul poate pune o **dată de sfârșit** (pentru programările până în ziua aceea) și poate alege **la ce servicii** se aplică (toate sau doar unele). Pe card și pe pagina service-ului apare „până pe 31 oct” și serviciile.
+
+**Reducere în zilele mai liniștite:** -5 / -10 / -15% la manoperă, în zilele săptămânii alese de proprietar, pentru programările făcute de clienți în aplicație. La pasul 2 al programării, zilele acelea au „-15%” cât mai au loc; când ziua se umple, nu mai poate fi aleasă, deci reducerea dispare.
+
+**Reguli comune:** procentul îl scrie baza de date pe programare, la trimitere, nu telefonul clientului. Ofertele nu se adună: se aplică cea mai mare, maxim 15%. O programare mutată își păstrează reducerea. Programările trecute de service (clienți la telefon) nu primesc oferte. Doar proprietarul schimbă ofertele, colegii nu. Service-ul vede pe card și în formularul devizului ce a promis („Client nou…” sau „Zi cu reducere…”).
+
+**Căutare:** filtrul „Doar cu ofertă” (în Filtre) arată doar service-urile cu o ofertă; ordinea rămâne aceeași.
+
+Migrarea `offers` (`schema_version` = 67). Termenii RO/EN §3 și §4.3 actualizați, `TERMS_VERSION` = `2026-10-08.2`. Teste: `tests/sql/118_offers.sql`, `tests/e2e/offers-more.spec.ts`, `tests/unit/offers.test.ts`. Fără pachete noi.

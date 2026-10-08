@@ -130,7 +130,7 @@ select test.eq(
   || 'decline_booking, export_my_data, get_availability, get_shop_page, get_shop_setup, history_report_preview, invite_staff, is_admin, is_shop_member, '
   || 'is_shop_owner, is_shop_public, join_area_waitlist, last_odometer_for_booking, leave_area_waitlist, list_imported_jobs, list_service_areas, list_shop_bookings, list_shop_history, list_shop_staff, list_threads, '
   || 'mark_no_show, mark_thread_read, my_imported_jobs, my_phone_verification, my_referrals, my_shop_id, my_subscription_offers, new_client_offers, phone_digits, replace_quote, reply_review, report_review, reschedule_booking, save_native_push_token, save_push_subscription, '
-  || 'save_shop_hours, search_card_extras, search_cities, search_shops, send_message, send_quote, set_booking_history_share, set_shop_services, shop_cancel_booking, shop_create_booking, shop_decide_quote, shop_import_add, shop_import_begin, shop_import_undo, shop_reports, shop_vehicle_file, start_inspection, '
+  || 'save_shop_hours, search_card_extras, search_cities, search_shops, send_message, send_quote, set_booking_history_share, set_shop_services, shop_cancel_booking, shop_create_booking, shop_decide_quote, shop_import_add, shop_import_begin, shop_import_undo, shop_offers, shop_reports, shop_vehicle_file, start_inspection, '
   || 'start_work, submit_review, toggle_favorite, touch_last_active, withdraw_quote',
   'functions callable only when signed in')
 from pg_proc p where p.pronamespace = 'public'::regnamespace;

@@ -1,4 +1,5 @@
 import type { Database, Json } from './database.types';
+import { NO_OFFERS, type NamedServiceRef, type ShopOffers } from '../lib/offers';
 import { reportSessionLost } from './sessionEvents';
 import { addBreadcrumb, captureError } from '../lib/monitoring';
 import { authStorage, rememberMe } from '../lib/remember';
@@ -392,6 +393,8 @@ export interface ShopSearchResult {
   is_favorite: boolean;
   /** The shop's discount on labor for the caller's first booking there (T23); null without one. */
   offer: number | null;
+  /** Every offer at the shop (new-client details, quiet days); never part of the order. */
+  offers: ShopOffers;
   /** The shop confirms free places at once (T28a). */
   auto_confirm: boolean;
   /** The first free place: on the day asked, else within the next 14 days; null when none. */
@@ -438,18 +441,19 @@ export async function searchShops(params: {
     p_lng: params.lng,
     p_sort: params.sort,
   });
-  const shops = data as unknown as Omit<ShopSearchResult, 'offer' | 'auto_confirm' | 'free' | 'amenities' | 'response' | 'founder'>[];
+  const shops = data as unknown as Omit<ShopSearchResult, 'offer' | 'offers' | 'auto_confirm' | 'free' | 'amenities' | 'response' | 'founder'>[];
   const ids = shops.map((s) => s.shop_id);
   // The offers and the free places come separately and never change the order. Without them the
   // list still shows — unless a day was asked: then a shop shows only with a free place that day.
   const [offers, extras, founders] = await Promise.all([
-    fetchNewClientOffers(ids).catch(() => new Map<string, number>()),
+    fetchShopOffers(ids).catch(() => new Map<string, ShopOffers>()),
     params.day ? fetchSearchExtras(ids, params.day) : fetchSearchExtras(ids).catch(() => new Map<string, SearchExtras>()),
     fetchFounders(ids).catch(() => new Set<string>()),
   ]);
   const all = shops.map((s) => ({
     ...s,
-    offer: offers.get(s.shop_id) ?? null,
+    offer: offers.get(s.shop_id)?.newClient?.percent ?? null,
+    offers: offers.get(s.shop_id) ?? NO_OFFERS,
     auto_confirm: extras.get(s.shop_id)?.auto_confirm ?? false,
     free: extras.get(s.shop_id)?.free ?? null,
     amenities: extras.get(s.shop_id)?.amenities ?? [],
@@ -484,11 +488,26 @@ export async function fetchSearchExtras(shopIds: string[], day?: string): Promis
   );
 }
 
-/** New-client offers the caller would get now at these shops (T23), shop id → percent. */
-export async function fetchNewClientOffers(shopIds: string[]): Promise<Map<string, number>> {
+/**
+ * The offers at these shops (Eduard, 8 Oct): the new-client offer the caller would get now (with its
+ * last day and services) and the quiet-day offer; shop id → offers, only shops that have one.
+ */
+export async function fetchShopOffers(shopIds: string[]): Promise<Map<string, ShopOffers>> {
   if (shopIds.length === 0) return new Map();
-  const rows = await call('new_client_offers', { p_shop_ids: shopIds.slice(0, 100) });
-  return new Map((rows ?? []).map((r) => [r.shop_id, r.percent]));
+  const rows = (await call('shop_offers', { p_shop_ids: shopIds.slice(0, 100) })) as unknown as {
+    shop_id: string;
+    new_client: { percent: number; until: string | null; services: NamedServiceRef[] | null } | null;
+    quiet_day: { percent: number; days: number[] } | null;
+  }[];
+  return new Map(
+    (rows ?? []).map((r) => [
+      r.shop_id,
+      {
+        newClient: r.new_client ? { percent: Number(r.new_client.percent), until: r.new_client.until, services: r.new_client.services } : null,
+        quietDay: r.quiet_day ? { percent: Number(r.quiet_day.percent), days: r.quiet_day.days.map(Number) } : null,
+      },
+    ]),
+  );
 }
 
 // ------------------------------------------------------------------------------------ bookings

@@ -57,6 +57,8 @@ export interface ShopBooking {
   client_no_shows: number;
   /** The new-client discount on labor this booking was promised (T23). */
   offer_percent?: number | null;
+  /** Which offer was promised (Eduard, 8 Oct): new client or a quiet day. */
+  offer_kind?: string | null;
   /** The loyalty discount promised (T28c) and the client's level then. */
   loyalty_percent?: number | null;
   loyalty_level?: number | null;

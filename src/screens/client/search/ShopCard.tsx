@@ -2,6 +2,7 @@ import { ChevronRight, MapPin } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FavoriteButton } from '../../../components/FavoriteButton';
 import { FounderBadge } from '../../../components/FounderBadge';
+import { useOfferText } from '../../../lib/useOfferText';
 import { FreePlaceNote } from '../../../components/FreePlaceNote';
 import { OfferNote } from '../../../components/OfferNote';
 import { ShopAvatar } from '../../../components/ShopAvatar';
@@ -26,6 +27,7 @@ export interface ShopCardProps {
 /** One search result (FR §3.1): one shop per row, whole card opens the shop page. */
 export function ShopCard({ shop, distanceKm, back, onFavorite, day }: ShopCardProps) {
   const { t, lang } = useI18n();
+  const offerText = useOfferText();
   const matched = lang === 'ro' ? shop.matched_service_ro : shop.matched_service_en;
   const navigate = useNavigate();
   const hasReviews = shop.review_count > 0 && shop.average !== null;
@@ -75,9 +77,14 @@ export function ShopCard({ shop, distanceKm, back, onFavorite, day }: ShopCardPr
             </span>
           )}
           {matched && <span className={styles.offers}>{t('search.offers', { service: matched })}</span>}
-          {shop.offer !== null && (
+          {shop.offers.newClient && (
             <span className={styles.newClient}>
-              <OfferNote compact>{t('offer.card', { n: shop.offer })}</OfferNote>
+              <OfferNote compact>{offerText.newClientCard(shop.offers.newClient)}</OfferNote>
+            </span>
+          )}
+          {shop.offers.quietDay && (
+            <span className={styles.newClient}>
+              <OfferNote compact>{offerText.quietCard(shop.offers.quietDay)}</OfferNote>
             </span>
           )}
         </span>

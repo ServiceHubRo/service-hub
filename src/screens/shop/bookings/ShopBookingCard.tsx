@@ -8,6 +8,7 @@ import { Card } from '../../../components/Card';
 import { ServiceIcon } from '../../../components/ServiceIcon';
 import { StatusBadge } from '../../../components/StatusBadge';
 import { OfferNote } from '../../../components/OfferNote';
+import { useOfferText } from '../../../lib/useOfferText';
 import {
   canRetryRpc,
   confirmBooking,
@@ -63,6 +64,7 @@ export interface ShopBookingCardProps {
  */
 export function ShopBookingCard({ booking: b, shopId, fee, expiryDays, now, onDone, onStale }: ShopBookingCardProps) {
   const { t, lang } = useI18n();
+  const offerText = useOfferText();
   const [panel, setPanel] = useState<PanelKind | null>(null);
   const started = slotStarted(b, now);
 
@@ -127,7 +129,7 @@ export function ShopBookingCard({ booking: b, shopId, fee, expiryDays, now, onDo
           <p className={styles.muted}>{t('sb.card.noShows', { n: b.client_no_shows })}</p>
         )}
         {b.note && <p className={styles.note}>{b.note}</p>}
-        {b.offer_percent ? <OfferNote>{t('offer.shop', { n: b.offer_percent })}</OfferNote> : null}
+        {b.offer_percent ? <OfferNote>{offerText.promise('shop', b.offer_percent, b.offer_kind ?? null)}</OfferNote> : null}
         {b.loyalty_percent ? <OfferNote>{t('loyalty.shop', { n: b.loyalty_percent, level: b.loyalty_level ?? 1 })}</OfferNote> : null}
         {b.share_history && <p className={styles.muted}>{t('sb.card.shared')}</p>}
         {b.source === 'shop' && (

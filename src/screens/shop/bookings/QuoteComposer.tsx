@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Field } from '../../../components/Field';
 import { TextArea } from '../../../components/TextArea';
 import { OfferNote } from '../../../components/OfferNote';
+import { useOfferText } from '../../../lib/useOfferText';
 import { replaceQuote, sendQuote, type Booking } from '../../../data/rpc';
 import type { ShopBooking } from '../../../data/shopBookings';
 import { useI18n } from '../../../i18n/context';
@@ -58,6 +59,7 @@ export function QuoteComposer({
   onClose: () => void;
 }) {
   const { t, lang } = useI18n();
+  const offerText = useOfferText();
   const decimal = lang === 'ro' ? ',' : '.';
   const [rows, setRows] = useState<QuoteDraftRow[]>(() =>
     mode === 'replace' && booking.quote
@@ -137,7 +139,7 @@ export function QuoteComposer({
   return (
     <Panel title={mode === 'send' ? t('sb.quote.title') : t('sb.quote.editTitle')}>
       {mode === 'replace' && <p className={styles.panelBody}>{t('sb.quote.editBody')}</p>}
-      {booking.offer_percent ? <OfferNote>{t('offer.quote', { n: booking.offer_percent })}</OfferNote> : null}
+      {booking.offer_percent ? <OfferNote>{offerText.promise('quote', booking.offer_percent, booking.offer_kind ?? null)}</OfferNote> : null}
       {booking.loyalty_percent ? <OfferNote>{t('loyalty.quote', { n: booking.loyalty_percent, level: booking.loyalty_level ?? 1 })}</OfferNote> : null}
       <div ref={container} className={styles.composer}>
         <ol className={styles.composerRows}>

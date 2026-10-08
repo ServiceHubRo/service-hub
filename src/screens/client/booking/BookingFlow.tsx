@@ -12,6 +12,7 @@ import { fetchShopPage, type ShopPage } from '../../../data/search';
 import { useI18n } from '../../../i18n/context';
 import { formatDate } from '../../../i18n/format';
 import { parseServiceIds, servicesLine, toggleServiceId } from '../../../lib/bookingServices';
+import { bestOffer } from '../../../lib/offers';
 import { parseSymptoms, toggleSymptom, UNSURE_SERVICE_ID } from '../../../lib/symptoms';
 import { useLoad } from '../../../lib/useLoad';
 import { bookingPath, bookingSentPath, SEARCH_PATH, shopPath } from '../paths';
@@ -194,6 +195,7 @@ function Flow({ page }: { page: ShopPage }) {
       {step === 2 && (
         <DayStep
           shop={shop}
+          offers={page.offers}
           selected={day}
           notice={notice}
           onPick={(d) => {
@@ -211,7 +213,7 @@ function Flow({ page }: { page: ShopPage }) {
           services={services}
           unsure={unsure}
           symptoms={symptoms}
-          offer={page.offer}
+          offer={bestOffer(page.offers, day, serviceIds)}
           day={day}
           time={time}
           draft={carDraft}

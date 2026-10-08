@@ -151,6 +151,7 @@ export type Database = {
           note: string | null
           odometer: number | null
           offer_percent: number | null
+          offer_kind: string | null
           ref: string
           reminder_sent_at: string | null
           service_id: string
@@ -195,6 +196,7 @@ export type Database = {
           note?: string | null
           odometer?: number | null
           offer_percent?: number | null
+          offer_kind?: string | null
           ref?: string
           reminder_sent_at?: string | null
           service_id: string
@@ -239,6 +241,7 @@ export type Database = {
           note?: string | null
           odometer?: number | null
           offer_percent?: number | null
+          offer_kind?: string | null
           ref?: string
           reminder_sent_at?: string | null
           service_id?: string
@@ -2185,10 +2188,14 @@ export type Database = {
           monthly_report: boolean
           name: string
           new_client_offer: number | null
+          new_client_offer_services: string[] | null
+          new_client_offer_until: string | null
           owner_id: string
           phone: string | null
           phone2: string | null
           postal_code: string | null
+          quiet_day_offer: number | null
+          quiet_days: number[]
           setup_completed_at: string | null
           slot_minutes: number
           sms_on_new_booking: boolean
@@ -2229,10 +2236,14 @@ export type Database = {
           monthly_report?: boolean
           name: string
           new_client_offer?: number | null
+          new_client_offer_services?: string[] | null
+          new_client_offer_until?: string | null
           owner_id: string
           phone?: string | null
           phone2?: string | null
           postal_code?: string | null
+          quiet_day_offer?: number | null
+          quiet_days?: number[]
           setup_completed_at?: string | null
           slot_minutes?: number
           sms_on_new_booking?: boolean
@@ -2273,10 +2284,14 @@ export type Database = {
           monthly_report?: boolean
           name?: string
           new_client_offer?: number | null
+          new_client_offer_services?: string[] | null
+          new_client_offer_until?: string | null
           owner_id?: string
           phone?: string | null
           phone2?: string | null
           postal_code?: string | null
+          quiet_day_offer?: number | null
+          quiet_days?: number[]
           setup_completed_at?: string | null
           slot_minutes?: number
           sms_on_new_booking?: boolean
@@ -2609,6 +2624,7 @@ export type Database = {
           note: string | null
           odometer: number | null
           offer_percent: number | null
+          offer_kind: string | null
           ref: string
           reminder_sent_at: string | null
           service_id: string
@@ -2846,6 +2862,7 @@ export type Database = {
           note: string | null
           odometer: number | null
           offer_percent: number | null
+          offer_kind: string | null
           ref: string
           reminder_sent_at: string | null
           service_id: string
@@ -2988,6 +3005,7 @@ export type Database = {
           note: string | null
           odometer: number | null
           offer_percent: number | null
+          offer_kind: string | null
           ref: string
           reminder_sent_at: string | null
           service_id: string
@@ -3041,6 +3059,7 @@ export type Database = {
           note: string | null
           odometer: number | null
           offer_percent: number | null
+          offer_kind: string | null
           ref: string
           reminder_sent_at: string | null
           service_id: string
@@ -3106,6 +3125,7 @@ export type Database = {
           note: string | null
           odometer: number | null
           offer_percent: number | null
+          offer_kind: string | null
           ref: string
           reminder_sent_at: string | null
           service_id: string
@@ -3190,6 +3210,7 @@ export type Database = {
           note: string | null
           odometer: number | null
           offer_percent: number | null
+          offer_kind: string | null
           ref: string
           reminder_sent_at: string | null
           service_id: string
@@ -3243,6 +3264,7 @@ export type Database = {
           note: string | null
           odometer: number | null
           offer_percent: number | null
+          offer_kind: string | null
           ref: string
           reminder_sent_at: string | null
           service_id: string
@@ -3477,6 +3499,7 @@ export type Database = {
           note: string | null
           odometer: number | null
           offer_percent: number | null
+          offer_kind: string | null
           ref: string
           reminder_sent_at: string | null
           service_id: string
@@ -3530,6 +3553,7 @@ export type Database = {
           note: string | null
           odometer: number | null
           offer_percent: number | null
+          offer_kind: string | null
           ref: string
           reminder_sent_at: string | null
           service_id: string
@@ -3592,6 +3616,7 @@ export type Database = {
           note: string | null
           odometer: number | null
           offer_percent: number | null
+          offer_kind: string | null
           ref: string
           reminder_sent_at: string | null
           service_id: string
@@ -3776,6 +3801,7 @@ export type Database = {
           note: string | null
           odometer: number | null
           offer_percent: number | null
+          offer_kind: string | null
           ref: string
           reminder_sent_at: string | null
           service_id: string
@@ -4017,6 +4043,7 @@ export type Database = {
           note: string | null
           odometer: number | null
           offer_percent: number | null
+          offer_kind: string | null
           ref: string
           reminder_sent_at: string | null
           service_id: string
@@ -4177,6 +4204,7 @@ export type Database = {
           note: string | null
           odometer: number | null
           offer_percent: number | null
+          offer_kind: string | null
           ref: string
           reminder_sent_at: string | null
           service_id: string
@@ -4264,6 +4292,7 @@ export type Database = {
           note: string | null
           odometer: number | null
           offer_percent: number | null
+          offer_kind: string | null
           ref: string
           reminder_sent_at: string | null
           service_id: string
@@ -4333,6 +4362,7 @@ export type Database = {
           note: string | null
           odometer: number | null
           offer_percent: number | null
+          offer_kind: string | null
           ref: string
           reminder_sent_at: string | null
           service_id: string
@@ -4400,6 +4430,7 @@ export type Database = {
           note: string | null
           odometer: number | null
           offer_percent: number | null
+          offer_kind: string | null
           ref: string
           reminder_sent_at: string | null
           service_id: string
@@ -4458,6 +4489,7 @@ export type Database = {
           note: string | null
           odometer: number | null
           offer_percent: number | null
+          offer_kind: string | null
           ref: string
           reminder_sent_at: string | null
           service_id: string
@@ -4552,6 +4584,7 @@ export type Database = {
       shop_response_badge: { Args: { p_shop_id: string }; Returns: string }
       shop_seat_count: { Args: { p_shop_id: string }; Returns: number }
       shop_state: { Args: { p_shop_id: string }; Returns: string }
+      shop_offers: { Args: { p_shop_ids: string[] }; Returns: Json }
       shop_vehicle_file: { Args: { p_booking_id: string }; Returns: Json }
       slot_starts_at: {
         Args: { p_date: string; p_slot: string }
@@ -4589,6 +4622,7 @@ export type Database = {
           note: string | null
           odometer: number | null
           offer_percent: number | null
+          offer_kind: string | null
           ref: string
           reminder_sent_at: string | null
           service_id: string
@@ -4642,6 +4676,7 @@ export type Database = {
           note: string | null
           odometer: number | null
           offer_percent: number | null
+          offer_kind: string | null
           ref: string
           reminder_sent_at: string | null
           service_id: string
@@ -4812,6 +4847,7 @@ export type Database = {
           note: string | null
           odometer: number | null
           offer_percent: number | null
+          offer_kind: string | null
           ref: string
           reminder_sent_at: string | null
           service_id: string

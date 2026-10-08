@@ -139,7 +139,8 @@ test.describe('zones', () => {
     await expect(card.getByRole('heading', { name: `Pornești zona ${zone.ro}?` })).toBeVisible();
     await shot(page, 'zones-admin-confirm', name());
     await card.getByRole('button', { name: 'Da, pornește' }).click();
-    await expect(page.getByRole('status').filter({ hasText: /Am anunțat \d+ client/ })).toBeVisible();
+    // The demo admin is shared by the runs in parallel: its session may refresh meanwhile.
+    await expect(page.getByRole('status').filter({ hasText: /Am anunțat \d+ client/ })).toBeVisible({ timeout: 15_000 });
     await expect(card.getByText('Pornită', { exact: true }).first()).toBeVisible();
     await expect(card).toContainText('Setată de tine');
 

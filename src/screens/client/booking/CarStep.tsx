@@ -25,6 +25,7 @@ import { useI18n } from '../../../i18n/context';
 import { formatDate, formatMoney } from '../../../i18n/format';
 import { carYearMax, isValidCarYear } from '../../../lib/car';
 import { useLoad } from '../../../lib/useLoad';
+import type { OfferKind } from '../../../lib/offers';
 import { composeUnsureNote, unsureDescribed, type Symptom } from '../../../lib/symptoms';
 import { PhoneVerify } from '../../phone/PhoneVerify';
 import { ResendConfirmation } from '../../auth/ResendConfirmation';
@@ -65,8 +66,8 @@ export function CarStep({
   /** A constatare tehnică is among the services. */
   unsure: boolean;
   symptoms: readonly Symptom[];
-  /** The new-client offer this booking should get (T23); the database decides when it is made. */
-  offer: number | null;
+  /** The offer this booking should get (the larger one); the database decides when it is made. */
+  offer: { percent: number; kind: OfferKind } | null;
   day: string;
   time: string;
   draft: CarDraft;
@@ -248,7 +249,9 @@ export function CarStep({
         {symptomNames.length > 0 && <SummaryRow label={t('booking.summary.symptoms')} value={symptomNames.join(', ')} />}
         <SummaryRow label={t('booking.summary.when')} value={`${formatDate(lang, day)}, ${time}`} mono />
         {carText && <SummaryRow label={t('booking.summary.car')} value={carText} />}
-        {offer !== null && <OfferNote>{t('offer.booking', { n: offer })}</OfferNote>}
+        {offer !== null && (
+          <OfferNote>{t(offer.kind === 'quiet_day' ? 'offer.quiet.booking' : 'offer.booking', { n: offer.percent })}</OfferNote>
+        )}
         {shop.inspection_fee > 0 && (
           <>
             <SummaryRow label={t('shop.fee')} value={formatMoney(lang, shop.inspection_fee)} mono />
