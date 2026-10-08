@@ -68,6 +68,7 @@ const SAMPLE: Record<string, Record<string, unknown>> = {
   referral_revoked: { kind: 'trial_days', referral_shop_id: 's-9', referred_name: 'Auto Nou', reason: 'refunded' },
   tire_season: { season: 'winter', car_id: 'c-1' },
   welcome: { day: 3, has_car: false },
+  area_launched: { area: 'CJ', area_ro: 'Cluj', area_en: 'Cluj', shops: 3 },
   favorite_offer: { percent: 15 },
   booking_request_waiting: {},
   booking_request_last_call: {},
@@ -219,6 +220,15 @@ describe('notification texts', () => {
     expect(render('welcome', 'client', 'ro', { day: 14 })).toMatchObject({ title: 'Adaugă mașina în Garaj', url: '/c/garaj' });
     expect(render('welcome', 'client', 'en', { day: 14, has_car: true })!.body).toBe(
       'When your car needs a shop, compare the reviews and book in the app. It takes a minute.',
+    );
+    expect(render('area_launched', 'client', 'ro')).toMatchObject({
+      title: 'Service-Hub a ajuns și la tine',
+      body: 'De azi te poți programa online la service-urile din județul Cluj. Caută unul aproape de tine.',
+      url: '/c/cauta',
+      tag: 'area_launched',
+    });
+    expect(render('area_launched', 'client', 'en', { area: 'B', area_ro: 'București', area_en: 'Bucharest' })!.body).toBe(
+      'Starting today you can book shops in Bucharest online. Find one near you.',
     );
     expect(render('favorite_offer', 'client', 'ro')).toMatchObject({
       title: 'Atelier Unu',

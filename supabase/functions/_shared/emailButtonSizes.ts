@@ -149,5 +149,15 @@ export const EMAIL_BUTTON_SIZES: Record<string, { slug: string; width: number; h
     "slug": "open-bookings",
     "width": 154,
     "height": 44
+  },
+  "Caută un service": {
+    "slug": "cauta-un-service",
+    "width": 168,
+    "height": 44
+  },
+  "Find a shop": {
+    "slug": "find-a-shop",
+    "width": 128,
+    "height": 44
   }
 };

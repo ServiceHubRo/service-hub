@@ -12,6 +12,7 @@ import { fetchShopPage, type ShopPage } from '../../../data/search';
 import { useI18n } from '../../../i18n/context';
 import { formatDate } from '../../../i18n/format';
 import { parseServiceIds, servicesLine, toggleServiceId } from '../../../lib/bookingServices';
+import { parseSymptoms, toggleSymptom, UNSURE_SERVICE_ID } from '../../../lib/symptoms';
 import { useLoad } from '../../../lib/useLoad';
 import { bookingPath, bookingSentPath, SEARCH_PATH, shopPath } from '../paths';
 import { serviceName } from '../shop/serviceGroups';
@@ -26,7 +27,7 @@ import styles from './booking.module.css';
 /**
  * The booking flow (FR §3.3, P6): service → day → time → car, with a four-part progress bar.
  * The choices live in the address (`?pas=2&serviciu=ulei,frane&zi=2026-10-14&ora=10:00`; several
- * services go in one booking, T21), so the phone's
+ * services go in one booking, T21; with a constatare tehnică also `&simptome=noise,leak`), so the phone's
  * Back goes one step back and a reload keeps them. Every rule — past times, notice, capacity,
  * limits — is checked again by create_booking when the request is sent.
  */
@@ -78,6 +79,9 @@ function Flow({ page }: { page: ShopPage }) {
   const serviceIds = parseServiceIds(params.get('serviciu')).filter((id) => page.services.some((s) => s.id === id));
   const services = serviceIds.map((id) => page.services.find((s) => s.id === id)!);
   const service = services[0] ?? null;
+  // Constatare tehnică: the symptoms selected on step 1 (only while that service is picked).
+  const unsure = serviceIds.includes(UNSURE_SERVICE_ID);
+  const symptoms = unsure ? parseSymptoms(params.get('simptome')) : [];
   // Step 1 is left only with "Continuă" (`pas` above 1), not with the first tick.
   const picking = (Number(params.get('pas')) || 1) <= 1;
   const day = YMD.test(params.get('zi') ?? '') ? params.get('zi') : null;
@@ -176,7 +180,13 @@ function Flow({ page }: { page: ShopPage }) {
           services={page.services}
           selected={serviceIds}
           // Ticks change the address in place: Back leaves step 1, not one tick.
-          onToggle={(id) => navigate(urlFor({ serviciu: toggleServiceId(serviceIds, id).join(','), pas: null }), { replace: true })}
+          onToggle={(id) => {
+            const next = toggleServiceId(serviceIds, id);
+            const keep = next.includes(UNSURE_SERVICE_ID) ? params.get('simptome') : null;
+            navigate(urlFor({ serviciu: next.join(','), simptome: keep, pas: null }), { replace: true });
+          }}
+          symptoms={symptoms}
+          onToggleSymptom={(s) => navigate(urlFor({ simptome: toggleSymptom(symptoms, s).join(',') || null }), { replace: true })}
           // Come with a day and a time (a free place from search or the shop page, T28a): straight on.
           onContinue={() => navigate(urlFor({ pas: day && time ? '4' : day ? '3' : '2' }))}
         />
@@ -199,6 +209,8 @@ function Flow({ page }: { page: ShopPage }) {
         <CarStep
           shop={shop}
           services={services}
+          unsure={unsure}
+          symptoms={symptoms}
           offer={page.offer}
           day={day}
           time={time}

@@ -126,6 +126,10 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
       title: 'Anvelopele de vară',
       body: 'Este momentul pentru anvelopele de vară la {car}. Data trecută le-ai schimbat la {shop}; te poți programa din aplicație.',
     },
+    'client.area_launched': {
+      title: 'Service-Hub a ajuns și la tine',
+      body: 'De azi te poți programa online la service-urile din {area}. Caută unul aproape de tine.',
+    },
     'client.welcome': {
       title: 'Service-Hub',
       body: 'Găsește un service aproape de tine și programează-te online. Devizul vine în aplicație, înainte să înceapă lucrarea.',
@@ -378,6 +382,10 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
       title: 'Summer tires',
       body: 'Time for summer tires on your {car}. Last time you had them changed at {shop}; you can book in the app.',
     },
+    'client.area_launched': {
+      title: 'Service-Hub is now in your area',
+      body: 'Starting today you can book shops in {area} online. Find one near you.',
+    },
     'client.welcome': {
       title: 'Service-Hub',
       body: 'Find a shop near you and book online. The quote comes in the app before any work starts.',
@@ -625,7 +633,7 @@ export const EVENTS: Record<Side, readonly string[]> = {
     'no_show', 'inspection_started', 'quote_sent', 'quote_replaced', 'quote_withdrawn', 'quote_expiring', 'quote_expired',
     'work_started', 'job_done', 'appointment_reminder', 'new_message', 'review_reply', 'doc_expiry', 'report_ready',
     'review_report_decided', 'review_request', 'service_due', 'account_suspended', 'account_reactivated',
-    'tire_season', 'welcome', 'favorite_offer', 'request_expired',
+    'tire_season', 'welcome', 'favorite_offer', 'request_expired', 'area_launched',
   ],
   shop: [
     'booking_requested', 'booking_auto_confirmed', 'booking_cancelled_client', 'booking_cancelled_admin', 'quote_accepted',
@@ -759,7 +767,16 @@ function vars(e: NotificationEvent, lang: Lang, side: Side, now: Date): Record<s
     requests: String(num(p.requests) ?? 0),
     cui: str(p.cui),
     anaf_name: str(p.anaf_name),
+    area: areaName(lang, p),
   };
+}
+
+/** The zone that started (area_launched): "județul Cluj" / "Cluj County", Bucharest by its name. */
+export function areaName(lang: Lang, p: Record<string, unknown>): string {
+  const name = str(lang === 'en' ? p.area_en : p.area_ro) || str(p.area_ro);
+  if (!name) return '';
+  if (str(p.area) === 'B') return name;
+  return lang === 'en' ? `${name} County` : `județul ${name}`;
 }
 
 /** Which text: the event, with a variant where the parameters change the sentence. */
@@ -841,6 +858,8 @@ export function urlFor(side: Side, e: NotificationEvent): string {
         return str(p.shop_id) ? `/c/service/${str(p.shop_id)}` : `/c/cauta?${q({ cat: 'cat_anv' })}`;
       case 'welcome':
         return num(p.day) === 14 && p.has_car !== true ? '/c/garaj' : '/c/cauta';
+      case 'area_launched':
+        return '/c/cauta';
       case 'favorite_offer':
         return str(p.shop_id) ? `/c/service/${str(p.shop_id)}` : '/c/cauta';
       // Other shops for the same kind of work, in the same city.
@@ -915,6 +934,7 @@ function tagFor(e: NotificationEvent): string {
       return `service-due-${str(p.car_id)}-${str(p.service_id)}`;
     case 'tire_season':
     case 'welcome':
+    case 'area_launched':
       return e.event;
     case 'favorite_offer':
       return `offer-${str(p.shop_id)}`;

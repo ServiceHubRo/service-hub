@@ -151,6 +151,7 @@ export const AUDIT_ACTIONS = [
   'send_notice',
   'withdraw_notice',
   'export',
+  'update_area',
 ] as const;
 
 export interface AuditChange {

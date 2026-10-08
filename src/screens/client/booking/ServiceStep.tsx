@@ -1,11 +1,13 @@
 import { Check } from 'lucide-react';
 import { BottomBar } from '../../../components/BottomBar';
 import { buttonClass } from '../../../components/buttonClass';
+import { Chip } from '../../../components/Chip';
 import { ServiceIcon } from '../../../components/ServiceIcon';
 import type { ShopPageService } from '../../../data/search';
 import { useI18n } from '../../../i18n/context';
 import { plural } from '../../../i18n/translate';
 import { MAX_BOOKING_SERVICES } from '../../../lib/bookingServices';
+import { SYMPTOMS, UNSURE_SERVICE_ID, type Symptom } from '../../../lib/symptoms';
 import { groupServices, serviceName } from '../shop/serviceGroups';
 import styles from './booking.module.css';
 
@@ -13,25 +15,70 @@ import styles from './booking.module.css';
  * Step 1: only what this shop offers, under category labels. No prices — those come with the quote.
  * Several services can go in the same booking (T21): each tap ticks or unticks one, up to five;
  * "Continuă" stays in sight at the bottom and names how many are picked.
+ * "Constatare tehnică" (the `constatare` service, when the shop offers it) comes first, on its own;
+ * ticked, it shows the symptoms the client may select.
  */
 export function ServiceStep({
   services,
   selected,
   onToggle,
+  symptoms,
+  onToggleSymptom,
   onContinue,
 }: {
   services: ShopPageService[];
   selected: readonly string[];
   onToggle: (serviceId: string) => void;
+  symptoms: readonly Symptom[];
+  onToggleSymptom: (s: Symptom) => void;
   onContinue: () => void;
 }) {
   const { t, lang } = useI18n();
   const full = selected.length >= MAX_BOOKING_SERVICES;
+  const unsure = services.find((s) => s.id === UNSURE_SERVICE_ID);
+  const unsureOn = unsure ? selected.includes(unsure.id) : false;
+  const others = services.filter((s) => s.id !== UNSURE_SERVICE_ID);
   return (
     <>
+      {unsure && (
+        <section aria-labelledby="unsure-title" className={styles.unsure}>
+          <button
+            type="button"
+            className={`${styles.option} ${styles.unsureOption} ${unsureOn ? styles.optionOn : ''}`}
+            aria-pressed={unsureOn}
+            disabled={!unsureOn && full}
+            onClick={() => onToggle(unsure.id)}
+          >
+            <ServiceIcon name={unsure.icon} className={styles.optionIcon} />
+            <span className={styles.optionText}>
+              <span id="unsure-title" className={styles.unsureTitle}>
+                {t('booking.unsure.title')}
+              </span>
+              <span className={styles.muted}>{t('booking.unsure.text')}</span>
+            </span>
+            <span className={`${styles.tick} ${unsureOn ? styles.tickOn : ''}`} aria-hidden="true">
+              {unsureOn && <Check size={15} strokeWidth={3} />}
+            </span>
+          </button>
+          {unsureOn && (
+            <div role="group" aria-labelledby="symptoms-title" className={styles.symptoms}>
+              <p id="symptoms-title" className={styles.groupTitle}>
+                {t('booking.unsure.symptoms')}
+              </p>
+              <div className={styles.symptomChips}>
+                {SYMPTOMS.map((s) => (
+                  <Chip key={s} selected={symptoms.includes(s)} onClick={() => onToggleSymptom(s)}>
+                    {t(`booking.symptom.${s}`)}
+                  </Chip>
+                ))}
+              </div>
+            </div>
+          )}
+        </section>
+      )}
       <p className={styles.muted}>{t('booking.servicesHint')}</p>
       <div className={styles.groups}>
-        {groupServices(services, lang).map((g) => (
+        {groupServices(others, lang).map((g) => (
           <section key={g.key} aria-label={g.name}>
             <h2 className={styles.groupTitle}>{g.name}</h2>
             <ul className={styles.options}>

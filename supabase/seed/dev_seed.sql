@@ -172,10 +172,10 @@ begin
   values (s1, public.bucharest_today() + 20, public.bucharest_today() + 22, 'Concediu');
 
   insert into public.shop_services (shop_id, service_id)
-  select s1, unnest(array['ulei', 'frane', 'itp', 'diag', 'clima', 'distributie'])
-  union all select s2, unnest(array['ulei', 'frane', 'vulcanizare', 'geometrie', 'suspensie'])
+  select s1, unnest(array['constatare', 'ulei', 'frane', 'itp', 'diag', 'clima', 'distributie'])
+  union all select s2, unnest(array['constatare', 'ulei', 'frane', 'vulcanizare', 'geometrie', 'suspensie'])
   union all select s3, unnest(array['vulcanizare', 'geometrie'])
-  union all select s4, unnest(array['ulei', 'diag', 'ambreiaj', 'distributie', 'frane']);
+  union all select s4, unnest(array['constatare', 'ulei', 'diag', 'ambreiaj', 'distributie', 'frane']);
 
   update public.shop_billing set legal_name = 'AUTO DEMO SERV S.R.L.', vat_id = 'RO14872301',
     reg_com = 'J08/1245/2009', legal_address = 'Str. Lungă 42, Brașov', vat_payer = true,

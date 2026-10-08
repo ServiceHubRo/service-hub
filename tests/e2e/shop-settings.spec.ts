@@ -67,10 +67,10 @@ test.describe('shop settings', () => {
     // 1. Services: search without diacritics, tick, page stays put, save.
     await page.getByRole('link', { name: /Alege serviciile pe care le faci/ }).click();
     await expect(page.getByRole('heading', { level: 1, name: 'Servicii oferite' })).toBeVisible();
-    await expect(page.getByText('Selectate: 0 din 150')).toBeVisible();
+    await expect(page.getByText('Selectate: 0 din 151')).toBeVisible();
     await clickInPlace(page, page.getByRole('checkbox', { name: 'Lamele ștergătoare' }));
     await clickInPlace(page, page.getByRole('checkbox', { name: 'Schimb ulei + filtru ulei' }));
-    await expect(page.getByText('Selectate: 2 din 150')).toBeVisible();
+    await expect(page.getByText('Selectate: 2 din 151')).toBeVisible();
     await page.getByLabel('Caută un serviciu').fill('frane');
     await expect(page.getByRole('checkbox', { name: 'Plăcuțe de frână' })).toBeVisible();
     await expect(page.getByRole('checkbox', { name: 'Schimb ulei + filtru ulei' })).toHaveCount(0);
@@ -80,9 +80,9 @@ test.describe('shop settings', () => {
     await page.getByLabel('Caută un serviciu').fill('frâne');
     const brakes = await page.getByRole('checkbox').count();
     await page.getByRole('button', { name: 'Selectează tot', exact: true }).click();
-    await expect(page.getByText(`Selectate: ${brakes + 2} din 150`)).toBeVisible();
+    await expect(page.getByText(`Selectate: ${brakes + 2} din 151`)).toBeVisible();
     await page.getByRole('button', { name: 'Deselectează tot' }).click();
-    await expect(page.getByText('Selectate: 2 din 150')).toBeVisible();
+    await expect(page.getByText('Selectate: 2 din 151')).toBeVisible();
     await clickInPlace(page, page.getByRole('checkbox', { name: 'Plăcuțe de frână' }));
     await expect(page.getByText('Ai modificări nesalvate.')).toBeVisible();
     await expectNoHorizontalScroll(page);
@@ -90,7 +90,7 @@ test.describe('shop settings', () => {
     await page.getByRole('button', { name: 'Salvează serviciile' }).click();
     await expect(page.getByRole('button', { name: '✓ Salvat' })).toBeVisible();
     await page.reload();
-    await expect(page.getByText('Selectate: 3 din 150')).toBeVisible();
+    await expect(page.getByText('Selectate: 3 din 151')).toBeVisible();
 
     // 2. Hours: short Saturday, 09:00–13:00.
     await page.getByRole('link', { name: 'Setări service' }).click();

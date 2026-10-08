@@ -216,6 +216,17 @@ describe('app emails', () => {
     expect(last.text).toContain('Dacă nu răspunzi până atunci, cererea se închide automat.');
   });
 
+  it('tells a waiting client once that Service-Hub reached their zone', () => {
+    const params = { area: 'CJ', area_ro: 'Cluj', area_en: 'Cluj', shops: 3 };
+    const ro = emailForEvent({ event: 'area_launched', lang: 'ro', role: 'client', params } as never, 'https://app.ro')!;
+    expect(ro.subject).toBe('Service-Hub a ajuns în județul Cluj');
+    expect(ro.text).toContain('Ne-ai cerut să te anunțăm când Service-Hub ajunge în județul Cluj.');
+    expect(ro.html).toContain('https://app.ro/c/cauta');
+    const en = emailForEvent({ event: 'area_launched', lang: 'en', role: 'client', params: { ...params, area: 'B', area_en: 'Bucharest' } } as never, 'https://app.ro')!;
+    expect(en.subject).toBe('Service-Hub is now in Bucharest');
+    expect(emailForEvent({ event: 'area_launched', lang: 'ro', role: 'client', params: {} } as never, 'https://app.ro')).toBeNull();
+  });
+
   it("sends the admin a morning email with only what waits", () => {
     const mail = emailForEvent(
       { event: 'admin_digest', lang: 'ro', params: { reports: 2, suspect: 0, past_due: 1, company_waiting: 0, company_hidden: 0, unanswered: 1, new_shops: 3, new_clients: 12, new_bookings: 20, done: 7 } },

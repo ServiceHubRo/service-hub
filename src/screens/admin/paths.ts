@@ -16,6 +16,8 @@ export const ADMIN_NOTICES_PATH = '/admin/cont/anunturi';
 export const ADMIN_EXPORT_PATH = '/admin/cont/export';
 /** Raport ANAF: every shop's company as ANAF answered it. */
 export const ADMIN_ANAF_PATH = '/admin/cont/anaf';
+/** Zone: where Service-Hub works and who waits (Eduard, 8 Oct). */
+export const ADMIN_ZONES_PATH = '/admin/cont/zone';
 
 export const adminShopPath = (id: string) => `${ADMIN_SHOPS_PATH}/${id}`;
 export const adminClientPath = (id: string) => `${ADMIN_CLIENTS_PATH}/${id}`;

@@ -1,5 +1,5 @@
 {
- "version": "1.1",
+ "version": "1.2",
  "categories": [
   {
    "key": "cat_rev",
@@ -783,6 +783,13 @@
    "icon": "Activity",
    "ro": "Test standuri suspensie / frâne",
    "en": "Suspension & brake test bench"
+  },
+  {
+   "id": "constatare",
+   "category": "cat_itp",
+   "icon": "Stethoscope",
+   "ro": "Constatare tehnică",
+   "en": "Diagnostic inspection"
   },
   {
    "id": "itp",
