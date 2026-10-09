@@ -69,6 +69,10 @@ export interface MyInvites {
   rewarded: number;
   creditsAvailable: number;
   creditsPerYear: number;
+  /** Friends with a first completed job that bring one free report (admin setting, 2). */
+  friendsPerReport: number;
+  /** Friends counted towards the next report. */
+  progress: number;
 }
 
 /** Does this code belong to a client? Callable before signing in (the sign-up form). */
@@ -86,5 +90,7 @@ export async function getMyInvites(): Promise<MyInvites | null> {
     rewarded: Number(raw.rewarded ?? 0),
     creditsAvailable: Number(raw.credits_available ?? 0),
     creditsPerYear: Number(raw.credits_per_year ?? 0),
+    friendsPerReport: Math.max(1, Number(raw.friends_per_report ?? 1)),
+    progress: Number(raw.progress ?? 0),
   };
 }

@@ -168,6 +168,7 @@ describe('settings form', () => {
       company_fix_days: 14,
       company_recheck_days: 30,
       referral_credits_per_year: 3,
+      referral_friends_per_report: 2,
     },
     notification_texts: {},
     updated_at: '2026-09-25T10:00:00Z',

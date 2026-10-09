@@ -106,7 +106,9 @@ test.describe('invite a friend', () => {
     const card = page.getByRole('region', { name: 'Invită un prieten' });
     await expect(card).toBeVisible();
     const code = (await card.locator('span.mono').filter({ hasText: /^C-\d{5,}$/ }).textContent())!.trim();
+    await expect(card).toContainText('Primești un raport de istoric gratuit la fiecare 2 prieteni');
     await expect(card).toContainText('Până la 3 rapoarte gratuite pe an.');
+    await expect(card).toContainText('Spre următorul raport: 0 din 2 prieteni');
     await expect(card).toContainText('Prieteni invitați: 0 · Rapoarte gratuite primite: 0');
     await card.scrollIntoViewIfNeeded();
     await expectNoHorizontalScroll(page);
@@ -180,6 +182,18 @@ test.describe('invite a friend', () => {
     // ------------------------------------------------------------ the friend's first job is finished
     await confirmEmail(invited!.client_id);
     await finishedJob(shop, friendEmail, shopId, plate(), 1);
+    // One report for every 2 friends (Eduard, 9 Oct): the first one is progress, nothing more.
+    expect(await serviceRest(`report_credits?client_id=eq.${inviterId}`, 'GET')).toEqual([]);
+    await page.reload();
+    const halfway = page.getByRole('region', { name: 'Invită un prieten' });
+    await expect(halfway).toContainText('Spre următorul raport: 1 din 2 prieteni');
+    await expect(halfway.getByRole('meter')).toHaveAttribute('aria-valuenow', '1');
+    await halfway.scrollIntoViewIfNeeded();
+    await shot(page, 'invite-card-progress', name());
+
+    // A second friend, signed up with the code, finishes a first job too: the report.
+    const second = await createUser('client', { referral_code: code });
+    await finishedJob(shop, second, shopId, plate(), 2);
     const events = await serviceRest<{ channels: string[] }[]>(
       `notification_events?user_id=eq.${inviterId}&event=eq.report_credit&select=channels`,
       'GET',
@@ -188,6 +202,7 @@ test.describe('invite a friend', () => {
     await page.reload();
     const rewarded = page.getByRole('region', { name: 'Invită un prieten' });
     await expect(rewarded).toContainText('Rapoarte gratuite primite: 1');
+    await expect(rewarded).toContainText('Spre următorul raport: 0 din 2 prieteni');
     await expect(rewarded).toContainText('Ai 1 raport gratuit de folosit.');
     await rewarded.scrollIntoViewIfNeeded();
     await expectNoHorizontalScroll(page);
@@ -199,7 +214,7 @@ test.describe('invite a friend', () => {
     await page.reload();
     const cardEn = page.getByRole('region', { name: 'Invite a friend' });
     await expect(cardEn).toContainText('You have 1 free report to use.');
-    await expect(cardEn).toContainText('Friends invited: 1 · Free reports received: 1');
+    await expect(cardEn).toContainText('Friends invited: 2 · Free reports received: 1');
     await cardEn.scrollIntoViewIfNeeded();
     await shot(page, 'invite-card-en', name());
     await serviceRest(`profiles?id=eq.${inviterId}`, 'PATCH', { lang: 'ro' });

@@ -966,6 +966,8 @@ Migrarea `client_referrals` (`schema_version` = 68). Termenii (§3.6a nouă) și
 
 **Pașii tăi de securitate** (conturi, GitHub, Supabase) sunt în `docs/LANSARE.md` 4.6c.
 
+**Invită un prieten: 2 prieteni pentru un raport (Eduard, 9 oct):** raportul gratuit vine la fiecare 2 prieteni care finalizează prima lucrare, nu la fiecare. Numărul se schimbă din Admin → Setări („Prieteni pentru un raport gratuit”, 1–10). Cardul din Cont arată progresul („Spre următorul raport: 1 din 2 prieteni”). Termenii §3.6a actualizați, `TERMS_VERSION` = `2026-10-09`. Migrarea `referral_two_friends` (`schema_version` = 71).
+
 **Texte profesionale (Eduard, 9 oct):** toate textele din aplicație, emailuri și notificări (RO/EN) au fost revăzute: fără formulări colocviale, întrebări retorice sau scuze, fără explicații despre cum funcționează sistemul. Aproximativ 200 de texte rescrise sau scurtate, 7 explicații scoase. Am corectat și trei texte greșite: colegii nu au acces la Setări, service-urile cu firma neconfirmată la ANAF ies automat din căutări după termen, iar mesajul de eroare pentru abonamentele gestionate în Stripe. Regula e trecută în CLAUDE.md §10.
 
 Migrarea `security_limits` (`schema_version` = 70). Teste: `tests/sql/120_security.sql`, `tests/e2e/security-headers.spec.ts`, `tests/unit/securityHeaders.test.ts`. Fără pachete noi.

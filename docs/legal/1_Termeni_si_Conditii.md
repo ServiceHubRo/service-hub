@@ -1,6 +1,6 @@
 # Termeni și condiții — Service-Hub
 
-**Ultima actualizare:** 8 octombrie 2026
+**Ultima actualizare:** 9 octombrie 2026
 
 Acești termeni („Termenii”) se aplică folosirii Service-Hub: site-ul și aplicația de la adresa service-hub.ro („Platforma”). Când îți faci cont, confirmi că i-ai citit și că ești de acord cu ei. Cum folosim datele tale scrie în Politica de confidențialitate, iar ce păstrăm în browser, în Politica de cookies.
 
@@ -89,8 +89,8 @@ Datele de expirare pentru ITP, RCA și rovinietă sunt opționale. Alertele (cu 
 ### 3.6a Invită un prieten
 
 - **Codul tău** de invitare este numărul contului tău (de forma C-00042). Îl găsești în Cont → Invită un prieten, cu un link de înscriere pe care îl poți trimite (de exemplu pe WhatsApp). Prietenul scrie codul la înscriere sau se înscrie din link; codul se poate da doar la înscriere.
-- **Raportul gratuit:** când un service termină prima lucrare a prietenului, programată prin Platformă și cu un cost mai mare de 0, primești un raport oficial de istoric gratuit (secțiunea 3.6), pe care îl folosești pentru oricare mașină a ta cu lucrări finalizate. Raportul gratuit se face imediat, fără plată, și este identic cu unul plătit (cod, verificare, descărcare).
-- **Limite:** un singur raport gratuit pentru fiecare prieten (aceeași persoană, după email sau telefon, aduce un singur raport, oricine ar fi invitat-o) și cel mult 3 rapoarte gratuite în 365 de zile pentru un cont (numărul îl poate schimba echipa Service-Hub, anunțat în aplicație). Nu se acordă pentru un cont al aceleiași persoane (același email sau telefon), nici când lucrarea este finalizată de un service al tău, nici dacă între timp contul tău a fost șters sau suspendat.
+- **Raportul gratuit:** un prieten contează când un service îi termină prima lucrare, programată prin Platformă și cu un cost mai mare de 0. Pentru fiecare 2 prieteni care contează primești un raport oficial de istoric gratuit (secțiunea 3.6), pe care îl folosești pentru oricare mașină a ta cu lucrări finalizate. Raportul gratuit se face imediat, fără plată, și este identic cu unul plătit (cod, verificare, descărcare).
+- **Limite:** fiecare prieten contează o singură dată (aceeași persoană, după email sau telefon, contează o singură dată, oricine ar fi invitat-o) și primești cel mult 3 rapoarte gratuite în 365 de zile pentru un cont. Numărul de prieteni pentru un raport și numărul de rapoarte pe an le poate schimba echipa Service-Hub, anunțat în aplicație; prietenii care contau deja rămân. Nu se acordă pentru un cont al aceleiași persoane (același email sau telefon), nici când lucrarea este finalizată de un service al tău, nici dacă între timp contul tău a fost șters sau suspendat.
 - **Ce vezi:** câți prieteni s-au înscris cu codul tău și câte rapoarte gratuite ai primit; nimic despre prietenii tăi.
 - Raportul gratuit nu se transformă în bani, puncte sau reduceri și nu se transferă. Putem schimba sau opri programul pentru invitațiile viitoare, anunțat în aplicație; rapoartele gratuite deja primite rămân.
 

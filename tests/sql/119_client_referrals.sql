@@ -3,6 +3,8 @@
 -- `referral_credits_per_year` a year, a credit used once; the browser never reads the invitations.
 begin;
 select test.make_world();
+-- The rules one friend at a time; two friends per report are tested at the end.
+update public.platform_settings set limits = limits || '{"referral_friends_per_report": 1}' where id = 1;
 
 create function pg_temp.client(p_n int, p_code text default null, p_phone text default null) returns uuid
 language sql as $$
@@ -119,7 +121,7 @@ select test.fails($$update public.report_credits set used_at = null$$, 'permissi
 select test.fails(format($$select public.redeem_report_credit(%L, gen_random_uuid())$$, current_setting('test.inviter')::uuid),
   'permission denied', 'only report-checkout uses a credit');
 select test.eq(public.my_client_referrals() - 'code',
-  '{"invited": 5, "rewarded": 3, "credits_available": 3, "credits_per_year": 3}'::jsonb, 'the counts for the card');
+  '{"invited": 5, "rewarded": 3, "credits_available": 3, "credits_per_year": 3, "friends_per_report": 1, "progress": 0}'::jsonb, 'the counts for the card');
 select test.eq(public.my_client_referrals()->>'code', current_setting('test.code'), 'and the code');
 select test.login(current_setting('test.f3')::uuid);
 select test.eq((select count(*)::int from public.report_credits), 0, 'another client sees none of them');
@@ -168,5 +170,36 @@ update public.profiles set deleted_at = now() - interval '3 years 1 day' where i
 select public.purge_account_fingerprints();
 select test.eq(pg_temp.state(current_setting('test.f8')::uuid), null::text, 'purged 3 years after the friend left');
 select test.eq(pg_temp.state(current_setting('test.f3')::uuid), 'rewarded', 'the others stay');
+
+-- ------------------------------------------------------------------ two friends per report (Eduard, 9 Oct)
+update public.platform_settings set limits = limits || '{"referral_friends_per_report": 2}' where id = 1;
+select set_config('test.inv3', pg_temp.client(20)::text, true);
+select set_config('test.code3', pg_temp.code(current_setting('test.inv3')::uuid), true);
+select set_config('test.g1', pg_temp.client(21, current_setting('test.code3'))::text, true);
+select set_config('test.g2', pg_temp.client(22, current_setting('test.code3'))::text, true);
+select pg_temp.finish(current_setting('test.g1')::uuid, 200);
+select test.eq(pg_temp.state(current_setting('test.g1')::uuid), 'qualified', 'the first friend counts');
+select test.eq(pg_temp.credits(current_setting('test.inv3')::uuid), 0, 'but one friend is not a report yet');
+select test.eq((select count(*)::int from public.notification_events where user_id = current_setting('test.inv3')::uuid
+                and event = 'report_credit'), 0, 'and nothing is announced');
+select test.login(current_setting('test.inv3')::uuid);
+select test.eq(public.my_client_referrals() - 'code',
+  '{"invited": 2, "rewarded": 0, "credits_available": 0, "credits_per_year": 3, "friends_per_report": 2, "progress": 1}'::jsonb,
+  'the card shows 1 of 2');
+select test.logout();
+-- A second job of the same friend does not count twice.
+select pg_temp.finish(current_setting('test.g1')::uuid, 200);
+select test.eq(pg_temp.credits(current_setting('test.inv3')::uuid), 0, 'the same friend twice is still one');
+select pg_temp.finish(current_setting('test.g2')::uuid, 200);
+select test.eq(pg_temp.credits(current_setting('test.inv3')::uuid), 1, 'the second friend: one report');
+select test.eq(pg_temp.state(current_setting('test.g1')::uuid) || ' ' || pg_temp.state(current_setting('test.g2')::uuid),
+  'rewarded rewarded', 'both friends are counted into it');
+select test.eq((select count(distinct credit_id)::int from public.client_referrals
+                where client_id in (current_setting('test.g1')::uuid, current_setting('test.g2')::uuid)), 1, 'the same report');
+select test.eq((select count(*)::int from public.notification_events where user_id = current_setting('test.inv3')::uuid
+                and event = 'report_credit'), 1, 'announced once');
+select test.login(current_setting('test.inv3')::uuid);
+select test.eq(public.my_client_referrals()->>'progress', '0', 'progress starts again');
+select test.logout();
 
 rollback;
