@@ -99,9 +99,10 @@ test('landing: the way in is "Intră în cont" and "Creează cont"; the shops se
   await expect(page.getByRole('button', { name: 'Sunt service' })).toHaveAttribute('aria-pressed', 'true');
   if (BACKEND) {
     await expect(page.getByText('Ofertă de lansare, locuri limitate: 99 lei pe lună în loc de 149 lei, păstrat cât timp rămâi cu noi. Profită acum.')).toBeVisible();
-    // Places are per city: once the city is typed, the offer names it (never a count).
+    // The same for every city: where places are left is the admin's business (Eduard, 9 Oct).
     await page.getByLabel('Oraș').fill('Brașov');
-    await expect(page.getByText('Ofertă de lansare în Brașov, locuri limitate: 99 lei pe lună în loc de 149 lei, păstrat cât timp rămâi cu noi. Profită acum.')).toBeVisible();
+    await expect(page.getByText('Ofertă de lansare, locuri limitate: 99 lei pe lună în loc de 149 lei, păstrat cât timp rămâi cu noi. Profită acum.')).toBeVisible();
+    await expect(page.getByText(/Ofertă de lansare în/)).toHaveCount(0);
     await shot(page, 'signup-shop-launch', name());
   }
 });

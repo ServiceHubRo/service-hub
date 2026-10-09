@@ -916,7 +916,7 @@ Decizii: zona = județul (București separat); pornire automată la primul servi
 
 **Locuri pe oraș (Eduard, 8 oct):** prețul de lansare nu mai merge la primele 50 de service-uri din țară, ci la primele service-uri din **fiecare oraș**. Numărul îl setezi în Admin → Setări platformă → „Locuri la prețul de lansare, în fiecare oraș” (10 la început). Orașul e cel scris la înscriere; „Brașov”, „Brasov” și „BRAȘOV” sunt același oraș, la fel „Cluj-Napoca” și „Cluj Napoca”. Service-urile deja înscrise își păstrează prețul și ocupă locuri în orașul lor. Când locurile unui oraș se ocupă, următorul service de acolo plătește prețul standard, iar în alt oraș se primește tot prețul de lansare.
 
-**Fără cifre pe site:** pagina de prezentare spune „Ofertă de lansare · Locuri limitate”, arată prețul tăiat și „−33%”, textul „Exclusiv pentru primele service-uri partenere din fiecare oraș…” și butonul „Profită acum”. La „Cont nou” service, sub câmpul Oraș apare „Ofertă de lansare în {oraș}, locuri limitate…”, doar dacă orașul mai are locuri. Baza de date nu spune nimănui câte locuri au rămas sau câte s-au ocupat.
+**Fără cifre pe site:** pagina de prezentare spune „Ofertă de lansare · Locuri limitate”, arată prețul tăiat și „−33%”, textul „Exclusiv pentru primele service-uri partenere din fiecare oraș…” și butonul „Profită acum”. La „Cont nou” service, sub câmpul Oraș apare „Ofertă de lansare, locuri limitate…”, la fel pentru orice oraș (corectat pe 9 oct în T35: înainte arăta orașul doar dacă mai avea locuri, deci se putea afla unde s-au terminat). Baza de date nu spune nimănui câte locuri au rămas, câte s-au ocupat sau în ce orașe; decide doar la înscriere.
 
 **Partener fondator:** service-urile cu preț de lansare au insigna pe cardul din căutare și pe pagina service-ului. Nu schimbă ordinea din căutare și nu se poate pune din aplicație.
 
@@ -945,5 +945,9 @@ Migrarea `offers` (`schema_version` = 67). Termenii RO/EN §3 și §4.3 actualiz
 **Abuz:** refuzat dacă prietenul are același email sau telefon cu cel care invită, dacă service-ul care termină lucrarea e al celui care invită, dacă aceeași persoană (email sau telefon) a mai adus un raport, dacă cel care invită și-a șters contul sau e suspendat, sau peste limita de 3 rapoarte gratuite în 365 de zile (Admin → Cont → Setări → „Rapoarte gratuite pe an din invitații”, 0–12; 0 oprește recompensa). Tabelul invitațiilor nu se citește din browser; clientul vede doar numerele.
 
 **Raportul gratuit:** pe previzualizarea raportului apare „Folosește raportul gratuit” deasupra plății; nu cere bifa pentru dreptul de retragere (nu se plătește nimic) și nu trece prin Stripe. Raportul primește cod, se verifică și se descarcă exact ca unul plătit (suma plătită 0).
+
+**Corecturi după T33 și T34 (Eduard, 9 oct):**
+- Locurile la prețul de lansare: răspunsul public (`public_pricing`) nu mai primește orașul, așa că nimeni nu poate încerca oraș după oraș ca să afle unde s-au ocupat locurile. Nota de la înscriere e aceeași peste tot. Migrarea `launch_offer_private` (`schema_version` = 69).
+- Mai puține butoane: în Setări → Reguli, ofertele și confirmarea instantă au comutator (switch), procentul se alege dintr-o listă, serviciile și zilele dintr-o listă pop-up cu bife. Cardul „Invită un prieten” are un singur buton „Trimite invitația”, cu meniu (WhatsApp, Copiază linkul, altă aplicație pe telefon). Componente noi: `Switch`, `CheckMenu`, `MenuButton`.
 
 Migrarea `client_referrals` (`schema_version` = 68). Termenii (§3.6a nouă) și Politica de confidențialitate (§2.2, §3, §4.1, §5) RO/EN actualizate, `TERMS_VERSION` = `2026-10-08.3`. Teste: `tests/sql/119_client_referrals.sql`, `tests/e2e/invite.spec.ts` (drumul întreg, RO/EN), unit pentru notificare și email. Fără pachete noi.

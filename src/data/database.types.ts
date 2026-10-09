@@ -3923,7 +3923,7 @@ export type Database = {
       }
       prepare_account_deletion: { Args: { p_user_id: string }; Returns: string }
       promote_to_admin: { Args: { p_email: string }; Returns: string }
-      public_pricing: { Args: { p_city?: string }; Returns: Json }
+      public_pricing: { Args: never; Returns: Json }
       purge_account_fingerprints: { Args: { p_now?: string }; Returns: number }
       purge_request_log: { Args: { p_now?: string }; Returns: number }
       quiet_until: { Args: { p_now?: string }; Returns: string }

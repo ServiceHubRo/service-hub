@@ -7,15 +7,15 @@ export interface PublicPricing {
   /** Colleagues with an account included in the subscription. */
   freeSeats: number;
   trialDays: number;
-  /** The launch price while places are open (in the city asked, or somewhere); never how many. */
+  /** The launch price while the offer is on; never how many places or where (the admin's business). */
   launchRon: number | null;
   /** Discount in percent when paying for 3, 6 or 12 months at once (0 when not offered). */
   periodDiscounts: { 3: number; 6: number; 12: number };
 }
 
-/** Anyone may ask, signed out too; with a city, whether its launch places are still open. */
-export async function fetchPublicPricing(city?: string): Promise<PublicPricing> {
-  const data = (await call('public_pricing', (city?.trim() ? { p_city: city.trim() } : {}) as never)) as Record<string, unknown> | null;
+/** Anyone may ask, signed out too. The same answer for every city (Eduard, 9 Oct). */
+export async function fetchPublicPricing(): Promise<PublicPricing> {
+  const data = (await call('public_pricing', undefined as never)) as Record<string, unknown> | null;
   const num = (v: unknown) => (typeof v === 'number' ? v : Number(v));
   const pricing = {
     subscriptionRon: num(data?.subscription_price_ron),

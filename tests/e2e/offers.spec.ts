@@ -38,17 +38,19 @@ test.describe('new-client offers', () => {
     await signIn(page, shopEmail, PASSWORD);
     await expect(page).toHaveURL(/\/s\/panou$/);
     await page.goto('/s/cont/setari/reguli');
-    const offer = page.getByRole('group', { name: 'Ofertă pentru clienți noi' });
-    await expect(offer.getByRole('button', { name: 'Fără ofertă', pressed: true })).toBeVisible();
-    await offer.getByRole('button', { name: '-10%' }).click();
-    await expect(offer.getByRole('button', { name: '-10%', pressed: true })).toBeVisible();
+    // A switch, then the percent in a list (Eduard, 9 Oct: no rows of buttons).
+    const offer = page.getByRole('switch', { name: /^Ofertă pentru clienți noi/ });
+    await expect(offer).not.toBeChecked();
+    await offer.check();
+    await expect(page.getByLabel('Reducerea la manoperă')).toHaveValue('10');
     await offer.scrollIntoViewIfNeeded();
     await expectNoHorizontalScroll(page);
     await shot(page, 'offer-settings', name());
     await page.getByRole('button', { name: 'Salvează regulile' }).click();
     await expect(page.getByRole('button', { name: /Salvat/ })).toBeVisible();
     await page.reload();
-    await expect(page.getByRole('group', { name: 'Ofertă pentru clienți noi' }).getByRole('button', { name: '-10%', pressed: true })).toBeVisible();
+    await expect(page.getByRole('switch', { name: /^Ofertă pentru clienți noi/ })).toBeChecked();
+    await expect(page.getByLabel('Reducerea la manoperă')).toHaveValue('10');
 
     // ------------------------------------------------------------ a new client
     const clientContext = await browser.newContext({ viewport: page.viewportSize() ?? undefined });
@@ -119,8 +121,9 @@ test.describe('new-client offers', () => {
     await page.reload();
     await expect(page.locator('li').filter({ hasText: 'Skoda Octavia' })).toContainText('New client: you promised 10% off labor');
     await page.goto('/s/cont/setari/reguli');
-    const offerEn = page.getByRole('group', { name: 'New-client offer' });
-    await expect(offerEn.getByRole('button', { name: '10% off', pressed: true })).toBeVisible();
+    const offerEn = page.getByRole('switch', { name: /^New-client offer/ });
+    await expect(offerEn).toBeChecked();
+    await expect(page.getByLabel('Discount on labor')).toHaveValue('10');
     await offerEn.scrollIntoViewIfNeeded();
     await expectNoHorizontalScroll(page);
     await shot(page, 'offer-settings-en', name());

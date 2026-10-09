@@ -33,34 +33,9 @@
   margin: 4px 0 12px;
 }
 
-.offerChips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-/* The offers' details (Eduard, 8 Oct): last day, services, quiet days. */
-.offerMore {
+/* An offer card: the switch, then (when on) the percent, the last day, the services or the days. */
+.offer {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  margin-top: 14px;
-}
-
-.subTitle {
-  margin: 0 0 8px;
-  font-size: 14px;
-  font-weight: 600;
-}
-
-.serviceList {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.error {
-  margin: 4px 0 0;
-  color: var(--red-text);
-  font-size: 14px;
+  gap: 14px;
 }

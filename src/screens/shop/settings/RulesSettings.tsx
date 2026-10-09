@@ -2,11 +2,12 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { BackLink } from '../../../components/BackLink';
 import { Card } from '../../../components/Card';
-import { Checkbox } from '../../../components/Checkbox';
+import { CheckMenu } from '../../../components/CheckMenu';
 import { Chip } from '../../../components/Chip';
 import { Field } from '../../../components/Field';
 import { SelectField } from '../../../components/SelectField';
 import { Stepper } from '../../../components/Stepper';
+import { Switch } from '../../../components/Switch';
 import { fetchCatalog, fetchShopServices, updateShop, type Shop } from '../../../data/shop';
 import { useI18n } from '../../../i18n/context';
 import type { MessageKey } from '../../../i18n/ro';
@@ -25,6 +26,13 @@ const CANCEL_HOURS = [0, 1, 2, 3, 4, 6, 12, 24, 48];
 const MAX_FEE = 10000;
 /** The discounts a shop can promise new clients (the database allows exactly these). */
 const OFFERS = [5, 10, 15];
+/** What a switched-on offer starts at. */
+const DEFAULT_OFFER = 10;
+
+/** Two names in full, more as a count ("3 servicii"). */
+function listOrCount(names: string[], count: string): string {
+  return names.length <= 2 ? names.join(', ') : count;
+}
 /** Monday first, as a week reads in Romania (0 = Sunday). */
 const WEEK = [1, 2, 3, 4, 5, 6, 0];
 
@@ -222,12 +230,9 @@ export function RulesSettings() {
       </Card>
 
       <Card>
-        <Checkbox checked={rules.instant} onChange={(e) => set('instant', e.target.checked)} aria-describedby="rules-instant-hint">
+        <Switch checked={rules.instant} hint={t('rules.instant.hint')} onChange={(e) => set('instant', e.target.checked)}>
           {t('rules.instant')}
-        </Checkbox>
-        <p id="rules-instant-hint" className={styles.hint}>
-          {t('rules.instant.hint')}
-        </p>
+        </Switch>
       </Card>
 
       <Card>
@@ -250,23 +255,25 @@ export function RulesSettings() {
       </Card>
 
       <Card>
-        <div role="group" aria-labelledby="rules-offer">
-          <p id="rules-offer" className={styles.cardTitle}>
+        <div className={own.offer}>
+          <Switch
+            checked={rules.offer !== null}
+            hint={t('rules.offer.hint')}
+            onChange={(e) => {
+              setOfferError(null);
+              set('offer', e.target.checked ? DEFAULT_OFFER : null);
+            }}
+          >
             {t('rules.offer')}
-          </p>
-          <p className={`${styles.hint} ${own.feeHint}`}>{t('rules.offer.hint')}</p>
-          <div className={own.offerChips}>
-            <Chip selected={rules.offer === null} onClick={() => set('offer', null)}>
-              {t('rules.offer.none')}
-            </Chip>
-            {OFFERS.map((n) => (
-              <Chip key={n} selected={rules.offer === n} onClick={() => set('offer', n)}>
-                {t('rules.offer.value', { n })}
-              </Chip>
-            ))}
-          </div>
+          </Switch>
           {rules.offer !== null && (
-            <div className={own.offerMore}>
+            <>
+              <SelectField
+                label={t('rules.offer.percent')}
+                value={String(rules.offer)}
+                options={OFFERS.map((n) => ({ value: String(n), label: t('rules.offer.value', { n }) }))}
+                onChange={(e) => set('offer', Number(e.target.value))}
+              />
               <Field
                 type="date"
                 label={t('rules.offer.until')}
@@ -275,92 +282,81 @@ export function RulesSettings() {
                 value={rules.offerUntil}
                 onChange={(e) => set('offerUntil', e.target.value)}
               />
-              <div role="group" aria-labelledby="rules-offer-scope">
-                <p id="rules-offer-scope" className={own.subTitle}>
-                  {t('rules.offer.scope')}
-                </p>
-                <div className={own.offerChips}>
-                  <Chip selected={rules.offerServices === null} onClick={() => set('offerServices', null)}>
-                    {t('rules.offer.scope.all')}
-                  </Chip>
-                  <Chip selected={rules.offerServices !== null} onClick={() => set('offerServices', rules.offerServices ?? [])}>
-                    {t('rules.offer.scope.some')}
-                  </Chip>
-                </div>
-              </div>
-              {rules.offerServices !== null && services.status === 'ready' && (
-                <div className={own.serviceList}>
-                  {services.data.map((s) => {
-                    const on = rules.offerServices!.includes(s.id);
-                    return (
-                      <Checkbox
-                        key={s.id}
-                        checked={on}
-                        onChange={() => {
-                          setOfferError(null);
-                          set('offerServices', on ? rules.offerServices!.filter((x) => x !== s.id) : [...rules.offerServices!, s.id]);
-                        }}
-                      >
-                        {lang === 'ro' ? s.name_ro : s.name_en}
-                      </Checkbox>
-                    );
-                  })}
-                  {offerError === 'services' && (
-                    <p className={own.error} role="alert">
-                      {t('rules.offer.scopeEmpty')}
-                    </p>
-                  )}
-                </div>
+              {services.status === 'ready' && (
+                <CheckMenu
+                  label={t('rules.offer.scope')}
+                  summary={
+                    rules.offerServices === null
+                      ? t('rules.offer.scope.all')
+                      : rules.offerServices.length === 0
+                        ? t('rules.offer.scope.pick')
+                        : listOrCount(
+                            services.data.filter((x) => rules.offerServices!.includes(x.id)).map((x) => (lang === 'ro' ? x.name_ro : x.name_en)),
+                            plural(lang, 'unit.services', rules.offerServices.length),
+                          )
+                  }
+                  all={{
+                    label: t('rules.offer.scope.all'),
+                    selected: rules.offerServices === null,
+                    onSelect: () => {
+                      setOfferError(null);
+                      set('offerServices', rules.offerServices === null ? [] : null);
+                    },
+                  }}
+                  options={services.data.map((x) => ({ value: x.id, label: lang === 'ro' ? x.name_ro : x.name_en }))}
+                  selected={rules.offerServices ?? []}
+                  onToggle={(id) => {
+                    setOfferError(null);
+                    const now = rules.offerServices ?? [];
+                    set('offerServices', now.includes(id) ? now.filter((x) => x !== id) : [...now, id]);
+                  }}
+                  error={offerError === 'services' ? t('rules.offer.scopeEmpty') : null}
+                />
               )}
-            </div>
+            </>
           )}
         </div>
       </Card>
 
       <Card>
-        <div role="group" aria-labelledby="rules-quiet">
-          <p id="rules-quiet" className={styles.cardTitle}>
+        <div className={own.offer}>
+          <Switch
+            checked={rules.quiet !== null}
+            hint={t('rules.quiet.hint')}
+            onChange={(e) => {
+              setOfferError(null);
+              set('quiet', e.target.checked ? DEFAULT_OFFER : null);
+            }}
+          >
             {t('rules.quiet')}
-          </p>
-          <p className={`${styles.hint} ${own.feeHint}`}>{t('rules.quiet.hint')}</p>
-          <div className={own.offerChips}>
-            <Chip selected={rules.quiet === null} onClick={() => set('quiet', null)}>
-              {t('rules.offer.none')}
-            </Chip>
-            {OFFERS.map((n) => (
-              <Chip key={n} selected={rules.quiet === n} onClick={() => set('quiet', n)}>
-                {t('rules.offer.value', { n })}
-              </Chip>
-            ))}
-          </div>
+          </Switch>
           {rules.quiet !== null && (
-            <div role="group" aria-labelledby="rules-quiet-days" className={own.offerMore}>
-              <p id="rules-quiet-days" className={own.subTitle}>
-                {t('rules.quiet.days')}
-              </p>
-              <div className={own.offerChips}>
-                {WEEK.map((d) => {
-                  const on = rules.quietDays.includes(d);
-                  return (
-                    <Chip
-                      key={d}
-                      selected={on}
-                      onClick={() => {
-                        setOfferError(null);
-                        set('quietDays', on ? rules.quietDays.filter((x) => x !== d) : [...rules.quietDays, d].sort((a, b) => a - b));
-                      }}
-                    >
-                      {t(`weekday.${d}` as MessageKey)}
-                    </Chip>
-                  );
-                })}
-              </div>
-              {offerError === 'days' && (
-                <p className={own.error} role="alert">
-                  {t('rules.quiet.daysRequired')}
-                </p>
-              )}
-            </div>
+            <>
+              <SelectField
+                label={t('rules.offer.percent')}
+                value={String(rules.quiet)}
+                options={OFFERS.map((n) => ({ value: String(n), label: t('rules.offer.value', { n }) }))}
+                onChange={(e) => set('quiet', Number(e.target.value))}
+              />
+              <CheckMenu
+                label={t('rules.quiet.days')}
+                summary={
+                  rules.quietDays.length === 0
+                    ? t('rules.quiet.daysPick')
+                    : WEEK.filter((d) => rules.quietDays.includes(d))
+                        .map((d) => t(`weekday.${d}` as MessageKey))
+                        .join(', ')
+                }
+                options={WEEK.map((d) => ({ value: String(d), label: t(`weekday.${d}` as MessageKey) }))}
+                selected={rules.quietDays.map(String)}
+                onToggle={(value) => {
+                  setOfferError(null);
+                  const d = Number(value);
+                  set('quietDays', rules.quietDays.includes(d) ? rules.quietDays.filter((x) => x !== d) : [...rules.quietDays, d].sort((x, y) => x - y));
+                }}
+                error={offerError === 'days' ? t('rules.quiet.daysRequired') : null}
+              />
+            </>
           )}
         </div>
       </Card>

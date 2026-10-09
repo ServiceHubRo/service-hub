@@ -108,15 +108,24 @@ test.describe('invite a friend', () => {
     const code = (await card.locator('span.mono').filter({ hasText: /^C-\d{5,}$/ }).textContent())!.trim();
     await expect(card).toContainText('Până la 3 rapoarte gratuite pe an.');
     await expect(card).toContainText('Prieteni invitați: 0 · Rapoarte gratuite primite: 0');
-    await expect(card.getByRole('link', { name: 'Trimite pe WhatsApp' })).toHaveAttribute(
-      'href',
-      new RegExp(`^https://wa\\.me/\\?text=.*cont-nou%3Frol%3Dclient%26cod%3D${code}`),
-    );
-    const link = await card.getByLabel('Linkul de înscriere').inputValue();
-    expect(link).toContain(`/cont-nou?rol=client&cod=${code}`);
     await card.scrollIntoViewIfNeeded();
     await expectNoHorizontalScroll(page);
     await shot(page, 'invite-card', name());
+    // One button, a menu: WhatsApp, copy the link (Eduard, 9 Oct: no row of buttons).
+    const send = card.getByRole('button', { name: 'Trimite invitația' });
+    await send.click();
+    const whatsapp = page.getByRole('menuitem', { name: 'Pe WhatsApp' });
+    await expect(whatsapp).toBeFocused();
+    const href = (await whatsapp.getAttribute('href'))!;
+    expect(href).toMatch(new RegExp(`^https://wa\\.me/\\?text=.*cont-nou%3Frol%3Dclient%26cod%3D${code}`));
+    const link = /(https?:\/\/\S+)$/.exec(decodeURIComponent(href.split('text=')[1]!))![1]!;
+    expect(link).toContain(`/cont-nou?rol=client&cod=${code}`);
+    await expect(page.getByRole('menuitem', { name: 'Copiază linkul' })).toBeVisible();
+    await expectNoHorizontalScroll(page);
+    await shot(page, 'invite-menu', name());
+    await page.keyboard.press('Escape');
+    await expect(page.getByRole('menu')).toHaveCount(0);
+    await expect(send).toBeFocused();
 
     // ------------------------------------------------------------ the friend, from the link
     const other = await browser.newContext({ viewport: page.viewportSize() ?? undefined });

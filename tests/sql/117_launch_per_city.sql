@@ -1,7 +1,7 @@
 -- Launch price per city (Eduard, 8 Oct): the first launch_slots_per_city shops of each city get the
 -- launch price and are founding partners; the next one in that city pays the standard price, another
 -- city still gets it; "Brasov" and "Brașov" are the same city; nobody changes the flag from the
--- browser; the landing page learns only whether a place is open, never a count.
+-- browser; the public answer says only whether the offer is on, never a count or a city.
 begin;
 update public.platform_settings set subscription_price_ron = 149, launch_price_ron = 99, launch_slots_per_city = 10 where id = 1;
 
@@ -22,11 +22,14 @@ select test.eq(test.count($$select 1 from public.subscriptions sub join public.s
                             where s.name like 'Lansare %' and sub.price_ron = 99 and sub.launch_offer and s.founder$$), 10::bigint,
   'the first ten in Brașov: 99 lei, founding partners');
 
+-- Which city still has places is the admin's business (Eduard, 9 Oct): the public answer takes no
+-- city and is the same while the offer is on, even with Brașov full.
+select test.eq((select string_agg(pg_get_function_identity_arguments(p.oid), '|') from pg_proc p
+                where p.proname = 'public_pricing' and p.pronamespace = 'public'::regnamespace), '',
+  'public_pricing takes no city');
 select test.login_anon();
-select test.ok(public.public_pricing('Brasov')->'launch_price_ron' = 'null'::jsonb, 'Brașov is full, also spelled Brasov');
-select test.eq(public.public_pricing('Cluj-Napoca')->>'launch_price_ron', '99.00', 'Cluj still has places');
-select test.eq(public.public_pricing()->>'launch_price_ron', '99.00', 'without a city: the offer is open');
-select test.ok(not (public.public_pricing('Brașov') ? 'launch_left') and not (public.public_pricing('Brașov') ? 'launch_shops'),
+select test.eq(public.public_pricing()->>'launch_price_ron', '99.00', 'the offer is on, Brașov full or not');
+select test.ok(not (public.public_pricing() ? 'launch_left') and not (public.public_pricing() ? 'launch_shops'),
   'never a count');
 select test.fails($$select public.launch_slots_left('Brașov')$$, 'permission denied', 'the count is not callable');
 select test.logout();
