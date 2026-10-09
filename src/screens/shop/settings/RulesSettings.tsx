@@ -1,15 +1,19 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { BackLink } from '../../../components/BackLink';
 import { Card } from '../../../components/Card';
-import { Checkbox } from '../../../components/Checkbox';
+import { CheckMenu } from '../../../components/CheckMenu';
 import { Chip } from '../../../components/Chip';
 import { Field } from '../../../components/Field';
 import { SelectField } from '../../../components/SelectField';
 import { Stepper } from '../../../components/Stepper';
-import { updateShop, type Shop } from '../../../data/shop';
+import { Switch } from '../../../components/Switch';
+import { fetchCatalog, fetchShopServices, updateShop, type Shop } from '../../../data/shop';
 import { useI18n } from '../../../i18n/context';
+import type { MessageKey } from '../../../i18n/ro';
 import { plural, type Msg } from '../../../i18n/translate';
+import { ymdInBucharest } from '../../../i18n/format';
+import { useLoad } from '../../../lib/useLoad';
 import { SETTINGS_PATH } from './paths';
 import { SaveButton } from './SaveButton';
 import { useShopSettings } from './shopSettingsContext';
@@ -22,6 +26,15 @@ const CANCEL_HOURS = [0, 1, 2, 3, 4, 6, 12, 24, 48];
 const MAX_FEE = 10000;
 /** The discounts a shop can promise new clients (the database allows exactly these). */
 const OFFERS = [5, 10, 15];
+/** What a switched-on offer starts at. */
+const DEFAULT_OFFER = 10;
+
+/** Two names in full, more as a count ("3 servicii"). */
+function listOrCount(names: string[], count: string): string {
+  return names.length <= 2 ? names.join(', ') : count;
+}
+/** Monday first, as a week reads in Romania (0 = Sunday). */
+const WEEK = [1, 2, 3, 4, 5, 6, 0];
 
 /** The preset choices plus the shop's current value when it is not one of them. */
 const withCurrent = (presets: number[], current: number) => [...new Set([...presets, current])].sort((a, b) => a - b);
@@ -45,6 +58,12 @@ interface Rules {
   cancel_deadline_hours: number;
   fee: string;
   offer: number | null;
+  /** Last day of appointments the offer covers, `YYYY-MM-DD`; '' = no end. */
+  offerUntil: string;
+  /** The services it covers; null = all. */
+  offerServices: string[] | null;
+  quiet: number | null;
+  quietDays: number[];
   instant: boolean;
 }
 
@@ -57,6 +76,10 @@ const toRules = (shop: Shop): Rules => ({
   cancel_deadline_hours: shop.cancel_deadline_hours,
   fee: feeText(shop.inspection_fee),
   offer: shop.new_client_offer,
+  offerUntil: shop.new_client_offer_until ?? '',
+  offerServices: shop.new_client_offer_services,
+  quiet: shop.quiet_day_offer,
+  quietDays: shop.quiet_days,
   instant: shop.auto_confirm,
 });
 
@@ -70,6 +93,13 @@ export function RulesSettings() {
   const location = useLocation();
   const [rules, setRules] = useState<Rules>(() => toRules(shop));
   const [feeError, setFeeError] = useState<Msg | null>(null);
+  const [offerError, setOfferError] = useState<'services' | 'days' | null>(null);
+  // The shop's own services, by name, for "Doar la anumite servicii".
+  const loadServices = useCallback(async () => {
+    const [ids, catalog] = await Promise.all([fetchShopServices(shop.id), fetchCatalog()]);
+    return catalog.flatMap((c) => c.services).filter((s) => ids.includes(s.id));
+  }, [shop.id]);
+  const { state: services } = useLoad(loadServices);
   const capacityRef = useRef<HTMLDivElement>(null);
   const feeRef = useRef<HTMLDivElement>(null);
 
@@ -89,6 +119,15 @@ export function RulesSettings() {
       feeRef.current?.querySelector('input')?.focus();
       return false;
     }
+    if (rules.offer !== null && rules.offerServices !== null && rules.offerServices.length === 0) {
+      setOfferError('services');
+      return false;
+    }
+    if (rules.quiet !== null && rules.quietDays.length === 0) {
+      setOfferError('days');
+      return false;
+    }
+    setOfferError(null);
     const saved = await updateShop(shop.id, {
       daily_capacity: rules.daily_capacity,
       cars_per_slot: rules.cars_per_slot,
@@ -98,6 +137,10 @@ export function RulesSettings() {
       cancel_deadline_hours: rules.cancel_deadline_hours,
       inspection_fee: fee,
       new_client_offer: rules.offer,
+      new_client_offer_until: rules.offer !== null && rules.offerUntil ? rules.offerUntil : null,
+      new_client_offer_services: rules.offer !== null ? rules.offerServices : null,
+      quiet_day_offer: rules.quiet,
+      quiet_days: rules.quiet !== null ? rules.quietDays : [],
       auto_confirm: rules.instant,
       // Checklist step 3; the database stores its own time.
       capacity_reviewed_at: new Date().toISOString(),
@@ -187,12 +230,9 @@ export function RulesSettings() {
       </Card>
 
       <Card>
-        <Checkbox checked={rules.instant} onChange={(e) => set('instant', e.target.checked)} aria-describedby="rules-instant-hint">
+        <Switch checked={rules.instant} hint={t('rules.instant.hint')} onChange={(e) => set('instant', e.target.checked)}>
           {t('rules.instant')}
-        </Checkbox>
-        <p id="rules-instant-hint" className={styles.hint}>
-          {t('rules.instant.hint')}
-        </p>
+        </Switch>
       </Card>
 
       <Card>
@@ -215,21 +255,109 @@ export function RulesSettings() {
       </Card>
 
       <Card>
-        <div role="group" aria-labelledby="rules-offer">
-          <p id="rules-offer" className={styles.cardTitle}>
+        <div className={own.offer}>
+          <Switch
+            checked={rules.offer !== null}
+            hint={t('rules.offer.hint')}
+            onChange={(e) => {
+              setOfferError(null);
+              set('offer', e.target.checked ? DEFAULT_OFFER : null);
+            }}
+          >
             {t('rules.offer')}
-          </p>
-          <p className={`${styles.hint} ${own.feeHint}`}>{t('rules.offer.hint')}</p>
-          <div className={own.offerChips}>
-            <Chip selected={rules.offer === null} onClick={() => set('offer', null)}>
-              {t('rules.offer.none')}
-            </Chip>
-            {OFFERS.map((n) => (
-              <Chip key={n} selected={rules.offer === n} onClick={() => set('offer', n)}>
-                {t('rules.offer.value', { n })}
-              </Chip>
-            ))}
-          </div>
+          </Switch>
+          {rules.offer !== null && (
+            <>
+              <SelectField
+                label={t('rules.offer.percent')}
+                value={String(rules.offer)}
+                options={OFFERS.map((n) => ({ value: String(n), label: t('rules.offer.value', { n }) }))}
+                onChange={(e) => set('offer', Number(e.target.value))}
+              />
+              <Field
+                type="date"
+                label={t('rules.offer.until')}
+                hint={t('rules.offer.untilHint')}
+                min={ymdInBucharest(new Date())}
+                value={rules.offerUntil}
+                onChange={(e) => set('offerUntil', e.target.value)}
+              />
+              {services.status === 'ready' && (
+                <CheckMenu
+                  label={t('rules.offer.scope')}
+                  summary={
+                    rules.offerServices === null
+                      ? t('rules.offer.scope.all')
+                      : rules.offerServices.length === 0
+                        ? t('rules.offer.scope.pick')
+                        : listOrCount(
+                            services.data.filter((x) => rules.offerServices!.includes(x.id)).map((x) => (lang === 'ro' ? x.name_ro : x.name_en)),
+                            plural(lang, 'unit.services', rules.offerServices.length),
+                          )
+                  }
+                  all={{
+                    label: t('rules.offer.scope.all'),
+                    selected: rules.offerServices === null,
+                    onSelect: () => {
+                      setOfferError(null);
+                      set('offerServices', rules.offerServices === null ? [] : null);
+                    },
+                  }}
+                  options={services.data.map((x) => ({ value: x.id, label: lang === 'ro' ? x.name_ro : x.name_en }))}
+                  selected={rules.offerServices ?? []}
+                  onToggle={(id) => {
+                    setOfferError(null);
+                    const now = rules.offerServices ?? [];
+                    set('offerServices', now.includes(id) ? now.filter((x) => x !== id) : [...now, id]);
+                  }}
+                  error={offerError === 'services' ? t('rules.offer.scopeEmpty') : null}
+                />
+              )}
+            </>
+          )}
+        </div>
+      </Card>
+
+      <Card>
+        <div className={own.offer}>
+          <Switch
+            checked={rules.quiet !== null}
+            hint={t('rules.quiet.hint')}
+            onChange={(e) => {
+              setOfferError(null);
+              set('quiet', e.target.checked ? DEFAULT_OFFER : null);
+            }}
+          >
+            {t('rules.quiet')}
+          </Switch>
+          {rules.quiet !== null && (
+            <>
+              <SelectField
+                label={t('rules.offer.percent')}
+                value={String(rules.quiet)}
+                options={OFFERS.map((n) => ({ value: String(n), label: t('rules.offer.value', { n }) }))}
+                onChange={(e) => set('quiet', Number(e.target.value))}
+              />
+              <CheckMenu
+                label={t('rules.quiet.days')}
+                summary={
+                  rules.quietDays.length === 0
+                    ? t('rules.quiet.daysPick')
+                    : WEEK.filter((d) => rules.quietDays.includes(d))
+                        .map((d) => t(`weekday.${d}` as MessageKey))
+                        .join(', ')
+                }
+                options={WEEK.map((d) => ({ value: String(d), label: t(`weekday.${d}` as MessageKey) }))}
+                selected={rules.quietDays.map(String)}
+                onToggle={(value) => {
+                  setOfferError(null);
+                  const d = Number(value);
+                  set('quietDays', rules.quietDays.includes(d) ? rules.quietDays.filter((x) => x !== d) : [...rules.quietDays, d].sort((x, y) => x - y));
+                }}
+                error={offerError === 'days' ? t('rules.quiet.daysRequired') : null}
+              />
+            </>
+          )}
         </div>
       </Card>
 

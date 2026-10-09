@@ -369,3 +369,15 @@
   flex-wrap: wrap;
   gap: 8px;
 }
+
+/* A quiet-day offer on a day with places (Eduard, 8 Oct). */
+.dayOffer {
+  margin-top: 3px;
+  padding: 1px 6px;
+  border-radius: var(--radius-pill);
+  background: var(--amber);
+  color: var(--ink);
+  font-size: 11.5px;
+  font-weight: 700;
+  line-height: 1.3;
+}

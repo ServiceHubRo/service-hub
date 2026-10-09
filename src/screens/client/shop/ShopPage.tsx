@@ -13,6 +13,8 @@ import { LoadError } from '../../../components/LoadError';
 import { OfferNote } from '../../../components/OfferNote';
 import { PhotoGallery } from '../../../components/PhotoGallery';
 import { ServiceIcon } from '../../../components/ServiceIcon';
+import { FounderBadge } from '../../../components/FounderBadge';
+import { useOfferText } from '../../../lib/useOfferText';
 import { ShopAvatar } from '../../../components/ShopAvatar';
 import { SkeletonList } from '../../../components/Skeleton';
 import { Stars } from '../../../components/Stars';
@@ -111,6 +113,7 @@ export function ShopPage() {
 
 function ShopDetails({ page, day, onFavorite }: { page: ShopPageData; day: string | null; onFavorite: (on: boolean) => void }) {
   const { t, lang } = useI18n();
+  const offerText = useOfferText();
   const { coords } = useLocation();
   const { shop, rating } = page;
   const distance = distanceTo(coords, shop);
@@ -139,6 +142,11 @@ function ShopDetails({ page, day, onFavorite }: { page: ShopPageData; day: strin
         <ShopAvatar name={shop.name} logoUrl={shop.logo_url} size={56} />
         <div className={styles.headText}>
           <h1 className={styles.name}>{shop.name}</h1>
+          {page.founder && (
+            <p className={styles.founder}>
+              <FounderBadge withHint />
+            </p>
+          )}
           {hasReviews && rating.review_count > 0 && rating.average !== null ? (
             <button type="button" className={`${styles.rating} ${styles.ratingButton}`} onClick={() => showReviews(true)}>
               <Stars value={rating.average} />
@@ -194,9 +202,15 @@ function ShopDetails({ page, day, onFavorite }: { page: ShopPageData; day: strin
           )}
         </div>
       )}
-      {page.bookable && page.offer !== null && (
+      {page.bookable && page.offers.newClient && (
         <OfferNote>
-          <strong>{t('offer.title')}</strong> · {t('offer.page', { n: page.offer })}
+          <strong>{t('offer.title')}</strong> · {offerText.newClientPage(page.offers.newClient)}
+          {page.offers.newClient.services && <> {offerText.services(page.offers.newClient)}</>}
+        </OfferNote>
+      )}
+      {page.bookable && page.offers.quietDay && (
+        <OfferNote>
+          <strong>{t('offer.quiet.title')}</strong> · {offerText.quietPage(page.offers.quietDay)}
         </OfferNote>
       )}
 

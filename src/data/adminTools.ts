@@ -211,6 +211,7 @@ export const ABUSE_LIMIT_KEYS = [
   'no_shows_before_phone',
   'company_fix_days',
   'company_recheck_days',
+  'referral_credits_per_year',
 ] as const;
 /** The notification limits (T24): quiet hours, tips a week, when a waiting request is recalled. */
 export const NOTIFICATION_LIMIT_KEYS = ['quiet_hours_start', 'quiet_hours_end', 'promo_per_week', 'request_reminder_hours'] as const;
@@ -229,9 +230,9 @@ export interface PlatformSettings {
   staff_seat_price_ron: number;
   /** Colleagues with an account included in the subscription (the first one). */
   staff_free_seats: number;
-  /** Launch price for the first launch_shops shops (0 = no launch offer). */
+  /** Launch price for the first launch_slots_per_city shops of each city (0 = no launch offer). */
   launch_price_ron: number;
-  launch_shops: number;
+  launch_slots_per_city: number;
   /** Discount in percent (0–50) when paying for 3, 6 or 12 months at once; kept by a shop once sold. */
   period_discount_3: number;
   period_discount_6: number;

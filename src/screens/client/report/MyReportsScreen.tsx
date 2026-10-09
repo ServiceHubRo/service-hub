@@ -11,6 +11,7 @@ import { EmptyState } from '../../../components/EmptyState';
 import { LoadError } from '../../../components/LoadError';
 import { SkeletonList } from '../../../components/Skeleton';
 import { fetchCars } from '../../../data/garage';
+import { getMyInvites } from '../../../data/referrals';
 import {
   downloadReport,
   fetchMyReports,
@@ -42,7 +43,7 @@ const RETRY_AFTER_MS = 45_000;
  * Stripe comes back here with ?plata=ok&raport=<id>.
  */
 export function MyReportsScreen() {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const session = useSession();
   const userId = session.user?.id ?? null;
   const [params] = useSearchParams();
@@ -57,6 +58,23 @@ export function MyReportsScreen() {
     });
   }, [userId, setData]);
 
+  // Free reports from inviting friends (T35): said once, above the cars to choose from; read again
+  // when the list changes (a report made with one).
+  const [credits, setCredits] = useState(0);
+  const reportCount = state.status === 'ready' ? state.data.length : -1;
+  useEffect(() => {
+    let cancelled = false;
+    getMyInvites().then(
+      (invites) => {
+        if (!cancelled) setCredits(invites?.creditsAvailable ?? 0);
+      },
+      () => {},
+    );
+    return () => {
+      cancelled = true;
+    };
+  }, [reportCount]);
+
   const reports = state.status === 'ready' ? state.data : null;
   const justPaid = highlight && reports ? reports.find((r) => r.id === highlight) : undefined;
 
@@ -70,6 +88,10 @@ export function MyReportsScreen() {
 
       {returned && (
         <Banner tone="info">{justPaid?.status === 'generated' ? t('reports.return.done') : t('reports.return.ok')}</Banner>
+      )}
+
+      {credits > 0 && (
+        <Banner tone="info">{t('reports.credits', { credits: plural(lang, 'unit.freeReports', credits) })}</Banner>
       )}
 
       {state.status === 'loading' && <SkeletonList />}

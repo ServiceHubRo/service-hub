@@ -10,20 +10,24 @@ import { useI18n } from '../../../i18n/context';
 import { formatDate, formatDayTile } from '../../../i18n/format';
 import { plural } from '../../../i18n/translate';
 import { BOOKING_DAYS_SHOWN, bookingDays } from '../../../lib/bookingDays';
+import { quietPercentOn, type ShopOffers } from '../../../lib/offers';
 import { useLoad } from '../../../lib/useLoad';
 import styles from './booking.module.css';
 
 /**
  * Step 2: the next 12 days the shop is open, with the places left; full days dimmed and not
- * selectable. The database counts the places (get_availability) — the screen never does.
+ * selectable. The database counts the places (get_availability) — the screen never does. A day of
+ * the shop's quiet-day offer shows "-10%" while it has places (Eduard, 8 Oct); a full day does not.
  */
 export function DayStep({
   shop,
+  offers,
   selected,
   notice,
   onPick,
 }: {
   shop: ShopPageShop;
+  offers: ShopOffers;
   selected: string | null;
   /** Shown above the days when the client was sent back here (the time went meanwhile). */
   notice: string | null;
@@ -55,7 +59,9 @@ export function DayStep({
               {days.map((d) => {
                 const tile = formatDayTile(lang, d.date);
                 const on = d.date === selected;
+                const quiet = d.bookable ? quietPercentOn(offers, d.date) : null;
                 const places = d.bookable ? plural(lang, 'unit.places', d.places_left) : t('booking.day.full');
+                const label = quiet ? `${places}, ${t('offer.dayLabel', { n: quiet })}` : places;
                 return (
                   <li key={d.date}>
                     <button
@@ -63,13 +69,14 @@ export function DayStep({
                       className={`${styles.tile} ${on ? styles.tileOn : ''}`}
                       disabled={!d.bookable}
                       aria-pressed={on}
-                      aria-label={t('booking.day.label', { date: formatDate(lang, d.date), places })}
+                      aria-label={t('booking.day.label', { date: formatDate(lang, d.date), places: label })}
                       onClick={() => onPick(d.date)}
                     >
                       <span className={styles.tileSmall}>{tile.weekday}</span>
                       <span className={styles.tileBig}>{tile.day}</span>
                       <span className={styles.tileSmall}>{tile.month}</span>
                       <span className={d.bookable ? styles.places : styles.full}>{places}</span>
+                      {quiet && <span className={styles.dayOffer}>{t('offer.dayBadge', { n: quiet })}</span>}
                     </button>
                   </li>
                 );

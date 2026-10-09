@@ -7,6 +7,7 @@ import { buttonClass } from '../../../components/buttonClass';
 import { CalendarLinks } from '../../../components/CalendarLinks';
 import { Card } from '../../../components/Card';
 import { OfferNote } from '../../../components/OfferNote';
+import { useOfferText } from '../../../lib/useOfferText';
 import { InlinePanel } from '../../../components/InlinePanel';
 import { ServiceIcon } from '../../../components/ServiceIcon';
 import { StatusBadge } from '../../../components/StatusBadge';
@@ -100,6 +101,7 @@ export function ClientBookingCard({
   openReview,
 }: ClientBookingCardProps) {
   const { t, lang } = useI18n();
+  const offerText = useOfferText();
   const quote = quoteOf(b);
   const car = [[b.car_snapshot.make, b.car_snapshot.model].filter(Boolean).join(' '), b.car_snapshot.plate].filter(Boolean).join(' · ');
   const cancel = cancelState(b, b.shop?.cancel_deadline_hours ?? 0, now);
@@ -148,7 +150,7 @@ export function ClientBookingCard({
         {car && <span className={styles.muted}> · {car}</span>}
       </p>
       {b.note && <p className={styles.note}>{b.note}</p>}
-      {b.offer_percent !== null && !OFFER_GONE.has(b.status) && <OfferNote>{t('offer.client', { n: b.offer_percent })}</OfferNote>}
+      {b.offer_percent !== null && !OFFER_GONE.has(b.status) && <OfferNote>{offerText.promise('client', b.offer_percent, b.offer_kind)}</OfferNote>}
       {b.loyalty_percent !== null && !OFFER_GONE.has(b.status) && <OfferNote>{t('loyalty.client', { n: b.loyalty_percent })}</OfferNote>}
 
       <StatusDetail booking={b} quote={quote} now={now} />

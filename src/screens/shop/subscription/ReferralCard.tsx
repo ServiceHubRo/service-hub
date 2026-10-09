@@ -119,8 +119,11 @@ function ReferralRow({ item, max }: { item: ReferralItem; max: number }) {
   );
 }
 
-/** The link, selectable, with a copy button (the field is selected when copying is not allowed). */
-function CopyLink({ url }: { url: string }) {
+/**
+ * The link, selectable, with a copy button (the field is selected when copying is not allowed).
+ * Also the client's invitation card (T35).
+ */
+export function CopyLink({ url, id = 'referral-link' }: { url: string; id?: string }) {
   const { t } = useI18n();
   const [copied, setCopied] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -140,11 +143,11 @@ function CopyLink({ url }: { url: string }) {
 
   return (
     <>
-      <label htmlFor="referral-link" className="visually-hidden">
+      <label htmlFor={id} className="visually-hidden">
         {t('ref.link')}
       </label>
       <input
-        id="referral-link"
+        id={id}
         ref={inputRef}
         readOnly
         className={`mono ${styles.linkInput}`}

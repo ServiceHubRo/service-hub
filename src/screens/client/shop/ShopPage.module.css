@@ -330,3 +330,9 @@
   border-radius: var(--radius-card);
   background: var(--surface);
 }
+
+/* Partener fondator (Eduard, 8 Oct). */
+.founder {
+  display: flex;
+  margin: 4px 0 2px;
+}

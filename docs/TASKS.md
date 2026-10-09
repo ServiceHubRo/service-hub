@@ -58,6 +58,8 @@ Ordinea contează: fiecare sarcină se sprijină pe cele de dinainte. Sarcinile 
 | T31 | Import din alt program | Service-ul își aduce clienții, mașinile și lucrările dintr-un fișier Excel/CSV (T31a); linkul și codul QR ale service-ului, istoricul importat în contul clientului (T31b) |
 | T30 | Schimbul de ulei al clientului | Clientul alege la câte luni schimbă uleiul și când l-a schimbat ultima dată; celelalte remindere devin un „heads-up” |
 | T32 | Zone și constatare tehnică | „În curând și în zona ta” cu email la pornire, Admin → Zone, „Constatare tehnică” la programare |
+| T33 | Prețul de lansare pe oraș | Primele service-uri din fiecare oraș (numărul îl setează adminul) plătesc prețul de lansare și primesc insigna „Partener fondator” |
+| T34 | Oferte: termen, servicii, zile liniștite | Oferta pentru clienți noi cu dată de sfârșit și servicii alese, reducere în zilele mai liniștite, filtrul „Doar cu ofertă” |
 
 ---
 
@@ -909,3 +911,45 @@ Note: migrarea `shared_history` (`schema_version` = 46), fără pachete noi, fă
 Migrările `service_areas` (`schema_version` = 64) și `service_areas_definer` (65: corecție ca proprietarul să-și poată salva adresa — calculul zonei rula cu drepturile lui), fără pachete noi. Politica de confidențialitate (RO/EN §2.5, §9) actualizată. Teste: `tests/sql/116_service_areas.sql`, `tests/e2e/areas.spec.ts`, `tests/unit/areas.test.ts`, `tests/unit/symptoms.test.ts`, textele în `notificationTexts.test.ts` și `emailSms.test.ts`. **Oferta de lansare mai vizibilă (Eduard, 8 oct):** pe pagina de prezentare, eticheta „Ofertă de lansare · Locuri limitate”, prețul normal tăiat lângă cel de lansare și reducerea („−33%”, rotunjită în jos, ca să nu arate niciodată mai mult decât e), textul „Exclusiv pentru primele service-uri partenere…” (fără numărul de locuri) și butonul „Profită de prețul de lansare”. La înscrierea unui service, nota cu oferta. Când locurile se termină, totul revine singur la prețul normal. Fără cronometre sau „doar azi”: doar afirmații adevărate.
 
 Decizii: zona = județul (București separat); pornire automată la primul service public, cu posibilitatea de a o forța; zonele sunt fixe (nu se adaugă din admin). Rămas: localitățile din listă sunt aproximative la granița dintre județe (clientul își poate corecta județul).
+
+## T33 — Prețul de lansare pe oraș ✅
+
+**Locuri pe oraș (Eduard, 8 oct):** prețul de lansare nu mai merge la primele 50 de service-uri din țară, ci la primele service-uri din **fiecare oraș**. Numărul îl setezi în Admin → Setări platformă → „Locuri la prețul de lansare, în fiecare oraș” (10 la început). Orașul e cel scris la înscriere; „Brașov”, „Brasov” și „BRAȘOV” sunt același oraș, la fel „Cluj-Napoca” și „Cluj Napoca”. Service-urile deja înscrise își păstrează prețul și ocupă locuri în orașul lor. Când locurile unui oraș se ocupă, următorul service de acolo plătește prețul standard, iar în alt oraș se primește tot prețul de lansare.
+
+**Fără cifre pe site:** pagina de prezentare spune „Ofertă de lansare · Locuri limitate”, arată prețul tăiat și „−33%”, textul „Exclusiv pentru primele service-uri partenere din fiecare oraș…” și butonul „Profită acum”. La „Cont nou” service, sub câmpul Oraș apare „Ofertă de lansare, locuri limitate…”, la fel pentru orice oraș (corectat pe 9 oct în T35: înainte arăta orașul doar dacă mai avea locuri, deci se putea afla unde s-au terminat). Baza de date nu spune nimănui câte locuri au rămas, câte s-au ocupat sau în ce orașe; decide doar la înscriere.
+
+**Partener fondator:** service-urile cu preț de lansare au insigna pe cardul din căutare și pe pagina service-ului. Nu schimbă ordinea din căutare și nu se poate pune din aplicație.
+
+Migrarea `launch_per_city` (`schema_version` = 66). Termenii RO/EN §4.5 actualizați, `TERMS_VERSION` = `2026-10-08`. Teste: `tests/sql/117_launch_per_city.sql`, `tests/e2e/launch.spec.ts`, `public.spec.ts`. Fără pachete noi.
+
+## T34 — Oferte: termen, servicii, zile liniștite ✅
+
+**Oferta pentru clienți noi, completată (Eduard, 8 oct):** în Setări → Reguli, proprietarul poate pune o **dată de sfârșit** (pentru programările până în ziua aceea) și poate alege **la ce servicii** se aplică (toate sau doar unele). Pe card și pe pagina service-ului apare „până pe 31 oct” și serviciile.
+
+**Reducere în zilele mai liniștite:** -5 / -10 / -15% la manoperă, în zilele săptămânii alese de proprietar, pentru programările făcute de clienți în aplicație. La pasul 2 al programării, zilele acelea au „-15%” cât mai au loc; când ziua se umple, nu mai poate fi aleasă, deci reducerea dispare.
+
+**Reguli comune:** procentul îl scrie baza de date pe programare, la trimitere, nu telefonul clientului. Ofertele nu se adună: se aplică cea mai mare, maxim 15%. O programare mutată își păstrează reducerea. Programările trecute de service (clienți la telefon) nu primesc oferte. Doar proprietarul schimbă ofertele, colegii nu. Service-ul vede pe card și în formularul devizului ce a promis („Client nou…” sau „Zi cu reducere…”).
+
+**Căutare:** filtrul „Doar cu ofertă” (în Filtre) arată doar service-urile cu o ofertă; ordinea rămâne aceeași.
+
+Migrarea `offers` (`schema_version` = 67). Termenii RO/EN §3 și §4.3 actualizați, `TERMS_VERSION` = `2026-10-08.2`. Teste: `tests/sql/118_offers.sql`, `tests/e2e/offers-more.spec.ts`, `tests/unit/offers.test.ts`. Fără pachete noi.
+
+## T35 — Invită un prieten ✅
+
+**Cardul (Cont, client):** „Invită un prieten” cu codul clientului (C-00042), linkul `/cont-nou?rol=client&cod=C-00042`, „Trimite pe WhatsApp” și „Copiază linkul”; dedesubt câți prieteni s-au înscris și câte rapoarte gratuite a primit, iar când are unul de folosit, „Alege mașina” (duce la Rapoartele mele). Cardul nu apare cât timp adminul a oprit recompensa (0 pe an).
+
+**Înscrierea:** la „Sunt client”, câmpul opțional „Cod de invitare”, completat din link; un cod greșit e refuzat pe formular. Codul se poate da doar la înscriere.
+
+**Recompensa:** când un service termină prima lucrare a prietenului, programată în aplicație și cu un cost mai mare de 0, cel care a invitat primește un raport de istoric gratuit și un push + email „Ai primit un raport gratuit”. Fără bani, fără puncte.
+
+**Abuz:** refuzat dacă prietenul are același email sau telefon cu cel care invită, dacă service-ul care termină lucrarea e al celui care invită, dacă aceeași persoană (email sau telefon) a mai adus un raport, dacă cel care invită și-a șters contul sau e suspendat, sau peste limita de 3 rapoarte gratuite în 365 de zile (Admin → Cont → Setări → „Rapoarte gratuite pe an din invitații”, 0–12; 0 oprește recompensa). Tabelul invitațiilor nu se citește din browser; clientul vede doar numerele.
+
+**Raportul gratuit:** pe previzualizarea raportului apare „Folosește raportul gratuit” deasupra plății; nu cere bifa pentru dreptul de retragere (nu se plătește nimic) și nu trece prin Stripe. Raportul primește cod, se verifică și se descarcă exact ca unul plătit (suma plătită 0).
+
+**Corecturi după T33 și T34 (Eduard, 9 oct):**
+- Locurile la prețul de lansare: răspunsul public (`public_pricing`) nu mai primește orașul, așa că nimeni nu poate încerca oraș după oraș ca să afle unde s-au ocupat locurile. Nota de la înscriere e aceeași peste tot. Migrarea `launch_offer_private` (`schema_version` = 69).
+- Mai puține butoane: în Setări → Reguli, ofertele și confirmarea instantă au comutator (switch), procentul se alege dintr-o listă, serviciile și zilele dintr-o listă pop-up cu bife. Cardul „Invită un prieten” are un singur buton „Trimite invitația”, cu meniu (WhatsApp, Copiază linkul, altă aplicație pe telefon). Componente noi: `Switch`, `CheckMenu`, `MenuButton`.
+
+**PR:** #54 țintește direct `main` și conține și T33 (#52) și T34 (#53): Netlify face link de test doar pentru PR-urile spre `main`. Un singur Merge pe #54 le aduce pe toate trei; GitHub închide singur #52 și #53 ca incluse.
+
+Migrarea `client_referrals` (`schema_version` = 68). Termenii (§3.6a nouă) și Politica de confidențialitate (§2.2, §3, §4.1, §5) RO/EN actualizate, `TERMS_VERSION` = `2026-10-08.3`. Teste: `tests/sql/119_client_referrals.sql`, `tests/e2e/invite.spec.ts` (drumul întreg, RO/EN), unit pentru notificare și email. Fără pachete noi.

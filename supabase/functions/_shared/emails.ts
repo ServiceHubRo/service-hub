@@ -604,6 +604,8 @@ export function emailForEvent(e: EmailEvent, app: string): EmailContent | null {
       return walkInInviteEmail(p, lang, app);
     case 'area_launched':
       return areaLaunchedEmail(p, lang, app);
+    case 'report_credit':
+      return reportCreditEmail(lang, app);
     default:
       return subscriptionEmail(e, lang, app);
   }
@@ -637,6 +639,32 @@ function areaLaunchedEmail(p: Record<string, unknown>, lang: Lang, app: string):
     footer: en
       ? 'You are receiving this email because you asked to be told when Service-Hub reaches your area. This is the only one.'
       : 'Primești acest email pentru că ai cerut să fii anunțat când Service-Hub ajunge în zona ta. Este singurul.',
+  });
+}
+
+/** To a client whose invited friend finished a first job (T35): one history report without paying. */
+function reportCreditEmail(lang: Lang, app: string): EmailContent {
+  const en = lang === 'en';
+  return email(en ? 'You got a free report' : 'Ai primit un raport gratuit', {
+    lang,
+    preheader: en ? 'Thank you for inviting a friend to Service-Hub.' : 'Mulțumim că ai invitat un prieten pe Service-Hub.',
+    title: en ? 'You got a free report' : 'Ai primit un raport gratuit',
+    blocks: [
+      {
+        p: en
+          ? 'A friend you invited finished their first job at a shop on Service-Hub. Thank you.'
+          : 'Un prieten invitat de tine a terminat prima lucrare la un service din Service-Hub. Mulțumim.',
+      },
+      {
+        p: en
+          ? 'You have one service history report without paying, for any car in your Garage with finished jobs. Open the car, tap "History report" and choose "Use the free report".'
+          : 'Ai un raport de istoric service fără plată, pentru oricare mașină din Garaj cu lucrări finalizate. Deschizi mașina, apeși „Raport istoric” și alegi „Folosește raportul gratuit”.',
+      },
+    ],
+    button: { label: en ? 'Open My reports' : 'Deschide Rapoartele mele', url: `${app}${REPORTS_PATH}` },
+    footer: en
+      ? 'You are receiving this email because a friend signed up with your invitation code.'
+      : 'Primești acest email pentru că un prieten și-a făcut cont cu codul tău de invitare.',
   });
 }
 

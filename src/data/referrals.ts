@@ -55,3 +55,36 @@ export async function getMyReferrals(): Promise<MyReferrals | null> {
     items: (raw.items ?? []).map((i) => ({ ...i, reward_amount: i.reward_amount === null ? null : Number(i.reward_amount) })),
   };
 }
+
+// ------------------------------------------------------------------ invite a friend (clients, T35)
+
+/**
+ * A client invites a friend with their code (C-00042); when a shop finishes the friend's first job
+ * booked in the app, the client gets a free history report. The invitations themselves are never
+ * readable from the browser: only these counts.
+ */
+export interface MyInvites {
+  code: string;
+  invited: number;
+  rewarded: number;
+  creditsAvailable: number;
+  creditsPerYear: number;
+}
+
+/** Does this code belong to a client? Callable before signing in (the sign-up form). */
+export async function checkClientInviteCode(code: string): Promise<boolean> {
+  return (await call('check_client_invite_code', { p_code: code.trim() })) === true;
+}
+
+/** The client's code and counts; null for anyone else. */
+export async function getMyInvites(): Promise<MyInvites | null> {
+  const raw = (await call('my_client_referrals', undefined as never)) as unknown as Record<string, unknown> | null;
+  if (!raw) return null;
+  return {
+    code: String(raw.code ?? ''),
+    invited: Number(raw.invited ?? 0),
+    rewarded: Number(raw.rewarded ?? 0),
+    creditsAvailable: Number(raw.credits_available ?? 0),
+    creditsPerYear: Number(raw.credits_per_year ?? 0),
+  };
+}

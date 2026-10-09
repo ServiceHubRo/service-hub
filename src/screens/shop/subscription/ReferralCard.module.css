@@ -81,3 +81,39 @@
   font-weight: 700;
   overflow-wrap: anywhere;
 }
+
+/* The client's invitation card (T35) shares this card. */
+.muted {
+  color: var(--muted);
+  font-size: 13.5px;
+  overflow-wrap: anywhere;
+}
+
+.available {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.textLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  min-height: var(--tap);
+  color: var(--amber);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.textLink:hover {
+  text-decoration: underline;
+}
+
+/* The status line of "Copiat" takes no room while empty. */
+.muted:empty {
+  display: none;
+}

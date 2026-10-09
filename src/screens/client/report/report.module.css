@@ -134,6 +134,24 @@
   font-weight: 600;
 }
 
+/* A free report from invitations (T35), above the payment. */
+.credit {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid var(--amber);
+  border-radius: var(--radius-input);
+}
+
+.creditTitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  color: var(--amber);
+}
+
 /* ------------------------------------------------------------------ my reports */
 .list {
   list-style: none;

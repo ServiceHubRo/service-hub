@@ -11,16 +11,23 @@
 // Nothing here marks the report paid: only stripe-webhook does, after Stripe confirms the payment.
 // Answers { url, report_id } — or { report_id, status } when that report is already paid — or
 // { error: code }.
+//
+// With `use_credit` (T35, a free report from inviting a friend) there is no payment, so no waiver
+// and no Stripe: the same `pending_payment` row is paid with one of the client's credits
+// (redeem_report_credit, 0 lei) and the PDF is made at once, numbered like any report. Answers
+// { report_id, status } — `generated`, or `paid` when the PDF is still to come (the client retries
+// from My reports) — or { error: 'no_credit' }.
 import { AdminError, adminApi } from '../_shared/admin.ts';
 import { linkBase } from '../_shared/app.ts';
 import { appUrlFromEnv, stripeConfigFromEnv } from '../_shared/env.ts';
+import { generateReport } from '../_shared/reportGenerate.ts';
 import { bearerToken, corsHeaders, json } from '../_shared/http.ts';
 import { reportCarName } from '../_shared/report.ts';
 import { StripeError, stripeApi, stripeLocale } from '../_shared/stripe.ts';
 import { reportError } from '../_shared/monitor.ts';
 
 /** Refusals the app translates (src/data/reports.ts). */
-const KNOWN_CODES = new Set(['not_allowed', 'account_suspended', 'car_not_found', 'booking_not_found', 'no_jobs', 'nothing_to_pay']);
+const KNOWN_CODES = new Set(['not_allowed', 'account_suspended', 'car_not_found', 'booking_not_found', 'no_jobs', 'nothing_to_pay', 'no_credit']);
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const uuidOrNull = (v: unknown) => (typeof v === 'string' && UUID.test(v) ? v : null);
 /** Where "Înapoi" on Stripe's page leads: the preview the client came from. */
@@ -50,13 +57,14 @@ Deno.serve(async (req) => {
     const body = (await req.json().catch(() => ({}))) as Record<string, unknown>;
     const requestId = uuidOrNull(body.request_id);
     if (!requestId) return json({ error: 'request_id_required' }, 400);
-    if (body.withdrawal_waiver !== true) return json({ error: 'waiver_required' }, 400);
+    const useCredit = body.use_credit === true;
+    if (!useCredit && body.withdrawal_waiver !== true) return json({ error: 'waiver_required' }, 400);
     const carId = uuidOrNull(body.car_id);
     const bookingId = carId ? null : uuidOrNull(body.booking_id);
     const lang = body.lang === 'en' ? 'en' : 'ro';
 
     const config = stripeConfigFromEnv();
-    if (!config.secretKey) return json({ error: 'payments_unavailable' }, 503);
+    if (!useCredit && !config.secretKey) return json({ error: 'payments_unavailable' }, 503);
 
     let report: Begun;
     try {
@@ -72,6 +80,24 @@ Deno.serve(async (req) => {
       throw e;
     }
     if (report.status !== 'pending_payment') return json({ report_id: report.id, status: report.status });
+
+    if (useCredit) {
+      let row: Record<string, unknown>;
+      try {
+        row = (await api.rpc('redeem_report_credit', { p_user_id: user.id, p_report_id: report.id })) as Record<string, unknown>;
+      } catch (e) {
+        if (e instanceof AdminError && KNOWN_CODES.has(e.message)) return json({ error: e.message }, 409);
+        throw e;
+      }
+      // The report is paid now; a PDF that fails here is made again from My reports.
+      let status = String(row.status);
+      try {
+        if (await generateReport(api, row, appUrlFromEnv())) status = 'generated';
+      } catch (e) {
+        await reportError('report-checkout', e);
+      }
+      return json({ report_id: report.id, status });
+    }
 
     const amount = Math.round(Number(report.price) * 100);
     const base = linkBase(req.headers.get('origin'), appUrlFromEnv());

@@ -33,8 +33,9 @@
   margin: 4px 0 12px;
 }
 
-.offerChips {
+/* An offer card: the switch, then (when on) the percent, the last day, the services or the days. */
+.offer {
   display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
+  flex-direction: column;
+  gap: 14px;
 }

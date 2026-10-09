@@ -118,7 +118,22 @@ export type Database = {
           notified_at?: string | null
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "area_waitlist_area_fkey"
+            columns: ["area"]
+            isOneToOne: false
+            referencedRelation: "service_areas"
+            referencedColumns: ["code"]
+          },
+          {
+            foreignKeyName: "area_waitlist_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       bookings: {
         Row: {
@@ -150,6 +165,7 @@ export type Database = {
           loyalty_percent: number | null
           note: string | null
           odometer: number | null
+          offer_kind: string | null
           offer_percent: number | null
           ref: string
           reminder_sent_at: string | null
@@ -194,6 +210,7 @@ export type Database = {
           loyalty_percent?: number | null
           note?: string | null
           odometer?: number | null
+          offer_kind?: string | null
           offer_percent?: number | null
           ref?: string
           reminder_sent_at?: string | null
@@ -238,6 +255,7 @@ export type Database = {
           loyalty_percent?: number | null
           note?: string | null
           odometer?: number | null
+          offer_kind?: string | null
           offer_percent?: number | null
           ref?: string
           reminder_sent_at?: string | null
@@ -350,6 +368,64 @@ export type Database = {
           {
             foreignKeyName: "cars_owner_id_fkey"
             columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      client_referrals: {
+        Row: {
+          booking_id: string | null
+          client_id: string
+          code: string
+          created_at: string
+          decided_at: string | null
+          fingerprints: string[]
+          referrer_id: string | null
+          refused_reason: string | null
+          status: string
+        }
+        Insert: {
+          booking_id?: string | null
+          client_id: string
+          code: string
+          created_at?: string
+          decided_at?: string | null
+          fingerprints?: string[]
+          referrer_id?: string | null
+          refused_reason?: string | null
+          status?: string
+        }
+        Update: {
+          booking_id?: string | null
+          client_id?: string
+          code?: string
+          created_at?: string
+          decided_at?: string | null
+          fingerprints?: string[]
+          referrer_id?: string | null
+          refused_reason?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_referrals_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_referrals_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_referrals_referrer_id_fkey"
+            columns: ["referrer_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
@@ -1025,6 +1101,7 @@ export type Database = {
           id: number
           launch_price_ron: number
           launch_shops: number
+          launch_slots_per_city: number
           limits: Json
           notification_texts: Json
           period_discount_12: number
@@ -1052,6 +1129,7 @@ export type Database = {
           id?: number
           launch_price_ron?: number
           launch_shops?: number
+          launch_slots_per_city?: number
           limits?: Json
           notification_texts?: Json
           period_discount_12?: number
@@ -1079,6 +1157,7 @@ export type Database = {
           id?: number
           launch_price_ron?: number
           launch_shops?: number
+          launch_slots_per_city?: number
           limits?: Json
           notification_texts?: Json
           period_discount_12?: number
@@ -1348,6 +1427,55 @@ export type Database = {
           },
         ]
       }
+      report_credits: {
+        Row: {
+          client_id: string
+          created_at: string
+          id: string
+          referral_client_id: string | null
+          report_id: string | null
+          used_at: string | null
+        }
+        Insert: {
+          client_id: string
+          created_at?: string
+          id?: string
+          referral_client_id?: string | null
+          report_id?: string | null
+          used_at?: string | null
+        }
+        Update: {
+          client_id?: string
+          created_at?: string
+          id?: string
+          referral_client_id?: string | null
+          report_id?: string | null
+          used_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "report_credits_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "report_credits_referral_client_id_fkey"
+            columns: ["referral_client_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "report_credits_report_id_fkey"
+            columns: ["report_id"]
+            isOneToOne: true
+            referencedRelation: "history_reports"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       request_log: {
         Row: {
           created_at: string
@@ -1476,6 +1604,36 @@ export type Database = {
         Update: {
           id?: number
           version?: number
+        }
+        Relationships: []
+      }
+      service_areas: {
+        Row: {
+          anchors: Json
+          code: string
+          created_at: string
+          launched_at: string | null
+          mode: string
+          name_en: string
+          name_ro: string
+        }
+        Insert: {
+          anchors: Json
+          code: string
+          created_at?: string
+          launched_at?: string | null
+          mode?: string
+          name_en: string
+          name_ro: string
+        }
+        Update: {
+          anchors?: Json
+          code?: string
+          created_at?: string
+          launched_at?: string | null
+          mode?: string
+          name_en?: string
+          name_ro?: string
         }
         Relationships: []
       }
@@ -2152,9 +2310,9 @@ export type Database = {
       }
       shops: {
         Row: {
-          area: string | null
           active: boolean
           amenities: string[]
+          area: string | null
           auto_confirm: boolean
           billing_reminder_dismissed_at: string | null
           cancel_deadline_hours: number
@@ -2167,6 +2325,7 @@ export type Database = {
           daily_digest: boolean
           description: string | null
           facebook: string | null
+          founder: boolean
           hours_reviewed_at: string | null
           id: string
           inspection_fee: number
@@ -2181,10 +2340,14 @@ export type Database = {
           monthly_report: boolean
           name: string
           new_client_offer: number | null
+          new_client_offer_services: string[] | null
+          new_client_offer_until: string | null
           owner_id: string
           phone: string | null
           phone2: string | null
           postal_code: string | null
+          quiet_day_offer: number | null
+          quiet_days: number[]
           setup_completed_at: string | null
           slot_minutes: number
           sms_on_new_booking: boolean
@@ -2195,9 +2358,9 @@ export type Database = {
           year_established: number | null
         }
         Insert: {
-          area?: string | null
           active?: boolean
           amenities?: string[]
+          area?: string | null
           auto_confirm?: boolean
           billing_reminder_dismissed_at?: string | null
           cancel_deadline_hours?: number
@@ -2210,6 +2373,7 @@ export type Database = {
           daily_digest?: boolean
           description?: string | null
           facebook?: string | null
+          founder?: boolean
           hours_reviewed_at?: string | null
           id?: string
           inspection_fee?: number
@@ -2224,10 +2388,14 @@ export type Database = {
           monthly_report?: boolean
           name: string
           new_client_offer?: number | null
+          new_client_offer_services?: string[] | null
+          new_client_offer_until?: string | null
           owner_id: string
           phone?: string | null
           phone2?: string | null
           postal_code?: string | null
+          quiet_day_offer?: number | null
+          quiet_days?: number[]
           setup_completed_at?: string | null
           slot_minutes?: number
           sms_on_new_booking?: boolean
@@ -2238,9 +2406,9 @@ export type Database = {
           year_established?: number | null
         }
         Update: {
-          area?: string | null
           active?: boolean
           amenities?: string[]
+          area?: string | null
           auto_confirm?: boolean
           billing_reminder_dismissed_at?: string | null
           cancel_deadline_hours?: number
@@ -2253,6 +2421,7 @@ export type Database = {
           daily_digest?: boolean
           description?: string | null
           facebook?: string | null
+          founder?: boolean
           hours_reviewed_at?: string | null
           id?: string
           inspection_fee?: number
@@ -2267,10 +2436,14 @@ export type Database = {
           monthly_report?: boolean
           name?: string
           new_client_offer?: number | null
+          new_client_offer_services?: string[] | null
+          new_client_offer_until?: string | null
           owner_id?: string
           phone?: string | null
           phone2?: string | null
           postal_code?: string | null
+          quiet_day_offer?: number | null
+          quiet_days?: number[]
           setup_completed_at?: string | null
           slot_minutes?: number
           sms_on_new_booking?: boolean
@@ -2281,6 +2454,13 @@ export type Database = {
           year_established?: number | null
         }
         Relationships: [
+          {
+            foreignKeyName: "shops_area_fkey"
+            columns: ["area"]
+            isOneToOne: false
+            referencedRelation: "service_areas"
+            referencedColumns: ["code"]
+          },
           {
             foreignKeyName: "shops_owner_id_fkey"
             columns: ["owner_id"]
@@ -2602,6 +2782,7 @@ export type Database = {
           loyalty_percent: number | null
           note: string | null
           odometer: number | null
+          offer_kind: string | null
           offer_percent: number | null
           ref: string
           reminder_sent_at: string | null
@@ -2780,6 +2961,16 @@ export type Database = {
         Returns: Json
       }
       app_limit: { Args: { p_default: number; p_key: string }; Returns: number }
+      area_for_address: {
+        Args: { p_city: string; p_county: string; p_lat: number; p_lng: number }
+        Returns: string
+      }
+      area_for_point: {
+        Args: { p_lat: number; p_lng: number }
+        Returns: string
+      }
+      area_key: { Args: { p: string }; Returns: string }
+      area_live: { Args: { p_code: string }; Returns: boolean }
       audit_entries: {
         Args: { p_entity_ids: string[]; p_limit?: number }
         Returns: Json
@@ -2797,6 +2988,21 @@ export type Database = {
       booking_event_params: {
         Args: { p_booking: Database["public"]["Tables"]["bookings"]["Row"] }
         Returns: Json
+      }
+      booking_offer: {
+        Args: {
+          p_client_id: string
+          p_date: string
+          p_except?: string
+          p_plate_norm: string
+          p_services: string[]
+          p_shop_id: string
+          p_source: string
+        }
+        Returns: {
+          kind: string
+          percent: number
+        }[]
       }
       booking_thread: { Args: { p_booking_id: string }; Returns: string }
       bucharest_today: { Args: never; Returns: string }
@@ -2839,6 +3045,7 @@ export type Database = {
           loyalty_percent: number | null
           note: string | null
           odometer: number | null
+          offer_kind: string | null
           offer_percent: number | null
           ref: string
           reminder_sent_at: string | null
@@ -2870,6 +3077,7 @@ export type Database = {
         Args: { p_name_en: string; p_name_ro: string }
         Returns: string[]
       }
+      check_client_invite_code: { Args: { p_code: string }; Returns: boolean }
       check_phone_code: {
         Args: { p_code: string; p_request_id: string }
         Returns: Json
@@ -2885,6 +3093,7 @@ export type Database = {
         }
         Returns: undefined
       }
+      city_key: { Args: { p: string }; Returns: string }
       claim_booking: { Args: { p_token: string }; Returns: Json }
       claim_notifications: { Args: { p_limit?: number }; Returns: Json }
       clean_quote_items: {
@@ -2981,6 +3190,7 @@ export type Database = {
           loyalty_percent: number | null
           note: string | null
           odometer: number | null
+          offer_kind: string | null
           offer_percent: number | null
           ref: string
           reminder_sent_at: string | null
@@ -3034,6 +3244,7 @@ export type Database = {
           loyalty_percent: number | null
           note: string | null
           odometer: number | null
+          offer_kind: string | null
           offer_percent: number | null
           ref: string
           reminder_sent_at: string | null
@@ -3099,6 +3310,7 @@ export type Database = {
           loyalty_percent: number | null
           note: string | null
           odometer: number | null
+          offer_kind: string | null
           offer_percent: number | null
           ref: string
           reminder_sent_at: string | null
@@ -3183,6 +3395,7 @@ export type Database = {
           loyalty_percent: number | null
           note: string | null
           odometer: number | null
+          offer_kind: string | null
           offer_percent: number | null
           ref: string
           reminder_sent_at: string | null
@@ -3236,6 +3449,7 @@ export type Database = {
           loyalty_percent: number | null
           note: string | null
           odometer: number | null
+          offer_kind: string | null
           offer_percent: number | null
           ref: string
           reminder_sent_at: string | null
@@ -3276,6 +3490,8 @@ export type Database = {
       expire_quotes: { Args: never; Returns: number }
       expire_unanswered_requests: { Args: { p_now?: string }; Returns: number }
       export_my_data: { Args: never; Returns: Json }
+      export_my_data_base: { Args: never; Returns: Json }
+      export_my_data_t32: { Args: never; Returns: Json }
       fail: { Args: { p_code: string; p_params?: Json }; Returns: undefined }
       finish_history_report: {
         Args: { p_generated_at?: string; p_path: string; p_report_id: string }
@@ -3301,6 +3517,10 @@ export type Database = {
       get_shop_page: { Args: { p_shop_id: string }; Returns: Json }
       get_shop_setup: { Args: never; Returns: Json }
       get_staff_invite: { Args: { p_token: string }; Returns: Json }
+      grant_client_referral_credit: {
+        Args: { p_booking_id: string }
+        Returns: string
+      }
       grant_referral_reward: { Args: { p_shop_id: string }; Returns: undefined }
       history_report_for: {
         Args: { p_aal?: string; p_report_id: string; p_user_id: string }
@@ -3402,6 +3622,7 @@ export type Database = {
         Returns: number
       }
       last_seen: { Args: { p_user_id: string }; Returns: string }
+      launch_slots_left: { Args: { p_city: string }; Returns: number }
       leave_area_waitlist: { Args: { p_request_id: string }; Returns: Json }
       limit_range: { Args: { p_key: string }; Returns: unknown }
       link_imported: {
@@ -3470,6 +3691,7 @@ export type Database = {
           loyalty_percent: number | null
           note: string | null
           odometer: number | null
+          offer_kind: string | null
           offer_percent: number | null
           ref: string
           reminder_sent_at: string | null
@@ -3523,6 +3745,7 @@ export type Database = {
           loyalty_percent: number | null
           note: string | null
           odometer: number | null
+          offer_kind: string | null
           offer_percent: number | null
           ref: string
           reminder_sent_at: string | null
@@ -3585,6 +3808,7 @@ export type Database = {
           loyalty_percent: number | null
           note: string | null
           odometer: number | null
+          offer_kind: string | null
           offer_percent: number | null
           ref: string
           reminder_sent_at: string | null
@@ -3628,6 +3852,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      my_client_referrals: { Args: never; Returns: Json }
       my_imported_jobs: { Args: never; Returns: Json }
       my_phone_verification: { Args: never; Returns: Json }
       my_referrals: { Args: never; Returns: Json }
@@ -3642,6 +3867,10 @@ export type Database = {
       }
       next_history_report_code: { Args: never; Returns: string }
       normalize_code: { Args: { p: string }; Returns: string }
+      notify_area_launches: {
+        Args: { p_area?: string; p_now?: string }
+        Returns: number
+      }
       notify_shop: {
         Args: {
           p_booking_id: string
@@ -3714,6 +3943,11 @@ export type Database = {
         Args: { p_customer: string; p_invoice: Json }
         Returns: Json
       }
+      redeem_report_credit: {
+        Args: { p_report_id: string; p_user_id: string }
+        Returns: Json
+      }
+      referral_code_client: { Args: { p_code: string }; Returns: string }
       referral_code_shop: { Args: { p_code: string }; Returns: string }
       referral_credit_info: {
         Args: { p_referral_shop_id: string }
@@ -3769,6 +4003,7 @@ export type Database = {
           loyalty_percent: number | null
           note: string | null
           odometer: number | null
+          offer_kind: string | null
           offer_percent: number | null
           ref: string
           reminder_sent_at: string | null
@@ -4010,6 +4245,7 @@ export type Database = {
           loyalty_percent: number | null
           note: string | null
           odometer: number | null
+          offer_kind: string | null
           offer_percent: number | null
           ref: string
           reminder_sent_at: string | null
@@ -4043,6 +4279,7 @@ export type Database = {
       }
       run_hourly_jobs: { Args: { p_now?: string }; Returns: Json }
       run_quote_jobs: { Args: { p_now?: string }; Returns: Json }
+      same_person: { Args: { p_a: string; p_b: string }; Returns: boolean }
       save_native_push_token: {
         Args: { p_platform: string; p_token: string; p_user_agent?: string }
         Returns: undefined
@@ -4170,6 +4407,7 @@ export type Database = {
           loyalty_percent: number | null
           note: string | null
           odometer: number | null
+          offer_kind: string | null
           offer_percent: number | null
           ref: string
           reminder_sent_at: string | null
@@ -4257,6 +4495,7 @@ export type Database = {
           loyalty_percent: number | null
           note: string | null
           odometer: number | null
+          offer_kind: string | null
           offer_percent: number | null
           ref: string
           reminder_sent_at: string | null
@@ -4326,6 +4565,7 @@ export type Database = {
           loyalty_percent: number | null
           note: string | null
           odometer: number | null
+          offer_kind: string | null
           offer_percent: number | null
           ref: string
           reminder_sent_at: string | null
@@ -4393,6 +4633,7 @@ export type Database = {
           loyalty_percent: number | null
           note: string | null
           odometer: number | null
+          offer_kind: string | null
           offer_percent: number | null
           ref: string
           reminder_sent_at: string | null
@@ -4451,6 +4692,7 @@ export type Database = {
           loyalty_percent: number | null
           note: string | null
           odometer: number | null
+          offer_kind: string | null
           offer_percent: number | null
           ref: string
           reminder_sent_at: string | null
@@ -4542,6 +4784,7 @@ export type Database = {
         Args: { p_month: string; p_shop_id: string }
         Returns: Json
       }
+      shop_offers: { Args: { p_shop_ids: string[] }; Returns: Json }
       shop_reports: { Args: never; Returns: Json }
       shop_response_badge: { Args: { p_shop_id: string }; Returns: string }
       shop_seat_count: { Args: { p_shop_id: string }; Returns: number }
@@ -4582,6 +4825,7 @@ export type Database = {
           loyalty_percent: number | null
           note: string | null
           odometer: number | null
+          offer_kind: string | null
           offer_percent: number | null
           ref: string
           reminder_sent_at: string | null
@@ -4635,6 +4879,7 @@ export type Database = {
           loyalty_percent: number | null
           note: string | null
           odometer: number | null
+          offer_kind: string | null
           offer_percent: number | null
           ref: string
           reminder_sent_at: string | null
@@ -4805,6 +5050,7 @@ export type Database = {
           loyalty_percent: number | null
           note: string | null
           odometer: number | null
+          offer_kind: string | null
           offer_percent: number | null
           ref: string
           reminder_sent_at: string | null

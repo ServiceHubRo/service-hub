@@ -1,0 +1,81 @@
+.row {
+  position: relative; /* keeps the hidden input inside the row: focusing it never scrolls the page away */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  min-height: var(--tap);
+  cursor: pointer;
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.label {
+  font-weight: 600;
+}
+
+.hint {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.input {
+  position: absolute;
+  top: 0;
+  right: 0;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+}
+
+.track {
+  position: relative;
+  flex-shrink: 0;
+  width: 48px;
+  height: 28px;
+  border-radius: 999px;
+  background: var(--surface2);
+  border: 1.5px solid var(--border-lit);
+  transition: background-color 0.15s, border-color 0.15s;
+}
+
+.thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 19px;
+  height: 19px;
+  border-radius: 50%;
+  background: var(--muted);
+  transition: transform 0.15s, background-color 0.15s;
+}
+
+.input:checked + .track {
+  background: var(--amber);
+  border-color: var(--amber);
+}
+
+.input:checked + .track .thumb {
+  transform: translateX(20px);
+  background: var(--ink);
+}
+
+.input:focus-visible + .track {
+  box-shadow: var(--focus-ring);
+}
+
+.input:disabled + .track {
+  opacity: 0.45;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .track,
+  .thumb {
+    transition: none;
+  }
+}

@@ -8,7 +8,7 @@ import { Field } from '../../components/Field';
 import { PasswordField } from '../../components/PasswordField';
 import { PhoneField } from '../../components/PhoneField';
 import { AuthFailure, authErrorMessage, isRetryable, signUp } from '../../data/auth';
-import { checkReferralCode } from '../../data/referrals';
+import { checkClientInviteCode, checkReferralCode } from '../../data/referrals';
 import { useI18n } from '../../i18n/context';
 import { recordEmailSent } from '../../lib/cooldown';
 import { TERMS_VERSION, type LegalDocId } from '../../lib/legal';
@@ -45,7 +45,8 @@ const CITY_SUGGESTIONS = [
 
 /**
  * P4b sign-up: role cards, name, shop name + city (shops), phone, email, password twice, terms.
- * A new shop can also give another shop's referral code (optional; filled in from a referral link).
+ * A new shop can also give another shop's referral code (optional; filled in from a referral link);
+ * a new client, a friend's invitation code (T35, `?rol=client&cod=C-00042`).
  */
 export function SignUpForm({
   email,
@@ -62,7 +63,7 @@ export function SignUpForm({
   invite?: { token: string; email: string };
   /** Chosen before arriving ("Sunt client" / "Sunt service" on the landing page); still changeable. */
   initialRole?: SignUpRole;
-  /** From a referral link (`?cod=S-00042`); still editable. */
+  /** From a referral link (`?cod=S-00042`) or a client's invitation (`?cod=C-00042`); still editable. */
   initialReferral?: string;
 }) {
   const { t, lang } = useI18n();
@@ -103,8 +104,8 @@ export function SignUpForm({
     setErrors(next);
     setAttempt((a) => a + 1);
     if (Object.keys(next).length > 0 || !role) return;
-    const referralCode = role === 'shop' && !invite ? referral.trim() : '';
-    if (referralCode && !(await checkReferralCode(referralCode))) {
+    const referralCode = !invite ? referral.trim() : '';
+    if (referralCode && !(await (role === 'shop' ? checkReferralCode(referralCode) : checkClientInviteCode(referralCode)))) {
       setErrors({ referral: t('auth.error.referralInvalid') });
       setAttempt((a) => a + 1);
       return;
@@ -197,7 +198,6 @@ export function SignUpForm({
       />
       {role === 'shop' && !invite && (
         <>
-          <LaunchOfferNote />
           <Field
             label={t('auth.shopName')}
             autoComplete="organization"
@@ -226,6 +226,8 @@ export function SignUpForm({
               <option key={c} value={c} />
             ))}
           </datalist>
+          {/* Under the city: the same note for every city (Eduard, 9 Oct: the places are the admin's business). */}
+          <LaunchOfferNote />
           <Field
             label={t('auth.referral')}
             hint={t('auth.referralHint')}
@@ -293,6 +295,24 @@ export function SignUpForm({
         }}
         error={errors.confirm}
       />
+      {role === 'client' && (
+        <Field
+          label={t('auth.invite')}
+          hint={t('auth.inviteHint')}
+          autoComplete="off"
+          autoCapitalize="characters"
+          spellCheck={false}
+          mono
+          upper
+          maxLength={16}
+          value={referral}
+          onChange={(e) => {
+            setReferral(e.target.value.toUpperCase());
+            clear('referral');
+          }}
+          error={errors.referral}
+        />
+      )}
       <div id="signup-terms">
         <Checkbox
           checked={terms}

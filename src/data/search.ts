@@ -1,6 +1,7 @@
-import { call, failure, fetchNewClientOffers, fetchSearchExtras, RpcError, type FreePlace, type ResponseBadge } from './rpc';
+import { call, failure, fetchFounders, fetchSearchExtras, fetchShopOffers, RpcError, type FreePlace, type ResponseBadge } from './rpc';
 import { supabase } from './supabase';
 import type { DayHours } from '../lib/hours';
+import { NO_OFFERS, type ShopOffers } from '../lib/offers';
 
 /**
  * Client search and the shop page (FR §3.1, §3.2; T06). Search itself is `searchShops()` in rpc.ts;
@@ -105,6 +106,10 @@ export interface ShopPage {
   reviews: ShopPageReview[];
   /** The discount on labor the caller would get on a first booking here (T23); null without one. */
   offer: number | null;
+  /** Every offer at the shop (Eduard, 8 Oct); filled in by fetchShopPage. */
+  offers: ShopOffers;
+  /** Partener fondator (signed up at the launch price); filled in by fetchShopPage. */
+  founder: boolean;
   /** The first free place on the day asked, else within the next 14 days (T28a); null when none. */
   free: FreePlace | null;
   /** How quickly the shop usually answers (T28b). */
@@ -115,13 +120,16 @@ export interface ShopPage {
 
 /** Everything the shop page shows, public columns only (get_shop_page); `day` for its free place. */
 export async function fetchShopPage(shopId: string, day?: string | null): Promise<ShopPage> {
-  const [read, offers, extras] = await Promise.all([
+  const [read, offers, extras, founders] = await Promise.all([
     call('get_shop_page', { p_shop_id: shopId }),
-    fetchNewClientOffers([shopId]).catch(() => new Map<string, number>()),
+    fetchShopOffers([shopId]).catch(() => new Map<string, ShopOffers>()),
     fetchSearchExtras([shopId], day ?? undefined).catch(() => null),
+    fetchFounders([shopId]).catch(() => new Set<string>()),
   ]);
   const page = read as unknown as ShopPage;
-  page.offer = offers.get(shopId) ?? null;
+  page.offer = offers.get(shopId)?.newClient?.percent ?? null;
+  page.offers = offers.get(shopId) ?? NO_OFFERS;
+  page.founder = founders.has(shopId);
   page.free = extras?.get(shopId)?.free ?? null;
   // numeric columns arrive as numbers from jsonb; keep them numbers even if a driver sends text.
   page.shop.inspection_fee = Number(page.shop.inspection_fee);

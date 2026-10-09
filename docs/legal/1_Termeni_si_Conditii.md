@@ -1,6 +1,6 @@
 # Termeni și condiții — Service-Hub
 
-**Ultima actualizare:** 4 octombrie 2026
+**Ultima actualizare:** 8 octombrie 2026
 
 Acești termeni („Termenii”) se aplică folosirii Service-Hub: site-ul și aplicația de la adresa service-hub.ro („Platforma”). Când îți faci cont, confirmi că i-ai citit și că ești de acord cu ei. Cum folosim datele tale scrie în Politica de confidențialitate, iar ce păstrăm în browser, în Politica de cookies.
 
@@ -56,7 +56,7 @@ Service-urile apar în ordinea notei ponderate din recenzii: media stelelor, câ
 - Fiecare Service își stabilește programul, câte mașini primește pe zi și la aceeași oră, cu cât timp înainte se poate programa și până când poți anula. Platforma respectă automat aceste limite.
 - Ca să nu fie blocate locurile, există limite rezonabile pentru programările active și pentru cererile noi pe zi. Dacă ajungi la o limită, aplicația îți spune.
 - La trimitere, Service-ul primește numele, telefonul și limba ta, datele mașinii (marcă, model, an, număr, serie de șasiu dacă ai trecut-o) și nota ta. Dacă modifici sau ștergi mai târziu mașina din Garaj, programarea păstrează datele de la momentul trimiterii.
-- Unele Service-uri oferă o reducere la manoperă clienților noi, la prima programare acolo. Reducerea pe care o ai la trimitere rămâne trecută pe programare, iar Service-ul o scade din manoperă în deviz. Platforma nu plătește și nu încasează nimic din aceste reduceri.
+- Unele Service-uri oferă o reducere la manoperă clienților noi, la prima programare acolo (eventual doar pentru anumite servicii și până la o dată afișată), sau o reducere la programările făcute în aplicație în anumite zile ale săptămânii. Reducerile nu se cumulează: se aplică cea mai mare, de cel mult 15%. Reducerea pe care o ai la trimitere rămâne trecută pe programare, chiar dacă programarea este mutată, iar Service-ul o scade din manoperă în deviz. Platforma nu plătește și nu încasează nimic din aceste reduceri.
 
 ### 3.3 Anularea și neprezentarea
 
@@ -86,6 +86,14 @@ Datele de expirare pentru ITP, RCA și rovinietă sunt opționale. Alertele (cu 
 - Un raport este o fotografie la data plății. Pentru lucrări făcute mai târziu faci un raport nou. Putem anula un raport făcut prin fraudă sau din date greșite; în acest caz nu se mai poate descărca, iar verificarea arată „Raport anulat”.
 - Raportul plătit este separat de exportul gratuit al datelor tale (Cont → Datele mele), care rămâne mereu gratuit și complet.
 
+### 3.6a Invită un prieten
+
+- **Codul tău** de invitare este numărul contului tău (de forma C-00042). Îl găsești în Cont → Invită un prieten, cu un link de înscriere pe care îl poți trimite (de exemplu pe WhatsApp). Prietenul scrie codul la înscriere sau se înscrie din link; codul se poate da doar la înscriere.
+- **Raportul gratuit:** când un service termină prima lucrare a prietenului, programată prin Platformă și cu un cost mai mare de 0, primești un raport oficial de istoric gratuit (secțiunea 3.6), pe care îl folosești pentru oricare mașină a ta cu lucrări finalizate. Raportul gratuit se face imediat, fără plată, și este identic cu unul plătit (cod, verificare, descărcare).
+- **Limite:** un singur raport gratuit pentru fiecare prieten (aceeași persoană, după email sau telefon, aduce un singur raport, oricine ar fi invitat-o) și cel mult 3 rapoarte gratuite în 365 de zile pentru un cont (numărul îl poate schimba echipa Service-Hub, anunțat în aplicație). Nu se acordă pentru un cont al aceleiași persoane (același email sau telefon), nici când lucrarea este finalizată de un service al tău, nici dacă între timp contul tău a fost șters sau suspendat.
+- **Ce vezi:** câți prieteni s-au înscris cu codul tău și câte rapoarte gratuite ai primit; nimic despre prietenii tăi.
+- Raportul gratuit nu se transformă în bani, puncte sau reduceri și nu se transferă. Putem schimba sau opri programul pentru invitațiile viitoare, anunțat în aplicație; rapoartele gratuite deja primite rămân.
+
 ### 3.7 Recenziile
 
 - Poți lăsa o recenzie (1–5 stele și, opțional, un text) doar pentru o lucrare finalizată, o singură dată pe programare, în cel mult 60 de zile de la finalizare. După trimitere, recenzia nu se mai poate modifica.
@@ -114,7 +122,7 @@ Un Service se înscrie de proprietarul sau reprezentantul unei afaceri autorizat
 
 - Răspundeți la cereri cât mai repede: confirmați, refuzați sau mutați. O cerere rămasă fără răspuns până la ora programării se închide automat, iar clientul este anunțat.
 - Puteți activa confirmarea instantă: cererile pentru locurile libere se confirmă atunci automat, iar o programare confirmată astfel vă obligă la fel ca una confirmată de voi. Clienții cu o neprezentare în ultimele 90 de zile trimit în continuare o cerere.
-- Puteți promite o reducere la manoperă clienților noi, la prima lor programare la voi. Reducerea valabilă la trimiterea cererii rămâne trecută pe programare și o scădeți din manoperă în deviz, chiar dacă între timp o schimbați. Reducerile nu schimbă ordinea din căutare, iar Platforma nu plătește și nu încasează nimic din ele.
+- Puteți promite o reducere la manoperă clienților noi, la prima lor programare la voi, pentru toate serviciile sau doar pentru unele, cu o dată de sfârșit opțională, și o reducere la programările făcute de clienți în aplicație în zilele săptămânii pe care le alegeți. Reducerile nu se cumulează: se aplică cea mai mare, de cel mult 15%. Reducerea valabilă la trimiterea cererii rămâne trecută pe programare și o scădeți din manoperă în deviz, chiar dacă între timp o schimbați sau mutați programarea. Doar titularul contului de Service poate seta reducerile. Reducerile nu schimbă ordinea din căutare, iar Platforma nu plătește și nu încasează nimic din ele.
 - Actualizați programările după ora lor (în constatare sau neprezentat). O programare confirmată care rămâne neactualizată 7 zile după data ei se încheie automat, fără să fie trecută ca neprezentare.
 - Puteți adăuga programări pentru clienții care vă sună sau vin direct și nu au cont. Treceți doar datele pe care vi le dă clientul și trimiteți SMS-ul cu linkul doar dacă este de acord. Răspunsul la deviz îl treceți doar după ce clientul vi l-a dat. Neprezentările la aceste programări nu se numără la client, iar recenziile lor sunt verificate de echipa Service-Hub.
 - Puteți importa clienții, mașinile și lucrările din programul folosit înainte. Importați doar datele clienților voștri, pe care le aveți legal. Platforma le păstrează pentru voi, nu le arată nimănui altcuiva și nu trimite nimic clienților importați. Lucrările importate nu intră în rapoartele de istoric cumpărate de clienți. Un client cu cont și același număr de telefon confirmat vede mașinile și lucrările importate pentru el. Linkul și codul QR ale service-ului le trimiteți voi clienților voștri; Platforma nu le trimite în numele vostru.
@@ -130,7 +138,7 @@ Proprietarul poate invita colegi, fiecare cu contul lui (colegii nu folosesc con
 ### 4.5 Abonamentul
 
 - **Prețul:** cel afișat pe service-hub.ro când te înscrii. Acum: 149 lei pe lună, cu primul coleg care și-a făcut contul în service inclus, plus 19 lei pe lună pentru fiecare coleg în plus. Invitația nu costă. Prețul se fixează la înscriere și este afișat în ecranul Abonament.
-- **Prețul de lansare:** primele 50 de service-uri înscrise plătesc 99 lei pe lună în loc de 149 și îl păstrează cât timp au abonamentul.
+- **Prețul de lansare:** în fiecare oraș, primele service-uri înscrise, într-un număr de locuri stabilit de Service-Hub, plătesc 99 lei pe lună în loc de 149 și îl păstrează cât timp au abonamentul. Orașul este cel declarat la înscriere (fără deosebire de diacritice sau majuscule). După ocuparea locurilor dintr-un oraș, service-urile noi de acolo plătesc prețul standard. Service-urile care plătesc prețul de lansare apar cu mențiunea „Partener fondator”; mențiunea nu influențează ordinea din căutare.
 - **Plata pe mai multe luni:** în loc de lunar, poți plăti o dată la 3, 6 sau 12 luni, cu reducerea afișată în ecranul Abonament când alegi (acum 5%, 10%, respectiv 15%), rotunjit la leu. Reducerea se aplică și prețului de lansare și colegilor plătiți și se păstrează la fiecare reînnoire a aceleiași perioade.
 - **TVA:** cât timp {{company}} nu este plătitoare de TVA, nu se adaugă TVA. Dacă devine, TVA-ul se adaugă la preț, iar schimbarea ți-o anunțăm cu cel puțin 30 de zile înainte.
 - **Perioada gratuită:** 90 de zile de la înscriere, cu colegi cu tot. Fără card nu plătești nimic. Dacă adaugi cardul în perioada gratuită, prima plată are loc la sfârșitul ei.

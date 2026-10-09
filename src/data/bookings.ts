@@ -55,6 +55,7 @@ export interface ClientBooking {
   extra_service_ids: string[];
   /** The new-client discount on labor this booking was promised (T23). */
   offer_percent: number | null;
+  offer_kind: string | null;
   /** The loyalty discount promised (T28c), and at which level. */
   loyalty_percent: number | null;
   loyalty_level: number | null;
@@ -74,7 +75,7 @@ export interface ClientBookingsData {
 }
 
 const COLUMNS = [
-  'id, ref, status, date, slot, note, car_id, car_snapshot, created_at, shop_id, service_id, extra_service_ids, offer_percent, loyalty_percent, loyalty_level, share_history',
+  'id, ref, status, date, slot, note, car_id, car_snapshot, created_at, shop_id, service_id, extra_service_ids, offer_percent, offer_kind, loyalty_percent, loyalty_level, share_history',
   'inspection_started_at, started_at, done_at, odometer, work, cost, cancelled_by, cancel_reason, decline_reason, closed_reason',
   'shop:shops(name, city, phone, cancel_deadline_hours, street, latitude, longitude, slot_minutes)',
   'service:services(name_ro, name_en, icon, category_key)',

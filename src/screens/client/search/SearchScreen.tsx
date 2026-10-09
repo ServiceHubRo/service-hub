@@ -1,4 +1,4 @@
-import { CalendarDays, Heart, List, Map as MapIcon, SearchX, Zap } from 'lucide-react';
+import { BadgePercent, CalendarDays, Heart, List, Map as MapIcon, SearchX, Zap } from 'lucide-react';
 import { lazy, Suspense, useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '../../../components/Button';
@@ -17,6 +17,7 @@ import type { MessageKey } from '../../../i18n/ro';
 import { plural } from '../../../i18n/translate';
 import { AMENITIES, AMENITY_ICONS, isAmenity } from '../../../lib/amenities';
 import { resolveDay } from '../../../lib/freePlace';
+import { hasOffer } from '../../../lib/offers';
 import { distanceTo, nearby, sortByDistance } from '../../../lib/geo';
 import { useLocation } from '../../../lib/location';
 import { cityNamedBy, fold } from '../../../lib/text';
@@ -54,7 +55,7 @@ const cache = new Map<string, ShopSearchResult[]>();
  * instant confirmation, favorites, category, city, facilities, order) sits in the "Filtre" panel,
  * and what is on shows above the list with its own ✕; "Aproape de tine" when the client shares their location. The order is the weighted
  * rating from the database — filters only narrow it, distance is a separate section and sort.
- * The filters live in the address (?q=&cat=&oras=&fav=1&sort=aproape&zi=&instant=1&fac=), so Back restores
+ * The filters live in the address (?q=&cat=&oras=&fav=1&sort=aproape&zi=&instant=1&oferta=1&fac=), so Back restores
  * them. A day (T28a: azi, maine or a date) keeps only shops with a free place that day; "Confirmare
  * instantă" only shops that confirm at once — both narrow, neither reorders.
  */
@@ -72,6 +73,8 @@ export function SearchScreen() {
   const dayParam = params.get('zi');
   const day = resolveDay(dayParam);
   const instantOnly = params.get('instant') === '1';
+  /** Only shops with an offer (Eduard, 8 Oct): narrows, never reorders. */
+  const offerOnly = params.get('oferta') === '1';
   /** Facilities asked for (T28b): a shop shows only with every one of them. */
   const facParam = params.get('fac') ?? '';
   const wanted = useMemo(() => facParam.split(',').filter(isAmenity), [facParam]);
@@ -170,13 +173,17 @@ export function SearchScreen() {
   const list = useMemo(() => {
     const all = results?.data ?? [];
     const narrowed = all.filter(
-      (s) => (!favOnly || s.is_favorite) && (!instantOnly || s.auto_confirm) && wanted.every((a) => s.amenities.includes(a)),
+      (s) =>
+        (!favOnly || s.is_favorite) &&
+        (!instantOnly || s.auto_confirm) &&
+        (!offerOnly || hasOffer(s.offers)) &&
+        wanted.every((a) => s.amenities.includes(a)),
     );
     return byDistance && coords ? sortByDistance(narrowed, distance) : narrowed;
-  }, [results, favOnly, instantOnly, wanted, byDistance, coords, distance]);
+  }, [results, favOnly, instantOnly, offerOnly, wanted, byDistance, coords, distance]);
   const near = useMemo(() => (coords && !byDistance ? nearby(list, distance) : []), [coords, byDistance, list, distance]);
 
-  const filtersOn = Boolean(category || city || favOnly || day || instantOnly || wanted.length > 0);
+  const filtersOn = Boolean(category || city || favOnly || day || instantOnly || offerOnly || wanted.length > 0);
   const [explainOpen, setExplainOpen] = useState(false);
   const explainId = useId();
   // What is typed right now, even if the address has not caught up yet (a result tapped quickly).
@@ -188,7 +195,7 @@ export function SearchScreen() {
   function clearFilters() {
     autoCity.current = null;
     setPickDay(false);
-    setParam({ cat: null, oras: null, fav: null, zi: null, instant: null, fac: null });
+    setParam({ cat: null, oras: null, fav: null, zi: null, instant: null, oferta: null, fac: null });
   }
 
   function clearQuery() {
@@ -217,6 +224,7 @@ export function SearchScreen() {
     });
   }
   if (instantOnly) active.push({ key: 'instant', label: t('instant.badge') });
+  if (offerOnly) active.push({ key: 'oferta', label: t('search.withOffer') });
   if (favOnly) active.push({ key: 'fav', label: t('search.favorites') });
   if (category && categoryName) active.push({ key: 'cat', label: categoryName });
   if (city) active.push({ key: 'oras', label: cityName });
@@ -334,6 +342,10 @@ export function SearchScreen() {
               <Chip selected={instantOnly} onClick={() => setParam({ instant: instantOnly ? null : '1' })}>
                 <Zap size={14} aria-hidden="true" />
                 {t('instant.badge')}
+              </Chip>
+              <Chip selected={offerOnly} onClick={() => setParam({ oferta: offerOnly ? null : '1' })}>
+                <BadgePercent size={14} aria-hidden="true" />
+                {t('search.withOffer')}
               </Chip>
               <Chip selected={favOnly} onClick={() => setParam({ fav: favOnly ? null : '1' })}>
                 <Heart size={14} aria-hidden="true" className={favOnly ? styles.heartOn : undefined} />

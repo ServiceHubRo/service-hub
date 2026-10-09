@@ -1,6 +1,6 @@
 # Terms and Conditions — Service-Hub
 
-**Last updated:** October 4, 2026
+**Last updated:** October 8, 2026
 
 These terms (the “Terms”) apply to your use of Service-Hub: the website and app at service-hub.ro (the “Platform”). By creating an account, you confirm that you have read and agree to them. How we use your data is described in the Privacy Policy, and what we keep in your browser in the Cookie Policy.
 
@@ -56,7 +56,7 @@ Search only shows Shops with a confirmed email and phone, at least one service s
 - Each Shop sets its own hours, how many cars it takes per day and at the same time, how far in advance you can book and until when you can cancel. The Platform enforces these limits automatically.
 - So that slots are not blocked, there are reasonable limits on active bookings and on new requests per day. If you reach a limit, the app tells you.
 - When you book, the Shop receives your name, phone and language, the car details (make, model, year, license plate, VIN if you entered it) and your note. If you later edit or delete the car in your Garage, the booking keeps the details from the moment it was made.
-- Some Shops give a discount on labor to new customers, on their first booking there. The discount you have when you book stays noted on the booking, and the Shop takes it off labor in the quote. The Platform neither pays nor collects anything for these discounts.
+- Some Shops give a discount on labor to new customers, on their first booking there (possibly only for some services and until a date shown), or a discount on bookings made in the app on certain days of the week. Discounts do not add up: the larger one applies, at most 15%. The discount you have when you book stays noted on the booking, even if the booking is moved, and the Shop takes it off labor in the quote. The Platform neither pays nor collects anything for these discounts.
 
 ### 3.3 Canceling and no-shows
 
@@ -86,6 +86,14 @@ Expiry dates for ITP, RCA and the vignette are optional. The alerts (30 days bef
 - A report is a snapshot as of the payment date. For later work, you get a new report. We may cancel a report obtained by fraud or made from wrong data; it can then no longer be downloaded, and the verification page shows “Canceled report.”
 - The paid report is separate from the free export of your data (Account → My data), which always stays free and complete.
 
+### 3.6a Invite a friend
+
+- **Your invitation code** is your account number (like C-00042). You find it in Account → Invite a friend, with a sign-up link you can send (for example on WhatsApp). Your friend enters the code when signing up or signs up from the link; the code can only be given at sign-up.
+- **The free report:** when a shop finishes your friend's first job, booked through the Platform and costing more than 0, you get one free official history report (section 3.6), which you can use for any of your cars with completed jobs. The free report is made right away, without payment, and is the same as a paid one (code, verification, download).
+- **Limits:** one free report per friend (the same person, by email or phone, brings only one report, whoever invited them) and at most 3 free reports in 365 days per account (the Service-Hub team may change this number, announced in the app). None is given for an account of the same person (same email or phone), when the job is finished by your own shop, or if your account has meanwhile been deleted or suspended.
+- **What you see:** how many friends signed up with your code and how many free reports you received; nothing about your friends.
+- A free report cannot be turned into money, points or discounts and cannot be transferred. We may change or stop the program for future invitations, announced in the app; free reports already received stay.
+
 ### 3.7 Reviews
 
 - You can leave a review (1–5 stars and optional text) only for a completed job, once per booking, within 60 days of completion. Once sent, a review can no longer be changed.
@@ -114,7 +122,7 @@ A Shop is listed by the owner or representative of a business authorized to prov
 
 - Answer requests promptly: confirm, decline or reschedule. A request still unanswered at the booking time closes automatically, and the customer is notified.
 - You can turn on instant confirmation: requests for free slots are then confirmed automatically, and a booking confirmed this way binds you just like one you confirmed yourself. Customers with a no-show in the last 90 days still send a request.
-- You can promise a discount on labor to new customers, on their first booking with you. The discount in effect when the request is sent stays noted on the booking, and you take it off labor in the quote, even if you have changed it since. Discounts do not change the order in search, and the Platform neither pays nor collects anything for them.
+- You can promise a discount on labor to new customers, on their first booking with you, for all services or only some, with an optional end date, and a discount on bookings customers make in the app on the days of the week you choose. Discounts do not add up: the larger one applies, at most 15%. The discount in effect when the request is sent stays noted on the booking, and you take it off labor in the quote, even if you have changed it or moved the booking since. Only the Shop account holder can set discounts. Discounts do not change the order in search, and the Platform neither pays nor collects anything for them.
 - Update bookings after their time (inspection started or no-show). A confirmed booking left without an update for 7 days after its date closes automatically, without being recorded as a no-show.
 - You can add bookings for customers who call you or walk in without an account. Enter only the details the customer gives you, and send the text with the link only if they agree. Record the answer to a quote only once the customer has given it to you. No-shows at these bookings do not count against the customer, and their reviews are checked by the Service-Hub team.
 - You can import your customers, cars and jobs from the program you used before. Import only your own customers' data, which you hold lawfully. The Platform keeps it for you, shows it to no one else and sends nothing to imported customers. Imported jobs are not part of the history reports customers buy. A customer with an account and the same confirmed phone number sees the cars and jobs imported for them. You send your shop's link and QR code to your customers yourselves; the Platform does not send them on your behalf.
@@ -130,7 +138,7 @@ The owner may invite colleagues, each with their own account (colleagues do not 
 ### 4.5 Subscription
 
 - **Price:** the one shown on service-hub.ro when you sign up, **excluding VAT**. Currently: 149 RON per month, with the first colleague who has joined the shop with an account included, plus 19 RON per month for each additional colleague. Invitations are free. The price is fixed at sign-up and shown on the Subscription screen.
-- **Launch price:** the first 50 shops to sign up pay 99 RON per month instead of 149 and keep it for as long as they have the subscription.
+- **Launch price:** in each city, the first shops to sign up, up to a number of places set by Service-Hub, pay 99 RON per month instead of 149 and keep it for as long as they have the subscription. The city is the one given at sign-up (regardless of diacritics or capital letters). Once a city's places are taken, new shops there pay the standard price. Shops paying the launch price are shown as “Founding partner”; this never affects the order of search results.
 - **Paying for several months:** instead of monthly, you can pay every 3, 6 or 12 months, with the discount shown on the Subscription screen when you choose (currently 5%, 10% and 15%), rounded to the nearest RON. The discount also applies to the launch price and to paid colleagues, and is kept at every renewal of the same period.
 - **VAT:** as long as {{company}} is not registered for VAT, no VAT is added. If it becomes registered, VAT is added to the price, and we announce the change at least 30 days in advance.
 - **Free period:** 90 days from sign-up, colleagues included. Without a card you pay nothing. If you add a card during the free period, the first payment is at its end.
