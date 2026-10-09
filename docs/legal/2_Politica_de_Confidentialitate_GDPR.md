@@ -1,6 +1,6 @@
 # Politica de confidențialitate — Service-Hub
 
-**Ultima actualizare:** 4 octombrie 2026
+**Ultima actualizare:** 8 octombrie 2026
 
 Aici afli ce date personale folosește Service-Hub, de ce, cine le mai vede, cât timp le păstrăm și ce drepturi ai, conform Regulamentului (UE) 2016/679 („GDPR”) și legii române.
 
@@ -37,6 +37,7 @@ Aici afli ce date personale folosește Service-Hub, de ce, cine le mai vede, câ
 - **Devizele și lucrările:** pozițiile și prețurile, ce ai acceptat sau refuzat, lucrarea făcută, costul și **kilometrajul** trecut de service la finalizare.
 - **Recenziile** și **mesajele** tale; service-urile **favorite**.
 - **Rapoartele de istoric** cumpărate: codul, mașina, lucrările incluse, prețul, starea plății și fișierul PDF.
+- **Invitațiile** („Invită un prieten”): codul cu care te-ai înscris și contul care te-a invitat, amprentele criptate ale emailului și telefonului tău de la înscriere (secțiunea 5), dacă prima ta lucrare a adus un raport gratuit; pentru cine invită, rapoartele gratuite primite și folosite.
 - Numărul de **neprezentări** din ultimele 90 de zile (calculat din programări).
 - **Confirmarea telefonului**, doar dacă ți se cere (după 2 neprezentări în 90 de zile): codul trimis prin SMS este păstrat doar criptat și este valabil 10 minute.
 - **Preferințele:** cererea de recenzie, reminderele de revizie și de anvelope și ofertele service-urilor favorite (pornite sau oprite).
@@ -85,6 +86,7 @@ Aici afli ce date personale folosește Service-Hub, de ce, cine le mai vede, câ
 | Raportul lunii pentru service | Contractul cu tine; îl oprești din Setări → Notificări |
 | Arătarea lucrărilor făcute la mașina ta la alte service-uri către service-ul la care ai o programare (Fișa mașinii) | Acordul tău (lit. a): îl dai la programare sau din Programări și îl retragi oricând, tot din Programări |
 | Raportul oficial de istoric | Contractul cu tine |
+| „Invită un prieten”: legătura dintre contul tău și cel care te-a invitat, raportul gratuit și verificarea că nu este aceeași persoană (amprente criptate ale emailului și telefonului) | Contractul cu cel care invită (programul din Termeni, 3.6a) și interesul legitim (lit. f) ca programul să nu fie folosit abuziv |
 | Abonamentul, plățile, facturile și contabilitatea | Contractul și obligațiile legale (lit. c): Legea contabilității nr. 82/1991, Codul fiscal |
 | Recenziile publice și verificarea celor raportate | Interesul legitim (lit. f) ca recenziile să fie reale; obligațiile din Regulamentul (UE) 2022/2065 |
 | Limite împotriva abuzului, indicatorul de neprezentări, confirmarea telefonului după neprezentări, verificarea anti-robot, suspendări | Interesul legitim ca Platforma să fie corectă și sigură |
@@ -109,6 +111,7 @@ Aici afli ce date personale folosește Service-Hub, de ce, cine le mai vede, câ
 - **Recenziile** sunt publice pentru utilizatorii Platformei, cu prenumele și inițiala numelui (de exemplu „Andrei M.”).
 - **Codul unui raport de istoric:** oricine îl are vede marca, modelul și numărul mașinii, câte lucrări are raportul, perioada și data raportului.
 - **Profilul unui service** este public pentru utilizatorii Platformei; datele de facturare nu.
+- **Cine te-a invitat** vede doar câți prieteni s-au înscris cu codul lui și câte rapoarte gratuite a primit; nu vede numele, contul, programările sau lucrările tale.
 
 ### 4.2 Echipa Service-Hub
 
@@ -148,6 +151,7 @@ Dăm date autorităților doar când legea ne obligă (de exemplu, la o cerere a
 - **Copiile de siguranță:** datele șterse dispar și din ele în cel mult 30 de zile.
 - **Codurile de confirmare prin SMS:** valabile 10 minute; păstrate doar criptat.
 - **Amprentele emailului și telefonului** (nu adresa și numărul, ci un cod criptat din care nu se pot afla): pentru proprietarii de service, ca perioada gratuită să se acorde o singură dată aceleiași persoane și ca o recomandare către propriul service să nu aducă o lună gratuită, și pentru conturile sau service-urile suspendate, ca suspendarea să nu poată fi ocolită cu un cont nou. Un cont nou cu aceleași date nu primește a doua perioadă gratuită, respectiv este creat suspendat până când echipa Service-Hub verifică situația. Le păstrăm cât există contul și încă 3 ani după ștergerea lui; amprentele unei suspendări se șterg când suspendarea este ridicată.
+- **Invitațiile** („Invită un prieten”) și amprentele de la înscrierea prietenului invitat: cât există contul lui și încă 3 ani după ștergerea lui, ca aceeași persoană să nu aducă un al doilea raport gratuit. Rapoartele gratuite primite rămân în contul celui care a invitat cât există contul.
 - **Datele tehnice pentru evitarea dublei trimiteri** a unei acțiuni: 7 zile.
 - **Rapoartele de erori:** cel mult 90 de zile.
 - **Jurnalele de server** ale furnizorilor: perioade scurte, după regulile lor.

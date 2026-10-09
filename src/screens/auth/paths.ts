@@ -12,3 +12,8 @@ export const REFERRAL_CODE_PARAM = 'cod';
 export function referralSignUpPath(code: string): string {
   return `${signUpPath('shop')}&${REFERRAL_CODE_PARAM}=${encodeURIComponent(code)}`;
 }
+
+/** `/cont-nou?rol=client&cod=C-00042`: a client's invitation link (T35) fills in the code. */
+export function inviteSignUpPath(code: string): string {
+  return `${signUpPath('client')}&${REFERRAL_CODE_PARAM}=${encodeURIComponent(code)}`;
+}

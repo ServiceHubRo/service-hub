@@ -135,6 +135,10 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
       title: 'Anvelopele de vară',
       body: 'Este momentul pentru anvelopele de vară la {car}. Data trecută le-ai schimbat la {shop}; te poți programa din aplicație.',
     },
+    'client.report_credit': {
+      title: 'Ai primit un raport gratuit',
+      body: 'Un prieten invitat de tine a terminat prima lucrare. Ai un raport de istoric gratuit, pentru oricare mașină din Garaj.',
+    },
     'client.area_launched': {
       title: 'Service-Hub a ajuns și la tine',
       body: 'De azi te poți programa online la service-urile din {area}. Caută unul aproape de tine.',
@@ -399,6 +403,10 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
       title: 'Summer tires',
       body: 'Time for summer tires on your {car}. Last time you had them changed at {shop}; you can book in the app.',
     },
+    'client.report_credit': {
+      title: 'You got a free report',
+      body: 'A friend you invited finished their first job. You have a free history report for any car in your Garage.',
+    },
     'client.area_launched': {
       title: 'Service-Hub is now in your area',
       body: 'Starting today you can book shops in {area} online. Find one near you.',
@@ -656,7 +664,7 @@ export const EVENTS: Record<Side, readonly string[]> = {
     'no_show', 'inspection_started', 'quote_sent', 'quote_replaced', 'quote_withdrawn', 'quote_expiring', 'quote_expired',
     'work_started', 'job_done', 'appointment_reminder', 'new_message', 'review_reply', 'doc_expiry', 'report_ready',
     'review_report_decided', 'review_request', 'service_due', 'account_suspended', 'account_reactivated',
-    'tire_season', 'welcome', 'favorite_offer', 'request_expired', 'area_launched',
+    'tire_season', 'welcome', 'favorite_offer', 'request_expired', 'area_launched', 'report_credit',
   ],
   shop: [
     'booking_requested', 'booking_auto_confirmed', 'booking_cancelled_client', 'booking_cancelled_admin', 'quote_accepted',
@@ -870,6 +878,7 @@ export function urlFor(side: Side, e: NotificationEvent): string {
       case 'doc_expiry':
         return str(p.car_id) ? `/c/garaj/${str(p.car_id)}` : '/c/garaj';
       case 'report_ready':
+      case 'report_credit':
         return REPORTS_PATH;
       case 'account_suspended':
       case 'account_reactivated':
@@ -965,6 +974,7 @@ function tagFor(e: NotificationEvent): string {
     case 'tire_season':
     case 'welcome':
     case 'area_launched':
+    case 'report_credit':
       return e.event;
     case 'favorite_offer':
       return `offer-${str(p.shop_id)}`;

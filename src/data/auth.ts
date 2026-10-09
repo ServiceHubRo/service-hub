@@ -163,7 +163,7 @@ export interface SignUpInput {
   city?: string;
   /** Sign-up through a staff invitation link: the account joins that shop (handle_new_user). */
   inviteToken?: string;
-  /** Another shop's referral code (a new shop only), checked before with checkReferralCode. */
+  /** Another shop's referral code (a new shop) or a client's invitation code (a new client, T35), checked before. */
   referralCode?: string;
   captchaToken?: string;
 }
@@ -187,7 +187,7 @@ export async function signUp(input: SignUpInput): Promise<'confirm_email' | 'sig
           terms_version: input.termsVersion,
           ...(input.role === 'shop' && !input.inviteToken ? { shop_name: input.shopName?.trim(), city: input.city?.trim() } : {}),
           ...(input.inviteToken ? { invite_token: input.inviteToken } : {}),
-          ...(input.role === 'shop' && !input.inviteToken && input.referralCode ? { referral_code: input.referralCode } : {}),
+          ...(!input.inviteToken && input.referralCode ? { referral_code: input.referralCode } : {}),
         },
       },
     }),

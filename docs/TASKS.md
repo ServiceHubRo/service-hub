@@ -933,3 +933,17 @@ Migrarea `launch_per_city` (`schema_version` = 66). Termenii RO/EN §4.5 actuali
 **Căutare:** filtrul „Doar cu ofertă” (în Filtre) arată doar service-urile cu o ofertă; ordinea rămâne aceeași.
 
 Migrarea `offers` (`schema_version` = 67). Termenii RO/EN §3 și §4.3 actualizați, `TERMS_VERSION` = `2026-10-08.2`. Teste: `tests/sql/118_offers.sql`, `tests/e2e/offers-more.spec.ts`, `tests/unit/offers.test.ts`. Fără pachete noi.
+
+## T35 — Invită un prieten ✅
+
+**Cardul (Cont, client):** „Invită un prieten” cu codul clientului (C-00042), linkul `/cont-nou?rol=client&cod=C-00042`, „Trimite pe WhatsApp” și „Copiază linkul”; dedesubt câți prieteni s-au înscris și câte rapoarte gratuite a primit, iar când are unul de folosit, „Alege mașina” (duce la Rapoartele mele). Cardul nu apare cât timp adminul a oprit recompensa (0 pe an).
+
+**Înscrierea:** la „Sunt client”, câmpul opțional „Cod de invitare”, completat din link; un cod greșit e refuzat pe formular. Codul se poate da doar la înscriere.
+
+**Recompensa:** când un service termină prima lucrare a prietenului, programată în aplicație și cu un cost mai mare de 0, cel care a invitat primește un raport de istoric gratuit și un push + email „Ai primit un raport gratuit”. Fără bani, fără puncte.
+
+**Abuz:** refuzat dacă prietenul are același email sau telefon cu cel care invită, dacă service-ul care termină lucrarea e al celui care invită, dacă aceeași persoană (email sau telefon) a mai adus un raport, dacă cel care invită și-a șters contul sau e suspendat, sau peste limita de 3 rapoarte gratuite în 365 de zile (Admin → Cont → Setări → „Rapoarte gratuite pe an din invitații”, 0–12; 0 oprește recompensa). Tabelul invitațiilor nu se citește din browser; clientul vede doar numerele.
+
+**Raportul gratuit:** pe previzualizarea raportului apare „Folosește raportul gratuit” deasupra plății; nu cere bifa pentru dreptul de retragere (nu se plătește nimic) și nu trece prin Stripe. Raportul primește cod, se verifică și se descarcă exact ca unul plătit (suma plătită 0).
+
+Migrarea `client_referrals` (`schema_version` = 68). Termenii (§3.6a nouă) și Politica de confidențialitate (§2.2, §3, §4.1, §5) RO/EN actualizate, `TERMS_VERSION` = `2026-10-08.3`. Teste: `tests/sql/119_client_referrals.sql`, `tests/e2e/invite.spec.ts` (drumul întreg, RO/EN), unit pentru notificare și email. Fără pachete noi.

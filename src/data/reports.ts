@@ -216,10 +216,12 @@ export type CheckoutAnswer = { url: string } | { reportId: string; status: Repor
  * preview). The same request id opens the same page; a report already paid is answered as such.
  * `waiver`: the client ticked that the report is made at once and the 14-day right of withdrawal
  * ends with it (OUG 34/2014 art. 16 m); the function refuses without it.
+ * `useCredit` (T35): a free report from inviting friends — no Stripe, no waiver (nothing is paid);
+ * the answer is the report, already made (or being made).
  */
 export async function startReportCheckout(
   target: ReportTarget,
-  options: { lang: Lang; returnPath: string; requestId: string; waiver: boolean },
+  options: { lang: Lang; returnPath: string; requestId: string; waiver: boolean; useCredit?: boolean },
 ): Promise<CheckoutAnswer> {
   const { data, error } = await db().functions.invoke<{ url?: string; report_id?: string; status?: string }>('report-checkout', {
     method: 'POST',
@@ -230,6 +232,7 @@ export async function startReportCheckout(
       return_path: options.returnPath,
       request_id: options.requestId,
       withdrawal_waiver: options.waiver,
+      use_credit: options.useCredit === true,
     },
   });
   if (error) throw await functionError(error);

@@ -28,6 +28,7 @@ import { OwnerTiles } from '../shop/OwnerTiles';
 import { DataSection } from './DataSection';
 import { helpPath } from './paths';
 import { IdentityCard } from './IdentityCard';
+import { InviteCard } from './InviteCard';
 import { LocationRow } from './LocationRow';
 import { ReminderRow } from './ReminderRow';
 import { PhoneCard } from './PhoneCard';
@@ -44,7 +45,7 @@ const SUBTITLE: Record<Role, MessageKey> = {
 /**
  * Cont, the part every role shares (P13b): identity, language, push notifications on this device
  * (clients and shops, T12), email and password, legal documents, my data, log out. Clients also get Locație, Favorite (T06), "Istoricul mașinilor
- * mele" (T10) and "Rapoartele mele" (T15); shops get the Setări and Recenzii tiles, and the owner Abonament (T14) and Rapoarte (T17); the admin gets the platform tools (T16b) and the audit log
+ * mele" (T10), "Rapoartele mele" (T15) and "Invită un prieten" (T35); shops get the Setări and Recenzii tiles, and the owner Abonament (T14) and Rapoarte (T17); the admin gets the platform tools (T16b) and the audit log
  * (T16a).
  */
 export function AccountScreen({ role }: { role: Role }) {
@@ -82,6 +83,7 @@ export function AccountScreen({ role }: { role: Role }) {
             <Tile to={MY_REPORTS_PATH} icon={FileCheck} label={t('reports.title')} hint={t('reports.tileHint')} />
             <Tile to={FAVORITES_PATH} icon={Heart} label={t('favorites.title')} hint={t('favorites.hint')} />
           </div>
+          <InviteCard />
         </>
       )}
 

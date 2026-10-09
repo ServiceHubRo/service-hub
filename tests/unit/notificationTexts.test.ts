@@ -69,6 +69,7 @@ const SAMPLE: Record<string, Record<string, unknown>> = {
   tire_season: { season: 'winter', car_id: 'c-1' },
   welcome: { day: 3, has_car: false },
   area_launched: { area: 'CJ', area_ro: 'Cluj', area_en: 'Cluj', shops: 3 },
+  report_credit: {},
   favorite_offer: { percent: 15 },
   booking_request_waiting: {},
   booking_request_last_call: {},
@@ -230,6 +231,12 @@ describe('notification texts', () => {
     expect(render('area_launched', 'client', 'en', { area: 'B', area_ro: 'București', area_en: 'Bucharest' })!.body).toBe(
       'Starting today you can book shops in Bucharest online. Find one near you.',
     );
+    expect(render('report_credit', 'client', 'ro')).toMatchObject({
+      title: 'Ai primit un raport gratuit',
+      url: '/c/cont/rapoarte',
+      tag: 'report_credit',
+    });
+    expect(render('report_credit', 'client', 'en')!.title).toBe('You got a free report');
     expect(render('favorite_offer', 'client', 'ro')).toMatchObject({
       title: 'Atelier Unu',
       body: 'Atelier Unu îți oferă 15% reducere la manoperă la prima programare.',

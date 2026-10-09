@@ -1,6 +1,6 @@
 # Privacy Policy — Service-Hub
 
-**Last updated:** October 4, 2026
+**Last updated:** October 8, 2026
 
 This policy explains what personal data Service-Hub uses, why, who else sees it, how long we keep it and what rights you have, under Regulation (EU) 2016/679 (the “GDPR”) and Romanian law.
 
@@ -37,6 +37,7 @@ This policy explains what personal data Service-Hub uses, why, who else sees it,
 - **Quotes and jobs:** the lines and prices, what you accepted or refused, the work done, the cost and the **odometer reading** recorded by the shop when finishing the job.
 - Your **reviews** and **messages**; your **favorite** shops.
 - **History reports** you bought: the code, the car, the jobs included, the price, the payment status and the PDF file.
+- **Invitations** (“Invite a friend”): the code you signed up with and the account that invited you, encrypted fingerprints of your email and phone at sign-up (section 5), and whether your first job brought a free report; for the person who invites, the free reports received and used.
 - The number of **no-shows** in the last 90 days (calculated from bookings).
 - **Phone confirmation**, only if we ask for it (after 2 no-shows in 90 days): the code sent by SMS is kept only in encrypted form and is valid for 10 minutes.
 - **Preferences:** the review request, the service and tire reminders and your favorite shops’ offers (on or off).
@@ -85,6 +86,7 @@ This policy explains what personal data Service-Hub uses, why, who else sees it,
 | The monthly report for shops | Our contract with you; turned off in Settings → Notifications |
 | Showing the shop you booked with what was done on your car at other shops (Vehicle file) | Your consent (para. 1(a)): you give it when booking or from Bookings, and withdraw it at any time, also from Bookings |
 | Official history report | Our contract with you |
+| “Invite a friend”: the link between your account and the person who invited you, the free report, and the check that it is not the same person (encrypted fingerprints of the email and phone) | The contract with the person who invites (the program in the Terms, 3.6a) and legitimate interest (point f) in a program that is not abused |
 | Subscription, payments, invoices and accounting | The contract and legal obligations (para. 1(c)): Accounting Law 82/1991, the Tax Code |
 | Public reviews and checking reported ones | Legitimate interest (para. 1(f)) in genuine reviews; obligations under Regulation (EU) 2022/2065 |
 | Limits against abuse, the no-show indicator, the phone confirmation after no-shows, the bot check, suspensions | Legitimate interest in a fair and safe Platform |
@@ -109,6 +111,7 @@ This policy explains what personal data Service-Hub uses, why, who else sees it,
 - **Reviews** are public to users of the Platform, with your first name and last initial (for example “Andrei M.”).
 - **A history report code:** anyone who has it sees the car’s make, model and license plate, how many jobs the report has, the period and the report date.
 - **A shop’s profile** is public to users of the Platform; its billing data is not.
+- **The person who invited you** sees only how many friends signed up with their code and how many free reports they received; they do not see your name, account, bookings or jobs.
 
 ### 4.2 The Service-Hub team
 
@@ -148,6 +151,7 @@ We share data with authorities only when the law requires us to (for example, a 
 - **Backups:** deleted data also disappears from backups within 30 days at most.
 - **SMS confirmation codes:** valid for 10 minutes; kept only in encrypted form.
 - **Fingerprints of the email and phone** (not the address or the number, but an encrypted code they cannot be recovered from): for shop owners, so the free period is given only once to the same person and a referral of one's own shop brings no free month, and for suspended accounts or shops, so a suspension cannot be avoided with a new account. A new account with the same details gets no second free period, or is created suspended until the Service-Hub team looks into it. We keep them while the account exists and for 3 years after it is deleted; the fingerprints of a suspension are deleted when the suspension is lifted.
+- **Invitations** (“Invite a friend”) and the fingerprints taken when the invited friend signed up: while their account exists and for 3 years after it is deleted, so the same person does not bring a second free report. Free reports received stay in the inviting account while it exists.
 - **Technical data that prevents an action from being sent twice:** 7 days.
 - **Error reports:** 90 days at most.
 - **Server logs** of our providers: short periods, under their own rules.

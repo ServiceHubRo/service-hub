@@ -86,6 +86,14 @@ Expiry dates for ITP, RCA and the vignette are optional. The alerts (30 days bef
 - A report is a snapshot as of the payment date. For later work, you get a new report. We may cancel a report obtained by fraud or made from wrong data; it can then no longer be downloaded, and the verification page shows “Canceled report.”
 - The paid report is separate from the free export of your data (Account → My data), which always stays free and complete.
 
+### 3.6a Invite a friend
+
+- **Your invitation code** is your account number (like C-00042). You find it in Account → Invite a friend, with a sign-up link you can send (for example on WhatsApp). Your friend enters the code when signing up or signs up from the link; the code can only be given at sign-up.
+- **The free report:** when a shop finishes your friend's first job, booked through the Platform and costing more than 0, you get one free official history report (section 3.6), which you can use for any of your cars with completed jobs. The free report is made right away, without payment, and is the same as a paid one (code, verification, download).
+- **Limits:** one free report per friend (the same person, by email or phone, brings only one report, whoever invited them) and at most 3 free reports in 365 days per account (the Service-Hub team may change this number, announced in the app). None is given for an account of the same person (same email or phone), when the job is finished by your own shop, or if your account has meanwhile been deleted or suspended.
+- **What you see:** how many friends signed up with your code and how many free reports you received; nothing about your friends.
+- A free report cannot be turned into money, points or discounts and cannot be transferred. We may change or stop the program for future invitations, announced in the app; free reports already received stay.
+
 ### 3.7 Reviews
 
 - You can leave a review (1–5 stars and optional text) only for a completed job, once per booking, within 60 days of completion. Once sent, a review can no longer be changed.

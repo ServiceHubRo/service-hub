@@ -81,6 +81,16 @@ export async function createUser(role: 'client' | 'shop', extra: Record<string, 
   return email;
 }
 
+/** Confirms an account's email through the Auth admin API (as if the link in the email was opened). */
+export async function confirmEmail(userId: string): Promise<void> {
+  const res = await fetch(`${API}/auth/v1/admin/users/${userId}`, {
+    method: 'PUT',
+    headers: { apikey: SERVICE_KEY, Authorization: `Bearer ${SERVICE_KEY}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email_confirm: true }),
+  });
+  expect(res.ok, await res.clone().text()).toBe(true);
+}
+
 /** The user id behind an email/password account (signs in through the Auth API). */
 export async function userIdOf(email: string, password = PASSWORD): Promise<string> {
   const res = await fetch(`${API}/auth/v1/token?grant_type=password`, {

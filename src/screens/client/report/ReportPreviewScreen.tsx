@@ -1,5 +1,5 @@
-import { EyeOff, FileCheck } from 'lucide-react';
-import { useCallback, useRef, useState } from 'react';
+import { EyeOff, FileCheck, Gift } from 'lucide-react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { ActionButton } from '../../../components/ActionButton';
 import { BackLink } from '../../../components/BackLink';
@@ -10,12 +10,13 @@ import { Chip, ChipRow } from '../../../components/Chip';
 import { EmptyState } from '../../../components/EmptyState';
 import { LoadError } from '../../../components/LoadError';
 import { SkeletonList } from '../../../components/Skeleton';
+import { getMyInvites } from '../../../data/referrals';
 import { getReportPreview, ReportError, startReportCheckout, type ReportJob, type ReportTarget } from '../../../data/reports';
 import { rpcErrorMessage } from '../../../data/rpc';
 import { useI18n } from '../../../i18n/context';
 import { formatDayMonth, formatKm, formatMoney } from '../../../i18n/format';
 import type { MessageKey } from '../../../i18n/ro';
-import type { Lang } from '../../../i18n/translate';
+import { plural, type Lang } from '../../../i18n/translate';
 import { formatPeriod, hiddenFrom } from '../../../lib/report';
 import { useLoad } from '../../../lib/useLoad';
 import {
@@ -32,7 +33,8 @@ import styles from './report.module.css';
  * period and the total, the jobs with the last two lines hidden until paid, and "Plătește". Two
  * addresses: a garage car (/c/garaj/:carId/raport) and the car of a booking
  * (/c/programari/:bookingId/raport — also a car no longer in the garage). Stripe's page comes
- * back here with ?plata=anulata, or to Rapoartele mele after paying.
+ * back here with ?plata=anulata, or to Rapoartele mele after paying. A client with free reports
+ * from inviting friends (T35) gets "Folosește raportul gratuit" first: no payment, no waiver.
  */
 export function ReportPreviewScreen() {
   const { t, lang } = useI18n();
@@ -49,6 +51,21 @@ export function ReportPreviewScreen() {
   const target: ReportTarget | null = carId ? { carId } : bookingId ? { bookingId } : null;
   const load = useCallback(() => getReportPreview(carId ? { carId } : { bookingId: bookingId ?? '' }), [carId, bookingId]);
   const { state, reload } = useLoad(load);
+  // Free reports from invitations: an extra, so the preview never waits for it or fails with it.
+  const [credits, setCredits] = useState(0);
+  useEffect(() => {
+    let cancelled = false;
+    getMyInvites().then(
+      (invites) => {
+        if (!cancelled) setCredits(invites?.creditsAvailable ?? 0);
+      },
+      () => {},
+    );
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+  const errorMessage = (e: unknown) => (e instanceof ReportError ? t(`report.error.${e.problem}` as MessageKey) : rpcErrorMessage(lang, e));
 
   const back =
     from === 'reports' ? (
@@ -146,6 +163,30 @@ export function ReportPreviewScreen() {
                 ))}
               </ChipRow>
             </div>
+            {credits > 0 && (
+              <div className={styles.credit}>
+                <p className={styles.creditTitle}>
+                  <Gift size={18} aria-hidden="true" /> {t('report.credit.title')}
+                </p>
+                <p className={styles.muted}>{t('report.credit.body', { credits: plural(lang, 'unit.freeReports', credits) })}</p>
+                <ActionButton
+                  onAction={async (requestId) => {
+                    const answer = await startReportCheckout(target, {
+                      lang: reportLang,
+                      returnPath: location.pathname,
+                      requestId,
+                      waiver: false,
+                      useCredit: true,
+                    });
+                    if ('reportId' in answer) navigate(`${MY_REPORTS_PATH}?raport=${answer.reportId}`);
+                  }}
+                  errorMessage={errorMessage}
+                >
+                  {t('report.useCredit')}
+                </ActionButton>
+              </div>
+            )}
+            {credits > 0 && <p className={styles.label}>{t('report.orPay')}</p>}
             <div>
               <Checkbox
                 ref={waiverRef}
@@ -166,6 +207,7 @@ export function ReportPreviewScreen() {
               )}
             </div>
             <ActionButton
+              variant={credits > 0 ? 'secondary' : 'primary'}
               onAction={async (requestId) => {
                 if (!waiver) {
                   setWaiverMissing(true);
@@ -181,7 +223,7 @@ export function ReportPreviewScreen() {
                 if ('url' in answer) window.location.assign(answer.url);
                 else navigate(`${MY_REPORTS_PATH}?raport=${answer.reportId}`);
               }}
-              errorMessage={(e) => (e instanceof ReportError ? t(`report.error.${e.problem}` as MessageKey) : rpcErrorMessage(lang, e))}
+              errorMessage={errorMessage}
             >
               {t('report.pay', { price: formatMoney(lang, price) })}
             </ActionButton>

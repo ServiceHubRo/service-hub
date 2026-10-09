@@ -227,6 +227,15 @@ describe('app emails', () => {
     expect(emailForEvent({ event: 'area_launched', lang: 'ro', role: 'client', params: {} } as never, 'https://app.ro')).toBeNull();
   });
 
+  it('tells an inviter about the free report (T35)', () => {
+    const ro = emailForEvent({ event: 'report_credit', lang: 'ro', role: 'client', params: {} } as never, 'https://app.ro')!;
+    expect(ro.subject).toBe('Ai primit un raport gratuit');
+    expect(ro.text).toContain('Folosește raportul gratuit');
+    expect(ro.html).toContain('https://app.ro/c/cont/rapoarte');
+    const en = emailForEvent({ event: 'report_credit', lang: 'en', role: 'client', params: {} } as never, 'https://app.ro')!;
+    expect(en.subject).toBe('You got a free report');
+  });
+
   it("sends the admin a morning email with only what waits", () => {
     const mail = emailForEvent(
       { event: 'admin_digest', lang: 'ro', params: { reports: 2, suspect: 0, past_due: 1, company_waiting: 0, company_hidden: 0, unanswered: 1, new_shops: 3, new_clients: 12, new_bookings: 20, done: 7 } },

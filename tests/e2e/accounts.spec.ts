@@ -242,7 +242,8 @@ test.describe('with accounts', () => {
     await expect(page.getByText('Cont de client')).toBeVisible();
     await expect(page.getByText('Andreea Ionescu')).toBeVisible();
     await expect(page.getByText(phone.national)).toBeVisible();
-    await expect(page.getByText(/^C-\d{5}$/)).toBeVisible();
+    // The account ID (also in the invitation card, T35).
+    await expect(page.getByText(/^C-\d{5}$/).first()).toBeVisible();
     await expectNoHorizontalScroll(page);
     await shot(page, 'account-client', name());
   });

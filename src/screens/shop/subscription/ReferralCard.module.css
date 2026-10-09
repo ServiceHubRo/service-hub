@@ -81,3 +81,18 @@
   font-weight: 700;
   overflow-wrap: anywhere;
 }
+
+/* The client's invitation card (T35) shares this card. */
+.muted {
+  color: var(--muted);
+  font-size: 13.5px;
+  overflow-wrap: anywhere;
+}
+
+.available {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}

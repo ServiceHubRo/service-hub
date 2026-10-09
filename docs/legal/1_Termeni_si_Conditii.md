@@ -86,6 +86,14 @@ Datele de expirare pentru ITP, RCA și rovinietă sunt opționale. Alertele (cu 
 - Un raport este o fotografie la data plății. Pentru lucrări făcute mai târziu faci un raport nou. Putem anula un raport făcut prin fraudă sau din date greșite; în acest caz nu se mai poate descărca, iar verificarea arată „Raport anulat”.
 - Raportul plătit este separat de exportul gratuit al datelor tale (Cont → Datele mele), care rămâne mereu gratuit și complet.
 
+### 3.6a Invită un prieten
+
+- **Codul tău** de invitare este numărul contului tău (de forma C-00042). Îl găsești în Cont → Invită un prieten, cu un link de înscriere pe care îl poți trimite (de exemplu pe WhatsApp). Prietenul scrie codul la înscriere sau se înscrie din link; codul se poate da doar la înscriere.
+- **Raportul gratuit:** când un service termină prima lucrare a prietenului, programată prin Platformă și cu un cost mai mare de 0, primești un raport oficial de istoric gratuit (secțiunea 3.6), pe care îl folosești pentru oricare mașină a ta cu lucrări finalizate. Raportul gratuit se face imediat, fără plată, și este identic cu unul plătit (cod, verificare, descărcare).
+- **Limite:** un singur raport gratuit pentru fiecare prieten (aceeași persoană, după email sau telefon, aduce un singur raport, oricine ar fi invitat-o) și cel mult 3 rapoarte gratuite în 365 de zile pentru un cont (numărul îl poate schimba echipa Service-Hub, anunțat în aplicație). Nu se acordă pentru un cont al aceleiași persoane (același email sau telefon), nici când lucrarea este finalizată de un service al tău, nici dacă între timp contul tău a fost șters sau suspendat.
+- **Ce vezi:** câți prieteni s-au înscris cu codul tău și câte rapoarte gratuite ai primit; nimic despre prietenii tăi.
+- Raportul gratuit nu se transformă în bani, puncte sau reduceri și nu se transferă. Putem schimba sau opri programul pentru invitațiile viitoare, anunțat în aplicație; rapoartele gratuite deja primite rămân.
+
 ### 3.7 Recenziile
 
 - Poți lăsa o recenzie (1–5 stele și, opțional, un text) doar pentru o lucrare finalizată, o singură dată pe programare, în cel mult 60 de zile de la finalizare. După trimitere, recenzia nu se mai poate modifica.

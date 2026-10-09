@@ -87,6 +87,7 @@ export const RPC_ERROR_CODES = [
   'not_allowed',
   'not_found',
   'not_signed_in',
+  'no_credit',
   'note_too_long',
   'nothing_to_pay',
   'notice_not_found',
