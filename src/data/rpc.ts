@@ -76,6 +76,7 @@ export const RPC_ERROR_CODES = [
   'limit_phone_codes',
   'limit_quote_versions',
   'limit_staff',
+  'limit_invites',
   'message_empty',
   'message_too_long',
   'mfa_required',

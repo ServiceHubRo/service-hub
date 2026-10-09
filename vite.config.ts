@@ -1,5 +1,9 @@
+import { createHash } from 'node:crypto';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
+import { headersFile, inlineScripts, parseHeadersFile, securityHeaders } from './src/lib/securityHeaders.ts';
 import { robotsTxt, sitemapXml } from './src/lib/seoFiles.ts';
 import { checkSupabaseConfig, describeConfigProblem } from './src/lib/supabaseConfig.ts';
 
@@ -15,11 +19,11 @@ const siteUrl = (
 ).replace(/\/+$/, '');
 
 export default defineConfig(({ command, mode }) => {
+  const viteEnv = loadEnv(mode, process.cwd(), 'VITE_');
   // On Netlify a build without a usable Supabase address would publish a site that cannot reach
   // the database; stop it here with the reason instead (the variables are read at build time).
   if (command === 'build' && process.env.NETLIFY === 'true') {
-    const env = loadEnv(mode, process.cwd(), 'VITE_');
-    const config = checkSupabaseConfig(env.VITE_SUPABASE_URL, env.VITE_SUPABASE_ANON_KEY);
+    const config = checkSupabaseConfig(viteEnv.VITE_SUPABASE_URL, viteEnv.VITE_SUPABASE_ANON_KEY);
     if (!config.ok) {
       throw new Error(
         `${describeConfigProblem(config.problem)} (Netlify context "${context}"). ` +
@@ -44,6 +48,42 @@ export default defineConfig(({ command, mode }) => {
           const published = context === 'production';
           this.emitFile({ type: 'asset', fileName: 'robots.txt', source: robotsTxt(published, siteUrl) });
           if (published) this.emitFile({ type: 'asset', fileName: 'sitemap.xml', source: sitemapXml(siteUrl) });
+        },
+      },
+      {
+        // The security headers (src/lib/securityHeaders.ts): Netlify reads dist/_headers; the
+        // inline start-up guard of index.html is allowed by the hash of what was built.
+        name: 'security-headers',
+        apply: 'build',
+        enforce: 'post',
+        generateBundle(_options, bundle) {
+          const page = bundle['index.html'];
+          const html = page && page.type === 'asset' ? String(page.source) : '';
+          const hashes = inlineScripts(html).map((code) => `sha256-${createHash('sha256').update(code).digest('base64')}`);
+          const headers = securityHeaders({
+            supabaseUrl: viteEnv.VITE_SUPABASE_URL,
+            sentryDsn: viteEnv.VITE_SENTRY_DSN,
+            mapTileUrl: viteEnv.VITE_MAP_TILE_URL,
+            turnstile: Boolean(viteEnv.VITE_TURNSTILE_SITE_KEY),
+            scriptHashes: hashes,
+          });
+          this.emitFile({ type: 'asset', fileName: '_headers', source: headersFile(headers) });
+        },
+      },
+      {
+        // `vite preview` (the browser tests) sends the same headers as Netlify.
+        name: 'security-headers-preview',
+        configurePreviewServer(server) {
+          let headers: [string, string][] = [];
+          try {
+            headers = parseHeadersFile(readFileSync(join(server.config.root, server.config.build.outDir, '_headers'), 'utf8'));
+          } catch {
+            // Built without them: nothing to send.
+          }
+          server.middlewares.use((_req, res, next) => {
+            for (const [name, value] of headers) res.setHeader(name, value);
+            next();
+          });
         },
       },
     ],

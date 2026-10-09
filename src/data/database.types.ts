@@ -1427,6 +1427,27 @@ export type Database = {
           },
         ]
       }
+      rate_events: {
+        Row: {
+          at: string
+          id: number
+          kind: string
+          subject: string
+        }
+        Insert: {
+          at?: string
+          id?: never
+          kind: string
+          subject: string
+        }
+        Update: {
+          at?: string
+          id?: never
+          kind?: string
+          subject?: string
+        }
+        Relationships: []
+      }
       report_credits: {
         Row: {
           client_id: string
@@ -3574,6 +3595,10 @@ export type Database = {
         Args: { p_email: string; p_request_id: string; p_token: string }
         Returns: Json
       }
+      invite_staff_base: {
+        Args: { p_email: string; p_request_id: string; p_token: string }
+        Returns: Json
+      }
       invite_token_hash: { Args: { p_token: string }; Returns: string }
       is_active_status: { Args: { p_status: string }; Returns: boolean }
       is_admin: { Args: never; Returns: boolean }
@@ -3927,6 +3952,15 @@ export type Database = {
       purge_account_fingerprints: { Args: { p_now?: string }; Returns: number }
       purge_request_log: { Args: { p_now?: string }; Returns: number }
       quiet_until: { Args: { p_now?: string }; Returns: string }
+      rate_take: {
+        Args: {
+          p_kind: string
+          p_max: number
+          p_subject: string
+          p_window: string
+        }
+        Returns: boolean
+      }
       record_company_check: {
         Args: { p_cui: string; p_result: Json; p_shop_id: string }
         Returns: Json

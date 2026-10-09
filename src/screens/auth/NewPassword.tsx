@@ -8,7 +8,7 @@ import { PasswordField } from '../../components/PasswordField';
 import { SkeletonList } from '../../components/Skeleton';
 import { authErrorMessage, isRetryable, setNewPassword } from '../../data/auth';
 import { useI18n } from '../../i18n/context';
-import { MIN_PASSWORD_LENGTH } from '../../lib/password';
+import { MIN_PASSWORD_LENGTH, passwordProblem } from '../../lib/password';
 import { AuthLayout } from './AuthLayout';
 import { useFocusFirstError } from './useFocusFirstError';
 import styles from './auth.module.css';
@@ -32,7 +32,8 @@ export function NewPassword() {
 
   async function save() {
     const next: Errors = {};
-    if (password.length < MIN_PASSWORD_LENGTH) next.password = t('auth.error.passwordShort', { min: MIN_PASSWORD_LENGTH });
+    const weak = passwordProblem(password);
+    if (weak) next.password = weak === 'short' ? t('auth.error.passwordShort', { min: MIN_PASSWORD_LENGTH }) : t('auth.error.passwordLettersDigits');
     else if (confirm !== password) next.confirm = t('auth.error.passwordMismatch');
     setErrors(next);
     setAttempt((a) => a + 1);

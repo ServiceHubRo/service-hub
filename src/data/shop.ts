@@ -111,7 +111,8 @@ export async function geocodeShop(): Promise<GeocodeResult> {
       : { found: false };
   }
   if (error instanceof FunctionsFetchError) throw new RpcError('network');
-  if (error instanceof FunctionsHttpError && (error.context as Response).status === 503) return { unavailable: true };
+  // 503: the map service is down; 429: too many lookups for this shop in the last hour.
+  if (error instanceof FunctionsHttpError && [503, 429].includes((error.context as Response).status)) return { unavailable: true };
   if (error instanceof FunctionsHttpError && (error.context as Response).status === 401) throw failure({ code: 'PGRST301' });
   throw new RpcError('unknown');
 }

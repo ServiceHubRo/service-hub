@@ -10,7 +10,7 @@ import { useCaptcha } from '../../components/useCaptcha';
 import { Field } from '../../components/Field';
 import { PasswordField } from '../../components/PasswordField';
 import { useI18n } from '../../i18n/context';
-import { looksLikeEmail, MIN_PASSWORD_LENGTH } from '../../lib/password';
+import { looksLikeEmail, MIN_PASSWORD_LENGTH, passwordProblem } from '../../lib/password';
 import styles from './account.module.css';
 
 /** Change email (pending until confirmed; the old address keeps working), P4c. */
@@ -122,7 +122,8 @@ function PasswordCard() {
   async function save() {
     const e: PasswordErrors = {};
     if (current === '') e.current = t('auth.error.passwordRequired');
-    if (next.length < MIN_PASSWORD_LENGTH) e.next = t('auth.error.passwordShort', { min: MIN_PASSWORD_LENGTH });
+    const weak = passwordProblem(next);
+    if (weak) e.next = weak === 'short' ? t('auth.error.passwordShort', { min: MIN_PASSWORD_LENGTH }) : t('auth.error.passwordLettersDigits');
     else if (confirm !== next) e.confirm = t('auth.error.passwordMismatch');
     setErrors(e);
     if (Object.keys(e).length > 0) return;

@@ -953,3 +953,17 @@ Migrarea `offers` (`schema_version` = 67). Termenii RO/EN §3 și §4.3 actualiz
 **PR:** #54 țintește direct `main` și conține și T33 (#52) și T34 (#53): Netlify face link de test doar pentru PR-urile spre `main`. Un singur Merge pe #54 le aduce pe toate trei; GitHub închide singur #52 și #53 ca incluse.
 
 Migrarea `client_referrals` (`schema_version` = 68). Termenii (§3.6a nouă) și Politica de confidențialitate (§2.2, §3, §4.1, §5) RO/EN actualizate, `TERMS_VERSION` = `2026-10-08.3`. Teste: `tests/sql/119_client_referrals.sql`, `tests/e2e/invite.spec.ts` (drumul întreg, RO/EN), unit pentru notificare și email. Fără pachete noi.
+
+## T36 — Securitate: headere, limite, parole ✅
+
+**Headere de securitate (Eduard, 9 oct: „fă tot ce poți”):** fiecare pagină a site-ului vine acum cu instrucțiuni pentru browser. Site-ul nu poate fi pus „ascuns” în pagina altcuiva; browserul încarcă și trimite date doar la adresele noastre (Supabase-ul acelui build, Sentry, serverul hărții, Cloudflare când CAPTCHA e pornit); conexiunea e mereu criptată (HTTPS); camera și microfonul nu pot fi cerute. Se generează la fiecare build din adresele reale, deci linkurile de test vorbesc doar cu proiectul de test, iar site-ul publicat doar cu cel real. Toată suita de teste de browser rulează sub ele.
+
+**Limite noi în baza de date:** maxim 20 de invitații de colegi pe zi per service (fiecare trimite un email de la adresa noastră); maxim 10 căutări de adresă pe hartă pe oră per service (serviciul gratuit al hărții ne-ar bloca la abuz). Căutarea de adresă făcută de admin cere și codul din telefon, ca orice acțiune de admin.
+
+**Parole:** minim 8 caractere, cu litere și cifre, cu mesaj clar în formular. Aceeași regulă trebuie pusă în Supabase (pasul tău, `docs/LANSARE.md` 4.6c).
+
+**Verificat, fără schimbări:** toate tabelele au reguli pe rând; fără cont se citește doar lista de servicii; rapoartele PDF sunt private; pozele acceptă doar PNG/JPEG/WebP, cu limită de mărime; toate funcțiile de pe server verifică cine cere; plățile sunt marcate doar de mesajele semnate de Stripe; codul SMS are maxim 5 încercări.
+
+**Pașii tăi de securitate** (conturi, GitHub, Supabase) sunt în `docs/LANSARE.md` 4.6c.
+
+Migrarea `security_limits` (`schema_version` = 70). Teste: `tests/sql/120_security.sql`, `tests/e2e/security-headers.spec.ts`, `tests/unit/securityHeaders.test.ts`. Fără pachete noi.
