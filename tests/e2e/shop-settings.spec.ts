@@ -167,7 +167,7 @@ test.describe('shop settings', () => {
     await page.getByLabel('Site (opțional)').fill('atelier');
     await page.getByRole('button', { name: 'Salvează profilul' }).click();
     await expect(page.getByText('Codul poștal are exact 6 cifre.')).toBeVisible();
-    await expect(page.getByText('Adresa nu pare corectă. Exemplu: www.atelier.ro')).toBeVisible();
+    await expect(page.getByText('Adresă invalidă. Exemplu: www.atelier.ro')).toBeVisible();
     await page.getByLabel('Cod poștal').fill('500059');
     await page.getByLabel('Site (opțional)').fill('www.atelier-test.ro');
     await page.getByLabel('Descriere scurtă').fill('Service auto multimarcă.');
@@ -215,7 +215,7 @@ test.describe('shop settings', () => {
     const colleague = uniqueEmail('coleg');
     await page.getByLabel('Emailul colegului').fill('nu-e-email');
     await page.getByRole('button', { name: 'Trimite invitația' }).click();
-    await expect(page.getByText('Adresa de email nu pare corectă.')).toBeVisible();
+    await expect(page.getByText('Adresa de email nu este validă.')).toBeVisible();
     await page.getByLabel('Emailul colegului').fill(colleague);
     await page.getByRole('button', { name: 'Trimite invitația' }).click();
     const linkField = page.getByLabel('Linkul de invitație');

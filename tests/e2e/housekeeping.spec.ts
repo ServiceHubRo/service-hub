@@ -115,10 +115,10 @@ test.describe('Bookings that look after themselves', () => {
 
     // The client's email: kind, with other shops for the same work nearby.
     await expect.poll(async () => (await emailsTo(client)).map((m) => m.subject), { timeout: 20_000 }).toContain(
-      'Cererea ta s-a închis: alte service-uri te pot ajuta',
+      'Cererea ta de programare s-a închis',
     );
     const mail = (await emailsTo(client)).find((m) => m.subject.startsWith('Cererea ta s-a închis'))!;
-    expect(mail.text).toContain(`Ne pare rău, ${shopName} nu a reușit să răspundă la timp`);
+    expect(mail.text).toContain(`${shopName} nu a răspuns la timp`);
     expect(mail.html).toContain('/c/cauta?cat=cat_rev&amp;oras=Bra%C8%99ov');
 
     // The card says so, and offers the search.

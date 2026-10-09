@@ -452,9 +452,9 @@ test.describe('Raport ANAF', () => {
     expect(await events('company_problem')).toBe(1);
     await signIn(page, email, PASSWORD);
     await expect(page).toHaveURL(/\/s\/panou/);
-    const banner = page.getByText('Nu am găsit CUI-ul din Date de facturare în registrul ANAF. Poate e doar o greșeală de scriere.');
+    const banner = page.getByText('CUI-ul din Date de facturare nu apare în registrul ANAF. Verifică-l.');
     await expect(banner).toBeVisible();
-    await expect(page.getByText(/Te rugăm să verifici datele până pe .+, ca service-ul să rămână vizibil în căutări\./)).toBeVisible();
+    await expect(page.getByText(/Verifică datele până pe .+, altfel service-ul nu mai apare în căutări\./)).toBeVisible();
     await expectNoHorizontalScroll(page);
     await shot(page, 'anaf-deadline-banner', name());
 

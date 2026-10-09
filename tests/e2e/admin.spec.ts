@@ -229,7 +229,7 @@ test.describe('admin', () => {
     await shot(page, 't16a-booking', name());
 
     await page.getByRole('link', { name: 'Deschide conversația' }).click();
-    await expect(page.getByText('Doar citire. Adminul nu scrie în conversații.')).toBeVisible();
+    await expect(page.getByText('Doar citire.')).toBeVisible();
     await expect(page.getByText(`Programarea ${booking.ref} a fost anulată de echipa Service-Hub.`)).toBeVisible();
     await expect(page.getByRole('textbox')).toHaveCount(0);
     await shot(page, 't16a-thread', name());

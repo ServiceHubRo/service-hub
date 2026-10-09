@@ -79,7 +79,7 @@ test.describe('import from another program', () => {
     await shot(page, 't31a-import-check', name());
 
     await page.getByRole('button', { name: 'Importă', exact: true }).click();
-    await expect(page.getByText('Gata: 2 clienți, 2 mașini, 2 lucrări.', { exact: false })).toBeVisible();
+    await expect(page.getByText('Import finalizat: 2 clienți, 2 mașini, 2 lucrări.', { exact: false })).toBeVisible();
     const past = page.locator('main li').filter({ hasText: 'clienti.csv' });
     await expect(past).toContainText('2 clienți · 2 mașini · 2 lucrări');
     await shot(page, 't31a-import-done', name());

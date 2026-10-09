@@ -182,7 +182,7 @@ test.describe('new shop', () => {
     await page.getByRole('link', { name: 'Account', exact: true }).filter({ visible: true }).first().click();
     await page.getByRole('link', { name: /^Reports/ }).click();
     await expect(page.getByText('Not enough jobs yet')).toBeVisible();
-    await expect(page.getByText('Reports fill up as you complete jobs. Come back in a few weeks.')).toBeVisible();
+    await expect(page.getByText('Reports fill up as you complete jobs.')).toBeVisible();
     await expectNoHorizontalScroll(page);
     await shot(page, 't17-reports-empty-en', name());
 

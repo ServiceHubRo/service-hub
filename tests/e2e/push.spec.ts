@@ -239,7 +239,7 @@ test.describe('push notifications', () => {
     await shot(page, 't12-banner-shop', name());
     await page.getByRole('button', { name: 'English' }).filter({ visible: true }).first().click();
     await expect(page.getByRole('region', { name: 'Push notifications' })).toContainText(
-      'Turn on notifications to hear right away about new requests and how clients answer your quotes.',
+      'Turn on notifications for new requests and quote responses.',
     );
     await expectNoHorizontalScroll(page);
     await shot(page, 't12-banner-shop-en', name());

@@ -89,7 +89,7 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
     'client.quote_expired': { title: '{shop}', body: 'Devizul pentru {car} a expirat fără răspuns.' },
     'client.request_expired': {
       title: 'Cererea ta s-a închis',
-      body: 'Ne pare rău, {shop} nu a reușit să răspundă la timp pentru {when}. Îți arătăm acum alte service-uri din zonă care te pot ajuta.',
+      body: '{shop} nu a răspuns la timp la cererea ta pentru {when}. Poți alege alt service din zonă.',
     },
     'client.work_started': { title: '{shop}', body: 'Lucrarea la {car} a început.' },
     'client.job_done': { title: '{shop}', body: '{car} este gata de ridicare. Total: {cost}.' },
@@ -103,20 +103,20 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
     'client.report_ready': { title: 'Raportul este gata', body: 'Raportul de istoric pentru {car_plate} este gata de descărcat. Cod: {code}.' },
     'client.review_request': {
       title: '{shop}',
-      body: 'Cum a fost la {shop}? Lasă o recenzie pentru {service}. Durează un minut și îi ajută pe alți șoferi.',
+      body: 'Lasă o recenzie pentru {service} la {shop}.',
     },
     // T30: the catalog's interval is only a heads-up; the oil follows the client's own interval.
     'client.service_due': {
       title: '{car}: {service}',
-      body: 'Ca să știi: ultima dată pe {last_done}, la {shop}. De obicei se verifică pe la {due}. Poate nu e cazul încă, tu decizi.',
+      body: 'Ultima dată: {last_done}, la {shop}. Verificare recomandată în jurul datei de {due}.',
     },
     'client.service_due_oil': {
       title: '{car}: {service}',
-      body: 'Ultimul schimb: {last_done}, la {shop}. La fiecare {months}, următorul vine pe la {due}. Programează-te din aplicație.',
+      body: 'Ultimul schimb: {last_done}, la {shop}. Următorul: în jurul datei de {due} (la fiecare {months}). Programează-te din aplicație.',
     },
     'client.service_due_oil_noshop': {
       title: '{car}: {service}',
-      body: 'Ultimul schimb: {last_done}. La fiecare {months}, următorul vine pe la {due}. Programează-te din aplicație.',
+      body: 'Ultimul schimb: {last_done}. Următorul: în jurul datei de {due} (la fiecare {months}). Programează-te din aplicație.',
     },
     // ------------------------------------------------------------------ tips and offers (T24, push only)
     'client.tire_season': {
@@ -140,7 +140,7 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
       body: 'Un prieten invitat de tine a terminat prima lucrare. Ai un raport de istoric gratuit, pentru oricare mașină din Garaj.',
     },
     'client.area_launched': {
-      title: 'Service-Hub a ajuns și la tine',
+      title: 'Service-Hub este disponibil în zona ta',
       body: 'De azi te poți programa online la service-urile din {area}. Caută unul aproape de tine.',
     },
     'client.welcome': {
@@ -153,7 +153,7 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
     },
     'client.welcome_later': {
       title: 'Service-Hub',
-      body: 'Când mașina are nevoie de un service, compari recenziile și te programezi din aplicație. Durează un minut.',
+      body: 'Când mașina are nevoie de service, compară recenziile și programează-te din aplicație.',
     },
     'client.favorite_offer': {
       title: '{shop}',
@@ -205,19 +205,19 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
     },
     'shop.booking_request_last_call': {
       title: 'Ultima reamintire pentru o cerere',
-      body: '{client} așteaptă încă răspuns pentru {when}: {service}. Dacă nu răspunzi până atunci, cererea se închide automat. Confirmă programarea sau propune altă oră.',
+      body: '{client} așteaptă răspuns pentru {when}: {service}. Confirmă sau propune altă oră până atunci, altfel cererea se închide automat.',
     },
     'shop.request_expired': {
       title: 'O cerere s-a închis fără răspuns',
-      body: 'Cererea de la {client} pentru {when} ({service}) s-a închis automat, pentru că ora programării a trecut. Un răspuns rapid aduce mai mulți clienți în service.',
+      body: 'Cererea de la {client} pentru {when} ({service}) s-a închis automat: ora programării a trecut fără răspuns.',
     },
     'shop.booking_followup': {
-      title: 'Cum a decurs programarea?',
-      body: '{client} avea programare {when}, pentru {car_plate}. Spune-ne ce s-a întâmplat: dacă mașina a venit, apasă „În constatare”, iar dacă nu, „Neprezentat”.',
+      title: 'Actualizează programarea',
+      body: '{client} avea programare {when}, pentru {car_plate}. Dacă mașina a venit, apasă „În constatare”; dacă nu, „Neprezentat”.',
     },
     'shop.booking_auto_closed': {
       title: 'Programare încheiată automat',
-      body: 'Programarea {ref} cu {client} din {when} s-a încheiat automat, pentru că nu a fost actualizată timp de 7 zile. Clientul nu a fost trecut ca neprezentat.',
+      body: 'Programarea {ref} cu {client} din {when} s-a încheiat automat după 7 zile fără actualizare. Clientul nu a fost marcat ca neprezentat.',
     },
     'shop.monthly_report': {
       title: 'Luna {month} pe Service-Hub',
@@ -258,7 +258,7 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
     },
     'shop.review_report_decided': {
       title: 'Recenzia rămâne publicată',
-      body: 'Am verificat recenzia raportată pentru {ref} ({rating} din 5 stele). Respectă regulile, așa că rămâne publicată.',
+      body: 'Am verificat recenzia raportată pentru {ref} ({rating} din 5 stele). Respectă regulile platformei și rămâne publicată.',
     },
     'shop.review_report_decided_removed': {
       title: 'Recenzia raportată a fost ștearsă',
@@ -292,31 +292,31 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
     },
     'shop.referral_revoked': {
       title: 'Luna gratuită s-a anulat',
-      body: 'Plata service-ului {referred} a fost returnată, așa că luna gratuită pentru recomandare s-a anulat. Ce ai folosit deja rămâne.',
+      body: 'Plata service-ului {referred} a fost returnată. Luna gratuită pentru recomandare s-a anulat; zilele deja folosite nu se retrag.',
     },
     // ------------------------------------------------------------------ the company at ANAF (Raport ANAF, automated)
     'shop.company_problem': {
       title: 'Verifică CUI-ul firmei',
-      body: 'Nu am găsit CUI-ul {cui} în registrul ANAF. Poate s-a strecurat o greșeală de scriere. Te rugăm să îl verifici în Date de facturare până pe {expiry}, ca service-ul să rămână vizibil în căutări.',
+      body: 'Nu am găsit CUI-ul {cui} în registrul ANAF. Verifică-l în Date de facturare până pe {expiry}, ca service-ul să rămână vizibil în căutări.',
     },
     'shop.company_problem_inactive': {
       title: 'Verifică datele firmei',
-      body: 'La ANAF, firma cu CUI-ul {cui} apare inactivă fiscal. Poate e o confuzie sau ai rezolvat deja. Te rugăm să verifici datele în Date de facturare până pe {expiry}, ca service-ul să rămână vizibil în căutări.',
+      body: 'La ANAF, firma cu CUI-ul {cui} apare inactivă fiscal. Verifică datele în Date de facturare până pe {expiry}, ca service-ul să rămână vizibil în căutări.',
     },
     'shop.company_problem_deregistered': {
       title: 'Verifică datele firmei',
-      body: 'La ANAF, firma cu CUI-ul {cui} apare radiată. Poate e un CUI vechi. Te rugăm să verifici datele în Date de facturare până pe {expiry}, ca service-ul să rămână vizibil în căutări.',
+      body: 'La ANAF, firma cu CUI-ul {cui} apare radiată. Verifică datele în Date de facturare până pe {expiry}, ca service-ul să rămână vizibil în căutări.',
     },
     'shop.company_name_mismatch': {
-      title: 'O mică verificare',
-      body: 'La ANAF, CUI-ul {cui} apare pe numele „{anaf_name}”. Dacă e cazul, actualizează denumirea legală în Date de facturare.',
+      title: 'Verifică denumirea firmei',
+      body: 'La ANAF, CUI-ul {cui} apare pe numele „{anaf_name}”. Dacă este cazul, actualizează denumirea legală în Date de facturare.',
     },
     'shop.company_hidden': {
-      title: 'Service-ul e ascuns temporar din căutări',
-      body: 'Nu am reușit încă să confirmăm la ANAF firma cu CUI-ul {cui}. Contul și programările merg în continuare. După ce verifici datele în Date de facturare, service-ul revine automat în căutări.',
+      title: 'Service-ul este ascuns temporar din căutări',
+      body: 'Firma cu CUI-ul {cui} nu a putut fi confirmată încă la ANAF. Contul și programările funcționează în continuare. După ce verifici datele în Date de facturare, service-ul revine automat în căutări.',
     },
     'shop.company_ok': {
-      title: 'Totul e în regulă',
+      title: 'Datele firmei sunt confirmate',
       body: 'Firma cu CUI-ul {cui} a fost confirmată la ANAF. Mulțumim. Service-ul apare din nou în căutări.',
     },
     // ------------------------------------------------------------------ account suspended / reactivated
@@ -358,7 +358,7 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
     'client.quote_expired': { title: '{shop}', body: 'The quote for your {car} expired without an answer.' },
     'client.request_expired': {
       title: 'Your request has closed',
-      body: "We're sorry, {shop} couldn't get back to you in time for {when}. Here are other shops nearby that can help.",
+      body: "{shop} didn't answer your request for {when} in time. You can choose another shop nearby.",
     },
     'client.work_started': { title: '{shop}', body: 'Work on your {car} has started.' },
     'client.job_done': { title: '{shop}', body: 'Your {car} is ready for pickup. Total: {cost}.' },
@@ -372,19 +372,19 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
     'client.report_ready': { title: 'Your report is ready', body: 'The history report for {car_plate} is ready to download. Code: {code}.' },
     'client.review_request': {
       title: '{shop}',
-      body: 'How was it at {shop}? Leave a review for {service}. It takes a minute and helps other drivers.',
+      body: 'Leave a review for {service} at {shop}.',
     },
     'client.service_due': {
       title: '{car}: {service}',
-      body: 'Just a heads-up: last done on {last_done} at {shop}. It is usually checked around {due}. It may not be needed yet; your call.',
+      body: 'Last done on {last_done} at {shop}. Next check recommended around {due}.',
     },
     'client.service_due_oil': {
       title: '{car}: {service}',
-      body: 'Last changed on {last_done} at {shop}. Every {months}, so the next one is due around {due}. Book it in the app.',
+      body: 'Last changed on {last_done} at {shop}. Next change due around {due} (every {months}). Book it in the app.',
     },
     'client.service_due_oil_noshop': {
       title: '{car}: {service}',
-      body: 'Last changed on {last_done}. Every {months}, so the next one is due around {due}. Book it in the app.',
+      body: 'Last changed on {last_done}. Next change due around {due} (every {months}). Book it in the app.',
     },
     // ------------------------------------------------------------------ tips and offers (T24, push only)
     'client.tire_season': {
@@ -408,7 +408,7 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
       body: 'A friend you invited finished their first job. You have a free history report for any car in your Garage.',
     },
     'client.area_launched': {
-      title: 'Service-Hub is now in your area',
+      title: 'Service-Hub is now available in your area',
       body: 'Starting today you can book shops in {area} online. Find one near you.',
     },
     'client.welcome': {
@@ -421,7 +421,7 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
     },
     'client.welcome_later': {
       title: 'Service-Hub',
-      body: 'When your car needs a shop, compare the reviews and book in the app. It takes a minute.',
+      body: 'When your car needs service, compare reviews and book in the app.',
     },
     'client.favorite_offer': {
       title: '{shop}',
@@ -473,19 +473,19 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
     },
     'shop.booking_request_last_call': {
       title: 'Last reminder for a request',
-      body: "{client} is still waiting for an answer for {when}: {service}. If you don't answer by then, the request closes automatically. Confirm it or suggest another time.",
+      body: '{client} is waiting for an answer for {when}: {service}. Confirm or suggest another time before then, or the request closes automatically.',
     },
     'shop.request_expired': {
       title: 'A request closed without an answer',
-      body: 'The request from {client} for {when} ({service}) closed automatically because the time has passed. A quick answer brings more customers to your shop.',
+      body: 'The request from {client} for {when} ({service}) closed automatically: the time passed without an answer.',
     },
     'shop.booking_followup': {
-      title: 'How did the appointment go?',
-      body: '{client} had an appointment {when} for {car_plate}. Let us know what happened: if the car came in, tap Start inspection; if not, tap No-show.',
+      title: 'Update the booking',
+      body: '{client} had an appointment {when} for {car_plate}. If the car came in, tap Start inspection; if not, tap No-show.',
     },
     'shop.booking_auto_closed': {
       title: 'Booking closed automatically',
-      body: 'Booking {ref} with {client} on {when} closed automatically because it was not updated for 7 days. The customer was not marked as a no-show.',
+      body: 'Booking {ref} with {client} on {when} closed automatically after 7 days without an update. The customer was not marked as a no-show.',
     },
     'shop.monthly_report': {
       title: 'Your {month} on Service-Hub',
@@ -526,7 +526,7 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
     },
     'shop.review_report_decided': {
       title: 'The review stays up',
-      body: 'We checked the review you reported for {ref} ({rating} of 5 stars). It follows the rules, so it stays published.',
+      body: 'We checked the review you reported for {ref} ({rating} of 5 stars). It follows the platform rules and stays published.',
     },
     'shop.review_report_decided_removed': {
       title: 'The reported review was removed',
@@ -560,31 +560,31 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
     },
     'shop.referral_revoked': {
       title: 'Your free month was canceled',
-      body: "{referred}'s payment was returned, so the free month for the referral was canceled. What you already used is yours.",
+      body: "{referred}'s payment was refunded. The free month for the referral is canceled; days already used are not taken back.",
     },
     // ------------------------------------------------------------------ the company at ANAF (ANAF report, automated)
     'shop.company_problem': {
       title: 'Please check your tax ID',
-      body: "We couldn't find tax ID {cui} in ANAF's register. It may just be a typo. Please check it under Billing details by {expiry} so your shop stays visible in search.",
+      body: "We couldn't find tax ID {cui} in the ANAF register. Check it under Billing details by {expiry} so your shop stays visible in search.",
     },
     'shop.company_problem_inactive': {
       title: 'Please check your company details',
-      body: 'At ANAF, the company with tax ID {cui} shows as inactive for tax purposes. It may be a mix-up, or already sorted. Please check your details under Billing details by {expiry} so your shop stays visible in search.',
+      body: 'At ANAF, the company with tax ID {cui} shows as inactive for tax purposes. Check your details under Billing details by {expiry} so your shop stays visible in search.',
     },
     'shop.company_problem_deregistered': {
       title: 'Please check your company details',
-      body: 'At ANAF, the company with tax ID {cui} shows as struck off. It may be an old tax ID. Please check your details under Billing details by {expiry} so your shop stays visible in search.',
+      body: 'At ANAF, the company with tax ID {cui} shows as struck off. Check your details under Billing details by {expiry} so your shop stays visible in search.',
     },
     'shop.company_name_mismatch': {
-      title: 'A quick check',
+      title: 'Check your company name',
       body: 'At ANAF, tax ID {cui} is registered as "{anaf_name}". If needed, update the legal name under Billing details.',
     },
     'shop.company_hidden': {
       title: 'Your shop is temporarily hidden from search',
-      body: "We haven't been able to confirm the company with tax ID {cui} at ANAF yet. Your account and bookings keep working. Once you check your details under Billing details, your shop comes back to search on its own.",
+      body: 'The company with tax ID {cui} could not be confirmed at ANAF yet. Your account and bookings keep working. Once you check your details under Billing details, your shop returns to search automatically.',
     },
     'shop.company_ok': {
-      title: 'All set',
+      title: 'Company details confirmed',
       body: 'The company with tax ID {cui} is confirmed at ANAF. Thank you. Your shop shows in search again.',
     },
     // ------------------------------------------------------------------ account suspended / reactivated

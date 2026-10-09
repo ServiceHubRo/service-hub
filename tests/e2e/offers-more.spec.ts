@@ -127,7 +127,7 @@ test.describe('offers: last day, services, quiet days', () => {
 
     // The shop sees which offer it promised.
     await page.goto('/s/programari?tab=cereri');
-    await expect(page.getByText('Zi cu reducere: i-ai promis -15% la manoperă')).toBeVisible();
+    await expect(page.getByText('Zi cu reducere: -15% la manoperă pentru client')).toBeVisible();
     await ctx.close();
     await ctx2.close();
   });

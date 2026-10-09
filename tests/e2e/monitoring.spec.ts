@@ -59,7 +59,7 @@ test('a screen that breaks shows a message instead of a blank page, and is repor
   const marker = `crash-${crypto.randomUUID()}`;
   await page.goto(`/dev/componente?t=${marker}`);
   await page.getByRole('button', { name: 'Strică ecranul (test)' }).click();
-  await expect(page.getByText('A apărut o eroare pe această pagină. Reîncarcă pagina; dacă se repetă, revino puțin mai târziu.')).toBeVisible();
+  await expect(page.getByText('A apărut o eroare pe această pagină. Reîncarcă pagina sau revino mai târziu.')).toBeVisible();
   await expect(page.getByRole('button', { name: 'Reîncarcă pagina' })).toBeVisible();
   await expectNoHorizontalScroll(page);
   await expectAccessible(page, 'crash notice');
@@ -80,7 +80,7 @@ test('the same message in English', async ({ page }) => {
   await page.goto('/dev/componente');
   await expect(page.getByText('On: errors reach Sentry.')).toBeVisible();
   await page.getByRole('button', { name: 'Break this screen (test)' }).click();
-  await expect(page.getByText('Something went wrong on this page. Reload it; if it happens again, come back a bit later.')).toBeVisible();
+  await expect(page.getByText('Something went wrong on this page. Reload it or try again later.')).toBeVisible();
   await expect(page.getByRole('button', { name: 'Reload the page' })).toBeVisible();
 });
 

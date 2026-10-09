@@ -65,7 +65,7 @@ test('sign-up refuses missing data with a specific message per field', async ({ 
   await expect(page.getByText('Alege dacă ești client sau service.')).toBeVisible();
   await expect(page.getByText('Scrie numele.')).toBeVisible();
   await expect(page.getByText('Număr de telefon invalid. Exemplu: 07xx xxx xxx.')).toBeVisible();
-  await expect(page.getByText('Adresa de email nu pare corectă.')).toBeVisible();
+  await expect(page.getByText('Adresa de email nu este validă.')).toBeVisible();
   await expect(page.getByText('Parola trebuie să aibă cel puțin 8 caractere.')).toBeVisible();
   await expect(page.getByText('Ca să creezi contul, trebuie să accepți Termenii și Politica de confidențialitate.')).toBeVisible();
   await shot(page, 'auth-signup-errors', name());
@@ -153,7 +153,7 @@ test('forgot password checks the address before sending', async ({ page }) => {
   await expect(page).toHaveURL(/\/parola-uitata$/);
   await expect(page.getByLabel('Email')).toHaveValue('nu-e-email');
   await page.getByRole('button', { name: 'Trimite linkul' }).click();
-  await expect(page.getByText('Adresa de email nu pare corectă.')).toBeVisible();
+  await expect(page.getByText('Adresa de email nu este validă.')).toBeVisible();
   await expectNoHorizontalScroll(page);
   await shot(page, 'auth-forgot', name());
 });

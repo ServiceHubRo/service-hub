@@ -160,7 +160,7 @@ test.describe('invite a friend', () => {
     const visitor = await english.newPage();
     await visitor.goto(new URL(link).pathname + new URL(link).search);
     await expect(visitor.getByLabel('Invitation code (optional)')).toHaveValue(code);
-    await expect(visitor.getByText('Got a link or a code from a friend? Enter it here.')).toBeVisible();
+    await expect(visitor.getByText('The code from the person who invited you.')).toBeVisible();
     await shot(visitor, 'invite-signup-en', name());
     await english.close();
 

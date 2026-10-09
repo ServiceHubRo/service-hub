@@ -111,7 +111,7 @@ test.describe('Fișa mașinii', () => {
     await client.getByLabel('Model').fill('Focus');
     await client.getByLabel('An fabricație').fill('2017');
     await client.getByLabel('Nr. înmatriculare').fill(plate);
-    const agree = client.getByRole('checkbox', { name: 'Arată service-ului ce s-a făcut la mașină la alte service-uri' });
+    const agree = client.getByRole('checkbox', { name: 'Arată service-ului istoricul lucrărilor de la alte service-uri' });
     await expect(agree).not.toBeChecked();
     await expect(client.getByText('fără prețuri sau nume de service-uri', { exact: false })).toBeVisible();
     await agree.check();

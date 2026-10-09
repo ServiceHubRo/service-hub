@@ -88,7 +88,7 @@ test.describe('instant booking', () => {
     await c.getByRole('button', { name: /^Continuă/ }).click();
     await expect(c.getByRole('heading', { level: 1, name: 'Mașina' })).toBeVisible();
     await expect(c.getByText(`, ${free.free_slot}`).first()).toBeVisible();
-    await expect(c.getByText('Acest service confirmă pe loc locurile libere.')).toBeVisible();
+    await expect(c.getByText('Programarea se confirmă imediat.')).toBeVisible();
     await c.getByLabel('Marcă').fill('Dacia');
     await c.getByLabel('Model').fill('Logan');
     await shot(c, 't28-step4-instant', name());

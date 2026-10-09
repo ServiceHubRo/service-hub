@@ -204,8 +204,8 @@ describe('app emails', () => {
     const params = { shop_name: 'Atelier Unu', client_name: 'Ana Marin', date: '2026-10-14', slot: '10:00', category: 'cat_rev', city: 'Brașov' };
     const service = { ro: 'Schimb ulei', en: 'Oil change' };
     const client = emailForEvent({ event: 'request_expired', lang: 'ro', role: 'client', params, service } as never, 'https://app.ro')!;
-    expect(client.subject).toBe('Cererea ta s-a închis: alte service-uri te pot ajuta');
-    expect(client.text).toContain('Ne pare rău, Atelier Unu nu a reușit să răspundă la timp');
+    expect(client.subject).toBe('Cererea ta de programare s-a închis');
+    expect(client.text).toContain('Atelier Unu nu a răspuns la timp');
     expect(client.html).toContain('https://app.ro/c/cauta?cat=cat_rev&amp;oras=Bra%C8%99ov');
     const shop = emailForEvent({ event: 'request_expired', lang: 'en', role: 'shop', params, service } as never, 'https://app.ro')!;
     expect(shop.subject).toBe('Atelier Unu: A request closed without an answer');
@@ -213,17 +213,17 @@ describe('app emails', () => {
     expect(shop.html).toContain('https://app.ro/s/programari?tab=cereri');
     const last = emailForEvent({ event: 'booking_request_last_call', lang: 'ro', role: 'shop', params, service } as never, 'https://app.ro')!;
     expect(last.subject).toBe('Atelier Unu: Ultima reamintire pentru o cerere');
-    expect(last.text).toContain('Dacă nu răspunzi până atunci, cererea se închide automat.');
+    expect(last.text).toContain('altfel cererea se închide automat.');
   });
 
   it('tells a waiting client once that Service-Hub reached their zone', () => {
     const params = { area: 'CJ', area_ro: 'Cluj', area_en: 'Cluj', shops: 3 };
     const ro = emailForEvent({ event: 'area_launched', lang: 'ro', role: 'client', params } as never, 'https://app.ro')!;
-    expect(ro.subject).toBe('Service-Hub a ajuns în județul Cluj');
+    expect(ro.subject).toBe('Service-Hub este disponibil în județul Cluj');
     expect(ro.text).toContain('Ne-ai cerut să te anunțăm când Service-Hub ajunge în județul Cluj.');
     expect(ro.html).toContain('https://app.ro/c/cauta');
     const en = emailForEvent({ event: 'area_launched', lang: 'en', role: 'client', params: { ...params, area: 'B', area_en: 'Bucharest' } } as never, 'https://app.ro')!;
-    expect(en.subject).toBe('Service-Hub is now in Bucharest');
+    expect(en.subject).toBe('Service-Hub is now available in Bucharest');
     expect(emailForEvent({ event: 'area_launched', lang: 'ro', role: 'client', params: {} } as never, 'https://app.ro')).toBeNull();
   });
 
@@ -241,7 +241,7 @@ describe('app emails', () => {
       { event: 'admin_digest', lang: 'ro', params: { reports: 2, suspect: 0, past_due: 1, company_waiting: 0, company_hidden: 0, unanswered: 1, new_shops: 3, new_clients: 12, new_bookings: 20, done: 7 } },
       'https://app.ro',
     )!;
-    expect(mail.subject).toBe('Service-Hub: 4 lucruri te așteaptă azi');
+    expect(mail.subject).toBe('Service-Hub: de rezolvat azi (4)');
     expect(mail.text).toContain('Recenzii raportate: 2');
     expect(mail.text).toContain('Plăți eșuate la abonament: 1');
     expect(mail.text).toContain('Cereri închise fără răspuns (ultimele 24 de ore): 1');

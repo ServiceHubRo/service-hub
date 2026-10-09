@@ -112,7 +112,7 @@ test.describe('shop referrals', () => {
     await expect(page.getByRole('heading', { name: 'Refer Service-Hub' })).toBeVisible();
     await expect(page.getByText('Free months earned: 1 of 12')).toBeVisible();
     await expect(page.getByText(/Your free period: \+30 days/)).toBeVisible();
-    await page.getByRole('heading', { name: 'Shops you brought' }).scrollIntoViewIfNeeded();
+    await page.getByRole('heading', { name: 'Referred shops' }).scrollIntoViewIfNeeded();
     await shot(page, 'referral-card-rewarded-en', name());
   });
 });

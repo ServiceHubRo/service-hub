@@ -33,7 +33,6 @@ export function NotificationSettings() {
     <div className={styles.page}>
       <BackLink to={SETTINGS_PATH} label={t('settings.title')} />
       <h1>{t('settings.notifications')}</h1>
-      <p className={styles.intro}>{t('notif.intro')}</p>
       <PushRow />
       {isOwner ? (
         <>

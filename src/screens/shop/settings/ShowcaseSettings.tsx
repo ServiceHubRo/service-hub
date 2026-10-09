@@ -39,7 +39,6 @@ export function ShowcaseSettings() {
     <div className={styles.page}>
       <BackLink to={SETTINGS_PATH} label={t('settings.title')} />
       <h1>{t('settings.showcase')}</h1>
-      <p className={styles.intro}>{t('showcase.intro')}</p>
       <PhotosCard />
       <AmenitiesCard />
     </div>

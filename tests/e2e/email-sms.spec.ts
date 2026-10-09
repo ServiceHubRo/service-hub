@@ -153,7 +153,7 @@ test.describe('email and SMS', () => {
     const colleague = uniqueEmail('invitat');
     await page.getByLabel('Emailul colegului').fill(colleague);
     await page.getByRole('button', { name: 'Trimite invitația' }).click();
-    await expect(page.getByText(`Invitația a plecat la ${colleague}`, { exact: false })).toBeVisible();
+    await expect(page.getByText(`Invitația a fost trimisă la ${colleague}`, { exact: false })).toBeVisible();
     await expect(page.getByLabel('Linkul de invitație')).toHaveValue(/\/invitatie\/[0-9a-f]{64}$/);
     await expectNoHorizontalScroll(page);
     await shot(page, 't13-invite-sent', name());

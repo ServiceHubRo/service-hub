@@ -90,7 +90,7 @@ export function ShopShareScreen() {
               )}
             </div>
             <p className={styles.muted} role="status">
-              {copied ? t('slk.copiedNote') : t('slk.how')}
+              {copied ? t('slk.copiedNote') : ''}
             </p>
           </Card>
 

@@ -125,6 +125,7 @@ If the network blocks a download or API you need, stop and tell Eduard the exact
 ## 10. Copy and tone
 
 - Romanian UI copy follows the reference demo and the Lovable prompts: short, concrete, friendly, no exclamation marks, no marketing words. Address the user with "tu".
+- Professional, never chatty (Eduard, Oct 2026): no colloquialisms, rhetorical questions, apologies or cute phrasing. No explanations of how or why the system works (database, Stripe, "so that…", reassurances): a hint exists only when it prevents a mistake, in one short sentence. Keep what the user must do, deadlines, money and consequences.
 - English copy: natural US English, same brevity ("Book now", "Send quote", "Your car is being inspected").
 - Money: RO `1.250 lei`, EN `1,250 RON`. Odometer: RO `105.400 km`, EN `105,400 km`. Dates: RO `Mar 14 oct`, EN `Tue, Oct 14`.
 - Brand: "Service-Hub" in text; wordmark `SERVICE-` in `#EAE8E2` and `HUB` in `#F5A524`, one component, never wraps.

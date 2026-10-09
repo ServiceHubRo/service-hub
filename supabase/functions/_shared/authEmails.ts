@@ -25,7 +25,7 @@ const TEXTS: Record<AuthEmailKind, { ro: Variant; en: Variant }> = {
     ro: {
       subject: 'Confirmă adresa de email',
       layout: {
-        preheader: 'Un pas până la primul tău cont Service-Hub.',
+        preheader: 'Ultimul pas pentru activarea contului Service-Hub.',
         title: 'Confirmă-ți emailul',
         blocks: [
           { p: 'Bine ai venit pe Service-Hub. Apasă butonul ca să confirmi adresa {{ .Email }}.' },
@@ -38,7 +38,7 @@ const TEXTS: Record<AuthEmailKind, { ro: Variant; en: Variant }> = {
     en: {
       subject: 'Confirm your email address',
       layout: {
-        preheader: 'One step to your Service-Hub account.',
+        preheader: 'One last step to activate your Service-Hub account.',
         title: 'Confirm your email',
         blocks: [
           { p: 'Welcome to Service-Hub. Tap the button to confirm {{ .Email }}.' },
