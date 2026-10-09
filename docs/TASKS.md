@@ -950,4 +950,6 @@ Migrarea `offers` (`schema_version` = 67). Termenii RO/EN §3 și §4.3 actualiz
 - Locurile la prețul de lansare: răspunsul public (`public_pricing`) nu mai primește orașul, așa că nimeni nu poate încerca oraș după oraș ca să afle unde s-au ocupat locurile. Nota de la înscriere e aceeași peste tot. Migrarea `launch_offer_private` (`schema_version` = 69).
 - Mai puține butoane: în Setări → Reguli, ofertele și confirmarea instantă au comutator (switch), procentul se alege dintr-o listă, serviciile și zilele dintr-o listă pop-up cu bife. Cardul „Invită un prieten” are un singur buton „Trimite invitația”, cu meniu (WhatsApp, Copiază linkul, altă aplicație pe telefon). Componente noi: `Switch`, `CheckMenu`, `MenuButton`.
 
+**PR:** #54 țintește direct `main` și conține și T33 (#52) și T34 (#53): Netlify face link de test doar pentru PR-urile spre `main`. Un singur Merge pe #54 le aduce pe toate trei; GitHub închide singur #52 și #53 ca incluse.
+
 Migrarea `client_referrals` (`schema_version` = 68). Termenii (§3.6a nouă) și Politica de confidențialitate (§2.2, §3, §4.1, §5) RO/EN actualizate, `TERMS_VERSION` = `2026-10-08.3`. Teste: `tests/sql/119_client_referrals.sql`, `tests/e2e/invite.spec.ts` (drumul întreg, RO/EN), unit pentru notificare și email. Fără pachete noi.
