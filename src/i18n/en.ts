@@ -200,7 +200,7 @@ export const en: Record<MessageKey, string> = {
   'auth.reset.expiredBody': 'The reset link has expired or was already used. Ask for a new one.',
   'auth.reset.askAgain': 'Get a new link',
 
-  'auth.error.emailFormat': "This email address doesn't look right.",
+  'auth.error.emailFormat': 'Invalid email address.',
   'auth.error.passwordRequired': 'Enter your password.',
   'auth.error.passwordShort': 'The password needs at least {min} characters.',
   'auth.error.passwordLettersDigits': 'The password needs both letters and digits.',

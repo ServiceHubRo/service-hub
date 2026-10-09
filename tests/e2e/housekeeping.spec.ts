@@ -117,7 +117,7 @@ test.describe('Bookings that look after themselves', () => {
     await expect.poll(async () => (await emailsTo(client)).map((m) => m.subject), { timeout: 20_000 }).toContain(
       'Cererea ta de programare s-a închis',
     );
-    const mail = (await emailsTo(client)).find((m) => m.subject.startsWith('Cererea ta s-a închis'))!;
+    const mail = (await emailsTo(client)).find((m) => m.subject.startsWith('Cererea ta de programare s-a închis'))!;
     expect(mail.text).toContain(`${shopName} nu a răspuns la timp`);
     expect(mail.html).toContain('/c/cauta?cat=cat_rev&amp;oras=Bra%C8%99ov');
 
@@ -168,7 +168,7 @@ test.describe('Bookings that look after themselves', () => {
     const at = new Date(Date.now() + (400 + Math.floor(Math.random() * 3000)) * DAY).toISOString();
     expect(await serviceRest<boolean>('rpc/send_admin_digest', 'POST', { p_now: at })).toBe(true);
     await expect.poll(async () => (await emailsTo('admin@service-hub.test')).slice(before).map((m) => m.subject), { timeout: 20_000 }).toContainEqual(
-      expect.stringMatching(/^Service-Hub: .+ te așteaptă azi$/),
+      expect.stringMatching(/^Service-Hub: de rezolvat azi \(\d+\)$/),
     );
     const mail = (await emailsTo('admin@service-hub.test')).slice(before).find((m) => m.subject.startsWith('Service-Hub:'))!;
     expect(mail.text).toContain('Firme în termenul de corectare (ANAF)');

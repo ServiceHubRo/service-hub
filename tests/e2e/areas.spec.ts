@@ -66,7 +66,7 @@ test.describe('zones', () => {
 
     const card = page.getByRole('region', { name: `În curând și în ${zone.ro}` });
     await expect(card).toBeVisible();
-    await expect(card).toContainText('Te anunțăm pe email când ajungem');
+    await expect(card).toContainText('Te anunțăm pe email când devin disponibile');
     await expectNoHorizontalScroll(page);
     await shot(page, 'zones-offer', name());
     await card.getByRole('button', { name: 'Anunță-mă' }).click();

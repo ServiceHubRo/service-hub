@@ -182,7 +182,7 @@ test.describe('shop settings', () => {
 
     await page.getByRole('link', { name: 'Setări service' }).click();
     await page.getByRole('link', { name: /Date de facturare/ }).click();
-    await expect(page.getByText('Nu este obligatoriu acum.', { exact: false })).toBeVisible();
+    await expect(page.getByText('Obligatorii până la sfârșitul perioadei gratuite.', { exact: false })).toBeVisible();
     await page.getByLabel('Denumire legală').fill('AUTO TEST S.R.L.');
     await page.getByLabel('CUI / Cod fiscal').fill('14872302');
     await page.getByLabel('Nr. Registrul Comerțului').fill('J08/1234/2015');
@@ -210,7 +210,7 @@ test.describe('shop settings', () => {
     const owner = await createUser('shop');
     await signIn(page, owner, PASSWORD);
     await openSettings(page, 'Personal');
-    await expect(page.getByText('Proprietar')).toBeVisible();
+    await expect(page.getByText('Proprietar', { exact: true })).toBeVisible();
 
     const colleague = uniqueEmail('coleg');
     await page.getByLabel('Emailul colegului').fill('nu-e-email');

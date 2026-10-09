@@ -198,7 +198,7 @@ export const ro = {
   'auth.reset.expiredBody': 'Linkul de resetare a expirat sau a fost deja folosit. Cere unul nou.',
   'auth.reset.askAgain': 'Cere alt link',
 
-  'auth.error.emailFormat': 'Adresa de email nu pare corectă.',
+  'auth.error.emailFormat': 'Adresa de email nu este validă.',
   'auth.error.passwordRequired': 'Scrie parola.',
   'auth.error.passwordShort': 'Parola trebuie să aibă cel puțin {min} caractere.',
   'auth.error.passwordLettersDigits': 'Parola trebuie să aibă și litere, și cifre.',

@@ -42,7 +42,7 @@ for (const [role, email, prefix] of [
     expect(href.startsWith('https://wa.me/40723375248?text=')).toBe(true);
     expect(decodeURIComponent(href.split('text=')[1]!)).toContain(`ID-ul contului meu: ${id}.`);
     await expect(whatsapp).toHaveAttribute('target', '_blank');
-    await expect(page.getByText(role === 'client' ? /scrie întâi service-ului, din Mesaje/ : /Pentru abonament, plăți/)).toBeVisible();
+    await expect(page.getByText(role === 'client' ? /scrie întâi service-ului din Mesaje/ : /Pentru o programare anume, include codul ei/)).toBeVisible();
     await expectNoHorizontalScroll(page);
     await expectAccessible(page, `${role} help (ro)`);
     await shot(page, `help-${role}-ro`, name());

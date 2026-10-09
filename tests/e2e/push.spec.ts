@@ -181,7 +181,7 @@ test.describe('push notifications', () => {
     await expect(page.getByRole('heading', { level: 1, name: 'Caută' })).toBeVisible();
 
     const banner = pushBanner(page);
-    await expect(banner).toContainText('Activează notificările ca să afli imediat de deviz');
+    await expect(banner).toContainText('Activează notificările pentru deviz');
     await expect(banner.getByRole('button', { name: 'Activează' })).toBeVisible();
     // Never the browser's prompt on its own.
     expect(asked).toBe(false);
@@ -234,7 +234,7 @@ test.describe('push notifications', () => {
     await browserPermission(page, 'default', 'granted');
     await signIn(page, email, PASSWORD);
     await expect(page.getByRole('heading', { level: 1, name: 'Panou' })).toBeVisible();
-    await expect(pushBanner(page)).toContainText('de cereri noi și de răspunsul clienților la deviz');
+    await expect(pushBanner(page)).toContainText('pentru cereri noi și răspunsurile clienților la deviz');
     await expectNoHorizontalScroll(page);
     await shot(page, 't12-banner-shop', name());
     await page.getByRole('button', { name: 'English' }).filter({ visible: true }).first().click();

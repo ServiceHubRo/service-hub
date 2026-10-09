@@ -54,7 +54,7 @@ test.describe('import from another program', () => {
     await page.getByRole('link', { name: 'Importă clienți din alt program' }).click();
     await expect(page).toHaveURL(/\/s\/programari\/import$/);
     await expect(page.getByRole('heading', { level: 1, name: 'Importă clienți' })).toBeVisible();
-    await expect(page.getByText('Adu-ți clienții din programul vechi', { exact: false })).toBeVisible();
+    await expect(page.getByText('Importă clienții dintr-un fișier Excel sau CSV', { exact: false })).toBeVisible();
 
     // A file that is not a table says so.
     await page
