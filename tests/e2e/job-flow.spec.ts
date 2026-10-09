@@ -143,7 +143,7 @@ test.describe('quote, work, completion, review', () => {
     await first.getByRole('checkbox', { name: /Plăcuțe/ }).uncheck();
     await first.getByRole('checkbox', { name: /Manoperă/ }).uncheck();
     await expect(first.getByRole('button', { name: 'Accept', exact: true })).toBeDisabled();
-    await expect(first).toContainText('Nu ai bifat nicio poziție');
+    await expect(first).toContainText('Bifează cel puțin o poziție sau apasă Refuz');
     await first.getByRole('checkbox', { name: /Plăcuțe/ }).check();
     await first.getByRole('checkbox', { name: /Manoperă/ }).check();
     await first.getByRole('button', { name: 'Accept selectate' }).click();
@@ -199,7 +199,7 @@ test.describe('quote, work, completion, review', () => {
     await expect(done.getByText('Alege o notă.')).toBeVisible();
     await done.getByRole('button', { name: '5 din 5 stele' }).click();
     await expect(done.getByRole('button', { name: '5 din 5 stele' })).toHaveAttribute('aria-pressed', 'true');
-    await done.getByLabel('Cum a fost? (opțional)').fill('Rapid și corect.');
+    await done.getByLabel('Comentariu (opțional)').fill('Rapid și corect.');
     await shot(page, 't09-client-review', name());
     await done.getByRole('button', { name: 'Trimite recenzia' }).click();
     await expect(done.getByText('Recenzie trimisă')).toBeVisible();

@@ -102,7 +102,7 @@ test.describe('T25 fraud checks', () => {
     );
     await signIn(page, admin, SEED_PASSWORD);
     await expect(page.getByRole('heading', { level: 1, name: 'Verificarea în doi pași' })).toBeVisible();
-    await expect(page.getByText('o parolă furată nu este suficientă')).toBeVisible();
+    await expect(page.getByText('Contul de admin cere la fiecare intrare')).toBeVisible();
     await page.setViewportSize({ width: 390, height: 844 });
     await expectNoHorizontalScroll(page);
     await shot(page, 't25-mfa-intro', 'mobile-390');

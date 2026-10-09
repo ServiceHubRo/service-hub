@@ -11,9 +11,12 @@
 // Answers { found, precision: 'address' | 'city' | null, latitude, longitude }.
 //
 // Nominatim's rules: an identifying User-Agent and at most one request per second. The app calls
-// this only when the address changed, so a shop makes a handful of requests a year.
+// this only when the address changed, so a shop makes a handful of requests a year; the database
+// refuses more than 10 an hour per shop (429, the old coordinates stay). The admin's path needs
+// the second step of sign-in (aal2).
 import { adminApi } from '../_shared/admin.ts';
 import { bearerToken, corsHeaders, json } from '../_shared/http.ts';
+import { tokenAal } from '../_shared/jwt.ts';
 import { reportError } from '../_shared/monitor.ts';
 
 const NOMINATIM = 'https://nominatim.openstreetmap.org/search';
@@ -75,7 +78,8 @@ Deno.serve(async (req) => {
 
   try {
     const api = adminApi();
-    const user = await api.userFromToken(bearerToken(req));
+    const token = bearerToken(req);
+    const user = await api.userFromToken(token);
     if (!user) return json({ error: 'not_signed_in' }, 401);
 
     // The admin (T16a) asks for a shop they just edited: { shop_id }. Everyone else gets their own.
@@ -88,7 +92,10 @@ Deno.serve(async (req) => {
     let shopId: unknown;
     if (typeof asked === 'string' && UUID.test(asked)) {
       const me = await api.select(`profiles?select=role,suspended&id=eq.${encodeURIComponent(user.id)}`);
-      if (me[0]?.role !== 'admin' || me[0]?.suspended === true) return json({ error: 'not_allowed' }, 403);
+      // Like every admin action: only after the second step of sign-in (T25).
+      if (me[0]?.role !== 'admin' || me[0]?.suspended === true || tokenAal(token) !== 'aal2') {
+        return json({ error: 'not_allowed' }, 403);
+      }
       shopId = asked;
     } else {
       const staff = await api.select(
@@ -101,6 +108,11 @@ Deno.serve(async (req) => {
     const shops = await api.select(`shops?select=street,city,county,postal_code&id=eq.${shopId}`);
     const address = shops[0] as unknown as Address | undefined;
     if (!address) return json({ error: 'not_allowed' }, 403);
+    // Nominatim allows about one request a second for the whole platform: at most 10 an hour per
+    // shop (security_limits migration); over it the old coordinates stay.
+    if ((await api.rpc('rate_take', { p_kind: 'geocode', p_subject: shopId, p_max: 10, p_window: '1 hour' })) !== true) {
+      return json({ error: 'rate_limited' }, 429);
+    }
 
     let place;
     try {

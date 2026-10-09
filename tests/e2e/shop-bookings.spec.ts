@@ -317,7 +317,7 @@ test.describe('shop flow', () => {
     const cy = card(page, 'Booking Y');
     await cy.getByRole('button', { name: 'Cancel', exact: true }).click();
     await cy.getByRole('button', { name: 'Cancel booking' }).click();
-    await expect(cy.getByText('Write the reason so the client knows why.')).toBeVisible();
+    await expect(cy.getByText('Enter the reason.')).toBeVisible();
     await shot(page, 't08-cancel-en', name());
     await cy.getByLabel('Reason').fill('The lift is broken this week.');
     await cy.getByRole('button', { name: 'Cancel booking' }).click();
@@ -332,7 +332,7 @@ test.describe('shop flow', () => {
     const cz = card(page, 'Booking Z');
     await cz.getByRole('button', { name: 'Decline' }).click();
     await cz.getByRole('button', { name: 'Decline request' }).click();
-    await expect(page.getByText(`Request ${z.ref} was declined. The client has been told.`)).toBeVisible();
+    await expect(page.getByText(`Request ${z.ref} was declined. The client has been notified.`)).toBeVisible();
     await expect(card(page, 'Booking Z')).toHaveCount(0);
     await expectNoHorizontalScroll(page);
   });

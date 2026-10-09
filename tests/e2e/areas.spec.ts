@@ -66,7 +66,7 @@ test.describe('zones', () => {
 
     const card = page.getByRole('region', { name: `În curând și în ${zone.ro}` });
     await expect(card).toBeVisible();
-    await expect(card).toContainText('Te anunțăm pe email când ajungem');
+    await expect(card).toContainText('Te anunțăm pe email când devin disponibile');
     await expectNoHorizontalScroll(page);
     await shot(page, 'zones-offer', name());
     await card.getByRole('button', { name: 'Anunță-mă' }).click();
@@ -77,7 +77,7 @@ test.describe('zones', () => {
     await shot(page, 'zones-waiting', name());
 
     // Details: the town and what they need, saved without leaving the card.
-    await waiting.getByRole('button', { name: 'Spune-ne mai multe' }).click();
+    await waiting.getByRole('button', { name: 'Adaugă detalii' }).click();
     await page.getByLabel('Localitatea (opțional)').fill('Comuna Test');
     await page.getByRole('button', { name: 'Frânare' }).click();
     await expect(page.getByRole('button', { name: 'Frânare', pressed: true })).toBeVisible();
@@ -99,8 +99,8 @@ test.describe('zones', () => {
 
     // "Nu mai vreau": asked inline, then the offer is back.
     await page.getByRole('button', { name: 'Nu mai vreau să fiu anunțat' }).click();
-    await expect(page.getByRole('heading', { name: 'Te scoatem de pe listă?' })).toBeVisible();
-    await page.getByRole('button', { name: 'Da, scoate-mă' }).click();
+    await expect(page.getByRole('heading', { name: 'Renunți la notificare?' })).toBeVisible();
+    await page.getByRole('button', { name: 'Da, renunț' }).click();
     await expect(page.getByRole('region', { name: `În curând și în ${zone.ro}` })).toBeVisible();
     expect(await serviceRest<unknown[]>(`area_waitlist?client_id=eq.${clientId}`, 'GET')).toEqual([]);
   });

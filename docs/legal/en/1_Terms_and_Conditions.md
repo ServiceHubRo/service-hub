@@ -1,6 +1,6 @@
 # Terms and Conditions — Service-Hub
 
-**Last updated:** October 8, 2026
+**Last updated:** October 9, 2026
 
 These terms (the “Terms”) apply to your use of Service-Hub: the website and app at service-hub.ro (the “Platform”). By creating an account, you confirm that you have read and agree to them. How we use your data is described in the Privacy Policy, and what we keep in your browser in the Cookie Policy.
 
@@ -89,8 +89,8 @@ Expiry dates for ITP, RCA and the vignette are optional. The alerts (30 days bef
 ### 3.6a Invite a friend
 
 - **Your invitation code** is your account number (like C-00042). You find it in Account → Invite a friend, with a sign-up link you can send (for example on WhatsApp). Your friend enters the code when signing up or signs up from the link; the code can only be given at sign-up.
-- **The free report:** when a shop finishes your friend's first job, booked through the Platform and costing more than 0, you get one free official history report (section 3.6), which you can use for any of your cars with completed jobs. The free report is made right away, without payment, and is the same as a paid one (code, verification, download).
-- **Limits:** one free report per friend (the same person, by email or phone, brings only one report, whoever invited them) and at most 3 free reports in 365 days per account (the Service-Hub team may change this number, announced in the app). None is given for an account of the same person (same email or phone), when the job is finished by your own shop, or if your account has meanwhile been deleted or suspended.
+- **The free report:** a friend counts when a shop finishes their first job, booked through the Platform and costing more than 0. For every 2 friends who count you get one free official history report (section 3.6), which you can use for any of your cars with completed jobs. The free report is made right away, without payment, and is the same as a paid one (code, verification, download).
+- **Limits:** each friend counts once (the same person, by email or phone, counts only once, whoever invited them) and you get at most 3 free reports in 365 days per account. The Service-Hub team may change the number of friends per report and the number of reports per year, announced in the app; friends who already counted stay counted. None is given for an account of the same person (same email or phone), when the job is finished by your own shop, or if your account has meanwhile been deleted or suspended.
 - **What you see:** how many friends signed up with your code and how many free reports you received; nothing about your friends.
 - A free report cannot be turned into money, points or discounts and cannot be transferred. We may change or stop the program for future invitations, announced in the app; free reports already received stay.
 

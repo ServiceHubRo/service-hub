@@ -88,7 +88,7 @@ test.describe('subscription', () => {
     await expect(page.getByText('Fără contract, anulezi oricând')).toBeVisible();
     await expect(page.getByText('Nicio plată încă.')).toBeVisible();
     // No invoice without the company's details: the button is a link to them.
-    await expect(page.getByText('Completează datele de facturare înainte de plată: factura se emite pe firma ta.')).toBeVisible();
+    await expect(page.getByText('Completează datele de facturare înainte de plată.')).toBeVisible();
     await expect(page.getByRole('button', { name: 'Activează abonamentul' })).toHaveCount(0);
     await expectNoHorizontalScroll(page);
     await shot(page, 't14-subscription-trial', name());

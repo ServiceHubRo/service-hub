@@ -277,6 +277,24 @@ where user_id = (select id from auth.users where email = 'adresa-ta@exemplu.ro')
 
 La următoarea intrare ca admin, aplicația îți cere să o configurezi din nou (cod QR nou). Nu da comanda nimănui: cine o poate rula are deja acces la tot proiectul.
 
+### 4.6c Securitatea conturilor tale și a setărilor (după T36)
+
+Partea din cod e făcută (headerele de securitate, regulile din baza de date, limitele). Ce rămâne ține de conturile tale, pe care eu nu le pot atinge. În ordinea importanței:
+
+1. **Codul din telefon (2FA) pe toate conturile platformei.** Cine îți ia parola de la unul dintre ele poate face orice. Pornește-l pe fiecare:
+   - **GitHub**: poza ta (dreapta sus) → **Settings → Password and authentication → Two-factor authentication → Enable**.
+   - **Supabase**: poza ta → **Account preferences → Multi-factor authentication → Add factor**.
+   - **Netlify**: **User settings → Security → Two-factor authentication → Enable**.
+   - **Stripe**: **Settings (rotița) → Personal details → Two-step authentication → Add**.
+   - **Resend**, **Cloudflare**, **Sentry**, firma de la care ai domeniul și **emailul tău** (Gmail: myaccount.google.com → **Security → 2-Step Verification**). Emailul e cel mai important: prin el se resetează parolele de la toate celelalte.
+2. **GitHub: nimeni nu scrie direct în `main`.** Repository → **Settings → Branches → Add branch ruleset** (sau **Add rule**). Name `main`, **Enforcement status: Active**, **Target branches → Add target → Include default branch**. Bifează **Restrict deletions**, **Require a pull request before merging** (Required approvals: 0) și **Require status checks to pass**. La al doilea: **Add checks** → `Typecheck, lint, tests, build` și `Browser tests (390 / 820 / 1440 px)` → **Create**. Tu dai în continuare Merge ca acum, dar doar când testele sunt verzi.
+3. **Supabase, proiectul real → Authentication**:
+   - **Sign In / Providers → Email**: **Secure email change** pornit (cere confirmare pe ambele adrese); **Secure password change** pornit (cine are doar o sesiune furată nu poate schimba parola fără un cod pe email); **Minimum password length** `8`; **Password requirements** „Letters and digits” → **Save**.
+   - **Attack Protection**: CAPTCHA (pasul 4.3). Dacă apare **Prevent use of leaked passwords** (pe planul Pro), pornește-l: refuză parolele apărute în scurgeri de date cunoscute.
+4. **Proiectul de test** (Partea 2) și **copiile de siguranță** (4.1), dacă nu le-ai făcut încă.
+
+Nimic de aici nu cere cod nou și nu se vede în aplicație, în afară de cerințele pentru parolă (le arată Supabase la înregistrare).
+
 ### 4.7 După mutare
 
 - **Partea 5** (ștergerea conturilor de test), chiar înainte să anunți lansarea.

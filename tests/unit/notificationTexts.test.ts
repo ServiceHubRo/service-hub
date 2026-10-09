@@ -220,10 +220,10 @@ describe('notification texts', () => {
     expect(render('welcome', 'client', 'ro')).toMatchObject({ url: '/c/cauta' });
     expect(render('welcome', 'client', 'ro', { day: 14 })).toMatchObject({ title: 'Adaugă mașina în Garaj', url: '/c/garaj' });
     expect(render('welcome', 'client', 'en', { day: 14, has_car: true })!.body).toBe(
-      'When your car needs a shop, compare the reviews and book in the app. It takes a minute.',
+      'When your car needs service, compare reviews and book in the app.',
     );
     expect(render('area_launched', 'client', 'ro')).toMatchObject({
-      title: 'Service-Hub a ajuns și la tine',
+      title: 'Service-Hub este disponibil în zona ta',
       body: 'De azi te poți programa online la service-urile din județul Cluj. Caută unul aproape de tine.',
       url: '/c/cauta',
       tag: 'area_launched',
@@ -253,7 +253,7 @@ describe('notification texts', () => {
     });
     expect(render('booking_request_last_call', 'shop', 'ro')).toMatchObject({
       title: 'Ultima reamintire pentru o cerere',
-      body: 'Ana Marin așteaptă încă răspuns pentru Mie 14 oct, 10:00: Schimb ulei și filtru. Dacă nu răspunzi până atunci, cererea se închide automat. Confirmă programarea sau propune altă oră.',
+      body: 'Ana Marin așteaptă răspuns pentru Mie 14 oct, 10:00: Schimb ulei și filtru. Confirmă sau propune altă oră până atunci, altfel cererea se închide automat.',
       url: '/s/programari?tab=cereri&p=b-1',
     });
     expect(render('booking_request_last_call', 'shop', 'en')!.title).toBe('Last reminder for a request');
@@ -277,40 +277,40 @@ describe('notification texts', () => {
   it('asks for a review of the job, and opens the form on the booking', () => {
     expect(render('review_request', 'client', 'ro')).toMatchObject({
       title: 'Atelier Unu',
-      body: 'Cum a fost la Atelier Unu? Lasă o recenzie pentru Schimb ulei și filtru. Durează un minut și îi ajută pe alți șoferi.',
+      body: 'Lasă o recenzie pentru Schimb ulei și filtru la Atelier Unu.',
       url: '/c/programari?p=b-1&recenzie=1',
       tag: 'review-request-b-1',
     });
     expect(render('review_request', 'client', 'en')!.body).toBe(
-      'How was it at Atelier Unu? Leave a review for Oil & oil filter change. It takes a minute and helps other drivers.',
+      'Leave a review for Oil & oil filter change at Atelier Unu.',
     );
   });
 
   it('reminds the next service as a heads-up and opens the booking at the same shop, the service and the car chosen', () => {
     expect(render('service_due', 'client', 'ro')).toMatchObject({
       title: 'Volkswagen Golf 7: Schimb ulei și filtru',
-      body: 'Ca să știi: ultima dată pe 20 oct 2024, la Atelier Unu. De obicei se verifică pe la 20 oct. Poate nu e cazul încă, tu decizi.',
+      body: 'Ultima dată: 20 oct 2024, la Atelier Unu. Verificare recomandată în jurul datei de 20 oct.',
       url: '/c/service/s-1/programare?pas=2&serviciu=lichid_frana&masina=c-1',
       tag: 'service-due-c-1-lichid_frana',
     });
     expect(render('service_due', 'client', 'en')!.body).toBe(
-      'Just a heads-up: last done on Oct 20, 2024 at Atelier Unu. It is usually checked around Oct 20. It may not be needed yet; your call.',
+      'Last done on Oct 20, 2024 at Atelier Unu. Next check recommended around Oct 20.',
     );
   });
 
   it('reminds the oil change with the client\'s own interval (T30)', () => {
     const oil = { kind: 'oil', months: 6, service_id: 'ulei', last_done: '2026-04-20', due: '2026-10-20' };
     expect(render('service_due', 'client', 'ro', oil)).toMatchObject({
-      body: 'Ultimul schimb: 20 apr, la Atelier Unu. La fiecare 6 luni, următorul vine pe la 20 oct. Programează-te din aplicație.',
+      body: 'Ultimul schimb: 20 apr, la Atelier Unu. Următorul: în jurul datei de 20 oct (la fiecare 6 luni). Programează-te din aplicație.',
       url: '/c/service/s-1/programare?pas=2&serviciu=ulei&masina=c-1',
     });
     expect(render('service_due', 'client', 'en', { ...oil, months: 24 })!.body).toBe(
-      'Last changed on Apr 20 at Atelier Unu. Every 24 months, so the next one is due around Oct 20. Book it in the app.',
+      'Last changed on Apr 20 at Atelier Unu. Next change due around Oct 20 (every 24 months). Book it in the app.',
     );
-    expect(render('service_due', 'client', 'ro', { ...oil, months: 24 })!.body).toContain('La fiecare 24 de luni,');
+    expect(render('service_due', 'client', 'ro', { ...oil, months: 24 })!.body).toContain('(la fiecare 24 de luni)');
     // The date written in the Garage: no shop, the maintenance shops.
     expect(render('service_due', 'client', 'ro', { ...oil, shop_id: null, shop_name: null })).toMatchObject({
-      body: 'Ultimul schimb: 20 apr. La fiecare 6 luni, următorul vine pe la 20 oct. Programează-te din aplicație.',
+      body: 'Ultimul schimb: 20 apr. Următorul: în jurul datei de 20 oct (la fiecare 6 luni). Programează-te din aplicație.',
       url: '/c/cauta?cat=cat_rev',
     });
   });
@@ -393,11 +393,11 @@ describe('notification texts', () => {
     const params = { shop_name: 'Atelier Unu', client_name: 'Ana Marin', category: 'cat_rev', city: 'Brașov' };
     expect(renderNotification(ev('request_expired', 'client', 'ro', params), {}, NOW)).toMatchObject({
       title: 'Cererea ta s-a închis',
-      body: 'Ne pare rău, Atelier Unu nu a reușit să răspundă la timp pentru Mie 14 oct, 10:00. Îți arătăm acum alte service-uri din zonă care te pot ajuta.',
+      body: 'Atelier Unu nu a răspuns la timp la cererea ta pentru Mie 14 oct, 10:00. Poți alege alt service din zonă.',
     });
     expect(renderNotification(ev('request_expired', 'client', 'en', params), {}, NOW)!.title).toBe('Your request has closed');
     expect(renderNotification(ev('request_expired', 'shop', 'ro', params), {}, NOW)!.body).toBe(
-      'Cererea de la Ana Marin pentru Mie 14 oct, 10:00 (Schimb ulei și filtru) s-a închis automat, pentru că ora programării a trecut. Un răspuns rapid aduce mai mulți clienți în service.',
+      'Cererea de la Ana Marin pentru Mie 14 oct, 10:00 (Schimb ulei și filtru) s-a închis automat: ora programării a trecut fără răspuns.',
     );
     expect(urlFor('client', ev('request_expired', 'client', 'ro', params))).toBe('/c/cauta?cat=cat_rev&oras=Bra%C8%99ov');
     expect(urlFor('client', ev('request_expired', 'client', 'ro'))).toBe('/c/cauta');
@@ -407,11 +407,11 @@ describe('notification texts', () => {
   it('asks the shop how a past appointment went, and says when it closed on its own', () => {
     const params = { client_name: 'Ana Marin', ref: 'P-000123' };
     expect(renderNotification(ev('booking_followup', 'shop', 'ro', params), {}, NOW)).toMatchObject({
-      title: 'Cum a decurs programarea?',
-      body: 'Ana Marin avea programare Mie 14 oct, 10:00, pentru Volkswagen Golf 7 (BV 12 ABC). Spune-ne ce s-a întâmplat: dacă mașina a venit, apasă „În constatare”, iar dacă nu, „Neprezentat”.',
+      title: 'Actualizează programarea',
+      body: 'Ana Marin avea programare Mie 14 oct, 10:00, pentru Volkswagen Golf 7 (BV 12 ABC). Dacă mașina a venit, apasă „În constatare”; dacă nu, „Neprezentat”.',
     });
     expect(renderNotification(ev('booking_auto_closed', 'shop', 'en', params), {}, NOW)!.body).toBe(
-      'Booking P-000123 with Ana Marin on Wed, Oct 14, 10:00 closed automatically because it was not updated for 7 days. The customer was not marked as a no-show.',
+      'Booking P-000123 with Ana Marin on Wed, Oct 14, 10:00 closed automatically after 7 days without an update. The customer was not marked as a no-show.',
     );
     expect(urlFor('shop', ev('booking_auto_closed', 'shop', 'ro', params))).toBe('/s/istoric?q=P-000123');
     expect(urlFor('shop', ev('booking_followup', 'shop', 'ro', params))).toBe('/s/programari?p=b-1');

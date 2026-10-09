@@ -24,7 +24,6 @@ export function HelpScreen({ role }: { role: 'client' | 'shop' }) {
     <div className={styles.page}>
       <BackLink to={NAV[role].account.path} label={t('nav.account')} />
       <h1>{t('help.title')}</h1>
-      <p className={styles.sub}>{t('help.intro')}</p>
 
       <div className={styles.tiles}>
         <Tile

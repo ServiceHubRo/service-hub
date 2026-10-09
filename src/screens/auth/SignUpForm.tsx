@@ -12,7 +12,7 @@ import { checkClientInviteCode, checkReferralCode } from '../../data/referrals';
 import { useI18n } from '../../i18n/context';
 import { recordEmailSent } from '../../lib/cooldown';
 import { TERMS_VERSION, type LegalDocId } from '../../lib/legal';
-import { looksLikeEmail, MIN_PASSWORD_LENGTH } from '../../lib/password';
+import { looksLikeEmail, MIN_PASSWORD_LENGTH, passwordProblem } from '../../lib/password';
 import { DEFAULT_PHONE_COUNTRY, phoneFromInput } from '../../lib/phone';
 import { LaunchOfferNote } from './LaunchOfferNote';
 import { useFocusFirstError } from './useFocusFirstError';
@@ -93,7 +93,8 @@ export function SignUpForm({
     if (!phoneFromInput(phoneCountry, phone))
       next.phone = t(phoneCountry === 'RO' ? 'auth.error.phoneInvalid' : 'auth.error.phoneInvalidIntl');
     if (!looksLikeEmail(email)) next.email = t('auth.error.emailFormat');
-    if (password.length < MIN_PASSWORD_LENGTH) next.password = t('auth.error.passwordShort', { min: MIN_PASSWORD_LENGTH });
+    const weak = passwordProblem(password);
+    if (weak) next.password = weak === 'short' ? t('auth.error.passwordShort', { min: MIN_PASSWORD_LENGTH }) : t('auth.error.passwordLettersDigits');
     else if (confirm !== password) next.confirm = t('auth.error.passwordMismatch');
     if (!terms) next.terms = t('auth.error.termsRequired');
     return next;

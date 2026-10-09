@@ -167,7 +167,7 @@ test.describe('shop settings', () => {
     await page.getByLabel('Site (opțional)').fill('atelier');
     await page.getByRole('button', { name: 'Salvează profilul' }).click();
     await expect(page.getByText('Codul poștal are exact 6 cifre.')).toBeVisible();
-    await expect(page.getByText('Adresa nu pare corectă. Exemplu: www.atelier.ro')).toBeVisible();
+    await expect(page.getByText('Adresă invalidă. Exemplu: www.atelier.ro')).toBeVisible();
     await page.getByLabel('Cod poștal').fill('500059');
     await page.getByLabel('Site (opțional)').fill('www.atelier-test.ro');
     await page.getByLabel('Descriere scurtă').fill('Service auto multimarcă.');
@@ -182,7 +182,7 @@ test.describe('shop settings', () => {
 
     await page.getByRole('link', { name: 'Setări service' }).click();
     await page.getByRole('link', { name: /Date de facturare/ }).click();
-    await expect(page.getByText('Nu este obligatoriu acum.', { exact: false })).toBeVisible();
+    await expect(page.getByText('Obligatorii până la sfârșitul perioadei gratuite.', { exact: false })).toBeVisible();
     await page.getByLabel('Denumire legală').fill('AUTO TEST S.R.L.');
     await page.getByLabel('CUI / Cod fiscal').fill('14872302');
     await page.getByLabel('Nr. Registrul Comerțului').fill('J08/1234/2015');
@@ -210,12 +210,12 @@ test.describe('shop settings', () => {
     const owner = await createUser('shop');
     await signIn(page, owner, PASSWORD);
     await openSettings(page, 'Personal');
-    await expect(page.getByText('Proprietar')).toBeVisible();
+    await expect(page.getByText('Proprietar', { exact: true })).toBeVisible();
 
     const colleague = uniqueEmail('coleg');
     await page.getByLabel('Emailul colegului').fill('nu-e-email');
     await page.getByRole('button', { name: 'Trimite invitația' }).click();
-    await expect(page.getByText('Adresa de email nu pare corectă.')).toBeVisible();
+    await expect(page.getByText('Adresa de email nu este validă.')).toBeVisible();
     await page.getByLabel('Emailul colegului').fill(colleague);
     await page.getByRole('button', { name: 'Trimite invitația' }).click();
     const linkField = page.getByLabel('Linkul de invitație');

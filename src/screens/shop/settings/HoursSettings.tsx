@@ -58,7 +58,6 @@ export function HoursSettings() {
     <div className={styles.page}>
       <BackLink to={SETTINGS_PATH} label={t('settings.title')} />
       <h1>{t('settings.hours')}</h1>
-      <p className={styles.intro}>{t('hours.intro')}</p>
 
       <h2 className={styles.section}>{t('hours.week')}</h2>
       {hours.state.status === 'loading' && <SkeletonList count={3} />}

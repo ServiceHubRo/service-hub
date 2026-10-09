@@ -111,7 +111,7 @@ test.describe('Fișa mașinii', () => {
     await client.getByLabel('Model').fill('Focus');
     await client.getByLabel('An fabricație').fill('2017');
     await client.getByLabel('Nr. înmatriculare').fill(plate);
-    const agree = client.getByRole('checkbox', { name: 'Arată service-ului ce s-a făcut la mașină la alte service-uri' });
+    const agree = client.getByRole('checkbox', { name: 'Arată service-ului istoricul lucrărilor de la alte service-uri' });
     await expect(agree).not.toBeChecked();
     await expect(client.getByText('fără prețuri sau nume de service-uri', { exact: false })).toBeVisible();
     await agree.check();
@@ -131,7 +131,7 @@ test.describe('Fișa mașinii', () => {
     await expect(page).toHaveURL(/\/s\/panou$/);
     await page.goto('/s/programari');
     const card = page.locator('li').filter({ hasText: 'Ford Focus' });
-    await expect(card).toContainText('Clientul îți arată ce s-a făcut la mașină la alte service-uri');
+    await expect(card).toContainText('Clientul a partajat istoricul mașinii de la alte service-uri');
     await shot(page, 't27-shop-card', name());
     await openFileFromBookings(page);
     await expect(page.getByRole('link', { name: 'Fișa mașinii' })).toHaveCount(0);
@@ -183,7 +183,7 @@ test.describe('Fișa mașinii', () => {
     await serviceRest(`profiles?id=eq.${await userIdOf(shopEmail)}`, 'PATCH', { lang: 'en' });
     await openFileFromBookingsEn(page);
     await expect(page.getByText('Last known odometer: 101,250 km')).toBeVisible();
-    await expect(page.getByRole('region', { name: /Previous repairs at other shops/ })).toContainText('No prices and no shop names.');
+    await expect(page.getByRole('region', { name: /Previous repairs at other shops/ })).toContainText('without prices or shop names');
     await expect(page.getByRole('region', { name: new RegExp(`At ${shopName}`) })).toContainText('389 RON');
     await expectNoHorizontalScroll(page);
     await shot(page, 't27-vehicle-file-en', name());

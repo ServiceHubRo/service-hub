@@ -154,7 +154,6 @@ export function RulesSettings() {
     <div className={styles.page}>
       <BackLink to={SETTINGS_PATH} label={t('settings.title')} />
       <h1>{t('settings.rules')}</h1>
-      <p className={styles.intro}>{t('rules.intro')}</p>
 
       <Card>
         <div id="capacitate" ref={capacityRef} className={own.block}>
@@ -167,7 +166,6 @@ export function RulesSettings() {
             decreaseLabel={t('common.decrease')}
             increaseLabel={t('common.increase')}
           />
-          <p className={styles.hint}>{t('rules.capacity.hint')}</p>
         </div>
         <div className={own.block}>
           <Stepper

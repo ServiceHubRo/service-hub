@@ -212,6 +212,7 @@ export const ABUSE_LIMIT_KEYS = [
   'company_fix_days',
   'company_recheck_days',
   'referral_credits_per_year',
+  'referral_friends_per_report',
 ] as const;
 /** The notification limits (T24): quiet hours, tips a week, when a waiting request is recalled. */
 export const NOTIFICATION_LIMIT_KEYS = ['quiet_hours_start', 'quiet_hours_end', 'promo_per_week', 'request_reminder_hours'] as const;

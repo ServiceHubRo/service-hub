@@ -55,6 +55,7 @@ export type PluralUnit =
   | 'unit.repairs'
   | 'unit.jobs'
   | 'unit.freeReports'
+  | 'unit.friends'
   | 'unit.trialLeft'
   | 'unit.clients'
   | 'unit.reportsPending'

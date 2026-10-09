@@ -13,6 +13,7 @@ import { webOrigin } from '../../lib/native';
 import { inviteSignUpPath } from '../auth/paths';
 import { MY_REPORTS_PATH } from '../client/paths';
 import styles from '../shop/subscription/ReferralCard.module.css';
+import sub from '../shop/subscription/subscription.module.css';
 
 /**
  * "Invită un prieten" in the client's Cont (T35): the client's code and one "Trimite invitația"
@@ -83,7 +84,11 @@ function Invites({ data }: { data: MyInvites }) {
       <h2 id="invite-title" className={styles.title}>
         <Gift size={20} className={styles.icon} aria-hidden="true" /> {t('friend.title')}
       </h2>
-      <p>{t('friend.lead')}</p>
+      <p>
+        {data.friendsPerReport > 1
+          ? t('friend.lead', { friends: plural(lang, 'unit.friends', data.friendsPerReport) })
+          : t('friend.leadOne')}
+      </p>
       {data.creditsPerYear > 0 && (
         <p className={styles.muted}>{t('friend.limit', { credits: plural(lang, 'unit.freeReports', data.creditsPerYear) })}</p>
       )}
@@ -115,6 +120,23 @@ function Invites({ data }: { data: MyInvites }) {
             value={url}
             onFocus={(e) => e.target.select()}
           />
+        </>
+      )}
+      {data.friendsPerReport > 1 && data.creditsPerYear > 0 && (
+        <>
+          <p className={styles.earned}>
+            {t('friend.progress', { n: data.progress, total: plural(lang, 'unit.friends', data.friendsPerReport) })}
+          </p>
+          <div
+            className={sub.meter}
+            role="meter"
+            aria-valuemin={0}
+            aria-valuemax={data.friendsPerReport}
+            aria-valuenow={data.progress}
+            aria-label={t('friend.progress', { n: data.progress, total: plural(lang, 'unit.friends', data.friendsPerReport) })}
+          >
+            <span style={{ width: `${Math.min(100, Math.round((data.progress / data.friendsPerReport) * 100))}%` }} />
+          </div>
         </>
       )}
       <p className={styles.muted}>{t('friend.stats', { invited: data.invited, rewarded: data.rewarded })}</p>

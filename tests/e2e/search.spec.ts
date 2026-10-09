@@ -112,7 +112,7 @@ test.describe('client search', () => {
 
     // The order explained.
     await page.getByRole('button', { name: 'Cum este ordonată lista?' }).click();
-    await expect(page.getByText(/Nimeni nu plătește ca să urce/)).toBeVisible();
+    await expect(page.getByText(/Poziția nu se poate cumpăra/)).toBeVisible();
 
     // The filters live in the address: a reload keeps them.
     await page.reload();

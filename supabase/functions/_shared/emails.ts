@@ -319,7 +319,7 @@ function subscriptionEmail(e: EmailEvent, lang: Lang, app: string): EmailContent
       const until = day(p.expiry);
       const reward = credit
         ? en
-          ? `Your next payment is ${total} lower: we took one month off.`
+          ? `Your next payment is ${total} lower, the value of one month of subscription.`
           : `Următoarea ta plată este mai mică cu ${total}, valoarea unei luni de abonament.`
         : en
           ? `Your free period is ${days} days longer${until ? `, until ${until}` : ''}.`
@@ -337,7 +337,7 @@ function subscriptionEmail(e: EmailEvent, lang: Lang, app: string): EmailContent
           { p: reward },
           {
             p: en
-              ? 'Every shop you bring that pays brings you another free month, up to 12.'
+              ? 'Each referred shop that pays its subscription earns you another free month, up to 12.'
               : 'Pentru fiecare service recomandat de tine care plătește abonamentul primești încă o lună gratuită, până la 12.',
           },
         ],
@@ -363,8 +363,8 @@ function subscriptionEmail(e: EmailEvent, lang: Lang, app: string): EmailContent
           { p: why },
           {
             p: en
-              ? 'So the free month for the referral was canceled. We only took back what you had not used yet; nothing extra is charged.'
-              : 'Prin urmare, luna gratuită pentru recomandare s-a anulat. Am retras doar zilele pe care nu le folosiseși încă; nu plătești nimic în plus.',
+              ? 'The free month for the referral is canceled. Only the unused days were taken back; nothing extra is charged.'
+              : 'Luna gratuită pentru recomandare s-a anulat. Am retras doar zilele nefolosite; nu plătești nimic în plus.',
           },
         ],
         button: open,
@@ -487,7 +487,7 @@ export function emailForEvent(e: EmailEvent, app: string): EmailContent | null {
           { p: `${shop} a raportat o recenzie. Recenzia rămâne publică până decizi.` },
           { rows },
           ...(str(p.text) ? [{ quote: str(p.text) }] : [{ p: 'Recenzia nu are text.' }]),
-          { p: 'Service-ului i-am promis un răspuns în cel mult 5 zile lucrătoare.' },
+          { p: 'Termen de răspuns către service: cel mult 5 zile lucrătoare.' },
         ],
         button: { label: 'Deschide Service-Hub', url: `${app}/intra` },
         footer: 'Primești acest email ca administrator Service-Hub (ADMIN_EMAIL).',
@@ -619,10 +619,10 @@ function areaLaunchedEmail(p: Record<string, unknown>, lang: Lang, app: string):
   const area = areaName(lang, p);
   if (!area) return null;
   const en = lang === 'en';
-  return email(en ? `Service-Hub is now in ${area}` : `Service-Hub a ajuns în ${area}`, {
+  return email(en ? `Service-Hub is now available in ${area}` : `Service-Hub este disponibil în ${area}`, {
     lang,
     preheader: en ? 'You can book a car shop near you online.' : 'Te poți programa online la un service aproape de tine.',
-    title: en ? 'We are in your area now' : 'Am ajuns și în zona ta',
+    title: en ? 'Service-Hub is now available in your area' : 'Service-Hub este disponibil în zona ta',
     blocks: [
       {
         p: en
@@ -746,17 +746,12 @@ function requestExpiredEmail(e: EmailEvent, lang: Lang, app: string): EmailConte
   const shop = str(p.shop_name) || 'Service-Hub';
   if (side === 'client') {
     const search = `${app}${urlFor('client', n)}`;
-    return email(en ? 'Your request has closed: other shops can help' : 'Cererea ta s-a închis: alte service-uri te pot ajuta', {
+    return email(en ? 'Your booking request has closed' : 'Cererea ta de programare s-a închis', {
       lang,
       preheader: text.body,
       title: text.title,
       blocks: [
         { p: text.body },
-        {
-          p: en
-            ? 'Booking again takes less than a minute, and your car details are already saved.'
-            : 'O nouă programare durează mai puțin de un minut, iar datele mașinii tale sunt deja salvate.',
-        },
       ],
       button: { label: en ? 'Find another shop' : 'Caută alt service', url: search },
       footer: en
@@ -772,8 +767,8 @@ function requestExpiredEmail(e: EmailEvent, lang: Lang, app: string): EmailConte
       { p: text.body },
       {
         p: en
-          ? 'Tip: turn on notifications on your phone, so every new request reaches you right away.'
-          : 'Un sfat: activează notificările pe telefon, ca fiecare cerere nouă să ajungă imediat la tine.',
+          ? 'Turn on phone notifications to receive new requests right away.'
+          : 'Activează notificările pe telefon ca să primești imediat cererile noi.',
       },
     ],
     button: { label: en ? 'Open Bookings' : 'Deschide Programări', url: `${app}/s/programari?tab=cereri` },
@@ -805,16 +800,16 @@ function adminDigestEmail(p: Record<string, unknown>, app: string): EmailContent
     ['Programări noi', String(n(p.new_bookings))],
     ['Lucrări finalizate', String(n(p.done))],
   ];
-  return email(`Service-Hub: ${total === 1 ? 'un lucru te așteaptă' : `${total} lucruri te așteaptă`} azi`, {
+  return email(`Service-Hub: de rezolvat azi (${total})`, {
     lang: 'ro',
     preheader: rows.map(([what, count]) => `${what}: ${count}`).join(' · '),
-    title: 'Bună dimineața',
+    title: 'Rezumat zilnic',
     blocks: [
-      { p: 'Iată ce te așteaptă azi pe Service-Hub:' },
+      { p: 'De rezolvat azi:' },
       { rows },
       { p: 'Ultimele 24 de ore pe platformă:' },
       { rows: day },
-      { p: 'Le găsești pe toate în panoul de admin: Moderare, Abonamente și Raport ANAF.' },
+      { p: 'Detalii în panoul de admin: Moderare, Abonamente și Raport ANAF.' },
     ],
     button: { label: 'Deschide Service-Hub', url: `${app}/intra` },
     footer: 'Primești acest email ca administrator Service-Hub (ADMIN_EMAIL), doar în zilele în care ceva te așteaptă.',

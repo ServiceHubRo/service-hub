@@ -99,9 +99,9 @@ test.describe('bookings added by the shop', () => {
       ],
       p_request_id: crypto.randomUUID(),
     });
-    await expect(card).toContainText('Clientul nu are cont: trece tu răspunsul lui.');
+    await expect(card).toContainText('Clientul nu are cont. Înregistrează aici răspunsul lui.');
     await card.getByRole('button', { name: 'Răspunsul clientului' }).click();
-    await expect(card.getByText('Ce a spus clientul?')).toBeVisible();
+    await expect(card.getByText('Decizia clientului')).toBeVisible();
     await card.getByRole('checkbox', { name: /Filtru aer/ }).setChecked(false);
     await expectAccessible(page, 'client answer');
     await shot(page, 'walkin-answer', name());
