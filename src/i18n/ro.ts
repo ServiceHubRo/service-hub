@@ -696,7 +696,7 @@ export const ro = {
   'expiry.inDays': '{doc} la {car} în {days}',
   'expiry.today': '{doc} la {car} expiră azi',
   'expiry.ago': '{doc} la {car} a expirat acum {days}',
-  'expiry.more': '+{n} de verificat',
+  'expiry.more': '+{n} în Garaj',
 
   'bookings.active': 'Active',
   'bookings.past': 'Încheiate',
@@ -1772,7 +1772,7 @@ export const ro = {
   'friend.lead': 'Primești un raport de istoric gratuit la fiecare {friends} care își fac cont cu linkul tău și finalizează prima lucrare prin Service-Hub.',
   'friend.leadOne': 'Primești un raport de istoric gratuit când un prieten își face cont cu linkul tău și finalizează prima lucrare prin Service-Hub.',
   'friend.progress': 'Spre următorul raport: {n} din {total}',
-  'friend.limit': 'Până la {credits} pe an.',
+  'friend.limit': 'Până la {credits} pe an. Raportul gratuit rămâne în cont până îl folosești.',
   'friend.code': 'Codul tău',
   'friend.send': 'Trimite invitația',
   'friend.other': 'Altă aplicație',

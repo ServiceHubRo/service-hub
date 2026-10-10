@@ -91,7 +91,7 @@ test.describe('garage', () => {
     await banner.click();
     await expect(page).toHaveURL(/\/c\/garaj$/);
 
-    // An expired RCA: red, first in the banner, "+1 de verificat".
+    // An expired RCA: red, first in the banner; the ITP on its own line under it.
     await page.getByRole('link', { name: 'Editează Volkswagen Golf 7' }).click();
     await expect(page.getByLabel('Marcă')).toHaveValue('Volkswagen');
     await expect(page.getByLabel(/Serie de șasiu/)).toHaveValue('WVWZZZAUZGW123456');
@@ -99,7 +99,10 @@ test.describe('garage', () => {
     await page.getByRole('button', { name: 'Salvează' }).click();
     await expect(page.getByText('RCA: expirat de 2 zile')).toBeVisible();
     await navLink(page, 'Caută').click();
-    await expect(page.getByRole('link', { name: /RCA la Golf 7 a expirat acum 2 zile/ })).toContainText('+1 de verificat');
+    const both = page.getByRole('link', { name: /RCA la Golf 7 a expirat acum 2 zile/ });
+    await expect(both).toContainText('ITP la Golf 7 în 10 zile');
+    await expect(both).not.toContainText('în Garaj');
+    await shot(page, 't07-search-expiry-two', name());
 
     // Delete: an inline confirmation, then the empty garage.
     await navLink(page, 'Garaj').click();

@@ -698,7 +698,7 @@ export const en: Record<MessageKey, string> = {
   'expiry.inDays': '{doc} for {car} in {days}',
   'expiry.today': '{doc} for {car} expires today',
   'expiry.ago': '{doc} for {car} expired {days} ago',
-  'expiry.more': '+{n} more to check',
+  'expiry.more': '+{n} more in Garage',
 
   'bookings.active': 'Active',
   'bookings.past': 'Past',
@@ -1774,7 +1774,7 @@ export const en: Record<MessageKey, string> = {
   'friend.lead': 'You get a free history report for every {friends} who sign up with your link and complete a first job through Service-Hub.',
   'friend.leadOne': 'You get a free history report when a friend signs up with your link and completes a first job through Service-Hub.',
   'friend.progress': 'Toward your next report: {n} of {total}',
-  'friend.limit': 'Up to {credits} a year.',
+  'friend.limit': 'Up to {credits} a year. A free report stays in your account until you use it.',
   'friend.code': 'Your code',
   'friend.send': 'Send the invitation',
   'friend.other': 'Another app',

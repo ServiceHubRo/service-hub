@@ -181,11 +181,17 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
+  gap: 3px;
 }
 
 .expiryLine {
   font-weight: 650;
   font-size: 13.5px;
+}
+
+/* An expired document: red text (the sentence itself says "a expirat"). */
+.expiryLineRed {
+  color: var(--red-text);
 }
 
 .expiryMore {
