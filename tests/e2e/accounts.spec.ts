@@ -208,6 +208,21 @@ test.describe('with accounts', () => {
     await expect(page.getByLabel('Telefon')).toHaveValue('15123456789');
   });
 
+  test('a temporary email address is refused with its own message', async ({ page }) => {
+    await page.goto('/cont-nou');
+    await page.getByRole('button', { name: 'Sunt client' }).click();
+    await page.getByLabel('Nume și prenume').fill('Ion Test');
+    await page.getByLabel('Telefon').fill(uniquePhone().national);
+    await page.getByLabel('Email').fill(`ion.${Date.now()}@sharklasers.com`);
+    await page.getByLabel('Parolă', { exact: true }).fill(PASSWORD);
+    await page.getByLabel('Repetă parola').fill(PASSWORD);
+    await page.getByRole('checkbox').check();
+    await page.getByRole('button', { name: 'Creează cont' }).click();
+    await expect(page.getByText('Adresele de email temporare nu sunt acceptate. Folosește o adresă permanentă.')).toBeVisible();
+    await expect(page).toHaveURL(/\/cont-nou$/);
+    await shot(page, 'auth-signup-disposable', name());
+  });
+
   test('client: sign up, confirm the email, land on Caută, see the account ID', async ({ page }) => {
     const email = uniqueEmail('client-ui');
     const phone = uniquePhone();

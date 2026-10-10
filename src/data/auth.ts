@@ -27,6 +27,7 @@ export type AuthFailureCode =
   | 'wrong_current_password'
   | 'session_missing'
   | 'invite_invalid'
+  | 'email_disposable'
   | 'network'
   | 'unknown';
 
@@ -169,7 +170,18 @@ export interface SignUpInput {
 }
 
 /** 'confirm_email' when the account waits for the email link (the normal case). */
+/**
+ * Temporary addresses (guerrillamail, sharklasers…) are refused by the database; asking first
+ * gives a clear message instead of a generic error. When the question itself fails, the database
+ * still decides.
+ */
+async function refuseDisposable(email: string): Promise<void> {
+  const blocked = await call('email_domain_blocked', { p_email: email.trim() }).catch(() => false);
+  if (blocked) throw new AuthFailure('email_disposable');
+}
+
 export async function signUp(input: SignUpInput): Promise<'confirm_email' | 'signed_in'> {
+  await refuseDisposable(input.email);
   setRememberMe(true);
   const request = run(
     auth().signUp({
@@ -252,6 +264,7 @@ export async function changePassword(email: string, current: string, next: strin
 
 /** Starts an email change; the new address works only after it is confirmed. */
 export async function changeEmail(newEmail: string): Promise<void> {
+  await refuseDisposable(newEmail);
   await run(auth().updateUser({ email: newEmail.trim() }, { emailRedirectTo: LINK_TARGETS.emailChange() }));
 }
 

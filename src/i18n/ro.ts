@@ -221,6 +221,7 @@ export const ro = {
   'auth.error.rate_limited_seconds': 'Prea multe încercări. Încearcă din nou peste {seconds} secunde.',
   'auth.error.email_invalid': 'Adresa de email nu este acceptată. Verifică-o.',
   'auth.error.email_not_authorized': 'Nu putem trimite emailuri la această adresă. Folosește altă adresă.',
+  'auth.error.email_disposable': 'Adresele de email temporare nu sunt acceptate. Folosește o adresă permanentă.',
   'auth.error.captcha_failed': 'Verificarea anti-robot nu a reușit. Încearcă din nou.',
   'auth.error.same_password': 'Parola nouă trebuie să fie diferită de cea veche.',
   'auth.error.signup_disabled': 'Crearea de conturi este oprită momentan.',

@@ -135,6 +135,18 @@ export type Database = {
           },
         ]
       }
+      blocked_email_domains: {
+        Row: {
+          domain: string
+        }
+        Insert: {
+          domain: string
+        }
+        Update: {
+          domain?: string
+        }
+        Relationships: []
+      }
       bookings: {
         Row: {
           cancel_reason: string | null
@@ -3494,6 +3506,7 @@ export type Database = {
         }
       }
       dispatch_sweep: { Args: never; Returns: boolean }
+      email_domain_blocked: { Args: { p_email: string }; Returns: boolean }
       end_expired_trials: { Args: { p_now?: string }; Returns: number }
       enforce_company_deadlines: { Args: { p_now?: string }; Returns: number }
       enqueue_referral_credit: {

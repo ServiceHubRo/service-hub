@@ -223,6 +223,7 @@ export const en: Record<MessageKey, string> = {
   'auth.error.rate_limited_seconds': 'Too many attempts. Try again in {seconds} seconds.',
   'auth.error.email_invalid': "This email address isn't accepted. Check it.",
   'auth.error.email_not_authorized': "We can't send emails to this address. Use a different one.",
+  'auth.error.email_disposable': 'Temporary email addresses are not accepted. Use a permanent address.',
   'auth.error.captcha_failed': 'The anti-robot check did not pass. Try again.',
   'auth.error.same_password': 'The new password must be different from the old one.',
   'auth.error.signup_disabled': 'Creating accounts is turned off right now.',

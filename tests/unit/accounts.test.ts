@@ -73,6 +73,7 @@ describe('auth errors are specific and translated', () => {
     ],
     [{ name: 'AuthRetryableFetchError', message: 'Failed to fetch', status: 0 }, 'Nu s-a putut trimite. Verifică internetul și încearcă din nou.'],
     [new AuthFailure('wrong_current_password'), 'Parola actuală nu este corectă.'],
+    [new AuthFailure('email_disposable'), 'Adresele de email temporare nu sunt acceptate. Folosește o adresă permanentă.'],
     [{ code: 'something_new', status: 500 }, 'A apărut o eroare. Încearcă din nou.'],
   ];
   it.each(cases)('%j', (error, text) => {
