@@ -102,6 +102,10 @@
   padding-bottom: var(--safe-bottom);
 }
 
+:global(html[data-keyboard]) .bottomBar {
+  display: none;
+}
+
 .tab {
   flex: 1;
   min-width: 0;

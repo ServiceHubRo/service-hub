@@ -199,6 +199,40 @@ test.describe('messages and reviews', () => {
     await expect(shopPage.getByRole('heading', { level: 1 })).toHaveText('Maria Pop');
   });
 
+  test('a phone keyboard leaves the message box and the newest message in sight', async ({ page }) => {
+    test.skip(isDesktop(page), 'the on-screen keyboard is a phone matter');
+    const { shopId } = await createBookableShop(`Atelier tastatură ${Date.now()}`, ['frane']);
+    const client = await createUser('client');
+    const [slot] = await freeSlots(client, shopId, 1);
+    const booking = await book(client, shopId, slot!);
+    await signIn(page, client, PASSWORD);
+    await expect(page).toHaveURL(/\/c\//);
+    await navLink(page, /^Programări/).click();
+    await page.locator('main section li').filter({ hasText: booking.ref }).getByRole('link', { name: 'Mesaj' }).click();
+    const log = page.getByRole('log');
+    await expect(log).toContainText(`Ai trimis cererea ${booking.ref}.`);
+    const tabs = page.getByRole('navigation', { name: 'Navigare principală' }).last();
+    await expect(tabs).toBeVisible();
+
+    // The keyboard comes up: the app gets shorter (Android adjustResize, Chrome resizes-content).
+    const input = page.getByLabel('Mesaj', { exact: true });
+    await input.click();
+    const full = page.viewportSize()!;
+    await page.setViewportSize({ width: full.width, height: full.height - 320 });
+    await expect(page.locator('html')).toHaveAttribute('data-keyboard', '');
+    await expect(tabs).toBeHidden();
+    await input.fill('Ajung la 9');
+    await expect(input).toBeInViewport();
+    await expect(input).toBeFocused();
+    await expect(log.getByText(`Ai trimis cererea ${booking.ref}.`)).toBeInViewport();
+    await shot(page, 'keyboard-open', name());
+
+    // The keyboard goes (Back on Android keeps the focus in the box): the bar is back.
+    await page.setViewportSize(full);
+    await expect(page.locator('html')).not.toHaveAttribute('data-keyboard', '');
+    await expect(tabs).toBeVisible();
+  });
+
   test('no conversations yet: the empty state after loading', async ({ page }) => {
     const client = await createUser('client');
     await signIn(page, client, PASSWORD);

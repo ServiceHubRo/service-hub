@@ -6,6 +6,7 @@ import { Wordmark } from '../components/Wordmark';
 import { useI18n } from '../i18n/context';
 import { plural, type PluralUnit } from '../i18n/translate';
 import { quotesWaiting } from '../lib/clientBookings';
+import { watchKeyboard } from '../lib/keyboard';
 import { useOptionalAdminCounts } from '../screens/admin/adminContext';
 import { ADMIN_MODERATION_PATH } from '../screens/admin/paths';
 import { useOptionalClientBookings } from '../screens/client/bookings/clientBookingsContext';
@@ -116,6 +117,9 @@ export function AppShell({ role }: { role: Role }) {
   useEffect(() => {
     mainRef.current?.scrollTo(0, 0);
   }, [pathname]);
+
+  // While a phone's keyboard is open the bottom bar steps aside (more room for what is typed).
+  useEffect(() => watchKeyboard(), []);
 
   // Keyboard users jump past the navigation straight to the screen (T18).
   function skipToContent(event: MouseEvent<HTMLAnchorElement>) {
