@@ -64,6 +64,13 @@
   --heading-size: 27px;
   --body-size: 14px;
 
+  /* Pop-up lists and menus: frosted glass over the page (Eduard, 10 Oct). Where blur is missing
+     the glass is opaque (--surface2). */
+  --glass-bg: rgba(36, 40, 48, 0.84);
+  --glass-blur: blur(24px) saturate(170%);
+  --glass-shadow: 0 18px 44px rgba(0, 0, 0, 0.5);
+  --glass-radius: 14px;
+
   --tap: 44px;
   --sidebar-w: 240px;
   --focus-ring: 0 0 0 2px var(--bg), 0 0 0 4px var(--amber);

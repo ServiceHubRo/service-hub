@@ -72,6 +72,101 @@
   cursor: pointer;
 }
 
+/* The list of a select (Chrome 135+, the Android app): in the app's style, frosted over the page,
+   sliding in. Elsewhere (Safari on the iPhone) the system's own picker. */
+@supports (appearance: base-select) {
+  .select,
+  .select::picker(select) {
+    appearance: base-select;
+  }
+
+  .select::picker-icon {
+    display: none;
+  }
+
+  .select::picker(select) {
+    margin-block: 6px;
+    padding: 6px;
+    max-height: min(360px, 60dvh);
+    color: var(--text);
+    background: var(--surface2);
+    border: 1px solid var(--border-lit);
+    border-radius: var(--glass-radius);
+    box-shadow: var(--glass-shadow);
+    opacity: 1;
+    transform: none;
+    transition:
+      opacity 0.18s ease,
+      transform 0.18s ease,
+      display 0.18s allow-discrete,
+      overlay 0.18s allow-discrete;
+  }
+
+  .select:not(:open)::picker(select) {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.98);
+  }
+
+  @starting-style {
+    .select:open::picker(select) {
+      opacity: 0;
+      transform: translateY(-6px) scale(0.98);
+    }
+  }
+
+  .select option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: var(--tap);
+    padding: 0 12px;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+  }
+
+  .select option:hover,
+  .select option:focus-visible {
+    background: rgba(255, 255, 255, 0.07);
+    outline: none;
+  }
+
+  .select option:checked {
+    color: var(--amber);
+    font-weight: 600;
+  }
+
+  .select option::checkmark {
+    order: 1;
+    margin-left: auto;
+    color: var(--amber);
+  }
+
+  .select legend {
+    padding: 10px 12px 4px;
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+}
+
+@supports (appearance: base-select) and ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .select::picker(select) {
+    background: var(--glass-bg);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .select::picker(select) {
+    transition: none;
+  }
+}
+
 .selectIcon {
   position: absolute;
   right: 12px;
