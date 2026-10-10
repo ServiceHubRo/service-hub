@@ -1,9 +1,24 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { isTextField, keyboardOpen, watchKeyboard } from '../../src/lib/keyboard';
+import { isTextField, keyboardOpen, resizeForKeyboard, watchKeyboard } from '../../src/lib/keyboard';
 
 describe('keyboard', () => {
   afterEach(() => {
     document.body.innerHTML = '';
+  });
+
+  it('asks for a page resized by the keyboard on Android only, once', () => {
+    const viewport = () => {
+      document.head.innerHTML = '<meta name="viewport" content="width=device-width, initial-scale=1">';
+      return document.head.querySelector('meta')!;
+    };
+    const android = viewport();
+    resizeForKeyboard('Mozilla/5.0 (Linux; Android 14; Pixel 8) Chrome/129.0', document);
+    resizeForKeyboard('Mozilla/5.0 (Linux; Android 14; Pixel 8) Chrome/129.0', document);
+    expect(android.content).toBe('width=device-width, initial-scale=1, interactive-widget=resizes-content');
+    const iphone = viewport();
+    resizeForKeyboard('Mozilla/5.0 (iPhone; CPU iPhone OS 26_0 like Mac OS X) Version/26.0 Mobile Safari/604.1', document);
+    expect(iphone.content).toBe('width=device-width, initial-scale=1');
+    document.head.innerHTML = '';
   });
 
   it('knows which fields bring up the keyboard', () => {

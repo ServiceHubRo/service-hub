@@ -5,6 +5,19 @@
  */
 export const KEYBOARD_MIN_PX = 120;
 
+/**
+ * On Android, Chrome makes the page smaller while the keyboard is open (instead of laying the
+ * keyboard over it) when the viewport says `interactive-widget=resizes-content`. Added here for
+ * Android only: Safari on iOS 26 cut the page above its address bar with it (a white strip over
+ * the bottom bar, 10 Oct). The Android app does the same through adjustResize.
+ */
+export function resizeForKeyboard(ua = navigator.userAgent, doc: Document = document): void {
+  if (!/Android/i.test(ua)) return;
+  const meta = doc.querySelector<HTMLMetaElement>('meta[name="viewport"]');
+  if (!meta || meta.content.includes('interactive-widget')) return;
+  meta.content = `${meta.content}, interactive-widget=resizes-content`;
+}
+
 /** A field that brings up the keyboard (not a checkbox, a button or a picker). */
 export function isTextField(el: Element | null): boolean {
   if (!el) return false;

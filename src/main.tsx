@@ -2,10 +2,13 @@ import { StrictMode, type ErrorInfo } from 'react';
 import { createRoot } from 'react-dom/client';
 import { App } from './app/App';
 import { ChunkLoadError } from './app/routes/lazyChunk';
+import { resizeForKeyboard } from './lib/keyboard';
 import { captureError, installGlobalHandlers } from './lib/monitoring';
 import '@fontsource-variable/inter/wght.css';
 import './styles/tokens.css';
 import './styles/global.css';
+
+resizeForKeyboard();
 
 // Error reports (T19): nothing is sent unless the build has VITE_SENTRY_DSN.
 installGlobalHandlers();
