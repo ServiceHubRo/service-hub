@@ -281,14 +281,13 @@ test.describe('messages and reviews', () => {
     await expect(page.locator('main')).toContainText('2 recenzii');
     await expect(page.locator('main')).toContainText('2,5');
 
-    // Report: a reason is required; afterwards "Raportată" and the confirmation.
+    // Report: a reason is required; afterwards the confirmation, no button to report again.
     await bad.getByRole('button', { name: 'Raportează' }).click();
     await expect(bad.getByRole('button', { name: 'Trimite raportarea' })).toBeDisabled();
     await bad.getByText('Limbaj abuziv').click();
     await expectNoHorizontalScroll(page);
     await shot(page, 't11-shop-report', name());
     await bad.getByRole('button', { name: 'Trimite raportarea' }).click();
-    await expect(bad).toContainText('Raportată');
     await expect(bad).toContainText('Primești răspuns în cel mult 5 zile lucrătoare.');
     await expect(bad.getByRole('button', { name: 'Raportează' })).toHaveCount(0);
     await shot(page, 't11-shop-reviews', name());

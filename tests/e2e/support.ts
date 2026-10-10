@@ -419,10 +419,13 @@ export async function selectInPanel(page: Page, name: string | RegExp) {
  * single extra action shows it as a plain button or link, which is returned instead.
  */
 export async function cardAction(scope: Locator, name: string | RegExp, exact = true): Promise<Locator> {
+  await expect(scope.first()).toBeVisible();
+  const direct = scope.getByRole('link', { name, exact }).or(scope.getByRole('button', { name, exact }));
+  if ((await direct.count()) > 0) return direct;
   const more = scope.getByRole('button', { name: /^(Mai multe|More)$/ });
   if ((await more.count()) > 0) {
     if ((await more.first().getAttribute('aria-expanded')) !== 'true') await more.first().click();
     return scope.getByRole('menuitem', { name, exact });
   }
-  return scope.getByRole('link', { name, exact }).or(scope.getByRole('button', { name, exact }));
+  return direct;
 }

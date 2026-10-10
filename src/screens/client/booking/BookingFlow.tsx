@@ -1,6 +1,7 @@
 import { Store } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useLiveSearchParams } from '../../../app/useLiveSearchParams';
 import { BackLink } from '../../../components/BackLink';
 import { Banner } from '../../../components/Banner';
 import { buttonClass } from '../../../components/buttonClass';
@@ -73,7 +74,7 @@ const HM = /^\d{2}:\d{2}$/;
 function Flow({ page }: { page: ShopPage }) {
   const { t, lang } = useI18n();
   const navigate = useNavigate();
-  const [params] = useSearchParams();
+  const [params, setParams] = useLiveSearchParams();
   const { shop } = page;
 
   // The services picked, in the order they were ticked; only those this shop offers.
@@ -95,14 +96,15 @@ function Flow({ page }: { page: ShopPage }) {
   // `?masina=<id>` (the service reminder, T19d): that garage car is picked on step 4.
   const [carDraft, setCarDraft] = useState<CarDraft>(() => ({ ...EMPTY_CAR_DRAFT, carId: params.get('masina') }));
 
-  const urlFor = (changes: Record<string, string | null>) => {
+  const paramsWith = (changes: Record<string, string | null>) => {
     const next = new URLSearchParams(params);
     for (const [k, v] of Object.entries(changes)) {
       if (v) next.set(k, v);
       else next.delete(k);
     }
-    return `${bookingPath(shop.id)}?${next.toString()}`;
+    return next;
   };
+  const urlFor = (changes: Record<string, string | null>) => `${bookingPath(shop.id)}?${paramsWith(changes).toString()}`;
 
   // A new step starts at the top, with the screen reader on its heading.
   const headingRef = useRef<HTMLHeadingElement>(null);
@@ -184,10 +186,10 @@ function Flow({ page }: { page: ShopPage }) {
           onToggle={(id) => {
             const next = toggleServiceId(serviceIds, id);
             const keep = next.includes(UNSURE_SERVICE_ID) ? params.get('simptome') : null;
-            navigate(urlFor({ serviciu: next.join(','), simptome: keep, pas: null }), { replace: true });
+            setParams(paramsWith({ serviciu: next.join(','), simptome: keep, pas: null }), { replace: true });
           }}
           symptoms={symptoms}
-          onToggleSymptom={(s) => navigate(urlFor({ simptome: toggleSymptom(symptoms, s).join(',') || null }), { replace: true })}
+          onToggleSymptom={(s) => setParams(paramsWith({ simptome: toggleSymptom(symptoms, s).join(',') || null }), { replace: true })}
           // Come with a day and a time (a free place from search or the shop page, T28a): straight on.
           onContinue={() => navigate(urlFor({ pas: day && time ? '4' : day ? '3' : '2' }))}
         />

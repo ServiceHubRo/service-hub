@@ -41,8 +41,8 @@ export interface ReviewCardProps {
 /**
  * One review on the shop's Recenzii (P10): who, stars, date, text, the booking it is about; the
  * shop's public reply in a nested panel; "Răspunde" / "Editează răspunsul" and "Raportează" open
- * inside the card. A reported review keeps an amber border and "Raportată" until admin decides; it
- * stays public meanwhile. Replying and reporting are the owner's; a colleague reads.
+ * inside the card. A reported review keeps an amber border and a line saying so until admin decides;
+ * it stays public meanwhile. Replying and reporting are the owner's; a colleague reads.
  */
 export function ReviewCard({ review: r, onChanged, onStale }: ReviewCardProps) {
   const { t, lang } = useI18n();

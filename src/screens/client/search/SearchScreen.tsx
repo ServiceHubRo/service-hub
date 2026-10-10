@@ -1,6 +1,7 @@
 import { Heart, List, Map as MapIcon, SearchX } from 'lucide-react';
 import { lazy, Suspense, useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { useLiveSearchParams } from '../../../app/useLiveSearchParams';
 import { Button } from '../../../components/Button';
 import { CheckMenu } from '../../../components/CheckMenu';
 import { EmptyState } from '../../../components/EmptyState';
@@ -63,7 +64,7 @@ const cache = new Map<string, ShopSearchResult[]>();
  */
 export function SearchScreen() {
   const { t, lang } = useI18n();
-  const [params, setParams] = useSearchParams();
+  const [params, setParams] = useLiveSearchParams();
   const q = params.get('q') ?? '';
   const category = params.get('cat') ?? '';
   const city = params.get('oras') ?? '';

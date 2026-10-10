@@ -79,8 +79,10 @@ test.describe('zones', () => {
     // Details: the town and what they need, saved without leaving the card.
     await waiting.getByRole('button', { name: 'Adaugă detalii' }).click();
     await page.getByLabel('Localitatea (opțional)').fill('Comuna Test');
-    await page.getByRole('button', { name: 'Frânare' }).click();
-    await expect(page.getByRole('button', { name: 'Frânare', pressed: true })).toBeVisible();
+    await page.getByRole('button', { name: /^Servicii de interes/ }).click();
+    await page.getByRole('checkbox', { name: 'Frânare' }).check();
+    await page.keyboard.press('Escape');
+    await expect(page.getByRole('button', { name: /^Servicii de interes \(opțional\) Frânare/ })).toBeVisible();
     await expectNoHorizontalScroll(page);
     await shot(page, 'zones-details', name());
     await page.getByRole('button', { name: 'Salvează', exact: true }).click();
@@ -178,8 +180,10 @@ test.describe('constatare tehnică', () => {
     await expect(unsure).toBeVisible();
     await expect(page.getByRole('group', { name: 'Simptome observate (opțional)' })).toHaveCount(0);
     await unsure.click();
-    await page.getByRole('button', { name: 'Zgomote neobișnuite' }).click();
-    await page.getByRole('button', { name: 'Martor aprins în bord' }).click();
+    await page.getByRole('button', { name: /^Simptome observate/ }).click();
+    await page.getByRole('checkbox', { name: 'Zgomote neobișnuite' }).check();
+    await page.getByRole('checkbox', { name: 'Martor aprins în bord' }).check();
+    await page.keyboard.press('Escape');
     await expect(page).toHaveURL(/simptome=noise%2Cwarning_light|simptome=noise,warning_light/);
     await expectNoHorizontalScroll(page);
     await shot(page, 'constatare-step1', name());

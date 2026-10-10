@@ -1,6 +1,6 @@
 import { ChevronDown, ClipboardList, Download, History as HistoryIcon, MessageSquare, Phone, Printer, SearchX } from 'lucide-react';
 import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useLiveSearchParams } from '../../../app/useLiveSearchParams';
 import { Button } from '../../../components/Button';
 import { Card } from '../../../components/Card';
 import { EmptyState } from '../../../components/EmptyState';
@@ -63,7 +63,7 @@ function titleText(b: ShopHistoryItem, lang: Lang, t: I18nValue['t']): string {
 export function ShopHistoryScreen() {
   const { t, lang } = useI18n();
   const { state, reload, setData } = useLoad(fetchShopHistory);
-  const [params, setParams] = useSearchParams();
+  const [params, setParams] = useLiveSearchParams();
   const filterParam = params.get('filtru');
   const periodParam = params.get('perioada');
   const filter = isHistoryFilter(filterParam) ? filterParam : 'all';

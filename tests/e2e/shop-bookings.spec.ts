@@ -93,22 +93,22 @@ test.describe('demo shop', () => {
     await shot(page, 't08-panou-print', name());
     await page.emulateMedia({ media: 'screen' });
 
-    // A row of today's schedule opens that booking alone, with a chip that clears the filter.
+    // A row of today's schedule opens that booking alone; "Șterge filtrele" shows the rest again.
     await page.getByRole('link', { name: /08:00/ }).click();
     await expect(page).toHaveURL(/\/s\/programari\?tab=programate&p=/);
     await expect(cards(page)).toHaveCount(1);
     await expect(cards(page)).toContainText('B 123 IRD');
     await expect(cards(page)).toContainText('În lucru din');
-    await page.getByRole('button', { name: /Programarea P-\d+/ }).click();
+    await expect(page.getByText(/Programarea P-\d+/).first()).toBeVisible();
+    await page.getByRole('button', { name: 'Șterge filtrele' }).click();
     await expect.poll(() => cards(page).count()).toBeGreaterThan(1);
 
     // Back to Panou: the "În lucru" card opens the filtered list.
     await navLink(page, 'Panou').click();
     await page.getByRole('link', { name: /^\d+ În lucru$/ }).click();
     await expect(page).toHaveURL(/filtru=lucru/);
-    await expect(page.getByRole('button', { name: /În lucru/, pressed: true })).toBeVisible();
     await expect(cards(page)).toHaveCount(1);
-    await page.getByRole('button', { name: /În lucru/, pressed: true }).click();
+    await page.getByRole('button', { name: 'Șterge filtrele' }).click();
     await expect(page).not.toHaveURL(/filtru=/);
 
     // Cereri: the request with the note, the car and the client's account id.

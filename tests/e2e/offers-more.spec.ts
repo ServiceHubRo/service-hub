@@ -76,7 +76,7 @@ test.describe('offers: last day, services, quiet days', () => {
     await c.goto(`/c/cauta?q=${encodeURIComponent(shopName)}&oferta=1`);
     const card = c.locator('article').filter({ hasText: shopName });
     await expect(card).toContainText(/-10% la manoperă la prima programare, până pe \d+ [a-z]+/);
-    await expect(card).toContainText('-15% la manoperă lunea, marțea, miercurea, joia și vinerea');
+    await expect(card).not.toContainText('lunea, marțea'); // one offer on the card; the rest on the shop page
     await expect(c.getByText('Doar cu ofertă').first()).toBeVisible(); // the chosen filter, shown with its ✕
     await expectNoHorizontalScroll(c);
     await shot(c, 'offers-search', name());

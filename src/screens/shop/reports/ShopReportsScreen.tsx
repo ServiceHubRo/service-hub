@@ -1,6 +1,6 @@
 import { ArrowDownRight, ArrowRight, ArrowUpRight, BarChart3, Download, Lock } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, type ReactNode } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useLiveSearchParams } from '../../../app/useLiveSearchParams';
 import { BackLink } from '../../../components/BackLink';
 import { Button } from '../../../components/Button';
 import { Card } from '../../../components/Card';
@@ -120,7 +120,7 @@ export function ShopReportsScreen() {
 
 function Reports({ data }: { data: ReportData }) {
   const { t, lang } = useI18n();
-  const [params, setParams] = useSearchParams();
+  const [params, setParams] = useLiveSearchParams();
   const periodParam = params.get('perioada');
   const period = isReportPeriod(periodParam) ? periodParam : 'month';
   const now = useNow();

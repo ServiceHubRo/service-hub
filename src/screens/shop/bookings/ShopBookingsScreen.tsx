@@ -1,6 +1,7 @@
 import { CalendarCheck, CalendarPlus, Inbox, Unlink, X } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
-import { Link, useLocation, useSearchParams } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
+import { useLiveSearchParams } from '../../../app/useLiveSearchParams';
 import { Banner } from '../../../components/Banner';
 import { Button } from '../../../components/Button';
 import { buttonClass } from '../../../components/buttonClass';
@@ -79,7 +80,7 @@ function doneMessage(before: BookingStatus, after: BookingStatus, moved: boolean
 export function ShopBookingsScreen() {
   const { t, lang } = useI18n();
   const { state, reload, refresh, apply } = useShopBookings();
-  const [params, setParams] = useSearchParams();
+  const [params, setParams] = useLiveSearchParams();
   const now = useNow();
   const today = ymdInBucharest(now);
   const location = useLocation();
