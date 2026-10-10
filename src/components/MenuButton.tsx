@@ -1,6 +1,7 @@
-import { useEffect, useId, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useId, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { buttonClass, type ButtonVariant } from './buttonClass';
+import { opensUp, visibleArea } from '../lib/menuPlacement';
 import styles from './MenuButton.module.css';
 
 export type MenuItem =
@@ -12,7 +13,9 @@ export type MenuItem =
 /**
  * One button that opens a short menu of actions (Eduard, 9 Oct: a pop-up instead of a row of
  * buttons). Arrow keys move between the items, Escape or a tap outside closes it, and the focus
- * returns to the button. The menu floats, so opening it never moves the page.
+ * returns to the button. The menu floats, so opening it never moves the page; it opens upwards
+ * when the room below (above the tab bar) is too short for it (Eduard, 10 Oct: on the last card
+ * only the first entry showed).
  */
 export function MenuButton({
   label,
@@ -35,6 +38,18 @@ export function MenuButton({
   const wrapRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
+
+  // Measured before the menu is painted, so it never shows on the wrong side first.
+  useLayoutEffect(() => {
+    const menu = menuRef.current;
+    const button = buttonRef.current;
+    if (!open || !menu || !button) return;
+    const { top, bottom } = visibleArea();
+    const flip = opensUp(button.getBoundingClientRect(), menu.offsetHeight, bottom, top);
+    menu.classList.toggle(styles.menuUp ?? '', flip);
+    // No room either way (a very short window): the page scrolls just enough to show it.
+    if (!flip && menu.getBoundingClientRect().bottom > bottom) menu.scrollIntoView?.({ block: 'nearest' });
+  }, [open]);
 
   const close = (focus: boolean) => {
     setOpen(false);

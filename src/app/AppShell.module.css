@@ -47,6 +47,10 @@
 }
 
 .main {
+  /* Holds its absolutely placed children (text for screen readers): without it they escaped the
+     scrolling area and made the whole page taller, so on the iPhone the shell, tab bar included,
+     could be pushed up over an empty strip. */
+  position: relative;
   flex: 1;
   min-width: 0;
   overflow-y: auto;

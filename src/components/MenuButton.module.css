@@ -25,6 +25,11 @@
   max-width: calc(100vw - 32px);
 }
 
+.menuUp {
+  top: auto;
+  bottom: calc(100% + 4px);
+}
+
 .item {
   display: flex;
   align-items: center;
