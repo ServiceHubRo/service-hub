@@ -1,4 +1,4 @@
-import { BadgePercent, CalendarClock, CircleDot, Lightbulb, Star } from 'lucide-react';
+import { BadgePercent, CalendarClock, CircleDot, History, Lightbulb, Star } from 'lucide-react';
 import { useSession } from '../../app/sessionContext';
 import { ActionSwitch } from '../../components/ActionSwitch';
 import { Card } from '../../components/Card';
@@ -44,6 +44,14 @@ const ROWS = {
     title: 'promoNotifications.title',
     on: 'promoNotifications.on',
     off: 'promoNotifications.off',
+  },
+  // Since 10 Oct (Eduard): the car's history from other shops, shown by default to the shop the
+  // client books with (no prices, no shop names); off here for every open booking at once.
+  share_history: {
+    icon: History,
+    title: 'shareHistory.title',
+    on: 'shareHistory.on',
+    off: 'shareHistory.off',
   },
 } as const;
 

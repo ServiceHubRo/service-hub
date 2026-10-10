@@ -161,7 +161,7 @@ The owner may invite colleagues, each with their own account (colleagues do not 
 
 For the data you receive about customers (name, phone, car, notes, messages), you are a data controller in your own right, separate from us. Use it only for the booking, the quote, the job and the shop’s legal obligations, keep it safe, and do not use it for advertising without the customer’s consent. The history and exports in the app are for your own records.
 
-In the **Vehicle file** you see the jobs done on that car at other shops only if the customer chose to show them to you, and only while the booking is open, without prices and without the other shops’ names. Use them only to work on the customer’s car: do not copy them into other records, do not show them to anyone else and do not try to find out which shop did the work.
+In the **Vehicle file** you see the jobs done on that car at other shops only while the booking is open and only if the customer has not turned this off in their account, without prices and without the other shops’ names. Use them only to work on the customer’s car: do not copy them into other records, do not show them to anyone else and do not try to find out which shop did the work.
 
 ### 4.7 What every business on the Platform should know
 

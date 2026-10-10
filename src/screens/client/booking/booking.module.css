@@ -319,17 +319,6 @@
   margin-top: 4px;
 }
 
-/* T27: the agreement to show the car's other jobs, with what it means under it. */
-.share {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.share > p {
-  padding-left: 34px;
-}
-
 .sentLinks {
   display: flex;
   flex-wrap: wrap;

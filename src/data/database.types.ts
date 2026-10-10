@@ -1210,6 +1210,7 @@ export type Database = {
           role: string
           season_reminders: boolean
           service_reminders: boolean
+          share_history: boolean
           suspended: boolean
           terms_accepted_at: string | null
           terms_version: string | null
@@ -1234,6 +1235,7 @@ export type Database = {
           role: string
           season_reminders?: boolean
           service_reminders?: boolean
+          share_history?: boolean
           suspended?: boolean
           terms_accepted_at?: string | null
           terms_version?: string | null
@@ -1258,6 +1260,7 @@ export type Database = {
           role?: string
           season_reminders?: boolean
           service_reminders?: boolean
+          share_history?: boolean
           suspended?: boolean
           terms_accepted_at?: string | null
           terms_version?: string | null

@@ -122,7 +122,6 @@ export function CarStep({
               }
             : { carId: picked!.id },
           note: composeUnsureNote(symptomsLine, draft.note, NOTE_MAX) || undefined,
-          shareHistory: draft.share,
         },
         requestId,
       );
@@ -228,13 +227,6 @@ export function CarStep({
         rows={3}
         onChange={(e) => set({ note: e.target.value })}
       />
-
-      {/* T27: the client's agreement, never ticked for them. */}
-      <div className={styles.share}>
-        <Switch checked={draft.share} hint={t('booking.share.hint')} onChange={(e) => set({ share: e.target.checked })}>
-          {t('booking.share.label')}
-        </Switch>
-      </div>
 
       <Card className={styles.summary}>
         <h2 className={styles.groupTitle}>{t('booking.summary')}</h2>

@@ -161,7 +161,7 @@ Proprietarul poate invita colegi, fiecare cu contul lui (colegii nu folosesc con
 
 Pentru datele pe care le primiți despre clienți (nume, telefon, mașină, note, mesaje) sunteți operator de date, separat de noi. Le folosiți doar pentru programare, deviz, lucrare și obligațiile legale ale service-ului, le păstrați în siguranță și nu le folosiți pentru reclame fără acordul clientului. Istoricul și exporturile din aplicație sunt pentru evidența voastră.
 
-În **Fișa mașinii** vedeți lucrările făcute la acea mașină la alte service-uri doar dacă clientul a ales să vi le arate și doar cât programarea este deschisă, fără prețuri și fără numele celorlalte service-uri. Le folosiți doar ca să lucrați la mașina clientului: nu le copiați în altă evidență, nu le arătați altcuiva și nu încercați să aflați la ce service s-au făcut.
+În **Fișa mașinii** vedeți lucrările făcute la acea mașină la alte service-uri doar cât programarea este deschisă și doar dacă clientul nu a oprit afișarea lor din contul lui, fără prețuri și fără numele celorlalte service-uri. Le folosiți doar ca să lucrați la mașina clientului: nu le copiați în altă evidență, nu le arătați altcuiva și nu încercați să aflați la ce service s-au făcut.
 
 ### 4.7 Ce trebuie să știe orice afacere de pe Platformă
 
