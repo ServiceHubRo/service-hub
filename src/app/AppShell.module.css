@@ -47,10 +47,6 @@
 }
 
 .main {
-  /* Holds its absolutely placed children (text for screen readers): without it they escaped the
-     scrolling area and made the whole page taller, so on the iPhone the shell, tab bar included,
-     could be pushed up over an empty strip. */
-  position: relative;
   flex: 1;
   min-width: 0;
   overflow-y: auto;
@@ -104,10 +100,6 @@
   background: var(--surface);
   border-top: 1px solid var(--border);
   padding-bottom: var(--safe-bottom);
-}
-
-:global(html[data-keyboard]) .bottomBar {
-  display: none;
 }
 
 .tab {

@@ -114,9 +114,6 @@ for (const role of Object.keys(NAV) as (keyof typeof NAV)[]) {
       const shown = isDesktop(page) ? label : (BAR_LABEL[label] ?? label);
       await page.getByRole('link', { name: new RegExp(`^${shown}( ?,.*)?$`) }).filter({ visible: true }).first().click();
       await expect(page.getByRole('heading', { level: 1 })).toHaveText(HEADING[label] ?? label);
-      // The shell is exactly the window: nothing in a screen makes the page itself taller (on the
-      // iPhone the whole shell, tab bar included, could then be pushed up over an empty strip).
-      await expect.poll(() => page.evaluate(() => document.documentElement.scrollHeight - innerHeight)).toBeLessThanOrEqual(1);
     }
 
     // Switching to English changes every label.

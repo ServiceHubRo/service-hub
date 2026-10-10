@@ -7,17 +7,13 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-/* --app-height: the visible height on the iPhone (src/lib/appHeight.ts); elsewhere 100%. */
 html,
 body,
 #root {
-  height: var(--app-height, 100%);
+  height: 100%;
 }
 
-/* The page color on html too: Safari on iOS 26 paints the strip under its floating address bar
-   from it, and showed white there with the color on body alone. */
 html {
-  background: var(--bg);
   color-scheme: dark;
   -webkit-text-size-adjust: 100%;
 }
@@ -93,7 +89,6 @@ textarea {
 }
 
 @media print {
-  html,
   body {
     background: #fff;
     color: #000;

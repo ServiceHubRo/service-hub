@@ -123,16 +123,6 @@ export function ConversationScreen() {
     endRef.current?.scrollIntoView({ block: 'end', behavior: intent.smooth && !reduce ? 'smooth' : 'auto' });
   }, [messages]);
 
-  // The phone's keyboard takes the bottom of the screen: the newest messages stay above the box.
-  useEffect(() => {
-    const viewport = window.visualViewport ?? window;
-    const onResize = () => {
-      if (document.activeElement === inputRef.current) endRef.current?.scrollIntoView({ block: 'end' });
-    };
-    viewport.addEventListener('resize', onResize);
-    return () => viewport.removeEventListener('resize', onResize);
-  }, []);
-
   const addMessages = useCallback(
     (incoming: ChatMessage[], forceBottom = false) => {
       const scroller = scrollerOf(endRef.current);
