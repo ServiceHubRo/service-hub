@@ -1,6 +1,6 @@
 # Politica de confidențialitate — Service-Hub
 
-**Ultima actualizare:** 8 octombrie 2026
+**Ultima actualizare:** 10 octombrie 2026
 
 Aici afli ce date personale folosește Service-Hub, de ce, cine le mai vede, cât timp le păstrăm și ce drepturi ai, conform Regulamentului (UE) 2016/679 („GDPR”) și legii române.
 
@@ -179,7 +179,7 @@ Ai dreptul:
 - să **ștergi** datele (din aplicație: Cont → Datele mele → Șterge contul), cu excepțiile din secțiunea 5;
 - să ceri **restricționarea** folosirii datelor;
 - să te **opui** folosirii datelor pe baza interesului legitim;
-- la **portabilitate**: fișierul din Cont → Datele mele → Descarcă datele mele conține, într-un format structurat (JSON), contul, mașinile, programările, devizele, recenziile și mesajele tale; este gratuit;
+- la **portabilitate**: fișierul din Cont → Datele mele → Descarcă datele mele este un fișier Excel (.xlsx), cu câte o foaie pentru contul, mașinile, programările, devizele, recenziile și mesajele tale; se deschide cu Excel, Google Sheets sau Numbers și este gratuit;
 - să îți **retragi acordul** pentru notificările push (din Cont sau din setările browserului), pentru locație (din setările browserului) și pentru arătarea istoricului mașinii către un service (din Programări), fără să afecteze ce s-a făcut înainte;
 - să depui **plângere** la Autoritatea Națională de Supraveghere a Prelucrării Datelor cu Caracter Personal (ANSPDCP), B-dul G-ral. Gheorghe Magheru nr. 28-30, sector 1, București, [dataprotection.ro](https://www.dataprotection.ro).
 

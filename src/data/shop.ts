@@ -224,6 +224,13 @@ export interface CatalogCategory {
 }
 
 /** Enabled catalog services, grouped by category in catalog order. */
+/** Every service's name by id, retired ones too (old bookings name them). */
+export async function fetchServiceNames(): Promise<Map<string, { name_ro: string; name_en: string }>> {
+  const { data, error } = await db().from('services').select('id, name_ro, name_en');
+  if (error) throw failure(error);
+  return new Map(data.map((s) => [s.id, { name_ro: s.name_ro, name_en: s.name_en }]));
+}
+
 export async function fetchCatalog(): Promise<CatalogCategory[]> {
   const [cats, svcs] = await Promise.all([
     db().from('service_categories').select('key, name_ro, name_en, position').eq('enabled', true).order('position'),

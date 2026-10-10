@@ -1,6 +1,6 @@
 # Privacy Policy — Service-Hub
 
-**Last updated:** October 8, 2026
+**Last updated:** October 10, 2026
 
 This policy explains what personal data Service-Hub uses, why, who else sees it, how long we keep it and what rights you have, under Regulation (EU) 2016/679 (the “GDPR”) and Romanian law.
 
@@ -179,7 +179,7 @@ You have the right to:
 - **erase** your data (in the app: Account → My data → Delete account), with the exceptions in section 5;
 - ask us to **restrict** the use of your data;
 - **object** to the use of your data based on legitimate interest;
-- **data portability**: the file from Account → My data → Download my data contains, in a structured format (JSON), your account, cars, bookings, quotes, reviews and messages; it is free;
+- **data portability**: the file from Account → My data → Download my data is an Excel file (.xlsx) with one sheet each for your account, cars, bookings, quotes, reviews and messages; it opens in Excel, Google Sheets or Numbers and is free;
 - **withdraw your consent** for push notifications (in Account or in your browser settings), for location (in your browser settings) and for showing your car's history to a shop (in Bookings), without affecting what was done before;
 - **complain** to the Romanian data protection authority (ANSPDCP), B-dul G-ral. Gheorghe Magheru nr. 28-30, sector 1, Bucharest, [dataprotection.ro](https://www.dataprotection.ro).
 

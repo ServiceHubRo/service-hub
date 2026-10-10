@@ -1,3 +1,4 @@
+import { strFromU8, unzipSync } from 'fflate';
 import { expect, test, type Page } from '@playwright/test';
 import {
   BACKEND,
@@ -387,10 +388,14 @@ test.describe('with accounts', () => {
     const downloadPromise = page.waitForEvent('download');
     await page.getByRole('button', { name: 'Descarcă datele mele' }).click();
     const download = await downloadPromise;
-    expect(download.suggestedFilename()).toMatch(/^service-hub-C-\d{5}-\d{4}-\d{2}-\d{2}\.json$/);
-    const body = JSON.parse(await (await download.createReadStream()).toArray().then((c) => Buffer.concat(c).toString()));
-    expect(body.account.name).toBe('Maria Pop-Ionescu');
-    expect(body.account.email).toBe(email);
+    // An Excel file anyone can open: the account sheet first, in the reader's language.
+    expect(download.suggestedFilename()).toMatch(/^service-hub-datele-mele-C-\d{5}-\d{4}-\d{2}-\d{2}\.xlsx$/);
+    const files = unzipSync(new Uint8Array(Buffer.concat(await (await download.createReadStream()).toArray())));
+    expect(strFromU8(files['xl/workbook.xml']!)).toContain('<sheet name="Cont"');
+    const accountSheet = strFromU8(files['xl/worksheets/sheet1.xml']!);
+    expect(accountSheet).toContain('Maria Pop-Ionescu');
+    expect(accountSheet).toContain(email);
+    expect(accountSheet).toContain('Cod cont');
 
     // Language: saved on the profile, so it follows the account to another browser.
     await page.getByRole('button', { name: 'English' }).filter({ visible: true }).first().click();

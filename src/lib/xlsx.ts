@@ -70,11 +70,39 @@ function sheetXml(rows: readonly (readonly string[])[]): string {
   );
 }
 
+export interface XlsxSheet {
+  name: string;
+  rows: readonly (readonly string[])[];
+}
+
 export function toXlsx(rows: readonly (readonly string[])[], sheetName: string): Blob {
-  // Excel: at most 31 characters, none of []:*?/\
-  const name = esc(sheetName.replace(/[[\]:*?/\\]/g, ' ').slice(0, 31) || 'Sheet1');
-  const width = Math.max(1, ...rows.map((r) => r.length));
-  const range = `'${name.replace(/'/g, "''")}'!$A$1:$${columnName(width - 1)}$${Math.max(1, rows.length)}`;
+  return toXlsxBook([{ name: sheetName, rows }]);
+}
+
+/** Excel: at most 31 characters, none of []:*?/\, each name once in the file. */
+function sheetNames(sheets: readonly XlsxSheet[]): string[] {
+  const used = new Set<string>();
+  return sheets.map((sheet, i) => {
+    const base = sheet.name.replace(/[[\]:*?/\\]/g, ' ').slice(0, 31) || `Sheet${i + 1}`;
+    let name = base;
+    for (let n = 2; used.has(name.toLowerCase()); n += 1) name = `${base.slice(0, 31 - String(n).length - 1)} ${n}`;
+    used.add(name.toLowerCase());
+    return name;
+  });
+}
+
+/** A file with one sheet per entry, in order (the first one opens). */
+export function toXlsxBook(sheets: readonly XlsxSheet[]): Blob {
+  const names = sheetNames(sheets);
+  const sheetType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml';
+  const relType = 'http://schemas.openxmlformats.org/officeDocument/2006/relationships';
+  const filters = sheets
+    .map(({ rows }, i) => {
+      const width = Math.max(1, ...rows.map((r) => r.length));
+      const range = `'${names[i]!.replace(/'/g, "''")}'!$A$1:$${columnName(width - 1)}$${Math.max(1, rows.length)}`;
+      return `<definedName name="_xlnm._FilterDatabase" localSheetId="${i}" hidden="1">${esc(range)}</definedName>`;
+    })
+    .join('');
   const files: Record<string, Uint8Array> = {
     '[Content_Types].xml': strToU8(
       XML_HEAD +
@@ -82,28 +110,28 @@ export function toXlsx(rows: readonly (readonly string[])[], sheetName: string):
         '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>' +
         '<Default Extension="xml" ContentType="application/xml"/>' +
         '<Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>' +
-        '<Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>' +
+        sheets.map((_, i) => `<Override PartName="/xl/worksheets/sheet${i + 1}.xml" ContentType="${sheetType}"/>`).join('') +
         '<Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>' +
         '</Types>',
     ),
     '_rels/.rels': strToU8(
       XML_HEAD +
         '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' +
-        '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>' +
+        `<Relationship Id="rId1" Type="${relType}/officeDocument" Target="xl/workbook.xml"/>` +
         '</Relationships>',
     ),
     'xl/workbook.xml': strToU8(
       XML_HEAD +
-        '<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">' +
-        `<sheets><sheet name="${name}" sheetId="1" r:id="rId1"/></sheets>` +
-        `<definedNames><definedName name="_xlnm._FilterDatabase" localSheetId="0" hidden="1">${esc(range)}</definedName></definedNames>` +
+        `<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="${relType}">` +
+        `<sheets>${names.map((name, i) => `<sheet name="${esc(name)}" sheetId="${i + 1}" r:id="rId${i + 1}"/>`).join('')}</sheets>` +
+        `<definedNames>${filters}</definedNames>` +
         '</workbook>',
     ),
     'xl/_rels/workbook.xml.rels': strToU8(
       XML_HEAD +
         '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' +
-        '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/>' +
-        '<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>' +
+        sheets.map((_, i) => `<Relationship Id="rId${i + 1}" Type="${relType}/worksheet" Target="worksheets/sheet${i + 1}.xml"/>`).join('') +
+        `<Relationship Id="rId${sheets.length + 1}" Type="${relType}/styles" Target="styles.xml"/>` +
         '</Relationships>',
     ),
     'xl/styles.xml': strToU8(
@@ -117,7 +145,9 @@ export function toXlsx(rows: readonly (readonly string[])[], sheetName: string):
         '<cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles>' +
         '</styleSheet>',
     ),
-    'xl/worksheets/sheet1.xml': strToU8(sheetXml(rows)),
   };
+  sheets.forEach(({ rows }, i) => {
+    files[`xl/worksheets/sheet${i + 1}.xml`] = strToU8(sheetXml(rows));
+  });
   return new Blob([zipSync(files)], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
 }
