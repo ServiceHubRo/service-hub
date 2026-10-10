@@ -12,10 +12,15 @@ export const KEYBOARD_MIN_PX = 120;
  * the bottom bar, 10 Oct). The Android app does the same through adjustResize.
  */
 export function resizeForKeyboard(ua = navigator.userAgent, doc: Document = document): void {
-  if (!/Android/i.test(ua)) return;
+  if (!isAndroid(ua)) return;
   const meta = doc.querySelector<HTMLMetaElement>('meta[name="viewport"]');
   if (!meta || meta.content.includes('interactive-widget')) return;
   meta.content = `${meta.content}, interactive-widget=resizes-content`;
+}
+
+/** The keyboard changes here are Android's: on the iPhone the page stays as Safari lays it out. */
+export function isAndroid(ua = navigator.userAgent): boolean {
+  return /Android/i.test(ua);
 }
 
 /** A field that brings up the keyboard (not a checkbox, a button or a picker). */
@@ -36,9 +41,10 @@ export function keyboardOpen(height: number, tallest: number, focused: boolean):
 
 /**
  * Marks `<html data-keyboard>` while the keyboard is open, so the bottom bar steps aside and the
- * screen being typed in keeps the room. Returns the cleanup.
+ * screen being typed in keeps the room (Android only, like resizeForKeyboard). Returns the cleanup.
  */
-export function watchKeyboard(): () => void {
+export function watchKeyboard(ua = navigator.userAgent): () => void {
+  if (!isAndroid(ua)) return () => {};
   const viewport = window.visualViewport;
   const tallest = new Map<number, number>();
   const update = () => {

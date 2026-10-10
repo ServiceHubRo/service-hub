@@ -202,6 +202,10 @@ test.describe('messages and reviews', () => {
 
   test('a phone keyboard leaves the message box and the newest message in sight', async ({ page }) => {
     test.skip(isDesktop(page), 'the on-screen keyboard is a phone matter');
+    // An Android phone: on the iPhone the page is left as Safari lays it out.
+    await page.addInitScript(() =>
+      Object.defineProperty(navigator, 'userAgent', { get: () => 'Mozilla/5.0 (Linux; Android 14; Pixel 8) Chrome/129.0 Mobile' }),
+    );
     const { shopId } = await createBookableShop(`Atelier tastatură ${Date.now()}`, ['frane']);
     const client = await createUser('client');
     const [slot] = await freeSlots(client, shopId, 1);

@@ -42,10 +42,22 @@ describe('keyboard', () => {
     expect(keyboardOpen(500, 800, false)).toBe(false); // the keyboard went, the page shrank otherwise
   });
 
+  it('leaves the iPhone alone', () => {
+    const stop = watchKeyboard('Mozilla/5.0 (iPhone; CPU iPhone OS 26_0 like Mac OS X) Mobile Safari/604.1');
+    const area = document.createElement('textarea');
+    document.body.appendChild(area);
+    area.focus();
+    Object.defineProperty(window, 'innerHeight', { configurable: true, value: window.innerHeight - 300 });
+    window.dispatchEvent(new Event('resize'));
+    expect(document.documentElement.hasAttribute('data-keyboard')).toBe(false);
+    Object.defineProperty(window, 'innerHeight', { configurable: true, value: window.innerHeight + 300 });
+    stop();
+  });
+
   it('marks <html data-keyboard> while it is open', () => {
     const area = document.createElement('textarea');
     document.body.appendChild(area);
-    const stop = watchKeyboard();
+    const stop = watchKeyboard('Mozilla/5.0 (Linux; Android 14; Pixel 8) Chrome/129.0 Mobile');
     area.focus();
     expect(document.documentElement.hasAttribute('data-keyboard')).toBe(false);
     Object.defineProperty(window, 'innerHeight', { configurable: true, value: window.innerHeight - 300 });
