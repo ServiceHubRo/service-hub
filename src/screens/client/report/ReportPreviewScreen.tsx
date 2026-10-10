@@ -6,10 +6,10 @@ import { BackLink } from '../../../components/BackLink';
 import { Banner } from '../../../components/Banner';
 import { Card } from '../../../components/Card';
 import { Checkbox } from '../../../components/Checkbox';
-import { Chip, ChipRow } from '../../../components/Chip';
 import { EmptyState } from '../../../components/EmptyState';
 import { LoadError } from '../../../components/LoadError';
 import { SkeletonList } from '../../../components/Skeleton';
+import { SelectField } from '../../../components/SelectField';
 import { getMyInvites } from '../../../data/referrals';
 import { getReportPreview, ReportError, startReportCheckout, type ReportJob, type ReportTarget } from '../../../data/reports';
 import { rpcErrorMessage } from '../../../data/rpc';
@@ -151,18 +151,12 @@ export function ReportPreviewScreen() {
           <p className={`${styles.note} ${styles.strong}`}>{t('report.onlyServiceHub')}</p>
 
           <Card className={styles.pay}>
-            <div className={styles.langRow}>
-              <span className={styles.label}>
-                {t('report.lang')}
-              </span>
-              <ChipRow label={t('report.lang')}>
-                {(['ro', 'en'] as const).map((l) => (
-                  <Chip key={l} selected={reportLang === l} onClick={() => setReportLang(l)}>
-                    {t(`lang.${l}` as MessageKey)}
-                  </Chip>
-                ))}
-              </ChipRow>
-            </div>
+            <SelectField
+              label={t('report.lang')}
+              value={reportLang}
+              options={(['ro', 'en'] as const).map((l) => ({ value: l, label: t(`lang.${l}` as MessageKey) }))}
+              onChange={(e) => setReportLang(e.target.value === 'en' ? 'en' : 'ro')}
+            />
             {credits > 0 && (
               <div className={styles.credit}>
                 <p className={styles.creditTitle}>
@@ -227,7 +221,6 @@ export function ReportPreviewScreen() {
             >
               {t('report.pay', { price: formatMoney(lang, price) })}
             </ActionButton>
-            <p className={styles.muted}>{t('report.stripeNote')}</p>
             <p className={styles.muted}>{t('report.after')}</p>
             <p className={styles.muted}>{t('report.snapshot')}</p>
           </Card>

@@ -1,10 +1,10 @@
 import { MapPin } from 'lucide-react';
+import { CheckMenu } from '../../../components/CheckMenu';
 import { useCallback, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ActionButton } from '../../../components/ActionButton';
 import { Button } from '../../../components/Button';
 import { buttonClass } from '../../../components/buttonClass';
-import { Chip } from '../../../components/Chip';
 import { Field } from '../../../components/Field';
 import { InlinePanel } from '../../../components/InlinePanel';
 import { SelectField } from '../../../components/SelectField';
@@ -238,25 +238,20 @@ function Details({
         autoComplete="address-level2"
         onChange={(e) => setLocality(e.target.value)}
       />
-      <div className={styles.group} role="group" aria-labelledby="area-categories">
-        <p id="area-categories" className={styles.groupTitle}>
-          {t('area.details.categories')}
-        </p>
-        <div className={styles.chips}>
-          {allCategories.map((c) => {
-            const on = categories.includes(c.key);
-            return (
-              <Chip
-                key={c.key}
-                selected={on}
-                onClick={() => setCategories((prev) => (on ? prev.filter((x) => x !== c.key) : [...prev, c.key]))}
-              >
-                {lang === 'ro' ? c.name_ro : c.name_en}
-              </Chip>
-            );
-          })}
-        </div>
-      </div>
+      <CheckMenu
+        label={t('area.details.categories')}
+        summary={
+          categories.length
+            ? allCategories
+                .filter((c) => categories.includes(c.key))
+                .map((c) => (lang === 'ro' ? c.name_ro : c.name_en))
+                .join(', ')
+            : t('area.details.categoriesNone')
+        }
+        options={allCategories.map((c) => ({ value: c.key, label: lang === 'ro' ? c.name_ro : c.name_en }))}
+        selected={categories}
+        onToggle={(key) => setCategories((prev) => (prev.includes(key) ? prev.filter((x) => x !== key) : [...prev, key]))}
+      />
       <div className={styles.actions}>
         <ActionButton
           block={false}

@@ -138,7 +138,7 @@ export function SettingsScreen() {
       <div>
         <h1>{t('admin.settings.title')}</h1>
         <p className={styles.sub}>
-          {state.status === 'ready' ? t('admin.settings.updated', { date: dateTime(lang, state.data.updated_at) }) : t('admin.settings.sub')}
+          {state.status === 'ready' ? t('admin.settings.updated', { date: dateTime(lang, state.data.updated_at) }) : null}
         </p>
       </div>
       <Tile to={ADMIN_TEXTS_PATH} icon={MessageSquareText} label={t('admin.texts.title')} hint={t('admin.texts.tileHint')} />

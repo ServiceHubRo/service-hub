@@ -12,9 +12,6 @@
   gap: 8px;
 }
 
-.heartOn {
-  fill: var(--amber);
-}
 
 /* ---------------------------------------------------------------- results */
 .results {
@@ -181,11 +178,17 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
+  gap: 3px;
 }
 
 .expiryLine {
   font-weight: 650;
   font-size: 13.5px;
+}
+
+/* An expired document: red text (the sentence itself says "a expirat"). */
+.expiryLineRed {
+  color: var(--red-text);
 }
 
 .expiryMore {
@@ -208,10 +211,16 @@
   max-width: 260px;
 }
 
-.viewToggle {
-  display: flex;
+.viewButton {
+  display: inline-flex;
+  align-items: center;
   gap: 6px;
   margin-left: auto;
+  min-height: var(--tap);
+  padding: 0 4px;
+  color: var(--amber);
+  font-size: 14px;
+  font-weight: 600;
 }
 
 .mapLoading {

@@ -13,6 +13,7 @@ import {
   shot,
   signIn,
   userIdOf,
+  cardAction,
 } from './support';
 
 // T11 — messages between a client and a shop, live on both sides, with automatic messages in the
@@ -131,7 +132,7 @@ test.describe('messages and reviews', () => {
     await expect(page).toHaveURL(/\/c\//);
     await navLink(page, /^Programări/).click();
     const card = page.locator('main section li').filter({ hasText: booking.ref });
-    await card.getByRole('link', { name: 'Mesaj' }).click();
+    await (await cardAction(card, 'Mesaj')).click();
     await expect(page).toHaveURL(/\/c\/mesaje\/[0-9a-f-]{36}$/);
     const log = page.getByRole('log');
     await expect(log).toContainText(`Ai trimis cererea ${booking.ref}. Service-ul o confirmă în curând.`);
@@ -194,7 +195,7 @@ test.describe('messages and reviews', () => {
 
     // The shop's booking card has the button too.
     await shopPage.goto(`/s/programari?tab=programate&p=${booking.id}`);
-    await shopPage.locator('main li').filter({ hasText: booking.ref }).getByRole('link', { name: 'Mesaj' }).click();
+    await (await cardAction(shopPage.locator('main li').filter({ hasText: booking.ref }), 'Mesaj')).click();
     await expect(shopPage).toHaveURL(/\/s\/mesaje\/[0-9a-f-]{36}$/);
     await expect(shopPage.getByRole('heading', { level: 1 })).toHaveText('Maria Pop');
   });
@@ -246,14 +247,13 @@ test.describe('messages and reviews', () => {
     await expect(page.locator('main')).toContainText('2 recenzii');
     await expect(page.locator('main')).toContainText('2,5');
 
-    // Report: a reason is required; afterwards "Raportată" and the confirmation.
+    // Report: a reason is required; afterwards the confirmation, no button to report again.
     await bad.getByRole('button', { name: 'Raportează' }).click();
     await expect(bad.getByRole('button', { name: 'Trimite raportarea' })).toBeDisabled();
     await bad.getByText('Limbaj abuziv').click();
     await expectNoHorizontalScroll(page);
     await shot(page, 't11-shop-report', name());
     await bad.getByRole('button', { name: 'Trimite raportarea' }).click();
-    await expect(bad).toContainText('Raportată');
     await expect(bad).toContainText('Primești răspuns în cel mult 5 zile lucrătoare.');
     await expect(bad.getByRole('button', { name: 'Raportează' })).toHaveCount(0);
     await shot(page, 't11-shop-reviews', name());

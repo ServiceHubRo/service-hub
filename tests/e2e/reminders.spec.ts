@@ -146,7 +146,7 @@ test.describe('client reminders', () => {
     await expectNoHorizontalScroll(page);
     await shot(page, 't19d-account-reminders', name());
 
-    await row.getByRole('button', { name: 'Oprește' }).click();
+    await row.getByRole('switch').uncheck();
     await expect(row).toContainText('Oprite.');
     const [profile] = await serviceRest<{ service_reminders: boolean }[]>(
       `profiles?id=eq.${await userIdOf(client)}&select=service_reminders`,
@@ -161,7 +161,7 @@ test.describe('client reminders', () => {
     const rowEn = page.getByRole('group', { name: 'Service reminders' });
     await expect(rowEn).toContainText('Off.');
     await shot(page, 't19d-account-reminders-en', name());
-    await rowEn.getByRole('button', { name: 'Turn on' }).click();
+    await rowEn.getByRole('switch').check();
     await expect(rowEn).toContainText('On.');
   });
 
@@ -179,7 +179,7 @@ test.describe('client reminders', () => {
     await openAccount(page);
     const row = page.getByRole('group', { name: 'Cerere de recenzie' });
     await expect(row).toContainText('Pornită.');
-    await row.getByRole('button', { name: 'Oprește' }).click();
+    await row.getByRole('switch').uncheck();
     await expect(row).toContainText('Oprită.');
     await expectNoHorizontalScroll(page);
     await shot(page, 't19d-account-review-requests', name());
@@ -193,7 +193,7 @@ test.describe('client reminders', () => {
     await expect(page.getByRole('heading', { level: 1, name: 'Caută' })).toBeVisible();
     await expect(card).toHaveCount(0);
     await openAccount(page);
-    await row.getByRole('button', { name: 'Pornește' }).click();
+    await row.getByRole('switch').check();
     await expect(row).toContainText('Pornită.');
     await page.getByRole('link', { name: 'Caută', exact: true }).filter({ visible: true }).first().click();
     await expect(card).toBeVisible();

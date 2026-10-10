@@ -78,6 +78,7 @@ export function AccountScreen({ role }: { role: Role }) {
           <ReminderRow setting="service_reminders" />
           <ReminderRow setting="season_reminders" />
           <ReminderRow setting="promo_notifications" />
+          <ReminderRow setting="share_history" />
           <div className={styles.tiles}>
             <Tile to={VEHICLE_HISTORY_PICK_PATH} icon={History} label={t('vh.title')} hint={t('vh.tileHint')} />
             <Tile to={MY_REPORTS_PATH} icon={FileCheck} label={t('reports.title')} hint={t('reports.tileHint')} />

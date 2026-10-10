@@ -14,6 +14,7 @@ import {
   uniquePhone,
   userIdOf,
   verifyPhoneByAdmin,
+  cardAction,
 } from './support';
 
 // T31a — a shop imports its clients, cars and past jobs from another program: the file, the
@@ -93,7 +94,7 @@ test.describe('import from another program', () => {
     await expect(card).toContainText('420 lei');
     await expect(page.getByText('Lucrările importate nu intră în total.')).toBeVisible();
     await card.getByRole('button').first().click();
-    await expect(card.getByRole('link', { name: 'Fișa mașinii' })).toHaveCount(0);
+    await expect(await cardAction(card, 'Fișa mașinii')).toHaveCount(0);
     await expectNoHorizontalScroll(page);
     await shot(page, 't31a-history', name());
 
@@ -102,10 +103,7 @@ test.describe('import from another program', () => {
     await page.getByLabel('Telefon').fill(ion.national);
     await expect(page.getByText('Client cunoscut.')).toBeVisible();
     await expect(page.getByLabel('Nume')).toHaveValue('Ion Pop');
-    await page
-      .getByRole('group', { name: 'Mașinile lui:' })
-      .getByRole('button', { name: new RegExp(`Dacia Logan ${plate}`) })
-      .click();
+    await page.getByLabel('Mașinile clientului').selectOption({ label: `Dacia Logan ${plate}` });
     await expect(page.getByLabel('Marcă')).toHaveValue('Dacia');
     await expect(page.getByLabel('Nr. înmatriculare')).toHaveValue(plate);
     await expectAccessible(page, 'add booking known client');

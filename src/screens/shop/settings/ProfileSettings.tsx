@@ -193,7 +193,6 @@ export function ProfileSettings() {
     <div className={styles.page}>
       <BackLink to={SETTINGS_PATH} label={t('settings.title')} />
       <h1>{t('settings.profile')}</h1>
-      <p className={styles.intro}>{t('profile.intro')}</p>
 
       <LogoCard />
 

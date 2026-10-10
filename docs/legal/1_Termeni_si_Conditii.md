@@ -1,6 +1,6 @@
 # Termeni și condiții — Service-Hub
 
-**Ultima actualizare:** 9 octombrie 2026
+**Ultima actualizare:** 10 octombrie 2026
 
 Acești termeni („Termenii”) se aplică folosirii Service-Hub: site-ul și aplicația de la adresa service-hub.ro („Platforma”). Când îți faci cont, confirmi că i-ai citit și că ești de acord cu ei. Cum folosim datele tale scrie în Politica de confidențialitate, iar ce păstrăm în browser, în Politica de cookies.
 
@@ -89,7 +89,7 @@ Datele de expirare pentru ITP, RCA și rovinietă sunt opționale. Alertele (cu 
 ### 3.6a Invită un prieten
 
 - **Codul tău** de invitare este numărul contului tău (de forma C-00042). Îl găsești în Cont → Invită un prieten, cu un link de înscriere pe care îl poți trimite (de exemplu pe WhatsApp). Prietenul scrie codul la înscriere sau se înscrie din link; codul se poate da doar la înscriere.
-- **Raportul gratuit:** un prieten contează când un service îi termină prima lucrare, programată prin Platformă și cu un cost mai mare de 0. Pentru fiecare 2 prieteni care contează primești un raport oficial de istoric gratuit (secțiunea 3.6), pe care îl folosești pentru oricare mașină a ta cu lucrări finalizate. Raportul gratuit se face imediat, fără plată, și este identic cu unul plătit (cod, verificare, descărcare).
+- **Raportul gratuit:** un prieten contează când un service îi termină prima lucrare, programată prin Platformă și cu un cost mai mare de 0. Pentru fiecare 2 prieteni care contează primești dreptul la un raport oficial de istoric gratuit (secțiunea 3.6). Dreptul rămâne în contul tău, fără termen, până îl folosești, pentru oricare mașină a ta cu lucrări finalizate. Când îl folosești, raportul se face imediat, fără plată, și este identic cu unul plătit (cod, verificare, descărcare).
 - **Limite:** fiecare prieten contează o singură dată (aceeași persoană, după email sau telefon, contează o singură dată, oricine ar fi invitat-o) și primești cel mult 3 rapoarte gratuite în 365 de zile pentru un cont. Numărul de prieteni pentru un raport și numărul de rapoarte pe an le poate schimba echipa Service-Hub, anunțat în aplicație; prietenii care contau deja rămân. Nu se acordă pentru un cont al aceleiași persoane (același email sau telefon), nici când lucrarea este finalizată de un service al tău, nici dacă între timp contul tău a fost șters sau suspendat.
 - **Ce vezi:** câți prieteni s-au înscris cu codul tău și câte rapoarte gratuite ai primit; nimic despre prietenii tăi.
 - Raportul gratuit nu se transformă în bani, puncte sau reduceri și nu se transferă. Putem schimba sau opri programul pentru invitațiile viitoare, anunțat în aplicație; rapoartele gratuite deja primite rămân.
@@ -161,7 +161,7 @@ Proprietarul poate invita colegi, fiecare cu contul lui (colegii nu folosesc con
 
 Pentru datele pe care le primiți despre clienți (nume, telefon, mașină, note, mesaje) sunteți operator de date, separat de noi. Le folosiți doar pentru programare, deviz, lucrare și obligațiile legale ale service-ului, le păstrați în siguranță și nu le folosiți pentru reclame fără acordul clientului. Istoricul și exporturile din aplicație sunt pentru evidența voastră.
 
-În **Fișa mașinii** vedeți lucrările făcute la acea mașină la alte service-uri doar dacă clientul a ales să vi le arate și doar cât programarea este deschisă, fără prețuri și fără numele celorlalte service-uri. Le folosiți doar ca să lucrați la mașina clientului: nu le copiați în altă evidență, nu le arătați altcuiva și nu încercați să aflați la ce service s-au făcut.
+În **Fișa mașinii** vedeți lucrările făcute la acea mașină la alte service-uri doar cât programarea este deschisă și doar dacă clientul nu a oprit afișarea lor din contul lui, fără prețuri și fără numele celorlalte service-uri. Le folosiți doar ca să lucrați la mașina clientului: nu le copiați în altă evidență, nu le arătați altcuiva și nu încercați să aflați la ce service s-au făcut.
 
 ### 4.7 Ce trebuie să știe orice afacere de pe Platformă
 

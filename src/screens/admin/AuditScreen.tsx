@@ -111,7 +111,6 @@ export function AuditScreen() {
       <BackLink to={ADMIN_ACCOUNT_PATH} label={t('nav.account')} />
       <div>
         <h1>{t('admin.audit.title')}</h1>
-        <p className={styles.sub}>{t('admin.audit.sub')}</p>
       </div>
       {state.status === 'loading' && <SkeletonList />}
       {state.status === 'error' && <LoadError message={t('admin.loadError')} onRetry={reload} />}

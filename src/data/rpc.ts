@@ -532,8 +532,6 @@ export interface CreateBookingInput {
   slot: string; // HH:MM
   car: { carId: string } | { car: CarInput; saveCar: boolean };
   note?: string;
-  /** The client lets this shop see the car's jobs at other shops (T27); off unless ticked. */
-  shareHistory?: boolean;
 }
 
 export function createBooking(input: CreateBookingInput, requestId: string): Promise<Booking> {
@@ -549,13 +547,7 @@ export function createBooking(input: CreateBookingInput, requestId: string): Pro
       : { p_car: car.car as unknown as Json, p_save_car: car.saveCar }),
     p_note: input.note,
     p_extra_service_ids: input.extraServiceIds ?? [],
-    p_share_history: input.shareHistory ?? false,
   });
-}
-
-/** The client turns on or off, for one active booking, the shop's view of the car's other jobs (T27). */
-export function setBookingHistoryShare(bookingId: string, share: boolean, requestId: string): Promise<Booking> {
-  return call('set_booking_history_share', { p_booking_id: bookingId, p_share: share, p_request_id: requestId });
 }
 
 export function confirmBooking(bookingId: string, requestId: string): Promise<Booking> {

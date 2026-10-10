@@ -1,6 +1,6 @@
-import { BadgePercent, CalendarClock, CircleDot, Lightbulb, Star } from 'lucide-react';
+import { BadgePercent, CalendarClock, CircleDot, History, Lightbulb, Star } from 'lucide-react';
 import { useSession } from '../../app/sessionContext';
-import { ActionButton } from '../../components/ActionButton';
+import { ActionSwitch } from '../../components/ActionSwitch';
 import { Card } from '../../components/Card';
 import { setReminder, type ReminderSetting } from '../../data/profile';
 import { rpcErrorMessage } from '../../data/rpc';
@@ -45,6 +45,14 @@ const ROWS = {
     on: 'promoNotifications.on',
     off: 'promoNotifications.off',
   },
+  // Since 10 Oct (Eduard): the car's history from other shops, shown by default to the shop the
+  // client books with (no prices, no shop names); off here for every open booking at once.
+  share_history: {
+    icon: History,
+    title: 'shareHistory.title',
+    on: 'shareHistory.on',
+    off: 'shareHistory.off',
+  },
 } as const;
 
 /** Cont → one of the client's reminders (T19d, T24): on by default (offers: off), switched here. */
@@ -59,24 +67,18 @@ export function ReminderRow({ setting }: { setting: ReminderSetting }) {
 
   return (
     <Card role="group" aria-label={t(row.title)}>
-      <div className={styles.row}>
-        <span className={styles.rowLabel}>
-          <Icon size={20} aria-hidden="true" />
-          <span className={styles.who}>
-            <span>{t(row.title)}</span>
-            <span className={styles.small}>{t(on ? row.on : row.off)}</span>
-          </span>
-        </span>
-        <ActionButton
-          variant="secondary"
-          block={false}
-          onAction={async () => {
-            session.setProfile(await setReminder(profile.id, setting, !on));
+      <div className={styles.switchRow}>
+        <Icon size={20} aria-hidden="true" className={styles.switchIcon} />
+        <ActionSwitch
+          checked={on}
+          hint={t(on ? row.on : row.off)}
+          onToggle={async (next) => {
+            session.setProfile(await setReminder(profile.id, setting, next));
           }}
           errorMessage={(e) => rpcErrorMessage(lang, e)}
         >
-          {t(on ? 'reminders.turnOff' : 'reminders.turnOn')}
-        </ActionButton>
+          {t(row.title)}
+        </ActionSwitch>
       </div>
     </Card>
   );

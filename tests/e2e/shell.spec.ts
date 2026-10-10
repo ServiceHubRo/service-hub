@@ -125,6 +125,30 @@ for (const role of Object.keys(NAV) as (keyof typeof NAV)[]) {
   });
 }
 
+test('"Mai multe" on the last card shows every entry, above the tab bar', async ({ page }) => {
+  test.skip(!BACKEND, 'needs the local Supabase stack');
+  await signIn(page, SEED.shop, SEED_PASSWORD);
+  await expect(page).toHaveURL(/\/s\//);
+  await page.goto('/s/programari?tab=programate');
+  const more = page.getByRole('button', { name: 'Mai multe' });
+  await expect(more.first()).toBeVisible();
+  await page.locator('main').evaluate((m) => m.scrollTo(0, m.scrollHeight));
+  await more.last().click();
+  const items = page.getByRole('menu').getByRole('menuitem');
+  await expect(items.first()).toBeVisible();
+  expect(await items.count()).toBeGreaterThan(1);
+  await page.screenshot({ path: `test-results/shots/more-last-card-${test.info().project.name}.png` });
+  // Each entry is the element under its own centre: not hidden by the tab bar or cut off.
+  for (const item of await items.all()) {
+    const box = (await item.boundingBox())!;
+    const hit = await page.evaluate(
+      ([x, y]) => document.elementFromPoint(x!, y!)?.closest('[role="menuitem"]')?.textContent ?? null,
+      [box.x + box.width / 2, box.y + box.height / 2],
+    );
+    expect(hit).toBe(await item.textContent());
+  }
+});
+
 test('a client cannot open shop or admin screens', async ({ page }) => {
   test.skip(!BACKEND, 'needs the local Supabase stack');
   await signIn(page, SEED.client, SEED_PASSWORD);

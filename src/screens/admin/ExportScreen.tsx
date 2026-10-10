@@ -28,7 +28,6 @@ export function ExportScreen() {
       <BackLink to={ADMIN_ACCOUNT_PATH} label={t('nav.account')} />
       <div>
         <h1>{t('admin.export.title')}</h1>
-        <p className={styles.sub}>{t('admin.export.sub')}</p>
       </div>
       <ul className={styles.list}>
         {EXPORT_KINDS.map((kind) => (

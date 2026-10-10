@@ -1,10 +1,11 @@
 import { CalendarCheck, CalendarPlus, Inbox, Unlink, X } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
-import { Link, useLocation, useSearchParams } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
+import { useLiveSearchParams } from '../../../app/useLiveSearchParams';
 import { Banner } from '../../../components/Banner';
 import { Button } from '../../../components/Button';
 import { buttonClass } from '../../../components/buttonClass';
-import { Chip } from '../../../components/Chip';
+import { ActiveFilters } from '../../../components/Filters';
 import { EmptyState } from '../../../components/EmptyState';
 import { LoadError } from '../../../components/LoadError';
 import { SkeletonList } from '../../../components/Skeleton';
@@ -79,7 +80,7 @@ function doneMessage(before: BookingStatus, after: BookingStatus, moved: boolean
 export function ShopBookingsScreen() {
   const { t, lang } = useI18n();
   const { state, reload, refresh, apply } = useShopBookings();
-  const [params, setParams] = useSearchParams();
+  const [params, setParams] = useLiveSearchParams();
   const now = useNow();
   const today = ymdInBucharest(now);
   const location = useLocation();
@@ -164,13 +165,7 @@ export function ShopBookingsScreen() {
           ]}
         />
         {chip && (
-          <div className={styles.filterRow}>
-            <Chip selected onClick={() => go({ tab })}>
-              {chip}
-              <X size={14} aria-hidden="true" />
-              <span className="visually-hidden">{t('sb.filter.clear')}</span>
-            </Chip>
-          </div>
+          <ActiveFilters items={[{ key: 'focus', label: chip }]} onClearAll={() => go({ tab })} />
         )}
         {notice && (
           <Banner

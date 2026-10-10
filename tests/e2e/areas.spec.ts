@@ -79,8 +79,10 @@ test.describe('zones', () => {
     // Details: the town and what they need, saved without leaving the card.
     await waiting.getByRole('button', { name: 'Adaugă detalii' }).click();
     await page.getByLabel('Localitatea (opțional)').fill('Comuna Test');
-    await page.getByRole('button', { name: 'Frânare' }).click();
-    await expect(page.getByRole('button', { name: 'Frânare', pressed: true })).toBeVisible();
+    await page.getByRole('button', { name: /^Servicii de interes/ }).click();
+    await page.getByRole('checkbox', { name: 'Frânare' }).check();
+    await page.keyboard.press('Escape');
+    await expect(page.getByRole('button', { name: /^Servicii de interes \(opțional\) Frânare/ })).toBeVisible();
     await expectNoHorizontalScroll(page);
     await shot(page, 'zones-details', name());
     await page.getByRole('button', { name: 'Salvează', exact: true }).click();
@@ -135,14 +137,15 @@ test.describe('zones', () => {
     const card = page.locator('main li').filter({ has: page.getByRole('heading', { name: zone.ro, exact: true }) });
     await expect(card).toContainText('Nepornită');
     await expect(card).toContainText('Test (');
-    await card.getByRole('button', { name: 'Pornită' }).click();
+    await card.getByRole('combobox', { name: 'Cum pornește' }).selectOption({ label: 'Pornită' });
+    await card.getByRole('button', { name: 'Salvează' }).click();
     await expect(card.getByRole('heading', { name: `Pornești zona ${zone.ro}?` })).toBeVisible();
     await shot(page, 'zones-admin-confirm', name());
     await card.getByRole('button', { name: 'Da, pornește' }).click();
     // The demo admin is shared by the runs in parallel: its session may refresh meanwhile.
     await expect(page.getByRole('status').filter({ hasText: /Am anunțat \d+ client/ })).toBeVisible({ timeout: 15_000 });
     await expect(card.getByText('Pornită', { exact: true }).first()).toBeVisible();
-    await expect(card).toContainText('Setată de tine');
+    await expect(card.getByRole('combobox', { name: 'Cum pornește' })).toHaveValue('on');
 
     const events = await serviceRest<{ channels: string[] }[]>(
       `notification_events?user_id=eq.${clientId}&event=eq.area_launched&select=channels`,
@@ -151,7 +154,8 @@ test.describe('zones', () => {
     expect(events).toEqual([{ channels: ['push', 'email'] }]);
 
     // Back to automatic (no public shop there): not live; nobody is told again.
-    await card.getByRole('button', { name: 'Automat' }).click();
+    await card.getByRole('combobox', { name: 'Cum pornește' }).selectOption({ label: 'Automat' });
+    await card.getByRole('button', { name: 'Salvează' }).click();
     await expect(card).toContainText('Nepornită');
     expect(
       await serviceRest<unknown[]>(`notification_events?user_id=eq.${clientId}&event=eq.area_launched`, 'GET'),
@@ -176,8 +180,10 @@ test.describe('constatare tehnică', () => {
     await expect(unsure).toBeVisible();
     await expect(page.getByRole('group', { name: 'Simptome observate (opțional)' })).toHaveCount(0);
     await unsure.click();
-    await page.getByRole('button', { name: 'Zgomote neobișnuite' }).click();
-    await page.getByRole('button', { name: 'Martor aprins în bord' }).click();
+    await page.getByRole('button', { name: /^Simptome observate/ }).click();
+    await page.getByRole('checkbox', { name: 'Zgomote neobișnuite' }).check();
+    await page.getByRole('checkbox', { name: 'Martor aprins în bord' }).check();
+    await page.keyboard.press('Escape');
     await expect(page).toHaveURL(/simptome=noise%2Cwarning_light|simptome=noise,warning_light/);
     await expectNoHorizontalScroll(page);
     await shot(page, 'constatare-step1', name());

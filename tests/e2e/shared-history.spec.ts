@@ -9,12 +9,13 @@ import {
   shot,
   signIn,
   userIdOf,
+  cardAction,
 } from './support';
 
-// Fișa mașinii (T27): the client ticks, when booking, that the shop may see what was done on the car
-// at other shops; the shop opens the car's file from the booking card and from Istoric and sees its
-// own jobs (with amounts) and, while the client agrees, the other shops' jobs without price or shop
-// name; the client hides or shows them again from Programări and the open file follows at once.
+// Fișa mașinii (T27; shown by default since 10 Oct): the shop the client books with sees what was
+// done on the car at other shops; it opens the car's file from the booking card and from Istoric and
+// sees its own jobs (with amounts) and the other shops' jobs without price or shop name; the client
+// turns it off or on again with one switch in Cont and the open file follows at once.
 
 const name = () => test.info().project.name;
 const tag = () => `${Date.now() % 100000}${Math.floor(Math.random() * 100)}`;
@@ -65,7 +66,7 @@ async function doneJob(shopId: string, clientId: string, plate: string, job: { w
 
 async function openFileFromBookings(page: Page) {
   await page.goto('/s/programari');
-  await page.locator('li').filter({ hasText: 'Ford Focus' }).getByRole('link', { name: 'Fișa mașinii' }).click();
+  await (await cardAction(page.locator('li').filter({ hasText: 'Ford Focus' }), 'Fișa mașinii')).click();
   await expect(page.getByRole('heading', { level: 1, name: 'Fișa mașinii' })).toBeVisible();
 }
 
@@ -73,7 +74,7 @@ test.describe('Fișa mașinii', () => {
   test.skip(!BACKEND, 'needs the local Supabase stack');
   test.setTimeout(120_000);
 
-  test('the client agrees, the shop sees the other shops’ jobs without price or name, until hidden', async ({ page, browser }) => {
+  test('shown by default, the shop sees the other shops’ jobs without price or name, until turned off in Cont', async ({ page, browser }) => {
     const id = tag();
     const plate = `BV ${10 + (Number(id) % 89)} FIS`;
     const otherName = `Service Altul ${id}`;
@@ -94,7 +95,7 @@ test.describe('Fișa mașinii', () => {
     });
     await doneJob(shopId, clientId, plate, { work: 'Ulei și filtre', cost: 389, km: 101_250, daysAgo: 20 });
 
-    // ------------------------------------------------------------ the client books and agrees
+    // ------------------------------------------------------------ the client books (nothing to tick)
     const clientContext = await browser.newContext({ viewport: page.viewportSize() ?? undefined, hasTouch: true });
     await clientContext.addInitScript(() => localStorage.setItem('sh_lang', 'ro'));
     const client = await clientContext.newPage();
@@ -111,13 +112,9 @@ test.describe('Fișa mașinii', () => {
     await client.getByLabel('Model').fill('Focus');
     await client.getByLabel('An fabricație').fill('2017');
     await client.getByLabel('Nr. înmatriculare').fill(plate);
-    const agree = client.getByRole('checkbox', { name: 'Arată service-ului istoricul lucrărilor de la alte service-uri' });
-    await expect(agree).not.toBeChecked();
-    await expect(client.getByText('fără prețuri sau nume de service-uri', { exact: false })).toBeVisible();
-    await agree.check();
-    await agree.scrollIntoViewIfNeeded();
+    await expect(client.getByRole('switch', { name: /istoricul/i })).toHaveCount(0);
     await expectNoHorizontalScroll(client);
-    await shot(client, 't27-booking-agree', name());
+    await shot(client, 't27-booking-car', name());
     await client.getByRole('button', { name: 'Trimite cererea' }).click();
     await expect(client.getByRole('heading', { level: 1, name: 'Cerere trimisă' })).toBeVisible();
     const [made] = await serviceRest<{ share_history: boolean }[]>(
@@ -130,8 +127,7 @@ test.describe('Fișa mașinii', () => {
     await signIn(page, shopEmail, PASSWORD);
     await expect(page).toHaveURL(/\/s\/panou$/);
     await page.goto('/s/programari');
-    const card = page.locator('li').filter({ hasText: 'Ford Focus' });
-    await expect(card).toContainText('Clientul a partajat istoricul mașinii de la alte service-uri');
+    await expect(page.locator('li').filter({ hasText: 'Ford Focus' })).toBeVisible();
     await shot(page, 't27-shop-card', name());
     await openFileFromBookings(page);
     await expect(page.getByRole('link', { name: 'Fișa mașinii' })).toHaveCount(0);
@@ -152,29 +148,34 @@ test.describe('Fișa mașinii', () => {
     await expectNoHorizontalScroll(page);
     await shot(page, 't27-vehicle-file', name());
 
-    // ------------------------------------------------------------ the client hides it: the file follows
+    // ------------------------------------------------------------ the client turns it off in Cont: the file follows
     await client.getByRole('link', { name: 'Vezi programările' }).click();
-    const share = client.getByRole('group', { name: 'Istoricul mașinii pentru service' });
+    await expect(client.getByRole('switch', { name: /istoricul/i })).toHaveCount(0);
+    await client.getByRole('link', { name: 'Cont', exact: true }).filter({ visible: true }).first().click();
+    const share = client.getByRole('group', { name: 'Istoricul mașinii pentru service-uri' });
+    await expect(share.getByRole('switch')).toBeChecked();
     await expect(share).toContainText('fără prețuri și fără numele lor');
+    await share.scrollIntoViewIfNeeded();
     await shot(client, 't27-client-share-on', name());
-    await share.getByRole('button', { name: 'Ascunde' }).click();
-    await expect(share).toContainText('Service-ul vede doar lucrările făcute la el.');
+    await share.getByRole('switch').uncheck();
+    await expect(share).toContainText('Service-urile văd doar lucrările făcute la ele.');
     await expectNoHorizontalScroll(client);
     await shot(client, 't27-client-share-off', name());
-    await expect(others).toContainText('Clientul nu a ales să-ți arate lucrările de la alte service-uri.');
+    await expect(others).toContainText('Clientul a ales să nu arate lucrările de la alte service-uri.');
     await expect(others).not.toContainText('Plăcuțe față schimbate');
     await expect(own).toContainText('Ulei și filtre');
     await shot(page, 't27-vehicle-file-hidden', name());
 
-    await share.getByRole('button', { name: 'Arată' }).click();
+    await share.getByRole('switch').check();
     await expect(share).toContainText('fără prețuri și fără numele lor');
     await expect(others).toContainText('Plăcuțe față schimbate');
+    await client.goto('/c/programari');
 
     // ------------------------------------------------------------ from Istoric, and in English
     await page.goto('/s/istoric');
     const job = page.locator('li').filter({ hasText: 'Ulei și filtre' });
     await job.getByRole('button').first().click();
-    await job.getByRole('link', { name: 'Fișa mașinii' }).click();
+    await (await cardAction(job, 'Fișa mașinii')).click();
     await expect(page).toHaveURL(/\/s\/istoric\/fisa\//);
     await expect(page.getByRole('region', { name: /Reparații anterioare la alte service-uri/ })).toContainText('Plăcuțe față schimbate');
     await page.getByRole('link', { name: 'Istoric' }).first().click();
@@ -189,9 +190,9 @@ test.describe('Fișa mașinii', () => {
     await shot(page, 't27-vehicle-file-en', name());
 
     // The client cancels: nothing of the other shops stays visible.
-    await client.locator('li').filter({ hasText: shopName }).getByRole('button', { name: 'Anulează', exact: true }).click();
+    await (await cardAction(client.locator('li').filter({ hasText: shopName }), 'Anulează')).click();
     await client.getByRole('button', { name: 'Anulează programarea' }).click();
-    await expect(page.getByRole('region', { name: /Previous repairs at other shops/ })).toContainText('while they have an open booking');
+    await expect(page.getByRole('region', { name: /Previous repairs at other shops/ })).toContainText('while the client has an open booking');
     await expect(page.getByRole('region', { name: /Previous repairs at other shops/ })).not.toContainText('Plăcuțe față schimbate');
     await clientContext.close();
   });
@@ -199,6 +200,6 @@ test.describe('Fișa mașinii', () => {
 
 async function openFileFromBookingsEn(page: Page) {
   await page.goto('/s/programari');
-  await page.locator('li').filter({ hasText: 'Ford Focus' }).getByRole('link', { name: 'Vehicle file' }).click();
+  await (await cardAction(page.locator('li').filter({ hasText: 'Ford Focus' }), 'Vehicle file')).click();
   await expect(page.getByRole('heading', { level: 1, name: 'Vehicle file' })).toBeVisible();
 }

@@ -1,10 +1,9 @@
-import { ClipboardList, Phone, Store, TriangleAlert } from 'lucide-react';
+import { CalendarClock, ClipboardList, FilePen, MessageSquare, Phone, Store, TriangleAlert } from 'lucide-react';
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
 import { ActionButton } from '../../../components/ActionButton';
 import { Button } from '../../../components/Button';
-import { buttonClass } from '../../../components/buttonClass';
 import { Card } from '../../../components/Card';
+import { MoreActions } from '../../../components/MoreActions';
 import { ServiceIcon } from '../../../components/ServiceIcon';
 import { StatusBadge } from '../../../components/StatusBadge';
 import { OfferNote } from '../../../components/OfferNote';
@@ -34,7 +33,7 @@ import { CompletionPanel } from './CompletionPanel';
 import { QuoteComposer } from './QuoteComposer';
 import { QuoteLines } from './QuoteLines';
 import { ReschedulePanel } from './ReschedulePanel';
-import { MessageLink } from '../../messages/MessageLink';
+import { bookingMessagesPath } from '../../messages/paths';
 import { vehicleFilePath } from '../paths';
 import styles from './shopBookings.module.css';
 
@@ -131,7 +130,6 @@ export function ShopBookingCard({ booking: b, shopId, fee, expiryDays, now, onDo
         {b.note && <p className={styles.note}>{b.note}</p>}
         {b.offer_percent ? <OfferNote>{offerText.promise('shop', b.offer_percent, b.offer_kind ?? null)}</OfferNote> : null}
         {b.loyalty_percent ? <OfferNote>{t('loyalty.shop', { n: b.loyalty_percent, level: b.loyalty_level ?? 1 })}</OfferNote> : null}
-        {b.share_history && <p className={styles.muted}>{t('sb.card.shared')}</p>}
         {b.source === 'shop' && (
           <p className={styles.walkIn}>
             <Store size={14} aria-hidden="true" />
@@ -145,57 +143,42 @@ export function ShopBookingCard({ booking: b, shopId, fee, expiryDays, now, onDo
 
       {panel === null && (
         <div className={styles.actions}>
-          {b.status === 'pending' && (
-            <>
-              {!started && (
-                <ActionButton
-                  variant="success"
-                  block={false}
-                  onAction={(rid) => act(() => confirmBooking(b.id, rid))}
-                  errorMessage={(e) => rpcErrorMessage(lang, e)}
-                  canRetry={canRetryRpc}
-                >
-                  {t('sb.action.confirm')}
-                </ActionButton>
-              )}
-              <Button variant="danger" onClick={() => setPanel('decline')}>
-                {t('sb.action.decline')}
-              </Button>
-              <Button onClick={() => setPanel('reschedule')}>{t('sb.action.reschedule')}</Button>
-            </>
+          {/* One main action in sight; the rest behind "Mai multe" (Eduard, 10 Oct). */}
+          {b.status === 'pending' && !started && (
+            <ActionButton
+              variant="success"
+              block={false}
+              onAction={(rid) => act(() => confirmBooking(b.id, rid))}
+              errorMessage={(e) => rpcErrorMessage(lang, e)}
+              canRetry={canRetryRpc}
+            >
+              {t('sb.action.confirm')}
+            </ActionButton>
+          )}
+          {b.status === 'pending' && started && (
+            <Button variant="danger" onClick={() => setPanel('decline')}>
+              {t('sb.action.decline')}
+            </Button>
           )}
           {b.status === 'confirmed' && (
-            <>
-              <ActionButton
-                block={false}
-                onAction={(rid) => act(() => startInspection(b.id, rid))}
-                errorMessage={(e) => rpcErrorMessage(lang, e)}
-                canRetry={canRetryRpc}
-              >
-                {t('sb.action.inspect')}
-              </ActionButton>
-              <Button onClick={() => setPanel('reschedule')}>{t('sb.action.reschedule')}</Button>
-              <Button onClick={() => setPanel('cancel')}>{t('sb.action.cancel')}</Button>
-              {started && <Button onClick={() => setPanel('noShow')}>{t('sb.action.noShow')}</Button>}
-            </>
+            <ActionButton
+              block={false}
+              onAction={(rid) => act(() => startInspection(b.id, rid))}
+              errorMessage={(e) => rpcErrorMessage(lang, e)}
+              canRetry={canRetryRpc}
+            >
+              {t('sb.action.inspect')}
+            </ActionButton>
           )}
           {b.status === 'in_inspection' && (
             <Button variant="primary" onClick={() => setPanel('quote')}>
               {t('sb.action.sendQuote')}
             </Button>
           )}
-          {b.status === 'quote_sent' && (
-            <>
-              {walkIn && b.quote && (
-                <Button variant="primary" onClick={() => setPanel('answer')}>
-                  {t('sb.action.clientAnswer')}
-                </Button>
-              )}
-              <Button onClick={() => setPanel('editQuote')}>{t('sb.action.editQuote')}</Button>
-              <Button variant="ghost" onClick={() => setPanel('withdraw')}>
-                {t('sb.action.withdrawQuote')}
-              </Button>
-            </>
+          {b.status === 'quote_sent' && walkIn && b.quote && (
+            <Button variant="primary" onClick={() => setPanel('answer')}>
+              {t('sb.action.clientAnswer')}
+            </Button>
           )}
           {b.status === 'approved' && (
             <ActionButton
@@ -213,19 +196,39 @@ export function ShopBookingCard({ booking: b, shopId, fee, expiryDays, now, onDo
               {t('sb.action.complete')}
             </Button>
           )}
-          {/* A deleted client account has no conversation. */}
-          {b.client_account && <MessageLink side="shop" bookingId={b.id} />}
-          <Link to={vehicleFilePath(b.id, 'bookings')} className={buttonClass('secondary')}>
-            <ClipboardList size={18} aria-hidden="true" />
-            {t('vf.title')}
-          </Link>
+          <MoreActions
+            items={[
+              ...(b.status === 'pending' && !started
+                ? [{ key: 'decline', label: t('sb.action.decline'), onSelect: () => setPanel('decline'), danger: true }]
+                : []),
+              ...(b.status === 'pending' || b.status === 'confirmed'
+                ? [{ key: 'reschedule', label: t('sb.action.reschedule'), icon: <CalendarClock size={18} aria-hidden="true" />, onSelect: () => setPanel('reschedule') }]
+                : []),
+              ...(b.status === 'quote_sent'
+                ? [
+                    { key: 'editQuote', label: t('sb.action.editQuote'), icon: <FilePen size={18} aria-hidden="true" />, onSelect: () => setPanel('editQuote') },
+                    { key: 'withdraw', label: t('sb.action.withdrawQuote'), onSelect: () => setPanel('withdraw'), danger: true },
+                  ]
+                : []),
+              // A deleted client account has no conversation.
+              ...(b.client_account
+                ? [{ key: 'message', label: t('msg.button'), icon: <MessageSquare size={18} aria-hidden="true" />, to: bookingMessagesPath('shop', b.id) }]
+                : []),
+              { key: 'file', label: t('vf.title'), icon: <ClipboardList size={18} aria-hidden="true" />, to: vehicleFilePath(b.id, 'bookings') },
+              ...(b.status === 'confirmed' && started
+                ? [{ key: 'noShow', label: t('sb.action.noShow'), onSelect: () => setPanel('noShow') }]
+                : []),
+              ...(b.status === 'confirmed'
+                ? [{ key: 'cancel', label: t('sb.action.cancel'), onSelect: () => setPanel('cancel'), danger: true }]
+                : []),
+            ]}
+          />
         </div>
       )}
 
       {panel === 'decline' && (
         <ReasonPanel
           title={t('sb.decline.title')}
-          body={t('sb.decline.body')}
           label={t('sb.decline.submit')}
           required={false}
           onAction={(reason, rid) => act(() => declineBooking(b.id, reason || undefined, rid))}

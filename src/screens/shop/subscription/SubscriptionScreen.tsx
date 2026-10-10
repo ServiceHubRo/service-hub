@@ -49,7 +49,7 @@ import styles from './subscription.module.css';
  * reload.
  */
 export function SubscriptionScreen() {
-  const { t, lang } = useI18n();
+  const { t } = useI18n();
   const load = useCallback(() => getSubscription(), []);
   const { state, reload, setData } = useLoad(load);
   const [params] = useSearchParams();
@@ -107,9 +107,6 @@ export function SubscriptionScreen() {
       <BackLink to={ACCOUNT_PATH} label={t('nav.account')} />
       <h1>{t('sub.title')}</h1>
       {body}
-      <p className={styles.note} lang={lang}>
-        <Lock size={14} aria-hidden="true" /> {t('sub.stripeNote')}
-      </p>
     </div>
   );
 }

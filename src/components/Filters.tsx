@@ -2,14 +2,15 @@ import { SlidersHorizontal, X } from 'lucide-react';
 import { useEffect, useId, useRef, useState, type ReactNode } from 'react';
 import { useI18n } from '../i18n/context';
 import { Button } from './Button';
-import { Chip } from './Chip';
+import { SelectField } from './SelectField';
 import styles from './Filters.module.css';
 
 /**
- * Filters behind one button (Eduard, 4 Oct: rows of chips were too many buttons). "Filtre" opens a
- * panel — a sheet from the bottom on phones, centered on wider screens — and the filters in use
- * show under it, each with its own ✕, plus "Șterge filtrele". Caută builds its own panel from these
- * pieces; the lists with plain one-of-several filters use <ChoiceFilters>.
+ * Filters behind one button (Eduard, 4 Oct: rows of chips were too many buttons; 10 Oct: dropdowns
+ * and switches, no pills). "Filtre" opens a panel — a sheet from the bottom on phones, centered on
+ * wider screens — and the filters in use show under it as one quiet line, with "Șterge filtrele".
+ * Caută builds its own panel from these pieces; the lists with one-of-several filters use
+ * <ChoiceFilters>.
  */
 
 /** The "Filtre" button, with how many filters are on. */
@@ -34,32 +35,16 @@ export interface ActiveFilter {
   label: string;
 }
 
-/** The filters in use, each removable on its own, and "Șterge filtrele". Nothing when none is on. */
-export function ActiveFilters({
-  items,
-  onRemove,
-  onClearAll,
-}: {
-  items: readonly ActiveFilter[];
-  onRemove: (key: string) => void;
-  onClearAll?: () => void;
-}) {
+/** The filters in use, in one line ("Finalizate · Luna aceasta"), and "Șterge filtrele". Nothing when none is on. */
+export function ActiveFilters({ items, onClearAll }: { items: readonly ActiveFilter[]; onClearAll?: () => void }) {
   const { t } = useI18n();
   if (items.length === 0) return null;
   return (
-    <div className={styles.active} role="group" aria-label={t('filters.active')}>
-      {items.map((f) => (
-        <button
-          key={f.key}
-          type="button"
-          className={styles.activeChip}
-          onClick={() => onRemove(f.key)}
-          aria-label={t('filters.remove', { name: f.label })}
-        >
-          {f.label}
-          <X size={14} aria-hidden="true" />
-        </button>
-      ))}
+    <div className={styles.active}>
+      <p className={styles.activeText}>
+        <span className="visually-hidden">{t('filters.active')}: </span>
+        {items.map((f) => f.label).join(' · ')}
+      </p>
       {onClearAll && (
         <button type="button" className={styles.clearAll} onClick={onClearAll}>
           {t('filters.clear')}
@@ -127,7 +112,7 @@ export function FilterSheet({
   );
 }
 
-/** One heading and its chips inside the panel. */
+/** One heading and its controls inside the panel (dropdowns, switches). */
 export function FilterGroup({ title, children }: { title: string; children: ReactNode }) {
   const id = useId();
   return (
@@ -135,9 +120,7 @@ export function FilterGroup({ title, children }: { title: string; children: Reac
       <h3 id={id} className={styles.groupTitle}>
         {title}
       </h3>
-      <div className={styles.groupChips} role="group" aria-labelledby={id}>
-        {children}
-      </div>
+      <div className={styles.groupBody}>{children}</div>
     </section>
   );
 }
@@ -180,10 +163,6 @@ export function ChoiceFilters({
       </div>
       <ActiveFilters
         items={on.map((g) => ({ key: g.key, label: g.options.find((o) => o.value === g.value)?.label ?? g.value }))}
-        onRemove={(key) => {
-          const g = groups.find((x) => x.key === key);
-          g?.onChange(g.defaultValue);
-        }}
         onClearAll={clearAll}
       />
       <FilterSheet
@@ -194,13 +173,13 @@ export function ChoiceFilters({
         doneLabel={doneLabel}
       >
         {groups.map((g) => (
-          <FilterGroup key={g.key} title={g.title}>
-            {g.options.map((o) => (
-              <Chip key={o.value} selected={g.value === o.value} onClick={() => g.onChange(o.value)}>
-                {o.label}
-              </Chip>
-            ))}
-          </FilterGroup>
+          <SelectField
+            key={g.key}
+            label={g.title}
+            value={g.value}
+            options={[...g.options]}
+            onChange={(e) => g.onChange(e.target.value)}
+          />
         ))}
       </FilterSheet>
     </>

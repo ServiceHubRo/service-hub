@@ -59,9 +59,3 @@
   font-size: 13.5px;
 }
 
-.knownCars {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px;
-}

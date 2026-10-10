@@ -1,6 +1,6 @@
 import { BackLink } from '../../../components/BackLink';
 import { Card } from '../../../components/Card';
-import { Checkbox } from '../../../components/Checkbox';
+import { Switch } from '../../../components/Switch';
 import { updateShop } from '../../../data/shop';
 import { useI18n } from '../../../i18n/context';
 import { PushRow } from '../../push/PushRow';
@@ -37,22 +37,12 @@ export function NotificationSettings() {
       {isOwner ? (
         <>
           <Card className={styles.stack}>
-            <div>
-              <Checkbox checked={digest} onChange={(e) => setDigest(e.target.checked)} aria-describedby="notif-digest-hint">
-                {t('notif.digest')}
-              </Checkbox>
-              <p id="notif-digest-hint" className={styles.hint}>
-                {t('notif.digest.hint')}
-              </p>
-            </div>
-            <div>
-              <Checkbox checked={monthly} onChange={(e) => setMonthly(e.target.checked)} aria-describedby="notif-monthly-hint">
-                {t('notif.monthly')}
-              </Checkbox>
-              <p id="notif-monthly-hint" className={styles.hint}>
-                {t('notif.monthly.hint')}
-              </p>
-            </div>
+            <Switch checked={digest} hint={t('notif.digest.hint')} onChange={(e) => setDigest(e.target.checked)}>
+              {t('notif.digest')}
+            </Switch>
+            <Switch checked={monthly} hint={t('notif.monthly.hint')} onChange={(e) => setMonthly(e.target.checked)}>
+              {t('notif.monthly')}
+            </Switch>
           </Card>
           <p className={styles.note}>{t('notif.soon')}</p>
           <SaveButton onSave={save}>{t('notif.save')}</SaveButton>

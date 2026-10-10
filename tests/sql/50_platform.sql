@@ -112,7 +112,7 @@ where grantee = 'anon' and table_schema = 'public' and privilege_type <> 'SELECT
 -- Functions callable from the API are an explicit list (a new RPC must be granted on purpose).
 select test.eq(
   string_agg(p.proname, ', ' order by p.proname) filter (where has_function_privilege('anon', p.oid, 'execute')),
-  'check_client_invite_code, check_referral_code, format_sequence_id, get_schema_version, get_staff_invite, invite_preview, is_valid_cui, is_valid_iban, is_valid_postal_code, is_valid_regcom, is_valid_vin, normalize_code, public_pricing, shop_link_preview, try_uuid, verify_report',
+  'check_client_invite_code, check_referral_code, email_domain_blocked, format_sequence_id, get_schema_version, get_staff_invite, invite_preview, is_valid_cui, is_valid_iban, is_valid_postal_code, is_valid_regcom, is_valid_vin, normalize_code, public_pricing, shop_link_preview, try_uuid, verify_report',
   'functions callable by anon')
 from pg_proc p where p.pronamespace = 'public'::regnamespace;
 select test.eq(

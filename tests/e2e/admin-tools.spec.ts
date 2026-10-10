@@ -93,7 +93,7 @@ test.describe('admin tools', () => {
 
     await signInAdmin(page);
     await openTool(page, 'Anunțuri');
-    await page.getByRole('button', { name: 'Toți clienții' }).click();
+    await page.getByRole('combobox', { name: 'Către' }).selectOption({ label: 'Toți clienții' });
     // The city is picked from the cities that have shops.
     await page.getByRole('combobox', { name: 'Oraș' }).selectOption(city);
     const title = `Program de sărbători ${tag()}`;

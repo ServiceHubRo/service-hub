@@ -142,7 +142,7 @@ export function AppShell({ role }: { role: Role }) {
       <a href="#continut" className={styles.skipLink} onClick={skipToContent}>
         {t('nav.skipToContent')}
       </a>
-      <header className={styles.header}>
+      <header className={styles.header} data-fixed-top>
         <LogoTile />
         <Wordmark />
         <div className={styles.headerEnd}>
@@ -204,7 +204,7 @@ export function AppShell({ role }: { role: Role }) {
         </main>
       </div>
 
-      <nav className={styles.bottomBar} aria-label={t('nav.main')}>
+      <nav className={styles.bottomBar} aria-label={t('nav.main')} data-fixed-bottom>
         {nav.bottomBar.map((item) => {
           return (
             <NavLink

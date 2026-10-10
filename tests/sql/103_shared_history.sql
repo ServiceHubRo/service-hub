@@ -26,7 +26,10 @@ values (test.id('shop2'), test.id('client_b'), 'ulei', 'Bogdan Pop',
         '{"make":"Volkswagen","model":"Golf 7","plate":"BV 12 ABC","plate_norm":"BV12ABC"}',
         current_date - 60, '09:00', 'done', 'Alt proprietar', 300, 90000, now() - interval '60 days');
 
--- ------------------------------------------------------------------ booking without the agreement
+-- ------------------------------------------------------------------ booking with the switch off
+-- Ana turned "Istoricul mașinii pentru service-uri" off in Cont (on by default since 10 Oct,
+-- tests/sql/122_history_by_default.sql).
+update public.profiles set share_history = false where id = test.id('client_a');
 select test.login(test.id('client_a'));
 select set_config('test.b1', (public.create_booking(p_shop_id => test.id('shop1'), p_service_id => 'frane',
   p_date => current_setting('test.day')::date, p_slot => '09:00', p_request_id => gen_random_uuid(),
@@ -122,7 +125,8 @@ select test.eq(current_setting('test.file')::jsonb->>'share', 'no_active', 'no o
 select test.eq(jsonb_array_length(current_setting('test.file')::jsonb->'others'), 0, 'so other shops'' jobs are hidden');
 select test.eq(jsonb_array_length(current_setting('test.file')::jsonb->'own'), 1, 'its own jobs stay');
 
--- ------------------------------------------------------------------ ticked when booking
+-- ------------------------------------------------------------------ the switch on again: a new booking follows it
+update public.profiles set share_history = true where id = test.id('client_a');
 select test.login(test.id('client_a'));
 select set_config('test.b2', (public.create_booking(p_shop_id => test.id('shop1'), p_service_id => 'ulei',
   p_date => current_setting('test.day')::date, p_slot => '10:00', p_request_id => gen_random_uuid(),

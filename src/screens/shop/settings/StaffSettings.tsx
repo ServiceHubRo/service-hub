@@ -64,7 +64,6 @@ export function StaffSettings() {
         <EmptyState icon={Lock} title={t('settings.ownerOnly')} />
       ) : (
         <>
-          <p className={styles.intro}>{t('staff.intro')}</p>
           {/* Read again whenever the team with accounts changes (a colleague removed here). */}
           <SeatPrice
             key={state.status === 'ready' ? state.data.filter((m) => m.role === 'staff' && m.accepted_at).length : -1}

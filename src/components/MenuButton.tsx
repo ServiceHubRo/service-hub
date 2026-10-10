@@ -1,32 +1,55 @@
-import { useEffect, useId, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useId, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
+import { Link } from 'react-router-dom';
 import { buttonClass, type ButtonVariant } from './buttonClass';
+import { opensUp, visibleArea } from '../lib/menuPlacement';
 import styles from './MenuButton.module.css';
 
 export type MenuItem =
   | { key: string; label: ReactNode; icon?: ReactNode; href: string; external?: boolean }
-  | { key: string; label: ReactNode; icon?: ReactNode; onSelect: () => void };
+  /** A screen of the app (no page reload). */
+  | { key: string; label: ReactNode; icon?: ReactNode; to: string; state?: unknown }
+  | { key: string; label: ReactNode; icon?: ReactNode; onSelect: () => void; danger?: boolean };
 
 /**
  * One button that opens a short menu of actions (Eduard, 9 Oct: a pop-up instead of a row of
  * buttons). Arrow keys move between the items, Escape or a tap outside closes it, and the focus
- * returns to the button. The menu floats, so opening it never moves the page.
+ * returns to the button. The menu floats, so opening it never moves the page; it opens upwards
+ * when the room below (above the tab bar) is too short for it (Eduard, 10 Oct: on the last card
+ * only the first entry showed).
  */
 export function MenuButton({
   label,
   items,
   variant = 'primary',
   block = true,
+  narrow = false,
+  ariaLabel,
 }: {
   label: ReactNode;
   items: MenuItem[];
   variant?: ButtonVariant;
   block?: boolean;
+  /** A small button ("Mai multe"): the menu is wider than it and opens towards the left. */
+  narrow?: boolean;
+  ariaLabel?: string;
 }) {
   const id = useId();
   const [open, setOpen] = useState(false);
   const wrapRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
+
+  // Measured before the menu is painted, so it never shows on the wrong side first.
+  useLayoutEffect(() => {
+    const menu = menuRef.current;
+    const button = buttonRef.current;
+    if (!open || !menu || !button) return;
+    const { top, bottom } = visibleArea();
+    const flip = opensUp(button.getBoundingClientRect(), menu.offsetHeight, bottom, top);
+    menu.classList.toggle(styles.menuUp ?? '', flip);
+    // No room either way (a very short window): the page scrolls just enough to show it.
+    if (!flip && menu.getBoundingClientRect().bottom > bottom) menu.scrollIntoView?.({ block: 'nearest' });
+  }, [open]);
 
   const close = (focus: boolean) => {
     setOpen(false);
@@ -69,6 +92,7 @@ export function MenuButton({
         type="button"
         className={buttonClass(variant, block)}
         aria-haspopup="menu"
+        aria-label={ariaLabel}
         aria-expanded={open}
         aria-controls={open ? `${id}-menu` : undefined}
         onClick={() => setOpen((o) => !o)}
@@ -76,9 +100,21 @@ export function MenuButton({
         {label}
       </button>
       {open && (
-        <div ref={menuRef} id={`${id}-menu`} role="menu" className={styles.menu}>
+        <div ref={menuRef} id={`${id}-menu`} role="menu" className={`${styles.menu} ${narrow ? styles.menuNarrow : ''}`}>
           {items.map((item) =>
-            'href' in item ? (
+            'to' in item ? (
+              <Link
+                key={item.key}
+                role="menuitem"
+                className={styles.item}
+                to={item.to}
+                state={item.state}
+                onClick={() => close(false)}
+              >
+                {item.icon}
+                {item.label}
+              </Link>
+            ) : 'href' in item ? (
               <a
                 key={item.key}
                 role="menuitem"
@@ -95,7 +131,7 @@ export function MenuButton({
                 key={item.key}
                 type="button"
                 role="menuitem"
-                className={styles.item}
+                className={`${styles.item} ${item.danger ? styles.itemDanger : ''}`}
                 onClick={() => {
                   item.onSelect();
                   close(true);

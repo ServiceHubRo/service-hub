@@ -1,7 +1,7 @@
 import { Check } from 'lucide-react';
+import { CheckMenu } from '../../../components/CheckMenu';
 import { BottomBar } from '../../../components/BottomBar';
 import { buttonClass } from '../../../components/buttonClass';
-import { Chip } from '../../../components/Chip';
 import { ServiceIcon } from '../../../components/ServiceIcon';
 import type { ShopPageService } from '../../../data/search';
 import { useI18n } from '../../../i18n/context';
@@ -61,17 +61,14 @@ export function ServiceStep({
             </span>
           </button>
           {unsureOn && (
-            <div role="group" aria-labelledby="symptoms-title" className={styles.symptoms}>
-              <p id="symptoms-title" className={styles.groupTitle}>
-                {t('booking.unsure.symptoms')}
-              </p>
-              <div className={styles.symptomChips}>
-                {SYMPTOMS.map((s) => (
-                  <Chip key={s} selected={symptoms.includes(s)} onClick={() => onToggleSymptom(s)}>
-                    {t(`booking.symptom.${s}`)}
-                  </Chip>
-                ))}
-              </div>
+            <div className={styles.symptoms}>
+              <CheckMenu
+                label={t('booking.unsure.symptoms')}
+                summary={symptoms.length ? symptoms.map((s) => t(`booking.symptom.${s}`)).join(', ') : t('booking.unsure.symptomsNone')}
+                options={SYMPTOMS.map((s) => ({ value: s, label: t(`booking.symptom.${s}`) }))}
+                selected={symptoms}
+                onToggle={(s) => onToggleSymptom(s as (typeof SYMPTOMS)[number])}
+              />
             </div>
           )}
         </section>

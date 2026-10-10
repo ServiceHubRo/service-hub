@@ -71,22 +71,22 @@ export function ShopCard({ shop, distanceKm, back, onFavorite, day }: ShopCardPr
             )}
             <span>· {plural(lang, 'unit.services', shop.service_count)}</span>
           </span>
-          {(shop.free || shop.auto_confirm || shop.response) && (
+          {/* Tidy (Eduard, 10 Oct): the first free place, instant confirmation and one offer; the rest is on the shop page. */}
+          {(shop.free || shop.auto_confirm) && (
             <span className={styles.free}>
-              <FreePlaceNote free={shop.free} instant={shop.auto_confirm} response={shop.response} />
+              <FreePlaceNote free={shop.free} instant={shop.auto_confirm} />
             </span>
           )}
           {matched && <span className={styles.offers}>{t('search.offers', { service: matched })}</span>}
-          {shop.offers.newClient && (
+          {shop.offers.newClient ? (
             <span className={styles.newClient}>
               <OfferNote compact>{offerText.newClientCard(shop.offers.newClient)}</OfferNote>
             </span>
-          )}
-          {shop.offers.quietDay && (
+          ) : shop.offers.quietDay ? (
             <span className={styles.newClient}>
               <OfferNote compact>{offerText.quietCard(shop.offers.quietDay)}</OfferNote>
             </span>
-          )}
+          ) : null}
         </span>
         <ChevronRight size={18} className={styles.chevron} aria-hidden="true" />
       </Link>

@@ -79,7 +79,7 @@ export function ReasonPanel({
   onClose,
 }: {
   title: string;
-  body: string;
+  body?: string;
   label: string;
   required: boolean;
   onAction: (reason: string, requestId: string) => Promise<unknown>;
@@ -90,7 +90,7 @@ export function ReasonPanel({
   const [error, setError] = useState<Msg | null>(null);
   return (
     <Panel title={title}>
-      <p className={styles.panelBody}>{body}</p>
+      {body && <p className={styles.panelBody}>{body}</p>}
       <TextArea
         label={required ? t('sb.reason.required') : t('sb.reason.optional')}
         hint={t('sb.reason.hint')}

@@ -37,7 +37,7 @@ A user has exactly one role. The role decides the entire interface. A client can
 - **On first visit, before any account exists, the interface language follows the browser's language setting**: Romanian for `ro`, English for anything else. The user can override it immediately from the switch on the sign-in screen. Once signed in, the profile setting wins.
 - Edit own name and phone.
 - Delete own account (with confirmation). Data removed/anonymized within 30 days except legally retained records.
-- Export own data as JSON.
+- Export own data as an Excel file (one sheet per kind of data, readable headers).
 - **Shop phone verification:** before a shop appears publicly, its phone must be verified by SMS code, or marked verified manually by admin.
 - **Shop staff:** shop owner can invite additional logins (by email) that see and operate the same shop; owner can remove them. Staff cannot access subscription or delete the shop.
 

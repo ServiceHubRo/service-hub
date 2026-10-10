@@ -1,3 +1,4 @@
+import { strFromU8, unzipSync } from 'fflate';
 import { expect, test, type Page } from '@playwright/test';
 import {
   BACKEND,
@@ -207,6 +208,21 @@ test.describe('with accounts', () => {
     await expect(page.getByLabel('Telefon')).toHaveValue('15123456789');
   });
 
+  test('a temporary email address is refused with its own message', async ({ page }) => {
+    await page.goto('/cont-nou');
+    await page.getByRole('button', { name: 'Sunt client' }).click();
+    await page.getByLabel('Nume și prenume').fill('Ion Test');
+    await page.getByLabel('Telefon').fill(uniquePhone().national);
+    await page.getByLabel('Email').fill(`ion.${Date.now()}@sharklasers.com`);
+    await page.getByLabel('Parolă', { exact: true }).fill(PASSWORD);
+    await page.getByLabel('Repetă parola').fill(PASSWORD);
+    await page.getByRole('checkbox').check();
+    await page.getByRole('button', { name: 'Creează cont' }).click();
+    await expect(page.getByText('Adresele de email temporare nu sunt acceptate. Folosește o adresă permanentă.')).toBeVisible();
+    await expect(page).toHaveURL(/\/cont-nou$/);
+    await shot(page, 'auth-signup-disposable', name());
+  });
+
   test('client: sign up, confirm the email, land on Caută, see the account ID', async ({ page }) => {
     const email = uniqueEmail('client-ui');
     const phone = uniquePhone();
@@ -387,10 +403,14 @@ test.describe('with accounts', () => {
     const downloadPromise = page.waitForEvent('download');
     await page.getByRole('button', { name: 'Descarcă datele mele' }).click();
     const download = await downloadPromise;
-    expect(download.suggestedFilename()).toMatch(/^service-hub-C-\d{5}-\d{4}-\d{2}-\d{2}\.json$/);
-    const body = JSON.parse(await (await download.createReadStream()).toArray().then((c) => Buffer.concat(c).toString()));
-    expect(body.account.name).toBe('Maria Pop-Ionescu');
-    expect(body.account.email).toBe(email);
+    // An Excel file anyone can open: the account sheet first, in the reader's language.
+    expect(download.suggestedFilename()).toMatch(/^service-hub-datele-mele-C-\d{5}-\d{4}-\d{2}-\d{2}\.xlsx$/);
+    const files = unzipSync(new Uint8Array(Buffer.concat(await (await download.createReadStream()).toArray())));
+    expect(strFromU8(files['xl/workbook.xml']!)).toContain('<sheet name="Cont"');
+    const accountSheet = strFromU8(files['xl/worksheets/sheet1.xml']!);
+    expect(accountSheet).toContain('Maria Pop-Ionescu');
+    expect(accountSheet).toContain(email);
+    expect(accountSheet).toContain('Cod cont');
 
     // Language: saved on the profile, so it follows the account to another browser.
     await page.getByRole('button', { name: 'English' }).filter({ visible: true }).first().click();

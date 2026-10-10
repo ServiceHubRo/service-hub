@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { BACKEND, PASSWORD, closeFilters, createBookableShop, createUser, expectNoHorizontalScroll, openFilters, rpcAs, serviceRest, shot, signIn, userIdOf } from './support';
+import { BACKEND, PASSWORD, closeFilters, createBookableShop, createUser, expectNoHorizontalScroll, openFilters, rpcAs, serviceRest, shot, signIn, userIdOf, cardAction, selectInPanel } from './support';
 
 // T28a — "like Booking, for car shops": the owner turns on instant confirmation; a client sees in
 // search which shops are free on a day and which confirm at once, opens the shop on its first
@@ -58,12 +58,12 @@ test.describe('instant booking', () => {
     await expect(card).toContainText('Confirmare instantă');
     await expect(card).toContainText(/Liber .+, de la \d{2}:\d{2}/);
     await openFilters(c);
-    await c.getByRole('button', { name: 'Confirmare instantă', exact: true }).click();
-    await c.getByRole('button', { name: 'Altă zi' }).click();
+    await c.getByRole('switch', { name: 'Confirmare instantă' }).check();
+    await selectInPanel(c, 'Altă zi');
     await c.getByLabel('Ziua').fill(free.free_date);
     await expect(c).toHaveURL(new RegExp(`zi=${free.free_date}`));
     await closeFilters(c);
-    await expect(c.getByRole('button', { name: 'Scoate filtrul Confirmare instantă' })).toBeVisible();
+    await expect(c.locator('p').filter({ hasText: 'Filtre alese:' })).toContainText('Confirmare instantă');
     await expect(card).toContainText(`de la ${free.free_slot}`);
     await expectNoHorizontalScroll(c);
     await shot(c, 't28-search-day', name());
@@ -96,7 +96,6 @@ test.describe('instant booking', () => {
 
     // Confirmed on the spot.
     await expect(c.getByRole('heading', { level: 1, name: 'Programarea e confirmată' })).toBeVisible();
-    await expect(c.getByRole('link', { name: 'Indicații' })).toBeVisible();
     const download = c.waitForEvent('download');
     await c.getByRole('button', { name: 'Adaugă în calendar' }).click();
     expect((await download).suggestedFilename()).toBe(`service-hub-${free.free_date}.ics`);
@@ -115,14 +114,14 @@ test.describe('instant booking', () => {
     await c.goto('/c/programari');
     const mine = c.locator('main li').filter({ hasText: shopName });
     await expect(mine).toContainText('Confirmată');
-    await expect(mine.getByRole('button', { name: 'Adaugă în calendar' })).toBeVisible();
-    await expect(mine.getByRole('link', { name: 'Indicații' })).toBeVisible();
+    await expect(await cardAction(mine, 'Adaugă în calendar')).toBeVisible();
+    await expect(mine.getByRole('menuitem', { name: 'Indicații' })).toHaveAttribute('href', /^https:\/\/www\.google\.com\/maps\/dir\//);
     await shot(c, 't28-bookings', name());
 
     // In English too.
     await c.getByRole('button', { name: 'English' }).filter({ visible: true }).first().click();
-    await expect(mine.getByRole('button', { name: 'Add to calendar' })).toBeVisible();
-    await expect(mine.getByRole('link', { name: 'Directions' })).toBeVisible();
+    await expect(await cardAction(mine, 'Add to calendar')).toBeVisible();
+    await expect(mine.getByRole('menuitem', { name: 'Directions' })).toBeVisible();
     await context.close();
   });
 });

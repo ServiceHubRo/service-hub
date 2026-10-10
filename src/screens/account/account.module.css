@@ -175,3 +175,15 @@
 .helpId + .helpNote {
   margin-top: 6px;
 }
+
+/* An icon and a switch that saves at once (reminders, notifications). */
+.switchRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.switchIcon {
+  flex-shrink: 0;
+  color: var(--amber);
+}

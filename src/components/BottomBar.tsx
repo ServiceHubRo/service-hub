@@ -7,5 +7,9 @@ import styles from './BottomBar.module.css';
  * it. The screen's root needs `data-fill-screen` (it then fills the content area, AppShell).
  */
 export function BottomBar({ children }: { children: ReactNode }) {
-  return <div className={styles.bar}>{children}</div>;
+  return (
+    <div className={styles.bar} data-fixed-bottom>
+      {children}
+    </div>
+  );
 }

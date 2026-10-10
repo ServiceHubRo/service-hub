@@ -5,7 +5,7 @@ import { ActionButton } from '../../../components/ActionButton';
 import { Banner } from '../../../components/Banner';
 import { BottomBar } from '../../../components/BottomBar';
 import { Card } from '../../../components/Card';
-import { Checkbox } from '../../../components/Checkbox';
+import { Switch } from '../../../components/Switch';
 import { Field } from '../../../components/Field';
 import { LoadError } from '../../../components/LoadError';
 import { OfferNote } from '../../../components/OfferNote';
@@ -122,7 +122,6 @@ export function CarStep({
               }
             : { carId: picked!.id },
           note: composeUnsureNote(symptomsLine, draft.note, NOTE_MAX) || undefined,
-          shareHistory: draft.share,
         },
         requestId,
       );
@@ -214,9 +213,9 @@ export function CarStep({
               onChange={(e) => set({ plate: e.target.value })}
             />
           </div>
-          <Checkbox checked={draft.save} onChange={(e) => set({ save: e.target.checked })}>
+          <Switch checked={draft.save} onChange={(e) => set({ save: e.target.checked })}>
             {t('booking.car.save')}
-          </Checkbox>
+          </Switch>
         </Card>
       )}
 
@@ -228,16 +227,6 @@ export function CarStep({
         rows={3}
         onChange={(e) => set({ note: e.target.value })}
       />
-
-      {/* T27: the client's agreement, never ticked for them. */}
-      <div className={styles.share}>
-        <Checkbox checked={draft.share} onChange={(e) => set({ share: e.target.checked })} aria-describedby="booking-share-hint">
-          {t('booking.share.label')}
-        </Checkbox>
-        <p id="booking-share-hint" className={styles.muted}>
-          {t('booking.share.hint')}
-        </p>
-      </div>
 
       <Card className={styles.summary}>
         <h2 className={styles.groupTitle}>{t('booking.summary')}</h2>

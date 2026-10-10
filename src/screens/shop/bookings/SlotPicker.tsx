@@ -172,7 +172,6 @@ function TimeGrid({
           );
         })}
       </ul>
-      {slots.some((s) => !s.available) && <p className={styles.muted}>{t('booking.times.takenNote')}</p>}
     </>
   );
 }

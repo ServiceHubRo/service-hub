@@ -11,7 +11,6 @@ export interface CarDraft {
   save: boolean;
   note: string;
   /** "Arată service-ului ce s-a făcut la mașină la alte service-uri" (T27): off unless ticked (consent). */
-  share: boolean;
 }
 
-export const EMPTY_CAR_DRAFT: CarDraft = { carId: null, manual: false, make: '', model: '', year: '', plate: '', save: true, note: '', share: false };
+export const EMPTY_CAR_DRAFT: CarDraft = { carId: null, manual: false, make: '', model: '', year: '', plate: '', save: true, note: '' };

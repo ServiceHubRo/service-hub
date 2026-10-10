@@ -28,9 +28,8 @@
   font-weight: 700;
 }
 
-.closedOn {
-  color: var(--red);
-  font-weight: 600;
+.daySwitch {
+  flex: 1;
 }
 
 .times {

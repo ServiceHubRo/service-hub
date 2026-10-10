@@ -6,16 +6,15 @@ import { Button } from '../../components/Button';
 import { Card } from '../../components/Card';
 import { Checkbox } from '../../components/Checkbox';
 import { authErrorMessage, deleteAccount, exportMyData, isRetryable } from '../../data/auth';
+import { fetchServiceNames } from '../../data/shop';
 import { useI18n } from '../../i18n/context';
 import { ymdInBucharest } from '../../i18n/format';
+import { myDataSheets } from '../../lib/myData';
 import { saveFile } from '../../lib/saveFile';
+import { toXlsxBook } from '../../lib/xlsx';
 import styles from './account.module.css';
 
-function download(filename: string, data: unknown): Promise<void> {
-  return saveFile(new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }), filename);
-}
-
-/** "Datele mele" (P13): export as JSON, delete the account with an inline confirmation. */
+/** "Datele mele" (P13): an Excel file with one sheet per kind of data; deleting the account asks first. */
 export function DataSection() {
   const { t, lang } = useI18n();
   const session = useSession();
@@ -25,8 +24,10 @@ export function DataSection() {
   const [understood, setUnderstood] = useState(false);
 
   async function exportData() {
-    const data = await exportMyData();
-    await download(`service-hub-${profile.display_id}-${ymdInBucharest(new Date())}.json`, data);
+    // Service names make the bookings readable; without them the file still has every booking.
+    const [data, services] = await Promise.all([exportMyData(), fetchServiceNames().catch(() => undefined)]);
+    const file = `service-hub-${t('mydata.file')}-${profile.display_id}-${ymdInBucharest(new Date())}.xlsx`;
+    await saveFile(toXlsxBook(myDataSheets(data, lang, services)), file);
   }
 
   async function remove() {

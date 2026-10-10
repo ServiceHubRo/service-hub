@@ -1,5 +1,5 @@
 import { Bell, BellOff } from 'lucide-react';
-import { ActionButton } from '../../components/ActionButton';
+import { ActionSwitch } from '../../components/ActionSwitch';
 import { Card } from '../../components/Card';
 import { disablePush, enablePush, usePushStatus } from '../../data/push';
 import { rpcErrorMessage } from '../../data/rpc';
@@ -26,30 +26,21 @@ export function PushRow() {
 
   return (
     <Card role="group" aria-label={t('push.title')}>
-      <div className={styles.row}>
-        <span className={`${styles.label} ${blocked ? styles.labelOff : ''}`}>
-          {blocked ? (
-            <BellOff size={20} aria-hidden="true" />
-          ) : (
-            <Bell size={20} aria-hidden="true" />
-          )}
-          <span className={styles.who}>
-            <span>{t('push.title')}</span>
-            <span className={styles.status}>
-              {IS_NATIVE && status === 'denied' ? t('push.status.deniedApp') : t(`push.status.${status}`)}
-            </span>
-          </span>
-        </span>
-        {(status === 'prompt' || status === 'off') && (
-          <ActionButton variant="secondary" block={false} onAction={enablePush} errorMessage={(e) => rpcErrorMessage(lang, e)}>
-            {t('push.enable')}
-          </ActionButton>
+      <div className={`${styles.switchRow} ${blocked ? styles.labelOff : ''}`}>
+        {blocked ? (
+          <BellOff size={20} aria-hidden="true" className={styles.switchIcon} />
+        ) : (
+          <Bell size={20} aria-hidden="true" className={styles.switchIcon} />
         )}
-        {on && (
-          <ActionButton variant="ghost" block={false} onAction={disablePush} errorMessage={(e) => rpcErrorMessage(lang, e)}>
-            {t('push.disable')}
-          </ActionButton>
-        )}
+        <ActionSwitch
+          checked={on}
+          disabled={!on && status !== 'prompt' && status !== 'off'}
+          hint={IS_NATIVE && status === 'denied' ? t('push.status.deniedApp') : t(`push.status.${status}`)}
+          onToggle={(next) => (next ? enablePush() : disablePush())}
+          errorMessage={(e) => rpcErrorMessage(lang, e)}
+        >
+          {t('push.title')}
+        </ActionSwitch>
       </div>
       <p className={styles.hint}>{hint}</p>
     </Card>

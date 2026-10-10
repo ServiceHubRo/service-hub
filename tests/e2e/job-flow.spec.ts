@@ -9,6 +9,7 @@ import {
   serviceRest,
   shot,
   signIn,
+  cardAction,
 } from './support';
 
 // T09 — the client decides on the quote (partially), the shop starts and completes the job with a
@@ -193,7 +194,8 @@ test.describe('quote, work, completion, review', () => {
     await expect(done).toContainText('105.400 km');
     await expect(done).toContainText('Plăcuțe frână față, Manoperă');
     await expect(done).toContainText('430 lei');
-    await expect(done.getByRole('link', { name: 'Programează din nou' })).toHaveAttribute('href', new RegExp(`/c/service/${shopId}/programare\\?pas=2&serviciu=frane`));
+    await expect(await cardAction(done, 'Programează din nou')).toHaveAttribute('href', new RegExp(`/c/service/${shopId}/programare\\?pas=2&serviciu=frane`));
+    await page.keyboard.press('Escape');
     await done.getByRole('button', { name: 'Lasă o recenzie' }).click();
     await done.getByRole('button', { name: 'Trimite recenzia' }).click();
     await expect(done.getByText('Alege o notă.')).toBeVisible();
@@ -208,7 +210,7 @@ test.describe('quote, work, completion, review', () => {
     // Cancelling a request: asks first, then it moves to "Încheiate".
     const pending = clientCard(page, pendingBooking.ref);
     await expect(pending).toContainText('Service-ul îți confirmă cererea în curând.');
-    await pending.getByRole('button', { name: 'Anulează' }).click();
+    await (await cardAction(pending, 'Anulează')).click();
     await pending.getByRole('button', { name: 'Anulează programarea' }).click();
     await expect(pending).toContainText('Ai anulat programarea.');
     await expectNoHorizontalScroll(page);
@@ -308,7 +310,7 @@ test.describe('quote, work, completion, review', () => {
     const confirmed = clientCard(page, booking.ref);
     await expect(confirmed).toContainText('Confirmată');
     await expect(confirmed).toContainText('Contactează service-ul pentru a anula.');
-    await expect(confirmed.getByRole('button', { name: 'Anulează' })).toHaveCount(0);
+    await expect(await cardAction(confirmed, 'Anulează')).toHaveCount(0);
   });
 });
 
