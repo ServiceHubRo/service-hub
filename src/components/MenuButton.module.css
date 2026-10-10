@@ -13,8 +13,9 @@
   padding: 4px;
   background: var(--surface2);
   border: 1px solid var(--border-lit);
-  border-radius: var(--radius-input);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+  border-radius: var(--glass-radius);
+  box-shadow: var(--glass-shadow);
+  animation: pop-in 0.18s ease;
 }
 
 .menuNarrow {
@@ -60,4 +61,20 @@
 
 .itemDanger {
   color: var(--red-text);
+}
+
+/* Frosted glass where the browser blurs (tokens.css). */
+@supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
+  .menu {
+    background: var(--glass-bg);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+  }
+}
+
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.98);
+  }
 }
