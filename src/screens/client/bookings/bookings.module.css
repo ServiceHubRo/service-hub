@@ -344,15 +344,3 @@
   color: var(--muted);
 }
 
-.shareText {
-  display: flex;
-  flex-direction: column;
-  flex: 1 1 180px;
-  min-width: 0;
-  overflow-wrap: anywhere;
-}
-
-.shareTitle {
-  font-weight: 600;
-  font-size: 14.5px;
-}

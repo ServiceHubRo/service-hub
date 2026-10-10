@@ -6,6 +6,7 @@ import { BackLink } from '../../components/BackLink';
 import { Banner } from '../../components/Banner';
 import { Button } from '../../components/Button';
 import { Card } from '../../components/Card';
+import { ActionSwitch } from '../../components/ActionSwitch';
 import { Checkbox } from '../../components/Checkbox';
 import { Chip, ChipRow } from '../../components/Chip';
 import { EmptyState } from '../../components/EmptyState';
@@ -15,6 +16,7 @@ import { StatusBadge } from '../../components/StatusBadge';
 import { BOOKING_STATUSES } from '../../lib/status';
 import { Stepper } from '../../components/Stepper';
 import { Tabs } from '../../components/Tabs';
+import { Switch } from '../../components/Switch';
 import { useI18n } from '../../i18n/context';
 import { captureError, monitoringEnabled } from '../../lib/monitoring';
 import styles from './ComponentGallery.module.css';
@@ -44,6 +46,8 @@ export function ComponentGallery() {
   const [tab, setTab] = useState<'req' | 'sched'>('req');
   const [plate, setPlate] = useState('');
   const [saveCar, setSaveCar] = useState(true);
+  const [demoOn, setDemoOn] = useState(true);
+  const [demoFailed, setDemoFailed] = useState(false);
   const [sent, setSent] = useState(0);
   const [testErrorSent, setTestErrorSent] = useState(false);
   const [broken, setBroken] = useState(false);
@@ -179,6 +183,24 @@ export function ComponentGallery() {
             <Checkbox checked={saveCar} onChange={(e) => setSaveCar(e.target.checked)}>
               {t('demo.checkbox')}
             </Checkbox>
+            <Switch checked={saveCar} hint={t('demo.switchHint')} onChange={(e) => setSaveCar(e.target.checked)}>
+              {t('demo.switch')}
+            </Switch>
+            <ActionSwitch
+              checked={demoOn}
+              hint={t(demoOn ? 'demo.switchOn' : 'demo.switchOff')}
+              onToggle={async (next) => {
+                await new Promise((r) => setTimeout(r, 600));
+                // The first save fails, to show the error and "Încearcă din nou".
+                if (!demoFailed) {
+                  setDemoFailed(true);
+                  throw new Error('demo');
+                }
+                setDemoOn(next);
+              }}
+            >
+              {t('demo.actionSwitch')}
+            </ActionSwitch>
           </div>
         </Section>
 

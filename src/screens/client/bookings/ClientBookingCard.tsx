@@ -2,6 +2,7 @@ import { History, Phone, Star } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ActionButton } from '../../../components/ActionButton';
+import { ActionSwitch } from '../../../components/ActionSwitch';
 import { Button } from '../../../components/Button';
 import { buttonClass } from '../../../components/buttonClass';
 import { CalendarLinks } from '../../../components/CalendarLinks';
@@ -64,19 +65,15 @@ function ShareRow({ booking: b, act }: { booking: ClientBooking; act: (run: () =
   return (
     <div className={styles.share} role="group" aria-label={t('cb.share.title')}>
       <History size={18} aria-hidden="true" className={styles.shareIcon} />
-      <p className={styles.shareText}>
-        <span className={styles.shareTitle}>{t('cb.share.title')}</span>
-        <span className={styles.muted}>{t(on ? 'cb.share.on' : 'cb.share.off')}</span>
-      </p>
-      <ActionButton
-        variant="secondary"
-        block={false}
-        onAction={(rid) => act(() => setBookingHistoryShare(b.id, !on, rid))}
+      <ActionSwitch
+        checked={on}
+        hint={t(on ? 'cb.share.on' : 'cb.share.off')}
+        onToggle={(next, rid) => act(() => setBookingHistoryShare(b.id, next, rid))}
         errorMessage={(e) => rpcErrorMessage(lang, e)}
         canRetry={canRetryRpc}
       >
-        {t(on ? 'cb.share.turnOff' : 'cb.share.turnOn')}
-      </ActionButton>
+        {t('cb.share.title')}
+      </ActionSwitch>
     </div>
   );
 }

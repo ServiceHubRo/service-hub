@@ -63,7 +63,7 @@ test.describe('bookings added by the shop', () => {
     await page.getByLabel('Nr. înmatriculare').fill('bv 07 dan');
     await page.getByRole('combobox', { name: 'Serviciu' }).selectOption('ulei');
     await pickFirstFreeSlot(page);
-    await expect(page.getByRole('checkbox', { name: 'Trimite clientului programarea prin SMS' })).toBeChecked();
+    await expect(page.getByRole('switch', { name: 'Trimite clientului programarea prin SMS' })).toBeChecked();
     await expectNoHorizontalScroll(page);
     await expectAccessible(page, 'add booking');
     await shot(page, 'walkin-form', name());

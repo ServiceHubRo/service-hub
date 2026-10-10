@@ -111,7 +111,7 @@ test.describe('Fișa mașinii', () => {
     await client.getByLabel('Model').fill('Focus');
     await client.getByLabel('An fabricație').fill('2017');
     await client.getByLabel('Nr. înmatriculare').fill(plate);
-    const agree = client.getByRole('checkbox', { name: 'Arată service-ului istoricul lucrărilor de la alte service-uri' });
+    const agree = client.getByRole('switch', { name: /^Arată service-ului istoricul lucrărilor de la alte service-uri/ });
     await expect(agree).not.toBeChecked();
     await expect(client.getByText('fără prețuri sau nume de service-uri', { exact: false })).toBeVisible();
     await agree.check();
@@ -157,7 +157,7 @@ test.describe('Fișa mașinii', () => {
     const share = client.getByRole('group', { name: 'Istoricul mașinii pentru service' });
     await expect(share).toContainText('fără prețuri și fără numele lor');
     await shot(client, 't27-client-share-on', name());
-    await share.getByRole('button', { name: 'Ascunde' }).click();
+    await share.getByRole('switch').uncheck();
     await expect(share).toContainText('Service-ul vede doar lucrările făcute la el.');
     await expectNoHorizontalScroll(client);
     await shot(client, 't27-client-share-off', name());
@@ -166,7 +166,7 @@ test.describe('Fișa mașinii', () => {
     await expect(own).toContainText('Ulei și filtre');
     await shot(page, 't27-vehicle-file-hidden', name());
 
-    await share.getByRole('button', { name: 'Arată' }).click();
+    await share.getByRole('switch').check();
     await expect(share).toContainText('fără prețuri și fără numele lor');
     await expect(others).toContainText('Plăcuțe față schimbate');
 

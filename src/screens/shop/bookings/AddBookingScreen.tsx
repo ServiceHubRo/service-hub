@@ -4,7 +4,7 @@ import { ActionButton } from '../../../components/ActionButton';
 import { BackLink } from '../../../components/BackLink';
 import { Banner } from '../../../components/Banner';
 import { Card } from '../../../components/Card';
-import { Checkbox } from '../../../components/Checkbox';
+import { Switch } from '../../../components/Switch';
 import { Chip } from '../../../components/Chip';
 import { EmptyState } from '../../../components/EmptyState';
 import { Field } from '../../../components/Field';
@@ -349,9 +349,9 @@ export function AddBookingScreen() {
             rows={3}
             onChange={(e) => set({ note: e.target.value })}
           />
-          <Checkbox checked={draft.sendInvite} onChange={(e) => set({ sendInvite: e.target.checked })}>
+          <Switch checked={draft.sendInvite} onChange={(e) => set({ sendInvite: e.target.checked })}>
             {t('wi.sms')}
-          </Checkbox>
+          </Switch>
           {draft.sendInvite && (
             <SelectField
               label={t('wi.lang')}

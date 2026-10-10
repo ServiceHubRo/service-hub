@@ -4,7 +4,7 @@ import { ActionButton } from '../../components/ActionButton';
 import { BackLink } from '../../components/BackLink';
 import { Button } from '../../components/Button';
 import { Card } from '../../components/Card';
-import { Checkbox } from '../../components/Checkbox';
+import { Switch } from '../../components/Switch';
 import { EmptyState } from '../../components/EmptyState';
 import { Field } from '../../components/Field';
 import { InlinePanel } from '../../components/InlinePanel';
@@ -117,9 +117,9 @@ function CategoryPanel({ category, onDone, onCancel }: { category?: CatalogCateg
       </div>
       {category && (
         <>
-          <Checkbox checked={enabled} onChange={(e) => setEnabled(e.target.checked)}>
+          <Switch checked={enabled} onChange={(e) => setEnabled(e.target.checked)}>
             {t('admin.catalog.categoryOn')}
-          </Checkbox>
+          </Switch>
           {category.enabled && !enabled && <p className={styles.warning}>{t('admin.catalog.categoryOffWarning')}</p>}
         </>
       )}
@@ -231,9 +231,9 @@ function ServicePanel({
       </div>
       {service && (
         <>
-          <Checkbox checked={enabled} onChange={(e) => setEnabled(e.target.checked)}>
+          <Switch checked={enabled} onChange={(e) => setEnabled(e.target.checked)}>
             {t('admin.catalog.serviceOn')}
-          </Checkbox>
+          </Switch>
           {enabled && !categoryOn && <p className={styles.warning}>{t('admin.catalog.categoryIsOff')}</p>}
           {service.enabled && !enabled && <p className={styles.muted}>{t('admin.catalog.serviceOffNote')}</p>}
         </>

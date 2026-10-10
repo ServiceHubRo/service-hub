@@ -4,7 +4,7 @@ import { ActionButton } from '../../components/ActionButton';
 import { BackLink } from '../../components/BackLink';
 import { Button } from '../../components/Button';
 import { Card } from '../../components/Card';
-import { Checkbox } from '../../components/Checkbox';
+import { Switch } from '../../components/Switch';
 import { Chip, ChipRow } from '../../components/Chip';
 import { SelectField } from '../../components/SelectField';
 import { EmptyState } from '../../components/EmptyState';
@@ -120,9 +120,9 @@ function Composer({ onSent }: { onSent: (n: AdminNotice) => void }) {
           onChange={(e) => set('body_en', e.target.value)}
         />
       </div>
-      <Checkbox checked={draft.push} onChange={(e) => set('push', e.target.checked)}>
+      <Switch checked={draft.push} onChange={(e) => set('push', e.target.checked)}>
         {t('admin.notices.push')}
-      </Checkbox>
+      </Switch>
 
       {preview === null ? (
         <ActionButton

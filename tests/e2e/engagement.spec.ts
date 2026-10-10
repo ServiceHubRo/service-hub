@@ -54,9 +54,9 @@ test.describe('T24 notifications', () => {
     await expectNoHorizontalScroll(page);
     await shot(page, 't24-account-reminders', name());
 
-    await tires.getByRole('button', { name: 'Oprește' }).click();
+    await tires.getByRole('switch').uncheck();
     await expect(tires).toContainText('Oprite.');
-    await offers.getByRole('button', { name: 'Pornește' }).click();
+    await offers.getByRole('switch').check();
     await expect(offers).toContainText('Pornite.');
     const [profile] = await serviceRest<{ season_reminders: boolean; app_tips: boolean; promo_notifications: boolean; service_reminders: boolean }[]>(
       `profiles?id=eq.${await userIdOf(client)}&select=season_reminders,app_tips,promo_notifications,service_reminders`,
@@ -74,7 +74,7 @@ test.describe('T24 notifications', () => {
     await offersEn.scrollIntoViewIfNeeded();
     await expectNoHorizontalScroll(page);
     await shot(page, 't24-account-reminders-en', name());
-    await tiresEn.getByRole('button', { name: 'Turn on' }).click();
+    await tiresEn.getByRole('switch').check();
     await expect(tiresEn).toContainText('On.');
   });
 
@@ -98,7 +98,7 @@ test.describe('T24 notifications', () => {
     await expect(page).toHaveURL(/\/s\/panou/);
     await page.goto('/s/cont/setari/notificari');
     await expect(page.getByRole('heading', { level: 1, name: 'Notificări' })).toBeVisible();
-    const monthly = page.getByRole('checkbox', { name: 'Raportul lunii, pe 1 ale lunii' });
+    const monthly = page.getByRole('switch', { name: /^Raportul lunii, pe 1 ale lunii/ });
     await expect(monthly).toBeChecked();
     await expectNoHorizontalScroll(page);
     await shot(page, 't24-shop-notifications', name());
@@ -113,7 +113,7 @@ test.describe('T24 notifications', () => {
     await expect(monthly).not.toBeChecked();
     await setLanguage(page, 'en');
     await page.goto('/s/cont/setari/notificari');
-    await expect(page.getByRole('checkbox', { name: 'Monthly report, on the 1st' })).not.toBeChecked();
+    await expect(page.getByRole('switch', { name: /^Monthly report, on the 1st/ })).not.toBeChecked();
     await expectNoHorizontalScroll(page);
     await shot(page, 't24-shop-notifications-en', name());
   });

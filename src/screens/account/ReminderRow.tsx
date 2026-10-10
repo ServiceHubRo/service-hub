@@ -1,6 +1,6 @@
 import { BadgePercent, CalendarClock, CircleDot, Lightbulb, Star } from 'lucide-react';
 import { useSession } from '../../app/sessionContext';
-import { ActionButton } from '../../components/ActionButton';
+import { ActionSwitch } from '../../components/ActionSwitch';
 import { Card } from '../../components/Card';
 import { setReminder, type ReminderSetting } from '../../data/profile';
 import { rpcErrorMessage } from '../../data/rpc';
@@ -59,24 +59,18 @@ export function ReminderRow({ setting }: { setting: ReminderSetting }) {
 
   return (
     <Card role="group" aria-label={t(row.title)}>
-      <div className={styles.row}>
-        <span className={styles.rowLabel}>
-          <Icon size={20} aria-hidden="true" />
-          <span className={styles.who}>
-            <span>{t(row.title)}</span>
-            <span className={styles.small}>{t(on ? row.on : row.off)}</span>
-          </span>
-        </span>
-        <ActionButton
-          variant="secondary"
-          block={false}
-          onAction={async () => {
-            session.setProfile(await setReminder(profile.id, setting, !on));
+      <div className={styles.switchRow}>
+        <Icon size={20} aria-hidden="true" className={styles.switchIcon} />
+        <ActionSwitch
+          checked={on}
+          hint={t(on ? row.on : row.off)}
+          onToggle={async (next) => {
+            session.setProfile(await setReminder(profile.id, setting, next));
           }}
           errorMessage={(e) => rpcErrorMessage(lang, e)}
         >
-          {t(on ? 'reminders.turnOff' : 'reminders.turnOn')}
-        </ActionButton>
+          {t(row.title)}
+        </ActionSwitch>
       </div>
     </Card>
   );

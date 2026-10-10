@@ -200,12 +200,13 @@ test.describe('push notifications', () => {
     const row = pushRow(page);
     await expect(row).toContainText('Dezactivate');
     await expect(row).toContainText('Le activezi separat pe fiecare telefon sau calculator.');
-    await expect(row.getByRole('button', { name: 'Activează' })).toBeVisible();
+    await expect(row.getByRole('switch')).not.toBeChecked();
+    await expect(row.getByRole('switch')).toBeEnabled();
     await shot(page, 't12-account-client', name());
 
     await page.getByRole('button', { name: 'English' }).filter({ visible: true }).first().click();
     await expect(pushRow(page, 'Push notifications')).toContainText('Off');
-    await expect(pushRow(page, 'Push notifications').getByRole('button', { name: 'Turn on' })).toBeVisible();
+    await expect(pushRow(page, 'Push notifications').getByRole('switch', { name: /^Push notifications/ })).not.toBeChecked();
     await shot(page, 't12-account-client-en', name());
   });
 
@@ -304,12 +305,12 @@ test.describe('push notifications', () => {
 
         // Turned off here: the device row is gone.
         await openAccount(page);
-        await pushRow(page).getByRole('button', { name: 'Dezactivează' }).click();
+        await pushRow(page).getByRole('switch').uncheck();
         await expect(pushRow(page)).toContainText('Dezactivate pe acest dispozitiv');
         expect(await serviceRest(`push_subscriptions?endpoint=eq.${encodeURIComponent(device.endpoint)}`, 'GET')).toEqual([]);
 
         // On again, then signing out takes the device away from this account.
-        await pushRow(page).getByRole('button', { name: 'Activează' }).click();
+        await pushRow(page).getByRole('switch').check();
         await expect(pushRow(page)).toContainText('Activate pe acest dispozitiv');
         await page.getByRole('button', { name: 'Deconectare' }).filter({ visible: true }).first().click();
         await page.getByRole('button', { name: 'Deconectează-mă' }).click();

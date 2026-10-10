@@ -4,7 +4,7 @@ import { ActionButton } from '../../../components/ActionButton';
 import { BackLink } from '../../../components/BackLink';
 import { Button } from '../../../components/Button';
 import { Card } from '../../../components/Card';
-import { Checkbox } from '../../../components/Checkbox';
+import { Switch } from '../../../components/Switch';
 import { EmptyState } from '../../../components/EmptyState';
 import { Field } from '../../../components/Field';
 import { SkeletonList } from '../../../components/Skeleton';
@@ -113,7 +113,7 @@ function WeekEditor({ initial }: { initial: DayHours[] }) {
   );
 }
 
-/** One weekday: "Închis", or opening and closing time in half-hour steps. */
+/** One weekday: a switch (open or closed), and when open its opening and closing time in half-hour steps. */
 function DayRow({ day, onChange }: { day: DayHours; onChange: (patch: Partial<DayHours>) => void }) {
   const { t } = useI18n();
   const id = useId();
@@ -123,21 +123,22 @@ function DayRow({ day, onChange }: { day: DayHours; onChange: (patch: Partial<Da
   return (
     <div className={own.day} role="group" aria-labelledby={id}>
       <div className={own.dayHead}>
-        <span id={id} className={own.dayName}>
-          {dayName}
-        </span>
-        <Checkbox
-          checked={day.is_closed}
+        <Switch
+          className={own.daySwitch}
+          checked={!day.is_closed}
+          hint={t(day.is_closed ? 'hours.closed' : 'hours.openDay')}
           onChange={(e) =>
             onChange(
               e.target.checked
-                ? { is_closed: true }
-                : { is_closed: false, open_time: toHhmm(open), close_time: toHhmm(Math.max(close, open + STEP)) },
+                ? { is_closed: false, open_time: toHhmm(open), close_time: toHhmm(Math.max(close, open + STEP)) }
+                : { is_closed: true },
             )
           }
         >
-          <span className={day.is_closed ? own.closedOn : undefined}>{t('hours.closed')}</span>
-        </Checkbox>
+          <span id={id} className={own.dayName}>
+            {dayName}
+          </span>
+        </Switch>
       </div>
       {!day.is_closed && (
         <div className={own.times}>

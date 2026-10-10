@@ -96,7 +96,8 @@ test.describe('shop settings', () => {
     await page.getByRole('link', { name: 'Setări service' }).click();
     await page.getByRole('link', { name: /Program și zile libere/ }).click();
     const saturday = page.getByRole('group', { name: 'Sâmbătă' });
-    await clickInPlace(page, saturday.getByRole('checkbox', { name: 'Închis' }));
+    await expect(saturday.getByRole('switch')).not.toBeChecked();
+    await clickInPlace(page, saturday.getByRole('switch'));
     await expect(saturday.getByText('08:00')).toBeVisible();
     for (let i = 0; i < 2; i++) await clickInPlace(page, saturday.getByRole('button', { name: 'Sâmbătă · Crește: Deschide' }));
     for (let i = 0; i < 8; i++) await clickInPlace(page, saturday.getByRole('button', { name: 'Sâmbătă · Scade: Închide' }));
