@@ -196,7 +196,7 @@ test.describe('shop settings', () => {
     await page.getByLabel('IBAN').fill('RO49 AAAA 1B31 0075 9384 0000');
     await page.getByRole('button', { name: 'Copiază adresa atelierului' }).click();
     await expect(page.getByLabel('Sediul social')).toHaveValue('Str. Lungă 42, Brașov, Brașov');
-    await page.getByRole('button', { name: 'Da', exact: true }).click();
+    await page.getByRole('switch', { name: 'Plătitor de TVA' }).check();
     await page.getByRole('button', { name: 'Salvează datele de facturare' }).click();
     await expect(page.getByRole('button', { name: '✓ Salvat' })).toBeVisible();
     await expectNoHorizontalScroll(page);
@@ -204,7 +204,7 @@ test.describe('shop settings', () => {
     await page.reload();
     await expect(page.getByLabel('IBAN')).toHaveValue('RO49AAAA1B31007593840000');
     await expect(page.getByLabel('CUI / Cod fiscal')).toHaveValue('RO14872301');
-    await expect(page.getByRole('button', { name: 'Da', exact: true })).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.getByRole('switch', { name: 'Plătitor de TVA' })).toBeChecked();
   });
 
   test('staff: invitation link, sign-up through it, same shop without billing; removal', async ({ page, browser }) => {

@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
-import { BACKEND, PASSWORD, closeFilters, createUser, expectAccessible, expectNoHorizontalScroll, openAccount, openFilters, scrollTopOf, shot, signIn } from './support';
+import { BACKEND, PASSWORD, closeFilters, createUser, expectAccessible, expectNoHorizontalScroll, openAccount, openFilters, scrollTopOf, selectInPanel, shot, signIn } from './support';
 
 // T06 — client search, favorites, "Aproape de tine", the shop page. Runs on the demo seed
 // (supabase/seed/dev_seed.sql): Atelier Demo, Rapid Service, Vulcanizare Roți Expres (Brașov) and
@@ -15,6 +15,9 @@ test.beforeEach(async ({ context }) => {
 });
 
 const name = () => test.info().project.name;
+
+/** The filters in use, in one line above the results. */
+const activeFilters = (page: Page) => page.locator('p').filter({ hasText: 'Filtre alese:' });
 
 /** A result card's link, by shop name. */
 const result = (page: Page, shop: string) => page.getByRole('link', { name: new RegExp(`^${shop}`) });
@@ -46,9 +49,9 @@ test.describe('client search', () => {
     await expect(result(page, 'Auto Precis')).toBeVisible();
     await expectNoHorizontalScroll(page);
     await shot(page, 't06-search', name());
-    // Every filter sits in one panel; the city chips come from the data.
+    // Every filter sits in one panel, as dropdowns and switches; the cities come from the data.
     await openFilters(page);
-    await expect(page.getByRole('button', { name: 'Codlea', exact: true })).toBeVisible();
+    await expect(page.getByLabel('Orașe').locator('option', { hasText: 'Codlea' })).toHaveCount(1);
     await expectNoHorizontalScroll(page);
     await shot(page, 't06-search-filters', name());
     await expectAccessible(page, 'filters panel');
@@ -62,43 +65,45 @@ test.describe('client search', () => {
     await expect(result(page, 'Auto Precis')).toContainText('Oferă: Plăcuțe de frână');
     await shot(page, 't06-search-frane', name());
 
-    // Typing a city selects its chip.
+    // Typing a city picks it as a filter.
     await search(page).fill('brasov');
-    await expect(page.getByRole('button', { name: 'Scoate filtrul Brașov' })).toBeVisible();
+    await expect(activeFilters(page)).toContainText('Brașov');
     await expect(page.getByRole('button', { name: /^Filtre/ })).toContainText('1');
     await expect(result(page, 'Auto Precis')).toHaveCount(0);
     await expect(result(page, 'Atelier Demo')).not.toContainText('Oferă');
     await expect(page.getByText(/service-uri în Brașov/)).toBeVisible();
 
-    // Clearing the text undoes the chip it picked.
+    // Clearing the text undoes the city it picked.
     await page.getByRole('button', { name: 'Șterge căutarea' }).click();
-    await expect(page.getByRole('button', { name: 'Scoate filtrul Brașov' })).toHaveCount(0);
+    await expect(activeFilters(page)).toHaveCount(0);
 
     // Category, then category + city: filters combine and narrow.
     await openFilters(page);
-    await expect(page.getByRole('button', { name: 'Toate orașele' })).toHaveAttribute('aria-pressed', 'true');
-    await page.getByRole('button', { name: 'Anvelope & Jante' }).click();
+    await expect(page.getByLabel('Orașe')).toHaveValue('');
+    await selectInPanel(page, 'Anvelope & Jante');
     await closeFilters(page);
     await expect(result(page, 'Vulcanizare Roți Expres')).toContainText('Oferă: Vulcanizare / reparație pană');
     await expect(result(page, 'Atelier Demo')).toHaveCount(0);
     await openFilters(page);
-    await page.getByRole('button', { name: 'Codlea', exact: true }).click();
+    await selectInPanel(page, 'Codlea');
     await expect(page.getByRole('dialog').getByRole('button', { name: 'Arată 0 service-uri' })).toBeVisible();
     await closeFilters(page);
     await expect(page.getByText('Niciun service cu filtrele alese.')).toBeVisible();
-    // Each filter on shows above the list with its own ✕.
-    await expect(page.getByRole('button', { name: 'Scoate filtrul Anvelope & Jante' })).toBeVisible();
-    await page.getByRole('button', { name: 'Scoate filtrul Codlea' }).click();
+    // The filters on show above the list in one line.
+    await expect(activeFilters(page)).toContainText('Anvelope & Jante · Codlea');
+    await openFilters(page);
+    await selectInPanel(page, 'Toate orașele');
+    await closeFilters(page);
     await expect(result(page, 'Vulcanizare Roți Expres')).toBeVisible();
     await openFilters(page);
-    await page.getByRole('button', { name: 'Codlea', exact: true }).click();
+    await selectInPanel(page, 'Codlea');
     await closeFilters(page);
     await shot(page, 't06-search-empty', name());
     await page.getByRole('button', { name: 'Șterge filtrele' }).last().click();
     await expect(result(page, 'Auto Precis')).toBeVisible();
-    await expect(page.getByRole('button', { name: /^Scoate filtrul/ })).toHaveCount(0);
+    await expect(activeFilters(page)).toHaveCount(0);
     await openFilters(page);
-    await expect(page.getByRole('button', { name: 'Toate', exact: true })).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.getByLabel('Categorii')).toHaveValue('');
     await closeFilters(page);
 
     // Two words: a service and a city.
@@ -130,13 +135,13 @@ test.describe('client search', () => {
     await expect(page.getByRole('button', { name: 'Scoate Rapid Service din favorite' })).toHaveAttribute('aria-pressed', 'true');
 
     await openFilters(page);
-    await page.getByRole('button', { name: 'Favorite', exact: true }).click();
+    await page.getByRole('switch', { name: 'Favorite' }).check();
     await closeFilters(page);
     await expect(result(page, 'Rapid Service')).toBeVisible();
     await expect(result(page, 'Atelier Demo')).toHaveCount(0);
 
     // Shop page: the same heart.
-    await page.getByRole('button', { name: 'Scoate filtrul Favorite' }).click();
+    await page.getByRole('button', { name: 'Șterge filtrele' }).last().click();
     await result(page, 'Atelier Demo').click();
     await expect(page.getByRole('heading', { level: 1, name: 'Atelier Demo' })).toBeVisible();
     await page.getByRole('button', { name: 'Salvează Atelier Demo la favorite' }).click();
@@ -246,7 +251,7 @@ test.describe('client search', () => {
 
       // "Cele mai apropiate" is a sort; the section is not repeated.
       await openFilters(page);
-      await page.getByRole('button', { name: 'Cele mai apropiate', exact: true }).click();
+      await selectInPanel(page, 'Cele mai apropiate');
       await closeFilters(page);
       await expect(page.getByRole('heading', { name: 'Aproape de tine' })).toHaveCount(0);
       const cards = await page.getByRole('article').allInnerTexts();

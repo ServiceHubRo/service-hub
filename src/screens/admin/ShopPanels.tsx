@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { ActionButton } from '../../components/ActionButton';
 import { Button } from '../../components/Button';
-import { Checkbox } from '../../components/Checkbox';
-import { Chip, ChipRow } from '../../components/Chip';
+import { SelectField } from '../../components/SelectField';
+import { Switch } from '../../components/Switch';
 import { Field } from '../../components/Field';
 import { InlinePanel } from '../../components/InlinePanel';
 import { Stepper } from '../../components/Stepper';
@@ -36,13 +36,6 @@ export function TrialPanel({ shopId, onDone, onCancel }: { shopId: string; onDon
   return (
     <InlinePanel title={t('admin.trial.title')}>
       <p className={styles.muted}>{t('admin.trial.body')}</p>
-      <ChipRow label={t('admin.trial.days')}>
-        {[7, 30, 90].map((n) => (
-          <Chip key={n} selected={days === n} onClick={() => setDays(n)}>
-            {plural(lang, 'unit.days', n)}
-          </Chip>
-        ))}
-      </ChipRow>
       <Stepper
         label={t('admin.trial.days')}
         value={days}
@@ -78,13 +71,12 @@ export function StatusPanel({ detail, onDone, onCancel }: { detail: AdminShopDet
   const [status, setStatus] = useState<ManualStatus>(options[0]!);
   return (
     <InlinePanel title={t('admin.status.title')}>
-      <ChipRow label={t('admin.status.title')}>
-        {options.map((s) => (
-          <Chip key={s} selected={status === s} onClick={() => setStatus(s)}>
-            {t(`admin.subStatus.${s}`)}
-          </Chip>
-        ))}
-      </ChipRow>
+      <SelectField
+        label={t('admin.status.title')}
+        value={status}
+        options={options.map((s) => ({ value: s, label: t(`admin.subStatus.${s}`) }))}
+        onChange={(e) => setStatus(e.target.value as ManualStatus)}
+      />
       <p className={styles.muted}>{t(`admin.status.explain.${status}`)}</p>
       {stripeRuns(detail.subscription?.stripe_status) && <p className={styles.warning}>{t('admin.status.stripe')}</p>}
       <div className={styles.panelButtons}>
@@ -274,9 +266,9 @@ export function EditPanel({ detail, onDone, onCancel }: { detail: AdminShopDetai
             {field('billing.billing_email', { type: 'email', inputMode: 'email' })}
             {field('billing.legal_rep')}
             <div className={styles.full}>
-              <Checkbox checked={vatPayer} onChange={(e) => setVatPayer(e.target.checked)}>
+              <Switch checked={vatPayer} onChange={(e) => setVatPayer(e.target.checked)}>
                 {t('admin.field.vat_payer')}
-              </Checkbox>
+              </Switch>
             </div>
           </>
         )}

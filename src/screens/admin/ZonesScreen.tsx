@@ -9,6 +9,7 @@ import { EmptyState } from '../../components/EmptyState';
 import { ChoiceFilters } from '../../components/Filters';
 import { InlinePanel } from '../../components/InlinePanel';
 import { LoadError } from '../../components/LoadError';
+import { SelectField } from '../../components/SelectField';
 import { SkeletonList } from '../../components/Skeleton';
 import { fetchAdminAreas, setAreaMode, type AdminArea, type AdminAreas, type AreaMode } from '../../data/areas';
 import { canRetryRpc, rpcErrorMessage } from '../../data/rpc';
@@ -148,6 +149,7 @@ function ZoneCard({
 }) {
   const { t, lang } = useI18n();
   const [confirm, setConfirm] = useState<AreaMode | null>(null);
+  const [chosen, setChosen] = useState<AreaMode>(a.mode);
   const title = lang === 'ro' ? a.name_ro : a.name_en;
   const categoryName = (key: string) => {
     const c = categories.find((x) => x.key === key);
@@ -167,8 +169,7 @@ function ZoneCard({
       <div className={styles.cardHead}>
         <h2 className={styles.cardTitle}>{title}</h2>
         <span>
-          <Pill tone={a.live ? 'green' : 'grey'}>{t(a.live ? 'admin.areas.live' : 'admin.areas.notLive')}</Pill>{' '}
-          {a.mode !== 'auto' && <Pill tone="amber">{t('admin.areas.manual')}</Pill>}
+          <Pill tone={a.live ? 'green' : 'grey'}>{t(a.live ? 'admin.areas.live' : 'admin.areas.notLive')}</Pill>
         </span>
       </div>
       <Facts
@@ -181,32 +182,29 @@ function ZoneCard({
           [t('admin.areas.localities'), a.localities.map((l) => `${l.name} (${l.count})`).join(', ')],
         ]}
       />
-      <div role="group" aria-label={t('admin.areas.mode')} className={styles.stack}>
-        <p className={styles.muted}>{t('admin.areas.mode')}</p>
+      <div className={styles.stack}>
+        <SelectField
+          label={t('admin.areas.mode')}
+          value={chosen}
+          disabled={confirm !== null}
+          options={MODES.map((m) => ({ value: m, label: t(`admin.areas.mode.${m}`) }))}
+          onChange={(e) => setChosen(e.target.value as AreaMode)}
+        />
         {confirm === null ? (
-          <div className={styles.panelButtons}>
-            {MODES.map((m) =>
-              m === a.mode ? (
-                <Button key={m} variant="primary" disabled aria-pressed="true">
-                  {t(`admin.areas.mode.${m}`)}
-                </Button>
-              ) : startsNow(m) ? (
-                <Button key={m} aria-pressed="false" onClick={() => setConfirm(m)}>
-                  {t(`admin.areas.mode.${m}`)}
-                </Button>
-              ) : (
-                <ActionButton
-                  key={m}
-                  variant="secondary"
-                  onAction={(requestId) => apply(m, requestId)}
-                  errorMessage={(e) => rpcErrorMessage(lang, e)}
-                  canRetry={canRetryRpc}
-                >
-                  {t(`admin.areas.mode.${m}`)}
-                </ActionButton>
-              ),
-            )}
-          </div>
+          chosen !== a.mode &&
+          (startsNow(chosen) ? (
+            <Button variant="primary" onClick={() => setConfirm(chosen)}>
+              {t('common.save')}
+            </Button>
+          ) : (
+            <ActionButton
+              onAction={(requestId) => apply(chosen, requestId)}
+              errorMessage={(e) => rpcErrorMessage(lang, e)}
+              canRetry={canRetryRpc}
+            >
+              {t('common.save')}
+            </ActionButton>
+          ))
         ) : (
           <InlinePanel title={t('admin.areas.confirm.title', { area: title })}>
             <p className={styles.muted}>{t('admin.areas.confirm.body', { n: a.waiting })}</p>
@@ -218,7 +216,13 @@ function ZoneCard({
               >
                 {t('admin.areas.confirm.yes')}
               </ActionButton>
-              <Button variant="ghost" onClick={() => setConfirm(null)}>
+              <Button
+                variant="ghost"
+                onClick={() => {
+                  setConfirm(null);
+                  setChosen(a.mode);
+                }}
+              >
                 {t('admin.areas.confirm.no')}
               </Button>
             </div>

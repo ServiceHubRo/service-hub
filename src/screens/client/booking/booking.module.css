@@ -319,12 +319,6 @@
   margin-top: 4px;
 }
 
-.sentLinks {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 8px;
-}
 
 /* Constatare tehnică (Eduard, 8 Oct): first on step 1, apart from the categories. */
 .unsure {
@@ -353,11 +347,6 @@
   padding: 0 2px;
 }
 
-.symptomChips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
 
 /* A quiet-day offer on a day with places (Eduard, 8 Oct). */
 .dayOffer {

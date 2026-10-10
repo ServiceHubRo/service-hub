@@ -12,6 +12,7 @@ import {
   signIn,
   xlsxText,
   pickFilter,
+  cardAction,
 } from './support';
 
 // T10 — the shop's repair history (search, filters, the opened card, CSV) and the client's vehicle
@@ -181,7 +182,7 @@ test.describe('repair history', () => {
     await expect(card).toContainText('Plăcuțe frână față');
     await expect(card).toContainText('Total aprobat');
     await expect(card).toContainText(`Programarea ${done.ref}`);
-    await expect(card.getByRole('link', { name: 'Mesaj' })).toBeVisible();
+    await expect(await cardAction(card, 'Mesaj')).toBeVisible();
     await expectNoHorizontalScroll(page);
     await shot(page, 't10-shop-history', name());
 
@@ -242,11 +243,7 @@ test.describe('repair history', () => {
 
     // 3. The finished booking in Programări.
     await navLink(me, /^Programări/).click();
-    await me
-      .locator('main section li')
-      .filter({ hasText: done.ref })
-      .getByRole('link', { name: 'Vezi istoricul mașinii' })
-      .click();
+    await (await cardAction(me.locator('main section li').filter({ hasText: done.ref }), 'Vezi istoricul mașinii')).click();
     await expect(me).toHaveURL(new RegExp(`/c/programari/${done.id}/istoric$`));
     await expect(me.getByRole('heading', { level: 1, name: 'Dacia Logan' })).toBeVisible();
     await expect(me.getByText('1 lucrare · 430 lei cheltuit în total')).toBeVisible();

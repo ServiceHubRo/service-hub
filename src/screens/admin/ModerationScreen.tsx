@@ -111,17 +111,13 @@ function SuspectCard({ r, onDecided }: { r: SuspectReview; onDecided: () => void
   const [panel, setPanel] = useState<SuspectDecision | null>(null);
   return (
     <Card highlight className={styles.stack}>
-      <div className={styles.rowTop}>
-        {r.signals.map((s) => (
-          <Pill key={s} tone={s === 'same_phone' || s === 'quick_job' ? 'red' : 'amber'}>
-            {t(`admin.signal.${s}`)}
-          </Pill>
-        ))}
-      </div>
       <ul className={styles.signalList}>
         {r.signals.map((s) => (
           <li key={s} className={styles.muted}>
-            {t(`admin.signal.${s}.why`)}
+            <strong className={s === 'same_phone' || s === 'quick_job' ? styles.signalRed : styles.signalAmber}>
+              {t(`admin.signal.${s}`)}
+            </strong>{' '}
+            · {t(`admin.signal.${s}.why`)}
           </li>
         ))}
       </ul>

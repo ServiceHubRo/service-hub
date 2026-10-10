@@ -1,0 +1,4 @@
+/* Always last in the actions row, so its menu (opening leftwards) stays on screen. */
+.end {
+  margin-left: auto;
+}

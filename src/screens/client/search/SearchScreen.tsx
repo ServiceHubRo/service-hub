@@ -1,21 +1,23 @@
-import { BadgePercent, CalendarDays, Heart, List, Map as MapIcon, SearchX, Zap } from 'lucide-react';
+import { Heart, List, Map as MapIcon, SearchX } from 'lucide-react';
 import { lazy, Suspense, useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '../../../components/Button';
-import { Chip } from '../../../components/Chip';
+import { CheckMenu } from '../../../components/CheckMenu';
 import { EmptyState } from '../../../components/EmptyState';
 import { Field } from '../../../components/Field';
 import { ActiveFilters, FilterGroup, FilterSheet, FiltersButton } from '../../../components/Filters';
 import { LoadError } from '../../../components/LoadError';
 import { SearchField } from '../../../components/SearchField';
+import { SelectField } from '../../../components/SelectField';
 import { SkeletonList } from '../../../components/Skeleton';
+import { Switch } from '../../../components/Switch';
 import { searchShops, type ShopSearchResult } from '../../../data/rpc';
 import { fetchCategories, fetchCities, type SearchCategory, type SearchCity } from '../../../data/search';
 import { useI18n } from '../../../i18n/context';
 import { formatDate, ymdInBucharest } from '../../../i18n/format';
 import type { MessageKey } from '../../../i18n/ro';
 import { plural } from '../../../i18n/translate';
-import { AMENITIES, AMENITY_ICONS, isAmenity } from '../../../lib/amenities';
+import { AMENITIES, isAmenity } from '../../../lib/amenities';
 import { resolveDay } from '../../../lib/freePlace';
 import { hasOffer } from '../../../lib/offers';
 import { distanceTo, nearby, sortByDistance } from '../../../lib/geo';
@@ -210,7 +212,7 @@ export function SearchScreen() {
   // ------------------------------------------------------------------ the filters panel
   const [filtersOpen, setFiltersOpen] = useState(false);
 
-  /** What narrows or reorders the list now, each with its own ✕ above the results. */
+  /** What narrows or reorders the list now, in one line above the results. */
   const categoryName = (() => {
     const c = meta.status === 'ready' ? meta.data.categories.find((x) => x.key === category) : undefined;
     return c ? (lang === 'ro' ? c.name_ro : c.name_en) : null;
@@ -231,16 +233,6 @@ export function SearchScreen() {
   for (const a of wanted) active.push({ key: `fac:${a}`, label: t(`amenity.${a}` as MessageKey) });
   if (byDistance && coords) active.push({ key: 'sort', label: t('search.sort.nearest') });
 
-  function removeFilter(key: string) {
-    if (key.startsWith('fac:')) {
-      const next = wanted.filter((x) => x !== key.slice(4));
-      setParam({ fac: next.length ? next.join(',') : null });
-      return;
-    }
-    if (key === 'zi') setPickDay(false);
-    if (key === 'oras') autoCity.current = null;
-    setParam({ [key]: null });
-  }
   const countText = city
     ? t('search.countIn', { count: plural(lang, 'unit.shops', list.length), city: cityName })
     : plural(lang, 'unit.shops', list.length);
@@ -267,19 +259,14 @@ export function SearchScreen() {
 
       <div className={styles.toolbar}>
         <FiltersButton count={active.length} onClick={() => setFiltersOpen(true)} />
-        <div className={styles.viewToggle} role="group" aria-label={t('search.view')}>
-          <Chip selected={!asMap} onClick={() => setParam({ vedere: null })}>
-            <List size={14} aria-hidden="true" />
-            {t('search.view.list')}
-          </Chip>
-          <Chip selected={asMap} onClick={() => setParam({ vedere: 'harta' })}>
-            <MapIcon size={14} aria-hidden="true" />
-            {t('search.view.map')}
-          </Chip>
-        </div>
+        {/* One button that switches to the other view (no pair of pills). */}
+        <button type="button" className={styles.viewButton} onClick={() => setParam({ vedere: asMap ? null : 'harta' })}>
+          {asMap ? <List size={16} aria-hidden="true" /> : <MapIcon size={16} aria-hidden="true" />}
+          {t(asMap ? 'search.view.list' : 'search.view.map')}
+        </button>
       </div>
 
-      <ActiveFilters items={active} onRemove={removeFilter} onClearAll={filtersOn ? clearFilters : undefined} />
+      <ActiveFilters items={active} onClearAll={filtersOn ? clearFilters : undefined} />
 
       {meta.status === 'error' && <LoadError message={t('search.loadError')} onRetry={reloadMeta} />}
 
@@ -295,39 +282,21 @@ export function SearchScreen() {
         {meta.status === 'loading' && <SkeletonList count={2} />}
         {meta.status === 'ready' && (
           <>
-            <FilterGroup title={t('search.when')}>
-              <Chip
-                selected={!day && !pickDay}
-                onClick={() => {
-                  setPickDay(false);
-                  setParam({ zi: null });
-                }}
-              >
-                {t('search.when.any')}
-              </Chip>
-              <Chip
-                selected={dayParam === 'azi'}
-                onClick={() => {
-                  setPickDay(false);
-                  setParam({ zi: dayParam === 'azi' ? null : 'azi' });
-                }}
-              >
-                {t('search.when.today')}
-              </Chip>
-              <Chip
-                selected={dayParam === 'maine'}
-                onClick={() => {
-                  setPickDay(false);
-                  setParam({ zi: dayParam === 'maine' ? null : 'maine' });
-                }}
-              >
-                {t('search.when.tomorrow')}
-              </Chip>
-              <Chip selected={datePicked || pickDay} onClick={() => setPickDay((o) => !o)}>
-                <CalendarDays size={14} aria-hidden="true" />
-                {datePicked && day ? formatDate(lang, day) : t('search.when.pick')}
-              </Chip>
-            </FilterGroup>
+            <SelectField
+              label={t('search.when')}
+              value={datePicked || pickDay ? 'zi' : (dayParam ?? '')}
+              options={[
+                { value: '', label: t('search.when.any') },
+                { value: 'azi', label: t('search.when.today') },
+                { value: 'maine', label: t('search.when.tomorrow') },
+                { value: 'zi', label: t('search.when.pick') },
+              ]}
+              onChange={(e) => {
+                const v = e.target.value;
+                setPickDay(v === 'zi');
+                if (v !== 'zi') setParam({ zi: v || null });
+              }}
+            />
             {(pickDay || datePicked) && (
               <Field
                 className={styles.dayField}
@@ -338,91 +307,59 @@ export function SearchScreen() {
                 onChange={(e) => setParam({ zi: e.target.value || null })}
               />
             )}
-            <FilterGroup title={t('search.more')}>
-              <Chip selected={instantOnly} onClick={() => setParam({ instant: instantOnly ? null : '1' })}>
-                <Zap size={14} aria-hidden="true" />
-                {t('instant.badge')}
-              </Chip>
-              <Chip selected={offerOnly} onClick={() => setParam({ oferta: offerOnly ? null : '1' })}>
-                <BadgePercent size={14} aria-hidden="true" />
-                {t('search.withOffer')}
-              </Chip>
-              <Chip selected={favOnly} onClick={() => setParam({ fav: favOnly ? null : '1' })}>
-                <Heart size={14} aria-hidden="true" className={favOnly ? styles.heartOn : undefined} />
-                {t('search.favorites')}
-              </Chip>
-            </FilterGroup>
-            <FilterGroup title={t('search.categories')}>
-              <Chip selected={!category} onClick={() => setParam({ cat: null })}>
-                {t('search.allCategories')}
-              </Chip>
-              {meta.data.categories.map((c) => (
-                <Chip
-                  key={c.key}
-                  selected={category === c.key}
-                  onClick={() => setParam({ cat: category === c.key ? null : c.key })}
-                >
-                  {lang === 'ro' ? c.name_ro : c.name_en}
-                </Chip>
-              ))}
-            </FilterGroup>
+            <SelectField
+              label={t('search.categories')}
+              value={category ?? ''}
+              options={[
+                { value: '', label: t('search.allCategories') },
+                ...meta.data.categories.map((c) => ({ value: c.key, label: lang === 'ro' ? c.name_ro : c.name_en })),
+              ]}
+              onChange={(e) => setParam({ cat: e.target.value || null })}
+            />
             {meta.data.cities.length > 0 && (
-              <FilterGroup title={t('search.cities')}>
-                <Chip
-                  selected={!city}
-                  onClick={() => {
-                    autoCity.current = null;
-                    setParam({ oras: null });
-                  }}
-                >
-                  {t('search.allCities')}
-                </Chip>
-                {meta.data.cities.map((c) => {
-                  const on = fold(city) === fold(c.city);
-                  return (
-                    <Chip
-                      key={c.city}
-                      selected={on}
-                      onClick={() => {
-                        autoCity.current = null;
-                        setParam({ oras: on ? null : c.city });
-                      }}
-                    >
-                      {c.city}
-                    </Chip>
-                  );
-                })}
-              </FilterGroup>
+              <SelectField
+                label={t('search.cities')}
+                value={meta.data.cities.find((c) => fold(c.city) === fold(city))?.city ?? ''}
+                options={[{ value: '', label: t('search.allCities') }, ...meta.data.cities.map((c) => ({ value: c.city, label: c.city }))]}
+                onChange={(e) => {
+                  autoCity.current = null;
+                  setParam({ oras: e.target.value || null });
+                }}
+              />
             )}
-            <FilterGroup title={t('search.amenities')}>
-              {AMENITIES.map((a) => {
-                const on = wanted.includes(a);
-                const Icon = AMENITY_ICONS[a];
-                return (
-                  <Chip
-                    key={a}
-                    selected={on}
-                    onClick={() => {
-                      const next = on ? wanted.filter((x) => x !== a) : AMENITIES.filter((x) => x === a || wanted.includes(x));
-                      setParam({ fac: next.length ? next.join(',') : null });
-                    }}
-                  >
-                    <Icon size={14} aria-hidden="true" />
-                    {t(`amenity.${a}` as MessageKey)}
-                  </Chip>
-                );
-              })}
-            </FilterGroup>
+            <CheckMenu
+              label={t('search.amenities')}
+              summary={wanted.length ? wanted.map((a) => t(`amenity.${a}` as MessageKey)).join(', ') : t('search.amenities.any')}
+              options={AMENITIES.map((a) => ({ value: a, label: t(`amenity.${a}` as MessageKey) }))}
+              selected={wanted}
+              onToggle={(a) => {
+                const on = wanted.includes(a as (typeof AMENITIES)[number]);
+                const next = on ? wanted.filter((x) => x !== a) : AMENITIES.filter((x) => x === a || wanted.includes(x));
+                setParam({ fac: next.length ? next.join(',') : null });
+              }}
+            />
             {coords && (
-              <FilterGroup title={t('search.sortBy')}>
-                <Chip selected={!byDistance} onClick={() => setParam({ sort: null })}>
-                  {t('search.sort.recommended')}
-                </Chip>
-                <Chip selected={byDistance} onClick={() => setParam({ sort: 'aproape' })}>
-                  {t('search.sort.nearest')}
-                </Chip>
-              </FilterGroup>
+              <SelectField
+                label={t('search.sortBy')}
+                value={byDistance ? 'aproape' : ''}
+                options={[
+                  { value: '', label: t('search.sort.recommended') },
+                  { value: 'aproape', label: t('search.sort.nearest') },
+                ]}
+                onChange={(e) => setParam({ sort: e.target.value || null })}
+              />
             )}
+            <FilterGroup title={t('search.more')}>
+              <Switch checked={instantOnly} onChange={(e) => setParam({ instant: e.target.checked ? '1' : null })}>
+                {t('instant.badge')}
+              </Switch>
+              <Switch checked={offerOnly} onChange={(e) => setParam({ oferta: e.target.checked ? '1' : null })}>
+                {t('search.withOffer')}
+              </Switch>
+              <Switch checked={favOnly} onChange={(e) => setParam({ fav: e.target.checked ? '1' : null })}>
+                {t('search.favorites')}
+              </Switch>
+            </FilterGroup>
           </>
         )}
       </FilterSheet>

@@ -12,9 +12,6 @@
   gap: 8px;
 }
 
-.heartOn {
-  fill: var(--amber);
-}
 
 /* ---------------------------------------------------------------- results */
 .results {
@@ -214,10 +211,16 @@
   max-width: 260px;
 }
 
-.viewToggle {
-  display: flex;
+.viewButton {
+  display: inline-flex;
+  align-items: center;
   gap: 6px;
   margin-left: auto;
+  min-height: var(--tap);
+  padding: 0 4px;
+  color: var(--amber);
+  font-size: 14px;
+  font-weight: 600;
 }
 
 .mapLoading {

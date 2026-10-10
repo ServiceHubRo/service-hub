@@ -1,4 +1,4 @@
-import { expect, type Page } from '@playwright/test';
+import { expect, type Locator, type Page } from '@playwright/test';
 import { createHmac } from 'node:crypto';
 import { strFromU8, unzipSync } from 'fflate';
 import { en } from '../../src/i18n/en';
@@ -388,9 +388,41 @@ export async function closeFilters(page: Page) {
   await expect(page.getByRole('dialog')).toBeHidden();
 }
 
-/** Any list with a "Filtre" panel (Istoric, the admin lists): opens it, picks one choice, closes it. */
+/**
+ * Any list with a "Filtre" panel (Istoric, the admin lists, Caută): opens it, picks the choice in
+ * whichever dropdown offers it, closes it.
+ */
 export async function pickFilter(page: Page, name: string | RegExp) {
   await openFilters(page);
-  await page.getByRole('dialog').getByRole('button', { name, exact: typeof name === 'string' }).click();
+  await selectInPanel(page, name);
   await closeFilters(page);
+}
+
+/** In the open "Filtre" panel: picks the option with this label in whichever dropdown has it. */
+export async function selectInPanel(page: Page, name: string | RegExp) {
+  const selects = page.getByRole('dialog').getByRole('combobox');
+  for (let i = 0; i < (await selects.count()); i++) {
+    const select = selects.nth(i);
+    const labels = await select.locator('option').allTextContents();
+    const label = labels.find((l) => (typeof name === 'string' ? l.trim() === name : name.test(l)));
+    if (label !== undefined) {
+      await select.selectOption({ label });
+      return;
+    }
+  }
+  throw new Error(`No filter option ${String(name)}`);
+}
+
+/**
+ * An action of a card (booking, history job) that sits behind "Mai multe" (Eduard, 10 Oct: one
+ * main action in sight). Opens the menu when there is one and returns the entry; a card with a
+ * single extra action shows it as a plain button or link, which is returned instead.
+ */
+export async function cardAction(scope: Locator, name: string | RegExp, exact = true): Promise<Locator> {
+  const more = scope.getByRole('button', { name: /^(Mai multe|More)$/ });
+  if ((await more.count()) > 0) {
+    if ((await more.first().getAttribute('aria-expanded')) !== 'true') await more.first().click();
+    return scope.getByRole('menuitem', { name, exact });
+  }
+  return scope.getByRole('link', { name, exact }).or(scope.getByRole('button', { name, exact }));
 }

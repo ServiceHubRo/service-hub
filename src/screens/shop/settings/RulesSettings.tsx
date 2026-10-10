@@ -3,7 +3,6 @@ import { useLocation } from 'react-router-dom';
 import { BackLink } from '../../../components/BackLink';
 import { Card } from '../../../components/Card';
 import { CheckMenu } from '../../../components/CheckMenu';
-import { Chip } from '../../../components/Chip';
 import { Field } from '../../../components/Field';
 import { SelectField } from '../../../components/SelectField';
 import { Stepper } from '../../../components/Stepper';
@@ -179,19 +178,12 @@ export function RulesSettings() {
           />
           <p className={styles.hint}>{t('rules.perSlot.hint')}</p>
         </div>
-        <div className={own.block} role="group" aria-labelledby="rules-slot">
-          <div className={own.inline}>
-            <span id="rules-slot">{t('rules.slot')}</span>
-            <div className={own.chips}>
-              {[30, 60].map((m) => (
-                <Chip key={m} selected={rules.slot_minutes === m} onClick={() => set('slot_minutes', m)}>
-                  {t('rules.slot.value', { n: m })}
-                </Chip>
-              ))}
-            </div>
-          </div>
-          <p className={styles.hint}>{t('rules.slot.hint')}</p>
-        </div>
+        <SelectField
+          label={t('rules.slot')}
+          value={String(rules.slot_minutes)}
+          options={[30, 60].map((m) => ({ value: String(m), label: t('rules.slot.value', { n: m }) }))}
+          onChange={(e) => set('slot_minutes', Number(e.target.value))}
+        />
       </Card>
 
       <Card className={styles.stack}>

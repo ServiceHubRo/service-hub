@@ -54,20 +54,5 @@
   align-items: flex-start;
 }
 
-.group {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
 
-.groupTitle {
-  margin: 0;
-  font-size: 14px;
-  font-weight: 600;
-}
 
-.chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}

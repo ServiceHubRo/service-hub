@@ -1,8 +1,7 @@
-import { ChevronDown, ClipboardList, Download, History as HistoryIcon, Phone, Printer, SearchX } from 'lucide-react';
+import { ChevronDown, ClipboardList, Download, History as HistoryIcon, MessageSquare, Phone, Printer, SearchX } from 'lucide-react';
 import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { Button } from '../../../components/Button';
-import { buttonClass } from '../../../components/buttonClass';
 import { Card } from '../../../components/Card';
 import { EmptyState } from '../../../components/EmptyState';
 import { ChoiceFilters } from '../../../components/Filters';
@@ -34,7 +33,8 @@ import { saveFile } from '../../../lib/saveFile';
 import { toXlsx } from '../../../lib/xlsx';
 import { formatPhone, normalizePhone } from '../../../lib/validators';
 import { HistoryQuote } from '../../history/HistoryQuote';
-import { MessageLink } from '../../messages/MessageLink';
+import { bookingMessagesPath } from '../../messages/paths';
+import { MoreActions } from '../../../components/MoreActions';
 import styles from '../../history/history.module.css';
 import { vehicleFilePath } from '../paths';
 import { useIsShopOwner } from '../shopRole';
@@ -402,13 +402,16 @@ function HistoryCard({ item: b, open, onToggle }: { item: ShopHistoryItem; open:
                 {formatPhone(phone)}
               </a>
             )}
-            {b.has_client && <MessageLink side="shop" bookingId={b.id} />}
-            {!b.imported && (
-              <Link to={vehicleFilePath(b.id, 'history')} className={buttonClass('secondary')}>
-                <ClipboardList size={18} aria-hidden="true" />
-                {t('vf.title')}
-              </Link>
-            )}
+            <MoreActions
+              items={[
+                ...(b.has_client
+                  ? [{ key: 'message', label: t('msg.button'), icon: <MessageSquare size={18} aria-hidden="true" />, to: bookingMessagesPath('shop', b.id) }]
+                  : []),
+                ...(!b.imported
+                  ? [{ key: 'file', label: t('vf.title'), icon: <ClipboardList size={18} aria-hidden="true" />, to: vehicleFilePath(b.id, 'history') }]
+                  : []),
+              ]}
+            />
           </div>
         </div>
       )}

@@ -1,7 +1,7 @@
 import { Check } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { buttonClass } from '../../../components/buttonClass';
-import { CalendarLinks } from '../../../components/CalendarLinks';
+import { AddToCalendar } from '../../../components/CalendarLinks';
 import { Card } from '../../../components/Card';
 import type { CalendarEvent } from '../../../lib/calendar';
 import type { MapPlace } from '../../../lib/maps';
@@ -56,16 +56,12 @@ export function BookingSent() {
           <SummaryRow label={t('booking.sent.ref')} value={sent.ref} mono />
         </Card>
       )}
-      {sent?.confirmed && sent.calendar && (
-        <div className={styles.sentLinks}>
-          <CalendarLinks event={sent.calendar.event} place={sent.calendar.place} />
-        </div>
-      )}
       <div className={styles.sentActions}>
         <Link to={BOOKINGS_PATH} className={buttonClass('primary', true)}>
           {t('booking.sent.toBookings')}
         </Link>
-        <Link to={SEARCH_PATH} className={buttonClass('secondary', true)}>
+        {sent?.confirmed && sent.calendar && <AddToCalendar event={sent.calendar.event} />}
+        <Link to={SEARCH_PATH} className={buttonClass('ghost', true)}>
           {t('booking.sent.toSearch')}
         </Link>
       </div>

@@ -497,3 +497,12 @@ a.stat:hover {
   margin: 0;
   padding-left: 18px;
 }
+
+/* The signal's name in its color, before why it counts (no separate pills). */
+.signalRed {
+  color: var(--red-text);
+}
+
+.signalAmber {
+  color: var(--amber);
+}

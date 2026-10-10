@@ -83,8 +83,6 @@ export function ReviewCard({ review: r, onChanged, onStale }: ReviewCardProps) {
             {about && <span className="mono"> · {about}</span>}
           </p>
         </div>
-        {pending && <span className={`${styles.pill} ${styles.pillAmber}`}>{t('reviews.reported')}</span>}
-        {removed && <span className={`${styles.pill} ${styles.pillMuted}`}>{t('reviews.removed')}</span>}
       </div>
       {/* A block around the stars: as a flex item they would stretch and fill all five. */}
       <div>

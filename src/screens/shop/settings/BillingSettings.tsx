@@ -3,7 +3,6 @@ import { useCallback, useRef, useState } from 'react';
 import { BackLink } from '../../../components/BackLink';
 import { Button } from '../../../components/Button';
 import { Card } from '../../../components/Card';
-import { Chip } from '../../../components/Chip';
 import { EmptyState } from '../../../components/EmptyState';
 import { Field } from '../../../components/Field';
 import { SkeletonList } from '../../../components/Skeleton';
@@ -13,6 +12,7 @@ import { looksLikeEmail } from '../../../lib/password';
 import { useLoad } from '../../../lib/useLoad';
 import { isValidCui, isValidIban, isValidRegCom, normalizeCode } from '../../../lib/validators';
 import { LoadError } from '../../../components/LoadError';
+import { Switch } from '../../../components/Switch';
 import { SETTINGS_PATH } from './paths';
 import { SaveButton } from './SaveButton';
 import { useShopSettings } from './shopSettingsContext';
@@ -61,7 +61,6 @@ export function BillingSettings() {
         <EmptyState icon={Lock} title={t('settings.ownerOnly')} />
       ) : (
         <>
-          <p className={styles.intro}>{t('billing.intro')}</p>
           <p className={styles.note}>{t('billing.later')}</p>
           {state.status === 'loading' && <SkeletonList />}
           {state.status === 'error' && <LoadError message={t('settings.loadError')} onRetry={reload} />}
@@ -167,17 +166,9 @@ function BillingForm({ initial }: { initial: ShopBilling | null }) {
         </Button>
       </div>
       <Card>
-        <div className={styles.inlineRow} role="group" aria-labelledby="billing-vat">
-          <span id="billing-vat">{t('billing.vatPayer')}</span>
-          <span className={styles.chips}>
-            <Chip selected={form.vat_payer} onClick={() => set('vat_payer', true)}>
-              {t('common.yes')}
-            </Chip>
-            <Chip selected={!form.vat_payer} onClick={() => set('vat_payer', false)}>
-              {t('common.no')}
-            </Chip>
-          </span>
-        </div>
+        <Switch checked={form.vat_payer} onChange={(e) => set('vat_payer', e.target.checked)}>
+          {t('billing.vatPayer')}
+        </Switch>
       </Card>
       <Field
         label={t('billing.legalRep')}

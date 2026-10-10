@@ -5,7 +5,6 @@ import { BackLink } from '../../../components/BackLink';
 import { Banner } from '../../../components/Banner';
 import { Card } from '../../../components/Card';
 import { Switch } from '../../../components/Switch';
-import { Chip } from '../../../components/Chip';
 import { EmptyState } from '../../../components/EmptyState';
 import { Field } from '../../../components/Field';
 import { LoadError } from '../../../components/LoadError';
@@ -244,18 +243,22 @@ export function AddBookingScreen() {
         <Card className={styles.section}>
           <h2 className={styles.sectionTitle}>{t('wi.car')}</h2>
           {known && known.cars.length > 0 && (
-            <div className={styles.knownCars} role="group" aria-label={t('imp.knownCars')}>
-              <span className={styles.intro}>{t('imp.knownCars')}</span>
-              {known.cars.map((c, i) => (
-                <Chip
-                  key={i}
-                  selected={draft.plate.trim().toUpperCase() === (c.plate ?? '').toUpperCase() && draft.make === c.make}
-                  onClick={() => set({ make: c.make, model: c.model, plate: c.plate ?? '', year: c.year ? String(c.year) : '' })}
-                >
-                  {[c.make, c.model, c.plate].filter(Boolean).join(' ')}
-                </Chip>
-              ))}
-            </div>
+            <SelectField
+              label={t('imp.knownCars')}
+              value={String(
+                known.cars.findIndex(
+                  (c) => draft.plate.trim().toUpperCase() === (c.plate ?? '').toUpperCase() && draft.make === c.make,
+                ),
+              )}
+              options={[
+                { value: '-1', label: t('imp.knownCars.pick') },
+                ...known.cars.map((c, i) => ({ value: String(i), label: [c.make, c.model, c.plate].filter(Boolean).join(' ') })),
+              ]}
+              onChange={(e) => {
+                const c = known.cars[Number(e.target.value)];
+                if (c) set({ make: c.make, model: c.model, plate: c.plate ?? '', year: c.year ? String(c.year) : '' });
+              }}
+            />
           )}
           <div className={styles.pair}>
             <Field

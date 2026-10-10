@@ -13,6 +13,7 @@ import {
   shot,
   signIn,
   userIdOf,
+  cardAction,
 } from './support';
 
 // T11 — messages between a client and a shop, live on both sides, with automatic messages in the
@@ -131,7 +132,7 @@ test.describe('messages and reviews', () => {
     await expect(page).toHaveURL(/\/c\//);
     await navLink(page, /^Programări/).click();
     const card = page.locator('main section li').filter({ hasText: booking.ref });
-    await card.getByRole('link', { name: 'Mesaj' }).click();
+    await (await cardAction(card, 'Mesaj')).click();
     await expect(page).toHaveURL(/\/c\/mesaje\/[0-9a-f-]{36}$/);
     const log = page.getByRole('log');
     await expect(log).toContainText(`Ai trimis cererea ${booking.ref}. Service-ul o confirmă în curând.`);
@@ -194,7 +195,7 @@ test.describe('messages and reviews', () => {
 
     // The shop's booking card has the button too.
     await shopPage.goto(`/s/programari?tab=programate&p=${booking.id}`);
-    await shopPage.locator('main li').filter({ hasText: booking.ref }).getByRole('link', { name: 'Mesaj' }).click();
+    await (await cardAction(shopPage.locator('main li').filter({ hasText: booking.ref }), 'Mesaj')).click();
     await expect(shopPage).toHaveURL(/\/s\/mesaje\/[0-9a-f-]{36}$/);
     await expect(shopPage.getByRole('heading', { level: 1 })).toHaveText('Maria Pop');
   });
@@ -208,7 +209,7 @@ test.describe('messages and reviews', () => {
     await signIn(page, client, PASSWORD);
     await expect(page).toHaveURL(/\/c\//);
     await navLink(page, /^Programări/).click();
-    await page.locator('main section li').filter({ hasText: booking.ref }).getByRole('link', { name: 'Mesaj' }).click();
+    await (await cardAction(page.locator('main section li').filter({ hasText: booking.ref }), 'Mesaj')).click();
     const log = page.getByRole('log');
     await expect(log).toContainText(`Ai trimis cererea ${booking.ref}.`);
     const tabs = page.getByRole('navigation', { name: 'Navigare principală' }).last();

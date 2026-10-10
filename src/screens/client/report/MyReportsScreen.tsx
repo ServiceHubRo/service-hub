@@ -83,7 +83,6 @@ export function MyReportsScreen() {
       <BackLink to={NAV.client.account.path} label={t('nav.account')} />
       <div>
         <h1>{t('reports.title')}</h1>
-        <p className={styles.sub}>{t('reports.intro')}</p>
       </div>
 
       {returned && (

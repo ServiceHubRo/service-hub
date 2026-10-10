@@ -95,16 +95,26 @@ test.describe('the shop window', () => {
     await expect(c).toHaveURL(/\/c\/cauta/);
     await c.goto(`/c/cauta?q=${encodeURIComponent(shopName)}`);
     const card = c.locator('main li').filter({ hasText: shopName });
-    await expect(card).toContainText('Răspunde de obicei în mai puțin de o oră');
+    await expect(card).toBeVisible();
+    // Facilities: a pop-up checklist in the filters panel.
+    const facilities = c.getByRole('dialog').getByRole('button', { name: /^Facilități/ });
     await openFilters(c);
-    await c.getByRole('button', { name: 'Mașină la schimb', exact: true }).click();
+    await facilities.click();
+    await c.getByRole('checkbox', { name: 'Mașină la schimb' }).check();
+    await facilities.click();
     await closeFilters(c);
     await expect(card).toBeVisible();
     await openFilters(c);
-    await c.getByRole('button', { name: 'Cafea și apă', exact: true }).click();
+    await facilities.click();
+    await c.getByRole('checkbox', { name: 'Cafea și apă' }).check();
+    await facilities.click();
     await closeFilters(c);
     await expect(card).toHaveCount(0);
-    await c.getByRole('button', { name: 'Scoate filtrul Cafea și apă' }).click();
+    await openFilters(c);
+    await facilities.click();
+    await c.getByRole('checkbox', { name: 'Cafea și apă' }).uncheck();
+    await facilities.click();
+    await closeFilters(c);
     await expect(card).toBeVisible();
 
     await c.getByRole('button', { name: 'Hartă' }).click();

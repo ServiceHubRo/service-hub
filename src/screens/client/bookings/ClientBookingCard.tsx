@@ -1,10 +1,11 @@
-import { Phone, Star } from 'lucide-react';
+import { History, MessageSquare, Phone, RotateCcw, Star } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ActionButton } from '../../../components/ActionButton';
 import { Button } from '../../../components/Button';
 import { buttonClass } from '../../../components/buttonClass';
-import { CalendarLinks } from '../../../components/CalendarLinks';
+import { calendarMenuItems } from '../../../components/calendarMenu';
+import { MoreActions } from '../../../components/MoreActions';
 import { Card } from '../../../components/Card';
 import { OfferNote } from '../../../components/OfferNote';
 import { useOfferText } from '../../../lib/useOfferText';
@@ -25,7 +26,7 @@ import { daysFromToday, formatDate, formatKm, formatMoney, formatTime, ymdInBuch
 import { bookingServicesText } from '../../../lib/bookingServices';
 import { cancelState, reviewState, type Quote } from '../../../lib/clientBookings';
 import { formatPhone, normalizePhone } from '../../../lib/validators';
-import { MessageLink } from '../../messages/MessageLink';
+import { bookingMessagesPath } from '../../messages/paths';
 import { bookingCarHistoryPath, bookingPath, SEARCH_PATH, type VehicleHistoryLinkState } from '../paths';
 import { QuoteDecision } from './QuoteDecision';
 import { ReviewForm } from './ReviewForm';
@@ -93,9 +94,10 @@ export function ClientBookingCard({
   }
 
   const bookAgain = b.status === 'done' && b.shop;
+  const bookAgainPath = `${bookingPath(b.shop_id)}?pas=2&serviciu=${[b.service_id, ...b.extra_service_ids].map(encodeURIComponent).join(',')}`;
   // A request the shop never answered: other shops for the same work, in the same city.
   const findAnother = b.status === 'expired' && b.closed_reason === 'unanswered';
-  // "Mesaj" is on every card, so the actions row always shows while no panel is open.
+  // "Mesaj" is on every card (in "Mai multe"), so the actions row always shows while no panel is open.
   const hasActions = panel === null;
 
   return (
@@ -132,46 +134,47 @@ export function ClientBookingCard({
 
       {hasActions && (
         <div className={styles.actions}>
-          {cancel === 'allowed' && (
-            <Button variant="danger" onClick={() => setPanel('cancel')}>
-              {t('cb.cancel')}
-            </Button>
-          )}
-          {review === 'open' && (
+          {/* One main action in sight; the rest behind "Mai multe" (Eduard, 10 Oct). */}
+          {review === 'open' ? (
             <Button variant="primary" onClick={() => setPanel('review')}>
               {t('cb.review.leave')}
             </Button>
-          )}
-          {bookAgain && (
-            <Link to={`${bookingPath(b.shop_id)}?pas=2&serviciu=${[b.service_id, ...b.extra_service_ids].map(encodeURIComponent).join(',')}`} className={buttonClass('secondary')}>
-              {t('cb.bookAgain')}
-            </Link>
-          )}
-          {b.status === 'confirmed' && b.shop && (
-            <CalendarLinks
-              event={{
-                uid: b.id,
-                title: `${bookingServicesText(lang, b.service, b.extra_services, b.service_id)} · ${b.shop.name}`,
-                date: b.date,
-                slot: b.slot,
-                minutes: b.shop.slot_minutes,
-                location: [b.shop.name, b.shop.street, b.shop.city].filter(Boolean).join(', '),
-                description: t('calendar.description', { ref: b.ref }),
-              }}
-              place={b.shop}
-            />
-          )}
-          {findAnother && (
+          ) : findAnother ? (
             <Link to={otherShopsPath(b)} className={buttonClass('primary')}>
               {t('cb.unanswered.find')}
             </Link>
-          )}
-          {b.status === 'done' && (
-            <Link to={bookingCarHistoryPath(b.id)} state={FROM_BOOKINGS} className={buttonClass('secondary')}>
-              {t('vh.see')}
+          ) : bookAgain ? (
+            <Link to={bookAgainPath} className={buttonClass('secondary')}>
+              {t('cb.bookAgain')}
             </Link>
-          )}
-          <MessageLink side="client" bookingId={b.id} />
+          ) : null}
+          <MoreActions
+            items={[
+              ...(b.status === 'confirmed' && b.shop
+                ? calendarMenuItems(
+                    {
+                      uid: b.id,
+                      title: `${bookingServicesText(lang, b.service, b.extra_services, b.service_id)} · ${b.shop.name}`,
+                      date: b.date,
+                      slot: b.slot,
+                      minutes: b.shop.slot_minutes,
+                      location: [b.shop.name, b.shop.street, b.shop.city].filter(Boolean).join(', '),
+                      description: t('calendar.description', { ref: b.ref }),
+                    },
+                    b.shop,
+                    t,
+                  )
+                : []),
+              ...(bookAgain && (review === 'open' || findAnother)
+                ? [{ key: 'again', label: t('cb.bookAgain'), icon: <RotateCcw size={18} aria-hidden="true" />, to: bookAgainPath }]
+                : []),
+              ...(b.status === 'done'
+                ? [{ key: 'history', label: t('vh.see'), icon: <History size={18} aria-hidden="true" />, to: bookingCarHistoryPath(b.id), state: FROM_BOOKINGS }]
+                : []),
+              { key: 'message', label: t('msg.button'), icon: <MessageSquare size={18} aria-hidden="true" />, to: bookingMessagesPath('client', b.id) },
+              ...(cancel === 'allowed' ? [{ key: 'cancel', label: t('cb.cancel'), onSelect: () => setPanel('cancel'), danger: true }] : []),
+            ]}
+          />
           {review === 'sent' && (
             <p className={styles.reviewSent}>
               <Star size={15} aria-hidden="true" className={styles.starFilled} />
@@ -198,7 +201,6 @@ export function ClientBookingCard({
 
       {panel === 'cancel' && (
         <InlinePanel title={t('cb.cancel.title')}>
-          <p className={styles.panelBody}>{t('cb.cancel.body')}</p>
           <div className={styles.buttons}>
             <ActionButton
               variant="danger"

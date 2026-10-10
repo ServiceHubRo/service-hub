@@ -4,7 +4,7 @@ import { Link, useLocation, useSearchParams } from 'react-router-dom';
 import { Banner } from '../../../components/Banner';
 import { Button } from '../../../components/Button';
 import { buttonClass } from '../../../components/buttonClass';
-import { Chip } from '../../../components/Chip';
+import { ActiveFilters } from '../../../components/Filters';
 import { EmptyState } from '../../../components/EmptyState';
 import { LoadError } from '../../../components/LoadError';
 import { SkeletonList } from '../../../components/Skeleton';
@@ -164,13 +164,7 @@ export function ShopBookingsScreen() {
           ]}
         />
         {chip && (
-          <div className={styles.filterRow}>
-            <Chip selected onClick={() => go({ tab })}>
-              {chip}
-              <X size={14} aria-hidden="true" />
-              <span className="visually-hidden">{t('sb.filter.clear')}</span>
-            </Chip>
-          </div>
+          <ActiveFilters items={[{ key: 'focus', label: chip }]} onClearAll={() => go({ tab })} />
         )}
         {notice && (
           <Banner

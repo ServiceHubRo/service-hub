@@ -5,7 +5,6 @@ import { BackLink } from '../../components/BackLink';
 import { Button } from '../../components/Button';
 import { Card } from '../../components/Card';
 import { Switch } from '../../components/Switch';
-import { Chip, ChipRow } from '../../components/Chip';
 import { SelectField } from '../../components/SelectField';
 import { EmptyState } from '../../components/EmptyState';
 import { Field } from '../../components/Field';
@@ -71,13 +70,12 @@ function Composer({ onSent }: { onSent: (n: AdminNotice) => void }) {
 
   return (
     <Card className={styles.stack}>
-      <ChipRow label={t('admin.notices.to')}>
-        {NOTICE_AUDIENCES.map((a) => (
-          <Chip key={a} selected={draft.audience === a} onClick={() => set('audience', a)}>
-            {t(`admin.notices.audience.${a}` as MessageKey)}
-          </Chip>
-        ))}
-      </ChipRow>
+      <SelectField
+        label={t('admin.notices.to')}
+        value={draft.audience}
+        options={NOTICE_AUDIENCES.map((a) => ({ value: a, label: t(`admin.notices.audience.${a}` as MessageKey) }))}
+        onChange={(e) => set('audience', e.target.value as (typeof NOTICE_AUDIENCES)[number])}
+      />
       {/* The cities that have shops, as in the client's search: nothing to type or know. */}
       <div className={styles.stack}>
         <SelectField

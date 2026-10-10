@@ -121,7 +121,6 @@ export function SubscriptionsScreen() {
       <BackLink to={ADMIN_ACCOUNT_PATH} label={t('nav.account')} />
       <div>
         <h1>{t('admin.subs.title')}</h1>
-        <p className={styles.sub}>{t('admin.subs.sub')}</p>
       </div>
       {state.status === 'loading' && <SkeletonList />}
       {state.status === 'error' && <LoadError message={t('admin.loadError')} onRetry={reload} />}

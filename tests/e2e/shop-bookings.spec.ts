@@ -5,6 +5,7 @@ import {
   PASSWORD,
   SEED,
   SEED_PASSWORD,
+  cardAction,
   createBookableShop,
   createUser,
   expectNoHorizontalScroll,
@@ -122,7 +123,7 @@ test.describe('demo shop', () => {
     await shot(page, 't08-cereri', name());
 
     // Reprogramează: the shop's calendar inline; "Renunță" closes it with nothing changed.
-    await request.getByRole('button', { name: 'Reprogramează' }).click();
+    await (await cardAction(request, 'Reprogramează')).click();
     await expect(request.getByRole('heading', { name: 'Reprogramează' })).toBeFocused();
     await request.getByRole('button', { name: /: \d+ (loc|locuri)$/ }).first().click();
     await expect(request.getByRole('button', { name: /^\d{2}:\d{2}$/, disabled: false }).first()).toBeVisible();
@@ -136,8 +137,9 @@ test.describe('demo shop', () => {
     const george = card(page, 'George Toma');
     await expect(george).toContainText('Client cu 3 neprezentări');
     await expect(george).toContainText('Ora programării a trecut');
-    await expect(card(page, 'Cristina Dobre').getByRole('button', { name: 'Neprezentat' })).toHaveCount(0);
-    await george.getByRole('button', { name: 'Neprezentat' }).click();
+    await expect(await cardAction(card(page, 'Cristina Dobre'), 'Neprezentat')).toHaveCount(0);
+    await page.keyboard.press('Escape');
+    await (await cardAction(george, 'Neprezentat')).click();
     await expect(george.getByText('Clientul nu a venit?')).toBeVisible();
     await george.getByRole('button', { name: 'Renunță' }).click();
     await expect(card(page, 'Mihai Petrescu')).toContainText('Clientul a acceptat 2 din 3 poziții');
@@ -148,7 +150,7 @@ test.describe('demo shop', () => {
 
     // "Editează devizul" starts from the sent lines.
     const quoted = card(page, 'Scârțâie la frânare dimineața.');
-    await quoted.getByRole('button', { name: 'Editează devizul' }).click();
+    await (await cardAction(quoted, 'Editează devizul')).click();
     await expect(quoted.getByLabel('Poziția 2', { exact: true })).toHaveValue('Discuri frână față');
     await expect(quoted.getByText('850 lei')).toHaveCount(2); // the sent quote and the composer's total
     await shot(page, 't08-quote-edit', name());
@@ -249,13 +251,13 @@ test.describe('shop flow', () => {
     await shot(clientPage, 't08-client-quote-sent', name());
 
     // Edit: a new version replaces it; withdraw: back to inspection; send again.
-    await page.getByRole('button', { name: 'Editează devizul' }).click();
+    await (await cardAction(sent, 'Editează devizul')).click();
     await page.getByLabel('Preț, lei').nth(2).fill('200');
     await page.getByRole('button', { name: 'Trimite devizul nou' }).click();
     await expect(page.getByText(`Devizul nou pentru ${booking.ref} a fost trimis clientului.`)).toBeVisible();
     await expect(sent).toContainText('900,50 lei');
-    await page.getByRole('button', { name: 'Retrage devizul' }).click();
-    await page.getByRole('button', { name: 'Retrage devizul' }).click();
+    await (await cardAction(sent, 'Retrage devizul')).click();
+    await sent.getByRole('button', { name: 'Retrage devizul' }).click();
     await expect(page.getByText(`Devizul pentru ${booking.ref} a fost retras.`)).toBeVisible();
     await expect(sent).toContainText('Mașina este în constatare din');
     await expect(clientCard).toContainText('În constatare');
@@ -289,7 +291,7 @@ test.describe('shop flow', () => {
     await shot(page, 't08-panou-en', name());
     await navLink(page, /^Bookings/).click();
     const cx = card(page, 'Booking X');
-    await cx.getByRole('button', { name: 'Reschedule' }).click();
+    await (await cardAction(cx, 'Reschedule')).click();
     await expect(cx.getByRole('button', { name: /: full$/ }).first()).toBeDisabled(); // day B, confirmed Y
     const tile = (d: string) => cx.getByRole('button', { name: `${formatDate('en', d)}: 1 spot` });
     await tile(dayC!).click();
@@ -315,7 +317,7 @@ test.describe('shop flow', () => {
     // Cancel needs a reason, which the client gets.
     await page.getByRole('tab', { name: /Scheduled/ }).click();
     const cy = card(page, 'Booking Y');
-    await cy.getByRole('button', { name: 'Cancel', exact: true }).click();
+    await (await cardAction(cy, 'Cancel')).click();
     await cy.getByRole('button', { name: 'Cancel booking' }).click();
     await expect(cy.getByText('Enter the reason.')).toBeVisible();
     await shot(page, 't08-cancel-en', name());
@@ -330,7 +332,7 @@ test.describe('shop flow', () => {
     const z = await book(clients[3]!, shopId, freeNow[0]!, await slotOf(freeNow[0]!), 'BV 04 WWW', 'Booking Z');
     await page.getByRole('tab', { name: /Requests/ }).click();
     const cz = card(page, 'Booking Z');
-    await cz.getByRole('button', { name: 'Decline' }).click();
+    await (await cardAction(cz, 'Decline')).click();
     await cz.getByRole('button', { name: 'Decline request' }).click();
     await expect(page.getByText(`Request ${z.ref} was declined. The client has been notified.`)).toBeVisible();
     await expect(card(page, 'Booking Z')).toHaveCount(0);

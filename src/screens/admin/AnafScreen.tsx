@@ -137,7 +137,7 @@ export function AnafScreen() {
       <BackLink to={ADMIN_ACCOUNT_PATH} label={t('nav.account')} />
       <div>
         <h1>{t('anaf.title')}</h1>
-        <p className={styles.sub}>{all ? plural(lang, 'unit.shops', shown.length) : t('anaf.sub')}</p>
+        <p className={styles.sub}>{all ? plural(lang, 'unit.shops', shown.length) : null}</p>
       </div>
       <p className={styles.muted}>{t('anaf.intro')}</p>
       {state.status === 'loading' && <SkeletonList />}
