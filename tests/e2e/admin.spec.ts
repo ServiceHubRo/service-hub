@@ -151,12 +151,12 @@ test.describe('admin', () => {
 
     // Stop the subscription by hand: out of search; then active again.
     await page.getByRole('button', { name: 'Schimbă statusul abonamentului' }).click();
-    await page.getByRole('button', { name: 'Inactiv', exact: true }).click();
+    await page.getByRole('combobox', { name: 'Schimbă statusul abonamentului' }).selectOption({ label: 'Inactiv' });
     await page.getByRole('button', { name: 'Setează „Inactiv”' }).click();
     await expect(page.getByRole('status').filter({ hasText: 'Statusul abonamentului este schimbat.' })).toBeVisible();
     expect(await inSearch(client, shopName)).toBe(false);
     await page.getByRole('button', { name: 'Schimbă statusul abonamentului' }).click();
-    await page.getByRole('button', { name: 'Activ', exact: true }).click();
+    await page.getByRole('combobox', { name: 'Schimbă statusul abonamentului' }).selectOption({ label: 'Activ' });
     await page.getByRole('button', { name: 'Setează „Activ”' }).click();
     await expect(page.getByRole('status').filter({ hasText: 'Statusul abonamentului este schimbat.' })).toBeVisible();
     expect(await inSearch(client, shopName)).toBe(true);
