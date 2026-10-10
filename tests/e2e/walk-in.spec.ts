@@ -196,7 +196,7 @@ test.describe('bookings added by the shop', () => {
     await serviceRest(`profiles?id=eq.${await userIdOf(shop.email)}`, 'PATCH', { lang: 'en' });
     await page.goto('/s/programari/nou');
     await expect(page.getByRole('heading', { level: 1, name: 'Add a booking' })).toBeVisible();
-    await expect(page.getByRole('checkbox', { name: 'Text the booking to the client' })).toBeChecked();
+    await expect(page.getByRole('switch', { name: 'Text the booking to the client' })).toBeChecked();
     await expect(page.locator('main')).not.toContainText('Adaugă');
     await expectNoHorizontalScroll(page);
     await shot(page, 'walkin-form-en', name());
