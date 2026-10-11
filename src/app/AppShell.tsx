@@ -7,6 +7,7 @@ import { useI18n } from '../i18n/context';
 import { plural, type PluralUnit } from '../i18n/translate';
 import { quotesWaiting } from '../lib/clientBookings';
 import { IN_ANDROID_APP, watchKeyboard } from '../lib/keyboard';
+import { IS_NATIVE } from '../lib/native';
 import { useOptionalAdminCounts } from '../screens/admin/adminContext';
 import { ADMIN_MODERATION_PATH } from '../screens/admin/paths';
 import { useOptionalClientBookings } from '../screens/client/bookings/clientBookingsContext';
@@ -16,6 +17,7 @@ import { SHOP_BOOKINGS_PATH } from '../screens/shop/paths';
 import { messagesPath } from '../screens/messages/paths';
 import { unreadThreads, useOptionalThreads } from '../screens/messages/threadsContext';
 import { useOptionalNotices } from '../screens/notices/noticesContext';
+import { PermissionsIntro } from '../screens/onboarding/PermissionsIntro';
 import { EmailVerifyBanner } from './EmailVerifyBanner';
 import { LangSwitch } from './LangSwitch';
 import { LogoutConfirm } from './LogoutConfirm';
@@ -143,6 +145,8 @@ export function AppShell({ role }: { role: Role }) {
 
   return (
     <div className={styles.shell} data-role={role}>
+      {/* The phone app's first start asks for the permissions one by one (on the site: the banners). */}
+      {IS_NATIVE && <PermissionsIntro role={role} />}
       <a href="#continut" className={styles.skipLink} onClick={skipToContent}>
         {t('nav.skipToContent')}
       </a>

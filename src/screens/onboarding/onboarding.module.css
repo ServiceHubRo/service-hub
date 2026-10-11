@@ -1,0 +1,90 @@
+/* The first start of the phone app: one permission at a time, over the app, frosted. */
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: calc(var(--safe-top) + 24px) calc(var(--safe-right) + 18px) calc(var(--safe-bottom) + 24px)
+    calc(var(--safe-left) + 18px);
+  background: rgba(10, 11, 13, 0.72);
+  animation: fade-in 0.2s ease;
+}
+
+@supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
+  .overlay {
+    background: rgba(10, 11, 13, 0.5);
+    -webkit-backdrop-filter: blur(18px) saturate(140%);
+    backdrop-filter: blur(18px) saturate(140%);
+  }
+}
+
+.card {
+  width: 100%;
+  max-width: 380px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 28px 22px 20px;
+  text-align: center;
+  background: var(--glass-bg);
+  border: 1px solid var(--border-lit);
+  border-radius: 22px;
+  box-shadow: var(--glass-shadow);
+  animation: rise-in 0.24s ease;
+}
+
+.step {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.icon {
+  display: grid;
+  place-items: center;
+  width: 76px;
+  height: 76px;
+  margin: 4px 0;
+  border-radius: 50%;
+  color: var(--amber);
+  background: var(--amber-soft);
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.body {
+  margin: 0 0 8px;
+  color: var(--muted-strong);
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.actions {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+}
