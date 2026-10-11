@@ -4,6 +4,19 @@ import { Capacitor } from '@capacitor/core';
 export const IN_ANDROID_APP = Capacitor.isNativePlatform() && Capacitor.getPlatform() === 'android';
 
 /**
+ * In the Android app the page itself gets shorter while the keyboard is open (instead of the
+ * keyboard covering it): `interactive-widget=resizes-content` on the viewport, as the app had until
+ * 10 Oct, when it worked on every tester's phone. Only there: Safari on the iPhone cut the page with
+ * it. Call once at start.
+ */
+export function resizeForKeyboard(inAndroidApp = IN_ANDROID_APP, doc: Document = document): void {
+  if (!inAndroidApp) return;
+  const meta = doc.querySelector<HTMLMetaElement>('meta[name="viewport"]');
+  if (!meta || meta.content.includes('interactive-widget')) return;
+  meta.content = `${meta.content}, interactive-widget=resizes-content`;
+}
+
+/**
  * The on-screen keyboard of a phone. A page cannot ask whether it is open, so the visible height
  * is compared with the tallest seen at the same width: a drop of KEYBOARD_MIN_PX or more while a
  * text field has the focus means the keyboard is up (the address bar hiding is far less).
@@ -28,9 +41,7 @@ export function keyboardOpen(height: number, tallest: number, focused: boolean):
 
 /**
  * Marks `<html data-keyboard>` while the keyboard is open, so the bottom bar steps aside and the
- * screen being typed in keeps the room. Should the phone lay the keyboard over the page instead of
- * making it shorter, `--keyboard-cover` on <html> holds how much it covers (0 when the page was made
- * shorter), and the shell leaves that room (AppShell.module.css). Returns the cleanup.
+ * screen being typed in keeps the room. Returns the cleanup.
  */
 export function watchKeyboard(): () => void {
   const viewport = window.visualViewport;
@@ -41,11 +52,7 @@ export function watchKeyboard(): () => void {
     const before = tallest.get(width) ?? 0;
     if (height > before) tallest.set(width, height);
     const open = keyboardOpen(height, Math.max(before, height), isTextField(document.activeElement));
-    const root = document.documentElement;
-    root.toggleAttribute('data-keyboard', open);
-    const cover = open && viewport ? Math.max(0, Math.round(window.innerHeight - viewport.height - viewport.offsetTop)) : 0;
-    if (cover > 0) root.style.setProperty('--keyboard-cover', `${cover}px`);
-    else root.style.removeProperty('--keyboard-cover');
+    document.documentElement.toggleAttribute('data-keyboard', open);
   };
   update();
   const target = viewport ?? window;
@@ -65,6 +72,5 @@ export function watchKeyboard(): () => void {
     document.removeEventListener('focusin', update);
     document.removeEventListener('focusout', later);
     document.documentElement.removeAttribute('data-keyboard');
-    document.documentElement.style.removeProperty('--keyboard-cover');
   };
 }

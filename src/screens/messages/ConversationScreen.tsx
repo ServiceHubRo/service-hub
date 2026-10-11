@@ -12,7 +12,6 @@ import { subscribeRows } from '../../data/realtime';
 import { canRetryRpc, markThreadRead, rpcErrorMessage, sendMessage, toRpcError } from '../../data/rpc';
 import { useI18n } from '../../i18n/context';
 import { formatTime, ymdInBucharest } from '../../i18n/format';
-import { IN_ANDROID_APP } from '../../lib/keyboard';
 import { counterpartName, formatDayHeading, isOwnSide, mergeMessages, systemMessageText } from '../../lib/messages';
 import { useLoad } from '../../lib/useLoad';
 import { useNow } from '../../lib/useNow';
@@ -124,16 +123,32 @@ export function ConversationScreen() {
     endRef.current?.scrollIntoView({ block: 'end', behavior: intent.smooth && !reduce ? 'smooth' : 'auto' });
   }, [messages]);
 
-  // In the Android app the keyboard makes the screen shorter: the newest messages stay above the box.
+  // When the screen gets shorter (the phone's keyboard, a longer message being typed), a reader who
+  // was at the newest messages stays there: they rise with the box instead of going under it.
   useEffect(() => {
-    if (!IN_ANDROID_APP) return;
-    const onResize = () => {
-      if (document.activeElement === inputRef.current) endRef.current?.scrollIntoView({ block: 'end' });
+    if (!ready || typeof ResizeObserver === 'undefined') return;
+    const scroller = scrollerOf(endRef.current);
+    let stick = nearBottom(scroller);
+    let height = scroller.clientHeight;
+    const onScroll = () => {
+      stick = nearBottom(scroller);
     };
-    const viewport = window.visualViewport ?? window;
-    viewport.addEventListener('resize', onResize);
-    return () => viewport.removeEventListener('resize', onResize);
-  }, []);
+    const observer = new ResizeObserver(() => {
+      if (scroller.clientHeight === height) return;
+      const shrank = scroller.clientHeight < height;
+      height = scroller.clientHeight;
+      if (stick || (shrank && document.activeElement === inputRef.current)) scroller.scrollTop = scroller.scrollHeight;
+    });
+    observer.observe(scroller);
+    // The page itself reports its scrolling on the window.
+    const page = scroller === document.scrollingElement || scroller === document.documentElement;
+    const scrollTarget: HTMLElement | Window = page ? window : scroller;
+    scrollTarget.addEventListener('scroll', onScroll, { passive: true });
+    return () => {
+      observer.disconnect();
+      scrollTarget.removeEventListener('scroll', onScroll);
+    };
+  }, [ready]);
 
   const addMessages = useCallback(
     (incoming: ChatMessage[], forceBottom = false) => {
