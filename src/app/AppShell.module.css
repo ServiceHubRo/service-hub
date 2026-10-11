@@ -3,6 +3,8 @@
   min-height: 0;
   display: flex;
   flex-direction: column;
+  /* What the Android app's keyboard covers when the phone lays it over the page (keyboard.ts). */
+  padding-bottom: var(--keyboard-cover, 0px);
 }
 
 /* ---------- mobile + tablet (< 1024 px) ---------- */
@@ -100,6 +102,11 @@
   background: var(--surface);
   border-top: 1px solid var(--border);
   padding-bottom: var(--safe-bottom);
+}
+
+/* The Android app's keyboard is open (src/lib/keyboard.ts). */
+:global(html[data-keyboard]) .bottomBar {
+  display: none;
 }
 
 .tab {

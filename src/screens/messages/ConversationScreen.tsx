@@ -12,6 +12,7 @@ import { subscribeRows } from '../../data/realtime';
 import { canRetryRpc, markThreadRead, rpcErrorMessage, sendMessage, toRpcError } from '../../data/rpc';
 import { useI18n } from '../../i18n/context';
 import { formatTime, ymdInBucharest } from '../../i18n/format';
+import { IN_ANDROID_APP } from '../../lib/keyboard';
 import { counterpartName, formatDayHeading, isOwnSide, mergeMessages, systemMessageText } from '../../lib/messages';
 import { useLoad } from '../../lib/useLoad';
 import { useNow } from '../../lib/useNow';
@@ -122,6 +123,17 @@ export function ConversationScreen() {
     const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
     endRef.current?.scrollIntoView({ block: 'end', behavior: intent.smooth && !reduce ? 'smooth' : 'auto' });
   }, [messages]);
+
+  // In the Android app the keyboard makes the screen shorter: the newest messages stay above the box.
+  useEffect(() => {
+    if (!IN_ANDROID_APP) return;
+    const onResize = () => {
+      if (document.activeElement === inputRef.current) endRef.current?.scrollIntoView({ block: 'end' });
+    };
+    const viewport = window.visualViewport ?? window;
+    viewport.addEventListener('resize', onResize);
+    return () => viewport.removeEventListener('resize', onResize);
+  }, []);
 
   const addMessages = useCallback(
     (incoming: ChatMessage[], forceBottom = false) => {
