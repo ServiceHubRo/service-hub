@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { isTextField, keyboardOpen, watchKeyboard } from '../../src/lib/keyboard';
+import { isTextField, keyboardOpen, resizeForKeyboard, watchKeyboard } from '../../src/lib/keyboard';
 
 describe('keyboard', () => {
   afterEach(() => {
@@ -40,12 +40,14 @@ describe('keyboard', () => {
     expect(document.documentElement.hasAttribute('data-keyboard')).toBe(false);
   });
 
-  it('without a visual viewport there is no cover to leave room for', () => {
-    const area = document.createElement('textarea');
-    document.body.appendChild(area);
-    const stop = watchKeyboard();
-    area.focus();
-    expect(document.documentElement.style.getPropertyValue('--keyboard-cover')).toBe('');
-    stop();
+  it('asks for a page made shorter by the keyboard in the Android app only, once', () => {
+    document.head.innerHTML = '<meta name="viewport" content="width=device-width, initial-scale=1">';
+    const meta = document.head.querySelector('meta')!;
+    resizeForKeyboard(false, document);
+    expect(meta.content).toBe('width=device-width, initial-scale=1');
+    resizeForKeyboard(true, document);
+    resizeForKeyboard(true, document);
+    expect(meta.content).toBe('width=device-width, initial-scale=1, interactive-widget=resizes-content');
+    document.head.innerHTML = '';
   });
 });

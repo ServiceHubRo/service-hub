@@ -1,7 +1,6 @@
 package ro.servicehub.app;
 
 import android.graphics.Color;
-import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
@@ -51,7 +50,6 @@ public class MainActivity extends BridgeActivity {
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.VANILLA_ICE_CREAM) {
             getWindow().setNavigationBarColor(DARK);
-            keepAboveKeyboard(content);
             return;
         }
         getWindow().setNavigationBarContrastEnforced(false);
@@ -85,27 +83,6 @@ public class MainActivity extends BridgeActivity {
                 }
             }
         );
-    }
-
-    /**
-     * Before Android 15 the window is made shorter for the keyboard (adjustResize), but some phones
-     * lay the keyboard over the app instead (a tester's phone, 11 Oct). Then the part it covers is
-     * measured and the app is padded by it; where the window was made shorter there is nothing to
-     * cover and nothing changes. A gap under 100 dp is a system bar, not the keyboard.
-     */
-    private void keepAboveKeyboard(View content) {
-        float density = getResources().getDisplayMetrics().density;
-        int[] location = new int[2];
-        Rect visible = new Rect();
-        content.getViewTreeObserver().addOnGlobalLayoutListener(() -> {
-            content.getWindowVisibleDisplayFrame(visible);
-            content.getLocationOnScreen(location);
-            int covered = location[1] + content.getHeight() - visible.bottom;
-            int bottom = covered >= 100 * density ? covered : 0;
-            if (content.getPaddingBottom() != bottom) {
-                content.setPadding(content.getPaddingLeft(), content.getPaddingTop(), content.getPaddingRight(), bottom);
-            }
-        });
     }
 
     private void injectInsets() {
