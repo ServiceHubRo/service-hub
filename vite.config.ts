@@ -6,6 +6,7 @@ import react from '@vitejs/plugin-react';
 import { headersFile, inlineScripts, parseHeadersFile, securityHeaders } from './src/lib/securityHeaders.ts';
 import { robotsTxt, sitemapXml } from './src/lib/seoFiles.ts';
 import { checkSupabaseConfig, describeConfigProblem } from './src/lib/supabaseConfig.ts';
+import { withKeyboardResize } from './src/lib/viewportMeta.ts';
 
 // Netlify sets CONTEXT to "production", "deploy-preview", "branch-deploy" or "dev".
 // Anything that is not the production site counts as a test build.
@@ -39,6 +40,15 @@ export default defineConfig(({ command, mode }) => {
       {
         name: 'site-url',
         transformIndexHtml: (html: string) => html.replaceAll('%SITE_URL%', siteUrl),
+      },
+      {
+        // The Android app (APP_PLATFORM=android, android.yml): the page gets shorter for the
+        // keyboard. Written into the page itself, as when it worked on every tester's phone (10 Oct);
+        // added later by script it was not taken into account on some phones. Not on the site:
+        // Safari on the iPhone cut the page with it.
+        name: 'android-keyboard',
+        transformIndexHtml: (html: string) =>
+          process.env.APP_PLATFORM === 'android' ? withKeyboardResize(html) : html,
       },
       {
         // Search engines index the published site only (T19c); previews say "stay away".

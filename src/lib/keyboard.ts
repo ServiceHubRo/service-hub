@@ -1,19 +1,19 @@
 import { Capacitor } from '@capacitor/core';
+import { KEYBOARD_RESIZE } from './viewportMeta';
 
 /** The keyboard handling here is the Android app's only: the site and the iPhone are left as they are. */
 export const IN_ANDROID_APP = Capacitor.isNativePlatform() && Capacitor.getPlatform() === 'android';
 
 /**
  * In the Android app the page itself gets shorter while the keyboard is open (instead of the
- * keyboard covering it): `interactive-widget=resizes-content` on the viewport, as the app had until
- * 10 Oct, when it worked on every tester's phone. Only there: Safari on the iPhone cut the page with
- * it. Call once at start.
+ * keyboard covering it). The app's build writes the setting into the page (vite.config.ts,
+ * APP_PLATFORM=android); this adds it at start to an app built without it. Call once at start.
  */
 export function resizeForKeyboard(inAndroidApp = IN_ANDROID_APP, doc: Document = document): void {
   if (!inAndroidApp) return;
   const meta = doc.querySelector<HTMLMetaElement>('meta[name="viewport"]');
   if (!meta || meta.content.includes('interactive-widget')) return;
-  meta.content = `${meta.content}, interactive-widget=resizes-content`;
+  meta.content = `${meta.content}, ${KEYBOARD_RESIZE}`;
 }
 
 /**
