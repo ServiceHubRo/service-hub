@@ -322,6 +322,13 @@ export function scrollTopOf(page: Page): Promise<number> {
  */
 export async function expectAccessible(page: Page, label: string) {
   const { default: AxeBuilder } = await import('@axe-core/playwright');
+  // Scroll animations (the public page): every part checked as it ends up, not halfway in.
+  await page.evaluate(async () => {
+    for (const el of Array.from(document.querySelectorAll<HTMLElement>('[data-reveal]'))) el.dataset.shown = '';
+    await new Promise((done) => requestAnimationFrame(() => requestAnimationFrame(done)));
+    const finite = document.getAnimations().filter((a) => a.effect?.getComputedTiming().iterations !== Infinity);
+    await Promise.all(finite.map((a) => a.finished.catch(() => undefined)));
+  });
   const result = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']).analyze();
   const violations = result.violations.map(
     (v) => `${v.id} (${v.impact}): ${v.help}\n    ${v.nodes.map((n) => n.target.join(' ')).slice(0, 6).join('\n    ')}`,

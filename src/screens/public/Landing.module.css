@@ -635,3 +635,311 @@
   vertical-align: middle;
   white-space: nowrap;
 }
+
+/* ------------------------------------------------------------------ steps line */
+/* The steps are joined by an amber line through their numbers: down the left on a phone, across
+   on a laptop (none on the 2 × 2 tablet grid). */
+.step {
+  position: relative;
+}
+
+.stepNum {
+  position: relative;
+  z-index: 2;
+}
+
+@media (max-width: 639px) {
+  .step {
+    display: grid;
+    grid-template-columns: 34px 1fr;
+    column-gap: 14px;
+  }
+
+  .stepNum {
+    grid-row: span 2;
+    margin-bottom: 0;
+  }
+
+  .step:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    z-index: 1;
+    left: 38px;
+    top: 39px;
+    width: 2px;
+    height: calc(100% + 16px);
+    background: var(--amber);
+    opacity: 0.7;
+    transform-origin: top;
+  }
+}
+
+@media (min-width: 900px) {
+  .step:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    z-index: 1;
+    left: 39px;
+    top: 38px;
+    width: calc(100% + 20px);
+    height: 2px;
+    background: var(--amber);
+    opacity: 0.7;
+    transform-origin: left;
+  }
+}
+
+/* ------------------------------------------------------------------ motion */
+/* Everything below runs only while landingMotion.ts has marked the page (data-motion): once per
+   part, when it comes on screen (data-shown). Without the mark the page is as before. */
+.page[data-motion] [data-reveal] {
+  opacity: 0;
+  transform: translateY(22px);
+  transition:
+    opacity 0.6s ease,
+    transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1);
+  transition-delay: calc(var(--i, 0) * 120ms);
+}
+
+.page[data-motion] [data-reveal][data-shown] {
+  opacity: 1;
+  transform: none;
+}
+
+/* The icons draw themselves line by line, on a tile that pops in. */
+.page[data-motion] .card .cardIcon {
+  transform: scale(0.4);
+  opacity: 0;
+}
+
+.page[data-motion] .card .cardIcon svg > * {
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+}
+
+.page[data-motion] .card[data-shown] .cardIcon {
+  animation: tile-pop 0.55s cubic-bezier(0.3, 1.6, 0.5, 1) both;
+  animation-delay: calc(var(--i, 0) * 120ms + 150ms);
+}
+
+.page[data-motion] .card[data-shown] .cardIcon svg > * {
+  animation: line-draw 1.1s ease-out forwards;
+  animation-delay: calc(var(--i, 0) * 120ms + 350ms);
+}
+
+@keyframes tile-pop {
+  from {
+    transform: scale(0.4);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes line-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* The steps: each number pops, then the line runs on to the next one. */
+.page[data-motion] .step .stepNum {
+  transform: scale(0);
+}
+
+.page[data-motion] .step[data-shown] .stepNum {
+  animation: num-pop 0.5s cubic-bezier(0.3, 1.7, 0.5, 1) forwards;
+  animation-delay: calc(var(--i, 0) * 380ms + 150ms);
+}
+
+.page[data-motion] .step::after {
+  transform: scale(0);
+}
+
+.page[data-motion] .step[data-shown]::after {
+  animation: line-grow 0.5s ease-in-out forwards;
+  animation-delay: calc(var(--i, 0) * 380ms + 380ms);
+}
+
+@keyframes num-pop {
+  0% {
+    transform: scale(0);
+  }
+  70% {
+    transform: scale(1.18);
+    box-shadow: 0 0 0 8px var(--amber-tint);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 transparent;
+  }
+}
+
+@keyframes line-grow {
+  to {
+    transform: scale(1);
+  }
+}
+
+/* The price: a light runs around its border, the old price is struck through in front of the
+   visitor, the new one jumps in and the saving bounces. */
+@property --price-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+.page[data-motion] .price {
+  position: relative;
+}
+
+.page[data-motion] .price::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  padding: 2px;
+  border-radius: 17px;
+  background: conic-gradient(from var(--price-angle), transparent 0deg 250deg, var(--amber) 320deg, transparent 360deg);
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box exclude,
+    linear-gradient(#000 0 0);
+  pointer-events: none;
+  opacity: 0;
+}
+
+.page[data-motion] .price[data-shown]::before {
+  animation:
+    fade-in 0.6s ease 0.4s forwards,
+    border-run 4s linear 0.4s infinite;
+}
+
+@keyframes fade-in {
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes border-run {
+  to {
+    --price-angle: 360deg;
+  }
+}
+
+.page[data-motion] .launchBadge {
+  position: relative;
+  overflow: hidden;
+}
+
+.page[data-motion] .price[data-shown] .launchBadge {
+  animation: badge-in 0.6s cubic-bezier(0.3, 1.6, 0.5, 1) 0.3s both;
+}
+
+.page[data-motion] .launchBadge::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(110deg, transparent 30%, rgba(255, 255, 255, 0.65) 50%, transparent 70%);
+  transform: translateX(-120%);
+}
+
+.page[data-motion] .price[data-shown] .launchBadge::after {
+  animation: shine 3.5s ease-in-out 1.2s infinite;
+}
+
+@keyframes badge-in {
+  0% {
+    transform: scale(0.5) rotate(-6deg);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.1) rotate(3deg);
+    opacity: 1;
+  }
+  100% {
+    transform: none;
+  }
+}
+
+@keyframes shine {
+  0%,
+  55% {
+    transform: translateX(-120%);
+  }
+  100% {
+    transform: translateX(120%);
+  }
+}
+
+.page[data-motion] .priceOld {
+  position: relative;
+  text-decoration: none;
+}
+
+.page[data-motion] .priceOld::after {
+  content: '';
+  position: absolute;
+  left: -3px;
+  right: -3px;
+  top: 50%;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--red);
+  transform: rotate(-8deg) scaleX(0);
+  transform-origin: left;
+}
+
+.page[data-motion] .price[data-shown] .priceOld::after {
+  animation: strike 0.45s ease-out 0.7s forwards;
+}
+
+@keyframes strike {
+  to {
+    transform: rotate(-8deg) scaleX(1);
+  }
+}
+
+.page[data-motion] .priceFigure {
+  display: inline-block;
+  transform-origin: left center;
+}
+
+.page[data-motion] .price[data-shown] .priceFigure {
+  animation: figure-in 0.7s cubic-bezier(0.3, 1.6, 0.5, 1) 1.05s both;
+}
+
+@keyframes figure-in {
+  0% {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.15);
+    opacity: 1;
+    text-shadow: 0 0 22px rgba(245, 165, 36, 0.75);
+  }
+  100% {
+    transform: none;
+    text-shadow: 0 0 0 transparent;
+  }
+}
+
+.page[data-motion] .price[data-shown] .priceSave {
+  animation: save-bounce 0.6s cubic-bezier(0.3, 1.8, 0.5, 1) 1.5s both;
+}
+
+@keyframes save-bounce {
+  0% {
+    transform: translateY(-14px) scale(0.6);
+    opacity: 0;
+  }
+  100% {
+    transform: none;
+    opacity: 1;
+  }
+}

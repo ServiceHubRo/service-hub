@@ -16,7 +16,7 @@ import {
   Users,
   type LucideIcon,
 } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, type CSSProperties } from 'react';
 import { Link, Navigate, useLocation } from 'react-router-dom';
 import { LangSwitch } from '../../app/LangSwitch';
 import { LoadingScreen } from '../../app/LoadingScreen';
@@ -39,6 +39,7 @@ import { includedColleagues, launchSaving } from '../../lib/subscription';
 import { formatPhone } from '../../lib/validators';
 import { signUpPath } from '../auth/paths';
 import styles from './Landing.module.css';
+import { revealOnScroll } from './landingMotion';
 
 interface Feature {
   icon: LucideIcon;
@@ -80,6 +81,7 @@ export function Landing() {
   const accountDeleted = state?.accountDeleted;
   const [linkError] = useState(takeAuthLinkError);
   useDocumentTitle(t('landing.title'));
+  const motionRef = useCallback((el: HTMLDivElement | null) => (el ? revealOnScroll(el) : undefined), []);
 
   if (session.status === 'loading') return <LoadingScreen />;
   // Just logged out (the session ends a moment after we arrive): stay here.
@@ -92,7 +94,7 @@ export function Landing() {
   }
 
   return (
-    <div className={styles.page}>
+    <div ref={motionRef} className={styles.page}>
       <div className="status-backdrop" aria-hidden="true" />
       <div className="nav-backdrop" aria-hidden="true" />
       <header className={styles.header}>
@@ -142,11 +144,15 @@ export function Landing() {
 
         <section className={`${styles.section} ${styles.dark}`} id="service" aria-labelledby="landing-shops">
           <div className={styles.wrap}>
-            <p className={styles.eyebrow}>{t('landing.forShops')}</p>
-            <h2 id="landing-shops" className={styles.h2}>
+            <p className={styles.eyebrow} data-reveal="">
+              {t('landing.forShops')}
+            </p>
+            <h2 id="landing-shops" className={styles.h2} data-reveal="" style={order(1)}>
               {t('landing.shopsTitle')}
             </h2>
-            <p className={styles.sub}>{t('landing.shopsText')}</p>
+            <p className={styles.sub} data-reveal="" style={order(2)}>
+              {t('landing.shopsText')}
+            </p>
             <FeatureCards features={SHOP_FEATURES} />
             <PriceBlock />
           </div>
@@ -154,13 +160,15 @@ export function Landing() {
 
         <section className={styles.section} aria-labelledby="landing-how">
           <div className={styles.wrap}>
-            <p className={styles.eyebrow}>{t('landing.howEyebrow')}</p>
-            <h2 id="landing-how" className={styles.h2}>
+            <p className={styles.eyebrow} data-reveal="">
+              {t('landing.howEyebrow')}
+            </p>
+            <h2 id="landing-how" className={styles.h2} data-reveal="" style={order(1)}>
               {t('landing.howTitle')}
             </h2>
             <ol className={styles.steps}>
               {STEPS.map((step, i) => (
-                <li key={step.title} className={styles.step}>
+                <li key={step.title} className={styles.step} data-reveal="" style={order(i)}>
                   <span className={styles.stepNum} aria-hidden="true">
                     {i + 1}
                   </span>
@@ -174,7 +182,7 @@ export function Landing() {
 
         <section className={styles.section} aria-labelledby="landing-trust">
           <div className={styles.wrap}>
-            <div className={styles.trust}>
+            <div className={styles.trust} data-reveal="">
               <span className={styles.trustIcon} aria-hidden="true">
                 <BadgeCheck size={30} />
               </span>
@@ -231,12 +239,19 @@ export function Landing() {
   );
 }
 
+/** The place of a part in its group: each one starts a moment after the one before (landingMotion.ts). */
+function order(i: number): CSSProperties {
+  return { '--i': i } as CSSProperties;
+}
+
 function FeatureSection({ id, eyebrow, title, features }: { id: string; eyebrow: string; title: string; features: Feature[] }) {
   return (
     <section className={styles.section} id={id} aria-labelledby={`${id}-title`}>
       <div className={styles.wrap}>
-        <p className={styles.eyebrow}>{eyebrow}</p>
-        <h2 id={`${id}-title`} className={styles.h2}>
+        <p className={styles.eyebrow} data-reveal="">
+          {eyebrow}
+        </p>
+        <h2 id={`${id}-title`} className={styles.h2} data-reveal="" style={order(1)}>
           {title}
         </h2>
         <FeatureCards features={features} />
@@ -249,8 +264,8 @@ function FeatureCards({ features }: { features: Feature[] }) {
   const { t } = useI18n();
   return (
     <ul className={styles.cards}>
-      {features.map(({ icon: Icon, title, text }) => (
-        <li key={title} className={styles.card}>
+      {features.map(({ icon: Icon, title, text }, i) => (
+        <li key={title} className={styles.card} data-reveal="" style={order(i)}>
           <span className={styles.cardIcon} aria-hidden="true">
             <Icon size={22} />
           </span>
@@ -286,7 +301,7 @@ function PriceBlock() {
   }, []);
 
   return (
-    <div className={styles.price}>
+    <div className={styles.price} data-reveal="">
       <div className={styles.priceText} aria-busy={state.status === 'loading'}>
         {state.status === 'loading' && (
           <>
