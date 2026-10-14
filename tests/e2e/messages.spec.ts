@@ -226,6 +226,19 @@ test.describe('messages and reviews', () => {
     await expect(input).toBeInViewport();
     await expect(last).toBeInViewport();
     await shot(page, 'keyboard-open', name());
+
+    // A message sent with the keyboard open shows whole above the box, not half under it.
+    await input.fill('Mesajul 15');
+    await page.getByRole('button', { name: 'Trimite' }).click();
+    const sent = log.locator('p').filter({ hasText: 'Mesajul 15' });
+    await expect(sent).toBeVisible();
+    const box = page.locator('form').filter({ has: input });
+    await expect
+      .poll(async () => {
+        const [bubble, form] = [await sent.boundingBox(), await box.boundingBox()];
+        return bubble && form ? Math.round(form.y - (bubble.y + bubble.height)) : -1;
+      })
+      .toBeGreaterThanOrEqual(0);
     await page.setViewportSize(full);
   });
 

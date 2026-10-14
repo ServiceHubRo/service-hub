@@ -20,7 +20,7 @@ import java.util.Locale;
  * drawn over the tab bar on some phones (Huawei P30 Pro, Android 10).
  *
  * Before Android 15 the window keeps its normal layout: the system places the app between the bars,
- * which are painted in the app's dark color. From Android 15 every app is drawn behind the bars, so
+ * which are painted in the app's dark color, and shrinks it while the keyboard is open. From Android 15 every app is drawn behind the bars, so
  * the app's view is padded by them here: the status bar and the sides always, the bottom when the
  * three buttons (or the keyboard) are there. A gesture bar is left to the page, which receives its
  * height as --safe-area-inset-bottom and lets content run under it.
@@ -49,6 +49,15 @@ public class MainActivity extends BridgeActivity {
         appearance.setAppearanceLightNavigationBars(false);
 
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.VANILLA_ICE_CREAM) {
+            // The status bar plugin has just drawn the app behind the status bar (its default,
+            // overlaysWebView). In that layout Android no longer shrinks the app for the keyboard
+            // (adjustResize), so the keyboard covered the message box (Huawei P30 Pro, Android 10).
+            // The app goes back between the bars, under a status bar in its dark color.
+            View decor = getWindow().getDecorView();
+            decor.setSystemUiVisibility(
+                decor.getSystemUiVisibility() & ~(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE)
+            );
+            getWindow().setStatusBarColor(DARK);
             getWindow().setNavigationBarColor(DARK);
             return;
         }

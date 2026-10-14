@@ -18,7 +18,7 @@
     "test:e2e": "playwright test",
     "icons": "node scripts/gen-icons.mjs",
     "db:types": "bash scripts/db-types.sh",
-    "android:sync": "npm run build && cap sync android",
+    "android:sync": "APP_PLATFORM=android npm run build && cap sync android",
     "android:assets": "node scripts/gen-android-assets.mjs"
   },
   "dependencies": {

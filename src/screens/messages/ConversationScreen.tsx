@@ -120,7 +120,9 @@ export function ConversationScreen() {
       return;
     }
     const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
-    endRef.current?.scrollIntoView({ block: 'end', behavior: intent.smooth && !reduce ? 'smooth' : 'auto' });
+    // To the very bottom: the box to write in sits over the end of the list (sticky), so bringing
+    // only the last message to the screen's edge left it half under the box.
+    scroller.scrollTo({ top: scroller.scrollHeight, behavior: intent.smooth && !reduce ? 'smooth' : 'auto' });
   }, [messages]);
 
   // When the screen gets shorter (the phone's keyboard, a longer message being typed), a reader who
