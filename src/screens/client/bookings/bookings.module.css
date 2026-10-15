@@ -90,6 +90,12 @@
   font-weight: 600;
 }
 
+.okFresh {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .ask {
   font-size: 14.5px;
   font-weight: 600;

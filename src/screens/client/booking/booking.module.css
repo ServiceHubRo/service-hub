@@ -290,14 +290,6 @@
 
 .sentIcon {
   align-self: center;
-  width: 66px;
-  height: 66px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--green);
-  color: #fff;
 }
 
 .sentTitle {

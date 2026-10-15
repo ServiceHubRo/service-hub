@@ -10,13 +10,15 @@ export interface BannerProps {
   tone?: BannerTone;
   children: ReactNode;
   action?: ReactNode;
+  /** In place of the tone's icon (decoration only, e.g. the SuccessCheck after an action went through). */
+  icon?: ReactNode;
 }
 
-export function Banner({ tone = 'info', children, action }: BannerProps) {
+export function Banner({ tone = 'info', children, action, icon }: BannerProps) {
   const Icon = ICONS[tone];
   return (
     <div className={`${styles.banner} ${styles[tone]}`} role={tone === 'error' ? 'alert' : 'status'}>
-      <Icon size={18} className={styles.icon} aria-hidden="true" />
+      {icon ? <span className={styles.icon}>{icon}</span> : <Icon size={18} className={styles.icon} aria-hidden="true" />}
       <div className={styles.text}>{children}</div>
       {action && <div className={styles.action}>{action}</div>}
     </div>

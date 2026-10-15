@@ -943,3 +943,227 @@
     opacity: 1;
   }
 }
+
+/* ------------------------------------------------------------------ hero demo */
+/* The phone in the first screen plays the whole flow in a 12 s loop (Eduard, 15 Oct): "Frâne" is
+   typed, the shops come in, "Programează" is tapped, the quote arrives line by line and is
+   accepted. Only with the page's motion on (landingMotion.ts); otherwise the still picture. */
+.page[data-motion] .mockTyped {
+  display: inline-block;
+  padding-right: 2px;
+  border-right: 2px solid var(--amber);
+  animation:
+    demo-type 12s steps(6, end) infinite,
+    demo-caret 0.8s step-end infinite;
+}
+
+@keyframes demo-type {
+  0%,
+  4% {
+    clip-path: inset(0 100% 0 0);
+  }
+  14%,
+  100% {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes demo-caret {
+  50% {
+    border-right-color: transparent;
+  }
+}
+
+.page[data-motion] .mockShop1 {
+  animation: demo-shop1 12s ease-out infinite;
+}
+
+.page[data-motion] .mockShop2 {
+  animation: demo-shop2 12s ease-out infinite;
+}
+
+@keyframes demo-shop1 {
+  0%,
+  16% {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  21%,
+  92% {
+    opacity: 1;
+    transform: none;
+  }
+  97%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes demo-shop2 {
+  0%,
+  19% {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  24%,
+  92% {
+    opacity: 1;
+    transform: none;
+  }
+  97%,
+  100% {
+    opacity: 0;
+  }
+}
+
+/* The tap on "Programează": the button sinks and a ring spreads from it. */
+.page[data-motion] .mockShop1 .mockBook {
+  position: relative;
+  animation: demo-tap 12s ease-out infinite;
+}
+
+.page[data-motion] .mockShop1 .mockBook::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 9px;
+  border: 2px solid var(--amber);
+  opacity: 0;
+  animation: demo-ring 12s ease-out infinite;
+}
+
+@keyframes demo-tap {
+  0%,
+  31% {
+    transform: none;
+  }
+  33% {
+    transform: scale(0.88);
+  }
+  36%,
+  100% {
+    transform: none;
+  }
+}
+
+@keyframes demo-ring {
+  0%,
+  32% {
+    opacity: 0;
+    transform: scale(1);
+  }
+  33% {
+    opacity: 1;
+  }
+  40%,
+  100% {
+    opacity: 0;
+    transform: scale(1.6);
+  }
+}
+
+.page[data-motion] .mockQuote {
+  animation: demo-quote 12s ease-out infinite;
+}
+
+.page[data-motion] .mockLine1 {
+  animation: demo-line1 12s ease-out infinite;
+}
+
+.page[data-motion] .mockLine2 {
+  animation: demo-line2 12s ease-out infinite;
+}
+
+.page[data-motion] .mockQuote .mockTotal {
+  animation: demo-total 12s ease-out infinite;
+}
+
+@keyframes demo-quote {
+  0%,
+  38% {
+    opacity: 0;
+    transform: translateY(18px) scale(0.96);
+  }
+  43%,
+  92% {
+    opacity: 1;
+    transform: none;
+  }
+  97%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes demo-line1 {
+  0%,
+  45% {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  49%,
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes demo-line2 {
+  0%,
+  50% {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  54%,
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes demo-total {
+  0%,
+  55% {
+    opacity: 0;
+  }
+  59%,
+  100% {
+    opacity: 1;
+  }
+}
+
+/* "Accept": an outline first, filled green when tapped. */
+.page[data-motion] .mockQuote .mockAccept {
+  animation: demo-accept 12s ease-out infinite;
+}
+
+@keyframes demo-accept {
+  0%,
+  59% {
+    opacity: 0;
+    background: transparent;
+    color: var(--green);
+    box-shadow: inset 0 0 0 1.5px var(--green);
+  }
+  62%,
+  67% {
+    opacity: 1;
+    background: transparent;
+    color: var(--green);
+    box-shadow: inset 0 0 0 1.5px var(--green);
+    transform: none;
+  }
+  69% {
+    transform: scale(0.94);
+  }
+  71%,
+  100% {
+    opacity: 1;
+    background: var(--green);
+    color: #0a1a0e;
+    box-shadow:
+      inset 0 0 0 1.5px var(--green),
+      0 0 18px rgba(52, 199, 89, 0.45);
+    transform: none;
+  }
+}

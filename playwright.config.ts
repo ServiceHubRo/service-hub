@@ -13,6 +13,9 @@ export default defineConfig({
     baseURL: `http://localhost:${PORT}`,
     // Dates and times must not depend on the device zone.
     timezoneId: 'Europe/Berlin',
+    // The app's animations (src/lib/motion.ts) off, as for a phone with "Reduce motion": a figure
+    // read at once is its value, not a step of the count. public.spec.ts checks them with motion on.
+    contextOptions: { reducedMotion: 'reduce' },
   },
   projects: [
     { name: 'mobile-390', use: { ...devices['Desktop Chrome'], viewport: { width: 390, height: 844 }, hasTouch: true } },

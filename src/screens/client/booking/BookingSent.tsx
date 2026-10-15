@@ -1,8 +1,8 @@
-import { Check } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { buttonClass } from '../../../components/buttonClass';
 import { AddToCalendar } from '../../../components/CalendarLinks';
 import { Card } from '../../../components/Card';
+import { SuccessCheck } from '../../../components/SuccessCheck';
 import type { CalendarEvent } from '../../../lib/calendar';
 import type { MapPlace } from '../../../lib/maps';
 import { useI18n } from '../../../i18n/context';
@@ -38,8 +38,8 @@ export function BookingSent() {
   const sent = state && Array.isArray(state.services) ? state : null;
   return (
     <div className={`${styles.page} ${styles.sent}`}>
-      <span className={styles.sentIcon} aria-hidden="true">
-        <Check size={34} strokeWidth={3} />
+      <span className={styles.sentIcon}>
+        <SuccessCheck size={72} />
       </span>
       <h1 className={styles.sentTitle}>{t(sent?.confirmed ? 'booking.sent.confirmedTitle' : 'booking.sent.title')}</h1>
       <p className={styles.sentBody}>{t(sent?.confirmed ? 'booking.sent.confirmedBody' : 'booking.sent.body')}</p>

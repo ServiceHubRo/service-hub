@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useLiveSearchParams } from '../../../app/useLiveSearchParams';
 import { Banner } from '../../../components/Banner';
+import { SuccessCheck } from '../../../components/SuccessCheck';
 import { Button } from '../../../components/Button';
 import { buttonClass } from '../../../components/buttonClass';
 import { ActiveFilters } from '../../../components/Filters';
@@ -169,7 +170,9 @@ export function ShopBookingsScreen() {
         )}
         {notice && (
           <Banner
+            key={`${notice.key}:${notice.ref}`}
             tone="info"
+            icon={<SuccessCheck size={22} />}
             action={
               <div className={styles.noticeButtons}>
                 {notice.show && (
