@@ -1,4 +1,5 @@
 import { CalendarDays, ChevronRight, Printer } from 'lucide-react';
+import { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { CountUp } from '../../../components/CountUp';
 import { Button } from '../../../components/Button';
@@ -38,9 +39,21 @@ export function TodayBoard({ data, today }: { data: ShopBookingsData; today: str
   const { t, lang } = useI18n();
   const counts = dashboardCounts(data.bookings, today);
   const schedule = todaySchedule(data.bookings, today);
-  // A request arriving live lights up its counter (src/lib/motion.ts, newRequestGlow).
+  // A request arriving live lights up the number of "Cereri noi" (src/lib/motion.ts,
+  // newRequestGlow); the number keeps counting from where it was.
   const newRequests = useBumps(counts.requests);
-  const glow = newRequests > 0 && motionOn('newRequestGlow');
+  const requestsNumber = useRef<HTMLSpanElement>(null);
+  useEffect(() => {
+    if (newRequests === 0 || !motionOn('newRequestGlow')) return;
+    requestsNumber.current?.animate(
+      [
+        { textShadow: '0 0 16px rgba(245, 165, 36, 0.95)', transform: 'scale(1.18)' },
+        { textShadow: '0 0 16px rgba(245, 165, 36, 0.95)', transform: 'none', offset: 0.3 },
+        { textShadow: '0 0 0 rgba(245, 165, 36, 0)', transform: 'none' },
+      ],
+      { duration: 2400, easing: 'ease-out' },
+    );
+  }, [newRequests]);
 
   const cards: StatCard[] = [
     { key: 'requests', labelKey: 'dash.card.requests', n: counts.requests, tone: 'amber', to: { tab: 'cereri' } },
@@ -57,7 +70,7 @@ export function TodayBoard({ data, today }: { data: ShopBookingsData; today: str
         {cards.map((c) => {
           const inner = (
             <>
-              <span className={`${styles.statNumber} ${styles[c.tone]}`}>
+              <span ref={c.key === 'requests' ? requestsNumber : undefined} className={`${styles.statNumber} ${styles[c.tone]}`}>
                 <CountUp value={c.n} />
               </span>
               <span className={styles.statLabel}>{t(c.labelKey)}</span>
@@ -68,7 +81,6 @@ export function TodayBoard({ data, today }: { data: ShopBookingsData; today: str
             <li key={c.key}>
               {c.n > 0 ? (
                 <Link to={shopBookingsLink(c.to)} className={styles.stat}>
-                  {c.key === 'requests' && glow && <span key={newRequests} className={styles.statFresh} aria-hidden="true" />}
                   {inner}
                 </Link>
               ) : (

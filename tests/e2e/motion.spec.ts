@@ -56,18 +56,19 @@ test('a favorite: the heart pops once saved, not when removed', async ({ page })
   expect(await running(save.locator('svg'))).toBe(0);
 });
 
-test('a request arriving live: the count jumps, "Cereri noi" and the card glow', async ({ page }) => {
+test('a request arriving live: the count jumps, the number of "Cereri noi" and the card glow', async ({ page }) => {
   const shopName = `Atelier Cerere ${Date.now() % 100000}`;
   const { email: shop, shopId } = await createBookableShop(shopName, ['ulei']);
   const client = await createUser('client');
   await signIn(page, shop, PASSWORD);
   await expect(page).toHaveURL(/\/s\/panou$/);
 
-  // Panou: the counter lights up when the request comes in.
+  // Panou: the number of "Cereri noi" lights up when the request comes in (not the whole box).
   await bookAs(client, shopId);
   const requests = page.getByRole('link', { name: /^\d+ Cereri noi$/ });
   await expect(requests).toContainText('1');
-  expect(await running(requests.locator('span[aria-hidden="true"]').first())).toBeGreaterThan(0);
+  expect(await running(requests.locator('span').first())).toBeGreaterThan(0);
+  expect(await running(requests)).toBe(0);
   await expect(navLink(page, /^Programări/)).toHaveAccessibleName(/1 cerere nouă/);
   await shot(page, 'motion-request-panou', name());
 
