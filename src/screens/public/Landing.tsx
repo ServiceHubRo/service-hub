@@ -187,6 +187,11 @@ export function Landing() {
                 <BadgeCheck size={30} />
               </span>
               <div>
+                <span className={styles.trustStars} aria-hidden="true">
+                  {[0, 1, 2, 3, 4].map((i) => (
+                    <Star key={i} size={20} fill="currentColor" style={{ '--i': i } as CSSProperties} />
+                  ))}
+                </span>
                 <h2 id="landing-trust" className={styles.trustTitle}>
                   {t('landing.trustTitle')}
                 </h2>

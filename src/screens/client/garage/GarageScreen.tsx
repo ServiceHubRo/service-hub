@@ -1,4 +1,4 @@
-import { Bell, Car as CarIcon, ChevronRight, FileCheck, History, Pencil, Plus } from 'lucide-react';
+import { Car as CarIcon, ChevronRight, FileCheck, History, Pencil, Plus } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { buttonClass } from '../../../components/buttonClass';
 import { Card } from '../../../components/Card';
@@ -17,6 +17,7 @@ import { lastOilChange, oilDue } from '../../../lib/oil';
 import { useLoad } from '../../../lib/useLoad';
 import { useClientBookings } from '../bookings/clientBookingsContext';
 import { carHistoryPath, carPath, carReportPath, NEW_CAR_PATH, type ReportLinkState, type VehicleHistoryLinkState } from '../paths';
+import { ExpiryRing } from './ExpiryRing';
 import styles from './garage.module.css';
 
 /**
@@ -159,41 +160,49 @@ function CarCard({
   );
 }
 
-/** "ITP: în 12 zile" — text and color together, with a bell when it needs attention. */
+/** One document: its ring, its name and when it expires, centered in a tile of its own. */
 function DocPill({ doc, date }: { doc: CarDoc; date: string | null }) {
   const { t, lang } = useI18n();
   const name = t(`doc.${doc}` as MessageKey);
-  if (!date) return <span className={styles.pillMuted}>{t('garage.notSet', { doc: name })}</span>;
+  if (!date) {
+    return (
+      <span className={styles.docTile}>
+        <ExpiryRing days={null} urgency={null} />
+        <span className={styles.docName}>{name}</span>
+        <span className={styles.docWhen}>{t('garage.when.notSet')}</span>
+      </span>
+    );
+  }
   const days = daysFromToday(date);
   const urgency = urgencyOf(days);
-  const text =
+  const when =
     days < 0
-      ? t('garage.expiredAgo', { doc: name, days: plural(lang, 'unit.days', -days) })
+      ? t('garage.when.expired', { days: plural(lang, 'unit.days', -days) })
       : days === 0
-        ? t('garage.today', { doc: name })
+        ? t('garage.when.today')
         : urgency === 'soon'
-          ? t('garage.inDays', { doc: name, days: plural(lang, 'unit.days', days) })
-          : t('garage.on', { doc: name, date: formatDayMonth(lang, date) });
-  const cls = urgency === 'expired' ? styles.pillRed : urgency === 'soon' ? styles.pillAmber : styles.pillMuted;
+          ? t('garage.when.in', { days: plural(lang, 'unit.days', days) })
+          : formatDayMonth(lang, date);
   return (
-    <span className={cls}>
-      {urgency !== 'ok' && <Bell size={13} aria-hidden="true" />}
-      {text}
+    <span className={`${styles.docTile} ${styles[`doc_${urgency}`]}`}>
+      <ExpiryRing days={days} urgency={urgency} />
+      <span className={styles.docName}>{name}</span>
+      <span className={styles.docWhen}>{when}</span>
     </span>
   );
 }
 
-/** "Schimb ulei: în octombrie" — the month only; amber within 30 days, red once the day has passed (T30). */
+/** The oil change: the month only; amber within 30 days, red once the day has passed (T30). */
 function OilPill({ due }: { due: string }) {
   const { t, lang } = useI18n();
   const days = daysFromToday(due);
   const urgency = urgencyOf(days);
   const month = formatMonthLong(lang, due);
-  const cls = urgency === 'expired' ? styles.pillRed : urgency === 'soon' ? styles.pillAmber : styles.pillMuted;
   return (
-    <span className={cls}>
-      {urgency !== 'ok' && <Bell size={13} aria-hidden="true" />}
-      {days < 0 ? t('garage.oilPast', { month }) : t('garage.oilDue', { month })}
+    <span className={`${styles.docTile} ${styles[`doc_${urgency}`]}`}>
+      <ExpiryRing days={days} urgency={urgency} />
+      <span className={styles.docName}>{t('garage.oil')}</span>
+      <span className={styles.docWhen}>{days < 0 ? t('garage.oil.past', { month }) : t('garage.oil.in', { month })}</span>
     </span>
   );
 }

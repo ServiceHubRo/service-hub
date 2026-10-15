@@ -46,6 +46,9 @@ function choice(page: Page): { day: string; time: string } {
   return { day: url.searchParams.get('zi') ?? '', time: url.searchParams.get('ora') ?? '' };
 }
 
+/** A document's tile in the Garage (ring, name, when it expires). */
+const docTile = (page: Page, name: string) => page.locator('main li li').filter({ has: page.getByText(name, { exact: true }) });
+
 test.describe('garage', () => {
   test.skip(!BACKEND, 'needs the local Supabase stack');
 
@@ -79,8 +82,8 @@ test.describe('garage', () => {
     await expect(page.getByText('1 mașină salvată')).toBeVisible();
     await expect(page.getByText('Volkswagen Golf 7')).toBeVisible();
     await expect(page.getByText('BV 12 ABC')).toBeVisible();
-    await expect(page.getByText('ITP: în 10 zile')).toBeVisible();
-    await expect(page.getByText('RCA: nesetat')).toBeVisible();
+    await expect(docTile(page, 'ITP')).toContainText('în 10 zile');
+    await expect(docTile(page, 'RCA')).toContainText('nesetat');
     await shot(page, 't07-garage', name());
 
     // Caută: the banner names the document and the car, and opens the garage.
@@ -97,7 +100,7 @@ test.describe('garage', () => {
     await expect(page.getByLabel(/Serie de șasiu/)).toHaveValue('WVWZZZAUZGW123456');
     await page.getByLabel(/RCA/).fill(inDays(-2));
     await page.getByRole('button', { name: 'Salvează' }).click();
-    await expect(page.getByText('RCA: expirat de 2 zile')).toBeVisible();
+    await expect(docTile(page, 'RCA')).toContainText('expirat de 2 zile');
     await navLink(page, 'Caută').click();
     const both = page.getByRole('link', { name: /RCA la Golf 7 a expirat acum 2 zile/ });
     await expect(both).toContainText('ITP la Golf 7 în 10 zile');

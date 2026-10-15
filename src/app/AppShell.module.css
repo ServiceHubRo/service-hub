@@ -286,3 +286,29 @@
     display: none;
   }
 }
+
+/* A tapped item gives way under the finger, and the item that becomes current pops into amber
+   (src/lib/motion.ts, tabBounce). */
+.bounce .tab svg {
+  transition: transform 0.12s ease-out;
+}
+
+.bounce .tab:active svg {
+  transform: scale(0.82);
+}
+
+.bounce .tabActive svg {
+  animation: tab-pop 0.42s cubic-bezier(0.3, 1.8, 0.5, 1);
+}
+
+@keyframes tab-pop {
+  0% {
+    transform: scale(0.82);
+  }
+  55% {
+    transform: scale(1.18) translateY(-2px);
+  }
+  100% {
+    transform: none;
+  }
+}

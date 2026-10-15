@@ -183,7 +183,7 @@ export function ClientBookingCard({
           />
           {review === 'sent' && (
             <p className={styles.reviewSent}>
-              <Star size={15} aria-hidden="true" className={styles.starFilled} />
+              {decided ? <SuccessCheck size={20} /> : <Star size={15} aria-hidden="true" className={styles.starFilled} />}
               {t('cb.review.sent')}
             </p>
           )}
@@ -229,6 +229,7 @@ export function ClientBookingCard({
           shopName={shopName}
           onSent={(r) => {
             setPanel(null);
+            setDecided(true);
             onReviewed(b.id, { id: r.id, rating: r.rating });
           }}
           onStale={onStale}

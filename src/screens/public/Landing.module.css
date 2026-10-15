@@ -1167,3 +1167,29 @@
     transform: none;
   }
 }
+
+/* ------------------------------------------------------------------ trust stars */
+/* Five stars in the trust block that light up one by one when it is reached (Eduard, 15 Oct). */
+.trustStars {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 10px;
+  color: var(--amber);
+}
+
+.page[data-motion] .trustStars svg {
+  opacity: 0.2;
+  transform: scale(0.6);
+}
+
+.page[data-motion] .trust[data-shown] .trustStars svg {
+  animation: star-on 0.45s cubic-bezier(0.3, 1.7, 0.5, 1) forwards;
+  animation-delay: calc(var(--i, 0) * 140ms + 0.35s);
+}
+
+@keyframes star-on {
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}

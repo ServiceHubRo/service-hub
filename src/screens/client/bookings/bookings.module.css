@@ -323,6 +323,37 @@
   fill: var(--amber);
 }
 
+/* Picking a mark (src/lib/motion.ts, starPop): the stars light up one after another and the one
+   tapped pops. */
+.starsLive .starOn svg {
+  animation: star-light 0.3s ease-out backwards;
+  animation-delay: calc(var(--i, 0) * 45ms);
+}
+
+.starsLive .starPicked svg {
+  animation: star-pop 0.45s cubic-bezier(0.3, 1.8, 0.5, 1) backwards;
+  animation-delay: calc(var(--i, 0) * 45ms);
+}
+
+@keyframes star-light {
+  from {
+    transform: scale(0.7);
+    fill: transparent;
+  }
+}
+
+@keyframes star-pop {
+  0% {
+    transform: scale(0.6);
+  }
+  60% {
+    transform: scale(1.3) rotate(-8deg);
+  }
+  100% {
+    transform: none;
+  }
+}
+
 .error {
   color: var(--red);
   font-size: 13px;
