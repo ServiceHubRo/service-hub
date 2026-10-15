@@ -15,6 +15,30 @@ test.beforeEach(async ({ context }) => {
   });
 });
 
+test.describe('motion on the landing page', () => {
+  // The tests run with "Reduce motion" (playwright.config.ts); here the animations are on.
+  test.use({ contextOptions: { reducedMotion: 'no-preference' } });
+
+  test('a part comes to life when it is reached; the phone plays the flow', async ({ page }) => {
+    await page.goto('/');
+    await expect(page.locator('[data-motion]')).toHaveCount(1);
+    const lastStep = page.locator('ol li').last();
+    await expect(lastStep).not.toHaveAttribute('data-shown');
+    await lastStep.evaluate((el) => el.scrollIntoView({ block: 'center' }));
+    await expect(lastStep).toHaveAttribute('data-shown', '');
+    // The demo in the phone is a running animation.
+    const accept = page.locator('[class*="mockAccept"]');
+    expect(await accept.evaluate((el) => el.getAnimations().length)).toBeGreaterThan(0);
+  });
+});
+
+test('with "Reduce motion" nothing on the landing page is hidden or moves', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+  await expect(page.locator('[data-motion]')).toHaveCount(0);
+  await expect(page.getByRole('heading', { level: 2, name: 'Patru pași' })).toHaveCSS('opacity', '1');
+});
+
 test('landing: every section, in Romanian and English, without horizontal scroll', async ({ page }) => {
   await page.goto('/');
   await expect(page).toHaveTitle('Service-Hub — programări online la service auto');
