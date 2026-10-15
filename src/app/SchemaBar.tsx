@@ -6,6 +6,9 @@ import { captureMessage, monitoringEnabled } from '../lib/monitoring';
 import { EXPECTED_SCHEMA_VERSION } from '../lib/schema';
 import styles from './SchemaBar.module.css';
 
+/** Waits before asking again when the database did not answer (ms). */
+const RETRY_MS = [1500, 4000, 10000];
+
 /**
  * Test builds: red bar when the database is not at the version this build expects (ARCHITECTURE §18),
  * or when the build cannot read it at all — then it says why (missing or wrong Netlify variables,
@@ -19,21 +22,46 @@ export function SchemaBar() {
   useEffect(() => {
     if (EXPECTED_SCHEMA_VERSION === 0 || (!IS_TEST_BUILD && !monitoringEnabled())) return;
     let cancelled = false;
-    void fetchSchemaVersion().then((result) => {
-      if (cancelled) return;
-      if (!IS_TEST_BUILD) {
-        if (result.kind === 'ok' && result.version !== EXPECTED_SCHEMA_VERSION) {
-          captureMessage(`Database schema version ${result.version}, the app expects ${EXPECTED_SCHEMA_VERSION}`, {
-            fingerprint: ['schema-version'],
-          });
+    let attempt = 0;
+    let unreachable = false;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const run = () => {
+      clearTimeout(timer);
+      void fetchSchemaVersion().then((result) => {
+        if (cancelled) return;
+        // No answer at all (the phone's network still waking up, e.g. the app opened from a
+        // notification): asked again a few times before the bar says so.
+        if (result.kind === 'error' && attempt < RETRY_MS.length) {
+          timer = setTimeout(run, RETRY_MS[attempt++]);
+          return;
         }
-        return;
-      }
-      if (result.kind !== 'ok') console.warn('schema version check:', result.detail);
-      setCheck(result);
-    });
+        if (!IS_TEST_BUILD) {
+          if (result.kind === 'ok' && result.version !== EXPECTED_SCHEMA_VERSION) {
+            captureMessage(`Database schema version ${result.version}, the app expects ${EXPECTED_SCHEMA_VERSION}`, {
+              fingerprint: ['schema-version'],
+            });
+          }
+          return;
+        }
+        if (result.kind !== 'ok') console.warn('schema version check:', result.detail);
+        unreachable = result.kind === 'error';
+        setCheck(result);
+      });
+    };
+    run();
+    // Back in the app or online again: a bar about an unreachable database is checked once more.
+    const again = () => {
+      if (!unreachable || document.visibilityState !== 'visible') return;
+      attempt = RETRY_MS.length;
+      run();
+    };
+    document.addEventListener('visibilitychange', again);
+    window.addEventListener('online', again);
     return () => {
       cancelled = true;
+      clearTimeout(timer);
+      document.removeEventListener('visibilitychange', again);
+      window.removeEventListener('online', again);
     };
   }, []);
 
