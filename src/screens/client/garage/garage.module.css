@@ -71,34 +71,74 @@
   background: var(--surface2);
 }
 
+/* The documents (and the oil change): one centered tile each, side by side in equal columns. */
 .docs {
   list-style: none;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px 14px;
-  margin-top: 10px;
-  padding-top: 10px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(68px, 1fr));
+  gap: 12px 8px;
+  margin-top: 12px;
+  padding-top: 14px;
   border-top: 1px solid var(--border);
 }
 
-.pillMuted,
-.pillAmber,
-.pillRed {
-  display: inline-flex;
+/* On a wide card the tiles stay together in the middle instead of spreading to the edges. */
+@media (min-width: 720px) {
+  .docs {
+    grid-template-columns: repeat(auto-fit, minmax(96px, 128px));
+    justify-content: center;
+  }
+}
+
+.docTile {
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 6px;
+  gap: 2px;
+  text-align: center;
   font-size: 12px;
+  line-height: 1.3;
+}
+
+.docName {
+  margin-top: 4px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.docWhen {
+  color: var(--muted);
+}
+
+.doc_soon .docWhen {
+  color: var(--amber);
+  font-weight: 700;
+}
+
+.doc_expired .docWhen {
+  color: var(--red);
+  font-weight: 700;
 }
 
 /* ---------------------------------------------------------------- time-left ring (ExpiryRing) */
 .ring {
-  flex-shrink: 0;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+}
+
+.ring svg {
+  position: absolute;
+  inset: 0;
 }
 
 .ringTrack,
 .ringArc {
   fill: none;
-  stroke-width: 3.2;
+  stroke-width: 4;
 }
 
 .ringTrack {
@@ -123,6 +163,23 @@
   stroke: var(--red);
 }
 
+.ringDays {
+  position: relative;
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+  font-variant-numeric: tabular-nums;
+}
+
+.ring_soon .ringDays {
+  color: var(--amber);
+}
+
+.ring_expired .ringDays {
+  color: var(--red);
+}
+
 .ringFill .ringArc {
   animation: ring-fill 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) 0.15s backwards;
 }
@@ -131,20 +188,6 @@
   from {
     stroke-dashoffset: 1;
   }
-}
-
-.pillMuted {
-  color: var(--muted);
-}
-
-.pillAmber {
-  color: var(--amber);
-  font-weight: 700;
-}
-
-.pillRed {
-  color: var(--red);
-  font-weight: 700;
 }
 
 /* ---------------------------------------------------------------- form */

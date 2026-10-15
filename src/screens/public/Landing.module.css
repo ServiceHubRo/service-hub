@@ -1168,40 +1168,8 @@
   }
 }
 
-/* ------------------------------------------------------------------ hero marker, trust stars */
-/* A marker line under the highlighted words of the title (drawn once at load), and five stars in
-   the trust block that light up one by one when it is reached (Eduard, 15 Oct). */
-.highlight {
-  position: relative;
-  display: inline-block;
-  isolation: isolate;
-}
-
-.highlight::after {
-  content: '';
-  position: absolute;
-  left: -2px;
-  right: -2px;
-  bottom: 0.02em;
-  height: 0.16em;
-  border-radius: 0.1em;
-  background: var(--amber);
-  opacity: 0.35;
-  z-index: -1;
-}
-
-.page[data-motion] .highlight::after {
-  transform: scaleX(0);
-  transform-origin: left;
-  animation: marker-draw 0.7s cubic-bezier(0.6, 0, 0.2, 1) 0.5s forwards;
-}
-
-@keyframes marker-draw {
-  to {
-    transform: scaleX(1);
-  }
-}
-
+/* ------------------------------------------------------------------ trust stars */
+/* Five stars in the trust block that light up one by one when it is reached (Eduard, 15 Oct). */
 .trustStars {
   display: flex;
   gap: 4px;
