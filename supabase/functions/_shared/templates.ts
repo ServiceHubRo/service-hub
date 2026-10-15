@@ -139,6 +139,10 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
       title: 'Ai primit un raport gratuit',
       body: 'Un prieten invitat de tine a terminat prima lucrare. Ai un raport de istoric gratuit, pentru oricare mașină din Garaj.',
     },
+    'client.report_credit_admin': {
+      title: 'Ai primit un raport gratuit',
+      body: 'Ai un raport de istoric gratuit, pentru oricare mașină din Garaj.',
+    },
     'client.area_launched': {
       title: 'Service-Hub este disponibil în zona ta',
       body: 'De azi te poți programa online la service-urile din {area}. Caută unul aproape de tine.',
@@ -406,6 +410,10 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
     'client.report_credit': {
       title: 'You got a free report',
       body: 'A friend you invited finished their first job. You have a free history report for any car in your Garage.',
+    },
+    'client.report_credit_admin': {
+      title: 'You got a free report',
+      body: 'You have a free history report for any car in your Garage.',
     },
     'client.area_launched': {
       title: 'Service-Hub is now available in your area',
@@ -845,6 +853,9 @@ export function templateKey(side: Side, e: NotificationEvent, now: Date = new Da
       return p.final === true || !str(p.expiry) ? `${base}_final` : base;
     case 'referral_reward':
       return p.kind === 'stripe_credit' ? `${base}_credit` : base;
+    // Given by the admin rather than earned by inviting friends.
+    case 'report_credit':
+      return p.source === 'admin' ? `${base}_admin` : base;
     case 'shop_inactive':
       return p.reason === 'payment_failed'
         ? `${base}_payment`

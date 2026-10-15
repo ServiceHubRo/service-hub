@@ -234,6 +234,16 @@ describe('app emails', () => {
     expect(ro.html).toContain('https://app.ro/c/cont/rapoarte');
     const en = emailForEvent({ event: 'report_credit', lang: 'en', role: 'client', params: {} } as never, 'https://app.ro')!;
     expect(en.subject).toBe('You got a free report');
+    expect(ro.text).toContain('Un prieten invitat de tine');
+  });
+
+  it('a free report given by the admin: the same email, without the friend', () => {
+    const ro = emailForEvent({ event: 'report_credit', lang: 'ro', role: 'client', params: { source: 'admin' } } as never, 'https://app.ro')!;
+    expect(ro.subject).toBe('Ai primit un raport gratuit');
+    expect(ro.text).toContain('Folosește raportul gratuit');
+    expect(ro.text).not.toContain('prieten');
+    const en = emailForEvent({ event: 'report_credit', lang: 'en', role: 'client', params: { source: 'admin' } } as never, 'https://app.ro')!;
+    expect(en.text).not.toContain('friend');
   });
 
   it("sends the admin a morning email with only what waits", () => {

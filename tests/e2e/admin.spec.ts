@@ -323,6 +323,50 @@ test.describe('admin', () => {
     expect(log.map((l) => l.action).sort()).toEqual(['delete_account', 'suspend_account', 'unsuspend_account']);
   });
 
+  test('a client: a free history report, told by push and email, in the log; the client sees it', async ({ page, browser }) => {
+    const client = await createUser('client');
+    const clientId = await userIdOf(client);
+    await signInAdmin(page);
+    await navLink(page, /^Clienți/).click();
+    await page.getByLabel('Caută după nume, email, telefon sau C-00001').fill(client);
+    await page.getByRole('link', { name: new RegExp(client.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')) }).click();
+    await expect(page.getByText('disponibile: 0 · folosite: 0')).toBeVisible();
+
+    // An inline confirmation first; "Renunță" gives nothing.
+    await page.getByRole('button', { name: 'Dă un raport gratuit' }).click();
+    await expect(page.getByText('Clientul primește un raport de istoric fără plată')).toBeVisible();
+    await expectNoHorizontalScroll(page);
+    await shot(page, 'admin-free-report', name());
+    await page.getByRole('button', { name: 'Renunță' }).click();
+    await page.getByRole('button', { name: 'Dă un raport gratuit' }).click();
+    await page.getByRole('button', { name: 'Dă raportul' }).click();
+    await expect(page.getByRole('status').filter({ hasText: 'Raportul gratuit este dat. Clientul este anunțat.' })).toBeVisible();
+    await expect(page.getByText('disponibile: 1 · folosite: 0')).toBeVisible();
+    await expect(page.getByRole('listitem').filter({ hasText: 'Raport gratuit dat' })).toBeVisible();
+    await shot(page, 'admin-free-report-done', name());
+
+    const credits = await serviceRest<{ source: string; used_at: string | null }[]>(
+      `report_credits?client_id=eq.${clientId}&select=source,used_at`,
+      'GET',
+    );
+    expect(credits).toEqual([{ source: 'admin', used_at: null }]);
+    const told = await serviceRest<{ channels: string[]; params: { source?: string } }[]>(
+      `notification_events?user_id=eq.${clientId}&event=eq.report_credit&select=channels,params`,
+      'GET',
+    );
+    expect(told).toEqual([{ channels: ['push', 'email'], params: { source: 'admin' } }]);
+
+    // The client: one free report in "Rapoartele mele", with no mention of friends.
+    const context = await browser.newContext();
+    await context.addInitScript(() => localStorage.setItem('sh_lang', 'ro'));
+    const clientPage = await context.newPage();
+    await signIn(clientPage, client, PASSWORD);
+    await expect(clientPage).toHaveURL(/\/c\/cauta/);
+    await clientPage.goto('/c/cont/rapoarte');
+    await expect(clientPage.getByText('Ai 1 raport gratuit. Alege mașina mai jos.')).toBeVisible();
+    await context.close();
+  });
+
   test('only the admin reaches the admin screens', async ({ page }) => {
     await signIn(page, SEED.client, SEED_PASSWORD);
     await expect(page).toHaveURL(/\/c\/cauta/);

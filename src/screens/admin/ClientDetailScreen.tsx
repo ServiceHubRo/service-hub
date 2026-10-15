@@ -8,7 +8,7 @@ import { LoadError } from '../../components/LoadError';
 import { SkeletonList } from '../../components/Skeleton';
 import { Stars } from '../../components/Stars';
 import { StatusBadge } from '../../components/StatusBadge';
-import { deleteAccount, fetchClient, setAccountSuspended } from '../../data/admin';
+import { deleteAccount, fetchClient, grantReportCredit, setAccountSuspended } from '../../data/admin';
 import { canRetryRpc, rpcErrorMessage, toRpcError } from '../../data/rpc';
 import { useI18n } from '../../i18n/context';
 import { NO_SHOW_FLAG } from '../../lib/admin';
@@ -20,11 +20,11 @@ import { useLiveData } from './useLiveData';
 import { carText, dateTime, day } from './format';
 import styles from './admin.module.css';
 
-type Panel = 'suspend' | 'delete' | null;
+type Panel = 'suspend' | 'delete' | 'report' | null;
 
 /**
  * One client for the admin (FR §5.3, P20): profile, cars, bookings, reviews and conversations
- * (read-only), the audit entries; suspend / reactivate and delete. Live.
+ * (read-only), the audit entries; suspend / reactivate, a free history report, delete. Live.
  */
 export function ClientDetailScreen() {
   const { clientId = '' } = useParams();
@@ -84,6 +84,10 @@ export function ClientDetailScreen() {
             [t('admin.created'), dateTime(lang, p.created_at)],
             [t('admin.lastActiveLabel'), p.last_active_at ? dateTime(lang, p.last_active_at) : t('admin.never')],
             [t('admin.clients.noShowsLabel'), c.no_shows],
+            [
+              t('admin.client.freeReports'),
+              t('admin.client.freeReportsValue', { available: c.report_credits.available, used: c.report_credits.used }),
+            ],
             [t('admin.terms'), p.terms_version],
           ]}
         />
@@ -116,6 +120,11 @@ export function ClientDetailScreen() {
             ) : (
               <Button onClick={() => setPanel('suspend')}>{t('admin.client.suspend')}</Button>
             )}
+            {!p.suspended && (
+              <Button variant="secondary" onClick={() => setPanel('report')}>
+                {t('admin.client.giveReport')}
+              </Button>
+            )}
             <Button variant="danger" onClick={() => setPanel('delete')}>
               {t('admin.client.delete')}
             </Button>
@@ -133,6 +142,18 @@ export function ClientDetailScreen() {
             onConfirm={async (reason, requestId) => {
               await setAccountSuspended(p.id, true, reason, requestId);
               done(t('admin.done.suspendedAccount'));
+            }}
+            onCancel={() => setPanel(null)}
+          />
+        )}
+        {panel === 'report' && (
+          <ConfirmPanel
+            title={t('admin.client.giveReport')}
+            body={t('admin.client.giveReportBody')}
+            confirmLabel={t('admin.client.giveReportConfirm')}
+            onConfirm={async (_text, requestId) => {
+              await grantReportCredit(p.id, requestId);
+              done(t('admin.done.reportCredit'));
             }}
             onCancel={() => setPanel(null)}
           />
