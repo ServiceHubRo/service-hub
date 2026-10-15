@@ -10,6 +10,7 @@ import { IN_ANDROID_APP, watchKeyboard } from '../lib/keyboard';
 import { motionOn } from '../lib/motion';
 import { IS_NATIVE } from '../lib/native';
 import { useScreenSlide } from '../lib/screenSlide';
+import { useBumps } from '../lib/useBumps';
 import { useOptionalAdminCounts } from '../screens/admin/adminContext';
 import { ADMIN_MODERATION_PATH } from '../screens/admin/paths';
 import { useOptionalClientBookings } from '../screens/client/bookings/clientBookingsContext';
@@ -30,14 +31,19 @@ import { useSession } from './sessionContext';
 import { useDocumentTitle } from './useDocumentTitle';
 import styles from './AppShell.module.css';
 
-/** The item's icon with its count bubble (the count is read out after the label). */
+/**
+ * The item's icon with its count bubble (the count is read out after the label). The bubble jumps
+ * when the count grows (src/lib/motion.ts, badgePop).
+ */
 function NavIcon({ item, size, badge }: { item: NavItem; size: number; badge: number }) {
   const Icon = item.icon;
+  const bumps = useBumps(badge);
   if (badge <= 0) return <Icon size={size} aria-hidden="true" />;
+  const pop = bumps > 0 && motionOn('badgePop');
   return (
     <span className={styles.iconWrap}>
       <Icon size={size} aria-hidden="true" />
-      <span className={styles.badge} aria-hidden="true">
+      <span key={bumps} className={`${styles.badge} ${pop ? styles.badgePop : ''}`} aria-hidden="true">
         {badge > 99 ? '99+' : badge}
       </span>
     </span>

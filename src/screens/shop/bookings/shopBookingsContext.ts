@@ -11,6 +11,8 @@ export interface ShopBookingsValue {
   refresh: () => void;
   /** Puts a booking an RPC returned into the list at once (a finished one leaves it). */
   apply: (row: Booking) => void;
+  /** Whether a request arrived live in the last two minutes (it glows: motion newRequestGlow). */
+  isFresh: (bookingId: string) => boolean;
 }
 
 export const ShopBookingsContext = createContext<ShopBookingsValue | null>(null);

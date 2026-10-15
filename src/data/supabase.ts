@@ -1,5 +1,5 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
-import { authStorage } from '../lib/remember';
+import { sessionStorageForAuth } from '../lib/remember';
 import { checkSupabaseConfig } from '../lib/supabaseConfig';
 import type { Database } from './database.types';
 
@@ -34,14 +34,15 @@ export function takeAuthLinkError(): string | null {
  * Null when they are missing or malformed (e.g. a local build without .env) so the shell still renders.
  *
  * Email links use the implicit flow (tokens in the address), so a confirmation link opened on
- * another device or browser still works. The session is stored where "Ține-mă minte" says.
+ * another device or browser still works. The session is stored where "Ține-mă minte" says (in the
+ * phone app, in the phone's own storage).
  */
 export const supabase: SupabaseClient<Database> | null =
   supabaseConfig.ok
     ? createClient<Database>(supabaseConfig.url, supabaseConfig.key, {
         auth: {
           flowType: 'implicit',
-          storage: authStorage,
+          storage: sessionStorageForAuth,
           persistSession: true,
           autoRefreshToken: true,
           detectSessionInUrl: true,

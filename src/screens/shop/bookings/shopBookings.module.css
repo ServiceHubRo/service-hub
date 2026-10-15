@@ -55,6 +55,39 @@
   gap: 10px;
 }
 
+/* A request that arrived live (src/lib/motion.ts, newRequestGlow): it comes in from above and an
+   amber glow around it fades. */
+.fresh {
+  animation:
+    request-in 0.4s cubic-bezier(0.2, 0.8, 0.2, 1),
+    request-glow 2.6s ease-out;
+}
+
+@keyframes request-in {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes request-glow {
+  0%,
+  25% {
+    box-shadow:
+      0 0 0 2px var(--amber),
+      0 0 22px var(--amber-line);
+  }
+  100% {
+    box-shadow:
+      0 0 0 2px transparent,
+      0 0 22px transparent;
+  }
+}
+
 .top {
   display: flex;
   align-items: flex-start;

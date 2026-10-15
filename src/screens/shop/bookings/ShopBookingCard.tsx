@@ -25,6 +25,7 @@ import { isUnclaimedWalkIn, type ShopBooking } from '../../../data/shopBookings'
 import { useI18n } from '../../../i18n/context';
 import { daysFromToday, formatDate, formatMoney, formatTime, ymdInBucharest } from '../../../i18n/format';
 import { rowServicesText } from '../../../lib/bookingServices';
+import { motionOn } from '../../../lib/motion';
 import { slotStarted } from '../../../lib/shopBookings';
 import { formatPhone, normalizePhone } from '../../../lib/validators';
 import { ConfirmPanel, ReasonPanel } from './BookingPanels';
@@ -49,6 +50,8 @@ export interface ShopBookingCardProps {
   fee: number;
   expiryDays: number;
   now: Date;
+  /** A request that just arrived live: it slides in with an amber glow that fades. */
+  fresh?: boolean;
   /** An action went through: the booking as the database returned it. */
   onDone: (before: ShopBooking, after: Booking) => void;
   /** The booking changed under this card (another device, the client): read the list again. */
@@ -61,7 +64,7 @@ export interface ShopBookingCardProps {
  * actions the status allows. Every action opens inside the card (no dialogs) and goes through a
  * database function; the buttons only mirror what the database allows.
  */
-export function ShopBookingCard({ booking: b, shopId, fee, expiryDays, now, onDone, onStale }: ShopBookingCardProps) {
+export function ShopBookingCard({ booking: b, shopId, fee, expiryDays, now, fresh = false, onDone, onStale }: ShopBookingCardProps) {
   const { t, lang } = useI18n();
   const offerText = useOfferText();
   const [panel, setPanel] = useState<PanelKind | null>(null);
@@ -88,7 +91,10 @@ export function ShopBookingCard({ booking: b, shopId, fee, expiryDays, now, onDo
   const walkIn = isUnclaimedWalkIn(b);
 
   return (
-    <Card highlight={b.status === 'pending'} className={styles.card}>
+    <Card
+      highlight={b.status === 'pending'}
+      className={`${styles.card} ${fresh && motionOn('newRequestGlow') ? styles.fresh : ''}`}
+    >
       <div className={styles.top}>
         <ServiceIcon name={b.service_icon} className={styles.icon} />
         <div className={styles.what}>
