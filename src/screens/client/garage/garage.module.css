@@ -86,8 +86,51 @@
 .pillRed {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
   font-size: 12px;
+}
+
+/* ---------------------------------------------------------------- time-left ring (ExpiryRing) */
+.ring {
+  flex-shrink: 0;
+}
+
+.ringTrack,
+.ringArc {
+  fill: none;
+  stroke-width: 3.2;
+}
+
+.ringTrack {
+  stroke: var(--border);
+}
+
+.ringArc {
+  stroke-linecap: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: var(--left);
+}
+
+.ring_ok .ringArc {
+  stroke: var(--green);
+}
+
+.ring_soon .ringArc {
+  stroke: var(--amber);
+}
+
+.ring_expired .ringArc {
+  stroke: var(--red);
+}
+
+.ringFill .ringArc {
+  animation: ring-fill 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) 0.15s backwards;
+}
+
+@keyframes ring-fill {
+  from {
+    stroke-dashoffset: 1;
+  }
 }
 
 .pillMuted {

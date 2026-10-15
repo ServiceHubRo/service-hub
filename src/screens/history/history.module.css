@@ -289,3 +289,76 @@
   align-items: center;
   gap: 6px;
 }
+
+/* ---------------------------------------------------------------- timeline (a car's history) */
+/* A line down the left, a point beside each job's card (timeline.ts). */
+.timeline {
+  position: relative;
+  padding-left: 22px;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 6px;
+  top: 18px;
+  bottom: 18px;
+  width: 2px;
+  border-radius: 1px;
+  background: var(--border-lit);
+  transform-origin: top;
+}
+
+.timeline > li {
+  position: relative;
+}
+
+.timeline > li::before {
+  content: '';
+  position: absolute;
+  left: -21px;
+  top: 16px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--bg);
+  border: 2px solid var(--amber);
+}
+
+.timeline > li:first-child::before {
+  background: var(--amber);
+}
+
+/* Opening the screen: the line grows down, each point and card come in as it reaches them. */
+.timelineGrow::before {
+  animation: line-down 0.9s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+.timelineGrow > li::before {
+  animation: point-in 0.4s cubic-bezier(0.3, 1.7, 0.5, 1) both;
+  animation-delay: calc(var(--i, 0) * 110ms + 0.15s);
+}
+
+.timelineGrow > li {
+  animation: job-in 0.45s ease-out both;
+  animation-delay: calc(var(--i, 0) * 110ms + 0.1s);
+}
+
+@keyframes line-down {
+  from {
+    transform: scaleY(0);
+  }
+}
+
+@keyframes point-in {
+  from {
+    transform: scale(0);
+  }
+}
+
+@keyframes job-in {
+  from {
+    opacity: 0;
+    transform: translateX(10px);
+  }
+}

@@ -7,6 +7,7 @@ import { useI18n } from '../i18n/context';
 import { plural, type PluralUnit } from '../i18n/translate';
 import { quotesWaiting } from '../lib/clientBookings';
 import { IN_ANDROID_APP, watchKeyboard } from '../lib/keyboard';
+import { motionOn } from '../lib/motion';
 import { IS_NATIVE } from '../lib/native';
 import { useScreenSlide } from '../lib/screenSlide';
 import { useOptionalAdminCounts } from '../screens/admin/adminContext';
@@ -215,7 +216,7 @@ export function AppShell({ role }: { role: Role }) {
         </main>
       </div>
 
-      <nav className={styles.bottomBar} aria-label={t('nav.main')} data-fixed-bottom>
+      <nav className={`${styles.bottomBar} ${motionOn('tabBounce') ? styles.bounce : ''}`} aria-label={t('nav.main')} data-fixed-bottom>
         {nav.bottomBar.map((item) => {
           return (
             <NavLink

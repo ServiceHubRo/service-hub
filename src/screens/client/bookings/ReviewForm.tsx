@@ -1,5 +1,5 @@
 import { Star } from 'lucide-react';
-import { useId, useState } from 'react';
+import { useId, useState, type CSSProperties } from 'react';
 import { ActionButton } from '../../../components/ActionButton';
 import { Button } from '../../../components/Button';
 import { InlinePanel } from '../../../components/InlinePanel';
@@ -7,6 +7,7 @@ import { TextArea } from '../../../components/TextArea';
 import { canRetryRpc, rpcErrorMessage, submitReview, toRpcError, type Review } from '../../../data/rpc';
 import { useI18n } from '../../../i18n/context';
 import type { Msg } from '../../../i18n/translate';
+import { motionOn } from '../../../lib/motion';
 import styles from './bookings.module.css';
 
 const REVIEW_MAX = 2000;
@@ -58,7 +59,7 @@ export function ReviewForm({
           {t('cb.review.rating')}
         </span>
         <div
-          className={styles.stars}
+          className={motionOn('starPop') ? `${styles.stars} ${styles.starsLive}` : styles.stars}
           role="group"
           aria-labelledby={labelId}
           aria-describedby={error ? errorId : undefined}
@@ -67,7 +68,8 @@ export function ReviewForm({
             <button
               key={n}
               type="button"
-              className={`${styles.star} ${n <= rating ? styles.starOn : ''}`}
+              className={`${styles.star} ${n <= rating ? styles.starOn : ''} ${n === rating ? styles.starPicked : ''}`}
+              style={{ '--i': n - 1 } as CSSProperties}
               aria-pressed={n === rating}
               aria-label={t('cb.review.star', { n })}
               onClick={() => {

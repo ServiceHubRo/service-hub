@@ -17,6 +17,7 @@ import { useLoad } from '../../../lib/useLoad';
 import { useShopBookings } from '../bookings/shopBookingsContext';
 import { SHOP_HISTORY_PATH, shopBookingsLink, type VehicleFileFrom } from '../paths';
 import history from '../../history/history.module.css';
+import { timelineClass, timelineItem } from '../../history/timeline';
 import styles from './vehicleFile.module.css';
 
 /**
@@ -122,9 +123,9 @@ export function VehicleFileScreen({ from }: { from: VehicleFileFrom }) {
         {file.own.length === 0 ? (
           <p className={history.muted}>{t('vf.ownEmpty')}</p>
         ) : (
-          <ul className={history.list}>
-            {file.own.map((job) => (
-              <li key={job.id}>
+          <ul className={timelineClass()}>
+            {file.own.map((job, i) => (
+              <li key={job.id} style={timelineItem(i)}>
                 <JobCard job={job} own={job} currentClient={file.client_name} />
               </li>
             ))}
@@ -145,9 +146,9 @@ export function VehicleFileScreen({ from }: { from: VehicleFileFrom }) {
             {file.others.length === 0 ? (
               <p className={history.muted}>{t('vf.othersEmpty')}</p>
             ) : (
-              <ul className={history.list}>
-                {file.others.map((job) => (
-                  <li key={job.id}>
+              <ul className={timelineClass()}>
+                {file.others.map((job, i) => (
+                  <li key={job.id} style={timelineItem(i)}>
                     <JobCard job={job} />
                   </li>
                 ))}

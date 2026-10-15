@@ -33,6 +33,7 @@ import {
   type VehicleHistoryLinkState,
 } from '../paths';
 import styles from '../../history/history.module.css';
+import { timelineClass, timelineItem } from '../../history/timeline';
 
 /**
  * The history of one car (FR §3.6, P16c): the car, how many jobs and how much was spent, then every
@@ -162,9 +163,9 @@ export function VehicleHistoryScreen() {
       ) : (
         <>
           {jobs.length > 0 && (
-            <ul className={styles.list}>
-              {jobs.map((b) => (
-                <li key={b.id}>
+            <ul className={timelineClass()}>
+              {jobs.map((b, i) => (
+                <li key={b.id} style={timelineItem(i)}>
                   <JobCard booking={b} open={open.has(b.id)} onToggle={() => toggle(b.id)} />
                 </li>
               ))}
@@ -172,9 +173,9 @@ export function VehicleHistoryScreen() {
           )}
           {imported.length > 0 && (
             <>
-              <ul className={styles.list}>
-                {imported.map((j) => (
-                  <li key={j.id}>
+              <ul className={timelineClass()}>
+                {imported.map((j, i) => (
+                  <li key={j.id} style={timelineItem(jobs.length + i)}>
                     <ImportedCard job={j} />
                   </li>
                 ))}

@@ -1,4 +1,4 @@
-import { Bell, Car as CarIcon, ChevronRight, FileCheck, History, Pencil, Plus } from 'lucide-react';
+import { Car as CarIcon, ChevronRight, FileCheck, History, Pencil, Plus } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { buttonClass } from '../../../components/buttonClass';
 import { Card } from '../../../components/Card';
@@ -17,6 +17,7 @@ import { lastOilChange, oilDue } from '../../../lib/oil';
 import { useLoad } from '../../../lib/useLoad';
 import { useClientBookings } from '../bookings/clientBookingsContext';
 import { carHistoryPath, carPath, carReportPath, NEW_CAR_PATH, type ReportLinkState, type VehicleHistoryLinkState } from '../paths';
+import { ExpiryRing } from './ExpiryRing';
 import styles from './garage.module.css';
 
 /**
@@ -159,7 +160,7 @@ function CarCard({
   );
 }
 
-/** "ITP: în 12 zile" — text and color together, with a bell when it needs attention. */
+/** "ITP: în 12 zile" — text and color together, with a ring of the time left (ExpiryRing). */
 function DocPill({ doc, date }: { doc: CarDoc; date: string | null }) {
   const { t, lang } = useI18n();
   const name = t(`doc.${doc}` as MessageKey);
@@ -177,7 +178,7 @@ function DocPill({ doc, date }: { doc: CarDoc; date: string | null }) {
   const cls = urgency === 'expired' ? styles.pillRed : urgency === 'soon' ? styles.pillAmber : styles.pillMuted;
   return (
     <span className={cls}>
-      {urgency !== 'ok' && <Bell size={13} aria-hidden="true" />}
+      <ExpiryRing days={days} urgency={urgency} />
       {text}
     </span>
   );
@@ -192,7 +193,7 @@ function OilPill({ due }: { due: string }) {
   const cls = urgency === 'expired' ? styles.pillRed : urgency === 'soon' ? styles.pillAmber : styles.pillMuted;
   return (
     <span className={cls}>
-      {urgency !== 'ok' && <Bell size={13} aria-hidden="true" />}
+      <ExpiryRing days={days} urgency={urgency} />
       {days < 0 ? t('garage.oilPast', { month }) : t('garage.oilDue', { month })}
     </span>
   );
