@@ -8,7 +8,7 @@ import { SkeletonList } from '../../../components/Skeleton';
 import { fetchCars, fetchOilStandard, type Car } from '../../../data/garage';
 import { fetchMyImportedJobsQuietly } from '../../../data/myImported';
 import { useI18n } from '../../../i18n/context';
-import { daysFromToday, formatDayMonth, formatMonthLong } from '../../../i18n/format';
+import { daysFromToday, formatDayMonth, formatMonthShortYear } from '../../../i18n/format';
 import type { MessageKey } from '../../../i18n/ro';
 import { plural } from '../../../i18n/translate';
 import { CAR_DOCS, urgencyOf, type CarDoc } from '../../../lib/expiry';
@@ -197,7 +197,8 @@ function OilPill({ due }: { due: string }) {
   const { t, lang } = useI18n();
   const days = daysFromToday(due);
   const urgency = urgencyOf(days);
-  const month = formatMonthLong(lang, due);
+  // Short, so the tile keeps to one line: „oct.”, „sept. 2027”.
+  const month = formatMonthShortYear(lang, due);
   return (
     <span className={`${styles.docTile} ${styles[`doc_${urgency}`]}`}>
       <ExpiryRing days={days} urgency={urgency} />
