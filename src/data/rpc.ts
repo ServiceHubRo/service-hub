@@ -1,3 +1,4 @@
+import { Capacitor } from '@capacitor/core';
 import type { Database, Json } from './database.types';
 import { NO_OFFERS, type NamedServiceRef, type ShopOffers } from '../lib/offers';
 import { reportSessionLost } from './sessionEvents';
@@ -294,6 +295,7 @@ export function failure(error: unknown, where?: string): RpcError {
 
 /** Whether this device still holds the session (no token is read out, only its state). */
 function storedSessionState(): string {
+  if (Capacitor.isNativePlatform() && rememberMe()) return 'kept in the phone storage';
   try {
     const key = Object.keys(localStorage).concat(Object.keys(sessionStorage)).find((k) => /^sb-.+-auth-token$/.test(k));
     const raw = key ? authStorage.getItem(key) : null;

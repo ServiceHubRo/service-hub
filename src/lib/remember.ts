@@ -1,3 +1,5 @@
+import { Capacitor } from '@capacitor/core';
+import { Preferences } from '@capacitor/preferences';
 import { sessionStore, storage } from './storage';
 
 /**
@@ -38,6 +40,58 @@ export const authStorage = {
     sessionStore.remove(key);
   },
 };
+
+/** The phone's own storage; on failure, what the web storage gives (`fallback`). */
+async function native<T>(fn: () => Promise<T>, fallback: () => T): Promise<T> {
+  try {
+    return await fn();
+  } catch {
+    return fallback();
+  }
+}
+
+/**
+ * In the phone app (T20) a remembered session lives in the phone's own storage (Capacitor
+ * Preferences) instead of the app's localStorage. Android writes the WebView's localStorage to disk
+ * only seconds after a change, so closing the app from the recent apps soon after Supabase renewed
+ * the session lost the new tokens; at the next start the old refresh token, already used, was
+ * refused and the user was signed out (Eduard, 15 Oct). Unticked "Ține-mă minte" stays in
+ * sessionStorage, as on the web. A session an older version left in localStorage moves over at
+ * the first read.
+ */
+export const nativeAuthStorage = {
+  async getItem(key: string): Promise<string | null> {
+    if (!rememberMe()) return sessionStore.get(key);
+    const legacy = storage.get(key);
+    const kept = await native(async () => (await Preferences.get({ key })).value, () => legacy);
+    if (kept !== null) return kept;
+    if (legacy !== null) {
+      await native(() => Preferences.set({ key, value: legacy }).then(() => storage.remove(key)), () => undefined);
+    }
+    return legacy;
+  },
+  async setItem(key: string, value: string): Promise<void> {
+    if (!rememberMe()) {
+      sessionStore.set(key, value);
+      storage.remove(key);
+      await native(() => Preferences.remove({ key }), () => undefined);
+      return;
+    }
+    await native(
+      () => Preferences.set({ key, value }).then(() => storage.remove(key)),
+      () => storage.set(key, value),
+    );
+    sessionStore.remove(key);
+  },
+  async removeItem(key: string): Promise<void> {
+    storage.remove(key);
+    sessionStore.remove(key);
+    await native(() => Preferences.remove({ key }), () => undefined);
+  },
+};
+
+/** Where the Supabase client keeps the session: the phone's storage in the app, else the web's. */
+export const sessionStorageForAuth = Capacitor.isNativePlatform() ? nativeAuthStorage : authStorage;
 
 export function markSeen(now: number = Date.now()): void {
   storage.set(LAST_SEEN_KEY, String(now));
