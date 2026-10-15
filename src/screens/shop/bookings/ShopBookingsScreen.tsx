@@ -80,7 +80,7 @@ function doneMessage(before: BookingStatus, after: BookingStatus, moved: boolean
  */
 export function ShopBookingsScreen() {
   const { t, lang } = useI18n();
-  const { state, reload, refresh, apply } = useShopBookings();
+  const { state, reload, refresh, apply, isFresh } = useShopBookings();
   const [params, setParams] = useLiveSearchParams();
   const now = useNow();
   const today = ymdInBucharest(now);
@@ -223,6 +223,7 @@ export function ShopBookingsScreen() {
                   fee={data.shop.inspection_fee}
                   expiryDays={data.quote_expiry_days}
                   now={now}
+                  fresh={isFresh(b.id)}
                   onDone={onDone}
                   onStale={refresh}
                 />

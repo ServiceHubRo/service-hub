@@ -21,6 +21,12 @@ export const MOTION = {
   emptyDrawings: true,
   /** The car's history: the timeline grows down and its points appear in turn. */
   historyTimeline: true,
+  /** A shop saved to favorites: the heart pops and a ring spreads from it. */
+  favoritePop: true,
+  /** A count on the tab bar (messages, requests, quotes) gives a small jump when it grows. */
+  badgePop: true,
+  /** A request that arrives live at the shop slides in with an amber glow that fades. */
+  newRequestGlow: true,
 } as const;
 
 /** The phone or computer asks for less motion (Accessibility → Reduce motion). */

@@ -185,6 +185,29 @@
   text-decoration: none;
 }
 
+/* "Cereri noi" when a request arrives live (src/lib/motion.ts, newRequestGlow). */
+.statFresh {
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  pointer-events: none;
+  animation: stat-glow 2.6s ease-out forwards;
+}
+
+@keyframes stat-glow {
+  0%,
+  25% {
+    box-shadow:
+      0 0 0 2px var(--amber),
+      0 0 22px var(--amber-line);
+  }
+  100% {
+    box-shadow:
+      0 0 0 2px transparent,
+      0 0 22px transparent;
+  }
+}
+
 a.stat:hover {
   border-color: var(--border-lit);
 }

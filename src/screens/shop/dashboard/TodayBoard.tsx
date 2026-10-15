@@ -10,7 +10,9 @@ import { formatDate } from '../../../i18n/format';
 import type { MessageKey } from '../../../i18n/ro';
 import { plural } from '../../../i18n/translate';
 import { rowServicesText } from '../../../lib/bookingServices';
+import { motionOn } from '../../../lib/motion';
 import { dashboardCounts, todaySchedule, type ShopFilter, type ShopTab } from '../../../lib/shopBookings';
+import { useBumps } from '../../../lib/useBumps';
 import { formatPhone } from '../../../lib/validators';
 import { shopBookingsLink } from '../paths';
 import styles from './Dashboard.module.css';
@@ -36,6 +38,9 @@ export function TodayBoard({ data, today }: { data: ShopBookingsData; today: str
   const { t, lang } = useI18n();
   const counts = dashboardCounts(data.bookings, today);
   const schedule = todaySchedule(data.bookings, today);
+  // A request arriving live lights up its counter (src/lib/motion.ts, newRequestGlow).
+  const newRequests = useBumps(counts.requests);
+  const glow = newRequests > 0 && motionOn('newRequestGlow');
 
   const cards: StatCard[] = [
     { key: 'requests', labelKey: 'dash.card.requests', n: counts.requests, tone: 'amber', to: { tab: 'cereri' } },
@@ -63,6 +68,7 @@ export function TodayBoard({ data, today }: { data: ShopBookingsData; today: str
             <li key={c.key}>
               {c.n > 0 ? (
                 <Link to={shopBookingsLink(c.to)} className={styles.stat}>
+                  {c.key === 'requests' && glow && <span key={newRequests} className={styles.statFresh} aria-hidden="true" />}
                   {inner}
                 </Link>
               ) : (
