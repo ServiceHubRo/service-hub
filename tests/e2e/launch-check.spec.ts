@@ -134,16 +134,17 @@ test('the browser console cannot change what the database protects', async () =>
 
 test('loading shows three skeleton cards, never the empty state first', async ({ page }) => {
   const email = await createUser('client');
-  await signIn(page, email, PASSWORD);
-  await expect(page).toHaveURL(/\/c\/cauta$/);
-
-  // The bookings answer is held back, as on a slow connection.
+  // The bookings answer is held back, as on a slow connection. Held from the start: the client's
+  // bookings are read once the account opens, often before Caută has finished appearing.
   let release: () => void = () => {};
   const held = new Promise<void>((resolve) => (release = resolve));
   await page.route('**/rest/v1/bookings?*', async (route) => {
     await held;
     await route.continue();
   });
+  await signIn(page, email, PASSWORD);
+  await expect(page).toHaveURL(/\/c\/cauta$/);
+
   await page.getByRole('link', { name: 'Programări', exact: true }).filter({ visible: true }).first().click();
   await expect(page.getByRole('heading', { level: 1, name: 'Programări' })).toBeVisible();
   const skeleton = page.locator('main [aria-busy="true"]');
