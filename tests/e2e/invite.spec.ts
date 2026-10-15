@@ -224,7 +224,7 @@ test.describe('invite a friend', () => {
     // ------------------------------------------------------------ the free report
     await page.getByRole('link', { name: 'Alege mașina' }).click();
     await expect(page.getByRole('heading', { level: 1, name: 'Rapoartele mele' })).toBeVisible();
-    await expect(page.getByText('Ai 1 raport gratuit de la prietenii invitați. Alege mașina mai jos.')).toBeVisible();
+    await expect(page.getByText('Ai 1 raport gratuit. Alege mașina mai jos.')).toBeVisible();
     await page.goto(`/c/programari/${ownJob}/raport`);
     await expect(page.getByText('Raport gratuit', { exact: true })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Plătește 29 lei' })).toBeVisible();
@@ -237,7 +237,7 @@ test.describe('invite a friend', () => {
     const reportCard = page.locator('main li').first();
     await expect(reportCard).toContainText('Gata', { timeout: 30_000 });
     await expect(reportCard.locator('.mono').filter({ hasText: /^SH-\d{4}-\d{6}$/ })).toBeVisible();
-    await expect(page.getByText(/de la prietenii invitați/)).toHaveCount(0);
+    await expect(page.getByText(/Alege mașina mai jos/)).toHaveCount(0);
     await shot(page, 'invite-report-done', name());
 
     const [credit] = await serviceRest<{ used_at: string | null; report_id: string | null }[]>(

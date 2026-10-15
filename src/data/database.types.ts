@@ -392,6 +392,7 @@ export type Database = {
           client_id: string
           code: string
           created_at: string
+          credit_id: string | null
           decided_at: string | null
           fingerprints: string[]
           referrer_id: string | null
@@ -403,6 +404,7 @@ export type Database = {
           client_id: string
           code: string
           created_at?: string
+          credit_id?: string | null
           decided_at?: string | null
           fingerprints?: string[]
           referrer_id?: string | null
@@ -414,6 +416,7 @@ export type Database = {
           client_id?: string
           code?: string
           created_at?: string
+          credit_id?: string | null
           decided_at?: string | null
           fingerprints?: string[]
           referrer_id?: string | null
@@ -433,6 +436,13 @@ export type Database = {
             columns: ["client_id"]
             isOneToOne: true
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_referrals_credit_id_fkey"
+            columns: ["credit_id"]
+            isOneToOne: false
+            referencedRelation: "report_credits"
             referencedColumns: ["id"]
           },
           {
@@ -1470,6 +1480,7 @@ export type Database = {
           id: string
           referral_client_id: string | null
           report_id: string | null
+          source: string
           used_at: string | null
         }
         Insert: {
@@ -1478,6 +1489,7 @@ export type Database = {
           id?: string
           referral_client_id?: string | null
           report_id?: string | null
+          source?: string
           used_at?: string | null
         }
         Update: {
@@ -1486,6 +1498,7 @@ export type Database = {
           id?: string
           referral_client_id?: string | null
           report_id?: string | null
+          source?: string
           used_at?: string | null
         }
         Relationships: [
@@ -2845,6 +2858,10 @@ export type Database = {
       admin_get_client: { Args: { p_user_id: string }; Returns: Json }
       admin_get_shop: { Args: { p_shop_id: string }; Returns: Json }
       admin_get_thread: { Args: { p_thread_id: string }; Returns: Json }
+      admin_grant_report_credit: {
+        Args: { p_request_id: string; p_user_id: string }
+        Returns: Json
+      }
       admin_list_audit: {
         Args: { p_before?: string; p_limit?: number }
         Returns: Json
@@ -4173,6 +4190,7 @@ export type Database = {
           role: string
           season_reminders: boolean
           service_reminders: boolean
+          share_history: boolean
           suspended: boolean
           terms_accepted_at: string | null
           terms_version: string | null
@@ -4206,6 +4224,7 @@ export type Database = {
           role: string
           season_reminders: boolean
           service_reminders: boolean
+          share_history: boolean
           suspended: boolean
           terms_accepted_at: string | null
           terms_version: string | null
@@ -4241,6 +4260,7 @@ export type Database = {
           role: string
           season_reminders: boolean
           service_reminders: boolean
+          share_history: boolean
           suspended: boolean
           terms_accepted_at: string | null
           terms_version: string | null

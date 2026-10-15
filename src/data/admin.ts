@@ -313,6 +313,8 @@ export interface AdminClientDetail {
     created_at: string;
   }[];
   threads: { id: string; shop_id: string; shop_name: string; last_message_at: string | null; messages: number }[];
+  /** History reports without paying: from inviting friends or given by the admin. */
+  report_credits: { available: number; used: number };
   audit: AuditEntry[];
 }
 
@@ -555,6 +557,11 @@ export function setAccountSuspended(userId: string, suspended: boolean, reason: 
     p_reason: reason,
     p_request_id: requestId,
   });
+}
+
+/** One free history report for a client (report_credits), told by push and email. */
+export function grantReportCredit(userId: string, requestId: string): Promise<Json> {
+  return call('admin_grant_report_credit', { p_user_id: userId, p_request_id: requestId });
 }
 
 export type ShopEdit = Partial<Record<keyof AdminShop, string | number | null>>;

@@ -237,6 +237,15 @@ describe('notification texts', () => {
       tag: 'report_credit',
     });
     expect(render('report_credit', 'client', 'en')!.title).toBe('You got a free report');
+    // Given by the admin: no friend in the sentence.
+    expect(render('report_credit', 'client', 'ro', { source: 'admin' })).toMatchObject({
+      title: 'Ai primit un raport gratuit',
+      body: 'Ai un raport de istoric gratuit, pentru oricare mașină din Garaj.',
+      url: '/c/cont/rapoarte',
+    });
+    expect(render('report_credit', 'client', 'en', { source: 'admin' })!.body).toBe(
+      'You have a free history report for any car in your Garage.',
+    );
     expect(render('favorite_offer', 'client', 'ro')).toMatchObject({
       title: 'Atelier Unu',
       body: 'Atelier Unu îți oferă 15% reducere la manoperă la prima programare.',

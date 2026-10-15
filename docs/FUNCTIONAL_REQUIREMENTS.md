@@ -239,7 +239,7 @@ Admin has a separate login route. No public link to it. Every admin action is wr
 ### 5.3 Clients
 - Searchable list: account ID, name, email, phone, verified, created, bookings count, no-show count.
 - Detail: profile, cars, bookings, reviews, messages (read-only).
-- Actions: suspend / unsuspend, delete.
+- Actions: suspend / unsuspend, give a free history report (the client is told by push and email; not counted in the invitations' yearly limit), delete. The detail shows the free reports available and used.
 
 ### 5.4 Bookings
 - All bookings, filter by status / shop / client / date range. Detail with quote and thread.

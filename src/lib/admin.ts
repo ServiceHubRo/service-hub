@@ -132,6 +132,7 @@ export const AUDIT_ACTIONS = [
   'auto_no_trial',
   'update_shop',
   'extend_trial',
+  'grant_report_credit',
   'set_subscription_status',
   'keep_review',
   'remove_review',
