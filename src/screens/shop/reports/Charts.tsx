@@ -1,7 +1,8 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import { useI18n } from '../../../i18n/context';
 import { formatCompactAmount, formatMoney, formatMonthShort, formatMonthYear } from '../../../i18n/format';
 import { plural } from '../../../i18n/translate';
+import { motionOn } from '../../../lib/motion';
 import type { MonthRevenue, ServiceRow } from '../../../lib/shopReports';
 import styles from './reports.module.css';
 
@@ -40,9 +41,11 @@ export function MonthlyChart({ months, currentMonth }: { months: MonthRevenue[];
   const barWidth = Math.min(40, slot * 0.64);
   const area = CHART_HEIGHT - TOP - BOTTOM;
   const small = slot < 34;
+  // The bars grow from the axis one after another, then their figures appear (src/lib/motion.ts).
+  const grow = motionOn('countUp');
 
   return (
-    <div ref={ref} className={styles.chart}>
+    <div ref={ref} className={grow ? `${styles.chart} ${styles.grow}` : styles.chart}>
       {width > 0 && (
         <svg width={width} height={CHART_HEIGHT} aria-hidden="true" className={styles.chartSvg}>
           <line x1={0} x2={width} y1={TOP + area + 0.5} y2={TOP + area + 0.5} className={styles.axis} />
@@ -51,7 +54,7 @@ export function MonthlyChart({ months, currentMonth }: { months: MonthRevenue[];
             const h = max > 0 ? Math.max(m.revenue > 0 ? 3 : 0, (m.revenue / max) * area) : 0;
             const current = m.month === currentMonth;
             return (
-              <g key={m.month}>
+              <g key={m.month} style={{ '--i': i } as CSSProperties}>
                 {h > 0 && (
                   <rect x={cx - barWidth / 2} y={TOP + area - h} width={barWidth} height={h} rx={3} className={styles.bar} />
                 )}
@@ -100,7 +103,13 @@ export function MonthlyChart({ months, currentMonth }: { months: MonthRevenue[];
 export function Meter({ share, tone = 'amber' }: { share: number; tone?: 'amber' | 'green' | 'red' | 'blue' }) {
   const pct = Math.max(0, Math.min(1, share)) * 100;
   return (
-    <svg width="100%" height={8} className={styles.meter} aria-hidden="true" preserveAspectRatio="none">
+    <svg
+      width="100%"
+      height={8}
+      className={motionOn('countUp') ? `${styles.meter} ${styles.grow}` : styles.meter}
+      aria-hidden="true"
+      preserveAspectRatio="none"
+    >
       <rect x={0} y={0} width="100%" height={8} rx={4} className={styles.track} />
       {pct > 0 && <rect x={0} y={0} width={`${pct}%`} height={8} rx={4} className={styles[tone]} />}
     </svg>

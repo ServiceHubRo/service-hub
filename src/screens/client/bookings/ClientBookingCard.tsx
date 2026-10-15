@@ -2,6 +2,7 @@ import { History, MessageSquare, Phone, RotateCcw, Star } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ActionButton } from '../../../components/ActionButton';
+import { BookingProgress } from '../../../components/BookingProgress';
 import { Button } from '../../../components/Button';
 import { buttonClass } from '../../../components/buttonClass';
 import { calendarMenuItems } from '../../../components/calendarMenu';
@@ -12,6 +13,7 @@ import { useOfferText } from '../../../lib/useOfferText';
 import { InlinePanel } from '../../../components/InlinePanel';
 import { ServiceIcon } from '../../../components/ServiceIcon';
 import { StatusBadge } from '../../../components/StatusBadge';
+import { SuccessCheck } from '../../../components/SuccessCheck';
 import { quoteOf, type ClientBooking } from '../../../data/bookings';
 import {
   cancelBooking,
@@ -80,12 +82,15 @@ export function ClientBookingCard({
   const review = reviewState(b, b.review !== null, reviewWindowDays, now);
   const [panel, setPanel] = useState<'cancel' | 'review' | null>(() => (openReview && review === 'open' ? 'review' : null));
   const shopName = b.shop?.name ?? '';
+  // Just decided here: the outcome comes with a check that draws itself (src/lib/motion.ts).
+  const [decided, setDecided] = useState(false);
 
   /** Runs one RPC; an outdated card makes the list reload. */
   async function act(run: () => Promise<Booking>): Promise<void> {
     try {
       const row = await run();
       setPanel(null);
+      setDecided(true);
       onDone(row);
     } catch (e) {
       if (STALE.has(toRpcError(e).code)) onStale();
@@ -122,11 +127,12 @@ export function ClientBookingCard({
         {b.status === 'done' && b.odometer !== null && <span className="mono"> · {formatKm(lang, b.odometer)}</span>}
         {car && <span className={styles.muted}> · {car}</span>}
       </p>
+      {b.status !== 'done' && <BookingProgress status={b.status} />}
       {b.note && <p className={styles.note}>{b.note}</p>}
       {b.offer_percent !== null && !OFFER_GONE.has(b.status) && <OfferNote>{offerText.promise('client', b.offer_percent, b.offer_kind)}</OfferNote>}
       {b.loyalty_percent !== null && !OFFER_GONE.has(b.status) && <OfferNote>{t('loyalty.client', { n: b.loyalty_percent })}</OfferNote>}
 
-      <StatusDetail booking={b} quote={quote} now={now} />
+      <StatusDetail booking={b} quote={quote} now={now} decided={decided} />
       {b.status === 'quote_sent' && quote && (
         // A replaced quote starts with every line ticked again.
         <QuoteDecision key={quote.id} bookingId={b.id} quote={quote} act={act} />
@@ -275,7 +281,17 @@ function DecidedLines({ quote }: { quote: Quote }) {
 }
 
 /** What the status means right now (P15 "Status display for the client"). */
-function StatusDetail({ booking: b, quote, now }: { booking: ClientBooking; quote: Quote | null; now: Date }) {
+function StatusDetail({
+  booking: b,
+  quote,
+  now,
+  decided,
+}: {
+  booking: ClientBooking;
+  quote: Quote | null;
+  now: Date;
+  decided: boolean;
+}) {
   const { t, lang } = useI18n();
   /** `09:20`, or `Lun 13 oct, 09:20` when it was not today. */
   const at = (iso: string | null) => {
@@ -306,10 +322,13 @@ function StatusDetail({ booking: b, quote, now }: { booking: ClientBooking; quot
       return (
         <>
           <DecidedLines quote={quote} />
-          <p className={styles.ok}>
-            {quote.status === 'partially_accepted'
-              ? t('cb.approvedPartial', { n: accepted, total: quote.items.length, amount })
-              : t('cb.approved', { amount })}
+          <p className={decided ? `${styles.ok} ${styles.okFresh}` : styles.ok}>
+            {decided && <SuccessCheck size={30} />}
+            <span>
+              {quote.status === 'partially_accepted'
+                ? t('cb.approvedPartial', { n: accepted, total: quote.items.length, amount })
+                : t('cb.approved', { amount })}
+            </span>
           </p>
         </>
       );

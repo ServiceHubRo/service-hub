@@ -1,5 +1,6 @@
 import { CalendarDays, ChevronRight, Printer } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { CountUp } from '../../../components/CountUp';
 import { Button } from '../../../components/Button';
 import { EmptyState } from '../../../components/EmptyState';
 import { StatusBadge } from '../../../components/StatusBadge';
@@ -51,7 +52,9 @@ export function TodayBoard({ data, today }: { data: ShopBookingsData; today: str
         {cards.map((c) => {
           const inner = (
             <>
-              <span className={`${styles.statNumber} ${styles[c.tone]}`}>{c.n}</span>
+              <span className={`${styles.statNumber} ${styles[c.tone]}`}>
+                <CountUp value={c.n} />
+              </span>
               <span className={styles.statLabel}>{t(c.labelKey)}</span>
               {c.n > 0 && <ChevronRight size={16} className={styles.statChevron} aria-hidden="true" />}
             </>

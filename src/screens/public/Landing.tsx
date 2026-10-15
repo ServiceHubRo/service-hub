@@ -411,13 +411,13 @@ function PhoneMockup() {
         </div>
         <div className={styles.mockSearch}>
           <Search size={15} />
-          <span>{t('landing.mock.search')}</span>
+          <span className={styles.mockTyped}>{t('landing.mock.search')}</span>
         </div>
         {[
           { name: t('landing.mock.shop1'), rating: formatRating(lang, 4.8) },
           { name: t('landing.mock.shop2'), rating: formatRating(lang, 4.6) },
         ].map((shop, i) => (
-          <div key={shop.name} className={`${styles.mockCard} ${i === 0 ? styles.mockCardLit : ''}`}>
+          <div key={shop.name} className={`${styles.mockCard} ${i === 0 ? `${styles.mockCardLit} ${styles.mockShop1}` : styles.mockShop2}`}>
             <div className={styles.mockRow}>
               <span className={styles.mockName}>{shop.name}</span>
               <span className={styles.mockRating}>
@@ -431,13 +431,13 @@ function PhoneMockup() {
             </div>
           </div>
         ))}
-        <div className={`${styles.mockCard} ${styles.mockCardLit}`}>
+        <div className={`${styles.mockCard} ${styles.mockCardLit} ${styles.mockQuote}`}>
           <span className={styles.mockPill}>{t('landing.mock.quote')}</span>
-          <div className={styles.mockLine}>
+          <div className={`${styles.mockLine} ${styles.mockLine1}`}>
             <span>{t('landing.mock.pads')}</span>
             <b>{money(280)}</b>
           </div>
-          <div className={styles.mockLine}>
+          <div className={`${styles.mockLine} ${styles.mockLine2}`}>
             <span>{t('landing.mock.labor')}</span>
             <b>{money(150)}</b>
           </div>

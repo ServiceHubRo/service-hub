@@ -311,3 +311,52 @@
 .period {
   max-width: 320px;
 }
+
+/* Opening the report (src/lib/motion.ts, countUp): the bars grow from the axis one after another,
+   their figures appear after them, and the service bars fill from the left. */
+.grow .bar {
+  transform-box: fill-box;
+  transform-origin: bottom;
+  animation: bar-grow 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  animation-delay: calc(var(--i, 0) * 45ms);
+}
+
+.grow .barValue {
+  animation: value-in 0.4s ease-out both;
+  animation-delay: calc(var(--i, 0) * 45ms + 0.55s);
+}
+
+.meter.grow rect + rect {
+  transform-box: fill-box;
+  transform-origin: left;
+  animation: meter-fill 0.8s cubic-bezier(0.2, 0.7, 0.2, 1) 0.15s both;
+}
+
+@keyframes bar-grow {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: none;
+  }
+}
+
+@keyframes value-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes meter-fill {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: none;
+  }
+}

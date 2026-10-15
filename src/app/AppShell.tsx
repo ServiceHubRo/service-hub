@@ -8,6 +8,7 @@ import { plural, type PluralUnit } from '../i18n/translate';
 import { quotesWaiting } from '../lib/clientBookings';
 import { IN_ANDROID_APP, watchKeyboard } from '../lib/keyboard';
 import { IS_NATIVE } from '../lib/native';
+import { useScreenSlide } from '../lib/screenSlide';
 import { useOptionalAdminCounts } from '../screens/admin/adminContext';
 import { ADMIN_MODERATION_PATH } from '../screens/admin/paths';
 import { useOptionalClientBookings } from '../screens/client/bookings/clientBookingsContext';
@@ -110,6 +111,8 @@ export function AppShell({ role }: { role: Role }) {
   const { pathname } = useLocation();
   const nav = NAV[role];
   const mainRef = useRef<HTMLElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+  useScreenSlide(contentRef);
   const badges = useNavBadges();
   // The tab title follows the navigation item the screen belongs to (Cont for its tiles).
   const current = [...nav.main, nav.account].find((item) => pathname === item.path || pathname.startsWith(`${item.path}/`));
@@ -202,7 +205,7 @@ export function AppShell({ role }: { role: Role }) {
         </aside>
 
         <main className={styles.main} ref={mainRef} id="continut" tabIndex={-1}>
-          <div className={styles.content}>
+          <div ref={contentRef} className={styles.content}>
             <EmailVerifyBanner role={role} />
             {role !== 'admin' && <PushBridge />}
             <ScreenErrorBoundary resetKey={pathname}>

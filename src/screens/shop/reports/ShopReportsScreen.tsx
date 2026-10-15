@@ -1,6 +1,7 @@
 import { ArrowDownRight, ArrowRight, ArrowUpRight, BarChart3, Download, Lock } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, type ReactNode } from 'react';
 import { useLiveSearchParams } from '../../../app/useLiveSearchParams';
+import { CountUp } from '../../../components/CountUp';
 import { BackLink } from '../../../components/BackLink';
 import { Button } from '../../../components/Button';
 import { Card } from '../../../components/Card';
@@ -165,18 +166,22 @@ function Reports({ data }: { data: ReportData }) {
       <section>
         <ul className={styles.stats}>
           <li className={`${styles.stat} ${styles.wide}`}>
-            <span className={`${styles.statNumber} ${styles.green}`}>{formatAmount(lang, current.revenue)}</span>
+            <span className={`${styles.statNumber} ${styles.green}`}>
+              <CountUp value={current.revenue} format={(n) => formatAmount(lang, n)} />
+            </span>
             <span className={styles.statLabel}>{t('rep.revenueUnit')}</span>
             {previous && <ChangeLine change={change(current.revenue, previous.revenue)} />}
           </li>
           <li className={styles.stat}>
-            <span className={styles.statNumber}>{current.jobs}</span>
+            <span className={styles.statNumber}>
+              <CountUp value={current.jobs} />
+            </span>
             <span className={styles.statLabel}>{t('rep.jobs')}</span>
             {previous && <ChangeLine change={change(current.jobs, previous.jobs)} />}
           </li>
           <li className={styles.stat}>
             <span className={`${styles.statNumber} ${styles.amber}`}>
-              {current.average === null ? '—' : formatAmount(lang, current.average)}
+              {current.average === null ? '—' : <CountUp value={current.average} format={(n) => formatAmount(lang, n)} />}
             </span>
             <span className={styles.statLabel}>{t('rep.averageUnit')}</span>
             {previous && current.average !== null && <ChangeLine change={change(current.average, previous.average)} />}
