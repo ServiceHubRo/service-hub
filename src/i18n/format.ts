@@ -89,6 +89,14 @@ export function formatMonthLong(lang: Lang, ymd: string, now: Date = new Date())
   return p.year !== thisYear ? `${month} ${p.year}` : month;
 }
 
+/** A month short, with the year only when it is not this one: RO `oct.`, `sept. 2027`; EN `Oct`, `Sep 2027`. */
+export function formatMonthShortYear(lang: Lang, ymd: string, now: Date = new Date()): string {
+  const p = parts(lang, dateFromYmd(ymd), { month: 'short', year: 'numeric' });
+  const thisYear = parts(lang, now, { year: 'numeric' }).year;
+  const month = lang === 'en' ? capitalize(p.month ?? '') : (p.month ?? '');
+  return p.year !== thisYear ? `${month} ${p.year}` : month;
+}
+
 /** A closed period: `20 oct – 22 oct`, or one day `20 oct`. */
 export function formatDateRange(lang: Lang, start: string, end: string, now: Date = new Date()): string {
   return start === end ? formatDayMonth(lang, start, now) : `${formatDayMonth(lang, start, now)} – ${formatDayMonth(lang, end, now)}`;

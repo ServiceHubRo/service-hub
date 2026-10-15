@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
-import { formatMonthLong, ymdInBucharest } from '../../src/i18n/format';
+import { formatMonthShortYear, ymdInBucharest } from '../../src/i18n/format';
 import { addMonths } from '../../src/lib/oil';
 import {
   BACKEND,
@@ -267,7 +267,7 @@ test.describe('client reminders', () => {
 
     await expect(page).toHaveURL(/\/c\/garaj$/);
     const pill = page.locator('main li li').filter({ has: page.getByText('Schimb ulei', { exact: true }) });
-    await expect(pill).toContainText(`în ${formatMonthLong('ro', addMonths(lastDay, 6))}`);
+    await expect(pill).toContainText(`în ${formatMonthShortYear('ro', addMonths(lastDay, 6))}`);
     await expectNoHorizontalScroll(page);
     await shot(page, 't30-garage-oil', name());
     const [saved] = await serviceRest<{ oil_change_months: number; last_oil_change: string }[]>(
@@ -280,7 +280,7 @@ test.describe('client reminders', () => {
     await serviceRest(`profiles?id=eq.${owner}`, 'PATCH', { lang: 'en' });
     await page.reload();
     await expect(page.locator('main li li').filter({ has: page.getByText('Oil change', { exact: true }) })).toContainText(
-      `in ${formatMonthLong('en', addMonths(lastDay, 6))}`,
+      `in ${formatMonthShortYear('en', addMonths(lastDay, 6))}`,
     );
     await page.getByRole('link', { name: 'Edit Dacia Logan' }).click();
     await expect(page.getByRole('combobox', { name: 'Change the oil every' })).toHaveValue('6');
