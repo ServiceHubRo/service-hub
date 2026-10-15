@@ -11,6 +11,16 @@ export const MOTION = {
   countUp: true,
   /** The next screen slides in over the one before, as on an iPhone. */
   screenSlide: true,
+  /** The Garage's ITP / RCA / rovinietă rings fill to the days left. */
+  expiryRings: true,
+  /** A tapped bottom-bar icon gives a small bounce. */
+  tabBounce: true,
+  /** The review stars light up one after another; the tapped one pops. */
+  starPop: true,
+  /** The empty screens' line drawings draw themselves. */
+  emptyDrawings: true,
+  /** The car's history: the timeline grows down and its points appear in turn. */
+  historyTimeline: true,
 } as const;
 
 /** The phone or computer asks for less motion (Accessibility → Reduce motion). */
