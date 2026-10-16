@@ -60,7 +60,7 @@ Ordinea contează: fiecare sarcină se sprijină pe cele de dinainte. Sarcinile 
 | T32 | Zone și constatare tehnică | „În curând și în zona ta” cu email la pornire, Admin → Zone, „Constatare tehnică” la programare |
 | T33 | Prețul de lansare pe oraș | Primele service-uri din fiecare oraș (numărul îl setează adminul) plătesc prețul de lansare și primesc insigna „Partener fondator” |
 | T34 | Oferte: termen, servicii, zile liniștite | Oferta pentru clienți noi cu dată de sfârșit și servicii alese, reducere în zilele mai liniștite, filtrul „Doar cu ofertă” |
-| T37 | Garanție, listă de așteptare, variante la deviz | Garanția lucrării cu reminder (T37a); „Anunță-mă dacă se eliberează un loc” (T37b); piesă originală sau alternativă în deviz (T37c) |
+| T37 | Garanție, listă de așteptare, variante la deviz | Garanția lucrării (T37a); „Anunță-mă dacă se eliberează un loc” (T37b); piesă originală sau alternativă în deviz (T37c) |
 
 ---
 
@@ -1031,9 +1031,9 @@ Cerut de Eduard (16 oct), din propunerile pentru funcții noi. Împărțit în t
 
 **Unde se vede:** pe programarea finalizată a clientului, în istoricul mașinii și în previzualizarea raportului („Garanție 12 luni, până la 16 oct 2027”, verde, cu scut; după încheiere „Garanția s-a încheiat pe …”, gri), în Istoricul service-ului și în raportul PDF, ca rând sub lucrare („Garanție 12 luni, până la 27.09.2027”).
 
-**Reminderul:** cu 30 de zile înainte de încheiere, clientul primește o singură dată un push „Garanția se încheie pe {data}”, cu lucrarea, service-ul și mașina. Apăsat, duce la mașina din Garaj. Pleacă dimineața la 10, cu celelalte remindere, doar dacă reminderele de service sunt pornite în Cont (`send_warranty_reminders`, `client_reminders.kind = 'warranty'`).
+**Fără reminder** (Eduard, 16 oct): prima variantă trimitea un push cu 30 de zile înainte de încheiere; l-am scos cu migrarea `remove_warranty_reminder` (schema 76), garanția rămâne doar afișată.
 
-Migrarea `job_warranty` (`schema_version` = 75). Teste: `tests/sql/124_job_warranty.sql`, `tests/e2e/job-flow.spec.ts` (garanția la finalizare și pe cardul clientului), unit pentru notificare și pentru rândul din raport. Fără pachete noi.
+Migrările `job_warranty` (`schema_version` = 75) și `remove_warranty_reminder` (76). Teste: `tests/sql/124_job_warranty.sql`, `tests/e2e/job-flow.spec.ts` (garanția la finalizare și pe cardul clientului), unit pentru rândul din raport. Fără pachete noi.
 
 ### T37b — „Anunță-mă dacă se eliberează un loc”
 

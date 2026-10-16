@@ -4557,7 +4557,6 @@ export type Database = {
       }
       send_tire_season_reminders: { Args: { p_now?: string }; Returns: number }
       send_trial_warnings: { Args: { p_now?: string }; Returns: number }
-      send_warranty_reminders: { Args: { p_today?: string }; Returns: number }
       send_welcome_tips: { Args: { p_now?: string }; Returns: number }
       service_names: { Args: { p_ids: string[] }; Returns: Json }
       services_label: {

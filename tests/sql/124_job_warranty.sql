@@ -1,6 +1,6 @@
 -- The warranty on a job (T37a): given at Finalizare (1–60 months, from today in Bucharest), kept on
--- the booking where only complete_job writes it, in the history report and the shop's Istoric, and
--- remembered to the client once, 30 days before it ends.
+-- the booking where only complete_job writes it, in the history report and the shop's Istoric. No
+-- reminder before it ends (Eduard).
 begin;
 select test.make_world();
 
@@ -49,29 +49,7 @@ select test.ok(public.report_jobs(test.id('client_a'), public.vehicle_key(
   @> jsonb_build_array(jsonb_build_object('id', current_setting('test.j1'), 'warranty_months', 12)),
   'the history report carries it');
 
--- ------------------------------------------------------------------ the reminder
-delete from public.notification_events;
--- j1's warranty ends in 20 days, j2 got one that ended yesterday.
-update public.bookings set warranty_until = test.today() + 20 where id = current_setting('test.j1')::uuid;
-update public.bookings set warranty_months = 1, warranty_until = test.today() - 1 where id = current_setting('test.j2')::uuid;
-select test.eq(public.send_warranty_reminders(test.today()), 1, 'one warranty ends within 30 days');
-select test.eq(public.send_warranty_reminders(test.today()), 0, 'told once');
-select test.eq(count(*), 1::bigint, 'to the client, with the shop and the day')
-from public.notification_events
-where user_id = test.id('client_a') and event = 'warranty_ending' and booking_id = current_setting('test.j1')::uuid
-  and params->>'until' = (test.today() + 20)::text and params->>'shop_name' is not null;
-
--- More than 30 days left: not yet. Service reminders off in Cont: never.
-select set_config('test.j3', pg_temp.job('BV 03 GAR', '12:00')::text, true);
-select test.login(test.id('owner1'));
-select public.complete_job(current_setting('test.j3')::uuid, 70000, gen_random_uuid(), p_warranty_months => 6);
-select test.logout();
-select test.eq(public.send_warranty_reminders(test.today()), 0, 'six months left: nothing yet');
-update public.bookings set warranty_until = test.today() + 10 where id = current_setting('test.j3')::uuid;
-update public.profiles set service_reminders = false where id = test.id('client_a');
-select test.eq(public.send_warranty_reminders(test.today()), 0, 'reminders off: nothing');
-update public.profiles set service_reminders = true where id = test.id('client_a');
-select test.eq(public.send_warranty_reminders(test.today()), 1, 'back on: told');
-select test.ok(public.is_quiet_event('warranty_ending'), 'it waits for the morning (quiet hours)');
+select test.eq(to_regprocedure('public.send_warranty_reminders(date)'), null::regprocedure, 'no warranty reminder (Eduard)');
+select test.ok(not public.is_quiet_event('warranty_ending'), 'nor its event');
 
 rollback;
