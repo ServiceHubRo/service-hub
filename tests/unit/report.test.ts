@@ -100,6 +100,23 @@ describe('report texts and formats', () => {
   });
 });
 
+describe('the warranty line (T37a)', () => {
+  it('names the months and the last day, in both languages', async () => {
+    const { reportWarranty } = await import('../../supabase/functions/_shared/report');
+    expect(reportWarranty('ro', { warranty_months: 12, warranty_until: '2027-09-27' })).toBe('Garanție 12 luni, până la 27.09.2027');
+    expect(reportWarranty('ro', { warranty_months: 1, warranty_until: '2026-10-27' })).toBe('Garanție 1 lună, până la 27.10.2026');
+    expect(reportWarranty('ro', { warranty_months: 24, warranty_until: '2028-09-27' })).toBe('Garanție 24 de luni, până la 27.09.2028');
+    expect(reportWarranty('en', { warranty_months: 6, warranty_until: '2027-03-27' })).toBe('Warranty 6 months, until 03/27/2027');
+    expect(reportWarranty('ro', { warranty_months: null, warranty_until: null })).toBe('');
+  });
+
+  it('fits in the job row of the PDF', async () => {
+    const d = data();
+    d.jobs = [{ ...d.jobs[0]!, warranty_months: 12, warranty_until: '2027-08-12' }, d.jobs[1]!];
+    expect((await PDFDocument.load(await renderReportPdf(lib, d))).getPageCount()).toBe(1);
+  });
+});
+
 describe('the PDF', () => {
   it('is a real A4 PDF with the fonts embedded, the code and the car', async () => {
     const bytes = await renderReportPdf(lib, data());

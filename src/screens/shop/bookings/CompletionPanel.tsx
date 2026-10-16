@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Checkbox } from '../../../components/Checkbox';
 import { Field } from '../../../components/Field';
+import { SelectField } from '../../../components/SelectField';
 import { TextArea } from '../../../components/TextArea';
 import { completeJob, lastOdometerForBooking, rpcErrorMessage, toRpcError, type Booking } from '../../../data/rpc';
 import type { ShopBooking } from '../../../data/shopBookings';
 import { useI18n } from '../../../i18n/context';
-import type { Msg } from '../../../i18n/translate';
+import { plural, type Msg } from '../../../i18n/translate';
 import { formatKm } from '../../../i18n/format';
 import { parsePriceBani, priceText } from '../../../lib/quoteDraft';
 import { useLoad } from '../../../lib/useLoad';
@@ -14,12 +15,16 @@ import { Panel, PanelButtons } from './BookingPanels';
 import styles from './shopBookings.module.css';
 
 const WORK_MAX = 4000;
+/** The warranty a shop can give on the work, in months (T37a). */
+const WARRANTY_MONTHS = [1, 3, 6, 12, 24, 36];
 
 /**
  * Finalizare (P15, P15d, FR §4.2): the odometer reading is required — km beside the field, numeric
  * keyboard, the last known reading for this plate shown under it. Lower than that is refused and
  * names it; more than 50 000 km above it needs an explicit tick. Work and cost start from the lines
- * the client approved and stay editable. The database applies the same rules (`complete_job`).
+ * the client approved and stay editable. A warranty (1–36 months) may be given on the work; the
+ * client sees it in the car's history and the report. The database applies the same rules
+ * (`complete_job`).
  */
 export function CompletionPanel({
   booking,
@@ -44,6 +49,7 @@ export function CompletionPanel({
   const [cost, setCost] = useState(() =>
     quote?.total_approved !== null && quote?.total_approved !== undefined ? priceText(quote.total_approved, decimal) : '',
   );
+  const [warranty, setWarranty] = useState('');
   const [jumpOk, setJumpOk] = useState(false);
   // The server found the same reading on a job from another day: shown until the shop confirms it.
   const [same, setSame] = useState<number | null>(null);
@@ -88,7 +94,14 @@ export function CompletionPanel({
     try {
       await act(() =>
         completeJob(
-          { bookingId: booking.id, odometer: check.km, work: work.trim() || undefined, cost: costValue, confirmJump: jumpOk },
+          {
+            bookingId: booking.id,
+            odometer: check.km,
+            work: work.trim() || undefined,
+            cost: costValue,
+            confirmJump: jumpOk,
+            warrantyMonths: warranty ? Number(warranty) : undefined,
+          },
           requestId,
         ),
       );
@@ -189,6 +202,15 @@ export function CompletionPanel({
           setCost(e.target.value);
           setCostError(null);
         }}
+      />
+      <SelectField
+        label={t('sb.complete.warranty')}
+        value={warranty}
+        options={[
+          { value: '', label: t('sb.complete.warrantyNone') },
+          ...WARRANTY_MONTHS.map((n) => ({ value: String(n), label: plural(lang, 'unit.months', n) })),
+        ]}
+        onChange={(e) => setWarranty(e.target.value)}
       />
       <PanelButtons
         label={t('sb.complete.submit')}

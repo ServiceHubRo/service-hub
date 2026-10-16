@@ -454,6 +454,8 @@ export const ro = {
   'unit.months.one': '{n} lună',
   'unit.months.few': '{n} luni',
   'unit.months.other': '{n} de luni',
+  'warranty.until': 'Garanție {months}, până la {date}',
+  'warranty.ended': 'Garanția s-a încheiat pe {date}',
   'unit.hours.one': '{n} oră',
   'unit.hours.few': '{n} ore',
   'unit.hours.other': '{n} de ore',
@@ -857,6 +859,7 @@ export const ro = {
   'rpcError.too_soon': 'Programările se fac cu cel puțin {hours} înainte. Alege altă oră.',
   'rpcError.work_too_long': 'Descrierea lucrării este prea lungă.',
   'rpcError.wrong_status': 'Programarea s-a schimbat între timp.',
+  'rpcError.warranty_invalid': 'Alege o garanție între 1 și 60 de luni.',
 
   // Shop settings, Panou checklist, staff invitations (T05)
   'account.tile.settings': 'Setări service',
@@ -1298,6 +1301,8 @@ export const ro = {
   'sb.complete.workHint': 'Vizibil pentru client.',
   'sb.complete.cost': 'Cost total, lei (opțional)',
   'sb.complete.costHint': 'Modifică suma dacă diferă de totalul acceptat.',
+  'sb.complete.warranty': 'Garanție',
+  'sb.complete.warrantyNone': 'Fără garanție',
   'sb.complete.submit': 'Confirmă finalizarea',
   'unit.km': 'km',
   'invite.title': 'Invitație în echipă',

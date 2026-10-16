@@ -33,6 +33,9 @@ export interface ShopHistoryItem {
   odometer: number | null;
   work: string | null;
   cost: number | null;
+  /** The warranty on the work (T37a), when the shop gave one. */
+  warranty_months?: number | null;
+  warranty_until?: string | null;
   done_at: string | null;
   cancelled_by: 'client' | 'shop' | 'admin' | null;
   cancel_reason: string | null;

@@ -191,6 +191,8 @@ export type Database = {
           status: string
           status_changed_at: string
           updated_at: string
+          warranty_months: number | null
+          warranty_until: string | null
           work: string | null
         }
         Insert: {
@@ -236,6 +238,8 @@ export type Database = {
           status?: string
           status_changed_at?: string
           updated_at?: string
+          warranty_months?: number | null
+          warranty_until?: string | null
           work?: string | null
         }
         Update: {
@@ -281,6 +285,8 @@ export type Database = {
           status?: string
           status_changed_at?: string
           updated_at?: string
+          warranty_months?: number | null
+          warranty_until?: string | null
           work?: string | null
         }
         Relationships: [
@@ -2845,6 +2851,8 @@ export type Database = {
           status: string
           status_changed_at: string
           updated_at: string
+          warranty_months: number | null
+          warranty_until: string | null
           work: string | null
         }
         SetofOptions: {
@@ -3112,6 +3120,8 @@ export type Database = {
           status: string
           status_changed_at: string
           updated_at: string
+          warranty_months: number | null
+          warranty_until: string | null
           work: string | null
         }
         SetofOptions: {
@@ -3212,6 +3222,7 @@ export type Database = {
           p_cost?: number
           p_odometer: number
           p_request_id: string
+          p_warranty_months?: number
           p_work?: string
         }
         Returns: {
@@ -3257,6 +3268,8 @@ export type Database = {
           status: string
           status_changed_at: string
           updated_at: string
+          warranty_months: number | null
+          warranty_until: string | null
           work: string | null
         }
         SetofOptions: {
@@ -3311,6 +3324,8 @@ export type Database = {
           status: string
           status_changed_at: string
           updated_at: string
+          warranty_months: number | null
+          warranty_until: string | null
           work: string | null
         }
         SetofOptions: {
@@ -3377,6 +3392,8 @@ export type Database = {
           status: string
           status_changed_at: string
           updated_at: string
+          warranty_months: number | null
+          warranty_until: string | null
           work: string | null
         }
         SetofOptions: {
@@ -3462,6 +3479,8 @@ export type Database = {
           status: string
           status_changed_at: string
           updated_at: string
+          warranty_months: number | null
+          warranty_until: string | null
           work: string | null
         }
         SetofOptions: {
@@ -3516,6 +3535,8 @@ export type Database = {
           status: string
           status_changed_at: string
           updated_at: string
+          warranty_months: number | null
+          warranty_until: string | null
           work: string | null
         }
         SetofOptions: {
@@ -3763,6 +3784,8 @@ export type Database = {
           status: string
           status_changed_at: string
           updated_at: string
+          warranty_months: number | null
+          warranty_until: string | null
           work: string | null
         }
         SetofOptions: {
@@ -3817,6 +3840,8 @@ export type Database = {
           status: string
           status_changed_at: string
           updated_at: string
+          warranty_months: number | null
+          warranty_until: string | null
           work: string | null
         }
         SetofOptions: {
@@ -3880,6 +3905,8 @@ export type Database = {
           status: string
           status_changed_at: string
           updated_at: string
+          warranty_months: number | null
+          warranty_until: string | null
           work: string | null
         }
         SetofOptions: {
@@ -4084,6 +4111,8 @@ export type Database = {
           status: string
           status_changed_at: string
           updated_at: string
+          warranty_months: number | null
+          warranty_until: string | null
           work: string | null
         }
         SetofOptions: {
@@ -4329,6 +4358,8 @@ export type Database = {
           status: string
           status_changed_at: string
           updated_at: string
+          warranty_months: number | null
+          warranty_until: string | null
           work: string | null
         }
         SetofOptions: {
@@ -4491,6 +4522,8 @@ export type Database = {
           status: string
           status_changed_at: string
           updated_at: string
+          warranty_months: number | null
+          warranty_until: string | null
           work: string | null
         }
         SetofOptions: {
@@ -4524,6 +4557,7 @@ export type Database = {
       }
       send_tire_season_reminders: { Args: { p_now?: string }; Returns: number }
       send_trial_warnings: { Args: { p_now?: string }; Returns: number }
+      send_warranty_reminders: { Args: { p_today?: string }; Returns: number }
       send_welcome_tips: { Args: { p_now?: string }; Returns: number }
       service_names: { Args: { p_ids: string[] }; Returns: Json }
       services_label: {
@@ -4579,6 +4613,8 @@ export type Database = {
           status: string
           status_changed_at: string
           updated_at: string
+          warranty_months: number | null
+          warranty_until: string | null
           work: string | null
         }
         SetofOptions: {
@@ -4649,6 +4685,8 @@ export type Database = {
           status: string
           status_changed_at: string
           updated_at: string
+          warranty_months: number | null
+          warranty_until: string | null
           work: string | null
         }
         SetofOptions: {
@@ -4717,6 +4755,8 @@ export type Database = {
           status: string
           status_changed_at: string
           updated_at: string
+          warranty_months: number | null
+          warranty_until: string | null
           work: string | null
         }
         SetofOptions: {
@@ -4776,6 +4816,8 @@ export type Database = {
           status: string
           status_changed_at: string
           updated_at: string
+          warranty_months: number | null
+          warranty_until: string | null
           work: string | null
         }
         SetofOptions: {
@@ -4909,6 +4951,8 @@ export type Database = {
           status: string
           status_changed_at: string
           updated_at: string
+          warranty_months: number | null
+          warranty_until: string | null
           work: string | null
         }
         SetofOptions: {
@@ -4963,6 +5007,8 @@ export type Database = {
           status: string
           status_changed_at: string
           updated_at: string
+          warranty_months: number | null
+          warranty_until: string | null
           work: string | null
         }
         SetofOptions: {
@@ -5134,6 +5180,8 @@ export type Database = {
           status: string
           status_changed_at: string
           updated_at: string
+          warranty_months: number | null
+          warranty_until: string | null
           work: string | null
         }
         SetofOptions: {

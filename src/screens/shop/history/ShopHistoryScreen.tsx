@@ -1,6 +1,7 @@
 import { ChevronDown, ClipboardList, Download, History as HistoryIcon, MessageSquare, Phone, Printer, SearchX } from 'lucide-react';
 import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react';
 import { useLiveSearchParams } from '../../../app/useLiveSearchParams';
+import { WarrantyNote } from '../../../components/WarrantyNote';
 import { Button } from '../../../components/Button';
 import { Card } from '../../../components/Card';
 import { EmptyState } from '../../../components/EmptyState';
@@ -368,6 +369,7 @@ function HistoryCard({ item: b, open, onToggle }: { item: ShopHistoryItem; open:
             {b.odometer !== null && <span className={`mono ${styles.nowrap}`}> · {formatKm(lang, b.odometer)}</span>}
           </span>
           {b.work && !b.imported && <span className={`${styles.work} ${styles.block}`}>{b.work}</span>}
+          <WarrantyNote months={b.warranty_months} until={b.warranty_until} />
         </span>
       </button>
 

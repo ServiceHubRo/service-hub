@@ -12,6 +12,7 @@ import {
   reportMoney,
   reportPeriod,
   reportText,
+  reportWarranty,
   repeatedOdometers,
   type ReportData,
   type ReportTextKey,
@@ -312,9 +313,18 @@ export async function renderReportPdf(lib: PdfLib, data: ReportData): Promise<Ui
       workText && workText !== clean(jobService(lang, job))
         ? clampLines(wrapText(workText, fonts.sans, 7.5, workW), 3, fonts.sans, 7.5, workW)
         : [];
+    const warranty = reportWarranty(lang, job);
+    const warrantyLines = warranty ? clampLines(wrapText(warranty, fonts.sans, 7.5, workW), 2, fonts.sans, 7.5, workW) : [];
     const leftH = shopLines.length * LEAD + cityLines.length * SMALL;
-    const workH = serviceLines.length * LEAD + (itemLines.length + workLines.length) * SMALL;
-    return { job, shopLines, cityLines, serviceLines, notes: [...itemLines, ...workLines], height: Math.max(leftH, workH, LEAD) + 14 };
+    const workH = serviceLines.length * LEAD + (itemLines.length + workLines.length + warrantyLines.length) * SMALL;
+    return {
+      job,
+      shopLines,
+      cityLines,
+      serviceLines,
+      notes: [...itemLines, ...workLines, ...warrantyLines],
+      height: Math.max(leftH, workH, LEAD) + 14,
+    };
   });
 
   // What closes the report (total, figures, the odometer note, the notice): one block

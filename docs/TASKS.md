@@ -60,6 +60,7 @@ Ordinea contează: fiecare sarcină se sprijină pe cele de dinainte. Sarcinile 
 | T32 | Zone și constatare tehnică | „În curând și în zona ta” cu email la pornire, Admin → Zone, „Constatare tehnică” la programare |
 | T33 | Prețul de lansare pe oraș | Primele service-uri din fiecare oraș (numărul îl setează adminul) plătesc prețul de lansare și primesc insigna „Partener fondator” |
 | T34 | Oferte: termen, servicii, zile liniștite | Oferta pentru clienți noi cu dată de sfârșit și servicii alese, reducere în zilele mai liniștite, filtrul „Doar cu ofertă” |
+| T37 | Garanție, listă de așteptare, variante la deviz | Garanția lucrării cu reminder (T37a); „Anunță-mă dacă se eliberează un loc” (T37b); piesă originală sau alternativă în deviz (T37c) |
 
 ---
 
@@ -1017,3 +1018,27 @@ Migrarea `security_limits` (`schema_version` = 70). Teste: `tests/sql/120_securi
 **Istoricul mașinii pornit implicit (Eduard, 10 oct, după sugestia unui tester):** service-ul la care clientul are o programare vede implicit lucrările de la alte service-uri (ca înainte: fără prețuri, fără numele service-urilor, doar cât programarea e deschisă). Un singur comutator în Cont („Istoricul mașinii pentru service-uri”) îl oprește pentru toate programările deschise; dispar bifa de la programare și comutatorul de pe cardul programării. Temeiul din Politica de confidențialitate devine interesul legitim (lit. f), cu dreptul de opoziție din Cont; Termenii pentru service-uri spun la fel. Programările făcute înainte își păstrează alegerea. Migrarea `history_shared_by_default` (`schema_version` = 73). Teste: `tests/sql/122_history_by_default.sql`, `103_shared_history.sql` adaptat, `tests/e2e/shared-history.spec.ts`.
 
 **Ordonat ca pe iPhone (Eduard, 10 oct: „verifică dacă ai mai lăsat lucruri nerezolvate”):** verificare completă a ecranelor după regulile cerute până acum. Filtrele (Caută, Istoric, listele din admin) sunt liste derulante, comutatoare și listă de bifat în panoul „Filtre”; deasupra listei, filtrele alese apar pe un singur rând, fără pastile. Cardurile programărilor (client și service) și ale Istoricului au o singură acțiune principală, restul în „Mai multe” (`MoreActions`). Au devenit liste derulante: durata intervalului, limba raportului, mașinile clientului la programarea adăugată, publicul anunțurilor, statusul abonamentului și modul zonelor (admin); comutator: „Plătitor de TVA” (service și admin); listă de bifat: simptomele la constatare și categoriile din zona „În curând”. Cardul din Caută arată locul liber, confirmarea instantă și o singură ofertă; pastilele dublate (recenzii raportate, semnalele din moderare) au dispărut. Scoase textele care explicau sistemul (Stripe, „Orele tăiate sunt ocupate”, „Service-ul află imediat” etc.) și subtitlurile explicative din admin. Teste e2e adaptate (`cardAction`, `selectInPanel` în `tests/e2e/support.ts`).
+
+---
+
+## T37 — Garanție, listă de așteptare, variante la deviz
+
+Cerut de Eduard (16 oct), din propunerile pentru funcții noi. Împărțit în trei părți, fiecare cu PR-ul ei.
+
+### T37a — Garanția lucrării ✅
+
+**La „Finalizare”**, service-ul alege garanția lucrării: „Fără garanție” (implicit) sau 1, 3, 6, 12, 24 ori 36 de luni. Baza de date acceptă 1–60 de luni (`complete_job`, `p_warranty_months`; altfel `warranty_invalid`) și calculează ultima zi acoperită, de la ziua finalizării în ora României (`bookings.warranty_months`, `warranty_until`). Doar `complete_job` le scrie; nici service-ul, nici clientul nu le pot schimba după.
+
+**Unde se vede:** pe programarea finalizată a clientului, în istoricul mașinii și în previzualizarea raportului („Garanție 12 luni, până la 16 oct 2027”, verde, cu scut; după încheiere „Garanția s-a încheiat pe …”, gri), în Istoricul service-ului și în raportul PDF, ca rând sub lucrare („Garanție 12 luni, până la 27.09.2027”).
+
+**Reminderul:** cu 30 de zile înainte de încheiere, clientul primește o singură dată un push „Garanția se încheie pe {data}”, cu lucrarea, service-ul și mașina. Apăsat, duce la mașina din Garaj. Pleacă dimineața la 10, cu celelalte remindere, doar dacă reminderele de service sunt pornite în Cont (`send_warranty_reminders`, `client_reminders.kind = 'warranty'`).
+
+Migrarea `job_warranty` (`schema_version` = 75). Teste: `tests/sql/124_job_warranty.sql`, `tests/e2e/job-flow.spec.ts` (garanția la finalizare și pe cardul clientului), unit pentru notificare și pentru rândul din raport. Fără pachete noi.
+
+### T37b — „Anunță-mă dacă se eliberează un loc”
+
+- [ ] Făcut
+
+### T37c — Variante la deviz (piesă originală sau alternativă)
+
+- [ ] Făcut

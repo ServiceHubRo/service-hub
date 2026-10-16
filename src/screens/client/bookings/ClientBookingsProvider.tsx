@@ -70,6 +70,8 @@ export function ClientBookingsProvider({ children }: { children: ReactNode }) {
         odometer: row.odometer,
         work: row.work,
         cost: row.cost === null ? null : Number(row.cost),
+        warranty_months: row.warranty_months,
+        warranty_until: row.warranty_until,
         cancelled_by: row.cancelled_by as ClientBooking['cancelled_by'],
         cancel_reason: row.cancel_reason,
         decline_reason: row.decline_reason,

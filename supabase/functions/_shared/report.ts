@@ -19,6 +19,9 @@ export interface ReportJob {
   work: string | null;
   odometer: number | null;
   cost: number | null;
+  /** The warranty the shop gave (T37a): months and the last day covered (YYYY-MM-DD). */
+  warranty_months?: number | null;
+  warranty_until?: string | null;
 }
 
 export interface ReportCar {
@@ -80,6 +83,10 @@ export const REPORT_TEXT = {
     footerVerify: 'Verifică la {address} cu codul {code}',
     unknownShop: 'Service',
     none: '—',
+    warranty: 'Garanție {months}, până la {until}',
+    month: '{n} lună',
+    months: '{n} luni',
+    monthsMany: '{n} de luni',
   },
   en: {
     title: 'Service history report',
@@ -113,6 +120,10 @@ export const REPORT_TEXT = {
     footerVerify: 'Verify at {address} with code {code}',
     unknownShop: 'Shop',
     none: '—',
+    warranty: 'Warranty {months}, until {until}',
+    month: '{n} month',
+    months: '{n} months',
+    monthsMany: '{n} months',
   },
 } as const;
 
@@ -247,6 +258,8 @@ export function reportDataFromRow(row: Record<string, unknown>, verifyAt: string
       work: typeof j.work === 'string' ? j.work : null,
       odometer: num(j.odometer),
       cost: num(j.cost),
+      warranty_months: num(j.warranty_months),
+      warranty_until: typeof j.warranty_until === 'string' ? j.warranty_until : null,
     })),
     total: num(row.total_amount) ?? 0,
     periodFrom: typeof row.period_from === 'string' ? row.period_from : null,
@@ -255,4 +268,14 @@ export function reportDataFromRow(row: Record<string, unknown>, verifyAt: string
     odometerOutOfOrder: row.odometer_out_of_order === true,
     verifyAt,
   };
+}
+
+/** "Garanție 12 luni, până la 27.09.2027" for a job with a warranty (T37a), else ''. */
+export function reportWarranty(lang: Lang, job: Pick<ReportJob, 'warranty_months' | 'warranty_until'>): string {
+  const n = job.warranty_months;
+  if (!n || !job.warranty_until) return '';
+  // Romanian: "20 de luni" from 20 on (and 101, 102...), as for every count.
+  const many = lang === 'ro' && (n % 100 >= 20 || n % 100 === 0);
+  const months = reportText(lang, n === 1 ? 'month' : many ? 'monthsMany' : 'months', { n: String(n) });
+  return reportText(lang, 'warranty', { months, until: reportDay(lang, job.warranty_until) });
 }

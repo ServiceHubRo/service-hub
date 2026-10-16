@@ -204,7 +204,7 @@ Side exits:
 | `withdraw_quote(id)` | shop | `quote_sent → in_inspection` | quote `withdrawn` |
 | `decide_quote(id, quote_id, approved_item_ids[])` | client | `quote_sent → approved` or `quote_refused` | `quote_id` = the version the client saw (a replaced one → `quote_changed`); all items → `accepted`; some → `partially_accepted`; none → refusal: quote `refused`, booking `quote_refused`, `cost = inspection_fee`; events → shop |
 | `start_work(id)` | shop | `approved → in_progress` | `started_at`; event → client |
-| `complete_job(id, odometer, work, cost, confirm_jump)` | shop | `in_progress → done` | odometer rules (§7); work/cost prefilled from approved items, editable; `done_at`; event → client |
+| `complete_job(id, odometer, work, cost, confirm_jump, warranty_months)` | shop | `in_progress → done` | odometer rules (§7); work/cost prefilled from approved items, editable; optional warranty 1–60 months → `warranty_months`, `warranty_until` (from today, Bucharest; T37a); `done_at`; event → client |
 | `admin_force_cancel(id, reason)` | admin | any active → `cancelled` | both parties notified; audit log |
 | `expire_quotes()` | cron | `quote_sent → expired` | quote `expired`; capacity released; events → both |
 
@@ -287,6 +287,8 @@ No-shows: `client_no_show_count(client_id, 90 days)`. At 3 or more, shops see a 
 ---
 
 ## 7. Odometer
+
+**Warranty (T37a, migration `job_warranty`, schema 75):** `bookings.warranty_months` (1–60) and `warranty_until` (date, both or neither), written only by `complete_job`; shown on the client's finished booking, the car's history, the report preview and PDF (`report_jobs` carries them) and the shop's Istoric (`list_shop_history`). `send_warranty_reminders(today)` (daily at 10, `run_hourly_jobs`) tells the client once, 30 days before `warranty_until`, when `profiles.service_reminders` is on: event `warranty_ending` (push, quiet hours), kept in `client_reminders` (`kind = 'warranty'`).
 
 `complete_job` requires `odometer`. Last known reading = highest `odometer` among `done` bookings with the same `car_snapshot->>'plate_norm'` (any shop). Checked in this order:
 1. missing → `odometer_required`

@@ -70,6 +70,7 @@ const SAMPLE: Record<string, Record<string, unknown>> = {
   welcome: { day: 3, has_car: false },
   area_launched: { area: 'CJ', area_ro: 'Cluj', area_en: 'Cluj', shops: 3 },
   report_credit: {},
+  warranty_ending: { car_id: 'c-1', shop_name: 'Atelier Unu', months: 12, until: '2026-11-14' },
   favorite_offer: { percent: 15 },
   booking_request_waiting: {},
   booking_request_last_call: {},
@@ -237,6 +238,13 @@ describe('notification texts', () => {
       tag: 'report_credit',
     });
     expect(render('report_credit', 'client', 'en')!.title).toBe('You got a free report');
+    // T37a: 30 days before a job's warranty ends.
+    expect(render('warranty_ending', 'client', 'ro')).toMatchObject({
+      title: 'Garanția se încheie pe 14 nov',
+      url: '/c/garaj/c-1',
+      tag: 'warranty-b-1',
+    });
+    expect(render('warranty_ending', 'client', 'en')!.title).toBe('Warranty ends on Nov 14');
     // Given by the admin: no friend in the sentence.
     expect(render('report_credit', 'client', 'ro', { source: 'admin' })).toMatchObject({
       title: 'Ai primit un raport gratuit',
