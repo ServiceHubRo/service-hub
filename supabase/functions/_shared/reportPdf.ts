@@ -264,9 +264,10 @@ export async function renderReportPdf(lib: PdfLib, data: ReportData): Promise<Ui
   facts.forEach(([label, value, font], i) => {
     const x = MARGIN + i * (factW + gap);
     box(x, y, factW, 46, C.white, C.box);
-    text(label, x + 12, y - 17, 7.5, fonts.sans, C.muted);
+    // Centered in its box, like the totals at the bottom (Eduard, 16 Oct).
+    center(label, x + factW / 2, y - 17, 7.5, fonts.sans, C.muted);
     const size = font.widthOfTextAtSize(value, 10) > factW - 24 ? 8.5 : 10;
-    text(value, x + 12, y - 33, size, font, C.ink);
+    center(value, x + factW / 2, y - 33, size, font, C.ink);
   });
   y -= 46 + 14;
 

@@ -22,11 +22,15 @@ export interface ShopsMapProps {
   label: string;
   /** A small map that only shows (the shop page): no scroll-zoom, no bubble. */
   compact?: boolean;
+  /** Where to look when there is no pin (the client's location); else the whole of Romania. */
+  center?: { latitude: number; longitude: number };
 }
 
 /** The whole of Romania: the view when no shop has coordinates. */
 const FALLBACK: L.LatLngTuple = [45.94, 24.97];
 const FALLBACK_ZOOM = 6;
+/** Around the client when no shop is on the map: the town and its surroundings. */
+const NEAR_ZOOM = 11;
 const TILE_URL = import.meta.env.VITE_MAP_TILE_URL || 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
 const ATTRIBUTION =
   import.meta.env.VITE_MAP_ATTRIBUTION || '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>';
@@ -36,7 +40,7 @@ const ATTRIBUTION =
  * OpenStreetMap by default). Pins are drawn in the app's colors without image files; their bubble
  * is built from text nodes, never from HTML, so a shop's name cannot inject anything.
  */
-export default function ShopsMap({ shops, openLabel, onOpen, label, compact }: ShopsMapProps) {
+export default function ShopsMap({ shops, openLabel, onOpen, label, compact, center }: ShopsMapProps) {
   const boxRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
   const layerRef = useRef<L.LayerGroup | null>(null);
@@ -71,6 +75,8 @@ export default function ShopsMap({ shops, openLabel, onOpen, label, compact }: S
 
   // The pins are drawn again only when they really change (a new array on every render of the
   // parent would close an open bubble).
+  const centerLat = center?.latitude;
+  const centerLng = center?.longitude;
   const pinsKey = JSON.stringify(shops.map((s) => [s.id, s.name, s.latitude, s.longitude, s.detail ?? '']));
   const shopsRef = useRef(shops);
   useEffect(() => {
@@ -113,7 +119,9 @@ export default function ShopsMap({ shops, openLabel, onOpen, label, compact }: S
     }
     if (points.length === 1) map.setView(points[0]!, 15);
     else if (points.length > 1) map.fitBounds(L.latLngBounds(points), { padding: [36, 36], maxZoom: 15 });
-  }, [pinsKey, openLabel, compact]);
+    else if (centerLat !== undefined && centerLng !== undefined) map.setView([centerLat, centerLng], NEAR_ZOOM);
+    else map.setView(FALLBACK, FALLBACK_ZOOM);
+  }, [pinsKey, openLabel, compact, centerLat, centerLng]);
 
   return <div ref={boxRef} className={compact ? `${styles.map} ${styles.compact}` : styles.map} role="region" aria-label={label} />;
 }

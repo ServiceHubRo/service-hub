@@ -1,4 +1,4 @@
-import { Heart, List, Map as MapIcon, SearchX } from 'lucide-react';
+import { Heart, List, Map as MapIcon, SearchX, Store } from 'lucide-react';
 import { lazy, Suspense, useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLiveSearchParams } from '../../../app/useLiveSearchParams';
@@ -238,6 +238,43 @@ export function SearchScreen() {
     ? t('search.countIn', { count: plural(lang, 'unit.shops', list.length), city: cityName })
     : plural(lang, 'unit.shops', list.length);
 
+  // Nothing typed and nothing filtered, and still no shop: none can be booked yet (Eduard, 16 Oct:
+  // the filters' message was wrong there).
+  const nothingAsked = !q.trim() && !filtersOn;
+  const favEmpty = favOnly && !q && !category && !city;
+  const empty = (
+    <EmptyState
+      icon={favEmpty ? Heart : nothingAsked ? Store : SearchX}
+      title={
+        favEmpty
+          ? t('search.empty.favorites')
+          : q.trim()
+            ? t('search.empty.query', { q: q.trim() })
+            : nothingAsked
+              ? t('search.empty.none')
+              : t('search.empty.filters')
+      }
+      body={
+        favEmpty
+          ? t('search.empty.favoritesBody')
+          : filtersOn
+            ? t('search.empty.filtersBody')
+            : nothingAsked
+              ? undefined
+              : t('search.empty.queryBody')
+      }
+      action={
+        filtersOn ? (
+          <Button variant="primary" onClick={clearFilters}>
+            {t('filters.clear')}
+          </Button>
+        ) : q ? (
+          <Button onClick={clearQuery}>{t('search.clearQuery')}</Button>
+        ) : undefined
+      }
+    />
+  );
+
   return (
     <div className={styles.page}>
       <h1>{t('nav.client.search')}</h1>
@@ -377,62 +414,41 @@ export function SearchScreen() {
           </div>
           {explainOpen && <RankingExplanation id={explainId} />}
 
-          {asMap && list.length > 0 ? (
-            <section className={styles.section} aria-label={t('search.view.map')}>
-              <Suspense fallback={<div className={styles.mapLoading} aria-busy="true" />}>
-                <ShopsMap
-                  label={t('search.map.label')}
-                  openLabel={t('search.map.open')}
-                  onOpen={(id) => navigate(day ? `${shopPath(id)}?zi=${day}` : shopPath(id), { state: back })}
-                  shops={list
-                    .filter((s) => s.latitude !== null && s.longitude !== null)
-                    .map((s) => ({
-                      id: s.shop_id,
-                      name: s.name,
-                      latitude: s.latitude!,
-                      longitude: s.longitude!,
-                      detail: [
-                        s.review_count > 0 && s.average !== null ? `★ ${formatRating(lang, Number(s.average))}` : '',
-                        s.free ? freeText(s.free) : '',
-                      ]
-                        .filter(Boolean)
-                        .join(' · '),
-                    }))}
-                />
-              </Suspense>
-              {list.some((s) => s.latitude === null || s.longitude === null) && (
-                <p className={styles.mapNote}>
-                  {t('search.map.missing', { n: list.filter((s) => s.latitude === null || s.longitude === null).length })}
-                </p>
-              )}
-            </section>
+          {asMap ? (
+            <>
+              <section className={styles.section} aria-label={t('search.view.map')}>
+                <Suspense fallback={<div className={styles.mapLoading} aria-busy="true" />}>
+                  <ShopsMap
+                    label={t('search.map.label')}
+                    center={coords ?? undefined}
+                    openLabel={t('search.map.open')}
+                    onOpen={(id) => navigate(day ? `${shopPath(id)}?zi=${day}` : shopPath(id), { state: back })}
+                    shops={list
+                      .filter((s) => s.latitude !== null && s.longitude !== null)
+                      .map((s) => ({
+                        id: s.shop_id,
+                        name: s.name,
+                        latitude: s.latitude!,
+                        longitude: s.longitude!,
+                        detail: [
+                          s.review_count > 0 && s.average !== null ? `★ ${formatRating(lang, Number(s.average))}` : '',
+                          s.free ? freeText(s.free) : '',
+                        ]
+                          .filter(Boolean)
+                          .join(' · '),
+                      }))}
+                  />
+                </Suspense>
+                {list.some((s) => s.latitude === null || s.longitude === null) && (
+                  <p className={styles.mapNote}>
+                    {t('search.map.missing', { n: list.filter((s) => s.latitude === null || s.longitude === null).length })}
+                  </p>
+                )}
+              </section>
+              {list.length === 0 && empty}
+            </>
           ) : list.length === 0 ? (
-            <EmptyState
-              icon={favOnly && !q && !category && !city ? Heart : SearchX}
-              title={
-                favOnly && !q && !category && !city
-                  ? t('search.empty.favorites')
-                  : q.trim()
-                    ? t('search.empty.query', { q: q.trim() })
-                    : t('search.empty.filters')
-              }
-              body={
-                favOnly && !q && !category && !city
-                  ? t('search.empty.favoritesBody')
-                  : filtersOn
-                    ? t('search.empty.filtersBody')
-                    : t('search.empty.queryBody')
-              }
-              action={
-                filtersOn ? (
-                  <Button variant="primary" onClick={clearFilters}>
-                    {t('filters.clear')}
-                  </Button>
-                ) : q ? (
-                  <Button onClick={clearQuery}>{t('search.clearQuery')}</Button>
-                ) : undefined
-              }
-            />
+            empty
           ) : (
             <>
               {near.length > 0 && (
