@@ -110,6 +110,10 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
       title: '{car}: {service}',
       body: 'Ultima dată: {last_done}, la {shop}. Verificare recomandată în jurul datei de {due}.',
     },
+    'client.slot_freed': {
+      title: 'S-a eliberat un loc la {shop}',
+      body: '{day} are acum un loc liber. Programează-te din aplicație.',
+    },
     'client.service_due_oil': {
       title: '{car}: {service}',
       body: 'Ultimul schimb: {last_done}, la {shop}. Următorul: în jurul datei de {due} (la fiecare {months}). Programează-te din aplicație.',
@@ -381,6 +385,10 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
     'client.service_due': {
       title: '{car}: {service}',
       body: 'Last done on {last_done} at {shop}. Next check recommended around {due}.',
+    },
+    'client.slot_freed': {
+      title: 'A spot opened up at {shop}',
+      body: '{day} now has a free spot. Book in the app.',
     },
     'client.service_due_oil': {
       title: '{car}: {service}',
@@ -673,6 +681,7 @@ export const EVENTS: Record<Side, readonly string[]> = {
     'work_started', 'job_done', 'appointment_reminder', 'new_message', 'review_reply', 'doc_expiry', 'report_ready',
     'review_report_decided', 'review_request', 'service_due', 'account_suspended', 'account_reactivated',
     'tire_season', 'welcome', 'favorite_offer', 'request_expired', 'area_launched', 'report_credit',
+    'slot_freed',
   ],
   shop: [
     'booking_requested', 'booking_auto_confirmed', 'booking_cancelled_client', 'booking_cancelled_admin', 'quote_accepted',
@@ -797,6 +806,7 @@ function vars(e: NotificationEvent, lang: Lang, side: Side, now: Date): Record<s
     expiry: str(p.expiry) ? formatDayMonth(lang, str(p.expiry)) : '',
     last_done: str(p.last_done) ? formatDayMonthYear(lang, str(p.last_done), now) : '',
     due: str(p.due) ? formatDayMonthYear(lang, str(p.due), now) : '',
+    day: str(p.date) ? formatDate(lang, str(p.date)) : '',
     months: months === null ? '' : plural(lang, 'months', months),
     digest,
     code: str(p.code),
@@ -888,6 +898,9 @@ export function urlFor(side: Side, e: NotificationEvent): string {
         return str(p.thread_id) ? `/c/mesaje/${str(p.thread_id)}` : '/c/mesaje';
       case 'doc_expiry':
         return str(p.car_id) ? `/c/garaj/${str(p.car_id)}` : '/c/garaj';
+      // The shop's page on that day: its times are shown first.
+      case 'slot_freed':
+        return str(p.shop_id) ? `/c/service/${str(p.shop_id)}?${q({ zi: str(p.date) })}` : '/c/cauta';
       case 'report_ready':
       case 'report_credit':
         return REPORTS_PATH;
@@ -982,6 +995,8 @@ function tagFor(e: NotificationEvent): string {
       return `review-request-${e.booking_id ?? str(p.booking_id)}`;
     case 'service_due':
       return `service-due-${str(p.car_id)}-${str(p.service_id)}`;
+    case 'slot_freed':
+      return `slot-${str(p.shop_id)}-${str(p.date)}`;
     case 'tire_season':
     case 'welcome':
     case 'area_launched':

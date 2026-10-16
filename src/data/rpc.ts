@@ -141,6 +141,7 @@ export const RPC_ERROR_CODES = [
   'too_many_services',
   'too_soon',
   'work_too_long',
+  'waitlist_limit',
   'warranty_invalid',
   'wrong_status',
 ] as const;

@@ -615,6 +615,11 @@ export const ro = {
   'booking.step.car': 'Mașina',
   'booking.day.full': 'plin',
   'booking.day.label': '{date}: {places}',
+  'booking.wait.full': '{date} este plină.',
+  'booking.wait.join': 'Anunță-mă dacă se eliberează un loc',
+  'booking.wait.on': 'Te anunțăm dacă se eliberează un loc în această zi.',
+  'booking.wait.leave': 'Renunță la anunț',
+  'booking.wait.badge': 'Aștepți un loc',
   'booking.days.empty': 'Nu sunt zile libere în perioada de programare.',
   'booking.days.emptyBody': 'Încearcă mai târziu sau sună service-ul.',
   'booking.days.loadError': 'Zilele libere nu s-au încărcat.',
@@ -859,6 +864,7 @@ export const ro = {
   'rpcError.too_soon': 'Programările se fac cu cel puțin {hours} înainte. Alege altă oră.',
   'rpcError.work_too_long': 'Descrierea lucrării este prea lungă.',
   'rpcError.wrong_status': 'Programarea s-a schimbat între timp.',
+  'rpcError.waitlist_limit': 'Aștepți deja un loc în 10 zile. Renunță la una dintre ele ca să adaugi alta.',
   'rpcError.warranty_invalid': 'Alege o garanție între 1 și 60 de luni.',
 
   // Shop settings, Panou checklist, staff invitations (T05)

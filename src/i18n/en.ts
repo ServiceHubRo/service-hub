@@ -617,6 +617,11 @@ export const en: Record<MessageKey, string> = {
   'booking.step.car': 'Your car',
   'booking.day.full': 'full',
   'booking.day.label': '{date}: {places}',
+  'booking.wait.full': '{date} is full.',
+  'booking.wait.join': 'Notify me if a spot opens up',
+  'booking.wait.on': 'We will notify you if a spot opens up on this day.',
+  'booking.wait.leave': 'Stop notifying me',
+  'booking.wait.badge': 'Waiting for a spot',
   'booking.days.empty': 'No free days in the booking period.',
   'booking.days.emptyBody': 'Try again later or call the shop.',
   'booking.days.loadError': "Free days didn't load.",
@@ -861,6 +866,7 @@ export const en: Record<MessageKey, string> = {
   'rpcError.too_soon': 'Bookings need at least {hours} notice. Pick another time.',
   'rpcError.work_too_long': 'The work description is too long.',
   'rpcError.wrong_status': 'This booking changed in the meantime.',
+  'rpcError.waitlist_limit': 'You are already waiting for a spot on 10 days. Remove one to add another.',
   'rpcError.warranty_invalid': 'Choose a warranty between 1 and 60 months.',
 
   // Shop settings, Panou checklist, staff invitations (T05)

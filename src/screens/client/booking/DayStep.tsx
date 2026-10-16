@@ -1,10 +1,12 @@
-import { CalendarX } from 'lucide-react';
-import { useCallback, useMemo } from 'react';
+import { BellRing, CalendarX } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { ActionButton } from '../../../components/ActionButton';
 import { Banner } from '../../../components/Banner';
 import { EmptyState } from '../../../components/EmptyState';
 import { LoadError } from '../../../components/LoadError';
 import { SkeletonGrid } from '../../../components/Skeleton';
-import { getAvailability } from '../../../data/rpc';
+import { canRetryRpc, getAvailability, rpcErrorMessage } from '../../../data/rpc';
+import { fetchWaitedDays, joinSlotWaitlist, leaveSlotWaitlist } from '../../../data/slotWaitlist';
 import type { ShopPageShop } from '../../../data/search';
 import { useI18n } from '../../../i18n/context';
 import { formatDate, formatDayTile } from '../../../i18n/format';
@@ -18,6 +20,8 @@ import styles from './booking.module.css';
  * Step 2: the next 12 days the shop is open, with the places left; full days dimmed and not
  * selectable. The database counts the places (get_availability) — the screen never does. A day of
  * the shop's quiet-day offer shows "-10%" while it has places (Eduard, 8 Oct); a full day does not.
+ * A full day can be tapped: "Anunță-mă dacă se eliberează un loc" (T37b), told by push when a
+ * booking of that day leaves it.
  */
 export function DayStep({
   shop,
@@ -44,6 +48,18 @@ export function DayStep({
     () => (state.status === 'ready' ? bookingDays(state.data.days, shop.min_notice_hours) : []),
     [state, shop.min_notice_hours],
   );
+  // The full day tapped, and the days of this shop the client already waits for.
+  const [fullDay, setFullDay] = useState<string | null>(null);
+  const loadWaited = useCallback(() => fetchWaitedDays(shop.id), [shop.id]);
+  const { state: waitedState, setData: setWaited } = useLoad(loadWaited);
+  const waited = waitedState.status === 'ready' ? waitedState.data : new Set<string>();
+  const errorText = (e: unknown) => rpcErrorMessage(lang, e);
+  // On a phone the panel opens under the 12 days: bring its button into view (again once it grows).
+  const waitRef = useRef<HTMLDivElement>(null);
+  const waitingFullDay = fullDay !== null && waited.has(fullDay);
+  useEffect(() => {
+    if (fullDay) waitRef.current?.scrollIntoView?.({ block: 'nearest' });
+  }, [fullDay, waitingFullDay]);
 
   return (
     <>
@@ -58,7 +74,8 @@ export function DayStep({
             <ul className={styles.grid}>
               {days.map((d) => {
                 const tile = formatDayTile(lang, d.date);
-                const on = d.date === selected;
+                const on = d.bookable ? d.date === selected : d.date === fullDay;
+                const waiting = waited.has(d.date);
                 const quiet = d.bookable ? quietPercentOn(offers, d.date) : null;
                 const places = d.bookable ? plural(lang, 'unit.places', d.places_left) : t('booking.day.full');
                 const label = quiet ? `${places}, ${t('offer.dayLabel', { n: quiet })}` : places;
@@ -66,22 +83,65 @@ export function DayStep({
                   <li key={d.date}>
                     <button
                       type="button"
-                      className={`${styles.tile} ${on ? styles.tileOn : ''}`}
-                      disabled={!d.bookable}
+                      className={`${styles.tile} ${on ? styles.tileOn : ''} ${d.bookable ? '' : styles.tileFull}`}
                       aria-pressed={on}
-                      aria-label={t('booking.day.label', { date: formatDate(lang, d.date), places: label })}
-                      onClick={() => onPick(d.date)}
+                      aria-label={t('booking.day.label', {
+                        date: formatDate(lang, d.date),
+                        places: waiting ? `${label}, ${t('booking.wait.badge')}` : label,
+                      })}
+                      onClick={() => (d.bookable ? onPick(d.date) : setFullDay((f) => (f === d.date ? null : d.date)))}
                     >
                       <span className={styles.tileSmall}>{tile.weekday}</span>
                       <span className={styles.tileBig}>{tile.day}</span>
                       <span className={styles.tileSmall}>{tile.month}</span>
                       <span className={d.bookable ? styles.places : styles.full}>{places}</span>
                       {quiet && <span className={styles.dayOffer}>{t('offer.dayBadge', { n: quiet })}</span>}
+                      {waiting && <BellRing size={14} className={styles.waitIcon} aria-hidden="true" />}
                     </button>
                   </li>
                 );
               })}
             </ul>
+            {fullDay && (
+              <div ref={waitRef} className={styles.waitPanel} role="region" aria-label={t('booking.wait.full', { date: formatDate(lang, fullDay) })}>
+                <p>{t('booking.wait.full', { date: formatDate(lang, fullDay) })}</p>
+                {waited.has(fullDay) ? (
+                  <>
+                    <p className={styles.waitOn}>
+                      <BellRing size={16} aria-hidden="true" /> {t('booking.wait.on')}
+                    </p>
+                    <ActionButton
+                      variant="secondary"
+                      block={false}
+                      onAction={async (requestId) => {
+                        await leaveSlotWaitlist(shop.id, fullDay, requestId);
+                        setWaited((prev) => {
+                          const next = new Set(prev);
+                          next.delete(fullDay);
+                          return next;
+                        });
+                      }}
+                      errorMessage={errorText}
+                      canRetry={canRetryRpc}
+                    >
+                      {t('booking.wait.leave')}
+                    </ActionButton>
+                  </>
+                ) : (
+                  <ActionButton
+                    block={false}
+                    onAction={async (requestId) => {
+                      await joinSlotWaitlist(shop.id, fullDay, requestId);
+                      setWaited((prev) => new Set(prev).add(fullDay));
+                    }}
+                    errorMessage={errorText}
+                    canRetry={canRetryRpc}
+                  >
+                    {t('booking.wait.join')}
+                  </ActionButton>
+                )}
+              </div>
+            )}
             <p className={styles.muted}>{t('booking.days.horizon', { days: plural(lang, 'unit.days', shop.max_advance_days) })}</p>
           </>
         ))}

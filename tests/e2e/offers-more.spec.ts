@@ -121,7 +121,7 @@ test.describe('offers: last day, services, quiet days', () => {
     await c2.getByRole('button', { name: /^Schimb ulei/ }).click();
     await c2.getByRole('button', { name: /^Continuă/ }).click();
     const full = c2.getByRole('button', { name: new RegExp(`^${date}:`) });
-    await expect(full).toBeDisabled();
+    await expect(full).toBeVisible();
     await expect(full).not.toContainText('-15%');
     await shot(c2, 'offers-day-full', name());
 
