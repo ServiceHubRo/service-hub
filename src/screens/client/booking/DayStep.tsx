@@ -1,6 +1,6 @@
 import { BellRing, CalendarX } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ActionButton } from '../../../components/ActionButton';
+import { ActionSwitch } from '../../../components/ActionSwitch';
 import { Banner } from '../../../components/Banner';
 import { EmptyState } from '../../../components/EmptyState';
 import { LoadError } from '../../../components/LoadError';
@@ -54,12 +54,11 @@ export function DayStep({
   const { state: waitedState, setData: setWaited } = useLoad(loadWaited);
   const waited = waitedState.status === 'ready' ? waitedState.data : new Set<string>();
   const errorText = (e: unknown) => rpcErrorMessage(lang, e);
-  // On a phone the panel opens under the 12 days: bring its button into view (again once it grows).
+  // On a phone the panel opens under the 12 days: bring its switch into view.
   const waitRef = useRef<HTMLDivElement>(null);
-  const waitingFullDay = fullDay !== null && waited.has(fullDay);
   useEffect(() => {
     if (fullDay) waitRef.current?.scrollIntoView?.({ block: 'nearest' });
-  }, [fullDay, waitingFullDay]);
+  }, [fullDay]);
 
   return (
     <>
@@ -105,41 +104,23 @@ export function DayStep({
             {fullDay && (
               <div ref={waitRef} className={styles.waitPanel} role="region" aria-label={t('booking.wait.full', { date: formatDate(lang, fullDay) })}>
                 <p>{t('booking.wait.full', { date: formatDate(lang, fullDay) })}</p>
-                {waited.has(fullDay) ? (
-                  <>
-                    <p className={styles.waitOn}>
-                      <BellRing size={16} aria-hidden="true" /> {t('booking.wait.on')}
-                    </p>
-                    <ActionButton
-                      variant="secondary"
-                      block={false}
-                      onAction={async (requestId) => {
-                        await leaveSlotWaitlist(shop.id, fullDay, requestId);
-                        setWaited((prev) => {
-                          const next = new Set(prev);
-                          next.delete(fullDay);
-                          return next;
-                        });
-                      }}
-                      errorMessage={errorText}
-                      canRetry={canRetryRpc}
-                    >
-                      {t('booking.wait.leave')}
-                    </ActionButton>
-                  </>
-                ) : (
-                  <ActionButton
-                    block={false}
-                    onAction={async (requestId) => {
-                      await joinSlotWaitlist(shop.id, fullDay, requestId);
-                      setWaited((prev) => new Set(prev).add(fullDay));
-                    }}
-                    errorMessage={errorText}
-                    canRetry={canRetryRpc}
-                  >
-                    {t('booking.wait.join')}
-                  </ActionButton>
-                )}
+                <ActionSwitch
+                  checked={waited.has(fullDay)}
+                  onToggle={async (next, requestId) => {
+                    if (next) await joinSlotWaitlist(shop.id, fullDay, requestId);
+                    else await leaveSlotWaitlist(shop.id, fullDay, requestId);
+                    setWaited((prev) => {
+                      const set = new Set(prev);
+                      if (next) set.add(fullDay);
+                      else set.delete(fullDay);
+                      return set;
+                    });
+                  }}
+                  errorMessage={errorText}
+                  canRetry={canRetryRpc}
+                >
+                  {t('booking.wait.join')}
+                </ActionSwitch>
               </div>
             )}
             <p className={styles.muted}>{t('booking.days.horizon', { days: plural(lang, 'unit.days', shop.max_advance_days) })}</p>

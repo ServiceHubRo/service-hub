@@ -252,17 +252,19 @@ test.describe('booking', () => {
     // A full day: "Notify me if a spot opens up" (T37b), and taken back.
     await fullDay.click();
     await expect(page2.getByText(`${formatDate('en', day)} is full.`)).toBeVisible();
-    await page2.getByRole('button', { name: 'Notify me if a spot opens up' }).click();
-    await expect(page2.getByText('We will notify you if a spot opens up on this day.')).toBeVisible();
+    const notify = page2.getByRole('switch', { name: 'Notify me if a spot opens up' });
+    await expect(notify).not.toBeChecked();
+    await notify.check();
+    await expect(notify).toBeChecked();
     await expect(page2.getByRole('button', { name: `${formatDate('en', day)}: full, Waiting for a spot` })).toBeVisible();
     await expectNoHorizontalScroll(page2);
     await shot(page2, 't37-waitlist-en', name());
     await page2.getByRole('button', { name: 'Română' }).filter({ visible: true }).first().click();
-    await expect(page2.getByText('Te anunțăm dacă se eliberează un loc în această zi.')).toBeVisible();
+    await expect(page2.getByRole('switch', { name: 'Anunță-mă dacă se eliberează un loc' })).toBeChecked();
     await shot(page2, 't37-waitlist-ro', name());
     await page2.getByRole('button', { name: 'English' }).filter({ visible: true }).first().click();
-    await page2.getByRole('button', { name: 'Stop notifying me' }).click();
-    await expect(page2.getByRole('button', { name: 'Notify me if a spot opens up' })).toBeVisible();
+    await notify.uncheck();
+    await expect(page2.getByRole('button', { name: `${formatDate('en', day)}: full` })).toBeVisible();
     await fullDay.click();
 
     // The screen stays open on step 4 while someone else takes the last place of that day.

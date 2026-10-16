@@ -617,8 +617,6 @@ export const ro = {
   'booking.day.label': '{date}: {places}',
   'booking.wait.full': '{date} este plină.',
   'booking.wait.join': 'Anunță-mă dacă se eliberează un loc',
-  'booking.wait.on': 'Te anunțăm dacă se eliberează un loc în această zi.',
-  'booking.wait.leave': 'Nu mă mai anunța',
   'booking.wait.badge': 'Aștepți un loc',
   'booking.days.empty': 'Nu sunt zile libere în perioada de programare.',
   'booking.days.emptyBody': 'Încearcă mai târziu sau sună service-ul.',

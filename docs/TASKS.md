@@ -1037,7 +1037,7 @@ Migrările `job_warranty` (`schema_version` = 75) și `remove_warranty_reminder`
 
 ### T37b — „Anunță-mă dacă se eliberează un loc” ✅
 
-**La pasul „Alege ziua”**, o zi plină se poate apăsa: sub zile apare „{zi} este plină.” și butonul „Anunță-mă dacă se eliberează un loc”. După apăsare: „Te anunțăm dacă se eliberează un loc în această zi.”, un clopoțel pe zi și „Nu mă mai anunța”. Pe telefon, panoul se aduce în ecran.
+**La pasul „Alege ziua”**, o zi plină se poate apăsa: sub zile apare „{zi} este plină.” și comutatorul „Anunță-mă dacă se eliberează un loc”. Comutatorul pornit pune un clopoțel pe zi; oprit, anunțul se anulează. Pe telefon, panoul se aduce în ecran.
 
 **Când se eliberează un loc** (programare anulată, refuzată, neprezentare, mutată pe altă zi sau la alt service, terminată) și ziua are din nou loc, toți cei care așteaptă primesc odată un push „S-a eliberat un loc la {service}”. Apăsat, deschide pagina service-ului pe acea zi. Primul care se programează ia locul. Fiecare cerere anunță o singură dată; se poate cere din nou.
 

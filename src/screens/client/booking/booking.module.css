@@ -227,7 +227,7 @@
 .waitPanel {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: stretch;
   gap: 10px;
   margin-top: 12px;
   padding: 14px;
@@ -242,12 +242,6 @@
   margin: 0;
 }
 
-.waitOn {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  color: var(--amber);
-}
 
 .tileSmall {
   font-size: 12px;

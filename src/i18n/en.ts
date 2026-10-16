@@ -619,8 +619,6 @@ export const en: Record<MessageKey, string> = {
   'booking.day.label': '{date}: {places}',
   'booking.wait.full': '{date} is full.',
   'booking.wait.join': 'Notify me if a spot opens up',
-  'booking.wait.on': 'We will notify you if a spot opens up on this day.',
-  'booking.wait.leave': 'Stop notifying me',
   'booking.wait.badge': 'Waiting for a spot',
   'booking.days.empty': 'No free days in the booking period.',
   'booking.days.emptyBody': 'Try again later or call the shop.',
