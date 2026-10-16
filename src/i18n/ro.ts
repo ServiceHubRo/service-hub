@@ -523,6 +523,7 @@ export const ro = {
   'search.howOrdered': 'Cum este ordonată lista?',
   'search.howOrdered.body1': 'După notă și numărul de recenzii. Un service nou pornește de la o notă medie. Poziția nu se poate cumpăra.',
   'search.howOrdered.body2': 'Filtrele doar restrâng lista. Distanța nu schimbă ordinea.',
+  'search.empty.none': 'Momentan nu există service-uri disponibile pentru programare.',
   'search.empty.query': 'Niciun service pentru „{q}”.',
   'search.empty.queryBody': 'Caută după numele service-ului, oraș sau serviciu (ex. frâne, ulei, ITP).',
   'search.empty.filters': 'Niciun service cu filtrele alese.',

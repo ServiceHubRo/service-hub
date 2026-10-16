@@ -124,6 +124,19 @@ test.describe('client search', () => {
     await expect(search(page)).toHaveValue('zzzz');
   });
 
+  test('no shop open yet: its own message, and the map still shows', async ({ page }) => {
+    // As before launch: the search answers no shop at all (nothing typed, no filter).
+    await page.route('**/rest/v1/rpc/search_shops', (route) => route.fulfill({ status: 200, contentType: 'application/json', body: '[]' }));
+    await signInNewClient(page);
+    await expect(page.getByText('Momentan nu există service-uri disponibile pentru programare.')).toBeVisible();
+    await expect(page.getByText('Niciun service cu filtrele alese.')).toHaveCount(0);
+    await page.getByRole('button', { name: 'Hartă' }).click();
+    await expect(page.getByRole('region', { name: 'Harta service-urilor găsite' })).toBeVisible();
+    await expect(page.getByText('Momentan nu există service-uri disponibile pentru programare.')).toBeVisible();
+    await expectNoHorizontalScroll(page);
+    await shot(page, 'search-none-map', name());
+  });
+
   test('favorites: heart on the card and on the shop page, the Favorite chip, the list in Cont', async ({ page }) => {
     await signInNewClient(page);
     // The heart saves in place: the list does not jump.

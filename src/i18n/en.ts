@@ -525,6 +525,7 @@ export const en: Record<MessageKey, string> = {
   'search.howOrdered': 'How is this list ordered?',
   'search.howOrdered.body1': 'By rating and number of reviews. A new shop starts at an average score. Placement cannot be bought.',
   'search.howOrdered.body2': "Filters only narrow the list. Distance doesn't change the order.",
+  'search.empty.none': 'No shops are available for booking yet.',
   'search.empty.query': 'No shops for “{q}”.',
   'search.empty.queryBody': 'Search by shop name, city or service (e.g. brakes, oil, inspection).',
   'search.empty.filters': 'No shops match these filters.',
