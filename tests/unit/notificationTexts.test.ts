@@ -103,7 +103,8 @@ describe('notification texts', () => {
       if (EMAIL_EVENTS.includes(event)) expect(emailForEvent({ event, lang: 'ro', params: {} }, 'https://x'), event).not.toBeNull();
       else expect(EVENTS.shop, event).toContain(event);
     }
-    const toClient = sent('notify_user');
+    // Sent by a function a later migration dropped (the warranty reminder, T37a).
+    const toClient = new Set([...sent('notify_user')].filter((e) => e !== 'warranty_ending'));
     expect(toShop.size).toBeGreaterThan(5);
     expect(toClient.size).toBeGreaterThan(10);
     for (const event of toShop) expect(EVENTS.shop, event).toContain(event);

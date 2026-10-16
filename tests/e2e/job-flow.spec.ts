@@ -182,8 +182,13 @@ test.describe('quote, work, completion, review', () => {
     await expect(odometer).toHaveAttribute('inputmode', 'numeric');
     await expect(shopA.getByRole('button', { name: 'Confirmă finalizarea' })).toBeDisabled();
     await odometer.fill('105.400');
+    // A warranty on the work (T37a): none unless chosen.
+    await expect(shopA.getByLabel('Garanție')).toHaveValue('');
+    await shopA.getByLabel('Garanție').selectOption({ label: '12 luni' });
     await expectNoHorizontalScroll(shopPage);
     await shot(shopPage, 't09-shop-complete', name());
+    await shopA.getByLabel('Garanție').scrollIntoViewIfNeeded();
+    await shot(shopPage, 't37-shop-warranty', name());
     await shopA.getByRole('button', { name: 'Confirmă finalizarea' }).click();
     await expect(shopPage.getByText(`Lucrarea ${accepted.ref} este finalizată.`, { exact: false })).toBeVisible();
     await expect(shopA).toHaveCount(0);
@@ -194,6 +199,9 @@ test.describe('quote, work, completion, review', () => {
     await expect(done).toContainText('105.400 km');
     await expect(done).toContainText('Plăcuțe frână față, Manoperă');
     await expect(done).toContainText('430 lei');
+    await expect(done).toContainText('Garanție 12 luni, până la');
+    await done.getByText('Garanție 12 luni, până la').scrollIntoViewIfNeeded();
+    await shot(page, 't37-client-warranty', name());
     await expect(await cardAction(done, 'Programează din nou')).toHaveAttribute('href', new RegExp(`/c/service/${shopId}/programare\\?pas=2&serviciu=frane`));
     await page.keyboard.press('Escape');
     await done.getByRole('button', { name: 'Lasă o recenzie' }).click();

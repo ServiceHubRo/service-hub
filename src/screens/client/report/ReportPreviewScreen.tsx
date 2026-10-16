@@ -1,6 +1,7 @@
 import { EyeOff, FileCheck, Gift } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { WarrantyNote } from '../../../components/WarrantyNote';
 import { ActionButton } from '../../../components/ActionButton';
 import { BackLink } from '../../../components/BackLink';
 import { Banner } from '../../../components/Banner';
@@ -249,6 +250,7 @@ function JobRow({ job, hidden }: { job: ReportJob; hidden: boolean }) {
         <span className={styles.jobService}>{service}</span>
         <br />
         <span className={styles.muted}>{[job.shop_name, job.shop_city].filter(Boolean).join(' · ')}</span>
+        <WarrantyNote months={job.warranty_months} until={job.warranty_until} />
       </span>
       <span className={styles.jobSide}>
         {job.cost !== null && <span className={`mono ${styles.amount}`}>{formatMoney(lang, job.cost)}</span>}

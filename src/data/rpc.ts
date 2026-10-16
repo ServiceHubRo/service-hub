@@ -141,6 +141,7 @@ export const RPC_ERROR_CODES = [
   'too_many_services',
   'too_soon',
   'work_too_long',
+  'warranty_invalid',
   'wrong_status',
 ] as const;
 
@@ -643,6 +644,8 @@ export interface CompleteJobInput {
   cost?: number;
   /** Set after the user confirmed an `odometer_jump` or an `odometer_same`. */
   confirmJump?: boolean;
+  /** Months of warranty on the work (1–60), none when left out. */
+  warrantyMonths?: number;
 }
 
 export function completeJob(input: CompleteJobInput, requestId: string): Promise<Booking> {
@@ -652,6 +655,7 @@ export function completeJob(input: CompleteJobInput, requestId: string): Promise
     p_work: input.work,
     p_cost: input.cost,
     p_confirm_jump: input.confirmJump ?? false,
+    p_warranty_months: input.warrantyMonths,
     p_request_id: requestId,
   });
 }

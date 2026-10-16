@@ -1,6 +1,7 @@
 import { Car as CarIcon, ChevronDown, FileCheck, Wrench } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { Link, useLocation, useParams } from 'react-router-dom';
+import { WarrantyNote } from '../../../components/WarrantyNote';
 import { BackLink } from '../../../components/BackLink';
 import { buttonClass } from '../../../components/buttonClass';
 import { Card } from '../../../components/Card';
@@ -252,6 +253,7 @@ function JobCard({ booking: b, open, onToggle }: { booking: ClientBooking; open:
               {formatDayMonth(lang, jobDay(b))}
               {b.odometer !== null && <span className={`mono ${styles.nowrap}`}> · {formatKm(lang, b.odometer)}</span>}
             </span>
+            <WarrantyNote months={b.warranty_months} until={b.warranty_until} />
           </span>
           <span className={styles.side}>
             {b.cost !== null && <span className={`mono ${styles.amount}`}>{formatMoney(lang, b.cost)}</span>}

@@ -34,6 +34,9 @@ export interface ReportJob {
   work: string | null;
   odometer: number | null;
   cost: number | null;
+  /** The warranty on the work (T37a). */
+  warranty_months: number | null;
+  warranty_until: string | null;
 }
 
 export interface ReportFacts {
@@ -125,6 +128,8 @@ export async function getReportPreview(target: ReportTarget): Promise<ReportPrev
       work: typeof j.work === 'string' ? j.work : null,
       odometer: n(j.odometer),
       cost: n(j.cost),
+      warranty_months: n(j.warranty_months),
+      warranty_until: typeof j.warranty_until === 'string' ? j.warranty_until : null,
     })),
     facts: {
       job_count: n(facts.job_count) ?? 0,

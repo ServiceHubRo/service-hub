@@ -456,6 +456,8 @@ export const en: Record<MessageKey, string> = {
   'unit.months.one': '{n} month',
   'unit.months.few': '{n} months',
   'unit.months.other': '{n} months',
+  'warranty.until': 'Warranty {months}, until {date}',
+  'warranty.ended': 'Warranty ended on {date}',
   'unit.hours.one': '{n} hour',
   'unit.hours.few': '{n} hours',
   'unit.hours.other': '{n} hours',
@@ -859,6 +861,7 @@ export const en: Record<MessageKey, string> = {
   'rpcError.too_soon': 'Bookings need at least {hours} notice. Pick another time.',
   'rpcError.work_too_long': 'The work description is too long.',
   'rpcError.wrong_status': 'This booking changed in the meantime.',
+  'rpcError.warranty_invalid': 'Choose a warranty between 1 and 60 months.',
 
   // Shop settings, Panou checklist, staff invitations (T05)
   'account.tile.settings': 'Shop settings',
@@ -1300,6 +1303,8 @@ export const en: Record<MessageKey, string> = {
   'sb.complete.workHint': 'Visible to the client.',
   'sb.complete.cost': 'Total cost, RON (optional)',
   'sb.complete.costHint': 'Change the amount if it differs from the accepted total.',
+  'sb.complete.warranty': 'Warranty',
+  'sb.complete.warrantyNone': 'No warranty',
   'sb.complete.submit': 'Confirm completion',
   'unit.km': 'km',
   'invite.title': 'Team invitation',

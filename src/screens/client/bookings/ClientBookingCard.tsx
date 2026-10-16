@@ -1,6 +1,7 @@
 import { History, MessageSquare, Phone, RotateCcw, Star } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { WarrantyNote } from '../../../components/WarrantyNote';
 import { ActionButton } from '../../../components/ActionButton';
 import { BookingProgress } from '../../../components/BookingProgress';
 import { Button } from '../../../components/Button';
@@ -127,6 +128,7 @@ export function ClientBookingCard({
         {b.status === 'done' && b.odometer !== null && <span className="mono"> · {formatKm(lang, b.odometer)}</span>}
         {car && <span className={styles.muted}> · {car}</span>}
       </p>
+      {b.status === 'done' && <WarrantyNote months={b.warranty_months} until={b.warranty_until} />}
       {b.status !== 'done' && <BookingProgress status={b.status} />}
       {b.note && <p className={styles.note}>{b.note}</p>}
       {b.offer_percent !== null && !OFFER_GONE.has(b.status) && <OfferNote>{offerText.promise('client', b.offer_percent, b.offer_kind)}</OfferNote>}
