@@ -122,16 +122,16 @@ select test.eq(
   'admin_create_category, admin_create_service, admin_decide_review, admin_decide_suspect_review, admin_export, admin_extend_trial, admin_force_cancel, '
   || 'admin_get_booking, admin_get_client, admin_get_shop, admin_get_thread, admin_grant_report_credit, admin_list_audit, admin_list_bookings, '
   || 'admin_list_catalog, admin_list_clients, admin_list_company_checks, admin_list_history_reports, admin_list_notices, admin_list_reviews, '
-  || 'admin_list_service_areas, admin_list_shops, admin_list_subscriptions, admin_list_suspect_reviews, admin_move_catalog_item, admin_notice_preview, admin_overview, '
+  || 'admin_list_service_areas, admin_list_shops, admin_list_subscriptions, admin_list_suggestions, admin_list_suspect_reviews, admin_move_catalog_item, admin_notice_preview, admin_overview, '
   || 'admin_send_notice, admin_set_account_suspended, admin_set_area_mode, admin_set_notification_text, admin_set_service_reminder, admin_set_shop_suspended, '
-  || 'admin_set_subscription_price, admin_set_subscription_status, admin_update_category, admin_update_service, '
+  || 'admin_set_subscription_price, admin_set_subscription_status, admin_set_suggestion_status, admin_update_category, admin_update_service, '
   || 'admin_update_settings, admin_update_shop, admin_verify_phone, admin_void_history_report, admin_withdraw_notice, booking_thread, can_read_booking, can_read_notice, can_read_shop, can_read_thread, cancel_booking, '
   || 'cancel_email_change, check_phone_code, claim_booking, client_no_show_count, complete_job, confirm_booking, create_booking, decide_quote, '
   || 'decline_booking, export_my_data, get_availability, get_shop_page, get_shop_setup, history_report_preview, invite_staff, is_admin, is_shop_member, '
   || 'is_shop_owner, is_shop_public, join_area_waitlist, join_slot_waitlist, last_odometer_for_booking, leave_area_waitlist, leave_slot_waitlist, list_imported_jobs, list_service_areas, list_shop_bookings, list_shop_history, list_shop_staff, list_threads, '
   || 'mark_no_show, mark_thread_read, my_client_referrals, my_imported_jobs, my_phone_verification, my_referrals, my_shop_id, my_subscription_offers, new_client_offers, phone_digits, replace_quote, reply_review, report_review, reschedule_booking, save_native_push_token, save_push_subscription, '
   || 'save_shop_hours, search_card_extras, search_cities, search_shops, send_message, send_quote, set_booking_history_share, set_shop_services, shop_cancel_booking, shop_create_booking, shop_decide_quote, shop_import_add, shop_import_begin, shop_import_undo, shop_offers, shop_reports, shop_vehicle_file, start_inspection, '
-  || 'start_work, submit_review, toggle_favorite, touch_last_active, withdraw_quote',
+  || 'start_work, submit_review, submit_suggestion, toggle_favorite, touch_last_active, withdraw_quote',
   'functions callable only when signed in')
 from pg_proc p where p.pronamespace = 'public'::regnamespace;
 

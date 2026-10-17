@@ -1,4 +1,4 @@
-import { CreditCard, Download, FileCheck, FileText, Heart, Landmark, History, LifeBuoy, ListTree, MapPinned, Megaphone, QrCode, ScrollText, Settings, SlidersHorizontal, Star } from 'lucide-react';
+import { CreditCard, Download, FileCheck, FileText, Heart, Landmark, History, LifeBuoy, Lightbulb, ListTree, MapPinned, Megaphone, QrCode, ScrollText, Settings, SlidersHorizontal, Star } from 'lucide-react';
 import { useCallback, useRef, useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import type { ShellOutletContext } from '../../app/AppShell';
@@ -20,13 +20,14 @@ import {
   ADMIN_REPORTS_PATH,
   ADMIN_SETTINGS_PATH,
   ADMIN_SUBSCRIPTIONS_PATH,
+  ADMIN_SUGGESTIONS_PATH,
 } from '../admin/paths';
 import { FAVORITES_PATH, MY_REPORTS_PATH, VEHICLE_HISTORY_PICK_PATH } from '../client/paths';
 import { REVIEWS_PATH, SHOP_LINK_PATH } from '../shop/paths';
 import { SETTINGS_PATH } from '../shop/settings/paths';
 import { OwnerTiles } from '../shop/OwnerTiles';
 import { DataSection } from './DataSection';
-import { helpPath } from './paths';
+import { helpPath, suggestionsPath } from './paths';
 import { IdentityCard } from './IdentityCard';
 import { InviteCard } from './InviteCard';
 import { LocationRow } from './LocationRow';
@@ -105,6 +106,7 @@ export function AccountScreen({ role }: { role: Role }) {
           <Tile to={ADMIN_SETTINGS_PATH} icon={SlidersHorizontal} label={t('admin.settings.title')} hint={t('admin.settings.tileHint')} />
           <Tile to={ADMIN_NOTICES_PATH} icon={Megaphone} label={t('admin.notices.title')} hint={t('admin.notices.tileHint')} />
           <Tile to={ADMIN_ZONES_PATH} icon={MapPinned} label={t('admin.areas.title')} hint={t('admin.areas.tileHint')} />
+          <Tile to={ADMIN_SUGGESTIONS_PATH} icon={Lightbulb} label={t('admin.sugg.title')} hint={t('admin.sugg.tileHint')} />
           <Tile to={ADMIN_ANAF_PATH} icon={Landmark} label={t('anaf.title')} hint={t('anaf.tileHint')} />
           <Tile to={ADMIN_EXPORT_PATH} icon={Download} label={t('admin.export.title')} hint={t('admin.export.tileHint')} />
           <Tile to={ADMIN_AUDIT_PATH} icon={ScrollText} label={t('admin.audit.title')} hint={t('admin.audit.tileHint')} />
@@ -118,6 +120,7 @@ export function AccountScreen({ role }: { role: Role }) {
           <h2 className={styles.section}>{t('help.title')}</h2>
           <div className={styles.tiles}>
             <Tile to={helpPath(role)} icon={LifeBuoy} label={t('help.title')} hint={t('help.tileHint')} />
+            <Tile to={suggestionsPath(role)} icon={Lightbulb} label={t('sugg.title')} hint={t('sugg.tileHint')} />
           </div>
         </>
       )}

@@ -221,6 +221,25 @@ Ordinea contează: dacă pornești întâi pasul 3, logarea pe site-ul publicat 
 
 **Verifici:** pe site-ul publicat, la **Intră în cont**, apare căsuța Cloudflare deasupra butonului și logarea merge. Pe un link de test căsuța nu apare (acolo e proiectul de test, fără CAPTCHA).
 
+### 4.3b Harta (MapTiler)
+
+Harta din Caută și de pe pagina service-ului folosește acum serverul gratuit OpenStreetMap, care nu acceptă traficul unei aplicații publice și poate bloca harta oricând. MapTiler e gratuit până la 100.000 de afișări de hartă pe lună (apoi de la ~25 $/lună).
+
+1. **cloud.maptiler.com** → fă-ți cont (gratuit, fără card).
+2. **API keys** (în meniul din stânga) → la cheia care există deja (sau **New key**): **Allowed HTTP origins** → adaugi pe rând `service-hub.ro`, `www.service-hub.ro` și `service-hubapp.netlify.app` → **Save**. Așa cheia merge doar pe site-ul tău. Copiezi cheia (șirul lung de litere și cifre).
+3. **Netlify** → `service-hubapp` → **Site configuration → Environment variables → Add a variable**, de două ori, ambele cu **Different value for each deploy context** → doar la **Production** pui valoarea, restul le lași goale (linkurile de test rămân pe OpenStreetMap):
+
+| Key | Valoare la Production |
+|---|---|
+| `VITE_MAP_TILE_URL` | `https://api.maptiler.com/maps/streets-v2-dark/256/{z}/{x}/{y}.png?key=CHEIA` (înlocuiești `CHEIA` cu cheia de la pasul 2; restul exact așa) |
+| `VITE_MAP_ATTRIBUTION` | `<a href="https://www.maptiler.com/copyright/">&copy; MapTiler</a> <a href="https://www.openstreetmap.org/copyright">&copy; OpenStreetMap</a>` |
+
+4. **Deploys → Trigger deploy → Deploy site** și aștepți să fie gata (2–3 minute).
+
+Cheia e publică prin natura ei (se vede în browser, ca la CAPTCHA); originile de la pasul 2 o apără.
+
+**Verifici:** pe site-ul publicat → **Caută → Hartă**: harta apare, iar jos, în dreapta, scrie „© MapTiler © OpenStreetMap”. În MapTiler → **Analytics** apar primele afișări a doua zi. Aplicația Android de test rămâne deocamdată pe OpenStreetMap; o mutăm pe MapTiler la publicarea în magazine (T20c).
+
 ### 4.4 Domeniul service-hub.ro
 
 Acum `service-hub.ro` arată pagina „în curând”. După pasul ăsta arată aplicația. Emailurile (`contact@service-hub.ro` și cele trimise de aplicație prin Resend) **nu se ating**.

@@ -1,0 +1,78 @@
+/* Sugestii (T26): the author's screen and the admin's list. */
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.body {
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 12px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.pill {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: var(--radius-pill);
+  white-space: nowrap;
+}
+
+.blue {
+  color: var(--blue);
+  background: var(--blue-soft);
+}
+
+.amber {
+  color: var(--amber);
+  background: var(--amber-soft);
+}
+
+.green {
+  color: var(--green);
+  background: var(--green-soft);
+}
+
+.grey {
+  color: var(--muted-strong);
+  background: var(--muted-soft);
+}
+
+.sent {
+  color: var(--green);
+  font-weight: 600;
+  margin: 0;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}

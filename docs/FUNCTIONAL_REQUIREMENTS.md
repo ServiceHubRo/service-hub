@@ -128,6 +128,7 @@ A user has exactly one role. The role decides the entire interface. A client can
 - Favorites list.
 - My reports: purchased history reports, free to re-download.
 - Legal documents (3), readable in-app.
+- Help and contact; Suggestions (T26): write an idea (≤ 1,000 characters, 5 a day), see your own with their state (received, planned, done, not now).
 - My data: export, delete account.
 - Log out.
 
@@ -212,7 +213,7 @@ A user has exactly one role. The role decides the entire interface. A client can
 - **Rule:** when the trial ends without payment, or after final failed payment retry, the shop becomes **inactive**: hidden from search and unable to receive new bookings. Existing bookings continue. All data kept. Paying reactivates immediately.
 
 ### 4.8 Account
-- Same as client account, plus: shop account ID, tiles for Settings, Subscription, Reviews and Reports.
+- Same as client account (including Suggestions), plus: shop account ID, tiles for Settings, Subscription, Reviews and Reports.
 
 ### 4.9 Reports (owner only)
 - Period chips: this month · last 3 months · this year · all time.
@@ -271,6 +272,9 @@ Admin has a separate login route. No public link to it. Every admin action is wr
 
 ### 5.11 Exports
 - CSV: shops, clients, bookings, reviews, subscriptions.
+
+### 5.12 Suggestions (T26)
+- A tile in the admin's Cont: every suggestion from clients and shops, newest first, filtered by state, with who wrote it; the admin sets the state the author sees (new, planned, done, not now). Audited.
 
 ---
 

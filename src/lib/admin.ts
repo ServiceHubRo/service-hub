@@ -153,6 +153,8 @@ export const AUDIT_ACTIONS = [
   'withdraw_notice',
   'export',
   'update_area',
+  // T26
+  'update_suggestion',
 ] as const;
 
 export interface AuditChange {

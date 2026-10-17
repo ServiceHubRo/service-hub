@@ -79,6 +79,7 @@ for (const lang of ['ro', 'en'] as const) {
       '/c/cont/favorite',
       '/c/cont/istoric',
       '/c/cont/rapoarte',
+      '/c/cont/sugestii',
       '/c/cont/legal/termeni',
       '/c/nu-exista',
     ]);
@@ -109,6 +110,7 @@ for (const lang of ['ro', 'en'] as const) {
       '/s/cont/recenzii',
       '/s/cont/abonament',
       '/s/cont/rapoarte',
+      '/s/cont/sugestii',
     ]);
   });
 
@@ -136,6 +138,7 @@ for (const lang of ['ro', 'en'] as const) {
       '/admin/cont/anunturi',
       '/admin/cont/export',
       '/admin/cont/anaf',
+      '/admin/cont/sugestii',
     ]);
   });
 }

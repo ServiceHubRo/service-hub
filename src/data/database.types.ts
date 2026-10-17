@@ -2700,6 +2700,61 @@ export type Database = {
           },
         ]
       }
+      suggestions: {
+        Row: {
+          author_id: string
+          author_role: string
+          body: string
+          created_at: string
+          id: string
+          shop_id: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          author_id: string
+          author_role: string
+          body: string
+          created_at?: string
+          id?: string
+          shop_id?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          author_id?: string
+          author_role?: string
+          body?: string
+          created_at?: string
+          id?: string
+          shop_id?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "suggestions_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "suggestions_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shop_ratings"
+            referencedColumns: ["shop_id"]
+          },
+          {
+            foreignKeyName: "suggestions_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       threads: {
         Row: {
           client_id: string | null
@@ -2950,6 +3005,7 @@ export type Database = {
       admin_list_service_areas: { Args: never; Returns: Json }
       admin_list_shops: { Args: never; Returns: Json }
       admin_list_subscriptions: { Args: never; Returns: Json }
+      admin_list_suggestions: { Args: never; Returns: Json }
       admin_list_suspect_reviews: { Args: never; Returns: Json }
       admin_move_catalog_item: {
         Args: {
@@ -3025,6 +3081,10 @@ export type Database = {
       }
       admin_set_subscription_status: {
         Args: { p_request_id: string; p_shop_id: string; p_status: string }
+        Returns: Json
+      }
+      admin_set_suggestion_status: {
+        Args: { p_id: string; p_request_id: string; p_status: string }
         Returns: Json
       }
       admin_subscription_rows: { Args: never; Returns: Json }
@@ -3634,6 +3694,7 @@ export type Database = {
       export_my_data_base: { Args: never; Returns: Json }
       export_my_data_t32: { Args: never; Returns: Json }
       export_my_data_t35: { Args: never; Returns: Json }
+      export_my_data_t37b: { Args: never; Returns: Json }
       fail: { Args: { p_code: string; p_params?: Json }; Returns: undefined }
       finish_history_report: {
         Args: { p_generated_at?: string; p_path: string; p_report_id: string }
@@ -5139,6 +5200,10 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      submit_suggestion: {
+        Args: { p_body: string; p_request_id: string }
+        Returns: Json
       }
       subscription_checkout_info: { Args: { p_user_id: string }; Returns: Json }
       subscription_for_customer: {
