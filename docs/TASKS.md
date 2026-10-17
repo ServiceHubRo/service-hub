@@ -52,7 +52,7 @@ Ordinea contează: fiecare sarcină se sprijină pe cele de dinainte. Sarcinile 
 | T23 | Oferte pentru clienți noi | Service-ul alege o reducere la manoperă pentru prima programare; clientul o vede în căutare și la programare |
 | T24 | Notificări care aduc clienții înapoi | Ore de liniște 21–9, anvelopele de sezon, sfaturi de început, ofertele favoritelor, cereri fără răspuns, raportul lunii pentru service |
 | T25 | Mai puține fraude | CUI verificat la ANAF, recenzii suspecte în Moderare, telefon confirmat după neprezentări, cod din telefon pentru admin |
-| T26 | Sugestii de la utilizatori | Un loc unde clienții și service-urile scriu idei — amânat (Eduard, 1 oct) |
+| T26 | Sugestii de la utilizatori | Clienții și service-urile scriu idei din Cont; adminul le vede și le dă o stare |
 | T27 | Fișa mașinii | Service-ul vede tot ce a lucrat la o mașină și, cu acordul clientului, ce s-a făcut la alte service-uri (fără prețuri și nume) |
 | T29 | Programări adăugate de service | Clienții care sună sau vin direct: service-ul îi trece în aplicație, clientul primește SMS cu link și o poate prelua în cont |
 | T31 | Import din alt program | Service-ul își aduce clienții, mașinile și lucrările dintr-un fișier Excel/CSV (T31a); linkul și codul QR ale service-ului, istoricul importat în contul clientului (T31b) |
@@ -732,7 +732,7 @@ Note: nicio migrare, niciun pachet nou. **Lista** `docs/LAUNCH_CHECK.md`: fiecar
 
 ### T19e — Lansarea: domeniul, plățile reale, CAPTCHA, adminul, copiile de siguranță
 
-Pașii tăi din `docs/LANSARE.md`, Partea 4 (în ordine: copiile de siguranță, Stripe live, CAPTCHA Turnstile, domeniul service-hub.ro, adresele din Supabase Auth și `APP_URL`, contul de admin), apoi Partea 5 (ștergerea conturilor de test) și lista „Ce verifici tu” din `docs/LAUNCH_CHECK.md`, partea C. Claude te ajută la fiecare pas: îi spui unde ai ajuns și ce vezi.
+Pașii tăi din `docs/LANSARE.md`, Partea 4 (în ordine: copiile de siguranță, Stripe live, CAPTCHA Turnstile, harta MapTiler, domeniul service-hub.ro, adresele din Supabase Auth și `APP_URL`, contul de admin), apoi Partea 5 (ștergerea conturilor de test) și lista „Ce verifici tu” din `docs/LAUNCH_CHECK.md`, partea C. Claude te ajută la fiecare pas: îi spui unde ai ajuns și ce vezi.
 
 **Gata când:** service-hub.ro deschide aplicația, iar partea C din `docs/LAUNCH_CHECK.md` e bifată.
 
@@ -1058,3 +1058,19 @@ Migrarea `slot_waitlist` (`schema_version` = 77). Teste: `tests/sql/125_slot_wai
 **În baza de date:** `quote_items.option_group`, `variant`, `brand`; cel mult o variantă pe poziție (`quote_variant_both`). Migrările `quote_variants` (`schema_version` = 78) și `quote_part_kind` (79, piesa pe o poziție simplă). Teste: `tests/sql/126_quote_variants.sql`, `tests/e2e/quote-variants.spec.ts`, `tests/unit/quoteLines.test.ts`. Fără pachete noi.
 
 **Rămas:** raportul de istoric (PDF) și fișa mașinii arată doar numele lucrărilor, fără variantă.
+
+## T26 — Sugestii de la utilizatori ✅
+
+Pornită pe 17 oct 2026, după reverificarea de dinainte de lansare (Eduard: „fă-le pe amândouă”).
+
+**Clientul și service-ul:** în Cont, lângă „Ajutor și contact”, caseta **Sugestii** (`/c/cont/sugestii`, `/s/cont/sugestii`): un câmp de până la 1.000 de caractere, cu numărătoarea sub el, „Trimite sugestia”, apoi lista „Sugestiile tale”, fiecare cu data și starea: Primită, Planificată, Făcută sau Nu acum. Orice coleg al unui service poate scrie; adminul vede și service-ul pentru care scrie.
+
+**Adminul:** Cont → **Sugestii** (`/admin/cont/sugestii`): toate sugestiile, cele mai noi primele, cu filtrele Toate · Nouă · Planificată · Făcută · Nu acum (cu numărul fiecăreia), cine a scris-o (clientul, cu linkul la fișa lui, sau service-ul, cu linkul la pagina lui de admin) și butoanele pentru celelalte stări. Fiecare schimbare intră în jurnal („Stare sugestie schimbată”).
+
+**Reguli în baza de date:** tabelul `suggestions`; autorul își citește doar sugestiile lui, nimeni nu scrie direct în tabel. `submit_suggestion` (doar clienți și service-uri, text gol sau peste 1.000 de caractere refuzat, cel mult 5 în 24 de ore: `limit_suggestions`), `admin_list_suggestions`, `admin_set_suggestion_status` (doar adminul, cu codul din telefon). Sugestiile apar în „Datele mele” și se șterg odată cu contul.
+
+Migrarea `suggestions` (`schema_version` = 80). Teste: `tests/sql/127_suggestions.sql`, `tests/e2e/suggestions.spec.ts` (client și service, apoi adminul, la 390 / 820 / 1440 px), ecranele noi în verificarea de accesibilitate (RO și EN). Fără pachete noi.
+
+**Tot acum:** pasul pentru harta MapTiler în `docs/LANSARE.md` (4.3b), care lipsea din ghid; adresa hărții din `docs/SERVICII_EXTERNE.md` corectată (`/256/`, ca harta să nu iasă de două ori mai mică).
+
+**Decizii:** (1) caseta stă lângă „Ajutor și contact”, nu într-un meniu nou; (2) adminul nu primește email sau notificare la fiecare sugestie, le vede când deschide caseta; (3) autorul nu primește notificare când adminul schimbă starea, o vede în listă; (4) lista adminului nu se actualizează singură (o sugestie nouă apare la redeschidere). **Rămas:** un răspuns scris de admin la o sugestie, dacă va fi nevoie.
