@@ -288,6 +288,8 @@ No-shows: `client_no_show_count(client_id, 90 days)`. At 3 or more, shops see a 
 
 ## 7. Odometer
 
+**slot_waitlist (T37b, migration `slot_waitlist`, schema 77)** — primary key `(client_id, shop_id, date)`, `created_at`, `notified_at`. The client reads their own rows (RLS); writes only through `join_slot_waitlist(shop_id, date, request_id)` (clients; `past_slot`, `shop_not_found`, at most 10 days at once → `waitlist_limit`; asking again clears `notified_at`) and `leave_slot_waitlist(shop_id, date, request_id)`. Trigger `bookings_slot_waitlist`: an active booking of the client on that day and shop ends the wait; an active booking leaving its day (status no longer active, or date/shop changed) calls `notify_slot_waitlist(shop, day)`, which — when the day is not past, the shop is public and the active bookings are under `daily_capacity` — tells everyone not yet told (`slot_freed`, push, not quiet) and sets `notified_at`. In `export_my_data()` (wraps `export_my_data_t35()`).
+
 **Warranty (T37a, migration `job_warranty`, schema 75):** `bookings.warranty_months` (1–60) and `warranty_until` (date, both or neither), written only by `complete_job`; shown on the client's finished booking, the car's history, the report preview and PDF (`report_jobs` carries them) and the shop's Istoric (`list_shop_history`). No reminder before it ends (Eduard; the first version had one, removed by migration `remove_warranty_reminder`, schema 76).
 
 `complete_job` requires `odometer`. Last known reading = highest `odometer` among `done` bookings with the same `car_snapshot->>'plate_norm'` (any shop). Checked in this order:

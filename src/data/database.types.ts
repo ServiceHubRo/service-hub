@@ -2525,6 +2525,52 @@ export type Database = {
           },
         ]
       }
+      slot_waitlist: {
+        Row: {
+          client_id: string
+          created_at: string
+          date: string
+          notified_at: string | null
+          shop_id: string
+        }
+        Insert: {
+          client_id: string
+          created_at?: string
+          date: string
+          notified_at?: string | null
+          shop_id: string
+        }
+        Update: {
+          client_id?: string
+          created_at?: string
+          date?: string
+          notified_at?: string | null
+          shop_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "slot_waitlist_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "slot_waitlist_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shop_ratings"
+            referencedColumns: ["shop_id"]
+          },
+          {
+            foreignKeyName: "slot_waitlist_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       stripe_events: {
         Row: {
           created_at: string
@@ -3567,6 +3613,7 @@ export type Database = {
       export_my_data: { Args: never; Returns: Json }
       export_my_data_base: { Args: never; Returns: Json }
       export_my_data_t32: { Args: never; Returns: Json }
+      export_my_data_t35: { Args: never; Returns: Json }
       fail: { Args: { p_code: string; p_params?: Json }; Returns: undefined }
       finish_history_report: {
         Args: { p_generated_at?: string; p_path: string; p_report_id: string }
@@ -3686,6 +3733,10 @@ export type Database = {
         }
         Returns: Json
       }
+      join_slot_waitlist: {
+        Args: { p_date: string; p_request_id: string; p_shop_id: string }
+        Returns: Json
+      }
       jsonb_changes: {
         Args: { p_after: Json; p_before: Json; p_keys: string[] }
         Returns: Json
@@ -3703,6 +3754,10 @@ export type Database = {
       last_seen: { Args: { p_user_id: string }; Returns: string }
       launch_slots_left: { Args: { p_city: string }; Returns: number }
       leave_area_waitlist: { Args: { p_request_id: string }; Returns: Json }
+      leave_slot_waitlist: {
+        Args: { p_date: string; p_request_id: string; p_shop_id: string }
+        Returns: Json
+      }
       limit_range: { Args: { p_key: string }; Returns: unknown }
       link_imported: {
         Args: { p_profile: string; p_shop: string }
@@ -3974,6 +4029,10 @@ export type Database = {
           p_shop_id: string
         }
         Returns: undefined
+      }
+      notify_slot_waitlist: {
+        Args: { p_date: string; p_shop_id: string }
+        Returns: number
       }
       notify_user: {
         Args: {

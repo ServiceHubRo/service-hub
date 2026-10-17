@@ -70,6 +70,7 @@ const SAMPLE: Record<string, Record<string, unknown>> = {
   welcome: { day: 3, has_car: false },
   area_launched: { area: 'CJ', area_ro: 'Cluj', area_en: 'Cluj', shops: 3 },
   report_credit: {},
+  slot_freed: { shop_id: 's-1', shop_name: 'Atelier Unu', date: '2026-10-23' },
   favorite_offer: { percent: 15 },
   booking_request_waiting: {},
   booking_request_last_call: {},
@@ -238,6 +239,14 @@ describe('notification texts', () => {
       tag: 'report_credit',
     });
     expect(render('report_credit', 'client', 'en')!.title).toBe('You got a free report');
+    // T37b: a place frees on a day the client waits for.
+    expect(render('slot_freed', 'client', 'ro')).toMatchObject({
+      title: 'S-a eliberat un loc la Atelier Unu',
+      body: 'Vin 23 oct are acum un loc liber. Programează-te din aplicație.',
+      url: '/c/service/s-1?zi=2026-10-23',
+      tag: 'slot-s-1-2026-10-23',
+    });
+    expect(render('slot_freed', 'client', 'en')!.body).toBe('Fri, Oct 23 now has a free spot. Book in the app.');
     // Given by the admin: no friend in the sentence.
     expect(render('report_credit', 'client', 'ro', { source: 'admin' })).toMatchObject({
       title: 'Ai primit un raport gratuit',

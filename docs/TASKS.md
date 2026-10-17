@@ -1035,9 +1035,15 @@ Cerut de Eduard (16 oct), din propunerile pentru funcții noi. Împărțit în t
 
 Migrările `job_warranty` (`schema_version` = 75) și `remove_warranty_reminder` (76). Teste: `tests/sql/124_job_warranty.sql`, `tests/e2e/job-flow.spec.ts` (garanția la finalizare și pe cardul clientului), unit pentru rândul din raport. Fără pachete noi.
 
-### T37b — „Anunță-mă dacă se eliberează un loc”
+### T37b — „Anunță-mă dacă se eliberează un loc” ✅
 
-- [ ] Făcut
+**La pasul „Alege ziua”**, o zi plină se poate apăsa: sub zile apare „{zi} este plină.” și comutatorul „Anunță-mă dacă se eliberează un loc”. Comutatorul pornit pune un clopoțel pe zi; oprit, anunțul se anulează. Pe telefon, panoul se aduce în ecran.
+
+**Când se eliberează un loc** (programare anulată, refuzată, neprezentare, mutată pe altă zi sau la alt service, terminată) și ziua are din nou loc, toți cei care așteaptă primesc odată un push „S-a eliberat un loc la {service}”. Apăsat, deschide pagina service-ului pe acea zi. Primul care se programează ia locul. Fiecare cerere anunță o singură dată; se poate cere din nou.
+
+**Reguli în baza de date:** doar clienții, doar zile de azi încolo, la un service public, cel mult 10 zile așteptate odată (`waitlist_limit`). O programare făcută în acea zi la acel service încheie așteptarea. Rândurile sunt ale clientului (RLS), scrise doar prin `join_slot_waitlist` / `leave_slot_waitlist`; apar în „Datele mele”.
+
+Migrarea `slot_waitlist` (`schema_version` = 77). Teste: `tests/sql/125_slot_waitlist.sql`, `tests/e2e/booking.spec.ts` (ziua plină, anunțul pus și scos, RO și EN), unit pentru notificare. Fără pachete noi.
 
 ### T37c — Variante la deviz (piesă originală sau alternativă)
 

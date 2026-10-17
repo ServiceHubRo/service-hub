@@ -247,8 +247,25 @@ test.describe('booking', () => {
     await page2.goto(`/c/service/${shopId}/programare?pas=2&serviciu=ulei`);
     await expect(page2.getByRole('heading', { level: 1, name: 'Pick a day' })).toBeVisible();
     const fullDay = page2.getByRole('button', { name: `${formatDate('en', day)}: full` });
-    await expect(fullDay).toBeDisabled();
+    await expect(fullDay).toBeVisible();
     await shot(page2, 't07-step2-full-en', name());
+    // A full day: "Notify me if a spot opens up" (T37b), and taken back.
+    await fullDay.click();
+    await expect(page2.getByText(`${formatDate('en', day)} is full.`)).toBeVisible();
+    const notify = page2.getByRole('switch', { name: 'Notify me if a spot opens up' });
+    await expect(notify).not.toBeChecked();
+    await notify.check();
+    await expect(notify).toBeChecked();
+    await expect(page2.getByRole('button', { name: `${formatDate('en', day)}: full, Waiting for a spot` })).toBeVisible();
+    await expectNoHorizontalScroll(page2);
+    await shot(page2, 't37-waitlist-en', name());
+    await page2.getByRole('button', { name: 'Română' }).filter({ visible: true }).first().click();
+    await expect(page2.getByRole('switch', { name: 'Anunță-mă dacă se eliberează un loc' })).toBeChecked();
+    await shot(page2, 't37-waitlist-ro', name());
+    await page2.getByRole('button', { name: 'English' }).filter({ visible: true }).first().click();
+    await notify.uncheck();
+    await expect(page2.getByRole('button', { name: `${formatDate('en', day)}: full` })).toBeVisible();
+    await fullDay.click();
 
     // The screen stays open on step 4 while someone else takes the last place of that day.
     await page2.getByRole('button', { name: /: 1 spot$/ }).first().click();
@@ -267,7 +284,7 @@ test.describe('booking', () => {
     await page2.getByRole('button', { name: 'Send request' }).click();
     await expect(page2.getByRole('heading', { level: 1, name: 'Pick a day' })).toBeVisible();
     await expect(page2.getByText('That day just filled up. Pick another day.')).toBeVisible();
-    await expect(page2.getByRole('button', { name: `${formatDate('en', picked.day)}: full` })).toBeDisabled();
+    await expect(page2.getByRole('button', { name: `${formatDate('en', picked.day)}: full` })).toBeVisible();
     await expectNoHorizontalScroll(page2);
     await shot(page2, 't07-day-filled-en', name());
     await other.close();

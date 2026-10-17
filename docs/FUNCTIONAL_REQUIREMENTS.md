@@ -73,7 +73,7 @@ A user has exactly one role. The role decides the entire interface. A client can
 
 ### 3.3 Booking flow (4 steps with progress bar)
 1. **Service** — only what this shop offers, grouped by category. One or more services, up to 5, in the same booking (T21): each tap ticks one, "Continue · N services" stays in sight at the bottom. Still one car, one time, one place of the day's capacity.
-2. **Day** — next available days; respects weekly closed days, special closed dates, minimum notice, maximum advance. Shows remaining places per day; full days greyed out.
+2. **Day** — next available days; respects weekly closed days, special closed dates, minimum notice, maximum advance. Shows remaining places per day; full days greyed out. Tapping a full day offers "Notify me if a spot opens up" (T37b): when a booking of that day leaves it, everyone waiting is told once by push; the first to book gets the place; at most 10 days waited for at once.
 3. **Time** — slots of the shop's slot length (default 60 min) within that day's hours; a slot is taken when it holds the shop's "cars per slot" (default 1); taken slots struck through.
 4. **Car** — pick from Garage in one tap, or enter manually with "save to garage" ticked by default. Optional note. Summary. Submit.
 - Booking is created as **Pending**. Confirmation screen.
