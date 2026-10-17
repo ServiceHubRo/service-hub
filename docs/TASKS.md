@@ -1045,6 +1045,14 @@ Migrările `job_warranty` (`schema_version` = 75) și `remove_warranty_reminder`
 
 Migrarea `slot_waitlist` (`schema_version` = 77). Teste: `tests/sql/125_slot_waitlist.sql`, `tests/e2e/booking.spec.ts` (ziua plină, anunțul pus și scos, RO și EN), unit pentru notificare. Fără pachete noi.
 
-### T37c — Variante la deviz (piesă originală sau alternativă)
+### T37c — Variante la deviz (piesă originală sau alternativă) ✅
 
-- [ ] Făcut
+**În devizul service-ului**, sub fiecare poziție e butonul „+ Piesă alternativă”. Apăsat, adaugă sub poziție prețul piesei alternative și „Marca (opțional)”; prețul de sus devine „Originală, lei”. Totalul afișat numără piesa originală. Devizul editat păstrează variantele.
+
+**Clientul** vede poziția cu bifă și două opțiuni: „Piesă originală” și „Piesă alternativă, {marca}”, fiecare cu prețul ei. Originala e aleasă la început, totalul urmează alegerea. Debifată, poziția rămâne pe dinafară; bifată din nou, revine la varianta aleasă înainte. „Accept” când fiecare poziție e luată într-o variantă, „Accept selectate” când lipsește una. Același lucru în „Răspunsul clientului” (client fără cont).
+
+**Service-ul** vede ambele variante, fiecare numită; după răspuns, cea neluată e tăiată. La finalizare, lucrarea precompletată scrie „{poziție} (piesă alternativă)” pentru alternativa luată. Istoricul arată la fel.
+
+**În baza de date:** `quote_items.option_group`, `variant`, `brand`; cel mult o variantă pe poziție (`quote_variant_both`). Migrarea `quote_variants` (`schema_version` = 78). Teste: `tests/sql/126_quote_variants.sql`, `tests/e2e/quote-variants.spec.ts`, `tests/unit/quoteLines.test.ts`. Fără pachete noi.
+
+**Rămas:** raportul de istoric (PDF) și fișa mașinii arată doar numele lucrărilor, fără variantă.

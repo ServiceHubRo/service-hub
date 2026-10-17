@@ -1,3 +1,4 @@
+import { QuoteVariantTag } from '../../../components/QuoteVariantTag';
 import type { ShopQuote } from '../../../data/shopBookings';
 import { useI18n } from '../../../i18n/context';
 import { formatMoney } from '../../../i18n/format';
@@ -5,7 +6,8 @@ import styles from './shopBookings.module.css';
 
 /**
  * A sent quote's lines with the total. After the client's decision, refused lines are struck
- * through (and say so in words) and the total is the approved one.
+ * through (and say so in words) and the total is the approved one. A line with variants shows
+ * both, each named (T37c); the one not taken is struck through.
  */
 export function QuoteLines({ quote }: { quote: ShopQuote }) {
   const { t, lang } = useI18n();
@@ -21,6 +23,7 @@ export function QuoteLines({ quote }: { quote: ShopQuote }) {
               <span className={styles.quoteName}>
                 {item.name}
                 {refused && <span className="visually-hidden">, {t('sb.quote.refusedLine')}</span>}
+                <QuoteVariantTag item={item} />
               </span>
               <span className="mono">{formatMoney(lang, item.price)}</span>
             </li>

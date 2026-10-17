@@ -3,6 +3,7 @@ import { call, type Booking } from './rpc';
 import type { CarSnapshot } from './bookings';
 import type { BookingStatus } from '../lib/status';
 import type { ExtraService } from '../lib/bookingServices';
+import type { QuoteVariantFields } from '../lib/quoteLines';
 
 /**
  * The shop's active bookings for Panou and Programări (FR §4.1, §4.2; T08), in one read:
@@ -12,7 +13,7 @@ import type { ExtraService } from '../lib/bookingServices';
 
 export type QuoteStatus = 'sent' | 'accepted' | 'partially_accepted';
 
-export interface ShopQuoteItem {
+export interface ShopQuoteItem extends QuoteVariantFields {
   id: string;
   position: number;
   name: string;

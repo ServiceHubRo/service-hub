@@ -3,14 +3,17 @@ import { ActionButton } from '../../../components/ActionButton';
 import { Button } from '../../../components/Button';
 import { Checkbox } from '../../../components/Checkbox';
 import { InlinePanel } from '../../../components/InlinePanel';
+import { QuoteVariantChoice } from '../../../components/QuoteVariantChoice';
 import { canRetryRpc, decideQuote, rpcErrorMessage, type Booking } from '../../../data/rpc';
 import { useI18n } from '../../../i18n/context';
 import { formatDate, formatMoney, formatTime } from '../../../i18n/format';
 import { decisionKind, selectedTotal, type Quote } from '../../../lib/clientBookings';
+import { initialSelection, linePick, quoteLines, withLinePick } from '../../../lib/quoteLines';
 import styles from './bookings.module.css';
 
 /**
  * The client's answer to a quote (P15, P15c, FR §3.5): every line with a checkbox, all ticked at
+ * first; a line with variants (T37c) also picks original or alternative part, the original at
  * first; the total follows the ticks. "Accept" with every line, "Accept selectate" with some;
  * unticking everything leaves only "Refuz". Refusing asks first and names the inspection fee
  * (never mentioned when the fee is 0). The answer names the version seen, so a quote the shop
@@ -26,7 +29,8 @@ export function QuoteDecision({
   act: (run: () => Promise<Booking>) => Promise<void>;
 }) {
   const { t, lang } = useI18n();
-  const [selected, setSelected] = useState<ReadonlySet<string>>(() => new Set(quote.items.map((i) => i.id)));
+  const [selected, setSelected] = useState<ReadonlySet<string>>(() => initialSelection(quote.items));
+  const lines = quoteLines(quote.items);
   const [refusing, setRefusing] = useState(false);
   const kind = decisionKind(quote.items, selected);
   const total = selectedTotal(quote.items, selected);
@@ -49,21 +53,38 @@ export function QuoteDecision({
       {quote.version > 1 && <p className={styles.muted}>{t('cb.quote.updated')}</p>}
       <p className={styles.hint}>{t('cb.quote.hint')}</p>
       <ul className={styles.quoteLines}>
-        {quote.items.map((item) => (
-          <li key={item.id}>
-            <Checkbox
-              checked={selected.has(item.id)}
-              disabled={refusing}
-              onChange={(e) => toggle(item.id, e.target.checked)}
-              aria-label={t('cb.quote.line', { name: item.name, price: formatMoney(lang, item.price) })}
-            >
-              <span className={styles.lineText}>
-                <span className={`${styles.lineName} ${selected.has(item.id) ? '' : styles.unticked}`}>{item.name}</span>
-                <span className="mono">{formatMoney(lang, item.price)}</span>
-              </span>
-            </Checkbox>
-          </li>
-        ))}
+        {lines.map((line) => {
+          if (line.kind === 'variants')
+            return (
+              <li key={line.key}>
+                <QuoteVariantChoice
+                  line={line}
+                  pick={linePick(line, selected)}
+                  disabled={refusing}
+                  onPick={(id) => setSelected((prev) => withLinePick(prev, line, id))}
+                />
+              </li>
+            );
+          const item = line.item;
+          return (
+            <li key={item.id}>
+              <Checkbox
+                checked={selected.has(item.id)}
+                disabled={refusing}
+                onChange={(e) => toggle(item.id, e.target.checked)}
+                aria-label={t('cb.quote.line', {
+                  name: item.name,
+                  price: formatMoney(lang, item.price),
+                })}
+              >
+                <span className={styles.lineText}>
+                  <span className={`${styles.lineName} ${selected.has(item.id) ? '' : styles.unticked}`}>{item.name}</span>
+                  <span className="mono">{formatMoney(lang, item.price)}</span>
+                </span>
+              </Checkbox>
+            </li>
+          );
+        })}
       </ul>
       <p className={styles.quoteTotal} aria-live="polite">
         <span>{kind === 'all' ? t('cb.quote.total') : t('cb.quote.totalSelected')}</span>

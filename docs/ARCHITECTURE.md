@@ -114,6 +114,7 @@ Settings writes (T05): public data, booking rules, fee, preferences, closures an
 - `booking_id`, `version int` (1, 2, … per booking), `status in ('sent','accepted','partially_accepted','refused','expired','superseded','withdrawn')`
 - `note`, `inspection_fee` (snapshot at sending), `total_sent`, `total_approved`, `sent_at`, `expires_at`, `decided_at`, `sent_by`, `decided_by in ('client','shop')` (T29: `shop` = recorded by the shop for a client without an account)
 **quote_items** — `quote_id`, `position`, `name`, `price numeric(10,2) check (price >= 0)`, `approved boolean` (null until decided)
+- **Variants (T37c, migration `quote_variants`, schema 78):** `option_group smallint`, `variant in ('original','alternative')`, `brand` (≤ 80, alternative only). A composer line `{"name","price","alt":{"price","brand"}}` becomes two items of one group (original, then alternative, consecutive positions); plain lines keep them null. `clean_quote_lines` replaces `clean_quote_items`; `total_sent` counts plain lines and originals. `decide_quote` / `shop_decide_quote` go through `apply_quote_answer`: at most one item per group (`quote_variant_both`), `accepted` when every plain line and one variant of every group are taken, else `partially_accepted`. `list_shop_bookings` / `list_shop_history` items carry `option_group`, `variant`, `brand`.
 - Items and totals are immutable once sent. "Edit quote" creates version N+1 and marks the old one `superseded` (kept for history).
 
 **reviews**

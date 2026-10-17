@@ -370,10 +370,34 @@
   gap: 10px;
 }
 
+.composerItem {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
 .composerRow {
   display: flex;
   align-items: flex-start;
   gap: 8px;
+}
+
+/* The alternative part, under its line. */
+.composerAlt {
+  padding-left: 12px;
+  border-left: 2px solid var(--amber);
+}
+
+.addAlt {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: var(--tap);
+  padding: 0 4px;
+  color: var(--amber);
+  font-size: 14px;
+  font-weight: 600;
 }
 
 .composerName {

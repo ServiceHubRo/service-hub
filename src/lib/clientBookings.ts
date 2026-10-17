@@ -1,3 +1,4 @@
+import { decisionKind as linesDecisionKind, type QuoteVariantFields } from './quoteLines';
 import { nowKey } from './shopBookings';
 import type { BookingStatus } from './status';
 
@@ -10,7 +11,7 @@ import type { BookingStatus } from './status';
 
 export type QuoteStatus = 'sent' | 'accepted' | 'partially_accepted' | 'refused' | 'expired' | 'superseded' | 'withdrawn';
 
-export interface QuoteItem {
+export interface QuoteItem extends QuoteVariantFields {
   id: string;
   position: number;
   name: string;
@@ -61,13 +62,12 @@ export function selectedTotal(items: readonly QuoteItem[], selected: ReadonlySet
 }
 
 /**
- * "Accept" when every line is ticked, "Accept selectate" when some are, and a refusal when none are
- * (unticking everything is the same as refusing, inspection fee included).
+ * "Accept" when every line is taken (a line with variants in one of them), "Accept selectate" when
+ * some are, and a refusal when none are (unticking everything is the same as refusing, inspection
+ * fee included).
  */
-export function decisionKind(items: readonly QuoteItem[], selected: ReadonlySet<string>): 'all' | 'some' | 'none' {
-  const n = items.filter((i) => selected.has(i.id)).length;
-  return n === 0 ? 'none' : n === items.length ? 'all' : 'some';
-}
+export const decisionKind: (items: readonly QuoteItem[], selected: ReadonlySet<string>) => 'all' | 'some' | 'none' =
+  linesDecisionKind;
 
 export type CancelState = 'allowed' | 'deadline_passed' | 'not_allowed';
 
