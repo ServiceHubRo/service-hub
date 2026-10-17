@@ -8,13 +8,13 @@ Lista „Final check” din `docs/lovable-prompts.md` și cerințele din `docs/F
 - 👤 — îl verifici tu, pe site-ul real, pentru că depinde de ceva ce un test nu poate atinge (telefonul tău, un email adevărat, o plată reală). Sunt adunate și în partea C.
 - Coloana **Tu** e pentru bifa ta, după ce ai parcurs partea C.
 
-**Ultima rulare completă:** 26 sept 2026, pe codul T19c (stack-ul Supabase local, ca în CI).
+**Ultima rulare completă:** 17 oct 2026, pe codul de după T37c (stack-ul Supabase local, ca în CI; testele în browser și pe GitHub, pe `main`).
 
 | Teste | Rezultat |
 |---|---|
-| Unitare (Vitest), 28 de fișiere | 381 trec |
-| Baza de date (SQL), 41 de fișiere | toate trec |
-| În browser (Playwright), 378 de rulări (126 de teste × 3 lățimi) | 368 trec, 10 sărite cu intenție (teste care au sens la o singură lățime, de exemplu meniul lateral doar la 1440 px) |
+| Unitare (Vitest), 59 de fișiere | 525 trec, și cu ora din Los Angeles și din Tokyo |
+| Baza de date (SQL), 73 de fișiere, plus datele demo | toate trec |
+| În browser (Playwright), 528 de rulări (176 de teste × 3 lățimi) | 515 trec, 13 sărite cu intenție (teste care au sens la o singură lățime, de exemplu meniul lateral doar la 1440 px) |
 | Verificarea tipurilor, lint, build | trec |
 
 ---
