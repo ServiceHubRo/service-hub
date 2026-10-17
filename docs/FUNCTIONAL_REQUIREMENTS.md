@@ -88,7 +88,7 @@ A user has exactly one role. The role decides the entire interface. A client can
 ### 3.5 My bookings
 - Chronological list, active first. Each card: service, shop + city, date/time, car, status badge.
 - **Status badges:** Pending · Confirmed · In inspection · Quote sent · Quote accepted · In progress · Done · Declined · Cancelled · Quote refused · Expired · No-show.
-- **Quote decision** happens here when status is Quote sent: full quote (line items, note, total), then **Accept** / **Refuse**. Optional **partial approval**: each line has a checkbox; total recalculates; "Accept selected". Refuse asks confirmation naming the inspection fee.
+- **Quote decision** happens here when status is Quote sent: full quote (line items, note, total), then **Accept** / **Refuse**. Optional **partial approval**: each line has a checkbox; total recalculates; "Accept selected". A line with variants (T37c) also has two radio buttons, original part or alternative part (with its brand), the original picked at first; a line marked original or alternative only says so under its name. Refuse asks confirmation naming the inspection fee.
 - State displays: In inspection ("Your car is being inspected"), In progress (pulsing dot + start time), Done ("Ready for pickup", with odometer reading, work performed and amount).
 - **Cancel:** allowed while Pending or Confirmed, before the shop's cancellation deadline if it set one. Not allowed from In inspection onward.
 - After Done: **Leave review** (once). Shows "Review sent" afterwards.
@@ -155,7 +155,7 @@ A user has exactly one role. The role decides the entire interface. A client can
   - Quote accepted → **In progress**
   - In progress → **Finalize**
 - Reschedule re-checks capacity at submit; fails safely if the day filled up.
-- **Quote composer:** repeating rows (item, price), optional note, live total, send. Inspection fee snapshotted onto the quote.
+- **Quote composer:** repeating rows (item, price), optional note, live total, send. Each row has a "Piesa" choice: not specified, original, alternative (optional brand), or original or alternative (the alternative's price and brand; the client picks); the total counts the row's price (the original's when both). Inspection fee snapshotted onto the quote.
 - **Finalize panel:** **odometer reading, mandatory** (no skip), then work performed + total cost, prefilled from the accepted lines, editable. Odometer rules: below the last known reading for that plate → refused, naming the previous value; more than 50,000 km above it → explicit confirmation; below 100 or above 2,000,000 → refused.
 - Message button always.
 - Unread/new-request badge on the tab.

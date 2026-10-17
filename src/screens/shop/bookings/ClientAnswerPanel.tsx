@@ -1,15 +1,19 @@
 import { useState } from 'react';
 import { Checkbox } from '../../../components/Checkbox';
+import { QuoteVariantChoice } from '../../../components/QuoteVariantChoice';
+import { QuoteVariantTag } from '../../../components/QuoteVariantTag';
 import type { Booking } from '../../../data/rpc';
 import { shopDecideQuote, type ShopBooking, type ShopQuote } from '../../../data/shopBookings';
 import { useI18n } from '../../../i18n/context';
 import { formatMoney } from '../../../i18n/format';
+import { initialSelection, linePick, quoteLines, withLinePick } from '../../../lib/quoteLines';
 import { Panel, PanelButtons } from './BookingPanels';
 import styles from './shopBookings.module.css';
 
 /**
  * "Răspunsul clientului" (T29): a client without an account answers the quote at the shop or on
- * the phone; the shop ticks what was approved. Every line starts ticked; nothing ticked refuses
+ * the phone; the shop ticks what was approved (a line with variants also in which one, T37c).
+ * Every line starts ticked; nothing ticked refuses
  * the quote (the inspection fee becomes the cost), exactly as the client's own answer would.
  */
 export function ClientAnswerPanel({
@@ -24,7 +28,7 @@ export function ClientAnswerPanel({
   onClose: () => void;
 }) {
   const { t, lang } = useI18n();
-  const [approved, setApproved] = useState<ReadonlySet<string>>(() => new Set(quote.items.map((i) => i.id)));
+  const [approved, setApproved] = useState<ReadonlySet<string>>(() => initialSelection(quote.items));
   const toggle = (id: string, on: boolean) =>
     setApproved((prev) => {
       const next = new Set(prev);
@@ -39,14 +43,30 @@ export function ClientAnswerPanel({
     <Panel title={t('sb.answer.title')}>
       <p className={styles.panelBody}>{t('sb.answer.body')}</p>
       <div className={styles.answerLines}>
-        {quote.items.map((item) => (
-          <Checkbox key={item.id} checked={approved.has(item.id)} onChange={(e) => toggle(item.id, e.target.checked)}>
-            <span className={styles.answerLine}>
-              <span>{item.name}</span>
-              <span className="mono">{formatMoney(lang, item.price)}</span>
-            </span>
-          </Checkbox>
-        ))}
+        {quoteLines(quote.items).map((line) =>
+          line.kind === 'variants' ? (
+            <QuoteVariantChoice
+              key={line.key}
+              line={line}
+              pick={linePick(line, approved)}
+              onPick={(id) => setApproved((prev) => withLinePick(prev, line, id))}
+            />
+          ) : (
+            <Checkbox
+              key={line.key}
+              checked={approved.has(line.item.id)}
+              onChange={(e) => toggle(line.item.id, e.target.checked)}
+            >
+              <span className={styles.answerLine}>
+                <span>
+                  {line.item.name}
+                  <QuoteVariantTag item={line.item} />
+                </span>
+                <span className="mono">{formatMoney(lang, line.item.price)}</span>
+              </span>
+            </Checkbox>
+          ),
+        )}
       </div>
       <p className={styles.quoteTotal}>
         <span>{t('sb.quote.totalApproved')}</span>

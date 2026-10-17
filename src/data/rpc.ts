@@ -112,6 +112,7 @@ export const RPC_ERROR_CODES = [
   'quote_items_required',
   'quote_too_many_items',
   'quote_total_zero',
+  'quote_variant_both',
   'rating_invalid',
   'reason_required',
   'reason_too_long',
@@ -592,8 +593,13 @@ export function adminForceCancel(bookingId: string, reason: string, requestId: s
 
 export interface QuoteLineInput {
   name: string;
-  /** Lei, at most 2 decimals. */
+  /** Lei, at most 2 decimals; the original part's price when the line has an alternative. */
   price: number;
+  /** Which part a single line is (T37c), and the alternative's brand. */
+  part?: 'original' | 'alternative';
+  brand?: string;
+  /** The alternative part the client may pick instead (T37c): its price and, optionally, its brand. */
+  alt?: { price: number; brand?: string };
 }
 
 export function sendQuote(bookingId: string, items: QuoteLineInput[], note: string | undefined, requestId: string): Promise<Booking> {

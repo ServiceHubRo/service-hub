@@ -1,0 +1,82 @@
+.line {
+  display: flex;
+  flex-direction: column;
+}
+
+.off {
+  color: var(--muted);
+}
+
+.options {
+  display: flex;
+  flex-direction: column;
+  margin: 0 0 4px 34px;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+
+.options:disabled {
+  opacity: 0.45;
+}
+
+.option {
+  position: relative; /* keeps the hidden input inside the row: focusing it never scrolls the page away */
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: var(--tap);
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.options:disabled .option {
+  cursor: not-allowed;
+}
+
+.input {
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+}
+
+.dot {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border-lit);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.input:checked + .dot {
+  border-color: var(--amber);
+}
+
+.input:checked + .dot::after {
+  content: '';
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--amber);
+}
+
+.input:focus-visible + .dot {
+  box-shadow: var(--focus-ring);
+}
+
+.label {
+  flex: 1;
+  min-width: 0;
+}
+
+/* In the choice the variant names are the options themselves, not a muted note. */
+.label > span {
+  color: var(--text);
+  font-size: 14px;
+}

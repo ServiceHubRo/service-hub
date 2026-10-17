@@ -1354,30 +1354,39 @@ export type Database = {
       quote_items: {
         Row: {
           approved: boolean | null
+          brand: string | null
           created_at: string
           id: string
           name: string
+          option_group: number | null
           position: number
           price: number
           quote_id: string
+          variant: string | null
         }
         Insert: {
           approved?: boolean | null
+          brand?: string | null
           created_at?: string
           id?: string
           name: string
+          option_group?: number | null
           position: number
           price: number
           quote_id: string
+          variant?: string | null
         }
         Update: {
           approved?: boolean | null
+          brand?: string | null
           created_at?: string
           id?: string
           name?: string
+          option_group?: number | null
           position?: number
           price?: number
           quote_id?: string
+          variant?: string | null
         }
         Relationships: [
           {
@@ -3068,6 +3077,14 @@ export type Database = {
         Returns: Json
       }
       app_limit: { Args: { p_default: number; p_key: string }; Returns: number }
+      apply_quote_answer: {
+        Args: { p_ids: string[]; p_quote_id: string }
+        Returns: {
+          approved: number
+          choices: number
+          total: number
+        }[]
+      }
       area_for_address: {
         Args: { p_city: string; p_county: string; p_lat: number; p_lng: number }
         Returns: string
@@ -3205,12 +3222,15 @@ export type Database = {
       city_key: { Args: { p: string }; Returns: string }
       claim_booking: { Args: { p_token: string }; Returns: Json }
       claim_notifications: { Args: { p_limit?: number }; Returns: Json }
-      clean_quote_items: {
+      clean_quote_lines: {
         Args: { p_items: Json }
         Returns: {
+          brand: string
           name: string
+          option_group: number
           pos: number
           price: number
+          variant: string
         }[]
       }
       clean_text: { Args: { p: string }; Returns: string }
@@ -3715,6 +3735,7 @@ export type Database = {
       }
       is_push_endpoint: { Args: { p_url: string }; Returns: boolean }
       is_quiet_event: { Args: { p_event: string }; Returns: boolean }
+      is_quote_price: { Args: { p_text: string }; Returns: boolean }
       is_shop_member: { Args: { p_shop_id: string }; Returns: boolean }
       is_shop_owner: { Args: { p_shop_id: string }; Returns: boolean }
       is_shop_public: { Args: { p_shop_id: string }; Returns: boolean }

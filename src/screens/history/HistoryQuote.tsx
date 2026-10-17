@@ -1,4 +1,5 @@
 import { Card } from '../../components/Card';
+import { QuoteVariantTag } from '../../components/QuoteVariantTag';
 import { useI18n } from '../../i18n/context';
 import { formatMoney } from '../../i18n/format';
 import type { QuoteItem, QuoteStatus } from '../../lib/clientBookings';
@@ -33,6 +34,7 @@ export function HistoryQuote({ quote }: HistoryQuoteProps) {
               <span className={styles.quoteName}>
                 {item.name}
                 {struck && <span className="visually-hidden">, {t('hist.quote.refusedLine')}</span>}
+                <QuoteVariantTag item={item} />
               </span>
               <span className="mono">{formatMoney(lang, item.price)}</span>
             </li>

@@ -45,7 +45,10 @@ export function CompletionPanel({
   const last = lastState.status === 'ready' ? lastState.data : null;
 
   const [odometer, setOdometer] = useState('');
-  const [work, setWork] = useState(() => approved.map((i) => i.name).join(', '));
+  // The alternative part taken is named in the work (T37c).
+  const [work, setWork] = useState(() =>
+    approved.map((i) => (i.variant === 'alternative' ? t('quote.variant.work', { name: i.name }) : i.name)).join(', '),
+  );
   const [cost, setCost] = useState(() =>
     quote?.total_approved !== null && quote?.total_approved !== undefined ? priceText(quote.total_approved, decimal) : '',
   );

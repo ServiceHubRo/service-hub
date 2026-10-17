@@ -82,7 +82,7 @@ const COLUMNS = [
   'inspection_started_at, started_at, done_at, odometer, work, cost, warranty_months, warranty_until, cancelled_by, cancel_reason, decline_reason, closed_reason',
   'shop:shops(name, city, phone, cancel_deadline_hours, street, latitude, longitude, slot_minutes)',
   'service:services(name_ro, name_en, icon, category_key)',
-  'quotes(id, version, status, note, inspection_fee, total_sent, total_approved, sent_at, expires_at, decided_at, items:quote_items(id, position, name, price, approved))',
+  'quotes(id, version, status, note, inspection_fee, total_sent, total_approved, sent_at, expires_at, decided_at, items:quote_items(id, position, name, price, approved, option_group, variant, brand))',
   'review:reviews(id, rating)',
 ].join(', ');
 

@@ -370,10 +370,29 @@
   gap: 10px;
 }
 
+.composerItem {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
 .composerRow {
   display: flex;
   align-items: flex-start;
   gap: 8px;
+}
+
+/* The alternative part, under its line. */
+.composerAlt {
+  padding-left: 12px;
+  /* The alternative's price under the original's (the line's delete button takes this room above). */
+  padding-right: calc(var(--tap) + 8px);
+  border-left: 2px solid var(--amber);
+}
+
+.composerPart {
+  /* Under the line's name, as wide as it at most. */
+  max-width: 320px;
 }
 
 .composerName {
