@@ -4,6 +4,7 @@ import { Button } from '../../../components/Button';
 import { Checkbox } from '../../../components/Checkbox';
 import { InlinePanel } from '../../../components/InlinePanel';
 import { QuoteVariantChoice } from '../../../components/QuoteVariantChoice';
+import { QuoteVariantTag } from '../../../components/QuoteVariantTag';
 import { canRetryRpc, decideQuote, rpcErrorMessage, type Booking } from '../../../data/rpc';
 import { useI18n } from '../../../i18n/context';
 import { formatDate, formatMoney, formatTime } from '../../../i18n/format';
@@ -78,7 +79,10 @@ export function QuoteDecision({
                 })}
               >
                 <span className={styles.lineText}>
-                  <span className={`${styles.lineName} ${selected.has(item.id) ? '' : styles.unticked}`}>{item.name}</span>
+                  <span className={`${styles.lineName} ${selected.has(item.id) ? '' : styles.unticked}`}>
+                    {item.name}
+                    <QuoteVariantTag item={item} />
+                  </span>
                   <span className="mono">{formatMoney(lang, item.price)}</span>
                 </span>
               </Checkbox>

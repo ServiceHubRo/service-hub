@@ -43,11 +43,11 @@ describe('quote lines with variants (T37c)', () => {
   });
 });
 
-describe('composer rows with an alternative part (T37c)', () => {
-  const row = (name: string, price: string, alt?: { price: string; brand: string }): QuoteDraftRow => ({ key: name, name, price, alt });
+describe('composer rows: which part a line is (T37c)', () => {
+  const row = (name: string, price: string, extra: Partial<QuoteDraftRow> = {}): QuoteDraftRow => ({ key: name, name, price, ...extra });
 
-  it('sends the alternative with its price and brand; the total counts the original', () => {
-    const rows = [row('Plăcuțe', '420', { price: '260', brand: ' Bosch ' }), row('Manoperă', '150')];
+  it('both: sends the alternative with its price and brand; the total counts the original', () => {
+    const rows = [row('Plăcuțe', '420', { part: 'both', altPrice: '260', brand: ' Bosch ' }), row('Manoperă', '150')];
     expect(checkDraft(rows)).toEqual({
       items: [{ name: 'Plăcuțe', price: 420, alt: { price: 260, brand: 'Bosch' } }, { name: 'Manoperă', price: 150 }],
       errors: {},
@@ -55,12 +55,24 @@ describe('composer rows with an alternative part (T37c)', () => {
     expect(draftTotalBani(rows)).toBe(57000);
   });
 
+  it('a single line says it is the original or the alternative part', () => {
+    expect(
+      checkDraft([row('Filtru', '60', { part: 'alternative', brand: 'Mann' }), row('Ulei', '200', { part: 'original', brand: 'x' })]).items,
+    ).toEqual([
+      { name: 'Filtru', price: 60, part: 'alternative', brand: 'Mann' },
+      { name: 'Ulei', price: 200, part: 'original' },
+    ]);
+    expect(checkDraft([row('Filtru', '60', { part: 'none', brand: 'Mann' })]).items).toEqual([{ name: 'Filtru', price: 60 }]);
+  });
+
   it('the brand is optional; the alternative price is not', () => {
-    expect(checkDraft([row('Plăcuțe', '420', { price: '260', brand: '' })]).items).toEqual([
+    expect(checkDraft([row('Plăcuțe', '420', { part: 'both', altPrice: '260', brand: '' })]).items).toEqual([
       { name: 'Plăcuțe', price: 420, alt: { price: 260 } },
     ]);
-    expect(checkDraft([row('Plăcuțe', '420', { price: '', brand: 'Bosch' })]).errors).toEqual({ Plăcuțe: 'alt_price_required' });
-    expect(checkDraft([row('Plăcuțe', '420', { price: '1.250', brand: '' })]).errors).toEqual({ Plăcuțe: 'alt_price_invalid' });
-    expect(checkDraft([row('Plăcuțe', '420', { price: '260', brand: 'b'.repeat(81) })]).errors).toEqual({ Plăcuțe: 'brand_too_long' });
+    expect(checkDraft([row('Plăcuțe', '420', { part: 'both', altPrice: '' })]).errors).toEqual({ Plăcuțe: 'alt_price_required' });
+    expect(checkDraft([row('Plăcuțe', '420', { part: 'both', altPrice: '1.250' })]).errors).toEqual({ Plăcuțe: 'alt_price_invalid' });
+    expect(checkDraft([row('Plăcuțe', '420', { part: 'alternative', brand: 'b'.repeat(81) })]).errors).toEqual({
+      Plăcuțe: 'brand_too_long',
+    });
   });
 });

@@ -595,7 +595,10 @@ export interface QuoteLineInput {
   name: string;
   /** Lei, at most 2 decimals; the original part's price when the line has an alternative. */
   price: number;
-  /** The alternative part (T37c): its price and, optionally, its brand. */
+  /** Which part a single line is (T37c), and the alternative's brand. */
+  part?: 'original' | 'alternative';
+  brand?: string;
+  /** The alternative part the client may pick instead (T37c): its price and, optionally, its brand. */
   alt?: { price: number; brand?: string };
 }
 

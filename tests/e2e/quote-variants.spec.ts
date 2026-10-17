@@ -75,15 +75,21 @@ test.describe('quote variants', () => {
     await (await cardAction(card, 'Trimite deviz')).click();
     await page.getByLabel('Poziția 1', { exact: true }).fill('Plăcuțe frână față');
     await page.getByLabel('Preț, lei').first().fill('420');
-    await page.getByRole('button', { name: 'Piesă alternativă' }).click();
+    await page.getByLabel('Piesa').first().selectOption({ label: 'Originală sau alternativă' });
     await expect(page.getByLabel('Alternativă, lei')).toBeFocused();
     await expect(page.getByLabel('Originală, lei')).toHaveValue('420');
     await page.getByLabel('Alternativă, lei').fill('260');
     await page.getByLabel('Marca (opțional)').fill('Bosch');
     await page.getByRole('button', { name: 'Adaugă poziție' }).click();
-    await page.getByLabel('Poziția 2', { exact: true }).fill('Manoperă');
-    await page.getByLabel('Preț, lei').first().fill('150');
-    await expect(page.getByText('570 lei')).toBeVisible();
+    await page.getByLabel('Poziția 2', { exact: true }).fill('Filtru ulei');
+    await page.getByLabel('Preț, lei').first().fill('60');
+    // No original to offer: the line says it is the alternative part.
+    await page.getByLabel('Piesa').nth(1).selectOption({ label: 'Alternativă' });
+    await page.getByLabel('Marca (opțional)').nth(1).fill('Mann');
+    await page.getByRole('button', { name: 'Adaugă poziție' }).click();
+    await page.getByLabel('Poziția 3', { exact: true }).fill('Manoperă');
+    await page.getByLabel('Preț, lei').nth(1).fill('150');
+    await expect(page.getByText('630 lei')).toBeVisible();
     await expectNoHorizontalScroll(page);
     await shot(page, 't37c-composer-ro', name());
     await page.getByRole('button', { name: 'Trimite devizul' }).click();
@@ -97,10 +103,13 @@ test.describe('quote variants', () => {
     const original = quote.getByRole('radio', { name: /^Piesă originală/ });
     const alternative = quote.getByRole('radio', { name: /^Piesă alternativă, Bosch/ });
     await expect(original).toBeChecked();
-    await expect(quote).toContainText('570 lei');
+    await expect(quote).toContainText('630 lei');
+    // The filter has nothing to pick: it only says it is an alternative part.
+    await expect(quote).toContainText('Piesă alternativă, Mann');
+    await expect(quote.getByRole('radio')).toHaveCount(2);
     await alternative.check();
     await expect(original).not.toBeChecked();
-    await expect(quote).toContainText('410 lei');
+    await expect(quote).toContainText('470 lei');
     // Leaving the line out and taking it back keeps the alternative.
     await quote.getByRole('checkbox', { name: /Plăcuțe frână față/ }).uncheck();
     await expect(alternative).toBeDisabled();
@@ -116,7 +125,7 @@ test.describe('quote variants', () => {
     await quote.getByRole('button', { name: 'Accept', exact: true }).click();
 
     // The shop: the alternative taken, the original struck through, the total of the choice.
-    await expect(card).toContainText('410 lei');
+    await expect(card).toContainText('470 lei');
     await expect(card).toContainText('refuzată de client');
     await expectNoHorizontalScroll(page);
     await shot(page, 't37c-shop-decided-ro', name());

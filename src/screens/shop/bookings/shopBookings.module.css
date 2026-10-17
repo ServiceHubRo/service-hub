@@ -385,19 +385,14 @@
 /* The alternative part, under its line. */
 .composerAlt {
   padding-left: 12px;
+  /* The alternative's price under the original's (the line's delete button takes this room above). */
+  padding-right: calc(var(--tap) + 8px);
   border-left: 2px solid var(--amber);
 }
 
-.addAlt {
-  align-self: flex-start;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  min-height: var(--tap);
-  padding: 0 4px;
-  color: var(--amber);
-  font-size: 14px;
-  font-weight: 600;
+.composerPart {
+  /* Under the line's name, as wide as it at most. */
+  max-width: 320px;
 }
 
 .composerName {

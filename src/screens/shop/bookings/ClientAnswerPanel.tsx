@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Checkbox } from '../../../components/Checkbox';
 import { QuoteVariantChoice } from '../../../components/QuoteVariantChoice';
+import { QuoteVariantTag } from '../../../components/QuoteVariantTag';
 import type { Booking } from '../../../data/rpc';
 import { shopDecideQuote, type ShopBooking, type ShopQuote } from '../../../data/shopBookings';
 import { useI18n } from '../../../i18n/context';
@@ -57,7 +58,10 @@ export function ClientAnswerPanel({
               onChange={(e) => toggle(line.item.id, e.target.checked)}
             >
               <span className={styles.answerLine}>
-                <span>{line.item.name}</span>
+                <span>
+                  {line.item.name}
+                  <QuoteVariantTag item={line.item} />
+                </span>
                 <span className="mono">{formatMoney(lang, line.item.price)}</span>
               </span>
             </Checkbox>

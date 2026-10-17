@@ -104,6 +104,30 @@ select test.ok((select b->'quote'->'items' from jsonb_array_elements(public.list
   'the shop''s Istoric shows the variant taken');
 select test.logout();
 
+-- A single line that says which part it is: no choice, counted in the total.
+select set_config('test.b3', pg_temp.in_inspection('11:00')::text, true);
+select test.login(test.id('owner1'));
+select test.fails(format($$select public.send_quote(%L, '[{"name":"Filtru","price":60,"part":"aftermarket"}]', gen_random_uuid())$$,
+  current_setting('test.b3')), 'quote_item_invalid', 'part is original or alternative');
+select test.fails(format($$select public.send_quote(%L, '[{"name":"Filtru","price":60,"brand":"Mann"}]', gen_random_uuid())$$,
+  current_setting('test.b3')), 'quote_item_invalid', 'a brand only on a part');
+select public.send_quote(current_setting('test.b3')::uuid,
+  '[{"name":"Filtru ulei","price":60,"part":"alternative","brand":"Mann"},{"name":"Ulei","price":200,"part":"original"},{"name":"Manoperă","price":100}]',
+  gen_random_uuid());
+select test.logout();
+select set_config('test.q3', test.sent_quote(current_setting('test.b3')::uuid)::text, true);
+select test.eq(array_agg(coalesce(variant, '-') || ':' || coalesce(brand, '-') || ':' || coalesce(option_group::text, '-') order by position),
+  array['alternative:Mann:-', 'original:-:-', '-:-:-'], 'single lines keep their part, outside any group')
+from public.quote_items where quote_id = current_setting('test.q3')::uuid;
+select test.eq(total_sent, 360.00::numeric(10,2), 'every single line counts in the total')
+from public.quotes where id = current_setting('test.q3')::uuid;
+select set_config('test.ids3', (select array_agg(id)::text from public.quote_items where quote_id = current_setting('test.q3')::uuid), true);
+select test.login(test.id('client_a'));
+select public.decide_quote(current_setting('test.b3')::uuid, current_setting('test.q3')::uuid,
+  current_setting('test.ids3')::uuid[], gen_random_uuid());
+select test.logout();
+select test.eq(status, 'accepted', 'all three taken: accepted') from public.quotes where id = current_setting('test.q3')::uuid;
+
 -- Nobody writes the variant from the browser.
 select test.login(test.id('client_a'));
 select test.fails(format($$update public.quote_items set variant = 'original' where id = %L$$,

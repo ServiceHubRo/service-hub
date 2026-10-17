@@ -1,6 +1,7 @@
-import { Plus, Trash2, X } from 'lucide-react';
+import { Plus, Trash2 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { Field } from '../../../components/Field';
+import { SelectField } from '../../../components/SelectField';
 import { TextArea } from '../../../components/TextArea';
 import { OfferNote } from '../../../components/OfferNote';
 import { useOfferText } from '../../../lib/useOfferText';
@@ -18,6 +19,7 @@ import {
   QUOTE_NAME_MAX,
   QUOTE_ROWS_MAX,
   type QuoteDraftRow,
+  type QuotePartKind,
   type QuoteRowError,
 } from '../../../lib/quoteDraft';
 import { quoteLines } from '../../../lib/quoteLines';
@@ -41,7 +43,15 @@ const ROW_ERROR: Record<QuoteRowError, MessageKey> = {
   brand_too_long: 'sb.quote.error.brand_too_long',
 };
 
-type RowField = 'name' | 'price' | 'altPrice' | 'altBrand';
+const PART_KINDS: readonly QuotePartKind[] = ['none', 'original', 'alternative', 'both'];
+const PART_LABEL: Record<QuotePartKind, MessageKey> = {
+  none: 'sb.quote.part.none',
+  original: 'sb.quote.part.original',
+  alternative: 'sb.quote.part.alternative',
+  both: 'sb.quote.part.both',
+};
+
+type RowField = 'name' | 'price' | 'altPrice' | 'brand';
 
 /** Where a row's error is shown (and the focus goes). */
 const ERROR_FIELD: Record<QuoteRowError, RowField> = {
@@ -51,13 +61,13 @@ const ERROR_FIELD: Record<QuoteRowError, RowField> = {
   price_invalid: 'price',
   alt_price_required: 'altPrice',
   alt_price_invalid: 'altPrice',
-  brand_too_long: 'altBrand',
+  brand_too_long: 'brand',
 };
 
 /**
  * The quote composer (P15, FR §4.2): rows of item + price, "+ Adaugă poziție", an optional note and
- * the total, live. A row may get an alternative part (T37c): its price and an optional brand; the
- * client then picks original or alternative, and the total shown counts the original. The shop's inspection fee is shown as it will be copied onto the quote. "Edit"
+ * the total, live. Each row says which part it is (T37c): not said, original, alternative (with a
+ * brand), or both, the client then picking one; the total shown counts the original. The shop's inspection fee is shown as it will be copied onto the quote. "Edit"
  * starts from the sent version and sends a new one in its place (the old one is kept for history).
  */
 export function QuoteComposer({
@@ -82,21 +92,22 @@ export function QuoteComposer({
   const decimal = lang === 'ro' ? ',' : '.';
   const [rows, setRows] = useState<QuoteDraftRow[]>(() =>
     mode === 'replace' && booking.quote
-      ? quoteLines(booking.quote.items).map((line) =>
+      ? quoteLines(booking.quote.items).map((line): QuoteDraftRow =>
           line.kind === 'plain'
             ? {
                 key: newRequestId(),
                 name: line.item.name,
                 price: priceText(line.item.price, decimal),
+                part: line.item.variant ?? 'none',
+                brand: line.item.brand ?? '',
               }
             : {
                 key: newRequestId(),
                 name: line.original.name,
                 price: priceText(line.original.price, decimal),
-                alt: {
-                  price: priceText(line.alternative.price, decimal),
-                  brand: line.alternative.brand ?? '',
-                },
+                part: 'both',
+                altPrice: priceText(line.alternative.price, decimal),
+                brand: line.alternative.brand ?? '',
               },
         )
       : [blankRow()],
@@ -121,8 +132,6 @@ export function QuoteComposer({
     setRows((prev) =>
       prev.map((r) => {
         if (r.key !== key) return r;
-        if (field === 'altPrice') return { ...r, alt: { price: value, brand: r.alt?.brand ?? '' } };
-        if (field === 'altBrand') return { ...r, alt: { price: r.alt?.price ?? '', brand: value } };
         return { ...r, [field]: value };
       }),
     );
@@ -142,9 +151,9 @@ export function QuoteComposer({
     setRows((prev) => [...prev, row]);
   }
 
-  function setAlt(key: string, on: boolean) {
-    focusRow.current = { key, field: on ? 'altPrice' : 'price' };
-    setRows((prev) => prev.map((r) => (r.key === key ? { ...r, alt: on ? { price: '', brand: '' } : null } : r)));
+  function setPart(key: string, part: QuotePartKind) {
+    if (part === 'both') focusRow.current = { key, field: 'altPrice' };
+    setRows((prev) => prev.map((r) => (r.key === key ? { ...r, part } : r)));
     setErrors((prev) => {
       const next = { ...prev };
       delete next[key];
@@ -214,7 +223,7 @@ export function QuoteComposer({
                   />
                   <Field
                     className={styles.composerPrice}
-                    label={row.alt ? t('sb.quote.priceOriginal') : t('sb.quote.price')}
+                    label={row.part === 'both' ? t('sb.quote.priceOriginal') : t('sb.quote.price')}
                     value={row.price}
                     inputMode="decimal"
                     autoComplete="off"
@@ -233,45 +242,41 @@ export function QuoteComposer({
                     <Trash2 size={18} aria-hidden="true" />
                   </button>
                 </div>
-                {row.alt ? (
+                <SelectField
+                  className={styles.composerPart}
+                  label={t('sb.quote.part')}
+                  value={row.part ?? 'none'}
+                  options={PART_KINDS.map((k) => ({ value: k, label: t(PART_LABEL[k]) }))}
+                  onChange={(e) => setPart(row.key, e.target.value as QuotePartKind)}
+                />
+                {(row.part === 'alternative' || row.part === 'both') && (
                   <div className={`${styles.composerRow} ${styles.composerAlt}`}>
                     <Field
                       className={styles.composerName}
                       label={t('sb.quote.altBrand')}
-                      value={row.alt.brand}
+                      value={row.brand ?? ''}
                       maxLength={QUOTE_BRAND_MAX}
                       autoComplete="off"
-                      error={errorAt('altBrand')}
-                      onChange={(e) => update(row.key, 'altBrand', e.target.value)}
+                      error={errorAt('brand')}
+                      onChange={(e) => update(row.key, 'brand', e.target.value)}
                       data-row={row.key}
-                      data-field="altBrand"
+                      data-field="brand"
                     />
-                    <Field
-                      className={styles.composerPrice}
-                      label={t('sb.quote.altPrice')}
-                      value={row.alt.price}
-                      inputMode="decimal"
-                      autoComplete="off"
-                      mono
-                      error={errorAt('altPrice')}
-                      onChange={(e) => update(row.key, 'altPrice', e.target.value)}
-                      data-row={row.key}
-                      data-field="altPrice"
-                    />
-                    <button
-                      type="button"
-                      className={styles.removeRow}
-                      aria-label={t('sb.quote.removeAlt', { n: i + 1 })}
-                      onClick={() => setAlt(row.key, false)}
-                    >
-                      <X size={18} aria-hidden="true" />
-                    </button>
+                    {row.part === 'both' && (
+                      <Field
+                        className={styles.composerPrice}
+                        label={t('sb.quote.altPrice')}
+                        value={row.altPrice ?? ''}
+                        inputMode="decimal"
+                        autoComplete="off"
+                        mono
+                        error={errorAt('altPrice')}
+                        onChange={(e) => update(row.key, 'altPrice', e.target.value)}
+                        data-row={row.key}
+                        data-field="altPrice"
+                      />
+                    )}
                   </div>
-                ) : (
-                  <button type="button" className={styles.addAlt} onClick={() => setAlt(row.key, true)}>
-                    <Plus size={16} aria-hidden="true" />
-                    {t('sb.quote.addAlt')}
-                  </button>
                 )}
               </li>
             );
