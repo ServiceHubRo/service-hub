@@ -10,6 +10,4 @@
   width: 250px;
   max-width: 100%;
   height: auto;
-  /* The pictogram's own frame is rounded: its white corners stay inside it on a dark page. */
-  border-radius: 8px;
 }
