@@ -730,6 +730,10 @@ Note: nicio migrare, niciun pachet nou. **Lista** `docs/LAUNCH_CHECK.md`: fiecar
 
 **Reverificare completă (17 oct 2026, înainte de firmă și magazine):** toate testele trec pe codul de după T37c (cifrele în `docs/LAUNCH_CHECK.md`). Singura problemă: testul animației „Cereri noi” (`e2e/motion`) pica uneori pe GitHub, când cererea de test ajungea înainte ca Panoul să se încarce; acum așteaptă Panoul gol, ca testul T08. Aplicația nu avea nimic de reparat.
 
+### T19f — Simbolul ANPC pentru SAL ✅
+
+Cerut de Eduard pe 18 oct 2026, după reverificare. Pictograma oficială ANPC „Soluționarea alternativă a litigiilor” (fișierul ANPC, adus de Eduard: anpc.ro nu se deschide din mediul de lucru, probabil doar din România), lată de 250 px, cu link spre `https://anpc.ro/ce-este-sal/` într-o filă nouă: în subsolul paginii de prezentare, sub documentele legale, și în Cont → Documente legale la client și la service (unde se cumpără raportul de istoric). Componenta `AnpcSal`, imaginea `public/anpc-sal.png`; textul alternativ e tradus, imaginea rămâne în română (e a ANPC). Teste: `e2e/public` (subsolul: linkul, imaginea încărcată, 250 px), `e2e/help` (în Cont la client și service, nu la admin), verificarea de accesibilitate. **Decizii:** fără pictograma SOL: platforma europeană de soluționare online a litigiilor s-a închis pe 20 iulie 2025; avocatul confirmă (și dacă mai trebuie pusă undeva în aplicația din magazine). Fără pachete noi, fără migrare.
+
 ### T19e — Lansarea: domeniul, plățile reale, CAPTCHA, adminul, copiile de siguranță
 
 Pașii tăi din `docs/LANSARE.md`, Partea 4 (în ordine: copiile de siguranță, Stripe live, CAPTCHA Turnstile, domeniul service-hub.ro, adresele din Supabase Auth și `APP_URL`, contul de admin), apoi Partea 5 (ștergerea conturilor de test) și lista „Ce verifici tu” din `docs/LAUNCH_CHECK.md`, partea C. Claude te ajută la fiecare pas: îi spui unde ai ajuns și ce vezi.

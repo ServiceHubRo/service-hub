@@ -589,6 +589,10 @@
   text-decoration: underline;
 }
 
+.footerSal {
+  margin-top: 12px;
+}
+
 .footerNote {
   color: var(--muted);
   font-size: 14px;

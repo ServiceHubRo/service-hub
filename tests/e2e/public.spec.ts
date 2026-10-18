@@ -85,6 +85,12 @@ test('landing: every section, in Romanian and English, without horizontal scroll
   for (const doc of ['Termeni și condiții', 'Politica de confidențialitate', 'Politica de cookies', 'Verifică un raport de istoric']) {
     await expect(page.getByRole('contentinfo').getByRole('link', { name: doc })).toBeVisible();
   }
+  // The ANPC pictogram for alternative dispute resolution, to ANPC's page, 250 px wide.
+  const sal = page.getByRole('contentinfo').getByRole('link', { name: 'ANPC – Soluționarea alternativă a litigiilor' });
+  await expect(sal).toHaveAttribute('href', 'https://anpc.ro/ce-este-sal/');
+  await expect(sal).toHaveAttribute('target', '_blank');
+  expect(await sal.locator('img').evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth > 0)).toBe(true);
+  expect((await sal.locator('img').boundingBox())!.width).toBe(250);
   await expectNoHorizontalScroll(page);
   await shot(page, 'landing-ro', name());
 

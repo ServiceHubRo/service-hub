@@ -277,6 +277,7 @@ export const ro = {
   'help.clientNote': 'Pentru o programare, scrie întâi service-ului din Mesaje. Dacă ne contactezi, include codul programării (ex. P-000123).',
   'help.shopNote':
     'Pentru o programare anume, include codul ei (ex. P-000123).',
+  'legal.anpcSal': 'ANPC – Soluționarea alternativă a litigiilor',
   'account.legal': 'Documente legale',
   'account.data': 'Datele mele',
   'account.data.rights': 'Poți vedea, descărca și șterge datele tale.',

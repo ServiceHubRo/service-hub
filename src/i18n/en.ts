@@ -279,6 +279,7 @@ export const en: Record<MessageKey, string> = {
   'help.clientNote': 'For a booking, message the shop first from Messages. When contacting us, include the booking code (e.g. P-000123).',
   'help.shopNote':
     'For a specific booking, include its code (e.g. P-000123).',
+  'legal.anpcSal': 'ANPC – Alternative dispute resolution',
   'account.legal': 'Legal documents',
   'account.data': 'My data',
   'account.data.rights': 'You can view, download and delete your data.',
