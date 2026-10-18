@@ -9,6 +9,7 @@ import { SkeletonList } from '../../components/Skeleton';
 import { AUDIT_PAGE, fetchAudit, type AuditEntry } from '../../data/admin';
 import { rpcErrorMessage } from '../../data/rpc';
 import { useI18n } from '../../i18n/context';
+import type { MessageKey } from '../../i18n/ro';
 import { useLoad } from '../../lib/useLoad';
 import { AuditList } from './parts';
 import {
@@ -17,6 +18,7 @@ import {
   ADMIN_MODERATION_PATH,
   ADMIN_NOTICES_PATH,
   ADMIN_REPORTS_PATH,
+  ADMIN_SUGGESTIONS_PATH,
   ADMIN_TEXTS_PATH,
   adminBookingPath,
   adminClientPath,
@@ -35,7 +37,7 @@ function toolLink(to: string, label: string) {
   );
 }
 
-function entityLink(e: AuditEntry) {
+function entityLink(e: AuditEntry, t: (key: MessageKey) => string) {
   if (e.entity_type === 'settings') {
     // The platform settings, or one push text (its key).
     return e.entity_id ? toolLink(`${ADMIN_TEXTS_PATH}?q=${encodeURIComponent(e.entity_id)}`, e.entity_id) : null;
@@ -77,6 +79,8 @@ function entityLink(e: AuditEntry) {
     case 'category':
     case 'service':
       return toolLink(`${ADMIN_CATALOG_PATH}?q=${encodeURIComponent(e.entity_id)}`, label);
+    case 'suggestion':
+      return toolLink(ADMIN_SUGGESTIONS_PATH, t('admin.sugg.auditLabel'));
     case 'export':
       return null;
     default:
@@ -119,7 +123,7 @@ export function AuditScreen() {
           <EmptyState icon={ScrollText} title={t('admin.audit.empty')} />
         ) : (
           <>
-            <AuditList entries={state.data} entityLink={entityLink} />
+            <AuditList entries={state.data} entityLink={(e) => entityLink(e, t)} />
             {state.data.length >= AUDIT_PAGE && !more.done && (
               <Button className={styles.more} disabled={more.busy} onClick={() => void loadMore(state.data)}>
                 {t('admin.showMore')}
