@@ -292,6 +292,7 @@ export const ro = {
   'sugg.status.planned': 'Planificată',
   'sugg.status.done': 'Făcută',
   'sugg.status.declined': 'Nu acum',
+  'legal.anpcSal': 'ANPC – Soluționarea alternativă a litigiilor',
   'account.legal': 'Documente legale',
   'account.data': 'Datele mele',
   'account.data.rights': 'Poți vedea, descărca și șterge datele tale.',

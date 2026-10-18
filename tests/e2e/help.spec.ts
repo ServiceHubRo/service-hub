@@ -29,6 +29,11 @@ for (const [role, email, prefix] of [
     await signIn(page, email, SEED_PASSWORD);
     await expect(page).not.toHaveURL(/\/intra/);
     await openAccount(page);
+    // Under the legal documents, the ANPC pictogram (clients and shops).
+    await expect(page.getByRole('link', { name: 'ANPC – Soluționarea alternativă a litigiilor' })).toHaveAttribute(
+      'href',
+      'https://anpc.ro/ce-este-sal/',
+    );
     await page.getByRole('link', { name: /^Ajutor și contact/ }).click();
     await expect(page).toHaveURL(role === 'client' ? /\/c\/cont\/ajutor$/ : /\/s\/cont\/ajutor$/);
     await expect(page.getByRole('heading', { level: 1, name: 'Ajutor și contact' })).toBeVisible();
@@ -66,6 +71,7 @@ test('admin: no Ajutor și contact (the admin is the team)', async ({ page }) =>
   await expect(page).toHaveURL(/\/admin\/prezentare$/);
   await openAccount(page);
   await expect(page.getByRole('link', { name: /Ajutor și contact/ })).toHaveCount(0);
+  await expect(page.getByRole('link', { name: /^ANPC/ })).toHaveCount(0);
   await page.goto('/admin/cont/ajutor');
   await expect(page.getByRole('heading', { level: 1, name: 'Pagina nu există' })).toBeVisible();
 });

@@ -294,6 +294,7 @@ export const en: Record<MessageKey, string> = {
   'sugg.status.planned': 'Planned',
   'sugg.status.done': 'Done',
   'sugg.status.declined': 'Not now',
+  'legal.anpcSal': 'ANPC – Alternative dispute resolution',
   'account.legal': 'Legal documents',
   'account.data': 'My data',
   'account.data.rights': 'You can view, download and delete your data.',

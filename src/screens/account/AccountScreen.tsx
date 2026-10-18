@@ -5,6 +5,7 @@ import type { ShellOutletContext } from '../../app/AppShell';
 import { LogoutConfirm } from '../../app/LogoutConfirm';
 import { NAV, type Role } from '../../app/roles';
 import { useSession } from '../../app/sessionContext';
+import { AnpcSal } from '../../components/AnpcSal';
 import { Button } from '../../components/Button';
 import { Tile } from '../../components/Tile';
 import { useI18n } from '../../i18n/context';
@@ -131,6 +132,7 @@ export function AccountScreen({ role }: { role: Role }) {
           <Tile key={doc.id} to={`${NAV[role].account.path}/legal/${doc.id}`} icon={FileText} label={t(doc.titleKey)} />
         ))}
       </div>
+      {role !== 'admin' && <AnpcSal />}
 
       <DataSection />
 

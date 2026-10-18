@@ -23,6 +23,7 @@ import { LoadingScreen } from '../../app/LoadingScreen';
 import { homeOf } from '../../app/roles';
 import { useSession } from '../../app/sessionContext';
 import { useDocumentTitle } from '../../app/useDocumentTitle';
+import { AnpcSal } from '../../components/AnpcSal';
 import { Banner } from '../../components/Banner';
 import { buttonClass } from '../../components/buttonClass';
 import { LogoTile } from '../../components/LogoTile';
@@ -236,6 +237,9 @@ export function Landing() {
                 {t('landing.components')}
               </Link>
             )}
+            <div className={styles.footerSal}>
+              <AnpcSal />
+            </div>
           </nav>
           <p className={styles.footerNote}>{t('landing.footerNote')}</p>
         </div>
