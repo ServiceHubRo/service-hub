@@ -4,3 +4,8 @@ import { NAV, type Role } from '../../app/roles';
 export function helpPath(role: Role): string {
   return `${NAV[role].account.path}/ajutor`;
 }
+
+/** Cont → Sugestii (T26): `/c/cont/sugestii`, `/s/cont/sugestii`. */
+export function suggestionsPath(role: Role): string {
+  return `${NAV[role].account.path}/sugestii`;
+}

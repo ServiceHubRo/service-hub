@@ -17,6 +17,7 @@ import { SettingsScreen } from '../../screens/admin/SettingsScreen';
 import { ShopDetailScreen } from '../../screens/admin/ShopDetailScreen';
 import { ShopsScreen } from '../../screens/admin/ShopsScreen';
 import { SubscriptionsScreen } from '../../screens/admin/SubscriptionsScreen';
+import { SuggestionsScreen } from '../../screens/admin/SuggestionsScreen';
 import { TextsScreen } from '../../screens/admin/TextsScreen';
 import { ThreadScreen } from '../../screens/admin/ThreadScreen';
 import { ZonesScreen } from '../../screens/admin/ZonesScreen';
@@ -59,6 +60,7 @@ export default function AdminApp() {
         <Route path="cont/export" element={<ExportScreen />} />
         <Route path="cont/anaf" element={<AnafScreen />} />
         <Route path="cont/zone" element={<ZonesScreen />} />
+        <Route path="cont/sugestii" element={<SuggestionsScreen />} />
       </Route>
     </Routes>
   );

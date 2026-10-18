@@ -18,6 +18,8 @@ export const ADMIN_EXPORT_PATH = '/admin/cont/export';
 export const ADMIN_ANAF_PATH = '/admin/cont/anaf';
 /** Zone: where Service-Hub works and who waits (Eduard, 8 Oct). */
 export const ADMIN_ZONES_PATH = '/admin/cont/zone';
+/** Sugestii: ideas from clients and shops (T26). */
+export const ADMIN_SUGGESTIONS_PATH = '/admin/cont/sugestii';
 
 export const adminShopPath = (id: string) => `${ADMIN_SHOPS_PATH}/${id}`;
 export const adminClientPath = (id: string) => `${ADMIN_CLIENTS_PATH}/${id}`;
