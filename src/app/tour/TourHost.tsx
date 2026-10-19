@@ -19,7 +19,9 @@ export function TourHost({ role }: { role: 'client' | 'shop' }) {
   const { pathname } = useLocation();
   const requested = useTourRequested();
   const [running, setRunning] = useState(false);
-  const first = Boolean(profile && !profile.tour_seen_at && storage.get(ONBOARDING_OFF_KEY) !== '1');
+  // Once ended here, it does not start again in this session unless asked (even if saving failed).
+  const [ended, setEnded] = useState(false);
+  const first = Boolean(profile && !profile.tour_seen_at && !ended && storage.get(ONBOARDING_OFF_KEY) !== '1');
   const wanted = !running && pathname === homeOf(role) && (first || requested);
 
   useEffect(() => {
@@ -41,15 +43,14 @@ export function TourHost({ role }: { role: 'client' | 'shop' }) {
   if (!running || !profile) return null;
 
   function done() {
+    setEnded(true);
     setRunning(false);
     clearTourRequest();
     const now = session.profile;
     if (!now || now.tour_seen_at) return;
-    // Best effort: if saving fails, the tour comes back on the next start.
-    markTourSeen(now.id).then(
-      (at) => session.setProfile({ ...now, tour_seen_at: at }),
-      () => undefined,
-    );
+    // Seen at once on screen; saved in the background (if that fails, it comes back on the next start).
+    session.setProfile({ ...now, tour_seen_at: new Date().toISOString() });
+    markTourSeen(now.id).catch(() => undefined);
   }
 
   const name = profile.name?.trim().split(/\s+/)[0] ?? null;

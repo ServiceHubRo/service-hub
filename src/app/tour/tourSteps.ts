@@ -9,6 +9,8 @@ export interface TourStep {
   target: string;
   titleKey: MessageKey;
   bodyKey: MessageKey;
+  /** A navigation item: no frame, its icon and label light up instead. */
+  nav?: boolean;
 }
 
 const nav = (path: string) => `[data-tour="${path}"]`;
@@ -17,18 +19,18 @@ export const TOUR_STEPS: Record<'client' | 'shop', TourStep[]> = {
   client: [
     { target: '[data-tour="guide"]', titleKey: 'tour.guide.title', bodyKey: 'tour.client.guide.body' },
     { target: '#search-q', titleKey: 'tour.client.search.title', bodyKey: 'tour.client.search.body' },
-    { target: nav('/c/garaj'), titleKey: 'nav.client.garage', bodyKey: 'tour.client.garage.body' },
-    { target: nav('/c/programari'), titleKey: 'nav.bookings', bodyKey: 'tour.client.bookings.body' },
-    { target: nav('/c/mesaje'), titleKey: 'nav.messages', bodyKey: 'tour.client.messages.body' },
-    { target: nav('/c/cont'), titleKey: 'nav.account', bodyKey: 'tour.client.account.body' },
+    { target: nav('/c/garaj'), titleKey: 'nav.client.garage', bodyKey: 'tour.client.garage.body', nav: true },
+    { target: nav('/c/programari'), titleKey: 'nav.bookings', bodyKey: 'tour.client.bookings.body', nav: true },
+    { target: nav('/c/mesaje'), titleKey: 'nav.messages', bodyKey: 'tour.client.messages.body', nav: true },
+    { target: nav('/c/cont'), titleKey: 'nav.account', bodyKey: 'tour.client.account.body', nav: true },
   ],
   shop: [
     { target: '[data-tour="guide"]', titleKey: 'tour.guide.title', bodyKey: 'tour.shop.guide.body' },
     { target: '[data-tour="dashboard"]', titleKey: 'tour.shop.dashboard.title', bodyKey: 'tour.shop.dashboard.body' },
-    { target: nav('/s/programari'), titleKey: 'nav.bookings', bodyKey: 'tour.shop.bookings.body' },
-    { target: nav('/s/istoric'), titleKey: 'nav.shop.history', bodyKey: 'tour.shop.history.body' },
-    { target: nav('/s/mesaje'), titleKey: 'nav.messages', bodyKey: 'tour.shop.messages.body' },
-    { target: nav('/s/cont'), titleKey: 'nav.account', bodyKey: 'tour.shop.account.body' },
+    { target: nav('/s/programari'), titleKey: 'nav.bookings', bodyKey: 'tour.shop.bookings.body', nav: true },
+    { target: nav('/s/istoric'), titleKey: 'nav.shop.history', bodyKey: 'tour.shop.history.body', nav: true },
+    { target: nav('/s/mesaje'), titleKey: 'nav.messages', bodyKey: 'tour.shop.messages.body', nav: true },
+    { target: nav('/s/cont'), titleKey: 'nav.account', bodyKey: 'tour.shop.account.body', nav: true },
   ],
 };
 

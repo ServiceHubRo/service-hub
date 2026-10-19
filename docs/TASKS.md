@@ -1100,3 +1100,5 @@ Cerut de Eduard pe 19 oct 2026: „un fel de ghid de început, pașii de înrola
 
 **Decizii:** (1) turul nu are „Înapoi”, doar „Înainte” și „Sari peste”, ca să rămână simplu; (2) ghidul clientului nu are pas pentru locație (bannerul ei rămâne cum era); (3) prenumele din salut e primul cuvânt din numele contului.
 
+**După testul lui Eduard (19 oct):** (1) turul pornea a doua oară când salvarea „tur văzut” întârzia (pe internet, nu local): acum contul e marcat pe loc, iar salvarea merge în fundal; (2) cât rulează turul, pagina nu se mai derulează, deci lumina stă pe loc; (3) la bara de navigare nu mai e chenar: iconița și eticheta se aprind galben, cu o strălucire care pulsează ușor; (4) **anunțurile echipei** ajung doar la conturile care existau când au fost trimise (un cont nou vedea anunțurile vechi): migrarea `notices_since_account` (`schema_version` = 82), testul `tests/sql/128_notices_since_account.sql`.
+

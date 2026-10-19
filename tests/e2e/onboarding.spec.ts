@@ -75,16 +75,34 @@ test('a new client: welcome, the lit spots one by one, "Primii pași" ticks itse
     await expect(tour(page)).toContainText(`${i + 1} din ${stops.length}`);
     await expect(tour(page)).toContainText(body);
     await expectLit(page, target);
+    if (i === 1) {
+      // The page does not scroll under the tour: the light stays where it is.
+      const before = await page.locator('[data-tour-spot]').boundingBox();
+      await page.mouse.wheel(0, 600);
+      await page.waitForTimeout(300);
+      expect(await page.locator('[data-tour-spot]').boundingBox()).toEqual(before);
+    }
+    // A navigation item has no frame: it lights up itself.
+    if (i >= 2) await expect(target).toHaveAttribute('data-tour-lit', '');
     if (i === 1 || i === 2) await shot(page, `tour-client-${i + 1}`, name());
     if (i < stops.length - 1) {
       await expect(page.getByRole('button', { name: 'Sari peste' })).toBeVisible();
       await page.getByRole('button', { name: 'Înainte' }).click();
     }
   }
-  // The last one has no "Sari peste": "Gata" ends it, and the app can be used again.
+  // The last one has no "Sari peste": "Gata" ends it, and the app can be used again. It does not
+  // start over while the server takes its time to save it (on the internet, not instant).
   await expect(page.getByRole('button', { name: 'Sari peste' })).toHaveCount(0);
+  await page.route('**/rest/v1/profiles?*', async (route) => {
+    if (route.request().method() === 'PATCH') await new Promise((r) => setTimeout(r, 1500));
+    await route.continue();
+  });
   await page.getByRole('button', { name: 'Gata' }).click();
   await expect(tour(page)).toHaveCount(0);
+  await page.waitForTimeout(2500);
+  await expect(tour(page)).toHaveCount(0);
+  await page.unroute('**/rest/v1/profiles?*');
+  await expect(page.locator('[data-tour-lit]')).toHaveCount(0);
   const id = await userIdOf(email);
   await expect
     .poll(async () => (await serviceRest<{ tour_seen_at: string | null }[]>(`profiles?id=eq.${id}&select=tour_seen_at`, 'GET'))[0]!.tour_seen_at)

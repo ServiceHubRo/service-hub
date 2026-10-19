@@ -23,6 +23,21 @@
   pointer-events: none;
 }
 
+/* A navigation item: only the shade is cut away, the item itself lights up. */
+.spotNav {
+  border-radius: 16px;
+  box-shadow: 0 0 0 200vmax var(--tour-shade);
+}
+
+:global([data-tour-lit]) {
+  color: var(--amber) !important;
+}
+
+:global([data-tour-lit]) svg {
+  color: var(--amber);
+  filter: drop-shadow(0 0 6px rgba(245, 165, 36, 0.85));
+}
+
 .card {
   position: fixed;
   width: min(360px, calc(100vw - 32px));
@@ -113,6 +128,20 @@
   animation: tourGlow 2.4s ease-in-out infinite;
 }
 
+.glide .spotNav {
+  animation: none;
+}
+
+:global([data-tour-lit]) svg {
+  animation: tourIcon 2.4s ease-in-out infinite;
+}
+
+@keyframes tourIcon {
+  50% {
+    filter: drop-shadow(0 0 10px rgba(245, 165, 36, 1));
+  }
+}
+
 .glide .dim {
   animation: tourFade 0.35s ease-out;
 }
@@ -150,7 +179,8 @@
 @media (prefers-reduced-motion: reduce) {
   .glide .spot,
   .glide .dim,
-  .glide .card {
+  .glide .card,
+  :global([data-tour-lit]) svg {
     animation: none;
     transition: none;
   }

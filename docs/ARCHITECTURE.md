@@ -295,6 +295,8 @@ No-shows: `client_no_show_count(client_id, 90 days)`. At 3 or more, shops see a 
 
 **profiles.tour_seen_at, profiles.guide_hidden_at (T39, migration `onboarding_tour`, schema 81)** — the account finished or skipped the app tour; the client hid "Primii pași" (or did all of it). Written by the account itself (column grant, like `push_prompt_dismissed_at`). The tour (`src/app/tour/`) runs on the home screen when `tour_seen_at` is null, or when asked again from Ajutor și contact; a device with localStorage `sh_onboarding_off` = 1 (the browser tests) never shows the tour or the guide.
 
+**Notices since the account (migration `notices_since_account`, schema 82)** — `can_read_notice(audience, city, created_at)` (the notices read policy): the admin sees every notice; anyone else only those of their audience sent at or after their account was created.
+
 **Warranty (T37a, migration `job_warranty`, schema 75):** `bookings.warranty_months` (1–60) and `warranty_until` (date, both or neither), written only by `complete_job`; shown on the client's finished booking, the car's history, the report preview and PDF (`report_jobs` carries them) and the shop's Istoric (`list_shop_history`). No reminder before it ends (Eduard; the first version had one, removed by migration `remove_warranty_reminder`, schema 76).
 
 `complete_job` requires `odometer`. Last known reading = highest `odometer` among `done` bookings with the same `car_snapshot->>'plate_norm'` (any shop). Checked in this order:

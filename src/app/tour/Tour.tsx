@@ -9,8 +9,9 @@ import styles from './Tour.module.css';
 
 /**
  * The tour itself (T39): the screen dims, one spot stays lit with a card beside it ("2 din 5", a
- * title, a line, "Sari peste" and "Înainte"); the light glides to the next spot. The app behind is
- * inert while it runs; Escape skips it. A welcome card comes first, centered.
+ * title, a line, "Sari peste" and "Înainte"); the light glides to the next spot. A content spot has
+ * an amber frame; a navigation item has none, its icon and label light up. The app behind is inert
+ * and does not scroll while it runs; Escape skips it. A welcome card comes first, centered.
  */
 export function Tour({ role, name, onDone }: { role: 'client' | 'shop'; name: string | null; onDone: () => void }) {
   const { t } = useI18n();
@@ -63,14 +64,33 @@ export function Tour({ role, name, onDone }: { role: 'client' | 'shop'; name: st
     return () => observer.disconnect();
   }, [index]);
 
-  // The app behind cannot be reached while the tour runs.
+  // The app behind cannot be reached, nor scrolled, while the tour runs: the lit spot stays put.
+  const layerRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const root = document.getElementById('root');
+    const main = document.querySelector<HTMLElement>('main');
+    const layer = layerRef.current;
+    const block = (event: Event) => event.preventDefault();
     if (root) root.inert = true;
+    if (main) main.style.overflow = 'hidden';
+    document.documentElement.style.overflow = 'hidden';
+    layer?.addEventListener('wheel', block, { passive: false });
+    layer?.addEventListener('touchmove', block, { passive: false });
     return () => {
       if (root) root.inert = false;
+      if (main) main.style.overflow = '';
+      document.documentElement.style.overflow = '';
+      layer?.removeEventListener('wheel', block);
+      layer?.removeEventListener('touchmove', block);
     };
   }, []);
+
+  // A navigation item lights up itself (its icon and label), without a frame.
+  useEffect(() => {
+    const el = step?.nav ? findSpot(step.target) : null;
+    el?.setAttribute('data-tour-lit', '');
+    return () => el?.removeAttribute('data-tour-lit');
+  }, [step]);
 
   useEffect(() => {
     primaryRef.current?.focus({ preventScroll: true });
@@ -97,9 +117,13 @@ export function Tour({ role, name, onDone }: { role: 'client' | 'shop'; name: st
   const glide = !reducedMotion();
 
   return createPortal(
-    <div className={`${styles.layer} ${glide ? styles.glide : ''}`} onKeyDown={onKeyDown}>
+    <div ref={layerRef} className={`${styles.layer} ${glide ? styles.glide : ''}`} onKeyDown={onKeyDown}>
       {index >= 0 && spot ? (
-        <div className={styles.spot} data-tour-spot style={{ top: spot.top, left: spot.left, width: spot.width, height: spot.height }} />
+        <div
+          className={`${styles.spot} ${step?.nav ? styles.spotNav : ''}`}
+          data-tour-spot
+          style={{ top: spot.top, left: spot.left, width: spot.width, height: spot.height }}
+        />
       ) : (
         <div className={styles.dim} />
       )}
