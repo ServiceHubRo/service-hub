@@ -1078,3 +1078,8 @@ Migrarea `suggestions` (`schema_version` = 80). Teste: `tests/sql/127_suggestion
 **Tot acum:** pasul pentru harta MapTiler în `docs/LANSARE.md` (4.3b), care lipsea din ghid; adresa hărții din `docs/SERVICII_EXTERNE.md` corectată (`/256/`, ca harta să nu iasă de două ori mai mică).
 
 **Decizii:** (1) caseta stă lângă „Ajutor și contact”, nu într-un meniu nou; (2) adminul nu primește email sau notificare la fiecare sugestie, le vede când deschide caseta; (3) autorul nu primește notificare când adminul schimbă starea, o vede în listă; (4) lista adminului nu se actualizează singură (o sugestie nouă apare la redeschidere). **Rămas:** un răspuns scris de admin la o sugestie, dacă va fi nevoie.
+
+## T40 — Ecranul rămâne unde l-ai lăsat ✅
+
+Cerut de Eduard pe 19 oct 2026: în Cont, după Sugestii, „înapoi” ducea pagina sus de tot. Acum, în toată aplicația (client, service, admin): un ecran nou pornește de sus, iar întors înapoi (butonul înapoi al telefonului sau al browserului, ori „‹ Cont” / „‹ Setări” spre ecranul de dinainte) ecranul e exact unde a fost lăsat. Un ecran care încă se încarcă e adus acolo pe măsură ce apare conținutul, cel mult o secundă și jumătate, și doar dacă omul nu derulează el între timp. Alt element din meniu pornește tot de sus. `src/lib/scrollMemory.ts` (pozițiile se țin cât e deschisă aplicația, nu se salvează). Test: `e2e/shell` „going back finds a screen where it was left …” (Cont → Sugestii → „‹ Cont” și înapoi din browser). Fără migrare, fără pachete noi.
+
