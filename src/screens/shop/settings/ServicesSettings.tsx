@@ -1,13 +1,16 @@
-import { SearchX } from 'lucide-react';
+import { ChevronDown, SearchX } from 'lucide-react';
 import { useCallback, useMemo, useState } from 'react';
 import { BackLink } from '../../../components/BackLink';
 import { Button } from '../../../components/Button';
 import { Checkbox } from '../../../components/Checkbox';
 import { EmptyState } from '../../../components/EmptyState';
 import { Field } from '../../../components/Field';
+import { SelectField } from '../../../components/SelectField';
 import { SkeletonList } from '../../../components/Skeleton';
 import { fetchCatalog, fetchShopServices, saveShopServices, type CatalogCategory } from '../../../data/shop';
 import { useI18n } from '../../../i18n/context';
+import { plural } from '../../../i18n/translate';
+import { SERVICE_PRESETS } from '../../../lib/servicePresets';
 import { matchesWords, searchWords } from '../../../lib/text';
 import { useLoad } from '../../../lib/useLoad';
 import { LoadError } from '../../../components/LoadError';
@@ -22,7 +25,11 @@ interface Loaded {
   selected: string[];
 }
 
-/** Servicii oferite (P5): the catalog with checkboxes, search without diacritics, no prices. */
+/**
+ * Servicii oferite (P5): the catalog with checkboxes, search without diacritics, no prices. Kept
+ * quiet (Eduard, 19 Oct): one picker ticks the usual services of a kind of workshop; the categories
+ * are closed rows with how many are ticked, and open on a tap with "Toate" as their first line.
+ */
 export function ServicesSettings() {
   const { t } = useI18n();
   const { shop } = useShopSettings();
@@ -51,9 +58,12 @@ function Catalog({ catalog, initial }: { catalog: CatalogCategory[]; initial: st
   const [selected, setSelected] = useState<Set<string>>(() => new Set(initial.filter((id) => all.includes(id))));
   const [saved, setSaved] = useState<Set<string>>(selected);
   const [query, setQuery] = useState('');
+  const [open, setOpen] = useState<Set<string>>(() => new Set());
+  const [presetNote, setPresetNote] = useState('');
 
   const name = (x: { name_ro: string; name_en: string }) => (lang === 'ro' ? x.name_ro : x.name_en);
 
+  const searching = searchWords(query).length > 0;
   const visible = useMemo(() => {
     const words = searchWords(query);
     if (words.length === 0) return catalog;
@@ -65,17 +75,7 @@ function Catalog({ catalog, initial }: { catalog: CatalogCategory[]; initial: st
       .filter((c) => c.services.length > 0);
   }, [catalog, query]);
 
-  const visibleIds = visible.flatMap((c) => c.services.map((s) => s.id));
   const changed = selected.size !== saved.size || [...selected].some((id) => !saved.has(id));
-
-  function toggle(id: string, on: boolean) {
-    setSelected((prev) => {
-      const next = new Set(prev);
-      if (on) next.add(id);
-      else next.delete(id);
-      return next;
-    });
-  }
 
   function setMany(ids: string[], on: boolean) {
     setSelected((prev) => {
@@ -84,6 +84,24 @@ function Catalog({ catalog, initial }: { catalog: CatalogCategory[]; initial: st
         if (on) next.add(id);
         else next.delete(id);
       }
+      return next;
+    });
+  }
+
+  /** A kind of workshop: its usual services are ticked (nothing is unticked); the picker empties again. */
+  function applyPreset(key: string) {
+    const preset = SERVICE_PRESETS.find((p) => p.key === key);
+    if (!preset) return;
+    const ids = preset.services.filter((id) => all.includes(id));
+    setMany(ids, true);
+    setPresetNote(t('services.presetOn', { type: t(`services.preset.${preset.key}`), services: plural(lang, 'unit.servicesTicked', ids.length) }));
+  }
+
+  function setOpenCategory(key: string, on: boolean) {
+    setOpen((prev) => {
+      const next = new Set(prev);
+      if (on) next.add(key);
+      else next.delete(key);
       return next;
     });
   }
@@ -97,27 +115,31 @@ function Catalog({ catalog, initial }: { catalog: CatalogCategory[]; initial: st
 
   return (
     <>
-      <div className={own.toolbar}>
+      <div className={own.top}>
+        <SelectField
+          label={t('services.presetLabel')}
+          value=""
+          options={[
+            { value: '', label: t('services.presetPick') },
+            ...SERVICE_PRESETS.map((p) => ({ value: p.key, label: t(`services.preset.${p.key}`) })),
+          ]}
+          onChange={(e) => applyPreset(e.target.value)}
+        />
+        <p className={own.note} role="status">
+          {presetNote}
+        </p>
+        <Field
+          label={t('services.search')}
+          type="search"
+          placeholder={t('services.searchPlaceholder')}
+          autoComplete="off"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+        />
         <p className={own.count} aria-live="polite">
           {t('services.count', { n: selected.size, total: all.length })}
         </p>
-        <div className={own.bulk}>
-          <Button variant="ghost" onClick={() => setMany(visibleIds, true)} disabled={visibleIds.length === 0}>
-            {t('services.selectAll')}
-          </Button>
-          <Button variant="ghost" onClick={() => setMany(visibleIds, false)} disabled={visibleIds.length === 0}>
-            {t('services.clearAll')}
-          </Button>
-        </div>
       </div>
-      <Field
-        label={t('services.search')}
-        type="search"
-        placeholder={t('services.searchPlaceholder')}
-        autoComplete="off"
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
-      />
 
       {visible.length === 0 && (
         <EmptyState
@@ -127,25 +149,59 @@ function Catalog({ catalog, initial }: { catalog: CatalogCategory[]; initial: st
         />
       )}
 
-      {visible.map((c) => (
-        <section key={c.key} className={own.category} aria-labelledby={`cat-${c.key}`}>
-          <h2 id={`cat-${c.key}`} className={styles.section}>
-            {name(c)}
-          </h2>
-          <div className={own.grid}>
-            {c.services.map((s) => (
-              <Checkbox
-                key={s.id}
-                className={own.service}
-                checked={selected.has(s.id)}
-                onChange={(e) => toggle(s.id, e.target.checked)}
-              >
-                {name(s)}
-              </Checkbox>
-            ))}
-          </div>
-        </section>
-      ))}
+      <div className={own.categories}>
+        {visible.map((c) => {
+          const ids = catalog.find((x) => x.key === c.key)!.services.map((s) => s.id);
+          const ticked = ids.filter((id) => selected.has(id)).length;
+          // While searching, the matching services are shown open (and "Toate" would reach hidden ones).
+          const expanded = searching || open.has(c.key);
+          return (
+            <section key={c.key} className={`${own.category} ${expanded ? own.categoryOpen : ''}`}>
+              <h3 className={own.categoryTitle}>
+                <button
+                  type="button"
+                  className={own.categoryToggle}
+                  aria-expanded={expanded}
+                  aria-controls={`cat-${c.key}`}
+                  disabled={searching}
+                  onClick={() => setOpenCategory(c.key, !expanded)}
+                >
+                  <span className={own.categoryName}>{name(c)}</span>
+                  <span className={`${own.categoryCount} ${ticked > 0 ? own.categoryCountOn : ''}`}>
+                    {t('services.catCount', { n: ticked, total: ids.length })}
+                  </span>
+                  {!searching && <ChevronDown size={18} aria-hidden="true" className={own.chevron} />}
+                </button>
+              </h3>
+              {expanded && (
+                <div id={`cat-${c.key}`} className={own.items}>
+                  {!searching && (
+                    <Checkbox
+                      className={`${own.item} ${own.itemAll}`}
+                      checked={ticked === ids.length}
+                      indeterminate={ticked > 0 && ticked < ids.length}
+                      aria-label={t('services.catAllLabel', { category: name(c) })}
+                      onChange={(e) => setMany(ids, e.target.checked)}
+                    >
+                      {t('services.catAll')}
+                    </Checkbox>
+                  )}
+                  {c.services.map((s) => (
+                    <Checkbox
+                      key={s.id}
+                      className={own.item}
+                      checked={selected.has(s.id)}
+                      onChange={(e) => setMany([s.id], e.target.checked)}
+                    >
+                      {name(s)}
+                    </Checkbox>
+                  ))}
+                </div>
+              )}
+            </section>
+          );
+        })}
+      </div>
 
       <div className={styles.stickySave}>
         {selected.size === 0 ? (
