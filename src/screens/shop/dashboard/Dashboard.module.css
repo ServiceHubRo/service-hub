@@ -193,8 +193,13 @@ a.stat:active {
   background: var(--surface2);
 }
 
+/* A counter at zero is quiet (no fill, a grey number) but its label stays as readable as the others. */
 .statZero {
-  opacity: 0.45;
+  background: transparent;
+}
+
+.statZero .statNumber {
+  color: var(--muted);
 }
 
 .statNumber {

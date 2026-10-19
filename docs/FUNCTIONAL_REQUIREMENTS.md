@@ -199,7 +199,7 @@ A user has exactly one role. The role decides the entire interface. A client can
 - **Cars per day** (1–100, no platform limit). **Cars per slot** (how many cars may start at the same time, default 1). **Slot length** (30 / 60 min). **Minimum notice** (e.g. 2 h). **Maximum advance** (e.g. 30 days). **Cancellation deadline** for clients (e.g. 2 h before; 0 = anytime).
 - **Inspection fee** (RON, may be 0).
 - **New-client offer** (T23, owner only): no offer, or 5 / 10 / 15 % off labor on a client's first booking at this shop. The shop pays for it and takes it off the quote; the booking remembers the promise (the card and the quote form remind the shop). It never affects search order.
-- **Services offered:** searchable catalog with checkboxes, select all / clear all. No prices.
+- **Services offered:** a picker "Start from your type of workshop" (general repair, tires, electrics, A/C, body and paint, detailing, glass, inspection station, LPG) ticks the usual services; a search without diacritics; the categories as quiet rows ("n/total"), opened on tap with "All" first (T38). No prices.
 - **Staff accounts:** invite by email, list, remove.
 - Notifications: push status, SMS on/off for new requests, daily digest on/off.
 
