@@ -40,6 +40,11 @@ async function openSettings(page: Page, tile: string) {
 }
 
 /** Clicks something that is already on screen and checks the page did not jump. */
+/** Brings a row to the top of the screen, clear of the sticky save bar at the bottom. */
+async function toTop(target: ReturnType<Page['getByRole']>) {
+  await target.evaluate((el) => el.scrollIntoView({ block: 'start' }));
+}
+
 async function clickInPlace(page: Page, target: ReturnType<Page['getByRole']>) {
   await target.scrollIntoViewIfNeeded();
   const before = await scrollTopOf(page);
@@ -68,6 +73,23 @@ test.describe('shop settings', () => {
     await page.getByRole('link', { name: /Alege serviciile pe care le faci/ }).click();
     await expect(page.getByRole('heading', { level: 1, name: 'Servicii oferite' })).toBeVisible();
     await expect(page.getByText('Selectate: 0 din 151')).toBeVisible();
+    // A kind of workshop ticks its usual services; a second tap clears them again.
+    await clickInPlace(page, page.getByRole('button', { name: 'Vulcanizare', exact: true }));
+    await expect(page.getByRole('status').filter({ hasText: 'Vulcanizare: 7 servicii bifate.' })).toBeVisible();
+    await expect(page.getByText('Selectate: 7 din 151')).toBeVisible();
+    await expect(page.getByRole('button', { name: /^Anvelope & Jante 6 din 6$/ })).toBeVisible();
+    await expect(page.getByRole('checkbox', { name: 'Toate: Anvelope & Jante' })).toBeChecked();
+    await expect(page.getByRole('checkbox', { name: 'Toate: Geometrie & Punte' })).toBeChecked({ indeterminate: true });
+    await clickInPlace(page, page.getByRole('button', { name: 'Vulcanizare', exact: true }));
+    await expect(page.getByRole('status').filter({ hasText: 'Vulcanizare: 7 servicii debifate.' })).toBeVisible();
+    await expect(page.getByText('Selectate: 0 din 151')).toBeVisible();
+    // The categories are closed: a tap opens one.
+    await expect(page.getByRole('checkbox', { name: 'Lamele ștergătoare' })).toHaveCount(0);
+    const maintenance = page.getByRole('button', { name: /^Revizii & Întreținere 0 din 11$/ });
+    await expect(maintenance).toHaveAttribute('aria-expanded', 'false');
+    await clickInPlace(page, maintenance);
+    await expect(maintenance).toHaveAttribute('aria-expanded', 'true');
+    await toTop(maintenance);
     await clickInPlace(page, page.getByRole('checkbox', { name: 'Lamele ștergătoare' }));
     await clickInPlace(page, page.getByRole('checkbox', { name: 'Schimb ulei + filtru ulei' }));
     await expect(page.getByText('Selectate: 2 din 151')).toBeVisible();
@@ -85,6 +107,20 @@ test.describe('shop settings', () => {
     await expect(page.getByText('Selectate: 2 din 151')).toBeVisible();
     await clickInPlace(page, page.getByRole('checkbox', { name: 'Plăcuțe de frână' }));
     await expect(page.getByText('Ai modificări nesalvate.')).toBeVisible();
+    // "Toate" ticks a whole category and takes it back; one of eight shows as a dash.
+    await page.getByLabel('Caută un serviciu').fill('');
+    const braking = page.getByRole('checkbox', { name: 'Toate: Frânare' });
+    await expect(braking).toBeChecked({ indeterminate: true });
+    await toTop(page.getByRole('button', { name: /^Frânare / }));
+    await clickInPlace(page, braking);
+    await expect(page.getByText('Selectate: 10 din 151')).toBeVisible();
+    await expect(page.getByRole('button', { name: /^Frânare 8 din 8$/ })).toBeVisible();
+    await clickInPlace(page, braking);
+    await expect(page.getByText('Selectate: 2 din 151')).toBeVisible();
+    await clickInPlace(page, page.getByRole('button', { name: /^Frânare 0 din 8$/ }));
+    await toTop(page.getByRole('button', { name: /^Frânare / }));
+    await clickInPlace(page, page.getByRole('checkbox', { name: 'Plăcuțe de frână' }));
+    await expect(page.getByText('Selectate: 3 din 151')).toBeVisible();
     await expectNoHorizontalScroll(page);
     await shot(page, 't05-services', name());
     await page.getByRole('button', { name: 'Salvează serviciile' }).click();

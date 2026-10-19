@@ -45,3 +45,102 @@
 .service:has(input:checked) {
   border-color: var(--amber-line);
 }
+
+/* Tipul atelierului: the kinds of workshop, wrapping (all visible at once). */
+.presets {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.presetChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.hint {
+  color: var(--muted);
+  font-size: 14px;
+  margin: 0;
+}
+
+.hint:empty {
+  display: none;
+}
+
+/* The categories: one row each (name, how many ticked, "Toate"), opened on tap. */
+.categories {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.categoryHead {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  padding: 0 12px 0 0;
+}
+
+.categoryTitle {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  font-size: 15px;
+}
+
+.categoryToggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 52px;
+  padding: 8px 12px;
+  border-radius: var(--radius-card);
+  text-align: left;
+  color: var(--text);
+  font: inherit;
+  font-weight: 600;
+}
+
+.categoryToggle:disabled {
+  cursor: default;
+  opacity: 1;
+}
+
+.chevron {
+  flex-shrink: 0;
+  color: var(--muted);
+  transition: transform 0.15s ease;
+}
+
+.categoryToggle[aria-expanded='true'] .chevron {
+  transform: rotate(180deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chevron {
+    transition: none;
+  }
+}
+
+.categoryName {
+  flex: 1;
+  min-width: 0;
+}
+
+.categoryCount {
+  flex-shrink: 0;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.categoryAll {
+  flex-shrink: 0;
+  gap: 8px;
+}

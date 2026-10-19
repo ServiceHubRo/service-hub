@@ -61,6 +61,7 @@ Ordinea contează: fiecare sarcină se sprijină pe cele de dinainte. Sarcinile 
 | T33 | Prețul de lansare pe oraș | Primele service-uri din fiecare oraș (numărul îl setează adminul) plătesc prețul de lansare și primesc insigna „Partener fondator” |
 | T34 | Oferte: termen, servicii, zile liniștite | Oferta pentru clienți noi cu dată de sfârșit și servicii alese, reducere în zilele mai liniștite, filtrul „Doar cu ofertă” |
 | T37 | Garanție, listă de așteptare, variante la deviz | Garanția lucrării (T37a); „Anunță-mă dacă se eliberează un loc” (T37b); piesă originală sau alternativă în deviz (T37c) |
+| T38 | Alegerea serviciilor mai rapidă | Tipul atelierului bifează serviciile obișnuite; categoriile strânse, cu „Toate” |
 
 ---
 
@@ -1078,3 +1079,18 @@ Migrarea `suggestions` (`schema_version` = 80). Teste: `tests/sql/127_suggestion
 **Tot acum:** pasul pentru harta MapTiler în `docs/LANSARE.md` (4.3b), care lipsea din ghid; adresa hărții din `docs/SERVICII_EXTERNE.md` corectată (`/256/`, ca harta să nu iasă de două ori mai mică).
 
 **Decizii:** (1) caseta stă lângă „Ajutor și contact”, nu într-un meniu nou; (2) adminul nu primește email sau notificare la fiecare sugestie, le vede când deschide caseta; (3) autorul nu primește notificare când adminul schimbă starea, o vede în listă; (4) lista adminului nu se actualizează singură (o sugestie nouă apare la redeschidere). **Rămas:** un răspuns scris de admin la o sugestie, dacă va fi nevoie.
+
+## T38 — Alegerea serviciilor mai rapidă ✅
+
+Cerut de Eduard pe 19 oct 2026 („e prea mult ca am pus lista aia de servicii multe?”). Lista de 151 de servicii rămâne (clientul caută lucruri precise); se schimbă doar felul în care o bifează service-ul, în Setări → **Servicii oferite**:
+
+- **Tipul atelierului**, sus: Service auto general, Vulcanizare, Electrică auto, Climatizare, Tinichigerie și vopsitorie, Detailing și spălătorie, Parbrize și geamuri, Stație ITP, Instalații GPL. O apăsare bifează serviciile obișnuite pentru acel tip („Vulcanizare: 7 servicii bifate.”); a doua apăsare le debifează, dar nu și pe cele bifate de service înainte sau aduse de alt tip încă pornit. Se pot alege mai multe. Listele sunt în `src/lib/servicePresets.ts`; un serviciu oprit de admin nu se bifează.
+- **Categoriile strânse:** fiecare categorie e un rând cu numele, „5 din 8” și căsuța „Toate” (cu liniuță când e bifată doar o parte); se deschide la apăsare. La căutare, rezultatele apar deschise, fără „Toate” (ar bifa și ce nu se vede).
+- Salvarea e cea de dinainte (aceeași funcție din baza de date); nimic nu se salvează până la „Salvează serviciile”.
+
+**Reparat tot acum:** pe Panou, un card cu zero (de exemplu „Azi: 0”) era estompat în întregime, iar eticheta nu mai avea contrastul cerut pentru lizibilitate; acum cardul e doar fără fundal, cu cifra gri, iar eticheta se citește ca la celelalte. (Testele de pe GitHub nu-l prindeau, pentru că acolo datele demo sunt proaspete și cardurile nu ajung la zero.)
+
+Teste: `tests/unit/servicePresets.test.ts` (fiecare serviciu din tipuri există în catalog, nume RO și EN), `tests/e2e/shop-settings.spec.ts` (tipul pornit și oprit, categoria închisă și deschisă, „Toate” bifat, parțial și debifat, pagina nu sare), verificarea de accesibilitate. Fără migrare, fără pachete noi.
+
+**De verificat de Eduard:** ce servicii intră în fiecare tip (lista e în pull request).
+

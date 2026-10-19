@@ -42,6 +42,8 @@ export type PluralUnit =
   | 'unit.shops'
   | 'unit.reviews'
   | 'unit.services'
+  | 'unit.servicesTicked'
+  | 'unit.servicesUnticked'
   | 'unit.places'
   | 'unit.savedCars'
   | 'unit.cars'

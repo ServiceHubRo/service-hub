@@ -42,6 +42,18 @@
   margin-top: -2px;
 }
 
+.input:indeterminate + .box {
+  border-color: var(--amber);
+}
+
+.input:indeterminate + .box::after {
+  content: '';
+  width: 10px;
+  height: 2.5px;
+  border-radius: 2px;
+  background: var(--amber);
+}
+
 .input:focus-visible + .box {
   box-shadow: var(--focus-ring);
 }
