@@ -1,94 +1,38 @@
-.toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  flex-wrap: wrap;
-}
+/* Servicii oferite: one picker, the search, then the categories as quiet rows (Eduard, 19 Oct). */
 
-.count {
-  font-weight: 700;
-}
-
-.bulk {
-  display: flex;
-  gap: 4px;
-  margin-right: -8px;
-}
-
-.category {
+.top {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 12px;
 }
 
-.grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 6px;
-}
-
-@media (min-width: 768px) {
-  .grid {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  }
-}
-
-.service {
-  min-height: 48px;
-  padding: 8px 12px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-card);
-}
-
-.service:has(input:checked) {
-  border-color: var(--amber-line);
-}
-
-/* Tipul atelierului: the kinds of workshop, wrapping (all visible at once). */
-.presets {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.presetChips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-.hint {
+.note {
+  margin: -4px 0 0;
   color: var(--muted);
   font-size: 14px;
-  margin: 0;
 }
 
-.hint:empty {
+.note:empty {
   display: none;
 }
 
-/* The categories: one row each (name, how many ticked, "Toate"), opened on tap. */
+.count {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
 .categories {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  border-top: 1px solid var(--border);
 }
 
-.categoryHead {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-card);
-  padding: 0 12px 0 0;
+.category {
+  border-bottom: 1px solid var(--border);
 }
 
 .categoryTitle {
-  flex: 1;
-  min-width: 0;
   margin: 0;
   font-size: 15px;
 }
@@ -96,20 +40,37 @@
 .categoryToggle {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   width: 100%;
-  min-height: 52px;
-  padding: 8px 12px;
-  border-radius: var(--radius-card);
+  min-height: 56px;
+  padding: 8px 4px;
   text-align: left;
   color: var(--text);
   font: inherit;
   font-weight: 600;
+  border-radius: 8px;
 }
 
 .categoryToggle:disabled {
   cursor: default;
   opacity: 1;
+}
+
+.categoryName {
+  flex: 1;
+  min-width: 0;
+}
+
+.categoryCount {
+  flex-shrink: 0;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+.categoryCountOn {
+  color: var(--amber);
 }
 
 .chevron {
@@ -128,19 +89,24 @@
   }
 }
 
-.categoryName {
-  flex: 1;
-  min-width: 0;
+.items {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  padding: 0 4px 12px;
 }
 
-.categoryCount {
-  flex-shrink: 0;
-  color: var(--muted);
-  font-size: 13px;
-  font-weight: 500;
+@media (min-width: 768px) {
+  .items {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    column-gap: 24px;
+  }
 }
 
-.categoryAll {
-  flex-shrink: 0;
-  gap: 8px;
+.item {
+  min-height: 48px;
+}
+
+.itemAll {
+  grid-column: 1 / -1;
+  font-weight: 600;
 }
