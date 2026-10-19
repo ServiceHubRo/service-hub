@@ -89,7 +89,8 @@ export function PermissionsIntro({ role }: { role: 'client' | 'shop' | 'admin' }
   const Icon = step === 'location' ? MapPin : Bell;
   const body = step === 'location' ? t('onboard.location.body') : role === 'shop' ? t('onboard.push.shop') : t('onboard.push.client');
   return (
-    <div className={styles.overlay}>
+    // The tour (T39) waits while this is on screen.
+    <div className={styles.overlay} data-permissions-intro>
       <div ref={cardRef} className={styles.card} role="dialog" aria-modal="true" aria-labelledby={titleId}>
         {steps.length > 1 && (
           <p className={styles.step}>{t('onboard.step', { n: index + 1, total: steps.length })}</p>

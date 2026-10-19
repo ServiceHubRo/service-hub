@@ -66,7 +66,7 @@ export function TodayBoard({ data, today }: { data: ShopBookingsData; today: str
 
   return (
     <>
-      <ul className={`${styles.stats} no-print`}>
+      <ul className={`${styles.stats} no-print`} data-tour="dashboard">
         {cards.map((c) => {
           const inner = (
             <>

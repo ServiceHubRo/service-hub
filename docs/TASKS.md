@@ -61,6 +61,7 @@ Ordinea contează: fiecare sarcină se sprijină pe cele de dinainte. Sarcinile 
 | T33 | Prețul de lansare pe oraș | Primele service-uri din fiecare oraș (numărul îl setează adminul) plătesc prețul de lansare și primesc insigna „Partener fondator” |
 | T34 | Oferte: termen, servicii, zile liniștite | Oferta pentru clienți noi cu dată de sfârșit și servicii alese, reducere în zilele mai liniștite, filtrul „Doar cu ofertă” |
 | T37 | Garanție, listă de așteptare, variante la deviz | Garanția lucrării (T37a); „Anunță-mă dacă se eliberează un loc” (T37b); piesă originală sau alternativă în deviz (T37c) |
+| T39 | Ghidul de început și turul aplicației | „Primii pași” numerotați (service pe Panou, client pe Caută) și un tur scurt, cu zona prezentată luminată |
 
 ---
 
@@ -1078,3 +1079,24 @@ Migrarea `suggestions` (`schema_version` = 80). Teste: `tests/sql/127_suggestion
 **Tot acum:** pasul pentru harta MapTiler în `docs/LANSARE.md` (4.3b), care lipsea din ghid; adresa hărții din `docs/SERVICII_EXTERNE.md` corectată (`/256/`, ca harta să nu iasă de două ori mai mică).
 
 **Decizii:** (1) caseta stă lângă „Ajutor și contact”, nu într-un meniu nou; (2) adminul nu primește email sau notificare la fiecare sugestie, le vede când deschide caseta; (3) autorul nu primește notificare când adminul schimbă starea, o vede în listă; (4) lista adminului nu se actualizează singură (o sugestie nouă apare la redeschidere). **Rămas:** un răspuns scris de admin la o sugestie, dacă va fi nevoie.
+
+## T39 — Ghidul de început și turul aplicației ✅
+
+Cerut de Eduard pe 19 oct 2026: „un fel de ghid de început, pașii de înrolare 1, 2, 3, apoi un mic tutorial cu posibilitate de skip; să se lumineze frumos la prezentare, cu restul puțin în umbră”.
+
+**Ghidul de început („Primii pași”)**
+- **Service, pe Panou:** cei 4 pași de dinainte (servicii, program, mașini pe zi, telefon) au acum numere 1–4, cu pasul următor în galben și bifă verde la cei făcuți; bara de progres și „2 din 4” rămân. Dispare când sunt gata toți (ca înainte).
+- **Client, pe Caută:** ① Adaugă mașina (duce la Garaj → Mașină nouă) ② Activează notificările (butonul „Activează” chiar pe rând; pasul apare doar unde browserul le poate porni) ③ Fă prima programare. Se bifează singuri; cu toți făcuți, sau cu ✕ („Ascunde primii pași”), ghidul dispare definitiv (`profiles.guide_hidden_at`). Cât e pe ecran, bannerul de notificări nu mai apare separat.
+
+**Turul aplicației** (`src/app/tour/`)
+- La prima intrare pe Caută / Panou, după ce ecranul s-a încărcat (în aplicația Android: după ecranele de permisiuni): „Bun venit, {prenume}” și „Începe” / „Sari peste”, apoi câte o oprire: ecranul se întunecă, zona prezentată rămâne luminată cu o margine aurie care pulsează ușor, cartonașul stă lângă ea („2 din 6”, titlu, o propoziție, puncte de progres, „Sari peste” și „Înainte”; la ultima, „Gata”). Lumina alunecă de la o oprire la alta; cu „Reduce mișcarea”, fără animații.
+- **Client:** Primii pași (dacă e pe ecran), căutarea, Garaj, Programări, Mesaje, Cont. **Service:** Primii pași (dacă mai e de făcut), cardurile din Panou, Programări, Istoric, Mesaje, Cont. Pe telefon se luminează bara de jos, pe calculator meniul din stânga (cartonașul stă alături).
+- O singură dată pe cont, pe orice dispozitiv (`profiles.tour_seen_at`, scris la „Gata”, „Sari peste” sau Escape). Se revede din Cont → Ajutor și contact → **Turul aplicației**.
+- Accesibil: cartonașul e un dialog cu titlu și text, focusul stă pe butoanele lui, aplicația din spate nu se poate atinge cât rulează turul, Escape îl închide.
+
+**În baza de date:** migrarea `onboarding_tour` (`schema_version` = 81): `profiles.tour_seen_at`, `profiles.guide_hidden_at`, scrise de cont ca „Nu acum” de la notificări. Conturile existente vor vedea turul o dată (sunt conturi de test). Datele demo le au marcate.
+
+**Teste:** `tests/e2e/onboarding.spec.ts` (client: bun venit, cele 6 opriri cu zona luminată în jurul elementului și cartonașul în ecran, „Gata”, nu mai apare, ghidul se bifează singur, ✕ îl ascunde, turul din Ajutor, Escape; service în engleză: „Skip” la a doua oprire, cei 4 pași numerotați), `tests/unit/tour.test.ts` (poziția cartonașului). Celelalte teste pornesc fără tur și fără ghid (`sh_onboarding_off` în `playwright.config.ts`; conturile făcute de teste au turul marcat ca văzut). Fără pachete noi.
+
+**Decizii:** (1) turul nu are „Înapoi”, doar „Înainte” și „Sari peste”, ca să rămână simplu; (2) ghidul clientului nu are pas pentru locație (bannerul ei rămâne cum era); (3) prenumele din salut e primul cuvânt din numele contului.
+

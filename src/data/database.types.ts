@@ -1212,6 +1212,7 @@ export type Database = {
           deleted_at: string | null
           display_id: string
           email_verified_at: string | null
+          guide_hidden_at: string | null
           id: string
           lang: string
           last_active_at: string | null
@@ -1230,6 +1231,7 @@ export type Database = {
           suspended: boolean
           terms_accepted_at: string | null
           terms_version: string | null
+          tour_seen_at: string | null
         }
         Insert: {
           app_tips?: boolean
@@ -1237,6 +1239,7 @@ export type Database = {
           deleted_at?: string | null
           display_id: string
           email_verified_at?: string | null
+          guide_hidden_at?: string | null
           id: string
           lang?: string
           last_active_at?: string | null
@@ -1255,6 +1258,7 @@ export type Database = {
           suspended?: boolean
           terms_accepted_at?: string | null
           terms_version?: string | null
+          tour_seen_at?: string | null
         }
         Update: {
           app_tips?: boolean
@@ -1262,6 +1266,7 @@ export type Database = {
           deleted_at?: string | null
           display_id?: string
           email_verified_at?: string | null
+          guide_hidden_at?: string | null
           id?: string
           lang?: string
           last_active_at?: string | null
@@ -1280,6 +1285,7 @@ export type Database = {
           suspended?: boolean
           terms_accepted_at?: string | null
           terms_version?: string | null
+          tour_seen_at?: string | null
         }
         Relationships: []
       }
@@ -4346,6 +4352,7 @@ export type Database = {
           deleted_at: string | null
           display_id: string
           email_verified_at: string | null
+          guide_hidden_at: string | null
           id: string
           lang: string
           last_active_at: string | null
@@ -4364,6 +4371,7 @@ export type Database = {
           suspended: boolean
           terms_accepted_at: string | null
           terms_version: string | null
+          tour_seen_at: string | null
         }
         SetofOptions: {
           from: "*"
@@ -4380,6 +4388,7 @@ export type Database = {
           deleted_at: string | null
           display_id: string
           email_verified_at: string | null
+          guide_hidden_at: string | null
           id: string
           lang: string
           last_active_at: string | null
@@ -4398,6 +4407,7 @@ export type Database = {
           suspended: boolean
           terms_accepted_at: string | null
           terms_version: string | null
+          tour_seen_at: string | null
         }
         SetofOptions: {
           from: "*"
@@ -4416,6 +4426,7 @@ export type Database = {
           deleted_at: string | null
           display_id: string
           email_verified_at: string | null
+          guide_hidden_at: string | null
           id: string
           lang: string
           last_active_at: string | null
@@ -4434,6 +4445,7 @@ export type Database = {
           suspended: boolean
           terms_accepted_at: string | null
           terms_version: string | null
+          tour_seen_at: string | null
         }
         SetofOptions: {
           from: "*"
