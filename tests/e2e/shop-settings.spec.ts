@@ -40,6 +40,11 @@ async function openSettings(page: Page, tile: string) {
 }
 
 /** Clicks something that is already on screen and checks the page did not jump. */
+/** Brings a row to the top of the screen, clear of the sticky save bar at the bottom. */
+async function toTop(target: ReturnType<Page['getByRole']>) {
+  await target.evaluate((el) => el.scrollIntoView({ block: 'start' }));
+}
+
 async function clickInPlace(page: Page, target: ReturnType<Page['getByRole']>) {
   await target.scrollIntoViewIfNeeded();
   const before = await scrollTopOf(page);
@@ -64,10 +69,40 @@ test.describe('shop settings', () => {
     await expectNoHorizontalScroll(page);
     await shot(page, 't05-panou-new', name());
 
-    // 1. Services: search without diacritics, tick, page stays put, save.
+    // 1. Services: a kind of workshop, the categories as closed rows, search without diacritics, save.
     await page.getByRole('link', { name: /Alege serviciile pe care le faci/ }).click();
     await expect(page.getByRole('heading', { level: 1, name: 'Servicii oferite' })).toBeVisible();
     await expect(page.getByText('Selectate: 0 din 151')).toBeVisible();
+    const kind = page.getByLabel('Pornește de la tipul atelierului');
+    await kind.selectOption('tires');
+    await expect(page.getByRole('status').filter({ hasText: 'Vulcanizare: 7 servicii bifate.' })).toBeVisible();
+    await expect(page.getByText('Selectate: 7 din 151')).toBeVisible();
+    await expect(kind).toHaveValue('');
+    // Closed rows with how many are ticked; "Toate" is the first line of an opened one.
+    const tires = page.getByRole('button', { name: /^Anvelope & Jante / });
+    await expect(tires).toHaveAccessibleName('Anvelope & Jante 6/6');
+    await expect(tires).toHaveAttribute('aria-expanded', 'false');
+    await expect(page.getByRole('checkbox', { name: 'Montaj + echilibrare anvelope' })).toHaveCount(0);
+    await clickInPlace(page, tires);
+    await toTop(tires);
+    const allTires = page.getByRole('checkbox', { name: 'Toate: Anvelope & Jante' });
+    await expect(allTires).toBeChecked();
+    await clickInPlace(page, allTires);
+    await expect(page.getByText('Selectate: 1 din 151')).toBeVisible();
+    await expect(tires).toHaveAccessibleName('Anvelope & Jante 0/6');
+    // Closing it near the end of the page makes the page shorter: the browser has to move up.
+    await tires.click();
+    await expect(tires).toHaveAttribute('aria-expanded', 'false');
+    const alignment = page.getByRole('button', { name: /^Geometrie & Punte 1\/3$/ });
+    await clickInPlace(page, alignment);
+    await toTop(alignment);
+    await expect(page.getByRole('checkbox', { name: 'Toate: Geometrie & Punte' })).toBeChecked({ indeterminate: true });
+    await clickInPlace(page, page.getByRole('checkbox', { name: 'Geometrie roți (2D/3D)' }));
+    await expect(page.getByText('Selectate: 0 din 151')).toBeVisible();
+    const maintenance = page.getByRole('button', { name: /^Revizii & Întreținere 0\/11$/ });
+    await clickInPlace(page, maintenance);
+    await expect(maintenance).toHaveAttribute('aria-expanded', 'true');
+    await toTop(maintenance);
     await clickInPlace(page, page.getByRole('checkbox', { name: 'Lamele ștergătoare' }));
     await clickInPlace(page, page.getByRole('checkbox', { name: 'Schimb ulei + filtru ulei' }));
     await expect(page.getByText('Selectate: 2 din 151')).toBeVisible();
@@ -78,12 +113,8 @@ test.describe('shop settings', () => {
     await expect(page.getByText('Niciun serviciu nu se potrivește cu „xyz nimic”.')).toBeVisible();
     await page.getByRole('button', { name: 'Șterge căutarea' }).click();
     await page.getByLabel('Caută un serviciu').fill('frâne');
-    const brakes = await page.getByRole('checkbox').count();
-    await page.getByRole('button', { name: 'Selectează tot', exact: true }).click();
-    await expect(page.getByText(`Selectate: ${brakes + 2} din 151`)).toBeVisible();
-    await page.getByRole('button', { name: 'Deselectează tot' }).click();
-    await expect(page.getByText('Selectate: 2 din 151')).toBeVisible();
     await clickInPlace(page, page.getByRole('checkbox', { name: 'Plăcuțe de frână' }));
+    await expect(page.getByText('Selectate: 3 din 151')).toBeVisible();
     await expect(page.getByText('Ai modificări nesalvate.')).toBeVisible();
     await expectNoHorizontalScroll(page);
     await shot(page, 't05-services', name());

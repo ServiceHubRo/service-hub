@@ -1,47 +1,112 @@
-.toolbar {
+/* Servicii oferite: one picker, the search, then the categories as quiet rows (Eduard, 19 Oct). */
+
+.top {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.note {
+  margin: -4px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.note:empty {
+  display: none;
 }
 
 .count {
-  font-weight: 700;
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
 }
 
-.bulk {
+.categories {
   display: flex;
-  gap: 4px;
-  margin-right: -8px;
+  flex-direction: column;
+  border-top: 1px solid var(--border);
 }
 
 .category {
+  border-bottom: 1px solid var(--border);
+}
+
+.categoryTitle {
+  margin: 0;
+  font-size: 15px;
+}
+
+.categoryToggle {
   display: flex;
-  flex-direction: column;
-  gap: 8px;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 56px;
+  padding: 8px 4px;
+  text-align: left;
+  color: var(--text);
+  font: inherit;
+  font-weight: 600;
+  border-radius: 8px;
 }
 
-.grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 6px;
+.categoryToggle:disabled {
+  cursor: default;
+  opacity: 1;
 }
 
-@media (min-width: 768px) {
-  .grid {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+.categoryName {
+  flex: 1;
+  min-width: 0;
+}
+
+.categoryCount {
+  flex-shrink: 0;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+.categoryCountOn {
+  color: var(--amber);
+}
+
+.chevron {
+  flex-shrink: 0;
+  color: var(--muted);
+  transition: transform 0.15s ease;
+}
+
+.categoryToggle[aria-expanded='true'] .chevron {
+  transform: rotate(180deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chevron {
+    transition: none;
   }
 }
 
-.service {
-  min-height: 48px;
-  padding: 8px 12px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-card);
+.items {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  padding: 0 4px 12px;
 }
 
-.service:has(input:checked) {
-  border-color: var(--amber-line);
+@media (min-width: 768px) {
+  .items {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    column-gap: 24px;
+  }
+}
+
+.item {
+  min-height: 48px;
+}
+
+.itemAll {
+  grid-column: 1 / -1;
+  font-weight: 600;
 }
