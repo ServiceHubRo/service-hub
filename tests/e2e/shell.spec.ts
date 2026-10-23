@@ -149,6 +149,43 @@ test('"Mai multe" on the last card shows every entry, above the tab bar', async 
   }
 });
 
+test('going back finds a screen where it was left; a new screen starts at the top', async ({ page }) => {
+  test.skip(!BACKEND, 'needs the local Supabase stack');
+  // Shared demo account: the language switch must not be saved on its profile.
+  await page.route('**/rest/v1/profiles?*', (route) =>
+    route.request().method() === 'PATCH' ? route.fulfill({ status: 204 }) : route.continue(),
+  );
+  await signIn(page, SEED.client, SEED_PASSWORD);
+  await expect(page).toHaveURL(/\/c\/cauta$/);
+  await page.getByRole('link', { name: 'Cont', exact: true }).filter({ visible: true }).first().click();
+  await expect(page.getByRole('heading', { level: 1, name: 'Cont' })).toBeVisible();
+  const top = () => page.locator('main').evaluate((el) => el.scrollTop);
+  const suggestions = page.getByRole('link', { name: /^Sugestii/ });
+  await suggestions.scrollIntoViewIfNeeded();
+  const left = await top();
+  expect(left).toBeGreaterThan(100);
+
+  // Into Sugestii: from the top. "‹ Cont": back where Cont was left.
+  await suggestions.click();
+  await expect(page.getByRole('heading', { level: 1, name: 'Sugestii' })).toBeVisible();
+  expect(await top()).toBe(0);
+  await page.locator('main').getByRole('link', { name: 'Cont', exact: true }).click();
+  await expect(page.getByRole('heading', { level: 1, name: 'Cont' })).toBeVisible();
+  await expect.poll(top).toBeGreaterThanOrEqual(left - 1);
+
+  // The browser's back too.
+  await suggestions.click();
+  await expect(page.getByRole('heading', { level: 1, name: 'Sugestii' })).toBeVisible();
+  await page.goBack();
+  await expect(page.getByRole('heading', { level: 1, name: 'Cont' })).toBeVisible();
+  await expect.poll(top).toBeGreaterThanOrEqual(left - 1);
+
+  // Another item of the menu starts at the top.
+  await page.getByRole('link', { name: /^Garaj/ }).filter({ visible: true }).first().click();
+  await expect(page.getByRole('heading', { level: 1, name: 'Garaj' })).toBeVisible();
+  expect(await top()).toBe(0);
+});
+
 test('a client cannot open shop or admin screens', async ({ page }) => {
   test.skip(!BACKEND, 'needs the local Supabase stack');
   await signIn(page, SEED.client, SEED_PASSWORD);

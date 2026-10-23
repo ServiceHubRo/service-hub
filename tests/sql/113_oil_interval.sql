@@ -46,7 +46,9 @@ select test.eq(params->>'kind', 'oil', 'the oil reminder'),
        test.eq(params->>'service_id', 'ulei', 'for the oil change'),
        test.eq(params->>'shop_id', null::text, 'no shop: the date came from the Garage'),
        test.eq(booking_id, null::uuid, 'no booking'),
-       test.eq((params->>'due')::date, public.bucharest_today() + 10, 'due in 10 days'),
+       -- Six months after the change written (10 or 11 days from now: months are not all as long).
+       test.eq((params->>'due')::date, (select (last_oil_change + interval '6 months')::date from public.cars where id = test.id('car_b')),
+         'due six months after the last change'),
        test.eq(params->>'make', 'Dacia', 'the car from the Garage'),
        test.eq(channels, '{push}'::text[], 'push only')
 from public.notification_events where user_id = test.id('client_b');

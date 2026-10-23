@@ -1119,3 +1119,7 @@ Cerut de Eduard pe 19 oct 2026: „un fel de ghid de început, pașii de înrola
 
 **După testul lui Eduard (19 oct):** (1) turul pornea a doua oară când salvarea „tur văzut” întârzia (pe internet, nu local): acum contul e marcat pe loc, iar salvarea merge în fundal; (2) cât rulează turul, pagina nu se mai derulează, deci lumina stă pe loc; (3) la bara de navigare nu mai e chenar: iconița și eticheta se aprind galben, cu o strălucire care pulsează ușor; (4) **anunțurile echipei** ajung doar la conturile care existau când au fost trimise (un cont nou vedea anunțurile vechi): migrarea `notices_since_account` (`schema_version` = 82), testul `tests/sql/128_notices_since_account.sql`.
 
+## T40 — Ecranul rămâne unde l-ai lăsat ✅
+
+Cerut de Eduard pe 19 oct 2026: în Cont, după Sugestii, „înapoi” ducea pagina sus de tot. Acum, în toată aplicația (client, service, admin): un ecran nou pornește de sus, iar întors înapoi (butonul înapoi al telefonului sau al browserului, ori „‹ Cont” / „‹ Setări” spre ecranul de dinainte) ecranul e exact unde a fost lăsat. Un ecran care încă se încarcă e adus acolo pe măsură ce apare conținutul, cel mult o secundă și jumătate, și doar dacă omul nu derulează el între timp. Alt element din meniu pornește tot de sus. `src/lib/scrollMemory.ts` (pozițiile se țin cât e deschisă aplicația, nu se salvează). Test: `e2e/shell` „going back finds a screen where it was left …” (Cont → Sugestii → „‹ Cont” și înapoi din browser). Fără migrare, fără pachete noi.
+
