@@ -39,8 +39,8 @@ jobs:
   e2e:
     name: Browser tests (390 / 820 / 1440 px)
     runs-on: ubuntu-latest
-    # The whole suite takes 22-30 minutes on three screen widths (Oct 2026); 30 cut it short.
-    timeout-minutes: 45
+    # About 20 minutes with two workers (playwright.config.ts); room for a slower runner.
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
