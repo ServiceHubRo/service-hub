@@ -1,14 +1,16 @@
 import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
+import { supabaseConfig } from '../data/supabase';
 import { useI18n } from '../i18n/context';
+import { ownImageUrl } from '../lib/ownImage';
 import styles from './PhotoGallery.module.css';
 
 /**
  * The shop's photos (T28b): a row that scrolls sideways; a tap opens the photo large, with previous,
  * next and close (arrow keys and Escape too). The large view is a native <dialog>, so focus stays
- * inside it and returns to the photo tapped.
+ * inside it and returns to the photo tapped. Only photos stored with us are shown (ownImageUrl).
  */
-export function PhotoGallery({ photos, shopName }: { photos: { id: string; url: string }[]; shopName: string }) {
+export function PhotoGallery({ photos: all, shopName }: { photos: { id: string; url: string }[]; shopName: string }) {
   const { t } = useI18n();
   const dialogRef = useRef<HTMLDialogElement>(null);
   const [open, setOpen] = useState<number | null>(null);
@@ -20,6 +22,8 @@ export function PhotoGallery({ photos, shopName }: { photos: { id: string; url: 
     if (open === null && d.open) d.close();
   }, [open]);
 
+  const project = supabaseConfig.ok ? supabaseConfig.url : null;
+  const photos = all.filter((p) => ownImageUrl(p.url, project));
   if (photos.length === 0) return null;
   const n = photos.length;
   const shown = open === null ? null : photos[open];
