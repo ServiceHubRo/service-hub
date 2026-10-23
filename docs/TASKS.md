@@ -1123,7 +1123,6 @@ Cerut de Eduard pe 19 oct 2026: „un fel de ghid de început, pașii de înrola
 
 Cerut de Eduard pe 19 oct 2026: în Cont, după Sugestii, „înapoi” ducea pagina sus de tot. Acum, în toată aplicația (client, service, admin): un ecran nou pornește de sus, iar întors înapoi (butonul înapoi al telefonului sau al browserului, ori „‹ Cont” / „‹ Setări” spre ecranul de dinainte) ecranul e exact unde a fost lăsat. Un ecran care încă se încarcă e adus acolo pe măsură ce apare conținutul, cel mult o secundă și jumătate, și doar dacă omul nu derulează el între timp. Alt element din meniu pornește tot de sus. `src/lib/scrollMemory.ts` (pozițiile se țin cât e deschisă aplicația, nu se salvează). Test: `e2e/shell` „going back finds a screen where it was left …” (Cont → Sugestii → „‹ Cont” și înapoi din browser). Fără migrare, fără pachete noi.
 
-
 ## T41 — Anunțurile echipei într-o conversație, „Înapoi” fix sus ✅
 
 Cerut de Eduard pe 23 oct 2026: anunțurile de la admin se adunau unul sub altul deasupra conversațiilor din Mesaje, iar „‹ Înapoi” dispărea la derulare.
@@ -1135,3 +1134,17 @@ Cerut de Eduard pe 23 oct 2026: anunțurile de la admin se adunau unul sub altul
 - **„‹ Înapoi”** rămâne lipit sus în zona de conținut a aplicației, pe toate ecranele cu buton înapoi, are fundalul paginii și nimic nu trece peste el. În conversații rămân sus, împreună cu el, și numele și poza celuilalt.
 - Fișiere: `TeamNoticesScreen.tsx`, `NoticeBubble.tsx` (îl înlocuiește pe `NoticeItem`), `TeamAvatar.tsx`, `BackLink`. Teste: `e2e/admin-tools` (anunțul în conversația echipei, push vechi redirecționat) și `e2e/shell` („‹ Înapoi” rămâne sus și se poate apăsa).
 - Fără migrare și fără pachete noi. Funcția Edge pentru push are linkul nou (ajunge automat prin „Deploy Supabase”).
+
+## T42 — Audit de securitate ✅
+
+Cerut de Eduard pe 23 oct 2026, după ce un IT i-a spus că nu e bine ca un AI să aibă acces la cod. Raportul complet, în română, pentru Eduard și pentru cine face verificarea externă, e în `docs/SECURITATE.md`.
+
+**Ce am verificat:** regulile de acces (RLS și grant-urile) pe toate cele 50 de tabele, funcțiile `security definer`, Storage, cele 14 funcții Edge, secretele din cod și din istoricul Git, pachetele npm, aplicația din browser, antetele de securitate, conturile și manifestul Android. Nicio problemă gravă.
+
+**Ce am reparat:**
+- **`/verifica`:** numărul de înmatriculare apare acum mascat (`mask_plate`, de exemplu „BV •• •BC”). Codurile rapoartelor sunt la rând, așa că încercându-le pe rând se puteau aduna numerele mașinilor. Migrarea `verify_report_masked_plate` (schema 83), cu teste în `79_history_report.sql` și `e2e/report`.
+- **Logo-urile și pozele service-urilor** se afișează doar din Storage-ul proiectului (`src/lib/ownImage.ts`, folosit în `ShopAvatar` și `PhotoGallery`). Unit test: `ownImage.test.ts`.
+- **Android:** `allowBackup="false"` și `data_extraction_rules.xml`, ca sesiunea de logare să nu intre în copiile de rezervă ale telefonului.
+- **`npm audit fix`:** actualizează doar uneltele de construire (Vite, Vitest, source-map-js). Aplicația avea 0 vulnerabilități. Rămâne `uuid`, adus de `@capacitor/cli`; nu ne afectează.
+
+**Lăsate așa, explicat în raport:** codurile la rând, coloanele nesecrete ale service-urilor citibile de utilizatorii logați, ștergerea contului fără reintroducerea parolei, CORS `*` pe funcțiile Edge.

@@ -142,13 +142,20 @@ select set_config('test.verify', public.verify_report(lower(replace(current_sett
 select test.eq((v->>'found')::boolean, true, 'the code is found, typed in lower case with spaces'),
        test.eq(v->>'code', current_setting('test.code'), 'the code'),
        test.eq(v->>'make', 'Volkswagen', 'the make'),
-       test.eq(v->>'plate', 'BV 12 ABC', 'the plate'),
+       test.eq(v->>'plate', 'BV •• •BC', 'the plate, masked: county letters and the last two'),
        test.eq((v->>'job_count')::int, 3, 'the number of jobs'),
        test.eq((v->>'void')::boolean, false, 'not void'),
        test.eq((select string_agg(k, ',' order by k) from jsonb_object_keys(v) k),
                'code,found,generated_at,job_count,make,model,period_from,period_to,plate,void',
                'nothing else: no shops, amounts, work or people')
 from (select current_setting('test.verify')::jsonb v) q;
+select test.logout();
+select test.eq(public.mask_plate('B 123 ABC'), 'B ••• •BC', 'Bucharest: one county letter'),
+       test.eq(public.mask_plate('cj-01-xyz'), 'cj-••-•yz', 'dashes stay'),
+       test.eq(public.mask_plate('12345'), '•••45', 'no county letters'),
+       test.eq(public.mask_plate('  '), null::text, 'no plate');
+select test.login_anon();
+select test.fails($$select public.mask_plate('BV 12 ABC')$$, 'permission denied', 'the masking itself is not callable from outside');
 select test.eq(public.verify_report('SH-2026-999999')->>'found', 'false', 'an unknown code'),
        test.eq(public.verify_report('<script>')->>'found', 'false', 'garbage'),
        test.eq(public.verify_report(null)->>'found', 'false', 'nothing typed');

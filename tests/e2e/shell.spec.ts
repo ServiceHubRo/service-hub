@@ -196,8 +196,15 @@ test('"‹ Înapoi" stays at the top of the screen while it scrolls', async ({ p
   await page.goto('/c/cont/legal/termeni');
   const back = page.locator('main').getByRole('link', { name: 'Cont', exact: true });
   await expect(back).toBeVisible();
-  await page.locator('main').evaluate((el) => el.scrollTo(0, 2000));
-  await expect.poll(() => page.locator('main').evaluate((el) => el.scrollTop)).toBeGreaterThan(1000);
+  // The document arrives a moment after the screen: scroll until it is long enough.
+  await expect
+    .poll(() =>
+      page.locator('main').evaluate((el) => {
+        el.scrollTo(0, 2000);
+        return el.scrollTop;
+      }),
+    )
+    .toBeGreaterThan(1000);
   const main = (await page.locator('main').boundingBox())!;
   const box = (await back.boundingBox())!;
   expect(box.y).toBeGreaterThanOrEqual(main.y - 1);

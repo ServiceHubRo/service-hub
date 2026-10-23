@@ -6,6 +6,9 @@ export default defineConfig({
   // Email and SMS stand-ins for the local backend (T13).
   globalSetup: './tests/e2e/global-setup.ts',
   fullyParallel: true,
+  // Two at a time on CI: Playwright's default (half the processors) gave one on a two-processor
+  // runner, and the suite then outlasted the job's time limit (Oct 2026).
+  workers: process.env.CI ? 2 : undefined,
   forbidOnly: !!process.env.CI,
   retries: 0,
   reporter: process.env.CI ? [['list'], ['html', { open: 'never' }]] : 'list',

@@ -32,8 +32,11 @@ test.beforeEach(async ({ context }) => {
 
 async function setLanguage(page: Page, lang: 'ro' | 'en') {
   await page.getByRole('link', { name: lang === 'en' ? 'Cont' : 'Account', exact: true }).filter({ visible: true }).first().click();
+  // Saved on the account before the test reloads: the account's language wins on the next start.
+  const saved = page.waitForResponse((r) => r.url().includes('/rest/v1/profiles') && r.request().method() === 'PATCH');
   await page.getByRole('button', { name: lang === 'en' ? 'English' : 'Română' }).filter({ visible: true }).first().click();
   await expect(page.getByRole('heading', { level: 1, name: lang === 'en' ? 'Account' : 'Cont' })).toBeVisible();
+  await saved;
 }
 
 test.describe('T24 notifications', () => {
