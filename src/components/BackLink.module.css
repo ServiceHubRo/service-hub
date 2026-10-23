@@ -1,3 +1,20 @@
+.bar {
+  display: flex;
+}
+
+/* In the app's content area the bar stays at the top while the screen scrolls under it (Eduard,
+   23 Oct): the page's own color, across the whole width, so nothing shows through. */
+:global(#continut) .bar {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background: var(--bg);
+  /* The side margins too, without widening the screen. */
+  box-shadow:
+    calc(-1 * var(--page-pad)) 0 0 var(--bg),
+    var(--page-pad) 0 0 var(--bg);
+}
+
 .back {
   display: inline-flex;
   align-items: center;

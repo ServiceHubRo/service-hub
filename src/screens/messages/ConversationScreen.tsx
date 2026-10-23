@@ -262,12 +262,14 @@ export function ConversationScreen() {
 
   return (
     <div className={styles.conversation} data-fill-screen>
-      <BackLink to={messagesPath(side)} label={t('nav.messages')} />
-      <div className={styles.header}>
-        {thread && <ThreadAvatar side={side} thread={thread} size={40} />}
-        <h1 className={styles.headerName}>
-          {thread && side === 'client' ? <Link to={shopPath(thread.shop_id)}>{name}</Link> : name}
-        </h1>
+      <div className={styles.top}>
+        <BackLink to={messagesPath(side)} label={t('nav.messages')} />
+        <div className={styles.header}>
+          {thread && <ThreadAvatar side={side} thread={thread} size={40} />}
+          <h1 className={styles.headerName}>
+            {thread && side === 'client' ? <Link to={shopPath(thread.shop_id)}>{name}</Link> : name}
+          </h1>
+        </div>
       </div>
 
       {state.status === 'loading' && (

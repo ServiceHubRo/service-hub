@@ -33,11 +33,13 @@ export async function fetchMyNotices(userId: string, now: Date = new Date()): Pr
   return (notices.data as Notice[]).map((n) => ({ ...n, read: read.has(n.id) }));
 }
 
-/** Opened in Mesaje: the notice is no longer new for this person (on every device). Harmless to repeat. */
-export async function markNoticeRead(noticeId: string): Promise<void> {
+/** Seen in Mesaje: these notices are no longer new for this person (on every device). Harmless to repeat. */
+export async function markNoticesRead(noticeIds: string[]): Promise<void> {
   if (!supabase) throw new RpcError('network');
-  const { error } = await supabase
-    .from('notice_reads')
-    .upsert({ notice_id: noticeId }, { onConflict: 'user_id,notice_id', ignoreDuplicates: true });
+  if (noticeIds.length === 0) return;
+  const { error } = await supabase.from('notice_reads').upsert(
+    noticeIds.map((id) => ({ notice_id: id })),
+    { onConflict: 'user_id,notice_id', ignoreDuplicates: true },
+  );
   if (error) throw failure(error);
 }

@@ -103,11 +103,11 @@ function useNavBadges(): Record<string, Badge> {
     badges[BOOKINGS_PATH] = { count: quotesWaiting(clientBookings.state.data.bookings), unit: 'unit.quotesToDecide' };
   }
   if (threads?.state.status === 'ready') {
-    // New notices from the team count too (they are at the top of Mesaje, T20a).
-    const newNotices = notices?.unread ?? 0;
+    // The team's conversation (its notices, at the top of Mesaje) counts like the others.
+    const team = (notices?.unread ?? 0) > 0 ? 1 : 0;
     badges[messagesPath(threads.side)] = {
-      count: unreadThreads(threads.state.data.threads) + newNotices,
-      unit: newNotices > 0 ? 'unit.unreadItems' : 'unit.unreadConversations',
+      count: unreadThreads(threads.state.data.threads) + team,
+      unit: 'unit.unreadConversations',
     };
   }
   return badges;

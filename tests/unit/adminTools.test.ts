@@ -232,8 +232,8 @@ describe('push texts', () => {
       booking_id: null,
       params: { notice_id: 'n1', title_ro: 'Program', body_ro: 'Închis', title_en: 'Hours', body_en: 'Closed' },
     };
-    expect(renderNotification(e)).toMatchObject({ title: 'Hours', body: 'Closed', url: '/c/mesaje?anunt=n1', tag: 'notice-n1' });
-    expect(renderNotification({ ...e, role: 'shop', lang: 'ro' })).toMatchObject({ title: 'Program', url: '/s/mesaje?anunt=n1' });
+    expect(renderNotification(e)).toMatchObject({ title: 'Hours', body: 'Closed', url: '/c/mesaje/echipa?anunt=n1', tag: 'notice-n1' });
+    expect(renderNotification({ ...e, role: 'shop', lang: 'ro' })).toMatchObject({ title: 'Program', url: '/s/mesaje/echipa?anunt=n1' });
     // English missing: the Romanian text.
     expect(renderNotification({ ...e, params: { notice_id: 'n1', title_ro: 'Program', body_ro: 'Închis' } })).toMatchObject({
       title: 'Program',

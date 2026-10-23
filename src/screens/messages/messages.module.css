@@ -110,6 +110,23 @@
   gap: 10px;
 }
 
+/* "‹ Mesaje" and who the conversation is with stay at the top while the messages scroll. */
+.top {
+  display: flex;
+  flex-direction: column;
+}
+
+:global(#continut) .top {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  padding-bottom: 8px;
+  background: var(--bg);
+  box-shadow:
+    calc(-1 * var(--page-pad)) 0 0 var(--bg),
+    var(--page-pad) 0 0 var(--bg);
+}
+
 .header {
   display: flex;
   align-items: center;

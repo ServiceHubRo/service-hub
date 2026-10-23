@@ -1,16 +1,14 @@
 import { MessageSquare } from 'lucide-react';
-import { useEffect, useState } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, Navigate, useSearchParams } from 'react-router-dom';
 import { EmptyState } from '../../components/EmptyState';
 import { LoadError } from '../../components/LoadError';
 import { SkeletonList } from '../../components/Skeleton';
 import { useI18n } from '../../i18n/context';
 import { counterpartName, formatListTime, systemMessageText } from '../../lib/messages';
 import { useNow } from '../../lib/useNow';
-import { NoticeItem } from '../notices/NoticeItem';
 import { useOptionalNotices } from '../notices/noticesContext';
-import noticeStyles from '../notices/notices.module.css';
-import { threadPath } from './paths';
+import { TeamAvatar } from '../notices/TeamAvatar';
+import { teamPath, threadPath } from './paths';
 import { ThreadAvatar } from './ThreadAvatar';
 import { useThreads } from './threadsContext';
 import styles from './messages.module.css';
@@ -18,8 +16,9 @@ import styles from './messages.module.css';
 /**
  * Mesaje (FR §3.7, §4.4, P9): one conversation per client–shop pair, the newest message on top,
  * with the last message and the number of unread messages. Live through ThreadsProvider.
- * Above them, the notices from the Service-Hub team (T20a): marked new until opened, then kept for
- * their 30 days; a push about one opens it (`?anunt=<id>`).
+ * Above them, while there are any, the notices from the Service-Hub team as one conversation
+ * (Eduard, 23 Oct): the newest title and the number of new ones. A push about one opens it there
+ * (`?anunt=<id>`, here too for the pushes sent before).
  */
 export function MessagesScreen() {
   const { t, lang } = useI18n();
@@ -27,33 +26,34 @@ export function MessagesScreen() {
   const now = useNow();
   const notices = useOptionalNotices();
   const [params] = useSearchParams();
-  const [openNotice, setOpenNotice] = useState<string | null>(() => params.get('anunt'));
-  const list = notices?.notices ?? [];
-  const opened = list.find((n) => n.id === openNotice);
+  const pushed = params.get('anunt');
+  const latest = notices?.notices[0];
+  const newNotices = notices?.unread ?? 0;
 
-  // An opened notice (tapped, or opened by a push once the list has arrived) is no longer new.
-  useEffect(() => {
-    if (opened && !opened.read) notices?.markRead(opened.id);
-  }, [opened, notices]);
+  if (pushed) return <Navigate to={`${teamPath(side)}?anunt=${encodeURIComponent(pushed)}`} replace />;
 
   return (
     <div className={styles.page}>
       <h1>{t('nav.messages')}</h1>
-      {list.length > 0 && (
-        <ul className={noticeStyles.list} aria-label={t('notices.listLabel')}>
-          {list.map((n) => (
-            <li key={n.id}>
-              <NoticeItem
-                id={`anunt-${n.id}`}
-                notice={n}
-                lang={lang}
-                isNew={!n.read}
-                open={openNotice === n.id}
-                onToggle={() => setOpenNotice((current) => (current === n.id ? null : n.id))}
-              />
-            </li>
-          ))}
-        </ul>
+      {latest && (
+        <Link to={teamPath(side)} className={`${styles.thread} ${newNotices > 0 ? styles.threadUnread : ''}`}>
+          <TeamAvatar />
+          <span className={styles.threadText}>
+            <span className={styles.threadTop}>
+              <span className={styles.threadName}>{t('notices.from')}</span>
+              <span className={`mono ${styles.threadTime}`}>{formatListTime(lang, latest.created_at, now)}</span>
+            </span>
+            <span className={styles.threadBottom}>
+              <span className={styles.preview}>{lang === 'en' ? latest.title_en : latest.title_ro}</span>
+              {newNotices > 0 && (
+                <span className={styles.unread}>
+                  <span aria-hidden="true">{newNotices}</span>
+                  <span className="visually-hidden">{t('notices.newCount', { n: newNotices })}</span>
+                </span>
+              )}
+            </span>
+          </span>
+        </Link>
       )}
       {state.status === 'loading' && <SkeletonList />}
       {state.status === 'error' && <LoadError message={t('msg.loadError')} onRetry={reload} />}

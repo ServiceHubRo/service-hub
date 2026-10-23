@@ -1032,9 +1032,8 @@ function tagFor(e: NotificationEvent): string {
 const firstUpper = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 const clip = (s: string, n: number) => (s.length > n ? `${s.slice(0, n - 1)}…` : s);
 
-/** The screen where notices show (T16b): Caută for clients, Panou for shops. */
-/** Notices live at the top of Mesaje (T20a); a push opens the notice there. */
-export const NOTICE_PATHS: Record<Side, string> = { client: '/c/mesaje', shop: '/s/mesaje' };
+/** Notices make the team's conversation in Mesaje (Eduard, 23 Oct); a push opens the notice there. */
+export const NOTICE_PATHS: Record<Side, string> = { client: '/c/mesaje/echipa', shop: '/s/mesaje/echipa' };
 
 /**
  * A notice from the Service-Hub team (T16b): the admin wrote its title and text in both

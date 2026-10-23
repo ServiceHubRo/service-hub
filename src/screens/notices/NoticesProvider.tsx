@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { useSession } from '../../app/sessionContext';
-import { fetchMyNotices, markNoticeRead, type MyNotice } from '../../data/notices';
+import { fetchMyNotices, markNoticesRead, type MyNotice } from '../../data/notices';
 import { subscribeRows } from '../../data/realtime';
 import { NoticesContext, type NoticesValue } from './noticesContext';
 
@@ -13,6 +13,7 @@ export function NoticesProvider({ children }: { children: ReactNode }) {
   const session = useSession();
   const userId = session.user?.id ?? null;
   const [notices, setNotices] = useState<MyNotice[]>([]);
+  const [loaded, setLoaded] = useState(false);
   const latest = useRef(0);
 
   const load = useCallback(() => {
@@ -20,9 +21,11 @@ export function NoticesProvider({ children }: { children: ReactNode }) {
     const mine = ++latest.current;
     fetchMyNotices(userId).then(
       (list) => {
-        if (mine === latest.current) setNotices(list);
+        if (mine !== latest.current) return;
+        setNotices(list);
+        setLoaded(true);
       },
-      () => {},
+      () => setLoaded(true),
     );
   }, [userId]);
 
@@ -32,15 +35,17 @@ export function NoticesProvider({ children }: { children: ReactNode }) {
     return subscribeRows({ channel: `notices:${userId}`, table: 'notices', onChange: load, onResync: load });
   }, [userId, load]);
 
-  const markRead = useCallback((noticeId: string) => {
-    setNotices((list) => list.map((n) => (n.id === noticeId ? { ...n, read: true } : n)));
-    // Best effort: if it fails, the notice is new again on the next visit.
-    markNoticeRead(noticeId).catch(() => {});
+  const markRead = useCallback((noticeIds: string[]) => {
+    if (noticeIds.length === 0) return;
+    const ids = new Set(noticeIds);
+    setNotices((list) => list.map((n) => (ids.has(n.id) ? { ...n, read: true } : n)));
+    // Best effort: if it fails, the notices are new again on the next visit.
+    markNoticesRead(noticeIds).catch(() => {});
   }, []);
 
   const value = useMemo<NoticesValue>(
-    () => ({ notices, unread: notices.filter((n) => !n.read).length, markRead }),
-    [notices, markRead],
+    () => ({ notices, loaded, unread: notices.filter((n) => !n.read).length, markRead }),
+    [notices, loaded, markRead],
   );
   return <NoticesContext.Provider value={value}>{children}</NoticesContext.Provider>;
 }

@@ -25,7 +25,7 @@ import { fetchCities, type SearchCity } from '../../data/search';
 import { useI18n } from '../../i18n/context';
 import type { MessageKey } from '../../i18n/ro';
 import { plural, type Msg } from '../../i18n/translate';
-import { NoticeItem } from '../notices/NoticeItem';
+import { NoticeBubble } from '../notices/NoticeBubble';
 import { ConfirmPanel } from './ActionPanels';
 import { SectionTitle } from './parts';
 import { ADMIN_ACCOUNT_PATH } from './paths';
@@ -144,7 +144,7 @@ function Composer({ onSent }: { onSent: (n: AdminNotice) => void }) {
             {(['ro', 'en'] as const).map((l) => (
               <div key={l} className={styles.stack}>
                 <span className={tools.previewLabel}>{t(l === 'en' ? 'admin.lang.en' : 'admin.lang.ro')}</span>
-                <NoticeItem notice={shownNotice} lang={l} isNew open />
+                <NoticeBubble notice={shownNotice} lang={l} isNew />
               </div>
             ))}
           </div>
