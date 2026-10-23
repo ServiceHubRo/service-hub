@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { supabaseConfig } from '../data/supabase';
+import { ownImageUrl } from '../lib/ownImage';
 import styles from './ShopAvatar.module.css';
 
 /** First letters of the first two words: "Atelier Demo" → "AD". */
@@ -12,12 +14,13 @@ function shopInitials(name: string): string {
     .toUpperCase();
 }
 
-/** The shop's logo, or its initials when it has none (or the image fails to load). Decorative. */
+/** The shop's logo, or its initials when it has none (or the image fails to load, or is not ours). Decorative. */
 export function ShopAvatar({ name, logoUrl, size = 44 }: { name: string; logoUrl: string | null; size?: number }) {
   const [broken, setBroken] = useState(false);
   const style = { width: size, height: size, fontSize: Math.round(size * 0.36) };
-  if (logoUrl && !broken) {
-    return <img src={logoUrl} alt="" className={styles.logo} style={style} loading="lazy" onError={() => setBroken(true)} />;
+  const src = ownImageUrl(logoUrl, supabaseConfig.ok ? supabaseConfig.url : null);
+  if (src && !broken) {
+    return <img src={src} alt="" className={styles.logo} style={style} loading="lazy" onError={() => setBroken(true)} />;
   }
   return (
     <span className={styles.initials} style={style} aria-hidden="true">

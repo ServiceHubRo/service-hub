@@ -216,7 +216,10 @@ test.describe('history report', () => {
     await buyer.getByLabel('Codul raportului').fill(code.toLowerCase().replace(/-/g, ' '));
     await buyer.getByRole('button', { name: 'Verifică' }).click();
     await expect(buyer.getByText('Raport autentic')).toBeVisible();
-    await expect(buyer.getByText(plate)).toBeVisible();
+    // The plate only in part (T42): "BV 123 ABC" → "BV ••• •BC".
+    const masked = `${plate.slice(0, 2)} ••• •${plate.slice(-2)}`;
+    await expect(buyer.getByText(masked)).toBeVisible();
+    await expect(buyer.getByText(plate)).toHaveCount(0);
     await expect(buyer.getByText('Volkswagen Golf 7')).toBeVisible();
     await expect(buyer).toHaveURL(new RegExp(`cod=${code}`));
     const text = await buyer.locator('main').innerText();
