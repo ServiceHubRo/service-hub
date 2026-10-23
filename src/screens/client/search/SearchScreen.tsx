@@ -30,6 +30,8 @@ import { SEARCH_PATH, shopPath, type ShopLinkState } from '../paths';
 import { useFreePlaceText } from '../../../lib/useFreePlaceText';
 import { formatRating } from '../../../i18n/format';
 import { AreaCard } from './AreaCard';
+import { ClientGuide } from './ClientGuide';
+import { useClientGuide } from './useClientGuide';
 import { ExpiryBanner } from './ExpiryBanner';
 import { LocationBanner } from './LocationBanner';
 import { ReviewPrompt } from './ReviewPrompt';
@@ -64,6 +66,7 @@ const cache = new Map<string, ShopSearchResult[]>();
  */
 export function SearchScreen() {
   const { t, lang } = useI18n();
+  const guide = useClientGuide();
   const [params, setParams] = useLiveSearchParams();
   const q = params.get('q') ?? '';
   const category = params.get('cat') ?? '';
@@ -279,9 +282,12 @@ export function SearchScreen() {
     <div className={styles.page}>
       <h1>{t('nav.client.search')}</h1>
 
+      {guide.visible && <ClientGuide guide={guide} />}
+      {guide.pending && <span hidden data-guide-pending />}
       <ExpiryBanner />
       <ReviewPrompt />
-      <PushBanner role="client" />
+      {/* "Primii pași" asks for notifications itself while it is shown. */}
+      {!guide.visible && <PushBanner role="client" />}
       <LocationBanner />
       <AreaCard />
 

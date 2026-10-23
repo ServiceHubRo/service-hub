@@ -29,6 +29,7 @@ import { PushBridge } from './PushBridge';
 import { ScreenErrorBoundary } from './ScreenErrorBoundary';
 import { NAV, type NavItem, type Role } from './roles';
 import { useSession } from './sessionContext';
+import { TourHost } from './tour/TourHost';
 import { useDocumentTitle } from './useDocumentTitle';
 import styles from './AppShell.module.css';
 
@@ -60,7 +61,11 @@ function BadgeText({ badge }: { badge: Badge | undefined }) {
 function SidebarLink({ item, badge }: { item: NavItem; badge?: Badge }) {
   const { t } = useI18n();
   return (
-    <NavLink to={item.path} className={({ isActive }) => `${styles.sideLink} ${isActive ? styles.sideActive : ''}`}>
+    <NavLink
+      to={item.path}
+      className={({ isActive }) => `${styles.sideLink} ${isActive ? styles.sideActive : ''}`}
+      data-tour={item.path}
+    >
       <NavIcon item={item} size={20} badge={badge?.count ?? 0} />
       <span>{t(item.labelKey)}</span>
       <BadgeText badge={badge} />
@@ -156,6 +161,8 @@ export function AppShell({ role }: { role: Role }) {
     <div className={styles.shell} data-role={role}>
       {/* The phone app's first start asks for the permissions one by one (on the site: the banners). */}
       {IS_NATIVE && <PermissionsIntro role={role} />}
+      {/* The short tour of the main features, once per account (T39). */}
+      {role !== 'admin' && <TourHost role={role} />}
       <a href="#continut" className={styles.skipLink} onClick={skipToContent}>
         {t('nav.skipToContent')}
       </a>
@@ -228,6 +235,7 @@ export function AppShell({ role }: { role: Role }) {
               key={item.path}
               to={item.path}
               className={({ isActive }) => `${styles.tab} ${isActive ? styles.tabActive : ''}`}
+              data-tour={item.path}
             >
               <NavIcon item={item} size={21} badge={badges[item.path]?.count ?? 0} />
               <span className={styles.tabLabel}>{t(item.shortLabelKey ?? item.labelKey)}</span>

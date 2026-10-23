@@ -128,6 +128,7 @@ A user has exactly one role. The role decides the entire interface. A client can
 - Favorites list.
 - My reports: purchased history reports, free to re-download.
 - Legal documents (3), readable in-app.
+- First visit (T39): a short tour of the main features (one lit spot at a time, skippable, once per account, again from Help and contact); "First steps" on Search: add the car, turn on notifications, make the first booking.
 - Help and contact; Suggestions (T26): write an idea (≤ 1,000 characters, 5 a day), see your own with their state (received, planned, done, not now).
 - My data: export, delete account.
 - Log out.

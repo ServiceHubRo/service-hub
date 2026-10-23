@@ -1,13 +1,14 @@
-import { ChevronRight, CircleCheck, CircleDashed } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Card } from '../../../components/Card';
+import { GuideMark } from '../../../components/GuideMark';
 import { SETUP_STEPS, type SetupStep, type ShopSetup } from '../../../data/shop';
 import { useI18n } from '../../../i18n/context';
 import type { MessageKey } from '../../../i18n/ro';
 import { formatPhone } from '../../../lib/validators';
 import { PhoneVerify } from '../../phone/PhoneVerify';
 import { SETTINGS_LINKS } from '../settings/paths';
-import styles from './Dashboard.module.css';
+import styles from '../../../components/Guide.module.css';
 
 const STEP_LINK: Record<Exclude<SetupStep, 'phone'>, string> = {
   services: SETTINGS_LINKS.services,
@@ -16,7 +17,7 @@ const STEP_LINK: Record<Exclude<SetupStep, 'phone'>, string> = {
 };
 
 /**
- * "Pregătește service-ul pentru programări" (P5d): four steps with "2 din 4". Shown until all four are done,
+ * "Pregătește service-ul pentru programări" (P5d): four numbered steps (T39), the next one lit, with "2 din 4". Shown until all four are done,
  * then never again (the database stamps setup_completed_at). Step 4 is done right here: the
  * owner asks for a code by SMS and types it (T13). The steps are the owner's: a colleague sees how
  * far it is, without links, and who does it.
@@ -25,9 +26,10 @@ export function SetupChecklist({ setup, onPhoneVerified }: { setup: ShopSetup; o
   const { t } = useI18n();
   const done = SETUP_STEPS.filter((s) => setup.steps[s]).length;
   const total = SETUP_STEPS.length;
+  const next = SETUP_STEPS.find((s) => !setup.steps[s]);
 
   return (
-    <Card highlight>
+    <Card highlight data-tour="guide">
       <div className={styles.setupHead}>
         <h2 className={styles.setupTitle}>{t('dash.setup.title')}</h2>
         <span className={`mono ${styles.progressText}`}>{t('dash.setup.progress', { done, total })}</span>
@@ -45,13 +47,12 @@ export function SetupChecklist({ setup, onPhoneVerified }: { setup: ShopSetup; o
       </div>
       {!setup.is_owner && <p className={styles.stepNote}>{t('dash.setup.staff')}</p>}
       <ol className={styles.steps}>
-        {SETUP_STEPS.map((step) => {
+        {SETUP_STEPS.map((step, i) => {
           const ok = setup.steps[step];
           const label = t(`dash.setup.${step}` as MessageKey);
-          const Icon = ok ? CircleCheck : CircleDashed;
           const content = (
             <>
-              <Icon size={22} className={ok ? styles.stepDone : styles.stepTodo} aria-hidden="true" />
+              <GuideMark n={i + 1} done={ok} current={step === next} />
               <span className={styles.stepText}>
                 <span className={ok ? styles.stepLabelDone : undefined}>{label}</span>
                 <span className="visually-hidden"> — {t(ok ? 'dash.setup.done' : 'dash.setup.todo')}</span>

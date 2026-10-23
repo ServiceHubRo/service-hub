@@ -56,8 +56,15 @@ export function uniquePhone(): { e164: string; national: string } {
   return { e164: `+40${digits}`, national: `0${digits.slice(0, 3)} ${digits.slice(3, 6)} ${digits.slice(6)}` };
 }
 
-/** A confirmed account made through the Auth admin API (fast; the UI sign-up has its own test). */
-export async function createUser(role: 'client' | 'shop', extra: Record<string, string> = {}): Promise<string> {
+/**
+ * A confirmed account made through the Auth admin API (fast; the UI sign-up has its own test). It
+ * has seen the tour and hidden "Primii pași" (T39) unless `onboarding` is asked for.
+ */
+export async function createUser(
+  role: 'client' | 'shop',
+  extra: Record<string, string> = {},
+  options: { onboarding?: boolean } = {},
+): Promise<string> {
   const email = uniqueEmail(role);
   const res = await fetch(`${API}/auth/v1/admin/users`, {
     method: 'POST',
@@ -78,6 +85,10 @@ export async function createUser(role: 'client' | 'shop', extra: Record<string, 
     }),
   });
   expect(res.ok, await res.clone().text()).toBe(true);
+  if (!options.onboarding) {
+    const { id } = (await res.json()) as { id: string };
+    await serviceRest(`profiles?id=eq.${id}`, 'PATCH', { tour_seen_at: new Date().toISOString(), guide_hidden_at: new Date().toISOString() });
+  }
   return email;
 }
 

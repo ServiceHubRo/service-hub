@@ -1,0 +1,28 @@
+.mark {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 14px;
+  font-size: 13px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.todo {
+  border: 1.5px solid var(--border-lit);
+  color: var(--muted-strong);
+}
+
+.current {
+  background: var(--amber);
+  color: var(--ink);
+  box-shadow: 0 0 0 4px var(--amber-tint);
+}
+
+.done {
+  background: var(--green);
+  color: var(--ink);
+}
