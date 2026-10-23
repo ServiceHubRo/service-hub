@@ -16,6 +16,14 @@ export default defineConfig({
     // The app's animations (src/lib/motion.ts) off, as for a phone with "Reduce motion": a figure
     // read at once is its value, not a step of the count. public.spec.ts checks them with motion on.
     contextOptions: { reducedMotion: 'reduce' },
+    // No tour and no "Primii pași" on fresh accounts (T39); tests/e2e/onboarding.spec.ts shows them.
+    storageState: {
+      cookies: [],
+      origins: [PORT, PUBLISHED_PORT].map((port) => ({
+        origin: `http://localhost:${port}`,
+        localStorage: [{ name: 'sh_onboarding_off', value: '1' }],
+      })),
+    },
   },
   projects: [
     { name: 'mobile-390', use: { ...devices['Desktop Chrome'], viewport: { width: 390, height: 844 }, hasTouch: true } },

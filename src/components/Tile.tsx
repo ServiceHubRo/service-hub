@@ -10,10 +10,12 @@ interface TileProps {
   to?: string;
   /** …or an address outside it (mailto:, WhatsApp). */
   href?: string;
+  /** Runs as the screen opens (with `to`). */
+  onClick?: () => void;
 }
 
 /** Full-width navigation card: amber icon, label (and an optional muted line), chevron (Cont tiles, P13b). */
-export function Tile({ to, href, icon: Icon, label, hint }: TileProps) {
+export function Tile({ to, href, icon: Icon, label, hint, onClick }: TileProps) {
   const inner = (
     <>
       <Icon size={20} className={styles.icon} aria-hidden="true" />
@@ -32,7 +34,7 @@ export function Tile({ to, href, icon: Icon, label, hint }: TileProps) {
     );
   }
   return (
-    <Link to={to ?? '/'} className={styles.tile}>
+    <Link to={to ?? '/'} className={styles.tile} onClick={onClick}>
       {inner}
     </Link>
   );

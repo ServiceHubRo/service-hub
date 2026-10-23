@@ -62,6 +62,7 @@ Ordinea contează: fiecare sarcină se sprijină pe cele de dinainte. Sarcinile 
 | T34 | Oferte: termen, servicii, zile liniștite | Oferta pentru clienți noi cu dată de sfârșit și servicii alese, reducere în zilele mai liniștite, filtrul „Doar cu ofertă” |
 | T37 | Garanție, listă de așteptare, variante la deviz | Garanția lucrării (T37a); „Anunță-mă dacă se eliberează un loc” (T37b); piesă originală sau alternativă în deviz (T37c) |
 | T38 | Alegerea serviciilor mai rapidă | Tipul atelierului bifează serviciile obișnuite; categoriile ca rânduri simple, cu „Toate” înăuntru |
+| T39 | Ghidul de început și turul aplicației | „Primii pași” numerotați (service pe Panou, client pe Caută) și un tur scurt, cu zona prezentată luminată |
 
 ---
 
@@ -1095,4 +1096,26 @@ Scoase: „Selectează tot” / „Deselectează tot” (le înlocuiește „Toa
 Teste: `tests/unit/servicePresets.test.ts` (fiecare serviciu din tipuri există în catalog, nume RO și EN), `tests/e2e/shop-settings.spec.ts` (tipul ales, categoria închisă și deschisă, „Toate” bifat, parțial și debifat, căutarea, pagina nu sare), verificarea de accesibilitate. Fără migrare, fără pachete noi.
 
 **De verificat de Eduard:** ce servicii intră în fiecare tip (lista e în pull request).
+
+## T39 — Ghidul de început și turul aplicației ✅
+
+Cerut de Eduard pe 19 oct 2026: „un fel de ghid de început, pașii de înrolare 1, 2, 3, apoi un mic tutorial cu posibilitate de skip; să se lumineze frumos la prezentare, cu restul puțin în umbră”.
+
+**Ghidul de început („Primii pași”)**
+- **Service, pe Panou:** cei 4 pași de dinainte (servicii, program, mașini pe zi, telefon) au acum numere 1–4, cu pasul următor în galben și bifă verde la cei făcuți; bara de progres și „2 din 4” rămân. Dispare când sunt gata toți (ca înainte).
+- **Client, pe Caută:** ① Adaugă mașina (duce la Garaj → Mașină nouă) ② Activează notificările (butonul „Activează” chiar pe rând; pasul apare doar unde browserul le poate porni) ③ Fă prima programare. Se bifează singuri; cu toți făcuți, sau cu ✕ („Ascunde primii pași”), ghidul dispare definitiv (`profiles.guide_hidden_at`). Cât e pe ecran, bannerul de notificări nu mai apare separat.
+
+**Turul aplicației** (`src/app/tour/`)
+- La prima intrare pe Caută / Panou, după ce ecranul s-a încărcat (în aplicația Android: după ecranele de permisiuni): „Bun venit, {prenume}” și „Începe” / „Sari peste”, apoi câte o oprire: ecranul se întunecă, zona prezentată rămâne luminată cu o margine aurie care pulsează ușor, cartonașul stă lângă ea („2 din 6”, titlu, o propoziție, puncte de progres, „Sari peste” și „Înainte”; la ultima, „Gata”). Lumina alunecă de la o oprire la alta; cu „Reduce mișcarea”, fără animații.
+- **Client:** Primii pași (dacă e pe ecran), căutarea, Garaj, Programări, Mesaje, Cont. **Service:** Primii pași (dacă mai e de făcut), cardurile din Panou, Programări, Istoric, Mesaje, Cont. Pe telefon se luminează bara de jos, pe calculator meniul din stânga (cartonașul stă alături).
+- O singură dată pe cont, pe orice dispozitiv (`profiles.tour_seen_at`, scris la „Gata”, „Sari peste” sau Escape). Se revede din Cont → Ajutor și contact → **Turul aplicației**.
+- Accesibil: cartonașul e un dialog cu titlu și text, focusul stă pe butoanele lui, aplicația din spate nu se poate atinge cât rulează turul, Escape îl închide.
+
+**În baza de date:** migrarea `onboarding_tour` (`schema_version` = 81): `profiles.tour_seen_at`, `profiles.guide_hidden_at`, scrise de cont ca „Nu acum” de la notificări. Conturile existente vor vedea turul o dată (sunt conturi de test). Datele demo le au marcate.
+
+**Teste:** `tests/e2e/onboarding.spec.ts` (client: bun venit, cele 6 opriri cu zona luminată în jurul elementului și cartonașul în ecran, „Gata”, nu mai apare, ghidul se bifează singur, ✕ îl ascunde, turul din Ajutor, Escape; service în engleză: „Skip” la a doua oprire, cei 4 pași numerotați), `tests/unit/tour.test.ts` (poziția cartonașului). Celelalte teste pornesc fără tur și fără ghid (`sh_onboarding_off` în `playwright.config.ts`; conturile făcute de teste au turul marcat ca văzut). Fără pachete noi.
+
+**Decizii:** (1) turul nu are „Înapoi”, doar „Înainte” și „Sari peste”, ca să rămână simplu; (2) ghidul clientului nu are pas pentru locație (bannerul ei rămâne cum era); (3) prenumele din salut e primul cuvânt din numele contului.
+
+**După testul lui Eduard (19 oct):** (1) turul pornea a doua oară când salvarea „tur văzut” întârzia (pe internet, nu local): acum contul e marcat pe loc, iar salvarea merge în fundal; (2) cât rulează turul, pagina nu se mai derulează, deci lumina stă pe loc; (3) la bara de navigare nu mai e chenar: iconița și eticheta se aprind galben, cu o strălucire care pulsează ușor; (4) **anunțurile echipei** ajung doar la conturile care existau când au fost trimise (un cont nou vedea anunțurile vechi): migrarea `notices_since_account` (`schema_version` = 82), testul `tests/sql/128_notices_since_account.sql`.
 

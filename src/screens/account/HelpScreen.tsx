@@ -1,5 +1,6 @@
-import { LifeBuoy, Mail, MessageCircle } from 'lucide-react';
-import { NAV } from '../../app/roles';
+import { Compass, LifeBuoy, Mail, MessageCircle } from 'lucide-react';
+import { homeOf, NAV } from '../../app/roles';
+import { requestTour } from '../../app/tour/tourStore';
 import { useSession } from '../../app/sessionContext';
 import { BackLink } from '../../components/BackLink';
 import { Card } from '../../components/Card';
@@ -11,7 +12,7 @@ import styles from './account.module.css';
 
 /**
  * How to reach the Service-Hub team (clients and shops): email and WhatsApp, each opening with the
- * account's ID already written, so the team finds the account at once.
+ * account's ID already written, so the team finds the account at once. Below, the app tour again (T39).
  */
 export function HelpScreen({ role }: { role: 'client' | 'shop' }) {
   const { t } = useI18n();
@@ -51,6 +52,10 @@ export function HelpScreen({ role }: { role: 'client' | 'shop' }) {
       </Card>
 
       <p className={styles.helpNote}>{t(role === 'client' ? 'help.clientNote' : 'help.shopNote')}</p>
+
+      <div className={styles.tiles}>
+        <Tile to={homeOf(role)} icon={Compass} label={t('tour.again')} hint={t('tour.againHint')} onClick={requestTour} />
+      </div>
     </div>
   );
 }

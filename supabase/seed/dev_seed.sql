@@ -385,3 +385,7 @@ begin
   end if;
 end
 $$;
+
+-- The demo accounts know the app already (T39): no tour and no "Primii pași" for them (the browser
+-- tests open them all the time; tests/e2e/onboarding.spec.ts makes its own new accounts).
+update public.profiles set tour_seen_at = now(), guide_hidden_at = now();

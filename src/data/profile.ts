@@ -77,3 +77,19 @@ export async function fetchMyShop(userId: string): Promise<ShopSummary | null> {
   if (error) throw failure(error);
   return data?.shops ?? null;
 }
+
+/** The tour was finished or skipped (T39): it is not shown again to this account, on any device. */
+export async function markTourSeen(userId: string): Promise<string> {
+  const at = new Date().toISOString();
+  const { error } = await db().from('profiles').update({ tour_seen_at: at }).eq('id', userId);
+  if (error) throw failure(error);
+  return at;
+}
+
+/** "Primii pași" on Caută was hidden, or all of it is done (T39). */
+export async function hideClientGuide(userId: string): Promise<string> {
+  const at = new Date().toISOString();
+  const { error } = await db().from('profiles').update({ guide_hidden_at: at }).eq('id', userId);
+  if (error) throw failure(error);
+  return at;
+}
