@@ -186,6 +186,33 @@ test('going back finds a screen where it was left; a new screen starts at the to
   expect(await top()).toBe(0);
 });
 
+test('"‹ Înapoi" stays at the top of the screen while it scrolls', async ({ page }) => {
+  test.skip(!BACKEND, 'needs the local Supabase stack');
+  await page.route('**/rest/v1/profiles?*', (route) =>
+    route.request().method() === 'PATCH' ? route.fulfill({ status: 204 }) : route.continue(),
+  );
+  await signIn(page, SEED.client, SEED_PASSWORD);
+  await expect(page).toHaveURL(/\/c\/cauta$/);
+  await page.goto('/c/cont/legal/termeni');
+  const back = page.locator('main').getByRole('link', { name: 'Cont', exact: true });
+  await expect(back).toBeVisible();
+  await page.locator('main').evaluate((el) => el.scrollTo(0, 2000));
+  await expect.poll(() => page.locator('main').evaluate((el) => el.scrollTop)).toBeGreaterThan(1000);
+  const main = (await page.locator('main').boundingBox())!;
+  const box = (await back.boundingBox())!;
+  expect(box.y).toBeGreaterThanOrEqual(main.y - 1);
+  expect(box.y).toBeLessThan(main.y + 20);
+  // Nothing scrolls over it: a tap there is a tap on it.
+  const hit = await page.evaluate(
+    ([x, y]) => document.elementFromPoint(x!, y!)?.closest('a')?.textContent ?? null,
+    [box.x + box.width / 2, box.y + box.height / 2],
+  );
+  expect(hit).toBe('Cont');
+  await expectNoHorizontalScroll(page);
+  await back.click();
+  await expect(page.getByRole('heading', { level: 1, name: 'Cont' })).toBeVisible();
+});
+
 test('a client cannot open shop or admin screens', async ({ page }) => {
   test.skip(!BACKEND, 'needs the local Supabase stack');
   await signIn(page, SEED.client, SEED_PASSWORD);

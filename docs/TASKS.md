@@ -1123,3 +1123,15 @@ Cerut de Eduard pe 19 oct 2026: „un fel de ghid de început, pașii de înrola
 
 Cerut de Eduard pe 19 oct 2026: în Cont, după Sugestii, „înapoi” ducea pagina sus de tot. Acum, în toată aplicația (client, service, admin): un ecran nou pornește de sus, iar întors înapoi (butonul înapoi al telefonului sau al browserului, ori „‹ Cont” / „‹ Setări” spre ecranul de dinainte) ecranul e exact unde a fost lăsat. Un ecran care încă se încarcă e adus acolo pe măsură ce apare conținutul, cel mult o secundă și jumătate, și doar dacă omul nu derulează el între timp. Alt element din meniu pornește tot de sus. `src/lib/scrollMemory.ts` (pozițiile se țin cât e deschisă aplicația, nu se salvează). Test: `e2e/shell` „going back finds a screen where it was left …” (Cont → Sugestii → „‹ Cont” și înapoi din browser). Fără migrare, fără pachete noi.
 
+
+## T41 — Anunțurile echipei într-o conversație, „Înapoi” fix sus ✅
+
+Cerut de Eduard pe 23 oct 2026: anunțurile de la admin se adunau unul sub altul deasupra conversațiilor din Mesaje, iar „‹ Înapoi” dispărea la derulare.
+
+- **Anunțurile** (ca la WhatsApp sau Snapchat): în Mesaje apare un singur rând, „Echipa Service-Hub”. Rândul arată titlul ultimului anunț, ora și câte anunțuri sunt noi, și apare doar dacă există anunțuri în ultimele 30 de zile. Rândul deschide `/c|s/mesaje/echipa`: anunțurile ca mesaje de la echipă, cele vechi sus și cel mai nou jos, cu ziua deasupra, ca în conversații. Ecranul se deschide jos, la cel mai nou.
+- **Citite:** când deschizi ecranul, toate anunțurile se marchează citite, deodată (un singur upsert în `notice_reads`). Cele care erau noi păstrează eticheta „Nou” până ieși din ecran.
+- **Numărul de pe tabul Mesaje:** echipa contează ca o singură conversație necitită, oricâte anunțuri noi ar fi.
+- **Push:** o notificare push deschide anunțul direct în conversația echipei (`/mesaje/echipa?anunt=<id>`). Notificările mai vechi (`/mesaje?anunt=<id>`) sunt redirecționate acolo. Previzualizarea adminului arată anunțul ca mesaj.
+- **„‹ Înapoi”** rămâne lipit sus în zona de conținut a aplicației, pe toate ecranele cu buton înapoi, are fundalul paginii și nimic nu trece peste el. În conversații rămân sus, împreună cu el, și numele și poza celuilalt.
+- Fișiere: `TeamNoticesScreen.tsx`, `NoticeBubble.tsx` (îl înlocuiește pe `NoticeItem`), `TeamAvatar.tsx`, `BackLink`. Teste: `e2e/admin-tools` (anunțul în conversația echipei, push vechi redirecționat) și `e2e/shell` („‹ Înapoi” rămâne sus și se poate apăsa).
+- Fără migrare și fără pachete noi. Funcția Edge pentru push are linkul nou (ajunge automat prin „Deploy Supabase”).

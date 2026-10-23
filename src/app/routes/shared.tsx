@@ -6,6 +6,7 @@ import { helpPath, suggestionsPath } from '../../screens/account/paths';
 import { AccountLegal } from '../../screens/legal/LegalPages';
 import { BookingThreadRedirect } from '../../screens/messages/BookingThreadRedirect';
 import { ConversationScreen } from '../../screens/messages/ConversationScreen';
+import { TeamNoticesScreen } from '../../screens/notices/TeamNoticesScreen';
 import { messagesPath } from '../../screens/messages/paths';
 import { NotFound } from '../../screens/public/NotFound';
 import { SuggestionsScreen } from '../../screens/suggestions/SuggestionsScreen';
@@ -47,6 +48,7 @@ export function messageRoutes(side: 'client' | 'shop') {
   const base = rel(side, messagesPath(side));
   return (
     <>
+      <Route path={`${base}/echipa`} element={<TeamNoticesScreen />} />
       <Route path={`${base}/programare/:bookingId`} element={<BookingThreadRedirect />} />
       <Route path={`${base}/:threadId`} element={<ConversationScreen />} />
     </>
