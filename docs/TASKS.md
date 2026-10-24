@@ -1148,3 +1148,7 @@ Cerut de Eduard pe 23 oct 2026, după ce un IT i-a spus că nu e bine ca un AI s
 - **`npm audit fix`:** actualizează doar uneltele de construire (Vite, Vitest, source-map-js). Aplicația avea 0 vulnerabilități. Rămâne `uuid`, adus de `@capacitor/cli`; nu ne afectează.
 
 **Lăsate așa, explicat în raport:** codurile la rând, coloanele nesecrete ale service-urilor citibile de utilizatorii logați, ștergerea contului fără reintroducerea parolei, CORS `*` pe funcțiile Edge.
+
+## T43 — Paginile publice pentru Google — anulată
+
+Construită pe 23 oct 2026 (PR #81), apoi retrasă de Eduard pe 24 oct, înainte de Merge: nu se mai face. „Deploy Supabase” aplicase deja migrarea `public_pages` (`schema_version` 84) pe proiectul de test, așa că în `main` intră două fișiere: migrarea originală, neschimbată, și `revert_public_pages` (`schema_version` = 85), care o anulează exact. Fără ele, istoricul migrărilor proiectului de test nu s-ar mai potrivi cu `main`, iar „Deploy Supabase” ar pica la următorul PR. Codul `page_not_found` rămâne în `RPC_ERROR_CODES`, cu mesajele lui, pentru că apare în migrarea păstrată. Nimic din aplicație nu s-a schimbat. Funcțiile, coloanele și triggerele sunt identice cu cele de dinainte (verificat prin comparație).

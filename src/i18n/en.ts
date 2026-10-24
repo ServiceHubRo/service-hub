@@ -904,6 +904,7 @@ export const en: Record<MessageKey, string> = {
   'rpcError.review_window_closed': 'A review can be left up to {days} after the job is done.',
   'rpcError.service_unavailable': 'The shop no longer offers this service.',
   'rpcError.shop_closed': 'The shop is closed that day. Pick another day.',
+  'rpcError.page_not_found': 'This page does not exist.',
   'rpcError.shop_not_found': 'This shop no longer exists.',
   'rpcError.shop_unavailable': "This shop isn't taking bookings right now.",
   'rpcError.shop_has_active_bookings': 'Your shop has active bookings. Finish or cancel them, then delete your account.',

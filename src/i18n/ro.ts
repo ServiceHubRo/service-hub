@@ -902,6 +902,7 @@ export const ro = {
   'rpcError.review_window_closed': 'O recenzie se poate lăsa în cel mult {days} de la finalizare.',
   'rpcError.service_unavailable': 'Service-ul nu mai oferă acest serviciu.',
   'rpcError.shop_closed': 'Service-ul este închis în ziua aleasă. Alege altă zi.',
+  'rpcError.page_not_found': 'Pagina nu există.',
   'rpcError.shop_not_found': 'Service-ul nu mai există.',
   'rpcError.shop_unavailable': 'Service-ul nu primește programări acum.',
   'rpcError.shop_has_active_bookings': 'Service-ul are programări active. Încheie-le sau anulează-le, apoi șterge contul.',
