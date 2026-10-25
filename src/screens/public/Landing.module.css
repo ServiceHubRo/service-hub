@@ -986,6 +986,14 @@
   animation-play-state: paused !important;
 }
 
+/* The shop's phone (T44) plays from the moment it is reached, from its first frame (Eduard, 25 Oct:
+   it was already at its end by the time the visitor scrolled to it). */
+.page[data-motion] .mockWrap[data-reveal]:not([data-shown]) *,
+.page[data-motion] .mockWrap[data-reveal]:not([data-shown]) *::before,
+.page[data-motion] .mockWrap[data-reveal]:not([data-shown]) *::after {
+  animation-play-state: paused !important;
+}
+
 /* ------------------------------------------------------------------ hero demo */
 /* The phone in the first screen plays the whole flow in a 12 s loop (Eduard, 15 Oct): "Frâne" is
    typed, the shops come in, "Programează" is tapped, the quote arrives line by line and is

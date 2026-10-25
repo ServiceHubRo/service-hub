@@ -41,12 +41,15 @@ export function MockNav({ role }: { role: Role }) {
  * The shop's side of the same booking (T44), decoration only, hidden from screen readers: the
  * request for Atelier Demo arrives on Panou and is confirmed, the quote (the driver's 430) is sent
  * and accepted, the car is marked ready and the client told. A 14 s loop while the page's motion
- * is on (landingMotion.ts) and MOTION.shopDemo; otherwise the still picture of the end.
+ * is on (landingMotion.ts) and MOTION.shopDemo, from the moment the phone is reached; otherwise
+ * the still picture of the end.
  */
 export function ShopMockup() {
   const { t, money } = useI18n();
   return (
-    <div className={landing.mockWrap} aria-hidden="true">
+    // A part of the page like the others (data-reveal): it comes in when reached, and only then
+    // does its loop start, from the request arriving (Eduard, 25 Oct).
+    <div className={landing.mockWrap} aria-hidden="true" data-reveal="">
       <div className={styles.column}>
         <ViewLabel role="shop" />
         <div className={`${landing.phone} ${styles.shopPhone}`} data-demo={MOTION.shopDemo ? '' : undefined}>

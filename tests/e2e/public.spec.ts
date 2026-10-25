@@ -40,7 +40,11 @@ test.describe('motion on the landing page', () => {
     await expect(driver).not.toContainText('Istoric');
     await expect(shop).toContainText('Istoric');
     await expect(shop).not.toContainText('Garaj');
+    // Its loop waits at the first frame until the phone is reached, then starts from there.
+    const request = shop.locator('[class*="request"]').first();
+    expect(await request.evaluate((el) => el.getAnimations().map((a) => [a.playState, a.currentTime]))).toEqual([['paused', 0]]);
     await shop.evaluate((el) => el.scrollIntoView({ block: 'center' }));
+    await expect.poll(() => request.evaluate((el) => el.getAnimations().map((a) => a.playState))).toEqual(['running']);
     // The request, the quote and "Mașina e gata" are running animations.
     for (const part of ['request', 'quote', 'readyTap']) {
       const el = shop.locator(`[class*="${part}"]`).first();
