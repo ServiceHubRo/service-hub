@@ -34,8 +34,8 @@ test.describe('motion on the landing page', () => {
   test('T44: the shop\'s phone plays its side of the booking, apart from the driver\'s', async ({ page }) => {
     await page.goto('/');
     // Each phone says whose screen it is and has that role's bottom bar.
-    const driver = page.locator('[class*="column"]').filter({ hasText: 'Așa vede șoferul' });
-    const shop = page.locator('#service [class*="column"]').filter({ hasText: 'Așa vede service-ul' });
+    const driver = page.locator('[class*="column"]').filter({ hasText: 'Ce vede șoferul' });
+    const shop = page.locator('#service [class*="column"]').filter({ hasText: 'Ce vede service-ul' });
     await expect(driver).toContainText('Garaj');
     await expect(driver).not.toContainText('Istoric');
     await expect(shop).toContainText('Istoric');
