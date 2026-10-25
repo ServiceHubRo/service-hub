@@ -184,7 +184,7 @@
 }
 
 .ringFill .ringArc {
-  animation: ring-fill var(--motion-draw) var(--ease-draw) 0.15s backwards;
+  animation: ring-fill var(--motion-long) var(--ease) 0.15s backwards;
 }
 
 @keyframes ring-fill {

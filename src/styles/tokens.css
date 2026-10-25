@@ -61,12 +61,6 @@
   --motion-quick: 0.18s;
   --motion: 0.4s;
   --motion-long: 0.5s;
-  /* Drawings (a stroke drawn, a line, bar or ring growing) take longer, start at once and finish
-     gently, as before T45 (Eduard, 25 Oct: "înainte se desenau frumos"); no overshoot either. */
-  --ease-draw: cubic-bezier(0.2, 0.7, 0.2, 1);
-  --motion-draw: 1s;
-  /* A part of the public page coming into view as it is reached. */
-  --motion-reveal: 0.7s;
 
   --radius-card: 12px;
   --radius-button: 10px;

@@ -331,7 +331,7 @@
 
 /* Opening the screen: the line grows down, each point and card come in as it reaches them. */
 .timelineGrow::before {
-  animation: line-down var(--motion-draw) var(--ease) both;
+  animation: line-down var(--motion-long) var(--ease) both;
 }
 
 .timelineGrow > li::before {

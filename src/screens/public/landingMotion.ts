@@ -42,8 +42,9 @@ export function revealOnScroll(root: HTMLElement, enabled = LANDING_MOTION): () 
 /**
  * The landing's motion (Landing.tsx). On the page drawn at build time (T46) index.html has held
  * everything (`data-hold`): an animation started while the phone is still busy starting the app
- * stalls and then shows its end at once. Here, once the app has taken over and the phone has
- * drawn a frame and has a moment free, the parts reached meanwhile come in and the phones start.
+ * stalls and then shows its end at once. Here (called once the session check is over, Landing.tsx),
+ * once the phone has drawn a frame and has a moment free, the parts reached meanwhile come in and
+ * the phones start.
  */
 export function startLandingMotion(root: HTMLElement): () => void {
   if (!('hold' in root.dataset)) return revealOnScroll(root);

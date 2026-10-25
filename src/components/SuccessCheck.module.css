@@ -37,7 +37,7 @@
 }
 
 .animated .ring {
-  animation: check-draw var(--motion-long) var(--ease-draw) forwards;
+  animation: check-draw var(--motion-long) var(--ease) forwards;
 }
 
 .animated .disc {
@@ -45,7 +45,7 @@
 }
 
 .animated .tick {
-  animation: check-draw var(--motion) var(--ease-draw) 0.5s forwards;
+  animation: check-draw var(--motion) var(--ease) 0.5s forwards;
 }
 
 @keyframes check-draw {

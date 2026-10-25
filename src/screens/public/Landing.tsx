@@ -16,7 +16,7 @@ import {
   Users,
   type LucideIcon,
 } from 'lucide-react';
-import { useCallback, useEffect, useState, type CSSProperties } from 'react';
+import { useEffect, useLayoutEffect, useState, type CSSProperties } from 'react';
 import { Link, Navigate, useLocation } from 'react-router-dom';
 import { LangSwitch } from '../../app/LangSwitch';
 import { LoadingScreen } from '../../app/LoadingScreen';
@@ -85,7 +85,12 @@ export function Landing() {
   const accountDeleted = state?.accountDeleted;
   const [linkError] = useState(takeAuthLinkError);
   useDocumentTitle(t('landing.title'));
-  const motionRef = useCallback((el: HTMLDivElement | null) => (el ? startLandingMotion(el) : undefined), []);
+  // The page's motion starts once the session check is over, as when the page is drawn only then:
+  // on the page drawn at build time (T46) the check runs with the page already on screen, and an
+  // icon drawing itself meanwhile stalls and shows its end at once. Before paint, so nothing blinks.
+  const [pageEl, setPageEl] = useState<HTMLDivElement | null>(null);
+  const sessionChecked = session.status !== 'loading';
+  useLayoutEffect(() => (pageEl && sessionChecked ? startLandingMotion(pageEl) : undefined), [pageEl, sessionChecked]);
 
   // Arrived drawn at build time (T46): the page stays while the session is checked.
   if (session.status === 'loading' && !fromPrerenderedPage()) return <LoadingScreen />;
@@ -99,7 +104,7 @@ export function Landing() {
   }
 
   return (
-    <div ref={motionRef} className={styles.page} data-landing={LANDING_MOTION ? 'motion' : ''}>
+    <div ref={setPageEl} className={styles.page} data-landing={LANDING_MOTION ? 'motion' : ''}>
       <div className="status-backdrop" aria-hidden="true" />
       <div className="nav-backdrop" aria-hidden="true" />
       <header className={styles.header}>
