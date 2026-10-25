@@ -153,3 +153,9 @@ textarea {
 :root[data-nav-buttons] .nav-backdrop {
   display: block;
 }
+
+/* The page drawn at build time (T46) never shows to a visitor it was not drawn for (index.html
+   decides before it is read and empties it right after). */
+:root[data-shell] #root[data-prerendered] {
+  display: none;
+}

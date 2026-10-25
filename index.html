@@ -38,20 +38,13 @@
     <title>Service-Hub — programări online la service auto</title>
   </head>
   <body>
-    <div id="root"></div>
     <!-- The page drawn at build time (T46, scripts/prerender.mjs), plain old JavaScript like the
          guard below. It stays only for whom it was drawn: at `/`, a Romanian visitor who is not
-         signed in, in the browser. Anyone else gets the empty page the app fills, as before.
-         When it stays, nothing on it moves until the app has taken over and checked the session
-         (data-hold, lifted in src/screens/public/landingMotion.ts): an animation started while
-         the phone is busy stalls and then shows its end at once. Nothing is measured here (on a
-         phone the layout is not settled yet): the parts below the first screen wait hidden for
-         the app to bring them in, the phones wait at their first frame. If the app has not taken
-         over after 8 s, the page stays still and complete. -->
+         signed in, in the browser. Decided before it is read, so anyone else never sees it, not
+         even for a frame (data-shell hides it, global.css); they get the empty page the app
+         fills, as before. -->
     <script>
       (function () {
-        var root = document.getElementById('root');
-        if (!root || !root.hasAttribute('data-prerendered')) return;
         var keep = location.pathname === '/' && !location.hash && !window.Capacitor;
         try {
           var lang = localStorage.getItem('sh_lang');
@@ -63,9 +56,24 @@
         } catch (e) {
           keep = false;
         }
-        if (!keep) {
+        if (!keep) document.documentElement.setAttribute('data-shell', '');
+      })();
+    </script>
+    <div id="root"></div>
+    <!-- When the drawn page stays, nothing on it moves until the app has taken over and checked
+         the session (data-hold, lifted in src/screens/public/landingMotion.ts): an animation
+         started while the phone is busy stalls and then shows its end at once. Nothing is
+         measured here (on a phone the layout is not settled yet): the parts below the first
+         screen wait hidden for the app to bring them in, the phones wait at their first frame.
+         If the app has not taken over after 8 s, the page stays still and complete. -->
+    <script>
+      (function () {
+        var root = document.getElementById('root');
+        if (!root || !root.hasAttribute('data-prerendered')) return;
+        if (document.documentElement.hasAttribute('data-shell')) {
           root.removeAttribute('data-prerendered');
           root.innerHTML = '';
+          document.documentElement.removeAttribute('data-shell');
           return;
         }
         var page = root.querySelector('[data-landing="motion"]');
