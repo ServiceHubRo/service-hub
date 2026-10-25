@@ -63,6 +63,7 @@ Ordinea contează: fiecare sarcină se sprijină pe cele de dinainte. Sarcinile 
 | T37 | Garanție, listă de așteptare, variante la deviz | Garanția lucrării (T37a); „Anunță-mă dacă se eliberează un loc” (T37b); piesă originală sau alternativă în deviz (T37c) |
 | T38 | Alegerea serviciilor mai rapidă | Tipul atelierului bifează serviciile obișnuite; categoriile ca rânduri simple, cu „Toate” înăuntru |
 | T39 | Ghidul de început și turul aplicației | „Primii pași” numerotați (service pe Panou, client pe Caută) și un tur scurt, cu zona prezentată luminată |
+| T44 | Telefonul service-ului pe prima pagină | În „Ai un service auto?”, un telefon animat cu Panoul: cererea, devizul, mașina gata; separat clar de telefonul șoferului |
 
 ---
 
@@ -1152,3 +1153,12 @@ Cerut de Eduard pe 23 oct 2026, după ce un IT i-a spus că nu e bine ca un AI s
 ## T43 — Paginile publice pentru Google — anulată
 
 Construită pe 23 oct 2026 (PR #81), apoi retrasă de Eduard pe 24 oct, înainte de Merge: nu se mai face. „Deploy Supabase” aplicase deja migrarea `public_pages` (`schema_version` 84) pe proiectul de test, așa că în `main` intră două fișiere: migrarea originală, neschimbată, și `revert_public_pages` (`schema_version` = 85), care o anulează exact. Fără ele, istoricul migrărilor proiectului de test nu s-ar mai potrivi cu `main`, iar „Deploy Supabase” ar pica la următorul PR. Codul `page_not_found` rămâne în `RPC_ERROR_CODES`, cu mesajele lui, pentru că apare în migrarea păstrată. Nimic din aplicație nu s-a schimbat. Funcțiile, coloanele și triggerele sunt identice cu cele de dinainte (verificat prin comparație).
+
+## T44 — Telefonul service-ului pe prima pagină ✅
+
+Cerut de Eduard pe 25 oct 2026, după discuția despre un tutorial animat: în loc de ecrane de bun venit (aplicația are deja turul și „Primii pași”), o animație cu **partea service-ului**, pe prima pagină. Telefonul de sus arăta doar drumul șoferului. Cerința lui Eduard: „clientul să fie delimitat de service”.
+
+- **Telefonul service-ului** (`src/screens/public/LandingMockups.tsx`), în secțiunea „Ai un service auto?”, lângă text: pe laptop în stânga (telefonul șoferului e în dreapta, sus), pe telefon sub text. Joacă în buclă, în 14 secunde, aceeași programare văzută de service: cererea pentru Atelier Demo intră în Panou („Cereri noi” crește de la 0 la 1), apoi „Confirmă” → „Confirmată”. Devizul (aceleași 280 + 150 = 430 lei ca la șofer) se scrie rând cu rând și se trimite. Vine „Devizul a fost acceptat”, apoi „Mașina e gata” → „Clientul a fost anunțat”.
+- **Delimitarea:** deasupra fiecărui telefon stă o etichetă, „Așa vede șoferul” (galbenă, cu mașină) și „Așa vede service-ul” (albastră, cu un atelier). Fiecare telefon are jos bara de navigare reală a rolului lui: Caută · Garaj · Programări · Mesaje · Cont pentru șofer, Panou · Programări · Istoric · Mesaje · Cont pentru service. Telefonul service-ului e mai închis la culoare și are numele service-ului sus.
+- **Fără mișcare:** cu „Reduce mișcarea” pornit, telefonul arată finalul (cerere confirmată, deviz acceptat, „Mașina e gata”), fără nimic animat. Comutatorul de oprire e `MOTION.shopDemo` în `src/lib/motion.ts`. Doar CSS, fără video și fără pachete noi. Telefonul e decor, ascuns pentru cititoarele de ecran (textul secțiunii spune tot).
+- **Teste:** `e2e/public` (cele două telefoane au barele rolului lor, animațiile pornesc, cu „Reduce mișcarea” totul stă pe loc și se vede finalul), verificarea de accesibilitate a primei pagini în română și engleză, la 390 / 820 / 1440 px.

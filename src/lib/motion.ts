@@ -27,6 +27,8 @@ export const MOTION = {
   badgePop: true,
   /** A request that arrives live at the shop slides in with an amber glow that fades. */
   newRequestGlow: true,
+  /** The public page: the shop's phone plays a request, the quote and the car ready (T44). */
+  shopDemo: true,
 } as const;
 
 /** The phone or computer asks for less motion (Accessibility → Reduce motion). */

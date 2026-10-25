@@ -1,0 +1,626 @@
+/* The two phones of the public page told apart (T44): a label above each, the role's own bottom
+   bar inside, and the shop's phone darker, on the other side of the page. */
+
+.column {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  max-width: 330px;
+}
+
+.viewLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 12px;
+  border-radius: var(--radius-pill);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.viewDriver {
+  background: var(--amber-soft);
+  color: var(--amber);
+}
+
+.viewShop {
+  background: var(--blue-soft);
+  color: var(--blue);
+}
+
+/* ------------------------------------------------------------------ bottom bars */
+.nav {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  margin: 4px -16px -16px;
+  padding: 9px 4px 11px;
+  border-top: 1px solid var(--border);
+  font-size: 9.5px;
+  line-height: 1.2;
+}
+
+.navItem,
+.navOn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  min-width: 0;
+  color: var(--muted);
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.navOn {
+  color: var(--amber);
+  font-weight: 700;
+}
+
+/* ------------------------------------------------------------------ the shop's phone */
+.shopPhone {
+  position: relative;
+  overflow: hidden;
+  background: var(--bg);
+  border-color: var(--border-lit);
+}
+
+.shopName {
+  margin-left: auto;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.tiles {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.tile {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 9px 11px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  color: var(--muted);
+  font-size: 11.5px;
+}
+
+.tile b {
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 19px;
+  line-height: 1.15;
+}
+
+.tileLit b {
+  color: var(--amber);
+}
+
+.request,
+.quote {
+  align-items: stretch;
+}
+
+/* Two states of one place, stacked; the still picture shows the second. */
+.swap {
+  display: grid;
+  justify-items: start;
+}
+
+.swap > * {
+  grid-area: 1 / 1;
+}
+
+.before {
+  visibility: hidden;
+}
+
+.action {
+  position: relative;
+  padding: 5px 12px;
+  border-radius: 7px;
+  background: var(--amber);
+  color: var(--ink);
+  font-weight: 700;
+  font-size: 12px;
+}
+
+.action::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 9px;
+  border: 2px solid var(--amber);
+  opacity: 0;
+}
+
+.done {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 0;
+  color: var(--green);
+  font-weight: 700;
+  font-size: 12px;
+}
+
+.sent {
+  padding: 5px 0;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.pillGreen {
+  padding: 2px 9px;
+  border-radius: var(--radius-pill);
+  background: var(--green-soft);
+  color: var(--green);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.ready {
+  position: relative;
+  align-self: stretch;
+  padding: 8px;
+  border-radius: 8px;
+  background: var(--surface2);
+  border: 1.5px solid var(--green);
+  color: var(--green);
+  font-weight: 700;
+  font-size: 12px;
+  text-align: center;
+}
+
+.toast {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  right: 12px;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 12px;
+  border-radius: 11px;
+  background: #16331f;
+  border: 1px solid var(--green);
+  color: var(--text);
+  font-weight: 700;
+  font-size: 12.5px;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.5);
+  visibility: hidden;
+}
+
+.toast svg {
+  flex-shrink: 0;
+  color: var(--green);
+}
+
+/* ------------------------------------------------------------------ the demo (14 s loop) */
+/* Only with the page's motion on (landingMotion.ts sets data-motion; never with "Reduce motion")
+   and MOTION.shopDemo (data-demo). Without them, the still picture above. */
+[data-motion] [data-demo] .request {
+  animation: shop-request 14s ease-out infinite;
+}
+
+[data-motion] [data-demo] .countBefore {
+  animation: shop-before-8 14s step-end infinite;
+}
+
+[data-motion] [data-demo] .countAfter {
+  animation: shop-after-8 14s step-end infinite;
+}
+
+[data-motion] [data-demo] .tileLit {
+  animation: shop-glow 14s ease-out infinite;
+}
+
+[data-motion] [data-demo] .confirmTap {
+  animation: shop-confirm 14s ease-out infinite;
+}
+
+[data-motion] [data-demo] .confirmTap::after {
+  animation: shop-ring-18 14s ease-out infinite;
+}
+
+[data-motion] [data-demo] .confirmDone {
+  animation: shop-after-21 14s ease-out infinite;
+}
+
+[data-motion] [data-demo] .quote {
+  animation: shop-quote 14s ease-out infinite;
+}
+
+[data-motion] [data-demo] .line1 {
+  animation: shop-line-34 14s ease-out infinite;
+}
+
+[data-motion] [data-demo] .line2 {
+  animation: shop-line-37 14s ease-out infinite;
+}
+
+[data-motion] [data-demo] .total {
+  animation: shop-total 14s ease-out infinite;
+}
+
+[data-motion] [data-demo] .sendTap {
+  animation: shop-send 14s ease-out infinite;
+}
+
+[data-motion] [data-demo] .sendTap::after {
+  animation: shop-ring-46 14s ease-out infinite;
+}
+
+[data-motion] [data-demo] .sendDone {
+  animation: shop-after-49 14s ease-out infinite;
+}
+
+[data-motion] [data-demo] .pillBefore {
+  animation: shop-before-60 14s step-end infinite;
+}
+
+[data-motion] [data-demo] .pillAfter {
+  animation: shop-after-60 14s ease-out infinite;
+}
+
+[data-motion] [data-demo] .toastAccepted {
+  animation: shop-toast-accepted 14s ease-out infinite;
+}
+
+[data-motion] [data-demo] .readyTap {
+  animation: shop-ready 14s ease-out infinite;
+}
+
+[data-motion] [data-demo] .toastNotified {
+  animation: shop-toast-notified 14s ease-out infinite;
+}
+
+/* The request arrives on Panou and its count goes from 0 to 1. */
+@keyframes shop-request {
+  0%,
+  6% {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+  10%,
+  92% {
+    opacity: 1;
+    transform: none;
+  }
+  97%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes shop-before-8 {
+  0% {
+    visibility: visible;
+  }
+  8%,
+  100% {
+    visibility: hidden;
+  }
+}
+
+@keyframes shop-after-8 {
+  0% {
+    visibility: hidden;
+  }
+  8%,
+  100% {
+    visibility: visible;
+  }
+}
+
+@keyframes shop-glow {
+  0%,
+  8% {
+    box-shadow: none;
+    border-color: var(--border);
+  }
+  10% {
+    box-shadow: 0 0 16px rgba(245, 165, 36, 0.45);
+    border-color: var(--amber);
+  }
+  20%,
+  100% {
+    box-shadow: none;
+    border-color: var(--border);
+  }
+}
+
+/* "Confirmă" is tapped and becomes "Confirmată". */
+@keyframes shop-confirm {
+  0%,
+  17% {
+    visibility: visible;
+    opacity: 1;
+    transform: none;
+  }
+  18% {
+    transform: scale(0.88);
+  }
+  20% {
+    visibility: visible;
+    opacity: 1;
+    transform: none;
+  }
+  21%,
+  100% {
+    visibility: hidden;
+    opacity: 0;
+  }
+}
+
+@keyframes shop-ring-18 {
+  0%,
+  17% {
+    opacity: 0;
+    transform: scale(1);
+  }
+  18% {
+    opacity: 1;
+  }
+  25%,
+  100% {
+    opacity: 0;
+    transform: scale(1.5);
+  }
+}
+
+@keyframes shop-after-21 {
+  0%,
+  20% {
+    visibility: hidden;
+    opacity: 0;
+  }
+  21% {
+    visibility: visible;
+    opacity: 0;
+  }
+  24%,
+  100% {
+    visibility: visible;
+    opacity: 1;
+  }
+}
+
+/* The quote is written line by line and sent. */
+@keyframes shop-quote {
+  0%,
+  28% {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  32%,
+  92% {
+    opacity: 1;
+    transform: none;
+  }
+  97%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes shop-line-34 {
+  0%,
+  33% {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  36%,
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes shop-line-37 {
+  0%,
+  36% {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  39%,
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes shop-total {
+  0%,
+  39% {
+    opacity: 0;
+  }
+  42%,
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes shop-send {
+  0%,
+  41% {
+    visibility: visible;
+    opacity: 0;
+    transform: none;
+  }
+  43%,
+  45% {
+    visibility: visible;
+    opacity: 1;
+    transform: none;
+  }
+  46% {
+    transform: scale(0.9);
+  }
+  48% {
+    visibility: visible;
+    opacity: 1;
+    transform: none;
+  }
+  49%,
+  100% {
+    visibility: hidden;
+    opacity: 0;
+  }
+}
+
+@keyframes shop-ring-46 {
+  0%,
+  45% {
+    opacity: 0;
+    transform: scale(1);
+  }
+  46% {
+    opacity: 1;
+  }
+  53%,
+  100% {
+    opacity: 0;
+    transform: scale(1.4);
+  }
+}
+
+@keyframes shop-after-49 {
+  0%,
+  48% {
+    visibility: hidden;
+    opacity: 0;
+  }
+  49% {
+    visibility: visible;
+    opacity: 0;
+  }
+  52%,
+  100% {
+    visibility: visible;
+    opacity: 1;
+  }
+}
+
+/* The client accepts: a notice comes down and the quote is marked accepted. */
+@keyframes shop-before-60 {
+  0% {
+    visibility: visible;
+  }
+  60%,
+  100% {
+    visibility: hidden;
+  }
+}
+
+@keyframes shop-after-60 {
+  0%,
+  59% {
+    visibility: hidden;
+    opacity: 0;
+  }
+  60% {
+    visibility: visible;
+    opacity: 0;
+  }
+  63%,
+  100% {
+    visibility: visible;
+    opacity: 1;
+  }
+}
+
+@keyframes shop-toast-accepted {
+  0%,
+  56% {
+    visibility: hidden;
+    opacity: 0;
+    transform: translateY(-24px);
+  }
+  57% {
+    visibility: visible;
+    opacity: 0;
+    transform: translateY(-24px);
+  }
+  60%,
+  67% {
+    visibility: visible;
+    opacity: 1;
+    transform: none;
+  }
+  70%,
+  100% {
+    visibility: hidden;
+    opacity: 0;
+    transform: translateY(-24px);
+  }
+}
+
+/* "Mașina e gata" is tapped and the client is told. */
+@keyframes shop-ready {
+  0%,
+  71% {
+    opacity: 0;
+    transform: translateY(10px);
+    background: var(--surface2);
+    color: var(--green);
+  }
+  74%,
+  77% {
+    opacity: 1;
+    transform: none;
+    background: var(--surface2);
+    color: var(--green);
+  }
+  78% {
+    transform: scale(0.94);
+  }
+  80%,
+  92% {
+    opacity: 1;
+    transform: none;
+    background: var(--green);
+    color: #0a1a0e;
+  }
+  97%,
+  100% {
+    opacity: 0;
+    background: var(--green);
+    color: #0a1a0e;
+  }
+}
+
+@keyframes shop-toast-notified {
+  0%,
+  80% {
+    visibility: hidden;
+    opacity: 0;
+    transform: translateY(-24px);
+  }
+  81% {
+    visibility: visible;
+    opacity: 0;
+    transform: translateY(-24px);
+  }
+  84%,
+  91% {
+    visibility: visible;
+    opacity: 1;
+    transform: none;
+  }
+  94%,
+  100% {
+    visibility: hidden;
+    opacity: 0;
+    transform: translateY(-24px);
+  }
+}

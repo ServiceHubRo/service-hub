@@ -30,6 +30,24 @@ test.describe('motion on the landing page', () => {
     const accept = page.locator('[class*="mockAccept"]');
     expect(await accept.evaluate((el) => el.getAnimations().length)).toBeGreaterThan(0);
   });
+
+  test('T44: the shop\'s phone plays its side of the booking, apart from the driver\'s', async ({ page }) => {
+    await page.goto('/');
+    // Each phone says whose screen it is and has that role's bottom bar.
+    const driver = page.locator('[class*="column"]').filter({ hasText: 'Așa vede șoferul' });
+    const shop = page.locator('#service [class*="column"]').filter({ hasText: 'Așa vede service-ul' });
+    await expect(driver).toContainText('Garaj');
+    await expect(driver).not.toContainText('Istoric');
+    await expect(shop).toContainText('Istoric');
+    await expect(shop).not.toContainText('Garaj');
+    await shop.evaluate((el) => el.scrollIntoView({ block: 'center' }));
+    // The request, the quote and "Mașina e gata" are running animations.
+    for (const part of ['request', 'quote', 'readyTap']) {
+      const el = shop.locator(`[class*="${part}"]`).first();
+      expect(await el.evaluate((e) => e.getAnimations().length), part).toBeGreaterThan(0);
+    }
+    await shot(page, 't44-shop-phone', name());
+  });
 });
 
 test('with "Reduce motion" nothing on the landing page is hidden or moves', async ({ page }) => {
@@ -37,6 +55,12 @@ test('with "Reduce motion" nothing on the landing page is hidden or moves', asyn
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
   await expect(page.locator('[data-motion]')).toHaveCount(0);
   await expect(page.getByRole('heading', { level: 2, name: 'Patru pași' })).toHaveCSS('opacity', '1');
+  // The shop's phone (T44): the still picture of the end, nothing moving.
+  const shop = page.locator('#service [class*="column"]');
+  await expect(shop.getByText('Acceptat de client')).toBeVisible();
+  await expect(shop.getByText('Mașina e gata')).toBeVisible();
+  await expect(shop.getByText('Devizul a fost acceptat')).toBeHidden();
+  expect(await shop.evaluate((el) => el.getAnimations({ subtree: true }).length)).toBe(0);
 });
 
 test('landing: every section, in Romanian and English, without horizontal scroll', async ({ page }) => {
