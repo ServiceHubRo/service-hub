@@ -29,6 +29,12 @@ const tour = (page: Page) => page.getByRole('dialog');
 
 /** The lit spot is around the element and the card is on screen. */
 async function expectLit(page: Page, target: Locator) {
+  // The light glides from spot to spot (CLAUDE.md §10): measure it once it has arrived.
+  await page
+    .locator('[data-tour-spot]')
+    .evaluate((el) =>
+      Promise.all(el.getAnimations().filter((a) => a.effect?.getComputedTiming().iterations !== Infinity).map((a) => a.finished)),
+    );
   const spot = (await page.locator('[data-tour-spot]').boundingBox())!;
   const box = (await target.boundingBox())!;
   // The light stays 4 px inside the screen (a sidebar item starts at its very edge).
