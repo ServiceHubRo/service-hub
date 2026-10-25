@@ -16,7 +16,7 @@ import {
   Users,
   type LucideIcon,
 } from 'lucide-react';
-import { useEffect, useLayoutEffect, useState, type CSSProperties } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from 'react';
 import { Link, Navigate, useLocation } from 'react-router-dom';
 import { LangSwitch } from '../../app/LangSwitch';
 import { LoadingScreen } from '../../app/LoadingScreen';
@@ -286,8 +286,14 @@ function FeatureSection({ id, eyebrow, title, features }: { id: string; eyebrow:
 
 function FeatureCards({ features }: { features: Feature[] }) {
   const { t } = useI18n();
+  const list = useRef<HTMLUListElement>(null);
+  // Every line of the icons counts as length 1, so short and long ones draw over the whole
+  // animation, as in EmptyState (with real lengths the short ones showed all at once at the end).
+  useLayoutEffect(() => {
+    list.current?.querySelectorAll('svg > *').forEach((el) => el.setAttribute('pathLength', '1'));
+  }, []);
   return (
-    <ul className={styles.cards}>
+    <ul ref={list} className={styles.cards}>
       {features.map(({ icon: Icon, title, text }, i) => (
         <li key={title} className={styles.card} data-reveal="" style={order(i)}>
           <span className={styles.cardIcon} aria-hidden="true">
