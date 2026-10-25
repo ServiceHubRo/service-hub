@@ -48,6 +48,25 @@ test.describe('motion on the landing page', () => {
     }
     await shot(page, 't44-shop-phone', name());
   });
+
+  test('T46: on the page drawn at build time the phones wait at their first frame until the app has started', async ({ page }) => {
+    let release = () => {};
+    const held = new Promise<void>((resolve) => (release = resolve));
+    await page.route(/\/assets\/index-[^/]*\.js$/, async (route) => {
+      await held;
+      await route.continue();
+    });
+    await page.goto('/', { waitUntil: 'commit' });
+    const landing = page.locator('[data-landing]');
+    await expect(landing).toHaveAttribute('data-motion', '');
+    await expect(landing).toHaveAttribute('data-hold', '');
+    // Started while the phone is busy starting the app, a loop stalls and then leaps ahead.
+    const card = page.locator('[class*="mockShop1"]');
+    expect(await card.evaluate((el) => el.getAnimations().map((a) => [a.playState, a.currentTime]))).toEqual([['paused', 0]]);
+    release();
+    await expect(landing).not.toHaveAttribute('data-hold');
+    expect(await card.evaluate((el) => el.getAnimations().map((a) => a.playState))).toEqual(['running']);
+  });
 });
 
 test('with "Reduce motion" nothing on the landing page is hidden or moves', async ({ page }) => {

@@ -973,6 +973,16 @@
   }
 }
 
+/* The page drawn at build time (T46): the two phones wait at their first frame until the app has
+   taken over (data-hold, set by index.html, lifted by Landing.tsx). Started while the phone is
+   still busy starting the app, a loop would stall and then leap ahead to catch up. */
+.page[data-hold] .mockWrap *,
+.page[data-hold] .mockWrap *::before,
+.page[data-hold] .mockWrap *::after {
+  /* Over every demo rule's `animation` shorthand, which would set it back to running. */
+  animation-play-state: paused !important;
+}
+
 /* ------------------------------------------------------------------ hero demo */
 /* The phone in the first screen plays the whole flow in a 12 s loop (Eduard, 15 Oct): "Frâne" is
    typed, the shops come in, "Programează" is tapped, the quote arrives line by line and is

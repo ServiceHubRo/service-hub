@@ -38,3 +38,23 @@ export function revealOnScroll(root: HTMLElement, enabled = LANDING_MOTION): () 
     delete root.dataset.motion;
   };
 }
+
+/**
+ * The page drawn at build time (T46) holds its two phones at their first frame (`data-hold`, set
+ * in index.html) while the app starts: a loop running then stalls and leaps ahead. Lifted once
+ * the app has taken over and the phone has drawn a frame and has a moment free.
+ */
+export function releaseHeldDemo(root: HTMLElement): () => void {
+  if (!('hold' in root.dataset)) return () => {};
+  let idle = 0;
+  const frame = requestAnimationFrame(() => {
+    const release = () => delete root.dataset.hold;
+    idle = typeof requestIdleCallback === 'function' ? requestIdleCallback(release, { timeout: 600 }) : window.setTimeout(release, 150);
+  });
+  return () => {
+    cancelAnimationFrame(frame);
+    if (typeof cancelIdleCallback === 'function') cancelIdleCallback(idle);
+    else window.clearTimeout(idle);
+    delete root.dataset.hold;
+  };
+}

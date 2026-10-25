@@ -43,7 +43,8 @@
          guard below. It stays only for whom it was drawn: at `/`, a Romanian visitor who is not
          signed in, in the browser. Anyone else gets the empty page the app fills, as before. When
          it stays, its scroll animations start now, as src/screens/public/landingMotion.ts would
-         start them: parts on screen shown at once, the others as they come into view. -->
+         start them: parts on screen shown at once, the others as they come into view. The phones
+         wait at their first frame (data-hold) until the app has taken over (Landing.tsx). -->
     <script>
       (function () {
         var root = document.getElementById('root');
@@ -83,6 +84,7 @@
           if (parts[j].getBoundingClientRect().top < fold) parts[j].setAttribute('data-shown', '');
           else observer.observe(parts[j]);
         }
+        page.setAttribute('data-hold', '');
         page.setAttribute('data-motion', '');
       })();
     </script>
