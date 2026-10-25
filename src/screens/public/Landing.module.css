@@ -983,7 +983,20 @@
   border-right: 2px solid var(--amber);
   animation:
     demo-type 12s steps(6, end) infinite,
-    demo-caret 0.8s step-end infinite;
+    demo-caret 0.8s step-end infinite,
+    demo-type-out 12s ease-out infinite;
+}
+
+/* "Frâne" leaves with the cards at the end of the loop, instead of vanishing as it starts again. */
+@keyframes demo-type-out {
+  0%,
+  92% {
+    opacity: 1;
+  }
+  97%,
+  100% {
+    opacity: 0;
+  }
 }
 
 @keyframes demo-type {

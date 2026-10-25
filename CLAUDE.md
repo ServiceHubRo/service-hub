@@ -129,3 +129,4 @@ If the network blocks a download or API you need, stop and tell Eduard the exact
 - English copy: natural US English, same brevity ("Book now", "Send quote", "Your car is being inspected").
 - Money: RO `1.250 lei`, EN `1,250 RON`. Odometer: RO `105.400 km`, EN `105,400 km`. Dates: RO `Mar 14 oct`, EN `Tue, Oct 14`.
 - Brand: "Service-Hub" in text; wordmark `SERVICE-` in `#EAE8E2` and `HUB` in `#F5A524`, one component, never wraps.
+- Motion (Eduard, 25 Oct 2026): every animation is smooth — never slow, never fast or jumpy. Changes fade or slide over about 0.3–0.5 s on one easing, two states of the same place cross-fade instead of swapping, a loop ends by fading out what it showed (counters included) before it starts again, and nothing moves with "Reduce motion". Check it frame by frame before calling it done.
