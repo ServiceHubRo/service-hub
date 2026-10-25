@@ -317,19 +317,19 @@
 .grow .bar {
   transform-box: fill-box;
   transform-origin: bottom;
-  animation: bar-grow 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  animation: bar-grow var(--motion-long) var(--ease) both;
   animation-delay: calc(var(--i, 0) * 45ms);
 }
 
 .grow .barValue {
-  animation: value-in 0.4s ease-out both;
-  animation-delay: calc(var(--i, 0) * 45ms + 0.55s);
+  animation: value-in var(--motion) var(--ease) both;
+  animation-delay: calc(var(--i, 0) * 45ms + 0.5s);
 }
 
 .meter.grow rect + rect {
   transform-box: fill-box;
   transform-origin: left;
-  animation: meter-fill 0.8s cubic-bezier(0.2, 0.7, 0.2, 1) 0.15s both;
+  animation: meter-fill var(--motion-long) var(--ease) 0.15s both;
 }
 
 @keyframes bar-grow {

@@ -15,7 +15,7 @@
   border: 1px solid var(--border-lit);
   border-radius: var(--glass-radius);
   box-shadow: var(--glass-shadow);
-  animation: pop-in 0.18s ease;
+  animation: pop-in var(--motion-quick) var(--ease);
 }
 
 .menuNarrow {

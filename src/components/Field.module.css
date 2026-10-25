@@ -96,10 +96,10 @@
     opacity: 1;
     transform: none;
     transition:
-      opacity 0.18s ease,
-      transform 0.18s ease,
-      display 0.18s allow-discrete,
-      overlay 0.18s allow-discrete;
+      opacity var(--motion-quick) var(--ease),
+      transform var(--motion-quick) var(--ease),
+      display var(--motion-quick) allow-discrete,
+      overlay var(--motion-quick) allow-discrete;
   }
 
   .select:not(:open)::picker(select) {

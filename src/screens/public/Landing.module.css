@@ -725,8 +725,8 @@
   opacity: 0;
   transform: translateY(22px);
   transition:
-    opacity 0.6s ease,
-    transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1);
+    opacity var(--motion-long) var(--ease),
+    transform var(--motion-long) var(--ease);
   transition-delay: calc(var(--i, 0) * 120ms);
 }
 
@@ -747,18 +747,18 @@
 }
 
 .page[data-motion] .card[data-shown] .cardIcon {
-  animation: tile-pop 0.55s cubic-bezier(0.3, 1.6, 0.5, 1) both;
+  animation: tile-pop var(--motion) var(--ease) both;
   animation-delay: calc(var(--i, 0) * 120ms + 150ms);
 }
 
 .page[data-motion] .card[data-shown] .cardIcon svg > * {
-  animation: line-draw 1.1s ease-out forwards;
+  animation: line-draw var(--motion-long) var(--ease) forwards;
   animation-delay: calc(var(--i, 0) * 120ms + 350ms);
 }
 
 @keyframes tile-pop {
   from {
-    transform: scale(0.4);
+    transform: scale(0.7);
     opacity: 0;
   }
   to {
@@ -779,7 +779,7 @@
 }
 
 .page[data-motion] .step[data-shown] .stepNum {
-  animation: num-pop 0.5s cubic-bezier(0.3, 1.7, 0.5, 1) forwards;
+  animation: num-pop var(--motion) var(--ease) forwards;
   animation-delay: calc(var(--i, 0) * 380ms + 150ms);
 }
 
@@ -788,7 +788,7 @@
 }
 
 .page[data-motion] .step[data-shown]::after {
-  animation: line-grow 0.5s ease-in-out forwards;
+  animation: line-grow var(--motion-long) var(--ease) forwards;
   animation-delay: calc(var(--i, 0) * 380ms + 380ms);
 }
 
@@ -797,7 +797,7 @@
     transform: scale(0);
   }
   70% {
-    transform: scale(1.18);
+    transform: scale(1.08);
     box-shadow: 0 0 0 8px var(--amber-tint);
   }
   100% {
@@ -844,7 +844,7 @@
 
 .page[data-motion] .price[data-shown]::before {
   animation:
-    fade-in 0.6s ease 0.4s forwards,
+    fade-in var(--motion-long) var(--ease) 0.4s forwards,
     border-run 4s linear 0.4s infinite;
 }
 
@@ -866,7 +866,7 @@
 }
 
 .page[data-motion] .price[data-shown] .launchBadge {
-  animation: badge-in 0.6s cubic-bezier(0.3, 1.6, 0.5, 1) 0.3s both;
+  animation: badge-in var(--motion-long) var(--ease) 0.3s both;
 }
 
 .page[data-motion] .launchBadge::after {
@@ -883,11 +883,11 @@
 
 @keyframes badge-in {
   0% {
-    transform: scale(0.5) rotate(-6deg);
+    transform: scale(0.8) rotate(-3deg);
     opacity: 0;
   }
   60% {
-    transform: scale(1.1) rotate(3deg);
+    transform: scale(1.04) rotate(1deg);
     opacity: 1;
   }
   100% {
@@ -924,7 +924,7 @@
 }
 
 .page[data-motion] .price[data-shown] .priceOld::after {
-  animation: strike 0.45s ease-out 0.7s forwards;
+  animation: strike var(--motion) var(--ease) 0.7s forwards;
 }
 
 @keyframes strike {
@@ -939,16 +939,16 @@
 }
 
 .page[data-motion] .price[data-shown] .priceFigure {
-  animation: figure-in 0.7s cubic-bezier(0.3, 1.6, 0.5, 1) 1.05s both;
+  animation: figure-in var(--motion-long) var(--ease) 1.05s both;
 }
 
 @keyframes figure-in {
   0% {
-    transform: scale(0.6);
+    transform: scale(0.85);
     opacity: 0;
   }
   60% {
-    transform: scale(1.15);
+    transform: scale(1.05);
     opacity: 1;
     text-shadow: 0 0 22px rgba(245, 165, 36, 0.75);
   }
@@ -959,12 +959,12 @@
 }
 
 .page[data-motion] .price[data-shown] .priceSave {
-  animation: save-bounce 0.6s cubic-bezier(0.3, 1.8, 0.5, 1) 1.5s both;
+  animation: save-bounce var(--motion) var(--ease) 1.5s both;
 }
 
 @keyframes save-bounce {
   0% {
-    transform: translateY(-14px) scale(0.6);
+    transform: translateY(-8px) scale(0.85);
     opacity: 0;
   }
   100% {
@@ -984,7 +984,7 @@
   animation:
     demo-type 12s steps(6, end) infinite,
     demo-caret 0.8s step-end infinite,
-    demo-type-out 12s ease-out infinite;
+    demo-type-out 12s var(--ease) infinite;
 }
 
 /* "Frâne" leaves with the cards at the end of the loop, instead of vanishing as it starts again. */
@@ -1017,11 +1017,11 @@
 }
 
 .page[data-motion] .mockShop1 {
-  animation: demo-shop1 12s ease-out infinite;
+  animation: demo-shop1 12s var(--ease) infinite;
 }
 
 .page[data-motion] .mockShop2 {
-  animation: demo-shop2 12s ease-out infinite;
+  animation: demo-shop2 12s var(--ease) infinite;
 }
 
 @keyframes demo-shop1 {
@@ -1030,7 +1030,7 @@
     opacity: 0;
     transform: translateY(14px);
   }
-  21%,
+  20%,
   92% {
     opacity: 1;
     transform: none;
@@ -1047,7 +1047,7 @@
     opacity: 0;
     transform: translateY(14px);
   }
-  24%,
+  23%,
   92% {
     opacity: 1;
     transform: none;
@@ -1061,7 +1061,7 @@
 /* The tap on "Programează": the button sinks and a ring spreads from it. */
 .page[data-motion] .mockShop1 .mockBook {
   position: relative;
-  animation: demo-tap 12s ease-out infinite;
+  animation: demo-tap 12s var(--ease) infinite;
 }
 
 .page[data-motion] .mockShop1 .mockBook::after {
@@ -1071,7 +1071,7 @@
   border-radius: 9px;
   border: 2px solid var(--amber);
   opacity: 0;
-  animation: demo-ring 12s ease-out infinite;
+  animation: demo-ring 12s var(--ease) infinite;
 }
 
 @keyframes demo-tap {
@@ -1105,19 +1105,19 @@
 }
 
 .page[data-motion] .mockQuote {
-  animation: demo-quote 12s ease-out infinite;
+  animation: demo-quote 12s var(--ease) infinite;
 }
 
 .page[data-motion] .mockLine1 {
-  animation: demo-line1 12s ease-out infinite;
+  animation: demo-line1 12s var(--ease) infinite;
 }
 
 .page[data-motion] .mockLine2 {
-  animation: demo-line2 12s ease-out infinite;
+  animation: demo-line2 12s var(--ease) infinite;
 }
 
 .page[data-motion] .mockQuote .mockTotal {
-  animation: demo-total 12s ease-out infinite;
+  animation: demo-total 12s var(--ease) infinite;
 }
 
 @keyframes demo-quote {
@@ -1126,7 +1126,7 @@
     opacity: 0;
     transform: translateY(18px) scale(0.96);
   }
-  43%,
+  42%,
   92% {
     opacity: 1;
     transform: none;
@@ -1176,7 +1176,7 @@
 
 /* "Accept": an outline first, filled green when tapped. */
 .page[data-motion] .mockQuote .mockAccept {
-  animation: demo-accept 12s ease-out infinite;
+  animation: demo-accept 12s var(--ease) infinite;
 }
 
 @keyframes demo-accept {
@@ -1225,7 +1225,7 @@
 }
 
 .page[data-motion] .trust[data-shown] .trustStars svg {
-  animation: star-on 0.45s cubic-bezier(0.3, 1.7, 0.5, 1) forwards;
+  animation: star-on var(--motion) var(--ease) forwards;
   animation-delay: calc(var(--i, 0) * 140ms + 0.35s);
 }
 

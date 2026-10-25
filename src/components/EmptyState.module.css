@@ -41,17 +41,17 @@
 
 /* Opening the screen: the ring turns into place, the icon draws itself line by line, then floats. */
 .draw .orbit {
-  animation: orbit-in 1.2s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  animation: orbit-in var(--motion-long) var(--ease) both;
 }
 
 .draw .icon > * {
   stroke-dasharray: 1;
   stroke-dashoffset: 1;
-  animation: icon-draw 1.2s ease-out 0.15s forwards;
+  animation: icon-draw var(--motion-long) var(--ease) 0.15s forwards;
 }
 
 .draw .icon {
-  animation: icon-float 3.6s ease-in-out 1.4s infinite;
+  animation: icon-float 3.6s ease-in-out 0.7s infinite;
 }
 
 @keyframes orbit-in {
