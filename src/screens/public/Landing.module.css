@@ -295,6 +295,31 @@
   text-align: center;
 }
 
+/* ------------------------------------------------------------------ the shops' section (T44) */
+/* The shop's phone under the text on a phone; on a wide screen on the left, across from the
+   driver's phone of the first screen. */
+.shopIntro {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.shopIntroText {
+  min-width: 0;
+}
+
+@media (min-width: 900px) {
+  .shopIntro {
+    flex-direction: row-reverse;
+    align-items: center;
+    gap: 56px;
+  }
+
+  .shopIntroText {
+    flex: 1 1 56%;
+  }
+}
+
 /* ------------------------------------------------------------------ sections */
 .section {
   padding: 52px 0;

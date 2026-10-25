@@ -40,6 +40,8 @@ import { includedColleagues, launchSaving } from '../../lib/subscription';
 import { formatPhone } from '../../lib/validators';
 import { signUpPath } from '../auth/paths';
 import styles from './Landing.module.css';
+import { MockNav, ShopMockup, ViewLabel } from './LandingMockups';
+import mockups from './LandingMockups.module.css';
 import { revealOnScroll } from './landingMotion';
 
 interface Feature {
@@ -145,15 +147,21 @@ export function Landing() {
 
         <section className={`${styles.section} ${styles.dark}`} id="service" aria-labelledby="landing-shops">
           <div className={styles.wrap}>
-            <p className={styles.eyebrow} data-reveal="">
-              {t('landing.forShops')}
-            </p>
-            <h2 id="landing-shops" className={styles.h2} data-reveal="" style={order(1)}>
-              {t('landing.shopsTitle')}
-            </h2>
-            <p className={styles.sub} data-reveal="" style={order(2)}>
-              {t('landing.shopsText')}
-            </p>
+            {/* The shop's own phone, on the other side from the driver's (T44). */}
+            <div className={styles.shopIntro}>
+              <div className={styles.shopIntroText}>
+                <p className={styles.eyebrow} data-reveal="">
+                  {t('landing.forShops')}
+                </p>
+                <h2 id="landing-shops" className={styles.h2} data-reveal="" style={order(1)}>
+                  {t('landing.shopsTitle')}
+                </h2>
+                <p className={styles.sub} data-reveal="" style={order(2)}>
+                  {t('landing.shopsText')}
+                </p>
+              </div>
+              <ShopMockup />
+            </div>
             <FeatureCards features={SHOP_FEATURES} />
             <PriceBlock />
           </div>
@@ -413,48 +421,52 @@ function PhoneMockup() {
   const { t, money, lang } = useI18n();
   return (
     <div className={styles.mockWrap} aria-hidden="true">
-      <div className={styles.phone}>
-        <div className={styles.phoneBar}>
-          <LogoTile size={22} />
-          <Wordmark size={14} />
-        </div>
-        <div className={styles.mockSearch}>
-          <Search size={15} />
-          <span className={styles.mockTyped}>{t('landing.mock.search')}</span>
-        </div>
-        {[
-          { name: t('landing.mock.shop1'), rating: formatRating(lang, 4.8) },
-          { name: t('landing.mock.shop2'), rating: formatRating(lang, 4.6) },
-        ].map((shop, i) => (
-          <div key={shop.name} className={`${styles.mockCard} ${i === 0 ? `${styles.mockCardLit} ${styles.mockShop1}` : styles.mockShop2}`}>
-            <div className={styles.mockRow}>
-              <span className={styles.mockName}>{shop.name}</span>
-              <span className={styles.mockRating}>
-                <Star size={12} fill="currentColor" />
-                {shop.rating}
-              </span>
+      <div className={mockups.column}>
+        <ViewLabel role="client" />
+        <div className={styles.phone}>
+          <div className={styles.phoneBar}>
+            <LogoTile size={22} />
+            <Wordmark size={14} />
+          </div>
+          <div className={styles.mockSearch}>
+            <Search size={15} />
+            <span className={styles.mockTyped}>{t('landing.mock.search')}</span>
+          </div>
+          {[
+            { name: t('landing.mock.shop1'), rating: formatRating(lang, 4.8) },
+            { name: t('landing.mock.shop2'), rating: formatRating(lang, 4.6) },
+          ].map((shop, i) => (
+            <div key={shop.name} className={`${styles.mockCard} ${i === 0 ? `${styles.mockCardLit} ${styles.mockShop1}` : styles.mockShop2}`}>
+              <div className={styles.mockRow}>
+                <span className={styles.mockName}>{shop.name}</span>
+                <span className={styles.mockRating}>
+                  <Star size={12} fill="currentColor" />
+                  {shop.rating}
+                </span>
+              </div>
+              <div className={styles.mockRow}>
+                <span className={styles.mockMuted}>{t('landing.mock.slot')}</span>
+                <span className={styles.mockBook}>{t('landing.mock.book')}</span>
+              </div>
             </div>
-            <div className={styles.mockRow}>
-              <span className={styles.mockMuted}>{t('landing.mock.slot')}</span>
-              <span className={styles.mockBook}>{t('landing.mock.book')}</span>
+          ))}
+          <div className={`${styles.mockCard} ${styles.mockCardLit} ${styles.mockQuote}`}>
+            <span className={styles.mockPill}>{t('landing.mock.quote')}</span>
+            <div className={`${styles.mockLine} ${styles.mockLine1}`}>
+              <span>{t('landing.mock.pads')}</span>
+              <b>{money(280)}</b>
             </div>
+            <div className={`${styles.mockLine} ${styles.mockLine2}`}>
+              <span>{t('landing.mock.labor')}</span>
+              <b>{money(150)}</b>
+            </div>
+            <div className={styles.mockTotal}>
+              <span>{t('landing.mock.total')}</span>
+              <span>{money(430)}</span>
+            </div>
+            <span className={styles.mockAccept}>{t('landing.mock.accept')}</span>
           </div>
-        ))}
-        <div className={`${styles.mockCard} ${styles.mockCardLit} ${styles.mockQuote}`}>
-          <span className={styles.mockPill}>{t('landing.mock.quote')}</span>
-          <div className={`${styles.mockLine} ${styles.mockLine1}`}>
-            <span>{t('landing.mock.pads')}</span>
-            <b>{money(280)}</b>
-          </div>
-          <div className={`${styles.mockLine} ${styles.mockLine2}`}>
-            <span>{t('landing.mock.labor')}</span>
-            <b>{money(150)}</b>
-          </div>
-          <div className={styles.mockTotal}>
-            <span>{t('landing.mock.total')}</span>
-            <span>{money(430)}</span>
-          </div>
-          <span className={styles.mockAccept}>{t('landing.mock.accept')}</span>
+          <MockNav role="client" />
         </div>
       </div>
     </div>
