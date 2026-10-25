@@ -5,6 +5,8 @@ import { detectLang, LANG_STORAGE_KEY, plural, translate, type Lang } from './tr
 import { storage } from '../lib/storage';
 
 function initialLang(): Lang {
+  // Drawn at build time (T46): the Romanian page; index.html keeps it only for Romanian visitors.
+  if (typeof window === 'undefined') return 'ro';
   return detectLang(storage.get(LANG_STORAGE_KEY), typeof navigator === 'undefined' ? undefined : navigator.language);
 }
 

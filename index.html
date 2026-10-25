@@ -39,6 +39,53 @@
   </head>
   <body>
     <div id="root"></div>
+    <!-- The page drawn at build time (T46, scripts/prerender.mjs), plain old JavaScript like the
+         guard below. It stays only for whom it was drawn: at `/`, a Romanian visitor who is not
+         signed in, in the browser. Anyone else gets the empty page the app fills, as before. When
+         it stays, its scroll animations start now, as src/screens/public/landingMotion.ts would
+         start them: parts on screen shown at once, the others as they come into view. -->
+    <script>
+      (function () {
+        var root = document.getElementById('root');
+        if (!root || !root.hasAttribute('data-prerendered')) return;
+        var keep = location.pathname === '/' && !location.hash && !window.Capacitor;
+        try {
+          var lang = localStorage.getItem('sh_lang');
+          if (lang !== 'ro' && lang !== 'en') lang = (navigator.language || '').toLowerCase().indexOf('ro') === 0 ? 'ro' : 'en';
+          if (lang !== 'ro') keep = false;
+          [localStorage, sessionStorage].forEach(function (store) {
+            for (var i = 0; i < store.length; i++) if (/^sb-.+-auth-token/.test(store.key(i) || '')) keep = false;
+          });
+        } catch (e) {
+          keep = false;
+        }
+        if (!keep) {
+          root.removeAttribute('data-prerendered');
+          root.innerHTML = '';
+          return;
+        }
+        var page = root.querySelector('[data-landing="motion"]');
+        var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (!page || reduce || !window.IntersectionObserver) return;
+        var observer = new IntersectionObserver(
+          function (entries) {
+            for (var i = 0; i < entries.length; i++) {
+              if (!entries[i].isIntersecting) continue;
+              entries[i].target.setAttribute('data-shown', '');
+              observer.unobserve(entries[i].target);
+            }
+          },
+          { rootMargin: '0px 0px -12% 0px' }
+        );
+        var fold = window.innerHeight * 0.88;
+        var parts = page.querySelectorAll('[data-reveal]');
+        for (var j = 0; j < parts.length; j++) {
+          if (parts[j].getBoundingClientRect().top < fold) parts[j].setAttribute('data-shown', '');
+          else observer.observe(parts[j]);
+        }
+        page.setAttribute('data-motion', '');
+      })();
+    </script>
     <!-- Start-up guard (T20a), plain old JavaScript on purpose: a browser or an Android System
          WebView too old to run the app gets a message instead of a blank page or, in the phone app,
          a launch screen that never goes away. The app sets window.__shStarted once it has drawn

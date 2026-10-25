@@ -1,9 +1,10 @@
 import { StrictMode, type ErrorInfo } from 'react';
-import { createRoot } from 'react-dom/client';
+import { createRoot, hydrateRoot } from 'react-dom/client';
 import { App } from './app/App';
 import { ChunkLoadError } from './app/routes/lazyChunk';
 import { resizeForKeyboard } from './lib/keyboard';
 import { captureError, installGlobalHandlers } from './lib/monitoring';
+import { markHydrating, PRERENDERED_ATTR } from './lib/prerender';
 import '@fontsource-variable/inter/wght.css';
 import './styles/tokens.css';
 import './styles/global.css';
@@ -24,11 +25,19 @@ function reportRenderError(error: unknown, info: ErrorInfo) {
   captureError(error, { tags: { mechanism: 'react' }, extra: { componentStack: info.componentStack?.slice(0, 2000) } });
 }
 
-createRoot(document.getElementById('root')!, {
-  onCaughtError: reportRenderError,
-  onUncaughtError: reportRenderError,
-}).render(
+const container = document.getElementById('root')!;
+const options = { onCaughtError: reportRenderError, onUncaughtError: reportRenderError };
+const app = (
   <StrictMode>
     <App />
-  </StrictMode>,
+  </StrictMode>
 );
+
+// The public page arrived drawn at build time (T46) and index.html kept it for this visitor:
+// React takes over that HTML (nothing is drawn twice, the animations keep running).
+if (container.hasAttribute(PRERENDERED_ATTR)) {
+  markHydrating();
+  hydrateRoot(container, app, options);
+} else {
+  createRoot(container, options).render(app);
+}

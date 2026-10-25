@@ -60,7 +60,7 @@ export function ShopMockup() {
             <div className={`${styles.tile} ${styles.tileLit}`}>
               <span className={styles.swap}>
                 <b className={`${styles.before} ${styles.countBefore}`}>0</b>
-                <b className={`${styles.after} ${styles.countAfter}`}>1</b>
+                <b className={styles.countAfter}>1</b>
               </span>
               <span>{t('landing.mock.newRequests')}</span>
             </div>
@@ -75,7 +75,7 @@ export function ShopMockup() {
             <span className={landing.mockMuted}>{t('landing.mock.when')}</span>
             <span className={styles.swap}>
               <span className={`${styles.before} ${styles.action} ${styles.confirmTap}`}>{t('landing.mock.confirm')}</span>
-              <span className={`${styles.after} ${styles.done} ${styles.confirmDone}`}>
+              <span className={`${styles.done} ${styles.confirmDone}`}>
                 <Check size={13} />
                 {t('landing.mock.confirmed')}
               </span>
@@ -85,7 +85,7 @@ export function ShopMockup() {
           <div className={`${landing.mockCard} ${styles.quote}`}>
             <span className={styles.swap}>
               <span className={`${styles.before} ${landing.mockPill} ${styles.pillBefore}`}>{t('landing.mock.quoteDraft')}</span>
-              <span className={`${styles.after} ${styles.pillGreen} ${styles.pillAfter}`}>{t('landing.mock.quoteAccepted')}</span>
+              <span className={`${styles.pillGreen} ${styles.pillAfter}`}>{t('landing.mock.quoteAccepted')}</span>
             </span>
             <div className={`${landing.mockLine} ${styles.line1}`}>
               <span>{t('landing.mock.pads')}</span>
@@ -101,7 +101,7 @@ export function ShopMockup() {
             </div>
             <span className={styles.swap}>
               <span className={`${styles.before} ${styles.action} ${styles.sendTap}`}>{t('landing.mock.send')}</span>
-              <span className={`${styles.after} ${styles.sent} ${styles.sendDone}`}>{t('landing.mock.sent')}</span>
+              <span className={`${styles.sent} ${styles.sendDone}`}>{t('landing.mock.sent')}</span>
             </span>
           </div>
 

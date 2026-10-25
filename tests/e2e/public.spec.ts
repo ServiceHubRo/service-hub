@@ -196,6 +196,52 @@ test('landing: link previews have a title, a description and an absolute image',
   expect(png.headers()['content-type']).toContain('image/png');
 });
 
+test('the public page arrives drawn: its text is in the HTML, and the app takes over that same page (T46)', async ({ page, request }) => {
+  const html = await (await request.get('/')).text();
+  expect(html).toContain('<div id="root" data-prerendered="">');
+  expect(html).toMatch(/<h1[^>]*>Programarea la service/);
+  expect(html).toMatch(/<link rel="canonical" href="https?:\/\/[^"]+\/" \/>/);
+  const ld = JSON.parse(html.match(/<script type="application\/ld\+json">(.+?)<\/script>/)![1]!);
+  expect(ld['@graph'].map((node: { '@type': string }) => node['@type'])).toEqual(['Organization', 'WebSite']);
+  // Every other address gets the empty shell, without the page's canonical address.
+  const shell = await (await request.get('/intra')).text();
+  expect(shell).toContain('<div id="root"></div>');
+  expect(shell).not.toContain('rel="canonical"');
+
+  // The app's code held back: the page is already on screen; then React takes over its elements.
+  let release = () => {};
+  const held = new Promise<void>((resolve) => (release = resolve));
+  await page.route(/\/assets\/index-[^/]*\.js$/, async (route) => {
+    await held;
+    await route.continue();
+  });
+  const errors: string[] = [];
+  page.on('pageerror', (error) => errors.push(error.message));
+  await page.goto('/', { waitUntil: 'commit' });
+  const title = page.getByRole('heading', { level: 1, name: /Programarea la service/ });
+  await expect(title).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Creează cont' }).first()).toBeVisible();
+  await title.evaluate((el) => (el.dataset.drawn = 'build'));
+  release();
+  await expect.poll(() => page.evaluate(() => (window as Window & { __shStarted?: boolean }).__shStarted)).toBe(true);
+  await expect(title).toHaveAttribute('data-drawn', 'build');
+  await page.getByRole('link', { name: 'Intră în cont' }).click();
+  await expect(page).toHaveURL(/\/intra$/);
+  expect(errors).toEqual([]);
+});
+
+test('the page drawn in Romanian is not shown to an English visitor (T46)', async ({ page }) => {
+  await page.addInitScript(() => localStorage.setItem('sh_lang', 'en'));
+  await page.route(/\/assets\/index-[^/]*\.js$/, async (route) => {
+    await new Promise((resolve) => setTimeout(resolve, 800));
+    await route.continue();
+  });
+  await page.goto('/', { waitUntil: 'commit' });
+  await page.waitForTimeout(300);
+  await expect(page.getByText('Programarea la service')).toHaveCount(0);
+  await expect(page.getByRole('heading', { level: 1, name: /Booking a car repair/ })).toBeVisible();
+});
+
 test('a test build tells search engines to stay away (T19c)', async ({ request }) => {
   const robots = await request.get('/robots.txt');
   expect(robots.ok()).toBe(true);
@@ -206,6 +252,8 @@ test('404: an unknown address has its own page with a way home', async ({ page }
   await page.goto('/pagina-care-nu-exista');
   await expect(page.getByRole('heading', { level: 1, name: 'Pagina nu există' })).toBeVisible();
   await expect(page).toHaveTitle('Pagina nu există · Service-Hub');
+  // Not listed by search engines (T46): the address still answers like the app.
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex');
   await expectNoHorizontalScroll(page);
   await shot(page, 'not-found', name());
   await page.getByRole('link', { name: 'Mergi la pagina principală' }).click();

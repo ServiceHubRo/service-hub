@@ -65,6 +65,7 @@ Ordinea contează: fiecare sarcină se sprijină pe cele de dinainte. Sarcinile 
 | T39 | Ghidul de început și turul aplicației | „Primii pași” numerotați (service pe Panou, client pe Caută) și un tur scurt, cu zona prezentată luminată |
 | T44 | Telefonul service-ului pe prima pagină | În „Ai un service auto?”, un telefon animat cu Panoul: cererea, devizul, mașina gata; separat clar de telefonul șoferului |
 | T45 | Animații line peste tot | Aceeași curbă și durate potrivite la toate animațiile, fără sărituri |
+| T46 | Prima pagină gata pentru Google | Prima pagină livrată gata desenată, cu adresa oficială și datele structurate; apare mai repede pe telefon |
 
 ---
 
@@ -1176,3 +1177,16 @@ Cerut de Eduard pe 25 oct 2026, după T44: „animațiile trebuie să fie smooth
 - **Panou:** cifra „Cereri noi” pornea dintr-odată mărită la o cerere nouă; acum crește lin, revine, iar lumina se stinge.
 - **Neschimbate (în fundal, nu deranjează):** sclipirea scheletelor de încărcare, rotița de încărcare, pulsul ușor de la programarea în curs, lumina din tur, luciul etichetei de preț.
 - Regula e în `CLAUDE.md` §10, cu excepția pentru răspunsul imediat la atingere. Cu „Reduce mișcarea” nu se mișcă nimic (ca înainte). Fără pachete noi, fără migrare.
+
+## T46 — Prima pagină gata pentru Google ✅
+
+Cerut de Eduard pe 25 oct 2026: „Vreau optimizare SEO pentru Service-Hub”. Pentru site-ul de acum, fără paginile pe service și pe oraș din T43 (anulată de Eduard pe 24 oct).
+
+- **Prima pagină vine gata desenată.** Până acum, serverul trimitea o pagină goală, iar textul apărea abia după ce telefonul descărca și pornea aplicația (~250 kB). Acum, la fiecare build, prima pagină e desenată dinainte (`scripts/prerender.mjs`): Google, Bing și previzualizările de linkuri văd tot textul direct în HTML, iar vizitatorul vede pagina imediat. Aplicația preia apoi aceeași pagină, fără să o redeseneze: nu clipește nimic și animațiile nu o iau de la capăt. Pe un telefon simulat lent, pe 4G lent, textul apare după **0,9 s în loc de 2,5 s**. Viteza contează în ordinea din Google.
+- **Doar pentru cine e desenată:** vizitatorii în română, nelogați, în browser. Un vizitor în engleză, un utilizator logat și aplicația de telefon primesc pagina ca până acum, fără să vadă româna o clipă. Celelalte adrese (`/intra`, `/legal/...`, ecranele din cont) primesc pagina goală, ca înainte (`app.html`).
+- **Adresa oficială și datele structurate:** prima pagină spune motoarelor de căutare care e adresa ei oficială (`canonical`) și ce e Service-Hub (`Organization`, `WebSite`: numele, sigla, emailul și telefonul de contact de pe pagină, România). Pe site-ul publicat adresa e cea a domeniului principal din Netlify, deci `service-hub.ro` după mutarea domeniului (T19e).
+- **Ce nu ajunge în Google:** pagina „Pagina nu există” cere să nu fie listată. Linkurile din SMS ale programărilor adăugate de service (`/p/...`) sunt acum oprite în `robots.txt`, ca și ecranele din cont.
+- **Reparat în treacăt:** în telefonul service-ului de pe prima pagină (T44), patru elemente aveau o clasă „undefined” (fără efect vizibil).
+- **Teste:** `e2e/public` (textul și datele structurate sunt în HTML; cu codul aplicației întârziat, pagina e deja pe ecran, iar aplicația preia aceleași elemente, fără erori; vizitatorul în engleză nu vede pagina în română; 404 cu `noindex`), `e2e/published` (adresa oficială și datele pe build-ul ca pe site-ul publicat, `/p/` oprit), `unit/seoFiles`.
+- **Decizii:** (1) doar prima pagină e desenată dinainte. Paginile legale au puțin de câștigat din căutări, iar Google citește oricum și paginile din aplicație. (2) Textele de pe pagină au rămas neschimbate. Titlul paginii din Google conține deja „programări online la service auto”. (3) Fără pachete noi, fără migrare.
+- **Rămas:** înscrierea site-ului în Google Search Console, după mutarea domeniului (`docs/LANSARE.md`, 4.7). Paginile pe oraș și pe service (T43) rămân anulate, dar se pot reface pe aceeași bază dacă Eduard le vrea.

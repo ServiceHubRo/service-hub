@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { LangSwitch } from '../../app/LangSwitch';
 import { useSession } from '../../app/sessionContext';
 import { useDocumentTitle } from '../../app/useDocumentTitle';
+import { useNoIndex } from '../../app/useNoIndex';
 import { buttonClass } from '../../components/buttonClass';
 import { LogoTile } from '../../components/LogoTile';
 import { Wordmark } from '../../components/Wordmark';
@@ -18,6 +19,7 @@ export function NotFound({ inShell = false }: { inShell?: boolean }) {
   const { t } = useI18n();
   const session = useSession();
   useDocumentTitle(t('notFound.title'));
+  useNoIndex();
   const signedIn = session.status === 'signedIn' && session.role !== null;
 
   const body = (
