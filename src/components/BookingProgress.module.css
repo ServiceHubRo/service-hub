@@ -52,11 +52,11 @@
 
 /* A new status: the line runs on, then the new point lights up with a pulse. */
 .animated .fill {
-  transition: transform var(--motion-long) var(--ease);
+  transition: transform var(--motion-draw) var(--ease);
 }
 
 .animated .current {
-  animation: point-on var(--motion) var(--ease) var(--motion-long) both;
+  animation: point-on var(--motion) var(--ease) var(--motion-reveal) both;
 }
 
 @keyframes point-on {

@@ -725,8 +725,8 @@
   opacity: 0;
   transform: translateY(22px);
   transition:
-    opacity var(--motion-long) var(--ease),
-    transform var(--motion-long) var(--ease);
+    opacity var(--motion-reveal) var(--ease-draw),
+    transform var(--motion-reveal) var(--ease-draw);
   transition-delay: calc(var(--i, 0) * 120ms);
 }
 
@@ -752,7 +752,7 @@
 }
 
 .page[data-motion] .card[data-shown] .cardIcon svg > * {
-  animation: line-draw var(--motion-long) var(--ease) forwards;
+  animation: line-draw var(--motion-draw) var(--ease-draw) forwards;
   animation-delay: calc(var(--i, 0) * 120ms + 350ms);
 }
 
@@ -844,7 +844,7 @@
 
 .page[data-motion] .price[data-shown]::before {
   animation:
-    fade-in var(--motion-long) var(--ease) 0.4s forwards,
+    fade-in var(--motion-reveal) var(--ease-draw) 0.4s forwards,
     border-run 4s linear 0.4s infinite;
 }
 
@@ -866,7 +866,7 @@
 }
 
 .page[data-motion] .price[data-shown] .launchBadge {
-  animation: badge-in var(--motion-long) var(--ease) 0.3s both;
+  animation: badge-in var(--motion-reveal) var(--ease-draw) 0.3s both;
 }
 
 .page[data-motion] .launchBadge::after {
@@ -939,7 +939,7 @@
 }
 
 .page[data-motion] .price[data-shown] .priceFigure {
-  animation: figure-in var(--motion-long) var(--ease) 1.05s both;
+  animation: figure-in var(--motion-reveal) var(--ease-draw) 1.05s both;
 }
 
 @keyframes figure-in {
