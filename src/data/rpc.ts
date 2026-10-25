@@ -99,6 +99,7 @@ export const RPC_ERROR_CODES = [
   'odometer_lower',
   'odometer_required',
   'odometer_same',
+  'page_not_found', // raised only by the withdrawn public pages (T43); kept because the migration stays
   'past_slot',
   'phone_already_verified',
   'phone_invalid',
