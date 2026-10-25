@@ -59,7 +59,7 @@
    amber glow around it fades. */
 .fresh {
   animation:
-    request-in 0.4s cubic-bezier(0.2, 0.8, 0.2, 1),
+    request-in var(--motion) var(--ease),
     request-glow 2.6s ease-out;
 }
 

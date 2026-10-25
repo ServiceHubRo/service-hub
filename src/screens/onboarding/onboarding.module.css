@@ -9,7 +9,7 @@
   padding: calc(var(--safe-top) + 24px) calc(var(--safe-right) + 18px) calc(var(--safe-bottom) + 24px)
     calc(var(--safe-left) + 18px);
   background: rgba(10, 11, 13, 0.72);
-  animation: fade-in 0.2s ease;
+  animation: fade-in 0.3s var(--ease);
 }
 
 @supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
@@ -33,7 +33,7 @@
   border: 1px solid var(--border-lit);
   border-radius: 22px;
   box-shadow: var(--glass-shadow);
-  animation: rise-in 0.24s ease;
+  animation: rise-in 0.3s var(--ease);
 }
 
 .step {

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { motionOn } from './motion';
 
-const DURATION_MS = 700;
+const DURATION_MS = 500;
 
 /** Slow at the end: the number settles on its value. */
 function easeOut(t: number): number {

@@ -18,7 +18,7 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
-  transition: opacity 0.15s;
+  transition: opacity var(--motion-quick) var(--ease);
 }
 
 .results[aria-busy='true'] {
@@ -56,7 +56,7 @@
 
 .chevron,
 .chevronOpen {
-  transition: transform 0.15s;
+  transition: transform var(--motion-quick) var(--ease);
   color: var(--muted);
 }
 

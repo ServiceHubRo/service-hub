@@ -121,10 +121,10 @@
 /* Motion (not with "Reduce motion"): the light glides from spot to spot, the card rises in. */
 .glide .spot {
   transition:
-    top 0.45s cubic-bezier(0.2, 0.8, 0.2, 1),
-    left 0.45s cubic-bezier(0.2, 0.8, 0.2, 1),
-    width 0.45s cubic-bezier(0.2, 0.8, 0.2, 1),
-    height 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
+    top var(--motion) var(--ease),
+    left var(--motion) var(--ease),
+    width var(--motion) var(--ease),
+    height var(--motion) var(--ease);
   animation: tourGlow 2.4s ease-in-out infinite;
 }
 
@@ -143,15 +143,15 @@
 }
 
 .glide .dim {
-  animation: tourFade 0.35s ease-out;
+  animation: tourFade var(--motion) var(--ease);
 }
 
 .glide .card {
-  animation: tourRise 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+  animation: tourRise var(--motion) var(--ease);
 }
 
 .glide .dotOn {
-  transition: width 0.3s ease;
+  transition: width var(--motion) var(--ease);
 }
 
 @keyframes tourFade {

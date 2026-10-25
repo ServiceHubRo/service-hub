@@ -207,232 +207,257 @@
 
 /* ------------------------------------------------------------------ the demo (14 s loop) */
 /* Only with the page's motion on (landingMotion.ts sets data-motion; never with "Reduce motion")
-   and MOTION.shopDemo (data-demo). Without them, the still picture above. */
-[data-motion] [data-demo] .request {
-  animation: shop-request 14s ease-out infinite;
+   and MOTION.shopDemo (data-demo). Without them, the still picture above.
+   Smooth, never abrupt (Eduard, 25 Oct): every change fades or slides over about half a second
+   (3–3.5 % of 14 s) on one easing; a tap presses for 0.2 s and comes back in 0.3 s; two states of
+   one place cross-fade; the loop ends with everything fading out together, the count included. */
+[data-motion] [data-demo] .before {
+  visibility: visible;
 }
 
-[data-motion] [data-demo] .countBefore {
-  animation: shop-before-8 14s step-end infinite;
-}
-
-[data-motion] [data-demo] .countAfter {
-  animation: shop-after-8 14s step-end infinite;
-}
-
-[data-motion] [data-demo] .tileLit {
-  animation: shop-glow 14s ease-out infinite;
-}
-
-[data-motion] [data-demo] .confirmTap {
-  animation: shop-confirm 14s ease-out infinite;
-}
-
-[data-motion] [data-demo] .confirmTap::after {
-  animation: shop-ring-18 14s ease-out infinite;
-}
-
-[data-motion] [data-demo] .confirmDone {
-  animation: shop-after-21 14s ease-out infinite;
-}
-
-[data-motion] [data-demo] .quote {
-  animation: shop-quote 14s ease-out infinite;
-}
-
-[data-motion] [data-demo] .line1 {
-  animation: shop-line-34 14s ease-out infinite;
-}
-
-[data-motion] [data-demo] .line2 {
-  animation: shop-line-37 14s ease-out infinite;
-}
-
-[data-motion] [data-demo] .total {
-  animation: shop-total 14s ease-out infinite;
-}
-
-[data-motion] [data-demo] .sendTap {
-  animation: shop-send 14s ease-out infinite;
-}
-
-[data-motion] [data-demo] .sendTap::after {
-  animation: shop-ring-46 14s ease-out infinite;
-}
-
-[data-motion] [data-demo] .sendDone {
-  animation: shop-after-49 14s ease-out infinite;
-}
-
-[data-motion] [data-demo] .pillBefore {
-  animation: shop-before-60 14s step-end infinite;
-}
-
-[data-motion] [data-demo] .pillAfter {
-  animation: shop-after-60 14s ease-out infinite;
-}
-
-[data-motion] [data-demo] .toastAccepted {
-  animation: shop-toast-accepted 14s ease-out infinite;
-}
-
-[data-motion] [data-demo] .readyTap {
-  animation: shop-ready 14s ease-out infinite;
-}
-
+[data-motion] [data-demo] .request,
+[data-motion] [data-demo] .countBefore,
+[data-motion] [data-demo] .countAfter,
+[data-motion] [data-demo] .tileLit,
+[data-motion] [data-demo] .confirmTap,
+[data-motion] [data-demo] .confirmTap::after,
+[data-motion] [data-demo] .confirmDone,
+[data-motion] [data-demo] .quote,
+[data-motion] [data-demo] .line1,
+[data-motion] [data-demo] .line2,
+[data-motion] [data-demo] .total,
+[data-motion] [data-demo] .sendTap,
+[data-motion] [data-demo] .sendTap::after,
+[data-motion] [data-demo] .sendDone,
+[data-motion] [data-demo] .pillBefore,
+[data-motion] [data-demo] .pillAfter,
+[data-motion] [data-demo] .toastAccepted,
+[data-motion] [data-demo] .readyTap,
 [data-motion] [data-demo] .toastNotified {
-  animation: shop-toast-notified 14s ease-out infinite;
+  animation-duration: 14s;
+  animation-iteration-count: infinite;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* The request arrives on Panou and its count goes from 0 to 1. */
+[data-motion] [data-demo] .request {
+  animation-name: shop-request;
+}
+[data-motion] [data-demo] .countBefore {
+  animation-name: shop-count-before;
+}
+[data-motion] [data-demo] .countAfter {
+  animation-name: shop-count-after;
+}
+[data-motion] [data-demo] .tileLit {
+  animation-name: shop-glow;
+}
+[data-motion] [data-demo] .confirmTap {
+  animation-name: shop-confirm;
+}
+[data-motion] [data-demo] .confirmTap::after {
+  animation-name: shop-confirm-ring;
+}
+[data-motion] [data-demo] .confirmDone {
+  animation-name: shop-confirmed;
+}
+[data-motion] [data-demo] .quote {
+  animation-name: shop-quote;
+}
+[data-motion] [data-demo] .line1 {
+  animation-name: shop-line1;
+}
+[data-motion] [data-demo] .line2 {
+  animation-name: shop-line2;
+}
+[data-motion] [data-demo] .total {
+  animation-name: shop-total;
+}
+[data-motion] [data-demo] .sendTap {
+  animation-name: shop-send;
+}
+[data-motion] [data-demo] .sendTap::after {
+  animation-name: shop-send-ring;
+}
+[data-motion] [data-demo] .sendDone {
+  animation-name: shop-sent;
+}
+[data-motion] [data-demo] .pillBefore {
+  animation-name: shop-pill-before;
+}
+[data-motion] [data-demo] .pillAfter {
+  animation-name: shop-pill-after;
+}
+[data-motion] [data-demo] .toastAccepted {
+  animation-name: shop-toast-accepted;
+}
+[data-motion] [data-demo] .readyTap {
+  animation-name: shop-ready;
+}
+[data-motion] [data-demo] .toastNotified {
+  animation-name: shop-toast-notified;
+}
+
+/* The request comes in on Panou and its count goes from 0 to 1 (and back, as the loop ends). */
 @keyframes shop-request {
   0%,
-  6% {
+  5% {
     opacity: 0;
     transform: translateY(-12px);
   }
-  10%,
+  8.5%,
   92% {
     opacity: 1;
     transform: none;
   }
-  97%,
+  96%,
   100% {
     opacity: 0;
+    transform: none;
   }
 }
 
-@keyframes shop-before-8 {
-  0% {
-    visibility: visible;
+@keyframes shop-count-before {
+  0%,
+  7.5% {
+    opacity: 1;
+    transform: none;
   }
-  8%,
+  10.5%,
+  92% {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  96%,
   100% {
-    visibility: hidden;
+    opacity: 1;
+    transform: none;
   }
 }
 
-@keyframes shop-after-8 {
-  0% {
-    visibility: hidden;
+@keyframes shop-count-after {
+  0%,
+  7.5% {
+    opacity: 0;
+    transform: translateY(6px);
   }
-  8%,
+  10.5%,
+  92% {
+    opacity: 1;
+    transform: none;
+  }
+  96%,
   100% {
-    visibility: visible;
+    opacity: 0;
+    transform: translateY(6px);
   }
 }
 
 @keyframes shop-glow {
   0%,
-  8% {
-    box-shadow: none;
+  7.5% {
+    box-shadow: 0 0 0 rgba(245, 165, 36, 0);
     border-color: var(--border);
   }
-  10% {
-    box-shadow: 0 0 16px rgba(245, 165, 36, 0.45);
+  10.5% {
+    box-shadow: 0 0 16px rgba(245, 165, 36, 0.4);
     border-color: var(--amber);
   }
-  20%,
+  19%,
   100% {
-    box-shadow: none;
+    box-shadow: 0 0 0 rgba(245, 165, 36, 0);
     border-color: var(--border);
   }
 }
 
-/* "Confirmă" is tapped and becomes "Confirmată". */
+/* "Confirmă" is pressed and cross-fades into "Confirmată". */
 @keyframes shop-confirm {
   0%,
   17% {
-    visibility: visible;
     opacity: 1;
     transform: none;
   }
-  18% {
-    transform: scale(0.88);
+  18.5% {
+    opacity: 1;
+    transform: scale(0.92);
   }
-  20% {
-    visibility: visible;
+  20.5% {
     opacity: 1;
     transform: none;
   }
-  21%,
+  23.5%,
   100% {
-    visibility: hidden;
     opacity: 0;
+    transform: none;
   }
 }
 
-@keyframes shop-ring-18 {
+@keyframes shop-confirm-ring {
   0%,
-  17% {
+  17.5% {
     opacity: 0;
     transform: scale(1);
   }
-  18% {
-    opacity: 1;
+  19% {
+    opacity: 0.9;
+    transform: scale(1.1);
   }
-  25%,
+  24%,
   100% {
     opacity: 0;
-    transform: scale(1.5);
+    transform: scale(1.45);
   }
 }
 
-@keyframes shop-after-21 {
+@keyframes shop-confirmed {
   0%,
-  20% {
-    visibility: hidden;
-    opacity: 0;
-  }
   21% {
-    visibility: visible;
     opacity: 0;
   }
   24%,
   100% {
-    visibility: visible;
     opacity: 1;
   }
 }
 
-/* The quote is written line by line and sent. */
+/* The quote is written line by line, then sent. */
 @keyframes shop-quote {
   0%,
-  28% {
+  27% {
     opacity: 0;
-    transform: translateY(16px);
+    transform: translateY(14px);
   }
-  32%,
+  30.5%,
   92% {
     opacity: 1;
     transform: none;
   }
-  97%,
+  96%,
   100% {
     opacity: 0;
+    transform: none;
   }
 }
 
-@keyframes shop-line-34 {
+@keyframes shop-line1 {
   0%,
-  33% {
+  32% {
     opacity: 0;
-    transform: translateX(-10px);
+    transform: translateX(-8px);
   }
-  36%,
+  35%,
   100% {
     opacity: 1;
     transform: none;
   }
 }
 
-@keyframes shop-line-37 {
+@keyframes shop-line2 {
   0%,
-  36% {
+  35.5% {
     opacity: 0;
-    transform: translateX(-10px);
+    transform: translateX(-8px);
   }
-  39%,
+  38.5%,
   100% {
     opacity: 1;
     transform: none;
@@ -452,104 +477,87 @@
 
 @keyframes shop-send {
   0%,
-  41% {
-    visibility: visible;
+  42% {
     opacity: 0;
     transform: none;
   }
-  43%,
-  45% {
-    visibility: visible;
+  45%,
+  47% {
     opacity: 1;
     transform: none;
   }
-  46% {
-    transform: scale(0.9);
+  48.5% {
+    opacity: 1;
+    transform: scale(0.92);
   }
-  48% {
-    visibility: visible;
+  50.5% {
     opacity: 1;
     transform: none;
   }
-  49%,
+  53.5%,
   100% {
-    visibility: hidden;
     opacity: 0;
+    transform: none;
   }
 }
 
-@keyframes shop-ring-46 {
+@keyframes shop-send-ring {
   0%,
-  45% {
+  47.5% {
     opacity: 0;
     transform: scale(1);
   }
-  46% {
-    opacity: 1;
-  }
-  53%,
-  100% {
-    opacity: 0;
-    transform: scale(1.4);
-  }
-}
-
-@keyframes shop-after-49 {
-  0%,
-  48% {
-    visibility: hidden;
-    opacity: 0;
-  }
   49% {
-    visibility: visible;
+    opacity: 0.9;
+    transform: scale(1.08);
+  }
+  54%,
+  100% {
+    opacity: 0;
+    transform: scale(1.35);
+  }
+}
+
+@keyframes shop-sent {
+  0%,
+  51% {
     opacity: 0;
   }
-  52%,
+  54%,
   100% {
-    visibility: visible;
     opacity: 1;
   }
 }
 
-/* The client accepts: a notice comes down and the quote is marked accepted. */
-@keyframes shop-before-60 {
-  0% {
-    visibility: visible;
-  }
-  60%,
-  100% {
-    visibility: hidden;
-  }
-}
-
-@keyframes shop-after-60 {
+/* The client accepts: a notice slides down and the quote's label cross-fades to "Acceptat". */
+@keyframes shop-pill-before {
   0%,
   59% {
-    visibility: hidden;
-    opacity: 0;
+    opacity: 1;
   }
-  60% {
-    visibility: visible;
-    opacity: 0;
-  }
-  63%,
+  62%,
   100% {
-    visibility: visible;
+    opacity: 0;
+  }
+}
+
+@keyframes shop-pill-after {
+  0%,
+  59% {
+    opacity: 0;
+  }
+  62%,
+  100% {
     opacity: 1;
   }
 }
 
 @keyframes shop-toast-accepted {
   0%,
-  56% {
-    visibility: hidden;
-    opacity: 0;
-    transform: translateY(-24px);
-  }
-  57% {
+  56.5% {
     visibility: visible;
     opacity: 0;
-    transform: translateY(-24px);
+    transform: translateY(-16px);
   }
   60%,
   67% {
@@ -557,43 +565,47 @@
     opacity: 1;
     transform: none;
   }
-  70%,
+  70.5%,
   100% {
-    visibility: hidden;
+    visibility: visible;
     opacity: 0;
-    transform: translateY(-24px);
+    transform: translateY(-16px);
   }
 }
 
-/* "Mașina e gata" is tapped and the client is told. */
+/* "Mașina e gata" comes up, is pressed and fills green; the client is told. */
 @keyframes shop-ready {
   0%,
   71% {
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(8px);
     background: var(--surface2);
     color: var(--green);
   }
-  74%,
+  74.5%,
   77% {
     opacity: 1;
     transform: none;
     background: var(--surface2);
     color: var(--green);
   }
-  78% {
-    transform: scale(0.94);
+  78.5% {
+    opacity: 1;
+    transform: scale(0.95);
+    background: var(--surface2);
+    color: var(--green);
   }
-  80%,
+  81%,
   92% {
     opacity: 1;
     transform: none;
     background: var(--green);
     color: #0a1a0e;
   }
-  97%,
+  96%,
   100% {
     opacity: 0;
+    transform: none;
     background: var(--green);
     color: #0a1a0e;
   }
@@ -601,26 +613,21 @@
 
 @keyframes shop-toast-notified {
   0%,
-  80% {
-    visibility: hidden;
-    opacity: 0;
-    transform: translateY(-24px);
-  }
-  81% {
+  80.5% {
     visibility: visible;
     opacity: 0;
-    transform: translateY(-24px);
+    transform: translateY(-16px);
   }
   84%,
-  91% {
+  89% {
     visibility: visible;
     opacity: 1;
     transform: none;
   }
-  94%,
+  92.5%,
   100% {
-    visibility: hidden;
+    visibility: visible;
     opacity: 0;
-    transform: translateY(-24px);
+    transform: translateY(-16px);
   }
 }

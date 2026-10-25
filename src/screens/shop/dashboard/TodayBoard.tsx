@@ -46,12 +46,14 @@ export function TodayBoard({ data, today }: { data: ShopBookingsData; today: str
   useEffect(() => {
     if (newRequests === 0 || !motionOn('newRequestGlow')) return;
     requestsNumber.current?.animate(
+      // Grows and lights up smoothly, settles, then the glow fades (CLAUDE.md §10: never a jump).
       [
-        { textShadow: '0 0 16px rgba(245, 165, 36, 0.95)', transform: 'scale(1.18)' },
-        { textShadow: '0 0 16px rgba(245, 165, 36, 0.95)', transform: 'none', offset: 0.3 },
+        { textShadow: '0 0 0 rgba(245, 165, 36, 0)', transform: 'none' },
+        { textShadow: '0 0 16px rgba(245, 165, 36, 0.95)', transform: 'scale(1.12)', offset: 0.15 },
+        { textShadow: '0 0 16px rgba(245, 165, 36, 0.95)', transform: 'none', offset: 0.32 },
         { textShadow: '0 0 0 rgba(245, 165, 36, 0)', transform: 'none' },
       ],
-      { duration: 2400, easing: 'ease-out' },
+      { duration: 2400, easing: 'cubic-bezier(0.4, 0, 0.2, 1)' },
     );
   }, [newRequests]);
 

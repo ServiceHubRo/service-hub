@@ -76,7 +76,7 @@
 .chevron {
   flex-shrink: 0;
   color: var(--muted);
-  transition: transform 0.15s ease;
+  transition: transform var(--motion-quick) var(--ease);
 }
 
 .categoryToggle[aria-expanded='true'] .chevron {

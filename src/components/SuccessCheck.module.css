@@ -27,7 +27,7 @@
 
 /* The ring draws itself, the disc fills in, then the tick is drawn and the whole check bounces. */
 .animated {
-  animation: check-bounce 0.45s cubic-bezier(0.3, 1.7, 0.5, 1) 0.75s both;
+  animation: check-bounce var(--motion) var(--ease) 0.75s both;
 }
 
 .animated .ring,
@@ -37,15 +37,15 @@
 }
 
 .animated .ring {
-  animation: check-draw 0.5s ease-out forwards;
+  animation: check-draw var(--motion-long) var(--ease) forwards;
 }
 
 .animated .disc {
-  animation: check-fill 0.35s ease-out 0.35s both;
+  animation: check-fill var(--motion) var(--ease) 0.35s both;
 }
 
 .animated .tick {
-  animation: check-draw 0.35s ease-out 0.5s forwards;
+  animation: check-draw var(--motion) var(--ease) 0.5s forwards;
 }
 
 @keyframes check-draw {

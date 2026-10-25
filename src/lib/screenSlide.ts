@@ -49,8 +49,9 @@ export function useScreenSlide(ref: RefObject<HTMLElement | null>): void {
     const el = ref.current;
     if (slide === 'none' || !el || typeof el.animate !== 'function' || !motionOn('screenSlide')) return;
     const animation = el.animate(FRAMES[slide], {
-      duration: slide === 'fade' ? 160 : 240,
-      easing: 'cubic-bezier(0.2, 0.7, 0.2, 1)',
+      // Smooth, not abrupt (CLAUDE.md §10): the same easing as every other change (--ease).
+      duration: slide === 'fade' ? 250 : 300,
+      easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
     });
     return () => animation.cancel();
   }, [pathname, navigationType, ref]);

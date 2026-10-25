@@ -64,6 +64,7 @@ Ordinea contează: fiecare sarcină se sprijină pe cele de dinainte. Sarcinile 
 | T38 | Alegerea serviciilor mai rapidă | Tipul atelierului bifează serviciile obișnuite; categoriile ca rânduri simple, cu „Toate” înăuntru |
 | T39 | Ghidul de început și turul aplicației | „Primii pași” numerotați (service pe Panou, client pe Caută) și un tur scurt, cu zona prezentată luminată |
 | T44 | Telefonul service-ului pe prima pagină | În „Ai un service auto?”, un telefon animat cu Panoul: cererea, devizul, mașina gata; separat clar de telefonul șoferului |
+| T45 | Animații line peste tot | Aceeași curbă și durate potrivite la toate animațiile, fără sărituri |
 
 ---
 
@@ -1161,4 +1162,17 @@ Cerut de Eduard pe 25 oct 2026, după discuția despre un tutorial animat: în l
 - **Telefonul service-ului** (`src/screens/public/LandingMockups.tsx`), în secțiunea „Ai un service auto?”, lângă text: pe laptop în stânga (telefonul șoferului e în dreapta, sus), pe telefon sub text. Joacă în buclă, în 14 secunde, aceeași programare văzută de service: cererea pentru Atelier Demo intră în Panou („Cereri noi” crește de la 0 la 1), apoi „Confirmă” → „Confirmată”. Devizul (aceleași 280 + 150 = 430 lei ca la șofer) se scrie rând cu rând și se trimite. Vine „Devizul a fost acceptat”, apoi „Mașina e gata” → „Clientul a fost anunțat”.
 - **Delimitarea:** deasupra fiecărui telefon stă o etichetă, „Ce vede șoferul” (galbenă, cu mașină) și „Ce vede service-ul” (albastră, cu un atelier). Formularea „Ce vede…” e a lui Eduard (25 oct), în locul lui „Așa vede…”. Fiecare telefon are jos bara de navigare reală a rolului lui: Caută · Garaj · Programări · Mesaje · Cont pentru șofer, Panou · Programări · Istoric · Mesaje · Cont pentru service. Telefonul service-ului e mai închis la culoare și are numele service-ului sus.
 - **Fără mișcare:** cu „Reduce mișcarea” pornit, telefonul arată finalul (cerere confirmată, deviz acceptat, „Mașina e gata”), fără nimic animat. Comutatorul de oprire e `MOTION.shopDemo` în `src/lib/motion.ts`. Doar CSS, fără video și fără pachete noi. Telefonul e decor, ascuns pentru cititoarele de ecran (textul secțiunii spune tot).
+- **Mai lin (Eduard, 25 oct: „animațiile trebuie să fie smooth, nu lente, nu rapide și sărite”):** fiecare schimbare din telefonul service-ului durează acum aproape jumătate de secundă, pe aceeași curbă; cifra „Cereri noi” trece de la 0 la 1 lin și tot lin înapoi la 0 când bucla se termină; „Deviz” → „Acceptat de client”, „Confirmă” → „Confirmată” și „Trimite devizul” → „Trimis” se estompează una în alta, nu se schimbă dintr-odată; o apăsare coboară în 0,2 s și revine în 0,3 s. La telefonul șoferului, „Frâne” pleacă odată cu cardurile la sfârșitul buclei, nu dispare brusc la reluare. Verificat cadru cu cadru (la 70 ms) pe toată bucla: nicio săritură. Regula e acum în `CLAUDE.md` §10, pentru toate animațiile.
 - **Teste:** `e2e/public` (cele două telefoane au barele rolului lor, animațiile pornesc, cu „Reduce mișcarea” totul stă pe loc și se vede finalul), verificarea de accesibilitate a primei pagini în română și engleză, la 390 / 820 / 1440 px.
+
+## T45 — Animații line peste tot ✅
+
+Cerut de Eduard pe 25 oct 2026, după T44: „animațiile trebuie să fie smooth, nu lente, nu rapide și sărite să deranjeze” — în toată platforma, nu doar pe prima pagină. Făcut în același pull request cu ajustarea T44, ca să fie un singur Merge.
+
+- **O singură curbă** pentru toate animațiile (`--ease` în `tokens.css`, pornire ușoară și oprire lină) și trei durate: `--motion-quick` 0,18 s pentru răspunsul imediat la atingere (comutator, buton apăsat, meniu care se deschide), `--motion` 0,4 s și `--motion-long` 0,5 s pentru restul.
+- **Fără „arc” (efectul care depășește și revine):** bulina cu numărul de pe meniu, iconița din bara de jos, inima de la favorite, stelele recenziei, bifa verde, punctul nou din linia programării, punctele din istoric, cifrele, eticheta și prețul de pe prima pagină cresc acum lin și revin lin; măririle sunt mai mici (cel mult 1,15).
+- **Mai repede, ce era lent:** linia programării (0,9 → 0,5 s), inelele ITP/RCA din Garaj (0,9 → 0,5 s), linia istoricului (0,9 → 0,5 s), desenul ecranelor goale (1,2 → 0,5 s), barele din Rapoarte (0,7–0,8 → 0,5 s), cifrele care cresc (0,7 → 0,5 s), apariția părților primei pagini (0,6–0,7 → 0,5 s), iconițele care se desenează (1,1 → 0,5 s).
+- **Mai calm, ce era prea rapid:** trecerea între ecrane (0,16–0,24 → 0,25–0,3 s), fereastra de permisiuni (0,2 → 0,3 s). Comutatoarele, meniurile și apăsările rămân rapide, ca să nu pară aplicația lentă.
+- **Panou:** cifra „Cereri noi” pornea dintr-odată mărită la o cerere nouă; acum crește lin, revine, iar lumina se stinge.
+- **Neschimbate (în fundal, nu deranjează):** sclipirea scheletelor de încărcare, rotița de încărcare, pulsul ușor de la programarea în curs, lumina din tur, luciul etichetei de preț.
+- Regula e în `CLAUDE.md` §10, cu excepția pentru răspunsul imediat la atingere. Cu „Reduce mișcarea” nu se mișcă nimic (ca înainte). Fără pachete noi, fără migrare.
