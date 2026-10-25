@@ -236,7 +236,7 @@
 [data-motion] [data-demo] .toastNotified {
   animation-duration: 14s;
   animation-iteration-count: infinite;
-  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  animation-timing-function: var(--ease-draw);
 }
 
 [data-motion] [data-demo] .request {

@@ -40,21 +40,27 @@ export function revealOnScroll(root: HTMLElement, enabled = LANDING_MOTION): () 
 }
 
 /**
- * The page drawn at build time (T46) holds its two phones at their first frame (`data-hold`, set
- * in index.html) while the app starts: a loop running then stalls and leaps ahead. Lifted once
- * the app has taken over and the phone has drawn a frame and has a moment free.
+ * The landing's motion (Landing.tsx). On the page drawn at build time (T46) index.html has held
+ * everything (`data-hold`): an animation started while the phone is still busy starting the app
+ * stalls and then shows its end at once. Here, once the app has taken over and the phone has
+ * drawn a frame and has a moment free, the parts reached meanwhile come in and the phones start.
  */
-export function releaseHeldDemo(root: HTMLElement): () => void {
-  if (!('hold' in root.dataset)) return () => {};
+export function startLandingMotion(root: HTMLElement): () => void {
+  if (!('hold' in root.dataset)) return revealOnScroll(root);
+  let stopReveal = () => {};
   let idle = 0;
   const frame = requestAnimationFrame(() => {
-    const release = () => delete root.dataset.hold;
-    idle = typeof requestIdleCallback === 'function' ? requestIdleCallback(release, { timeout: 600 }) : window.setTimeout(release, 150);
+    const start = () => {
+      stopReveal = revealOnScroll(root);
+      delete root.dataset.hold;
+    };
+    idle = typeof requestIdleCallback === 'function' ? requestIdleCallback(start, { timeout: 600 }) : window.setTimeout(start, 150);
   });
   return () => {
     cancelAnimationFrame(frame);
     if (typeof cancelIdleCallback === 'function') cancelIdleCallback(idle);
     else window.clearTimeout(idle);
     delete root.dataset.hold;
+    stopReveal();
   };
 }

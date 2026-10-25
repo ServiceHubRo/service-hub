@@ -747,7 +747,7 @@
 }
 
 .page[data-motion] .card[data-shown] .cardIcon {
-  animation: tile-pop var(--motion) var(--ease) both;
+  animation: tile-pop var(--motion) var(--ease-draw) both;
   animation-delay: calc(var(--i, 0) * 120ms + 150ms);
 }
 
@@ -779,7 +779,7 @@
 }
 
 .page[data-motion] .step[data-shown] .stepNum {
-  animation: num-pop var(--motion) var(--ease) forwards;
+  animation: num-pop var(--motion) var(--ease-draw) forwards;
   animation-delay: calc(var(--i, 0) * 380ms + 150ms);
 }
 
@@ -788,7 +788,7 @@
 }
 
 .page[data-motion] .step[data-shown]::after {
-  animation: line-grow var(--motion-long) var(--ease) forwards;
+  animation: line-grow var(--motion-long) var(--ease-draw) forwards;
   animation-delay: calc(var(--i, 0) * 380ms + 380ms);
 }
 
@@ -924,7 +924,7 @@
 }
 
 .page[data-motion] .price[data-shown] .priceOld::after {
-  animation: strike var(--motion) var(--ease) 0.7s forwards;
+  animation: strike var(--motion) var(--ease-draw) 0.7s forwards;
 }
 
 @keyframes strike {
@@ -959,7 +959,7 @@
 }
 
 .page[data-motion] .price[data-shown] .priceSave {
-  animation: save-bounce var(--motion) var(--ease) 1.5s both;
+  animation: save-bounce var(--motion) var(--ease-draw) 1.5s both;
 }
 
 @keyframes save-bounce {
@@ -974,8 +974,8 @@
 }
 
 /* The page drawn at build time (T46): the two phones wait at their first frame until the app has
-   taken over (data-hold, set by index.html, lifted by Landing.tsx). Started while the phone is
-   still busy starting the app, a loop would stall and then leap ahead to catch up. */
+   taken over (data-hold, set by index.html, lifted by startLandingMotion). Started while the
+   phone is still busy starting the app, a loop would stall and then leap ahead to catch up. */
 .page[data-hold] .mockWrap *,
 .page[data-hold] .mockWrap *::before,
 .page[data-hold] .mockWrap *::after {
@@ -994,7 +994,7 @@
   animation:
     demo-type 12s steps(6, end) infinite,
     demo-caret 0.8s step-end infinite,
-    demo-type-out 12s var(--ease) infinite;
+    demo-type-out 12s var(--ease-draw) infinite;
 }
 
 /* "Frâne" leaves with the cards at the end of the loop, instead of vanishing as it starts again. */
@@ -1027,11 +1027,11 @@
 }
 
 .page[data-motion] .mockShop1 {
-  animation: demo-shop1 12s var(--ease) infinite;
+  animation: demo-shop1 12s var(--ease-draw) infinite;
 }
 
 .page[data-motion] .mockShop2 {
-  animation: demo-shop2 12s var(--ease) infinite;
+  animation: demo-shop2 12s var(--ease-draw) infinite;
 }
 
 @keyframes demo-shop1 {
@@ -1040,7 +1040,7 @@
     opacity: 0;
     transform: translateY(14px);
   }
-  20%,
+  21%,
   92% {
     opacity: 1;
     transform: none;
@@ -1057,7 +1057,7 @@
     opacity: 0;
     transform: translateY(14px);
   }
-  23%,
+  24%,
   92% {
     opacity: 1;
     transform: none;
@@ -1071,7 +1071,7 @@
 /* The tap on "Programează": the button sinks and a ring spreads from it. */
 .page[data-motion] .mockShop1 .mockBook {
   position: relative;
-  animation: demo-tap 12s var(--ease) infinite;
+  animation: demo-tap 12s var(--ease-draw) infinite;
 }
 
 .page[data-motion] .mockShop1 .mockBook::after {
@@ -1081,7 +1081,7 @@
   border-radius: 9px;
   border: 2px solid var(--amber);
   opacity: 0;
-  animation: demo-ring 12s var(--ease) infinite;
+  animation: demo-ring 12s var(--ease-draw) infinite;
 }
 
 @keyframes demo-tap {
@@ -1115,19 +1115,19 @@
 }
 
 .page[data-motion] .mockQuote {
-  animation: demo-quote 12s var(--ease) infinite;
+  animation: demo-quote 12s var(--ease-draw) infinite;
 }
 
 .page[data-motion] .mockLine1 {
-  animation: demo-line1 12s var(--ease) infinite;
+  animation: demo-line1 12s var(--ease-draw) infinite;
 }
 
 .page[data-motion] .mockLine2 {
-  animation: demo-line2 12s var(--ease) infinite;
+  animation: demo-line2 12s var(--ease-draw) infinite;
 }
 
 .page[data-motion] .mockQuote .mockTotal {
-  animation: demo-total 12s var(--ease) infinite;
+  animation: demo-total 12s var(--ease-draw) infinite;
 }
 
 @keyframes demo-quote {
@@ -1136,7 +1136,7 @@
     opacity: 0;
     transform: translateY(18px) scale(0.96);
   }
-  42%,
+  43%,
   92% {
     opacity: 1;
     transform: none;
@@ -1186,7 +1186,7 @@
 
 /* "Accept": an outline first, filled green when tapped. */
 .page[data-motion] .mockQuote .mockAccept {
-  animation: demo-accept 12s var(--ease) infinite;
+  animation: demo-accept 12s var(--ease-draw) infinite;
 }
 
 @keyframes demo-accept {
@@ -1235,7 +1235,7 @@
 }
 
 .page[data-motion] .trust[data-shown] .trustStars svg {
-  animation: star-on var(--motion) var(--ease) forwards;
+  animation: star-on var(--motion) var(--ease-draw) forwards;
   animation-delay: calc(var(--i, 0) * 140ms + 0.35s);
 }
 

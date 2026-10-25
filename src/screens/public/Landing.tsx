@@ -43,7 +43,7 @@ import { signUpPath } from '../auth/paths';
 import styles from './Landing.module.css';
 import { MockNav, ShopMockup, ViewLabel } from './LandingMockups';
 import mockups from './LandingMockups.module.css';
-import { LANDING_MOTION, releaseHeldDemo, revealOnScroll } from './landingMotion';
+import { LANDING_MOTION, startLandingMotion } from './landingMotion';
 
 interface Feature {
   icon: LucideIcon;
@@ -85,15 +85,7 @@ export function Landing() {
   const accountDeleted = state?.accountDeleted;
   const [linkError] = useState(takeAuthLinkError);
   useDocumentTitle(t('landing.title'));
-  const motionRef = useCallback((el: HTMLDivElement | null) => {
-    if (!el) return undefined;
-    const stopReveal = revealOnScroll(el);
-    const stopHold = releaseHeldDemo(el);
-    return () => {
-      stopHold();
-      stopReveal();
-    };
-  }, []);
+  const motionRef = useCallback((el: HTMLDivElement | null) => (el ? startLandingMotion(el) : undefined), []);
 
   // Arrived drawn at build time (T46): the page stays while the session is checked.
   if (session.status === 'loading' && !fromPrerenderedPage()) return <LoadingScreen />;
