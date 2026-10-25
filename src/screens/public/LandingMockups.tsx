@@ -1,4 +1,4 @@
-import { Car, Check, Wrench } from 'lucide-react';
+import { Car, Check, Store } from 'lucide-react';
 import { NAV, type Role } from '../../app/roles';
 import { LogoTile } from '../../components/LogoTile';
 import { Wordmark } from '../../components/Wordmark';
@@ -13,7 +13,7 @@ import styles from './LandingMockups.module.css';
  */
 export function ViewLabel({ role }: { role: 'client' | 'shop' }) {
   const { t } = useI18n();
-  const Icon = role === 'client' ? Car : Wrench;
+  const Icon = role === 'client' ? Car : Store;
   return (
     <p className={`${styles.viewLabel} ${role === 'client' ? styles.viewDriver : styles.viewShop}`}>
       <Icon size={15} />
