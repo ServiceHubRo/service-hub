@@ -2,6 +2,7 @@ import { expect, test, type Page } from '@playwright/test';
 import { formatDate } from '../../src/i18n/format';
 import {
   BACKEND,
+  bucharestDay,
   PASSWORD,
   createBookableShop,
   createUser,
@@ -26,10 +27,7 @@ test.beforeEach(async ({ context }) => {
 
 const name = () => test.info().project.name;
 
-/** YYYY-MM-DD, n days from today (Bucharest). */
-function inDays(n: number): string {
-  return new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Bucharest' }).format(new Date(Date.now() + n * 86_400_000));
-}
+const inDays = bucharestDay;
 
 const navLink = (page: Page, label: string) => page.getByRole('link', { name: label, exact: true }).filter({ visible: true }).first();
 

@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { BACKEND, PASSWORD, createBookableShop, createUser, expectNoHorizontalScroll, serviceRest, shot, signIn } from './support';
+import { BACKEND, PASSWORD, bucharestDay, createBookableShop, createUser, expectNoHorizontalScroll, serviceRest, shot, signIn } from './support';
 
 // Offers, completed (Eduard, 8 Oct): the new-client offer with a last day and chosen services, the
 // quiet-day offer; the "Doar cu ofertă" filter and the badges; "-15%" on the quiet days of step 2
@@ -7,7 +7,7 @@ import { BACKEND, PASSWORD, createBookableShop, createUser, expectNoHorizontalSc
 
 const name = () => test.info().project.name;
 const tag = () => `${Date.now() % 100000}${Math.floor(Math.random() * 100)}`;
-const inDays = (n: number) => new Date(Date.now() + n * 86_400_000).toISOString().slice(0, 10);
+const inDays = bucharestDay;
 
 test.beforeEach(async ({ context }) => {
   await context.addInitScript(() => {

@@ -43,6 +43,17 @@ export function totp(key: string, at: number = Date.now()): string {
   return String(n).padStart(6, '0');
 }
 
+/**
+ * YYYY-MM-DD in Bucharest, `n` calendar days from today there. Not `n` × 24 hours: on the days
+ * the clock changes a day has 23 or 25 hours, and near midnight that lands on the wrong date.
+ */
+export function bucharestDay(n = 0): string {
+  const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Bucharest' }).format(new Date());
+  const day = new Date(`${today}T12:00:00Z`);
+  day.setUTCDate(day.getUTCDate() + n);
+  return day.toISOString().slice(0, 10);
+}
+
 export function uniqueEmail(prefix: string): string {
   return `${prefix}-${Date.now()}-${Math.floor(Math.random() * 1e6)}@service-hub.test`;
 }
