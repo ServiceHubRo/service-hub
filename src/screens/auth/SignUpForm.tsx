@@ -16,7 +16,7 @@ import { recordEmailSent } from '../../lib/cooldown';
 import { TERMS_VERSION, type LegalDocId } from '../../lib/legal';
 import { looksLikeEmail, MIN_PASSWORD_LENGTH, passwordProblem } from '../../lib/password';
 import { DEFAULT_PHONE_COUNTRY, phoneFromInput } from '../../lib/phone';
-import { forgetGoogleSignUp, type SignUpRole } from './googleSignUp';
+import { forgetSocialSignUp, type SignUpRole } from './socialSignUp';
 import { LaunchOfferNote } from './LaunchOfferNote';
 import { useFocusFirstError } from './useFocusFirstError';
 import styles from './auth.module.css';
@@ -48,7 +48,8 @@ const CITY_SUGGESTIONS = [
  * P4b sign-up: role cards, name, shop name + city (shops), phone, email, password twice, terms.
  * A new shop can also give another shop's referral code (optional; filled in from a referral link);
  * a new client, a friend's invitation code (T35, `?rol=client&cod=C-00042`).
- * With `google` (T48, "Finalizează contul"): the same questions without email and password.
+ * With `social` (T48, "Finalizează contul" after Google or Apple): the same questions without email
+ * and password.
  */
 export function SignUpForm({
   email,
@@ -57,7 +58,7 @@ export function SignUpForm({
   invite,
   initialRole,
   initialReferral,
-  google,
+  social,
 }: {
   email: string;
   setEmail: (email: string) => void;
@@ -68,15 +69,15 @@ export function SignUpForm({
   initialRole?: SignUpRole;
   /** From a referral link (`?cod=S-00042`) or a client's invitation (`?cod=C-00042`); still editable. */
   initialReferral?: string;
-  /** Signed in through Google, no account yet: the name Google gave, still editable. */
-  google?: { name: string };
+  /** Signed in through Google or Apple, no account yet: the name it gave, still editable. */
+  social?: { name: string };
 }) {
   const { t, lang } = useI18n();
   const navigate = useNavigate();
   const session = useSession();
   const formRef = useRef<HTMLFormElement>(null);
   const [role, setRole] = useState<SignUpRole | null>(invite ? 'shop' : (initialRole ?? null));
-  const [name, setName] = useState(google?.name ?? '');
+  const [name, setName] = useState(social?.name ?? '');
   const [shopName, setShopName] = useState('');
   const [city, setCity] = useState('');
   const [phone, setPhone] = useState('');
@@ -98,7 +99,7 @@ export function SignUpForm({
     if (role === 'shop' && !invite && city.trim() === '') next.city = t('auth.error.cityRequired');
     if (!phoneFromInput(phoneCountry, phone))
       next.phone = t(phoneCountry === 'RO' ? 'auth.error.phoneInvalid' : 'auth.error.phoneInvalidIntl');
-    if (!google) {
+    if (!social) {
       if (!looksLikeEmail(email)) next.email = t('auth.error.emailFormat');
       const weak = passwordProblem(password);
       if (weak) next.password = weak === 'short' ? t('auth.error.passwordShort', { min: MIN_PASSWORD_LENGTH }) : t('auth.error.passwordLettersDigits');
@@ -119,7 +120,7 @@ export function SignUpForm({
       setAttempt((a) => a + 1);
       return;
     }
-    if (google && role) {
+    if (social && role) {
       await completeSignUp(
         {
           role,
@@ -133,7 +134,7 @@ export function SignUpForm({
         },
         requestId,
       );
-      forgetGoogleSignUp();
+      forgetSocialSignUp();
       await session.refreshProfile();
       navigate(homeOf(role), { replace: true });
       return;
@@ -288,7 +289,7 @@ export function SignUpForm({
         }}
         error={errors.phone}
       />
-      {!google && (
+      {!social && (
         <>
           <Field
             label={t('auth.email')}
@@ -384,7 +385,7 @@ export function SignUpForm({
           </p>
         )}
       </div>
-      {!google && captcha.element}
+      {!social && captcha.element}
       <ActionButton
         submit
         onAction={submit}

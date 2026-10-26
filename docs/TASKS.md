@@ -68,6 +68,7 @@ Ordinea contează: fiecare sarcină se sprijină pe cele de dinainte. Sarcinile 
 | T46 | Prima pagină gata pentru Google | Prima pagină livrată gata desenată, cu adresa oficială și datele structurate; apare mai repede pe telefon |
 | T47 | Sunet la programare nouă | Un sunet scurt și plăcut, al nostru, când service-ul primește o programare: în aplicația deschisă și în notificările aplicației de Android |
 | T48 | Intrarea cu Google | „Continuă cu Google” pe Intră și Cont nou; la prima intrare, „Finalizează contul” cere ce lipsește |
+| T49 | Intrarea cu Apple, butoane pastilă | „Continuă cu Apple” lângă Google; amândouă ca pastile |
 
 ---
 
@@ -1223,4 +1224,17 @@ Cerut de Eduard pe 26 oct 2026: „Vreau să setez Google auth pentru varianta m
 - **Invitațiile colegilor** rămân cu email și parolă.
 - **Politica de confidențialitate (RO/EN):** un rând nou la 2.1: ce primim de la Google (nume, email, poză), nu parola.
 - **Pașii tăi:** Google Cloud și Supabase, în `docs/LANSARE.md` 4.5b.
-- **Teste:** `tests/sql/129_google_sign_in.sql` (contul nu se face până la completare; refuzurile; client; service cu tot ce primește; aceeași cerere de două ori; contul se face o singură dată; suspendare după telefon; fără a doua perioadă gratuită; codul de recomandare), `e2e/google` (butonul pleacă spre Google și se întoarce pe Intră, rolul păstrat, eroarea; „Finalizează contul” ca service; în engleză și „Renunță”). Fără pachete noi.
+- **Teste:** `tests/sql/129_google_sign_in.sql` (contul nu se face până la completare; refuzurile; client; service cu tot ce primește; aceeași cerere de două ori; contul se face o singură dată; suspendare după telefon; fără a doua perioadă gratuită; codul de recomandare), `e2e/social-sign-in` (butonul pleacă spre Google și se întoarce pe Intră, rolul păstrat, eroarea; „Finalizează contul” ca service; în engleză și „Renunță”). Fără pachete noi.
+
+## T49 — Intrarea cu Apple, butoane pastilă ✅
+
+Cerut de Eduard pe 26 oct 2026: „Facem și cu Apple?” și „aș vrea să le facem tip pastilă. Elegant”.
+
+- **Pastile:** „Continuă cu Google” și „Continuă cu Apple” sunt acum pastile (colțuri complet rotunjite), aproape negre, cu o margine fină deschisă; G-ul colorat al Google și mărul alb al Apple, cum cer regulile celor două firme pentru fundal închis. Una sub alta, cu „sau” dedesubt.
+- **Apple:** merge exact ca Google: butonul apare doar dacă proiectul Supabase are Apple pornit; cont existent → intră în el; cont nou → „Finalizează contul” („Conectat cu Apple: …”). Nu e nevoie de schimbări în baza de date. Nu apare în aplicația de Android.
+- **Mesajul de eroare** e acum comun: „Conectarea nu a reușit. Încearcă din nou.”
+- **Adrese ascunse:** cine intră cu Apple poate primi la noi o adresă `…@privaterelay.appleid.com`; ca emailurile să ajungă, domeniul nostru de trimitere se înregistrează la Apple (`docs/LANSARE.md` 4.5c, pasul 7).
+- **Cheia Apple expiră la 6 luni** și se reînnoiește din Supabase (4.5c).
+- **Politica de confidențialitate (RO/EN):** rândul de la 2.1 acoperă și Apple.
+- **Pașii tăi:** contul Apple Developer, apoi `docs/LANSARE.md` 4.5c.
+- **Teste:** `e2e/social-sign-in` (ambele pastile pleacă la furnizorul lor și revin pe Intră), `unit/social` (furnizorul unui cont). Fără pachete noi, fără migrare.

@@ -1,8 +1,8 @@
 import { expect, test } from '@playwright/test';
 import { BACKEND, PASSWORD, asGoogleSignUp, createUser, expectNoHorizontalScroll, serviceRest, shot } from './support';
 
-// T48: "Continuă cu Google". The local stack has Google turned on (supabase/config.toml), so the
-// button shows; the browser is stopped on its way to Google. A first Google sign-in is played by an
+// T48, T49: "Continuă cu Google" and "Continuă cu Apple". The local stack has both turned on
+// (supabase/config.toml), so the pills show; the browser is stopped on its way out. A first Google sign-in is played by an
 // account with provider google and no profile: "Finalizează contul" makes it.
 
 test.skip(!BACKEND, 'needs the local Supabase stack');
@@ -24,7 +24,7 @@ test('the button leaves for Google and comes back to sign-in; the role chosen on
   let authorize: URL | null = null;
   await page.route('**/auth/v1/authorize?**', async (route) => {
     authorize = new URL(route.request().url());
-    await route.fulfill({ contentType: 'text/html', body: '<p>Google</p>' });
+    await route.fulfill({ contentType: 'text/html', body: '<p>Pagina furnizorului</p>' });
   });
   await page.goto('/cont-nou?rol=service&cod=S-00001');
   const google = page.getByRole('button', { name: 'Continuă cu Google' });
@@ -32,22 +32,29 @@ test('the button leaves for Google and comes back to sign-in; the role chosen on
   await expectNoHorizontalScroll(page);
   await shot(page, 't48-signup-google', name());
   await google.click();
-  await expect(page.getByText('Google', { exact: true })).toBeVisible();
+  await expect(page.getByText('Pagina furnizorului')).toBeVisible();
   expect(authorize).not.toBeNull();
   expect(authorize!.searchParams.get('provider')).toBe('google');
   expect(new URL(authorize!.searchParams.get('redirect_to')!).pathname).toBe('/intra');
   await page.goBack();
-  expect(await page.evaluate(() => sessionStorage.getItem('sh_google_signup'))).toBe(JSON.stringify({ role: 'shop', referral: 'S-00001' }));
+  expect(await page.evaluate(() => sessionStorage.getItem('sh_social_signup'))).toBe(JSON.stringify({ role: 'shop', referral: 'S-00001' }));
+
+  // Apple, the same way.
+  authorize = null;
+  await page.getByRole('button', { name: 'Continuă cu Apple' }).click();
+  await expect(page.getByText('Pagina furnizorului')).toBeVisible();
+  expect(authorize!.searchParams.get('provider')).toBe('apple');
+  await page.goBack();
 
   // Back without signing in (refused on Google's page): sign-in says so.
   await page.goto('/intra#error=access_denied&error_description=denied');
-  await expect(page.getByText('Conectarea cu Google nu a reușit. Încearcă din nou.')).toBeVisible();
+  await expect(page.getByText('Conectarea nu a reușit. Încearcă din nou.')).toBeVisible();
 });
 
 test('a first Google sign-in finishes the account: a shop, with its shop and free period', async ({ page }) => {
   const email = await createUser('client');
   const id = await asGoogleSignUp(email);
-  await page.addInitScript(() => sessionStorage.setItem('sh_google_signup', JSON.stringify({ role: 'shop' })));
+  await page.addInitScript(() => sessionStorage.setItem('sh_social_signup', JSON.stringify({ role: 'shop' })));
   await signInWithPassword(page, email);
 
   await expect(page.getByRole('heading', { level: 1, name: 'Finalizează contul' })).toBeVisible();

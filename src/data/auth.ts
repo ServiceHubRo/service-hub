@@ -132,8 +132,8 @@ export const LINK_TARGETS = {
   confirm: () => `${origin()}/`,
   reset: () => `${origin()}/parola-noua`,
   emailChange: () => `${origin()}/`,
-  /** Back from Google (T48): to sign-in, which shows a failure or moves on. */
-  google: () => `${origin()}/intra`,
+  /** Back from Google or Apple (T48): to sign-in, which shows a failure or moves on. */
+  social: () => `${origin()}/intra`,
 };
 
 async function run<T extends { error: unknown }>(promise: Promise<T>): Promise<T> {
@@ -221,35 +221,45 @@ export async function signUp(input: SignUpInput): Promise<'confirm_email' | 'sig
   return data.session ? 'signed_in' : 'confirm_email';
 }
 
-// ------------------------------------------------------------------------------------ Google (T48)
+// ------------------------------------------------------------------------------------ Google and Apple (T48, T49)
 
-let googleAnswer: Promise<boolean> | null = null;
+/** The sign-in providers besides email, in the order their buttons stand. */
+export const SOCIAL_PROVIDERS = ['google', 'apple'] as const;
+export type SocialProvider = (typeof SOCIAL_PROVIDERS)[number];
+
+let socialAnswer: Promise<SocialProvider[]> | null = null;
 
 /**
- * Whether "Continuă cu Google" can be shown: the Supabase project has Google turned on
- * (Authentication → Sign In / Providers). Never in the phone app, where Google refuses to sign in
- * inside the app's own window.
+ * The providers whose buttons can be shown: the ones the Supabase project has turned on
+ * (Authentication → Sign In / Providers). None in the phone app, where Google and Apple refuse to
+ * sign in inside the app's own window.
  */
-export function googleSignInAvailable(): Promise<boolean> {
-  if (IS_NATIVE || !supabaseConfig.ok) return Promise.resolve(false);
+export function socialProvidersAvailable(): Promise<SocialProvider[]> {
+  if (IS_NATIVE || !supabaseConfig.ok) return Promise.resolve([]);
   const { url, key } = supabaseConfig;
-  googleAnswer ??= fetch(`${url}/auth/v1/settings`, { headers: { apikey: key } })
-    .then((r) => (r.ok ? (r.json() as Promise<{ external?: { google?: boolean } }>) : null))
-    .then((settings) => settings?.external?.google === true)
+  socialAnswer ??= fetch(`${url}/auth/v1/settings`, { headers: { apikey: key } })
+    .then((r) => (r.ok ? (r.json() as Promise<{ external?: Partial<Record<SocialProvider, boolean>> }>) : null))
+    .then((settings) => SOCIAL_PROVIDERS.filter((p) => settings?.external?.[p] === true))
     .catch(() => {
-      googleAnswer = null; // asked again next time
-      return false;
+      socialAnswer = null; // asked again next time
+      return [];
     });
-  return googleAnswer;
+  return socialAnswer;
 }
 
-/** Leaves for Google's page; back on /intra signed in (a new person then finishes the account). */
-export async function signInWithGoogle(): Promise<void> {
+/** Leaves for Google's or Apple's page; back on /intra signed in (a new person then finishes the account). */
+export async function signInWithProvider(provider: SocialProvider): Promise<void> {
   setRememberMe(true);
-  await run(auth().signInWithOAuth({ provider: 'google', options: { redirectTo: LINK_TARGETS.google() } }));
+  await run(auth().signInWithOAuth({ provider, options: { redirectTo: LINK_TARGETS.social() } }));
 }
 
-/** Signed in through Google, no account yet (ARCHITECTURE §15). */
+/** The provider a signed-in person came through, when it is Google or Apple. */
+export function socialProviderOf(user: { app_metadata?: { provider?: unknown } }): SocialProvider | null {
+  const provider = user.app_metadata?.provider;
+  return SOCIAL_PROVIDERS.find((p) => p === provider) ?? null;
+}
+
+/** Signed in through Google or Apple, no account yet (ARCHITECTURE §15). */
 export function isAwaitingSignUp(user: { app_metadata?: { provider?: unknown } }): boolean {
   const provider = user.app_metadata?.provider;
   return typeof provider === 'string' && provider !== 'email';
@@ -257,7 +267,7 @@ export function isAwaitingSignUp(user: { app_metadata?: { provider?: unknown } }
 
 export type CompleteSignUpInput = Omit<SignUpInput, 'email' | 'password' | 'inviteToken' | 'captchaToken'>;
 
-/** The data the email form asks for, after a Google sign-up: the account is made (complete_signup). */
+/** The data the email form asks for, after a Google or Apple sign-up: the account is made (complete_signup). */
 export async function completeSignUp(input: CompleteSignUpInput, requestId: string): Promise<void> {
   await call('complete_signup', {
     p_request_id: requestId,

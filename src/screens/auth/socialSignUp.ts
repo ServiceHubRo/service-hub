@@ -1,17 +1,17 @@
 /**
- * What a visitor chose on Cont nou before leaving for Google (T48): the role and a referral or
- * invitation code, kept for "Finalizează contul" in this tab only.
+ * What a visitor chose on Cont nou before leaving for Google or Apple (T48): the role and a
+ * referral or invitation code, kept for "Finalizează contul" in this tab only.
  */
 export type SignUpRole = 'client' | 'shop';
 
-const KEY = 'sh_google_signup';
+const KEY = 'sh_social_signup';
 
-export interface GoogleSignUpChoice {
+export interface SocialSignUpChoice {
   role?: SignUpRole;
   referral?: string;
 }
 
-export function rememberGoogleSignUp(choice: GoogleSignUpChoice): void {
+export function rememberSocialSignUp(choice: SocialSignUpChoice): void {
   try {
     sessionStorage.setItem(KEY, JSON.stringify(choice));
   } catch {
@@ -19,7 +19,7 @@ export function rememberGoogleSignUp(choice: GoogleSignUpChoice): void {
   }
 }
 
-export function recallGoogleSignUp(): GoogleSignUpChoice {
+export function recallSocialSignUp(): SocialSignUpChoice {
   try {
     const value = JSON.parse(sessionStorage.getItem(KEY) ?? '{}') as { role?: unknown; referral?: unknown };
     return {
@@ -31,7 +31,7 @@ export function recallGoogleSignUp(): GoogleSignUpChoice {
   }
 }
 
-export function forgetGoogleSignUp(): void {
+export function forgetSocialSignUp(): void {
   try {
     sessionStorage.removeItem(KEY);
   } catch {

@@ -26,7 +26,7 @@ This policy explains what personal data Service-Hub uses, why, who else sees it,
 - the account code (for example `C-00012`), when the account was created, when the email was confirmed and when you last used the app;
 - the version of the Terms and of this policy you accepted, and when;
 - your password, only in encrypted form (we cannot read it either);
-- if you sign in with Google: the name, email address and profile picture Google sends us; your Google password never reaches us;
+- if you sign in with Google or Apple: the name, email address and (from Google) profile picture they send us; with Apple you may choose to give us a hidden address that forwards our emails to you; your Google or Apple password never reaches us;
 - your choices in the app (for example, if you postponed the message about notifications).
 
 ### 2.2 If you are a Customer
