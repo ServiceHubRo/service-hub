@@ -2540,6 +2540,33 @@ export type Database = {
           },
         ]
       }
+      signup_completions: {
+        Row: {
+          created_at: string
+          email: string | null
+          email_confirmed_at: string | null
+          id: string
+          raw_app_meta_data: Json
+          raw_user_meta_data: Json
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          email_confirmed_at?: string | null
+          id: string
+          raw_app_meta_data: Json
+          raw_user_meta_data: Json
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          email_confirmed_at?: string | null
+          id?: string
+          raw_app_meta_data?: Json
+          raw_user_meta_data?: Json
+        }
+        Relationships: []
+      }
       slot_waitlist: {
         Row: {
           client_id: string
@@ -3410,6 +3437,20 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      complete_signup: {
+        Args: {
+          p_city?: string
+          p_lang: string
+          p_name: string
+          p_phone: string
+          p_referral_code?: string
+          p_request_id: string
+          p_role: string
+          p_shop_name?: string
+          p_terms_version: string
+        }
+        Returns: Json
       }
       confirm_booking: {
         Args: { p_booking_id: string; p_request_id: string }
@@ -5054,6 +5095,10 @@ export type Database = {
       shop_seat_count: { Args: { p_shop_id: string }; Returns: number }
       shop_state: { Args: { p_shop_id: string }; Returns: string }
       shop_vehicle_file: { Args: { p_booking_id: string }; Returns: Json }
+      signup_pending: {
+        Args: { p_app_meta: Json; p_user_meta: Json }
+        Returns: boolean
+      }
       slot_starts_at: {
         Args: { p_date: string; p_slot: string }
         Returns: string

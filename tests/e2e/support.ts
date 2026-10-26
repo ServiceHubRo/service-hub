@@ -113,6 +113,22 @@ export async function confirmEmail(userId: string): Promise<void> {
   expect(res.ok, await res.clone().text()).toBe(true);
 }
 
+/**
+ * An account as a first Google sign-in leaves it (T48): provider google, no profile yet. Made from
+ * an email account (the tests never reach Google), whose password still signs it in.
+ */
+export async function asGoogleSignUp(email: string): Promise<string> {
+  const id = await userIdOf(email);
+  await serviceRest(`profiles?id=eq.${id}`, 'DELETE');
+  const res = await fetch(`${API}/auth/v1/admin/users/${id}`, {
+    method: 'PUT',
+    headers: { apikey: SERVICE_KEY, Authorization: `Bearer ${SERVICE_KEY}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ app_metadata: { provider: 'google', providers: ['google'] }, user_metadata: { full_name: 'Ion Google' } }),
+  });
+  expect(res.ok, await res.clone().text()).toBe(true);
+  return id;
+}
+
 /** The user id behind an email/password account (signs in through the Auth API). */
 export async function userIdOf(email: string, password = PASSWORD): Promise<string> {
   const res = await fetch(`${API}/auth/v1/token?grant_type=password`, {
@@ -179,7 +195,7 @@ export async function verifyPhoneByAdmin(email: string): Promise<void> {
 }
 
 /** A request to the local REST API as the service role (test stack only; bypasses RLS). */
-export async function serviceRest<T = unknown>(path: string, method: 'GET' | 'POST' | 'PATCH', body?: unknown): Promise<T> {
+export async function serviceRest<T = unknown>(path: string, method: 'GET' | 'POST' | 'PATCH' | 'DELETE', body?: unknown): Promise<T> {
   const res = await fetch(`${API}/rest/v1/${path}`, {
     method,
     headers: {

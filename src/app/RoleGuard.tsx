@@ -16,6 +16,7 @@ export function RoleGuard({ role }: { role: Role }) {
 
   switch (session.status) {
     case 'loading':
+    case 'incomplete': // App shows "Finalizează contul" instead of any route
       return <LoadingScreen />;
     case 'error':
       return <SessionErrorScreen />;

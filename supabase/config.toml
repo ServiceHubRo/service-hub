@@ -354,6 +354,18 @@ skip_nonce_check = false
 # If enabled, it will allow the user to successfully authenticate when the provider does not return an email address.
 email_optional = false
 
+# "Continuă cu Google" (T48), for the local stack and the browser tests only: the tests stop the
+# browser before it reaches Google, so the client id is a placeholder and there is no secret.
+# The real and test projects are set in the Supabase dashboard (docs/LANSARE.md).
+[auth.external.google]
+enabled = true
+client_id = "local-test.apps.googleusercontent.com"
+secret = "local-test-not-secret"
+redirect_uri = ""
+url = ""
+skip_nonce_check = true
+email_optional = false
+
 # Allow Solana wallet holders to sign in to your project via the Sign in with Solana (SIWS, EIP-4361) standard.
 # You can configure "web3" rate limit in the [auth.rate_limit] section and set up [auth.captcha] if self-hosting.
 [auth.web3.solana]

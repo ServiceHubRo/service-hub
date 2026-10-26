@@ -26,6 +26,7 @@ Aici afli ce date personale folosește Service-Hub, de ce, cine le mai vede, câ
 - codul contului (de exemplu `C-00012`), data creării contului, data confirmării emailului și data ultimei folosiri;
 - versiunea Termenilor și a acestei politici pe care le-ai acceptat și data acceptării;
 - parola, doar sub formă criptată (nici noi nu o putem citi);
+- dacă intri cu Google: numele, adresa de email și poza de profil pe care ni le trimite Google; parola contului Google nu ajunge la noi;
 - alegerile tale din aplicație (de exemplu, dacă ai amânat mesajul despre notificări).
 
 ### 2.2 Dacă ești Client

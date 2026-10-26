@@ -126,7 +126,7 @@ select test.eq(
   || 'admin_send_notice, admin_set_account_suspended, admin_set_area_mode, admin_set_notification_text, admin_set_service_reminder, admin_set_shop_suspended, '
   || 'admin_set_subscription_price, admin_set_subscription_status, admin_set_suggestion_status, admin_update_category, admin_update_service, '
   || 'admin_update_settings, admin_update_shop, admin_verify_phone, admin_void_history_report, admin_withdraw_notice, booking_thread, can_read_booking, can_read_notice, can_read_shop, can_read_thread, cancel_booking, '
-  || 'cancel_email_change, check_phone_code, claim_booking, client_no_show_count, complete_job, confirm_booking, create_booking, decide_quote, '
+  || 'cancel_email_change, check_phone_code, claim_booking, client_no_show_count, complete_job, complete_signup, confirm_booking, create_booking, decide_quote, '
   || 'decline_booking, export_my_data, get_availability, get_shop_page, get_shop_setup, history_report_preview, invite_staff, is_admin, is_shop_member, '
   || 'is_shop_owner, is_shop_public, join_area_waitlist, join_slot_waitlist, last_odometer_for_booking, leave_area_waitlist, leave_slot_waitlist, list_imported_jobs, list_service_areas, list_shop_bookings, list_shop_history, list_shop_staff, list_threads, '
   || 'mark_no_show, mark_thread_read, my_client_referrals, my_imported_jobs, my_phone_verification, my_referrals, my_shop_id, my_subscription_offers, new_client_offers, phone_digits, replace_quote, reply_review, report_review, reschedule_booking, save_native_push_token, save_push_subscription, '

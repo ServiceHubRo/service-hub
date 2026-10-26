@@ -67,6 +67,7 @@ Ordinea contează: fiecare sarcină se sprijină pe cele de dinainte. Sarcinile 
 | T45 | Animații line peste tot | Aceeași curbă și durate potrivite la toate animațiile, fără sărituri |
 | T46 | Prima pagină gata pentru Google | Prima pagină livrată gata desenată, cu adresa oficială și datele structurate; apare mai repede pe telefon |
 | T47 | Sunet la programare nouă | Un sunet scurt și plăcut, al nostru, când service-ul primește o programare: în aplicația deschisă și în notificările aplicației de Android |
+| T48 | Intrarea cu Google | „Continuă cu Google” pe Intră și Cont nou; la prima intrare, „Finalizează contul” cere ce lipsește |
 
 ---
 
@@ -1209,3 +1210,17 @@ Cerut de Eduard pe 26 oct 2026: „un sunet pentru platforma web să anunțe că
 - **Aplicația de Android:** un canal nou de notificări, „Programări noi”, cu sunetul nostru, folosit doar pentru programările noi ale service-ului. Restul notificărilor rămân pe canalul obișnuit. Canalul apare după instalarea aplicației noi de test și prima deschidere a ecranelor de service. Clienții nu îl au.
 - **iPhone și notificările din browser:** Apple și browserele folosesc mereu sunetul telefonului, deci acolo nu se poate pune sunetul nostru. Pe ecranul deschis, sunetul nostru se aude însă și pe iPhone.
 - **Teste:** `unit/chime` (care notificări sună, comutatorul, o singură sonerie pentru mai multe cereri, browser fără sunet), `unit/fcm` (canalul și sunetul pe Android), `e2e/chime` (o cerere sosită live sună o dată; „Ascultă”; oprit pe dispozitiv, următoarea cerere e liniștită; în engleză). Fără pachete noi, fără migrare.
+
+## T48 — Intrarea cu Google ✅
+
+Cerut de Eduard pe 26 oct 2026: „Vreau să setez Google auth pentru varianta main”.
+
+- **Butonul:** „Continuă cu Google” sus pe Intră și pe Cont nou, cu linia „sau” sub el. Apare doar unde proiectul Supabase are Google pornit, deci doar pe site-ul real dacă e pornit doar acolo. Nu apare în aplicația de Android: Google nu permite intrarea în fereastra unei aplicații (se poate adăuga separat, cu browserul telefonului).
+- **Cont existent:** cine intră cu Google pe adresa unui cont deja făcut intră în contul acela (Supabase le leagă singur).
+- **Cont nou:** la prima intrare cu Google apare „Finalizează contul”: client sau service, numele (pus deja din Google), telefonul, acordul cu Termenii și, la service, numele și orașul service-ului (plus codul de recomandare). Fără email și parolă. Rolul și codul alese pe Cont nou înainte de Google sunt deja bifate. Până la „Creează cont” nu se deschide alt ecran. „Renunță” iese din cont.
+- **La fel ca la înscrierea cu email:** profilul, service-ul cu perioada gratuită, programul, verificările anti-abuz (telefonul sau emailul unui cont suspendat, a doua perioadă gratuită) și codurile de recomandare se fac de aceleași funcții din baza de date (migrarea `google_sign_in`, `schema_version` = 86).
+- **Eroare:** dacă cineva refuză pe pagina Google, Intră spune „Conectarea cu Google nu a reușit. Încearcă din nou.”
+- **Invitațiile colegilor** rămân cu email și parolă.
+- **Politica de confidențialitate (RO/EN):** un rând nou la 2.1: ce primim de la Google (nume, email, poză), nu parola.
+- **Pașii tăi:** Google Cloud și Supabase, în `docs/LANSARE.md` 4.5b.
+- **Teste:** `tests/sql/129_google_sign_in.sql` (contul nu se face până la completare; refuzurile; client; service cu tot ce primește; aceeași cerere de două ori; contul se face o singură dată; suspendare după telefon; fără a doua perioadă gratuită; codul de recomandare), `e2e/google` (butonul pleacă spre Google și se întoarce pe Intră, rolul păstrat, eroarea; „Finalizează contul” ca service; în engleză și „Renunță”). Fără pachete noi.

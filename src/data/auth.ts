@@ -1,10 +1,10 @@
 import { FunctionsFetchError, FunctionsHttpError } from '@supabase/supabase-js';
 import { translate, type Lang } from '../i18n/translate';
-import { emailLinkOrigin } from '../lib/native';
+import { emailLinkOrigin, IS_NATIVE } from '../lib/native';
 import { setRememberMe } from '../lib/remember';
 import type { Role } from '../app/roles';
 import { call, failure, RpcError, rpcErrorMessage } from './rpc';
-import { supabase } from './supabase';
+import { supabase, supabaseConfig } from './supabase';
 
 /**
  * Accounts (ARCHITECTURE §15, FR §2): sign-up, sign-in, email confirmation, password reset,
@@ -132,6 +132,8 @@ export const LINK_TARGETS = {
   confirm: () => `${origin()}/`,
   reset: () => `${origin()}/parola-noua`,
   emailChange: () => `${origin()}/`,
+  /** Back from Google (T48): to sign-in, which shows a failure or moves on. */
+  google: () => `${origin()}/intra`,
 };
 
 async function run<T extends { error: unknown }>(promise: Promise<T>): Promise<T> {
@@ -217,6 +219,56 @@ export async function signUp(input: SignUpInput): Promise<'confirm_email' | 'sig
   // identities instead of an error (so nobody can probe addresses); that is our "already exists".
   if (data.user && (data.user.identities?.length ?? 0) === 0) throw new AuthFailure('email_exists');
   return data.session ? 'signed_in' : 'confirm_email';
+}
+
+// ------------------------------------------------------------------------------------ Google (T48)
+
+let googleAnswer: Promise<boolean> | null = null;
+
+/**
+ * Whether "Continuă cu Google" can be shown: the Supabase project has Google turned on
+ * (Authentication → Sign In / Providers). Never in the phone app, where Google refuses to sign in
+ * inside the app's own window.
+ */
+export function googleSignInAvailable(): Promise<boolean> {
+  if (IS_NATIVE || !supabaseConfig.ok) return Promise.resolve(false);
+  const { url, key } = supabaseConfig;
+  googleAnswer ??= fetch(`${url}/auth/v1/settings`, { headers: { apikey: key } })
+    .then((r) => (r.ok ? (r.json() as Promise<{ external?: { google?: boolean } }>) : null))
+    .then((settings) => settings?.external?.google === true)
+    .catch(() => {
+      googleAnswer = null; // asked again next time
+      return false;
+    });
+  return googleAnswer;
+}
+
+/** Leaves for Google's page; back on /intra signed in (a new person then finishes the account). */
+export async function signInWithGoogle(): Promise<void> {
+  setRememberMe(true);
+  await run(auth().signInWithOAuth({ provider: 'google', options: { redirectTo: LINK_TARGETS.google() } }));
+}
+
+/** Signed in through Google, no account yet (ARCHITECTURE §15). */
+export function isAwaitingSignUp(user: { app_metadata?: { provider?: unknown } }): boolean {
+  const provider = user.app_metadata?.provider;
+  return typeof provider === 'string' && provider !== 'email';
+}
+
+export type CompleteSignUpInput = Omit<SignUpInput, 'email' | 'password' | 'inviteToken' | 'captchaToken'>;
+
+/** The data the email form asks for, after a Google sign-up: the account is made (complete_signup). */
+export async function completeSignUp(input: CompleteSignUpInput, requestId: string): Promise<void> {
+  await call('complete_signup', {
+    p_request_id: requestId,
+    p_role: input.role,
+    p_name: input.name.trim(),
+    p_phone: input.phone,
+    p_lang: input.lang,
+    p_terms_version: input.termsVersion,
+    ...(input.role === 'shop' ? { p_shop_name: input.shopName?.trim(), p_city: input.city?.trim() } : {}),
+    ...(input.referralCode ? { p_referral_code: input.referralCode } : {}),
+  });
 }
 
 export async function resendConfirmation(email: string, captchaToken?: string): Promise<void> {

@@ -29,6 +29,7 @@ export type Review = Tables['reviews']['Row'];
 
 /** Every code the database functions raise. `tests/unit/rpc.test.ts` checks this list against the migrations. */
 export const RPC_ERROR_CODES = [
+  'account_exists',
   'account_has_active_bookings',
   'account_suspended',
   'already_reported',
@@ -62,6 +63,7 @@ export const RPC_ERROR_CODES = [
   'import_not_found',
   'import_row_invalid',
   'import_too_large',
+  'invalid_role',
   'invalid_slot',
   'invite_invalid',
   'invite_mismatch',
@@ -83,6 +85,7 @@ export const RPC_ERROR_CODES = [
   'message_too_long',
   'mfa_required',
   'mode_invalid',
+  'name_required',
   'no_booking_together',
   'no_jobs',
   'no_recipients',
@@ -130,6 +133,7 @@ export const RPC_ERROR_CODES = [
   'service_not_found',
   'service_unavailable',
   'shop_closed',
+  'shop_details_required',
   'shop_has_active_bookings',
   'shop_not_found',
   'shop_unavailable',
@@ -140,6 +144,7 @@ export const RPC_ERROR_CODES = [
   'suggestion_empty',
   'suggestion_not_found',
   'suggestion_too_long',
+  'terms_required',
   'thread_not_found',
   'too_early',
   'too_far',
