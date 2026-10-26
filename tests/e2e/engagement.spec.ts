@@ -16,7 +16,7 @@ import {
 } from './support';
 
 // T24 — the switches for the new notifications: the client's tires and tips in Cont, the owner's
-// monthly report in Setări → Notificări, the quiet hours and weekly tips in the admin's settings,
+// monthly report in Cont → Notificări, the quiet hours and weekly tips in the admin's settings,
 // and where a tap on the tire reminder leads. (The pushes themselves, sent by the jobs, are
 // covered by tests/sql/101_engagement.sql.)
 

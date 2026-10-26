@@ -277,10 +277,11 @@ test.describe('shop settings', () => {
     await openAccount(guest);
     await expect(guest.getByText('Atelier Test · Brașov')).toBeVisible();
     // A colleague works with bookings, quotes, messages and the history; the settings are the owner's.
+    // Notifications live in Cont → Notificări, for the colleague too.
+    await expect(guest.getByRole('link', { name: /^Notificări/ })).toBeVisible();
     await guest.getByRole('link', { name: /Setări service/ }).click();
     await expect(guest.getByText(/^Setările le schimbă proprietarul/)).toBeVisible();
-    await expect(guest.getByRole('link', { name: /Notificări/ })).toBeVisible();
-    for (const section of [/Program și zile libere/, /Servicii oferite/, /Date de facturare/, /Personal/]) {
+    for (const section of [/Notificări/, /Program și zile libere/, /Servicii oferite/, /Date de facturare/, /Personal/]) {
       await expect(guest.getByRole('link', { name: section })).toHaveCount(0);
     }
     await expectNoHorizontalScroll(guest);

@@ -83,7 +83,7 @@ Aici afli ce date personale folosește Service-Hub, de ce, cine le mai vede, câ
 | Reminderul pentru următoarea revizie (după ultima lucrare de acel fel făcută prin Platformă) și cererea de recenzie după o lucrare | Contractul cu tine; pe amândouă le oprești din Cont |
 | Reminderul pentru schimbul anvelopelor de sezon (pentru mașinile din Garaj) și cele două sfaturi din primele două săptămâni | Contractul cu tine; reminderul de anvelope îl oprești din Cont, iar sfaturile din setările de notificări ale telefonului |
 | Ofertele service-urilor din favorite | Acordul tău: le primești doar dacă le pornești din Cont și le oprești oricând |
-| Raportul lunii pentru service | Contractul cu tine; îl oprești din Setări → Notificări |
+| Raportul lunii pentru service | Contractul cu tine; îl oprești din Cont → Notificări |
 | Arătarea lucrărilor făcute la mașina ta la alte service-uri către service-ul la care ai o programare (Fișa mașinii) | Interesul legitim (lit. f), al tău și al service-ului, ca lucrarea la mașină să se facă corect, știind ce s-a făcut înainte. Te poți opune oricând, din Cont → „Istoricul mașinii pentru service-uri” |
 | Raportul oficial de istoric | Contractul cu tine |
 | „Invită un prieten”: legătura dintre contul tău și cel care te-a invitat, raportul gratuit și verificarea că nu este aceeași persoană (amprente criptate ale emailului și telefonului) | Contractul cu cel care invită (programul din Termeni, 3.6a) și interesul legitim (lit. f) ca programul să nu fie folosit abuziv |
@@ -195,7 +195,7 @@ Platforma nu este pentru persoane sub 18 ani. Dacă aflăm că un cont este al u
 
 ## 9. Mesajele pe care ți le trimitem
 
-Îți trimitem mesaje legate de cont și de programări (confirmări, devize, remindere, cererea de recenzie după o lucrare, plăți), remindere pentru mașină (ITP, RCA, rovinietă, următoarea revizie, schimbul anvelopelor de sezon), două sfaturi în primele două săptămâni dacă încă nu ai făcut o programare anunțul că Service-Hub a ajuns în zona ta (o singură dată, doar dacă l-ai cerut) și anunțuri importante despre Platformă. Ofertele service-urilor din favorite le primești doar dacă le pornești din Cont; sfaturile și ofertele sunt cel mult două pe săptămână. Mementourile automate nu pleacă noaptea (între 21:00 și 9:00, ora României): le primești dimineața. Fiecare tip se oprește din Cont, în afară de cele două sfaturi, iar notificările push le poți opri oricând din setările telefonului. Service-urile pot opri rezumatul zilnic și raportul lunii din Setări → Notificări.
+Îți trimitem mesaje legate de cont și de programări (confirmări, devize, remindere, cererea de recenzie după o lucrare, plăți), remindere pentru mașină (ITP, RCA, rovinietă, următoarea revizie, schimbul anvelopelor de sezon), două sfaturi în primele două săptămâni dacă încă nu ai făcut o programare anunțul că Service-Hub a ajuns în zona ta (o singură dată, doar dacă l-ai cerut) și anunțuri importante despre Platformă. Ofertele service-urilor din favorite le primești doar dacă le pornești din Cont; sfaturile și ofertele sunt cel mult două pe săptămână. Mementourile automate nu pleacă noaptea (între 21:00 și 9:00, ora României): le primești dimineața. Fiecare tip se oprește din Cont, în afară de cele două sfaturi, iar notificările push le poți opri oricând din setările telefonului. Service-urile pot opri rezumatul zilnic și raportul lunii din Cont → Notificări.
 
 ---
 

@@ -83,7 +83,7 @@ This policy explains what personal data Service-Hub uses, why, who else sees it,
 | The reminder for your next service (after the last job of that kind done through the Platform) and the review request after a job | Our contract with you; you turn both off in Account |
 | The seasonal tire reminder (for the cars in your Garage) and the two tips in your first two weeks | Our contract with you; you turn the tire reminder off in Account, and the tips in your phone’s notification settings |
 | Your favorite shops’ offers | Your consent: you get them only if you turn them on in Account, and you can turn them off at any time |
-| The monthly report for shops | Our contract with you; turned off in Settings → Notifications |
+| The monthly report for shops | Our contract with you; turned off in Account → Notifications |
 | Showing the shop you booked with what was done on your car at other shops (Vehicle file) | Legitimate interest (para. 1(f)), yours and the shop's, in the work on your car being done right, knowing what was done before. You can object at any time in Account → “Car history for shops” |
 | Official history report | Our contract with you |
 | “Invite a friend”: the link between your account and the person who invited you, the free report, and the check that it is not the same person (encrypted fingerprints of the email and phone) | The contract with the person who invites (the program in the Terms, 3.6a) and legitimate interest (point f) in a program that is not abused |
@@ -195,7 +195,7 @@ The Platform is not for people under 18. If we learn that an account belongs to 
 
 ## 9. Messages we send you
 
-We send you messages about your account and bookings (confirmations, quotes, reminders, the review request after a job, payments), reminders about your car (ITP, RCA, vignette, your next service, the seasonal tire change), two tips in your first two weeks if you haven’t booked yet, the news that Service-Hub has reached your area (once, only if you asked for it), and important announcements about the Platform. You get your favorite shops’ offers only if you turn them on in Account; tips and offers are at most two a week. Automatic reminders are not sent at night (between 9 PM and 9 AM, Romanian time): you get them in the morning. You can turn each kind off in Account, except the two tips, and push notifications at any time in your phone’s settings. Shops can turn off the daily summary and the monthly report in Settings → Notifications.
+We send you messages about your account and bookings (confirmations, quotes, reminders, the review request after a job, payments), reminders about your car (ITP, RCA, vignette, your next service, the seasonal tire change), two tips in your first two weeks if you haven’t booked yet, the news that Service-Hub has reached your area (once, only if you asked for it), and important announcements about the Platform. You get your favorite shops’ offers only if you turn them on in Account; tips and offers are at most two a week. Automatic reminders are not sent at night (between 9 PM and 9 AM, Romanian time): you get them in the morning. You can turn each kind off in Account, except the two tips, and push notifications at any time in your phone’s settings. Shops can turn off the daily summary and the monthly report in Account → Notifications.
 
 ---
 
