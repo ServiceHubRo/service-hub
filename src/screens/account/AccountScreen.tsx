@@ -73,7 +73,7 @@ export function AccountScreen({ role }: { role: Role }) {
       {role === 'shop' && <PhoneCard />}
 
       {role !== 'admin' && <PushRow />}
-      {/* The new-booking chime on this phone (T47), next to push: both are set per device. */}
+      {/* The new-booking chime on this device (T47), only here, next to push (Eduard, 26 Oct). */}
       {role === 'shop' && <SoundRow />}
 
       {role === 'client' && (

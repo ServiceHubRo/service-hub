@@ -8,8 +8,8 @@ import { playChime, setChimeOn, useChimeOn } from '../../lib/chime';
 import styles from './push.module.css';
 
 /**
- * The new-booking chime on this device (T47), in the shop's Notificări: on or off, and "Ascultă" to
- * hear it (which also lets the browser play it later). Saved on the device, like push.
+ * The new-booking chime on this device (T47), in the shop's Cont under push: on or off, and
+ * "Ascultă" to hear it (which also lets the browser play it later). Saved on the device, like push.
  */
 export function SoundRow() {
   const { t } = useI18n();

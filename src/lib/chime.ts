@@ -5,7 +5,7 @@ import { storage } from './storage';
  * The sound of a new booking (T47): a short, soft chime the shop hears in the open app when a
  * request arrives (ShopBookingsProvider). The same file rings the phone app's notifications for new
  * bookings (res/raw/new_booking.wav, nativePush.ts). Both are made by scripts/gen-chime.mjs.
- * On by default, turned off per device in Setări → Notificări.
+ * On by default, turned off per device in the shop's Cont, under push.
  */
 export const CHIME_URL = '/sounds/new-booking.wav';
 
