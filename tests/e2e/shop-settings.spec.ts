@@ -1,6 +1,7 @@
 import { expect, test, type Page } from '@playwright/test';
 import {
   BACKEND,
+  bucharestDay,
   PASSWORD,
   createUser,
   expectNoHorizontalScroll,
@@ -26,11 +27,7 @@ test.beforeEach(async ({ context }) => {
 
 const name = () => test.info().project.name;
 
-/** YYYY-MM-DD, n days from today (Bucharest). */
-function inDays(n: number): string {
-  const d = new Date(Date.now() + n * 86_400_000);
-  return new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Bucharest' }).format(d);
-}
+const inDays = bucharestDay;
 
 async function openSettings(page: Page, tile: string) {
   await openAccount(page);
