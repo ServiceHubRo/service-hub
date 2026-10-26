@@ -68,6 +68,9 @@ test('a first Google sign-in finishes the account: a shop, with its shop and fre
   await page.getByLabel('Telefon').fill('0722 333 444');
   await page.getByRole('checkbox').check();
   await page.getByRole('button', { name: 'Creează cont' }).click();
+  // The address is already /s/panou (opened above): wait for the form to give way to the app.
+  await expect(page.getByRole('heading', { level: 1, name: 'Finalizează contul' })).toHaveCount(0);
+  await expect(page.getByRole('link', { name: 'Panou' }).filter({ visible: true }).first()).toBeVisible();
   await expect(page).toHaveURL(/\/s\/panou$/);
 
   const [profile] = await serviceRest<{ role: string; name: string; terms_version: string }[]>(`profiles?id=eq.${id}&select=role,name,terms_version`, 'GET');
