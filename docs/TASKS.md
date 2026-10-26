@@ -66,6 +66,7 @@ Ordinea contează: fiecare sarcină se sprijină pe cele de dinainte. Sarcinile 
 | T44 | Telefonul service-ului pe prima pagină | În „Ai un service auto?”, un telefon animat cu Panoul: cererea, devizul, mașina gata; separat clar de telefonul șoferului |
 | T45 | Animații line peste tot | Aceeași curbă și durate potrivite la toate animațiile, fără sărituri |
 | T46 | Prima pagină gata pentru Google | Prima pagină livrată gata desenată, cu adresa oficială și datele structurate; apare mai repede pe telefon |
+| T47 | Sunet la programare nouă | Un sunet scurt și plăcut, al nostru, când service-ul primește o programare: în aplicația deschisă și în notificările aplicației de Android |
 
 ---
 
@@ -1194,3 +1195,16 @@ Cerut de Eduard pe 25 oct 2026: „Vreau optimizare SEO pentru Service-Hub”. P
 - **Teste:** `e2e/public` (textul și datele structurate sunt în HTML; cu codul aplicației întârziat, pagina e deja pe ecran, iar aplicația preia aceleași elemente, fără erori; vizitatorul în engleză nu vede pagina în română; 404 cu `noindex`), `e2e/published` (adresa oficială și datele pe build-ul ca pe site-ul publicat, `/p/` oprit), `unit/seoFiles`.
 - **Decizii:** (1) doar prima pagină e desenată dinainte. Paginile legale au puțin de câștigat din căutări, iar Google citește oricum și paginile din aplicație. (2) Textele de pe pagină au rămas neschimbate. Titlul paginii din Google conține deja „programări online la service auto”. (3) Fără pachete noi, fără migrare.
 - **Rămas:** înscrierea site-ului în Google Search Console, după mutarea domeniului (`docs/LANSARE.md`, 4.7). Paginile pe oraș și pe service (T43) rămân anulate, dar se pot reface pe aceeași bază dacă Eduard le vrea.
+
+## T47 — Sunet la programare nouă ✅
+
+Cerut de Eduard pe 26 oct 2026: „un sunet pentru platforma web să anunțe că a venit o nouă programare, ceva plăcut; și la telefon, dacă putem face un sunet personalizat”.
+
+- **Sunetul:** trei note scurte, ca de marimba, care urcă (sol, do, mi, acord de Do major), cu un ecou slab de cameră. Durează 1,25 s și e destul de încet ca să nu sperie. E făcut de noi (`scripts/gen-chime.mjs`), deci nu are drepturi de autor, și e același pe web și în aplicația de Android.
+- **În aplicația deschisă (web, laptop sau telefon):** service-ul îl aude când îi intră o programare de la un client: o cerere nouă sau o programare confirmată automat. Nu sună pentru programările adăugate chiar de service. Mai multe cereri în aceeași clipă sună o singură dată. Se aude cât pagina e pe ecran sau, cu pagina în alt tab, dacă acel calculator nu primește notificări push (altfel notificarea vine cu sunetul ei).
+- **Regula browserelor:** o pagină poate face sunet doar după ce ai atins-o o dată. După prima atingere sau tastă, sunetul e pregătit.
+- **Setări → Notificări:** „Sunet la programare nouă” se poate opri pe fiecare dispozitiv și are butonul „Ascultă”. Pornit de la început.
+- **Notificările din browser:** când pagina Service-Hub e pe ecran și poate cânta sunetul, notificarea apare fără sunet, ca să nu se audă de două ori. Altfel vine cu sunetul sistemului.
+- **Aplicația de Android:** un canal nou de notificări, „Programări noi”, cu sunetul nostru, folosit doar pentru programările noi ale service-ului. Restul notificărilor rămân pe canalul obișnuit. Canalul apare după instalarea aplicației noi de test și prima deschidere a ecranelor de service. Clienții nu îl au.
+- **iPhone și notificările din browser:** Apple și browserele folosesc mereu sunetul telefonului, deci acolo nu se poate pune sunetul nostru. Pe ecranul deschis, sunetul nostru se aude însă și pe iPhone.
+- **Teste:** `unit/chime` (care notificări sună, comutatorul, o singură sonerie pentru mai multe cereri, browser fără sunet), `unit/fcm` (canalul și sunetul pe Android), `e2e/chime` (o cerere sosită live sună o dată; „Ascultă”; oprit pe dispozitiv, următoarea cerere e liniștită; în engleză). Fără pachete noi, fără migrare.

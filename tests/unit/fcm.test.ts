@@ -93,6 +93,11 @@ describe('Firebase Cloud Messaging', () => {
     expect((fcmBody('tok', { ...message, urgent: false }).message as { android: { priority: string } }).android.priority).toBe('NORMAL');
   });
 
+  it('a new booking for the shop rings on its own channel, with the new-booking chime (T47)', () => {
+    const android = (fcmBody('tok', { ...message, chime: true }).message as { android: { notification: unknown } }).android;
+    expect(android.notification).toEqual({ channel_id: 'new-bookings', tag: 'booking-b-1', sound: 'new_booking' });
+  });
+
   it('sends with a token it gets once, to the project of the key', async () => {
     const { json } = await serviceAccount();
     const google = fakeGoogle();

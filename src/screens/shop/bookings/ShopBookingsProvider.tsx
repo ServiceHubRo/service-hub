@@ -1,7 +1,11 @@
 import { useCallback, useEffect, useMemo, useRef, type ReactNode } from 'react';
+import { ensureBookingsChannel } from '../../../data/nativePush';
+import { currentPushStatus, refreshPush } from '../../../data/push';
 import { subscribeRows } from '../../../data/realtime';
 import type { Booking } from '../../../data/rpc';
 import { fetchShopBookings, type ShopBooking, type ShopBookingsData } from '../../../data/shopBookings';
+import { playChime, primeChime } from '../../../lib/chime';
+import { IS_NATIVE } from '../../../lib/native';
 import { isActiveStatus, type BookingStatus } from '../../../lib/status';
 import { useLoad } from '../../../lib/useLoad';
 import { ShopBookingsContext, type ShopBookingsValue } from './shopBookingsContext';
@@ -12,7 +16,9 @@ import { ShopBookingsContext, type ShopBookingsValue } from './shopBookingsConte
  * into the list at once, then the list is read again quietly for what the row does not carry (the
  * quote, service names). Panou, Programări and the badge on the Programări tab all read from here,
  * so moving between them never shows a skeleton again. A request that arrives live is noted, so
- * the list can make it glow (`isFresh`).
+ * the list can make it glow (`isFresh`), and rings the new-booking chime (T47) on this device: while
+ * the app is on screen, or in a background tab when this device gets no push (the push brings its
+ * own sound then).
  */
 /** How long a request that arrived live keeps its glow when a list shows it. */
 const FRESH_MS = 2 * 60 * 1000;
@@ -31,9 +37,22 @@ export function ShopBookingsProvider({ children }: { children: ReactNode }) {
     const before = known.current;
     if (!before) return;
     const now = Date.now();
+    let fromClient = false;
     for (const b of data.bookings) {
-      if (b.status === 'pending' && !before.has(b.id)) arrived.current.set(b.id, now);
+      if (before.has(b.id)) continue;
+      if (b.status === 'pending') arrived.current.set(b.id, now);
+      // Booked by a client (a request, or confirmed at once); not one the shop typed in itself.
+      if (b.source !== 'shop') fromClient = true;
     }
+    if (fromClient && (document.visibilityState === 'visible' || currentPushStatus() !== 'on')) void playChime();
+  }, []);
+
+  // Sound needs a first touch of the page (browser rule); the push state decides the background.
+  // In the phone app, the channel whose notifications ring with the same chime.
+  useEffect(() => {
+    void refreshPush();
+    if (IS_NATIVE) void ensureBookingsChannel();
+    return primeChime();
   }, []);
   const isFresh = useCallback((id: string) => {
     const at = arrived.current.get(id);

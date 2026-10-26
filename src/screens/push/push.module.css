@@ -93,3 +93,13 @@
   flex-shrink: 0;
   color: var(--amber);
 }
+
+/* The new-booking sound (T47): the switch takes the row, "Ascultă" sits under it. */
+.grow {
+  flex: 1;
+  min-width: 0;
+}
+
+.listen {
+  margin-top: 12px;
+}

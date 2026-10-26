@@ -9,6 +9,18 @@ self.addEventListener('activate', (event) => {
   event.waitUntil(self.clients.claim());
 });
 
+// Pages that can play the new-booking chime (T47, src/lib/chime.ts tells): a browser plays sound
+// only after the page was touched, and the person can turn it off. Lost when the worker sleeps;
+// the notification then simply keeps its own sound.
+const chimeReady = new Set();
+
+self.addEventListener('message', (event) => {
+  const msg = event.data;
+  if (!msg || msg.type !== 'sh:chime' || !event.source || !event.source.id) return;
+  if (msg.ready === true) chimeReady.add(event.source.id);
+  else chimeReady.delete(event.source.id);
+});
+
 self.addEventListener('push', (event) => {
   let data;
   try {
@@ -27,7 +39,17 @@ self.addEventListener('push', (event) => {
     options.tag = data.tag;
     options.renotify = true;
   }
-  event.waitUntil(self.registration.showNotification(title, options));
+  event.waitUntil(
+    (async () => {
+      // A new booking for the shop (T47): when a page on screen can ring its own chime, the
+      // notification itself stays silent instead of sounding a second time.
+      if (data.chime === true) {
+        const windows = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+        if (windows.some((w) => w.visibilityState === 'visible' && chimeReady.has(w.id))) options.silent = true;
+      }
+      await self.registration.showNotification(title, options);
+    })(),
+  );
 });
 
 // Only paths inside the app; anything else opens the start page.
