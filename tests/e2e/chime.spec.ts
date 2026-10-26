@@ -65,8 +65,9 @@ test('a request arriving live rings once; turned off on this device, the next on
   const sound = page.getByRole('switch', { name: /Sunet la programare nouă/ });
   await expect(sound).toBeChecked();
   await expect(page.getByText('Pe acest dispozitiv, cât Service-Hub este deschis.')).toBeVisible();
+  // A new page: the count starts again at 0.
   await page.getByRole('button', { name: 'Ascultă' }).click();
-  await expect.poll(() => chimes(page)).toBe(2);
+  await expect.poll(() => chimes(page)).toBe(1);
   await expect(page.getByText('Sunetul nu poate fi redat pe acest dispozitiv.')).toHaveCount(0);
   await expectNoHorizontalScroll(page);
   await shot(page, 't47-sound-setting', name());
@@ -86,9 +87,9 @@ test('a request arriving live rings once; turned off on this device, the next on
 });
 
 test('in English: the sound setting', async ({ page }) => {
-  const { email: shop } = await createBookableShop(`Atelier Sound ${Date.now() % 100000}`, ['ulei']);
-  await page.addInitScript(() => localStorage.setItem('sh_lang', 'en'));
+  const shop = await createUser('shop', { lang: 'en' });
   await signIn(page, shop, PASSWORD);
+  await expect(page).toHaveURL(/\/s\/panou$/);
   await page.goto('/s/cont');
   await expect(page.getByRole('switch', { name: /Sound for new bookings/ })).toBeChecked();
   await expect(page.getByText('On this device, while Service-Hub is open.')).toBeVisible();
