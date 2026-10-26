@@ -129,3 +129,37 @@
   margin-top: 2px;
   color: var(--amber);
 }
+
+/* "Continuă cu Google" and the line under it (T48). */
+.google {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.googleLabel {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.googleLogo {
+  flex-shrink: 0;
+}
+
+.or {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.or::before,
+.or::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}

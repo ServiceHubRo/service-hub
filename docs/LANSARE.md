@@ -269,6 +269,38 @@ Acum `service-hub.ro` arată pagina „în curând”. După pasul ăsta arată 
 
 **Verifici:** pe `https://service-hub.ro` → **Ai uitat parola?** cu adresa ta → linkul din email începe cu `https://service-hub.ro` și te lasă să pui parola nouă.
 
+### 4.5b Intrarea cu Google (din T48)
+
+Butonul „Continuă cu Google” apare singur pe Intră și pe Cont nou după ce pornești Google în proiectul Supabase. Dacă îl pornești doar în proiectul real, apare doar pe site-ul real.
+
+**A. În Google Cloud (gratuit)**
+1. Intră pe **console.cloud.google.com** cu contul firmei → sus, lângă logo, **Select a project → New project** → nume `Service-Hub` → **Create**. Alege proiectul nou.
+2. Meniul din stânga → **Google Auth Platform** (sau caută „OAuth consent screen”) → **Get started**:
+   - **App name**: `Service-Hub`; **User support email**: adresa ta → **Next**;
+   - **Audience**: **External** → **Next**;
+   - **Contact information**: adresa ta → **Next** → bifezi acordul → **Create**.
+3. **Branding** → **App domain**:
+   - **Application home page**: `https://service-hub.ro`;
+   - **Privacy policy link**: `https://service-hub.ro/legal/confidentialitate`;
+   - **Terms of service link**: `https://service-hub.ro/legal/termeni`;
+   - **Authorized domains → Add domain**: `service-hub.ro`, apoi încă unul: adresa proiectului real din Supabase fără `https://` (de forma `abcdefgh.supabase.co`, o găsești în Supabase → **Project Settings → Data API → Project URL**) → **Save**.
+4. **Data Access → Add or remove scopes** → bifezi `openid`, `.../auth/userinfo.email` și `.../auth/userinfo.profile` → **Update** → **Save**. Doar acestea trei: Google nu cere verificare pentru ele.
+5. În Supabase, proiectul real → **Authentication → Sign In / Providers → Google**: copiezi **Callback URL (for OAuth)** (se termină în `/auth/v1/callback`). Lași pagina deschisă.
+6. Înapoi în Google → **Clients → Create client**:
+   - **Application type**: **Web application**; **Name**: `Service-Hub web`;
+   - **Authorized JavaScript origins → Add URI**: `https://service-hub.ro`;
+   - **Authorized redirect URIs → Add URI**: adresa copiată la pasul 5 → **Create**.
+   Google îți arată **Client ID** și **Client secret**. Le copiezi doar în Supabase, la pasul 8, nu în chat.
+7. **Audience → Publish app → Confirm**. Până la acest pas, doar adresele trecute la „Test users” pot intra cu Google.
+
+**B. În Supabase (proiectul real)**
+8. Pe pagina de la pasul 5 (**Google**): **Enable Sign in with Google** pornit, lipești **Client ID** și **Client Secret** → **Save**.
+9. Adresele de întoarcere sunt deja cele de la 4.5 (`https://service-hub.ro/**`). Nu e nimic de adăugat.
+
+**Verifici:** pe `https://service-hub.ro/intra` apare „Continuă cu Google”. Cu un cont Google pe care nu l-ai folosit pe Service-Hub ajungi la „Finalizează contul”: alegi client sau service, completezi și ești în aplicație. Cu adresa unui cont existent intri direct în contul acela.
+
+**De știut:** pe pagina Google scrie „continuă către abcdefgh.supabase.co”, nu „service-hub.ro”. Ca să scrie numele site-ului, Supabase are „Custom domain” (cost lunar, Project Settings → Add-ons). Se poate porni și mai târziu; atunci îți scriu ce se schimbă.
+
 ### 4.6 Contul de admin real
 
 Conturile de admin rămân după ștergerea conturilor de test (Partea 5). Dacă vrei alt cont de admin decât cel folosit la teste:

@@ -1,6 +1,6 @@
 import type { Session, User } from '@supabase/supabase-js';
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
-import { signOut as authSignOut } from '../data/auth';
+import { isAwaitingSignUp, signOut as authSignOut } from '../data/auth';
 import { fetchProfile, touchLastActive, updateLang, type Profile } from '../data/profile';
 import { forgetPushDevice } from '../data/push';
 import { onSessionLost } from '../data/sessionEvents';
@@ -48,6 +48,11 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       try {
         const profile = await fetchProfile(user.id);
         if (loadedForRef.current !== user.id) return;
+        if (!profile && isAwaitingSignUp(user)) {
+          // Signed in through Google for the first time: the account is made on "Finalizează contul".
+          setState({ status: 'incomplete', user, profile: null });
+          return;
+        }
         if (!profile || profile.deleted_at) {
           loadedForRef.current = null;
           await authSignOut();

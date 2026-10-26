@@ -2,8 +2,10 @@ import { useState } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { Banner } from '../../components/Banner';
 import { Tabs } from '../../components/Tabs';
+import { takeAuthLinkError } from '../../data/supabase';
 import { useI18n } from '../../i18n/context';
 import { AuthLayout } from './AuthLayout';
+import { GoogleSignIn } from './GoogleSignIn';
 import { LegalDocScreen } from './LegalDocScreen';
 import { REFERRAL_CODE_PARAM, SIGNUP_ROLE_PARAM } from './paths';
 import { useLegalDoc } from './useLegalDoc';
@@ -36,6 +38,8 @@ export function AuthScreen({ tab }: { tab: AuthTab }) {
   const referralCode = params.get(REFERRAL_CODE_PARAM)?.slice(0, 16) ?? undefined;
   const [email, setEmail] = useState(state.email ?? '');
   const { doc, open: openDoc, close: closeDoc } = useLegalDoc();
+  // Back from Google without signing in (refused, or the window closed): Auth puts the error in the address.
+  const [googleFailed] = useState(() => takeAuthLinkError() !== null || params.has('error'));
 
   return (
     <AuthLayout title={t(tab === 'signin' ? 'auth.tab.signin' : 'auth.tab.signup')}>
@@ -56,6 +60,8 @@ export function AuthScreen({ tab }: { tab: AuthTab }) {
           }
         />
         {state.linkError && <Banner tone="warning">{t('auth.linkExpired')}</Banner>}
+        {googleFailed && <Banner tone="warning">{t('auth.google.failed')}</Banner>}
+        <GoogleSignIn role={initialRole} referral={referralCode} />
         {tab === 'signin' ? (
           <SignInForm email={email} setEmail={setEmail} />
         ) : (

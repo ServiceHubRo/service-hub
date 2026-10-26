@@ -7,18 +7,19 @@ import { Checkbox } from '../../components/Checkbox';
 import { Field } from '../../components/Field';
 import { PasswordField } from '../../components/PasswordField';
 import { PhoneField } from '../../components/PhoneField';
-import { AuthFailure, authErrorMessage, isRetryable, signUp } from '../../data/auth';
+import { homeOf } from '../../app/roles';
+import { useSession } from '../../app/sessionContext';
+import { AuthFailure, authErrorMessage, completeSignUp, isRetryable, signUp } from '../../data/auth';
 import { checkClientInviteCode, checkReferralCode } from '../../data/referrals';
 import { useI18n } from '../../i18n/context';
 import { recordEmailSent } from '../../lib/cooldown';
 import { TERMS_VERSION, type LegalDocId } from '../../lib/legal';
 import { looksLikeEmail, MIN_PASSWORD_LENGTH, passwordProblem } from '../../lib/password';
 import { DEFAULT_PHONE_COUNTRY, phoneFromInput } from '../../lib/phone';
+import { forgetGoogleSignUp, type SignUpRole } from './googleSignUp';
 import { LaunchOfferNote } from './LaunchOfferNote';
 import { useFocusFirstError } from './useFocusFirstError';
 import styles from './auth.module.css';
-
-type SignUpRole = 'client' | 'shop';
 
 interface Errors {
   role?: string;
@@ -47,6 +48,7 @@ const CITY_SUGGESTIONS = [
  * P4b sign-up: role cards, name, shop name + city (shops), phone, email, password twice, terms.
  * A new shop can also give another shop's referral code (optional; filled in from a referral link);
  * a new client, a friend's invitation code (T35, `?rol=client&cod=C-00042`).
+ * With `google` (T48, "Finalizează contul"): the same questions without email and password.
  */
 export function SignUpForm({
   email,
@@ -55,6 +57,7 @@ export function SignUpForm({
   invite,
   initialRole,
   initialReferral,
+  google,
 }: {
   email: string;
   setEmail: (email: string) => void;
@@ -65,12 +68,15 @@ export function SignUpForm({
   initialRole?: SignUpRole;
   /** From a referral link (`?cod=S-00042`) or a client's invitation (`?cod=C-00042`); still editable. */
   initialReferral?: string;
+  /** Signed in through Google, no account yet: the name Google gave, still editable. */
+  google?: { name: string };
 }) {
   const { t, lang } = useI18n();
   const navigate = useNavigate();
+  const session = useSession();
   const formRef = useRef<HTMLFormElement>(null);
   const [role, setRole] = useState<SignUpRole | null>(invite ? 'shop' : (initialRole ?? null));
-  const [name, setName] = useState('');
+  const [name, setName] = useState(google?.name ?? '');
   const [shopName, setShopName] = useState('');
   const [city, setCity] = useState('');
   const [phone, setPhone] = useState('');
@@ -92,15 +98,17 @@ export function SignUpForm({
     if (role === 'shop' && !invite && city.trim() === '') next.city = t('auth.error.cityRequired');
     if (!phoneFromInput(phoneCountry, phone))
       next.phone = t(phoneCountry === 'RO' ? 'auth.error.phoneInvalid' : 'auth.error.phoneInvalidIntl');
-    if (!looksLikeEmail(email)) next.email = t('auth.error.emailFormat');
-    const weak = passwordProblem(password);
-    if (weak) next.password = weak === 'short' ? t('auth.error.passwordShort', { min: MIN_PASSWORD_LENGTH }) : t('auth.error.passwordLettersDigits');
-    else if (confirm !== password) next.confirm = t('auth.error.passwordMismatch');
+    if (!google) {
+      if (!looksLikeEmail(email)) next.email = t('auth.error.emailFormat');
+      const weak = passwordProblem(password);
+      if (weak) next.password = weak === 'short' ? t('auth.error.passwordShort', { min: MIN_PASSWORD_LENGTH }) : t('auth.error.passwordLettersDigits');
+      else if (confirm !== password) next.confirm = t('auth.error.passwordMismatch');
+    }
     if (!terms) next.terms = t('auth.error.termsRequired');
     return next;
   }
 
-  async function submit() {
+  async function submit(requestId: string) {
     const next = validate();
     setErrors(next);
     setAttempt((a) => a + 1);
@@ -109,6 +117,25 @@ export function SignUpForm({
     if (referralCode && !(await (role === 'shop' ? checkReferralCode(referralCode) : checkClientInviteCode(referralCode)))) {
       setErrors({ referral: t('auth.error.referralInvalid') });
       setAttempt((a) => a + 1);
+      return;
+    }
+    if (google && role) {
+      await completeSignUp(
+        {
+          role,
+          name,
+          phone: phoneFromInput(phoneCountry, phone) ?? phone,
+          lang,
+          termsVersion: TERMS_VERSION,
+          shopName: role === 'shop' ? shopName : undefined,
+          city: role === 'shop' ? city : undefined,
+          referralCode: referralCode || undefined,
+        },
+        requestId,
+      );
+      forgetGoogleSignUp();
+      await session.refreshProfile();
+      navigate(homeOf(role), { replace: true });
       return;
     }
     if (!captcha.ready) throw new AuthFailure('captcha_failed');
@@ -261,41 +288,45 @@ export function SignUpForm({
         }}
         error={errors.phone}
       />
-      <Field
-        label={t('auth.email')}
-        type="email"
-        autoComplete="email"
-        inputMode="email"
-        value={email}
-        readOnly={!!invite}
-        onChange={(e) => {
-          setEmail(e.target.value);
-          clear('email');
-        }}
-        error={errors.email}
-      />
-      <PasswordField
-        label={t('auth.password')}
-        autoComplete="new-password"
-        showStrength
-        hint={t('auth.passwordHint', { min: MIN_PASSWORD_LENGTH })}
-        value={password}
-        onChange={(e) => {
-          setPassword(e.target.value);
-          clear('password');
-        }}
-        error={errors.password}
-      />
-      <PasswordField
-        label={t('auth.repeatPassword')}
-        autoComplete="new-password"
-        value={confirm}
-        onChange={(e) => {
-          setConfirm(e.target.value);
-          clear('confirm');
-        }}
-        error={errors.confirm}
-      />
+      {!google && (
+        <>
+          <Field
+            label={t('auth.email')}
+            type="email"
+            autoComplete="email"
+            inputMode="email"
+            value={email}
+            readOnly={!!invite}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              clear('email');
+            }}
+            error={errors.email}
+          />
+          <PasswordField
+            label={t('auth.password')}
+            autoComplete="new-password"
+            showStrength
+            hint={t('auth.passwordHint', { min: MIN_PASSWORD_LENGTH })}
+            value={password}
+            onChange={(e) => {
+              setPassword(e.target.value);
+              clear('password');
+            }}
+            error={errors.password}
+          />
+          <PasswordField
+            label={t('auth.repeatPassword')}
+            autoComplete="new-password"
+            value={confirm}
+            onChange={(e) => {
+              setConfirm(e.target.value);
+              clear('confirm');
+            }}
+            error={errors.confirm}
+          />
+        </>
+      )}
       {role === 'client' && (
         <Field
           label={t('auth.invite')}
@@ -353,7 +384,7 @@ export function SignUpForm({
           </p>
         )}
       </div>
-      {captcha.element}
+      {!google && captcha.element}
       <ActionButton
         submit
         onAction={submit}

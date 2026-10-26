@@ -11,8 +11,9 @@ import type { Role } from './roles';
  *   expired   — the session ended by itself while the app was open; the screen stays as it was
  *               and a sign-in panel covers it (nothing typed is lost)
  *   error     — the profile could not be loaded (offline); retry
+ *   incomplete — signed in through Google, no account yet: "Finalizează contul" (T48)
  */
-export type SessionStatus = 'loading' | 'signedOut' | 'signedIn' | 'expired' | 'error';
+export type SessionStatus = 'loading' | 'signedOut' | 'signedIn' | 'expired' | 'error' | 'incomplete';
 
 export interface SessionValue {
   status: SessionStatus;

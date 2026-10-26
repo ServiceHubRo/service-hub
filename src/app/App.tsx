@@ -6,6 +6,7 @@ import { IS_TEST_BUILD } from '../lib/env';
 import { addBreadcrumb, safePath } from '../lib/monitoring';
 import { AuthScreen } from '../screens/auth/AuthScreen';
 import { CheckEmail } from '../screens/auth/CheckEmail';
+import { CompleteSignUp } from '../screens/auth/CompleteSignUp';
 import { ForgotPassword } from '../screens/auth/ForgotPassword';
 import { InviteScreen } from '../screens/auth/InviteScreen';
 import { NewPassword } from '../screens/auth/NewPassword';
@@ -19,6 +20,7 @@ import { NativeBridge } from './NativeBridge';
 import { SchemaBar } from './SchemaBar';
 import { ScreenErrorBoundary } from './ScreenErrorBoundary';
 import { SessionProvider } from './SessionProvider';
+import { useSession } from './sessionContext';
 import styles from './App.module.css';
 
 // Each role's screens are a file of their own, loaded after sign-in (T18): a client never
@@ -75,6 +77,17 @@ function RouteGuard({ children }: { children: ReactNode }) {
 }
 
 /**
+ * Signed in through Google with no account yet (T48): "Finalizează contul" instead of any screen,
+ * except the legal documents its links open.
+ */
+function SignUpGate({ children }: { children: ReactNode }) {
+  const session = useSession();
+  const location = useLocation();
+  if (session.status === 'incomplete' && !location.pathname.startsWith('/legal/')) return <CompleteSignUp />;
+  return children;
+}
+
+/**
  * `location` only when the public page is drawn ahead at build time (T46, src/prerender.tsx):
  * there is no browser address to read then.
  */
@@ -88,65 +101,67 @@ export function App({ location }: { location?: string }) {
             <OfflineBar />
             <SchemaBar />
             <RouteGuard>
-              <Routes>
-                <Route path="/" element={<Landing />} />
-                <Route element={<PublicOnly />}>
-                  <Route path="/intra" element={<AuthScreen tab="signin" />} />
-                  <Route path="/cont-nou" element={<AuthScreen tab="signup" />} />
-                  <Route path="/confirma-email" element={<CheckEmail />} />
-                  <Route path="/parola-uitata" element={<ForgotPassword />} />
-                </Route>
-                <Route path="/parola-noua" element={<NewPassword />} />
-                <Route path="/invitatie/:token" element={<InviteScreen />} />
-                {/* The link in the SMS of a booking the shop added (T29). */}
-                <Route
-                  path="/p/:token"
-                  element={
-                    <ChunkBoundary>
-                      <BookingLinkScreen />
-                    </ChunkBoundary>
-                  }
-                />
-                {/* The shop's own link (T31b), shared by the shop or scanned from its poster. */}
-                <Route
-                  path="/atelier/:shopId"
-                  element={
-                    <ChunkBoundary>
-                      <ShopLinkScreen />
-                    </ChunkBoundary>
-                  }
-                />
-                <Route
-                  path="/legal/:doc"
-                  element={
-                    <ChunkBoundary>
-                      <PublicLegal />
-                    </ChunkBoundary>
-                  }
-                />
-                <Route
-                  path="/verifica"
-                  element={
-                    <ChunkBoundary>
-                      <VerifyScreen />
-                    </ChunkBoundary>
-                  }
-                />
-                {IS_TEST_BUILD && (
+              <SignUpGate>
+                <Routes>
+                  <Route path="/" element={<Landing />} />
+                  <Route element={<PublicOnly />}>
+                    <Route path="/intra" element={<AuthScreen tab="signin" />} />
+                    <Route path="/cont-nou" element={<AuthScreen tab="signup" />} />
+                    <Route path="/confirma-email" element={<CheckEmail />} />
+                    <Route path="/parola-uitata" element={<ForgotPassword />} />
+                  </Route>
+                  <Route path="/parola-noua" element={<NewPassword />} />
+                  <Route path="/invitatie/:token" element={<InviteScreen />} />
+                  {/* The link in the SMS of a booking the shop added (T29). */}
                   <Route
-                    path="/dev/componente"
+                    path="/p/:token"
                     element={
                       <ChunkBoundary>
-                        <ComponentGallery />
+                        <BookingLinkScreen />
                       </ChunkBoundary>
                     }
                   />
-                )}
-                {roleRoutes('client')}
-                {roleRoutes('shop')}
-                {roleRoutes('admin')}
-                <Route path="*" element={<NotFound />} />
-              </Routes>
+                  {/* The shop's own link (T31b), shared by the shop or scanned from its poster. */}
+                  <Route
+                    path="/atelier/:shopId"
+                    element={
+                      <ChunkBoundary>
+                        <ShopLinkScreen />
+                      </ChunkBoundary>
+                    }
+                  />
+                  <Route
+                    path="/legal/:doc"
+                    element={
+                      <ChunkBoundary>
+                        <PublicLegal />
+                      </ChunkBoundary>
+                    }
+                  />
+                  <Route
+                    path="/verifica"
+                    element={
+                      <ChunkBoundary>
+                        <VerifyScreen />
+                      </ChunkBoundary>
+                    }
+                  />
+                  {IS_TEST_BUILD && (
+                    <Route
+                      path="/dev/componente"
+                      element={
+                        <ChunkBoundary>
+                          <ComponentGallery />
+                        </ChunkBoundary>
+                      }
+                    />
+                  )}
+                  {roleRoutes('client')}
+                  {roleRoutes('shop')}
+                  {roleRoutes('admin')}
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </SignUpGate>
             </RouteGuard>
           </div>
         </Router>
