@@ -2,6 +2,8 @@
 
 declare const __APP_CONTEXT__: string;
 declare const __APP_RELEASE__: string;
+/** The site's own address, without the final slash (vite.config.ts). */
+declare const __SITE_URL__: string;
 
 interface ImportMetaEnv {
   readonly VITE_SUPABASE_URL?: string;

@@ -1,5 +1,5 @@
 import { useEffect, type ReactNode } from 'react';
-import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom';
+import { BrowserRouter, Route, Routes, StaticRouter, useLocation } from 'react-router-dom';
 import { OfflineBar } from '../components/OfflineBar';
 import { I18nProvider } from '../i18n/I18nProvider';
 import { IS_TEST_BUILD } from '../lib/env';
@@ -54,6 +54,10 @@ function roleRoutes(role: Role) {
   );
 }
 
+function Router({ location, children }: { location?: string; children: ReactNode }) {
+  return location === undefined ? <BrowserRouter>{children}</BrowserRouter> : <StaticRouter location={location}>{children}</StaticRouter>;
+}
+
 /**
  * Every screen: a message instead of an empty page if one breaks (T19), and the screens visited
  * remembered for the error report (addresses without tokens, in memory only).
@@ -70,11 +74,15 @@ function RouteGuard({ children }: { children: ReactNode }) {
   );
 }
 
-export function App() {
+/**
+ * `location` only when the public page is drawn ahead at build time (T46, src/prerender.tsx):
+ * there is no browser address to read then.
+ */
+export function App({ location }: { location?: string }) {
   return (
     <I18nProvider>
       <SessionProvider>
-        <BrowserRouter>
+        <Router location={location}>
           <div className={styles.app}>
             <NativeBridge />
             <OfflineBar />
@@ -141,7 +149,7 @@ export function App() {
               </Routes>
             </RouteGuard>
           </div>
-        </BrowserRouter>
+        </Router>
       </SessionProvider>
     </I18nProvider>
   );

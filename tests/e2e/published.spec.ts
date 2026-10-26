@@ -37,8 +37,20 @@ test('published site: search engines may index the public pages, with a sitemap'
   const txt = await robots.text();
   expect(txt).toContain('Allow: /');
   expect(txt).toContain('Disallow: /c/');
+  expect(txt).toContain('Disallow: /p/');
   expect(txt).toMatch(/Sitemap: https?:\/\/\S+\/sitemap\.xml/);
   const sitemap = await request.get('/sitemap.xml');
   expect(sitemap.ok()).toBe(true);
   expect(await sitemap.text()).toContain('/legal/termeni</loc>');
+});
+
+test('published site: the public page carries its official address and structured data (T46)', async ({ request }) => {
+  const html = await (await request.get('/')).text();
+  const canonical = html.match(/<link rel="canonical" href="([^"]+)" \/>/)![1]!;
+  expect(canonical).toMatch(/^https:\/\/\S+\/$/);
+  const ld = JSON.parse(html.match(/<script type="application\/ld\+json">(.+?)<\/script>/)![1]!);
+  const organization = ld['@graph'].find((node: { '@type': string }) => node['@type'] === 'Organization');
+  expect(organization.url).toBe(canonical);
+  expect(organization.email).toBe('contact@service-hub.ro');
+  expect(html).toMatch(/<h1[^>]*>Programarea la service/);
 });

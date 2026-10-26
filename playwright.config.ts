@@ -43,7 +43,7 @@ export default defineConfig({
     },
     {
       // The same app built exactly like the published site (Netlify CONTEXT=production).
-      command: `CONTEXT=production VITE_SENTRY_DSN=${SENTRY_TEST_DSN} npx vite build --outDir dist-published && npx vite preview --outDir dist-published --port ${PUBLISHED_PORT} --strictPort`,
+      command: `CONTEXT=production VITE_SENTRY_DSN=${SENTRY_TEST_DSN} npx vite build --outDir dist-published && node scripts/prerender.mjs dist-published && npx vite preview --outDir dist-published --port ${PUBLISHED_PORT} --strictPort`,
       port: PUBLISHED_PORT,
       reuseExistingServer: !process.env.CI,
       timeout: 120_000,

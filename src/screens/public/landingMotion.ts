@@ -38,3 +38,30 @@ export function revealOnScroll(root: HTMLElement, enabled = LANDING_MOTION): () 
     delete root.dataset.motion;
   };
 }
+
+/**
+ * The landing's motion (Landing.tsx). On the page drawn at build time (T46) index.html has held
+ * everything (`data-hold`): an animation started while the phone is still busy starting the app
+ * stalls and then shows its end at once. Here (called once the session check is over, Landing.tsx),
+ * once the phone has drawn a frame and has a moment free, the parts reached meanwhile come in and
+ * the phones start.
+ */
+export function startLandingMotion(root: HTMLElement): () => void {
+  if (!('hold' in root.dataset)) return revealOnScroll(root);
+  let stopReveal = () => {};
+  let idle = 0;
+  const frame = requestAnimationFrame(() => {
+    const start = () => {
+      stopReveal = revealOnScroll(root);
+      delete root.dataset.hold;
+    };
+    idle = typeof requestIdleCallback === 'function' ? requestIdleCallback(start, { timeout: 600 }) : window.setTimeout(start, 150);
+  });
+  return () => {
+    cancelAnimationFrame(frame);
+    if (typeof cancelIdleCallback === 'function') cancelIdleCallback(idle);
+    else window.clearTimeout(idle);
+    delete root.dataset.hold;
+    stopReveal();
+  };
+}

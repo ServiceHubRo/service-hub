@@ -318,7 +318,11 @@ Nimic de aici nu cere cod nou și nu se vede în aplicație, în afară de cerin
 
 - **Partea 5** (ștergerea conturilor de test), chiar înainte să anunți lansarea.
 - Lista „Ce verifici tu” din `docs/LAUNCH_CHECK.md`, cap-coadă, cu un service și un client reali.
-- Opțional, **Google Search Console** (search.google.com/search-console) → **Add property** → `service-hub.ro` → verificarea prin DNS (un rând `TXT` nou, nu schimbă nimic altceva) → **Sitemaps** → `https://service-hub.ro/sitemap.xml`. Așa apare site-ul mai repede în Google. Linkurile de test nu apar niciodată în Google (le spun motoarelor de căutare să nu le citească).
+- **Google Search Console** (search.google.com/search-console), ca Google să găsească site-ul repede:
+  1. **Add property** → **Domain** → `service-hub.ro` → Google îți dă un rând `TXT`. Îl adaugi la firma de domeniu, lângă celelalte (nu schimbă nimic altceva), apoi apeși **Verify**.
+  2. **Sitemaps** (în stânga) → scrii `sitemap.xml` → **Submit**.
+  3. **URL inspection** (sus) → `https://service-hub.ro/` → **Request indexing**.
+  4. După câteva zile, la **Pages** vezi ce pagini sunt în Google. Linkurile de test nu apar niciodată acolo, pentru că le spun motoarelor de căutare să nu le citească.
 - Bine de știut: notificările și „Ține-mă minte” țin de adresa site-ului. Cine le-a pornit pe `service-hubapp.netlify.app` le pornește din nou pe `service-hub.ro` (după Partea 5 oricum toată lumea își face cont nou).
 
 ---

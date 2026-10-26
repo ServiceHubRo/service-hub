@@ -1,1 +1,3 @@
-/* /index.html 200
+# Every address is the app (T46): `/` is index.html, the page drawn at build time
+# (scripts/prerender.mjs); any other address gets the empty shell, app.html.
+/* /app.html 200

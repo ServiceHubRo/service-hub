@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
@@ -90,8 +90,15 @@ export default defineConfig(({ command, mode }) => {
           } catch {
             // Built without them: nothing to send.
           }
-          server.middlewares.use((_req, res, next) => {
+          // As public/_redirects on Netlify (T46): `/` is the page drawn at build time, any other
+          // address of the app gets the empty shell.
+          const shell = existsSync(join(server.config.root, server.config.build.outDir, 'app.html'));
+          server.middlewares.use((req, res, next) => {
             for (const [name, value] of headers) res.setHeader(name, value);
+            const path = (req.url ?? '/').split('?')[0];
+            if (shell && req.method === 'GET' && path !== '/' && path !== '/index.html' && !/\.\w+$/.test(path)) {
+              req.url = '/app.html';
+            }
             next();
           });
         },
@@ -113,6 +120,7 @@ export default defineConfig(({ command, mode }) => {
       __APP_CONTEXT__: JSON.stringify(context),
       // Netlify's COMMIT_REF: error reports name the exact version (T19).
       __APP_RELEASE__: JSON.stringify(process.env.COMMIT_REF ?? ''),
+      __SITE_URL__: JSON.stringify(siteUrl),
     },
     test: {
       environment: 'jsdom',

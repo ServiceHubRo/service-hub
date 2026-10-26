@@ -38,7 +38,56 @@
     <title>Service-Hub — programări online la service auto</title>
   </head>
   <body>
+    <!-- The page drawn at build time (T46, scripts/prerender.mjs), plain old JavaScript like the
+         guard below. It stays only for whom it was drawn: at `/`, a Romanian visitor who is not
+         signed in, in the browser. Decided before it is read, so anyone else never sees it, not
+         even for a frame (data-shell hides it, global.css); they get the empty page the app
+         fills, as before. -->
+    <script>
+      (function () {
+        var keep = location.pathname === '/' && !location.hash && !window.Capacitor;
+        try {
+          var lang = localStorage.getItem('sh_lang');
+          if (lang !== 'ro' && lang !== 'en') lang = (navigator.language || '').toLowerCase().indexOf('ro') === 0 ? 'ro' : 'en';
+          if (lang !== 'ro') keep = false;
+          [localStorage, sessionStorage].forEach(function (store) {
+            for (var i = 0; i < store.length; i++) if (/^sb-.+-auth-token/.test(store.key(i) || '')) keep = false;
+          });
+        } catch (e) {
+          keep = false;
+        }
+        if (!keep) document.documentElement.setAttribute('data-shell', '');
+      })();
+    </script>
     <div id="root"></div>
+    <!-- When the drawn page stays, nothing on it moves until the app has taken over and checked
+         the session (data-hold, lifted in src/screens/public/landingMotion.ts): an animation
+         started while the phone is busy stalls and then shows its end at once. Nothing is
+         measured here (on a phone the layout is not settled yet): the parts below the first
+         screen wait hidden for the app to bring them in, the phones wait at their first frame.
+         If the app has not taken over after 8 s, the page stays still and complete. -->
+    <script>
+      (function () {
+        var root = document.getElementById('root');
+        if (!root || !root.hasAttribute('data-prerendered')) return;
+        if (document.documentElement.hasAttribute('data-shell')) {
+          root.removeAttribute('data-prerendered');
+          root.innerHTML = '';
+          document.documentElement.removeAttribute('data-shell');
+          return;
+        }
+        var page = root.querySelector('[data-landing="motion"]');
+        var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (!page || reduce || !window.IntersectionObserver) return;
+        page.setAttribute('data-hold', '');
+        page.setAttribute('data-motion', '');
+        setTimeout(function () {
+          if (!page.hasAttribute('data-hold')) return;
+          page.removeAttribute('data-hold');
+          page.removeAttribute('data-motion');
+        }, 8000);
+      })();
+    </script>
     <!-- Start-up guard (T20a), plain old JavaScript on purpose: a browser or an Android System
          WebView too old to run the app gets a message instead of a blank page or, in the phone app,
          a launch screen that never goes away. The app sets window.__shStarted once it has drawn

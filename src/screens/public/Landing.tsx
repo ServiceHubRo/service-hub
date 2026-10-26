@@ -16,7 +16,7 @@ import {
   Users,
   type LucideIcon,
 } from 'lucide-react';
-import { useCallback, useEffect, useState, type CSSProperties } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from 'react';
 import { Link, Navigate, useLocation } from 'react-router-dom';
 import { LangSwitch } from '../../app/LangSwitch';
 import { LoadingScreen } from '../../app/LoadingScreen';
@@ -36,13 +36,14 @@ import type { MessageKey } from '../../i18n/ro';
 import { CONTACT, whatsappLink } from '../../lib/contact';
 import { IS_TEST_BUILD } from '../../lib/env';
 import { LEGAL_DOCS } from '../../lib/legal';
+import { fromPrerenderedPage } from '../../lib/prerender';
 import { includedColleagues, launchSaving } from '../../lib/subscription';
 import { formatPhone } from '../../lib/validators';
 import { signUpPath } from '../auth/paths';
 import styles from './Landing.module.css';
 import { MockNav, ShopMockup, ViewLabel } from './LandingMockups';
 import mockups from './LandingMockups.module.css';
-import { revealOnScroll } from './landingMotion';
+import { LANDING_MOTION, startLandingMotion } from './landingMotion';
 
 interface Feature {
   icon: LucideIcon;
@@ -84,9 +85,15 @@ export function Landing() {
   const accountDeleted = state?.accountDeleted;
   const [linkError] = useState(takeAuthLinkError);
   useDocumentTitle(t('landing.title'));
-  const motionRef = useCallback((el: HTMLDivElement | null) => (el ? revealOnScroll(el) : undefined), []);
+  // The page's motion starts once the session check is over, as when the page is drawn only then:
+  // on the page drawn at build time (T46) the check runs with the page already on screen, and an
+  // icon drawing itself meanwhile stalls and shows its end at once. Before paint, so nothing blinks.
+  const [pageEl, setPageEl] = useState<HTMLDivElement | null>(null);
+  const sessionChecked = session.status !== 'loading';
+  useLayoutEffect(() => (pageEl && sessionChecked ? startLandingMotion(pageEl) : undefined), [pageEl, sessionChecked]);
 
-  if (session.status === 'loading') return <LoadingScreen />;
+  // Arrived drawn at build time (T46): the page stays while the session is checked.
+  if (session.status === 'loading' && !fromPrerenderedPage()) return <LoadingScreen />;
   // Just logged out (the session ends a moment after we arrive): stay here.
   if (session.status === 'signedIn' && session.role && !state?.leaving) {
     return <Navigate to={homeOf(session.role)} replace />;
@@ -97,7 +104,7 @@ export function Landing() {
   }
 
   return (
-    <div ref={motionRef} className={styles.page}>
+    <div ref={setPageEl} className={styles.page} data-landing={LANDING_MOTION ? 'motion' : ''}>
       <div className="status-backdrop" aria-hidden="true" />
       <div className="nav-backdrop" aria-hidden="true" />
       <header className={styles.header}>
@@ -279,8 +286,14 @@ function FeatureSection({ id, eyebrow, title, features }: { id: string; eyebrow:
 
 function FeatureCards({ features }: { features: Feature[] }) {
   const { t } = useI18n();
+  const list = useRef<HTMLUListElement>(null);
+  // Every line of the icons counts as length 1, so short and long ones draw over the whole
+  // animation, as in EmptyState (with real lengths the short ones showed all at once at the end).
+  useLayoutEffect(() => {
+    list.current?.querySelectorAll('svg > *').forEach((el) => el.setAttribute('pathLength', '1'));
+  }, []);
   return (
-    <ul className={styles.cards}>
+    <ul ref={list} className={styles.cards}>
       {features.map(({ icon: Icon, title, text }, i) => (
         <li key={title} className={styles.card} data-reveal="" style={order(i)}>
           <span className={styles.cardIcon} aria-hidden="true">

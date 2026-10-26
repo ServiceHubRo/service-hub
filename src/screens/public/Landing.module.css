@@ -741,9 +741,11 @@
   opacity: 0;
 }
 
+/* Every line counts as length 1 (pathLength, set in Landing.tsx), so each one draws over the whole
+   animation; with a fixed 100 the short lines only showed in its last moment, all at once. */
 .page[data-motion] .card .cardIcon svg > * {
-  stroke-dasharray: 100;
-  stroke-dashoffset: 100;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
 }
 
 .page[data-motion] .card[data-shown] .cardIcon {
@@ -752,7 +754,8 @@
 }
 
 .page[data-motion] .card[data-shown] .cardIcon svg > * {
-  animation: line-draw var(--motion-long) var(--ease) forwards;
+  /* A drawing takes longer than a change (Eduard, 25 Oct: "se desenau smooth, frumos"). */
+  animation: line-draw 0.8s var(--ease) forwards;
   animation-delay: calc(var(--i, 0) * 120ms + 350ms);
 }
 
@@ -971,6 +974,24 @@
     transform: none;
     opacity: 1;
   }
+}
+
+/* The page drawn at build time (T46): the two phones wait at their first frame until the app has
+   taken over (data-hold, set by index.html, lifted by startLandingMotion). Started while the
+   phone is still busy starting the app, a loop would stall and then leap ahead to catch up. */
+.page[data-hold] .mockWrap *,
+.page[data-hold] .mockWrap *::before,
+.page[data-hold] .mockWrap *::after {
+  /* Over every demo rule's `animation` shorthand, which would set it back to running. */
+  animation-play-state: paused !important;
+}
+
+/* The shop's phone (T44) plays from the moment it is reached, from its first frame (Eduard, 25 Oct:
+   it was already at its end by the time the visitor scrolled to it). */
+.page[data-motion] .mockWrap[data-reveal]:not([data-shown]) *,
+.page[data-motion] .mockWrap[data-reveal]:not([data-shown]) *::before,
+.page[data-motion] .mockWrap[data-reveal]:not([data-shown]) *::after {
+  animation-play-state: paused !important;
 }
 
 /* ------------------------------------------------------------------ hero demo */
