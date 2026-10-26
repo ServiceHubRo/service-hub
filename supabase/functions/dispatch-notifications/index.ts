@@ -45,7 +45,7 @@ import { seatPrice, syncSeats, type SeatInfo } from '../_shared/seats.ts';
 import { smsForEvent } from '../_shared/sms.ts';
 import { sendSms, type SmsConfig } from '../_shared/smso.ts';
 import { StripeError, stripeApi, type StripeConfig } from '../_shared/stripe.ts';
-import { renderNotification, type NotificationEvent, type Overrides } from '../_shared/templates.ts';
+import { isNewBookingForShop, renderNotification, type NotificationEvent, type Overrides } from '../_shared/templates.ts';
 import { generateVapidKeys, sendWebPush, type PushDevice, type VapidKeys } from '../_shared/webpush.ts';
 import { reportError } from '../_shared/monitor.ts';
 
@@ -157,7 +157,16 @@ async function pushChannel(e: ClaimedEvent, texts: Overrides, vapid: VapidKeys, 
   const rendered = renderNotification(e, texts);
   if (!rendered) return { done: true, log: { channel: 'push', status: 'no_template' } };
   if (e.devices.length === 0) return { done: true, log: { channel: 'push', status: 'no_device' } };
-  const payload = JSON.stringify({ title: rendered.title, body: rendered.body, url: rendered.url, tag: rendered.tag });
+  // A new booking for the shop rings with its own chime (T47): the phone app's channel, and in a
+  // browser the page on screen plays it (the service worker then shows the notification silently).
+  const chime = isNewBookingForShop(e);
+  const payload = JSON.stringify({
+    title: rendered.title,
+    body: rendered.body,
+    url: rendered.url,
+    tag: rendered.tag,
+    ...(chime ? { chime: true } : {}),
+  });
   const outcomes = await Promise.all(
     e.devices.map(async (d) => {
       if (d.fcm_token) {
@@ -168,6 +177,7 @@ async function pushChannel(e: ClaimedEvent, texts: Overrides, vapid: VapidKeys, 
           tag: rendered.tag,
           urgent: URGENT.has(e.event),
           ttlSeconds: ttlFor(e.event),
+          chime,
         });
         return { endpoint: d.endpoint, outcome: r.outcome, error: r.error };
       }

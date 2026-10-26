@@ -277,10 +277,11 @@ test.describe('shop settings', () => {
     await openAccount(guest);
     await expect(guest.getByText('Atelier Test · Brașov')).toBeVisible();
     // A colleague works with bookings, quotes, messages and the history; the settings are the owner's.
+    // Notifications live in Cont → Notificări, for the colleague too.
+    await expect(guest.getByRole('link', { name: /^Notificări/ })).toBeVisible();
     await guest.getByRole('link', { name: /Setări service/ }).click();
     await expect(guest.getByText(/^Setările le schimbă proprietarul/)).toBeVisible();
-    await expect(guest.getByRole('link', { name: /Notificări/ })).toBeVisible();
-    for (const section of [/Program și zile libere/, /Servicii oferite/, /Date de facturare/, /Personal/]) {
+    for (const section of [/Notificări/, /Program și zile libere/, /Servicii oferite/, /Date de facturare/, /Personal/]) {
       await expect(guest.getByRole('link', { name: section })).toHaveCount(0);
     }
     await expectNoHorizontalScroll(guest);
@@ -289,7 +290,7 @@ test.describe('shop settings', () => {
       await guest.goto(`/s/cont/setari/${path}`);
       await expect(guest.getByText('Doar proprietarul service-ului vede această secțiune.')).toBeVisible();
     }
-    await guest.goto('/s/cont/setari/notificari');
+    await guest.goto('/s/cont/notificari');
     await expect(guest.getByText('Rezumatul zilnic și raportul lunii le alege proprietarul service-ului.')).toBeVisible();
     await expect(guest.getByRole('checkbox')).toHaveCount(0);
     // Istoric: the jobs, no total of the takings, no CSV; Recenzii: read, no reply.

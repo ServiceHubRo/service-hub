@@ -97,6 +97,11 @@ function start() {
   );
 }
 
+/** The state on this device right now, outside React (the new-booking chime, T47). */
+export function currentPushStatus(): PushStatus {
+  return status;
+}
+
 export function usePushStatus(): PushStatus {
   useEffect(start, []);
   return useSyncExternalStore(subscribe, () => status);

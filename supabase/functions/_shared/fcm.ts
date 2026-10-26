@@ -105,10 +105,17 @@ export interface FcmMessage {
   tag: string;
   urgent: boolean;
   ttlSeconds: number;
+  /** A new booking for the shop (T47): the "Programări noi" channel, with the new-booking chime. */
+  chime?: boolean;
 }
 
 /** The Android notification channel the app creates at start (MainActivity / nativePush.ts). */
 export const FCM_CHANNEL_ID = 'service-hub';
+/**
+ * The channel of new bookings (T47), with its own sound (res/raw/new_booking.wav). A phone with an
+ * older app has no such channel; Android then uses the default one above.
+ */
+export const FCM_BOOKINGS_CHANNEL_ID = 'new-bookings';
 
 /** The request body for one device. */
 export function fcmBody(token: string, m: FcmMessage): Record<string, unknown> {
@@ -121,7 +128,10 @@ export function fcmBody(token: string, m: FcmMessage): Record<string, unknown> {
         priority: m.urgent ? 'HIGH' : 'NORMAL',
         ttl: `${m.ttlSeconds}s`,
         collapse_key: m.tag.slice(0, 100),
-        notification: { channel_id: FCM_CHANNEL_ID, tag: m.tag, default_sound: true },
+        notification: m.chime
+          ? // `sound` for Android before 8, where channels do not exist yet.
+            { channel_id: FCM_BOOKINGS_CHANNEL_ID, tag: m.tag, sound: 'new_booking' }
+          : { channel_id: FCM_CHANNEL_ID, tag: m.tag, default_sound: true },
       },
     },
   };

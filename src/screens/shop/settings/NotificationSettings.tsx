@@ -1,17 +1,19 @@
+import { NAV } from '../../../app/roles';
 import { BackLink } from '../../../components/BackLink';
 import { Card } from '../../../components/Card';
 import { Switch } from '../../../components/Switch';
 import { updateShop } from '../../../data/shop';
 import { useI18n } from '../../../i18n/context';
 import { PushRow } from '../../push/PushRow';
+import { SoundRow } from '../../push/SoundRow';
 import { useState } from 'react';
-import { SETTINGS_PATH } from './paths';
 import { SaveButton } from './SaveButton';
 import { useShopSettings } from './shopSettingsContext';
 import styles from './settings.module.css';
 
 /**
- * Notificări (P5b): push on this device (the same row as in Cont, T12), the daily summary (a push
+ * Cont → Notificări for a shop (P5b; Eduard, 26 Oct: every notification setting in one place):
+ * push and the new-booking sound on this device (T12, T47), the daily summary (a push
  * at opening time, T12) and the monthly report (email on the 1st, T24). No SMS on a new request
  * (Eduard, 4 Oct: every text costs money; the push is enough). A colleague turns push on for their
  * own phone; the summary and the report are the owner's.
@@ -31,9 +33,10 @@ export function NotificationSettings() {
 
   return (
     <div className={styles.page}>
-      <BackLink to={SETTINGS_PATH} label={t('settings.title')} />
+      <BackLink to={NAV.shop.account.path} label={t('nav.account')} />
       <h1>{t('settings.notifications')}</h1>
       <PushRow />
+      <SoundRow />
       {isOwner ? (
         <>
           <Card className={styles.stack}>

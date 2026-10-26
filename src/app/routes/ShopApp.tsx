@@ -1,4 +1,4 @@
-import { Route, Routes } from 'react-router-dom';
+import { Navigate, Route, Routes } from 'react-router-dom';
 import { MessagesScreen } from '../../screens/messages/MessagesScreen';
 import { ThreadsProvider } from '../../screens/messages/ThreadsProvider';
 import { NoticesProvider } from '../../screens/notices/NoticesProvider';
@@ -27,7 +27,7 @@ import { BillingSettings } from '../../screens/shop/settings/BillingSettings';
 import { HoursSettings } from '../../screens/shop/settings/HoursSettings';
 import { NotificationSettings } from '../../screens/shop/settings/NotificationSettings';
 import { OwnerOnlySettings } from '../../screens/shop/settings/OwnerOnlySettings';
-import { SETTINGS_PATH } from '../../screens/shop/settings/paths';
+import { SETTINGS_LINKS, SETTINGS_PATH } from '../../screens/shop/settings/paths';
 import { ProfileSettings } from '../../screens/shop/settings/ProfileSettings';
 import { RulesSettings } from '../../screens/shop/settings/RulesSettings';
 import { ShowcaseSettings } from '../../screens/shop/settings/ShowcaseSettings';
@@ -92,7 +92,11 @@ export default function ShopApp() {
           </Route>
           <Route path="facturare" element={<BillingSettings />} />
           <Route path="personal" element={<StaffSettings />} />
-          <Route path="notificari" element={<NotificationSettings />} />
+          {/* Moved to Cont → Notificări (Eduard, 26 Oct). */}
+          <Route path="notificari" element={<Navigate to={SETTINGS_LINKS.notifications} replace />} />
+        </Route>
+        <Route path={rel('shop', SETTINGS_LINKS.notifications)} element={<ShopSettingsLayout />}>
+          <Route index element={<NotificationSettings />} />
         </Route>
       </Route>
     </Routes>

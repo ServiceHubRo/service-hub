@@ -1,4 +1,6 @@
 import { PushNotifications, type PushNotificationSchema, type Token } from '@capacitor/push-notifications';
+import { detectLang, LANG_STORAGE_KEY, translate } from '../i18n/translate';
+import { storage } from '../lib/storage';
 import { call, failure, RpcError } from './rpc';
 import { supabase } from './supabase';
 
@@ -11,6 +13,12 @@ import { supabase } from './supabase';
 
 /** The Android notification channel (the server names it in every message, `_shared/fcm.ts`). */
 export const CHANNEL_ID = 'service-hub';
+/**
+ * New bookings for a shop (T47): their own channel, "Programări noi", ringing with the new-booking
+ * chime (res/raw/new_booking.wav, made by scripts/gen-chime.mjs). Android fixes a channel's sound
+ * when it is created, so a different sound needs a new id.
+ */
+export const BOOKINGS_CHANNEL_ID = 'new-bookings';
 
 const TOKEN_KEY = 'sh_fcm_token';
 /** Turned off in Cont on this phone (the permission stays; the device is no longer saved). */
@@ -56,6 +64,22 @@ async function ensureChannel(): Promise<void> {
     () => undefined,
   );
   channelMade = true;
+}
+
+/**
+ * The shop's "Programări noi" channel with its chime (T47), made when the shop's screens open in the
+ * app (ShopBookingsProvider), named in the app's language. A client's phone never gets it.
+ */
+export async function ensureBookingsChannel(): Promise<void> {
+  const lang = detectLang(storage.get(LANG_STORAGE_KEY), navigator.language);
+  await PushNotifications.createChannel({
+    id: BOOKINGS_CHANNEL_ID,
+    name: translate(lang, 'push.channel.bookings'),
+    importance: 4,
+    visibility: 1,
+    vibration: true,
+    sound: 'new_booking.wav',
+  }).catch(() => undefined);
 }
 
 /** Registers with Firebase and answers this phone's token (the same one until it changes). */

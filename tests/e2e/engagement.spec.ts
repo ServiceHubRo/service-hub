@@ -8,6 +8,7 @@ import {
   createUser,
   expectNoHorizontalScroll,
   openAccount,
+  openNotifications,
   serviceRest,
   shot,
   signIn,
@@ -15,7 +16,7 @@ import {
 } from './support';
 
 // T24 — the switches for the new notifications: the client's tires and tips in Cont, the owner's
-// monthly report in Setări → Notificări, the quiet hours and weekly tips in the admin's settings,
+// monthly report in Cont → Notificări, the quiet hours and weekly tips in the admin's settings,
 // and where a tap on the tire reminder leads. (The pushes themselves, sent by the jobs, are
 // covered by tests/sql/101_engagement.sql.)
 
@@ -46,7 +47,7 @@ test.describe('T24 notifications', () => {
   test('Cont: seasonal tires on, offers off until turned on, saved on the account; no switch for the tips', async ({ page }) => {
     const client = await createUser('client');
     await signIn(page, client, PASSWORD);
-    await openAccount(page);
+    await openNotifications(page);
     const tires = page.getByRole('group', { name: 'Anvelopele de sezon' });
     const tips = page.getByRole('group', { name: 'Sfaturi pentru început' });
     const offers = page.getByRole('group', { name: 'Ofertele service-urilor favorite' });
@@ -70,6 +71,7 @@ test.describe('T24 notifications', () => {
     await page.reload();
     await expect(tires).toContainText('Oprite.');
     await setLanguage(page, 'en');
+    await openNotifications(page);
     const tiresEn = page.getByRole('group', { name: 'Seasonal tires' });
     await expect(tiresEn).toContainText('Off.');
     const offersEn = page.getByRole('group', { name: 'Favorite shops’ offers' });
@@ -95,11 +97,11 @@ test.describe('T24 notifications', () => {
     await shot(page, 't24-tire-search', name());
   });
 
-  test('Setări → Notificări: the owner turns the monthly report off', async ({ page }) => {
+  test('Cont → Notificări: the owner turns the monthly report off', async ({ page }) => {
     const { email: owner, shopId } = await createBookableShop(`Atelier T24 ${Date.now()}`, ['ulei']);
     await signIn(page, owner, PASSWORD);
     await expect(page).toHaveURL(/\/s\/panou/);
-    await page.goto('/s/cont/setari/notificari');
+    await page.goto('/s/cont/notificari');
     await expect(page.getByRole('heading', { level: 1, name: 'Notificări' })).toBeVisible();
     const monthly = page.getByRole('switch', { name: /^Raportul lunii, pe 1 ale lunii/ });
     await expect(monthly).toBeChecked();
@@ -115,7 +117,7 @@ test.describe('T24 notifications', () => {
     await page.reload();
     await expect(monthly).not.toBeChecked();
     await setLanguage(page, 'en');
-    await page.goto('/s/cont/setari/notificari');
+    await page.goto('/s/cont/notificari');
     await expect(page.getByRole('switch', { name: /^Monthly report, on the 1st/ })).not.toBeChecked();
     await expectNoHorizontalScroll(page);
     await shot(page, 't24-shop-notifications-en', name());

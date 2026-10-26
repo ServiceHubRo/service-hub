@@ -717,8 +717,8 @@ function monthlyReportEmail(p: Record<string, unknown>, lang: Lang, app: string)
     ],
     button: { label: en ? 'Open Reports' : 'Deschide Rapoarte', url: `${app}${SHOP_REPORTS_PATH}` },
     footer: en
-      ? `You are receiving this email as the owner of ${shop} on Service-Hub. Turn it off under Settings → Notifications.`
-      : `Primești acest email ca proprietar al service-ului ${shop} pe Service-Hub. Îl poți opri din Setări → Notificări.`,
+      ? `You are receiving this email as the owner of ${shop} on Service-Hub. Turn it off under Account → Notifications.`
+      : `Primești acest email ca proprietar al service-ului ${shop} pe Service-Hub. Îl poți opri din Cont → Notificări.`,
   });
 }
 

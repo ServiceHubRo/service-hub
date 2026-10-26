@@ -35,6 +35,14 @@ export interface NotificationEvent {
   service?: { ro: string; en: string } | null;
 }
 
+/**
+ * A new booking for the shop (T47): its notification rings with the new-booking chime, on the
+ * phone app's "Programări noi" channel and, in a browser with Service-Hub on screen, from the page.
+ */
+export function isNewBookingForShop(e: Pick<NotificationEvent, 'event' | 'role'>): boolean {
+  return e.role === 'shop' && (e.event === 'booking_requested' || e.event === 'booking_auto_confirmed');
+}
+
 export interface Rendered {
   key: string;
   title: string;

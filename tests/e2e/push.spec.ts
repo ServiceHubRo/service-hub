@@ -7,7 +7,7 @@ import {
   createBookableShop,
   createUser,
   expectNoHorizontalScroll,
-  openAccount,
+  openNotifications,
   rpcAs,
   serviceRest,
   shot,
@@ -196,7 +196,7 @@ test.describe('push notifications', () => {
     await expect(page.getByRole('heading', { level: 1, name: 'Caută' })).toBeVisible();
     await expect(pushBanner(page)).toHaveCount(0);
 
-    await openAccount(page);
+    await openNotifications(page);
     const row = pushRow(page);
     await expect(row).toContainText('Dezactivate');
     await expect(row).toContainText('Le activezi separat pe fiecare telefon sau calculator.');
@@ -223,7 +223,7 @@ test.describe('push notifications', () => {
     await page.reload();
     await expect(page.getByRole('heading', { level: 1, name: 'Caută' })).toBeVisible();
     await expect(pushBanner(page)).toHaveCount(0);
-    await openAccount(page);
+    await openNotifications(page);
     await expect(pushRow(page)).toContainText('Blocate de browser');
     await expect(pushRow(page)).toContainText('Le poți activa din setările browserului pentru acest site.');
     await expect(pushRow(page).getByRole('button')).toHaveCount(0);
@@ -250,7 +250,7 @@ test.describe('push notifications', () => {
     );
     await page.getByRole('button', { name: 'Română' }).filter({ visible: true }).first().click();
     await langSaved;
-    await page.goto('/s/cont/setari/notificari');
+    await page.goto('/s/cont/notificari');
     await expect(page.getByRole('heading', { level: 1, name: 'Notificări' })).toBeVisible();
     await expect(pushRow(page)).toContainText('Dezactivate');
     await expect(page.getByText('Notificările vin pe dispozitivele unde le-ai activat.')).toBeVisible();
@@ -273,7 +273,7 @@ test.describe('push notifications', () => {
         await expect(page.getByRole('heading', { level: 1, name: 'Caută' })).toBeVisible();
         await pushBanner(page).getByRole('button', { name: 'Activează' }).click();
         await expect(page.getByRole('status').filter({ hasText: 'Notificările sunt activate pe acest dispozitiv.' })).toBeVisible();
-        await openAccount(page);
+        await openNotifications(page);
         await expect(pushRow(page)).toContainText('Activate pe acest dispozitiv');
         const clientId = await userIdOf(client);
         const rows = await serviceRest<{ user_id: string }[]>(`push_subscriptions?endpoint=eq.${encodeURIComponent(device.endpoint)}&select=user_id`, 'GET');
@@ -304,7 +304,7 @@ test.describe('push notifications', () => {
         await expect(page.locator(`#booking-${booking.id}`)).toContainText(booking.ref);
 
         // Turned off here: the device row is gone.
-        await openAccount(page);
+        await openNotifications(page);
         await pushRow(page).getByRole('switch').uncheck();
         await expect(pushRow(page)).toContainText('Dezactivate pe acest dispozitiv');
         expect(await serviceRest(`push_subscriptions?endpoint=eq.${encodeURIComponent(device.endpoint)}`, 'GET')).toEqual([]);

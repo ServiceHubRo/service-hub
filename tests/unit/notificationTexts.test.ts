@@ -290,7 +290,7 @@ describe('notification texts', () => {
     expect(mail!.html).toContain('https://x/s/cont/rapoarte');
     const en = emailForEvent({ event: 'monthly_report', lang: 'en', params: { ...SAMPLE.monthly_report, reviews: 0 } }, 'https://x');
     expect(en!.text).toContain('6,450 RON');
-    expect(en!.text).toContain('Settings → Notifications');
+    expect(en!.text).toContain('Account → Notifications');
   });
 
   it('asks for a review of the job, and opens the form on the booking', () => {
