@@ -14,6 +14,7 @@ import { GarageScreen } from '../../screens/client/garage/GarageScreen';
 import { VehicleHistoryScreen } from '../../screens/client/history/VehicleHistoryScreen';
 import { VehiclePickScreen } from '../../screens/client/history/VehiclePickScreen';
 import { MyReportsScreen } from '../../screens/client/report/MyReportsScreen';
+import { ClientNotificationsScreen } from '../../screens/account/ClientNotificationsScreen';
 import { ReportPreviewScreen } from '../../screens/client/report/ReportPreviewScreen';
 import { SearchScreen } from '../../screens/client/search/SearchScreen';
 import { ShopPage } from '../../screens/client/shop/ShopPage';
@@ -84,6 +85,7 @@ export default function ClientApp() {
           <Route path="garaj/:carId/raport" element={<ReportPreviewScreen />} />
           <Route path="programari/:bookingId/raport" element={<ReportPreviewScreen />} />
           <Route path="cont/rapoarte" element={<MyReportsScreen />} />
+          <Route path="cont/notificari" element={<ClientNotificationsScreen />} />
           <Route path="preia/:token" element={<ClaimScreen />} />
           {messageRoutes('client')}
         </Route>

@@ -11,5 +11,6 @@ export const SETTINGS_LINKS = {
   showcase: `${SETTINGS_PATH}/vitrina`,
   billing: `${SETTINGS_PATH}/facturare`,
   staff: `${SETTINGS_PATH}/personal`,
-  notifications: `${SETTINGS_PATH}/notificari`,
+  /** In Cont itself since Eduard's 26 Oct ask (every notification setting in one place). */
+  notifications: '/s/cont/notificari',
 } as const;

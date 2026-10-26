@@ -1,4 +1,4 @@
-import { Bell, Building2, CalendarClock, Images, ListChecks, SlidersHorizontal, Store, Users } from 'lucide-react';
+import { Building2, CalendarClock, Images, ListChecks, SlidersHorizontal, Store, Users } from 'lucide-react';
 import { BackLink } from '../../../components/BackLink';
 import { Tile } from '../../../components/Tile';
 import { useI18n } from '../../../i18n/context';
@@ -8,7 +8,7 @@ import styles from './settings.module.css';
 
 /**
  * Setări service: one tile per section (reached from Cont, not from the navigation bar). A
- * colleague gets only Notificări (push on their phone) and a line saying who changes the rest.
+ * colleague gets a line saying who changes them; notifications are in Cont → Notificări.
  */
 export function SettingsIndex() {
   const { t } = useI18n();
@@ -30,12 +30,6 @@ export function SettingsIndex() {
             <Tile to={SETTINGS_LINKS.staff} icon={Users} label={t('settings.staff')} hint={t('settings.staff.hint')} />
           </>
         )}
-        <Tile
-          to={SETTINGS_LINKS.notifications}
-          icon={Bell}
-          label={t('settings.notifications')}
-          hint={t(isOwner ? 'settings.notifications.hint' : 'settings.notifications.staffHint')}
-        />
       </div>
     </div>
   );

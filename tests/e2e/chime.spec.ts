@@ -2,7 +2,7 @@ import { expect, test, type Page } from '@playwright/test';
 import { BACKEND, PASSWORD, createBookableShop, createUser, expectNoHorizontalScroll, rpcAs, shot, signIn } from './support';
 
 // T47: the new-booking chime. The shop hears it in the open app when a client's request arrives;
-// it is turned off (and tried with "Ascultă") per device in Cont, under push. Every chime played
+// it is turned off (and tried with "Ascultă") per device in Cont → Notificări, under push. Every chime played
 // is counted by wrapping the browser's sound source.
 
 test.skip(!BACKEND, 'needs the local Supabase stack');
@@ -60,8 +60,8 @@ test('a request arriving live rings once; turned off on this device, the next on
   await expect(page.getByRole('link', { name: /^1 Cereri noi$/ })).toBeVisible();
   await expect.poll(() => chimes(page)).toBe(1);
 
-  // Cont, under push: the sound on this device, "Ascultă" plays it.
-  await page.goto('/s/cont');
+  // Cont → Notificări, under push: the sound on this device, "Ascultă" plays it.
+  await page.goto('/s/cont/notificari');
   const sound = page.getByRole('switch', { name: /Sunet la programare nouă/ });
   await expect(sound).toBeChecked();
   await expect(page.getByText('Pe acest dispozitiv, cât Service-Hub este deschis.')).toBeVisible();
@@ -90,7 +90,7 @@ test('in English: the sound setting', async ({ page }) => {
   const shop = await createUser('shop', { lang: 'en' });
   await signIn(page, shop, PASSWORD);
   await expect(page).toHaveURL(/\/s\/panou$/);
-  await page.goto('/s/cont');
+  await page.goto('/s/cont/notificari');
   await expect(page.getByRole('switch', { name: /Sound for new bookings/ })).toBeChecked();
   await expect(page.getByText('On this device, while Service-Hub is open.')).toBeVisible();
   await expect(page.getByRole('button', { name: 'Play' })).toBeVisible();

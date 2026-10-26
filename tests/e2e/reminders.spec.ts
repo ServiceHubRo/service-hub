@@ -8,7 +8,7 @@ import {
   createUser,
   expectAccessible,
   expectNoHorizontalScroll,
-  openAccount,
+  openNotifications,
   rpcAs,
   serviceRest,
   shot,
@@ -140,7 +140,7 @@ test.describe('client reminders', () => {
   test('Cont: service reminders off and on, saved on the account', async ({ page }) => {
     const client = await createUser('client');
     await signIn(page, client, PASSWORD);
-    await openAccount(page);
+    await openNotifications(page);
     const row = page.getByRole('group', { name: 'Remindere de revizie' });
     await expect(row).toContainText('Pornite.');
     await expectNoHorizontalScroll(page);
@@ -157,6 +157,7 @@ test.describe('client reminders', () => {
     await page.reload();
     await expect(row).toContainText('Oprite.');
     await setLanguage(page, 'en');
+    await openNotifications(page);
     await expect(page.getByRole('button', { name: 'English' }).filter({ visible: true }).first()).toBeVisible();
     const rowEn = page.getByRole('group', { name: 'Service reminders' });
     await expect(rowEn).toContainText('Off.');
@@ -176,7 +177,7 @@ test.describe('client reminders', () => {
     const card = page.getByRole('region', { name: 'Recenzie în așteptare' });
     await expect(card).toBeVisible();
 
-    await openAccount(page);
+    await openNotifications(page);
     const row = page.getByRole('group', { name: 'Cerere de recenzie' });
     await expect(row).toContainText('Pornită.');
     await row.getByRole('switch').uncheck();
@@ -192,7 +193,7 @@ test.describe('client reminders', () => {
     await page.getByRole('link', { name: 'Caută', exact: true }).filter({ visible: true }).first().click();
     await expect(page.getByRole('heading', { level: 1, name: 'Caută' })).toBeVisible();
     await expect(card).toHaveCount(0);
-    await openAccount(page);
+    await openNotifications(page);
     await row.getByRole('switch').check();
     await expect(row).toContainText('Pornită.');
     await page.getByRole('link', { name: 'Caută', exact: true }).filter({ visible: true }).first().click();

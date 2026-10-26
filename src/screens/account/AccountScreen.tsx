@@ -1,4 +1,4 @@
-import { CreditCard, Download, FileCheck, FileText, Heart, Landmark, History, LifeBuoy, Lightbulb, ListTree, MapPinned, Megaphone, QrCode, ScrollText, Settings, SlidersHorizontal, Star } from 'lucide-react';
+import { Bell, CreditCard, Download, FileCheck, FileText, Heart, Landmark, History, LifeBuoy, Lightbulb, ListTree, MapPinned, Megaphone, QrCode, ScrollText, Settings, SlidersHorizontal, Star } from 'lucide-react';
 import { useCallback, useRef, useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import type { ShellOutletContext } from '../../app/AppShell';
@@ -28,14 +28,12 @@ import { REVIEWS_PATH, SHOP_LINK_PATH } from '../shop/paths';
 import { SETTINGS_PATH } from '../shop/settings/paths';
 import { OwnerTiles } from '../shop/OwnerTiles';
 import { DataSection } from './DataSection';
-import { helpPath, suggestionsPath } from './paths';
+import { helpPath, notificationsPath, suggestionsPath } from './paths';
 import { IdentityCard } from './IdentityCard';
 import { InviteCard } from './InviteCard';
 import { LocationRow } from './LocationRow';
 import { ReminderRow } from './ReminderRow';
 import { PhoneCard } from './PhoneCard';
-import { PushRow } from '../push/PushRow';
-import { SoundRow } from '../push/SoundRow';
 import { SecuritySection } from './SecuritySection';
 import styles from './account.module.css';
 
@@ -72,19 +70,12 @@ export function AccountScreen({ role }: { role: Role }) {
       <IdentityCard />
       {role === 'shop' && <PhoneCard />}
 
-      {role !== 'admin' && <PushRow />}
-      {/* The new-booking chime on this device (T47), only here, next to push (Eduard, 26 Oct). */}
-      {role === 'shop' && <SoundRow />}
-
       {role === 'client' && (
         <>
           <LocationRow />
-          <ReminderRow setting="review_requests" />
-          <ReminderRow setting="service_reminders" />
-          <ReminderRow setting="season_reminders" />
-          <ReminderRow setting="promo_notifications" />
           <ReminderRow setting="share_history" />
           <div className={styles.tiles}>
+            <NotificationsTile role="client" />
             <Tile to={VEHICLE_HISTORY_PICK_PATH} icon={History} label={t('vh.title')} hint={t('vh.tileHint')} />
             <Tile to={MY_REPORTS_PATH} icon={FileCheck} label={t('reports.title')} hint={t('reports.tileHint')} />
             <Tile to={FAVORITES_PATH} icon={Heart} label={t('favorites.title')} hint={t('favorites.hint')} />
@@ -95,6 +86,7 @@ export function AccountScreen({ role }: { role: Role }) {
 
       {role === 'shop' && (
         <div className={styles.tiles}>
+          <NotificationsTile role="shop" />
           <Tile to={SETTINGS_PATH} icon={Settings} label={t('account.tile.settings')} />
           <Tile to={REVIEWS_PATH} icon={Star} label={t('reviews.title')} />
           <Tile to={SHOP_LINK_PATH} icon={QrCode} label={t('slk.title')} hint={t('slk.tileHint')} />
@@ -150,4 +142,13 @@ export function AccountScreen({ role }: { role: Role }) {
       </div>
     </div>
   );
+}
+
+/**
+ * Every notification setting in one place (Eduard, 26 Oct): push and the reminders for a client;
+ * push, the new-booking sound and the summaries for a shop.
+ */
+function NotificationsTile({ role }: { role: 'client' | 'shop' }) {
+  const { t } = useI18n();
+  return <Tile to={notificationsPath(role)} icon={Bell} label={t('settings.notifications')} hint={t(`account.notifications.hint.${role}`)} />;
 }

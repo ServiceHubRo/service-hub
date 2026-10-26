@@ -328,6 +328,14 @@ export async function openAccount(page: Page) {
   await expect(page.getByRole('heading', { level: 1, name: 'Cont' })).toBeVisible();
 }
 
+/** Cont → Notificări (push, the new-booking sound, reminders, the shop's summaries), in either language. */
+export async function openNotifications(page: Page) {
+  await page.getByRole('link', { name: /^(Cont|Account)$/ }).filter({ visible: true }).first().click();
+  await expect(page.getByRole('heading', { level: 1, name: /^(Cont|Account)$/ })).toBeVisible();
+  await page.getByRole('link', { name: /^(Notificări|Notifications)/ }).click();
+  await expect(page.getByRole('heading', { level: 1, name: /^(Notificări|Notifications)$/ })).toBeVisible();
+}
+
 export function shot(page: Page, name: string, projectName: string) {
   return page.screenshot({ path: `test-results/shots/${name}-${projectName}.png`, fullPage: true });
 }

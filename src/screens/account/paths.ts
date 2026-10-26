@@ -9,3 +9,8 @@ export function helpPath(role: Role): string {
 export function suggestionsPath(role: Role): string {
   return `${NAV[role].account.path}/sugestii`;
 }
+
+/** Cont → Notificări (Eduard, 26 Oct: every notification setting in one place): `/c/cont/notificari`, `/s/cont/notificari`. */
+export function notificationsPath(role: Role): string {
+  return `${NAV[role].account.path}/notificari`;
+}
