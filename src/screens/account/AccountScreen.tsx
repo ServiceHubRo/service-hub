@@ -35,6 +35,7 @@ import { LocationRow } from './LocationRow';
 import { ReminderRow } from './ReminderRow';
 import { PhoneCard } from './PhoneCard';
 import { PushRow } from '../push/PushRow';
+import { SoundRow } from '../push/SoundRow';
 import { SecuritySection } from './SecuritySection';
 import styles from './account.module.css';
 
@@ -72,6 +73,8 @@ export function AccountScreen({ role }: { role: Role }) {
       {role === 'shop' && <PhoneCard />}
 
       {role !== 'admin' && <PushRow />}
+      {/* The new-booking chime on this phone (T47), next to push: both are set per device. */}
+      {role === 'shop' && <SoundRow />}
 
       {role === 'client' && (
         <>

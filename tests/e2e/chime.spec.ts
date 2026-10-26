@@ -71,6 +71,11 @@ test('a request arriving live rings once; turned off on this device, the next on
   await expectNoHorizontalScroll(page);
   await shot(page, 't47-sound-setting', name());
 
+  // Also in Cont, under push: both are set on this device.
+  await page.goto('/s/cont');
+  await expect(page.getByRole('switch', { name: /Sunet la programare nouă/ })).toBeChecked();
+  await page.goto('/s/cont/setari/notificari');
+
   // Off: saved on this device, and the next request is quiet.
   await sound.click();
   await expect(sound).not.toBeChecked();
