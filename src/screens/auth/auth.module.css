@@ -130,22 +130,44 @@
   color: var(--amber);
 }
 
-/* "Continuă cu Google" and the line under it (T48). */
-.google {
+/* "Continuă cu Google" / "Continuă cu Apple": pills on the dark page (T48, T49). */
+.social {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 10px;
 }
 
-.googleLabel {
+.pill {
+  min-height: 48px;
+  border-radius: var(--radius-pill);
+  background: #0e0f12;
+  border: 1px solid rgba(234, 232, 226, 0.22);
+  color: #fff;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  transition: border-color var(--motion-quick) var(--ease), background-color var(--motion-quick) var(--ease);
+}
+
+@media (hover: hover) {
+  .pill:hover:not(:disabled) {
+    border-color: rgba(234, 232, 226, 0.45);
+    background: #121418;
+  }
+}
+
+.pillLabel {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
 }
 
-.googleLogo {
+.socialLogo {
   flex-shrink: 0;
+}
+
+.social .or {
+  margin-top: 4px;
 }
 
 .or {

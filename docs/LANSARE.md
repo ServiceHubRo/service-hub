@@ -301,6 +301,35 @@ Butonul „Continuă cu Google” apare singur pe Intră și pe Cont nou după c
 
 **De știut:** pe pagina Google scrie „continuă către abcdefgh.supabase.co”, nu „service-hub.ro”. Ca să scrie numele site-ului, Supabase are „Custom domain” (cost lunar, Project Settings → Add-ons). Se poate porni și mai târziu; atunci îți scriu ce se schimbă.
 
+### 4.5c Intrarea cu Apple (din T49)
+
+Butonul „Continuă cu Apple” apare sub cel de Google după ce pornești Apple în proiectul Supabase. Ai nevoie de contul **Apple Developer** al firmei (99 $ pe an; același cont e nevoie pentru aplicația de iPhone).
+
+**A. În Apple Developer (developer.apple.com → Account)**
+1. **Certificates, Identifiers & Profiles → Identifiers → +** → **App IDs** → **App** → **Continue**:
+   - **Description**: `Service-Hub`; **Bundle ID** (Explicit): `ro.servicehub.app`;
+   - în listă bifezi **Sign In with Apple** → **Continue** → **Register**.
+2. Din nou **Identifiers → +** → **Services IDs** → **Continue**:
+   - **Description**: `Service-Hub web`; **Identifier**: `ro.servicehub.web` → **Continue** → **Register**.
+   - Deschizi `ro.servicehub.web` din listă → bifezi **Sign In with Apple** → **Configure**:
+     - **Primary App ID**: `ro.servicehub.app`;
+     - **Domains and Subdomains**: `service-hub.ro`, apoi adresa proiectului real din Supabase fără `https://` (de forma `abcdefgh.supabase.co`);
+     - **Return URLs**: adresa **Callback URL (for OAuth)** din Supabase → **Authentication → Sign In / Providers → Apple** (se termină în `/auth/v1/callback`);
+     - **Next → Done → Continue → Save**.
+3. **Keys → +**: **Key Name** `Service-Hub Sign in`, bifezi **Sign In with Apple** → **Configure** → **Primary App ID** `ro.servicehub.app` → **Save → Continue → Register** → **Download**. Primești un fișier `.p8`; îl păstrezi într-un loc sigur (se descarcă o singură dată). Notezi **Key ID** (pe aceeași pagină) și **Team ID** (sus în dreapta, lângă numele firmei).
+
+**B. În Supabase (proiectul real) → Authentication → Sign In / Providers → Apple**
+4. Pornești **Enable Sign in with Apple**.
+5. **Client IDs**: `ro.servicehub.web` (și `ro.servicehub.app`, despărțite prin virgulă, pentru aplicația de iPhone de mai târziu).
+6. **Secret Key (for OAuth)**: pe aceeași pagină, Supabase are linkul spre unealta lui care face cheia din fișierul `.p8`, **Team ID**, **Key ID** și **Client ID** (`ro.servicehub.web`). Lipești rezultatul aici → **Save**. Nu lipești nimic în chat.
+
+**C. Emailurile către adresele ascunse de Apple**
+7. Cine intră cu Apple poate alege să-și ascundă emailul: primim o adresă `...@privaterelay.appleid.com`, care trimite mai departe la el. Ca emailurile noastre să treacă: Apple Developer → **Certificates, Identifiers & Profiles → Services → Sign in with Apple for Email Communication → Configure → +** → adaugi domeniul de trimitere `service-hub.ro` (același ca în Resend) → **Next → Register**. Apple verifică singur SPF-ul pus deja pentru Resend.
+
+**De ținut minte:** cheia de la pasul 6 expiră după **6 luni**. Atunci faci din nou pasul 6 cu același fișier `.p8` și o lipești în Supabase; altfel butonul Apple nu mai merge. Pune-ți un memento în calendar.
+
+**Verifici:** pe `https://service-hub.ro/intra` apar două pastile, Google și Apple. Cu un Apple ID nefolosit pe Service-Hub ajungi la „Finalizează contul”.
+
 ### 4.6 Contul de admin real
 
 Conturile de admin rămân după ștergerea conturilor de test (Partea 5). Dacă vrei alt cont de admin decât cel folosit la teste:

@@ -340,10 +340,10 @@ max_frequency = "5s"
 # `discord`, `facebook`, `github`, `gitlab`, `google`, `keycloak`, `linkedin_oidc`, `notion`, `twitch`,
 # `twitter`, `x`, `slack`, `spotify`, `workos`, `zoom`.
 [auth.external.apple]
-enabled = false
-client_id = ""
+enabled = true
+client_id = "ro.servicehub.local-test"
 # DO NOT commit your OAuth provider secret to git. Use environment variable substitution instead:
-secret = "env(SUPABASE_AUTH_EXTERNAL_APPLE_SECRET)"
+secret = "local-test-not-secret"
 # Overrides the default auth callback URL derived from auth.external_url.
 redirect_uri = ""
 # Overrides the default auth provider URL. Used to support self-hosted gitlab, single-tenant Azure,
@@ -354,8 +354,9 @@ skip_nonce_check = false
 # If enabled, it will allow the user to successfully authenticate when the provider does not return an email address.
 email_optional = false
 
-# "Continuă cu Google" (T48), for the local stack and the browser tests only: the tests stop the
-# browser before it reaches Google, so the client id is a placeholder and there is no secret.
+# "Continuă cu Google" (T48) and "Continuă cu Apple" (T49, the [auth.external.apple] above), for
+# the local stack and the browser tests only: the tests stop the browser before it reaches Google
+# or Apple, so the client ids are placeholders and there is no secret.
 # The real and test projects are set in the Supabase dashboard (docs/LANSARE.md).
 [auth.external.google]
 enabled = true
