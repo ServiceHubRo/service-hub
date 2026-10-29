@@ -18,7 +18,7 @@ export function SettingsIndex() {
       <BackLink to="/s/cont" label={t('nav.account')} />
       <h1>{t('settings.title')}</h1>
       {!isOwner && <p className={styles.intro}>{t('settings.staff.body')}</p>}
-      <div className={styles.tiles}>
+      <div className={styles.tiles} data-layout="tiles">
         {isOwner && (
           <>
             <Tile to={SETTINGS_LINKS.profile} icon={Store} label={t('settings.profile')} hint={t('settings.profile.hint')} />

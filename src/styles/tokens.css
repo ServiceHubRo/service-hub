@@ -91,12 +91,21 @@
   }
 }
 
+/* Desktop (T51, Eduard 29 Oct: the whole free width, airy, not a column in the middle). The content
+   area fills the space beside the sidebar up to --content-max; lists of cards and tiles gain columns
+   (global.css, data-layout), one card is never wider than reads well. */
 @media (min-width: 1024px) {
   :root {
     --card-pad: 20px;
     --page-pad: 32px;
-    --content-max: 900px;
+    --content-max: 1480px;
     --heading-size: 32px;
     --body-size: 15px;
+  }
+}
+
+@media (min-width: 1280px) {
+  :root {
+    --page-pad: 44px;
   }
 }

@@ -55,13 +55,13 @@ export function MessagesScreen() {
           </span>
         </Link>
       )}
-      {state.status === 'loading' && <SkeletonList />}
+      {state.status === 'loading' && <SkeletonList cards />}
       {state.status === 'error' && <LoadError message={t('msg.loadError')} onRetry={reload} />}
       {state.status === 'ready' &&
         (state.data.threads.length === 0 ? (
           <EmptyState icon={MessageSquare} title={t('msg.empty')} body={t(side === 'client' ? 'msg.emptyBody.client' : 'msg.emptyBody.shop')} />
         ) : (
-          <ul className={styles.threadList}>
+          <ul className={styles.threadList} data-layout="cards">
             {state.data.threads.map((thread) => {
               const name = counterpartName(side, thread, t('msg.deletedAccount'));
               const preview =

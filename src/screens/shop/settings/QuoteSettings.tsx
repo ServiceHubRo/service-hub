@@ -132,7 +132,7 @@ export function QuoteSettings() {
             }}
           />
         </Card>
-        <Card className={styles.stack}>
+        <Card className={styles.stack} data-span="all">
           <TextArea
             label={t('qs.terms')}
             hint={t('qs.terms.hint')}
@@ -151,7 +151,9 @@ export function QuoteSettings() {
     <div className={styles.page}>
       <BackLink to={SETTINGS_PATH} label={t('settings.title')} />
       <h1>{t('settings.quotes')}</h1>
-      {body}
+      <div className={styles.page} data-layout="columns">
+        {body}
+      </div>
     </div>
   );
 }

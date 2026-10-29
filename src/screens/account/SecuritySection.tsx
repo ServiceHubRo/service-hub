@@ -215,7 +215,7 @@ export function SecuritySection() {
   return (
     <>
       <h2 className={styles.section}>{t('account.security')}</h2>
-      <div className={styles.cardStack}>
+      <div className={styles.cardStack} data-layout="columns" data-span="all">
         <EmailCard />
         <PasswordCard />
       </div>

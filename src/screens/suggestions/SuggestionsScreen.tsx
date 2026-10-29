@@ -67,13 +67,13 @@ export function SuggestionsScreen({ role }: { role: 'client' | 'shop' }) {
       </Card>
 
       <h2 className={accountStyles.section}>{t('sugg.mine')}</h2>
-      {state.status === 'loading' && <SkeletonList />}
+      {state.status === 'loading' && <SkeletonList cards />}
       {state.status === 'error' && <LoadError message={t('sugg.loadError')} onRetry={reload} />}
       {state.status === 'ready' &&
         (state.data.length === 0 ? (
           <EmptyState icon={Lightbulb} title={t('sugg.empty')} />
         ) : (
-          <ul className={styles.list}>
+          <ul className={styles.list} data-layout="cards">
             {state.data.map((s) => (
               <li key={s.id}>
                 <Card className={styles.item}>

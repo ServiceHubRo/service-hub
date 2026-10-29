@@ -125,3 +125,15 @@
 .inlineLink:hover {
   text-decoration: underline;
 }
+
+/* The save button: the whole width on a phone, the width of a form column on a desktop (T51). */
+.save {
+  display: flex;
+  flex-direction: column;
+}
+
+@media (min-width: 1024px) {
+  .save {
+    width: min(100%, 420px);
+  }
+}

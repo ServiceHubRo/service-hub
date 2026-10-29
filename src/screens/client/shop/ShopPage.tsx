@@ -138,180 +138,188 @@ function ShopDetails({ page, day, onFavorite }: { page: ShopPageData; day: strin
 
   return (
     <>
-      <header className={styles.header}>
-        <ShopAvatar name={shop.name} logoUrl={shop.logo_url} size={56} />
-        <div className={styles.headText}>
-          <h1 className={styles.name}>{shop.name}</h1>
-          {page.founder && (
-            <p className={styles.founder}>
-              <FounderBadge withHint />
-            </p>
-          )}
-          {hasReviews && rating.review_count > 0 && rating.average !== null ? (
-            <button type="button" className={`${styles.rating} ${styles.ratingButton}`} onClick={() => showReviews(true)}>
-              <Stars value={rating.average} />
-              <span className={styles.ratingValue}>{formatRating(lang, rating.average)}</span>
-              <span className={styles.ratingLink}>· {plural(lang, 'unit.reviews', rating.review_count)}</span>
-            </button>
-          ) : (
-            <p className={styles.rating}>
-              {rating.review_count > 0 && rating.average !== null ? (
-                <>
+      {/* Two columns on a wide screen (T51): the shop on the left, its services and reviews on the right. */}
+      <div className={styles.columns} data-layout="columns">
+        <div className={styles.column}>
+          <header className={styles.header}>
+            <ShopAvatar name={shop.name} logoUrl={shop.logo_url} size={56} />
+            <div className={styles.headText}>
+              <h1 className={styles.name}>{shop.name}</h1>
+              {page.founder && (
+                <p className={styles.founder}>
+                  <FounderBadge withHint />
+                </p>
+              )}
+              {hasReviews && rating.review_count > 0 && rating.average !== null ? (
+                <button type="button" className={`${styles.rating} ${styles.ratingButton}`} onClick={() => showReviews(true)}>
                   <Stars value={rating.average} />
                   <span className={styles.ratingValue}>{formatRating(lang, rating.average)}</span>
-                  <span>· {plural(lang, 'unit.reviews', rating.review_count)}</span>
-                </>
+                  <span className={styles.ratingLink}>· {plural(lang, 'unit.reviews', rating.review_count)}</span>
+                </button>
               ) : (
-                <span>{t('rating.none')}</span>
-              )}
-            </p>
-          )}
-        </div>
-        <FavoriteButton shopId={shop.id} shopName={shop.name} on={page.is_favorite} onChange={onFavorite} />
-      </header>
-
-      <PhotoGallery photos={page.photos ?? []} shopName={shop.name} />
-
-      <p className={styles.address}>
-        <MapPin size={15} aria-hidden="true" />
-        <span>
-          {address}
-          {distance !== null && <span className={styles.distance}> · {t('shop.distance', { distance: formatDistance(lang, distance) })}</span>}
-        </span>
-        <a className={styles.directions} href={directionsUrl(shop)} target="_blank" rel="noopener noreferrer">
-          <Navigation size={14} aria-hidden="true" />
-          {t('shop.directions')}
-        </a>
-      </p>
-
-      {shop.description && <p className={styles.description}>{shop.description}</p>}
-
-      {!page.bookable && <Banner tone="warning">{t('shop.notBookable')}</Banner>}
-      {page.bookable && (
-        <div className={styles.freePlace}>
-          {page.free || shop.auto_confirm || page.response ? (
-            <FreePlaceNote free={page.free} instant={shop.auto_confirm} response={page.response} />
-          ) : null}
-          {page.free ? (
-            // Straight to that day and time; "Programează-te" below still lets the client choose.
-            <Link to={`${bookingPath(shop.id)}?zi=${page.free.date}&ora=${page.free.slot}`} className={buttonClass('secondary', false, styles.freeBook)}>
-              {t('free.bookThis', { when: `${formatDate(lang, page.free.date)}, ${page.free.slot}` })}
-            </Link>
-          ) : (
-            <p className={styles.muted}>{t(day ? 'free.noneDay' : 'free.none')}</p>
-          )}
-        </div>
-      )}
-      {page.bookable && page.offers.newClient && (
-        <OfferNote>
-          <strong>{t('offer.title')}</strong> · {offerText.newClientPage(page.offers.newClient)}
-          {page.offers.newClient.services && <> {offerText.services(page.offers.newClient)}</>}
-        </OfferNote>
-      )}
-      {page.bookable && page.offers.quietDay && (
-        <OfferNote>
-          <strong>{t('offer.quiet.title')}</strong> · {offerText.quietPage(page.offers.quietDay)}
-        </OfferNote>
-      )}
-
-      <Card className={styles.info}>
-        <InfoRow label={t('shop.hours')}>
-          <HoursList rows={groupHours(page.hours)} />
-        </InfoRow>
-        {page.closures.length > 0 && (
-          <InfoRow label={t('shop.closures')}>
-            <ul className={styles.plainList}>
-              {page.closures.map((c) => (
-                <li key={`${c.start_date}-${c.end_date}`}>
-                  <span className="mono">{formatDateRange(lang, c.start_date, c.end_date)}</span>
-                  {c.label && <span className={styles.muted}> · {c.label}</span>}
-                </li>
-              ))}
-            </ul>
-          </InfoRow>
-        )}
-        {(shop.amenities ?? []).length > 0 && (
-          <InfoRow label={t('shop.amenities')}>
-            <ul className={styles.amenities}>
-              {AMENITIES.filter((a) => shop.amenities.includes(a)).map((a) => {
-                const Icon = AMENITY_ICONS[a];
-                return (
-                  <li key={a}>
-                    <Icon size={15} aria-hidden="true" />
-                    {t(`amenity.${a}` as MessageKey)}
-                  </li>
-                );
-              })}
-            </ul>
-          </InfoRow>
-        )}
-        <InfoRow label={t('shop.capacity')}>
-          <span className="mono">{shop.daily_capacity}</span>
-        </InfoRow>
-        {shop.min_notice_hours > 0 && (
-          <InfoRow label={t('shop.notice')}>{t('shop.noticeValue', { hours: plural(lang, 'unit.hours', shop.min_notice_hours) })}</InfoRow>
-        )}
-        {shop.phone && (
-          <InfoRow label={t('shop.phone')}>
-            <PhoneLinks phones={[shop.phone, shop.phone2]} shopName={shop.name} />
-          </InfoRow>
-        )}
-        {shop.website && (
-          <InfoRow label={t('shop.website')}>
-            <a className={styles.link} href={websiteUrl(shop.website)} target="_blank" rel="noopener noreferrer">
-              <Globe size={14} aria-hidden="true" />
-              {shop.website.replace(/^https?:\/\//, '').replace(/\/$/, '')}
-            </a>
-          </InfoRow>
-        )}
-        {shop.inspection_fee > 0 && (
-          <InfoRow label={t('shop.fee')} note={t('shop.feeNote')}>
-            <span className="mono">{formatMoney(lang, shop.inspection_fee)}</span>
-          </InfoRow>
-        )}
-      </Card>
-
-      {shop.latitude !== null && shop.longitude !== null && (
-        <Suspense fallback={<div className={styles.mapLoading} />}>
-          <ShopsMap
-            compact
-            label={t('shop.map', { name: shop.name })}
-            shops={[{ id: shop.id, name: shop.name, latitude: shop.latitude, longitude: shop.longitude }]}
-          />
-        </Suspense>
-      )}
-
-      <h2 className={styles.sectionTitle}>{t('shop.services')}</h2>
-      <ServiceGroups services={page.services} />
-      <p className={styles.muted}>{t('shop.priceNote')}</p>
-
-      {hasReviews && (
-        <section id={REVIEWS_HASH} className={styles.reviews} aria-labelledby="reviews-title">
-          <h2 id="reviews-title" ref={reviewsRef} tabIndex={-1} className={`${styles.sectionTitle} ${styles.reviewsTitle}`}>
-            {t('shop.reviews')}
-          </h2>
-          <ul className={styles.plainList}>
-            {page.reviews.map((r) => (
-              <li key={r.id}>
-                <Card className={styles.review}>
-                  <div className={styles.reviewHead}>
-                    <span className={styles.reviewer}>{r.display_name}</span>
-                    <span className={styles.muted}>{formatDayMonth(lang, new Date(r.created_at))}</span>
-                  </div>
-                  <Stars value={r.rating} />
-                  {r.text && <p className={styles.reviewText}>{r.text}</p>}
-                  {r.reply && (
-                    <Card inset className={styles.reply}>
-                      <p className={styles.replyLabel}>{t('shop.reply')}</p>
-                      <p className={styles.reviewText}>{r.reply}</p>
-                    </Card>
+                <p className={styles.rating}>
+                  {rating.review_count > 0 && rating.average !== null ? (
+                    <>
+                      <Stars value={rating.average} />
+                      <span className={styles.ratingValue}>{formatRating(lang, rating.average)}</span>
+                      <span>· {plural(lang, 'unit.reviews', rating.review_count)}</span>
+                    </>
+                  ) : (
+                    <span>{t('rating.none')}</span>
                   )}
-                </Card>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
+                </p>
+              )}
+            </div>
+            <FavoriteButton shopId={shop.id} shopName={shop.name} on={page.is_favorite} onChange={onFavorite} />
+          </header>
+
+          <PhotoGallery photos={page.photos ?? []} shopName={shop.name} />
+
+          <p className={styles.address}>
+            <MapPin size={15} aria-hidden="true" />
+            <span>
+              {address}
+              {distance !== null && <span className={styles.distance}> · {t('shop.distance', { distance: formatDistance(lang, distance) })}</span>}
+            </span>
+            <a className={styles.directions} href={directionsUrl(shop)} target="_blank" rel="noopener noreferrer">
+              <Navigation size={14} aria-hidden="true" />
+              {t('shop.directions')}
+            </a>
+          </p>
+
+          {shop.description && <p className={styles.description}>{shop.description}</p>}
+
+          {!page.bookable && <Banner tone="warning">{t('shop.notBookable')}</Banner>}
+          {page.bookable && (
+            <div className={styles.freePlace}>
+              {page.free || shop.auto_confirm || page.response ? (
+                <FreePlaceNote free={page.free} instant={shop.auto_confirm} response={page.response} />
+              ) : null}
+              {page.free ? (
+                // Straight to that day and time; "Programează-te" below still lets the client choose.
+                <Link to={`${bookingPath(shop.id)}?zi=${page.free.date}&ora=${page.free.slot}`} className={buttonClass('secondary', false, styles.freeBook)}>
+                  {t('free.bookThis', { when: `${formatDate(lang, page.free.date)}, ${page.free.slot}` })}
+                </Link>
+              ) : (
+                <p className={styles.muted}>{t(day ? 'free.noneDay' : 'free.none')}</p>
+              )}
+            </div>
+          )}
+          {page.bookable && page.offers.newClient && (
+            <OfferNote>
+              <strong>{t('offer.title')}</strong> · {offerText.newClientPage(page.offers.newClient)}
+              {page.offers.newClient.services && <> {offerText.services(page.offers.newClient)}</>}
+            </OfferNote>
+          )}
+          {page.bookable && page.offers.quietDay && (
+            <OfferNote>
+              <strong>{t('offer.quiet.title')}</strong> · {offerText.quietPage(page.offers.quietDay)}
+            </OfferNote>
+          )}
+
+          <Card className={styles.info}>
+            <InfoRow label={t('shop.hours')}>
+              <HoursList rows={groupHours(page.hours)} />
+            </InfoRow>
+            {page.closures.length > 0 && (
+              <InfoRow label={t('shop.closures')}>
+                <ul className={styles.plainList}>
+                  {page.closures.map((c) => (
+                    <li key={`${c.start_date}-${c.end_date}`}>
+                      <span className="mono">{formatDateRange(lang, c.start_date, c.end_date)}</span>
+                      {c.label && <span className={styles.muted}> · {c.label}</span>}
+                    </li>
+                  ))}
+                </ul>
+              </InfoRow>
+            )}
+            {(shop.amenities ?? []).length > 0 && (
+              <InfoRow label={t('shop.amenities')}>
+                <ul className={styles.amenities}>
+                  {AMENITIES.filter((a) => shop.amenities.includes(a)).map((a) => {
+                    const Icon = AMENITY_ICONS[a];
+                    return (
+                      <li key={a}>
+                        <Icon size={15} aria-hidden="true" />
+                        {t(`amenity.${a}` as MessageKey)}
+                      </li>
+                    );
+                  })}
+                </ul>
+              </InfoRow>
+            )}
+            <InfoRow label={t('shop.capacity')}>
+              <span className="mono">{shop.daily_capacity}</span>
+            </InfoRow>
+            {shop.min_notice_hours > 0 && (
+              <InfoRow label={t('shop.notice')}>{t('shop.noticeValue', { hours: plural(lang, 'unit.hours', shop.min_notice_hours) })}</InfoRow>
+            )}
+            {shop.phone && (
+              <InfoRow label={t('shop.phone')}>
+                <PhoneLinks phones={[shop.phone, shop.phone2]} shopName={shop.name} />
+              </InfoRow>
+            )}
+            {shop.website && (
+              <InfoRow label={t('shop.website')}>
+                <a className={styles.link} href={websiteUrl(shop.website)} target="_blank" rel="noopener noreferrer">
+                  <Globe size={14} aria-hidden="true" />
+                  {shop.website.replace(/^https?:\/\//, '').replace(/\/$/, '')}
+                </a>
+              </InfoRow>
+            )}
+            {shop.inspection_fee > 0 && (
+              <InfoRow label={t('shop.fee')} note={t('shop.feeNote')}>
+                <span className="mono">{formatMoney(lang, shop.inspection_fee)}</span>
+              </InfoRow>
+            )}
+          </Card>
+
+          {shop.latitude !== null && shop.longitude !== null && (
+            <Suspense fallback={<div className={styles.mapLoading} />}>
+              <ShopsMap
+                compact
+                label={t('shop.map', { name: shop.name })}
+                shops={[{ id: shop.id, name: shop.name, latitude: shop.latitude, longitude: shop.longitude }]}
+              />
+            </Suspense>
+          )}
+
+        </div>
+        <div className={styles.column}>
+          <h2 className={styles.sectionTitle}>{t('shop.services')}</h2>
+          <ServiceGroups services={page.services} />
+          <p className={styles.muted}>{t('shop.priceNote')}</p>
+
+          {hasReviews && (
+            <section id={REVIEWS_HASH} className={styles.reviews} aria-labelledby="reviews-title">
+              <h2 id="reviews-title" ref={reviewsRef} tabIndex={-1} className={`${styles.sectionTitle} ${styles.reviewsTitle}`}>
+                {t('shop.reviews')}
+              </h2>
+              <ul className={styles.plainList}>
+                {page.reviews.map((r) => (
+                  <li key={r.id}>
+                    <Card className={styles.review}>
+                      <div className={styles.reviewHead}>
+                        <span className={styles.reviewer}>{r.display_name}</span>
+                        <span className={styles.muted}>{formatDayMonth(lang, new Date(r.created_at))}</span>
+                      </div>
+                      <Stars value={r.rating} />
+                      {r.text && <p className={styles.reviewText}>{r.text}</p>}
+                      {r.reply && (
+                        <Card inset className={styles.reply}>
+                          <p className={styles.replyLabel}>{t('shop.reply')}</p>
+                          <p className={styles.reviewText}>{r.reply}</p>
+                        </Card>
+                      )}
+                    </Card>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+
+        </div>
+      </div>
 
       {/* Always at hand (asked at testing): at the bottom, just above the menu. */}
       {page.bookable && (

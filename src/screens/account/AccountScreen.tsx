@@ -63,9 +63,11 @@ export function AccountScreen({ role }: { role: Role }) {
   if (!session.profile) return null;
 
   return (
-    <div className={styles.page}>
+    <div className={styles.page} data-layout="columns">
       <h1>{t('nav.account')}</h1>
-      <p className={styles.sub}>{t(SUBTITLE[role])}</p>
+      <p className={styles.sub} data-span="all">
+        {t(SUBTITLE[role])}
+      </p>
 
       <IdentityCard />
       {role === 'shop' && <PhoneCard />}
@@ -74,7 +76,7 @@ export function AccountScreen({ role }: { role: Role }) {
         <>
           <LocationRow />
           <ReminderRow setting="share_history" />
-          <div className={styles.tiles}>
+          <div className={styles.tiles} data-layout="tiles" data-span="all">
             <NotificationsTile role="client" />
             <Tile to={VEHICLE_HISTORY_PICK_PATH} icon={History} label={t('vh.title')} hint={t('vh.tileHint')} />
             <Tile to={MY_REPORTS_PATH} icon={FileCheck} label={t('reports.title')} hint={t('reports.tileHint')} />
@@ -86,7 +88,7 @@ export function AccountScreen({ role }: { role: Role }) {
       )}
 
       {role === 'shop' && (
-        <div className={styles.tiles}>
+        <div className={styles.tiles} data-layout="tiles" data-span="all">
           <NotificationsTile role="shop" />
           <Tile to={SETTINGS_PATH} icon={Settings} label={t('account.tile.settings')} />
           <Tile to={REVIEWS_PATH} icon={Star} label={t('reviews.title')} />
@@ -96,7 +98,7 @@ export function AccountScreen({ role }: { role: Role }) {
       )}
 
       {role === 'admin' && (
-        <div className={styles.tiles}>
+        <div className={styles.tiles} data-layout="tiles" data-span="all">
           <Tile to={ADMIN_SUBSCRIPTIONS_PATH} icon={CreditCard} label={t('admin.subs.title')} hint={t('admin.subs.tileHint')} />
           <Tile to={ADMIN_REPORTS_PATH} icon={FileCheck} label={t('admin.reports.title')} hint={t('admin.reports.tileHint')} />
           <Tile to={ADMIN_CATALOG_PATH} icon={ListTree} label={t('admin.catalog.title')} hint={t('admin.catalog.tileHint')} />
@@ -115,7 +117,7 @@ export function AccountScreen({ role }: { role: Role }) {
       {role !== 'admin' && (
         <>
           <h2 className={styles.section}>{t('help.title')}</h2>
-          <div className={styles.tiles}>
+          <div className={styles.tiles} data-layout="tiles" data-span="all">
             <Tile to={helpPath(role)} icon={LifeBuoy} label={t('help.title')} hint={t('help.tileHint')} />
             <Tile to={suggestionsPath(role)} icon={Lightbulb} label={t('sugg.title')} hint={t('sugg.tileHint')} />
           </div>
@@ -123,7 +125,7 @@ export function AccountScreen({ role }: { role: Role }) {
       )}
 
       <h2 className={styles.section}>{t('account.legal')}</h2>
-      <div className={styles.tiles}>
+      <div className={styles.tiles} data-layout="tiles" data-span="all">
         {LEGAL_DOCS.map((doc) => (
           <Tile key={doc.id} to={`${NAV[role].account.path}/legal/${doc.id}`} icon={FileText} label={t(doc.titleKey)} />
         ))}

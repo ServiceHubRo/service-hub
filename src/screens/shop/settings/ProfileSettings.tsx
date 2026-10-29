@@ -196,118 +196,126 @@ export function ProfileSettings() {
 
       <LogoCard />
 
-      <form ref={formRef} className={styles.stack} noValidate onSubmit={(e) => e.preventDefault()}>
-        <Field
-          label={t('profile.name')}
-          autoComplete="organization"
-          maxLength={120}
-          value={form.name}
-          onChange={(e) => set('name', e.target.value)}
-          error={errors.name}
-        />
-        <TextArea
-          label={t('profile.description')}
-          hint={t('profile.descriptionHint')}
-          maxLength={2000}
-          rows={4}
-          value={form.description}
-          onChange={(e) => set('description', e.target.value)}
-        />
-
-        <h2 className={styles.section}>{t('profile.address')}</h2>
-        <Field
-          label={t('profile.street')}
-          autoComplete="street-address"
-          maxLength={200}
-          value={form.street}
-          onChange={(e) => set('street', e.target.value)}
-        />
-        <div className={styles.grid2}>
+      <form ref={formRef} className={styles.stack} data-layout="columns" noValidate onSubmit={(e) => e.preventDefault()}>
+        <div className={styles.stack}>
           <Field
-            label={t('profile.city')}
-            autoComplete="address-level2"
-            maxLength={80}
-            value={form.city}
-            onChange={(e) => set('city', e.target.value)}
-            error={errors.city}
+            label={t('profile.name')}
+            autoComplete="organization"
+            maxLength={120}
+            value={form.name}
+            onChange={(e) => set('name', e.target.value)}
+            error={errors.name}
           />
-          <Field
-            label={t('profile.county')}
-            autoComplete="address-level1"
-            maxLength={80}
-            value={form.county}
-            onChange={(e) => set('county', e.target.value)}
+          <TextArea
+            label={t('profile.description')}
+            hint={t('profile.descriptionHint')}
+            maxLength={2000}
+            rows={4}
+            value={form.description}
+            onChange={(e) => set('description', e.target.value)}
           />
         </div>
-        <Field
-          label={t('profile.postalCode')}
-          autoComplete="postal-code"
-          inputMode="numeric"
-          mono
-          maxLength={7}
-          value={form.postal_code}
-          onChange={(e) => set('postal_code', e.target.value)}
-          error={errors.postal_code}
-        />
 
-        <h2 className={styles.section}>{t('profile.contact')}</h2>
-        <div className={styles.grid2}>
+        <div className={styles.stack}>
+          <h2 className={styles.section}>{t('profile.address')}</h2>
           <Field
-            label={t('profile.phone')}
-            type="tel"
-            autoComplete="tel"
-            inputMode="tel"
-            mono
-            placeholder="0268 312 445"
-            value={form.phone}
-            onChange={(e) => set('phone', e.target.value)}
-            error={errors.phone}
+            label={t('profile.street')}
+            autoComplete="street-address"
+            maxLength={200}
+            value={form.street}
+            onChange={(e) => set('street', e.target.value)}
           />
+          <div className={styles.grid2}>
+            <Field
+              label={t('profile.city')}
+              autoComplete="address-level2"
+              maxLength={80}
+              value={form.city}
+              onChange={(e) => set('city', e.target.value)}
+              error={errors.city}
+            />
+            <Field
+              label={t('profile.county')}
+              autoComplete="address-level1"
+              maxLength={80}
+              value={form.county}
+              onChange={(e) => set('county', e.target.value)}
+            />
+          </div>
           <Field
-            label={t('profile.phone2')}
-            type="tel"
-            inputMode="tel"
+            label={t('profile.postalCode')}
+            autoComplete="postal-code"
+            inputMode="numeric"
             mono
-            value={form.phone2}
-            onChange={(e) => set('phone2', e.target.value)}
-            error={errors.phone2}
+            maxLength={7}
+            value={form.postal_code}
+            onChange={(e) => set('postal_code', e.target.value)}
+            error={errors.postal_code}
           />
         </div>
-        <Field
-          label={t('profile.website')}
-          type="url"
-          inputMode="url"
-          autoComplete="url"
-          maxLength={300}
-          placeholder="www.atelier.ro"
-          value={form.website}
-          onChange={(e) => set('website', e.target.value)}
-          error={errors.website}
-        />
-        <Field
-          label={t('profile.facebook')}
-          type="url"
-          inputMode="url"
-          maxLength={300}
-          placeholder="facebook.com/atelier"
-          value={form.facebook}
-          onChange={(e) => set('facebook', e.target.value)}
-          error={errors.facebook}
-        />
-        <Field
-          label={t('profile.year')}
-          inputMode="numeric"
-          mono
-          maxLength={4}
-          value={form.year}
-          onChange={(e) => set('year', e.target.value.replace(/\D/g, ''))}
-          error={errors.year}
-        />
 
-        <SaveButton onSave={save}>{t('profile.save')}</SaveButton>
+        <div className={styles.stack}>
+          <h2 className={styles.section}>{t('profile.contact')}</h2>
+          <div className={styles.grid2}>
+            <Field
+              label={t('profile.phone')}
+              type="tel"
+              autoComplete="tel"
+              inputMode="tel"
+              mono
+              placeholder="0268 312 445"
+              value={form.phone}
+              onChange={(e) => set('phone', e.target.value)}
+              error={errors.phone}
+            />
+            <Field
+              label={t('profile.phone2')}
+              type="tel"
+              inputMode="tel"
+              mono
+              value={form.phone2}
+              onChange={(e) => set('phone2', e.target.value)}
+              error={errors.phone2}
+            />
+          </div>
+          <Field
+            label={t('profile.website')}
+            type="url"
+            inputMode="url"
+            autoComplete="url"
+            maxLength={300}
+            placeholder="www.atelier.ro"
+            value={form.website}
+            onChange={(e) => set('website', e.target.value)}
+            error={errors.website}
+          />
+          <Field
+            label={t('profile.facebook')}
+            type="url"
+            inputMode="url"
+            maxLength={300}
+            placeholder="facebook.com/atelier"
+            value={form.facebook}
+            onChange={(e) => set('facebook', e.target.value)}
+            error={errors.facebook}
+          />
+          <Field
+            label={t('profile.year')}
+            inputMode="numeric"
+            mono
+            maxLength={4}
+            value={form.year}
+            onChange={(e) => set('year', e.target.value.replace(/\D/g, ''))}
+            error={errors.year}
+          />
+        </div>
+
+        <div data-span="all">
+          <SaveButton onSave={save}>{t('profile.save')}</SaveButton>
+        </div>
       </form>
 
-      <Card>
+      <Card className={own.half}>
         <div className={own.mapHead}>
           <MapPin size={20} className={hasMap ? own.mapOk : own.mapMissing} aria-hidden="true" />
           <div>
@@ -389,7 +397,7 @@ function LogoCard() {
     .toUpperCase();
 
   return (
-    <Card>
+    <Card className={own.half}>
       <div className={own.logoRow}>
         {shown ? (
           <img src={shown} alt={t('profile.logo.alt', { name: shop.name })} className={own.logo} />

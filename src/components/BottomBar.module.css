@@ -11,3 +11,14 @@
   padding: 14px var(--page-pad) 12px;
   background: linear-gradient(to bottom, transparent, var(--bg) 14px);
 }
+
+/* A desktop (T51): the action at the right, as wide as a form column, not across the whole page. */
+@media (min-width: 1024px) {
+  .bar {
+    align-items: flex-end;
+  }
+
+  .bar > * {
+    width: min(100%, 420px);
+  }
+}

@@ -409,7 +409,7 @@ export function SearchScreen() {
       </FilterSheet>
 
       {status === 'error' && <LoadError message={t('search.resultsError')} onRetry={() => setAttempt((a) => a + 1)} />}
-      {status !== 'error' && !results && <SkeletonList />}
+      {status !== 'error' && !results && <SkeletonList cards />}
       {status !== 'error' && results && (
         <div className={styles.results} aria-busy={status === 'loading'}>
           <div className={styles.countRow}>
@@ -462,7 +462,7 @@ export function SearchScreen() {
                   <h2 id="near-title" className={styles.sectionTitle}>
                     {t('search.near')}
                   </h2>
-                  <ul className={styles.list}>
+                  <ul className={styles.list} data-layout="cards">
                     {near.map((s) => (
                       <li key={s.shop_id}>
                         <ShopCard shop={s} distanceKm={distance(s)} back={back} onFavorite={onFavorite} day={day} />
@@ -477,7 +477,7 @@ export function SearchScreen() {
                     {t('search.allResults')}
                   </h2>
                 )}
-                <ul className={styles.list}>
+                <ul className={styles.list} data-layout="cards">
                   {list.map((s) => (
                     <li key={s.shop_id}>
                       <ShopCard shop={s} distanceKm={distance(s)} back={back} onFavorite={onFavorite} day={day} />

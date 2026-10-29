@@ -200,7 +200,9 @@ export function AddBookingScreen() {
     }));
     body = (
       <>
-        <p className={styles.intro}>{t('wi.intro')}</p>
+        <p className={styles.intro} data-span="all">
+          {t('wi.intro')}
+        </p>
 
         <Card className={styles.section}>
           <h2 className={styles.sectionTitle}>{t('wi.client')}</h2>
@@ -369,7 +371,7 @@ export function AddBookingScreen() {
         </Card>
 
         {tried && Object.keys(found).length > 0 && (
-          <p className={styles.error} role="alert">
+          <p className={styles.error} role="alert" data-span="all">
             {t('wi.err.fix')}
           </p>
         )}
@@ -381,11 +383,11 @@ export function AddBookingScreen() {
   }
 
   return (
-    <div className={styles.page}>
+    <div className={styles.page} data-layout="columns">
       <BackLink to={SHOP_BOOKINGS_PATH} label={t('nav.bookings')} />
       <h1>{t('wi.title')}</h1>
       {isOwner && (
-        <Link to={IMPORT_PATH} className={styles.importLink}>
+        <Link to={IMPORT_PATH} className={styles.importLink} data-span="all">
           <FileUp size={16} aria-hidden="true" />
           {t('imp.link')}
         </Link>

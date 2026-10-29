@@ -147,3 +147,10 @@
   gap: 8px;
   margin-top: 4px;
 }
+
+/* A wide screen (T51): the page takes the whole width, its cards in two columns. */
+@media (min-width: 1280px) {
+  .page {
+    max-width: none;
+  }
+}

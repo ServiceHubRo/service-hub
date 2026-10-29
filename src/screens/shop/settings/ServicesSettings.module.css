@@ -110,3 +110,40 @@
   grid-column: 1 / -1;
   font-weight: 600;
 }
+
+/* A wide screen (T51): the picker and the search side by side, the categories in two columns. */
+@media (min-width: 1280px) {
+  .top {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 14px;
+  }
+
+  .top > :nth-child(1) {
+    grid-area: 1 / 1;
+  }
+
+  .top > :nth-child(2) {
+    grid-area: 2 / 1;
+  }
+
+  .top > :nth-child(3) {
+    grid-area: 1 / 2;
+  }
+
+  .top > :nth-child(4) {
+    grid-column: 1 / -1;
+  }
+
+  .categories {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+    column-gap: 40px;
+    border-top: none;
+  }
+
+  .category:nth-child(-n + 2) {
+    border-top: 1px solid var(--border);
+  }
+}

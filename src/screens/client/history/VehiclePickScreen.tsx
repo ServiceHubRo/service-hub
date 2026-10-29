@@ -42,7 +42,7 @@ export function VehiclePickScreen() {
       />
     );
   } else if (!bookings || !cars) {
-    body = <SkeletonList />;
+    body = <SkeletonList cards />;
   } else {
     const others = otherVehicles(bookings, cars);
     body =
@@ -60,7 +60,7 @@ export function VehiclePickScreen() {
       ) : (
         <>
           {cars.length > 0 && (
-            <ul className={styles.list}>
+            <ul className={styles.list} data-layout="cards">
               {cars.map((car) => (
                 <li key={car.id}>
                   <VehicleRow to={carHistoryPath(car.id)} vehicle={car} jobs={jobsOf(bookings, car).length} />
@@ -74,7 +74,7 @@ export function VehiclePickScreen() {
                 {t('vh.other')}
               </h2>
               <p className={styles.hint}>{t('vh.otherHint')}</p>
-              <ul className={styles.list}>
+              <ul className={styles.list} data-layout="cards">
                 {others.map((o) => (
                   <li key={o.latest.id}>
                     <VehicleRow to={bookingCarHistoryPath(o.latest.id)} vehicle={o.latest.car_snapshot} jobs={o.jobs} />

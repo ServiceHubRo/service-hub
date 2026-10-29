@@ -78,7 +78,7 @@ export function ShopReviewsScreen() {
       <BackLink to={ACCOUNT_PATH} label={t('nav.account')} />
       <h1>{t('reviews.title')}</h1>
       {isColleague && <p className={styles.muted}>{t('reviews.staffNote')}</p>}
-      {state.status === 'loading' && <SkeletonList />}
+      {state.status === 'loading' && <SkeletonList cards />}
       {state.status === 'error' && <LoadError message={t('reviews.loadError')} onRetry={reload} />}
       {reviews &&
         summary &&
@@ -93,7 +93,7 @@ export function ShopReviewsScreen() {
                 <span className={styles.muted}>{plural(lang, 'unit.reviews', summary.count)}</span>
               </div>
             </Card>
-            <ul className={styles.list}>
+            <ul className={styles.list} data-layout="cards">
               {reviews.map((r) => (
                 <li key={r.id}>
                   <ReviewCard review={r} onChanged={replace} onStale={refresh} />

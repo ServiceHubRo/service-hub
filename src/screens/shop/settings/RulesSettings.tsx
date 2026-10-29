@@ -150,7 +150,7 @@ export function RulesSettings() {
   }
 
   return (
-    <div className={styles.page}>
+    <div className={styles.page} data-layout="columns">
       <BackLink to={SETTINGS_PATH} label={t('settings.title')} />
       <h1>{t('settings.rules')}</h1>
 

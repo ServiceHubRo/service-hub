@@ -1,11 +1,14 @@
 import { useI18n } from '../i18n/context';
 import styles from './Skeleton.module.css';
 
-/** Loading placeholder for lists: 3 cards by default. Never looks like an empty state. */
-export function SkeletonList({ count = 3 }: { count?: number }) {
+/**
+ * Loading placeholder for lists: 3 cards by default. Never looks like an empty state. `cards` lays
+ * them out like the list they stand for when it has columns on a desktop (global.css, data-layout).
+ */
+export function SkeletonList({ count = 3, cards = false }: { count?: number; cards?: boolean }) {
   const { t } = useI18n();
   return (
-    <div className={styles.list} aria-busy="true" role="status">
+    <div className={styles.list} aria-busy="true" role="status" data-layout={cards ? 'cards' : undefined}>
       <span className="visually-hidden">{t('common.loading')}</span>
       {Array.from({ length: count }, (_, i) => (
         <div key={i} className={styles.card} aria-hidden="true">

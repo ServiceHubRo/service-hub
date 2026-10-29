@@ -277,3 +277,10 @@
   min-height: var(--tap);
   color: var(--muted);
 }
+
+/* A desktop (T51): "Adaugă mașină" as wide as a form column, under the cards. */
+@media (min-width: 1024px) {
+  a.add {
+    width: min(100%, 420px);
+  }
+}

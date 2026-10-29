@@ -122,87 +122,92 @@ function BillingForm({ initial }: { initial: ShopBilling | null }) {
   }
 
   return (
-    <form ref={formRef} className={styles.stack} noValidate onSubmit={(e) => e.preventDefault()}>
-      <h2 className={styles.section}>{t('billing.company')}</h2>
-      <Field
-        label={t('billing.legalName')}
-        hint={t('billing.legalNameHint')}
-        autoComplete="organization"
-        maxLength={200}
-        value={form.legal_name}
-        onChange={(e) => set('legal_name', e.target.value)}
-      />
-      <div className={styles.grid2}>
+    <form ref={formRef} className={styles.stack} data-layout="columns" noValidate onSubmit={(e) => e.preventDefault()}>
+      <div className={styles.stack}>
+        <h2 className={styles.section}>{t('billing.company')}</h2>
         <Field
-          label={t('billing.vatId')}
-          mono
-          autoCapitalize="characters"
-          maxLength={14}
-          value={form.vat_id}
-          onChange={(e) => set('vat_id', e.target.value)}
-          error={errors.vat_id}
+          label={t('billing.legalName')}
+          hint={t('billing.legalNameHint')}
+          autoComplete="organization"
+          maxLength={200}
+          value={form.legal_name}
+          onChange={(e) => set('legal_name', e.target.value)}
         />
+        <div className={styles.grid2}>
+          <Field
+            label={t('billing.vatId')}
+            mono
+            autoCapitalize="characters"
+            maxLength={14}
+            value={form.vat_id}
+            onChange={(e) => set('vat_id', e.target.value)}
+            error={errors.vat_id}
+          />
+          <Field
+            label={t('billing.regCom')}
+            hint={t('billing.regComHint')}
+            mono
+            autoCapitalize="characters"
+            maxLength={20}
+            value={form.reg_com}
+            onChange={(e) => set('reg_com', e.target.value)}
+            error={errors.reg_com}
+          />
+        </div>
         <Field
-          label={t('billing.regCom')}
-          hint={t('billing.regComHint')}
-          mono
-          autoCapitalize="characters"
-          maxLength={20}
-          value={form.reg_com}
-          onChange={(e) => set('reg_com', e.target.value)}
-          error={errors.reg_com}
+          label={t('billing.legalAddress')}
+          maxLength={300}
+          value={form.legal_address}
+          onChange={(e) => set('legal_address', e.target.value)}
         />
-      </div>
-      <Field
-        label={t('billing.legalAddress')}
-        maxLength={300}
-        value={form.legal_address}
-        onChange={(e) => set('legal_address', e.target.value)}
-      />
-      <div>
-        <Button onClick={copyWorkshopAddress}>
-          <Copy size={16} aria-hidden="true" />
-          {t('billing.copyAddress')}
-        </Button>
-      </div>
-      <Card>
-        <Switch checked={form.vat_payer} onChange={(e) => set('vat_payer', e.target.checked)}>
-          {t('billing.vatPayer')}
-        </Switch>
-      </Card>
-      <Field
-        label={t('billing.legalRep')}
-        autoComplete="name"
-        maxLength={120}
-        value={form.legal_rep}
-        onChange={(e) => set('legal_rep', e.target.value)}
-      />
-
-      <h2 className={styles.section}>{t('billing.bankSection')}</h2>
-      <div className={styles.grid2}>
-        <Field label={t('billing.bank')} maxLength={120} value={form.bank_name} onChange={(e) => set('bank_name', e.target.value)} />
+        <div>
+          <Button onClick={copyWorkshopAddress}>
+            <Copy size={16} aria-hidden="true" />
+            {t('billing.copyAddress')}
+          </Button>
+        </div>
+        <Card>
+          <Switch checked={form.vat_payer} onChange={(e) => set('vat_payer', e.target.checked)}>
+            {t('billing.vatPayer')}
+          </Switch>
+        </Card>
         <Field
-          label={t('billing.iban')}
-          mono
-          autoCapitalize="characters"
-          maxLength={34}
-          placeholder="RO49 AAAA 1B31 0075 9384 0000"
-          value={form.iban}
-          onChange={(e) => set('iban', e.target.value)}
-          error={errors.iban}
+          label={t('billing.legalRep')}
+          autoComplete="name"
+          maxLength={120}
+          value={form.legal_rep}
+          onChange={(e) => set('legal_rep', e.target.value)}
         />
       </div>
-      <Field
-        label={t('billing.email')}
-        type="email"
-        inputMode="email"
-        autoComplete="email"
-        maxLength={254}
-        value={form.billing_email}
-        onChange={(e) => set('billing_email', e.target.value)}
-        error={errors.billing_email}
-      />
-      <SaveButton onSave={save}>{t('billing.save')}</SaveButton>
+      <div className={styles.stack}>
+        <h2 className={styles.section}>{t('billing.bankSection')}</h2>
+        <div className={styles.grid2}>
+          <Field label={t('billing.bank')} maxLength={120} value={form.bank_name} onChange={(e) => set('bank_name', e.target.value)} />
+          <Field
+            label={t('billing.iban')}
+            mono
+            autoCapitalize="characters"
+            maxLength={34}
+            placeholder="RO49 AAAA 1B31 0075 9384 0000"
+            value={form.iban}
+            onChange={(e) => set('iban', e.target.value)}
+            error={errors.iban}
+          />
+        </div>
+        <Field
+          label={t('billing.email')}
+          type="email"
+          inputMode="email"
+          autoComplete="email"
+          maxLength={254}
+          value={form.billing_email}
+          onChange={(e) => set('billing_email', e.target.value)}
+          error={errors.billing_email}
+        />
+      </div>
+      <div data-span="all">
+        <SaveButton onSave={save}>{t('billing.save')}</SaveButton>
+      </div>
     </form>
   );
 }

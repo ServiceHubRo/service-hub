@@ -43,7 +43,7 @@ export function GarageScreen() {
           <p className={styles.sub}>{plural(lang, 'unit.savedCars', state.data.length)}</p>
         )}
       </div>
-      {state.status === 'loading' && <SkeletonList />}
+      {state.status === 'loading' && <SkeletonList cards />}
       {state.status === 'error' && <LoadError message={t('garage.loadError')} onRetry={reload} />}
       {state.status === 'ready' &&
         (state.data.length === 0 ? (
@@ -60,7 +60,7 @@ export function GarageScreen() {
           />
         ) : (
           <>
-            <ul className={styles.list}>
+            <ul className={styles.list} data-layout="cards">
               {state.data.map((car) => (
                 <li key={car.id}>
                   <CarCard
@@ -76,7 +76,7 @@ export function GarageScreen() {
                 </li>
               ))}
             </ul>
-            <Link to={NEW_CAR_PATH} className={buttonClass('primary', true)}>
+            <Link to={NEW_CAR_PATH} className={buttonClass('primary', true, styles.add)}>
               <Plus size={18} aria-hidden="true" />
               {t('garage.add')}
             </Link>

@@ -35,10 +35,10 @@ export function NotificationSettings() {
     <div className={styles.page}>
       <BackLink to={NAV.shop.account.path} label={t('nav.account')} />
       <h1>{t('settings.notifications')}</h1>
-      <PushRow />
-      <SoundRow />
-      {isOwner ? (
-        <>
+      <div className={styles.page} data-layout="columns">
+        <PushRow />
+        <SoundRow />
+        {isOwner && (
           <Card className={styles.stack}>
             <Switch checked={digest} hint={t('notif.digest.hint')} onChange={(e) => setDigest(e.target.checked)}>
               {t('notif.digest')}
@@ -47,6 +47,10 @@ export function NotificationSettings() {
               {t('notif.monthly')}
             </Switch>
           </Card>
+        )}
+      </div>
+      {isOwner ? (
+        <>
           <p className={styles.note}>{t('notif.soon')}</p>
           <SaveButton onSave={save}>{t('notif.save')}</SaveButton>
         </>

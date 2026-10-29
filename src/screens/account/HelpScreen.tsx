@@ -26,7 +26,7 @@ export function HelpScreen({ role }: { role: 'client' | 'shop' }) {
       <BackLink to={NAV[role].account.path} label={t('nav.account')} />
       <h1>{t('help.title')}</h1>
 
-      <div className={styles.tiles}>
+      <div className={styles.tiles} data-layout="tiles">
         <Tile
           href={`mailto:${CONTACT.email}?subject=${encodeURIComponent(subject)}`}
           icon={Mail}
@@ -53,7 +53,7 @@ export function HelpScreen({ role }: { role: 'client' | 'shop' }) {
 
       <p className={styles.helpNote}>{t(role === 'client' ? 'help.clientNote' : 'help.shopNote')}</p>
 
-      <div className={styles.tiles}>
+      <div className={styles.tiles} data-layout="tiles">
         <Tile to={homeOf(role)} icon={Compass} label={t('tour.again')} hint={t('tour.againHint')} onClick={requestTour} />
       </div>
     </div>

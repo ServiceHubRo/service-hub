@@ -82,3 +82,10 @@
 .mapAction {
   margin-top: 12px;
 }
+
+/* The logo and the map cards as wide as one column of the form under them (T51). */
+@media (min-width: 1280px) {
+  .half {
+    width: calc(50% - 7px);
+  }
+}

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { ActionButton } from '../../../components/ActionButton';
 import { rpcErrorMessage } from '../../../data/rpc';
 import { useI18n } from '../../../i18n/context';
+import styles from './settings.module.css';
 
 /**
  * The save button of a settings section: an ActionButton that reads "✓ Salvat" for 1.5 s after a
@@ -22,7 +23,7 @@ export function SaveButton({
   useEffect(() => () => window.clearTimeout(timer.current), []);
 
   return (
-    <>
+    <div className={styles.save}>
       <ActionButton
         disabled={disabled}
         errorMessage={(e) => rpcErrorMessage(lang, e)}
@@ -40,6 +41,6 @@ export function SaveButton({
       <span className="visually-hidden" role="status">
         {saved ? t('common.saved') : ''}
       </span>
-    </>
+    </div>
   );
 }

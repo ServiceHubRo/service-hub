@@ -230,7 +230,7 @@ export function ShopHistoryScreen() {
         )}
       </div>
 
-      {state.status === 'loading' && <SkeletonList />}
+      {state.status === 'loading' && <SkeletonList cards />}
       {state.status === 'error' && <LoadError message={t('hist.loadError')} onRetry={reload} />}
       {data && !anything && <EmptyState icon={HistoryIcon} title={t('hist.empty')} body={t('hist.emptyBody')} />}
 
@@ -303,7 +303,7 @@ export function ShopHistoryScreen() {
             />
           ) : (
             <>
-              <ul className={`${styles.list} no-print`}>
+              <ul className={`${styles.list} no-print`} data-layout="cards">
                 {shown.map((b) => (
                   <li key={b.id}>
                     <HistoryCard item={b} open={open.has(b.id)} onToggle={() => toggle(b.id)} />

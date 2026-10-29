@@ -336,3 +336,17 @@
   display: flex;
   margin: 4px 0 2px;
 }
+
+/* The two halves of the page (T51): one after the other on a phone, side by side on a desktop. */
+.columns,
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+@media (min-width: 1280px) {
+  .columns {
+    column-gap: 40px;
+  }
+}

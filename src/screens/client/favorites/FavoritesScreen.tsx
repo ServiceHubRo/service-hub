@@ -48,7 +48,7 @@ export function FavoritesScreen() {
     <div className={styles.page}>
       <BackLink to={NAV.client.account.path} label={t('nav.account')} />
       <h1>{t('favorites.title')}</h1>
-      {state.status === 'loading' && <SkeletonList />}
+      {state.status === 'loading' && <SkeletonList cards />}
       {state.status === 'error' && <LoadError message={t('favorites.loadError')} onRetry={reload} />}
       {state.status === 'ready' &&
         (state.data.shops.length === 0 ? (
@@ -65,7 +65,7 @@ export function FavoritesScreen() {
         ) : (
           <>
             <p className={styles.count}>{plural(lang, 'unit.shops', state.data.shops.filter((s) => s.is_favorite).length)}</p>
-            <ul className={styles.list}>
+            <ul className={styles.list} data-layout="cards">
               {state.data.shops.map((s) => (
                 <li key={s.shop_id}>
                   <ShopCard

@@ -36,7 +36,7 @@ import own from './ShowcaseSettings.module.css';
 export function ShowcaseSettings() {
   const { t } = useI18n();
   return (
-    <div className={styles.page}>
+    <div className={styles.page} data-layout="columns">
       <BackLink to={SETTINGS_PATH} label={t('settings.title')} />
       <h1>{t('settings.showcase')}</h1>
       <PhotosCard />
@@ -223,7 +223,7 @@ function AmenitiesCard() {
   }
 
   return (
-    <>
+    <div className={styles.page}>
       <Card className={styles.stack}>
         <div>
           <p className={styles.cardTitle}>{t('showcase.amenities')}</p>
@@ -244,6 +244,6 @@ function AmenitiesCard() {
         </div>
       </Card>
       <SaveButton onSave={save}>{t('showcase.amenities.save')}</SaveButton>
-    </>
+    </div>
   );
 }

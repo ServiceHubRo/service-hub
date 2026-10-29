@@ -78,10 +78,10 @@ export function StaffSettings() {
           {link && <LinkPanel email={link.email} url={link.url} mailed={link.mailed} />}
 
           <h2 className={styles.section}>{t('staff.team')}</h2>
-          {state.status === 'loading' && <SkeletonList />}
+          {state.status === 'loading' && <SkeletonList cards />}
           {state.status === 'error' && <LoadError message={t('settings.loadError')} onRetry={reload} />}
           {state.status === 'ready' && (
-            <div className={styles.stack}>
+            <div className={styles.stack} data-layout="cards">
               {state.data.map((m) => (
                 <MemberCard
                   key={m.id}

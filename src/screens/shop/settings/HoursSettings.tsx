@@ -59,12 +59,18 @@ export function HoursSettings() {
       <BackLink to={SETTINGS_PATH} label={t('settings.title')} />
       <h1>{t('settings.hours')}</h1>
 
-      <h2 className={styles.section}>{t('hours.week')}</h2>
-      {hours.state.status === 'loading' && <SkeletonList count={3} />}
-      {hours.state.status === 'error' && <LoadError message={t('settings.loadError')} onRetry={hours.reload} />}
-      {hours.state.status === 'ready' && <WeekEditor initial={hours.state.data} />}
-
-      <Closures />
+      {/* The week and the closed periods side by side on a wide screen (T51). */}
+      <div className={styles.page} data-layout="columns">
+        <div className={styles.page}>
+          <h2 className={styles.section}>{t('hours.week')}</h2>
+          {hours.state.status === 'loading' && <SkeletonList count={3} />}
+          {hours.state.status === 'error' && <LoadError message={t('settings.loadError')} onRetry={hours.reload} />}
+          {hours.state.status === 'ready' && <WeekEditor initial={hours.state.data} />}
+        </div>
+        <div className={styles.page}>
+          <Closures />
+        </div>
+      </div>
     </div>
   );
 }
