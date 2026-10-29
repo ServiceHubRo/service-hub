@@ -1403,6 +1403,8 @@ export const en: Record<MessageKey, string> = {
   'sb.done.quote_sent': 'The quote for {ref} was sent to the client.',
   'sb.done.quote_replaced': 'The new quote for {ref} was sent to the client.',
   'sb.done.quote_withdrawn': 'The quote for {ref} was withdrawn.',
+  'sb.done.intake_sent': 'The intake sheet for {ref} was sent to the client.',
+  'sb.done.intake_saved': 'The intake sheet for {ref} was saved.',
   'sb.done.rescheduled': 'Booking {ref} moved to {when} and confirmed.',
   'sb.done.show': 'View booking',
   'sb.done.in_progress': 'Work on {ref} has started. The client has been notified.',

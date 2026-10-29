@@ -45,8 +45,10 @@ export function JobDocuments({
           errorMessage={(e) => rpcErrorMessage(lang, e)}
           canRetry={canRetryRpc}
         >
-          <FileText size={16} aria-hidden="true" />
-          {t(LABEL[kind])}
+          <span className={styles.label}>
+            <FileText size={16} aria-hidden="true" />
+            {t(LABEL[kind])}
+          </span>
         </ActionButton>
       ))}
     </div>

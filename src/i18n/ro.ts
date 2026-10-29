@@ -1401,6 +1401,8 @@ export const ro = {
   'sb.done.quote_sent': 'Devizul pentru {ref} a fost trimis clientului.',
   'sb.done.quote_replaced': 'Devizul nou pentru {ref} a fost trimis clientului.',
   'sb.done.quote_withdrawn': 'Devizul pentru {ref} a fost retras.',
+  'sb.done.intake_sent': 'Fișa de preluare pentru {ref} a fost trimisă clientului.',
+  'sb.done.intake_saved': 'Fișa de preluare pentru {ref} a fost salvată.',
   'sb.done.rescheduled': 'Programarea {ref} este mutată pe {when} și confirmată.',
   'sb.done.show': 'Vezi programarea',
   'sb.done.in_progress': 'Lucrarea pentru {ref} a început. Clientul a fost anunțat.',

@@ -34,6 +34,7 @@ import { useI18n } from '../../../i18n/context';
 import { formatKm } from '../../../i18n/format';
 import { useLoad } from '../../../lib/useLoad';
 import { shopBookingsLink } from '../paths';
+import type { DoneState } from './ShopBookingsScreen';
 import { useShopBookings } from './shopBookingsContext';
 import styles from '../../../components/intake/Intake.module.css';
 
@@ -201,7 +202,10 @@ function IntakeForm({
       for (const p of sheet?.photos ?? []) if (!photos.includes(p)) void removeIntakePhoto(p);
       onSaved(saved);
       refresh();
-      navigate(back, { replace: true });
+      const done: DoneState = {
+        done: { key: walkIn ? 'sb.done.intake_saved' : 'sb.done.intake_sent', ref: booking.ref, date: booking.date, slot: booking.slot },
+      };
+      navigate(back, { replace: true, state: done });
     } catch (e) {
       const error = toRpcError(e);
       if (error.code === 'odometer_lower' || error.code === 'odometer_invalid') {

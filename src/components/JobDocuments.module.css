@@ -3,3 +3,9 @@
   flex-wrap: wrap;
   gap: 8px;
 }
+
+.label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}

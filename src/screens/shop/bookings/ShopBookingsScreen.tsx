@@ -42,6 +42,11 @@ const FILTER_LABEL: Record<ShopFilter, MessageKey> = {
 };
 
 /** What happened after an action, and where the booking went. */
+/** Router state of a screen that leads back here after a write (the quote editor, the intake sheet). */
+export interface DoneState {
+  done: { key: MessageKey; ref: string; date: string; slot: string };
+}
+
 interface Notice {
   /** Kept as a key, not a sentence, so it follows a language switch. */
   key: MessageKey;
@@ -87,7 +92,10 @@ export function ShopBookingsScreen() {
   const location = useLocation();
   // Back from "Adaugă programare": say where the new booking went.
   const [notice, setNotice] = useState<Notice | null>(() => {
-    const added = (location.state as Partial<AddedBookingState> | null)?.added;
+    const state = location.state as Partial<AddedBookingState & DoneState> | null;
+    // Back from the quote editor or the intake sheet (T50): what went out.
+    if (state?.done) return state.done;
+    const added = state?.added;
     return added
       ? { key: added.invited ? 'sb.done.addedSms' : 'sb.done.added', ref: added.ref, date: added.date, slot: added.slot }
       : null;

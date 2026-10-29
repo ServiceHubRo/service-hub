@@ -43,6 +43,7 @@ import { newRequestId } from '../../../lib/requestId';
 import { storage } from '../../../lib/storage';
 import { useOfferText } from '../../../lib/useOfferText';
 import { shopBookingsLink } from '../paths';
+import type { DoneState } from './ShopBookingsScreen';
 import { useShopBookings } from './shopBookingsContext';
 import styles from './quoteEditor.module.css';
 
@@ -128,7 +129,8 @@ export function QuoteEditorScreen() {
     else
       body = (
         <Editor
-          key={`${booking.id}-${booking.quote?.id ?? ''}`}
+          // Not the quote: the list read again after a withdrawal must not start the editor over.
+          key={`${booking.id}-${booking.status}`}
           booking={booking}
           fee={state.data.shop.inspection_fee}
           expiryDays={state.data.quote_expiry_days}
@@ -279,7 +281,10 @@ function Editor({
           ? await sendQuote(b.id, checked.items, text, hours, requestId)
           : await replaceQuote(b.id, checked.items, text, hours, requestId);
       apply(row);
-      navigate(back, { replace: true });
+      const done: DoneState = {
+        done: { key: mode === 'send' ? 'sb.done.quote_sent' : 'sb.done.quote_replaced', ref: row.ref, date: row.date, slot: row.slot.slice(0, 5) },
+      };
+      navigate(back, { replace: true, state: done });
     } catch (e) {
       const code = toRpcError(e).code;
       if (code === 'wrong_status' || code === 'booking_not_found') refresh();
