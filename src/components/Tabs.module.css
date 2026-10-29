@@ -10,7 +10,7 @@
 }
 
 @media (min-width: 1024px) {
-  .tabs {
+  .tabs:not(.segmented) {
     align-self: flex-start;
     min-width: 420px;
   }
@@ -22,7 +22,7 @@
   align-items: center;
   justify-content: center;
   gap: var(--space-2);
-  min-height: 40px;
+  min-height: var(--tap);
   padding: 8px 18px;
   border-radius: var(--radius-button);
   font-size: 14px;
@@ -62,10 +62,6 @@
 .on .count {
   background: var(--amber);
   color: var(--ink);
-}
-
-.segmented .tab {
-  min-height: var(--tap);
 }
 
 @media (prefers-reduced-motion: reduce) {

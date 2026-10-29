@@ -66,9 +66,10 @@
   filter: brightness(1.06);
 }
 
+/* --red-text: plain red falls under 4.5:1 on a raised card. */
 .danger {
   border-color: var(--red-line);
-  color: var(--red);
+  color: var(--red-text);
 }
 
 .danger:hover:not(:disabled) {
