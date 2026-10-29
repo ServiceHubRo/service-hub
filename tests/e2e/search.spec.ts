@@ -206,7 +206,8 @@ test.describe('client search', () => {
       window.scrollTo(0, 0);
       document.querySelectorAll('main').forEach((m) => m.scrollTo(0, 0));
     });
-    await expect(page.getByRole('heading', { name: 'Recenzii' })).not.toBeInViewport();
+    // On a laptop (T51) the reviews may already show in the right-hand column.
+    if (page.viewportSize()!.width < 1280) await expect(page.getByRole('heading', { name: 'Recenzii' })).not.toBeInViewport();
     await shot(page, 't20a-shop-header', name());
     await page.getByRole('button', { name: /recenzi/ }).click();
     await expect(page.getByRole('heading', { name: 'Recenzii' })).toBeFocused();
