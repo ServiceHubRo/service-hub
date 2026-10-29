@@ -1,4 +1,4 @@
-import { Bell, CreditCard, Download, FileCheck, FileText, Heart, Landmark, History, LifeBuoy, Lightbulb, ListTree, MapPinned, Megaphone, QrCode, ScrollText, Settings, SlidersHorizontal, Star } from 'lucide-react';
+import { Bell, Building2, CreditCard, Download, FileCheck, FileText, Heart, Landmark, History, LifeBuoy, Lightbulb, ListTree, MapPinned, Megaphone, QrCode, ScrollText, Settings, SlidersHorizontal, Star } from 'lucide-react';
 import { useCallback, useRef, useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import type { ShellOutletContext } from '../../app/AppShell';
@@ -28,7 +28,7 @@ import { REVIEWS_PATH, SHOP_LINK_PATH } from '../shop/paths';
 import { SETTINGS_PATH } from '../shop/settings/paths';
 import { OwnerTiles } from '../shop/OwnerTiles';
 import { DataSection } from './DataSection';
-import { helpPath, notificationsPath, suggestionsPath } from './paths';
+import { COMPANY_PATH, helpPath, notificationsPath, suggestionsPath } from './paths';
 import { IdentityCard } from './IdentityCard';
 import { InviteCard } from './InviteCard';
 import { LocationRow } from './LocationRow';
@@ -79,6 +79,7 @@ export function AccountScreen({ role }: { role: Role }) {
             <Tile to={VEHICLE_HISTORY_PICK_PATH} icon={History} label={t('vh.title')} hint={t('vh.tileHint')} />
             <Tile to={MY_REPORTS_PATH} icon={FileCheck} label={t('reports.title')} hint={t('reports.tileHint')} />
             <Tile to={FAVORITES_PATH} icon={Heart} label={t('favorites.title')} hint={t('favorites.hint')} />
+            <Tile to={COMPANY_PATH} icon={Building2} label={t('co.title')} hint={t('co.tileHint')} />
           </div>
           <InviteCard />
         </>

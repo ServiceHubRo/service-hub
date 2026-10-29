@@ -49,6 +49,8 @@ export type ShopUpdate = Partial<
     | 'monthly_report'
     | 'capacity_reviewed_at'
     | 'billing_reminder_dismissed_at'
+    | 'labor_rate'
+    | 'quote_terms'
   >
 >;
 export type BillingUpdate = Partial<
@@ -262,6 +264,13 @@ export async function saveShopServices(ids: string[], requestId: string): Promis
 }
 
 // ------------------------------------------------------------------------------------ billing (owner only)
+
+/** The VAT rate a VAT payer's quotes carry now (platform setting, T50). */
+export async function fetchVatRate(): Promise<number> {
+  const { data, error } = await db().from('platform_settings').select('vat_rate').eq('id', 1).single();
+  if (error) throw failure(error);
+  return Number(data.vat_rate);
+}
 
 export async function fetchBilling(shopId: string): Promise<ShopBilling | null> {
   const { data, error } = await db().from('shop_billing').select('*').eq('shop_id', shopId).maybeSingle();

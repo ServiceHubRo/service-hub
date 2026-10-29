@@ -1132,4 +1132,28 @@ begin
 end
 $function$;
 
+-- The reading Finalizare shows and checks against: the plate's last job, or this car's reading at
+-- intake when that is higher.
+CREATE OR REPLACE FUNCTION public.last_odometer_for_booking(p_booking_id uuid)
+ RETURNS integer
+ LANGUAGE plpgsql
+ STABLE SECURITY DEFINER
+ SET search_path TO ''
+AS $function$
+declare
+  v public.bookings%rowtype;
+begin
+  perform public.require_reader();
+  select * into v from public.bookings where id = p_booking_id;
+  if not found then
+    perform public.fail('booking_not_found');
+  end if;
+  if not public.is_shop_member(v.shop_id) then
+    perform public.fail('not_allowed');
+  end if;
+  return nullif(greatest(coalesce(public.last_odometer_for_plate(v.car_snapshot->>'plate_norm'), -1),
+                         coalesce((select i.odometer from public.vehicle_intakes i where i.booking_id = v.id), -1)), -1);
+end
+$function$;
+
 update public.schema_version set version = 87;

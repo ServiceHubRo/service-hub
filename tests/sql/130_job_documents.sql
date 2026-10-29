@@ -204,6 +204,7 @@ select public.decide_quote(current_setting('test.b3')::uuid, test.sent_quote(cur
   array(select id from public.quote_items where quote_id = test.sent_quote(current_setting('test.b3')::uuid)), gen_random_uuid());
 select test.login(test.id('owner1'));
 select public.start_work(current_setting('test.b3')::uuid, gen_random_uuid());
+select test.eq(public.last_odometer_for_booking(current_setting('test.b3')::uuid), 23611, 'Finalizare shows the reading at intake');
 select test.eq(test.error_of(format('select public.complete_job(%L, 23000, gen_random_uuid())', current_setting('test.b3'))),
   'odometer_lower', 'never below the odometer at intake');
 select test.eq(test.error_params(format('select public.complete_job(%L, 23000, gen_random_uuid())', current_setting('test.b3')))->>'previous',

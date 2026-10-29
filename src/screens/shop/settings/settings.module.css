@@ -115,3 +115,13 @@
   display: flex;
   gap: 6px;
 }
+
+.inlineLink {
+  color: var(--amber);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.inlineLink:hover {
+  text-decoration: underline;
+}

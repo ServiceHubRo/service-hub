@@ -36,6 +36,11 @@ export interface ShopHistoryItem {
   /** The warranty on the work (T37a), when the shop gave one. */
   warranty_months?: number | null;
   warranty_until?: string | null;
+  /** The shop's quote number (T50), who did the work and who checked it, and the intake sheet. */
+  quote_number?: number | null;
+  work_by?: string | null;
+  checked_by?: string | null;
+  intake_sent_at?: string | null;
   done_at: string | null;
   cancelled_by: 'client' | 'shop' | 'admin' | null;
   cancel_reason: string | null;
@@ -131,7 +136,13 @@ function normalize(data: RawHistory): ShopHistoryData {
         inspection_fee: toNumber(b.quote.inspection_fee),
         total_sent: toNumber(b.quote.total_sent),
         total_approved: toNumberOrNull(b.quote.total_approved),
-        items: b.quote.items.map((i) => ({ ...i, price: toNumber(i.price) })),
+        vat_rate: toNumberOrNull(b.quote.vat_rate),
+        items: b.quote.items.map((i) => ({
+          ...i,
+          price: toNumber(i.price),
+          quantity: toNumberOrNull(i.quantity),
+          unit_price: toNumberOrNull(i.unit_price),
+        })),
       },
     })),
     imported: (data.imported ?? []).map(fromImported),

@@ -1,4 +1,4 @@
-import { decisionKind as linesDecisionKind, type QuoteVariantFields } from './quoteLines';
+import { decisionKind as linesDecisionKind, type QuoteDetailFields, type QuoteVariantFields } from './quoteLines';
 import { nowKey } from './shopBookings';
 import type { BookingStatus } from './status';
 
@@ -11,7 +11,7 @@ import type { BookingStatus } from './status';
 
 export type QuoteStatus = 'sent' | 'accepted' | 'partially_accepted' | 'refused' | 'expired' | 'superseded' | 'withdrawn';
 
-export interface QuoteItem extends QuoteVariantFields {
+export interface QuoteItem extends QuoteVariantFields, QuoteDetailFields {
   id: string;
   position: number;
   name: string;
@@ -31,6 +31,10 @@ export interface Quote {
   sent_at: string;
   expires_at: string | null;
   decided_at: string | null;
+  /** The VAT rate the prices include (T50); null when the shop was not a VAT payer. */
+  vat_rate?: number | null;
+  /** The estimated time, in hours. */
+  est_hours?: number | null;
   items: QuoteItem[];
 }
 

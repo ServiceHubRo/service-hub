@@ -93,3 +93,13 @@ export async function hideClientGuide(userId: string): Promise<string> {
   if (error) throw failure(error);
   return at;
 }
+
+/** The client's company printed on quotes (T50); all empty clears it. */
+export async function updateCompany(
+  userId: string,
+  fields: { company_name: string | null; company_vat_id: string | null; company_address: string | null },
+): Promise<Profile> {
+  const { data, error } = await db().from('profiles').update(fields).eq('id', userId).select('*').single();
+  if (error) throw failure(error);
+  return data;
+}

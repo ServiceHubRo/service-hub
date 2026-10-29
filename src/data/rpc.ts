@@ -1,5 +1,6 @@
 import { Capacitor } from '@capacitor/core';
 import type { Database, Json } from './database.types';
+import type { QuoteLineInput } from '../lib/quoteDraft';
 import { NO_OFFERS, type NamedServiceRef, type ShopOffers } from '../lib/offers';
 import { reportSessionLost } from './sessionEvents';
 import { addBreadcrumb, captureError } from '../lib/monitoring';
@@ -609,32 +610,38 @@ export function adminForceCancel(bookingId: string, reason: string, requestId: s
 
 // ------------------------------------------------------------------------------------ quotes and work
 
-export interface QuoteLineInput {
-  name: string;
-  /** Lei, at most 2 decimals; the original part's price when the line has an alternative. */
-  price: number;
-  /** Which part a single line is (T37c), and the alternative's brand. */
-  part?: 'original' | 'alternative';
-  brand?: string;
-  /** The alternative part the client may pick instead (T37c): its price and, optionally, its brand. */
-  alt?: { price: number; brand?: string };
-}
+export type { QuoteLineInput };
 
-export function sendQuote(bookingId: string, items: QuoteLineInput[], note: string | undefined, requestId: string): Promise<Booking> {
+/** Sends the first quote; `estHours` is the estimated time (T50), optional. */
+export function sendQuote(
+  bookingId: string,
+  items: QuoteLineInput[],
+  note: string | undefined,
+  estHours: number | undefined,
+  requestId: string,
+): Promise<Booking> {
   return call('send_quote', {
     p_booking_id: bookingId,
     p_items: items as unknown as Json,
     p_note: note,
+    p_est_hours: estHours,
     p_request_id: requestId,
   });
 }
 
 /** "Edit quote": the waiting version is superseded by a new one; the expiry clock restarts. */
-export function replaceQuote(bookingId: string, items: QuoteLineInput[], note: string | undefined, requestId: string): Promise<Booking> {
+export function replaceQuote(
+  bookingId: string,
+  items: QuoteLineInput[],
+  note: string | undefined,
+  estHours: number | undefined,
+  requestId: string,
+): Promise<Booking> {
   return call('replace_quote', {
     p_booking_id: bookingId,
     p_items: items as unknown as Json,
     p_note: note,
+    p_est_hours: estHours,
     p_request_id: requestId,
   });
 }
@@ -671,6 +678,9 @@ export interface CompleteJobInput {
   confirmJump?: boolean;
   /** Months of warranty on the work (1–60), none when left out. */
   warrantyMonths?: number;
+  /** Who did the work and who checked it (T50), printed on the final quote. */
+  workBy?: string;
+  checkedBy?: string;
 }
 
 export function completeJob(input: CompleteJobInput, requestId: string): Promise<Booking> {
@@ -681,6 +691,8 @@ export function completeJob(input: CompleteJobInput, requestId: string): Promise
     p_cost: input.cost,
     p_confirm_jump: input.confirmJump ?? false,
     p_warranty_months: input.warrantyMonths,
+    p_work_by: input.workBy,
+    p_checked_by: input.checkedBy,
     p_request_id: requestId,
   });
 }

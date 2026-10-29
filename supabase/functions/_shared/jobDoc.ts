@@ -451,7 +451,10 @@ export function consentText(lang: Lang, data: JobDocData): string {
 }
 
 /** The file name: `deviz-000478.pdf`, `deviz-final-000478.pdf`, `fisa-preluare-P-004213.pdf`. */
-export function jobDocFileName(lang: Lang, data: Pick<JobDocData, 'kind' | 'booking'>): string {
+export function jobDocFileName(
+  lang: Lang,
+  data: { kind: JobDocKind; booking: Pick<JobDocData['booking'], 'ref' | 'quote_number'> },
+): string {
   const id = data.booking.quote_number != null ? docNumber(data.booking.quote_number) : data.booking.ref;
   const base =
     data.kind === 'intake'

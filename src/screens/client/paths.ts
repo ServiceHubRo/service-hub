@@ -47,6 +47,11 @@ export function bookingCarHistoryPath(bookingId: string): string {
   return `${BOOKINGS_PATH}/${bookingId}/istoric`;
 }
 
+/** The intake sheet of a booking (T50): the client reads and confirms it. */
+export function bookingIntakePath(bookingId: string): string {
+  return `${BOOKINGS_PATH}/${bookingId}/preluare`;
+}
+
 /** Router state of a link into the vehicle history: where "Înapoi" leads. */
 export interface VehicleHistoryLinkState {
   from: 'garage' | 'bookings' | 'account';

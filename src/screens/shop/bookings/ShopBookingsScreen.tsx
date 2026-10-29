@@ -220,8 +220,6 @@ export function ShopBookingsScreen() {
                 <ShopBookingCard
                   booking={b}
                   shopId={data.shop.id}
-                  fee={data.shop.inspection_fee}
-                  expiryDays={data.quote_expiry_days}
                   now={now}
                   fresh={isFresh(b.id)}
                   onDone={onDone}

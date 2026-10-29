@@ -89,6 +89,8 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
     'client.inspection_started': { title: '{shop}', body: '{car} este în constatare. Vei primi devizul în aplicație.' },
     'client.quote_sent': { title: '{shop}', body: 'Devizul pentru {car} este gata: {total}. Răspunde până pe {deadline}.' },
     'client.quote_replaced': { title: '{shop}', body: 'Service-ul a modificat devizul pentru {car}: {total}.' },
+    'client.intake_sent': { title: '{shop}', body: 'Fișa de preluare pentru {car} este completată. Verific-o și confirm-o.' },
+    'client.intake_updated': { title: '{shop}', body: 'Service-ul a modificat fișa de preluare pentru {car}.' },
     'client.quote_withdrawn': { title: '{shop}', body: 'Service-ul a retras devizul pentru {car}.' },
     'client.quote_expiring': {
       title: '{shop}',
@@ -189,6 +191,10 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
     'shop.booking_cancelled_admin': {
       title: 'Programare anulată',
       body: 'Echipa Service-Hub a anulat programarea {ref} ({client}, {when}). Motiv: {reason}',
+    },
+    'shop.intake_confirmed': {
+      title: 'Fișă de preluare confirmată',
+      body: '{client} a confirmat fișa de preluare pentru {car_plate}.',
     },
     'shop.quote_accepted': {
       title: 'Deviz acceptat',
@@ -366,6 +372,8 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
     'client.inspection_started': { title: '{shop}', body: 'Your {car} is being inspected. The quote will come in the app.' },
     'client.quote_sent': { title: '{shop}', body: 'The quote for your {car} is ready: {total}. Please answer by {deadline}.' },
     'client.quote_replaced': { title: '{shop}', body: 'The shop changed the quote for your {car}: {total}.' },
+    'client.intake_sent': { title: '{shop}', body: 'The intake sheet for your {car} is ready. Check it and confirm.' },
+    'client.intake_updated': { title: '{shop}', body: 'The shop changed the intake sheet for your {car}.' },
     'client.quote_withdrawn': { title: '{shop}', body: 'The shop withdrew the quote for your {car}.' },
     'client.quote_expiring': {
       title: '{shop}',
@@ -465,6 +473,10 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
     'shop.booking_cancelled_admin': {
       title: 'Booking canceled',
       body: 'The Service-Hub team canceled booking {ref} ({client}, {when}). Reason: {reason}',
+    },
+    'shop.intake_confirmed': {
+      title: 'Intake sheet confirmed',
+      body: '{client} confirmed the intake sheet for the {car_plate}.',
     },
     'shop.quote_accepted': {
       title: 'Quote accepted',
@@ -685,14 +697,14 @@ const WORDS: Record<Lang, Record<string, string>> = {
 export const EVENTS: Record<Side, readonly string[]> = {
   client: [
     'booking_confirmed', 'booking_declined', 'booking_rescheduled', 'booking_cancelled_shop', 'booking_cancelled_admin',
-    'no_show', 'inspection_started', 'quote_sent', 'quote_replaced', 'quote_withdrawn', 'quote_expiring', 'quote_expired',
+    'no_show', 'inspection_started', 'intake_sent', 'intake_updated', 'quote_sent', 'quote_replaced', 'quote_withdrawn', 'quote_expiring', 'quote_expired',
     'work_started', 'job_done', 'appointment_reminder', 'new_message', 'review_reply', 'doc_expiry', 'report_ready',
     'review_report_decided', 'review_request', 'service_due', 'account_suspended', 'account_reactivated',
     'tire_season', 'welcome', 'favorite_offer', 'request_expired', 'area_launched', 'report_credit',
     'slot_freed',
   ],
   shop: [
-    'booking_requested', 'booking_auto_confirmed', 'booking_cancelled_client', 'booking_cancelled_admin', 'quote_accepted',
+    'booking_requested', 'booking_auto_confirmed', 'booking_cancelled_client', 'booking_cancelled_admin', 'intake_confirmed', 'quote_accepted',
     'quote_partially_accepted', 'quote_refused', 'quote_expiring', 'quote_expired', 'new_message', 'new_review',
     'daily_digest', 'trial_ending', 'payment_failed', 'shop_inactive', 'review_report_decided', 'account_suspended',
     'account_reactivated', 'referral_reward', 'referral_revoked', 'booking_request_waiting', 'booking_request_last_call', 'monthly_report',
@@ -915,6 +927,10 @@ export function urlFor(side: Side, e: NotificationEvent): string {
       case 'account_suspended':
       case 'account_reactivated':
         return '/c/cauta';
+      // The intake sheet to check and confirm (T50).
+      case 'intake_sent':
+      case 'intake_updated':
+        return booking ? `/c/programari/${booking}/preluare` : '/c/programari';
       // The booking card with the review form open.
       case 'review_request':
         return booking ? `/c/programari?${q({ p: booking, recenzie: '1' })}` : '/c/programari';
@@ -959,6 +975,7 @@ export function urlFor(side: Side, e: NotificationEvent): string {
     case 'referral_revoked':
       return SUBSCRIPTION_PATH;
     case 'booking_auto_confirmed':
+    case 'intake_confirmed':
       return booking ? `/s/programari?${q({ tab: 'programate', p: booking })}` : '/s/programari?tab=programate';
     case 'booking_requested':
     case 'booking_request_waiting':

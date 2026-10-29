@@ -4,6 +4,8 @@ import { ThreadsProvider } from '../../screens/messages/ThreadsProvider';
 import { NoticesProvider } from '../../screens/notices/NoticesProvider';
 import { AddBookingScreen } from '../../screens/shop/bookings/AddBookingScreen';
 import { ImportScreen } from '../../screens/shop/bookings/ImportScreen';
+import { IntakeScreen } from '../../screens/shop/bookings/IntakeScreen';
+import { QuoteEditorScreen } from '../../screens/shop/bookings/QuoteEditorScreen';
 import { ShopShareScreen } from '../../screens/shop/link/ShopShareScreen';
 import { ShopBookingsProvider } from '../../screens/shop/bookings/ShopBookingsProvider';
 import { ShopBookingsScreen } from '../../screens/shop/bookings/ShopBookingsScreen';
@@ -12,6 +14,8 @@ import { ShopHistoryScreen } from '../../screens/shop/history/ShopHistoryScreen'
 import {
   ADD_BOOKING_PATH,
   IMPORT_PATH,
+  INTAKE_SEGMENT,
+  QUOTE_EDITOR_SEGMENT,
   SHOP_LINK_PATH,
   REPORTS_PATH,
   REVIEWS_PATH,
@@ -29,6 +33,7 @@ import { NotificationSettings } from '../../screens/shop/settings/NotificationSe
 import { OwnerOnlySettings } from '../../screens/shop/settings/OwnerOnlySettings';
 import { SETTINGS_LINKS, SETTINGS_PATH } from '../../screens/shop/settings/paths';
 import { ProfileSettings } from '../../screens/shop/settings/ProfileSettings';
+import { QuoteSettings } from '../../screens/shop/settings/QuoteSettings';
 import { RulesSettings } from '../../screens/shop/settings/RulesSettings';
 import { ShowcaseSettings } from '../../screens/shop/settings/ShowcaseSettings';
 import { ServicesSettings } from '../../screens/shop/settings/ServicesSettings';
@@ -68,6 +73,9 @@ export default function ShopApp() {
         {messageRoutes('shop')}
         <Route path={rel('shop', ADD_BOOKING_PATH)} element={<AddBookingScreen />} />
         <Route path={rel('shop', IMPORT_PATH)} element={<ImportScreen />} />
+        {/* The quote editor and the intake sheet (T50), full screen under Programări. */}
+        <Route path={`${rel('shop', SHOP_BOOKINGS_PATH)}/${QUOTE_EDITOR_SEGMENT}/:bookingId`} element={<QuoteEditorScreen />} />
+        <Route path={`${rel('shop', SHOP_BOOKINGS_PATH)}/${INTAKE_SEGMENT}/:bookingId`} element={<IntakeScreen />} />
         {/* Fișa mașinii (T27), under the tab it was opened from. */}
         <Route
           path={`${rel('shop', SHOP_BOOKINGS_PATH)}/${VEHICLE_FILE_SEGMENT}/:bookingId`}
@@ -89,6 +97,7 @@ export default function ShopApp() {
             <Route path="reguli" element={<RulesSettings />} />
             <Route path="servicii" element={<ServicesSettings />} />
             <Route path="vitrina" element={<ShowcaseSettings />} />
+            <Route path="devize" element={<QuoteSettings />} />
           </Route>
           <Route path="facturare" element={<BillingSettings />} />
           <Route path="personal" element={<StaffSettings />} />

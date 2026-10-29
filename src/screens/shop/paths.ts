@@ -45,3 +45,17 @@ export function vehicleFilePath(bookingId: string, from: VehicleFileFrom): strin
   const base = from === 'history' ? SHOP_HISTORY_PATH : SHOP_BOOKINGS_PATH;
   return `${base}/${VEHICLE_FILE_SEGMENT}/${encodeURIComponent(bookingId)}`;
 }
+
+/** The quote editor (T50), full screen, under Programări. */
+export const QUOTE_EDITOR_SEGMENT = 'deviz';
+
+export function quoteEditorPath(bookingId: string): string {
+  return `${SHOP_BOOKINGS_PATH}/${QUOTE_EDITOR_SEGMENT}/${encodeURIComponent(bookingId)}`;
+}
+
+/** The intake sheet (T50), under Programări. */
+export const INTAKE_SEGMENT = 'preluare';
+
+export function intakePath(bookingId: string): string {
+  return `${SHOP_BOOKINGS_PATH}/${INTAKE_SEGMENT}/${encodeURIComponent(bookingId)}`;
+}
