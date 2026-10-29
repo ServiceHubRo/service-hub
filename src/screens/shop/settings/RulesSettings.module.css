@@ -28,3 +28,8 @@
   flex-direction: column;
   gap: 14px;
 }
+
+/* "Mașini pe zi", reached from Panou (#capacitate): clear of the sticky back link. */
+.anchor {
+  scroll-margin: calc(var(--space-12) + var(--space-8));
+}

@@ -153,9 +153,9 @@ export function RulesSettings() {
     <div className={styles.page}>
       <PageHeader back={{ to: SETTINGS_PATH, label: t('settings.title') }} title={t('settings.rules')} />
 
-      <Section id="capacitate" title={t('rules.sec.capacity')} description={t('rules.sec.capacity.desc')}>
+      <Section title={t('rules.sec.capacity')} description={t('rules.sec.capacity.desc')}>
         <SectionCard>
-          <div ref={capacityRef}>
+          <div id="capacitate" ref={capacityRef} className={own.anchor}>
             <Stepper
               label={t('rules.capacity')}
               value={rules.daily_capacity}
