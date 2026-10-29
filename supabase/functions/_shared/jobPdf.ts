@@ -206,13 +206,18 @@ export async function renderJobPdf(lib: PdfLib, data: JobDocData, lang: 'ro' | '
   const colW = (CONTENT - 10) / 2;
   const clientRows: [string, PdfFont, Color][] = [];
   const recipient = data.recipient;
-  if (recipient?.company_name) {
+  if (recipient?.kind !== 'person' && recipient?.company_name) {
     clientRows.push([clean(recipient.company_name), bold, C.ink]);
-    if (recipient.vat_id) clientRows.push([t('cui', { code: clean(recipient.vat_id) }), sans, C.ink]);
+    const codes = [
+      recipient.vat_id ? t('cui', { code: clean(recipient.vat_id) }) : '',
+      recipient.reg_com ? t('regCom', { code: clean(recipient.reg_com) }) : '',
+    ].filter(Boolean);
+    if (codes.length) clientRows.push([codes.join(' · '), sans, C.ink]);
     if (recipient.address) clientRows.push([clean(recipient.address), sans, C.ink]);
     if (b.client_name) clientRows.push([clean(b.client_name), sans, C.muted]);
   } else {
     clientRows.push([clean(b.client_name) || t('none'), bold, C.ink]);
+    if (recipient?.address) clientRows.push([clean(recipient.address), sans, C.ink]);
   }
   if (b.client_phone) clientRows.push([clean(b.client_phone), sans, C.muted]);
 

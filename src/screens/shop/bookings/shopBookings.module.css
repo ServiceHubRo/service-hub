@@ -431,6 +431,9 @@
 }
 
 .inlineLink {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap);
   color: var(--amber);
   font-weight: 600;
   text-decoration: none;
@@ -445,4 +448,11 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
   gap: 10px;
+}
+
+.intakeLine {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  column-gap: 8px;
 }

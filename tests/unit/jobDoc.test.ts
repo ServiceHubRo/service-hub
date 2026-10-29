@@ -65,7 +65,7 @@ function sample(kind: JobDocData['kind'] = 'quote', status = 'sent'): JobDocData
       legal_address: 'Str. Exemplului 52, Hala M2, Brașov',
       phone: '0268 000 000',
     },
-    recipient: { company_name: 'Exemplu Consult SRL', vat_id: 'RO32155640', address: 'Str. Teodoroiu 2 bis, Brașov' },
+    recipient: { kind: 'company', company_name: 'Exemplu Consult SRL', vat_id: 'RO32155640', reg_com: 'J08/1249/2013', address: 'Str. Teodoroiu 2 bis, Brașov' },
     quote: {
       version: 1,
       status,
@@ -165,6 +165,18 @@ describe('job documents', () => {
     const shop = sample('quote', 'accepted');
     shop.quote!.decided_by = 'shop';
     expect(consentText('en', shop)).toContain('recorded by the shop');
+  });
+
+  it('names a person by the booking, a company by its name', () => {
+    const person = sample('quote', 'accepted');
+    person.recipient = { kind: 'person', address: 'Str. Mică 3, Brașov' };
+    expect(consentText('ro', person)).toBe('Acceptat în aplicație de Andrei Popescu la 19.10.2026, ora 14:32.');
+  });
+
+  it('renders a quote issued to a person with an address', async () => {
+    const person = sample('final', 'accepted');
+    person.recipient = { kind: 'person', address: 'Str. Mică 3, Brașov' };
+    expect(await pdfText(await renderJobPdf(lib, person, 'ro'))).toBeGreaterThanOrEqual(1);
   });
 
   it('has the same texts in both languages', () => {

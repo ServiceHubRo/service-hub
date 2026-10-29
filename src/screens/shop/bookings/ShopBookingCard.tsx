@@ -359,8 +359,8 @@ function IntakeLine({ booking: b }: { booking: ShopBooking }) {
   if (!INTAKE_STATUSES.has(b.status)) return null;
   const text = b.intake_confirmed_at ? t('in.line.confirmed') : b.intake_sent_at ? t('in.line.sent') : null;
   return (
-    <p className={styles.muted}>
-      {text && <>{text} </>}
+    <p className={`${styles.muted} ${styles.intakeLine}`}>
+      {text && <span>{text}</span>}
       <Link to={intakePath(b.id)} className={styles.inlineLink}>
         {b.intake_sent_at ? t('in.line.open') : t('in.line.write')}
       </Link>

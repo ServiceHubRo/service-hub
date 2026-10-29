@@ -201,33 +201,49 @@ test.describe('the complete quote and the intake sheet', () => {
     await clientPage.context().close();
   });
 
-  test('the client gives a company for quotes', async ({ page }) => {
+  test('the client chooses who quotes are issued to: a person or a company', async ({ page }) => {
     const client = await createUser('client');
     await signIn(page, client, PASSWORD);
     await expect(page).toHaveURL(/\/c\//);
     await page.goto('/c/cont');
     await page.getByRole('link', { name: /Date pentru deviz/ }).click();
     await expect(page.getByRole('heading', { level: 1, name: 'Date pentru deviz' })).toBeVisible();
+    // A person: the account's name, an optional address.
+    await expect(page.getByRole('button', { name: 'Persoană fizică' })).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.getByText('Devizele se emit pe numele Maria Pop, cu telefonul din cont.')).toBeVisible();
+    await page.getByLabel('Adresa (opțional)').fill('Str. Mică 3, Brașov');
+    await shot(page, 't50-person', name());
+    await page.getByRole('button', { name: 'Salvează' }).click();
+    await expect(page.getByRole('button', { name: 'Salvat' })).toBeVisible();
+    // A company: the name is required, the codes optional but valid.
+    await page.getByRole('button', { name: 'Persoană juridică' }).click();
+    await page.getByLabel('CUI (opțional)').fill('123');
+    await page.getByRole('button', { name: 'Salvează' }).click();
+    await expect(page.getByText('Scrie denumirea firmei.')).toBeVisible();
     await page.getByLabel('Denumirea firmei').fill('Exemplu Consult SRL');
-    await page.getByLabel('CUI').fill('123');
     await page.getByRole('button', { name: 'Salvează' }).click();
     await expect(page.getByText('CUI-ul nu este valid.')).toBeVisible();
-    await page.getByLabel('CUI').fill('RO14872301');
-    await page.getByRole('button', { name: 'Salvează' }).click();
-    await expect(page.getByText('Scrie adresa sediului.')).toBeVisible();
-    await page.getByLabel('Adresa sediului').fill('Str. Teodoroiu 2 bis, Brașov');
+    await page.getByLabel('CUI (opțional)').fill('');
+    await page.getByLabel('Nr. Reg. Com. (opțional)').fill('J08/1249/2013');
     await expectNoHorizontalScroll(page);
     await shot(page, 't50-company', name());
     await page.getByRole('button', { name: 'Salvează' }).click();
     await expect(page.getByRole('button', { name: 'Salvat' })).toBeVisible();
     const id = await userIdOf(client);
-    const [profile] = await serviceRest<{ company_name: string; company_vat_id: string }[]>(
-      `profiles?id=eq.${id}&select=company_name,company_vat_id`,
+    const [profile] = await serviceRest<Record<string, string | null>[]>(
+      `profiles?id=eq.${id}&select=doc_party,person_address,company_name,company_vat_id,company_reg_com`,
       'GET',
     );
-    expect(profile).toEqual({ company_name: 'Exemplu Consult SRL', company_vat_id: 'RO14872301' });
+    expect(profile).toEqual({
+      doc_party: 'company',
+      person_address: 'Str. Mică 3, Brașov',
+      company_name: 'Exemplu Consult SRL',
+      company_vat_id: null,
+      company_reg_com: 'J08/1249/2013',
+    });
     await page.getByRole('button', { name: 'English' }).filter({ visible: true }).first().click();
     await expect(page.getByRole('heading', { level: 1, name: 'Details for quotes' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Company' })).toHaveAttribute('aria-pressed', 'true');
     await shot(page, 't50-company-en', name());
   });
 });

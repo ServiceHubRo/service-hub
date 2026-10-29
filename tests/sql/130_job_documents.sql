@@ -9,11 +9,13 @@ update public.platform_settings
 update public.shops set daily_capacity = 20, labor_rate = 181.50, quote_terms = 'Piesele rămân proprietatea service-ului până la plată.'
 where id = test.id('shop1');
 update public.shop_billing set vat_payer = true, legal_address = 'Str. Lungă 1, Brașov' where shop_id = test.id('shop1');
-update public.profiles set company_name = 'Firma Anei SRL', company_vat_id = 'ro 14872301', company_address = 'Str. Scurtă 2, Brașov'
+update public.profiles set doc_party = 'company', company_name = 'Firma Anei SRL', company_vat_id = 'ro 14872301',
+  company_reg_com = 'j08/1245/2009', company_address = 'Str. Scurtă 2, Brașov'
 where id = test.id('client_a');
 select set_config('test.day1', test.workday(1)::text, true);
 
-select test.eq(company_vat_id, 'RO14872301', 'the client''s company code is stored in one form')
+select test.eq(company_vat_id, 'RO14872301', 'the client''s company code is stored in one form'),
+       test.eq(company_reg_com, 'J08/1245/2009', 'and the trade register number')
 from public.profiles where id = test.id('client_a');
 
 create function pg_temp.in_inspection(p_slot time, p_plate text default 'BV 50 DOC') returns uuid
@@ -66,6 +68,7 @@ select test.eq(total_sent, 869.40::numeric(10,2), 'the total counts the original
        test.eq(issuer->>'legal_name', 'AUTO UNU SRL', 'the shop''s company is kept on the quote'),
        test.eq(issuer->>'vat_id', 'RO14872301', 'with its code'),
        test.eq(recipient->>'company_name', 'Firma Anei SRL', 'the client''s company is kept on the quote'),
+       test.eq(recipient->>'reg_com', 'J08/1245/2009', 'with its trade register number'),
        test.eq(terms, 'Piesele rămân proprietatea service-ului până la plată.', 'the shop''s terms are kept on the quote')
 from public.quotes where id = current_setting('test.q')::uuid;
 
@@ -241,12 +244,29 @@ select test.eq(test.error_of(format('select public.job_document_data(%L, %L, %L)
   'permission denied for function job_document_data', 'only the Edge Function (service role) calls it');
 select test.logout();
 
--- The client's company: their own row only, a valid code.
+-- Who quotes are issued to: the client's own row; a company needs its name, the codes are
+-- optional but valid; a person may give an address.
 select test.login(test.id('client_a'));
 select test.fails($$update public.profiles set company_vat_id = '123' where id = auth.uid()$$, 'check', 'a valid company code');
-update public.profiles set company_name = '' where id = auth.uid();
+select test.fails($$update public.profiles set company_reg_com = 'X1' where id = auth.uid()$$, 'check', 'a valid trade register number');
+select test.fails($$update public.profiles set company_name = '' where id = auth.uid()$$, 'profiles_company_named', 'a company needs its name');
+update public.profiles set company_vat_id = null, company_reg_com = null, company_address = null where id = auth.uid();
 select test.logout();
-select test.eq(company_name, null::text, 'an empty company name clears it')
+select test.eq(public.quote_recipient(test.id('client_a')), '{"kind": "company", "company_name": "Firma Anei SRL"}'::jsonb,
+  'a company with its name only');
+select test.login(test.id('client_a'));
+update public.profiles set doc_party = 'person', person_address = '  Str. Mică 3, Brașov ' where id = auth.uid();
+select test.logout();
+select test.eq(public.quote_recipient(test.id('client_a')), '{"kind": "person", "address": "Str. Mică 3, Brașov"}'::jsonb,
+  'a person with an address');
+select test.login(test.id('client_a'));
+update public.profiles set person_address = '' where id = auth.uid();
+select test.logout();
+select test.eq(public.quote_recipient(test.id('client_a')), null::jsonb, 'a person without an address: the booking says enough');
+select test.login(test.id('client_b'));
+update public.profiles set doc_party = 'company', company_name = 'Altcineva SRL' where id = test.id('client_a');
+select test.logout();
+select test.eq(doc_party, 'person', 'nobody changes another client''s details')
 from public.profiles where id = test.id('client_a');
 
 rollback;

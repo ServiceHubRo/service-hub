@@ -63,7 +63,8 @@ export interface JobDocData {
     services_en: string | null;
   };
   shop: JobDocParty;
-  recipient: { company_name?: string; vat_id?: string; address?: string } | null;
+  /** Who the quote is issued to, when more than the booking's name: a company, or a person with an address. */
+  recipient: { kind?: 'person' | 'company'; company_name?: string; vat_id?: string; reg_com?: string; address?: string } | null;
   quote: {
     version: number;
     status: string;
@@ -434,7 +435,7 @@ export function docTotals(data: JobDocData): DocTotals {
 export function consentText(lang: Lang, data: JobDocData): string {
   const q = data.quote;
   if (!q) return '';
-  const name = (data.recipient?.company_name ?? data.booking.client_name ?? '').trim() || jobDocText(lang, 'client');
+  const name = ((data.recipient?.kind !== 'person' && data.recipient?.company_name) || data.booking.client_name || '').trim() || jobDocText(lang, 'client');
   const decided = q.decided_at ? docMoment(lang, q.decided_at) : '';
   switch (q.status) {
     case 'accepted':

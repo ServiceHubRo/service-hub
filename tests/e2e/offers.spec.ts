@@ -116,9 +116,9 @@ test.describe('new-client offers', () => {
     await expectNoHorizontalScroll(page);
     await shot(page, 'offer-quote-form', name());
 
-    // In English too.
+    // In English too (the quote editor is a screen of its own since T50: back to the list).
     await serviceRest(`profiles?id=eq.${await userIdOf(shopEmail)}`, 'PATCH', { lang: 'en' });
-    await page.reload();
+    await page.goto('/s/programari?tab=programate');
     await expect(page.locator('li').filter({ hasText: 'Skoda Octavia' })).toContainText('New client: you promised 10% off labor');
     await page.goto('/s/cont/setari/reguli');
     const offerEn = page.getByRole('switch', { name: /^New-client offer/ });

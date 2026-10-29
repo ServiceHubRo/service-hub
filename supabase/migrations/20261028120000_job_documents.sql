@@ -5,8 +5,8 @@
 -- · Quote lines say what they are: labor (hours × hourly rate) or part (quantity × unit price,
 --   producer). A line without hours keeps a fixed price, as before. Older lines keep kind null.
 -- · A sent quote keeps what its document prints: the VAT rate (null when the shop is not a VAT
---   payer), the estimated duration, the shop's legal identity, the client's company (when the
---   client gave one) and the shop's own terms.
+--   payer), the estimated duration, the shop's legal identity, who it is issued to (a company, or
+--   a person with an address, as the client set it) and the shop's own terms.
 -- · Every booking gets a quote number at its first quote, from the shop's own sequence
 --   (shop_quote_numbers, private); the owner may set where it continues from.
 -- · vehicle_intakes: the intake sheet (odometer in, fuel, damage marked on a drawing, photos,
@@ -61,12 +61,18 @@ alter table public.quote_items drop constraint quote_items_brand_variant;
 alter table public.quote_items
   add constraint quote_items_brand_variant check (brand is null or variant is not null or kind = 'part');
 
--- The client's company, printed on quotes when the client gives one (Cont → Date pentru deviz).
+-- Who the client's quotes are issued to (Cont → Date pentru deviz): a person (the account's name,
+-- an optional address) or a company (its name; CUI, trade register number and address optional).
 alter table public.profiles
+  add column doc_party text not null default 'person' check (doc_party in ('person', 'company')),
+  add column person_address text check (char_length(btrim(person_address)) between 1 and 300),
   add column company_name text check (char_length(btrim(company_name)) between 1 and 200),
   add column company_vat_id text check (company_vat_id is null or public.is_valid_cui(company_vat_id)),
-  add column company_address text check (char_length(btrim(company_address)) between 1 and 300);
-grant update (company_name, company_vat_id, company_address) on public.profiles to authenticated;
+  add column company_reg_com text check (company_reg_com is null or public.is_valid_regcom(company_reg_com)),
+  add column company_address text check (char_length(btrim(company_address)) between 1 and 300),
+  add constraint profiles_company_named check (doc_party <> 'company' or company_name is not null);
+grant update (doc_party, person_address, company_name, company_vat_id, company_reg_com, company_address)
+  on public.profiles to authenticated;
 
 create function public.profiles_company_normalize()
 returns trigger
@@ -74,13 +80,16 @@ language plpgsql
 set search_path = ''
 as $$
 begin
+  new.person_address := nullif(btrim(new.person_address), '');
   new.company_name := nullif(btrim(new.company_name), '');
   new.company_vat_id := public.normalize_code(nullif(btrim(new.company_vat_id), ''));
+  new.company_reg_com := public.normalize_code(nullif(btrim(new.company_reg_com), ''));
   new.company_address := nullif(btrim(new.company_address), '');
   return new;
 end
 $$;
-create trigger profiles_company_normalize before insert or update of company_name, company_vat_id, company_address
+create trigger profiles_company_normalize
+  before insert or update of person_address, company_name, company_vat_id, company_reg_com, company_address
   on public.profiles for each row execute function public.profiles_company_normalize();
 
 -- ---------------------------------------------------------------------------------------------
@@ -336,17 +345,23 @@ as $$
 $$;
 revoke execute on function public.quote_issuer(uuid) from public, anon, authenticated;
 
--- The client's company, when the client gave one.
+-- Who the quote is issued to, when the client said more than the booking's name and phone: a
+-- company, or a person with an address.
 create function public.quote_recipient(p_client_id uuid)
 returns jsonb
 language sql
 stable
 set search_path = ''
 as $$
-  select case when p.company_name is null then null else jsonb_strip_nulls(jsonb_build_object(
-    'company_name', p.company_name,
-    'vat_id', p.company_vat_id,
-    'address', p.company_address)) end
+  select case
+    when p.doc_party = 'company' then jsonb_strip_nulls(jsonb_build_object(
+      'kind', 'company',
+      'company_name', p.company_name,
+      'vat_id', p.company_vat_id,
+      'reg_com', p.company_reg_com,
+      'address', p.company_address))
+    when p.person_address is not null then jsonb_build_object('kind', 'person', 'address', p.person_address)
+  end
   from public.profiles p
   where p.id = p_client_id
 $$;

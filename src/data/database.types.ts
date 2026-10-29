@@ -1228,10 +1228,12 @@ export type Database = {
           app_tips: boolean
           company_address: string | null
           company_name: string | null
+          company_reg_com: string | null
           company_vat_id: string | null
           created_at: string
           deleted_at: string | null
           display_id: string
+          doc_party: string
           email_verified_at: string | null
           guide_hidden_at: string | null
           id: string
@@ -1239,6 +1241,7 @@ export type Database = {
           last_active_at: string | null
           location_prompt_dismissed_at: string | null
           name: string | null
+          person_address: string | null
           phone: string | null
           phone_verified_at: string | null
           phone_verified_by_admin: boolean
@@ -1258,10 +1261,12 @@ export type Database = {
           app_tips?: boolean
           company_address?: string | null
           company_name?: string | null
+          company_reg_com?: string | null
           company_vat_id?: string | null
           created_at?: string
           deleted_at?: string | null
           display_id: string
+          doc_party?: string
           email_verified_at?: string | null
           guide_hidden_at?: string | null
           id: string
@@ -1269,6 +1274,7 @@ export type Database = {
           last_active_at?: string | null
           location_prompt_dismissed_at?: string | null
           name?: string | null
+          person_address?: string | null
           phone?: string | null
           phone_verified_at?: string | null
           phone_verified_by_admin?: boolean
@@ -1288,10 +1294,12 @@ export type Database = {
           app_tips?: boolean
           company_address?: string | null
           company_name?: string | null
+          company_reg_com?: string | null
           company_vat_id?: string | null
           created_at?: string
           deleted_at?: string | null
           display_id?: string
+          doc_party?: string
           email_verified_at?: string | null
           guide_hidden_at?: string | null
           id?: string
@@ -1299,6 +1307,7 @@ export type Database = {
           last_active_at?: string | null
           location_prompt_dismissed_at?: string | null
           name?: string | null
+          person_address?: string | null
           phone?: string | null
           phone_verified_at?: string | null
           phone_verified_by_admin?: boolean
@@ -4681,10 +4690,12 @@ export type Database = {
           app_tips: boolean
           company_address: string | null
           company_name: string | null
+          company_reg_com: string | null
           company_vat_id: string | null
           created_at: string
           deleted_at: string | null
           display_id: string
+          doc_party: string
           email_verified_at: string | null
           guide_hidden_at: string | null
           id: string
@@ -4692,6 +4703,7 @@ export type Database = {
           last_active_at: string | null
           location_prompt_dismissed_at: string | null
           name: string | null
+          person_address: string | null
           phone: string | null
           phone_verified_at: string | null
           phone_verified_by_admin: boolean
@@ -4720,10 +4732,12 @@ export type Database = {
           app_tips: boolean
           company_address: string | null
           company_name: string | null
+          company_reg_com: string | null
           company_vat_id: string | null
           created_at: string
           deleted_at: string | null
           display_id: string
+          doc_party: string
           email_verified_at: string | null
           guide_hidden_at: string | null
           id: string
@@ -4731,6 +4745,7 @@ export type Database = {
           last_active_at: string | null
           location_prompt_dismissed_at: string | null
           name: string | null
+          person_address: string | null
           phone: string | null
           phone_verified_at: string | null
           phone_verified_by_admin: boolean
@@ -4761,10 +4776,12 @@ export type Database = {
           app_tips: boolean
           company_address: string | null
           company_name: string | null
+          company_reg_com: string | null
           company_vat_id: string | null
           created_at: string
           deleted_at: string | null
           display_id: string
+          doc_party: string
           email_verified_at: string | null
           guide_hidden_at: string | null
           id: string
@@ -4772,6 +4789,7 @@ export type Database = {
           last_active_at: string | null
           location_prompt_dismissed_at: string | null
           name: string | null
+          person_address: string | null
           phone: string | null
           phone_verified_at: string | null
           phone_verified_by_admin: boolean
