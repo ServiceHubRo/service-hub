@@ -158,10 +158,10 @@ test.describe('shop settings', () => {
     await page.getByRole('link', { name: /Reguli de programare/ }).click();
     await clickInPlace(page, page.getByRole('button', { name: 'Crește: Mașini pe zi' }));
     await expect(page.locator('#capacitate output')).toHaveText('6');
-    await page.getByLabel('Suma (lei)').fill('8o');
+    await page.getByLabel('Taxă de constatare (lei)').fill('8o');
     await page.getByRole('button', { name: 'Salvează regulile' }).click();
     await expect(page.getByText('Scrie o sumă între 0 și 10.000 lei.')).toBeVisible();
-    await page.getByLabel('Suma (lei)').fill('80');
+    await page.getByLabel('Taxă de constatare (lei)').fill('80');
     await page.getByRole('button', { name: 'Salvează regulile' }).click();
     await expect(page.getByRole('button', { name: '✓ Salvat' })).toBeVisible();
     await expectNoHorizontalScroll(page);

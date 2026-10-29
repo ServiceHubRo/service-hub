@@ -3,6 +3,7 @@
   border: 1px solid var(--border);
   border-radius: var(--radius-card);
   padding: var(--card-pad);
+  box-shadow: var(--shadow-card);
 }
 
 .highlight {
@@ -11,6 +12,7 @@
 
 .inset {
   background: var(--surface2);
+  border: 1px solid var(--border);
   border-radius: var(--radius-input);
-  padding: 11px;
+  padding: var(--space-3);
 }

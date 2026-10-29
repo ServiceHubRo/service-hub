@@ -1,9 +1,10 @@
 import { ArrowLeft, ArrowRight, ImagePlus, Trash2 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { ActionButton } from '../../../components/ActionButton';
-import { BackLink } from '../../../components/BackLink';
 import { Button } from '../../../components/Button';
 import { Card } from '../../../components/Card';
+import { PageHeader } from '../../../components/PageHeader';
+import { Section } from '../../../components/Section';
 import { Checkbox } from '../../../components/Checkbox';
 import { LoadError } from '../../../components/LoadError';
 import { SkeletonList } from '../../../components/Skeleton';
@@ -36,11 +37,14 @@ import own from './ShowcaseSettings.module.css';
 export function ShowcaseSettings() {
   const { t } = useI18n();
   return (
-    <div className={styles.page} data-layout="columns">
-      <BackLink to={SETTINGS_PATH} label={t('settings.title')} />
-      <h1>{t('settings.showcase')}</h1>
-      <PhotosCard />
-      <AmenitiesCard />
+    <div className={styles.page}>
+      <PageHeader back={{ to: SETTINGS_PATH, label: t('settings.title') }} title={t('settings.showcase')} />
+      <Section title={t('showcase.photos')} description={t('showcase.photos.hint', { n: PHOTO_LIMIT })}>
+        <PhotosCard />
+      </Section>
+      <Section title={t('showcase.amenities')} description={t('showcase.amenities.hint')}>
+        <AmenitiesCard />
+      </Section>
     </div>
   );
 }
@@ -95,10 +99,6 @@ function PhotosCard() {
 
   return (
     <Card className={styles.stack}>
-      <div>
-        <p className={styles.cardTitle}>{t('showcase.photos')}</p>
-        <p className={styles.hint}>{t('showcase.photos.hint', { n: PHOTO_LIMIT })}</p>
-      </div>
       {failed && <LoadError message={t('showcase.photos.loadError')} onRetry={() => {
             setFailed(false);
             setAttempt((a) => a + 1);
@@ -223,12 +223,8 @@ function AmenitiesCard() {
   }
 
   return (
-    <div className={styles.page}>
+    <>
       <Card className={styles.stack}>
-        <div>
-          <p className={styles.cardTitle}>{t('showcase.amenities')}</p>
-          <p className={styles.hint}>{t('showcase.amenities.hint')}</p>
-        </div>
         <div className={own.amenities}>
           {AMENITIES.map((a) => {
             const Icon = AMENITY_ICONS[a];
@@ -243,7 +239,9 @@ function AmenitiesCard() {
           })}
         </div>
       </Card>
-      <SaveButton onSave={save}>{t('showcase.amenities.save')}</SaveButton>
-    </div>
+      <SaveButton footer onSave={save}>
+        {t('showcase.amenities.save')}
+      </SaveButton>
+    </>
   );
 }

@@ -203,3 +203,16 @@
   color: var(--muted);
   font-size: 13px;
 }
+
+/* A wide screen (T51): a card's single action ("Editează", "Schimbă emailul") on the right, as wide
+   as its words, not across the card. */
+@media (min-width: 768px) {
+  div.panel:has(> button:only-child) {
+    align-items: flex-end;
+  }
+
+  div.panel > button:only-child {
+    width: auto;
+    min-width: 220px;
+  }
+}

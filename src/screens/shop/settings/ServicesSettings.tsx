@@ -1,10 +1,10 @@
 import { ChevronDown, SearchX } from 'lucide-react';
 import { useCallback, useMemo, useState } from 'react';
-import { BackLink } from '../../../components/BackLink';
 import { Button } from '../../../components/Button';
 import { Checkbox } from '../../../components/Checkbox';
 import { EmptyState } from '../../../components/EmptyState';
 import { Field } from '../../../components/Field';
+import { PageHeader } from '../../../components/PageHeader';
 import { SelectField } from '../../../components/SelectField';
 import { SkeletonList } from '../../../components/Skeleton';
 import { fetchCatalog, fetchShopServices, saveShopServices, type CatalogCategory } from '../../../data/shop';
@@ -41,9 +41,7 @@ export function ServicesSettings() {
 
   return (
     <div className={styles.page}>
-      <BackLink to={SETTINGS_PATH} label={t('settings.title')} />
-      <h1>{t('settings.services')}</h1>
-      <p className={styles.intro}>{t('services.intro')}</p>
+      <PageHeader back={{ to: SETTINGS_PATH, label: t('settings.title') }} title={t('settings.services')} subtitle={t('services.intro')} />
       {state.status === 'loading' && <SkeletonList />}
       {state.status === 'error' && <LoadError message={t('settings.loadError')} onRetry={reload} />}
       {state.status === 'ready' && <Catalog catalog={state.data.catalog} initial={state.data.selected} />}
@@ -203,14 +201,18 @@ function Catalog({ catalog, initial }: { catalog: CatalogCategory[]; initial: st
         })}
       </div>
 
-      <div className={styles.stickySave}>
-        {selected.size === 0 ? (
-          <p className={styles.warn}>{t('services.none')}</p>
-        ) : (
-          changed && <p className={styles.warn}>{t('common.unsaved')}</p>
-        )}
-        <SaveButton onSave={save}>{t('services.save')}</SaveButton>
-      </div>
+      <SaveButton
+        onSave={save}
+        note={
+          selected.size === 0 ? (
+            <p className={styles.warn}>{t('services.none')}</p>
+          ) : (
+            changed && <p className={styles.warn}>{t('common.unsaved')}</p>
+          )
+        }
+      >
+        {t('services.save')}
+      </SaveButton>
     </>
   );
 }

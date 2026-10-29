@@ -63,19 +63,6 @@
   gap: 12px;
 }
 
-/* The save button stays in reach at the bottom of long sections (services). */
-.stickySave {
-  position: sticky;
-  bottom: 0;
-  z-index: 1;
-  margin: 0 calc(-1 * var(--page-pad)) calc(-1 * var(--page-pad));
-  padding: 10px var(--page-pad) calc(10px + var(--page-pad));
-  background: var(--bg);
-  border-top: 1px solid var(--border);
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
 
 .rowButtons {
   display: flex;
@@ -126,14 +113,81 @@
   text-decoration: underline;
 }
 
-/* The save button: the whole width on a phone, the width of a form column on a desktop (T51). */
-.save {
+/* The save bar (T51): held at the bottom of the screen across the whole content width, glass over
+   the page, the button on the right. On a phone the button takes the whole width. */
+.saveBar,
+.saveFooter {
   display: flex;
   flex-direction: column;
+  gap: var(--space-2);
 }
 
-@media (min-width: 1024px) {
-  .save {
-    width: min(100%, 420px);
+.saveBar {
+  position: sticky;
+  bottom: 0;
+  z-index: 4;
+  margin: var(--space-4) calc(-1 * var(--page-pad)) calc(-1 * var(--page-pad));
+  padding: var(--space-3) var(--page-pad);
+  background: rgba(19, 21, 25, 0.9);
+  border-top: 1px solid var(--border);
+}
+
+@supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
+  .saveBar {
+    background: rgba(19, 21, 25, 0.72);
+    -webkit-backdrop-filter: blur(16px) saturate(160%);
+    backdrop-filter: blur(16px) saturate(160%);
+  }
+}
+
+.saveNote {
+  font-size: 13.5px;
+  color: var(--muted);
+}
+
+@media (min-width: 600px) {
+  .saveBar,
+  .saveFooter {
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--space-4);
+  }
+
+  .saveNote {
+    margin-right: auto;
+  }
+
+  .saveAction {
+    min-width: 220px;
+  }
+}
+
+/* A field with a note under it, as one row of a section card. */
+.fieldNote {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+/* A form inside a section card: fields one under the other, evenly spaced. */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+/* Next to a footer save: a secondary action and the unsaved note. */
+.footerNote {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-4);
+}
+
+@media (min-width: 600px) {
+  button.addButton {
+    width: auto;
+    align-self: flex-start;
   }
 }

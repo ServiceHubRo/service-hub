@@ -1,15 +1,15 @@
 .week {
   display: flex;
   flex-direction: column;
-  padding-top: 4px;
-  padding-bottom: 4px;
+  padding-top: var(--space-1);
+  padding-bottom: var(--space-1);
 }
 
 .day {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 10px 0;
+  gap: var(--space-2);
+  padding: var(--space-3) 0;
   border-bottom: 1px solid var(--border);
 }
 
@@ -25,7 +25,7 @@
 }
 
 .dayName {
-  font-weight: 700;
+  font-weight: 650;
 }
 
 .daySwitch {
@@ -40,4 +40,22 @@
 
 .cardButtons {
   margin-top: 12px;
+}
+
+/* A wide screen (T51): each day one line, like a timetable. The day and its switch on the left, the
+   two times on the right, the same columns on every line. */
+@media (min-width: 768px) {
+  .day {
+    display: grid;
+    grid-template-columns: minmax(0, 260px) 1fr;
+    align-items: center;
+    column-gap: var(--space-8);
+    min-height: 76px;
+  }
+
+  .times {
+    justify-content: flex-end;
+    flex-wrap: nowrap;
+    gap: var(--space-4);
+  }
 }

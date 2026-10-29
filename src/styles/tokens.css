@@ -20,12 +20,20 @@
   --safe-bottom: max(env(safe-area-inset-bottom, 0px), var(--safe-area-inset-bottom, 0px));
   --safe-left: max(env(safe-area-inset-left, 0px), var(--safe-area-inset-left, 0px));
 
-  --bg: #14161a;
-  --surface: #1d2026;
-  --surface2: #242830;
-  --border: #2c313a;
-  --border-lit: #3a404b;
+  /* Layers, darkest to lightest (T51, premium pass): the sidebar, the page, a card, a control or
+     a raised row on a card, its hover. Borders are quiet hairlines; --border-lit on hover. */
+  --bg-deep: #0f1114;
+  --bg: #131519;
+  --surface: #1a1d22;
+  --surface2: #22262c;
+  --surface3: #2a2e35;
+  --surface-hover: #1e2127;
+  --field-bg: #15181c;
+  --border: #272b32;
+  --border-lit: #363c46;
   --text: #eae8e2;
+  /* Secondary text (labels, card subtitles): between --text and --muted. */
+  --text-2: #b9bdc5;
   --muted: #8a909b;
   /* Muted text on a tinted background (the grey status pills): #8A909B there is below 4.5:1. */
   --muted-strong: #a4aab4;
@@ -62,15 +70,33 @@
   --motion: 0.4s;
   --motion-long: 0.5s;
 
-  --radius-card: 12px;
+  --radius-card: 14px;
   --radius-button: 10px;
-  --radius-input: 9px;
+  --radius-input: 10px;
   --radius-pill: 999px;
 
-  --card-pad: 14px;
+  /* Spacing: multiples of 4 px. */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+
+  /* A card: a hairline of light on its top edge and a soft shadow under it. */
+  --shadow-card: inset 0 1px 0 rgba(255, 255, 255, 0.025), 0 1px 2px rgba(0, 0, 0, 0.28);
+  --shadow-raised: 0 8px 24px rgba(0, 0, 0, 0.32);
+
+  /* Between the sections of a page (a settings page, the account). */
+  --section-gap: var(--space-8);
+
+  --card-pad: 16px;
   --page-pad: 18px;
   --content-max: 560px;
-  --heading-size: 27px;
+  --heading-size: 26px;
   --body-size: 14px;
 
   /* Pop-up lists and menus: frosted glass over the page (Eduard, 10 Oct). Where blur is missing
@@ -96,16 +122,17 @@
    (global.css, data-layout), one card is never wider than reads well. */
 @media (min-width: 1024px) {
   :root {
-    --card-pad: 20px;
+    --card-pad: 24px;
     --page-pad: 32px;
     --content-max: 1480px;
-    --heading-size: 32px;
+    --heading-size: 30px;
     --body-size: 15px;
+    --section-gap: var(--space-10);
   }
 }
 
 @media (min-width: 1280px) {
   :root {
-    --page-pad: 44px;
+    --page-pad: 48px;
   }
 }

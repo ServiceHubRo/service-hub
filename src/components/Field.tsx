@@ -13,15 +13,17 @@ export interface FieldProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 
   end?: ReactNode;
   /** The input element (to focus it). */
   ref?: Ref<HTMLInputElement>;
+  /** Label on the left, input on the right (a row of a section card). */
+  inline?: boolean;
 }
 
 /** Label + input + hint/error, tied together for screen readers. */
-export function Field({ label, hint, error, mono, upper, end, className, ...rest }: FieldProps) {
+export function Field({ label, hint, error, mono, upper, end, inline, className, ...rest }: FieldProps) {
   const id = useId();
   const hintId = hint ? `${id}-hint` : undefined;
   const errorId = error ? `${id}-error` : undefined;
   return (
-    <div className={`${styles.field} ${className ?? ''}`}>
+    <div className={`${styles.field} ${inline ? styles.inline : ''} ${className ?? ''}`}>
       <label htmlFor={id} className={styles.label}>
         {label}
       </label>

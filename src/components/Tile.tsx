@@ -18,7 +18,9 @@ interface TileProps {
 export function Tile({ to, href, icon: Icon, label, hint, onClick }: TileProps) {
   const inner = (
     <>
-      <Icon size={20} className={styles.icon} aria-hidden="true" />
+      <span className={styles.iconBox} aria-hidden="true">
+        <Icon size={19} className={styles.icon} />
+      </span>
       <span className={styles.label}>
         {label}
         {hint && <span className={styles.hint}>{hint}</span>}

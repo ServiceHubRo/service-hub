@@ -146,12 +146,14 @@
     display: none;
   }
 
+  /* The sidebar (T51): one step darker than the page; rows inset with rounded corners; the chosen
+     row lifted with a soft amber tint, its icon amber, its text white. */
   .sidebar {
     display: flex;
     flex-direction: column;
     flex-shrink: 0;
     width: var(--sidebar-w);
-    background: var(--surface);
+    background: var(--bg-deep);
     border-right: 1px solid var(--border);
     overflow-y: auto;
   }
@@ -160,12 +162,14 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 20px;
+    padding: var(--space-6) var(--space-5) var(--space-5);
   }
 
   .sideNav {
     display: flex;
     flex-direction: column;
+    gap: 2px;
+    padding: var(--space-2) var(--space-3);
   }
 
   .sideBottom {
@@ -173,46 +177,52 @@
     border-top: 1px solid var(--border);
     display: flex;
     flex-direction: column;
-    padding-bottom: 8px;
+    gap: 2px;
+    padding: var(--space-3) var(--space-3) var(--space-4);
   }
 
   .sideLang {
-    padding: 12px 20px 8px;
+    padding: var(--space-1) var(--space-2) var(--space-2);
   }
 
   .sideLink {
     position: relative;
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: var(--space-3);
     width: 100%;
     min-height: var(--tap);
-    padding: 12px 20px;
-    color: var(--text);
-    font-size: 14px;
+    padding: 10px var(--space-3);
+    border-radius: var(--radius-button);
+    color: var(--text-2);
+    font-size: 14.5px;
+    font-weight: 500;
     text-decoration: none;
     text-align: left;
+    transition:
+      background-color var(--motion-quick) var(--ease),
+      color var(--motion-quick) var(--ease);
+  }
+
+  .sideLink svg {
+    color: var(--muted);
+    transition: color var(--motion-quick) var(--ease);
   }
 
   .sideLink:hover {
-    background: var(--surface2);
+    background: var(--surface);
+    color: var(--text);
   }
 
   .sideActive,
   .sideActive:hover {
     background: var(--amber-tint);
-    color: var(--amber);
-    font-weight: 700;
+    color: var(--text);
+    font-weight: 650;
   }
 
-  .sideActive::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 3px;
-    background: var(--amber);
+  .sideActive svg {
+    color: var(--amber);
   }
 
   .logout {

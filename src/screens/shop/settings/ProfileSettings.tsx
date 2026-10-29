@@ -1,10 +1,11 @@
 import { ImageUp, LocateFixed, MapPin } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { ActionButton } from '../../../components/ActionButton';
-import { BackLink } from '../../../components/BackLink';
 import { Button } from '../../../components/Button';
 import { Card } from '../../../components/Card';
 import { Field } from '../../../components/Field';
+import { PageHeader } from '../../../components/PageHeader';
+import { Section } from '../../../components/Section';
 import { TextArea } from '../../../components/TextArea';
 import { rpcErrorMessage } from '../../../data/rpc';
 import {
@@ -191,33 +192,32 @@ export function ProfileSettings() {
 
   return (
     <div className={styles.page}>
-      <BackLink to={SETTINGS_PATH} label={t('settings.title')} />
-      <h1>{t('settings.profile')}</h1>
+      <PageHeader back={{ to: SETTINGS_PATH, label: t('settings.title') }} title={t('settings.profile')} />
+      <form ref={formRef} className={styles.page} noValidate onSubmit={(e) => e.preventDefault()}>
+        <Section title={t('profile.sec.about')} description={t('profile.sec.about.desc')}>
+          <LogoCard />
+          <Card className={styles.form}>
+            <Field
+              label={t('profile.name')}
+              autoComplete="organization"
+              maxLength={120}
+              value={form.name}
+              onChange={(e) => set('name', e.target.value)}
+              error={errors.name}
+            />
+            <TextArea
+              label={t('profile.description')}
+              hint={t('profile.descriptionHint')}
+              maxLength={2000}
+              rows={4}
+              value={form.description}
+              onChange={(e) => set('description', e.target.value)}
+            />
+          </Card>
+        </Section>
 
-      <LogoCard />
-
-      <form ref={formRef} className={styles.stack} data-layout="columns" noValidate onSubmit={(e) => e.preventDefault()}>
-        <div className={styles.stack}>
-          <Field
-            label={t('profile.name')}
-            autoComplete="organization"
-            maxLength={120}
-            value={form.name}
-            onChange={(e) => set('name', e.target.value)}
-            error={errors.name}
-          />
-          <TextArea
-            label={t('profile.description')}
-            hint={t('profile.descriptionHint')}
-            maxLength={2000}
-            rows={4}
-            value={form.description}
-            onChange={(e) => set('description', e.target.value)}
-          />
-        </div>
-
-        <div className={styles.stack}>
-          <h2 className={styles.section}>{t('profile.address')}</h2>
+        <Section title={t('profile.address')} description={t('profile.sec.address.desc')}>
+          <Card className={styles.form}>
           <Field
             label={t('profile.street')}
             autoComplete="street-address"
@@ -252,10 +252,40 @@ export function ProfileSettings() {
             onChange={(e) => set('postal_code', e.target.value)}
             error={errors.postal_code}
           />
-        </div>
+          </Card>
+          <Card className={own.mapCard}>
+            <div className={own.mapHead}>
+              <MapPin size={20} className={hasMap ? own.mapOk : own.mapMissing} aria-hidden="true" />
+              <div>
+                <p className={styles.cardTitle}>{t('profile.map')}</p>
+                <p className={styles.note}>{t(hasMap ? 'profile.map.set' : 'profile.map.missing')}</p>
+              </div>
+            </div>
+            {mapNote && (
+              <p
+                className={mapNote === 'searching' ? own.mapNote : mapNote === 'found' || mapNote === 'saved' ? own.mapNoteOk : own.mapNoteWarn}
+                role="status"
+              >
+                {t(MAP_NOTES[mapNote])}
+              </p>
+            )}
+            <div className={own.mapAction}>
+              <ActionButton
+                variant="secondary"
+                onAction={saveCurrentLocation}
+                canRetry={(e) => !(e instanceof GeoError && e.denied)}
+                errorMessage={(e) =>
+                  e instanceof GeoError ? t(e.denied ? 'profile.map.denied' : 'profile.map.failed') : rpcErrorMessage(lang, e)
+                }
+              >
+                <LocateFixed size={18} aria-hidden="true" /> {t('profile.map.useCurrent')}
+              </ActionButton>
+            </div>
+          </Card>
+        </Section>
 
-        <div className={styles.stack}>
-          <h2 className={styles.section}>{t('profile.contact')}</h2>
+        <Section title={t('profile.contact')} description={t('profile.sec.contact.desc')}>
+          <Card className={styles.form}>
           <div className={styles.grid2}>
             <Field
               label={t('profile.phone')}
@@ -308,42 +338,11 @@ export function ProfileSettings() {
             onChange={(e) => set('year', e.target.value.replace(/\D/g, ''))}
             error={errors.year}
           />
-        </div>
+          </Card>
+        </Section>
 
-        <div data-span="all">
-          <SaveButton onSave={save}>{t('profile.save')}</SaveButton>
-        </div>
+        <SaveButton onSave={save}>{t('profile.save')}</SaveButton>
       </form>
-
-      <Card className={own.half}>
-        <div className={own.mapHead}>
-          <MapPin size={20} className={hasMap ? own.mapOk : own.mapMissing} aria-hidden="true" />
-          <div>
-            <p className={styles.cardTitle}>{t('profile.map')}</p>
-            <p className={styles.note}>{t(hasMap ? 'profile.map.set' : 'profile.map.missing')}</p>
-          </div>
-        </div>
-        {mapNote && (
-          <p
-            className={mapNote === 'searching' ? own.mapNote : mapNote === 'found' || mapNote === 'saved' ? own.mapNoteOk : own.mapNoteWarn}
-            role="status"
-          >
-            {t(MAP_NOTES[mapNote])}
-          </p>
-        )}
-        <div className={own.mapAction}>
-          <ActionButton
-            variant="secondary"
-            onAction={saveCurrentLocation}
-            canRetry={(e) => !(e instanceof GeoError && e.denied)}
-            errorMessage={(e) =>
-              e instanceof GeoError ? t(e.denied ? 'profile.map.denied' : 'profile.map.failed') : rpcErrorMessage(lang, e)
-            }
-          >
-            <LocateFixed size={18} aria-hidden="true" /> {t('profile.map.useCurrent')}
-          </ActionButton>
-        </div>
-      </Card>
     </div>
   );
 }
@@ -397,7 +396,7 @@ function LogoCard() {
     .toUpperCase();
 
   return (
-    <Card className={own.half}>
+    <Card className={own.logoCard}>
       <div className={own.logoRow}>
         {shown ? (
           <img src={shown} alt={t('profile.logo.alt', { name: shop.name })} className={own.logo} />

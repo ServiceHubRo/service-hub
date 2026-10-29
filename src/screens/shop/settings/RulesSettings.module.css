@@ -1,19 +1,8 @@
+/* A stepper with its hint under it. */
 .block {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  padding: 10px 0;
-  border-bottom: 1px solid var(--border);
-  scroll-margin: 24px;
-}
-
-.block:first-child {
-  padding-top: 0;
-}
-
-.block:last-child {
-  padding-bottom: 0;
-  border-bottom: none;
+  gap: var(--space-1);
 }
 
 .inline {

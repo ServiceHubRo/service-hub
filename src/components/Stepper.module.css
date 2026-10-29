@@ -18,7 +18,11 @@
 }
 
 .label {
-  font-size: 14px;
+  font-size: 14.5px;
+}
+
+.row > .label {
+  font-weight: 600;
 }
 
 .control {

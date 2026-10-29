@@ -9,15 +9,17 @@ export interface SelectFieldProps extends Omit<SelectHTMLAttributes<HTMLSelectEl
   options: { value: string; label: string }[];
   /** Options under headings (`<optgroup>`), after `options`. */
   groups?: { label: string; options: { value: string; label: string }[] }[];
+  /** Label on the left, select on the right (a row of a section card). */
+  inline?: boolean;
 }
 
 /** Label + native select (the phone's own picker) + hint. Lets go of the focus after a tap choice (useTouchSelect). */
-export function SelectField({ label, hint, options, groups, className, onChange, ...rest }: SelectFieldProps) {
+export function SelectField({ label, hint, options, groups, inline, className, onChange, ...rest }: SelectFieldProps) {
   const id = useId();
   const touch = useTouchSelect(onChange);
   const hintId = hint ? `${id}-hint` : undefined;
   return (
-    <div className={`${styles.field} ${className ?? ''}`}>
+    <div className={`${styles.field} ${inline ? styles.inline : ''} ${className ?? ''}`}>
       <label htmlFor={id} className={styles.label}>
         {label}
       </label>

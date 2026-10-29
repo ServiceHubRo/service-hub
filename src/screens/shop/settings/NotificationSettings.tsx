@@ -1,6 +1,6 @@
 import { NAV } from '../../../app/roles';
-import { BackLink } from '../../../components/BackLink';
-import { Card } from '../../../components/Card';
+import { PageHeader } from '../../../components/PageHeader';
+import { Section, SectionCard } from '../../../components/Section';
 import { Switch } from '../../../components/Switch';
 import { updateShop } from '../../../data/shop';
 import { useI18n } from '../../../i18n/context';
@@ -33,30 +33,29 @@ export function NotificationSettings() {
 
   return (
     <div className={styles.page}>
-      <BackLink to={NAV.shop.account.path} label={t('nav.account')} />
-      <h1>{t('settings.notifications')}</h1>
-      <div className={styles.page} data-layout="columns">
+      <PageHeader back={{ to: NAV.shop.account.path, label: t('nav.account') }} title={t('settings.notifications')} />
+      <Section title={t('notif.sec.device')} description={t('notif.sec.device.desc')}>
         <PushRow />
         <SoundRow />
-        {isOwner && (
-          <Card className={styles.stack}>
-            <Switch checked={digest} hint={t('notif.digest.hint')} onChange={(e) => setDigest(e.target.checked)}>
-              {t('notif.digest')}
-            </Switch>
-            <Switch checked={monthly} hint={t('notif.monthly.hint')} onChange={(e) => setMonthly(e.target.checked)}>
-              {t('notif.monthly')}
-            </Switch>
-          </Card>
+      </Section>
+      <Section title={t('notif.sec.summary')} description={t('notif.sec.summary.desc')}>
+        {isOwner ? (
+          <>
+            <SectionCard>
+              <Switch checked={digest} hint={t('notif.digest.hint')} onChange={(e) => setDigest(e.target.checked)}>
+                {t('notif.digest')}
+              </Switch>
+              <Switch checked={monthly} hint={t('notif.monthly.hint')} onChange={(e) => setMonthly(e.target.checked)}>
+                {t('notif.monthly')}
+              </Switch>
+            </SectionCard>
+            <p className={styles.note}>{t('notif.soon')}</p>
+          </>
+        ) : (
+          <p className={styles.note}>{t('settings.staff.notifications')}</p>
         )}
-      </div>
-      {isOwner ? (
-        <>
-          <p className={styles.note}>{t('notif.soon')}</p>
-          <SaveButton onSave={save}>{t('notif.save')}</SaveButton>
-        </>
-      ) : (
-        <p className={styles.note}>{t('settings.staff.notifications')}</p>
-      )}
+      </Section>
+      {isOwner && <SaveButton onSave={save}>{t('notif.save')}</SaveButton>}
     </div>
   );
 }

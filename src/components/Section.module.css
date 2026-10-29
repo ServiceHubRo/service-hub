@@ -1,0 +1,75 @@
+.section {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-3);
+  scroll-margin: var(--space-6);
+}
+
+/* A hairline above every section but the first of the page. */
+.section + .section {
+  margin-top: calc(var(--section-gap) - var(--space-4));
+  padding-top: var(--section-gap);
+  border-top: 1px solid var(--border);
+}
+
+.head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.title {
+  font-size: 16px;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+
+.description {
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+/* Desktop: the title column and the controls column, the same proportions on every page. */
+@media (min-width: 1024px) {
+  .section {
+    grid-template-columns: minmax(200px, 1fr) minmax(0, 2.6fr);
+    column-gap: var(--space-12);
+    align-items: start;
+  }
+
+  .head {
+    padding-top: var(--space-4);
+  }
+
+  .description {
+    max-width: 32ch;
+  }
+}
+
+/* ---------------------------------------------------------------- the card of a section */
+.card {
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  padding: var(--space-1) var(--card-pad);
+}
+
+.card > * {
+  padding: var(--space-4) 0;
+}
+
+.card > * + * {
+  border-top: 1px solid var(--border);
+}
