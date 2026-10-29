@@ -1,0 +1,60 @@
+.frame {
+  display: block;
+  width: 100%;
+  max-width: 260px;
+  margin: 0 auto;
+  padding: 8px;
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
+.editable {
+  cursor: crosshair;
+  transition: border-color var(--motion-quick) var(--ease);
+}
+
+.editable:hover {
+  border-color: var(--border-lit);
+}
+
+.svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.body {
+  fill: var(--bg);
+  stroke: var(--muted);
+  stroke-width: 2;
+}
+
+.detail {
+  fill: none;
+  stroke: var(--muted);
+  stroke-width: 1.4;
+}
+
+.wheel {
+  fill: var(--border-lit);
+}
+
+.side {
+  fill: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.mark {
+  fill: var(--amber);
+  stroke: var(--ink);
+  stroke-width: 1.5;
+}
+
+.markText {
+  fill: var(--ink);
+  font-size: 12px;
+  font-weight: 700;
+}

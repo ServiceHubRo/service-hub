@@ -187,3 +187,19 @@
   flex-shrink: 0;
   color: var(--amber);
 }
+
+.intro {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.label {
+  color: var(--muted);
+  font-size: 13px;
+}

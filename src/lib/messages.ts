@@ -36,6 +36,9 @@ const EVENTS = [
   'booking_auto_closed',
   'work_started',
   'job_done',
+  'intake_sent',
+  'intake_updated',
+  'intake_confirmed',
 ] as const;
 
 const known: ReadonlySet<string> = new Set(EVENTS);

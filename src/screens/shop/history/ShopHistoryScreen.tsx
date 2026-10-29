@@ -35,6 +35,7 @@ import { toXlsx } from '../../../lib/xlsx';
 import { formatPhone, normalizePhone } from '../../../lib/validators';
 import { HistoryQuote } from '../../history/HistoryQuote';
 import { bookingMessagesPath } from '../../messages/paths';
+import { JobDocuments } from '../../../components/JobDocuments';
 import { MoreActions } from '../../../components/MoreActions';
 import styles from '../../history/history.module.css';
 import { vehicleFilePath } from '../paths';
@@ -377,12 +378,26 @@ function HistoryCard({ item: b, open, onToggle }: { item: ShopHistoryItem; open:
         <div id={detailsId} className={styles.details}>
           <Outcome item={b} />
           {b.quote && <HistoryQuote quote={b.quote} />}
-          {b.note && (
+          {(b.note || b.work_by || b.checked_by) && (
             <dl className={styles.facts}>
-              <div>
-                <dt>{t('hist.card.clientNote')}</dt>
-                <dd className={styles.note}>{b.note}</dd>
-              </div>
+              {b.note && (
+                <div>
+                  <dt>{t('hist.card.clientNote')}</dt>
+                  <dd className={styles.note}>{b.note}</dd>
+                </div>
+              )}
+              {b.work_by && (
+                <div>
+                  <dt>{t('sb.complete.workBy')}</dt>
+                  <dd>{b.work_by}</dd>
+                </div>
+              )}
+              {b.checked_by && (
+                <div>
+                  <dt>{t('sb.complete.checkedBy')}</dt>
+                  <dd>{b.checked_by}</dd>
+                </div>
+              )}
             </dl>
           )}
           {b.imported ? (
@@ -392,6 +407,18 @@ function HistoryCard({ item: b, open, onToggle }: { item: ShopHistoryItem; open:
             <p className={`mono ${styles.muted}`}>
               {t('hist.card.booking', { ref: b.ref, when: `${formatDayMonth(lang, b.date)}, ${b.slot}` })}
             </p>
+          )}
+          {!b.imported && (
+            <JobDocuments
+              bookingId={b.id}
+              bookingRef={b.ref}
+              quoteNumber={b.quote_number}
+              kinds={[
+                ...(b.status === 'done' && b.quote ? (['final'] as const) : []),
+                ...(b.quote ? (['quote'] as const) : []),
+                ...(b.intake_sent_at ? (['intake'] as const) : []),
+              ]}
+            />
           )}
           <div className={styles.actions}>
             {phone && (

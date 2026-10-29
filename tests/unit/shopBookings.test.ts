@@ -1,5 +1,16 @@
 import { describe, expect, it } from 'vitest';
-import { checkDraft, draftTotalBani, parsePriceBani, priceText, type QuoteDraftRow } from '../../src/lib/quoteDraft';
+import {
+  checkDraft,
+  convertPriceText,
+  convertRows,
+  draftTotals,
+  GROSS,
+  parsePriceBani,
+  parseQuantity,
+  priceText,
+  rowBani,
+  type QuoteDraftRow,
+} from '../../src/lib/quoteDraft';
 import {
   addDays,
   dashboardCounts,
@@ -77,8 +88,16 @@ describe('shop bookings: tabs, filters, counters', () => {
   });
 });
 
-describe('quote composer', () => {
-  const row = (name: string, price: string, key = name || price): QuoteDraftRow => ({ key, name, price });
+describe('quote editor', () => {
+  let n = 0;
+  const row = (kind: 'labor' | 'part', name: string, qty: string, price: string, extra: Partial<QuoteDraftRow> = {}): QuoteDraftRow => ({
+    key: `r${n++}`,
+    kind,
+    name,
+    qty,
+    price,
+    ...extra,
+  });
 
   it('parses prices the way a Romanian shop types them', () => {
     expect(parsePriceBani('1250')).toBe(125_000);
@@ -94,22 +113,61 @@ describe('quote composer', () => {
     expect(parsePriceBani('1000000,01')).toBeNull();
   });
 
-  it('adds up exactly in bani', () => {
-    expect(draftTotalBani([row('a', '0,1'), row('b', '0,2'), row('c', 'x')])).toBe(30);
+  it('parses hours and quantities', () => {
+    expect(parseQuantity('1,5')).toBe(150);
+    expect(parseQuantity('0.1')).toBe(10);
+    expect(parseQuantity('4')).toBe(400);
+    expect(parseQuantity('0')).toBeNull();
+    expect(parseQuantity('1,555')).toBeNull();
+    expect(parseQuantity('10001')).toBeNull();
+  });
+
+  it('adds up the paper quote exactly: hours × rate, quantity × price', () => {
+    const rows = [
+      row('labor', 'Revizie ulei + filtre', '1,5', '181,50'),
+      row('labor', 'Constatare mecanică', '0,1', '181,50'),
+      row('labor', 'Diagnoză tester', '0,1', '181,50'),
+      row('part', 'Ulei 5L', '1', '623'),
+      row('part', 'Ulei 1L', '4', '129'),
+      row('part', 'Filtre', '', '705'),
+      row('part', 'Materiale', '5', '5'),
+    ];
+    expect(draftTotals(rows, { net: false, vatRate: 21 })).toEqual({ labor: 30_855, parts: 186_900, total: 217_755, net: 179_963, vat: 37_792 });
+    expect(draftTotals(rows, GROSS).net).toBeNull();
+  });
+
+  it('adds the VAT to prices typed without it', () => {
+    const mode = { net: true, vatRate: 21 };
+    expect(rowBani(row('labor', 'Revizie', '1,5', '150'), mode)).toBe(27_225);
+    expect(checkDraft([row('labor', 'Revizie', '1,5', '150')], mode).items).toEqual([{ name: 'Revizie', kind: 'labor', qty: 1.5, unit_price: 181.5 }]);
+    expect(convertRows([row('part', 'Ulei', '1', '623', { altPrice: '121' })], true, 21, ',')[0]).toMatchObject({ price: '514,88', altPrice: '100' });
+    expect(convertPriceText('514,88', false, 21, ',')).toBe('623');
   });
 
   it('checks rows like the database and ignores empty ones', () => {
-    const checked = checkDraft([row('Plăcuțe frână', '280'), row('', ''), row('  Manoperă ', '120,50'), row('Disc', ''), row('', '50')]);
+    const a = row('part', 'Plăcuțe frână', '1', '280', { brand: 'Brembo' });
+    const blank = row('labor', '', '', '');
+    const b = row('labor', '  Manoperă ', '', '120,50');
+    const c = row('part', 'Disc', '2', '');
+    const d = row('labor', '', '', '50');
+    const e = row('part', 'Bec', 'x', '10');
+    const f = row('part', 'Plăcuțe spate', '1', '300', { part: 'both', brand: 'Bosch', altPrice: '200', altBrand: 'Ferodo' });
+    const checked = checkDraft([a, blank, b, c, d, e, f], GROSS);
     expect(checked.items).toEqual([
-      { name: 'Plăcuțe frână', price: 280 },
-      { name: 'Manoperă', price: 120.5 },
+      { name: 'Plăcuțe frână', kind: 'part', qty: 1, unit_price: 280, brand: 'Brembo' },
+      { name: 'Manoperă', kind: 'labor', price: 120.5 },
+      { name: 'Plăcuțe spate', kind: 'part', qty: 1, unit_price: 300, brand: 'Bosch', alt: { unit_price: 200, brand: 'Ferodo' } },
     ]);
-    expect(checked.errors).toEqual({ Disc: 'price_required', '50': 'name_required' });
-    expect(checkDraft([row('x'.repeat(201), '1')]).errors).toEqual({ ['x'.repeat(201)]: 'name_too_long' });
-    expect(checkDraft([row('Ulei', '1.250')]).errors).toEqual({ Ulei: 'price_invalid' });
+    expect(checked.errors).toEqual({ [c.key]: 'price_required', [d.key]: 'name_required', [e.key]: 'qty_invalid' });
+    const long = row('labor', 'x'.repeat(201), '', '1');
+    expect(checkDraft([long], GROSS).errors).toEqual({ [long.key]: 'name_too_long' });
+    const dot = row('part', 'Ulei', '1', '1.250');
+    expect(checkDraft([dot], GROSS).errors).toEqual({ [dot.key]: 'price_invalid' });
+    const high = row('part', 'Motor', '100', '20000');
+    expect(checkDraft([high], GROSS).errors).toEqual({ [high.key]: 'line_too_high' });
   });
 
-  it('shows sent prices back in the composer', () => {
+  it('shows sent prices back in the editor', () => {
     expect(priceText(280, ',')).toBe('280');
     expect(priceText(99.5, ',')).toBe('99,50');
     expect(priceText(0.1, '.')).toBe('0.10');

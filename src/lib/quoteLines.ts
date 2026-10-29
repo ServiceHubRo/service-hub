@@ -16,7 +16,16 @@ export interface QuoteVariantFields {
   brand?: string | null;
 }
 
-export interface QuoteLineItem extends QuoteVariantFields {
+/** What a line is (T50): labor (hours × rate) or a part (quantity × unit price); null on older quotes. */
+export interface QuoteDetailFields {
+  kind?: 'labor' | 'part' | null;
+  /** Hours or quantity; null for a fixed price. */
+  quantity?: number | null;
+  /** The rate per hour or price per piece (with VAT when the quote has VAT). */
+  unit_price?: number | null;
+}
+
+export interface QuoteLineItem extends QuoteVariantFields, QuoteDetailFields {
   id: string;
   position: number;
   name: string;

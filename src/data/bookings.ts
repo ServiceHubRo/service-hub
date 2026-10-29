@@ -38,6 +38,11 @@ export interface ClientBooking {
   /** The warranty on the work (T37a): months, and the last day it covers. */
   warranty_months: number | null;
   warranty_until: string | null;
+  /** The shop's number for this booking's quote (T50). */
+  quote_number: number | null;
+  /** When the shop sent the intake sheet, and when the client confirmed it (T50). */
+  intake_sent_at: string | null;
+  intake_confirmed_at: string | null;
   cancelled_by: 'client' | 'shop' | 'admin' | null;
   cancel_reason: string | null;
   decline_reason: string | null;
@@ -79,10 +84,10 @@ export interface ClientBookingsData {
 
 const COLUMNS = [
   'id, ref, status, date, slot, note, car_id, car_snapshot, created_at, shop_id, service_id, extra_service_ids, offer_percent, offer_kind, loyalty_percent, loyalty_level, share_history',
-  'inspection_started_at, started_at, done_at, odometer, work, cost, warranty_months, warranty_until, cancelled_by, cancel_reason, decline_reason, closed_reason',
+  'inspection_started_at, started_at, done_at, odometer, work, cost, warranty_months, warranty_until, quote_number, intake_sent_at, intake_confirmed_at, cancelled_by, cancel_reason, decline_reason, closed_reason',
   'shop:shops(name, city, phone, cancel_deadline_hours, street, latitude, longitude, slot_minutes)',
   'service:services(name_ro, name_en, icon, category_key)',
-  'quotes(id, version, status, note, inspection_fee, total_sent, total_approved, sent_at, expires_at, decided_at, items:quote_items(id, position, name, price, approved, option_group, variant, brand))',
+  'quotes(id, version, status, note, inspection_fee, total_sent, total_approved, sent_at, expires_at, decided_at, vat_rate, est_hours, items:quote_items(id, position, name, price, approved, option_group, variant, brand, kind, quantity, unit_price))',
   'review:reviews(id, rating)',
 ].join(', ');
 
@@ -115,7 +120,10 @@ function normalize(row: ClientBooking): ClientBooking {
       inspection_fee: toNumber(q.inspection_fee),
       total_sent: toNumber(q.total_sent),
       total_approved: toNumberOrNull(q.total_approved),
-      items: [...(q.items ?? [])].map((i) => ({ ...i, price: toNumber(i.price) })).sort((a, b) => a.position - b.position),
+      vat_rate: toNumberOrNull(q.vat_rate),
+      items: [...(q.items ?? [])]
+        .map((i) => ({ ...i, price: toNumber(i.price), quantity: toNumberOrNull(i.quantity), unit_price: toNumberOrNull(i.unit_price) }))
+        .sort((a, b) => a.position - b.position),
     })),
   };
 }

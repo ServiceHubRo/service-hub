@@ -9,8 +9,12 @@ import { canRetryRpc, decideQuote, rpcErrorMessage, type Booking } from '../../.
 import { useI18n } from '../../../i18n/context';
 import { formatDate, formatMoney, formatTime } from '../../../i18n/format';
 import { decisionKind, selectedTotal, type Quote } from '../../../lib/clientBookings';
-import { initialSelection, linePick, quoteLines, withLinePick } from '../../../lib/quoteLines';
+import type { MessageKey } from '../../../i18n/ro';
+import { initialSelection, linePick, withLinePick, type QuoteLine } from '../../../lib/quoteLines';
+import { estimateText, hasSections, quantityDetail, quoteSections, vatOf, type QuoteSectionKind } from '../../../lib/quoteSections';
 import styles from './bookings.module.css';
+
+const HEADING: Record<QuoteSectionKind, MessageKey> = { labor: 'qe.labor', part: 'qe.parts', other: 'qe.other' };
 
 /**
  * The client's answer to a quote (P15, P15c, FR §3.5): every line with a checkbox, all ticked at
@@ -31,7 +35,6 @@ export function QuoteDecision({
 }) {
   const { t, lang } = useI18n();
   const [selected, setSelected] = useState<ReadonlySet<string>>(() => initialSelection(quote.items));
-  const lines = quoteLines(quote.items);
   const [refusing, setRefusing] = useState(false);
   const kind = decisionKind(quote.items, selected);
   const total = selectedTotal(quote.items, selected);
@@ -48,52 +51,64 @@ export function QuoteDecision({
   }
 
   const errorMessage = (e: unknown) => rpcErrorMessage(lang, e);
+  const headed = hasSections(quote.items);
+
+  const renderLine = (line: QuoteLine<Quote['items'][number]>) => {
+    if (line.kind === 'variants')
+      return (
+        <li key={line.key}>
+          <QuoteVariantChoice
+            line={line}
+            pick={linePick(line, selected)}
+            disabled={refusing}
+            onPick={(id) => setSelected((prev) => withLinePick(prev, line, id))}
+          />
+        </li>
+      );
+    const item = line.item;
+    const detail = [quantityDetail(lang, item), item.kind === 'part' && !item.variant ? item.brand : null].filter(Boolean).join(' · ');
+    return (
+      <li key={item.id}>
+        <Checkbox
+          checked={selected.has(item.id)}
+          disabled={refusing}
+          onChange={(e) => toggle(item.id, e.target.checked)}
+          aria-label={t('cb.quote.line', {
+            name: item.name,
+            price: formatMoney(lang, item.price),
+          })}
+        >
+          <span className={styles.lineText}>
+            <span className={`${styles.lineName} ${selected.has(item.id) ? '' : styles.unticked}`}>
+              {item.name}
+              <QuoteVariantTag item={item} />
+              {detail && <span className={styles.lineDetail}>{detail}</span>}
+            </span>
+            <span className="mono">{formatMoney(lang, item.price)}</span>
+          </span>
+        </Checkbox>
+      </li>
+    );
+  };
 
   return (
     <div className={styles.quote}>
       {quote.version > 1 && <p className={styles.muted}>{t('cb.quote.updated')}</p>}
       <p className={styles.hint}>{t('cb.quote.hint')}</p>
-      <ul className={styles.quoteLines}>
-        {lines.map((line) => {
-          if (line.kind === 'variants')
-            return (
-              <li key={line.key}>
-                <QuoteVariantChoice
-                  line={line}
-                  pick={linePick(line, selected)}
-                  disabled={refusing}
-                  onPick={(id) => setSelected((prev) => withLinePick(prev, line, id))}
-                />
-              </li>
-            );
-          const item = line.item;
-          return (
-            <li key={item.id}>
-              <Checkbox
-                checked={selected.has(item.id)}
-                disabled={refusing}
-                onChange={(e) => toggle(item.id, e.target.checked)}
-                aria-label={t('cb.quote.line', {
-                  name: item.name,
-                  price: formatMoney(lang, item.price),
-                })}
-              >
-                <span className={styles.lineText}>
-                  <span className={`${styles.lineName} ${selected.has(item.id) ? '' : styles.unticked}`}>
-                    {item.name}
-                    <QuoteVariantTag item={item} />
-                  </span>
-                  <span className="mono">{formatMoney(lang, item.price)}</span>
-                </span>
-              </Checkbox>
-            </li>
-          );
-        })}
-      </ul>
+      {quoteSections(quote.items).map((section) => (
+        <div key={section.kind} className={styles.quoteSection}>
+          {headed && <p className={styles.quoteHeading}>{t(HEADING[section.kind])}</p>}
+          <ul className={styles.quoteLines}>{section.lines.map(renderLine)}</ul>
+        </div>
+      ))}
       <p className={styles.quoteTotal} aria-live="polite">
         <span>{kind === 'all' ? t('cb.quote.total') : t('cb.quote.totalSelected')}</span>
         <span className="mono">{formatMoney(lang, total)}</span>
       </p>
+      {quote.vat_rate != null && (
+        <p className={styles.quoteVat}>{t('quote.vatIncluded', { rate: quote.vat_rate, vat: formatMoney(lang, vatOf(total, quote.vat_rate)) })}</p>
+      )}
+      {quote.est_hours ? <p className={styles.muted}>{t('cb.quote.term', { term: estimateText(lang, quote.est_hours) })}</p> : null}
       {quote.note && <p className={styles.note}>{quote.note}</p>}
       {expires && (
         <p className={styles.muted}>

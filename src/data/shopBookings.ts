@@ -3,7 +3,7 @@ import { call, type Booking } from './rpc';
 import type { CarSnapshot } from './bookings';
 import type { BookingStatus } from '../lib/status';
 import type { ExtraService } from '../lib/bookingServices';
-import type { QuoteVariantFields } from '../lib/quoteLines';
+import type { QuoteDetailFields, QuoteVariantFields } from '../lib/quoteLines';
 
 /**
  * The shop's active bookings for Panou and Programări (FR §4.1, §4.2; T08), in one read:
@@ -13,7 +13,7 @@ import type { QuoteVariantFields } from '../lib/quoteLines';
 
 export type QuoteStatus = 'sent' | 'accepted' | 'partially_accepted';
 
-export interface ShopQuoteItem extends QuoteVariantFields {
+export interface ShopQuoteItem extends QuoteVariantFields, QuoteDetailFields {
   id: string;
   position: number;
   name: string;
@@ -34,6 +34,10 @@ export interface ShopQuote {
   expires_at: string | null;
   /** Who answered (T29): the client in the app, or the shop for a client without an account. */
   decided_by?: 'client' | 'shop' | null;
+  /** The VAT rate the prices include (T50); null when the shop was not a VAT payer. */
+  vat_rate?: number | null;
+  /** The estimated time, in hours. */
+  est_hours?: number | null;
   items: ShopQuoteItem[];
 }
 
@@ -78,6 +82,11 @@ export interface ShopBooking {
   confirmed_at: string | null;
   inspection_started_at: string | null;
   started_at: string | null;
+  /** The shop's number for this booking's quote (T50), from its first quote on. */
+  quote_number?: number | null;
+  /** When the intake sheet went to the client, and when the client confirmed it. */
+  intake_sent_at?: string | null;
+  intake_confirmed_at?: string | null;
   /** From quote_sent on: the waiting or the accepted version. */
   quote: ShopQuote | null;
 }
@@ -90,7 +99,17 @@ export function isUnclaimedWalkIn(b: Pick<ShopBooking, 'source' | 'claimed'>): b
 }
 
 export interface ShopBookingsData {
-  shop: { id: string; name: string; city: string; daily_capacity: number; inspection_fee: number };
+  shop: {
+    id: string;
+    name: string;
+    city: string;
+    daily_capacity: number;
+    inspection_fee: number;
+    /** The hourly rate the editor starts labor lines with (with VAT for a VAT payer). */
+    labor_rate?: number | null;
+    /** The VAT a quote sent now carries; null when the shop is not a VAT payer. */
+    vat_rate?: number | null;
+  };
   quote_expiry_days: number;
   bookings: ShopBooking[];
 }
@@ -104,7 +123,12 @@ function toNumber(value: unknown): number {
 function normalize(data: ShopBookingsData): ShopBookingsData {
   return {
     ...data,
-    shop: { ...data.shop, inspection_fee: toNumber(data.shop.inspection_fee) },
+    shop: {
+      ...data.shop,
+      inspection_fee: toNumber(data.shop.inspection_fee),
+      labor_rate: data.shop.labor_rate == null ? null : toNumber(data.shop.labor_rate),
+      vat_rate: data.shop.vat_rate == null ? null : toNumber(data.shop.vat_rate),
+    },
     bookings: data.bookings.map((b) => ({
       ...b,
       quote: b.quote && {
@@ -112,7 +136,13 @@ function normalize(data: ShopBookingsData): ShopBookingsData {
         inspection_fee: toNumber(b.quote.inspection_fee),
         total_sent: toNumber(b.quote.total_sent),
         total_approved: b.quote.total_approved === null ? null : toNumber(b.quote.total_approved),
-        items: b.quote.items.map((i) => ({ ...i, price: toNumber(i.price) })),
+        vat_rate: b.quote.vat_rate == null ? null : toNumber(b.quote.vat_rate),
+        items: b.quote.items.map((i) => ({
+          ...i,
+          price: toNumber(i.price),
+          quantity: i.quantity == null ? null : toNumber(i.quantity),
+          unit_price: i.unit_price == null ? null : toNumber(i.unit_price),
+        })),
       },
     })),
   };

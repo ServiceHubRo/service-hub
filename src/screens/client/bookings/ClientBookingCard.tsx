@@ -1,8 +1,9 @@
-import { History, MessageSquare, Phone, RotateCcw, Star } from 'lucide-react';
+import { ClipboardCheck, History, MessageSquare, Phone, RotateCcw, Star } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { WarrantyNote } from '../../../components/WarrantyNote';
 import { ActionButton } from '../../../components/ActionButton';
+import { JobDocuments } from '../../../components/JobDocuments';
 import { BookingProgress } from '../../../components/BookingProgress';
 import { Button } from '../../../components/Button';
 import { buttonClass } from '../../../components/buttonClass';
@@ -28,9 +29,10 @@ import { useI18n } from '../../../i18n/context';
 import { daysFromToday, formatDate, formatKm, formatMoney, formatTime, ymdInBucharest } from '../../../i18n/format';
 import { bookingServicesText } from '../../../lib/bookingServices';
 import { cancelState, reviewState, type Quote } from '../../../lib/clientBookings';
+import { quantityDetail, vatOf } from '../../../lib/quoteSections';
 import { formatPhone, normalizePhone } from '../../../lib/validators';
 import { bookingMessagesPath } from '../../messages/paths';
-import { bookingCarHistoryPath, bookingPath, SEARCH_PATH, type VehicleHistoryLinkState } from '../paths';
+import { bookingCarHistoryPath, bookingIntakePath, bookingPath, SEARCH_PATH, type VehicleHistoryLinkState } from '../paths';
 import { QuoteDecision } from './QuoteDecision';
 import { ReviewForm } from './ReviewForm';
 import styles from './bookings.module.css';
@@ -139,6 +141,25 @@ export function ClientBookingCard({
         // A replaced quote starts with every line ticked again.
         <QuoteDecision key={quote.id} bookingId={b.id} quote={quote} act={act} />
       )}
+      {b.intake_sent_at && !b.intake_confirmed_at && (
+        <Link to={bookingIntakePath(b.id)} className={styles.intakePrompt}>
+          <ClipboardCheck size={18} aria-hidden="true" />
+          <span>
+            <strong>{t('cin.prompt.title')}</strong>
+            <span className={styles.block}>{t('cin.prompt.body')}</span>
+          </span>
+        </Link>
+      )}
+      <JobDocuments
+        bookingId={b.id}
+        bookingRef={b.ref}
+        quoteNumber={b.quote_number}
+        kinds={[
+          ...(b.status === 'done' && quote ? (['final'] as const) : []),
+          ...(quote ? (['quote'] as const) : []),
+          ...(b.intake_sent_at ? (['intake'] as const) : []),
+        ]}
+      />
 
       {hasActions && (
         <div className={styles.actions}>
@@ -175,6 +196,9 @@ export function ClientBookingCard({
                 : []),
               ...(bookAgain && (review === 'open' || findAnother)
                 ? [{ key: 'again', label: t('cb.bookAgain'), icon: <RotateCcw size={18} aria-hidden="true" />, to: bookAgainPath }]
+                : []),
+              ...(b.intake_confirmed_at
+                ? [{ key: 'intake', label: t('cin.title'), icon: <ClipboardCheck size={18} aria-hidden="true" />, to: bookingIntakePath(b.id) }]
                 : []),
               ...(b.status === 'done'
                 ? [{ key: 'history', label: t('vh.see'), icon: <History size={18} aria-hidden="true" />, to: bookingCarHistoryPath(b.id), state: FROM_BOOKINGS }]
@@ -264,11 +288,13 @@ function DecidedLines({ quote }: { quote: Quote }) {
       <ul className={styles.quoteLines}>
         {quote.items.map((item) => {
           const refused = item.approved === false;
+          const detail = quantityDetail(lang, item);
           return (
             <li key={item.id} className={`${styles.quoteLine} ${refused ? styles.refused : ''}`}>
               <span className={styles.lineName}>
                 {item.name}
                 {refused && <span className="visually-hidden">, {t('cb.quote.refusedLine')}</span>}
+                {detail && <span className={styles.lineDetail}>{detail}</span>}
               </span>
               <span className="mono">{formatMoney(lang, item.price)}</span>
             </li>
@@ -279,6 +305,11 @@ function DecidedLines({ quote }: { quote: Quote }) {
         <span>{t('cb.quote.totalApproved')}</span>
         <span className="mono">{formatMoney(lang, quote.total_approved ?? quote.total_sent)}</span>
       </p>
+      {quote.vat_rate != null && (
+        <p className={styles.quoteVat}>
+          {t('quote.vatIncluded', { rate: quote.vat_rate, vat: formatMoney(lang, vatOf(quote.total_approved ?? quote.total_sent, quote.vat_rate)) })}
+        </p>
+      )}
     </div>
   );
 }

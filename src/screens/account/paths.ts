@@ -14,3 +14,6 @@ export function suggestionsPath(role: Role): string {
 export function notificationsPath(role: Role): string {
   return `${NAV[role].account.path}/notificari`;
 }
+
+/** Cont → Date pentru deviz (T50), the client's company printed on quotes: `/c/cont/firma`. */
+export const COMPANY_PATH = '/c/cont/firma';

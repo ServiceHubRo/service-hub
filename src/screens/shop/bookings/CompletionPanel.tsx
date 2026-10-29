@@ -15,6 +15,7 @@ import { Panel, PanelButtons } from './BookingPanels';
 import styles from './shopBookings.module.css';
 
 const WORK_MAX = 4000;
+const NAME_MAX = 120;
 /** The warranty a shop can give on the work, in months (T37a). */
 const WARRANTY_MONTHS = [1, 3, 6, 12, 24, 36];
 
@@ -23,8 +24,8 @@ const WARRANTY_MONTHS = [1, 3, 6, 12, 24, 36];
  * keyboard, the last known reading for this plate shown under it. Lower than that is refused and
  * names it; more than 50 000 km above it needs an explicit tick. Work and cost start from the lines
  * the client approved and stay editable. A warranty (1–36 months) may be given on the work; the
- * client sees it in the car's history and the report. The database applies the same rules
- * (`complete_job`).
+ * client sees it in the car's history and the report. Who did the work and who checked it go on
+ * the final quote (T50). The database applies the same rules (`complete_job`).
  */
 export function CompletionPanel({
   booking,
@@ -53,6 +54,8 @@ export function CompletionPanel({
     quote?.total_approved !== null && quote?.total_approved !== undefined ? priceText(quote.total_approved, decimal) : '',
   );
   const [warranty, setWarranty] = useState('');
+  const [workBy, setWorkBy] = useState('');
+  const [checkedBy, setCheckedBy] = useState('');
   const [jumpOk, setJumpOk] = useState(false);
   // The server found the same reading on a job from another day: shown until the shop confirms it.
   const [same, setSame] = useState<number | null>(null);
@@ -104,6 +107,8 @@ export function CompletionPanel({
             cost: costValue,
             confirmJump: jumpOk,
             warrantyMonths: warranty ? Number(warranty) : undefined,
+            workBy: workBy.trim() || undefined,
+            checkedBy: checkedBy.trim() || undefined,
           },
           requestId,
         ),
@@ -215,6 +220,22 @@ export function CompletionPanel({
         ]}
         onChange={(e) => setWarranty(e.target.value)}
       />
+      <div className={styles.pair}>
+        <Field
+          label={t('sb.complete.workBy')}
+          value={workBy}
+          maxLength={NAME_MAX}
+          autoComplete="off"
+          onChange={(e) => setWorkBy(e.target.value)}
+        />
+        <Field
+          label={t('sb.complete.checkedBy')}
+          value={checkedBy}
+          maxLength={NAME_MAX}
+          autoComplete="off"
+          onChange={(e) => setCheckedBy(e.target.value)}
+        />
+      </div>
       <PanelButtons
         label={t('sb.complete.submit')}
         variant="success"

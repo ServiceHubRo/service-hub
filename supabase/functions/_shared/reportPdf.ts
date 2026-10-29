@@ -77,7 +77,7 @@ const PAD = 8;
 const WRENCH =
   'M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z';
 
-function base64Bytes(b64: string): Uint8Array {
+export function base64Bytes(b64: string): Uint8Array {
   const bin = atob(b64);
   const out = new Uint8Array(bin.length);
   for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
@@ -85,7 +85,7 @@ function base64Bytes(b64: string): Uint8Array {
 }
 
 /** Rounded rectangle as an SVG path from its top-left corner (drawSvgPath's origin). */
-function roundRectPath(w: number, h: number, r: number): string {
+export function roundRectPath(w: number, h: number, r: number): string {
   return `M${r} 0H${w - r}A${r} ${r} 0 0 1 ${w} ${r}V${h - r}A${r} ${r} 0 0 1 ${w - r} ${h}H${r}A${r} ${r} 0 0 1 0 ${h - r}V${r}A${r} ${r} 0 0 1 ${r} 0Z`;
 }
 
@@ -134,7 +134,7 @@ export function wrapText(text: string, font: PdfFont, size: number, width: numbe
 }
 
 /** At most `max` lines, the last one ending in `…` when text was left out. */
-function clampLines(lines: string[], max: number, font: PdfFont, size: number, width: number): string[] {
+export function clampLines(lines: string[], max: number, font: PdfFont, size: number, width: number): string[] {
   if (lines.length <= max) return lines;
   const kept = lines.slice(0, max);
   let last = kept[max - 1]!;

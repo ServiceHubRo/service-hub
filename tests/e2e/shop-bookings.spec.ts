@@ -148,13 +148,15 @@ test.describe('demo shop', () => {
     await expectNoHorizontalScroll(page);
     await shot(page, 't08-programate', name());
 
-    // "Editează devizul" starts from the sent lines.
+    // "Editează devizul" opens the editor (T50) with the sent lines.
     const quoted = card(page, 'Scârțâie la frânare dimineața.');
     await (await cardAction(quoted, 'Editează devizul')).click();
-    await expect(quoted.getByLabel('Poziția 2', { exact: true })).toHaveValue('Discuri frână față');
-    await expect(quoted.getByText('850 lei')).toHaveCount(2); // the sent quote and the composer's total
+    await expect(page.getByRole('heading', { level: 1, name: 'Modifică devizul' })).toBeVisible();
+    await expect(page.getByLabel('Piesă sau material').nth(1)).toHaveValue('Discuri frână față');
+    await expect(page.getByText('850 lei').last()).toBeVisible();
     await shot(page, 't08-quote-edit', name());
-    await quoted.getByRole('button', { name: 'Renunță' }).click();
+    await page.getByRole('button', { name: 'Renunță' }).click();
+    await expect(page).toHaveURL(/\/s\/programari\?/);
   });
 });
 
@@ -172,7 +174,7 @@ test.describe('shop flow', () => {
     await expect(page.getByText('Nicio programare azi.')).toBeVisible();
     // A counter at zero is not a link.
     await expect(page.getByRole('link', { name: /^\d+ Cereri noi$/ })).toHaveCount(0);
-    await expect(page.getByText('Cereri noi')).toBeVisible();
+    await expect(page.getByText('Cereri noi', { exact: true })).toBeVisible();
 
     // The client books: Panou and the tab badge change without a reload.
     const [day] = await freeDays(clientEmail, shopId);
@@ -217,42 +219,45 @@ test.describe('shop flow', () => {
     const clientCard = clientPage.locator('main li').filter({ hasText: shopName });
     await expect(clientCard).toContainText('În constatare');
 
-    // The quote: three lines, the total live, a row with a missing price refused in place.
+    // The quote (T50, its own screen): parts with quantity × price, a fixed-price labor line, the
+    // total live, a line with a missing price refused in place.
     await page.getByRole('button', { name: 'Trimite deviz' }).click();
-    await page.getByLabel('Poziția 1', { exact: true }).fill('Plăcuțe frână');
-    await page.getByLabel('Preț, lei').first().fill('280');
-    await page.getByRole('button', { name: 'Adaugă poziție' }).click();
-    await expect(page.getByLabel('Poziția 2', { exact: true })).toBeFocused();
-    await page.getByLabel('Poziția 2', { exact: true }).fill('Discuri frână');
-    await page.getByLabel('Preț, lei').nth(1).fill('420,50');
-    await page.getByRole('button', { name: 'Adaugă poziție' }).click();
-    await page.getByLabel('Poziția 3', { exact: true }).fill('Manoperă');
+    await expect(page.getByRole('heading', { level: 1, name: 'Deviz nou' })).toBeVisible();
+    await page.getByLabel('Piesă sau material').first().fill('Plăcuțe frână');
+    await page.getByLabel('Preț unitar, lei').first().fill('280');
+    await page.getByRole('button', { name: 'Adaugă piesă' }).click();
+    await expect(page.getByLabel('Piesă sau material').nth(1)).toBeFocused();
+    await page.getByLabel('Piesă sau material').nth(1).fill('Discuri frână');
+    await page.getByLabel('Preț unitar, lei').nth(1).fill('420,50');
+    await page.getByLabel('Operație').first().fill('Manoperă');
+    await page.getByLabel('Ore', { exact: true }).first().fill('');
     const top = await scrollTopOf(page);
-    await page.getByLabel('Preț, lei').nth(2).fill('150');
+    await page.getByLabel('Preț, lei').first().fill('150');
     expect(Math.abs((await scrollTopOf(page)) - top)).toBeLessThan(5); // typing never jumps the page
-    await expect(page.getByLabel('Preț, lei').nth(2)).toBeFocused();
-    await expect(page.getByText('850,50 lei')).toBeVisible();
-    await page.getByRole('button', { name: 'Adaugă poziție' }).click();
-    await page.getByLabel('Poziția 4', { exact: true }).fill('Lichid frână');
+    await expect(page.getByLabel('Preț, lei').first()).toBeFocused();
+    await expect(page.getByText('850,50 lei').last()).toBeVisible();
+    await page.getByRole('button', { name: 'Adaugă piesă' }).click();
+    await page.getByLabel('Piesă sau material').nth(2).fill('Lichid frână');
     await page.getByRole('button', { name: 'Trimite devizul' }).click();
     await expect(page.getByText('Scrie prețul.')).toBeVisible();
-    await expect(page.getByLabel('Preț, lei').nth(3)).toBeFocused();
+    await expect(page.getByLabel('Preț unitar, lei').nth(2)).toBeFocused();
     await expect(page.getByText('Taxa de constatare de 80 lei se plătește doar dacă clientul refuză tot devizul.')).toBeVisible();
     await expectNoHorizontalScroll(page);
     await shot(page, 't08-quote-composer', name());
-    await page.getByRole('button', { name: 'Șterge poziția 4' }).click();
+    await page.getByRole('button', { name: 'Șterge piesa 3' }).click();
     await page.getByRole('button', { name: 'Trimite devizul' }).click();
     await expect(page.getByText(`Devizul pentru ${booking.ref} a fost trimis clientului.`)).toBeVisible();
     const sent = card(page, booking.ref);
     await expect(sent).toContainText('Deviz trimis — se așteaptă răspunsul clientului.');
     await expect(sent).toContainText('Discuri frână');
+    await expect(sent).toContainText('Piese și materiale');
     await expect(clientCard).toContainText('Deviz trimis');
     await shot(page, 't08-quote-sent', name());
     await shot(clientPage, 't08-client-quote-sent', name());
 
     // Edit: a new version replaces it; withdraw: back to inspection; send again.
     await (await cardAction(sent, 'Editează devizul')).click();
-    await page.getByLabel('Preț, lei').nth(2).fill('200');
+    await page.getByLabel('Preț, lei').first().fill('200');
     await page.getByRole('button', { name: 'Trimite devizul nou' }).click();
     await expect(page.getByText(`Devizul nou pentru ${booking.ref} a fost trimis clientului.`)).toBeVisible();
     await expect(sent).toContainText('900,50 lei');
@@ -262,8 +267,8 @@ test.describe('shop flow', () => {
     await expect(sent).toContainText('Mașina este în constatare din');
     await expect(clientCard).toContainText('În constatare');
     await page.getByRole('button', { name: 'Trimite deviz' }).click();
-    await page.getByLabel('Poziția 1', { exact: true }).fill('Plăcuțe frână');
-    await page.getByLabel('Preț, lei').first().fill('280');
+    await page.getByLabel('Piesă sau material').first().fill('Plăcuțe frână');
+    await page.getByLabel('Preț unitar, lei').first().fill('280');
     await page.getByRole('button', { name: 'Trimite devizul' }).click();
     await expect(sent).toContainText('Deviz trimis — se așteaptă răspunsul clientului.');
     await expect(clientCard).toContainText('Deviz trimis');

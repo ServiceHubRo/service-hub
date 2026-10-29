@@ -367,3 +367,58 @@
 }
 
 
+
+.quoteSection {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.quoteHeading {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.lineDetail {
+  display: block;
+  color: var(--muted);
+  font-size: 12.5px;
+}
+
+.quoteVat {
+  color: var(--muted);
+  font-size: 12.5px;
+  text-align: right;
+}
+
+.intakePrompt {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--amber-line);
+  border-radius: var(--radius-card);
+  background: var(--amber-tint);
+  color: var(--text);
+  text-decoration: none;
+  transition: border-color var(--motion-quick) var(--ease);
+}
+
+.intakePrompt:hover {
+  border-color: var(--amber);
+}
+
+.intakePrompt svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: var(--amber);
+}
+
+.block {
+  display: block;
+  color: var(--muted);
+  font-size: 13.5px;
+}

@@ -1,6 +1,8 @@
-import { CalendarClock, ClipboardList, FilePen, MessageSquare, Phone, Store, TriangleAlert } from 'lucide-react';
+import { CalendarClock, ClipboardCheck, ClipboardList, FilePen, MessageSquare, Phone, Store, TriangleAlert } from 'lucide-react';
 import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { ActionButton } from '../../../components/ActionButton';
+import { JobDocuments } from '../../../components/JobDocuments';
 import { Button } from '../../../components/Button';
 import { Card } from '../../../components/Card';
 import { MoreActions } from '../../../components/MoreActions';
@@ -31,14 +33,16 @@ import { formatPhone, normalizePhone } from '../../../lib/validators';
 import { ConfirmPanel, ReasonPanel } from './BookingPanels';
 import { ClientAnswerPanel } from './ClientAnswerPanel';
 import { CompletionPanel } from './CompletionPanel';
-import { QuoteComposer } from './QuoteComposer';
 import { QuoteLines } from './QuoteLines';
 import { ReschedulePanel } from './ReschedulePanel';
 import { bookingMessagesPath } from '../../messages/paths';
-import { vehicleFilePath } from '../paths';
+import { intakePath, quoteEditorPath, vehicleFilePath } from '../paths';
 import styles from './shopBookings.module.css';
 
-type PanelKind = 'decline' | 'reschedule' | 'cancel' | 'noShow' | 'quote' | 'editQuote' | 'withdraw' | 'complete' | 'answer';
+type PanelKind = 'decline' | 'reschedule' | 'cancel' | 'noShow' | 'withdraw' | 'complete' | 'answer';
+
+/** The statuses in which the car is at the shop and the intake sheet can be written (T50). */
+const INTAKE_STATUSES = new Set(['confirmed', 'in_inspection', 'quote_sent', 'approved', 'in_progress']);
 
 /** From 3 no-shows in 90 days shops see a discreet line (ARCHITECTURE §6); no automatic block. */
 const NO_SHOW_MARK = 3;
@@ -46,9 +50,6 @@ const NO_SHOW_MARK = 3;
 export interface ShopBookingCardProps {
   booking: ShopBooking;
   shopId: string;
-  /** The shop's inspection fee now (the composer shows it). */
-  fee: number;
-  expiryDays: number;
   now: Date;
   /** A request that just arrived live: it slides in with an amber glow that fades. */
   fresh?: boolean;
@@ -64,10 +65,11 @@ export interface ShopBookingCardProps {
  * actions the status allows. Every action opens inside the card (no dialogs) and goes through a
  * database function; the buttons only mirror what the database allows.
  */
-export function ShopBookingCard({ booking: b, shopId, fee, expiryDays, now, fresh = false, onDone, onStale }: ShopBookingCardProps) {
+export function ShopBookingCard({ booking: b, shopId, now, fresh = false, onDone, onStale }: ShopBookingCardProps) {
   const { t, lang } = useI18n();
   const offerText = useOfferText();
   const [panel, setPanel] = useState<PanelKind | null>(null);
+  const navigate = useNavigate();
   const started = slotStarted(b, now);
 
   /** Runs one RPC; a booking that moved on meanwhile makes the list reload. */
@@ -146,6 +148,13 @@ export function ShopBookingCard({ booking: b, shopId, fee, expiryDays, now, fres
       </Card>
 
       <StatusDetail booking={b} started={started} />
+      <IntakeLine booking={b} />
+      <JobDocuments
+        bookingId={b.id}
+        bookingRef={b.ref}
+        quoteNumber={b.quote_number}
+        kinds={[...(b.quote ? (['quote'] as const) : []), ...(b.intake_sent_at ? (['intake'] as const) : [])]}
+      />
 
       {panel === null && (
         <div className={styles.actions}>
@@ -177,7 +186,7 @@ export function ShopBookingCard({ booking: b, shopId, fee, expiryDays, now, fres
             </ActionButton>
           )}
           {b.status === 'in_inspection' && (
-            <Button variant="primary" onClick={() => setPanel('quote')}>
+            <Button variant="primary" onClick={() => navigate(quoteEditorPath(b.id))}>
               {t('sb.action.sendQuote')}
             </Button>
           )}
@@ -212,13 +221,16 @@ export function ShopBookingCard({ booking: b, shopId, fee, expiryDays, now, fres
                 : []),
               ...(b.status === 'quote_sent'
                 ? [
-                    { key: 'editQuote', label: t('sb.action.editQuote'), icon: <FilePen size={18} aria-hidden="true" />, onSelect: () => setPanel('editQuote') },
+                    { key: 'editQuote', label: t('sb.action.editQuote'), icon: <FilePen size={18} aria-hidden="true" />, to: quoteEditorPath(b.id) },
                     { key: 'withdraw', label: t('sb.action.withdrawQuote'), onSelect: () => setPanel('withdraw'), danger: true },
                   ]
                 : []),
               // A deleted client account has no conversation.
               ...(b.client_account
                 ? [{ key: 'message', label: t('msg.button'), icon: <MessageSquare size={18} aria-hidden="true" />, to: bookingMessagesPath('shop', b.id) }]
+                : []),
+              ...(INTAKE_STATUSES.has(b.status)
+                ? [{ key: 'intake', label: t('in.title'), icon: <ClipboardCheck size={18} aria-hidden="true" />, to: intakePath(b.id) }]
                 : []),
               { key: 'file', label: t('vf.title'), icon: <ClipboardList size={18} aria-hidden="true" />, to: vehicleFilePath(b.id, 'bookings') },
               ...(b.status === 'confirmed' && started
@@ -272,16 +284,6 @@ export function ShopBookingCard({ booking: b, shopId, fee, expiryDays, now, fres
       {panel === 'reschedule' && <ReschedulePanel booking={b} shopId={shopId} act={act} onClose={close} />}
       {panel === 'complete' && <CompletionPanel booking={b} act={act} onClose={close} />}
       {panel === 'answer' && b.quote && <ClientAnswerPanel booking={b} quote={b.quote} act={act} onClose={close} />}
-      {(panel === 'quote' || panel === 'editQuote') && (
-        <QuoteComposer
-          booking={b}
-          mode={panel === 'quote' ? 'send' : 'replace'}
-          fee={fee}
-          expiryDays={expiryDays}
-          act={act}
-          onClose={close}
-        />
-      )}
     </Card>
   );
 }
@@ -349,4 +351,19 @@ function StatusDetail({ booking: b, started }: { booking: ShopBooking; started: 
     default:
       return null;
   }
+}
+
+/** Where the intake sheet stands (T50), with a link to it while the car is at the shop. */
+function IntakeLine({ booking: b }: { booking: ShopBooking }) {
+  const { t } = useI18n();
+  if (!INTAKE_STATUSES.has(b.status)) return null;
+  const text = b.intake_confirmed_at ? t('in.line.confirmed') : b.intake_sent_at ? t('in.line.sent') : null;
+  return (
+    <p className={`${styles.muted} ${styles.intakeLine}`}>
+      {text && <span>{text}</span>}
+      <Link to={intakePath(b.id)} className={styles.inlineLink}>
+        {b.intake_sent_at ? t('in.line.open') : t('in.line.write')}
+      </Link>
+    </p>
+  );
 }

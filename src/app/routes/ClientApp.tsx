@@ -6,6 +6,8 @@ import { shopPath } from '../../screens/client/paths';
 import { BookingFlow } from '../../screens/client/booking/BookingFlow';
 import { BookingSent } from '../../screens/client/booking/BookingSent';
 import { ClaimScreen } from '../../screens/client/claim/ClaimScreen';
+import { ClientIntakeScreen } from '../../screens/client/intake/ClientIntakeScreen';
+import { CompanyScreen } from '../../screens/account/CompanyScreen';
 import { ClientBookingsProvider } from '../../screens/client/bookings/ClientBookingsProvider';
 import { ClientBookingsScreen } from '../../screens/client/bookings/ClientBookingsScreen';
 import { FavoritesScreen } from '../../screens/client/favorites/FavoritesScreen';
@@ -80,12 +82,14 @@ export default function ClientApp() {
           <Route path="garaj/:carId" element={<CarFormScreen />} />
           <Route path="garaj/:carId/istoric" element={<VehicleHistoryScreen />} />
           <Route path="programari/:bookingId/istoric" element={<VehicleHistoryScreen />} />
+          <Route path="programari/:bookingId/preluare" element={<ClientIntakeScreen />} />
           <Route path="cont/favorite" element={<FavoritesScreen />} />
           <Route path="cont/istoric" element={<VehiclePickScreen />} />
           <Route path="garaj/:carId/raport" element={<ReportPreviewScreen />} />
           <Route path="programari/:bookingId/raport" element={<ReportPreviewScreen />} />
           <Route path="cont/rapoarte" element={<MyReportsScreen />} />
           <Route path="cont/notificari" element={<ClientNotificationsScreen />} />
+          <Route path="cont/firma" element={<CompanyScreen />} />
           <Route path="preia/:token" element={<ClaimScreen />} />
           {messageRoutes('client')}
         </Route>

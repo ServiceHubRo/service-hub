@@ -93,3 +93,19 @@ export async function hideClientGuide(userId: string): Promise<string> {
   if (error) throw failure(error);
   return at;
 }
+
+/** Who the client's quotes are issued to (T50): a person (an optional address) or a company. */
+export interface DocParty {
+  doc_party: 'person' | 'company';
+  person_address: string | null;
+  company_name: string | null;
+  company_vat_id: string | null;
+  company_reg_com: string | null;
+  company_address: string | null;
+}
+
+export async function updateDocParty(userId: string, fields: DocParty): Promise<Profile> {
+  const { data, error } = await db().from('profiles').update(fields).eq('id', userId).select('*').single();
+  if (error) throw failure(error);
+  return data;
+}

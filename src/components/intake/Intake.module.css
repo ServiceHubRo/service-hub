@@ -1,0 +1,262 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-width: 900px;
+}
+
+.form,
+.view {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.muted {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.label {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.error {
+  color: var(--red-text);
+  font-size: 13.5px;
+}
+
+.head {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.car {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.confirmed {
+  padding: 10px 12px;
+  border: 1px solid var(--green);
+  border-radius: var(--radius-card);
+  background: var(--green-soft);
+  color: var(--text);
+  font-weight: 600;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 14px;
+}
+
+.choice {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.heading {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.damage {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.damageBody {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 14px;
+  align-items: start;
+}
+
+.markList {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.markList li {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.markNo {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-pill);
+  background: var(--amber);
+  color: var(--ink);
+  font-size: 12.5px;
+  font-weight: 700;
+}
+
+.markEdit {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.markEdit li {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr) var(--tap);
+  grid-template-areas:
+    'no kind remove'
+    '. note note';
+  gap: 8px 10px;
+  align-items: end;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.markEdit li > .markNo {
+  grid-area: no;
+  align-self: center;
+  margin-top: 22px;
+}
+
+.markEdit li > :nth-child(2) {
+  grid-area: kind;
+}
+
+.markEdit li > :nth-child(3) {
+  grid-area: note;
+}
+
+.remove {
+  grid-area: remove;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--tap);
+  height: var(--tap);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-button);
+  color: var(--muted);
+  transition: color var(--motion-quick) var(--ease), border-color var(--motion-quick) var(--ease);
+}
+
+.remove:hover {
+  color: var(--red-text);
+  border-color: var(--red-line);
+}
+
+.photos {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+  gap: 8px;
+}
+
+.photos img,
+.photoWait {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  max-width: 100%;
+  object-fit: cover;
+  border-radius: var(--radius-input);
+  background: var(--surface2);
+}
+
+.photoItem {
+  position: relative;
+}
+
+.photoRemove {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--tap);
+  height: var(--tap);
+  border-radius: var(--radius-pill);
+  background: var(--glass-bg);
+  color: var(--text);
+}
+
+.photoActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.facts,
+.options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 160px), 1fr));
+  gap: 10px;
+}
+
+.facts > div,
+.options > div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+}
+
+.facts dt,
+.options dt {
+  color: var(--muted);
+  font-size: 12.5px;
+}
+
+.facts dd,
+.options dd {
+  font-weight: 600;
+}
+
+.buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+@media (min-width: 900px) {
+  .row {
+    grid-template-columns: minmax(0, 240px) minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .damageBody {
+    grid-template-columns: 260px minmax(0, 1fr);
+  }
+
+  .markEdit li {
+    grid-template-columns: 24px minmax(0, 180px) minmax(0, 1fr) var(--tap);
+    grid-template-areas: 'no kind note remove';
+    padding-bottom: 0;
+    border-bottom: 0;
+  }
+}
