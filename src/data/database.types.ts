@@ -154,6 +154,7 @@ export type Database = {
           cancelled_by: string | null
           car_id: string | null
           car_snapshot: Json
+          checked_by: string | null
           claimed_at: string | null
           client_email: string | null
           client_id: string | null
@@ -171,6 +172,8 @@ export type Database = {
           followup_sent_at: string | null
           id: string
           inspection_started_at: string | null
+          intake_confirmed_at: string | null
+          intake_sent_at: string | null
           invite_sent_at: string | null
           invite_token: string | null
           loyalty_level: number | null
@@ -179,6 +182,7 @@ export type Database = {
           odometer: number | null
           offer_kind: string | null
           offer_percent: number | null
+          quote_number: number | null
           ref: string
           reminder_sent_at: string | null
           service_id: string
@@ -194,6 +198,7 @@ export type Database = {
           warranty_months: number | null
           warranty_until: string | null
           work: string | null
+          work_by: string | null
         }
         Insert: {
           cancel_reason?: string | null
@@ -201,6 +206,7 @@ export type Database = {
           cancelled_by?: string | null
           car_id?: string | null
           car_snapshot?: Json
+          checked_by?: string | null
           claimed_at?: string | null
           client_email?: string | null
           client_id?: string | null
@@ -218,6 +224,8 @@ export type Database = {
           followup_sent_at?: string | null
           id?: string
           inspection_started_at?: string | null
+          intake_confirmed_at?: string | null
+          intake_sent_at?: string | null
           invite_sent_at?: string | null
           invite_token?: string | null
           loyalty_level?: number | null
@@ -226,6 +234,7 @@ export type Database = {
           odometer?: number | null
           offer_kind?: string | null
           offer_percent?: number | null
+          quote_number?: number | null
           ref?: string
           reminder_sent_at?: string | null
           service_id: string
@@ -241,6 +250,7 @@ export type Database = {
           warranty_months?: number | null
           warranty_until?: string | null
           work?: string | null
+          work_by?: string | null
         }
         Update: {
           cancel_reason?: string | null
@@ -248,6 +258,7 @@ export type Database = {
           cancelled_by?: string | null
           car_id?: string | null
           car_snapshot?: Json
+          checked_by?: string | null
           claimed_at?: string | null
           client_email?: string | null
           client_id?: string | null
@@ -265,6 +276,8 @@ export type Database = {
           followup_sent_at?: string | null
           id?: string
           inspection_started_at?: string | null
+          intake_confirmed_at?: string | null
+          intake_sent_at?: string | null
           invite_sent_at?: string | null
           invite_token?: string | null
           loyalty_level?: number | null
@@ -273,6 +286,7 @@ export type Database = {
           odometer?: number | null
           offer_kind?: string | null
           offer_percent?: number | null
+          quote_number?: number | null
           ref?: string
           reminder_sent_at?: string | null
           service_id?: string
@@ -288,6 +302,7 @@ export type Database = {
           warranty_months?: number | null
           warranty_until?: string | null
           work?: string | null
+          work_by?: string | null
         }
         Relationships: [
           {
@@ -1145,6 +1160,7 @@ export type Database = {
           trial_days: number
           updated_at: string
           updated_by: string | null
+          vat_rate: number
           vat_rate_percent: number
         }
         Insert: {
@@ -1173,6 +1189,7 @@ export type Database = {
           trial_days?: number
           updated_at?: string
           updated_by?: string | null
+          vat_rate?: number
           vat_rate_percent?: number
         }
         Update: {
@@ -1201,6 +1218,7 @@ export type Database = {
           trial_days?: number
           updated_at?: string
           updated_by?: string | null
+          vat_rate?: number
           vat_rate_percent?: number
         }
         Relationships: []
@@ -1208,6 +1226,9 @@ export type Database = {
       profiles: {
         Row: {
           app_tips: boolean
+          company_address: string | null
+          company_name: string | null
+          company_vat_id: string | null
           created_at: string
           deleted_at: string | null
           display_id: string
@@ -1235,6 +1256,9 @@ export type Database = {
         }
         Insert: {
           app_tips?: boolean
+          company_address?: string | null
+          company_name?: string | null
+          company_vat_id?: string | null
           created_at?: string
           deleted_at?: string | null
           display_id: string
@@ -1262,6 +1286,9 @@ export type Database = {
         }
         Update: {
           app_tips?: boolean
+          company_address?: string | null
+          company_name?: string | null
+          company_vat_id?: string | null
           created_at?: string
           deleted_at?: string | null
           display_id?: string
@@ -1363,11 +1390,14 @@ export type Database = {
           brand: string | null
           created_at: string
           id: string
+          kind: string | null
           name: string
           option_group: number | null
           position: number
           price: number
+          quantity: number | null
           quote_id: string
+          unit_price: number | null
           variant: string | null
         }
         Insert: {
@@ -1375,11 +1405,14 @@ export type Database = {
           brand?: string | null
           created_at?: string
           id?: string
+          kind?: string | null
           name: string
           option_group?: number | null
           position: number
           price: number
+          quantity?: number | null
           quote_id: string
+          unit_price?: number | null
           variant?: string | null
         }
         Update: {
@@ -1387,11 +1420,14 @@ export type Database = {
           brand?: string | null
           created_at?: string
           id?: string
+          kind?: string | null
           name?: string
           option_group?: number | null
           position?: number
           price?: number
+          quantity?: number | null
           quote_id?: string
+          unit_price?: number | null
           variant?: string | null
         }
         Relationships: [
@@ -1410,16 +1446,21 @@ export type Database = {
           created_at: string
           decided_at: string | null
           decided_by: string | null
+          est_hours: number | null
           expires_at: string | null
           expiry_reminded_at: string | null
           id: string
           inspection_fee: number
+          issuer: Json | null
           note: string | null
+          recipient: Json | null
           sent_at: string
           sent_by: string | null
           status: string
+          terms: string | null
           total_approved: number | null
           total_sent: number
+          vat_rate: number | null
           version: number
         }
         Insert: {
@@ -1427,16 +1468,21 @@ export type Database = {
           created_at?: string
           decided_at?: string | null
           decided_by?: string | null
+          est_hours?: number | null
           expires_at?: string | null
           expiry_reminded_at?: string | null
           id?: string
           inspection_fee?: number
+          issuer?: Json | null
           note?: string | null
+          recipient?: Json | null
           sent_at?: string
           sent_by?: string | null
           status?: string
+          terms?: string | null
           total_approved?: number | null
           total_sent: number
+          vat_rate?: number | null
           version: number
         }
         Update: {
@@ -1444,16 +1490,21 @@ export type Database = {
           created_at?: string
           decided_at?: string | null
           decided_by?: string | null
+          est_hours?: number | null
           expires_at?: string | null
           expiry_reminded_at?: string | null
           id?: string
           inspection_fee?: number
+          issuer?: Json | null
           note?: string | null
+          recipient?: Json | null
           sent_at?: string
           sent_by?: string | null
           status?: string
+          terms?: string | null
           total_approved?: number | null
           total_sent?: number
+          vat_rate?: number | null
           version?: number
         }
         Relationships: [
@@ -2182,6 +2233,36 @@ export type Database = {
           },
         ]
       }
+      shop_quote_numbers: {
+        Row: {
+          next_number: number
+          shop_id: string
+        }
+        Insert: {
+          next_number?: number
+          shop_id: string
+        }
+        Update: {
+          next_number?: number
+          shop_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shop_quote_numbers_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: true
+            referencedRelation: "shop_ratings"
+            referencedColumns: ["shop_id"]
+          },
+          {
+            foreignKeyName: "shop_quote_numbers_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: true
+            referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       shop_referrals: {
         Row: {
           applied_at: string | null
@@ -2399,6 +2480,7 @@ export type Database = {
           hours_reviewed_at: string | null
           id: string
           inspection_fee: number
+          labor_rate: number | null
           lang: string
           latitude: number | null
           logo_url: string | null
@@ -2418,6 +2500,7 @@ export type Database = {
           postal_code: string | null
           quiet_day_offer: number | null
           quiet_days: number[]
+          quote_terms: string | null
           setup_completed_at: string | null
           slot_minutes: number
           sms_on_new_booking: boolean
@@ -2447,6 +2530,7 @@ export type Database = {
           hours_reviewed_at?: string | null
           id?: string
           inspection_fee?: number
+          labor_rate?: number | null
           lang?: string
           latitude?: number | null
           logo_url?: string | null
@@ -2466,6 +2550,7 @@ export type Database = {
           postal_code?: string | null
           quiet_day_offer?: number | null
           quiet_days?: number[]
+          quote_terms?: string | null
           setup_completed_at?: string | null
           slot_minutes?: number
           sms_on_new_booking?: boolean
@@ -2495,6 +2580,7 @@ export type Database = {
           hours_reviewed_at?: string | null
           id?: string
           inspection_fee?: number
+          labor_rate?: number | null
           lang?: string
           latitude?: number | null
           logo_url?: string | null
@@ -2514,6 +2600,7 @@ export type Database = {
           postal_code?: string | null
           quiet_day_offer?: number | null
           quiet_days?: number[]
+          quote_terms?: string | null
           setup_completed_at?: string | null
           slot_minutes?: number
           sms_on_new_booking?: boolean
@@ -2843,6 +2930,106 @@ export type Database = {
           },
         ]
       }
+      vehicle_intakes: {
+        Row: {
+          booking_id: string
+          confirmed_at: string | null
+          confirmed_by: string | null
+          created_at: string
+          created_by: string | null
+          damages: Json
+          fuel: number | null
+          keep_parts: boolean | null
+          notes: string | null
+          odometer: number | null
+          personal_items: string | null
+          photos: string[]
+          road_test: boolean | null
+          shop_id: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          booking_id: string
+          confirmed_at?: string | null
+          confirmed_by?: string | null
+          created_at?: string
+          created_by?: string | null
+          damages?: Json
+          fuel?: number | null
+          keep_parts?: boolean | null
+          notes?: string | null
+          odometer?: number | null
+          personal_items?: string | null
+          photos?: string[]
+          road_test?: boolean | null
+          shop_id: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          booking_id?: string
+          confirmed_at?: string | null
+          confirmed_by?: string | null
+          created_at?: string
+          created_by?: string | null
+          damages?: Json
+          fuel?: number | null
+          keep_parts?: boolean | null
+          notes?: string | null
+          odometer?: number | null
+          personal_items?: string | null
+          photos?: string[]
+          road_test?: boolean | null
+          shop_id?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vehicle_intakes_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: true
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vehicle_intakes_confirmed_by_fkey"
+            columns: ["confirmed_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vehicle_intakes_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vehicle_intakes_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shop_ratings"
+            referencedColumns: ["shop_id"]
+          },
+          {
+            foreignKeyName: "vehicle_intakes_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vehicle_intakes_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       shop_ratings: {
@@ -2957,6 +3144,7 @@ export type Database = {
           cancelled_by: string | null
           car_id: string | null
           car_snapshot: Json
+          checked_by: string | null
           claimed_at: string | null
           client_email: string | null
           client_id: string | null
@@ -2974,6 +3162,8 @@ export type Database = {
           followup_sent_at: string | null
           id: string
           inspection_started_at: string | null
+          intake_confirmed_at: string | null
+          intake_sent_at: string | null
           invite_sent_at: string | null
           invite_token: string | null
           loyalty_level: number | null
@@ -2982,6 +3172,7 @@ export type Database = {
           odometer: number | null
           offer_kind: string | null
           offer_percent: number | null
+          quote_number: number | null
           ref: string
           reminder_sent_at: string | null
           service_id: string
@@ -2997,6 +3188,7 @@ export type Database = {
           warranty_months: number | null
           warranty_until: string | null
           work: string | null
+          work_by: string | null
         }
         SetofOptions: {
           from: "*"
@@ -3188,6 +3380,10 @@ export type Database = {
       }
       area_key: { Args: { p: string }; Returns: string }
       area_live: { Args: { p_code: string }; Returns: boolean }
+      assign_quote_number: {
+        Args: { p_booking: Database["public"]["Tables"]["bookings"]["Row"] }
+        Returns: number
+      }
       audit_entries: {
         Args: { p_entity_ids: string[]; p_limit?: number }
         Returns: Json
@@ -3226,7 +3422,7 @@ export type Database = {
       caller_aal: { Args: never; Returns: string }
       can_read_booking: { Args: { p_booking_id: string }; Returns: boolean }
       can_read_notice: {
-        Args: { p_audience: string; p_city: string }
+        Args: { p_audience: string; p_city: string; p_created_at: string }
         Returns: boolean
       }
       can_read_shop: { Args: { p_shop_id: string }; Returns: boolean }
@@ -3239,6 +3435,7 @@ export type Database = {
           cancelled_by: string | null
           car_id: string | null
           car_snapshot: Json
+          checked_by: string | null
           claimed_at: string | null
           client_email: string | null
           client_id: string | null
@@ -3256,6 +3453,8 @@ export type Database = {
           followup_sent_at: string | null
           id: string
           inspection_started_at: string | null
+          intake_confirmed_at: string | null
+          intake_sent_at: string | null
           invite_sent_at: string | null
           invite_token: string | null
           loyalty_level: number | null
@@ -3264,6 +3463,7 @@ export type Database = {
           odometer: number | null
           offer_kind: string | null
           offer_percent: number | null
+          quote_number: number | null
           ref: string
           reminder_sent_at: string | null
           service_id: string
@@ -3279,6 +3479,7 @@ export type Database = {
           warranty_months: number | null
           warranty_until: string | null
           work: string | null
+          work_by: string | null
         }
         SetofOptions: {
           from: "*"
@@ -3315,14 +3516,18 @@ export type Database = {
       city_key: { Args: { p: string }; Returns: string }
       claim_booking: { Args: { p_token: string }; Returns: Json }
       claim_notifications: { Args: { p_limit?: number }; Returns: Json }
+      clean_intake_damages: { Args: { p_damages: Json }; Returns: Json }
       clean_quote_lines: {
         Args: { p_items: Json }
         Returns: {
           brand: string
+          kind: string
           name: string
           option_group: number
           pos: number
           price: number
+          quantity: number
+          unit_price: number
           variant: string
         }[]
       }
@@ -3377,12 +3582,14 @@ export type Database = {
       complete_job: {
         Args: {
           p_booking_id: string
+          p_checked_by?: string
           p_confirm_jump?: boolean
           p_cost?: number
           p_odometer: number
           p_request_id: string
           p_warranty_months?: number
           p_work?: string
+          p_work_by?: string
         }
         Returns: {
           cancel_reason: string | null
@@ -3390,6 +3597,7 @@ export type Database = {
           cancelled_by: string | null
           car_id: string | null
           car_snapshot: Json
+          checked_by: string | null
           claimed_at: string | null
           client_email: string | null
           client_id: string | null
@@ -3407,6 +3615,8 @@ export type Database = {
           followup_sent_at: string | null
           id: string
           inspection_started_at: string | null
+          intake_confirmed_at: string | null
+          intake_sent_at: string | null
           invite_sent_at: string | null
           invite_token: string | null
           loyalty_level: number | null
@@ -3415,6 +3625,7 @@ export type Database = {
           odometer: number | null
           offer_kind: string | null
           offer_percent: number | null
+          quote_number: number | null
           ref: string
           reminder_sent_at: string | null
           service_id: string
@@ -3430,6 +3641,7 @@ export type Database = {
           warranty_months: number | null
           warranty_until: string | null
           work: string | null
+          work_by: string | null
         }
         SetofOptions: {
           from: "*"
@@ -3460,6 +3672,7 @@ export type Database = {
           cancelled_by: string | null
           car_id: string | null
           car_snapshot: Json
+          checked_by: string | null
           claimed_at: string | null
           client_email: string | null
           client_id: string | null
@@ -3477,6 +3690,8 @@ export type Database = {
           followup_sent_at: string | null
           id: string
           inspection_started_at: string | null
+          intake_confirmed_at: string | null
+          intake_sent_at: string | null
           invite_sent_at: string | null
           invite_token: string | null
           loyalty_level: number | null
@@ -3485,6 +3700,7 @@ export type Database = {
           odometer: number | null
           offer_kind: string | null
           offer_percent: number | null
+          quote_number: number | null
           ref: string
           reminder_sent_at: string | null
           service_id: string
@@ -3500,6 +3716,7 @@ export type Database = {
           warranty_months: number | null
           warranty_until: string | null
           work: string | null
+          work_by: string | null
         }
         SetofOptions: {
           from: "*"
@@ -3507,6 +3724,10 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      confirm_vehicle_intake: {
+        Args: { p_booking_id: string; p_request_id: string }
+        Returns: Json
       }
       create_booking: {
         Args: {
@@ -3528,6 +3749,7 @@ export type Database = {
           cancelled_by: string | null
           car_id: string | null
           car_snapshot: Json
+          checked_by: string | null
           claimed_at: string | null
           client_email: string | null
           client_id: string | null
@@ -3545,6 +3767,8 @@ export type Database = {
           followup_sent_at: string | null
           id: string
           inspection_started_at: string | null
+          intake_confirmed_at: string | null
+          intake_sent_at: string | null
           invite_sent_at: string | null
           invite_token: string | null
           loyalty_level: number | null
@@ -3553,6 +3777,7 @@ export type Database = {
           odometer: number | null
           offer_kind: string | null
           offer_percent: number | null
+          quote_number: number | null
           ref: string
           reminder_sent_at: string | null
           service_id: string
@@ -3568,6 +3793,7 @@ export type Database = {
           warranty_months: number | null
           warranty_until: string | null
           work: string | null
+          work_by: string | null
         }
         SetofOptions: {
           from: "*"
@@ -3583,16 +3809,21 @@ export type Database = {
           created_at: string
           decided_at: string | null
           decided_by: string | null
+          est_hours: number | null
           expires_at: string | null
           expiry_reminded_at: string | null
           id: string
           inspection_fee: number
+          issuer: Json | null
           note: string | null
+          recipient: Json | null
           sent_at: string
           sent_by: string | null
           status: string
+          terms: string | null
           total_approved: number | null
           total_sent: number
+          vat_rate: number | null
           version: number
         }
         SetofOptions: {
@@ -3615,6 +3846,7 @@ export type Database = {
           cancelled_by: string | null
           car_id: string | null
           car_snapshot: Json
+          checked_by: string | null
           claimed_at: string | null
           client_email: string | null
           client_id: string | null
@@ -3632,6 +3864,8 @@ export type Database = {
           followup_sent_at: string | null
           id: string
           inspection_started_at: string | null
+          intake_confirmed_at: string | null
+          intake_sent_at: string | null
           invite_sent_at: string | null
           invite_token: string | null
           loyalty_level: number | null
@@ -3640,6 +3874,7 @@ export type Database = {
           odometer: number | null
           offer_kind: string | null
           offer_percent: number | null
+          quote_number: number | null
           ref: string
           reminder_sent_at: string | null
           service_id: string
@@ -3655,6 +3890,7 @@ export type Database = {
           warranty_months: number | null
           warranty_until: string | null
           work: string | null
+          work_by: string | null
         }
         SetofOptions: {
           from: "*"
@@ -3671,6 +3907,7 @@ export type Database = {
           cancelled_by: string | null
           car_id: string | null
           car_snapshot: Json
+          checked_by: string | null
           claimed_at: string | null
           client_email: string | null
           client_id: string | null
@@ -3688,6 +3925,8 @@ export type Database = {
           followup_sent_at: string | null
           id: string
           inspection_started_at: string | null
+          intake_confirmed_at: string | null
+          intake_sent_at: string | null
           invite_sent_at: string | null
           invite_token: string | null
           loyalty_level: number | null
@@ -3696,6 +3935,7 @@ export type Database = {
           odometer: number | null
           offer_kind: string | null
           offer_percent: number | null
+          quote_number: number | null
           ref: string
           reminder_sent_at: string | null
           service_id: string
@@ -3711,6 +3951,7 @@ export type Database = {
           warranty_months: number | null
           warranty_until: string | null
           work: string | null
+          work_by: string | null
         }
         SetofOptions: {
           from: "*"
@@ -3791,6 +4032,7 @@ export type Database = {
       insert_quote: {
         Args: {
           p_booking: Database["public"]["Tables"]["bookings"]["Row"]
+          p_est_hours?: number
           p_items: Json
           p_note: string
         }
@@ -3799,16 +4041,21 @@ export type Database = {
           created_at: string
           decided_at: string | null
           decided_by: string | null
+          est_hours: number | null
           expires_at: string | null
           expiry_reminded_at: string | null
           id: string
           inspection_fee: number
+          issuer: Json | null
           note: string | null
+          recipient: Json | null
           sent_at: string
           sent_by: string | null
           status: string
+          terms: string | null
           total_approved: number | null
           total_sent: number
+          vat_rate: number | null
           version: number
         }
         SetofOptions: {
@@ -3831,6 +4078,10 @@ export type Database = {
       invite_token_hash: { Args: { p_token: string }; Returns: string }
       is_active_status: { Args: { p_status: string }; Returns: boolean }
       is_admin: { Args: never; Returns: boolean }
+      is_booking_shop_member: {
+        Args: { p_booking_id: string }
+        Returns: boolean
+      }
       is_dispatch_token: { Args: { p_token: string }; Returns: boolean }
       is_new_client: {
         Args: {
@@ -3844,6 +4095,7 @@ export type Database = {
       is_push_endpoint: { Args: { p_url: string }; Returns: boolean }
       is_quiet_event: { Args: { p_event: string }; Returns: boolean }
       is_quote_price: { Args: { p_text: string }; Returns: boolean }
+      is_quote_quantity: { Args: { p_text: string }; Returns: boolean }
       is_shop_member: { Args: { p_shop_id: string }; Returns: boolean }
       is_shop_owner: { Args: { p_shop_id: string }; Returns: boolean }
       is_shop_public: { Args: { p_shop_id: string }; Returns: boolean }
@@ -3853,6 +4105,15 @@ export type Database = {
       is_valid_postal_code: { Args: { p: string }; Returns: boolean }
       is_valid_regcom: { Args: { p: string }; Returns: boolean }
       is_valid_vin: { Args: { p: string }; Returns: boolean }
+      job_document_data: {
+        Args: {
+          p_aal?: string
+          p_booking_id: string
+          p_kind: string
+          p_user_id: string
+        }
+        Returns: Json
+      }
       join_area_waitlist: {
         Args: {
           p_area: string
@@ -3931,6 +4192,7 @@ export type Database = {
           cancelled_by: string | null
           car_id: string | null
           car_snapshot: Json
+          checked_by: string | null
           claimed_at: string | null
           client_email: string | null
           client_id: string | null
@@ -3948,6 +4210,8 @@ export type Database = {
           followup_sent_at: string | null
           id: string
           inspection_started_at: string | null
+          intake_confirmed_at: string | null
+          intake_sent_at: string | null
           invite_sent_at: string | null
           invite_token: string | null
           loyalty_level: number | null
@@ -3956,6 +4220,7 @@ export type Database = {
           odometer: number | null
           offer_kind: string | null
           offer_percent: number | null
+          quote_number: number | null
           ref: string
           reminder_sent_at: string | null
           service_id: string
@@ -3971,6 +4236,7 @@ export type Database = {
           warranty_months: number | null
           warranty_until: string | null
           work: string | null
+          work_by: string | null
         }
         SetofOptions: {
           from: "*"
@@ -3987,6 +4253,7 @@ export type Database = {
           cancelled_by: string | null
           car_id: string | null
           car_snapshot: Json
+          checked_by: string | null
           claimed_at: string | null
           client_email: string | null
           client_id: string | null
@@ -4004,6 +4271,8 @@ export type Database = {
           followup_sent_at: string | null
           id: string
           inspection_started_at: string | null
+          intake_confirmed_at: string | null
+          intake_sent_at: string | null
           invite_sent_at: string | null
           invite_token: string | null
           loyalty_level: number | null
@@ -4012,6 +4281,7 @@ export type Database = {
           odometer: number | null
           offer_kind: string | null
           offer_percent: number | null
+          quote_number: number | null
           ref: string
           reminder_sent_at: string | null
           service_id: string
@@ -4027,6 +4297,7 @@ export type Database = {
           warranty_months: number | null
           warranty_until: string | null
           work: string | null
+          work_by: string | null
         }
         SetofOptions: {
           from: "*"
@@ -4052,6 +4323,7 @@ export type Database = {
           cancelled_by: string | null
           car_id: string | null
           car_snapshot: Json
+          checked_by: string | null
           claimed_at: string | null
           client_email: string | null
           client_id: string | null
@@ -4069,6 +4341,8 @@ export type Database = {
           followup_sent_at: string | null
           id: string
           inspection_started_at: string | null
+          intake_confirmed_at: string | null
+          intake_sent_at: string | null
           invite_sent_at: string | null
           invite_token: string | null
           loyalty_level: number | null
@@ -4077,6 +4351,7 @@ export type Database = {
           odometer: number | null
           offer_kind: string | null
           offer_percent: number | null
+          quote_number: number | null
           ref: string
           reminder_sent_at: string | null
           service_id: string
@@ -4092,6 +4367,7 @@ export type Database = {
           warranty_months: number | null
           warranty_until: string | null
           work: string | null
+          work_by: string | null
         }
         SetofOptions: {
           from: "*"
@@ -4113,6 +4389,7 @@ export type Database = {
         Returns: undefined
       }
       mark_thread_read: { Args: { p_thread_id: string }; Returns: string }
+      mask_plate: { Args: { p_plate: string }; Returns: string }
       message_is_own_side: {
         Args: {
           p_client_id: string
@@ -4124,6 +4401,7 @@ export type Database = {
       my_client_referrals: { Args: never; Returns: Json }
       my_imported_jobs: { Args: never; Returns: Json }
       my_phone_verification: { Args: never; Returns: Json }
+      my_quote_numbering: { Args: never; Returns: Json }
       my_referrals: { Args: never; Returns: Json }
       my_shop_id: { Args: never; Returns: string }
       my_subscription_offers: { Args: never; Returns: Json }
@@ -4200,6 +4478,12 @@ export type Database = {
       purge_account_fingerprints: { Args: { p_now?: string }; Returns: number }
       purge_request_log: { Args: { p_now?: string }; Returns: number }
       quiet_until: { Args: { p_now?: string }; Returns: string }
+      quote_issuer: { Args: { p_shop_id: string }; Returns: Json }
+      quote_item_json: {
+        Args: { qi: Database["public"]["Tables"]["quote_items"]["Row"] }
+        Returns: Json
+      }
+      quote_recipient: { Args: { p_client_id: string }; Returns: Json }
       rate_take: {
         Args: {
           p_kind: string
@@ -4252,6 +4536,7 @@ export type Database = {
       replace_quote: {
         Args: {
           p_booking_id: string
+          p_est_hours?: number
           p_items: Json
           p_note?: string
           p_request_id: string
@@ -4262,6 +4547,7 @@ export type Database = {
           cancelled_by: string | null
           car_id: string | null
           car_snapshot: Json
+          checked_by: string | null
           claimed_at: string | null
           client_email: string | null
           client_id: string | null
@@ -4279,6 +4565,8 @@ export type Database = {
           followup_sent_at: string | null
           id: string
           inspection_started_at: string | null
+          intake_confirmed_at: string | null
+          intake_sent_at: string | null
           invite_sent_at: string | null
           invite_token: string | null
           loyalty_level: number | null
@@ -4287,6 +4575,7 @@ export type Database = {
           odometer: number | null
           offer_kind: string | null
           offer_percent: number | null
+          quote_number: number | null
           ref: string
           reminder_sent_at: string | null
           service_id: string
@@ -4302,6 +4591,7 @@ export type Database = {
           warranty_months: number | null
           warranty_until: string | null
           work: string | null
+          work_by: string | null
         }
         SetofOptions: {
           from: "*"
@@ -4389,6 +4679,9 @@ export type Database = {
         Args: never
         Returns: {
           app_tips: boolean
+          company_address: string | null
+          company_name: string | null
+          company_vat_id: string | null
           created_at: string
           deleted_at: string | null
           display_id: string
@@ -4425,6 +4718,9 @@ export type Database = {
         Args: never
         Returns: {
           app_tips: boolean
+          company_address: string | null
+          company_name: string | null
+          company_vat_id: string | null
           created_at: string
           deleted_at: string | null
           display_id: string
@@ -4463,6 +4759,9 @@ export type Database = {
         Args: never
         Returns: {
           app_tips: boolean
+          company_address: string | null
+          company_name: string | null
+          company_vat_id: string | null
           created_at: string
           deleted_at: string | null
           display_id: string
@@ -4515,6 +4814,7 @@ export type Database = {
           cancelled_by: string | null
           car_id: string | null
           car_snapshot: Json
+          checked_by: string | null
           claimed_at: string | null
           client_email: string | null
           client_id: string | null
@@ -4532,6 +4832,8 @@ export type Database = {
           followup_sent_at: string | null
           id: string
           inspection_started_at: string | null
+          intake_confirmed_at: string | null
+          intake_sent_at: string | null
           invite_sent_at: string | null
           invite_token: string | null
           loyalty_level: number | null
@@ -4540,6 +4842,7 @@ export type Database = {
           odometer: number | null
           offer_kind: string | null
           offer_percent: number | null
+          quote_number: number | null
           ref: string
           reminder_sent_at: string | null
           service_id: string
@@ -4555,6 +4858,7 @@ export type Database = {
           warranty_months: number | null
           warranty_until: string | null
           work: string | null
+          work_by: string | null
         }
         SetofOptions: {
           from: "*"
@@ -4589,6 +4893,10 @@ export type Database = {
       }
       save_shop_hours: {
         Args: { p_hours: Json; p_request_id: string }
+        Returns: Json
+      }
+      save_vehicle_intake: {
+        Args: { p_booking_id: string; p_data: Json; p_request_id: string }
         Returns: Json
       }
       schedule_notification_jobs: { Args: never; Returns: string }
@@ -4669,6 +4977,7 @@ export type Database = {
       send_quote: {
         Args: {
           p_booking_id: string
+          p_est_hours?: number
           p_items: Json
           p_note?: string
           p_request_id: string
@@ -4679,6 +4988,7 @@ export type Database = {
           cancelled_by: string | null
           car_id: string | null
           car_snapshot: Json
+          checked_by: string | null
           claimed_at: string | null
           client_email: string | null
           client_id: string | null
@@ -4696,6 +5006,8 @@ export type Database = {
           followup_sent_at: string | null
           id: string
           inspection_started_at: string | null
+          intake_confirmed_at: string | null
+          intake_sent_at: string | null
           invite_sent_at: string | null
           invite_token: string | null
           loyalty_level: number | null
@@ -4704,6 +5016,7 @@ export type Database = {
           odometer: number | null
           offer_kind: string | null
           offer_percent: number | null
+          quote_number: number | null
           ref: string
           reminder_sent_at: string | null
           service_id: string
@@ -4719,6 +5032,7 @@ export type Database = {
           warranty_months: number | null
           warranty_until: string | null
           work: string | null
+          work_by: string | null
         }
         SetofOptions: {
           from: "*"
@@ -4769,6 +5083,7 @@ export type Database = {
           cancelled_by: string | null
           car_id: string | null
           car_snapshot: Json
+          checked_by: string | null
           claimed_at: string | null
           client_email: string | null
           client_id: string | null
@@ -4786,6 +5101,8 @@ export type Database = {
           followup_sent_at: string | null
           id: string
           inspection_started_at: string | null
+          intake_confirmed_at: string | null
+          intake_sent_at: string | null
           invite_sent_at: string | null
           invite_token: string | null
           loyalty_level: number | null
@@ -4794,6 +5111,7 @@ export type Database = {
           odometer: number | null
           offer_kind: string | null
           offer_percent: number | null
+          quote_number: number | null
           ref: string
           reminder_sent_at: string | null
           service_id: string
@@ -4809,6 +5127,7 @@ export type Database = {
           warranty_months: number | null
           warranty_until: string | null
           work: string | null
+          work_by: string | null
         }
         SetofOptions: {
           from: "*"
@@ -4820,6 +5139,10 @@ export type Database = {
       set_history_report_session: {
         Args: { p_report_id: string; p_session_id: string }
         Returns: undefined
+      }
+      set_quote_next_number: {
+        Args: { p_next: number; p_request_id: string }
+        Returns: Json
       }
       set_shop_services: {
         Args: { p_request_id: string; p_service_ids: string[] }
@@ -4841,6 +5164,7 @@ export type Database = {
           cancelled_by: string | null
           car_id: string | null
           car_snapshot: Json
+          checked_by: string | null
           claimed_at: string | null
           client_email: string | null
           client_id: string | null
@@ -4858,6 +5182,8 @@ export type Database = {
           followup_sent_at: string | null
           id: string
           inspection_started_at: string | null
+          intake_confirmed_at: string | null
+          intake_sent_at: string | null
           invite_sent_at: string | null
           invite_token: string | null
           loyalty_level: number | null
@@ -4866,6 +5192,7 @@ export type Database = {
           odometer: number | null
           offer_kind: string | null
           offer_percent: number | null
+          quote_number: number | null
           ref: string
           reminder_sent_at: string | null
           service_id: string
@@ -4881,6 +5208,7 @@ export type Database = {
           warranty_months: number | null
           warranty_until: string | null
           work: string | null
+          work_by: string | null
         }
         SetofOptions: {
           from: "*"
@@ -4911,6 +5239,7 @@ export type Database = {
           cancelled_by: string | null
           car_id: string | null
           car_snapshot: Json
+          checked_by: string | null
           claimed_at: string | null
           client_email: string | null
           client_id: string | null
@@ -4928,6 +5257,8 @@ export type Database = {
           followup_sent_at: string | null
           id: string
           inspection_started_at: string | null
+          intake_confirmed_at: string | null
+          intake_sent_at: string | null
           invite_sent_at: string | null
           invite_token: string | null
           loyalty_level: number | null
@@ -4936,6 +5267,7 @@ export type Database = {
           odometer: number | null
           offer_kind: string | null
           offer_percent: number | null
+          quote_number: number | null
           ref: string
           reminder_sent_at: string | null
           service_id: string
@@ -4951,6 +5283,7 @@ export type Database = {
           warranty_months: number | null
           warranty_until: string | null
           work: string | null
+          work_by: string | null
         }
         SetofOptions: {
           from: "*"
@@ -4972,6 +5305,7 @@ export type Database = {
           cancelled_by: string | null
           car_id: string | null
           car_snapshot: Json
+          checked_by: string | null
           claimed_at: string | null
           client_email: string | null
           client_id: string | null
@@ -4989,6 +5323,8 @@ export type Database = {
           followup_sent_at: string | null
           id: string
           inspection_started_at: string | null
+          intake_confirmed_at: string | null
+          intake_sent_at: string | null
           invite_sent_at: string | null
           invite_token: string | null
           loyalty_level: number | null
@@ -4997,6 +5333,7 @@ export type Database = {
           odometer: number | null
           offer_kind: string | null
           offer_percent: number | null
+          quote_number: number | null
           ref: string
           reminder_sent_at: string | null
           service_id: string
@@ -5012,6 +5349,7 @@ export type Database = {
           warranty_months: number | null
           warranty_until: string | null
           work: string | null
+          work_by: string | null
         }
         SetofOptions: {
           from: "*"
@@ -5111,6 +5449,7 @@ export type Database = {
           cancelled_by: string | null
           car_id: string | null
           car_snapshot: Json
+          checked_by: string | null
           claimed_at: string | null
           client_email: string | null
           client_id: string | null
@@ -5128,6 +5467,8 @@ export type Database = {
           followup_sent_at: string | null
           id: string
           inspection_started_at: string | null
+          intake_confirmed_at: string | null
+          intake_sent_at: string | null
           invite_sent_at: string | null
           invite_token: string | null
           loyalty_level: number | null
@@ -5136,6 +5477,7 @@ export type Database = {
           odometer: number | null
           offer_kind: string | null
           offer_percent: number | null
+          quote_number: number | null
           ref: string
           reminder_sent_at: string | null
           service_id: string
@@ -5151,6 +5493,7 @@ export type Database = {
           warranty_months: number | null
           warranty_until: string | null
           work: string | null
+          work_by: string | null
         }
         SetofOptions: {
           from: "*"
@@ -5167,6 +5510,7 @@ export type Database = {
           cancelled_by: string | null
           car_id: string | null
           car_snapshot: Json
+          checked_by: string | null
           claimed_at: string | null
           client_email: string | null
           client_id: string | null
@@ -5184,6 +5528,8 @@ export type Database = {
           followup_sent_at: string | null
           id: string
           inspection_started_at: string | null
+          intake_confirmed_at: string | null
+          intake_sent_at: string | null
           invite_sent_at: string | null
           invite_token: string | null
           loyalty_level: number | null
@@ -5192,6 +5538,7 @@ export type Database = {
           odometer: number | null
           offer_kind: string | null
           offer_percent: number | null
+          quote_number: number | null
           ref: string
           reminder_sent_at: string | null
           service_id: string
@@ -5207,6 +5554,7 @@ export type Database = {
           warranty_months: number | null
           warranty_until: string | null
           work: string | null
+          work_by: string | null
         }
         SetofOptions: {
           from: "*"
@@ -5344,6 +5692,7 @@ export type Database = {
           cancelled_by: string | null
           car_id: string | null
           car_snapshot: Json
+          checked_by: string | null
           claimed_at: string | null
           client_email: string | null
           client_id: string | null
@@ -5361,6 +5710,8 @@ export type Database = {
           followup_sent_at: string | null
           id: string
           inspection_started_at: string | null
+          intake_confirmed_at: string | null
+          intake_sent_at: string | null
           invite_sent_at: string | null
           invite_token: string | null
           loyalty_level: number | null
@@ -5369,6 +5720,7 @@ export type Database = {
           odometer: number | null
           offer_kind: string | null
           offer_percent: number | null
+          quote_number: number | null
           ref: string
           reminder_sent_at: string | null
           service_id: string
@@ -5384,6 +5736,7 @@ export type Database = {
           warranty_months: number | null
           warranty_until: string | null
           work: string | null
+          work_by: string | null
         }
         SetofOptions: {
           from: "*"
