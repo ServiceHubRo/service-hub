@@ -208,20 +208,31 @@ async function signInSeed(page: Page, email: string) {
   await expect(page).not.toHaveURL(/\/intra/);
 }
 
-test('search results stand one under another, at every width', async ({ page }) => {
+// T51 (Eduard, 29 Oct): one column on a phone and a tablet; on a laptop the results fill the width
+// in columns of the same width, read row by row, the cards of a row the same height.
+test('search results: one column on a phone, an even grid on a laptop', async ({ page }) => {
   await signInSeed(page, SEED.client);
   await expect(page.getByRole('article').nth(1)).toBeVisible();
   const boxes = await page.getByRole('article').evaluateAll((cards) =>
     cards.map((c) => {
-      const r = c.getBoundingClientRect();
-      return { left: Math.round(r.left), top: Math.round(r.top), bottom: Math.round(r.bottom) };
+      const r = (c.closest('li') ?? c).getBoundingClientRect();
+      return { left: Math.round(r.left), top: Math.round(r.top), bottom: Math.round(r.bottom), width: Math.round(r.width) };
     }),
   );
   expect(boxes.length).toBeGreaterThan(1);
+  const wide = page.viewportSize()!.width >= 1280;
   for (let i = 1; i < boxes.length; i++) {
-    expect(boxes[i]!.left, `card ${i + 1} in the same column`).toBe(boxes[0]!.left);
-    expect(boxes[i]!.top, `card ${i + 1} below the one before`).toBeGreaterThanOrEqual(boxes[i - 1]!.bottom);
+    const [prev, card] = [boxes[i - 1]!, boxes[i]!];
+    expect(card.width, `card ${i + 1} as wide as the first`).toBe(boxes[0]!.width);
+    if (wide && card.top === prev.top) {
+      expect(card.left, `card ${i + 1} to the right of the one before`).toBeGreaterThan(prev.left);
+      expect(card.bottom, `card ${i + 1} as tall as its row`).toBe(prev.bottom);
+    } else {
+      expect(card.left, `card ${i + 1} starts a row on the left`).toBe(boxes[0]!.left);
+      expect(card.top, `card ${i + 1} below the row before`).toBeGreaterThanOrEqual(prev.bottom);
+    }
   }
+  if (wide) expect(boxes[1]!.top, 'two columns on a laptop').toBe(boxes[0]!.top);
   await expectNoHorizontalScroll(page);
 });
 
