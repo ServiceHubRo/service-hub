@@ -232,8 +232,47 @@
 .buttons {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: var(--space-2);
   align-items: flex-start;
+}
+
+/* The send bar (T51): held at the bottom of the screen across the content width, like the save bar
+   of the settings; the total on the left, the buttons on the right. */
+.bar {
+  position: sticky;
+  bottom: 0;
+  z-index: 4;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3) var(--space-6);
+  margin: var(--space-2) calc(-1 * var(--page-pad)) calc(-1 * var(--page-pad));
+  padding: var(--space-3) var(--page-pad);
+  background: rgba(19, 21, 25, 0.9);
+  border-top: 1px solid var(--border);
+}
+
+@supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
+  .bar {
+    background: rgba(19, 21, 25, 0.72);
+    -webkit-backdrop-filter: blur(16px) saturate(160%);
+    backdrop-filter: blur(16px) saturate(160%);
+  }
+}
+
+.barTotal {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+  color: var(--text-2);
+  font-weight: 600;
+}
+
+.barTotal .mono {
+  color: var(--amber);
+  font-size: 20px;
+  font-weight: 700;
 }
 
 /* Laptop: each line in one row, like the columns of a paper quote. */

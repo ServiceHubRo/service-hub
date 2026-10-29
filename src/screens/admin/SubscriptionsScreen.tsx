@@ -165,15 +165,17 @@ export function SubscriptionsScreen() {
                     },
                   ]}
                   onClearAll={() => setParam({ stare: null })}
+                  end={
+                    <div className={styles.toolbar}>
+                      <span className={styles.sub}>{plural(lang, 'unit.subscriptions', shown.length)}</span>
+                      <ExportButton<AdminSubscriptionRow>
+                        kind="subscriptions"
+                        filters={{ q: query || undefined, status: filter === 'all' ? undefined : filter }}
+                        narrow={(rows) => filterSubscriptions(rows, query, filter)}
+                      />
+                    </div>
+                  }
                 />
-                <div className={styles.toolbar}>
-                  <span className={styles.sub}>{plural(lang, 'unit.subscriptions', shown.length)}</span>
-                  <ExportButton<AdminSubscriptionRow>
-                    kind="subscriptions"
-                    filters={{ q: query || undefined, status: filter === 'all' ? undefined : filter }}
-                    narrow={(rows) => filterSubscriptions(rows, query, filter)}
-                  />
-                </div>
               </div>
               {data.subscriptions.length === 0 ? (
                 <EmptyState icon={CreditCard} title={t('admin.subs.empty')} />

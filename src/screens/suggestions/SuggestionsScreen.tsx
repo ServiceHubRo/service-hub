@@ -2,7 +2,7 @@ import { Lightbulb } from 'lucide-react';
 import { useState } from 'react';
 import { NAV } from '../../app/roles';
 import { ActionButton } from '../../components/ActionButton';
-import { BackLink } from '../../components/BackLink';
+import { PageHeader } from '../../components/PageHeader';
 import { Card } from '../../components/Card';
 import { EmptyState } from '../../components/EmptyState';
 import { LoadError } from '../../components/LoadError';
@@ -30,8 +30,7 @@ export function SuggestionsScreen({ role }: { role: 'client' | 'shop' }) {
 
   return (
     <div className={accountStyles.page}>
-      <BackLink to={NAV[role].account.path} label={t('nav.account')} />
-      <h1>{t('sugg.title')}</h1>
+      <PageHeader back={{ to: NAV[role].account.path, label: t('nav.account') }} title={t('sugg.title')} />
       <p className={accountStyles.sub}>{t('sugg.sub')}</p>
 
       <Card className={styles.form}>

@@ -10,6 +10,7 @@ import { ActiveFilters, FilterGroup, FilterSheet, FiltersButton } from '../../..
 import { LoadError } from '../../../components/LoadError';
 import { SearchField } from '../../../components/SearchField';
 import { SelectField } from '../../../components/SelectField';
+import { PageHeader } from '../../../components/PageHeader';
 import { SkeletonList } from '../../../components/Skeleton';
 import { Switch } from '../../../components/Switch';
 import { searchShops, type ShopSearchResult } from '../../../data/rpc';
@@ -280,7 +281,7 @@ export function SearchScreen() {
 
   return (
     <div className={styles.page}>
-      <h1>{t('nav.client.search')}</h1>
+      <PageHeader title={t('nav.client.search')} />
 
       {guide.visible && <ClientGuide guide={guide} />}
       {guide.pending && <span hidden data-guide-pending />}

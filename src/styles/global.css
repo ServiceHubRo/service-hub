@@ -95,11 +95,12 @@ textarea {
   }
 }
 
-/* Desktop columns (T51, Eduard 29 Oct: use the whole free width). A container opts in with
+/* Desktop columns (T51, Eduard 29 Oct: use the whole free width, symmetric). A container opts in with
    `data-layout`; below the width it stays one column, exactly as on a phone.
-   - cards:   a list of cards, 2 columns at 1440 px, 3 on a wide monitor; a card keeps its height.
-   - tiles:   the rows of Cont and Setări, 2–3 columns from 1024 px, equal height in a row.
-   - columns: a page of independent cards (a settings page), 2 columns.
+   - cards:   a list of cards, 2 columns at 1440 px, 3 on a wide monitor. The cards of a row share
+              their height; a card that is a flex column keeps its actions at its foot.
+   - tiles:   the links of Cont and Setări, 2–3 columns from 1024 px, equal height in a row.
+   - columns: two halves of a page or a form, side by side.
    A title, the back link and a child with `data-span="all"` (an intro, a notice) take the whole row.
    `html` in front outranks the container's own one-column class from its CSS module. */
 @media (min-width: 1024px) {
@@ -113,13 +114,20 @@ textarea {
   html [data-layout='cards'] {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(min(100%, 440px), 1fr));
-    align-items: start;
+  }
+
+  html [data-layout='cards'] > li {
+    display: flex;
+    flex-direction: column;
+  }
+
+  html [data-layout='cards'] > li > :last-child {
+    flex: 1;
   }
 
   html [data-layout='columns'] {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    align-items: start;
   }
 
   html [data-layout] > :is([data-span='all'], h1, h2, [data-back-bar]) {

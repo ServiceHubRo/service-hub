@@ -4,6 +4,7 @@ import { buttonClass } from '../../../components/buttonClass';
 import { Card } from '../../../components/Card';
 import { EmptyState } from '../../../components/EmptyState';
 import { LoadError } from '../../../components/LoadError';
+import { PageHeader } from '../../../components/PageHeader';
 import { SkeletonList } from '../../../components/Skeleton';
 import { fetchCars, fetchOilStandard, type Car } from '../../../data/garage';
 import { fetchMyImportedJobsQuietly } from '../../../data/myImported';
@@ -37,12 +38,10 @@ export function GarageScreen() {
 
   return (
     <div className={styles.page}>
-      <div>
-        <h1>{t('nav.client.garage')}</h1>
-        {state.status === 'ready' && state.data.length > 0 && (
-          <p className={styles.sub}>{plural(lang, 'unit.savedCars', state.data.length)}</p>
-        )}
-      </div>
+      <PageHeader
+        title={t('nav.client.garage')}
+        subtitle={state.status === 'ready' && state.data.length > 0 ? plural(lang, 'unit.savedCars', state.data.length) : undefined}
+      />
       {state.status === 'loading' && <SkeletonList cards />}
       {state.status === 'error' && <LoadError message={t('garage.loadError')} onRetry={reload} />}
       {state.status === 'ready' &&

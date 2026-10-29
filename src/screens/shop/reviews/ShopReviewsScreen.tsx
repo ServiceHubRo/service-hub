@@ -1,6 +1,6 @@
 import { Star } from 'lucide-react';
 import { useCallback, useEffect, useRef } from 'react';
-import { BackLink } from '../../../components/BackLink';
+import { PageHeader } from '../../../components/PageHeader';
 import { Card } from '../../../components/Card';
 import { EmptyState } from '../../../components/EmptyState';
 import { LoadError } from '../../../components/LoadError';
@@ -75,8 +75,7 @@ export function ShopReviewsScreen() {
 
   return (
     <div className={styles.page}>
-      <BackLink to={ACCOUNT_PATH} label={t('nav.account')} />
-      <h1>{t('reviews.title')}</h1>
+      <PageHeader back={{ to: ACCOUNT_PATH, label: t('nav.account') }} title={t('reviews.title')} />
       {isColleague && <p className={styles.muted}>{t('reviews.staffNote')}</p>}
       {state.status === 'loading' && <SkeletonList cards />}
       {state.status === 'error' && <LoadError message={t('reviews.loadError')} onRetry={reload} />}

@@ -20,7 +20,7 @@ export function PageHeader({ title, subtitle, back, actions }: PageHeaderProps) 
   return (
     <>
       {back && <BackLink to={back.to} label={back.label} />}
-      <header className={styles.header}>
+      <header className={styles.header} data-span="all">
         <div className={styles.text}>
           <h1>{title}</h1>
           {subtitle && <p className={styles.subtitle}>{subtitle}</p>}

@@ -4,7 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { DAMAGE_KINDS, FUEL_LEVELS, type DamageKind, type DamageMark } from '../../../../supabase/functions/_shared/carDiagram.ts';
 import { damageKindText, fuelText } from '../../../../supabase/functions/_shared/jobDoc.ts';
 import { ActionButton } from '../../../components/ActionButton';
-import { BackLink } from '../../../components/BackLink';
+import { PageHeader } from '../../../components/PageHeader';
 import { Button } from '../../../components/Button';
 import { Card } from '../../../components/Card';
 import { Chip, ChipRow } from '../../../components/Chip';
@@ -83,8 +83,7 @@ export function IntakeScreen() {
 
   return (
     <div className={styles.page}>
-      <BackLink to={back} label={t('nav.bookings')} />
-      <h1>{t('in.title')}</h1>
+      <PageHeader back={{ to: back, label: t('nav.bookings') }} title={t('in.title')} />
       {body}
     </div>
   );

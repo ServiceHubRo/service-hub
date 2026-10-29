@@ -9,6 +9,7 @@ import { buttonClass } from '../../../components/buttonClass';
 import { ActiveFilters } from '../../../components/Filters';
 import { EmptyState } from '../../../components/EmptyState';
 import { LoadError } from '../../../components/LoadError';
+import { PageHeader } from '../../../components/PageHeader';
 import { SkeletonList } from '../../../components/Skeleton';
 import { Tabs } from '../../../components/Tabs';
 import { RpcError, type Booking } from '../../../data/rpc';
@@ -243,15 +244,17 @@ export function ShopBookingsScreen() {
 
   return (
     <div className={styles.page}>
-      <div className={styles.head}>
-        <h1>{t('nav.bookings')}</h1>
-        {state.status === 'ready' && (
-          <Link to={ADD_BOOKING_PATH} className={buttonClass('secondary')}>
-            <CalendarPlus size={18} aria-hidden="true" />
-            {t('wi.add')}
-          </Link>
-        )}
-      </div>
+      <PageHeader
+        title={t('nav.bookings')}
+        actions={
+          state.status === 'ready' && (
+            <Link to={ADD_BOOKING_PATH} className={buttonClass('primary')}>
+              <CalendarPlus size={18} aria-hidden="true" />
+              {t('wi.add')}
+            </Link>
+          )
+        }
+      />
       {body}
     </div>
   );

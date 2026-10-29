@@ -52,7 +52,7 @@
 .card {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: var(--space-3);
 }
 
 /* A request that arrived live (src/lib/motion.ts, newRequestGlow): it comes in from above and an
@@ -90,14 +90,19 @@
 
 .top {
   display: flex;
-  align-items: flex-start;
-  gap: 10px;
+  align-items: center;
+  gap: var(--space-3);
 }
 
+/* The service's icon in a tinted square, like the tiles (T51). */
 .icon {
   color: var(--amber);
   flex-shrink: 0;
-  margin-top: 2px;
+  box-sizing: content-box;
+  padding: 9px;
+  border-radius: var(--radius-button);
+  background: var(--amber-tint);
+  border: 1px solid rgba(245, 165, 36, 0.18);
 }
 
 .what {
@@ -107,14 +112,18 @@
 }
 
 .service {
-  font-weight: 700;
+  font-weight: 650;
+  font-size: 15.5px;
+  letter-spacing: -0.005em;
 }
 
 .when {
   font-size: 13.5px;
+  color: var(--text-2);
 }
 
 .ref {
+  white-space: nowrap;
   color: var(--muted);
   font-family: var(--font-mono);
   font-size: 12.5px;
@@ -193,11 +202,16 @@
   overflow-wrap: anywhere;
 }
 
+/* The card's foot (T51): its actions under a hairline, held at the bottom of the card, so the
+   cards of a row end on the same line. */
 .actions {
   display: flex;
   flex-wrap: wrap;
   align-items: flex-start;
-  gap: 8px;
+  gap: var(--space-2);
+  margin-top: auto;
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--border);
 }
 
 /* ---------------------------------------------------------------- quote */

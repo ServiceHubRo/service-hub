@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import { ActionButton } from '../../../components/ActionButton';
-import { BackLink } from '../../../components/BackLink';
+import { PageHeader } from '../../../components/PageHeader';
 import { Card } from '../../../components/Card';
 import { IntakeView } from '../../../components/intake/IntakeView';
 import { momentText } from '../../../lib/moment';
@@ -77,8 +77,7 @@ export function ClientIntakeScreen() {
 
   return (
     <div className={styles.page}>
-      <BackLink to={back} label={t('nav.bookings')} />
-      <h1>{t('cin.title')}</h1>
+      <PageHeader back={{ to: back, label: t('nav.bookings') }} title={t('cin.title')} />
       {body}
     </div>
   );

@@ -2,7 +2,7 @@ import { Compass, LifeBuoy, Mail, MessageCircle } from 'lucide-react';
 import { homeOf, NAV } from '../../app/roles';
 import { requestTour } from '../../app/tour/tourStore';
 import { useSession } from '../../app/sessionContext';
-import { BackLink } from '../../components/BackLink';
+import { PageHeader } from '../../components/PageHeader';
 import { Card } from '../../components/Card';
 import { Tile } from '../../components/Tile';
 import { useI18n } from '../../i18n/context';
@@ -23,8 +23,7 @@ export function HelpScreen({ role }: { role: 'client' | 'shop' }) {
 
   return (
     <div className={styles.page}>
-      <BackLink to={NAV[role].account.path} label={t('nav.account')} />
-      <h1>{t('help.title')}</h1>
+      <PageHeader back={{ to: NAV[role].account.path, label: t('nav.account') }} title={t('help.title')} />
 
       <div className={styles.tiles} data-layout="tiles">
         <Tile

@@ -2,7 +2,7 @@ import { ArrowDownRight, ArrowRight, ArrowUpRight, BarChart3, Download, Lock } f
 import { useCallback, useEffect, useMemo, useRef, type ReactNode } from 'react';
 import { useLiveSearchParams } from '../../../app/useLiveSearchParams';
 import { CountUp } from '../../../components/CountUp';
-import { BackLink } from '../../../components/BackLink';
+import { PageHeader } from '../../../components/PageHeader';
 import { Button } from '../../../components/Button';
 import { Card } from '../../../components/Card';
 import { SelectField } from '../../../components/SelectField';
@@ -112,8 +112,7 @@ export function ShopReportsScreen() {
 
   return (
     <div className={styles.page}>
-      <BackLink to={ACCOUNT_PATH} label={t('nav.account')} />
-      <h1>{t('rep.title')}</h1>
+      <PageHeader back={{ to: ACCOUNT_PATH, label: t('nav.account') }} title={t('rep.title')} />
       {body}
     </div>
   );

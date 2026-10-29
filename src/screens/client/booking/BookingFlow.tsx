@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useLiveSearchParams } from '../../../app/useLiveSearchParams';
 import { BackLink } from '../../../components/BackLink';
+import { PageHeader } from '../../../components/PageHeader';
 import { Banner } from '../../../components/Banner';
 import { buttonClass } from '../../../components/buttonClass';
 import { EmptyState } from '../../../components/EmptyState';
@@ -43,8 +44,7 @@ export function BookingFlow() {
 
   return (
     <div className={styles.page} data-fill-screen>
-      <BackLink to={shopPath(shopId)} label={t('booking.backToShop')} />
-      <h1>{t('booking.title')}</h1>
+      <PageHeader back={{ to: shopPath(shopId), label: t('booking.backToShop') }} title={t('booking.title')} />
       {state.status === 'loading' && <SkeletonList count={3} />}
       {state.status === 'error' &&
         (toRpcError(state.error).code === 'shop_not_found' ? (

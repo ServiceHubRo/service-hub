@@ -1,7 +1,7 @@
 import { useCallback, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ActionButton } from '../../../components/ActionButton';
-import { BackLink } from '../../../components/BackLink';
+import { PageHeader } from '../../../components/PageHeader';
 import { Banner } from '../../../components/Banner';
 import { Card } from '../../../components/Card';
 import { Switch } from '../../../components/Switch';
@@ -384,8 +384,7 @@ export function AddBookingScreen() {
 
   return (
     <div className={styles.page} data-layout="columns">
-      <BackLink to={SHOP_BOOKINGS_PATH} label={t('nav.bookings')} />
-      <h1>{t('wi.title')}</h1>
+      <PageHeader back={{ to: SHOP_BOOKINGS_PATH, label: t('nav.bookings') }} title={t('wi.title')} />
       {isOwner && (
         <Link to={IMPORT_PATH} className={styles.importLink} data-span="all">
           <FileUp size={16} aria-hidden="true" />

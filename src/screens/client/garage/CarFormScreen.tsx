@@ -2,7 +2,7 @@ import { CarFront } from 'lucide-react';
 import { useCallback, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { ActionButton } from '../../../components/ActionButton';
-import { BackLink } from '../../../components/BackLink';
+import { PageHeader } from '../../../components/PageHeader';
 import { Button } from '../../../components/Button';
 import { buttonClass } from '../../../components/buttonClass';
 import { Card } from '../../../components/Card';
@@ -37,8 +37,7 @@ export function CarFormScreen() {
   if (state.status === 'ready' && state.data) return <CarEditor key={state.data.id} car={state.data} />;
   return (
     <div className={styles.page}>
-      <BackLink to={GARAGE_PATH} label={t('nav.client.garage')} />
-      <h1>{t('garage.editTitle')}</h1>
+      <PageHeader back={{ to: GARAGE_PATH, label: t('nav.client.garage') }} title={t('garage.editTitle')} />
       {state.status === 'loading' && <SkeletonList count={2} />}
       {state.status === 'error' && <LoadError message={t('garage.loadError')} onRetry={reload} />}
       {state.status === 'ready' && (
@@ -116,8 +115,7 @@ function CarEditor({ car }: { car: Car | null }) {
 
   return (
     <div className={styles.page}>
-      <BackLink to={GARAGE_PATH} label={t('nav.client.garage')} />
-      <h1>{car ? t('garage.editTitle') : t('garage.newTitle')}</h1>
+      <PageHeader back={{ to: GARAGE_PATH, label: t('nav.client.garage') }} title={car ? t('garage.editTitle') : t('garage.newTitle')} />
 
       <form className={styles.form} data-layout="columns" onSubmit={(e) => e.preventDefault()} noValidate>
         <div className={styles.form}>

@@ -2,7 +2,7 @@ import { FileUp, History as HistoryIcon } from 'lucide-react';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ActionButton } from '../../../components/ActionButton';
-import { BackLink } from '../../../components/BackLink';
+import { PageHeader } from '../../../components/PageHeader';
 import { Banner } from '../../../components/Banner';
 import { Button } from '../../../components/Button';
 import { buttonClass } from '../../../components/buttonClass';
@@ -110,8 +110,7 @@ export function ImportScreen() {
 
   return (
     <div className={styles.page}>
-      <BackLink to={SHOP_BOOKINGS_PATH} label={t('nav.bookings')} />
-      <h1>{t('imp.title')}</h1>
+      <PageHeader back={{ to: SHOP_BOOKINGS_PATH, label: t('nav.bookings') }} title={t('imp.title')} />
       <p className={styles.muted}>{t('imp.intro')}</p>
 
       {!isOwner ? (
