@@ -3,6 +3,7 @@ import {
   BACKEND,
   bucharestDay,
   PASSWORD,
+  createBookableShop,
   createUser,
   expectNoHorizontalScroll,
   latestEmail,
@@ -10,7 +11,9 @@ import {
   scrollTopOf,
   shot,
   signIn,
+  serviceRest,
   uniqueEmail,
+  userIdOf,
   verifyPhoneByAdmin,
 } from './support';
 
@@ -233,6 +236,34 @@ test.describe('shop settings', () => {
     await expect(page.getByLabel('IBAN')).toHaveValue('RO49AAAA1B31007593840000');
     await expect(page.getByLabel('CUI / Cod fiscal')).toHaveValue('RO14872301');
     await expect(page.getByRole('switch', { name: 'Plătitor de TVA' })).toBeChecked();
+  });
+
+  test('a changed shop phone needs a new code: the panel shows, the shop is out of search until then', async ({ page }) => {
+    const { email } = await createBookableShop(`Atelier telefon ${Date.now()}`, ['ulei']);
+    const owner = await userIdOf(email);
+    await signIn(page, email, PASSWORD);
+    await expect(page).toHaveURL(/\/s\//);
+    await openSettings(page, 'Profil public');
+    await expect(page.getByRole('heading', { level: 1, name: 'Profil public' })).toBeVisible();
+    await expect(page.getByText('Un telefon schimbat se confirmă cu un cod prin SMS')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Confirmă numărul de telefon' })).toHaveCount(0);
+    await page.getByLabel('Telefonul service-ului').fill('0268 400 500');
+    await page.getByRole('button', { name: 'Salvează profilul' }).click();
+    await expect(page.getByRole('button', { name: '✓ Salvat' })).toBeVisible();
+    const panel = page.getByRole('region', { name: 'Confirmă numărul de telefon' });
+    await expect(panel).toBeVisible();
+    await expect(panel.getByRole('button', { name: 'Trimite codul' })).toBeVisible();
+    await panel.scrollIntoViewIfNeeded();
+    await expectNoHorizontalScroll(page);
+    await shot(page, 't54-shop-phone', name());
+    const [profile] = await serviceRest<{ phone_verified_at: string | null; phone_verified_by_admin: boolean }[]>(
+      `profiles?id=eq.${owner}&select=phone_verified_at,phone_verified_by_admin`,
+      'GET',
+    );
+    expect(profile).toMatchObject({ phone_verified_at: null, phone_verified_by_admin: false });
+    // Panou says why the shop is out of search, with the way to the code.
+    await page.goto('/s/panou');
+    await expect(page.getByRole('link', { name: 'Confirmă numărul de telefon.' })).toHaveAttribute('href', '/s/cont');
   });
 
   test('staff: invitation link, sign-up through it, same shop without billing; removal', async ({ page, browser }) => {

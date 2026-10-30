@@ -1,5 +1,6 @@
 import { ImageUp, LocateFixed, MapPin } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
+import { useSession } from '../../../app/sessionContext';
 import { ActionButton } from '../../../components/ActionButton';
 import { Button } from '../../../components/Button';
 import { Card } from '../../../components/Card';
@@ -23,6 +24,7 @@ import type { Msg } from '../../../i18n/translate';
 import type { MessageKey } from '../../../i18n/ro';
 import { formatPhone, isValidPostalCode, normalizePhone } from '../../../lib/validators';
 import { normalizeUrl } from '../../../lib/url';
+import { PhoneCard } from '../../account/PhoneCard';
 import { SETTINGS_PATH } from './paths';
 import { SaveButton } from './SaveButton';
 import { ymdInBucharest } from '../../../i18n/format';
@@ -99,6 +101,7 @@ function currentPosition(): Promise<GeolocationPosition> {
 /** Profil public (P5c group A + P5b identity): what clients see on the shop page. */
 export function ProfileSettings() {
   const { t, lang } = useI18n();
+  const session = useSession();
   const { shop, setShop } = useShopSettings();
   const [form, setForm] = useState<Form>(() => toForm(shop));
   const [errors, setErrors] = useState<Errors>({});
@@ -150,6 +153,8 @@ export function ProfileSettings() {
     setShop(saved);
     setForm(toForm(saved));
     setMapNote(null);
+    // A changed number clears the owner's confirmation (the database): the code panel shows below.
+    if (saved.phone !== shop.phone || saved.phone2 !== shop.phone2) await session.refreshProfile();
     // The map lookup can take a few seconds: the save is done, the lookup reports on its own.
     if (addressChanged || saved.latitude === null) void locate(saved);
     return true;
@@ -289,6 +294,7 @@ export function ProfileSettings() {
           <div className={styles.grid2}>
             <Field
               label={t('profile.phone')}
+              hint={t('profile.phoneCodeNote')}
               type="tel"
               autoComplete="tel"
               inputMode="tel"
@@ -339,6 +345,7 @@ export function ProfileSettings() {
             error={errors.year}
           />
           </Card>
+          <PhoneCard />
         </Section>
 
         <SaveButton onSave={save}>{t('profile.save')}</SaveButton>

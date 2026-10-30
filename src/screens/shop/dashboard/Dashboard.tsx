@@ -19,7 +19,7 @@ import { LoadError } from '../../../components/LoadError';
 import { PushBanner } from '../../push/PushBanner';
 import { useShopBookings } from '../bookings/shopBookingsContext';
 import { SETTINGS_LINKS } from '../settings/paths';
-import { SUBSCRIPTION_PATH } from '../paths';
+import { ACCOUNT_PATH, SUBSCRIPTION_PATH } from '../paths';
 import { trialWarningDays } from '../../../lib/subscription';
 import { plural } from '../../../i18n/translate';
 import { SetupChecklist } from './SetupChecklist';
@@ -203,6 +203,7 @@ function HiddenBanner({ setup }: { setup: ShopSetup }) {
   // The settings and the subscription are the owner's: a colleague reads the reasons, no links.
   const link: Partial<Record<ShopSetup['reasons'][number], string>> = setup.is_owner
     ? {
+        phone_unverified: ACCOUNT_PATH,
         no_services: SETTINGS_LINKS.services,
         no_open_days: SETTINGS_LINKS.hours,
         subscription_inactive: SUBSCRIPTION_PATH,

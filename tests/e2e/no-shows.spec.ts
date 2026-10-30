@@ -131,11 +131,11 @@ test.describe('T53 no-shows', () => {
     await expectNoHorizontalScroll(page);
     await shot(page, 't53-dispute-form', name());
     await panel.getByRole('button', { name: 'Trimite contestația' }).click();
-    await expect(card.getByText('Contestație în analiză.')).toBeVisible();
+    await expect(card.getByText('Contestație în analiză la echipa Service-Hub.')).toBeVisible();
     await expect(card.getByRole('button', { name: 'Contestă neprezentarea' })).toHaveCount(0);
     await shot(page, 't53-dispute-pending', name());
-    // Now two count: the notice drops the acknowledgement.
-    await expect(page.getByText('Neprezentări în ultimele 90 de zile: 2. Anunță service-ul din timp')).toBeVisible();
+    // A waiting dispute still counts until the admin decides (after the audit, variant A).
+    await expect(page.getByText('Neprezentări în ultimele 90 de zile: 3. La fiecare programare confirmi prezența')).toBeVisible();
   });
 
   test('Moderare: the admin annuls a contested no-show; the client and the shop see it', async ({ page, browser }) => {

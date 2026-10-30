@@ -1315,3 +1315,14 @@ Cerut de Eduard pe 30 oct 2026 („NO-SHOW PREVENTION & CUSTOMER RELIABILITY SYS
 - **Teste:** `tests/sql/131_no_show_disputes.sql`, `tests/unit/notificationTexts.test.ts`, `tests/e2e/no-shows.spec.ts` (390, 820, 1440 px).
 
 - [x] Făcut
+
+## T54 — Contestațiile se numără până la decizie; telefonul schimbat cere cod ✅
+
+După auditul din 30 oct 2026, deciziile lui Eduard: varianta A la contestații, „nou SMS la fiecare” schimbare de telefon, raportul de 29 lei rămâne pornit. Migrarea `pending_disputes_and_shop_phone` (schema 89), fără pachete noi.
+
+- **Contestațiile:** o neprezentare contestată se numără în continuare până decide adminul. Bifa de prezență, confirmarea telefonului și lipsa confirmării instante rămân. Numai o contestație acceptată o scoate din calcul. Textele clientului spun asta („Dacă echipa Service-Hub acceptă contestația, neprezentarea se anulează”).
+- **Telefonul service-ului:** când proprietarul schimbă telefonul sau al doilea telefon din Profil public (alte cifre, nu doar spațiile), confirmarea numărului se șterge și service-ul iese din căutare până introduce codul. Codul vine pe numărul contului proprietarului, nu pe cel nou: telefonul unui service e adesea fix și nu primește SMS. Panoul de cod apare chiar în Profil public după salvare; în Panou, motivul „Confirmă numărul de telefon.” duce la Cont. O schimbare făcută de admin nu cere cod.
+- **Decizie:** și o confirmare dată de admin se șterge la schimbarea telefonului; dacă numărul contului e fix, adminul îl confirmă din nou de mână.
+- **Teste:** `tests/sql/131_no_show_disputes.sql` (actualizat), `tests/sql/132_shop_phone_reconfirm.sql`, `tests/e2e/no-shows.spec.ts`, `tests/e2e/shop-settings.spec.ts` (390, 820, 1440 px).
+
+- [x] Făcut
