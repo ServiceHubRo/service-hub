@@ -122,7 +122,9 @@ select test.eq((params->>'day')::int, 3, 'the first one'),
        test.eq((params->>'has_car')::boolean, false, 'knows the garage is empty')
 from public.notification_events where event = 'welcome';
 select test.eq(public.send_welcome_tips(now() + interval '1 day'), 0, 'once');
-update public.profiles set created_at = now() - interval '14 days' where id = current_setting('test.new')::uuid;
+-- 14 days by the calendar in Bucharest (14 × 24 h back can land on the 15th day across the change of clocks).
+update public.profiles set created_at = ((public.bucharest_today() - 14) + time '12:00') at time zone 'Europe/Bucharest'
+where id = current_setting('test.new')::uuid;
 update public.profiles set app_tips = false where id = current_setting('test.new')::uuid;
 select test.eq(public.send_welcome_tips(now()), 0, 'tips turned off in Cont');
 update public.profiles set app_tips = true where id = current_setting('test.new')::uuid;

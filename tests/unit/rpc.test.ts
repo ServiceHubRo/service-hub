@@ -80,6 +80,19 @@ describe('toRpcError', () => {
 });
 
 describe('rpcErrorMessage', () => {
+  it('names the booking a car already has at the shop, and the day at another shop (T60)', () => {
+    const detail = '{"ref":"P-000004","date":"2026-11-02","slot":"10:00"}';
+    expect(rpcErrorMessage('ro', pgError('car_already_booked', detail))).toBe(
+      'Mașina are deja o programare activă la acest service (P-000004, Lun 2 nov, 10:00). Lucrările în plus se adaugă la ea.',
+    );
+    expect(rpcErrorMessage('en', pgError('car_already_booked', detail))).toBe(
+      'This car already has an active booking at this shop (P-000004, Mon, Nov 2, 10:00). Add any extra work to it.',
+    );
+    expect(rpcErrorMessage('ro', pgError('car_booked_that_day', '{"date":"2026-11-02"}'))).toBe(
+      'Mașina are deja o programare la alt service pe Lun 2 nov. Alege altă zi.',
+    );
+  });
+
   it('formats odometer values in each language', () => {
     expect(rpcErrorMessage('ro', pgError('odometer_lower', '{"previous":105400}'))).toBe(
       'Ultima valoare înregistrată a fost 105.400 km. Verifică cifra.',

@@ -18,7 +18,8 @@ select test.eq(auto_confirm, false, 'nor a colleague') from public.shops where i
 select test.login(test.id('client_a'));
 select test.eq((public.create_booking(p_shop_id => test.id('shop1'), p_service_id => 'ulei',
   p_date => current_setting('test.day')::date, p_slot => '09:00', p_request_id => gen_random_uuid(),
-  p_car_id => (select id from public.cars where owner_id = test.id('client_a')))).status, 'pending', 'off: a request');
+  -- Another car than the one booked below (one car has one active booking at a shop, T60).
+  p_car => '{"make":"Dacia","model":"Logan","plate":"B 108 OFF"}')).status, 'pending', 'off: a request');
 select test.logout();
 
 select test.login(test.id('owner1'));
