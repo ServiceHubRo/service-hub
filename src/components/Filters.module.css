@@ -160,3 +160,10 @@
   flex-direction: column;
   gap: 4px;
 }
+
+/* A phone (T52): on the card colour, like the "Hartă" pill beside it. */
+@media (max-width: 599px) {
+  .filtersButton {
+    background: var(--surface);
+  }
+}

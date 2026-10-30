@@ -1,15 +1,20 @@
+/* On a phone (T52) the page's action stands beside the title when both fit, under it otherwise. */
 .header {
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
   gap: var(--space-3);
   margin-bottom: var(--space-2);
 }
 
 .text {
   display: flex;
+  flex: 1 0 auto;
   flex-direction: column;
   gap: var(--space-1);
   min-width: 0;
+  max-width: 100%;
 }
 
 .subtitle {
@@ -23,12 +28,22 @@
   gap: var(--space-2);
 }
 
+@media (max-width: 599px) {
+  .actions :is(a, button) {
+    padding-inline: 14px;
+  }
+}
+
 @media (min-width: 600px) {
   .header {
-    flex-direction: row;
+    flex-wrap: nowrap;
     align-items: flex-end;
     justify-content: space-between;
     gap: var(--space-6);
+  }
+
+  .text {
+    flex: 1 1 auto;
   }
 
   .actions {

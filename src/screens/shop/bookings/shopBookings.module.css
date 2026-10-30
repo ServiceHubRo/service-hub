@@ -470,3 +470,42 @@
   align-items: center;
   column-gap: 8px;
 }
+
+/* A phone (T52): the status under the title, so the service and its date each keep one line; the
+   icon a step smaller. */
+@media (max-width: 599px) {
+  .top {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: start;
+    column-gap: var(--space-3);
+    row-gap: var(--space-2);
+  }
+
+  .top > :last-child {
+    grid-column: 2;
+    justify-self: start;
+  }
+
+  .icon {
+    padding: 7px;
+  }
+}
+
+/* A phone (T52): the main action fills the row, "Mai multe" stays compact on its right. */
+@media (max-width: 599px) {
+  .actions {
+    flex-wrap: nowrap;
+    align-items: stretch;
+  }
+
+  .actions > :first-child:not(:last-child) {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .actions > :first-child:not(:last-child) > button,
+  .actions > :is(a, button):first-child:not(:last-child) {
+    width: 100%;
+  }
+}

@@ -436,3 +436,59 @@
   padding-top: var(--space-4);
   border-top: 1px solid var(--border);
 }
+
+/* A phone (T52): the card's main action fills the row, "Mai multe" stays compact on its right. */
+@media (max-width: 599px) {
+  .card > .actions {
+    flex-wrap: nowrap;
+    align-items: stretch;
+  }
+
+  .card > .actions > :first-child:not(:last-child) {
+    flex: 1;
+    min-width: 0;
+  }
+}
+
+/* The quote's lines and total (T52): part of the card on a wider screen, their own panel on a phone,
+   the total larger; "Accept" and "Refuz" half the row each, apart. */
+.quoteBody {
+  display: contents;
+}
+
+@media (max-width: 599px) {
+  .quoteBody {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: var(--space-3);
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-input);
+  }
+
+  .quoteTotal {
+    align-items: baseline;
+    margin-top: var(--space-1);
+    padding-top: var(--space-3);
+    font-size: 15.5px;
+  }
+
+  .quoteTotal .mono {
+    font-size: 21px;
+  }
+
+  .quote .buttons {
+    flex-wrap: nowrap;
+    gap: var(--space-3);
+  }
+
+  .quote .buttons > * {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+
+  .quote .buttons > * > button {
+    width: 100%;
+  }
+}

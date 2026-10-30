@@ -4,6 +4,17 @@
   gap: 12px;
 }
 
+/* ---------------------------------------------------------------- notices */
+/* Only the first notice shows (T52): each one renders nothing once answered, so the next takes its
+   place. `display: contents` keeps the page's spacing; an empty group takes no room. */
+.notices {
+  display: contents;
+}
+
+.notices > :not(:first-child) {
+  display: none;
+}
+
 /* ---------------------------------------------------------------- toolbar */
 .toolbar {
   display: flex;
@@ -234,4 +245,19 @@
   margin: 0;
   color: var(--muted);
   font-size: 13px;
+}
+
+/* A phone (T52): "Hartă" is a pill like "Filtre", the two the same height on one line. */
+@media (max-width: 599px) {
+  .viewButton {
+    padding: 0 16px;
+    border: 1px solid var(--border-lit);
+    border-radius: var(--radius-pill);
+    background: var(--surface);
+    color: var(--text);
+  }
+
+  .viewButton svg {
+    color: var(--amber);
+  }
 }

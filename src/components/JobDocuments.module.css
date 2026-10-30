@@ -9,3 +9,20 @@
   align-items: center;
   gap: 8px;
 }
+
+/* A phone (T52): the PDF buttons in equal columns, the same width side by side. */
+@media (max-width: 599px) {
+  .docs {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  }
+
+  .docs > *,
+  .docs > * > button {
+    width: 100%;
+  }
+
+  .docs button {
+    padding-inline: 12px;
+  }
+}

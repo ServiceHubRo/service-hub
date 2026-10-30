@@ -71,6 +71,7 @@ Ordinea contează: fiecare sarcină se sprijină pe cele de dinainte. Sarcinile 
 | T49 | Intrarea cu Apple, butoane pastilă | „Continuă cu Apple” lângă Google; amândouă ca pastile |
 | T50 | Devizul complet, fișa de preluare, devizul final | Manoperă (ore × tarif) și piese (cantitate × preț, producător) cu TVA, numerotare proprie; fișa de preluare cu defectele pe desen, confirmată de client; PDF-uri pentru service și client |
 | T51 | Design premium și lățimea pe laptop | Tot ecranul liber pe laptop; setările pe secțiuni simetrice, bară de salvare jos; componente și culori rafinate; carduri egale pe rând |
+| T52 | Interfața pe telefon | Același stil premium ca pe laptop, adaptat la telefon: programări, căutare, devizul la client, navigarea; un singur anunț odată în Caută |
 
 ---
 
@@ -1269,6 +1270,25 @@ Cerut de Eduard pe 29 oct 2026: „pe PC … toată bucata liberă pe ecran, aer
 - **Sistemul de design** (`tokens.css`): straturi de culoare (meniu, pagină, card, control), margini fine, umbră discretă pe carduri, spațiere din 4 în 4 px, raze 14/10/10. Meniul lateral cu rânduri rotunjite și rândul ales în nuanța chihlimbarului; butoane, câmpuri (un pas mai închise decât cardul, inel discret la focus), comutatoare, file (control segmentat), dale (pictograma într-un pătrat colorat) și cardurile programărilor refăcute în același stil. Administrare: „Descarcă Excel” pe același rând cu Filtre.
 - **Decizii:** „Mesaje” rămâne o listă pe o coloană (o conversație se citește ca un inbox). Editorul de deviz păstrează rândurile pe toată lățimea, ca un deviz pe hârtie. Eticheta taxei din Reguli e acum „Taxă de constatare (lei)”.
 - **Teste:** testele de browser existente pe 390, 820 și 1440 px; capturile înainte/după verificate pe fiecare ecran atins.
+
+- [x] Făcut
+
+## T52 — Interfața pe telefon ✅
+
+Cerut de Eduard pe 30 oct 2026, după T51 („Crezi că mai trebuie adaptat ceva pe telefon?” — „Da”). Am trecut prin 22 de ecrane la 390 px; trei lucruri. Fără migrare, fără pachete noi.
+
+- **Cardul de programare la service:** pe telefon starea („Confirmată”, „În așteptare”) stă sub titlu, iar pictograma e mai mică, ca numele serviciului și data să stea fiecare pe un rând. De la 600 px rămâne pe același rând. Cardul clientului rămâne cum era (titlul încape lângă stare).
+- **Caută:** deasupra căutării apare **un singur anunț odată**, în ordinea: documente care expiră, recenzie, notificări, locație. Următorul apare după ce primul e rezolvat sau amânat („Nu acum”). Căsuța de căutare se vede la deschidere.
+- **Bara de salvare** e mai subțire pe telefon (butonul rămâne de 44 px). În editorul de deviz, suma și butoanele stau pe un rând; eticheta „Total deviz” rămâne în totalurile de deasupra.
+- **Adaptarea premium pe telefon** (cerută apoi de Eduard: „același nivel de calitate ca pe PC”, fără să schimbăm laptopul). Totul sub 600 px, în aceleași componente (nu există o aplicație mobilă separată):
+  - **Navigarea:** bara de sus și cea de jos pe stratul cel mai închis, ca meniul lateral de pe laptop; fila aleasă are și o liniuță portocalie (nu doar culoarea).
+  - **Antetul paginii:** acțiunea paginii („Adaugă programare”) stă lângă titlu când încap amândouă, sub el altfel.
+  - **Cardurile de programare** (service și client): acțiunea principală umple rândul de jos, „Mai multe” rămâne compact în dreapta.
+  - **Caută:** cardurile service-urilor au umbra și reacția la atingere ale celorlalte carduri; „Hartă” e o pastilă ca „Filtre”, la aceeași înălțime.
+  - **Devizul la client:** liniile și totalul într-un panou propriu, totalul mai mare; „Accept” și „Refuz” câte jumătate de rând, depărtate.
+  - **Butoanele PDF** (deviz, deviz final, fișa de preluare) pe coloane egale; **Istoricul** are rândul de jos (telefonul, „Mai multe”) sub o linie fină, ca la programări.
+- **Verificare:** capturi la 360, 390 și 430 px; laptopul (1440 px) identic cu înainte, imagine cu imagine; pe tabletă se schimbă doar navigarea (aceeași cu telefonul).
+- **Teste:** `e2e/search` (anunțul de locație: întâi „Nu acum” la notificări, când apare).
 
 - [x] Făcut
 
