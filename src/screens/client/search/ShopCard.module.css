@@ -5,6 +5,25 @@
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  transition:
+    border-color var(--motion-quick) var(--ease),
+    background-color var(--motion-quick) var(--ease);
+}
+
+/* Like the other cards (T52): a lighter edge under the pointer, a lighter card under the finger. */
+.card:hover {
+  border-color: var(--border-lit);
+}
+
+.card:has(.link:active) {
+  background: var(--surface-hover);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    transition: none;
+  }
 }
 
 .link {

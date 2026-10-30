@@ -491,3 +491,21 @@
     padding: 7px;
   }
 }
+
+/* A phone (T52): the main action fills the row, "Mai multe" stays compact on its right. */
+@media (max-width: 599px) {
+  .actions {
+    flex-wrap: nowrap;
+    align-items: stretch;
+  }
+
+  .actions > :first-child:not(:last-child) {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .actions > :first-child:not(:last-child) > button,
+  .actions > :is(a, button):first-child:not(:last-child) {
+    width: 100%;
+  }
+}

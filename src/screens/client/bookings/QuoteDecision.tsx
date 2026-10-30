@@ -95,19 +95,22 @@ export function QuoteDecision({
     <div className={styles.quote}>
       {quote.version > 1 && <p className={styles.muted}>{t('cb.quote.updated')}</p>}
       <p className={styles.hint}>{t('cb.quote.hint')}</p>
-      {quoteSections(quote.items).map((section) => (
-        <div key={section.kind} className={styles.quoteSection}>
-          {headed && <p className={styles.quoteHeading}>{t(HEADING[section.kind])}</p>}
-          <ul className={styles.quoteLines}>{section.lines.map(renderLine)}</ul>
-        </div>
-      ))}
-      <p className={styles.quoteTotal} aria-live="polite">
-        <span>{kind === 'all' ? t('cb.quote.total') : t('cb.quote.totalSelected')}</span>
-        <span className="mono">{formatMoney(lang, total)}</span>
-      </p>
-      {quote.vat_rate != null && (
-        <p className={styles.quoteVat}>{t('quote.vatIncluded', { rate: quote.vat_rate, vat: formatMoney(lang, vatOf(total, quote.vat_rate)) })}</p>
-      )}
+      {/* The lines and the total: one panel on a phone (T52), as they were on a wider screen. */}
+      <div className={styles.quoteBody}>
+        {quoteSections(quote.items).map((section) => (
+          <div key={section.kind} className={styles.quoteSection}>
+            {headed && <p className={styles.quoteHeading}>{t(HEADING[section.kind])}</p>}
+            <ul className={styles.quoteLines}>{section.lines.map(renderLine)}</ul>
+          </div>
+        ))}
+        <p className={styles.quoteTotal} aria-live="polite">
+          <span>{kind === 'all' ? t('cb.quote.total') : t('cb.quote.totalSelected')}</span>
+          <span className="mono">{formatMoney(lang, total)}</span>
+        </p>
+        {quote.vat_rate != null && (
+          <p className={styles.quoteVat}>{t('quote.vatIncluded', { rate: quote.vat_rate, vat: formatMoney(lang, vatOf(total, quote.vat_rate)) })}</p>
+        )}
+      </div>
       {quote.est_hours ? <p className={styles.muted}>{t('cb.quote.term', { term: estimateText(lang, quote.est_hours) })}</p> : null}
       {quote.note && <p className={styles.note}>{quote.note}</p>}
       {expires && (
