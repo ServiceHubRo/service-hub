@@ -285,11 +285,15 @@ export function SearchScreen() {
 
       {guide.visible && <ClientGuide guide={guide} />}
       {guide.pending && <span hidden data-guide-pending />}
-      <ExpiryBanner />
-      <ReviewPrompt />
-      {/* "Primii pași" asks for notifications itself while it is shown. */}
-      {!guide.visible && <PushBanner role="client" />}
-      <LocationBanner />
+      {/* One notice at a time (T52, Eduard 30 Oct: the search in sight on a phone), in this order;
+          the next shows once the first is answered or put off. */}
+      <div className={styles.notices}>
+        <ExpiryBanner />
+        <ReviewPrompt />
+        {/* "Primii pași" asks for notifications itself while it is shown. */}
+        {!guide.visible && <PushBanner role="client" />}
+        <LocationBanner />
+      </div>
       <AreaCard />
 
       <SearchField

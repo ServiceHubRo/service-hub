@@ -283,6 +283,10 @@ test.describe('client search', () => {
 
   test('"Nu acum" hides the location banner for good', async ({ page }) => {
     await signInNewClient(page);
+    // One notice at a time (T52): the notifications one comes first when the browser can ask.
+    const push = page.getByRole('region', { name: 'Notificări push' });
+    await expect(push.or(page.getByText('Activează locația ca să vezi service-urile din apropiere.')).first()).toBeVisible();
+    if (await push.isVisible()) await push.getByRole('button', { name: 'Nu acum' }).click();
     // Asked in the app first; the browser's own prompt only after "Activează".
     await expect(page.getByText('Activează locația ca să vezi service-urile din apropiere.')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Aproape de tine' })).toHaveCount(0);
