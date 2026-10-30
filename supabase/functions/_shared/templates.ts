@@ -85,7 +85,27 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
       title: BRAND,
       body: 'Programarea {ref} la {shop} a fost anulată de echipa Service-Hub. Motiv: {reason}',
     },
-    'client.no_show': { title: '{shop}', body: 'Programarea {ref} din {when} a fost marcată ca neprezentare.' },
+    // T53: the level says how serious it is; the first one tells how to contest it.
+    'client.no_show': {
+      title: '{shop}',
+      body: 'Programarea {ref} din {when} a fost marcată ca neprezentare. Dacă nu este corect, o poți contesta din Programări.',
+    },
+    'client.no_show_repeat': {
+      title: '{shop}',
+      body: 'Programarea {ref} din {when} a fost marcată ca neprezentare. Neprezentări în ultimele 90 de zile: {count}. Anunță service-ul din timp dacă nu poți ajunge.',
+    },
+    'client.no_show_ack': {
+      title: '{shop}',
+      body: 'Programarea {ref} din {when} a fost marcată ca neprezentare. Neprezentări în ultimele 90 de zile: {count}. De acum confirmi prezența la fiecare programare, iar service-ul aprobă fiecare cerere.',
+    },
+    'client.no_show_dispute_decided': {
+      title: 'Contestație respinsă',
+      body: 'Neprezentarea la {shop} ({ref}) rămâne înregistrată după analiza echipei Service-Hub.',
+    },
+    'client.no_show_dispute_decided_upheld': {
+      title: 'Contestație acceptată',
+      body: 'Neprezentarea la {shop} ({ref}) a fost anulată și nu se mai ia în calcul.',
+    },
     'client.inspection_started': { title: '{shop}', body: '{car} este în constatare. Vei primi devizul în aplicație.' },
     'client.quote_sent': { title: '{shop}', body: 'Devizul pentru {car} este gata: {total}. Răspunde până pe {deadline}.' },
     'client.quote_replaced': { title: '{shop}', body: 'Service-ul a modificat devizul pentru {car}: {total}.' },
@@ -368,7 +388,26 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
       title: BRAND,
       body: 'Booking {ref} at {shop} was canceled by the Service-Hub team. Reason: {reason}',
     },
-    'client.no_show': { title: '{shop}', body: 'Booking {ref} on {when} was marked as a no-show.' },
+    'client.no_show': {
+      title: '{shop}',
+      body: 'Booking {ref} on {when} was marked as a no-show. If this is not correct, you can dispute it in Bookings.',
+    },
+    'client.no_show_repeat': {
+      title: '{shop}',
+      body: 'Booking {ref} on {when} was marked as a no-show. No-shows in the last 90 days: {count}. Let the shop know in advance if you cannot make it.',
+    },
+    'client.no_show_ack': {
+      title: '{shop}',
+      body: 'Booking {ref} on {when} was marked as a no-show. No-shows in the last 90 days: {count}. From now on you confirm each booking, and the shop approves each request.',
+    },
+    'client.no_show_dispute_decided': {
+      title: 'Dispute rejected',
+      body: 'After review by the Service-Hub team, the no-show at {shop} ({ref}) stays on record.',
+    },
+    'client.no_show_dispute_decided_upheld': {
+      title: 'Dispute accepted',
+      body: 'The no-show at {shop} ({ref}) was annulled and no longer counts.',
+    },
     'client.inspection_started': { title: '{shop}', body: 'Your {car} is being inspected. The quote will come in the app.' },
     'client.quote_sent': { title: '{shop}', body: 'The quote for your {car} is ready: {total}. Please answer by {deadline}.' },
     'client.quote_replaced': { title: '{shop}', body: 'The shop changed the quote for your {car}: {total}.' },
@@ -697,7 +736,7 @@ const WORDS: Record<Lang, Record<string, string>> = {
 export const EVENTS: Record<Side, readonly string[]> = {
   client: [
     'booking_confirmed', 'booking_declined', 'booking_rescheduled', 'booking_cancelled_shop', 'booking_cancelled_admin',
-    'no_show', 'inspection_started', 'intake_sent', 'intake_updated', 'quote_sent', 'quote_replaced', 'quote_withdrawn', 'quote_expiring', 'quote_expired',
+    'no_show', 'no_show_dispute_decided', 'inspection_started', 'intake_sent', 'intake_updated', 'quote_sent', 'quote_replaced', 'quote_withdrawn', 'quote_expiring', 'quote_expired',
     'work_started', 'job_done', 'appointment_reminder', 'new_message', 'review_reply', 'doc_expiry', 'report_ready',
     'review_report_decided', 'review_request', 'service_due', 'account_suspended', 'account_reactivated',
     'tire_season', 'welcome', 'favorite_offer', 'request_expired', 'area_launched', 'report_credit',
@@ -839,6 +878,7 @@ function vars(e: NotificationEvent, lang: Lang, side: Side, now: Date): Record<s
     cui: str(p.cui),
     anaf_name: str(p.anaf_name),
     area: areaName(lang, p),
+    count: String(num(p.count) ?? 0),
   };
 }
 
@@ -896,6 +936,12 @@ export function templateKey(side: Side, e: NotificationEvent, now: Date = new Da
             : base;
     case 'review_report_decided':
       return side === 'shop' && p.decision === 'removed' ? `${base}_removed` : base;
+    // T53: a repeated no-show, then one from the acknowledgement on (a booking the shop added never counts).
+    case 'no_show':
+      if (p.counts === false) return base;
+      return num(p.level) === 3 ? `${base}_ack` : num(p.level) === 2 ? `${base}_repeat` : base;
+    case 'no_show_dispute_decided':
+      return p.decision === 'upheld' ? `${base}_upheld` : base;
     case 'company_problem':
       return p.status === 'inactive' || p.status === 'deregistered' ? `${base}_${p.status}` : base;
     // A shop suspended (shops.suspended) rather than its owner's account.

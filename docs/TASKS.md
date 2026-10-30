@@ -1292,3 +1292,16 @@ Cerut de Eduard pe 30 oct 2026, după T51 („Crezi că mai trebuie adaptat ceva
 
 - [x] Făcut
 
+## T53 — Neprezentări: avertizare, confirmarea prezenței, contestații ✅
+
+Cerut de Eduard pe 30 oct 2026 („NO-SHOW PREVENTION & CUSTOMER RELIABILITY SYSTEM”), planul aprobat („Bine. Grijă să nu strici și grijă la limbajul profesional”). Fără plăți, penalizări sau blocări; fără scor public. Migrarea `no_show_disputes` (schema 88), doar adăugiri.
+
+- **Ce se ia în calcul:** neprezentările programărilor făcute în aplicație, din ultimele 90 de zile, fără cele contestate (în analiză sau acceptate). Aceeași numărătoare peste tot: cardul service-ului, adminul, confirmarea instantă, confirmarea telefonului.
+- **Marcarea:** service-ul poate marca neprezentarea abia după sfârșitul intervalului plus 15 minute (setare în Setări platformă, 0–120). Până atunci cardul spune de la ce oră se poate.
+- **Notificarea clientului**, pe trei niveluri: prima (cu calea de contestare), repetată (numărul din ultimele 90 de zile), de la a treia (confirmarea prezenței de acum). În Programări, de la a doua, un anunț neutru.
+- **Confirmarea prezenței:** de la 3 neprezentări (setare, 1–20), la fiecare cerere clientul bifează „Confirm că vin la programare și anunț service-ul din timp dacă nu pot ajunge”; baza de date o cere și o folosește o singură dată. Cererea așteaptă confirmarea service-ului (fără confirmare instantă, ca înainte de la prima neprezentare). Confirmarea telefonului prin SMS rămâne de la 2.
+- **Contestația:** pe cardul unei neprezentări, „Contestă neprezentarea” (ce s-a întâmplat, 10–1000 de caractere), o dată, cât timp se ia în calcul. Adminul decide în Moderare („Anulează neprezentarea” / „Menține neprezentarea”, cu notă internă), decizia intră în jurnal, clientul e anunțat. Service-ul vede starea în Istoric. Programarea rămâne „Neprezentat”.
+- **Decizii:** service-ul nu primește notificare la decizie (o vede în Istoric). Pe cardul service-ului linia „Client cu N neprezentări” rămâne de la 3, ca înainte.
+- **Teste:** `tests/sql/131_no_show_disputes.sql`, `tests/unit/notificationTexts.test.ts`, `tests/e2e/no-shows.spec.ts` (390, 820, 1440 px).
+
+- [x] Făcut

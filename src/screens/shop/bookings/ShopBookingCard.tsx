@@ -71,6 +71,8 @@ export function ShopBookingCard({ booking: b, shopId, now, fresh = false, onDone
   const [panel, setPanel] = useState<PanelKind | null>(null);
   const navigate = useNavigate();
   const started = slotStarted(b, now);
+  // T53: a no-show only after the slot and the grace period (the database decides; this mirrors it).
+  const noShowOpen = b.status === 'confirmed' && started && (!b.no_show_from || new Date(b.no_show_from) <= now);
 
   /** Runs one RPC; a booking that moved on meanwhile makes the list reload. */
   async function act(run: () => Promise<Booking>): Promise<void> {
@@ -147,7 +149,7 @@ export function ShopBookingCard({ booking: b, shopId, now, fresh = false, onDone
         )}
       </Card>
 
-      <StatusDetail booking={b} started={started} />
+      <StatusDetail booking={b} started={started} noShowOpen={noShowOpen} />
       <IntakeLine booking={b} />
       <JobDocuments
         bookingId={b.id}
@@ -233,7 +235,7 @@ export function ShopBookingCard({ booking: b, shopId, now, fresh = false, onDone
                 ? [{ key: 'intake', label: t('in.title'), icon: <ClipboardCheck size={18} aria-hidden="true" />, to: intakePath(b.id) }]
                 : []),
               { key: 'file', label: t('vf.title'), icon: <ClipboardList size={18} aria-hidden="true" />, to: vehicleFilePath(b.id, 'bookings') },
-              ...(b.status === 'confirmed' && started
+              ...(noShowOpen
                 ? [{ key: 'noShow', label: t('sb.action.noShow'), onSelect: () => setPanel('noShow') }]
                 : []),
               ...(b.status === 'confirmed'
@@ -289,7 +291,7 @@ export function ShopBookingCard({ booking: b, shopId, now, fresh = false, onDone
 }
 
 /** What the status means right now, in one line (and the quote, once there is one). */
-function StatusDetail({ booking: b, started }: { booking: ShopBooking; started: boolean }) {
+function StatusDetail({ booking: b, started, noShowOpen }: { booking: ShopBooking; started: boolean; noShowOpen: boolean }) {
   const { t, lang } = useI18n();
   /** `09:20`, or `Lun 13 oct, 09:20` when it was not today. */
   const at = (iso: string | null) => {
@@ -308,7 +310,12 @@ function StatusDetail({ booking: b, started }: { booking: ShopBooking; started: 
         </p>
       ) : null;
     case 'confirmed':
-      return started ? <p className={styles.muted}>{t('sb.detail.confirmedPast')}</p> : null;
+      return started ? (
+        <p className={styles.muted}>
+          {t('sb.detail.confirmedPast')}
+          {!noShowOpen && b.no_show_from && <> {t('sb.detail.noShowFrom', { time: formatTime(lang, new Date(b.no_show_from)) })}</>}
+        </p>
+      ) : null;
     case 'in_inspection':
       return <p className={styles.muted}>{t('sb.detail.inspection', { since: at(b.inspection_started_at) })}</p>;
     case 'quote_sent':

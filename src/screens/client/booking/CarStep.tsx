@@ -1,10 +1,11 @@
 import { Car as CarIcon, Check, Plus } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSession } from '../../../app/sessionContext';
 import { ActionButton } from '../../../components/ActionButton';
 import { Banner } from '../../../components/Banner';
 import { BottomBar } from '../../../components/BottomBar';
 import { Card } from '../../../components/Card';
+import { Checkbox } from '../../../components/Checkbox';
 import { Switch } from '../../../components/Switch';
 import { Field } from '../../../components/Field';
 import { LoadError } from '../../../components/LoadError';
@@ -12,6 +13,7 @@ import { OfferNote } from '../../../components/OfferNote';
 import { SkeletonList } from '../../../components/Skeleton';
 import { TextArea } from '../../../components/TextArea';
 import { fetchCars, type Car } from '../../../data/garage';
+import { acknowledgeNoShowNotice, fetchNoShowSummary, needsAcknowledgement } from '../../../data/noShows';
 import {
   canRetryRpc,
   createBooking,
@@ -44,6 +46,8 @@ const SYMPTOMS_LINE_MAX = 300;
  * an optional note, the summary and "Trimite cererea". A client whose email is not confirmed gets
  * the explanation instead of the button (create_booking refuses them anyway). After repeated
  * no-shows the database asks for a phone confirmed by SMS (T25): the code panel opens right here.
+ * From more no-shows (T53) every request needs the client's acknowledgement first: a checkbox
+ * shown before the button (and after a refusal, should the count have changed meanwhile).
  * The client may let the shop see what was done on the car at other shops (T27), unticked by default.
  * For a constatare tehnică the note describes the symptoms: a selected symptom or a few words are
  * needed, and the selected ones go first in the note ("Simptome semnalate: …").
@@ -82,6 +86,22 @@ export function CarStep({
   /** null, or why the phone must be confirmed first: the number of no-shows (T25). */
   const [phoneNeeded, setPhoneNeeded] = useState<number | null>(null);
   const [phoneDone, setPhoneDone] = useState(false);
+  /** null, or the no-shows that make the acknowledgement needed (T53); and whether it is ticked. */
+  const [ackNeeded, setAckNeeded] = useState<number | null>(null);
+  const [acked, setAcked] = useState(false);
+  useEffect(() => {
+    let cancelled = false;
+    // Read once; when it fails the database still asks for it (no_show_ack_required).
+    fetchNoShowSummary().then(
+      (s) => {
+        if (!cancelled && needsAcknowledgement(s)) setAckNeeded(s.count);
+      },
+      () => undefined,
+    );
+    return () => {
+      cancelled = true;
+    };
+  }, []);
   const set = (changes: Partial<CarDraft>) => onDraft({ ...draft, ...changes });
 
   if (state.status === 'loading') return <SkeletonList count={2} />;
@@ -93,7 +113,7 @@ export function CarStep({
   const yearProblem = manual && !isValidCarYear(draft.year) ? t('car.yearInvalid', { max: carYearMax() }) : null;
   const typedOk = draft.make.trim() !== '' && draft.model.trim() !== '' && !yearProblem;
   const described = !unsure || unsureDescribed(symptoms, draft.note);
-  const ready = (manual ? typedOk : picked !== null) && described;
+  const ready = (manual ? typedOk : picked !== null) && described && (ackNeeded === null || acked);
   const symptomNames = symptoms.map((s) => t(`booking.symptom.${s}`));
   const symptomsLine = symptomNames.length
     ? t('booking.unsure.notePrefix', { symptoms: symptomNames.map(lowerFirst).join(', ') })
@@ -103,6 +123,7 @@ export function CarStep({
   async function send(requestId: string) {
     const typedYear = draft.year.trim();
     try {
+      if (ackNeeded !== null) await acknowledgeNoShowNotice(crypto.randomUUID());
       const booking = await createBooking(
         {
           shopId: shop.id,
@@ -136,6 +157,11 @@ export function CarStep({
       if (err.code === 'phone_verification_required') {
         setPhoneNeeded(Number(err.params.no_shows) || 2);
         setPhoneDone(false);
+        return;
+      }
+      if (err.code === 'no_show_ack_required') {
+        setAckNeeded(Number(err.params.no_shows) || 0);
+        setAcked(false);
         return;
       }
       throw e;
@@ -273,10 +299,25 @@ export function CarStep({
         </Card>
       )}
 
+      {ackNeeded !== null && (
+        <Card>
+          <section aria-labelledby="booking-ack-title" className={styles.stack}>
+            <h2 id="booking-ack-title" className={styles.groupTitle}>
+              {t('booking.ack.title')}
+            </h2>
+            <p className={styles.muted}>{t('booking.ack.why', { n: ackNeeded })}</p>
+            <Checkbox checked={acked} onChange={(e) => setAcked(e.target.checked)}>
+              {t('booking.ack.label')}
+            </Checkbox>
+          </section>
+        </Card>
+      )}
+
       {phoneNeeded !== null && !phoneDone ? null : session.emailVerified ? (
         <BottomBar>
           {manual && !typedOk && <p className={styles.muted}>{t('car.required')}</p>}
           {!described && <p className={styles.muted}>{t('booking.unsure.required')}</p>}
+          {ackNeeded !== null && !acked && <p className={styles.muted}>{t('booking.ack.required')}</p>}
           {shop.auto_confirm && <p className={styles.muted}>{t('booking.instantNote')}</p>}
           <ActionButton onAction={send} disabled={!ready} errorMessage={(e) => rpcErrorMessage(lang, e)} canRetry={canRetryRpc}>
             {t(shop.auto_confirm ? 'booking.submitInstant' : 'booking.submit')}

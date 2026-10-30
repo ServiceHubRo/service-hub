@@ -806,6 +806,7 @@ function adminDigestEmail(p: Record<string, unknown>, app: string): EmailContent
     ['Firme în termenul de corectare (ANAF)', n(p.company_waiting)],
     ['Service-uri ascunse din căutări (ANAF)', n(p.company_hidden)],
     ['Cereri închise fără răspuns (ultimele 24 de ore)', n(p.unanswered)],
+    ['Contestații la neprezentări', n(p.no_show_disputes)],
   ];
   const rows: [string, string][] = waiting.filter(([, count]) => count > 0).map(([what, count]) => [what, String(count)]);
   const total = waiting.reduce((sum, [, count]) => sum + count, 0);

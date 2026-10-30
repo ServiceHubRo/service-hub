@@ -466,7 +466,12 @@ function Outcome({ item: b }: { item: ShopHistoryItem }) {
         <p className={styles.muted}>{t(b.closed_reason === 'not_updated' ? 'hist.card.notUpdated' : 'hist.card.expired')}</p>
       );
     case 'no_show':
-      return <p className={styles.muted}>{t('hist.card.noShow')}</p>;
+      return (
+        <p className={styles.muted}>
+          {t('hist.card.noShow')}
+          {b.no_show_dispute && <> {t(`hist.card.dispute.${b.no_show_dispute}`)}</>}
+        </p>
+      );
     case 'cancelled':
       return (
         <p className={styles.muted}>

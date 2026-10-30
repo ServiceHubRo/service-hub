@@ -376,6 +376,26 @@ describe('notification texts', () => {
     );
   });
 
+  it('a no-show says how serious it is, and how a dispute was decided (T53)', () => {
+    expect(render('no_show', 'client', 'ro', { counts: true, level: 1, count: 1 })!.body).toBe(
+      'Programarea P-000123 din Mie 14 oct, 10:00 a fost marcată ca neprezentare. Dacă nu este corect, o poți contesta din Programări.',
+    );
+    expect(render('no_show', 'client', 'ro', { counts: true, level: 2, count: 2 })!.body).toContain(
+      'Neprezentări în ultimele 90 de zile: 2. Anunță service-ul din timp dacă nu poți ajunge.',
+    );
+    expect(render('no_show', 'client', 'en', { counts: true, level: 3, count: 3 })!.body).toContain(
+      'No-shows in the last 90 days: 3. From now on you confirm each booking, and the shop approves each request.',
+    );
+    // A booking the shop added never counts: the plain text.
+    expect(render('no_show', 'client', 'ro', { counts: false, level: 3, count: 0 })!.body).not.toContain('90 de zile');
+    expect(render('no_show_dispute_decided', 'client', 'ro', { decision: 'upheld' })).toMatchObject({
+      title: 'Contestație acceptată',
+      body: 'Neprezentarea la Atelier Unu (P-000123) a fost anulată și nu se mai ia în calcul.',
+      url: '/c/programari?p=b-1',
+    });
+    expect(render('no_show_dispute_decided', 'client', 'en', { decision: 'rejected' })!.title).toBe('Dispute rejected');
+  });
+
   it('the daily summary counts in both languages', () => {
     expect(render('daily_digest', 'shop', 'ro')).toMatchObject({
       title: 'Programul de azi',

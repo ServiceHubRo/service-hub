@@ -209,6 +209,8 @@ export const ABUSE_LIMIT_KEYS = [
   'review_window_days',
   'quote_versions_max',
   'no_shows_before_phone',
+  'no_shows_before_ack',
+  'no_show_grace_minutes',
   'company_fix_days',
   'company_recheck_days',
   'referral_credits_per_year',

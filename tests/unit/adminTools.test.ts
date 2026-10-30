@@ -161,6 +161,8 @@ describe('settings form', () => {
       review_window_days: 60,
       quote_versions_max: 20,
       no_shows_before_phone: 2,
+      no_shows_before_ack: 3,
+      no_show_grace_minutes: 15,
       quiet_hours_start: 21,
       quiet_hours_end: 9,
       promo_per_week: 2,
