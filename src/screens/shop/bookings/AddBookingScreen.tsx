@@ -200,193 +200,199 @@ export function AddBookingScreen() {
     }));
     body = (
       <>
-        <p className={styles.intro} data-span="all">
-          {t('wi.intro')}
-        </p>
+        <p className={styles.intro}>{t('wi.intro')}</p>
 
-        <Card className={styles.section}>
-          <h2 className={styles.sectionTitle}>{t('wi.client')}</h2>
-          <Field
-            label={t('wi.name')}
-            value={draft.name}
-            maxLength={120}
-            autoComplete="off"
-            error={err('name')}
-            onChange={(e) => set({ name: e.target.value })}
-          />
-          <Field
-            label={t('wi.phone')}
-            type="tel"
-            inputMode="tel"
-            placeholder={t('auth.phonePlaceholder')}
-            value={draft.phone}
-            mono
-            autoComplete="off"
-            error={err('phone')}
-            onChange={(e) => onPhone(e.target.value)}
-          />
-          {known && (
-            <p className={styles.known} role="status">
-              {t('imp.known')}
-            </p>
-          )}
-          <Field
-            label={t('wi.email')}
-            type="email"
-            inputMode="email"
-            value={draft.email}
-            maxLength={254}
-            autoComplete="off"
-            error={err('email')}
-            onChange={(e) => set({ email: e.target.value })}
-          />
-        </Card>
-
-        <Card className={styles.section}>
-          <h2 className={styles.sectionTitle}>{t('wi.car')}</h2>
-          {known && known.cars.length > 0 && (
-            <SelectField
-              label={t('imp.knownCars')}
-              value={String(
-                known.cars.findIndex(
-                  (c) => draft.plate.trim().toUpperCase() === (c.plate ?? '').toUpperCase() && draft.make === c.make,
-                ),
+        {/* T59: on a wide page, what is booked on the left (client, car, service, note), when and the
+            button that books it on the right, held in view; on a phone the same, one under the other. */}
+        <div className={styles.form}>
+          <div className={styles.main}>
+            <Card className={styles.section}>
+              <h2 className={styles.sectionTitle}>{t('wi.client')}</h2>
+              <Field
+                label={t('wi.name')}
+                value={draft.name}
+                maxLength={120}
+                autoComplete="off"
+                error={err('name')}
+                onChange={(e) => set({ name: e.target.value })}
+              />
+              <Field
+                label={t('wi.phone')}
+                type="tel"
+                inputMode="tel"
+                placeholder={t('auth.phonePlaceholder')}
+                value={draft.phone}
+                mono
+                autoComplete="off"
+                error={err('phone')}
+                onChange={(e) => onPhone(e.target.value)}
+              />
+              {known && (
+                <p className={styles.known} role="status">
+                  {t('imp.known')}
+                </p>
               )}
-              options={[
-                { value: '-1', label: t('imp.knownCars.pick') },
-                ...known.cars.map((c, i) => ({ value: String(i), label: [c.make, c.model, c.plate].filter(Boolean).join(' ') })),
-              ]}
-              onChange={(e) => {
-                const c = known.cars[Number(e.target.value)];
-                if (c) set({ make: c.make, model: c.model, plate: c.plate ?? '', year: c.year ? String(c.year) : '' });
-              }}
-            />
-          )}
-          <div className={styles.pair}>
-            <Field
-              label={t('car.make')}
-              placeholder={t('car.makePlaceholder')}
-              value={draft.make}
-              maxLength={60}
-              autoComplete="off"
-              error={err('car')}
-              onChange={(e) => set({ make: e.target.value })}
-            />
-            <Field
-              label={t('car.model')}
-              placeholder={t('car.modelPlaceholder')}
-              value={draft.model}
-              maxLength={60}
-              autoComplete="off"
-              onChange={(e) => set({ model: e.target.value })}
-            />
+              <Field
+                label={t('wi.email')}
+                type="email"
+                inputMode="email"
+                value={draft.email}
+                maxLength={254}
+                autoComplete="off"
+                error={err('email')}
+                onChange={(e) => set({ email: e.target.value })}
+              />
+            </Card>
+
+            <Card className={styles.section}>
+              <h2 className={styles.sectionTitle}>{t('wi.car')}</h2>
+              {known && known.cars.length > 0 && (
+                <SelectField
+                  label={t('imp.knownCars')}
+                  value={String(
+                    known.cars.findIndex(
+                      (c) => draft.plate.trim().toUpperCase() === (c.plate ?? '').toUpperCase() && draft.make === c.make,
+                    ),
+                  )}
+                  options={[
+                    { value: '-1', label: t('imp.knownCars.pick') },
+                    ...known.cars.map((c, i) => ({ value: String(i), label: [c.make, c.model, c.plate].filter(Boolean).join(' ') })),
+                  ]}
+                  onChange={(e) => {
+                    const c = known.cars[Number(e.target.value)];
+                    if (c) set({ make: c.make, model: c.model, plate: c.plate ?? '', year: c.year ? String(c.year) : '' });
+                  }}
+                />
+              )}
+              <div className={styles.pair}>
+                <Field
+                  label={t('car.make')}
+                  placeholder={t('car.makePlaceholder')}
+                  value={draft.make}
+                  maxLength={60}
+                  autoComplete="off"
+                  error={err('car')}
+                  onChange={(e) => set({ make: e.target.value })}
+                />
+                <Field
+                  label={t('car.model')}
+                  placeholder={t('car.modelPlaceholder')}
+                  value={draft.model}
+                  maxLength={60}
+                  autoComplete="off"
+                  onChange={(e) => set({ model: e.target.value })}
+                />
+              </div>
+              <div className={styles.pair}>
+                <Field
+                  label={t('car.plate')}
+                  placeholder={t('car.platePlaceholder')}
+                  value={draft.plate}
+                  maxLength={20}
+                  mono
+                  upper
+                  autoCapitalize="characters"
+                  autoComplete="off"
+                  error={err('plate')}
+                  onChange={(e) => set({ plate: e.target.value })}
+                />
+                <Field
+                  label={t('car.year')}
+                  value={draft.year}
+                  inputMode="numeric"
+                  maxLength={4}
+                  mono
+                  autoComplete="off"
+                  error={err('year')}
+                  onChange={(e) => set({ year: e.target.value.replace(/\D/g, '') })}
+                />
+              </div>
+            </Card>
+
+            <Card className={styles.section}>
+              <SelectField
+                label={t('wi.service')}
+                value={draft.serviceId}
+                options={[{ value: '', label: t('wi.servicePick') }]}
+                groups={groups}
+                onChange={(e) => set({ serviceId: e.target.value })}
+              />
+              {err('service') && (
+                <p className={styles.error} role="alert">
+                  {err('service')}
+                </p>
+              )}
+            </Card>
+
+            <Card className={styles.section}>
+              <TextArea
+                label={t('wi.note')}
+                value={draft.note}
+                maxLength={NOTE_MAX}
+                rows={3}
+                onChange={(e) => set({ note: e.target.value })}
+              />
+              <Switch checked={draft.sendInvite} onChange={(e) => set({ sendInvite: e.target.checked })}>
+                {t('wi.sms')}
+              </Switch>
+              {draft.sendInvite && (
+                <SelectField
+                  label={t('wi.lang')}
+                  value={draft.lang}
+                  options={[
+                    { value: 'ro', label: t('wi.lang.ro') },
+                    { value: 'en', label: t('wi.lang.en') },
+                  ]}
+                  onChange={(e) => set({ lang: e.target.value === 'en' ? 'en' : 'ro' })}
+                />
+              )}
+            </Card>
           </div>
-          <div className={styles.pair}>
-            <Field
-              label={t('car.plate')}
-              placeholder={t('car.platePlaceholder')}
-              value={draft.plate}
-              maxLength={20}
-              mono
-              upper
-              autoCapitalize="characters"
-              autoComplete="off"
-              error={err('plate')}
-              onChange={(e) => set({ plate: e.target.value })}
-            />
-            <Field
-              label={t('car.year')}
-              value={draft.year}
-              inputMode="numeric"
-              maxLength={4}
-              mono
-              autoComplete="off"
-              error={err('year')}
-              onChange={(e) => set({ year: e.target.value.replace(/\D/g, '') })}
-            />
+
+          <div className={styles.aside}>
+            <Card className={styles.section}>
+              <h2 className={styles.sectionTitle}>{t('wi.when')}</h2>
+              {stale && <Banner tone="warning">{t(stale.key, stale.params)}</Banner>}
+              <div className={styles.slots}>
+                <SlotPicker
+                  key={calendar}
+                  shopId={shopId!}
+                  day={day}
+                  time={time}
+                  onDay={(d) => {
+                    setDay(d);
+                    setTime(null);
+                  }}
+                  onTime={setTime}
+                  dayLabel={t('sb.reschedule.day')}
+                />
+              </div>
+              {err('slot') && (
+                <p className={styles.error} role="alert">
+                  {err('slot')}
+                </p>
+              )}
+            </Card>
+
+            {tried && Object.keys(found).length > 0 && (
+              <p className={styles.error} role="alert">
+                {t('wi.err.fix')}
+              </p>
+            )}
+            <ActionButton onAction={submit} errorMessage={(e) => rpcErrorMessage(lang, e)} canRetry={canRetryRpc}>
+              {t('wi.submit')}
+            </ActionButton>
           </div>
-        </Card>
-
-        <Card className={styles.section}>
-          <SelectField
-            label={t('wi.service')}
-            value={draft.serviceId}
-            options={[{ value: '', label: t('wi.servicePick') }]}
-            groups={groups}
-            onChange={(e) => set({ serviceId: e.target.value })}
-          />
-          {err('service') && (
-            <p className={styles.error} role="alert">
-              {err('service')}
-            </p>
-          )}
-        </Card>
-
-        <Card className={styles.section}>
-          <h2 className={styles.sectionTitle}>{t('wi.when')}</h2>
-          {stale && <Banner tone="warning">{t(stale.key, stale.params)}</Banner>}
-          <div className={styles.slots}>
-            <SlotPicker
-              key={calendar}
-              shopId={shopId!}
-              day={day}
-              time={time}
-              onDay={(d) => {
-                setDay(d);
-                setTime(null);
-              }}
-              onTime={setTime}
-              dayLabel={t('sb.reschedule.day')}
-            />
-          </div>
-          {err('slot') && (
-            <p className={styles.error} role="alert">
-              {err('slot')}
-            </p>
-          )}
-        </Card>
-
-        <Card className={styles.section}>
-          <TextArea
-            label={t('wi.note')}
-            value={draft.note}
-            maxLength={NOTE_MAX}
-            rows={3}
-            onChange={(e) => set({ note: e.target.value })}
-          />
-          <Switch checked={draft.sendInvite} onChange={(e) => set({ sendInvite: e.target.checked })}>
-            {t('wi.sms')}
-          </Switch>
-          {draft.sendInvite && (
-            <SelectField
-              label={t('wi.lang')}
-              value={draft.lang}
-              options={[
-                { value: 'ro', label: t('wi.lang.ro') },
-                { value: 'en', label: t('wi.lang.en') },
-              ]}
-              onChange={(e) => set({ lang: e.target.value === 'en' ? 'en' : 'ro' })}
-            />
-          )}
-        </Card>
-
-        {tried && Object.keys(found).length > 0 && (
-          <p className={styles.error} role="alert" data-span="all">
-            {t('wi.err.fix')}
-          </p>
-        )}
-        <ActionButton onAction={submit} errorMessage={(e) => rpcErrorMessage(lang, e)} canRetry={canRetryRpc}>
-          {t('wi.submit')}
-        </ActionButton>
+        </div>
       </>
     );
   }
 
   return (
-    <div className={styles.page} data-layout="columns">
+    <div className={styles.page}>
       <PageHeader back={{ to: SHOP_BOOKINGS_PATH, label: t('nav.bookings') }} title={t('wi.title')} />
       {isOwner && (
-        <Link to={IMPORT_PATH} className={styles.importLink} data-span="all">
+        <Link to={IMPORT_PATH} className={styles.importLink}>
           <FileUp size={16} aria-hidden="true" />
           {t('imp.link')}
         </Link>

@@ -2,7 +2,34 @@
   display: flex;
   flex-direction: column;
   gap: 14px;
-  max-width: 640px;
+  /* The form lays out by the page's width (T59), the same beside the sidebar and on a tablet. */
+  container-type: inline-size;
+}
+
+/* One column: client, car, service, note, then the day and time and "Adaugă programarea". */
+.form,
+.main,
+.aside {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+}
+
+/* A wide page: what is booked on the left, when and the button on the right, held in view while
+   the left column scrolls. Two columns of their own, so no card is stretched to match another. */
+@container (min-width: 900px) {
+  .form {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: start;
+    column-gap: var(--space-6);
+  }
+
+  .aside {
+    position: sticky;
+    top: var(--space-4);
+  }
 }
 
 .intro {
@@ -59,10 +86,3 @@
   font-size: 13.5px;
 }
 
-
-/* A wide screen (T51): the page takes the whole width, its cards in two columns. */
-@media (min-width: 1280px) {
-  .page {
-    max-width: none;
-  }
-}
