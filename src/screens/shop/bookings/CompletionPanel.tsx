@@ -150,77 +150,80 @@ export function CompletionPanel({
 
   return (
     <Panel title={t('sb.complete.title')}>
-      <div className={styles.odometer}>
+      {/* The same order as always; on a wide card the short fields go two by two (T57). */}
+      <div className={styles.completion}>
+        <div className={styles.odometer}>
+          <Field
+            ref={odometerRef}
+            label={t('sb.complete.odometer')}
+            hint={t('sb.complete.odometerHint')}
+            value={odometer}
+            inputMode="numeric"
+            autoComplete="off"
+            enterKeyHint="done"
+            mono
+            required
+            aria-required="true"
+            error={odometerError}
+            end={<span className={styles.unit}>{t('unit.km')}</span>}
+            onChange={(e) => {
+              setOdometer(e.target.value);
+              setOdometerError(null);
+              setJumpOk(false);
+              setSame(null);
+            }}
+            onBlur={() => {
+              if (odometer.trim() !== '' && !check.ok) setOdometerError(messageOf(check));
+            }}
+          />
+          {/* A "lower" error already names the last reading. */}
+          {!(odometerError && !check.ok && check.error === 'odometer_lower') && <p className={styles.muted}>{lastLine}</p>}
+        </div>
+        {(jump !== null || same !== null) && (
+          <div className={styles.jump} role="alert">
+            <p>
+              {jump !== null
+                ? t('rpcError.odometer_jump', { diff: formatKm(lang, jump) })
+                : t('rpcError.odometer_same', { previous: formatKm(lang, same ?? 0) })}
+            </p>
+            <Checkbox checked={jumpOk} onChange={(e) => setJumpOk(e.target.checked)}>
+              {t('sb.complete.jumpConfirm')}
+            </Checkbox>
+          </div>
+        )}
+        <div className={styles.wide}>
+          <TextArea
+            label={t('sb.complete.work')}
+            hint={t('sb.complete.workHint')}
+            value={work}
+            maxLength={WORK_MAX}
+            rows={3}
+            onChange={(e) => setWork(e.target.value)}
+          />
+        </div>
         <Field
-          ref={odometerRef}
-          label={t('sb.complete.odometer')}
-          hint={t('sb.complete.odometerHint')}
-          value={odometer}
-          inputMode="numeric"
+          ref={costRef}
+          label={t('sb.complete.cost')}
+          hint={t('sb.complete.costHint')}
+          value={cost}
+          inputMode="decimal"
           autoComplete="off"
-          enterKeyHint="done"
           mono
-          required
-          aria-required="true"
-          error={odometerError}
-          end={<span className={styles.unit}>{t('unit.km')}</span>}
+          error={costError ? t(costError.key, costError.params) : null}
           onChange={(e) => {
-            setOdometer(e.target.value);
-            setOdometerError(null);
-            setJumpOk(false);
-            setSame(null);
-          }}
-          onBlur={() => {
-            if (odometer.trim() !== '' && !check.ok) setOdometerError(messageOf(check));
+            setCost(e.target.value);
+            setCostError(null);
           }}
         />
-        {/* A "lower" error already names the last reading. */}
-        {!(odometerError && !check.ok && check.error === 'odometer_lower') && <p className={styles.muted}>{lastLine}</p>}
-      </div>
-      {(jump !== null || same !== null) && (
-        <div className={styles.jump} role="alert">
-          <p>
-            {jump !== null
-              ? t('rpcError.odometer_jump', { diff: formatKm(lang, jump) })
-              : t('rpcError.odometer_same', { previous: formatKm(lang, same ?? 0) })}
-          </p>
-          <Checkbox checked={jumpOk} onChange={(e) => setJumpOk(e.target.checked)}>
-            {t('sb.complete.jumpConfirm')}
-          </Checkbox>
-        </div>
-      )}
-      <TextArea
-        label={t('sb.complete.work')}
-        hint={t('sb.complete.workHint')}
-        value={work}
-        maxLength={WORK_MAX}
-        rows={3}
-        onChange={(e) => setWork(e.target.value)}
-      />
-      <Field
-        ref={costRef}
-        label={t('sb.complete.cost')}
-        hint={t('sb.complete.costHint')}
-        value={cost}
-        inputMode="decimal"
-        autoComplete="off"
-        mono
-        error={costError ? t(costError.key, costError.params) : null}
-        onChange={(e) => {
-          setCost(e.target.value);
-          setCostError(null);
-        }}
-      />
-      <SelectField
-        label={t('sb.complete.warranty')}
-        value={warranty}
-        options={[
-          { value: '', label: t('sb.complete.warrantyNone') },
-          ...WARRANTY_MONTHS.map((n) => ({ value: String(n), label: plural(lang, 'unit.months', n) })),
-        ]}
-        onChange={(e) => setWarranty(e.target.value)}
-      />
-      <div className={styles.pair}>
+        <SelectField
+          label={t('sb.complete.warranty')}
+          value={warranty}
+          options={[
+            { value: '', label: t('sb.complete.warrantyNone') },
+            ...WARRANTY_MONTHS.map((n) => ({ value: String(n), label: plural(lang, 'unit.months', n) })),
+          ]}
+          onChange={(e) => setWarranty(e.target.value)}
+        />
         <Field
           label={t('sb.complete.workBy')}
           value={workBy}

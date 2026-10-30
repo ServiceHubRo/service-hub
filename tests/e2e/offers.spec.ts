@@ -9,6 +9,7 @@ import {
   shot,
   signIn,
   userIdOf,
+  openBooking,
 } from './support';
 
 // New-client offers (T23): the owner picks a discount on labor for first bookings; a new client
@@ -99,6 +100,7 @@ test.describe('new-client offers', () => {
     // ------------------------------------------------------------ the shop sees the promise
     await page.goto('/s/programari');
     const shopCard = page.locator('li').filter({ hasText: 'Skoda Octavia' });
+    await openBooking(shopCard);
     await expect(shopCard).toContainText('Client nou: i-ai promis -10% la manoperă');
     await expectNoHorizontalScroll(page);
     await shot(page, 'offer-shop-booking', name());
@@ -119,6 +121,7 @@ test.describe('new-client offers', () => {
     // In English too (the quote editor is a screen of its own since T50: back to the list).
     await serviceRest(`profiles?id=eq.${await userIdOf(shopEmail)}`, 'PATCH', { lang: 'en' });
     await page.goto('/s/programari?tab=programate');
+    await openBooking(page.locator('li').filter({ hasText: 'Skoda Octavia' }));
     await expect(page.locator('li').filter({ hasText: 'Skoda Octavia' })).toContainText('New client: you promised 10% off labor');
     await page.goto('/s/cont/setari/reguli');
     const offerEn = page.getByRole('switch', { name: /^New-client offer/ });

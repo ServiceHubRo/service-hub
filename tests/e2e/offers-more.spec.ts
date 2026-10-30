@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { BACKEND, PASSWORD, bucharestDay, createBookableShop, createUser, expectNoHorizontalScroll, serviceRest, shot, signIn } from './support';
+import { BACKEND, PASSWORD, bucharestDay, createBookableShop, createUser, expectNoHorizontalScroll, openAllBookings, serviceRest, shot, signIn } from './support';
 
 // Offers, completed (Eduard, 8 Oct): the new-client offer with a last day and chosen services, the
 // quiet-day offer; the "Doar cu ofertă" filter and the badges; "-15%" on the quiet days of step 2
@@ -127,6 +127,7 @@ test.describe('offers: last day, services, quiet days', () => {
 
     // The shop sees which offer it promised.
     await page.goto('/s/programari?tab=cereri');
+    await openAllBookings(page);
     await expect(page.getByText('Zi cu reducere: -15% la manoperă pentru client')).toBeVisible();
     await ctx.close();
     await ctx2.close();

@@ -13,6 +13,7 @@ import {
   uniquePhone,
   userIdOf,
   verifyPhoneByAdmin,
+  openBooking,
 } from './support';
 
 // T29 — a booking the shop adds for a client who called or walked in: the form, the card, the
@@ -72,6 +73,7 @@ test.describe('bookings added by the shop', () => {
     await expect(page).toHaveURL(/\/s\/programari\?tab=programate$/);
     await expect(page.getByText(/a fost adăugată: .*Clientul primește un SMS\./)).toBeVisible();
     const card = cards(page).filter({ hasText: 'Dan Marin' });
+    await openBooking(card);
     await expect(card).toContainText('Adăugată de service · SMS trimis');
     await expect(card).toContainText('BV 07 DAN');
     // "Adaugă programare" sits in the same place in both languages (under the title on a phone).
@@ -147,6 +149,7 @@ test.describe('bookings added by the shop', () => {
 
     // The shop sees the client has it now, and a conversation is possible.
     await page.reload();
+    await openBooking(card);
     await expect(card).toContainText('Adăugată de service · în contul clientului');
   });
 
@@ -201,6 +204,7 @@ test.describe('bookings added by the shop', () => {
     await expectNoHorizontalScroll(page);
     await shot(page, 'walkin-form-en', name());
     await page.goto('/s/programari?tab=programate');
+    await openBooking(cards(page).filter({ hasText: 'Ana Pop' }));
     await expect(cards(page).filter({ hasText: 'Ana Pop' })).toContainText('Added by the shop · no account');
     await shot(page, 'walkin-list-en', name());
   });

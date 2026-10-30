@@ -1,8 +1,9 @@
-import { CalendarClock, ClipboardCheck, ClipboardList, FilePen, MessageSquare, Phone, Store, TriangleAlert } from 'lucide-react';
+import { CalendarClock, ChevronDown, ClipboardCheck, ClipboardList, FilePen, MessageSquare, Phone, Store, TriangleAlert } from 'lucide-react';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ActionButton } from '../../../components/ActionButton';
 import { JobDocuments } from '../../../components/JobDocuments';
+import type { JobDocKind } from '../../../data/jobDocs';
 import { Button } from '../../../components/Button';
 import { Card } from '../../../components/Card';
 import { MoreActions } from '../../../components/MoreActions';
@@ -28,7 +29,7 @@ import { useI18n } from '../../../i18n/context';
 import { daysFromToday, formatDate, formatMoney, formatTime, ymdInBucharest } from '../../../i18n/format';
 import { rowServicesText } from '../../../lib/bookingServices';
 import { motionOn } from '../../../lib/motion';
-import { slotStarted } from '../../../lib/shopBookings';
+import { quoteTotal, slotStarted } from '../../../lib/shopBookings';
 import { formatPhone, normalizePhone } from '../../../lib/validators';
 import { ConfirmPanel, ReasonPanel } from './BookingPanels';
 import { ClientAnswerPanel } from './ClientAnswerPanel';
@@ -44,6 +45,9 @@ type PanelKind = 'decline' | 'reschedule' | 'cancel' | 'noShow' | 'withdraw' | '
 /** The statuses in which the car is at the shop and the intake sheet can be written (T50). */
 const INTAKE_STATUSES = new Set(['confirmed', 'in_inspection', 'quote_sent', 'approved', 'in_progress']);
 
+/** The statuses with a line (and the quote) in the details: StatusDetail. */
+const DETAIL_STATUSES = new Set(['in_inspection', 'quote_sent', 'approved', 'in_progress']);
+
 /** From 3 no-shows in 90 days shops see a discreet line (ARCHITECTURE §6); no automatic block. */
 const NO_SHOW_MARK = 3;
 
@@ -57,18 +61,22 @@ export interface ShopBookingCardProps {
   onDone: (before: ShopBooking, after: Booking) => void;
   /** The booking changed under this card (another device, the client): read the list again. */
   onStale: () => void;
+  /** Opened from the start: the one booking a notification or Panou pointed to. */
+  defaultOpen?: boolean;
 }
 
 /**
- * One booking in the shop's Programări (P8, P15, FR §4.2): service, day and time, status; the car,
- * the client with tap-to-call, account id, note and the no-show mark; the quote once sent; and the
- * actions the status allows. Every action opens inside the card (no dialogs) and goes through a
+ * One booking in the shop's Programări (P8, P15, FR §4.2). Closed (T57): service, day and time,
+ * car and plate, client, the quote's amount, status, and the actions the status allows. Opened, in
+ * the same card: the client's phone, account id, note and no-show mark; the quote's lines; the
+ * intake sheet; the PDFs. Every action opens inside the card (no dialogs) and goes through a
  * database function; the buttons only mirror what the database allows.
  */
-export function ShopBookingCard({ booking: b, shopId, now, fresh = false, onDone, onStale }: ShopBookingCardProps) {
+export function ShopBookingCard({ booking: b, shopId, now, fresh = false, onDone, onStale, defaultOpen = false }: ShopBookingCardProps) {
   const { t, lang } = useI18n();
   const offerText = useOfferText();
   const [panel, setPanel] = useState<PanelKind | null>(null);
+  const [open, setOpen] = useState(defaultOpen);
   const navigate = useNavigate();
   const started = slotStarted(b, now);
   // T53: a no-show only after the slot and the grace period (the database decides; this mirrors it).
@@ -94,69 +102,102 @@ export function ShopBookingCard({ booking: b, shopId, now, fresh = false, onDone
   const phone = b.client_phone;
   const walkIn = isUnclaimedWalkIn(b);
 
+  const amount = b.quote ? quoteTotal(b.quote) : null;
+  const detailsId = `booking-${b.id}`;
+  const docs: JobDocKind[] = [...(b.quote ? (['quote'] as const) : []), ...(b.intake_sent_at ? (['intake'] as const) : [])];
+  const hasClientFacts =
+    !!phone || !!b.client_account || b.client_no_shows >= NO_SHOW_MARK || !!b.note || !!b.offer_percent || !!b.loyalty_percent || b.source === 'shop';
+
   return (
     <Card
       highlight={b.status === 'pending'}
-      className={`${styles.card} ${fresh && motionOn('newRequestGlow') ? styles.fresh : ''}`}
+      className={`${styles.card} ${open ? styles.open : ''} ${fresh && motionOn('newRequestGlow') ? styles.fresh : ''}`}
     >
-      <div className={styles.top}>
+      {/* The summary is one button: it opens the booking's details inside the same card (T57). */}
+      <button type="button" className={styles.summary} aria-expanded={open} aria-controls={detailsId} onClick={() => setOpen((o) => !o)}>
         <ServiceIcon name={b.service_icon} className={styles.icon} />
-        <div className={styles.what}>
-          <p className={styles.service}>{service}</p>
-          <p className={styles.when}>
+        <span className={styles.what}>
+          <span className={styles.service}>{service}</span>
+          <span className={styles.when}>
             <span className="mono">
               {formatDate(lang, b.date)}, {b.slot}
             </span>
             <span className={styles.ref}> · {b.ref}</span>
-          </p>
-        </div>
-        <StatusBadge status={b.status} />
-      </div>
+          </span>
+        </span>
+        <span className={styles.who}>
+          <span className={styles.carRow}>
+            <span className={styles.car}>{car || t('sb.card.noCar')}</span>
+            {plate && <span className={`mono ${styles.plate}`}>{plate}</span>}
+          </span>
+          <span className={styles.clientName}>{b.client_name || t('sb.card.deletedClient')}</span>
+        </span>
+        <span className={styles.meta}>
+          {amount !== null && <span className={`mono ${styles.amount}`}>{formatMoney(lang, amount)}</span>}
+          <StatusBadge status={b.status} />
+        </span>
+        <ChevronDown size={18} className={styles.chevron} aria-hidden="true" />
+      </button>
 
-      <Card inset className={styles.client}>
-        <div className={styles.carRow}>
-          <span className={styles.car}>{car || t('sb.card.noCar')}</span>
-          {plate && <span className={`mono ${styles.plate}`}>{plate}</span>}
-        </div>
-        <p className={styles.clientName}>{b.client_name || t('sb.card.deletedClient')}</p>
-        {phone && (
-          <a
-            className={`mono ${styles.phone}`}
-            href={`tel:${normalizePhone(phone) ?? phone.replace(/[^\d+]/g, '')}`}
-            aria-label={t('sb.card.call', { name: b.client_name ?? '', phone: formatPhone(phone) })}
-          >
-            <Phone size={15} aria-hidden="true" />
-            {formatPhone(phone)}
-          </a>
-        )}
-        {b.client_account && (
-          <p className={styles.muted}>
-            {t('sb.card.account')} <span className="mono">{b.client_account}</span>
-          </p>
-        )}
-        {b.client_no_shows >= NO_SHOW_MARK && (
-          <p className={styles.muted}>{t('sb.card.noShows', { n: b.client_no_shows })}</p>
-        )}
-        {b.note && <p className={styles.note}>{b.note}</p>}
-        {b.offer_percent ? <OfferNote>{offerText.promise('shop', b.offer_percent, b.offer_kind ?? null)}</OfferNote> : null}
-        {b.loyalty_percent ? <OfferNote>{t('loyalty.shop', { n: b.loyalty_percent, level: b.loyalty_level ?? 1 })}</OfferNote> : null}
-        {b.source === 'shop' && (
-          <p className={styles.walkIn}>
-            <Store size={14} aria-hidden="true" />
-            {t('sb.card.walkIn')} ·{' '}
-            {b.claimed ? t('sb.card.inAccount') : b.invite_sent_at ? t('sb.card.smsSent') : t('sb.card.noAccount')}
-          </p>
-        )}
-      </Card>
+      <StatusHint booking={b} started={started} noShowOpen={noShowOpen} />
 
-      <StatusDetail booking={b} started={started} noShowOpen={noShowOpen} />
-      <IntakeLine booking={b} />
-      <JobDocuments
-        bookingId={b.id}
-        bookingRef={b.ref}
-        quoteNumber={b.quote_number}
-        kinds={[...(b.quote ? (['quote'] as const) : []), ...(b.intake_sent_at ? (['intake'] as const) : [])]}
-      />
+      {open && (
+        <div id={detailsId} className={`${styles.details} ${b.quote ? styles.split : ''}`}>
+          {/* On a wide card the quote stands on the right, the rest on the left; on a narrow one all
+              of it reads in one column, in this order: client, quote, intake sheet, documents. */}
+          <div className={styles.detailsMain}>
+            {hasClientFacts && (
+              <Card inset className={styles.client}>
+                {(phone || b.client_account || b.client_no_shows >= NO_SHOW_MARK) && (
+                  <div className={styles.clientLine}>
+                    {phone && (
+                      <a
+                        className={`mono ${styles.phone}`}
+                        href={`tel:${normalizePhone(phone) ?? phone.replace(/[^\d+]/g, '')}`}
+                        aria-label={t('sb.card.call', { name: b.client_name ?? '', phone: formatPhone(phone) })}
+                      >
+                        <Phone size={15} aria-hidden="true" />
+                        {formatPhone(phone)}
+                      </a>
+                    )}
+                    {b.client_account && (
+                      <p className={styles.muted}>
+                        {t('sb.card.account')} <span className="mono">{b.client_account}</span>
+                      </p>
+                    )}
+                    {b.client_no_shows >= NO_SHOW_MARK && (
+                      <p className={styles.muted}>{t('sb.card.noShows', { n: b.client_no_shows })}</p>
+                    )}
+                  </div>
+                )}
+                {b.note && <p className={styles.note}>{b.note}</p>}
+                {b.offer_percent ? <OfferNote>{offerText.promise('shop', b.offer_percent, b.offer_kind ?? null)}</OfferNote> : null}
+                {b.loyalty_percent ? <OfferNote>{t('loyalty.shop', { n: b.loyalty_percent, level: b.loyalty_level ?? 1 })}</OfferNote> : null}
+                {b.source === 'shop' && (
+                  <p className={styles.walkIn}>
+                    <Store size={14} aria-hidden="true" />
+                    {t('sb.card.walkIn')} ·{' '}
+                    {b.claimed ? t('sb.card.inAccount') : b.invite_sent_at ? t('sb.card.smsSent') : t('sb.card.noAccount')}
+                  </p>
+                )}
+              </Card>
+            )}
+            <IntakeLine booking={b} />
+            {/* The documents read only: apart from the actions that move the job on. */}
+            {docs.length > 0 && (
+              <div className={styles.docs}>
+                <p className={styles.groupLabel}>{t('doc.title')}</p>
+                <JobDocuments bookingId={b.id} bookingRef={b.ref} quoteNumber={b.quote_number} kinds={docs} />
+              </div>
+            )}
+          </div>
+          {DETAIL_STATUSES.has(b.status) && (
+            <div className={styles.detailsSide}>
+              <StatusDetail booking={b} />
+            </div>
+          )}
+        </div>
+      )}
 
       {panel === null && (
         <div className={styles.actions}>
@@ -290,8 +331,29 @@ export function ShopBookingCard({ booking: b, shopId, now, fresh = false, onDone
   );
 }
 
-/** What the status means right now, in one line (and the quote, once there is one). */
-function StatusDetail({ booking: b, started, noShowOpen }: { booking: ShopBooking; started: boolean; noShowOpen: boolean }) {
+/** Why the main action is what it is, in the summary: a request past its time, a visit past its slot. */
+function StatusHint({ booking: b, started, noShowOpen }: { booking: ShopBooking; started: boolean; noShowOpen: boolean }) {
+  const { t, lang } = useI18n();
+  if (!started) return null;
+  if (b.status === 'pending')
+    return (
+      <p className={styles.warn}>
+        <TriangleAlert size={16} aria-hidden="true" />
+        {t('sb.detail.pendingPast')}
+      </p>
+    );
+  if (b.status === 'confirmed')
+    return (
+      <p className={styles.muted}>
+        {t('sb.detail.confirmedPast')}
+        {!noShowOpen && b.no_show_from && <> {t('sb.detail.noShowFrom', { time: formatTime(lang, new Date(b.no_show_from)) })}</>}
+      </p>
+    );
+  return null;
+}
+
+/** What the status means in the details (and the quote, once there is one). */
+function StatusDetail({ booking: b }: { booking: ShopBooking }) {
   const { t, lang } = useI18n();
   /** `09:20`, or `Lun 13 oct, 09:20` when it was not today. */
   const at = (iso: string | null) => {
@@ -302,20 +364,6 @@ function StatusDetail({ booking: b, started, noShowOpen }: { booking: ShopBookin
   };
 
   switch (b.status) {
-    case 'pending':
-      return started ? (
-        <p className={styles.warn}>
-          <TriangleAlert size={16} aria-hidden="true" />
-          {t('sb.detail.pendingPast')}
-        </p>
-      ) : null;
-    case 'confirmed':
-      return started ? (
-        <p className={styles.muted}>
-          {t('sb.detail.confirmedPast')}
-          {!noShowOpen && b.no_show_from && <> {t('sb.detail.noShowFrom', { time: formatTime(lang, new Date(b.no_show_from)) })}</>}
-        </p>
-      ) : null;
     case 'in_inspection':
       return <p className={styles.muted}>{t('sb.detail.inspection', { since: at(b.inspection_started_at) })}</p>;
     case 'quote_sent':

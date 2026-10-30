@@ -26,6 +26,8 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
+  /* The cards lay out by their own width, the same on a tablet and beside the sidebar. */
+  container-type: inline-size;
 }
 
 .filterRow {
@@ -88,25 +90,44 @@
   }
 }
 
-.top {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
+.card.open {
+  border-color: var(--border-lit);
+}
+
+/* The summary (T57): one button that opens the booking in the card. On a narrow card the car and
+   client sit under a hairline; on a wide one everything is one row. */
+.summary {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-areas:
+    'icon what chevron'
+    '. meta meta'
+    'who who who';
+  align-items: start;
+  column-gap: var(--space-3);
+  row-gap: var(--space-2);
+  width: 100%;
+  min-height: var(--tap);
+  text-align: left;
+  border-radius: var(--radius-input);
 }
 
 /* The service's icon in a tinted square, like the tiles (T51). */
 .icon {
+  grid-area: icon;
   color: var(--amber);
   flex-shrink: 0;
   box-sizing: content-box;
-  padding: 9px;
+  padding: 7px;
   border-radius: var(--radius-button);
   background: var(--amber-tint);
   border: 1px solid rgba(245, 165, 36, 0.18);
 }
 
 .what {
-  flex: 1;
+  grid-area: what;
+  display: flex;
+  flex-direction: column;
   min-width: 0;
   overflow-wrap: anywhere;
 }
@@ -129,18 +150,97 @@
   font-size: 12.5px;
 }
 
-.client {
+.who {
+  grid-area: who;
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 2px;
+  min-width: 0;
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--border);
   overflow-wrap: anywhere;
+}
+
+.meta {
+  grid-area: meta;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+}
+
+.amount {
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.chevron {
+  grid-area: chevron;
+  align-self: center;
+  color: var(--muted);
+}
+
+.open .chevron {
+  transform: rotate(180deg);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .chevron {
+    transition: transform var(--motion-quick) var(--ease);
+  }
+}
+
+/* Finalizare (T57): one column on a narrow card, two on a wide one (below); fields of a row start
+   on the same line. */
+.completion {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+  gap: var(--space-3);
+}
+
+@container (min-width: 720px) {
+  /* The same columns on every card, so service, car and status line up down the list. */
+  .summary {
+    grid-template-columns: auto minmax(0, 1.2fr) minmax(0, 1fr) 210px auto;
+    grid-template-areas: 'icon what who meta chevron';
+    align-items: center;
+    column-gap: var(--space-4);
+  }
+
+  .icon {
+    padding: 9px;
+  }
+
+  .who {
+    padding-top: 0;
+    border-top: 0;
+  }
+
+  .meta {
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+  }
+
+  /* Finalizare: the short fields two by two; the odometer, its warning and the work across. */
+  .completion {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .completion > :is(.odometer, .jump, .wide) {
+    grid-column: 1 / -1;
+  }
+
+  .completion > .odometer {
+    max-width: calc(50% - var(--space-3) / 2);
+  }
 }
 
 .carRow {
   display: flex;
+  flex-wrap: wrap;
   align-items: baseline;
-  justify-content: space-between;
-  gap: 10px;
+  gap: 2px 10px;
 }
 
 .car {
@@ -152,11 +252,36 @@
   color: var(--amber);
   font-size: 14px;
   font-weight: 700;
-  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .clientName {
   font-size: 14px;
+  color: var(--text-2);
+}
+
+/* Opened (T57): the details under a hairline, the full width of the card. */
+.details {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--border);
+}
+
+.client {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  overflow-wrap: anywhere;
+}
+
+/* The client's phone, account id and no-show mark on one line while they fit. */
+.clientLine {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  column-gap: var(--space-6);
 }
 
 .phone {
@@ -168,6 +293,57 @@
   color: var(--blue);
   font-size: 15px;
   text-decoration: none;
+}
+
+/* On a narrow card the details read in one column (client, quote, intake sheet, documents); on a
+   wide one with a quote, the quote stands on the right. */
+.detailsMain {
+  display: contents;
+}
+
+.detailsMain > .client {
+  order: 1;
+}
+
+.detailsSide {
+  order: 2;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.detailsMain > :not(.client) {
+  order: 3;
+}
+
+@container (min-width: 960px) {
+  .details.split {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+    align-items: start;
+    column-gap: var(--space-8);
+  }
+
+  .split > .detailsMain {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+}
+
+/* The PDFs under their own small heading, apart from the actions that change the job. */
+.docs {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.groupLabel {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
 .muted {
@@ -202,15 +378,13 @@
   overflow-wrap: anywhere;
 }
 
-/* The card's foot (T51): its actions under a hairline, held at the bottom of the card, so the
-   cards of a row end on the same line. */
+/* The card's foot (T51): the main action, then "Mai multe" at the end of the row, under a hairline. */
 .actions {
   display: flex;
   flex-wrap: wrap;
   align-items: flex-start;
   gap: var(--space-2);
-  margin-top: auto;
-  padding-top: var(--space-4);
+  padding-top: var(--space-3);
   border-top: 1px solid var(--border);
 }
 
@@ -457,39 +631,11 @@
   text-decoration: underline;
 }
 
-/* Two short fields side by side, one under the other on a phone. */
-.pair {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
-  gap: 10px;
-}
-
 .intakeLine {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   column-gap: 8px;
-}
-
-/* A phone (T52): the status under the title, so the service and its date each keep one line; the
-   icon a step smaller. */
-@media (max-width: 599px) {
-  .top {
-    display: grid;
-    grid-template-columns: auto minmax(0, 1fr);
-    align-items: start;
-    column-gap: var(--space-3);
-    row-gap: var(--space-2);
-  }
-
-  .top > :last-child {
-    grid-column: 2;
-    justify-self: start;
-  }
-
-  .icon {
-    padding: 7px;
-  }
 }
 
 /* A phone (T52): the main action fills the row, "Mai multe" stays compact on its right. */

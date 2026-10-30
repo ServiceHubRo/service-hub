@@ -21,12 +21,69 @@
   display: flex;
   flex-direction: column;
   gap: 9px;
+  /* One booking under the other, the whole width (T58); each card lays out by its own width. */
+  container-type: inline-size;
 }
 
 .card {
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
+}
+
+/* T58: on a narrow card everything reads in one column, as before. On a wide one the booking stands
+   on the left and its quote, the decision on it or the finished job on the right; the actions and
+   the panels under both. */
+.main,
+.extra {
+  display: contents;
+}
+
+.aside {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+@container (min-width: 880px) {
+  .card.split {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-areas:
+      'main aside'
+      'extra aside';
+    grid-template-rows: auto 1fr;
+    align-items: start;
+    column-gap: var(--space-8);
+    row-gap: var(--space-3);
+  }
+
+  .split > .main,
+  .split > .extra {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .split > .main {
+    grid-area: main;
+  }
+
+  .split > .aside {
+    grid-area: aside;
+  }
+
+  .split > .extra {
+    grid-area: extra;
+  }
+
+  .split > .extra:empty {
+    display: none;
+  }
+
+  .split > :not(.main, .aside, .extra) {
+    grid-column: 1 / -1;
+  }
 }
 
 .top {

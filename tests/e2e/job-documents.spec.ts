@@ -11,6 +11,7 @@ import {
   shot,
   signIn,
   userIdOf,
+  openBooking,
 } from './support';
 
 // T50 — the complete quote, the intake sheet and the client's company: the owner sets the hourly
@@ -108,6 +109,7 @@ test.describe('the complete quote and the intake sheet', () => {
     // The intake sheet: odometer, fuel, two marks on the drawing, a note, the options.
     await page.goto('/s/programari?tab=programate');
     const card = shopCard(page, booking.ref);
+    await openBooking(card);
     await card.getByRole('link', { name: 'Completează fișa de preluare' }).click();
     await expect(page.getByRole('heading', { level: 1, name: 'Fișa de preluare' })).toBeVisible();
     await page.getByLabel('Km la intrare').fill('23611');

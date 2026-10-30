@@ -38,7 +38,8 @@ jobs:
 
   e2e:
     name: Browser tests (390 / 820 / 1440 px)
-    runs-on: ubuntu-latest
+    # Pinned: on ubuntu-latest = 26.04 (30 Oct 2026) Playwright 1.56 cannot install Chromium.
+    runs-on: ubuntu-24.04
     # About 20 minutes with two workers (playwright.config.ts); room for a slower runner.
     timeout-minutes: 60
     steps:

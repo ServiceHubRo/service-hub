@@ -4,6 +4,7 @@ import { useI18n } from '../../../i18n/context';
 import { formatMoney } from '../../../i18n/format';
 import type { MessageKey } from '../../../i18n/ro';
 import { hasSections, quantityDetail, quoteSections, vatOf, type QuoteSectionKind } from '../../../lib/quoteSections';
+import { quoteTotal } from '../../../lib/shopBookings';
 import styles from './shopBookings.module.css';
 
 const HEADING: Record<QuoteSectionKind, MessageKey> = {
@@ -21,7 +22,7 @@ const HEADING: Record<QuoteSectionKind, MessageKey> = {
 export function QuoteLines({ quote }: { quote: ShopQuote }) {
   const { t, lang } = useI18n();
   const decided = quote.status !== 'sent';
-  const total = decided ? (quote.total_approved ?? quote.total_sent) : quote.total_sent;
+  const total = quoteTotal(quote);
   const headed = hasSections(quote.items);
 
   const line = (item: ShopQuoteItem) => {

@@ -102,7 +102,9 @@ textarea {
 /* Desktop columns (T51, Eduard 29 Oct: use the whole free width, symmetric). A container opts in with
    `data-layout`; below the width it stays one column, exactly as on a phone.
    - cards:   a list of cards, 2 columns at 1440 px, 3 on a wide monitor. The cards of a row share
-              their height; a card that is a flex column keeps its actions at its foot.
+              their height; a card that is a flex column keeps its actions at its foot. Fewer cards
+              than columns fill the row (auto-fit, Eduard 30 Oct: no empty half of a page): one card
+              takes the whole width and lays its content out across it (container queries).
    - tiles:   the links of Cont and Setări, 2–3 columns from 1024 px, equal height in a row.
    - columns: two halves of a page or a form, side by side.
    A title, the back link and a child with `data-span="all"` (an intro, a notice) take the whole row.
@@ -110,14 +112,14 @@ textarea {
 @media (min-width: 1024px) {
   html [data-layout='tiles'] {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
   }
 }
 
 @media (min-width: 1280px) {
   html [data-layout='cards'] {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 440px), 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 440px), 1fr));
   }
 
   html [data-layout='cards'] > li {

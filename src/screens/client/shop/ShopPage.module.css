@@ -164,18 +164,112 @@
   gap: 10px;
 }
 
+.categories {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 230px), 1fr));
+  gap: 8px;
+}
+
+/* A category tile (T58): its name and how many services; the open one tinted amber. */
+.category {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 56px;
+  padding: 9px 13px;
+  text-align: left;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-input);
+  transition:
+    border-color var(--motion-quick) var(--ease),
+    background-color var(--motion-quick) var(--ease);
+}
+
+.category:hover {
+  border-color: var(--border-lit);
+}
+
+.categoryOn,
+.categoryOn:hover {
+  border-color: var(--amber-line);
+  background: var(--amber-tint);
+}
+
+.categoryText {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  overflow-wrap: anywhere;
+}
+
 .categoryTitle {
-  margin-bottom: 6px;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
   color: var(--text);
 }
 
+.categoryCount {
+  color: var(--muted);
+  font-size: 12.5px;
+}
+
+.categoryOn .categoryCount {
+  color: var(--muted-strong);
+}
+
+.categoryChevron {
+  flex-shrink: 0;
+  color: var(--muted);
+}
+
+.categoryOn .categoryChevron {
+  transform: rotate(180deg);
+  color: var(--amber);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .categoryChevron {
+    transition: transform var(--motion-quick) var(--ease);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .category {
+    transition: none;
+  }
+}
+
+/* The open category's services, across the width. */
 .services {
   list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr));
+  gap: 6px;
+}
+
+.categoryItem {
   display: flex;
   flex-direction: column;
   gap: 6px;
+}
+
+/* Under the tapped tile on a narrow page; under all the tiles on a wide one. */
+.below {
+  display: none;
+}
+
+@container (min-width: 900px) {
+  .inline {
+    display: none;
+  }
+
+  .below {
+    display: grid;
+  }
 }
 
 .service {
@@ -345,8 +439,37 @@
   gap: 12px;
 }
 
-@media (min-width: 1280px) {
-  .columns {
-    column-gap: 40px;
+/* One column the whole width (T58): the parts inside lay out across it when there is room. */
+.columns {
+  container-type: inline-size;
+}
+
+@container (min-width: 900px) {
+  /* The opening hours, contact and rules in two balanced columns inside their card. */
+  .info {
+    display: block;
+    columns: 2;
+    column-gap: var(--space-10);
+    column-rule: 1px solid var(--border);
+  }
+
+  .info .infoRow {
+    break-inside: avoid;
+  }
+
+  .info .infoRow + .infoRow {
+    margin-top: 0;
+    border-top: 0;
+  }
+
+  .info .infoRow {
+    padding-block: 7px;
+  }
+
+  /* The reviews side by side. */
+  .reviews .plainList {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+    align-items: start;
   }
 }

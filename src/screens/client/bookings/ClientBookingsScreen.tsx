@@ -60,7 +60,7 @@ export function ClientBookingsScreen() {
         <h2 id={`bookings-${id}`} className={styles.sectionTitle}>
           {title}
         </h2>
-        <ul className={styles.list} data-layout="cards">
+        <ul className={styles.list}>
           {items.map((b) => (
             <li
               key={b.id}
@@ -103,7 +103,7 @@ export function ClientBookingsScreen() {
           {t(needsAcknowledgement(data.noShows) ? 'bookings.noShows.ack' : 'bookings.noShows', { n: data.noShows.count })}
         </Banner>
       )}
-      {state.status === 'loading' && <SkeletonList cards />}
+      {state.status === 'loading' && <SkeletonList />}
       {state.status === 'error' && <LoadError message={t('bookings.loadError')} onRetry={reload} />}
       {groups &&
         (groups.active.length + groups.past.length === 0 ? (
