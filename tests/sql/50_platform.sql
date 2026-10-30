@@ -46,7 +46,7 @@ select test.eq(public, false, 'reports bucket private') from storage.buckets whe
 
 -- Realtime publication.
 select test.eq(array_agg(tablename::text order by tablename),
-               array['bookings', 'history_reports', 'invoices', 'messages', 'notices', 'profiles', 'reviews', 'shops', 'subscriptions', 'threads'],
+               array['bookings', 'history_reports', 'invoices', 'messages', 'no_show_disputes', 'notices', 'profiles', 'reviews', 'shops', 'subscriptions', 'threads'],
                'realtime tables')
 from pg_publication_tables where pubname = 'supabase_realtime' and schemaname = 'public';
 
