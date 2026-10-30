@@ -10,13 +10,19 @@ const HYPHENATED = /(\S*\p{L}-\p{L}\S*)/u;
 export function KeepHyphens({ children }: { children: string }) {
   const parts = children.split(HYPHENATED);
   if (parts.length === 1) return children;
-  return parts.map((part, i) =>
-    i % 2 === 1 ? (
-      <span key={i} className={styles.keep}>
-        {part}
-      </span>
-    ) : (
-      part
-    ),
+  // One element around the whole text: inside a flex row (a button, an icon and its label) the
+  // pieces stay one item, without the row's gap between them.
+  return (
+    <span>
+      {parts.map((part, i) =>
+        i % 2 === 1 ? (
+          <span key={i} className={styles.keep}>
+            {part}
+          </span>
+        ) : (
+          part
+        ),
+      )}
+    </span>
   );
 }

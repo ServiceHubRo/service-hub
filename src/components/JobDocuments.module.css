@@ -17,6 +17,11 @@
     flex: 1 1 0;
   }
 
+  /* A single PDF button keeps its own width, as before. */
+  .docs > :only-child {
+    flex: 0 1 auto;
+  }
+
   .docs > * > button {
     width: 100%;
   }

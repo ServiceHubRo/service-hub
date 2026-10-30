@@ -14,7 +14,8 @@ describe('KeepHyphens', () => {
       </p>,
     );
     expect(container.textContent).toBe(text);
-    expect([...container.querySelectorAll('span')].map((s) => s.textContent)).toEqual(['service-uri', 'Service-Hub', 's-a']);
+    expect([...container.querySelectorAll('p > span > span')].map((s) => s.textContent)).toEqual(['service-uri', 'Service-Hub', 's-a']);
+    expect(container.querySelectorAll('p > span')).toHaveLength(1);
   });
 
   it('leaves text without hyphenated words as it is', () => {
@@ -26,8 +27,10 @@ describe('KeepHyphens', () => {
     expect(container.querySelector('span')).toBeNull();
   });
 
-  it('applies to a button label, with the same accessible name', () => {
-    render(<Button>Deconectează-mă</Button>);
-    expect(screen.getByRole('button', { name: 'Deconectează-mă' }).querySelector('span')?.textContent).toBe('Deconectează-mă');
+  it('applies to a button label as one piece, with the same accessible name', () => {
+    render(<Button>Marchează că s-a terminat</Button>);
+    const button = screen.getByRole('button', { name: 'Marchează că s-a terminat' });
+    expect(button.children).toHaveLength(1);
+    expect(button.querySelector('span span')?.textContent).toBe('s-a');
   });
 });
