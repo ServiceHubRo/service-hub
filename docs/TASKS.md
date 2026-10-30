@@ -71,7 +71,7 @@ Ordinea contează: fiecare sarcină se sprijină pe cele de dinainte. Sarcinile 
 | T49 | Intrarea cu Apple, butoane pastilă | „Continuă cu Apple” lângă Google; amândouă ca pastile |
 | T50 | Devizul complet, fișa de preluare, devizul final | Manoperă (ore × tarif) și piese (cantitate × preț, producător) cu TVA, numerotare proprie; fișa de preluare cu defectele pe desen, confirmată de client; PDF-uri pentru service și client |
 | T51 | Design premium și lățimea pe laptop | Tot ecranul liber pe laptop; setările pe secțiuni simetrice, bară de salvare jos; componente și culori rafinate; carduri egale pe rând |
-| T52 | Ajustări pe telefon | Starea programării sub titlu; un singur anunț odată în Caută; bara de salvare mai subțire |
+| T52 | Ajustări pe telefon | Starea programării sub titlu (la service); un singur anunț odată în Caută; bara de salvare mai subțire |
 
 ---
 
@@ -1277,7 +1277,7 @@ Cerut de Eduard pe 29 oct 2026: „pe PC … toată bucata liberă pe ecran, aer
 
 Cerut de Eduard pe 30 oct 2026, după T51 („Crezi că mai trebuie adaptat ceva pe telefon?” — „Da”). Am trecut prin 22 de ecrane la 390 px; trei lucruri. Fără migrare, fără pachete noi.
 
-- **Cardul de programare** (service și client): pe telefon starea („Confirmată”, „În așteptare”) stă sub titlu, iar pictograma e mai mică, ca numele serviciului și data să stea fiecare pe un rând. De la 600 px rămâne pe același rând.
+- **Cardul de programare la service:** pe telefon starea („Confirmată”, „În așteptare”) stă sub titlu, iar pictograma e mai mică, ca numele serviciului și data să stea fiecare pe un rând. De la 600 px rămâne pe același rând. Cardul clientului rămâne cum era (titlul încape lângă stare).
 - **Caută:** deasupra căutării apare **un singur anunț odată**, în ordinea: documente care expiră, recenzie, notificări, locație. Următorul apare după ce primul e rezolvat sau amânat („Nu acum”). Căsuța de căutare se vede la deschidere.
 - **Bara de salvare** e mai subțire pe telefon (butonul rămâne de 44 px). În editorul de deviz, suma și butoanele stau pe un rând; eticheta „Total deviz” rămâne în totalurile de deasupra.
 - **Teste:** `e2e/search` (anunțul de locație: întâi „Nu acum” la notificări, când apare).
