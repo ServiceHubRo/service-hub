@@ -388,3 +388,13 @@
   font-size: 12.5px;
   text-align: right;
 }
+
+/* A phone (T52): the card's foot under a hairline, like the booking cards — the phone on the left,
+   "Mai multe" on the right. */
+@media (max-width: 599px) {
+  .actions {
+    margin-top: var(--space-1);
+    padding-top: var(--space-3);
+    border-top: 1px solid var(--border);
+  }
+}

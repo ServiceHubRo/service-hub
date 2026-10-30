@@ -1286,6 +1286,7 @@ Cerut de Eduard pe 30 oct 2026, după T51 („Crezi că mai trebuie adaptat ceva
   - **Cardurile de programare** (service și client): acțiunea principală umple rândul de jos, „Mai multe” rămâne compact în dreapta.
   - **Caută:** cardurile service-urilor au umbra și reacția la atingere ale celorlalte carduri; „Hartă” e o pastilă ca „Filtre”, la aceeași înălțime.
   - **Devizul la client:** liniile și totalul într-un panou propriu, totalul mai mare; „Accept” și „Refuz” câte jumătate de rând, depărtate.
+  - **Butoanele PDF** (deviz, deviz final, fișa de preluare) pe coloane egale; **Istoricul** are rândul de jos (telefonul, „Mai multe”) sub o linie fină, ca la programări.
 - **Verificare:** capturi la 360, 390 și 430 px; laptopul (1440 px) identic cu înainte, imagine cu imagine; pe tabletă se schimbă doar navigarea (aceeași cu telefonul).
 - **Teste:** `e2e/search` (anunțul de locație: întâi „Nu acum” la notificări, când apare).
 
