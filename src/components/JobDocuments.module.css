@@ -10,19 +10,24 @@
   gap: 8px;
 }
 
-/* A phone (T52): the PDF buttons in equal columns, the same width side by side. */
+/* A phone (T52): the PDF buttons share the row in equal parts; a label never breaks: a button that
+   does not fit moves to the next row (Eduard, 30 Oct 2026). */
 @media (max-width: 599px) {
-  .docs {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  .docs > * {
+    flex: 1 1 0;
   }
 
-  .docs > *,
+  /* A single PDF button keeps its own width, as before. */
+  .docs > :only-child {
+    flex: 0 1 auto;
+  }
+
   .docs > * > button {
     width: 100%;
   }
 
   .docs button {
+    min-width: max-content;
     padding-inline: 12px;
   }
 }

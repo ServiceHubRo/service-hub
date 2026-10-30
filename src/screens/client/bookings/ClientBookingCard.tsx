@@ -136,10 +136,18 @@ export function ClientBookingCard({
       </div>
       <p className={styles.when}>
         <span className="mono">
-          {formatDate(lang, b.date)}, {b.slot.slice(0, 5)}
+          {formatDate(lang, b.date)}, <span className={styles.keep}>{b.slot.slice(0, 5)}</span>
         </span>
-        <span className={`mono ${styles.ref}`}> · {b.ref}</span>
-        {b.status === 'done' && b.odometer !== null && <span className="mono"> · {formatKm(lang, b.odometer)}</span>}
+        <span className={`mono ${styles.ref}`}>
+          {' · '}
+          <span className={styles.keep}>{b.ref}</span>
+        </span>
+        {b.status === 'done' && b.odometer !== null && (
+          <span className="mono">
+            {' · '}
+            <span className={styles.keep}>{formatKm(lang, b.odometer)}</span>
+          </span>
+        )}
         {car && <span className={styles.muted}> · {car}</span>}
       </p>
       {b.status === 'done' && <WarrantyNote months={b.warranty_months} until={b.warranty_until} />}

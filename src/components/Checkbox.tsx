@@ -1,4 +1,5 @@
 import type { ComponentProps, ReactNode } from 'react';
+import { KeepHyphens } from './KeepHyphens';
 import styles from './Checkbox.module.css';
 
 export interface CheckboxProps extends Omit<ComponentProps<'input'>, 'type'> {
@@ -20,7 +21,7 @@ export function Checkbox({ children, className, indeterminate = false, ...rest }
         {...rest}
       />
       <span className={styles.box} aria-hidden="true" />
-      <span className={styles.text}>{children}</span>
+      <span className={styles.text}>{typeof children === 'string' ? <KeepHyphens>{children}</KeepHyphens> : children}</span>
     </label>
   );
 }

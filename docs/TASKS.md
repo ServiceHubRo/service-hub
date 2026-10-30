@@ -1335,4 +1335,18 @@ Cerut de Eduard pe 30 oct 2026, cu o poză de pe PC. Textul din dreapta jos („
 - Când trebuie să se rupă (telefon, tabletă), rândurile ies egale (`text-wrap: balance`).
 - Doar `src/screens/public/Landing.module.css`. Teste: `e2e/public` (390, 820, 1440 px).
 
+## T56 — Texte rupte pe două rânduri ✅
+
+Cerut de Eduard pe 30 oct 2026 (butonul „Deconectează-mă” rupt la cratimă în bara laterală: „Aiurea dacă găsesc d-astea peste tot”). Doar stiluri și componente, fără migrare, fără pachete noi.
+
+- **Regula generală:** un text care are nevoie de două rânduri primește două rânduri egale (`text-wrap: balance` pe toată aplicația; peste șase rânduri, ca înainte). Nu mai rămâne un cuvânt singur pe ultimul rând, iar un buton nu se mai rupe după primul cuvânt. Paginile legale (text lung) păstrează rândurile pline.
+- **Cuvintele cu cratimă** („service-uri”, „Service-Hub”, „s-a”, „Deconectează-mă”) stau întregi pe rând în butoane, carduri din Cont, bife, detaliile din admin și pe pagina principală (`KeepHyphens`). Textul rămâne același.
+- **Butoanele din carduri:** pe telefon, butonul principal nu se mai strânge („Programează din nou” ajunsese pe trei rânduri); când nu încape lângă „Mai multe”, „Mai multe” trece dedesubt. Butoanele PDF stau pe același rând cât încap, altfel unul sub altul; un singur buton PDF își păstrează lățimea.
+- **Cardul programării:** ora, codul și kilometrii nu se mai despart de unitate („105.400 / km”).
+- **Bara laterală:** panoul de deconectare folosește toată lățimea; „Deconectează-mă” și „Rămân conectat” pe câte un rând.
+- **Texte:** „Copiază luni pe zilele lucrătoare” (EN „Copy Monday to all weekdays”) în locul unui buton de două rânduri.
+- **Comparație înainte / după:** 382 de capturi (fiecare card și zonă cu butoane, telefon, tabletă, PC). Diferențele rămase sunt doar cele de mai sus; un spațiu dublu apărut la „Wi-Fi pentru clienți” și o coloană mutată în detaliile din admin au fost corectate înainte de merge.
+- **Verificare:** toate ecranele clientului, service-ului și adminului, pagina principală și paginile publice, în română și engleză, la 390, 820 și 1440 px, cu un test care caută butoane rupte, cuvinte rupte la cratimă și cuvinte singure pe ultimul rând. Rămân doar denumiri scurte unde împărțirea egală e și cea mai bună („Kit distribuție / (curea)”).
+- **Teste:** `tests/unit/KeepHyphens.test.tsx`.
+
 - [x] Făcut

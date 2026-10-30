@@ -244,8 +244,10 @@
     color: var(--muted);
   }
 
+  /* The bottom block already insets its rows: no second inset, so „Deconectează-mă” stays on one
+     line in the 240 px sidebar (Eduard, 30 Oct 2026). */
   .sideConfirm {
-    padding: 8px 12px 4px;
+    padding: 8px 0 4px;
   }
 }
 

@@ -1030,7 +1030,7 @@ export const ro = {
   'hours.openDay': 'Deschis',
   'hours.opens': 'Deschide',
   'hours.closes': 'Închide',
-  'hours.copyWeekdays': 'Pune programul de luni la toate zilele lucrătoare',
+  'hours.copyWeekdays': 'Copiază luni pe zilele lucrătoare',
   'hours.save': 'Salvează programul',
   'hours.closures': 'Zile libere și concedii',
   'hours.closures.hint': 'Programările deja făcute rămân.',

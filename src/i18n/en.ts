@@ -1032,7 +1032,7 @@ export const en: Record<MessageKey, string> = {
   'hours.openDay': 'Open',
   'hours.opens': 'Opens',
   'hours.closes': 'Closes',
-  'hours.copyWeekdays': "Use Monday's hours for all weekdays",
+  'hours.copyWeekdays': 'Copy Monday to all weekdays',
   'hours.save': 'Save hours',
   'hours.closures': 'Days off and vacations',
   'hours.closures.hint': 'Existing bookings stay.',

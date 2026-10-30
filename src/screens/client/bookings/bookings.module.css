@@ -253,6 +253,18 @@
   align-items: flex-start;
 }
 
+/* A number with its unit, a booking code: never split over two lines. */
+.keep {
+  white-space: nowrap;
+}
+
+/* A button keeps its label on one line: when the row is full it moves to the next row instead of
+   squeezing its text (Eduard, 30 Oct 2026). */
+.actions > * {
+  flex-shrink: 0;
+  max-width: 100%;
+}
+
 .panelBody {
   font-size: 14px;
 }
@@ -437,16 +449,16 @@
   border-top: 1px solid var(--border);
 }
 
-/* A phone (T52): the card's main action fills the row, "Mai multe" stays compact on its right. */
+/* A phone (T52): the card's main action fills the row, "Mai multe" stays compact on its right; when
+   both do not fit with their labels on one line, "Mai multe" moves under it (30 Oct 2026). */
 @media (max-width: 599px) {
   .card > .actions {
-    flex-wrap: nowrap;
     align-items: stretch;
+    gap: 6px;
   }
 
   .card > .actions > :first-child:not(:last-child) {
-    flex: 1;
-    min-width: 0;
+    flex: 1 0 auto;
   }
 }
 
