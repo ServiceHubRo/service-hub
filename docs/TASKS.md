@@ -741,6 +741,16 @@ Note: nicio migrare, niciun pachet nou. **Lista** `docs/LAUNCH_CHECK.md`: fiecar
 
 **Reverificare completă (17 oct 2026, înainte de firmă și magazine):** toate testele trec pe codul de după T37c (cifrele în `docs/LAUNCH_CHECK.md`). Singura problemă: testul animației „Cereri noi” (`e2e/motion`) pica uneori pe GitHub, când cererea de test ajungea înainte ca Panoul să se încarce; acum așteaptă Panoul gol, ca testul T08. Aplicația nu avea nimic de reparat.
 
+### T19g — Aprobarea ta înainte de baza reală ✅
+
+După auditul din 30 oct 2026 (Eduard: „Bagă mare cu tot”). Până acum, un Merge schimba baza de date reală imediat (așa a ajuns T53 în producție la un minut după Merge).
+
+- „Deploy Supabase” pe `main` rulează în mediul GitHub `production`; cu regula **Required reviewers** pusă de Eduard (`docs/LANSARE.md` 4.6d), așteaptă aprobarea lui înainte de migrații și funcții.
+- Pull request-urile merg doar pe proiectul de test (mediul `test`, fără aprobare). Fără secretele proiectului de test se opresc cu eroare, nu mai cad pe proiectul real.
+- Fără migrare, fără pachete noi. Doar `.github/workflows/deploy-supabase.yml`.
+
+- [x] Făcut
+
 ### T19f — Simbolul ANPC pentru SAL ✅
 
 Cerut de Eduard pe 18 oct 2026, după reverificare. Pictograma oficială ANPC „Soluționarea alternativă a litigiilor” (fișierul ANPC, adus de Eduard: anpc.ro nu se deschide din mediul de lucru, probabil doar din România; tăiat pe ramă, cu colțurile din afara ei transparente, ca să nu apară un contur alb pe fundalul închis), lată de 250 px, cu link spre `https://anpc.ro/ce-este-sal/` într-o filă nouă: în subsolul paginii de prezentare, sub documentele legale, și în Cont → Documente legale la client și la service (unde se cumpără raportul de istoric). Componenta `AnpcSal`, imaginea `public/anpc-sal.png`; textul alternativ e tradus, imaginea rămâne în română (e a ANPC). Teste: `e2e/public` (subsolul: linkul, imaginea încărcată, 250 px), `e2e/help` (în Cont la client și service, nu la admin), verificarea de accesibilitate. **Decizii:** fără pictograma SOL: platforma europeană de soluționare online a litigiilor s-a închis pe 20 iulie 2025; avocatul confirmă (și dacă mai trebuie pusă undeva în aplicația din magazine). Fără pachete noi, fără migrare.

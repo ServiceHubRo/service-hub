@@ -2,10 +2,11 @@ name: Deploy Supabase
 
 # Applies new database migrations and publishes Edge Functions, so every deploy preview has the
 # database it needs (ARCHITECTURE §18). Two projects since T19:
-#   pull requests → the TEST project (what the deploy previews use)
-#   main          → the REAL project (the published site)
-# Until the test project's two secrets exist, pull requests still go to the real project, as
-# before (with a warning). docs/LANSARE.md has the steps.
+#   pull requests → the TEST project (what the deploy previews use), never the real one
+#   main          → the REAL project (the published site), only after Eduard approves the run
+# The approval is the GitHub environment `production` with a required reviewer (after the audit,
+# 30 Oct 2026: a merge must never change the real database on its own). docs/LANSARE.md has the
+# steps.
 #
 # Secrets (GitHub → Settings → Secrets and variables → Actions), see PORNIRE.md step 6:
 #   SUPABASE_ACCESS_TOKEN        personal access token (supabase.com/dashboard/account/tokens)
@@ -38,6 +39,8 @@ jobs:
     name: Deploy Supabase
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    # The real project waits here for the approval set on the `production` environment.
+    environment: ${{ (github.event_name == 'pull_request' || inputs.target == 'test') && 'test' || 'production' }}
     env:
       SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
       REAL_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
@@ -64,19 +67,16 @@ jobs:
             exit 1
           fi
 
-      # Pull requests go to the test project once it exists (T19); main always to the real one.
-      # A half-configured test project stops here instead of falling back to the real one.
+      # Pull requests go to the test project (T19); main always to the real one. Without the test
+      # project's secrets a pull request stops here: it never falls back to the real project.
       - name: Choose the project
         run: |
           if [ "$WANTED" = "test" ] && [ -n "$TEST_PROJECT_REF" ] && [ -n "$TEST_DB_PASSWORD" ]; then
             target=test; ref=$TEST_PROJECT_REF; password=$TEST_DB_PASSWORD
-          elif [ "$WANTED" = "test" ] && { [ -n "$TEST_PROJECT_REF" ] || [ -n "$TEST_DB_PASSWORD" ]; }; then
-            echo "::error title=Proiectul de test::Lipsește unul din secretele SUPABASE_TEST_PROJECT_REF / SUPABASE_TEST_DB_PASSWORD. Pune-le pe amândouă (docs/LANSARE.md, partea 2)."
+          elif [ "$WANTED" = "test" ]; then
+            echo "::error title=Proiectul de test::Lipsesc secretele SUPABASE_TEST_PROJECT_REF / SUPABASE_TEST_DB_PASSWORD. Un pull request nu atinge niciodată proiectul real (docs/LANSARE.md, partea 2)."
             exit 1
           else
-            if [ "$WANTED" = "test" ]; then
-              echo "::warning title=Mediul de test::Nu există încă proiectul de test, așa că linkul de test folosește proiectul real, ca până acum (docs/LANSARE.md, partea 2)."
-            fi
             target=real; ref=$REAL_PROJECT_REF; password=$REAL_DB_PASSWORD
           fi
           if [ "$target" = "test" ] && [ "$TEST_PROJECT_REF" = "$REAL_PROJECT_REF" ]; then
