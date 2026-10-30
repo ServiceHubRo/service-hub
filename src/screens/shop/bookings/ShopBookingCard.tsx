@@ -45,6 +45,9 @@ type PanelKind = 'decline' | 'reschedule' | 'cancel' | 'noShow' | 'withdraw' | '
 /** The statuses in which the car is at the shop and the intake sheet can be written (T50). */
 const INTAKE_STATUSES = new Set(['confirmed', 'in_inspection', 'quote_sent', 'approved', 'in_progress']);
 
+/** The statuses with a line (and the quote) in the details: StatusDetail. */
+const DETAIL_STATUSES = new Set(['in_inspection', 'quote_sent', 'approved', 'in_progress']);
+
 /** From 3 no-shows in 90 days shops see a discreet line (ARCHITECTURE §6); no automatic block. */
 const NO_SHOW_MARK = 3;
 
@@ -139,50 +142,58 @@ export function ShopBookingCard({ booking: b, shopId, now, fresh = false, onDone
       <StatusHint booking={b} started={started} noShowOpen={noShowOpen} />
 
       {open && (
-        <div id={detailsId} className={styles.details}>
-          {hasClientFacts && (
-            <Card inset className={styles.client}>
-              {(phone || b.client_account || b.client_no_shows >= NO_SHOW_MARK) && (
-                <div className={styles.clientLine}>
-                  {phone && (
-                    <a
-                      className={`mono ${styles.phone}`}
-                      href={`tel:${normalizePhone(phone) ?? phone.replace(/[^\d+]/g, '')}`}
-                      aria-label={t('sb.card.call', { name: b.client_name ?? '', phone: formatPhone(phone) })}
-                    >
-                      <Phone size={15} aria-hidden="true" />
-                      {formatPhone(phone)}
-                    </a>
-                  )}
-                  {b.client_account && (
-                    <p className={styles.muted}>
-                      {t('sb.card.account')} <span className="mono">{b.client_account}</span>
-                    </p>
-                  )}
-                  {b.client_no_shows >= NO_SHOW_MARK && (
-                    <p className={styles.muted}>{t('sb.card.noShows', { n: b.client_no_shows })}</p>
-                  )}
-                </div>
-              )}
-              {b.note && <p className={styles.note}>{b.note}</p>}
-              {b.offer_percent ? <OfferNote>{offerText.promise('shop', b.offer_percent, b.offer_kind ?? null)}</OfferNote> : null}
-              {b.loyalty_percent ? <OfferNote>{t('loyalty.shop', { n: b.loyalty_percent, level: b.loyalty_level ?? 1 })}</OfferNote> : null}
-              {b.source === 'shop' && (
-                <p className={styles.walkIn}>
-                  <Store size={14} aria-hidden="true" />
-                  {t('sb.card.walkIn')} ·{' '}
-                  {b.claimed ? t('sb.card.inAccount') : b.invite_sent_at ? t('sb.card.smsSent') : t('sb.card.noAccount')}
-                </p>
-              )}
-            </Card>
-          )}
-          <StatusDetail booking={b} />
-          <IntakeLine booking={b} />
-          {/* The documents read only: apart from the actions that move the job on. */}
-          {docs.length > 0 && (
-            <div className={styles.docs}>
-              <p className={styles.groupLabel}>{t('doc.title')}</p>
-              <JobDocuments bookingId={b.id} bookingRef={b.ref} quoteNumber={b.quote_number} kinds={docs} />
+        <div id={detailsId} className={`${styles.details} ${b.quote ? styles.split : ''}`}>
+          {/* On a wide card the quote stands on the right, the rest on the left; on a narrow one all
+              of it reads in one column, in this order: client, quote, intake sheet, documents. */}
+          <div className={styles.detailsMain}>
+            {hasClientFacts && (
+              <Card inset className={styles.client}>
+                {(phone || b.client_account || b.client_no_shows >= NO_SHOW_MARK) && (
+                  <div className={styles.clientLine}>
+                    {phone && (
+                      <a
+                        className={`mono ${styles.phone}`}
+                        href={`tel:${normalizePhone(phone) ?? phone.replace(/[^\d+]/g, '')}`}
+                        aria-label={t('sb.card.call', { name: b.client_name ?? '', phone: formatPhone(phone) })}
+                      >
+                        <Phone size={15} aria-hidden="true" />
+                        {formatPhone(phone)}
+                      </a>
+                    )}
+                    {b.client_account && (
+                      <p className={styles.muted}>
+                        {t('sb.card.account')} <span className="mono">{b.client_account}</span>
+                      </p>
+                    )}
+                    {b.client_no_shows >= NO_SHOW_MARK && (
+                      <p className={styles.muted}>{t('sb.card.noShows', { n: b.client_no_shows })}</p>
+                    )}
+                  </div>
+                )}
+                {b.note && <p className={styles.note}>{b.note}</p>}
+                {b.offer_percent ? <OfferNote>{offerText.promise('shop', b.offer_percent, b.offer_kind ?? null)}</OfferNote> : null}
+                {b.loyalty_percent ? <OfferNote>{t('loyalty.shop', { n: b.loyalty_percent, level: b.loyalty_level ?? 1 })}</OfferNote> : null}
+                {b.source === 'shop' && (
+                  <p className={styles.walkIn}>
+                    <Store size={14} aria-hidden="true" />
+                    {t('sb.card.walkIn')} ·{' '}
+                    {b.claimed ? t('sb.card.inAccount') : b.invite_sent_at ? t('sb.card.smsSent') : t('sb.card.noAccount')}
+                  </p>
+                )}
+              </Card>
+            )}
+            <IntakeLine booking={b} />
+            {/* The documents read only: apart from the actions that move the job on. */}
+            {docs.length > 0 && (
+              <div className={styles.docs}>
+                <p className={styles.groupLabel}>{t('doc.title')}</p>
+                <JobDocuments bookingId={b.id} bookingRef={b.ref} quoteNumber={b.quote_number} kinds={docs} />
+              </div>
+            )}
+          </div>
+          {DETAIL_STATUSES.has(b.status) && (
+            <div className={styles.detailsSide}>
+              <StatusDetail booking={b} />
             </div>
           )}
         </div>

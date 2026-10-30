@@ -16,6 +16,32 @@
   gap: 9px;
 }
 
+/* T58: one car takes the whole row on a desktop; a wide card puts the documents beside the car. */
+.list > li {
+  container-type: inline-size;
+}
+
+.carMain {
+  min-width: 0;
+}
+
+@container (min-width: 820px) {
+  .carSplit {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: center;
+    column-gap: var(--space-8);
+  }
+
+  .carSplit > .docs {
+    margin-top: 0;
+    padding: 4px 0 4px var(--space-8);
+    border-top: 0;
+    border-left: 1px solid var(--border);
+    grid-auto-columns: minmax(0, 1fr);
+  }
+}
+
 /* ---------------------------------------------------------------- car card (P7) */
 .head {
   display: flex;

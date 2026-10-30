@@ -107,40 +107,43 @@ function CarCard({
   const name = `${car.make} ${car.model}`;
   const anyDate = CAR_DOCS.some(({ column }) => car[column]) || oilDue !== null;
   return (
-    <Card>
-      <div className={styles.head}>
-        <span className={styles.carTile} aria-hidden="true">
-          <CarIcon size={19} />
-        </span>
-        <div className={styles.carText}>
-          <p className={styles.carName}>
-            {name} {car.year && <span className={styles.year}>{car.year}</span>}
-          </p>
-          {car.plate && <p className={`mono ${styles.plate}`}>{car.plate}</p>}
-        </div>
-        <Link to={carPath(car.id)} className={styles.edit} aria-label={t('garage.edit', { car: name })}>
-          <Pencil size={18} aria-hidden="true" />
-        </Link>
-      </div>
-      {jobs === null ? null : jobs + importedJobs > 0 ? (
-        <>
-          <Link to={carHistoryPath(car.id)} state={FROM_GARAGE} className={styles.history}>
-            <History size={16} aria-hidden="true" />
-            <span className={styles.historyText}>{t('vh.garageRow', { jobs: plural(lang, 'unit.jobs', jobs + importedJobs) })}</span>
-            <ChevronRight size={18} aria-hidden="true" />
+    <Card className={anyDate ? styles.carSplit : undefined}>
+      {/* A wide card (T58): the car and its links on the left, the documents on the right. */}
+      <div className={styles.carMain}>
+        <div className={styles.head}>
+          <span className={styles.carTile} aria-hidden="true">
+            <CarIcon size={19} />
+          </span>
+          <div className={styles.carText}>
+            <p className={styles.carName}>
+              {name} {car.year && <span className={styles.year}>{car.year}</span>}
+            </p>
+            {car.plate && <p className={`mono ${styles.plate}`}>{car.plate}</p>}
+          </div>
+          <Link to={carPath(car.id)} className={styles.edit} aria-label={t('garage.edit', { car: name })}>
+            <Pencil size={18} aria-hidden="true" />
           </Link>
-          {/* The paid report (T15, P16e): a secondary action, only for a car with jobs done through Service-Hub. */}
-          {jobs > 0 && (
-            <Link to={carReportPath(car.id)} state={REPORT_FROM_GARAGE} className={`${styles.history} ${styles.report}`}>
-              <FileCheck size={16} aria-hidden="true" />
-              <span className={styles.historyText}>{t('report.garageRow')}</span>
+        </div>
+        {jobs === null ? null : jobs + importedJobs > 0 ? (
+          <>
+            <Link to={carHistoryPath(car.id)} state={FROM_GARAGE} className={styles.history}>
+              <History size={16} aria-hidden="true" />
+              <span className={styles.historyText}>{t('vh.garageRow', { jobs: plural(lang, 'unit.jobs', jobs + importedJobs) })}</span>
               <ChevronRight size={18} aria-hidden="true" />
             </Link>
-          )}
-        </>
-      ) : (
-        <p className={styles.historyNone}>{t('vh.noJobs')}</p>
-      )}
+            {/* The paid report (T15, P16e): a secondary action, only for a car with jobs done through Service-Hub. */}
+            {jobs > 0 && (
+              <Link to={carReportPath(car.id)} state={REPORT_FROM_GARAGE} className={`${styles.history} ${styles.report}`}>
+                <FileCheck size={16} aria-hidden="true" />
+                <span className={styles.historyText}>{t('report.garageRow')}</span>
+                <ChevronRight size={18} aria-hidden="true" />
+              </Link>
+            )}
+          </>
+        ) : (
+          <p className={styles.historyNone}>{t('vh.noJobs')}</p>
+        )}
+      </div>
       {anyDate && (
         <ul className={styles.docs}>
           {CAR_DOCS.map(({ doc, column }) => (

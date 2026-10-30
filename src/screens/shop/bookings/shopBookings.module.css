@@ -2,10 +2,6 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
-  /* One column of bookings (T57): as wide as a booking reads well, never stretched across a wide
-     monitor. The title, the tabs and the list share this width. */
-  width: 100%;
-  max-width: var(--list-max);
 }
 
 /* The title, then "Adaugă programare": on a phone always under the title, full width, so the
@@ -297,6 +293,42 @@
   color: var(--blue);
   font-size: 15px;
   text-decoration: none;
+}
+
+/* On a narrow card the details read in one column (client, quote, intake sheet, documents); on a
+   wide one with a quote, the quote stands on the right. */
+.detailsMain {
+  display: contents;
+}
+
+.detailsMain > .client {
+  order: 1;
+}
+
+.detailsSide {
+  order: 2;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.detailsMain > :not(.client) {
+  order: 3;
+}
+
+@container (min-width: 960px) {
+  .details.split {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+    align-items: start;
+    column-gap: var(--space-8);
+  }
+
+  .split > .detailsMain {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
 }
 
 /* The PDFs under their own small heading, apart from the actions that change the job. */

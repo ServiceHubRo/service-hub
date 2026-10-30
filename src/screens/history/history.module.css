@@ -400,12 +400,6 @@
 }
 
 /* ---------------------------------------------------------------- shop Istoric (T57) */
-/* One job under the other, never two columns: the page as wide as a job reads well. */
-.shopPage {
-  width: 100%;
-  max-width: var(--list-max);
-}
-
 .jobList {
   container-type: inline-size;
 }
@@ -540,4 +534,43 @@
   gap: var(--space-2);
   padding-top: var(--space-3);
   border-top: 1px solid var(--border);
+}
+
+/* The record opened: in one column on a narrow card (how it ended, the quote, the rest); on a wide
+   one with a quote, the quote on the right. */
+.jobRecord {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.jobMain {
+  display: contents;
+}
+
+.jobMain > .jobOutcome {
+  order: 1;
+}
+
+.jobQuote {
+  order: 2;
+}
+
+.jobMain > :not(.jobOutcome) {
+  order: 3;
+}
+
+@container (min-width: 960px) {
+  .jobSplit {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+    align-items: start;
+    column-gap: var(--space-8);
+  }
+
+  .jobSplit > .jobMain {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
 }

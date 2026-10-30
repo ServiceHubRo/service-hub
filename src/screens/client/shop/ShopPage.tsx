@@ -1,5 +1,5 @@
-import { CalendarPlus, Globe, MapPin, Navigation, Phone, Store } from 'lucide-react';
-import { lazy, Suspense, useCallback, useEffect, useRef, type ReactNode } from 'react';
+import { CalendarPlus, ChevronDown, Globe, MapPin, Navigation, Phone, Store } from 'lucide-react';
+import { lazy, Suspense, useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { Link, useLocation as useRouterLocation, useParams, useSearchParams } from 'react-router-dom';
 import { BackLink } from '../../../components/BackLink';
 import { Banner } from '../../../components/Banner';
@@ -138,8 +138,9 @@ function ShopDetails({ page, day, onFavorite }: { page: ShopPageData; day: strin
 
   return (
     <>
-      {/* Two columns on a wide screen (T51): the shop on the left, its services and reviews on the right. */}
-      <div className={styles.columns} data-layout="columns">
+      {/* One column the whole width (T58, Eduard 30 Oct: the long list of services left the shop's
+          column empty below); the parts inside lay out across the width. */}
+      <div className={styles.columns}>
         <div className={styles.column}>
           <header className={styles.header}>
             <ShopAvatar name={shop.name} logoUrl={shop.logo_url} size={56} />
@@ -378,24 +379,52 @@ function PhoneLinks({ phones, shopName }: { phones: (string | null)[]; shopName:
   );
 }
 
+/**
+ * The shop's services by category (T58): the categories as tiles with how many services each has;
+ * a tap shows that category's services under them (one at a time). The services are chosen again
+ * when booking.
+ */
 function ServiceGroups({ services }: { services: ShopPageService[] }) {
   const { lang } = useI18n();
   const groups = groupServices(services, lang);
+  const [openKey, setOpenKey] = useState<string | null>(null);
+  const open = groups.find((g) => g.key === openKey) ?? null;
+  // The open category's services: under its tile on a narrow page, under all the tiles on a wide one
+  // (CSS shows one of the two).
+  const list = (where: 'inline' | 'below') =>
+    open && (
+      <ul id={`shop-category-services-${where}`} className={`${styles.services} ${styles[where]}`} aria-label={open.name}>
+        {open.items.map((s) => (
+          <li key={s.id} className={styles.service}>
+            <ServiceIcon name={s.icon} className={styles.serviceIcon} />
+            {serviceName(s, lang)}
+          </li>
+        ))}
+      </ul>
+    );
   return (
     <div className={styles.serviceGroups}>
-      {groups.map((g) => (
-        <div key={g.key}>
-          <h3 className={styles.categoryTitle}>{g.name}</h3>
-          <ul className={styles.services}>
-            {g.items.map((s) => (
-              <li key={s.id} className={styles.service}>
-                <ServiceIcon name={s.icon} className={styles.serviceIcon} />
-                {serviceName(s, lang)}
-              </li>
-            ))}
-          </ul>
-        </div>
-      ))}
+      <ul className={styles.categories}>
+        {groups.map((g) => (
+          <li key={g.key} className={styles.categoryItem}>
+            <button
+              type="button"
+              className={`${styles.category} ${g.key === openKey ? styles.categoryOn : ''}`}
+              aria-expanded={g.key === openKey}
+              aria-controls="shop-category-services-inline shop-category-services-below"
+              onClick={() => setOpenKey((k) => (k === g.key ? null : g.key))}
+            >
+              <span className={styles.categoryText}>
+                <span className={styles.categoryTitle}>{g.name}</span>
+                <span className={styles.categoryCount}>{plural(lang, 'unit.services', g.items.length)}</span>
+              </span>
+              <ChevronDown size={18} className={styles.categoryChevron} aria-hidden="true" />
+            </button>
+            {g.key === openKey && list('inline')}
+          </li>
+        ))}
+      </ul>
+      {list('below')}
     </div>
   );
 }

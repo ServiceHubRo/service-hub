@@ -120,67 +120,80 @@ export function ClientBookingCard({
   // "Mesaj" is on every card (in "Mai multe"), so the actions row always shows while no panel is open.
   const hasActions = panel === null;
 
-  return (
-    <Card highlight={b.status === 'quote_sent'} className={styles.card}>
-      <div className={styles.top}>
-        <ServiceIcon name={b.service?.icon} className={styles.icon} />
-        <div className={styles.what}>
-          <p className={styles.service}>{bookingServicesText(lang, b.service, b.extra_services, b.service_id)}</p>
-          {b.shop && (
-            <p className={styles.muted}>
-              {b.shop.name} · {b.shop.city}
-            </p>
-          )}
-        </div>
-        <StatusBadge status={b.status} />
-      </div>
-      <p className={styles.when}>
-        <span className="mono">
-          {formatDate(lang, b.date)}, <span className={styles.keep}>{b.slot.slice(0, 5)}</span>
-        </span>
-        <span className={`mono ${styles.ref}`}>
-          {' · '}
-          <span className={styles.keep}>{b.ref}</span>
-        </span>
-        {b.status === 'done' && b.odometer !== null && (
-          <span className="mono">
-            {' · '}
-            <span className={styles.keep}>{formatKm(lang, b.odometer)}</span>
-          </span>
-        )}
-        {car && <span className={styles.muted}> · {car}</span>}
-      </p>
-      {b.status === 'done' && <WarrantyNote months={b.warranty_months} until={b.warranty_until} />}
-      {b.status !== 'done' && <BookingProgress status={b.status} />}
-      {b.note && <p className={styles.note}>{b.note}</p>}
-      {b.offer_percent !== null && !OFFER_GONE.has(b.status) && <OfferNote>{offerText.promise('client', b.offer_percent, b.offer_kind)}</OfferNote>}
-      {b.loyalty_percent !== null && !OFFER_GONE.has(b.status) && <OfferNote>{t('loyalty.client', { n: b.loyalty_percent })}</OfferNote>}
-
+  // A wide card (T58) puts the quote, its decision or the finished job on the right of the booking.
+  const aside =
+    b.status === 'quote_sent' && quote ? (
+      // A replaced quote starts with every line ticked again.
+      <QuoteDecision key={quote.id} bookingId={b.id} quote={quote} act={act} />
+    ) : (b.status === 'approved' && quote) || b.status === 'done' ? (
       <StatusDetail booking={b} quote={quote} now={now} decided={decided} />
-      {dispute && <NoShowDisputeStatus dispute={dispute} />}
-      {b.status === 'quote_sent' && quote && (
-        // A replaced quote starts with every line ticked again.
-        <QuoteDecision key={quote.id} bookingId={b.id} quote={quote} act={act} />
-      )}
-      {b.intake_sent_at && !b.intake_confirmed_at && (
-        <Link to={bookingIntakePath(b.id)} className={styles.intakePrompt}>
-          <ClipboardCheck size={18} aria-hidden="true" />
-          <span>
-            <strong>{t('cin.prompt.title')}</strong>
-            <span className={styles.block}>{t('cin.prompt.body')}</span>
+    ) : b.status === 'in_progress' && quote ? (
+      <DecidedLines quote={quote} />
+    ) : null;
+  const statusInMain = !(b.status === 'approved' && quote) && b.status !== 'done';
+
+  return (
+    <Card highlight={b.status === 'quote_sent'} className={`${styles.card} ${aside ? styles.split : ''}`}>
+      <div className={styles.main}>
+        <div className={styles.top}>
+          <ServiceIcon name={b.service?.icon} className={styles.icon} />
+          <div className={styles.what}>
+            <p className={styles.service}>{bookingServicesText(lang, b.service, b.extra_services, b.service_id)}</p>
+            {b.shop && (
+              <p className={styles.muted}>
+                {b.shop.name} · {b.shop.city}
+              </p>
+            )}
+          </div>
+          <StatusBadge status={b.status} />
+        </div>
+        <p className={styles.when}>
+          <span className="mono">
+            {formatDate(lang, b.date)}, <span className={styles.keep}>{b.slot.slice(0, 5)}</span>
           </span>
-        </Link>
-      )}
-      <JobDocuments
-        bookingId={b.id}
-        bookingRef={b.ref}
-        quoteNumber={b.quote_number}
-        kinds={[
-          ...(b.status === 'done' && quote ? (['final'] as const) : []),
-          ...(quote ? (['quote'] as const) : []),
-          ...(b.intake_sent_at ? (['intake'] as const) : []),
-        ]}
-      />
+          <span className={`mono ${styles.ref}`}>
+            {' · '}
+            <span className={styles.keep}>{b.ref}</span>
+          </span>
+          {b.status === 'done' && b.odometer !== null && (
+            <span className="mono">
+              {' · '}
+              <span className={styles.keep}>{formatKm(lang, b.odometer)}</span>
+            </span>
+          )}
+          {car && <span className={styles.muted}> · {car}</span>}
+        </p>
+        {b.status === 'done' && <WarrantyNote months={b.warranty_months} until={b.warranty_until} />}
+        {b.status !== 'done' && <BookingProgress status={b.status} />}
+        {b.note && <p className={styles.note}>{b.note}</p>}
+        {b.offer_percent !== null && !OFFER_GONE.has(b.status) && <OfferNote>{offerText.promise('client', b.offer_percent, b.offer_kind)}</OfferNote>}
+        {b.loyalty_percent !== null && !OFFER_GONE.has(b.status) && <OfferNote>{t('loyalty.client', { n: b.loyalty_percent })}</OfferNote>}
+
+        {statusInMain && <StatusDetail booking={b} quote={quote} now={now} decided={decided} />}
+        {dispute && <NoShowDisputeStatus dispute={dispute} />}
+      </div>
+      {aside && <div className={styles.aside}>{aside}</div>}
+      <div className={styles.extra}>
+        {b.intake_sent_at && !b.intake_confirmed_at && (
+          <Link to={bookingIntakePath(b.id)} className={styles.intakePrompt}>
+            <ClipboardCheck size={18} aria-hidden="true" />
+            <span>
+              <strong>{t('cin.prompt.title')}</strong>
+              <span className={styles.block}>{t('cin.prompt.body')}</span>
+            </span>
+          </Link>
+        )}
+        <JobDocuments
+          bookingId={b.id}
+          bookingRef={b.ref}
+          quoteNumber={b.quote_number}
+          kinds={[
+            ...(b.status === 'done' && quote ? (['final'] as const) : []),
+            ...(quote ? (['quote'] as const) : []),
+            ...(b.intake_sent_at ? (['intake'] as const) : []),
+          ]}
+        />
+      </div>
 
       {hasActions && (
         <div className={styles.actions}>
@@ -413,7 +426,6 @@ function StatusDetail({
               {b.started_at && <p className={`mono ${styles.muted}`}>{t('cb.inProgressSince', { time: at(b.started_at) })}</p>}
             </div>
           </div>
-          {quote && <DecidedLines quote={quote} />}
         </>
       );
     case 'done':

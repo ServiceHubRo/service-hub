@@ -191,7 +191,13 @@ test.describe('client search', () => {
     await expect(page.getByRole('link', { name: /Sună la Atelier Demo/ })).toHaveAttribute('href', /^tel:\+?\d+$/);
     await expect(page.getByText('80 lei')).toBeVisible();
     await expect(page.getByText('Se percepe doar dacă refuzi devizul după verificare.')).toBeVisible();
-    await expect(page.getByText('Plăcuțe de frână')).toBeVisible();
+    // The services by category (T58): the tile shows how many; a tap shows them.
+    const brakes = page.getByRole('button', { name: /^Frânare/ });
+    await expect(brakes).toHaveAttribute('aria-expanded', 'false');
+    await brakes.click();
+    await expect(brakes).toHaveAttribute('aria-expanded', 'true');
+    // Under the tile on a narrow page, under all the tiles on a wide one: one of the two shows.
+    await expect(page.getByText('Plăcuțe de frână').filter({ visible: true })).toHaveCount(1);
     await expect(page.getByText('Prețul se stabilește prin deviz, după ce service-ul vede mașina.')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Recenzii' })).toBeVisible();
     await expect(page.getByText('Răspunsul service-ului')).toBeVisible();

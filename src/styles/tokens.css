@@ -96,8 +96,6 @@
   --card-pad: 16px;
   --page-pad: 18px;
   --content-max: 560px;
-  /* A list read one item under the other (the shop's Programări and Istoric, T57): never wider. */
-  --list-max: 1040px;
   --heading-size: 26px;
   --body-size: 14px;
 
@@ -136,12 +134,5 @@
 @media (min-width: 1280px) {
   :root {
     --page-pad: 48px;
-  }
-}
-
-/* A wide monitor: the one-column lists grow a step, still far from edge to edge. */
-@media (min-width: 1680px) {
-  :root {
-    --list-max: 1240px;
   }
 }
