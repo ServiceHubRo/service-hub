@@ -2,7 +2,7 @@ import { Lightbulb } from 'lucide-react';
 import { useState } from 'react';
 import { NAV } from '../../app/roles';
 import { ActionButton } from '../../components/ActionButton';
-import { BackLink } from '../../components/BackLink';
+import { PageHeader } from '../../components/PageHeader';
 import { Card } from '../../components/Card';
 import { EmptyState } from '../../components/EmptyState';
 import { LoadError } from '../../components/LoadError';
@@ -30,8 +30,7 @@ export function SuggestionsScreen({ role }: { role: 'client' | 'shop' }) {
 
   return (
     <div className={accountStyles.page}>
-      <BackLink to={NAV[role].account.path} label={t('nav.account')} />
-      <h1>{t('sugg.title')}</h1>
+      <PageHeader back={{ to: NAV[role].account.path, label: t('nav.account') }} title={t('sugg.title')} />
       <p className={accountStyles.sub}>{t('sugg.sub')}</p>
 
       <Card className={styles.form}>
@@ -67,13 +66,13 @@ export function SuggestionsScreen({ role }: { role: 'client' | 'shop' }) {
       </Card>
 
       <h2 className={accountStyles.section}>{t('sugg.mine')}</h2>
-      {state.status === 'loading' && <SkeletonList />}
+      {state.status === 'loading' && <SkeletonList cards />}
       {state.status === 'error' && <LoadError message={t('sugg.loadError')} onRetry={reload} />}
       {state.status === 'ready' &&
         (state.data.length === 0 ? (
           <EmptyState icon={Lightbulb} title={t('sugg.empty')} />
         ) : (
-          <ul className={styles.list}>
+          <ul className={styles.list} data-layout="cards">
             {state.data.map((s) => (
               <li key={s.id}>
                 <Card className={styles.item}>

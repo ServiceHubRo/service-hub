@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { BackLink } from '../../components/BackLink';
+import { PageHeader } from '../../components/PageHeader';
 import { Card } from '../../components/Card';
 import { LoadError } from '../../components/LoadError';
 import { SkeletonList } from '../../components/Skeleton';
@@ -31,8 +32,7 @@ export function ThreadScreen() {
   const clientName = thread.client_name || t('admin.deletedAccount');
   return (
     <div className={styles.page}>
-      <BackLink to={thread.client_id ? adminClientPath(thread.client_id) : ADMIN_CLIENTS_PATH} label={t('common.back')} />
-      <h1>{t('admin.thread.title')}</h1>
+      <PageHeader back={{ to: thread.client_id ? adminClientPath(thread.client_id) : ADMIN_CLIENTS_PATH, label: t('common.back') }} title={t('admin.thread.title')} />
       <Card className={styles.stack}>
         <span className={styles.rowMeta}>
           <Link className={styles.link} to={adminShopPath(thread.shop_id)}>

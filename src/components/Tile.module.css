@@ -1,37 +1,70 @@
+/* A link to a page (Cont, Setări): the icon in a tinted square, the name and one line, a chevron.
+   Tiles in a grid share their height (T51). */
 .tile {
   display: flex;
   align-items: center;
-  gap: 12px;
-  min-height: 52px;
-  padding: 12px var(--card-pad);
+  gap: var(--space-4);
+  min-height: 72px;
+  padding: var(--space-4) var(--card-pad);
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
   color: var(--text);
   text-decoration: none;
+  transition:
+    border-color var(--motion-quick) var(--ease),
+    background-color var(--motion-quick) var(--ease);
 }
 
 .tile:hover {
   border-color: var(--border-lit);
+  background: var(--surface-hover);
+}
+
+.iconBox {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-button);
+  background: var(--amber-tint);
+  border: 1px solid rgba(245, 165, 36, 0.18);
 }
 
 .icon {
   color: var(--amber);
-  flex-shrink: 0;
 }
 
 .label {
   flex: 1;
   min-width: 0;
+  font-weight: 600;
 }
 
 .chevron {
   color: var(--muted);
   flex-shrink: 0;
+  transition: transform var(--motion-quick) var(--ease);
+}
+
+.tile:hover .chevron {
+  transform: translateX(2px);
 }
 
 .hint {
   display: block;
-  font-size: 12.5px;
+  margin-top: 2px;
+  font-size: 13px;
+  font-weight: 400;
   color: var(--muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tile,
+  .chevron {
+    transition: none;
+  }
 }

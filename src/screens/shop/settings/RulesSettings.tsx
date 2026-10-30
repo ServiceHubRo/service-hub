@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { BackLink } from '../../../components/BackLink';
-import { Card } from '../../../components/Card';
 import { CheckMenu } from '../../../components/CheckMenu';
 import { Field } from '../../../components/Field';
+import { PageHeader } from '../../../components/PageHeader';
+import { Section, SectionCard } from '../../../components/Section';
 import { SelectField } from '../../../components/SelectField';
 import { Stepper } from '../../../components/Stepper';
 import { Switch } from '../../../components/Switch';
@@ -151,205 +151,210 @@ export function RulesSettings() {
 
   return (
     <div className={styles.page}>
-      <BackLink to={SETTINGS_PATH} label={t('settings.title')} />
-      <h1>{t('settings.rules')}</h1>
+      <PageHeader back={{ to: SETTINGS_PATH, label: t('settings.title') }} title={t('settings.rules')} />
 
-      <Card>
-        <div id="capacitate" ref={capacityRef} className={own.block}>
-          <Stepper
-            label={t('rules.capacity')}
-            value={rules.daily_capacity}
-            min={1}
-            max={100}
-            onChange={(v) => set('daily_capacity', v)}
-            decreaseLabel={t('common.decrease')}
-            increaseLabel={t('common.increase')}
+      <Section title={t('rules.sec.capacity')} description={t('rules.sec.capacity.desc')}>
+        <SectionCard>
+          <div id="capacitate" ref={capacityRef} className={own.anchor}>
+            <Stepper
+              label={t('rules.capacity')}
+              value={rules.daily_capacity}
+              min={1}
+              max={100}
+              onChange={(v) => set('daily_capacity', v)}
+              decreaseLabel={t('common.decrease')}
+              increaseLabel={t('common.increase')}
+            />
+          </div>
+          <div className={own.block}>
+            <Stepper
+              label={t('rules.perSlot')}
+              value={rules.cars_per_slot}
+              min={1}
+              max={20}
+              onChange={(v) => set('cars_per_slot', v)}
+              decreaseLabel={t('common.decrease')}
+              increaseLabel={t('common.increase')}
+            />
+            <p className={styles.hint}>{t('rules.perSlot.hint')}</p>
+          </div>
+          <SelectField
+            inline
+            label={t('rules.slot')}
+            value={String(rules.slot_minutes)}
+            options={[30, 60].map((m) => ({ value: String(m), label: t('rules.slot.value', { n: m }) }))}
+            onChange={(e) => set('slot_minutes', Number(e.target.value))}
           />
-        </div>
-        <div className={own.block}>
-          <Stepper
-            label={t('rules.perSlot')}
-            value={rules.cars_per_slot}
-            min={1}
-            max={20}
-            onChange={(v) => set('cars_per_slot', v)}
-            decreaseLabel={t('common.decrease')}
-            increaseLabel={t('common.increase')}
+        </SectionCard>
+      </Section>
+
+      <Section title={t('rules.sec.times')} description={t('rules.sec.times.desc')}>
+        <SectionCard>
+          <SelectField
+            inline
+            label={t('rules.notice')}
+            hint={t('rules.notice.hint')}
+            value={String(rules.min_notice_hours)}
+            onChange={(e) => set('min_notice_hours', Number(e.target.value))}
+            options={withCurrent(NOTICE_HOURS, rules.min_notice_hours).map((h) => ({
+              value: String(h),
+              label: h === 0 ? t('rules.notice.none') : plural(lang, 'unit.hours', h),
+            }))}
           />
-          <p className={styles.hint}>{t('rules.perSlot.hint')}</p>
-        </div>
-        <SelectField
-          label={t('rules.slot')}
-          value={String(rules.slot_minutes)}
-          options={[30, 60].map((m) => ({ value: String(m), label: t('rules.slot.value', { n: m }) }))}
-          onChange={(e) => set('slot_minutes', Number(e.target.value))}
-        />
-      </Card>
-
-      <Card className={styles.stack}>
-        <SelectField
-          label={t('rules.notice')}
-          hint={t('rules.notice.hint')}
-          value={String(rules.min_notice_hours)}
-          onChange={(e) => set('min_notice_hours', Number(e.target.value))}
-          options={withCurrent(NOTICE_HOURS, rules.min_notice_hours).map((h) => ({
-            value: String(h),
-            label: h === 0 ? t('rules.notice.none') : plural(lang, 'unit.hours', h),
-          }))}
-        />
-        <SelectField
-          label={t('rules.advance')}
-          hint={t('rules.advance.hint')}
-          value={String(rules.max_advance_days)}
-          onChange={(e) => set('max_advance_days', Number(e.target.value))}
-          options={withCurrent(ADVANCE_DAYS, rules.max_advance_days).map((d) => ({
-            value: String(d),
-            label: plural(lang, 'unit.days', d),
-          }))}
-        />
-        <SelectField
-          label={t('rules.cancel')}
-          hint={t('rules.cancel.hint')}
-          value={String(rules.cancel_deadline_hours)}
-          onChange={(e) => set('cancel_deadline_hours', Number(e.target.value))}
-          options={withCurrent(CANCEL_HOURS, rules.cancel_deadline_hours).map((h) => ({
-            value: String(h),
-            label: h === 0 ? t('rules.cancel.anytime') : t('rules.cancel.before', { hours: plural(lang, 'unit.hours', h) }),
-          }))}
-        />
-      </Card>
-
-      <Card>
-        <Switch checked={rules.instant} hint={t('rules.instant.hint')} onChange={(e) => set('instant', e.target.checked)}>
-          {t('rules.instant')}
-        </Switch>
-      </Card>
-
-      <Card>
-        <p className={styles.cardTitle}>{t('rules.fee')}</p>
-        <p className={`${styles.hint} ${own.feeHint}`}>{t('rules.fee.hint')}</p>
-        <div ref={feeRef}>
-          <Field
-            label={t('rules.fee.label')}
-            inputMode="decimal"
-            mono
-            maxLength={9}
-            value={rules.fee}
-            onChange={(e) => {
-              set('fee', e.target.value);
-              setFeeError(null);
-            }}
-            error={feeError ? t(feeError.key, feeError.params) : null}
+          <SelectField
+            inline
+            label={t('rules.advance')}
+            hint={t('rules.advance.hint')}
+            value={String(rules.max_advance_days)}
+            onChange={(e) => set('max_advance_days', Number(e.target.value))}
+            options={withCurrent(ADVANCE_DAYS, rules.max_advance_days).map((d) => ({
+              value: String(d),
+              label: plural(lang, 'unit.days', d),
+            }))}
           />
-        </div>
-      </Card>
+          <SelectField
+            inline
+            label={t('rules.cancel')}
+            hint={t('rules.cancel.hint')}
+            value={String(rules.cancel_deadline_hours)}
+            onChange={(e) => set('cancel_deadline_hours', Number(e.target.value))}
+            options={withCurrent(CANCEL_HOURS, rules.cancel_deadline_hours).map((h) => ({
+              value: String(h),
+              label: h === 0 ? t('rules.cancel.anytime') : t('rules.cancel.before', { hours: plural(lang, 'unit.hours', h) }),
+            }))}
+          />
+        </SectionCard>
+      </Section>
 
-      <Card>
-        <div className={own.offer}>
-          <Switch
-            checked={rules.offer !== null}
-            hint={t('rules.offer.hint')}
-            onChange={(e) => {
-              setOfferError(null);
-              set('offer', e.target.checked ? DEFAULT_OFFER : null);
-            }}
-          >
-            {t('rules.offer')}
+      <Section title={t('rules.sec.confirm')} description={t('rules.sec.confirm.desc')}>
+        <SectionCard>
+          <Switch checked={rules.instant} hint={t('rules.instant.hint')} onChange={(e) => set('instant', e.target.checked)}>
+            {t('rules.instant')}
           </Switch>
-          {rules.offer !== null && (
-            <>
-              <SelectField
-                label={t('rules.offer.percent')}
-                value={String(rules.offer)}
-                options={OFFERS.map((n) => ({ value: String(n), label: t('rules.offer.value', { n }) }))}
-                onChange={(e) => set('offer', Number(e.target.value))}
-              />
-              <Field
-                type="date"
-                label={t('rules.offer.until')}
-                hint={t('rules.offer.untilHint')}
-                min={ymdInBucharest(new Date())}
-                value={rules.offerUntil}
-                onChange={(e) => set('offerUntil', e.target.value)}
-              />
-              {services.status === 'ready' && (
-                <CheckMenu
-                  label={t('rules.offer.scope')}
-                  summary={
-                    rules.offerServices === null
-                      ? t('rules.offer.scope.all')
-                      : rules.offerServices.length === 0
-                        ? t('rules.offer.scope.pick')
-                        : listOrCount(
-                            services.data.filter((x) => rules.offerServices!.includes(x.id)).map((x) => (lang === 'ro' ? x.name_ro : x.name_en)),
-                            plural(lang, 'unit.services', rules.offerServices.length),
-                          )
-                  }
-                  all={{
-                    label: t('rules.offer.scope.all'),
-                    selected: rules.offerServices === null,
-                    onSelect: () => {
-                      setOfferError(null);
-                      set('offerServices', rules.offerServices === null ? [] : null);
-                    },
-                  }}
-                  options={services.data.map((x) => ({ value: x.id, label: lang === 'ro' ? x.name_ro : x.name_en }))}
-                  selected={rules.offerServices ?? []}
-                  onToggle={(id) => {
-                    setOfferError(null);
-                    const now = rules.offerServices ?? [];
-                    set('offerServices', now.includes(id) ? now.filter((x) => x !== id) : [...now, id]);
-                  }}
-                  error={offerError === 'services' ? t('rules.offer.scopeEmpty') : null}
+          <div ref={feeRef}>
+            <Field
+              inline
+              label={t('rules.fee.label')}
+              hint={t('rules.fee.hint')}
+              inputMode="decimal"
+              mono
+              maxLength={9}
+              value={rules.fee}
+              onChange={(e) => {
+                set('fee', e.target.value);
+                setFeeError(null);
+              }}
+              error={feeError ? t(feeError.key, feeError.params) : null}
+            />
+          </div>
+        </SectionCard>
+      </Section>
+
+      <Section title={t('rules.sec.offers')} description={t('rules.sec.offers.desc')}>
+        <SectionCard>
+          <div className={own.offer}>
+            <Switch
+              checked={rules.offer !== null}
+              hint={t('rules.offer.hint')}
+              onChange={(e) => {
+                setOfferError(null);
+                set('offer', e.target.checked ? DEFAULT_OFFER : null);
+              }}
+            >
+              {t('rules.offer')}
+            </Switch>
+            {rules.offer !== null && (
+              <>
+                <SelectField
+                  label={t('rules.offer.percent')}
+                  value={String(rules.offer)}
+                  options={OFFERS.map((n) => ({ value: String(n), label: t('rules.offer.value', { n }) }))}
+                  onChange={(e) => set('offer', Number(e.target.value))}
                 />
-              )}
-            </>
-          )}
-        </div>
-      </Card>
-
-      <Card>
-        <div className={own.offer}>
-          <Switch
-            checked={rules.quiet !== null}
-            hint={t('rules.quiet.hint')}
-            onChange={(e) => {
-              setOfferError(null);
-              set('quiet', e.target.checked ? DEFAULT_OFFER : null);
-            }}
-          >
-            {t('rules.quiet')}
-          </Switch>
-          {rules.quiet !== null && (
-            <>
-              <SelectField
-                label={t('rules.offer.percent')}
-                value={String(rules.quiet)}
-                options={OFFERS.map((n) => ({ value: String(n), label: t('rules.offer.value', { n }) }))}
-                onChange={(e) => set('quiet', Number(e.target.value))}
-              />
-              <CheckMenu
-                label={t('rules.quiet.days')}
-                summary={
-                  rules.quietDays.length === 0
-                    ? t('rules.quiet.daysPick')
-                    : WEEK.filter((d) => rules.quietDays.includes(d))
-                        .map((d) => t(`weekday.${d}` as MessageKey))
-                        .join(', ')
-                }
-                options={WEEK.map((d) => ({ value: String(d), label: t(`weekday.${d}` as MessageKey) }))}
-                selected={rules.quietDays.map(String)}
-                onToggle={(value) => {
-                  setOfferError(null);
-                  const d = Number(value);
-                  set('quietDays', rules.quietDays.includes(d) ? rules.quietDays.filter((x) => x !== d) : [...rules.quietDays, d].sort((x, y) => x - y));
-                }}
-                error={offerError === 'days' ? t('rules.quiet.daysRequired') : null}
-              />
-            </>
-          )}
-        </div>
-      </Card>
+                <Field
+                  type="date"
+                  label={t('rules.offer.until')}
+                  hint={t('rules.offer.untilHint')}
+                  min={ymdInBucharest(new Date())}
+                  value={rules.offerUntil}
+                  onChange={(e) => set('offerUntil', e.target.value)}
+                />
+                {services.status === 'ready' && (
+                  <CheckMenu
+                    label={t('rules.offer.scope')}
+                    summary={
+                      rules.offerServices === null
+                        ? t('rules.offer.scope.all')
+                        : rules.offerServices.length === 0
+                          ? t('rules.offer.scope.pick')
+                          : listOrCount(
+                              services.data.filter((x) => rules.offerServices!.includes(x.id)).map((x) => (lang === 'ro' ? x.name_ro : x.name_en)),
+                              plural(lang, 'unit.services', rules.offerServices.length),
+                            )
+                    }
+                    all={{
+                      label: t('rules.offer.scope.all'),
+                      selected: rules.offerServices === null,
+                      onSelect: () => {
+                        setOfferError(null);
+                        set('offerServices', rules.offerServices === null ? [] : null);
+                      },
+                    }}
+                    options={services.data.map((x) => ({ value: x.id, label: lang === 'ro' ? x.name_ro : x.name_en }))}
+                    selected={rules.offerServices ?? []}
+                    onToggle={(id) => {
+                      setOfferError(null);
+                      const now = rules.offerServices ?? [];
+                      set('offerServices', now.includes(id) ? now.filter((x) => x !== id) : [...now, id]);
+                    }}
+                    error={offerError === 'services' ? t('rules.offer.scopeEmpty') : null}
+                  />
+                )}
+              </>
+            )}
+          </div>
+          <div className={own.offer}>
+            <Switch
+              checked={rules.quiet !== null}
+              hint={t('rules.quiet.hint')}
+              onChange={(e) => {
+                setOfferError(null);
+                set('quiet', e.target.checked ? DEFAULT_OFFER : null);
+              }}
+            >
+              {t('rules.quiet')}
+            </Switch>
+            {rules.quiet !== null && (
+              <>
+                <SelectField
+                  label={t('rules.offer.percent')}
+                  value={String(rules.quiet)}
+                  options={OFFERS.map((n) => ({ value: String(n), label: t('rules.offer.value', { n }) }))}
+                  onChange={(e) => set('quiet', Number(e.target.value))}
+                />
+                <CheckMenu
+                  label={t('rules.quiet.days')}
+                  summary={
+                    rules.quietDays.length === 0
+                      ? t('rules.quiet.daysPick')
+                      : WEEK.filter((d) => rules.quietDays.includes(d))
+                          .map((d) => t(`weekday.${d}` as MessageKey))
+                          .join(', ')
+                  }
+                  options={WEEK.map((d) => ({ value: String(d), label: t(`weekday.${d}` as MessageKey) }))}
+                  selected={rules.quietDays.map(String)}
+                  onToggle={(value) => {
+                    setOfferError(null);
+                    const d = Number(value);
+                    set('quietDays', rules.quietDays.includes(d) ? rules.quietDays.filter((x) => x !== d) : [...rules.quietDays, d].sort((x, y) => x - y));
+                  }}
+                  error={offerError === 'days' ? t('rules.quiet.daysRequired') : null}
+                />
+              </>
+            )}
+          </div>
+        </SectionCard>
+      </Section>
 
       <SaveButton onSave={save}>{t('rules.save')}</SaveButton>
     </div>

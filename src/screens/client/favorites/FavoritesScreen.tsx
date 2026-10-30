@@ -1,7 +1,7 @@
 import { Heart } from 'lucide-react';
 import { useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { BackLink } from '../../../components/BackLink';
+import { PageHeader } from '../../../components/PageHeader';
 import { buttonClass } from '../../../components/buttonClass';
 import { EmptyState } from '../../../components/EmptyState';
 import { LoadError } from '../../../components/LoadError';
@@ -46,9 +46,8 @@ export function FavoritesScreen() {
 
   return (
     <div className={styles.page}>
-      <BackLink to={NAV.client.account.path} label={t('nav.account')} />
-      <h1>{t('favorites.title')}</h1>
-      {state.status === 'loading' && <SkeletonList />}
+      <PageHeader back={{ to: NAV.client.account.path, label: t('nav.account') }} title={t('favorites.title')} />
+      {state.status === 'loading' && <SkeletonList cards />}
       {state.status === 'error' && <LoadError message={t('favorites.loadError')} onRetry={reload} />}
       {state.status === 'ready' &&
         (state.data.shops.length === 0 ? (
@@ -65,7 +64,7 @@ export function FavoritesScreen() {
         ) : (
           <>
             <p className={styles.count}>{plural(lang, 'unit.shops', state.data.shops.filter((s) => s.is_favorite).length)}</p>
-            <ul className={styles.list}>
+            <ul className={styles.list} data-layout="cards">
               {state.data.shops.map((s) => (
                 <li key={s.shop_id}>
                   <ShopCard

@@ -65,7 +65,7 @@ test('a request arriving live: the count jumps, the number of "Cereri noi" and t
   // Panou has loaded with no request: a request already there when it loads does not light up.
   await expect(page.getByText('Nicio programare azi.')).toBeVisible();
   await expect(page.getByRole('link', { name: /^\d+ Cereri noi$/ })).toHaveCount(0);
-  await expect(page.getByText('Cereri noi')).toBeVisible();
+  await expect(page.getByText('Cereri noi', { exact: true })).toBeVisible();
 
   // Panou: the number of "Cereri noi" lights up when the request comes in (not the whole box).
   await bookAs(client, shopId);

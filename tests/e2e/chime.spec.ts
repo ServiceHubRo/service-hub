@@ -51,7 +51,7 @@ test('a request arriving live rings once; turned off on this device, the next on
   const client = await createUser('client');
   await signIn(page, shop, PASSWORD);
   await expect(page).toHaveURL(/\/s\/panou$/);
-  await expect(page.getByText('Cereri noi')).toBeVisible();
+  await expect(page.getByText('Cereri noi', { exact: true })).toBeVisible();
   // A browser plays sound only after the page was touched once.
   await page.keyboard.press('Shift');
   expect(await chimes(page)).toBe(0);

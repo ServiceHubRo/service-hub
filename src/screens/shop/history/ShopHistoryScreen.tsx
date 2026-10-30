@@ -9,6 +9,7 @@ import { ChoiceFilters } from '../../../components/Filters';
 import { LoadError } from '../../../components/LoadError';
 import { SearchField } from '../../../components/SearchField';
 import { ServiceIcon } from '../../../components/ServiceIcon';
+import { PageHeader } from '../../../components/PageHeader';
 import { SkeletonList } from '../../../components/Skeleton';
 import { StatusBadge } from '../../../components/StatusBadge';
 import { subscribeRows } from '../../../data/realtime';
@@ -214,14 +215,16 @@ export function ShopHistoryScreen() {
   return (
     <div className={styles.page}>
       <div>
-        <h1>{t('hist.title')}</h1>
-        {anything && (
-          <p className={styles.sub}>
-            {isOwner
-              ? t('hist.totals', { jobs: plural(lang, 'unit.repairs', totals.jobs), amount: formatMoney(lang, totals.revenue) })
-              : plural(lang, 'unit.repairs', totals.jobs)}
-          </p>
-        )}
+        <PageHeader
+          title={t('hist.title')}
+          subtitle={
+            anything
+              ? isOwner
+                ? t('hist.totals', { jobs: plural(lang, 'unit.repairs', totals.jobs), amount: formatMoney(lang, totals.revenue) })
+                : plural(lang, 'unit.repairs', totals.jobs)
+              : undefined
+          }
+        />
         {shown.some((b) => b.imported) && <p className={`${styles.sub} no-print`}>{t('imp.histNote')}</p>}
         {state.status === 'ready' && (
           <p className={`${styles.sub} print-only`}>
@@ -230,7 +233,7 @@ export function ShopHistoryScreen() {
         )}
       </div>
 
-      {state.status === 'loading' && <SkeletonList />}
+      {state.status === 'loading' && <SkeletonList cards />}
       {state.status === 'error' && <LoadError message={t('hist.loadError')} onRetry={reload} />}
       {data && !anything && <EmptyState icon={HistoryIcon} title={t('hist.empty')} body={t('hist.emptyBody')} />}
 
@@ -303,7 +306,7 @@ export function ShopHistoryScreen() {
             />
           ) : (
             <>
-              <ul className={`${styles.list} no-print`}>
+              <ul className={`${styles.list} no-print`} data-layout="cards">
                 {shown.map((b) => (
                   <li key={b.id}>
                     <HistoryCard item={b} open={open.has(b.id)} onToggle={() => toggle(b.id)} />

@@ -1,4 +1,4 @@
-import { BackLink } from '../../components/BackLink';
+import { PageHeader } from '../../components/PageHeader';
 import { NAV } from '../../app/roles';
 import { useI18n } from '../../i18n/context';
 import { PushRow } from '../push/PushRow';
@@ -13,8 +13,7 @@ export function ClientNotificationsScreen() {
   const { t } = useI18n();
   return (
     <div className={styles.page}>
-      <BackLink to={NAV.client.account.path} label={t('nav.account')} />
-      <h1>{t('settings.notifications')}</h1>
+      <PageHeader back={{ to: NAV.client.account.path, label: t('nav.account') }} title={t('settings.notifications')} />
       <PushRow />
       <ReminderRow setting="review_requests" />
       <ReminderRow setting="service_reminders" />

@@ -1,5 +1,5 @@
 import { Building2, CalendarClock, FileText, Images, ListChecks, SlidersHorizontal, Store, Users } from 'lucide-react';
-import { BackLink } from '../../../components/BackLink';
+import { PageHeader } from '../../../components/PageHeader';
 import { Tile } from '../../../components/Tile';
 import { useI18n } from '../../../i18n/context';
 import { SETTINGS_LINKS } from './paths';
@@ -15,10 +15,12 @@ export function SettingsIndex() {
   const { isOwner } = useShopSettings();
   return (
     <div className={styles.page}>
-      <BackLink to="/s/cont" label={t('nav.account')} />
-      <h1>{t('settings.title')}</h1>
-      {!isOwner && <p className={styles.intro}>{t('settings.staff.body')}</p>}
-      <div className={styles.tiles}>
+      <PageHeader
+        back={{ to: '/s/cont', label: t('nav.account') }}
+        title={t('settings.title')}
+        subtitle={isOwner ? undefined : t('settings.staff.body')}
+      />
+      <div className={styles.tiles} data-layout="tiles">
         {isOwner && (
           <>
             <Tile to={SETTINGS_LINKS.profile} icon={Store} label={t('settings.profile')} hint={t('settings.profile.hint')} />

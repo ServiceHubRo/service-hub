@@ -71,14 +71,16 @@ export function ClientsScreen() {
                 },
               ]}
               onClearAll={() => setParam({ filtru: null })}
+              end={
+                <div className={styles.toolbar}>
+                  <ExportButton<AdminClientRow>
+                    kind="clients"
+                    filters={{ q: query || undefined, filter: filter === 'all' ? undefined : filter }}
+                    narrow={(rows) => filterClients(rows, query, filter)}
+                  />
+                </div>
+              }
             />
-            <div className={styles.toolbar}>
-              <ExportButton<AdminClientRow>
-                kind="clients"
-                filters={{ q: query || undefined, filter: filter === 'all' ? undefined : filter }}
-                narrow={(rows) => filterClients(rows, query, filter)}
-              />
-            </div>
           </div>
           {shown.length === 0 ? (
             <EmptyState

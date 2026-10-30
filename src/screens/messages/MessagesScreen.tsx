@@ -2,6 +2,7 @@ import { MessageSquare } from 'lucide-react';
 import { Link, Navigate, useSearchParams } from 'react-router-dom';
 import { EmptyState } from '../../components/EmptyState';
 import { LoadError } from '../../components/LoadError';
+import { PageHeader } from '../../components/PageHeader';
 import { SkeletonList } from '../../components/Skeleton';
 import { useI18n } from '../../i18n/context';
 import { counterpartName, formatListTime, systemMessageText } from '../../lib/messages';
@@ -34,7 +35,7 @@ export function MessagesScreen() {
 
   return (
     <div className={styles.page}>
-      <h1>{t('nav.messages')}</h1>
+      <PageHeader title={t('nav.messages')} />
       {latest && (
         <Link to={teamPath(side)} className={`${styles.thread} ${newNotices > 0 ? styles.threadUnread : ''}`}>
           <TeamAvatar />

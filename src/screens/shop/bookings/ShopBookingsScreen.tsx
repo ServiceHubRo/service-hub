@@ -9,6 +9,7 @@ import { buttonClass } from '../../../components/buttonClass';
 import { ActiveFilters } from '../../../components/Filters';
 import { EmptyState } from '../../../components/EmptyState';
 import { LoadError } from '../../../components/LoadError';
+import { PageHeader } from '../../../components/PageHeader';
 import { SkeletonList } from '../../../components/Skeleton';
 import { Tabs } from '../../../components/Tabs';
 import { RpcError, type Booking } from '../../../data/rpc';
@@ -144,7 +145,7 @@ export function ShopBookingsScreen() {
   }
 
   let body;
-  if (state.status === 'loading') body = <SkeletonList />;
+  if (state.status === 'loading') body = <SkeletonList cards />;
   else if (state.status === 'error') {
     body =
       state.error instanceof RpcError && state.error.code === 'not_allowed' ? (
@@ -222,7 +223,7 @@ export function ShopBookingsScreen() {
             <EmptyState icon={CalendarCheck} title={t('sb.empty.scheduled')} body={t('sb.empty.scheduledBody')} />
           )
         ) : (
-          <ul className={styles.list} aria-label={tab === 'cereri' ? t('sb.tab.requests') : t('sb.tab.scheduled')}>
+          <ul className={styles.list} data-layout="cards" aria-label={tab === 'cereri' ? t('sb.tab.requests') : t('sb.tab.scheduled')}>
             {list.map((b) => (
               <li key={b.id}>
                 <ShopBookingCard
@@ -243,15 +244,17 @@ export function ShopBookingsScreen() {
 
   return (
     <div className={styles.page}>
-      <div className={styles.head}>
-        <h1>{t('nav.bookings')}</h1>
-        {state.status === 'ready' && (
-          <Link to={ADD_BOOKING_PATH} className={buttonClass('secondary')}>
-            <CalendarPlus size={18} aria-hidden="true" />
-            {t('wi.add')}
-          </Link>
-        )}
-      </div>
+      <PageHeader
+        title={t('nav.bookings')}
+        actions={
+          state.status === 'ready' && (
+            <Link to={ADD_BOOKING_PATH} className={buttonClass('primary')}>
+              <CalendarPlus size={18} aria-hidden="true" />
+              {t('wi.add')}
+            </Link>
+          )
+        }
+      />
       {body}
     </div>
   );

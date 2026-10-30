@@ -10,6 +10,7 @@ import { ActiveFilters, FilterGroup, FilterSheet, FiltersButton } from '../../..
 import { LoadError } from '../../../components/LoadError';
 import { SearchField } from '../../../components/SearchField';
 import { SelectField } from '../../../components/SelectField';
+import { PageHeader } from '../../../components/PageHeader';
 import { SkeletonList } from '../../../components/Skeleton';
 import { Switch } from '../../../components/Switch';
 import { searchShops, type ShopSearchResult } from '../../../data/rpc';
@@ -280,7 +281,7 @@ export function SearchScreen() {
 
   return (
     <div className={styles.page}>
-      <h1>{t('nav.client.search')}</h1>
+      <PageHeader title={t('nav.client.search')} />
 
       {guide.visible && <ClientGuide guide={guide} />}
       {guide.pending && <span hidden data-guide-pending />}
@@ -409,7 +410,7 @@ export function SearchScreen() {
       </FilterSheet>
 
       {status === 'error' && <LoadError message={t('search.resultsError')} onRetry={() => setAttempt((a) => a + 1)} />}
-      {status !== 'error' && !results && <SkeletonList />}
+      {status !== 'error' && !results && <SkeletonList cards />}
       {status !== 'error' && results && (
         <div className={styles.results} aria-busy={status === 'loading'}>
           <div className={styles.countRow}>
@@ -462,7 +463,7 @@ export function SearchScreen() {
                   <h2 id="near-title" className={styles.sectionTitle}>
                     {t('search.near')}
                   </h2>
-                  <ul className={styles.list}>
+                  <ul className={styles.list} data-layout="cards">
                     {near.map((s) => (
                       <li key={s.shop_id}>
                         <ShopCard shop={s} distanceKm={distance(s)} back={back} onFavorite={onFavorite} day={day} />
@@ -477,7 +478,7 @@ export function SearchScreen() {
                     {t('search.allResults')}
                   </h2>
                 )}
-                <ul className={styles.list}>
+                <ul className={styles.list} data-layout="cards">
                   {list.map((s) => (
                     <li key={s.shop_id}>
                       <ShopCard shop={s} distanceKm={distance(s)} back={back} onFavorite={onFavorite} day={day} />

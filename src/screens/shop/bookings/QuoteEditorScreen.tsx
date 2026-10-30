@@ -529,19 +529,26 @@ function Editor({
           {t(formError.key, formError.params)}
         </p>
       )}
-      <div className={styles.buttons}>
-        <ActionButton
-          block={false}
-          disabled={totals.total <= 0}
-          onAction={submit}
-          errorMessage={(e) => rpcErrorMessage(lang, e)}
-          canRetry={canRetryRpc}
-        >
-          {mode === 'send' ? t('sb.quote.send') : t('sb.quote.sendNew')}
-        </ActionButton>
-        <Button variant="ghost" onClick={() => navigate(back)}>
-          {t('common.cancel')}
-        </Button>
+      {/* Held at the bottom of the screen (T51): the total on the left, the send on the right. */}
+      <div className={styles.bar}>
+        <p className={styles.barTotal} aria-hidden="true">
+          <span>{t('qe.totals.total')}</span>
+          <span className="mono">{formatMoney(lang, totals.total / 100)}</span>
+        </p>
+        <div className={styles.buttons}>
+          <ActionButton
+            block={false}
+            disabled={totals.total <= 0}
+            onAction={submit}
+            errorMessage={(e) => rpcErrorMessage(lang, e)}
+            canRetry={canRetryRpc}
+          >
+            {mode === 'send' ? t('sb.quote.send') : t('sb.quote.sendNew')}
+          </ActionButton>
+          <Button variant="ghost" onClick={() => navigate(back)}>
+            {t('common.cancel')}
+          </Button>
+        </div>
       </div>
     </div>
   );

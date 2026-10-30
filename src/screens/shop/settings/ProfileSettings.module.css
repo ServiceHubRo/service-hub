@@ -82,3 +82,51 @@
 .mapAction {
   margin-top: 12px;
 }
+
+
+/* A wide screen (T51): the logo and its text on the left, its buttons on the right, one line. */
+@media (min-width: 768px) {
+  .logoCard {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    column-gap: var(--space-6);
+  }
+
+  .logoCard > .logoError {
+    grid-column: 1 / -1;
+  }
+
+  .logoCard > .logoButtons {
+    margin-top: 0;
+    flex-wrap: nowrap;
+  }
+
+  .logoCard > .logoButtons > * {
+    flex: 0 0 auto;
+    min-width: 160px;
+  }
+}
+
+@media (min-width: 768px) {
+  .mapCard {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    column-gap: var(--space-6);
+  }
+
+  .mapCard > .mapHead {
+    grid-area: 1 / 1;
+  }
+
+  .mapCard > .mapAction {
+    grid-area: 1 / 2;
+    margin-top: 0;
+  }
+
+  .mapCard > p {
+    grid-column: 1 / -1;
+    margin-top: var(--space-3);
+  }
+}

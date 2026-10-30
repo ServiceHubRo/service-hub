@@ -55,12 +55,14 @@ export function ShopShareScreen() {
   }
 
   return (
-    <div className={styles.page}>
-      <div className="no-print">
+    <div className={styles.page} data-layout="columns">
+      <div className="no-print" data-span="all">
         <BackLink to={ACCOUNT_PATH} label={t('nav.account')} />
       </div>
       <h1 className="no-print">{t('slk.title')}</h1>
-      <p className={`${styles.muted} no-print`}>{t('slk.intro')}</p>
+      <p className={`${styles.muted} no-print`} data-span="all">
+        {t('slk.intro')}
+      </p>
 
       {state.status === 'loading' && <SkeletonList count={2} />}
       {state.status === 'error' && <LoadError message={t('slk.loadError')} onRetry={reload} />}

@@ -2,7 +2,7 @@ import { CarFront } from 'lucide-react';
 import { useCallback, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { ActionButton } from '../../../components/ActionButton';
-import { BackLink } from '../../../components/BackLink';
+import { PageHeader } from '../../../components/PageHeader';
 import { Button } from '../../../components/Button';
 import { buttonClass } from '../../../components/buttonClass';
 import { Card } from '../../../components/Card';
@@ -37,8 +37,7 @@ export function CarFormScreen() {
   if (state.status === 'ready' && state.data) return <CarEditor key={state.data.id} car={state.data} />;
   return (
     <div className={styles.page}>
-      <BackLink to={GARAGE_PATH} label={t('nav.client.garage')} />
-      <h1>{t('garage.editTitle')}</h1>
+      <PageHeader back={{ to: GARAGE_PATH, label: t('nav.client.garage') }} title={t('garage.editTitle')} />
       {state.status === 'loading' && <SkeletonList count={2} />}
       {state.status === 'error' && <LoadError message={t('garage.loadError')} onRetry={reload} />}
       {state.status === 'ready' && (
@@ -116,100 +115,106 @@ function CarEditor({ car }: { car: Car | null }) {
 
   return (
     <div className={styles.page}>
-      <BackLink to={GARAGE_PATH} label={t('nav.client.garage')} />
-      <h1>{car ? t('garage.editTitle') : t('garage.newTitle')}</h1>
+      <PageHeader back={{ to: GARAGE_PATH, label: t('nav.client.garage') }} title={car ? t('garage.editTitle') : t('garage.newTitle')} />
 
-      <form className={styles.form} onSubmit={(e) => e.preventDefault()} noValidate>
-        <div className={styles.pair}>
-          <Field label={t('car.make')} placeholder={t('car.makePlaceholder')} value={make} maxLength={60} autoComplete="off" onChange={(e) => setMake(e.target.value)} />
-          <Field label={t('car.model')} placeholder={t('car.modelPlaceholder')} value={model} maxLength={60} autoComplete="off" onChange={(e) => setModel(e.target.value)} />
-        </div>
-        <div className={styles.pair}>
+      <form className={styles.form} data-layout="columns" onSubmit={(e) => e.preventDefault()} noValidate>
+        <div className={styles.form}>
+          <div className={styles.pair}>
+            <Field label={t('car.make')} placeholder={t('car.makePlaceholder')} value={make} maxLength={60} autoComplete="off" onChange={(e) => setMake(e.target.value)} />
+            <Field label={t('car.model')} placeholder={t('car.modelPlaceholder')} value={model} maxLength={60} autoComplete="off" onChange={(e) => setModel(e.target.value)} />
+          </div>
+          <div className={styles.pair}>
+            <Field
+              label={t('car.year')}
+              value={year}
+              inputMode="numeric"
+              maxLength={4}
+              mono
+              autoComplete="off"
+              error={touched.year ? yearError : null}
+              onBlur={() => setTouched((s) => ({ ...s, year: true }))}
+              onChange={(e) => setYear(e.target.value.replace(/\D/g, ''))}
+            />
+            <Field
+              label={t('car.plate')}
+              placeholder={t('car.platePlaceholder')}
+              value={plate}
+              maxLength={20}
+              mono
+              upper
+              autoCapitalize="characters"
+              autoComplete="off"
+              onChange={(e) => setPlate(e.target.value)}
+            />
+          </div>
           <Field
-            label={t('car.year')}
-            value={year}
-            inputMode="numeric"
-            maxLength={4}
-            mono
-            autoComplete="off"
-            error={touched.year ? yearError : null}
-            onBlur={() => setTouched((s) => ({ ...s, year: true }))}
-            onChange={(e) => setYear(e.target.value.replace(/\D/g, ''))}
-          />
-          <Field
-            label={t('car.plate')}
-            placeholder={t('car.platePlaceholder')}
-            value={plate}
-            maxLength={20}
+            label={t('car.vin')}
+            hint={t('car.vinHint')}
+            value={vin}
+            maxLength={24}
             mono
             upper
             autoCapitalize="characters"
             autoComplete="off"
-            onChange={(e) => setPlate(e.target.value)}
+            spellCheck={false}
+            error={touched.vin ? vinError : null}
+            onBlur={() => setTouched((s) => ({ ...s, vin: true }))}
+            onChange={(e) => setVin(e.target.value)}
           />
         </div>
-        <Field
-          label={t('car.vin')}
-          hint={t('car.vinHint')}
-          value={vin}
-          maxLength={24}
-          mono
-          upper
-          autoCapitalize="characters"
-          autoComplete="off"
-          spellCheck={false}
-          error={touched.vin ? vinError : null}
-          onBlur={() => setTouched((s) => ({ ...s, vin: true }))}
-          onChange={(e) => setVin(e.target.value)}
-        />
+        <div className={styles.form}>
+          <Card inset className={styles.docsPanel}>
+            <p className={styles.panelTitle}>{t('garage.docsTitle')}</p>
+            <p className={styles.sub}>{t('garage.docsHint')}</p>
+            {CAR_DOCS.map(({ doc, column }) => (
+              <Field
+                key={doc}
+                type="date"
+                label={t(`doc.long.${doc}` as MessageKey)}
+                value={dates[column]}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setDates((d) => ({ ...d, [column]: value }));
+                }}
+              />
+            ))}
+          </Card>
 
-        <Card inset className={styles.docsPanel}>
-          <p className={styles.panelTitle}>{t('garage.docsTitle')}</p>
-          <p className={styles.sub}>{t('garage.docsHint')}</p>
-          {CAR_DOCS.map(({ doc, column }) => (
-            <Field
-              key={doc}
-              type="date"
-              label={t(`doc.long.${doc}` as MessageKey)}
-              value={dates[column]}
-              onChange={(e) => {
-                const value = e.target.value;
-                setDates((d) => ({ ...d, [column]: value }));
-              }}
+          {/* T30: the client's own interval (else the catalog's) and a change made outside Service-Hub. */}
+          <Card inset className={styles.docsPanel}>
+            <p className={styles.panelTitle}>{t('garage.oilTitle')}</p>
+            <p className={styles.sub}>{t('garage.oilHint')}</p>
+            <SelectField
+              label={t('garage.oilEvery')}
+              value={oilMonths}
+              options={[
+                {
+                  value: '',
+                  label: standardMonths
+                    ? t('garage.oilStandard', { months: plural(lang, 'unit.months', standardMonths) })
+                    : t('garage.oilStandardNone'),
+                },
+                ...OIL_MONTH_CHOICES.map((n) => ({ value: String(n), label: plural(lang, 'unit.months', n) })),
+              ]}
+              onChange={(e) => setOilMonths(e.target.value)}
             />
-          ))}
-        </Card>
+            <Field
+              type="date"
+              label={t('garage.oilLast')}
+              hint={t('garage.oilLastHint')}
+              value={oilLast}
+              max={today}
+              error={oilLastError}
+              onChange={(e) => setOilLast(e.target.value)}
+            />
+          </Card>
+        </div>
 
-        {/* T30: the client's own interval (else the catalog's) and a change made outside Service-Hub. */}
-        <Card inset className={styles.docsPanel}>
-          <p className={styles.panelTitle}>{t('garage.oilTitle')}</p>
-          <p className={styles.sub}>{t('garage.oilHint')}</p>
-          <SelectField
-            label={t('garage.oilEvery')}
-            value={oilMonths}
-            options={[
-              {
-                value: '',
-                label: standardMonths
-                  ? t('garage.oilStandard', { months: plural(lang, 'unit.months', standardMonths) })
-                  : t('garage.oilStandardNone'),
-              },
-              ...OIL_MONTH_CHOICES.map((n) => ({ value: String(n), label: plural(lang, 'unit.months', n) })),
-            ]}
-            onChange={(e) => setOilMonths(e.target.value)}
-          />
-          <Field
-            type="date"
-            label={t('garage.oilLast')}
-            hint={t('garage.oilLastHint')}
-            value={oilLast}
-            max={today}
-            error={oilLastError}
-            onChange={(e) => setOilLast(e.target.value)}
-          />
-        </Card>
-
-        {!filled && <p className={styles.sub}>{t('car.required')}</p>}
+        {!filled && (
+          <p className={styles.sub} data-span="all">
+            {t('car.required')}
+          </p>
+        )}
         <ActionButton submit onAction={save} disabled={!canSave} errorMessage={(e) => rpcErrorMessage(lang, e)} canRetry={canRetryRpc}>
           {t('common.save')}
         </ActionButton>

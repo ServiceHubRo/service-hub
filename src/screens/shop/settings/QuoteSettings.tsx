@@ -1,9 +1,10 @@
 import { useCallback, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { docNumber } from '../../../../supabase/functions/_shared/jobDoc.ts';
-import { BackLink } from '../../../components/BackLink';
 import { Card } from '../../../components/Card';
 import { Field } from '../../../components/Field';
+import { PageHeader } from '../../../components/PageHeader';
+import { Section, SectionCard } from '../../../components/Section';
 import { LoadError } from '../../../components/LoadError';
 import { SkeletonList } from '../../../components/Skeleton';
 import { TextArea } from '../../../components/TextArea';
@@ -94,54 +95,60 @@ export function QuoteSettings() {
 
     body = (
       <>
-        <Card className={styles.stack}>
-          <Field
-            ref={rateRef}
-            label={vatPayer ? t('qs.rate.vat') : t('qs.rate')}
-            hint={t('qs.rate.hint')}
-            value={rate}
-            inputMode="decimal"
-            autoComplete="off"
-            mono
-            error={rateError}
-            onChange={(e) => {
-              setRate(e.target.value);
-              setRateError(null);
-            }}
-          />
-          <p className={styles.hint}>
-            {vatPayer ? t('qs.vat.on', { rate: vatRate }) : t('qs.vat.off')}{' '}
-            <Link to={SETTINGS_LINKS.billing} className={styles.inlineLink}>
-              {t('settings.billing')}
-            </Link>
-          </p>
-        </Card>
-        <Card className={styles.stack}>
-          <Field
-            ref={numberRef}
-            label={t('qs.next')}
-            hint={numbering.last != null ? t('qs.next.last', { n: docNumber(numbering.last) }) : t('qs.next.none')}
-            value={nextText}
-            inputMode="numeric"
-            autoComplete="off"
-            mono
-            error={numberError}
-            onChange={(e) => {
-              setNext(e.target.value);
-              setNumberError(null);
-            }}
-          />
-        </Card>
-        <Card className={styles.stack}>
-          <TextArea
-            label={t('qs.terms')}
-            hint={t('qs.terms.hint')}
-            value={terms}
-            maxLength={TERMS_MAX}
-            rows={5}
-            onChange={(e) => setTerms(e.target.value)}
-          />
-        </Card>
+        <Section title={t('qs.sec.pricing')} description={t('qs.sec.pricing.desc')}>
+          <SectionCard>
+            <div className={styles.fieldNote}>
+              <Field
+                inline
+                ref={rateRef}
+                label={vatPayer ? t('qs.rate.vat') : t('qs.rate')}
+                hint={t('qs.rate.hint')}
+                value={rate}
+                inputMode="decimal"
+                autoComplete="off"
+                mono
+                error={rateError}
+                onChange={(e) => {
+                  setRate(e.target.value);
+                  setRateError(null);
+                }}
+              />
+              <p className={styles.hint}>
+                {vatPayer ? t('qs.vat.on', { rate: vatRate }) : t('qs.vat.off')}{' '}
+                <Link to={SETTINGS_LINKS.billing} className={styles.inlineLink}>
+                  {t('settings.billing')}
+                </Link>
+              </p>
+            </div>
+            <Field
+              inline
+              ref={numberRef}
+              label={t('qs.next')}
+              hint={numbering.last != null ? t('qs.next.last', { n: docNumber(numbering.last) }) : t('qs.next.none')}
+              value={nextText}
+              inputMode="numeric"
+              autoComplete="off"
+              mono
+              error={numberError}
+              onChange={(e) => {
+                setNext(e.target.value);
+                setNumberError(null);
+              }}
+            />
+          </SectionCard>
+        </Section>
+        <Section title={t('qs.sec.terms')} description={t('qs.sec.terms.desc')}>
+          <Card className={styles.stack}>
+            <TextArea
+              label={t('qs.terms')}
+              hint={t('qs.terms.hint')}
+              value={terms}
+              maxLength={TERMS_MAX}
+              rows={5}
+              onChange={(e) => setTerms(e.target.value)}
+            />
+          </Card>
+        </Section>
         <SaveButton onSave={save}>{t('common.save')}</SaveButton>
       </>
     );
@@ -149,8 +156,7 @@ export function QuoteSettings() {
 
   return (
     <div className={styles.page}>
-      <BackLink to={SETTINGS_PATH} label={t('settings.title')} />
-      <h1>{t('settings.quotes')}</h1>
+      <PageHeader back={{ to: SETTINGS_PATH, label: t('settings.title') }} title={t('settings.quotes')} />
       {body}
     </div>
   );

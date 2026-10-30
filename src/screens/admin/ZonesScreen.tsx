@@ -2,7 +2,7 @@ import { MapPinned, SearchX } from 'lucide-react';
 import { useCallback, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ActionButton } from '../../components/ActionButton';
-import { BackLink } from '../../components/BackLink';
+import { PageHeader } from '../../components/PageHeader';
 import { Button } from '../../components/Button';
 import { Card } from '../../components/Card';
 import { EmptyState } from '../../components/EmptyState';
@@ -70,8 +70,7 @@ export function ZonesScreen() {
 
   return (
     <div className={styles.page}>
-      <BackLink to={ADMIN_ACCOUNT_PATH} label={t('nav.account')} />
-      <h1>{t('admin.areas.title')}</h1>
+      <PageHeader back={{ to: ADMIN_ACCOUNT_PATH, label: t('nav.account') }} title={t('admin.areas.title')} />
       <p className={styles.muted}>{t('admin.areas.intro')}</p>
       {state.status === 'loading' && <SkeletonList />}
       {state.status === 'error' && <LoadError message={t('admin.areas.loadError')} onRetry={reload} />}

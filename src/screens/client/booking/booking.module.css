@@ -385,3 +385,13 @@
   font-weight: 700;
   line-height: 1.3;
 }
+
+/* A wide screen (T51): the service categories in two columns. */
+@media (min-width: 1280px) {
+  .groups {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+    column-gap: 20px;
+  }
+}

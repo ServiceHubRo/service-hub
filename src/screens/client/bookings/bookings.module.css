@@ -26,19 +26,24 @@
 .card {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--space-3);
 }
 
 .top {
   display: flex;
-  align-items: flex-start;
-  gap: 10px;
+  align-items: center;
+  gap: var(--space-3);
 }
 
+/* The service's icon in a tinted square, like the tiles (T51). */
 .icon {
   color: var(--amber);
   flex-shrink: 0;
-  margin-top: 2px;
+  box-sizing: content-box;
+  padding: 9px;
+  border-radius: var(--radius-button);
+  background: var(--amber-tint);
+  border: 1px solid rgba(245, 165, 36, 0.18);
 }
 
 .what {
@@ -48,7 +53,9 @@
 }
 
 .service {
-  font-weight: 700;
+  font-weight: 650;
+  font-size: 15.5px;
+  letter-spacing: -0.005em;
 }
 
 .muted {
@@ -421,4 +428,11 @@
   display: block;
   color: var(--muted);
   font-size: 13.5px;
+}
+
+/* The card's foot (T51): its actions under a hairline at the bottom of the card. */
+.card > .actions {
+  margin-top: auto;
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--border);
 }

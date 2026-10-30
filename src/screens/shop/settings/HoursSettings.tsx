@@ -1,12 +1,13 @@
 import { CalendarOff, CalendarPlus } from 'lucide-react';
 import { useCallback, useId, useState } from 'react';
 import { ActionButton } from '../../../components/ActionButton';
-import { BackLink } from '../../../components/BackLink';
 import { Button } from '../../../components/Button';
 import { Card } from '../../../components/Card';
 import { Switch } from '../../../components/Switch';
 import { EmptyState } from '../../../components/EmptyState';
 import { Field } from '../../../components/Field';
+import { PageHeader } from '../../../components/PageHeader';
+import { Section } from '../../../components/Section';
 import { SkeletonList } from '../../../components/Skeleton';
 import { Stepper } from '../../../components/Stepper';
 import { rpcErrorMessage } from '../../../data/rpc';
@@ -56,15 +57,15 @@ export function HoursSettings() {
 
   return (
     <div className={styles.page}>
-      <BackLink to={SETTINGS_PATH} label={t('settings.title')} />
-      <h1>{t('settings.hours')}</h1>
-
-      <h2 className={styles.section}>{t('hours.week')}</h2>
-      {hours.state.status === 'loading' && <SkeletonList count={3} />}
-      {hours.state.status === 'error' && <LoadError message={t('settings.loadError')} onRetry={hours.reload} />}
-      {hours.state.status === 'ready' && <WeekEditor initial={hours.state.data} />}
-
-      <Closures />
+      <PageHeader back={{ to: SETTINGS_PATH, label: t('settings.title') }} title={t('settings.hours')} />
+      <Section title={t('hours.week')} description={t('hours.sec.week.desc')}>
+        {hours.state.status === 'loading' && <SkeletonList count={3} />}
+        {hours.state.status === 'error' && <LoadError message={t('settings.loadError')} onRetry={hours.reload} />}
+        {hours.state.status === 'ready' && <WeekEditor initial={hours.state.data} />}
+      </Section>
+      <Section title={t('hours.closures')} description={t('hours.closures.hint')}>
+        <Closures />
+      </Section>
     </div>
   );
 }
@@ -104,11 +105,18 @@ function WeekEditor({ initial }: { initial: DayHours[] }) {
           return day ? <DayRow key={weekday} day={day} onChange={(patch) => update(weekday, patch)} /> : null;
         })}
       </Card>
-      <Button block onClick={copyMonday}>
-        {t('hours.copyWeekdays')}
-      </Button>
-      {changed && <p className={styles.warn}>{t('common.unsaved')}</p>}
-      <SaveButton onSave={save}>{t('hours.save')}</SaveButton>
+      <SaveButton
+        footer
+        onSave={save}
+        note={
+          <div className={styles.footerNote}>
+            <Button onClick={copyMonday}>{t('hours.copyWeekdays')}</Button>
+            {changed && <p className={styles.warn}>{t('common.unsaved')}</p>}
+          </div>
+        }
+      >
+        {t('hours.save')}
+      </SaveButton>
     </div>
   );
 }
@@ -186,8 +194,6 @@ function Closures() {
 
   return (
     <>
-      <h2 className={styles.section}>{t('hours.closures')}</h2>
-      <p className={styles.note}>{t('hours.closures.hint')}</p>
       {state.status === 'loading' && <SkeletonList count={3} />}
       {state.status === 'error' && <LoadError message={t('settings.loadError')} onRetry={reload} />}
       {state.status === 'ready' && (
@@ -215,7 +221,7 @@ function Closures() {
               />
             </Card>
           ) : (
-            <Button block onClick={() => setAdding(true)}>
+            <Button block className={styles.addButton} onClick={() => setAdding(true)}>
               <CalendarPlus size={18} aria-hidden="true" />
               {t('hours.closures.add')}
             </Button>

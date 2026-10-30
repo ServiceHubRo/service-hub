@@ -71,14 +71,16 @@ export function ShopsScreen() {
                 },
               ]}
               onClearAll={() => setParam({ stare: null })}
+              end={
+                <div className={styles.toolbar}>
+                  <ExportButton<AdminShopRow>
+                    kind="shops"
+                    filters={{ q: query || undefined, state: filter === 'all' ? undefined : filter }}
+                    narrow={(rows) => filterShops(rows, query, filter)}
+                  />
+                </div>
+              }
             />
-            <div className={styles.toolbar}>
-              <ExportButton<AdminShopRow>
-                kind="shops"
-                filters={{ q: query || undefined, state: filter === 'all' ? undefined : filter }}
-                narrow={(rows) => filterShops(rows, query, filter)}
-              />
-            </div>
           </div>
           {shown.length === 0 ? (
             <EmptyState

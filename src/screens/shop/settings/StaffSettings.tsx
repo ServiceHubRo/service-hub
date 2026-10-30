@@ -1,11 +1,12 @@
 import { Copy, Lock, UserPlus } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { ActionButton } from '../../../components/ActionButton';
-import { BackLink } from '../../../components/BackLink';
 import { Button } from '../../../components/Button';
 import { Card } from '../../../components/Card';
 import { EmptyState } from '../../../components/EmptyState';
 import { Field } from '../../../components/Field';
+import { PageHeader } from '../../../components/PageHeader';
+import { Section } from '../../../components/Section';
 import { SkeletonList } from '../../../components/Skeleton';
 import { rpcErrorMessage } from '../../../data/rpc';
 import {
@@ -58,43 +59,44 @@ export function StaffSettings() {
 
   return (
     <div className={styles.page}>
-      <BackLink to={SETTINGS_PATH} label={t('settings.title')} />
-      <h1>{t('settings.staff')}</h1>
+      <PageHeader back={{ to: SETTINGS_PATH, label: t('settings.title') }} title={t('settings.staff')} />
       {!isOwner ? (
         <EmptyState icon={Lock} title={t('settings.ownerOnly')} />
       ) : (
         <>
-          {/* Read again whenever the team with accounts changes (a colleague removed here). */}
-          <SeatPrice
-            key={state.status === 'ready' ? state.data.filter((m) => m.role === 'staff' && m.accepted_at).length : -1}
-          />
+          <Section title={t('staff.invite')}>
+            {/* Read again whenever the team with accounts changes (a colleague removed here). */}
+            <SeatPrice
+              key={state.status === 'ready' ? state.data.filter((m) => m.role === 'staff' && m.accepted_at).length : -1}
+            />
+            <InviteForm
+              onInvited={async (email, url, mailed) => {
+                setLink({ email, url, mailed });
+                await refresh().catch(() => undefined);
+              }}
+            />
+            {link && <LinkPanel email={link.email} url={link.url} mailed={link.mailed} />}
+          </Section>
 
-          <InviteForm
-            onInvited={async (email, url, mailed) => {
-              setLink({ email, url, mailed });
-              await refresh().catch(() => undefined);
-            }}
-          />
-          {link && <LinkPanel email={link.email} url={link.url} mailed={link.mailed} />}
-
-          <h2 className={styles.section}>{t('staff.team')}</h2>
-          {state.status === 'loading' && <SkeletonList />}
-          {state.status === 'error' && <LoadError message={t('settings.loadError')} onRetry={reload} />}
-          {state.status === 'ready' && (
-            <div className={styles.stack}>
-              {state.data.map((m) => (
-                <MemberCard
-                  key={m.id}
-                  member={m}
-                  onRemoved={() => setData((list) => list.filter((x) => x.id !== m.id))}
-                  onNewLink={async (email, url, mailed) => {
-                    setLink({ email, url, mailed });
-                    await refresh().catch(() => undefined);
-                  }}
-                />
-              ))}
-            </div>
-          )}
+          <Section title={t('staff.team')}>
+            {state.status === 'loading' && <SkeletonList />}
+            {state.status === 'error' && <LoadError message={t('settings.loadError')} onRetry={reload} />}
+            {state.status === 'ready' && (
+              <div className={styles.stack}>
+                {state.data.map((m) => (
+                  <MemberCard
+                    key={m.id}
+                    member={m}
+                    onRemoved={() => setData((list) => list.filter((x) => x.id !== m.id))}
+                    onNewLink={async (email, url, mailed) => {
+                      setLink({ email, url, mailed });
+                      await refresh().catch(() => undefined);
+                    }}
+                  />
+                ))}
+              </div>
+            )}
+          </Section>
         </>
       )}
     </div>
@@ -135,7 +137,6 @@ function InviteForm({
   return (
     <Card>
       <form className={styles.stack} noValidate onSubmit={(e) => e.preventDefault()}>
-        <p className={styles.cardTitle}>{t('staff.invite')}</p>
         <Field
           label={t('staff.inviteEmail')}
           type="email"

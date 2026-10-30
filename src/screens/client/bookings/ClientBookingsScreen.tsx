@@ -4,6 +4,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { buttonClass } from '../../../components/buttonClass';
 import { EmptyState } from '../../../components/EmptyState';
 import { LoadError } from '../../../components/LoadError';
+import { PageHeader } from '../../../components/PageHeader';
 import { SkeletonList } from '../../../components/Skeleton';
 import { splitBookings, type ClientBooking } from '../../../data/bookings';
 import { useI18n } from '../../../i18n/context';
@@ -57,7 +58,7 @@ export function ClientBookingsScreen() {
         <h2 id={`bookings-${id}`} className={styles.sectionTitle}>
           {title}
         </h2>
-        <ul className={styles.list}>
+        <ul className={styles.list} data-layout="cards">
           {items.map((b) => (
             <li
               key={b.id}
@@ -84,8 +85,8 @@ export function ClientBookingsScreen() {
 
   return (
     <div className={styles.page}>
-      <h1>{t('nav.bookings')}</h1>
-      {state.status === 'loading' && <SkeletonList />}
+      <PageHeader title={t('nav.bookings')} />
+      {state.status === 'loading' && <SkeletonList cards />}
       {state.status === 'error' && <LoadError message={t('bookings.loadError')} onRetry={reload} />}
       {groups &&
         (groups.active.length + groups.past.length === 0 ? (

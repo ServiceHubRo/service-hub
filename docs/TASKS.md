@@ -70,6 +70,7 @@ Ordinea contează: fiecare sarcină se sprijină pe cele de dinainte. Sarcinile 
 | T48 | Intrarea cu Google | „Continuă cu Google” pe Intră și Cont nou; la prima intrare, „Finalizează contul” cere ce lipsește |
 | T49 | Intrarea cu Apple, butoane pastilă | „Continuă cu Apple” lângă Google; amândouă ca pastile |
 | T50 | Devizul complet, fișa de preluare, devizul final | Manoperă (ore × tarif) și piese (cantitate × preț, producător) cu TVA, numerotare proprie; fișa de preluare cu defectele pe desen, confirmată de client; PDF-uri pentru service și client |
+| T51 | Design premium și lățimea pe laptop | Tot ecranul liber pe laptop; setările pe secțiuni simetrice, bară de salvare jos; componente și culori rafinate; carduri egale pe rând |
 
 ---
 
@@ -1254,6 +1255,20 @@ Cerut de Eduard pe 28 oct 2026, pe baza unui deviz pe hârtie al unui service di
 - **Decizii:** factura fiscală rămâne în programul de facturare al service-ului (e-Factura); platforma nu emite facturi în numele service-urilor. PDF-urile nu au cod de verificare `/verifica` (ar fi cerut o pagină publică nouă); poartă codul programării. Liniile devizelor vechi (fără tip) apar împreună sub „Lucrări și piese”.
 - **Teste:** `tests/sql/130_job_documents.sql` (liniile cu cantități, refuzurile, TVA-ul și firma păstrate pe deviz, numerotarea și cine o poate schimba, fișa: cine o scrie, cine o citește, fotografiile, confirmarea o singură dată, km la finalizare, cine a lucrat, datele PDF-ului și cine le primește), `unit/jobDoc` (totalurile devizului de pe hârtie exact, TVA, formatări, cele trei PDF-uri în ambele limbi, mai multe pagini), `unit/shopBookings` și `unit/quoteLines` (editorul: ore, cantități, TVA, validări), `e2e/job-documents` (setările, fișa confirmată de client, editorul cu TVA, clientul citește pe secțiuni, persoană fizică sau juridică; RO/EN), `e2e/shop-bookings` și `e2e/quote-variants` rescrise pentru editorul nou. Fără pachete noi (`pdf-lib` era deja folosit la raport).
 - **Rămas:** butoanele PDF au nevoie de funcția `job-document` publicată (o face „Deploy Supabase”); semnătura de mână pe tabletă la predare, dacă e nevoie, se poate adăuga separat.
+
+- [x] Făcut
+
+## T51 — Design premium și lățimea pe laptop ✅
+
+Cerut de Eduard pe 29 oct 2026: „pe PC … toată bucata liberă pe ecran, aerisit, nu un pătrat în mijloc”, apoi, după prima variantă: „chiar nu puteai să le faci simetrice? … butonul de salvare subtil sau măcar lat cât tot jos … design premium”. Fără migrare, fără pachete noi.
+
+- **Lățimea:** pe laptop conținutul ocupă tot spațiul de lângă meniu (până la 1480 px, margini de 48 px de la 1280 px). Listele de carduri (Programări, Istoric, Caută, Garaj, Favorite, Recenzii, Rapoartele mele, colegii) trec pe 2 coloane la 1440 px și 3 pe un monitor lat; cardurile de pe un rând au aceeași înălțime, cu butoanele aliniate jos, sub o linie fină. Dalele din Cont și Setări: 2–3 coloane. Telefonul și tableta rămân pe o coloană.
+- **Setările pe secțiuni** (`Section`, `SectionCard`): pe laptop titlul secțiunii și o propoziție în stânga, controalele într-un card în dreapta, aceleași proporții pe fiecare pagină; pe telefon titlul deasupra. Reguli de programare (Capacitate, Termene, Confirmare și taxă, Reduceri), Profil public (Prezentare, Adresa, Contact), Program (săptămâna ca un orar, fiecare zi pe un rând, apoi zilele libere), Facturare, Devize, Notificări, Vitrina, Personal, Cont (Profil, Setări și instrumente, Autentificare, Ajutor, Documente legale, Datele mele). În carduri, etichetele stau în stânga și controalele în dreapta, aliniate la aceeași margine (`inline` la `Field` și `SelectField`).
+- **Bara de salvare:** lipită jos, cât toată lățimea conținutului, sticlă peste pagină, butonul în dreapta (pe telefon pe toată lățimea), cu o notă în stânga când e cazul („Modificări nesalvate”). Editorul de deviz are aceeași bară, cu totalul în stânga și „Trimite devizul” în dreapta. Program și Vitrina salvează la finalul secțiunii, în dreapta.
+- **Antetul paginii** (`PageHeader`): linkul înapoi, titlul, rândul de sub el și acțiunea paginii în dreapta („Adaugă programare”), la fel pe fiecare ecran.
+- **Sistemul de design** (`tokens.css`): straturi de culoare (meniu, pagină, card, control), margini fine, umbră discretă pe carduri, spațiere din 4 în 4 px, raze 14/10/10. Meniul lateral cu rânduri rotunjite și rândul ales în nuanța chihlimbarului; butoane, câmpuri (un pas mai închise decât cardul, inel discret la focus), comutatoare, file (control segmentat), dale (pictograma într-un pătrat colorat) și cardurile programărilor refăcute în același stil. Administrare: „Descarcă Excel” pe același rând cu Filtre.
+- **Decizii:** „Mesaje” rămâne o listă pe o coloană (o conversație se citește ca un inbox). Editorul de deviz păstrează rândurile pe toată lățimea, ca un deviz pe hârtie. Eticheta taxei din Reguli e acum „Taxă de constatare (lei)”.
+- **Teste:** testele de browser existente pe 390, 820 și 1440 px; capturile înainte/după verificate pe fiecare ecran atins.
 
 - [x] Făcut
 

@@ -93,14 +93,14 @@ export function MyReportsScreen() {
         <Banner tone="info">{t('reports.credits', { credits: plural(lang, 'unit.freeReports', credits) })}</Banner>
       )}
 
-      {state.status === 'loading' && <SkeletonList />}
+      {state.status === 'loading' && <SkeletonList cards />}
       {state.status === 'error' && <LoadError message={t('reports.loadError')} onRetry={reload} />}
       {reports &&
         (reports.length === 0 ? (
           <EmptyState icon={FileCheck} title={t('reports.empty')} body={t('reports.emptyBody')} />
         ) : (
           <>
-            <ul className={styles.list}>
+            <ul className={styles.list} data-layout="cards">
               {reports.map((r) => (
                 <li key={r.id}>
                   <ReportCard report={r} highlighted={r.id === highlight} />

@@ -3,7 +3,7 @@ import { useCallback, useEffect, useId, useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { ActionButton } from '../../../components/ActionButton';
 import { Banner } from '../../../components/Banner';
-import { BackLink } from '../../../components/BackLink';
+import { PageHeader } from '../../../components/PageHeader';
 import { buttonClass } from '../../../components/buttonClass';
 import { Card } from '../../../components/Card';
 import { EmptyState } from '../../../components/EmptyState';
@@ -104,8 +104,7 @@ export function SubscriptionScreen() {
 
   return (
     <div className={styles.page}>
-      <BackLink to={ACCOUNT_PATH} label={t('nav.account')} />
-      <h1>{t('sub.title')}</h1>
+      <PageHeader back={{ to: ACCOUNT_PATH, label: t('nav.account') }} title={t('sub.title')} />
       {body}
     </div>
   );

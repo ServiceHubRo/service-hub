@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useSession } from '../../app/sessionContext';
 import { ActionButton } from '../../components/ActionButton';
 import { Button } from '../../components/Button';
+import { Section } from '../../components/Section';
 import { Card } from '../../components/Card';
 import { Checkbox } from '../../components/Checkbox';
 import { authErrorMessage, deleteAccount, exportMyData, isRetryable } from '../../data/auth';
@@ -37,8 +38,7 @@ export function DataSection() {
   }
 
   return (
-    <>
-      <h2 className={styles.section}>{t('account.data')}</h2>
+    <Section title={t('account.data')} description={t('account.sec.data.desc')}>
       <Card>
         <div className={styles.cardStack}>
           <p className={styles.muted}>{t('account.data.rights')}</p>
@@ -85,6 +85,6 @@ export function DataSection() {
           </div>
         </Card>
       )}
-    </>
+    </Section>
   );
 }

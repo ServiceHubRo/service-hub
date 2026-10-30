@@ -4,6 +4,7 @@ import { useSession } from '../../app/sessionContext';
 import { ActionButton } from '../../components/ActionButton';
 import { Banner } from '../../components/Banner';
 import { Button } from '../../components/Button';
+import { Section } from '../../components/Section';
 import { Card } from '../../components/Card';
 import { AuthFailure, authErrorMessage, cancelEmailChange, changeEmail, changePassword, isRetryable } from '../../data/auth';
 import { useCaptcha } from '../../components/useCaptcha';
@@ -213,12 +214,9 @@ function PasswordCard() {
 export function SecuritySection() {
   const { t } = useI18n();
   return (
-    <>
-      <h2 className={styles.section}>{t('account.security')}</h2>
-      <div className={styles.cardStack}>
-        <EmailCard />
-        <PasswordCard />
-      </div>
-    </>
+    <Section title={t('account.security')} description={t('account.sec.security.desc')}>
+      <EmailCard />
+      <PasswordCard />
+    </Section>
   );
 }

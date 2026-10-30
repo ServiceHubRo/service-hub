@@ -3,6 +3,7 @@ import { useCallback, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useSession } from '../../../app/sessionContext';
 import { ActionButton } from '../../../components/ActionButton';
+import { PageHeader } from '../../../components/PageHeader';
 import { Banner } from '../../../components/Banner';
 import { EmptyState } from '../../../components/EmptyState';
 import { SkeletonList } from '../../../components/Skeleton';
@@ -123,7 +124,9 @@ export function Dashboard() {
 
   return (
     <div className={styles.page}>
-      <h1 className="no-print">{t('nav.shop.dashboard')}</h1>
+      <div className="no-print">
+        <PageHeader title={t('nav.shop.dashboard')} />
+      </div>
       <div className="no-print">
         <PushBanner role="shop" />
       </div>
