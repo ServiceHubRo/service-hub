@@ -20,7 +20,7 @@ export interface NoShowDispute {
 }
 
 export interface NoShowSummary {
-  /** No-shows that count: booked in the app, last 90 days, not disputed (waiting or accepted). */
+  /** No-shows that count: booked in the app, last 90 days, not annulled after a dispute. */
   count: number;
   window_days: number;
   /** From this many, every booking needs the acknowledgement. */
@@ -86,7 +86,7 @@ export interface AdminNoShowDispute extends NoShowDispute {
     name: string | null;
     phone: string | null;
     email: string | null;
-    /** No-shows that count now (this one left out while it waits). */
+    /** No-shows that count now (this one included while it waits). */
     no_shows: number;
     disputes: number;
   } | null;

@@ -143,8 +143,8 @@ select test.fails(format($$select public.dispute_no_show(%L, 'Încă o dată, al
   'already_disputed', 'once per booking');
 select test.eq(reason, 'Am fost la service la ora stabilită.', 'reason trimmed'), test.eq(status, 'pending', 'waiting')
 from public.no_show_disputes where id = current_setting('test.d2')::uuid;
--- Under review: it does not count.
-select test.eq(public.client_no_show_count(test.id('client_a')), 2, 'a disputed no-show does not count while waiting');
+-- Under review: it still counts until the admin decides (after the audit, variant A).
+select test.eq(public.client_no_show_count(test.id('client_a')), 3, 'a disputed no-show still counts while waiting');
 select test.eq(jsonb_array_length(public.my_no_show_summary()->'disputes'), 1, 'the client sees the dispute');
 select test.ok(not (public.my_no_show_summary()->'disputable' ? current_setting('test.c2')), 'no longer to contest');
 select test.ok(not (public.my_no_show_summary()->'disputes'->0 ? 'decision_note'), 'without an internal note');
@@ -153,7 +153,8 @@ select test.fails($$select decision_note from public.no_show_disputes$$, 'permis
 select test.fails($$update public.no_show_disputes set status = 'upheld'$$, 'permission denied', 'cannot decide it');
 select test.fails($$insert into public.no_show_disputes (booking_id, client_id, reason) values (gen_random_uuid(), auth.uid(), 'xxxxxxxxxxxx')$$,
   'permission denied', 'nor write it directly');
-select test.ok(test.book(test.id('client_a'), test.id('shop1'), test.workday(4), '12:00') is not null, 'two count: no acknowledgement needed');
+select test.eq(test.error_of($$select test.book(test.id('client_a'), test.id('shop1'), test.workday(4), '12:00')$$),
+  'no_show_ack_required', 'disputing does not lift the acknowledgement');
 select test.logout();
 select test.login(test.id('client_b'));
 select test.eq(test.count($$select 1 from public.no_show_disputes$$), 0::bigint, 'another client sees nothing');
@@ -166,7 +167,7 @@ select test.eq(test.count($$select 1 from public.no_show_disputes$$), 0::bigint,
 select test.eq((select x->>'no_show_dispute' from jsonb_array_elements(public.list_shop_history()->'bookings') x
                 where x->>'id' = current_setting('test.c2')), 'pending', 'the shop''s history shows it is under review');
 select test.eq((select (x->>'client_no_shows')::int from jsonb_array_elements(public.list_shop_bookings()->'bookings') x
-                where x->>'id' = current_setting('test.acked')), 2, 'the shop''s card counts the same');
+                where x->>'id' = current_setting('test.acked')), 3, 'the shop''s card counts the same');
 select test.logout();
 
 -- The admin decides.
@@ -206,7 +207,7 @@ select test.logout();
 select test.login(test.id('client_a'));
 select set_config('test.d3', public.dispute_no_show(current_setting('test.c3')::uuid, 'Am anunțat service-ul prin telefon.',
   gen_random_uuid())->>'id', true);
-select test.eq(public.client_no_show_count(test.id('client_a')), 1, 'second dispute waiting');
+select test.eq(public.client_no_show_count(test.id('client_a')), 2, 'second dispute waiting: still counts');
 select test.logout();
 select test.login(test.id('admin'));
 select public.admin_decide_no_show_dispute(current_setting('test.d3')::uuid, 'rejected', '', gen_random_uuid());
@@ -224,7 +225,7 @@ select test.fails(format($$select public.dispute_no_show(%L, 'Am fost la service
   'dispute_window_closed', 'over 90 days: no longer counts, nothing to contest');
 select test.logout();
 
--- The phone rule uses the same count: a pending dispute lifts it.
+-- The phone rule uses the same count: a waiting dispute does not lift it, an upheld one does.
 update public.platform_settings set limits = limits || '{"no_shows_before_phone": 2}' where id = 1;
 select test.eq(test.error_of($$select test.book(test.id('client_a'), test.id('shop1'), test.workday(5), '13:00')$$),
   'phone_verification_required', 'two count: phone code first');
@@ -232,13 +233,19 @@ select set_config('test.c4', test.raw_booking(test.id('shop1'), test.id('client_
 select test.login(test.id('client_a'));
 select public.dispute_no_show(current_setting('test.c4')::uuid, 'Am fost la service la ora stabilită.', gen_random_uuid());
 select test.logout();
--- c3 (rejected) and late count; c4 is waiting.
-select test.eq(test.error_of($$select test.book(test.id('client_a'), test.id('shop1'), test.workday(5), '13:00')$$),
-  'phone_verification_required', 'still two');
+-- c3 (rejected), late and c4 (waiting) count.
 update public.platform_settings set limits = limits || '{"no_shows_before_phone": 3}' where id = 1;
-select test.ok(test.book(test.id('client_a'), test.id('shop1'), test.workday(5), '13:00') is not null, 'the waiting one does not count');
+select test.eq(test.error_of($$select test.book(test.id('client_a'), test.id('shop1'), test.workday(5), '13:00')$$),
+  'phone_verification_required', 'the waiting one counts too');
 
 -- The admin's morning email counts the waiting disputes.
 select test.eq((public.admin_digest_counts()->>'no_show_disputes')::int, 1, 'digest: one waiting');
+
+-- Upheld: it no longer counts, the client books again (two left, below both limits).
+select test.login(test.id('admin'));
+select public.admin_decide_no_show_dispute((select id from public.no_show_disputes where booking_id = current_setting('test.c4')::uuid),
+  'upheld', '', gen_random_uuid());
+select test.logout();
+select test.ok(test.book(test.id('client_a'), test.id('shop1'), test.workday(5), '13:00') is not null, 'upheld: books again');
 
 rollback;
