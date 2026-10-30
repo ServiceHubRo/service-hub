@@ -622,11 +622,14 @@
   color: var(--muted);
   font-size: 14px;
   max-width: 28em;
+  /* When it wraps, the lines come out even: never a word alone on the last line (Eduard). */
+  text-wrap: balance;
 }
 
 @media (min-width: 900px) {
   .footerNote {
     justify-self: end;
+    max-width: none;
     text-align: right;
   }
 }
