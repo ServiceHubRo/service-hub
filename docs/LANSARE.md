@@ -375,6 +375,17 @@ Partea din cod e făcută (headerele de securitate, regulile din baza de date, l
 
 Nimic de aici nu cere cod nou și nu se vede în aplicație, în afară de cerințele pentru parolă (le arată Supabase la înregistrare).
 
+### 4.6d Aprobarea ta înainte ca baza reală să se schimbe (după auditul din 30 oct 2026)
+
+După fiecare Merge, acțiunea „Deploy Supabase” aplică modificările în baza de date reală. De acum așteaptă întâi aprobarea ta. Un singur pas, o singură dată:
+
+1. GitHub → repo-ul → **Settings → Environments → New environment** → numele `production` → **Configure environment**.
+2. Bifează **Required reviewers**, scrie `ServiceHubRo` și alege contul → **Save protection rules**. Lasă **Prevent self-review** nebifat (tu dai Merge și tot tu aprobi).
+
+**Cum aprobi:** după Merge, primești email de la GitHub („Deployment review required”). Sau: repo-ul → **Actions → Deploy Supabase** → rularea galbenă → **Review deployments** → bifezi `production` → **Approve and deploy**. Fă-o după ce te-ai uitat pe linkul de test și, la o modificare mare, după o copie de siguranță (4.1).
+
+**Verifici:** la următorul Merge, „Deploy Supabase” rămâne galben, cu „Waiting”, până apeși **Approve and deploy**. Linkurile de test (pull request-urile) nu așteaptă: ele merg doar pe proiectul de test.
+
 ### 4.7 După mutare
 
 - **Partea 5** (ștergerea conturilor de test), chiar înainte să anunți lansarea.
