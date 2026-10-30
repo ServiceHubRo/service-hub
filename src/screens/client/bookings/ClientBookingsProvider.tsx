@@ -98,6 +98,18 @@ export function ClientBookingsProvider({ children }: { children: ReactNode }) {
     });
   }, [clientId, ready, apply, refresh]);
 
+  // T53: the admin decided a dispute of a no-show: the card says how.
+  useEffect(() => {
+    if (!clientId || !ready) return;
+    return subscribeRows({
+      channel: `client-no-show-disputes:${clientId}`,
+      table: 'no_show_disputes',
+      filter: `client_id=eq.${clientId}`,
+      onChange: () => refresh(),
+      onResync: refresh,
+    });
+  }, [clientId, ready, refresh]);
+
   const value = useMemo<ClientBookingsValue>(
     () => ({ state, reload, refresh, apply, patch }),
     [state, reload, refresh, apply, patch],

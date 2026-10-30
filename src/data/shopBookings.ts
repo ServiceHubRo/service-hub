@@ -58,8 +58,10 @@ export interface ShopBooking {
   client_phone: string | null;
   /** Account id (`C-00012`); null when the client deleted the account. */
   client_account: string | null;
-  /** No-shows in the last 90 days, at any shop (§6). */
+  /** No-shows in the last 90 days, at any shop (§6), without the disputed ones (T53). */
   client_no_shows: number;
+  /** A confirmed booking: from when it may be marked as a no-show (end of the slot + grace, T53). */
+  no_show_from?: string | null;
   /** The new-client discount on labor this booking was promised (T23). */
   offer_percent?: number | null;
   /** Which offer was promised (Eduard, 8 Oct): new client or a quiet day. */

@@ -18,12 +18,14 @@ import {
   type SuspectDecision,
   type SuspectReview,
 } from '../../data/admin';
+import { fetchNoShowDisputes } from '../../data/noShows';
 import { useI18n } from '../../i18n/context';
 import { plural, type Msg } from '../../i18n/translate';
 import { reportAge } from '../../lib/admin';
 import { useNow } from '../../lib/useNow';
 import { ConfirmPanel } from './ActionPanels';
 import { ExportButton } from './ExportButton';
+import { NoShowDisputesSection } from './NoShowDisputes';
 import { Pill, SectionTitle } from './parts';
 import { adminBookingPath, adminShopPath } from './paths';
 import { useLiveData } from './useLiveData';
@@ -31,7 +33,7 @@ import { useUrlParams } from './useUrlParams';
 import { dateTime, day } from './format';
 import styles from './admin.module.css';
 
-const LIVE = [{ table: 'reviews' }];
+const LIVE = [{ table: 'reviews' }, { table: 'no_show_disputes' }];
 
 function ReviewBody({ r }: { r: AdminReview }) {
   const { t, lang } = useI18n();
@@ -162,7 +164,8 @@ function statusPill(r: AdminReview, t: (k: 'admin.reportStatus.removed' | 'admin
  * shop, the text and how long it has waited — the platform promises a decision within 5 working
  * days. "Păstrează" dismisses the report, "Șterge" removes the review (the shop's average is
  * recalculated); an optional note is kept in the log; both sides are told. Then the reviews that
- * look staged (T25), with why. Below, every review, searchable. Live.
+ * look staged (T25), with why; the no-shows clients contested (T53). Below, every review,
+ * searchable. Live.
  */
 export function ModerationScreen() {
   const { t } = useI18n();
@@ -170,7 +173,12 @@ export function ModerationScreen() {
   const { params, setParam, text, setText } = useUrlParams();
   const q = params.get('q') ?? '';
   const load = useCallback(
-    () => Promise.all([fetchReviews(q), fetchSuspectReviews()]).then(([reviews, suspects]) => ({ ...reviews, suspects })),
+    () =>
+      Promise.all([fetchReviews(q), fetchSuspectReviews(), fetchNoShowDisputes()]).then(([reviews, suspects, disputes]) => ({
+        ...reviews,
+        suspects,
+        disputes,
+      })),
     [q],
   );
   const { state, reload, refetch } = useLiveData(load, LIVE, 'admin-moderation');
@@ -229,6 +237,14 @@ export function ModerationScreen() {
               </ul>
             </>
           )}
+
+          <NoShowDisputesSection
+            data={state.data.disputes}
+            onDecided={() => {
+              setNotice({ key: 'admin.done.decided' });
+              void refetch().catch(() => {});
+            }}
+          />
 
           <SectionTitle>{t('admin.moderation.all')}</SectionTitle>
           <SearchField

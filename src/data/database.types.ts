@@ -3054,6 +3054,7 @@ export type Database = {
     }
     Functions: {
       accepted_quote_lines: { Args: { p_booking_id: string }; Returns: Json }
+      acknowledge_no_show_notice: { Args: { p_request_id: string }; Returns: Json }
       account_email: { Args: { p_user_id: string }; Returns: string }
       account_fingerprint: {
         Args: { p_kind: string; p_value: string }
@@ -3114,6 +3115,15 @@ export type Database = {
           p_id: string
           p_name_en: string
           p_name_ro: string
+          p_request_id: string
+        }
+        Returns: Json
+      }
+      admin_decide_no_show_dispute: {
+        Args: {
+          p_decision: string
+          p_dispute_id: string
+          p_note: string
           p_request_id: string
         }
         Returns: Json
@@ -3234,6 +3244,7 @@ export type Database = {
       admin_list_clients: { Args: never; Returns: Json }
       admin_list_company_checks: { Args: never; Returns: Json }
       admin_list_history_reports: { Args: never; Returns: Json }
+      admin_list_no_show_disputes: { Args: never; Returns: Json }
       admin_list_notices: { Args: never; Returns: Json }
       admin_list_reviews: { Args: { p_q?: string }; Returns: Json }
       admin_list_service_areas: { Args: never; Returns: Json }
@@ -3969,6 +3980,10 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      dispute_no_show: {
+        Args: { p_booking_id: string; p_reason: string; p_request_id: string }
+        Returns: Json
+      }
       dispatch_sweep: { Args: never; Returns: boolean }
       email_domain_blocked: { Args: { p_email: string }; Returns: boolean }
       end_expired_trials: { Args: { p_now?: string }; Returns: number }
@@ -4409,6 +4424,7 @@ export type Database = {
       }
       my_client_referrals: { Args: never; Returns: Json }
       my_imported_jobs: { Args: never; Returns: Json }
+      my_no_show_summary: { Args: never; Returns: Json }
       my_phone_verification: { Args: never; Returns: Json }
       my_quote_numbering: { Args: never; Returns: Json }
       my_referrals: { Args: never; Returns: Json }

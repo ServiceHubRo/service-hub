@@ -2,6 +2,7 @@ import { failure, RpcError } from './rpc';
 import { supabase } from './supabase';
 import { currentQuote, type Quote } from '../lib/clientBookings';
 import { isActiveStatus, type BookingStatus } from '../lib/status';
+import { fetchNoShowSummary, type NoShowSummary } from './noShows';
 
 /**
  * The client's own bookings (FR §3.5, P10b; T07 basic cards, T09 quotes, cancelling, reviews).
@@ -80,6 +81,8 @@ export interface ClientBookingsData {
   bookings: ClientBooking[];
   /** How long after completion a review can be left (platform setting, default 60). */
   reviewWindowDays: number;
+  /** T53: the no-shows that count, the disputes and what may be contested; read only when a booking is a no-show. */
+  noShows?: NoShowSummary | null;
 }
 
 const COLUMNS = [
@@ -159,7 +162,8 @@ async function fetchReviewWindowDays(): Promise<number> {
 
 export async function fetchClientBookingsData(clientId: string): Promise<ClientBookingsData> {
   const [bookings, reviewWindowDays] = await Promise.all([fetchClientBookings(clientId), fetchReviewWindowDays()]);
-  return { bookings, reviewWindowDays };
+  const noShows = bookings.some((b) => b.status === 'no_show') ? await fetchNoShowSummary() : null;
+  return { bookings, reviewWindowDays, noShows };
 }
 
 /** The quote this booking's card shows (the waiting one, or the one that was decided). */

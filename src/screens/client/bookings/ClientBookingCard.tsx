@@ -17,6 +17,7 @@ import { ServiceIcon } from '../../../components/ServiceIcon';
 import { StatusBadge } from '../../../components/StatusBadge';
 import { SuccessCheck } from '../../../components/SuccessCheck';
 import { quoteOf, type ClientBooking } from '../../../data/bookings';
+import type { NoShowDispute } from '../../../data/noShows';
 import {
   cancelBooking,
   canRetryRpc,
@@ -33,6 +34,7 @@ import { quantityDetail, vatOf } from '../../../lib/quoteSections';
 import { formatPhone, normalizePhone } from '../../../lib/validators';
 import { bookingMessagesPath } from '../../messages/paths';
 import { bookingCarHistoryPath, bookingIntakePath, bookingPath, SEARCH_PATH, type VehicleHistoryLinkState } from '../paths';
+import { NoShowDisputePanel, NoShowDisputeStatus } from './NoShowDispute';
 import { QuoteDecision } from './QuoteDecision';
 import { ReviewForm } from './ReviewForm';
 import styles from './bookings.module.css';
@@ -56,6 +58,10 @@ export interface ClientBookingCardProps {
   openReview?: boolean;
   /** The booking changed under this card: read the list again. */
   onStale: () => void;
+  /** A no-show (T53): its dispute, and whether it may still be contested. */
+  noShow?: { dispute: NoShowDispute | null; disputable: boolean };
+  /** A dispute was sent: read the no-shows again. */
+  onDisputed?: () => void;
 }
 
 /** Requests that never reached the shop's work: the offer no longer applies to them. */
@@ -76,6 +82,8 @@ export function ClientBookingCard({
   onReviewed,
   onStale,
   openReview,
+  noShow,
+  onDisputed,
 }: ClientBookingCardProps) {
   const { t, lang } = useI18n();
   const offerText = useOfferText();
@@ -83,7 +91,11 @@ export function ClientBookingCard({
   const car = [[b.car_snapshot.make, b.car_snapshot.model].filter(Boolean).join(' '), b.car_snapshot.plate].filter(Boolean).join(' · ');
   const cancel = cancelState(b, b.shop?.cancel_deadline_hours ?? 0, now);
   const review = reviewState(b, b.review !== null, reviewWindowDays, now);
-  const [panel, setPanel] = useState<'cancel' | 'review' | null>(() => (openReview && review === 'open' ? 'review' : null));
+  const [panel, setPanel] = useState<'cancel' | 'review' | 'dispute' | null>(() => (openReview && review === 'open' ? 'review' : null));
+  // A dispute sent from this card shows at once, before the list is read again.
+  const [sentDispute, setSentDispute] = useState<NoShowDispute | null>(null);
+  const dispute = b.status === 'no_show' ? (sentDispute ?? noShow?.dispute ?? null) : null;
+  const disputable = b.status === 'no_show' && !dispute && (noShow?.disputable ?? false);
   const shopName = b.shop?.name ?? '';
   // Just decided here: the outcome comes with a check that draws itself (src/lib/motion.ts).
   const [decided, setDecided] = useState(false);
@@ -137,6 +149,7 @@ export function ClientBookingCard({
       {b.loyalty_percent !== null && !OFFER_GONE.has(b.status) && <OfferNote>{t('loyalty.client', { n: b.loyalty_percent })}</OfferNote>}
 
       <StatusDetail booking={b} quote={quote} now={now} decided={decided} />
+      {dispute && <NoShowDisputeStatus dispute={dispute} />}
       {b.status === 'quote_sent' && quote && (
         // A replaced quote starts with every line ticked again.
         <QuoteDecision key={quote.id} bookingId={b.id} quote={quote} act={act} />
@@ -176,6 +189,10 @@ export function ClientBookingCard({
             <Link to={bookAgainPath} className={buttonClass('secondary')}>
               {t('cb.bookAgain')}
             </Link>
+          ) : disputable ? (
+            <Button variant="secondary" onClick={() => setPanel('dispute')}>
+              {t('cb.dispute.action')}
+            </Button>
           ) : null}
           <MoreActions
             items={[
@@ -248,6 +265,17 @@ export function ClientBookingCard({
             </Button>
           </div>
         </InlinePanel>
+      )}
+      {panel === 'dispute' && (
+        <NoShowDisputePanel
+          bookingId={b.id}
+          onSent={(d) => {
+            setSentDispute(d);
+            setPanel(null);
+            onDisputed?.();
+          }}
+          onClose={() => setPanel(null)}
+        />
       )}
       {panel === 'review' && (
         <ReviewForm

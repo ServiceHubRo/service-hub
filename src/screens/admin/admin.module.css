@@ -89,6 +89,11 @@
   font-size: 13px;
 }
 
+/* A link (44 px tall) and plain text on one line: the text sits on the link's middle. */
+.rowMetaCentered {
+  align-items: center;
+}
+
 .chevron {
   color: var(--muted);
   flex-shrink: 0;

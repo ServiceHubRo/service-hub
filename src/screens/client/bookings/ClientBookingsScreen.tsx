@@ -1,12 +1,14 @@
 import { CalendarDays } from 'lucide-react';
 import { useEffect, useMemo, useRef } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
+import { Banner } from '../../../components/Banner';
 import { buttonClass } from '../../../components/buttonClass';
 import { EmptyState } from '../../../components/EmptyState';
 import { LoadError } from '../../../components/LoadError';
 import { PageHeader } from '../../../components/PageHeader';
 import { SkeletonList } from '../../../components/Skeleton';
 import { splitBookings, type ClientBooking } from '../../../data/bookings';
+import { needsAcknowledgement } from '../../../data/noShows';
 import { useI18n } from '../../../i18n/context';
 import { useNow } from '../../../lib/useNow';
 import { SEARCH_PATH } from '../paths';
@@ -76,6 +78,15 @@ export function ClientBookingsScreen() {
                 onReviewed={(id, review) => patch(id, { review })}
                 onStale={refresh}
                 openReview={reviewFocus && b.id === focusId}
+                noShow={
+                  b.status === 'no_show'
+                    ? {
+                        dispute: data?.noShows?.disputes.find((d) => d.booking_id === b.id) ?? null,
+                        disputable: data?.noShows?.disputable.includes(b.id) ?? false,
+                      }
+                    : undefined
+                }
+                onDisputed={refresh}
               />
             </li>
           ))}
@@ -86,6 +97,12 @@ export function ClientBookingsScreen() {
   return (
     <div className={styles.page}>
       <PageHeader title={t('nav.bookings')} />
+      {/* T53: from the second no-show that counts, a neutral notice; never a score. */}
+      {data?.noShows && data.noShows.count >= 2 && (
+        <Banner tone="warning">
+          {t(needsAcknowledgement(data.noShows) ? 'bookings.noShows.ack' : 'bookings.noShows', { n: data.noShows.count })}
+        </Banner>
+      )}
       {state.status === 'loading' && <SkeletonList cards />}
       {state.status === 'error' && <LoadError message={t('bookings.loadError')} onRetry={reload} />}
       {groups &&

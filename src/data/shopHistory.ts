@@ -3,6 +3,7 @@ import type { CarSnapshot } from './bookings';
 import type { Quote } from '../lib/clientBookings';
 import { endedDay, type HistoryStatus } from '../lib/history';
 import type { ExtraService } from '../lib/bookingServices';
+import type { NoShowDisputeStatus } from './noShows';
 
 /**
  * The shop's repair history (FR §4.3, P16b; T10), in one read: `list_shop_history()` answers only
@@ -46,6 +47,8 @@ export interface ShopHistoryItem {
   cancel_reason: string | null;
   /** `not_updated` when the system closed a confirmed booking left open for 7 days. */
   closed_reason: 'unanswered' | 'not_updated' | null;
+  /** A no-show the client contested (T53): under review, annulled, or kept after review. */
+  no_show_dispute?: NoShowDisputeStatus | null;
   /** When it ended: finished, canceled, or the last status change. */
   ended_at: string;
   /** The accepted version of a finished job, the refused or the expired one; else null. */
