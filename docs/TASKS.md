@@ -1327,6 +1327,14 @@ După auditul din 30 oct 2026, deciziile lui Eduard: varianta A la contestații,
 
 - [x] Făcut
 
+## T55 — Subsolul paginii de prezentare: „România” nu mai rămâne singur pe rând ✅
+
+Cerut de Eduard pe 30 oct 2026, cu o poză de pe PC. Textul din dreapta jos („Service-Hub · programări online la service-uri auto din toată România.”) era limitat la 28em și lăsa ultimul cuvânt singur pe al doilea rând.
+
+- Pe ecranul lat (de la 900 px) textul folosește toată coloana lui: un singur rând la 1280, 1440 și 1920 px, în română și engleză.
+- Când trebuie să se rupă (telefon, tabletă), rândurile ies egale (`text-wrap: balance`).
+- Doar `src/screens/public/Landing.module.css`. Teste: `e2e/public` (390, 820, 1440 px).
+
 ## T56 — Texte rupte pe două rânduri ✅
 
 Cerut de Eduard pe 30 oct 2026 (butonul „Deconectează-mă” rupt la cratimă în bara laterală: „Aiurea dacă găsesc d-astea peste tot”). Doar stiluri și componente, fără migrare, fără pachete noi.
