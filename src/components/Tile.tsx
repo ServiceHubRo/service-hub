@@ -1,5 +1,6 @@
 import { ChevronRight, type LucideIcon } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { KeepHyphens } from './KeepHyphens';
 import styles from './Tile.module.css';
 
 interface TileProps {
@@ -22,8 +23,12 @@ export function Tile({ to, href, icon: Icon, label, hint, onClick }: TileProps) 
         <Icon size={19} className={styles.icon} />
       </span>
       <span className={styles.label}>
-        {label}
-        {hint && <span className={styles.hint}>{hint}</span>}
+        <KeepHyphens>{label}</KeepHyphens>
+        {hint && (
+          <span className={styles.hint}>
+            <KeepHyphens>{hint}</KeepHyphens>
+          </span>
+        )}
       </span>
       <ChevronRight size={18} className={styles.chevron} aria-hidden="true" />
     </>

@@ -12,3 +12,8 @@
   flex-direction: column;
   gap: 8px;
 }
+
+/* Short labels: one line, never broken at the hyphen of „Deconectează-mă”. */
+.buttons > * {
+  white-space: nowrap;
+}

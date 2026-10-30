@@ -24,6 +24,10 @@ body {
   font-family: var(--font-body);
   font-size: var(--body-size);
   line-height: 1.55;
+  /* Text that needs two lines gets two even ones: never one word alone on the last line, never a
+     button label broken after its first word (Eduard, 30 Oct 2026). Browsers balance up to six
+     lines; longer text wraps as usual. */
+  text-wrap: balance;
 }
 
 h1,

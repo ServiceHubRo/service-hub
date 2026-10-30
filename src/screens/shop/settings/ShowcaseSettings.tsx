@@ -6,6 +6,7 @@ import { Card } from '../../../components/Card';
 import { PageHeader } from '../../../components/PageHeader';
 import { Section } from '../../../components/Section';
 import { Checkbox } from '../../../components/Checkbox';
+import { KeepHyphens } from '../../../components/KeepHyphens';
 import { LoadError } from '../../../components/LoadError';
 import { SkeletonList } from '../../../components/Skeleton';
 import { rpcErrorMessage } from '../../../data/rpc';
@@ -232,7 +233,7 @@ function AmenitiesCard() {
               <Checkbox key={a} checked={picked.includes(a)} onChange={(e) => toggle(a, e.target.checked)}>
                 <span className={own.amenity}>
                   <Icon size={16} aria-hidden="true" />
-                  {t(`amenity.${a}` as MessageKey)}
+                  <KeepHyphens>{t(`amenity.${a}` as MessageKey)}</KeepHyphens>
                 </span>
               </Checkbox>
             );

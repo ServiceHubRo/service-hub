@@ -1,6 +1,7 @@
 import { Check, ChevronRight, X } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
+import { KeepHyphens } from '../../components/KeepHyphens';
 import type { AuditEntry, ShopState, SubscriptionStatus } from '../../data/admin';
 import { useI18n } from '../../i18n/context';
 import { formatMoney } from '../../i18n/format';
@@ -57,7 +58,9 @@ export function Facts({ rows }: { rows: [string, ReactNode][] }) {
     <dl className={styles.facts}>
       {rows.map(([label, value]) => (
         <div key={label} style={{ display: 'contents' }}>
-          <dt>{label}</dt>
+          <dt>
+            <KeepHyphens>{label}</KeepHyphens>
+          </dt>
           <dd>{value === null || value === undefined || value === '' ? '—' : value}</dd>
         </div>
       ))}

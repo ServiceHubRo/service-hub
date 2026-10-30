@@ -40,6 +40,7 @@ import { fromPrerenderedPage } from '../../lib/prerender';
 import { includedColleagues, launchSaving } from '../../lib/subscription';
 import { formatPhone } from '../../lib/validators';
 import { signUpPath } from '../auth/paths';
+import { KeepHyphens } from '../../components/KeepHyphens';
 import styles from './Landing.module.css';
 import { MockNav, ShopMockup, ViewLabel } from './LandingMockups';
 import mockups from './LandingMockups.module.css';
@@ -135,7 +136,9 @@ export function Landing() {
               <h1 id="landing-title" className={styles.heroTitle}>
                 {t('landing.heroTitle')} <span className={styles.highlight}>{t('landing.heroHighlight')}</span>
               </h1>
-              <p className={styles.lead}>{t('landing.heroText')}</p>
+              <p className={styles.lead}>
+                <KeepHyphens>{t('landing.heroText')}</KeepHyphens>
+              </p>
               <p className={styles.free}>
                 <Check size={18} aria-hidden="true" className={styles.freeIcon} />
                 <span>{t('landing.drivers')}</span>
@@ -164,7 +167,7 @@ export function Landing() {
                   {t('landing.shopsTitle')}
                 </h2>
                 <p className={styles.sub} data-reveal="" style={order(2)}>
-                  {t('landing.shopsText')}
+                  <KeepHyphens>{t('landing.shopsText')}</KeepHyphens>
                 </p>
               </div>
               <ShopMockup />
@@ -189,7 +192,9 @@ export function Landing() {
                     {i + 1}
                   </span>
                   <h3 className={styles.h3}>{t(step.title)}</h3>
-                  <p className={styles.cardText}>{t(step.text)}</p>
+                  <p className={styles.cardText}>
+                    <KeepHyphens>{t(step.text)}</KeepHyphens>
+                  </p>
                 </li>
               ))}
             </ol>
@@ -211,7 +216,9 @@ export function Landing() {
                 <h2 id="landing-trust" className={styles.trustTitle}>
                   {t('landing.trustTitle')}
                 </h2>
-                <p className={styles.trustText}>{t('landing.trustText')}</p>
+                <p className={styles.trustText}>
+                  <KeepHyphens>{t('landing.trustText')}</KeepHyphens>
+                </p>
               </div>
             </div>
           </div>
@@ -300,7 +307,9 @@ function FeatureCards({ features }: { features: Feature[] }) {
             <Icon size={22} />
           </span>
           <h3 className={styles.h3}>{t(title)}</h3>
-          <p className={styles.cardText}>{t(text)}</p>
+          <p className={styles.cardText}>
+            <KeepHyphens>{t(text)}</KeepHyphens>
+          </p>
         </li>
       ))}
     </ul>
@@ -380,7 +389,9 @@ function PriceBlock() {
             {state.pricing.launchRon !== null && (
               <p className={styles.priceNote}>
                 <Tag size={16} aria-hidden="true" />
-                <span>{t('landing.priceLaunch')}</span>
+                <span>
+                  <KeepHyphens>{t('landing.priceLaunch')}</KeepHyphens>
+                </span>
               </p>
             )}
             {state.pricing.periodDiscounts[12] > 0 && (

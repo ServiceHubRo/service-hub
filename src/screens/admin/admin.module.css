@@ -227,7 +227,8 @@ a.stat:hover {
 /* ---------------------------------------------------------------- facts (label : value) */
 .facts {
   display: grid;
-  grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+  /* Labels on one line when they fit in half the card ("Service-uri publice"), not cut at a hyphen. */
+  grid-template-columns: fit-content(50%) minmax(0, 1fr);
   gap: 6px 12px;
   font-size: 14px;
 }

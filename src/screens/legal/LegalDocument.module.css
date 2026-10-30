@@ -13,6 +13,8 @@
   border-radius: var(--radius-card);
   padding: var(--card-pad);
   overflow-wrap: anywhere;
+  /* Long running text: full lines, only the last one kept from being a lone word. */
+  text-wrap: pretty;
 }
 
 .body h2 {
