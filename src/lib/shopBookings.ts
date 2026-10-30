@@ -102,3 +102,8 @@ export function parseTab(value: string | null): ShopTab {
 export function parseFilter(value: string | null): ShopFilter | null {
   return SHOP_FILTERS.includes(value as ShopFilter) ? (value as ShopFilter) : null;
 }
+
+/** The amount a quote stands at: the sent total, or the approved one once the client decided. */
+export function quoteTotal(quote: { status: string; total_sent: number; total_approved: number | null }): number {
+  return quote.status !== 'sent' ? (quote.total_approved ?? quote.total_sent) : quote.total_sent;
+}

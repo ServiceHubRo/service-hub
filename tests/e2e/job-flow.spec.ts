@@ -10,6 +10,7 @@ import {
   shot,
   signIn,
   cardAction,
+  openBooking,
 } from './support';
 
 // T09 — the client decides on the quote (partially), the shop starts and completes the job with a
@@ -123,6 +124,7 @@ test.describe('quote, work, completion, review', () => {
     // The shop watches its scheduled bookings in a second browser.
     const shopPage = await signedIn(browser, page, shop);
     await shopPage.goto('/s/programari?tab=programate');
+    await openBooking(shopCard(shopPage, accepted.ref));
     await expect(shopCard(shopPage, accepted.ref)).toContainText('Deviz trimis — se așteaptă răspunsul clientului.');
 
     // Client: the tab badge counts the two quotes waiting.

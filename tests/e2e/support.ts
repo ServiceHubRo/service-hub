@@ -303,6 +303,24 @@ async function secondStep(page: Page, password: string, options: { remember?: bo
 
 export const isDesktop = (page: Page) => (page.viewportSize()?.width ?? 0) >= 1024;
 
+/**
+ * T57: a shop booking card shows its summary; its details (phone, quote lines, intake, PDFs) open
+ * with a tap on the summary. Opens the card if it is closed.
+ */
+export async function openBooking(card: Locator) {
+  const summary = card.locator('button[aria-controls^="booking-"]');
+  await expect(summary).toBeVisible();
+  if ((await summary.getAttribute('aria-expanded')) !== 'true') await summary.click();
+  await expect(summary).toHaveAttribute('aria-expanded', 'true');
+}
+
+/** Opens every shop booking card on the page. */
+export async function openAllBookings(page: Page) {
+  const closed = page.locator('main button[aria-controls^="booking-"][aria-expanded="false"]');
+  await expect(page.locator('main button[aria-controls^="booking-"]').first()).toBeVisible();
+  while ((await closed.count()) > 0) await closed.first().click();
+}
+
 export async function expectNoHorizontalScroll(page: Page) {
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
   expect(overflow).toBeLessThanOrEqual(0);

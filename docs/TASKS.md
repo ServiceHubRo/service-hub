@@ -1350,3 +1350,16 @@ Cerut de Eduard pe 30 oct 2026 (butonul „Deconectează-mă” rupt la cratimă
 - **Teste:** `tests/unit/KeepHyphens.test.tsx`.
 
 - [x] Făcut
+
+## T57 — Programări și Istoric pe o coloană ✅
+
+Cerut de Eduard pe 30 oct 2026 (cardurile pe două coloane, un card deschis lăsa vecinul gol). Doar interfața: fără backend, fără schimbări de logică, toate acțiunile și regulile lor rămân.
+
+- **Cauza:** regula globală `data-layout="cards"` așeza listele pe două coloane de la 1280 px, cu cardurile unui rând de aceeași înălțime și acțiunile împinse jos. Un card lung (sau deschis) întindea și cardul de alături, care rămânea gol.
+- **Programări:** o coloană, cel mult 1040 px (1240 px pe monitor lat). Cardul închis: serviciul, data și ora, codul, mașina și numărul, clientul, suma devizului (când există), statusul și acțiunile; o notă scurtă doar când explică acțiunea (cerere trecută de oră, programare trecută). Deschis (atingi rezumatul), în același card: telefonul, ID-ul contului, neprezentările, nota, ofertele, devizul pe linii, fișa de preluare și PDF-urile sub „Documente”. O programare deschisă dintr-o notificare apare deschisă.
+- **Istoric:** o coloană, aceeași lățime. Rezumatul pe un rând (lucrarea și data, mașina și numărul, clientul și km, suma sau statusul); detaliile sub el, în același card, cu PDF-urile sub „Documente” și telefonul cu „Mai multe” jos. Căutarea, filtrele, totalurile, exportul, tipărirea, lucrările importate și contestațiile rămân neschimbate.
+- **Butoane:** acțiunea principală și „Mai multe” la baza cardului, sub o linie fină; PDF-urile separat, în detalii. Coloanele rezumatului sunt aceleași pe fiecare card, ca lista să se citească pe verticală.
+- **Finalizare:** aceeași ordine a câmpurilor; pe un card lat, câmpurile scurte câte două (cost și garanție, efectuate de și verificate de), kilometrajul și lucrarea pe rândul lor; pe telefon unul sub altul.
+- **Teste:** testele care citeau detalii din card îl deschid întâi (`openBooking`, `openAllBookings` în `tests/e2e/support.ts`).
+
+- [x] Făcut

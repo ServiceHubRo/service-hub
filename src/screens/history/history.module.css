@@ -398,3 +398,146 @@
     border-top: 1px solid var(--border);
   }
 }
+
+/* ---------------------------------------------------------------- shop Istoric (T57) */
+/* One job under the other, never two columns: the page as wide as a job reads well. */
+.shopPage {
+  width: 100%;
+  max-width: var(--list-max);
+}
+
+.jobList {
+  container-type: inline-size;
+}
+
+/* The summary: on a narrow card what and amount on top, car and client under a hairline, the work
+   under them; on a wide one what, car, amount on one row, the work under it. */
+.jobSummary {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  grid-template-areas:
+    'icon what meta chevron'
+    'who who who who'
+    'extra extra extra extra';
+  align-items: start;
+  /* Rows without a gap: a row left empty (no work, no warranty) adds no space. */
+  column-gap: 10px;
+  width: 100%;
+  min-height: var(--tap);
+  text-align: left;
+  border-radius: var(--radius-input);
+}
+
+.jobIcon {
+  grid-area: icon;
+  /* The service's icon in a tinted square, as in Programări. */
+  box-sizing: content-box;
+  margin-top: 0;
+  padding: 7px;
+  border-radius: var(--radius-button);
+  background: var(--amber-tint);
+  border: 1px solid rgba(245, 165, 36, 0.18);
+}
+
+.jobWhat {
+  grid-area: what;
+}
+
+.jobWho {
+  grid-area: who;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  margin-top: 9px;
+  padding-top: 9px;
+  border-top: 1px solid var(--border);
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+.jobMeta {
+  grid-area: meta;
+  display: flex;
+  align-items: center;
+}
+
+.jobChevron {
+  grid-area: chevron;
+  margin-top: 2px;
+}
+
+.jobExtra {
+  grid-area: extra;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin-top: 9px;
+  min-width: 0;
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+@container (min-width: 720px) {
+  /* The same columns on every card, so job, car and amount line up down the list. */
+  .jobSummary {
+    grid-template-columns: auto minmax(0, 1.2fr) minmax(0, 1fr) 130px auto;
+    grid-template-areas:
+      'icon what who meta chevron'
+      '. extra extra extra .';
+    align-items: center;
+    column-gap: var(--space-4);
+  }
+
+  .jobWho {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: 0;
+  }
+
+  .jobExtra {
+    margin-top: var(--space-2);
+  }
+
+  .jobChevron {
+    margin-top: 0;
+  }
+
+  .jobMeta {
+    justify-content: flex-end;
+  }
+
+  .jobIcon {
+    padding: 9px;
+  }
+}
+
+/* Opened: the record under a hairline, across the card. */
+.jobDetails {
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--border);
+}
+
+.jobDocs {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.groupLabel {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* The foot: the phone on the left, "Mai multe" on the right, under a hairline. */
+.jobActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--border);
+}

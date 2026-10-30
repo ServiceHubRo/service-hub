@@ -37,6 +37,7 @@ import { formatPhone, normalizePhone } from '../../../lib/validators';
 import { HistoryQuote } from '../../history/HistoryQuote';
 import { bookingMessagesPath } from '../../messages/paths';
 import { JobDocuments } from '../../../components/JobDocuments';
+import type { JobDocKind } from '../../../data/jobDocs';
 import { MoreActions } from '../../../components/MoreActions';
 import styles from '../../history/history.module.css';
 import { vehicleFilePath } from '../paths';
@@ -213,7 +214,7 @@ export function ShopHistoryScreen() {
   const filtered = text.trim() !== '' || filter !== 'all' || period !== 'all';
 
   return (
-    <div className={styles.page}>
+    <div className={`${styles.page} ${styles.shopPage}`}>
       <div>
         <PageHeader
           title={t('hist.title')}
@@ -233,7 +234,7 @@ export function ShopHistoryScreen() {
         )}
       </div>
 
-      {state.status === 'loading' && <SkeletonList cards />}
+      {state.status === 'loading' && <SkeletonList />}
       {state.status === 'error' && <LoadError message={t('hist.loadError')} onRetry={reload} />}
       {data && !anything && <EmptyState icon={HistoryIcon} title={t('hist.empty')} body={t('hist.emptyBody')} />}
 
@@ -306,7 +307,7 @@ export function ShopHistoryScreen() {
             />
           ) : (
             <>
-              <ul className={`${styles.list} no-print`} data-layout="cards">
+              <ul className={`${styles.list} ${styles.jobList} no-print`}>
                 {shown.map((b) => (
                   <li key={b.id}>
                     <HistoryCard item={b} open={open.has(b.id)} onToggle={() => toggle(b.id)} />
@@ -334,36 +335,38 @@ export function ShopHistoryScreen() {
   );
 }
 
-/** One finished job (P16b): summary as a button; opened, the whole record. */
+/**
+ * One finished job (P16b), one under the other (T57): the summary is a button — what, when, car,
+ * client, amount or status — and opened, the whole record appears under it in the same card.
+ */
 function HistoryCard({ item: b, open, onToggle }: { item: ShopHistoryItem; open: boolean; onToggle: () => void }) {
   const { t, lang } = useI18n();
   const detailsId = `history-${b.id}`;
   const car = carText(b);
   const plate = b.car_snapshot.plate;
   const phone = b.client_phone;
+  const docs: JobDocKind[] = b.imported
+    ? []
+    : [
+        ...(b.status === 'done' && b.quote ? (['final'] as const) : []),
+        ...(b.quote ? (['quote'] as const) : []),
+        ...(b.intake_sent_at ? (['intake'] as const) : []),
+      ];
+  const work = b.work && !b.imported ? b.work : null;
+  const warranty = !!b.warranty_months && !!b.warranty_until;
 
   return (
     <Card className={`${styles.card} ${open ? styles.open : ''}`}>
-      <button type="button" className={styles.toggle} aria-expanded={open} aria-controls={detailsId} onClick={onToggle}>
-        <span className={styles.top}>
-          <ServiceIcon name={b.service_icon} className={styles.icon} />
-          <span className={styles.what}>
-            <span className={`${styles.service} ${styles.block}`}>{titleText(b, lang, t)}</span>
-            <span className={`${styles.muted} ${styles.block}`}>
-              {formatDayMonth(lang, endedDay(b))}
-              {b.imported && <span className={styles.importedBadge}> · {t('imp.badge')}</span>}
-            </span>
-          </span>
-          <span className={styles.side}>
-            {b.status === 'done' ? (
-              b.cost !== null && <span className={`mono ${styles.amount}`}>{formatMoney(lang, b.cost)}</span>
-            ) : (
-              <StatusBadge status={b.status} />
-            )}
-            <ChevronDown size={18} className={styles.chevron} aria-hidden="true" />
+      <button type="button" className={styles.jobSummary} aria-expanded={open} aria-controls={detailsId} onClick={onToggle}>
+        <ServiceIcon name={b.service_icon} className={`${styles.icon} ${styles.jobIcon}`} />
+        <span className={`${styles.what} ${styles.jobWhat}`}>
+          <span className={`${styles.service} ${styles.block}`}>{titleText(b, lang, t)}</span>
+          <span className={`${styles.muted} ${styles.block}`}>
+            {formatDayMonth(lang, endedDay(b))}
+            {b.imported && <span className={styles.importedBadge}> · {t('imp.badge')}</span>}
           </span>
         </span>
-        <span className={styles.carBlock}>
+        <span className={styles.jobWho}>
           <span className={styles.carRow}>
             <span className={styles.car}>{car || t('sb.card.noCar')}</span>
             {plate && <span className={`mono ${styles.plate}`}>{plate}</span>}
@@ -372,13 +375,25 @@ function HistoryCard({ item: b, open, onToggle }: { item: ShopHistoryItem; open:
             {b.client_name || t('sb.card.deletedClient')}
             {b.odometer !== null && <span className={`mono ${styles.nowrap}`}> · {formatKm(lang, b.odometer)}</span>}
           </span>
-          {b.work && !b.imported && <span className={`${styles.work} ${styles.block}`}>{b.work}</span>}
-          <WarrantyNote months={b.warranty_months} until={b.warranty_until} />
         </span>
+        <span className={styles.jobMeta}>
+          {b.status === 'done' ? (
+            b.cost !== null && <span className={`mono ${styles.amount}`}>{formatMoney(lang, b.cost)}</span>
+          ) : (
+            <StatusBadge status={b.status} />
+          )}
+        </span>
+        <ChevronDown size={18} className={`${styles.chevron} ${styles.jobChevron}`} aria-hidden="true" />
+        {(work || warranty) && (
+          <span className={styles.jobExtra}>
+            {work && <span className={`${styles.work} ${styles.block}`}>{work}</span>}
+            <WarrantyNote months={b.warranty_months} until={b.warranty_until} />
+          </span>
+        )}
       </button>
 
       {open && (
-        <div id={detailsId} className={styles.details}>
+        <div id={detailsId} className={`${styles.details} ${styles.jobDetails}`}>
           <Outcome item={b} />
           {b.quote && <HistoryQuote quote={b.quote} />}
           {(b.note || b.work_by || b.checked_by) && (
@@ -411,19 +426,14 @@ function HistoryCard({ item: b, open, onToggle }: { item: ShopHistoryItem; open:
               {t('hist.card.booking', { ref: b.ref, when: `${formatDayMonth(lang, b.date)}, ${b.slot}` })}
             </p>
           )}
-          {!b.imported && (
-            <JobDocuments
-              bookingId={b.id}
-              bookingRef={b.ref}
-              quoteNumber={b.quote_number}
-              kinds={[
-                ...(b.status === 'done' && b.quote ? (['final'] as const) : []),
-                ...(b.quote ? (['quote'] as const) : []),
-                ...(b.intake_sent_at ? (['intake'] as const) : []),
-              ]}
-            />
+          {/* The documents read only, under their own heading. */}
+          {docs.length > 0 && (
+            <div className={styles.jobDocs}>
+              <p className={styles.groupLabel}>{t('doc.title')}</p>
+              <JobDocuments bookingId={b.id} bookingRef={b.ref} quoteNumber={b.quote_number} kinds={docs} />
+            </div>
           )}
-          <div className={styles.actions}>
+          <div className={styles.jobActions}>
             {phone && (
               <a
                 className={`mono ${styles.phone}`}

@@ -145,7 +145,7 @@ export function ShopBookingsScreen() {
   }
 
   let body;
-  if (state.status === 'loading') body = <SkeletonList cards />;
+  if (state.status === 'loading') body = <SkeletonList />;
   else if (state.status === 'error') {
     body =
       state.error instanceof RpcError && state.error.code === 'not_allowed' ? (
@@ -223,7 +223,7 @@ export function ShopBookingsScreen() {
             <EmptyState icon={CalendarCheck} title={t('sb.empty.scheduled')} body={t('sb.empty.scheduledBody')} />
           )
         ) : (
-          <ul className={styles.list} data-layout="cards" aria-label={tab === 'cereri' ? t('sb.tab.requests') : t('sb.tab.scheduled')}>
+          <ul className={styles.list} aria-label={tab === 'cereri' ? t('sb.tab.requests') : t('sb.tab.scheduled')}>
             {list.map((b) => (
               <li key={b.id}>
                 <ShopBookingCard
@@ -233,6 +233,7 @@ export function ShopBookingsScreen() {
                   fresh={isFresh(b.id)}
                   onDone={onDone}
                   onStale={refresh}
+                  defaultOpen={!!onlyId}
                 />
               </li>
             ))}
