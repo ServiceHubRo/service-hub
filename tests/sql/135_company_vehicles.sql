@@ -4,6 +4,8 @@
 -- (profiles.fleet_beta) can use them.
 begin;
 select test.make_world();
+-- Fleets are on since migration fleet_on; turned off here to check the test accounts.
+update public.platform_settings set fleet_enabled = false where id = 1;
 
 -- ------------------------------------------------------------------ fleets off: only a test account
 select test.login(test.id('client_a'));
@@ -102,5 +104,16 @@ select test.eq((select count(*) from public.company_audit_log where entity_type 
 delete from auth.users where id = test.id('client_b');
 select test.ok(exists (select 1 from public.company_vehicles where id = current_setting('test.v1')::uuid),
   'a member deleting their account leaves the vehicles in place');
+
+-- ------------------------------------------------------------------ fleets on (the default since fleet_on)
+update public.platform_settings set fleet_enabled = true where id = 1;
+select test.login(test.id('staff1'));
+select test.ok(not public.my_fleet_access(), 'fleets on: a shop account still has no access');
+select test.login(test.id('admin'));
+select test.ok(not public.my_fleet_access(), 'nor the platform admin');
+select test.logout();
+update public.profiles set fleet_beta = false where id = test.id('client_a');
+select test.login(test.id('client_a'));
+select test.ok(public.my_fleet_access(), 'fleets on: every client account has access');
 
 rollback;

@@ -1461,7 +1461,8 @@ Notă (31 oct): Eduard a aprobat politica de acces (7 zile de grație, apoi doar
 - Migrarea `company_vehicles` (schema 92): vehiculele firmei stau într-un tabel separat de garajul personal, ca să rămână ale firmei chiar dacă angajatul care le-a adăugat pleacă sau își șterge contul. Un număr de înmatriculare o singură dată în flota activă; arhivarea păstrează istoricul.
 - **Cont de probă pentru flotă** (`profiles.fleet_beta`, doar prin SQL): pe proiectul real flotele rămân oprite pentru toți, iar contul marcat le poate folosi. „Firmele mele” apare oricând baza de date spune că ai acces.
 - **Spațiul firmei** (`/c/firme/<firmă>`, butonul „Deschide flota” din pagina firmei): rama lui (sigla și limba sus, bara laterală, cele 5 pagini), Panou, Vehicule, pagina vehiculului, Costuri, Rapoarte, Membri pe datele reale. Adaugi și editezi vehicule, aloci șoferul, marchezi indisponibil, arhivezi și readuci. Șoferul vede doar vehiculul lui, fără sume. Se actualizează singur când alt membru schimbă ceva.
-- Teste: `tests/sql/135_company_vehicles.sql`, `tests/e2e/fleet-space.spec.ts`, `published.spec.ts` (contul de probă vede firmele pe site-ul publicat, ceilalți nu).
+- **Flotele pornite pentru toți clienții** (migrarea `fleet_on`, schema 93; Eduard, 31 oct: aplicația nu e publică încă, butoanele trebuie să se vadă fără pași manuali). Înainte de lansare hotărăști dacă rămân pornite (`docs/LAUNCH_CHECK.md`, partea C).
+- Teste: `tests/sql/135_company_vehicles.sql`, `tests/e2e/fleet-space.spec.ts`, `published.spec.ts` (cu flotele oprite, doar contul de probă vede firmele).
 - Rămas: programările firmei și aprobarea devizelor (T63d), cheltuieli, documente, rapoarte cu date (T63e), notificări (T63g).
 
 - [x] Făcut
