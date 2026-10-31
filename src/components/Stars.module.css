@@ -3,6 +3,11 @@
   display: inline-flex;
   flex-shrink: 0;
   vertical-align: -2px;
+  /* No line box around the stars: the filled row sits exactly on the empty one (T59: it sat 3 px
+     lower, cut at the bottom, with the grey outline showing above it). */
+  line-height: 0;
+  /* Never stretched by a flex column around it: the filled part is a share of the five stars. */
+  width: max-content;
 }
 
 .off,
@@ -16,6 +21,11 @@
   color: var(--border-lit);
 }
 
+/* Empty stars solid and quiet, like the filled ones: no outline to show around them. */
+.off svg {
+  fill: var(--border-lit);
+}
+
 .on {
   color: var(--amber);
 }
@@ -27,5 +37,6 @@
 .clip {
   position: absolute;
   inset: 0 auto 0 0;
+  display: flex;
   overflow: hidden;
 }
