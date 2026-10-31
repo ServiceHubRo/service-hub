@@ -638,16 +638,21 @@
   column-gap: 8px;
 }
 
-/* A phone (T52): the main action fills the row, "Mai multe" stays compact on its right. */
+/* A phone (T52): the main action fills the row, "Mai multe" stays compact on its right. A label
+   stays on one line: when both do not fit ("Start inspection" in English on 320 px), "Mai multe"
+   moves under the main action instead of squeezing it (T62, as on the client's cards). */
 @media (max-width: 599px) {
   .actions {
-    flex-wrap: nowrap;
     align-items: stretch;
   }
 
+  .actions > * {
+    flex-shrink: 0;
+    max-width: 100%;
+  }
+
   .actions > :first-child:not(:last-child) {
-    flex: 1;
-    min-width: 0;
+    flex: 1 0 auto;
   }
 
   .actions > :first-child:not(:last-child) > button,
