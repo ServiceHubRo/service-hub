@@ -506,16 +506,36 @@
   border-top: 1px solid var(--border);
 }
 
-/* A phone (T52): the card's main action fills the row, "Mai multe" stays compact on its right; when
-   both do not fit with their labels on one line, "Mai multe" moves under it (30 Oct 2026). */
+/* A phone (T52, T62): the card's main action and "Mai multe" (the second) share the row, the same
+   height; the main one takes the free width, "Mai multe" keeps the width of its label. When both do
+   not fit with their labels on one line, each takes a whole row of its own (as on the shop's cards). */
 @media (max-width: 599px) {
   .card > .actions {
     align-items: stretch;
-    gap: 6px;
+    gap: var(--space-2);
   }
 
   .card > .actions > :first-child:not(:last-child) {
+    flex: 1000 0 auto;
+  }
+
+  .card > .actions > :nth-child(2) {
     flex: 1 0 auto;
+  }
+
+  .card > .actions > :not(:only-child) > :is(a, button),
+  .card > .actions > :nth-child(2) button[aria-haspopup] {
+    width: 100%;
+  }
+
+  /* A little less side padding (the same 44 px height), so two actions share the row more often. */
+  .card > .actions :is(a, button):not([role='menuitem']) {
+    padding-inline: 14px;
+  }
+
+  /* "Recenzie trimisă" after the buttons: a line of its own under them, not squeezed beside them. */
+  .card > .actions > .reviewSent {
+    flex-basis: 100%;
   }
 }
 

@@ -58,7 +58,7 @@ export function StaffSettings() {
   const refresh = useCallback(async () => setData(await listStaff()), [setData]);
 
   return (
-    <div className={styles.page}>
+    <div className={styles.page} data-layout="sections">
       <PageHeader back={{ to: SETTINGS_PATH, label: t('settings.title') }} title={t('settings.staff')} />
       {!isOwner ? (
         <EmptyState icon={Lock} title={t('settings.ownerOnly')} />

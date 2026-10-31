@@ -1409,3 +1409,19 @@ Cerut de Eduard pe 31 oct 2026 (pagina de start pe telefon: „mi-ai despărțit
 - **Verificare:** pagina de start în română și engleză la 390, 430, 820 și 1440 px; testele pagina de start și ale interfeței comune pe telefon, tabletă și PC.
 
 - [x] Făcut
+
+## T62 — Iconițe lângă titlu, contoare care încap, acțiuni echilibrate, secțiuni fără coloana goală ✅
+
+Cerut de Eduard pe 31 oct 2026, după auditul pe toate paginile (10 dimensiuni de ecran, română și engleză): „Iconița și titlul trebuie să fie pe același rând atunci când există suficient spațiu”. Doar stiluri și așezare, fără migrare, fără pachete noi, fără texte noi.
+
+- **Pagina principală și turul:** cele 6 carduri informative, cardul „Recenzii de la clienți reali” și primul ecran al turului au iconița lângă titlu, centrată pe primul rând al titlului; descrierea începe sub titlu, aliniată cu el. Cauza: iconița era un bloc separat, cu spațiu sub ea.
+- **Panou, contoarele:** pe o pagină sub 330 px (telefon de 320 px) câte 2 pe rând, până la 700 px câte 3, peste toate 6 pe un rând. Etichetele („În constatare”, „Awaiting quote reply”) rămân în căsuță, fără font micșorat și fără tăiere.
+- **Bara „Salvează”:** verificată pe Reguli, Devize, Facturare, Sugestii (și Profil, Program) la 320–430 px, 768 și 1440: ultimul câmp rămâne vizibil deasupra butonului. Problema nu se reproduce (semnalul venea din câmpurile care trec sub bara „‹ Înapoi” la derulare); nimic schimbat.
+- **Admin, acțiunile unui service sau client:** cel mult 3 pe rând, fiecare cu eticheta pe un rând: 3 + 3 pe calculator, 2 + 2 + 2 pe tabletă, unul sub altul pe telefon. „Șterge” rămâne ultimul, roșu.
+- **Cont și Setări:** titlul secțiunii deasupra conținutului pe toate lățimile (dispare coloana stângă goală). De la 1280 px, paginile de setări pun secțiunile câte două alăturate (Reguli, Devize, Facturare, Profil, Vitrină, Personal, Notificări); Program rămâne pe o coloană, cu orele imediat după comutator. Două câmpuri stau alăturate doar când cardul le cuprinde (IBAN-ul încape într-un card pe jumătate de pagină).
+- **Engleză, pagini cu cont:** verificate clientul, service-ul și adminul cu limba schimbată din aplicație. Corectat: „Start inspection” pe 320 px se rupea pe două rânduri — acum „More” trece dedesubt, ca la cardurile clientului.
+- **Verificare:** pagina principală și turul la 320, 375, 390, 430, 768, 1024, 1280, 1440 în română și engleză (iconiță lângă titlu, text aliniat, nimic ieșit din card); Panou și acțiunile din admin la aceleași lățimi, în ambele limbi; setările la 390, 1024, 1280 și 1440, fără suprapuneri și fără scroll orizontal; testele din browser pentru zonele atinse, pe telefon, tabletă și PC.
+- **Datele (a doua rundă, Eduard):** pe iPhone câmpurile de dată ieșeau din card („Zile libere și concedii”, „Valabilă până pe” la oferta pentru clienți noi). Cauza: Safari desenează câmpul de dată cu o lățime minimă proprie și ignoră lățimea câmpului. Corectat o dată, în componenta comună `Field` (fără aspectul nativ, valoarea la stânga, înălțimea păstrată), pentru toate cele 8 câmpuri de dată. Verificat în Chromium la cele 10 lățimi; Safari nu se poate rula aici.
+- **Butoanele din carduri (a doua rundă):** „Trimite deviz” lua tot rândul și „Mai multe” rămânea singur dedesubt (un buton simplu primea lățimea direct, nu prin învelișul de la „În constatare”). Acum, pe telefon, acțiunea principală și „Mai multe” stau pe un rând, aceeași înălțime, cea principală ia spațiul liber; doar când nu încap (320 px, etichete lungi) fiecare ia un rând întreg. La fel pe cardurile clientului („Recenzie trimisă” pe rândul ei) și la panourile cu confirmare + „Renunță”. Pe telefon butoanele din aceste rânduri au 14 px lateral în loc de 18 (aceeași înălțime de 44 px).
+
+- [x] Făcut

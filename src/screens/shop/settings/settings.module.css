@@ -29,16 +29,13 @@
   gap: 8px;
 }
 
+/* Two fields side by side when the card is wide enough for both (16rem each, an IBAN fits), one
+   under the other otherwise: by the card's width, not the screen's, since a card can be half of a
+   wide page (T62). */
 .grid2 {
   display: grid;
-  grid-template-columns: minmax(0, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, max(16rem, calc(50% - 6px))), 1fr));
   gap: 12px;
-}
-
-@media (min-width: 520px) {
-  .grid2 {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  }
 }
 
 .hint {

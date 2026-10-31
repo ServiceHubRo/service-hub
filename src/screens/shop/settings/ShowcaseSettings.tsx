@@ -38,7 +38,7 @@ import own from './ShowcaseSettings.module.css';
 export function ShowcaseSettings() {
   const { t } = useI18n();
   return (
-    <div className={styles.page}>
+    <div className={styles.page} data-layout="sections">
       <PageHeader back={{ to: SETTINGS_PATH, label: t('settings.title') }} title={t('settings.showcase')} />
       <Section title={t('showcase.photos')} description={t('showcase.photos.hint', { n: PHOTO_LIMIT })}>
         <PhotosCard />

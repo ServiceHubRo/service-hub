@@ -155,7 +155,7 @@ export function QuoteSettings() {
   }
 
   return (
-    <div className={styles.page}>
+    <div className={styles.page} data-layout="sections">
       <PageHeader back={{ to: SETTINGS_PATH, label: t('settings.title') }} title={t('settings.quotes')} />
       {body}
     </div>

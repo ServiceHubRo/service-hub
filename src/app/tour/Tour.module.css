@@ -75,13 +75,34 @@
   line-height: 1.45;
 }
 
+/* Welcome card: the icon beside the title, the text under the title. */
+.welcome {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  column-gap: 12px;
+  row-gap: 8px;
+  align-items: start;
+}
+
+/* Centred on the first line of the title. */
+.welcome .welcomeIcon {
+  grid-row: 1 / span 2;
+}
+
+.welcome .title {
+  padding-top: calc((44px - 1.2em) / 2);
+}
+
+.welcome .body {
+  grid-column: 2;
+}
+
 .welcomeIcon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   width: 44px;
   height: 44px;
-  margin-bottom: 4px;
   border-radius: 14px;
   background: var(--amber-tint);
   color: var(--amber);

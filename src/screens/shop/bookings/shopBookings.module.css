@@ -471,6 +471,27 @@
   gap: 8px;
 }
 
+/* A phone (T62): the confirming write and "Renunță" like a card's actions, on one row when both fit,
+   otherwise each on a whole row of its own. */
+@media (max-width: 599px) {
+  .panelButtons > * {
+    flex-shrink: 0;
+    max-width: 100%;
+  }
+
+  .panelButtons > :first-child:not(:last-child) {
+    flex: 1000 0 auto;
+  }
+
+  .panelButtons > :last-child:not(:first-child) {
+    flex: 1 0 auto;
+  }
+
+  .panelButtons > :not(:only-child) > button {
+    width: 100%;
+  }
+}
+
 .stepLabel {
   font-size: 13px;
   font-weight: 600;
@@ -638,20 +659,37 @@
   column-gap: 8px;
 }
 
-/* A phone (T52): the main action fills the row, "Mai multe" stays compact on its right. */
+/* A phone (T52, T62): the main action and "Mai multe" share the row, the same height; the main one
+   takes the free width (it grows a thousand times faster), "Mai multe" keeps the width of its label.
+   A label never squeezes: when both do not fit ("Start inspection" in English on 320 px), each takes
+   a whole row of its own, one under the other. No action sets its own width, so a plain button
+   ("Trimite deviz") behaves like one wrapped in an ActionButton ("În constatare"). */
 @media (max-width: 599px) {
   .actions {
-    flex-wrap: nowrap;
     align-items: stretch;
   }
 
-  .actions > :first-child:not(:last-child) {
-    flex: 1;
-    min-width: 0;
+  .actions > * {
+    flex-shrink: 0;
+    max-width: 100%;
   }
 
-  .actions > :first-child:not(:last-child) > button,
-  .actions > :is(a, button):first-child:not(:last-child) {
+  .actions > :first-child:not(:last-child) {
+    flex: 1000 0 auto;
+  }
+
+  .actions > :last-child:not(:first-child) {
+    flex: 1 0 auto;
+  }
+
+  .actions > :not(:only-child) > :is(a, button),
+  .actions > :last-child:not(:first-child) button[aria-haspopup] {
     width: 100%;
   }
+
+  /* A little less side padding (the same 44 px height), so two actions share the row more often. */
+  .actions :is(a, button):not([role='menuitem']) {
+    padding-inline: 14px;
+  }
 }
+

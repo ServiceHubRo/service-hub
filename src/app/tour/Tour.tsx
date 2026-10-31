@@ -148,7 +148,7 @@ export function Tour({ role, name, onDone }: { role: 'client' | 'shop'; name: st
             </p>
           </>
         ) : (
-          <>
+          <div className={styles.welcome}>
             <span className={styles.welcomeIcon} aria-hidden="true">
               <Sparkles size={22} />
             </span>
@@ -158,7 +158,7 @@ export function Tour({ role, name, onDone }: { role: 'client' | 'shop'; name: st
             <p id={bodyId} className={styles.body}>
               {t('tour.welcome.body')}
             </p>
-          </>
+          </div>
         )}
         {steps.length > 1 && (
           <div className={styles.dots} aria-hidden="true">

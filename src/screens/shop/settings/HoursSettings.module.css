@@ -42,19 +42,20 @@
   margin-top: 12px;
 }
 
-/* A wide screen (T51): each day one line, like a timetable. The day and its switch on the left, the
-   two times on the right, the same columns on every line. */
+/* A wide screen (T51): each day one line, like a timetable. The day and its switch, then the two
+   times right after them (T62: not pushed to the far edge of a wide card), the same columns on every
+   line. */
 @media (min-width: 768px) {
   .day {
     display: grid;
-    grid-template-columns: minmax(0, 260px) 1fr;
+    grid-template-columns: minmax(0, 260px) auto;
+    justify-content: start;
     align-items: center;
     column-gap: var(--space-8);
     min-height: 76px;
   }
 
   .times {
-    justify-content: flex-end;
     flex-wrap: nowrap;
     gap: var(--space-4);
   }

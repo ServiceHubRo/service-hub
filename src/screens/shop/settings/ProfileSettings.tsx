@@ -198,7 +198,7 @@ export function ProfileSettings() {
   return (
     <div className={styles.page}>
       <PageHeader back={{ to: SETTINGS_PATH, label: t('settings.title') }} title={t('settings.profile')} />
-      <form ref={formRef} className={styles.page} noValidate onSubmit={(e) => e.preventDefault()}>
+      <form ref={formRef} className={styles.page} data-layout="sections" noValidate onSubmit={(e) => e.preventDefault()}>
         <Section title={t('profile.sec.about')} description={t('profile.sec.about.desc')}>
           <LogoCard />
           <Card className={styles.form}>

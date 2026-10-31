@@ -283,11 +283,14 @@ a.stat:hover {
   flex: 1 1 200px;
 }
 
-/* A shop's or a client's actions: a grid of equal cells, every button the same width and height
-   (the tallest one, when a label takes two lines), including those inside an ActionButton. */
+/* A shop's or a client's actions: a grid of equal cells, every button the same width and height,
+   including those inside an ActionButton. A cell is wide enough for the longest label on one line
+   ("Schimbă statusul abonamentului"), and there are never more than three per row, so six actions
+   are 3 + 3 on a computer, 2 + 2 + 2 on a tablet and one under the other on a phone (Eduard, 31 Oct
+   2026: 4 + 2 with labels on two lines). */
 .actionGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(max(min(100%, 17.5rem), calc((100% - 16px) / 3)), 1fr));
   grid-auto-rows: 1fr;
   gap: 8px;
 }
