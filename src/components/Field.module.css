@@ -29,6 +29,23 @@
   color: #6b717c;
 }
 
+/* Dates and times (T62): Safari on iPhone draws its own control with a minimum width of its own and
+   ignores the field's width, so the box ran past the card's right edge (Zile libere, the new-client
+   offer). Without the native look the field takes the card's width like any other; the value stays
+   on the left and an empty field keeps its height. The picker still opens on a tap. */
+.input:is([type='date'], [type='time'], [type='datetime-local'], [type='month']) {
+  display: block;
+  min-width: 0;
+  max-width: 100%;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.input::-webkit-date-and-time-value {
+  min-height: 1.5em;
+  text-align: left;
+}
+
 .input:hover:not(:disabled):not(:focus-visible) {
   border-color: #46505c;
 }
