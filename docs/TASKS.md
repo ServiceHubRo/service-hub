@@ -1456,3 +1456,12 @@ Notă (31 oct): Eduard a aprobat politica de acces (7 zile de grație, apoi doar
 - Rămas: emailul cu invitația (acum linkul se copiază), comutatorul Personal/Firmă și ecranele flotei pe date reale (T63c, cu vehiculele firmei).
 
 - [x] Făcut
+
+### T63c — Vehiculele firmei și spațiul flotei ✅
+- Migrarea `company_vehicles` (schema 92): vehiculele firmei stau într-un tabel separat de garajul personal, ca să rămână ale firmei chiar dacă angajatul care le-a adăugat pleacă sau își șterge contul. Un număr de înmatriculare o singură dată în flota activă; arhivarea păstrează istoricul.
+- **Cont de probă pentru flotă** (`profiles.fleet_beta`, doar prin SQL): pe proiectul real flotele rămân oprite pentru toți, iar contul marcat le poate folosi. „Firmele mele” apare oricând baza de date spune că ai acces.
+- **Spațiul firmei** (`/c/firme/<firmă>`, butonul „Deschide flota” din pagina firmei): rama lui (sigla și limba sus, bara laterală, cele 5 pagini), Panou, Vehicule, pagina vehiculului, Costuri, Rapoarte, Membri pe datele reale. Adaugi și editezi vehicule, aloci șoferul, marchezi indisponibil, arhivezi și readuci. Șoferul vede doar vehiculul lui, fără sume. Se actualizează singur când alt membru schimbă ceva.
+- Teste: `tests/sql/135_company_vehicles.sql`, `tests/e2e/fleet-space.spec.ts`, `published.spec.ts` (contul de probă vede firmele pe site-ul publicat, ceilalți nu).
+- Rămas: programările firmei și aprobarea devizelor (T63d), cheltuieli, documente, rapoarte cu date (T63e), notificări (T63g).
+
+- [x] Făcut

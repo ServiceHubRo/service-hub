@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { PUBLISHED_PORT } from './ports';
-import { BACKEND, PASSWORD, createUser, openAccount, serviceRest, signIn } from './support';
+import { BACKEND, PASSWORD, createFleetUser, createUser, openAccount, serviceRest, signIn } from './support';
 
 // The published site (not a deploy preview): real accounts only — the T01 role switch is gone —
 // and developer-only pages stay hidden.
@@ -56,15 +56,25 @@ test('published site: the public page carries its official address and structure
   expect(html).toMatch(/<h1[^>]*>Programarea la service/);
 });
 
-test('published site: no companies tile in Cont and no fleet preview, even with fleets on (T63b)', async ({ page }) => {
+test('published site: no fleet preview; companies only for a fleet test account while fleets are off (T63c)', async ({ page, browser }) => {
   await page.goto('/dev/flota');
   await expect(page.getByRole('heading', { level: 1, name: 'Pagina nu există' })).toBeVisible();
   test.skip(!BACKEND, 'the Cont check needs the local Supabase stack');
-  await serviceRest('platform_settings?id=eq.1', 'PATCH', { fleet_enabled: true });
+  await serviceRest('platform_settings?id=eq.1', 'PATCH', { fleet_enabled: false });
   const email = await createUser('client');
   await signIn(page, email, PASSWORD);
   await expect(page).toHaveURL(/\/c\/cauta/);
   await openAccount(page);
   await expect(page.getByRole('link', { name: /Date pentru deviz/ })).toBeVisible();
   await expect(page.getByRole('link', { name: /Firmele mele/ })).toHaveCount(0);
+
+  const tester = await createFleetUser();
+  const context = await browser.newContext({ baseURL: `http://localhost:${PUBLISHED_PORT}` });
+  await context.addInitScript(() => localStorage.setItem('sh_lang', 'ro'));
+  const other = await context.newPage();
+  await signIn(other, tester, PASSWORD);
+  await expect(other).toHaveURL(/\/c\/cauta/);
+  await openAccount(other);
+  await expect(other.getByRole('link', { name: /Firmele mele/ })).toBeVisible();
+  await context.close();
 });

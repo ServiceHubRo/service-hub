@@ -25,6 +25,7 @@ import {
 } from '../../lib/fleet';
 import { saveFile } from '../../lib/saveFile';
 import { VehicleStatusPill } from './FleetPills';
+import { FleetVehicleForm } from './FleetVehicleForm';
 import { useFleet } from './fleetContext';
 import styles from './fleet.module.css';
 
@@ -36,7 +37,7 @@ import styles from './fleet.module.css';
  */
 export function FleetVehicles({ initialStatus }: { initialStatus?: string }) {
   const { t, lang } = useI18n();
-  const { data, go, allowed } = useFleet();
+  const { data, go, allowed, mode } = useFleet();
   const today = ymdInBucharest(new Date());
   const ledger = useMemo(() => ledgerFor(data), [data]);
   const rows = useMemo(() => vehicleRows(data.vehicles, data.jobs, ledger?.entries ?? null, yearRange(today), data.expenses), [data, ledger, today]);
@@ -94,14 +95,24 @@ export function FleetVehicles({ initialStatus }: { initialStatus?: string }) {
         </div>
       </div>
 
-      {adding && (
-        <InlinePanel title={t('fleet.vehicles.addTitle')}>
-          <p className={styles.note}>{t('fleet.vehicles.addPreview')}</p>
-          <div>
-            <Button onClick={() => setAdding(false)}>{t('fleet.close')}</Button>
-          </div>
-        </InlinePanel>
-      )}
+      {adding &&
+        (mode === 'live' ? (
+          <FleetVehicleForm
+            vehicle={null}
+            onCancel={() => setAdding(false)}
+            onDone={(v) => {
+              setAdding(false);
+              go({ section: 'vehicul', vehicle: v.id });
+            }}
+          />
+        ) : (
+          <InlinePanel title={t('fleet.vehicles.addTitle')}>
+            <p className={styles.note}>{t('fleet.vehicles.addPreview')}</p>
+            <div>
+              <Button onClick={() => setAdding(false)}>{t('fleet.close')}</Button>
+            </div>
+          </InlinePanel>
+        ))}
 
       <ChipRow label={t('fleet.vehicles.statusFilter')}>
         <Chip selected={filter.status === 'all'} onClick={() => set({ status: 'all' })}>

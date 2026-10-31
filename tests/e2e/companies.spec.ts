@@ -1,16 +1,12 @@
 import { expect, test, type Browser } from '@playwright/test';
-import { BACKEND, PASSWORD, createUser, expectNoHorizontalScroll, openAccount, serviceRest, shot, signIn } from './support';
+import { BACKEND, PASSWORD, createFleetUser, expectNoHorizontalScroll, openAccount, shot, signIn } from './support';
 
 // Companies (T63b): a client creates a company from Cont, invites a colleague as driver by link,
 // the colleague accepts with their own account and sees only what a driver sees; the admin hands the
-// administration over. The personal space stays as it was. Fleets are switched on for the run.
+// administration over. The personal space stays as it was. The accounts are fleet test accounts
+// (T63c), so the run needs no global switch.
 
 const name = () => test.info().project.name;
-
-test.beforeAll(async () => {
-  test.skip(!BACKEND, 'needs the local Supabase stack');
-  await serviceRest('platform_settings?id=eq.1', 'PATCH', { fleet_enabled: true });
-});
 
 test.beforeEach(async ({ context }) => {
   await context.addInitScript(() => {
@@ -32,8 +28,8 @@ async function asOther(browser: Browser, email: string) {
 
 test('create a company, invite a driver, hand over the administration', async ({ page, browser }) => {
   test.skip(!BACKEND, 'needs the local Supabase stack');
-  const admin = await createUser('client');
-  const driver = await createUser('client');
+  const admin = await createFleetUser();
+  const driver = await createFleetUser();
 
   await signIn(page, admin, PASSWORD);
   await expect(page).toHaveURL(/\/c\/cauta/);
@@ -105,7 +101,7 @@ test('create a company, invite a driver, hand over the administration', async ({
 
 test('the companies screen in English', async ({ page }) => {
   test.skip(!BACKEND, 'needs the local Supabase stack');
-  const email = await createUser('client');
+  const email = await createFleetUser();
   await signIn(page, email, PASSWORD);
   await expect(page).toHaveURL(/\/c\/cauta/);
   await page.goto('/c/cont/firme');

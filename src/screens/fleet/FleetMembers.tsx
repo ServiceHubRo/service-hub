@@ -1,5 +1,7 @@
 import { Check, Lock, Minus, UserPlus } from 'lucide-react';
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { buttonClass } from '../../components/buttonClass';
 import { Chip, ChipRow } from '../../components/Chip';
 import { Button } from '../../components/Button';
 import { Card } from '../../components/Card';
@@ -19,7 +21,7 @@ const ROLE_TONE = { admin: 'amber', manager: 'blue', driver: 'muted', accountant
  */
 export function FleetMembers() {
   const { t, lang } = useI18n();
-  const { data, allowed } = useFleet();
+  const { data, allowed, companyPage } = useFleet();
   const [phoneRole, setPhoneRole] = useState<FleetRole>('manager');
 
   if (!allowed('members.manage')) {
@@ -32,9 +34,15 @@ export function FleetMembers() {
       <Card className={styles.card}>
         <div className={styles.cardHead}>
           <h2 className={styles.cardTitle}>{t('fleet.members.title')}</h2>
-          <Button variant="primary" disabled title={t('fleet.preview.notSaved')}>
-            <UserPlus size={18} aria-hidden="true" /> {t('fleet.members.invite')}
-          </Button>
+          {companyPage ? (
+            <Link to={companyPage} className={buttonClass('primary')}>
+              <UserPlus size={18} aria-hidden="true" /> {t('fleet.members.manage')}
+            </Link>
+          ) : (
+            <Button variant="primary" disabled title={t('fleet.preview.notSaved')}>
+              <UserPlus size={18} aria-hidden="true" /> {t('fleet.members.invite')}
+            </Button>
+          )}
         </div>
         <ul className={styles.plainList}>
           {data.members.map((m) => (

@@ -126,6 +126,9 @@ never the last admin), `set_company_budget`, `set_approval_limit` (admin). Read:
 and `company_members` for members; `my_companies()` for the space switcher.
 
 ### 3.2 Stage 3 — company cars
+
+> **Built differently (T63c, 31 Oct 2026):** a separate table `company_vehicles`, not columns on `cars`. Reason found while building: `cars.owner_id` cascades on delete and the garage and personal reminders follow the owner, so a company vehicle stored in `cars` would disappear with the member who added it. See ARCHITECTURE §2. The sketch below is kept for the record.
+
 ```sql
 alter table public.cars
   add column company_id uuid references public.companies(id),

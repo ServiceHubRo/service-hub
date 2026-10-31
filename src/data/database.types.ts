@@ -669,6 +669,94 @@ export type Database = {
           },
         ]
       }
+      company_vehicles: {
+        Row: {
+          archived_at: string | null
+          company_id: string
+          created_at: string
+          created_by: string | null
+          department: string | null
+          driver_member_id: string | null
+          id: string
+          itp_expiry: string | null
+          make: string
+          model: string
+          plate: string | null
+          plate_norm: string | null
+          rca_expiry: string | null
+          unavailable: boolean
+          updated_at: string
+          vehicle_type: string | null
+          vignette_expiry: string | null
+          vin: string | null
+          year: number | null
+        }
+        Insert: {
+          archived_at?: string | null
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          department?: string | null
+          driver_member_id?: string | null
+          id?: string
+          itp_expiry?: string | null
+          make: string
+          model: string
+          plate?: string | null
+          plate_norm?: string | null
+          rca_expiry?: string | null
+          unavailable?: boolean
+          updated_at?: string
+          vehicle_type?: string | null
+          vignette_expiry?: string | null
+          vin?: string | null
+          year?: number | null
+        }
+        Update: {
+          archived_at?: string | null
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          department?: string | null
+          driver_member_id?: string | null
+          id?: string
+          itp_expiry?: string | null
+          make?: string
+          model?: string
+          plate?: string | null
+          plate_norm?: string | null
+          rca_expiry?: string | null
+          unavailable?: boolean
+          updated_at?: string
+          vehicle_type?: string | null
+          vignette_expiry?: string | null
+          vin?: string | null
+          year?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_vehicles_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "company_vehicles_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "company_vehicles_driver_member_id_fkey"
+            columns: ["driver_member_id"]
+            isOneToOne: false
+            referencedRelation: "company_members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       engagement_log: {
         Row: {
           key: string
@@ -1493,6 +1581,7 @@ export type Database = {
           display_id: string
           doc_party: string
           email_verified_at: string | null
+          fleet_beta: boolean
           guide_hidden_at: string | null
           id: string
           lang: string
@@ -1526,6 +1615,7 @@ export type Database = {
           display_id: string
           doc_party?: string
           email_verified_at?: string | null
+          fleet_beta?: boolean
           guide_hidden_at?: string | null
           id: string
           lang?: string
@@ -1559,6 +1649,7 @@ export type Database = {
           display_id?: string
           doc_party?: string
           email_verified_at?: string | null
+          fleet_beta?: boolean
           guide_hidden_at?: string | null
           id?: string
           lang?: string
@@ -3806,6 +3897,7 @@ export type Database = {
         }
         Returns: undefined
       }
+      check_vehicle_fields: { Args: { p: Json }; Returns: undefined }
       city_key: { Args: { p: string }; Returns: string }
       claim_booking: { Args: { p_token: string }; Returns: Json }
       claim_notifications: { Args: { p_limit?: number }; Returns: Json }
@@ -4314,13 +4406,39 @@ export type Database = {
         Returns: boolean
       }
       finish_notifications: { Args: { p_results: Json }; Returns: number }
+      fleet_archive_vehicle: {
+        Args: { p_archived: boolean; p_request_id: string; p_vehicle: string }
+        Returns: Json
+      }
+      fleet_assign_driver: {
+        Args: { p_member: string; p_request_id: string; p_vehicle: string }
+        Returns: Json
+      }
       fleet_can: {
         Args: { p_capability: string; p_company: string }
         Returns: boolean
       }
+      fleet_overview: { Args: { p_company: string }; Returns: Json }
       fleet_role_can: {
         Args: { p_capability: string; p_role: string }
         Returns: boolean
+      }
+      fleet_save_vehicle: {
+        Args: {
+          p_company: string
+          p_fields: Json
+          p_request_id: string
+          p_vehicle: string
+        }
+        Returns: Json
+      }
+      fleet_set_unavailable: {
+        Args: {
+          p_request_id: string
+          p_unavailable: boolean
+          p_vehicle: string
+        }
+        Returns: Json
       }
       fold_text: { Args: { p: string }; Returns: string }
       format_sequence_id: {
@@ -4745,7 +4863,9 @@ export type Database = {
       }
       my_client_referrals: { Args: never; Returns: Json }
       my_companies: { Args: never; Returns: Json }
+      my_fleet_access: { Args: never; Returns: boolean }
       my_imported_jobs: { Args: never; Returns: Json }
+      my_member_id: { Args: { p_company: string }; Returns: string }
       my_no_show_summary: { Args: never; Returns: Json }
       my_phone_verification: { Args: never; Returns: Json }
       my_quote_numbering: { Args: never; Returns: Json }
@@ -5048,6 +5168,7 @@ export type Database = {
           display_id: string
           doc_party: string
           email_verified_at: string | null
+          fleet_beta: boolean
           guide_hidden_at: string | null
           id: string
           lang: string
@@ -5090,6 +5211,7 @@ export type Database = {
           display_id: string
           doc_party: string
           email_verified_at: string | null
+          fleet_beta: boolean
           guide_hidden_at: string | null
           id: string
           lang: string
@@ -5155,6 +5277,7 @@ export type Database = {
           display_id: string
           doc_party: string
           email_verified_at: string | null
+          fleet_beta: boolean
           guide_hidden_at: string | null
           id: string
           lang: string
@@ -5199,6 +5322,7 @@ export type Database = {
           display_id: string
           doc_party: string
           email_verified_at: string | null
+          fleet_beta: boolean
           guide_hidden_at: string | null
           id: string
           lang: string
@@ -6142,6 +6266,10 @@ export type Database = {
           p_request_id: string
           p_vat_id: string
         }
+        Returns: Json
+      }
+      vehicle_json: {
+        Args: { v: Database["public"]["Tables"]["company_vehicles"]["Row"] }
         Returns: Json
       }
       vehicle_key: { Args: { p_car: Json }; Returns: string }
