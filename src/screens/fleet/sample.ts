@@ -1,5 +1,5 @@
 import { ymdInBucharest } from '../../i18n/format';
-import type { FleetExpense, FleetJob, FleetOverview, FleetQuote, FleetVehicle } from '../../lib/fleet';
+import type { FleetExpense, FleetJob, FleetOverview, FleetPlanRow, FleetPlanSummary, FleetQuote, FleetSubscriptionView, FleetVehicle } from '../../lib/fleet';
 
 /**
  * SAMPLE DATA for the design preview (`/dev/flota`, test builds only). Invented company, cars, shops
@@ -248,4 +248,47 @@ export const SAMPLE_MEMBER_FOR_ROLE = { admin: 'm1', manager: 'm2', driver: 'm3'
 export function emptyFleet(): FleetOverview {
   const s = sampleFleet();
   return { ...s, company: { ...s.company, budget: { monthly: null, yearly: null } }, vehicles: [], jobs: [], expenses: [], issues: [], members: s.members.slice(0, 1) };
+}
+
+/** SAMPLE plans for the preview, as `fleet_subscription` answers them (T64a). */
+const SAMPLE_PLANS: FleetPlanRow[] = [
+  { key: 'fleet_start', name_ro: 'Fleet Start', name_en: 'Fleet Start', price_ron: 29, vehicle_limit: 5, member_limit: 1, features: ['dashboard', 'vehicles', 'history', 'doc_alerts', 'costs_basic'] },
+  { key: 'fleet_business', name_ro: 'Fleet Business', name_en: 'Fleet Business', price_ron: 59, vehicle_limit: 15, member_limit: 10, features: ['dashboard', 'vehicles', 'history', 'doc_alerts', 'costs_basic', 'members', 'reports', 'export_csv', 'budget', 'cost_per_km'] },
+  { key: 'fleet_pro', name_ro: 'Fleet Pro', name_en: 'Fleet Pro', price_ron: 119, vehicle_limit: 40, member_limit: null, features: ['dashboard', 'vehicles', 'history', 'doc_alerts', 'costs_basic', 'members', 'reports', 'export_csv', 'budget', 'cost_per_km'] },
+  { key: 'enterprise', name_ro: 'Enterprise', name_en: 'Enterprise', price_ron: null, vehicle_limit: null, member_limit: null, features: ['dashboard', 'vehicles', 'history', 'doc_alerts', 'costs_basic', 'members', 'reports', 'export_csv', 'budget', 'cost_per_km'] },
+];
+
+export function sampleSubscription(now: Date = new Date(), vehicles = 5, members = 7): FleetSubscriptionView {
+  const started = new Date(now.getTime() - 12 * 86_400_000).toISOString();
+  const ends = new Date(now.getTime() + 18 * 86_400_000).toISOString();
+  const business = SAMPLE_PLANS[1]!;
+  return {
+    plan: {
+      plan_key: business.key,
+      name_ro: business.name_ro,
+      name_en: business.name_en,
+      vehicle_limit: business.vehicle_limit,
+      member_limit: business.member_limit,
+      features: business.features,
+      status: 'trial',
+      ended_reason: null,
+      trial_started_at: started,
+      trial_ends_at: ends,
+      current_period_end: null,
+      cancel_at_period_end: false,
+      read_only: false,
+      billing_enabled: false,
+      price_ron: business.price_ron,
+      billing_months: 1,
+    },
+    usage: { vehicles, members },
+    plans: SAMPLE_PLANS,
+  };
+}
+
+export function samplePlanSummary(now: Date = new Date(), vehicles = 5): FleetPlanSummary {
+  const plan: Partial<FleetSubscriptionView['plan']> = { ...sampleSubscription(now, vehicles).plan };
+  delete plan.price_ron;
+  delete plan.billing_months;
+  return { ...(plan as FleetSubscriptionView['plan']), vehicles };
 }

@@ -669,6 +669,78 @@ export type Database = {
           },
         ]
       }
+      company_subscriptions: {
+        Row: {
+          billing_months: number
+          cancel_at_period_end: boolean
+          company_id: string
+          created_at: string
+          current_period_end: string | null
+          custom_member_limit: number | null
+          custom_vehicle_limit: number | null
+          ended_reason: string | null
+          plan_key: string
+          price_ron: number | null
+          status: string
+          status_changed_at: string
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
+          trial_ends_at: string | null
+          trial_started_at: string | null
+        }
+        Insert: {
+          billing_months?: number
+          cancel_at_period_end?: boolean
+          company_id: string
+          created_at?: string
+          current_period_end?: string | null
+          custom_member_limit?: number | null
+          custom_vehicle_limit?: number | null
+          ended_reason?: string | null
+          plan_key: string
+          price_ron?: number | null
+          status: string
+          status_changed_at?: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          trial_ends_at?: string | null
+          trial_started_at?: string | null
+        }
+        Update: {
+          billing_months?: number
+          cancel_at_period_end?: boolean
+          company_id?: string
+          created_at?: string
+          current_period_end?: string | null
+          custom_member_limit?: number | null
+          custom_vehicle_limit?: number | null
+          ended_reason?: string | null
+          plan_key?: string
+          price_ron?: number | null
+          status?: string
+          status_changed_at?: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          trial_ends_at?: string | null
+          trial_started_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_subscriptions_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: true
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "company_subscriptions_plan_key_fkey"
+            columns: ["plan_key"]
+            isOneToOne: false
+            referencedRelation: "fleet_plans"
+            referencedColumns: ["key"]
+          },
+        ]
+      }
       company_vehicles: {
         Row: {
           archived_at: string | null
@@ -822,6 +894,87 @@ export type Database = {
             columns: ["shop_id"]
             isOneToOne: false
             referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fleet_plans: {
+        Row: {
+          active: boolean
+          features: string[]
+          key: string
+          member_limit: number | null
+          name_en: string
+          name_ro: string
+          position: number
+          price_ron: number | null
+          public: boolean
+          updated_at: string
+          vehicle_limit: number | null
+        }
+        Insert: {
+          active?: boolean
+          features?: string[]
+          key: string
+          member_limit?: number | null
+          name_en: string
+          name_ro: string
+          position?: number
+          price_ron?: number | null
+          public?: boolean
+          updated_at?: string
+          vehicle_limit?: number | null
+        }
+        Update: {
+          active?: boolean
+          features?: string[]
+          key?: string
+          member_limit?: number | null
+          name_en?: string
+          name_ro?: string
+          position?: number
+          price_ron?: number | null
+          public?: boolean
+          updated_at?: string
+          vehicle_limit?: number | null
+        }
+        Relationships: []
+      }
+      fleet_trial_claims: {
+        Row: {
+          claimed_at: string
+          company_id: string
+          id: string
+          user_id: string | null
+          vat_id: string | null
+        }
+        Insert: {
+          claimed_at?: string
+          company_id: string
+          id?: string
+          user_id?: string | null
+          vat_id?: string | null
+        }
+        Update: {
+          claimed_at?: string
+          company_id?: string
+          id?: string
+          user_id?: string | null
+          vat_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fleet_trial_claims_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fleet_trial_claims_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -1484,7 +1637,10 @@ export type Database = {
           default_max_advance_days: number
           default_min_notice_hours: number
           default_slot_minutes: number
+          fleet_billing_enabled: boolean
           fleet_enabled: boolean
+          fleet_trial_days: number
+          fleet_trial_plan: string
           id: number
           launch_price_ron: number
           launch_shops: number
@@ -1514,7 +1670,10 @@ export type Database = {
           default_max_advance_days?: number
           default_min_notice_hours?: number
           default_slot_minutes?: number
+          fleet_billing_enabled?: boolean
           fleet_enabled?: boolean
+          fleet_trial_days?: number
+          fleet_trial_plan?: string
           id?: number
           launch_price_ron?: number
           launch_shops?: number
@@ -1544,7 +1703,10 @@ export type Database = {
           default_max_advance_days?: number
           default_min_notice_hours?: number
           default_slot_minutes?: number
+          fleet_billing_enabled?: boolean
           fleet_enabled?: boolean
+          fleet_trial_days?: number
+          fleet_trial_plan?: string
           id?: number
           launch_price_ron?: number
           launch_shops?: number
@@ -3511,6 +3673,10 @@ export type Database = {
         Args: { p_filters?: Json; p_kind: string }
         Returns: Json
       }
+      admin_extend_company_trial: {
+        Args: { p_company: string; p_days: number; p_request_id: string }
+        Returns: Json
+      }
       admin_extend_trial: {
         Args: { p_days: number; p_request_id: string; p_shop_id: string }
         Returns: Json
@@ -3603,6 +3769,7 @@ export type Database = {
       admin_list_catalog: { Args: never; Returns: Json }
       admin_list_clients: { Args: never; Returns: Json }
       admin_list_company_checks: { Args: never; Returns: Json }
+      admin_list_fleet_companies: { Args: never; Returns: Json }
       admin_list_history_reports: { Args: never; Returns: Json }
       admin_list_no_show_disputes: { Args: never; Returns: Json }
       admin_list_notices: { Args: never; Returns: Json }
@@ -3660,6 +3827,10 @@ export type Database = {
         Args: { p_code: string; p_mode: string; p_request_id: string }
         Returns: Json
       }
+      admin_set_company_plan: {
+        Args: { p_company: string; p_plan_key: string; p_request_id: string }
+        Returns: Json
+      }
       admin_set_notification_text: {
         Args: {
           p_body_en: string
@@ -3705,6 +3876,16 @@ export type Database = {
           p_name_en: string
           p_name_ro: string
           p_request_id: string
+        }
+        Returns: Json
+      }
+      admin_update_fleet_plan: {
+        Args: {
+          p_key: string
+          p_member_limit: number
+          p_price_ron: number
+          p_request_id: string
+          p_vehicle_limit: number
         }
         Returns: Json
       }
@@ -3981,6 +4162,8 @@ export type Database = {
         Args: { c: Database["public"]["Tables"]["companies"]["Row"] }
         Returns: Json
       }
+      company_plan: { Args: { p_company: string }; Returns: Json }
+      company_read_only: { Args: { p_company: string }; Returns: boolean }
       company_role: { Args: { p_company: string }; Returns: string }
       complete_job: {
         Args: {
@@ -4418,7 +4601,12 @@ export type Database = {
         Args: { p_capability: string; p_company: string }
         Returns: boolean
       }
+      fleet_has_feature: {
+        Args: { p_company: string; p_feature: string }
+        Returns: boolean
+      }
       fleet_overview: { Args: { p_company: string }; Returns: Json }
+      fleet_plan_summary: { Args: { p_company: string }; Returns: Json }
       fleet_role_can: {
         Args: { p_capability: string; p_role: string }
         Returns: boolean
@@ -4440,6 +4628,7 @@ export type Database = {
         }
         Returns: Json
       }
+      fleet_subscription: { Args: { p_company: string }; Returns: Json }
       fold_text: { Args: { p: string }; Returns: string }
       format_sequence_id: {
         Args: { p_number: number; p_prefix: string; p_width?: number }

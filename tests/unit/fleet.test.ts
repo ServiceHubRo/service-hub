@@ -22,6 +22,12 @@ import {
   partsAndLabor,
   readingsOf,
   recentActivity,
+  hasFeature,
+  offeredFeatures,
+  trialDaysLeft,
+  trialUsed,
+  planState,
+  overLimit,
   scopeFor,
   sortVehicles,
   sumAmounts,
@@ -484,5 +490,35 @@ describe('fleet rights in the database', () => {
       }
       if (matrix[role] !== 'all') for (const c of matrix[role] as string[]) expect(FLEET_CAPABILITIES, `${role}: ${c} exists`).toContain(c);
     }
+  });
+});
+
+describe('fleet plans', () => {
+  const plan = { features: ['dashboard', 'vehicles', 'reports', 'approval_flow'] };
+
+  it('gates features; the preview (no plan) shows everything', () => {
+    expect(hasFeature(plan, 'reports')).toBe(true);
+    expect(hasFeature(plan, 'budget')).toBe(false);
+    expect(hasFeature(null, 'budget')).toBe(true);
+  });
+
+  it('never offers a feature that is not built', () => {
+    expect(offeredFeatures(plan.features)).toEqual(['dashboard', 'vehicles', 'reports']);
+  });
+
+  it('counts the trial in Bucharest days', () => {
+    expect(trialDaysLeft('2026-11-30T10:00:00Z', NOW)).toBe(30);
+    expect(trialDaysLeft('2026-10-30T10:00:00Z', NOW)).toBe(0);
+    expect(trialDaysLeft(null, NOW)).toBeNull();
+    expect(trialUsed('2026-10-01T10:00:00Z', '2026-10-31T10:00:00Z', new Date('2026-10-16T10:00:00Z'))).toBeCloseTo(0.5);
+  });
+
+  it('names the state and how far over a limit', () => {
+    expect(planState({ status: 'trial', trial_ends_at: '2026-11-30T10:00:00Z' }, NOW)).toBe('trial');
+    expect(planState({ status: 'trial', trial_ends_at: '2026-10-30T10:00:00Z' }, NOW)).toBe('trial_over');
+    expect(planState({ status: 'active', trial_ends_at: null }, NOW)).toBe('active');
+    expect(overLimit(18, 15)).toBe(3);
+    expect(overLimit(4, 15)).toBe(0);
+    expect(overLimit(400, null)).toBe(0);
   });
 });

@@ -7,14 +7,14 @@ import { EmptyState } from '../../components/EmptyState';
 import { LoadError } from '../../components/LoadError';
 import { PageHeader } from '../../components/PageHeader';
 import { SkeletonList } from '../../components/Skeleton';
-import { archiveVehicle, assignDriver, fetchFleetOverview, saveVehicle, setUnavailable } from '../../data/fleet';
+import { archiveVehicle, assignDriver, fetchFleetOverview, fetchPlanSummary, fetchSubscription, saveVehicle, setUnavailable } from '../../data/fleet';
 import { subscribeRows } from '../../data/realtime';
 import { toRpcError } from '../../data/rpc';
 import { useI18n } from '../../i18n/context';
 import { useLoad } from '../../lib/useLoad';
 import { COMPANIES_PATH, companyPath } from '../client/companies/paths';
 import { FleetContext, useFleetLocation, type FleetActions } from './fleetContext';
-import { FleetFrame, FleetSectionBody } from './FleetFrame';
+import { FleetFrame, FleetPlanNotice, FleetSectionBody } from './FleetFrame';
 import styles from './fleet.module.css';
 
 /**
@@ -27,16 +27,20 @@ export function FleetSpaceScreen() {
   const { t } = useI18n();
   const { companyId = '' } = useParams();
   const { section, vehicleId, filter, go } = useFleetLocation();
-  const load = useCallback(() => fetchFleetOverview(companyId), [companyId]);
+  const load = useCallback(async () => {
+    const [overview, plan] = await Promise.all([fetchFleetOverview(companyId), fetchPlanSummary(companyId)]);
+    return { overview, plan };
+  }, [companyId]);
   const { state, reload, setData } = useLoad(load);
+  const loadSubscription = useCallback(() => fetchSubscription(companyId), [companyId]);
 
   // Quiet re-read: several changes in a row cost one read; an older answer never replaces a newer one.
   const generation = useRef(0);
   const refresh = useCallback(async () => {
     const mine = ++generation.current;
-    const next = await fetchFleetOverview(companyId);
+    const next = await load();
     if (mine === generation.current) setData(next);
-  }, [companyId, setData]);
+  }, [load, setData]);
 
   const ready = state.status === 'ready';
   useEffect(() => {
@@ -48,10 +52,12 @@ export function FleetSpaceScreen() {
     };
     const offVehicles = subscribeRows({ channel: `fleet-vehicles:${companyId}`, table: 'company_vehicles', filter: `company_id=eq.${companyId}`, onChange: later, onResync: later });
     const offMembers = subscribeRows({ channel: `fleet-members:${companyId}`, table: 'company_members', filter: `company_id=eq.${companyId}`, onChange: later, onResync: later });
+    const offPlan = subscribeRows({ channel: `fleet-plan:${companyId}`, table: 'company_subscriptions', filter: `company_id=eq.${companyId}`, onChange: later, onResync: later });
     return () => {
       window.clearTimeout(timer);
       offVehicles();
       offMembers();
+      offPlan();
     };
   }, [ready, companyId, refresh]);
 
@@ -80,7 +86,7 @@ export function FleetSpaceScreen() {
   );
 
   const title = section === 'vehicul' ? t('fleet.nav.vehicle') : t(`fleet.nav.${section}`);
-  useDocumentTitle(state.status === 'ready' ? `${title} · ${state.data.company.name}` : t('fleet.space.loading'));
+  useDocumentTitle(state.status === 'ready' ? `${title} · ${state.data.overview.company.name}` : t('fleet.space.loading'));
 
   if (state.status === 'loading') {
     return (
@@ -110,9 +116,9 @@ export function FleetSpaceScreen() {
     );
   }
 
-  const data = state.data;
+  const { overview: data, plan } = state.data;
   return (
-    <FleetContext.Provider value={{ data, go, mode: 'live', actions, companyPage: companyPath(companyId), addExpense: null }}>
+    <FleetContext.Provider value={{ data, go, mode: 'live', actions, companyPage: companyPath(companyId), addExpense: null, plan, loadSubscription }}>
       <FleetFrame companyName={data.company.name} section={section} onNav={(s) => go({ section: s })} personalTo="/c/cauta">
         <PageHeader
           back={{ to: companyPath(companyId), label: t('fleet.space.companyPage') }}
@@ -123,6 +129,7 @@ export function FleetSpaceScreen() {
             </span>
           }
         />
+        <FleetPlanNotice section={section} onOpen={() => go({ section: 'abonament' })} />
         <FleetSectionBody section={section} vehicleId={vehicleId} filter={filter} />
       </FleetFrame>
     </FleetContext.Provider>

@@ -3,19 +3,20 @@ import { useMemo, useRef, useState } from 'react';
 import { ActionButton } from '../../components/ActionButton';
 import { Button } from '../../components/Button';
 import { Card } from '../../components/Card';
-import { Chip, ChipRow } from '../../components/Chip';
+import { ChoiceFilters } from '../../components/Filters';
 import { EmptyState } from '../../components/EmptyState';
 import { Field } from '../../components/Field';
 import { SelectField } from '../../components/SelectField';
 import { TextArea } from '../../components/TextArea';
 import { useI18n } from '../../i18n/context';
-import { formatDate, formatMoney, ymdInBucharest } from '../../i18n/format';
+import { formatDate, formatDateRange, formatMoney, ymdInBucharest } from '../../i18n/format';
 import { importAmount, importOdometer } from '../../lib/importRows';
 import {
   buildLedger,
   costsCsv,
   filterCosts,
   FLEET_CATEGORIES,
+  hasFeature,
   sumAmounts,
   totalsBy,
   type CostSource,
@@ -35,7 +36,7 @@ import styles from './fleet.module.css';
  */
 export function FleetCosts({ initialPeriod }: { initialPeriod?: string }) {
   const { t, lang } = useI18n();
-  const { data, allowed, vehicle, addExpense } = useFleet();
+  const { data, allowed, vehicle, addExpense, plan } = useFleet();
   const today = ymdInBucharest(new Date());
   const ledger = useMemo(() => buildLedger(data.jobs, data.expenses), [data.jobs, data.expenses]);
   const [period, setPeriod] = useState<CostPeriod>(COST_PERIODS.includes(initialPeriod as CostPeriod) ? (initialPeriod as CostPeriod) : 'year');
@@ -50,8 +51,9 @@ export function FleetCosts({ initialPeriod }: { initialPeriod?: string }) {
     return [...map.entries()].sort((a, b) => a[1].localeCompare(b[1]));
   }, [data.jobs]);
 
+  const range = periodRange(period, today);
   const shown = filterCosts(ledger.entries, {
-    range: periodRange(period, today),
+    range,
     vehicleIds: vehicleId ? [vehicleId] : undefined,
     categories: category ? [category] : undefined,
     shopIds: shopId ? [shopId] : undefined,
@@ -72,61 +74,83 @@ export function FleetCosts({ initialPeriod }: { initialPeriod?: string }) {
 
   return (
     <div className={styles.stack}>
-      <div className={styles.toolbar}>
-        <SelectField
-          className={styles.periodSelect}
-          label={t('fleet.period')}
-          value={period}
-          onChange={(e) => setPeriod(e.target.value as CostPeriod)}
-          options={COST_PERIODS.map((p) => ({ value: p, label: t(`fleet.period.${p}`) }))}
-        />
-        <div className={styles.toolbarActions}>
-          {allowed('costs.manage') && addExpense && (
-            <Button variant="primary" onClick={() => setAdding((a) => !a)} aria-expanded={adding}>
-              <Plus size={18} aria-hidden="true" /> {t('fleet.costs.add')}
-            </Button>
-          )}
-          <Button onClick={() => void exportCsv()} disabled={shown.length === 0}>
-            <Download size={18} aria-hidden="true" /> {t('fleet.export.csv')}
-          </Button>
-        </div>
-      </div>
+      <ChoiceFilters
+        groups={[
+          {
+            key: 'period',
+            title: t('fleet.period'),
+            options: COST_PERIODS.map((p) => ({ value: p, label: t(`fleet.period.${p}`) })),
+            value: period,
+            defaultValue: 'year',
+            onChange: (v) => setPeriod(v as CostPeriod),
+          },
+          {
+            key: 'vehicle',
+            title: t('fleet.col.vehicle'),
+            options: [{ value: '', label: t('fleet.costs.anyVehicle') }, ...data.vehicles.map((v) => ({ value: v.id, label: vehicleLabel(v) }))],
+            value: vehicleId,
+            defaultValue: '',
+            onChange: setVehicleId,
+          },
+          {
+            key: 'category',
+            title: t('fleet.col.category'),
+            options: [{ value: '', label: t('fleet.costs.anyCategory') }, ...FLEET_CATEGORIES.map((c) => ({ value: c, label: t(`fleet.cat.${c}`) }))],
+            value: category,
+            defaultValue: '',
+            onChange: (v) => setCategory(v as FleetCategory | ''),
+          },
+          ...(shops.length > 0
+            ? [
+                {
+                  key: 'shop',
+                  title: t('fleet.col.shop'),
+                  options: [{ value: '', label: t('fleet.costs.anyShop') }, ...shops.map(([id, name]) => ({ value: id, label: name }))],
+                  value: shopId,
+                  defaultValue: '',
+                  onChange: setShopId,
+                },
+              ]
+            : []),
+          {
+            key: 'source',
+            title: t('fleet.col.source'),
+            options: [
+              { value: '', label: t('fleet.costs.allSources') },
+              { value: 'service', label: t('fleet.source.service') },
+              { value: 'manual', label: t('fleet.source.manual') },
+            ],
+            value: source,
+            defaultValue: '',
+            onChange: (v) => setSource(v as CostSource | ''),
+          },
+        ]}
+        onClearAll={() => {
+          setPeriod('year');
+          setVehicleId('');
+          setCategory('');
+          setShopId('');
+          setSource('');
+        }}
+        doneLabel={t('fleet.filters.show', { n: shown.length })}
+        end={
+          <div className={styles.toolbarEnd}>
+            {shown.length > 0 && hasFeature(plan, 'export_csv') && (
+              <Button variant="ghost" className={styles.tool} onClick={() => void exportCsv()}>
+                <Download size={18} aria-hidden="true" /> {t('fleet.export.csv')}
+              </Button>
+            )}
+            {allowed('costs.manage') && addExpense && (
+              <Button variant="primary" onClick={() => setAdding((a) => !a)} aria-expanded={adding}>
+                <Plus size={18} aria-hidden="true" /> {t('fleet.costs.add')}
+              </Button>
+            )}
+          </div>
+        }
+      />
+      {range.from && <p className={styles.count}>{formatDateRange(lang, range.from, range.to)}</p>}
 
       {adding && <ExpenseForm onDone={() => setAdding(false)} />}
-
-      <div className={styles.filters}>
-        <SelectField
-          label={t('fleet.col.vehicle')}
-          value={vehicleId}
-          onChange={(e) => setVehicleId(e.target.value)}
-          options={[{ value: '', label: t('fleet.costs.anyVehicle') }, ...data.vehicles.map((v) => ({ value: v.id, label: vehicleLabel(v) }))]}
-        />
-        <SelectField
-          label={t('fleet.col.category')}
-          value={category}
-          onChange={(e) => setCategory(e.target.value as FleetCategory | '')}
-          options={[{ value: '', label: t('fleet.costs.anyCategory') }, ...FLEET_CATEGORIES.map((c) => ({ value: c, label: t(`fleet.cat.${c}`) }))]}
-        />
-        {shops.length > 0 && (
-          <SelectField
-            label={t('fleet.col.shop')}
-            value={shopId}
-            onChange={(e) => setShopId(e.target.value)}
-            options={[{ value: '', label: t('fleet.costs.anyShop') }, ...shops.map(([id, name]) => ({ value: id, label: name }))]}
-          />
-        )}
-      </div>
-      <ChipRow label={t('fleet.col.source')}>
-        <Chip selected={source === ''} onClick={() => setSource('')}>
-          {t('fleet.costs.allSources')}
-        </Chip>
-        <Chip selected={source === 'service'} onClick={() => setSource('service')}>
-          {t('fleet.source.service')}
-        </Chip>
-        <Chip selected={source === 'manual'} onClick={() => setSource('manual')}>
-          {t('fleet.source.manual')}
-        </Chip>
-      </ChipRow>
 
       <ul className={styles.summary}>
         <li className={styles.summaryItem}>

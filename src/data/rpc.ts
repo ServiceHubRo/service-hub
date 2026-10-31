@@ -191,6 +191,11 @@ export const RPC_ERROR_CODES = [
   'vehicle_not_found',
   'vehicle_plate_exists',
   'vehicle_archived',
+  'fleet_read_only',
+  'fleet_vehicle_limit',
+  'fleet_member_limit',
+  'plan_feature_missing',
+  'plan_not_found',
 ] as const;
 
 export type RpcErrorCode = (typeof RPC_ERROR_CODES)[number] | 'network' | 'unknown';

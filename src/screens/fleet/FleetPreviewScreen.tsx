@@ -9,8 +9,8 @@ import { SkeletonList } from '../../components/Skeleton';
 import { useI18n } from '../../i18n/context';
 import { FLEET_ROLES, scopeFor, type FleetExpense, type FleetRole } from '../../lib/fleet';
 import { FleetContext, useFleetLocation } from './fleetContext';
-import { FleetFrame, FleetSectionBody } from './FleetFrame';
-import { emptyFleet, SAMPLE_MEMBER_FOR_ROLE, sampleFleet } from './sample';
+import { FleetFrame, FleetPlanNotice, FleetSectionBody } from './FleetFrame';
+import { emptyFleet, SAMPLE_MEMBER_FOR_ROLE, sampleFleet, samplePlanSummary, sampleSubscription } from './sample';
 import styles from './fleet.module.css';
 
 type DataMode = 'sample' | 'empty' | 'loading' | 'error';
@@ -36,6 +36,9 @@ export function FleetPreviewScreen() {
   }, [mode, role, added]);
 
   const addExpense = useCallback((e: FleetExpense) => setAdded((list) => [...list, e]), []);
+  const activeVehicles = data.vehicles.filter((v) => !v.archived_at).length;
+  const plan = useMemo(() => (mode === 'sample' || mode === 'empty' ? samplePlanSummary(new Date(), activeVehicles) : null), [mode, activeVehicles]);
+  const loadSubscription = useCallback(async () => sampleSubscription(new Date(), activeVehicles, data.members.length), [activeVehicles, data.members.length]);
   const title = section === 'vehicul' ? t('fleet.nav.vehicle') : t(`fleet.nav.${section}`);
   useDocumentTitle(`${title} · ${t('fleet.preview.tag')}`);
 
@@ -45,7 +48,7 @@ export function FleetPreviewScreen() {
   else body = <FleetSectionBody section={section} vehicleId={vehicleId} filter={filter} />;
 
   return (
-    <FleetContext.Provider value={{ data, go, mode: 'preview', actions: null, companyPage: null, addExpense }}>
+    <FleetContext.Provider value={{ data, go, mode: 'preview', actions: null, companyPage: null, addExpense, plan, loadSubscription }}>
       <FleetFrame companyName={data.company.name} section={section} onNav={(s) => go({ section: s })} personalTo="/c/garaj">
         <Banner tone="warning">{t('fleet.preview.banner')}</Banner>
         <div className={styles.controls}>
@@ -70,6 +73,7 @@ export function FleetPreviewScreen() {
             </span>
           }
         />
+        <FleetPlanNotice section={section} onOpen={() => go({ section: 'abonament' })} />
         {body}
       </FleetFrame>
     </FleetContext.Provider>

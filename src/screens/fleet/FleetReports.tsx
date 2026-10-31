@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { Button } from '../../components/Button';
 import { buttonClass } from '../../components/buttonClass';
 import { Card } from '../../components/Card';
-import { Chip, ChipRow } from '../../components/Chip';
+import { MoreActions } from '../../components/MoreActions';
 import { EmptyState } from '../../components/EmptyState';
 import { SelectField } from '../../components/SelectField';
 import { useI18n } from '../../i18n/context';
@@ -12,6 +12,7 @@ import { formatDate, formatDateRange, formatKm, formatMoney, formatPercent, ymdI
 import { plural } from '../../i18n/translate';
 import {
   budgetUsage,
+  hasFeature,
   buildLedger,
   costsCsv,
   documentStates,
@@ -49,7 +50,7 @@ const HIGH_COST = 1.5;
  */
 export function FleetReports({ initialReport }: { initialReport?: string }) {
   const { t, lang } = useI18n();
-  const { data, go, allowed, vehicle, companyPage } = useFleet();
+  const { data, go, allowed, vehicle, companyPage, plan } = useFleet();
   const today = ymdInBucharest(new Date());
   const [report, setReport] = useState<ReportKey>(REPORT_KEYS.includes(initialReport as ReportKey) ? (initialReport as ReportKey) : 'totals');
   const [period, setPeriod] = useState<CostPeriod>('year');
@@ -60,6 +61,16 @@ export function FleetReports({ initialReport }: { initialReport?: string }) {
 
   if (!allowed('reports.view')) {
     return <EmptyState icon={Lock} title={t('fleet.reports.locked')} body={t('fleet.reports.lockedBody')} />;
+  }
+  if (!hasFeature(plan, 'reports')) {
+    return (
+      <EmptyState
+        icon={Lock}
+        title={t('fleet.sub.reportsLocked')}
+        body={t('fleet.sub.reportsLockedBody')}
+        action={<Button onClick={() => go({ section: 'abonament' })}>{t('fleet.sub.compare')}</Button>}
+      />
+    );
   }
 
   async function exportCsv() {
@@ -74,30 +85,32 @@ export function FleetReports({ initialReport }: { initialReport?: string }) {
 
   return (
     <div className={styles.stack}>
-      <ChipRow label={t('fleet.reports.pick')}>
-        {REPORT_KEYS.map((k) => (
-          <Chip key={k} selected={report === k} onClick={() => setReport(k)}>
-            {t(`fleet.report.${k}`)}
-          </Chip>
-        ))}
-      </ChipRow>
-      <div className={styles.toolbar}>
+      <div className={styles.reportBar}>
+        <SelectField
+          className={styles.reportSelect}
+          label={t('fleet.reports.pick')}
+          value={report}
+          onChange={(e) => setReport(e.target.value as ReportKey)}
+          options={REPORT_KEYS.map((k) => ({ value: k, label: t(`fleet.report.${k}`) }))}
+        />
         {report !== 'documents' && report !== 'budget' && (
           <SelectField
-            className={styles.periodSelect}
+            className={styles.reportSelect}
             label={t('fleet.period')}
             value={period}
             onChange={(e) => setPeriod(e.target.value as CostPeriod)}
             options={COST_PERIODS.map((p) => ({ value: p, label: t(`fleet.period.${p}`) }))}
           />
         )}
-        <div className={styles.toolbarActions}>
-          <Button onClick={() => void exportCsv()} disabled={entries.length === 0}>
-            <Download size={18} aria-hidden="true" /> {t('fleet.export.csv')}
-          </Button>
-          <Button onClick={() => window.print()}>
-            <Printer size={18} aria-hidden="true" /> {t('fleet.export.pdf')}
-          </Button>
+        <div className={styles.reportMore}>
+          <MoreActions
+            items={[
+              ...(entries.length > 0 && hasFeature(plan, 'export_csv')
+                ? [{ key: 'csv', label: t('fleet.export.csv'), icon: <Download size={18} aria-hidden="true" />, onSelect: () => void exportCsv() }]
+                : []),
+              { key: 'print', label: t('fleet.export.pdf'), icon: <Printer size={18} aria-hidden="true" />, onSelect: () => window.print() },
+            ]}
+          />
         </div>
       </div>
       {report !== 'documents' && report !== 'budget' && range.from && <p className={styles.count}>{formatDateRange(lang, range.from, range.to)}</p>}

@@ -1,16 +1,16 @@
 import { CarFront, ChevronRight, Download, Plus, SearchX } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { Button } from '../../components/Button';
-import { Chip, ChipRow } from '../../components/Chip';
+import { ChoiceFilters } from '../../components/Filters';
 import { EmptyState } from '../../components/EmptyState';
 import { InlinePanel } from '../../components/InlinePanel';
 import { SearchField } from '../../components/SearchField';
-import { SelectField } from '../../components/SelectField';
 import { useI18n } from '../../i18n/context';
 import { formatDate, formatKm, formatMoney, ymdInBucharest } from '../../i18n/format';
 import { csvFormat, toCsv } from '../../lib/history';
 import {
   distinctValues,
+  hasFeature,
   filterVehicles,
   ledgerFor,
   NO_FILTER,
@@ -37,7 +37,7 @@ import styles from './fleet.module.css';
  */
 export function FleetVehicles({ initialStatus }: { initialStatus?: string }) {
   const { t, lang } = useI18n();
-  const { data, go, allowed, mode } = useFleet();
+  const { data, go, allowed, mode, plan } = useFleet();
   const today = ymdInBucharest(new Date());
   const ledger = useMemo(() => ledgerFor(data), [data]);
   const rows = useMemo(() => vehicleRows(data.vehicles, data.jobs, ledger?.entries ?? null, yearRange(today), data.expenses), [data, ledger, today]);
@@ -89,11 +89,77 @@ export function FleetVehicles({ initialStatus }: { initialStatus?: string }) {
               <Plus size={18} aria-hidden="true" /> {t('fleet.vehicles.add')}
             </Button>
           )}
-          <Button onClick={() => void exportCsv()} disabled={shown.length === 0}>
-            <Download size={18} aria-hidden="true" /> {t('fleet.export.csv')}
-          </Button>
         </div>
       </div>
+
+      <ChoiceFilters
+        groups={[
+          {
+            key: 'status',
+            title: t('fleet.col.status'),
+            options: [{ value: 'all', label: t('fleet.vehicles.all') }, ...VEHICLE_STATUSES.map((v) => ({ value: v, label: t(`fleet.status.${v}`) }))],
+            value: filter.status,
+            defaultValue: 'all',
+            onChange: (v) => set({ status: v as VehicleFilter['status'] }),
+          },
+          ...(drivers.length > 0
+            ? [
+                {
+                  key: 'driver',
+                  title: t('fleet.col.driver'),
+                  options: [{ value: '', label: t('fleet.vehicles.anyDriver') }, ...drivers.map((d) => ({ value: d.id, label: d.name }))],
+                  value: filter.driverId ?? '',
+                  defaultValue: '',
+                  onChange: (v: string) => set({ driverId: v || null }),
+                },
+              ]
+            : []),
+          ...(departments.length > 0
+            ? [
+                {
+                  key: 'department',
+                  title: t('fleet.col.department'),
+                  options: [{ value: '', label: t('fleet.vehicles.anyDepartment') }, ...departments.map((d) => ({ value: d, label: d }))],
+                  value: filter.department ?? '',
+                  defaultValue: '',
+                  onChange: (v: string) => set({ department: v || null }),
+                },
+              ]
+            : []),
+          ...(types.length > 0
+            ? [
+                {
+                  key: 'type',
+                  title: t('fleet.col.type'),
+                  options: [{ value: '', label: t('fleet.vehicles.anyType') }, ...types.map((v) => ({ value: v, label: typeLabel(v) }))],
+                  value: filter.vehicleType ?? '',
+                  defaultValue: '',
+                  onChange: (v: string) => set({ vehicleType: v || null }),
+                },
+              ]
+            : []),
+          {
+            key: 'sort',
+            title: t('fleet.vehicles.sort'),
+            options: sorts.map((v) => ({ value: v, label: t(`fleet.sort.${v}`) })),
+            value: sort,
+            defaultValue: 'plate',
+            onChange: (v) => setSort(v as VehicleSort),
+          },
+        ]}
+        onClearAll={() => {
+          setFilter((f) => ({ ...NO_FILTER, query: f.query }));
+          setSort('plate');
+        }}
+        doneLabel={t('fleet.filters.show', { n: shown.length })}
+        end={
+          shown.length > 0 && hasFeature(plan, 'export_csv') ? (
+            <Button variant="ghost" className={styles.tool} onClick={() => void exportCsv()}>
+              <Download size={18} aria-hidden="true" /> {t('fleet.export.csv')}
+            </Button>
+          ) : undefined
+        }
+      />
 
       {adding &&
         (mode === 'live' ? (
@@ -113,50 +179,6 @@ export function FleetVehicles({ initialStatus }: { initialStatus?: string }) {
             </div>
           </InlinePanel>
         ))}
-
-      <ChipRow label={t('fleet.vehicles.statusFilter')}>
-        <Chip selected={filter.status === 'all'} onClick={() => set({ status: 'all' })}>
-          {t('fleet.vehicles.all')}
-        </Chip>
-        {VEHICLE_STATUSES.map((s) => (
-          <Chip key={s} selected={filter.status === s} onClick={() => set({ status: s })}>
-            {t(`fleet.status.${s}`)}
-          </Chip>
-        ))}
-      </ChipRow>
-
-      <div className={styles.filters}>
-        {drivers.length > 0 && (
-          <SelectField
-            label={t('fleet.col.driver')}
-            value={filter.driverId ?? ''}
-            onChange={(e) => set({ driverId: e.target.value || null })}
-            options={[{ value: '', label: t('fleet.vehicles.anyDriver') }, ...drivers.map((d) => ({ value: d.id, label: d.name }))]}
-          />
-        )}
-        {departments.length > 0 && (
-          <SelectField
-            label={t('fleet.col.department')}
-            value={filter.department ?? ''}
-            onChange={(e) => set({ department: e.target.value || null })}
-            options={[{ value: '', label: t('fleet.vehicles.anyDepartment') }, ...departments.map((d) => ({ value: d, label: d }))]}
-          />
-        )}
-        {types.length > 0 && (
-          <SelectField
-            label={t('fleet.col.type')}
-            value={filter.vehicleType ?? ''}
-            onChange={(e) => set({ vehicleType: e.target.value || null })}
-            options={[{ value: '', label: t('fleet.vehicles.anyType') }, ...types.map((v) => ({ value: v, label: typeLabel(v) }))]}
-          />
-        )}
-        <SelectField
-          label={t('fleet.vehicles.sort')}
-          value={sort}
-          onChange={(e) => setSort(e.target.value as VehicleSort)}
-          options={sorts.map((s) => ({ value: s, label: t(`fleet.sort.${s}`) }))}
-        />
-      </div>
 
       <p className={styles.count} aria-live="polite">
         {t('fleet.vehicles.count', { shown: shown.length, total: rows.filter((r) => r.status !== 'archived').length })}

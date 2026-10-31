@@ -1,5 +1,6 @@
-import { call } from './rpc';
-import type { FleetOverview, FleetVehicle } from '../lib/fleet';
+import { call, failure, RpcError } from './rpc';
+import { supabase } from './supabase';
+import type { FleetOverview, FleetPlanRow, FleetPlanSummary, FleetSubscriptionView, FleetVehicle } from '../lib/fleet';
 
 /**
  * The company's fleet (T63c, docs/FLEET_PLAN.md): one read, `fleet_overview(company)`, already
@@ -51,4 +52,63 @@ export async function assignDriver(vehicleId: string, memberId: string | null, r
 
 export async function setUnavailable(vehicleId: string, unavailable: boolean, requestId: string): Promise<FleetVehicle> {
   return (await call('fleet_set_unavailable', { p_vehicle: vehicleId, p_unavailable: unavailable, p_request_id: requestId })) as unknown as FleetVehicle;
+}
+
+// ------------------------------------------------------------------------------------ plans (T64a)
+
+/** The plan as every member's frame needs it (badge, banners): no price. */
+export async function fetchPlanSummary(company: string): Promise<FleetPlanSummary> {
+  return (await call('fleet_plan_summary', { p_company: company })) as unknown as FleetPlanSummary;
+}
+
+/** The Abonament page: admin, manager and accountant (`not_allowed` for a driver). */
+export async function fetchSubscription(company: string): Promise<FleetSubscriptionView> {
+  return (await call('fleet_subscription', { p_company: company })) as unknown as FleetSubscriptionView;
+}
+
+// ------------------------------------------------------------------------------------ platform admin
+
+export interface AdminFleetCompany {
+  id: string;
+  name: string;
+  vat_id: string | null;
+  created_at: string;
+  archived_at: string | null;
+  plan: FleetSubscriptionView['plan'];
+  vehicles: number;
+  members: number;
+  admin_email: string | null;
+}
+
+export async function adminListFleetCompanies(): Promise<AdminFleetCompany[]> {
+  return (await call('admin_list_fleet_companies', {} as never)) as unknown as AdminFleetCompany[];
+}
+
+export async function adminFleetPlans(): Promise<(FleetPlanRow & { position: number; public: boolean; active: boolean })[]> {
+  if (!supabase) throw new RpcError('network');
+  const { data, error } = await supabase.from('fleet_plans').select('*').order('position');
+  if (error) throw failure(error);
+  return data as unknown as (FleetPlanRow & { position: number; public: boolean; active: boolean })[];
+}
+
+export async function adminSetCompanyPlan(company: string, planKey: string, requestId: string): Promise<void> {
+  await call('admin_set_company_plan', { p_company: company, p_plan_key: planKey, p_request_id: requestId });
+}
+
+export async function adminExtendCompanyTrial(company: string, days: number, requestId: string): Promise<void> {
+  await call('admin_extend_company_trial', { p_company: company, p_days: days, p_request_id: requestId });
+}
+
+export async function adminUpdateFleetPlan(
+  key: string,
+  v: { price: number | null; vehicleLimit: number | null; memberLimit: number | null },
+  requestId: string,
+): Promise<void> {
+  await call('admin_update_fleet_plan', {
+    p_key: key,
+    p_price_ron: v.price,
+    p_vehicle_limit: v.vehicleLimit,
+    p_member_limit: v.memberLimit,
+    p_request_id: requestId,
+  } as never);
 }

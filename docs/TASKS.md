@@ -1444,7 +1444,7 @@ Cerut de Eduard pe 31 oct 2026: firmele cu mai multe mașini își administreaz�
 - Abonamentele service-urilor și conturile personale nu se ating: tabele separate pentru firme, aceeași firmă Stripe, o ramură nouă în webhook.
 - Depinde de T63b/T63c (firmele și vehiculele lor) și, pentru plăți reale, de T14b (facturi fiscale, e-Factura).
 
-- [ ] Aprobat de Eduard
+- [x] Aprobat de Eduard (31 oct: politica de acces; Start doar administratorul, membri 1 / 10 / nelimitat; test 30 de zile Fleet Business, o dată pe CUI; doar lunar; Pro = Business + 40 de vehicule)
 
 Notă (31 oct): Eduard a aprobat politica de acces (7 zile de grație, apoi doar citire, devizele deja primite rămân de decis).
 
@@ -1464,5 +1464,17 @@ Notă (31 oct): Eduard a aprobat politica de acces (7 zile de grație, apoi doar
 - **Flotele pornite pentru toți clienții** (migrarea `fleet_on`, schema 93; Eduard, 31 oct: aplicația nu e publică încă, butoanele trebuie să se vadă fără pași manuali). Înainte de lansare hotărăști dacă rămân pornite (`docs/LAUNCH_CHECK.md`, partea C).
 - Teste: `tests/sql/135_company_vehicles.sql`, `tests/e2e/fleet-space.spec.ts`, `published.spec.ts` (cu flotele oprite, doar contul de probă vede firmele).
 - Rămas: programările firmei și aprobarea devizelor (T63d), cheltuieli, documente, rapoarte cu date (T63e), notificări (T63g).
+
+- [x] Făcut
+
+### T64a — Planurile flotelor și pagina „Abonament și facturare” ✅
+- Migrarea `fleet_plans` (schema 94): planurile ca rânduri (prețurile și limitele le schimbă adminul), abonamentul fiecărei firme, perioada de test de 30 de zile cu Fleet Business o singură dată pe cont și pe CUI. **Fără plăți**: niciun Stripe, abonamentele service-urilor neatinse.
+- Limitele se verifică în baza de date pe orice drum: vehicul nou sau readus peste limită, membru sau invitație peste limită, buget doar din Fleet Business. Nimic nu se șterge când planul scade.
+- „Doar citire” după test se aplică abia când pornim plățile (`fleet_billing_enabled`, oprit). Până atunci nicio firmă nu e blocată.
+- **În spațiul firmei:** insigna planului sub comutatorul de spațiu deschide pagina „Abonament și facturare”: planul, prețul, zilele de test rămase (cu bară), ce folosește firma față de limite, compararea celor 4 planuri (doar funcțiile care există). Fără butoane de plată; un rând spune că plata nu e încă disponibilă. Avertizări discrete pe Panou și Vehicule: limită depășită, ultima săptămână de test.
+- **Admin → Cont → Flote:** firmele cu planul, starea, sfârșitul testului și vehiculele; schimbă planul și prelungește testul din „Mai multe”; prețurile și limitele planurilor. Totul cu pasul al doilea al autentificării și în jurnal.
+- **Mai puține butoane** (Eduard, 31 oct): Vehicule și Costuri au un singur buton „Filtre” (liste derulante), Rapoarte are raportul și perioada în liste derulante și exporturile în „Mai multe”, pagina vehiculului are secțiunile într-o listă derulantă pe telefon și acțiunile rare în „Mai multe”.
+- Teste: `tests/sql/136_fleet_plans.sql`, `tests/e2e/fleet-space.spec.ts`.
+- Rămas: notificările înainte de sfârșitul testului (au sens când pornim plățile), plata (T64b, aprobare separată), facturile fiscale (T64c, cu T14b).
 
 - [x] Făcut

@@ -4,6 +4,7 @@ import { Button } from '../../components/Button';
 import { Card } from '../../components/Card';
 import { Chip, ChipRow } from '../../components/Chip';
 import { EmptyState } from '../../components/EmptyState';
+import { SelectField } from '../../components/SelectField';
 import { useI18n } from '../../i18n/context';
 import { formatDate, formatKm, formatMoney } from '../../i18n/format';
 import { CAR_DOCS } from '../../lib/expiry';
@@ -107,14 +108,24 @@ export function FleetVehicle({ vehicleId }: { vehicleId: string }) {
         <FleetVehicleForm vehicle={v} onCancel={() => setEditing(false)} onDone={() => setEditing(false)} />
       )}
 
-      <ChipRow label={t('fleet.vehicle.sections')}>
-        {tabs.map((x) => (
-          <Chip key={x.key} selected={tab === x.key} onClick={() => setTab(x.key)}>
-            {x.label}
-            {x.count ? <span className={styles.chipCount}>{x.count}</span> : null}
-          </Chip>
-        ))}
-      </ChipRow>
+      <div className={styles.sectionSelect}>
+        <SelectField
+          label={t('fleet.vehicle.sections')}
+          value={tab}
+          onChange={(e) => setTab(e.target.value as Tab)}
+          options={tabs.map((x) => ({ value: x.key, label: x.count ? `${x.label} (${x.count})` : x.label }))}
+        />
+      </div>
+      <div className={styles.sectionTabs}>
+        <ChipRow label={t('fleet.vehicle.sections')}>
+          {tabs.map((x) => (
+            <Chip key={x.key} selected={tab === x.key} onClick={() => setTab(x.key)}>
+              {x.label}
+              {x.count ? <span className={styles.chipCount}>{x.count}</span> : null}
+            </Chip>
+          ))}
+        </ChipRow>
+      </div>
 
       {tab === 'overview' && (
         <div className={styles.grid2}>
