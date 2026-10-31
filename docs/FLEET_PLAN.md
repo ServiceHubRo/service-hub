@@ -267,7 +267,7 @@ create table public.fleet_expenses (
 | 4 | Company bookings, approvals with thresholds, decision log, vehicle history | **Migration** (bookings/quotes, `decide_quote` replaced) |
 | 5 | Expenses, receipts bucket, reports, exports | **Migration** + storage bucket |
 | 6 | Driver/accountant flows, issues | **Migration** |
-| 7 | Fleet notifications, plans table (no payments) | **Migration**; payments = separate decision |
+| 7 | Fleet notifications; plans and billing → `docs/FLEET_BILLING_PLAN.md` (T64) | **Migration**; payments = separate decision |
 | 8 | SQL tests (isolation between companies, driver scope, approval bypass via API, limits), Playwright flows A–H, regression pass | – |
 
 ## 8. Tests per stage
@@ -279,7 +279,7 @@ create table public.fleet_expenses (
 - Playwright: scenarios A–H of the request at 390 / 820 / 1440 px, RO and EN.
 
 ## 9. Open decisions for Eduard
-1. Fleet as membership inside client accounts (not a fourth role) — R8.
+1. ~~Fleet as membership inside client accounts (not a fourth role) — R8.~~ **Approved by Eduard, 31 Oct 2026.** CLAUDE.md §1 is updated together with T63b, when the first company table exists.
 2. Manager approval limit when none is set: proposed "no limit" (the company chooses a limit when it
    wants one).
 3. Plan prices and limits are hypotheses; payments stay off until a separate approval.

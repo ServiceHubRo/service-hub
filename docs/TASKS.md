@@ -1438,3 +1438,10 @@ Cerut de Eduard pe 31 oct 2026: firmele cu mai multe mașini își administreaz�
 - Rămas: T63b (firme și membri), T63c (vehiculele firmei), T63d (programări și aprobări), T63e (cheltuieli, documente, rapoarte pe date reale), T63f (șofer și contabil), T63g (notificări, planuri), T63h (teste SQL și de browser, regresii).
 
 - [x] Făcut
+
+### T64 — Abonamentele flotelor (propunere)
+- Analiza abonamentelor existente și propunerea completă: `docs/FLEET_BILLING_PLAN.md` (planuri configurabile, vehicul activ, limite în baza de date, perioada de testare, ce se întâmplă la plată eșuată, expirare, anulare, upgrade și downgrade, schema, Stripe, facturare, admin, teste). **Niciun cod și nicio migrare.**
+- Abonamentele service-urilor și conturile personale nu se ating: tabele separate pentru firme, aceeași firmă Stripe, o ramură nouă în webhook.
+- Depinde de T63b/T63c (firmele și vehiculele lor) și, pentru plăți reale, de T14b (facturi fiscale, e-Factura).
+
+- [ ] Aprobat de Eduard
