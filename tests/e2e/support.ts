@@ -67,6 +67,12 @@ export function uniquePhone(): { e164: string; national: string } {
   return { e164: `+40${digits}`, national: `0${digits.slice(0, 3)} ${digits.slice(3, 6)} ${digits.slice(6)}` };
 }
 
+/** A plate no other test uses: a car has one active booking per shop (T60), and the odometer check looks at every job on a plate. */
+export function uniquePlate(county = 'BV'): string {
+  const l = () => 'ABCDEFGHJKLMNPRSTUVWXZ'[Math.floor(Math.random() * 22)];
+  return `${county} ${10 + Math.floor(Math.random() * 89)} ${l()}${l()}${l()}`;
+}
+
 /**
  * A confirmed account made through the Auth admin API (fast; the UI sign-up has its own test). It
  * has seen the tour and hidden "Primii pași" (T39) unless `onboarding` is asked for.

@@ -1388,7 +1388,19 @@ Cerut de Eduard pe 30 oct 2026, cu poze: stelele unei recenzii „nu sunt între
 
 - [x] Făcut
 
-## T61 — Propozițiile umplu din nou rândul
+## T60 — O mașină, o programare activă la un service ✅
+
+Cerut de Eduard pe 30 oct 2026 („pot programa o mașină de două sau mai multe ori la service, chiar dacă se află deja programată”); alegerea lui: „Una la același service”. Migrarea `one_booking_per_car` (schema 90), doar adăugiri.
+
+- **La același service:** o mașină (același număr, scris în orice fel; fără număr, aceeași mașină din garaj) are cel mult o programare activă (în așteptare, confirmată, în constatare, deviz trimis, deviz acceptat, în lucru). A doua e refuzată: „Mașina are deja o programare activă la acest service (P-000004, Lun 2 nov, 10:00). Lucrările în plus se adaugă la ea.” Se aplică și când service-ul adaugă o programare.
+- **La alt service:** clientul nu poate programa aceeași mașină în aceeași zi. Un service care adaugă o programare nu află nimic despre programările de la alte service-uri.
+- **Cine e verificat:** clientul doar față de programările lui, service-ul doar față de programările de la el (pe care le vede oricum). Cineva care scrie numărul altei persoane nu blochează acea mașină și nu află nimic despre programările altcuiva.
+- **Ce nu se schimbă:** programările care există deja; rândurile scrise de server (seed, import); după finalizare, anulare sau refuz, mașina se poate programa din nou. Un blocaj pe mașină face ca două cereri în același moment să se aștepte una pe alta.
+- **Teste:** `tests/sql/133_one_booking_per_car.sql`; testele care programau aceeași mașină de mai multe ori la același service folosesc acum mașini diferite (`test.book` și `uniquePlate()` din testele de browser dau fiecărei programări un număr al ei; testele de kilometraj programează a doua lucrare după ce prima e gata). Tot aici, două teste care depindeau de ora zilei în săptămânile de după schimbarea orei (`79_history_report`, `101_engagement`) calculează ziua în ora României.
+
+- [x] Făcut
+
+## T61 — Propozițiile umplu din nou rândul ✅
 
 Cerut de Eduard pe 31 oct 2026 (pagina de start pe telefon: „mi-ai despărțit propozițiile și le-am pus de două rânduri fără logică și arată urat”). Doar stiluri, fără migrare, fără pachete noi.
 

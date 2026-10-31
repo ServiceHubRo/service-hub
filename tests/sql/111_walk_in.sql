@@ -11,7 +11,9 @@ begin
   return (public.shop_create_booking(
     p_service_id => 'ulei', p_date => current_setting('test.day')::date, p_slot => p_slot::time,
     p_client_name => 'Dan Marin', p_client_phone => p_phone,
-    p_car => '{"make":"Opel","model":"Astra","plate":"BV 07 DAN","year":"2016"}',
+    -- A car of its own per phone (one car has one active booking at a shop, T60).
+    p_car => jsonb_build_object('make', 'Opel', 'model', 'Astra', 'year', '2016', 'plate',
+      case when p_phone = '0745 111 222' then 'BV 07 DAN' else 'BV 07 ' || right(regexp_replace(p_phone, '\D', '', 'g'), 3) end),
     p_request_id => gen_random_uuid(), p_client_email => p_email, p_send_invite => p_invite)).id;
 end $$;
 grant execute on function pg_temp.add(text, text, text, boolean) to public;

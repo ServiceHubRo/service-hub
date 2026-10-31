@@ -276,6 +276,7 @@ Search, the shop page, and `create_booking` all use this function. A shop that i
 | Limit | Default | Enforced in |
 |---|---|---|
 | Active bookings per client at one shop | 3 | `create_booking` |
+| Active bookings per car at one shop (same plate, or the client's saved car without a plate); at another shop, not the same day (only when the client books). A client is checked against their own bookings only, a shop against its own | 1 | trigger `bookings_rule_car` (T60): `car_already_booked {ref, date, slot}`, `car_booked_that_day {date}` |
 | Active bookings per client in total | 10 | `create_booking` |
 | New bookings per client per 24 h | 5 | `create_booking` |
 | Messages per thread per hour | 30 | `send_message` |

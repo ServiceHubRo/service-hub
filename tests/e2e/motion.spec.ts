@@ -1,5 +1,5 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
-import { BACKEND, PASSWORD, createBookableShop, createUser, rpcAs, shot, signIn } from './support';
+import { BACKEND, PASSWORD, createBookableShop, createUser, rpcAs, shot, signIn, uniquePlate } from './support';
 
 // The three animations of 15 Oct (src/lib/motion.ts): the heart of a favorite, the jump of a count
 // on the tab bar and the glow of a request that arrives live at the shop. The other tests run with
@@ -31,7 +31,7 @@ async function bookAs(client: string, shopId: string) {
     p_date: day,
     p_slot: slots.slots.find((s) => s.available)!.time,
     p_request_id: crypto.randomUUID(),
-    p_car: { make: 'Dacia', model: 'Logan', year: 2019, plate: 'BV 12 ANM' },
+    p_car: { make: 'Dacia', model: 'Logan', year: 2019, plate: uniquePlate() },
     p_save_car: false,
     p_note: 'Cerere sosită live',
   });

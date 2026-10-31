@@ -14,6 +14,7 @@ import {
   signIn,
   userIdOf,
   cardAction,
+  uniquePlate,
 } from './support';
 
 // T11 — messages between a client and a shop, live on both sides, with automatic messages in the
@@ -62,7 +63,7 @@ async function book(client: string, shopId: string, at: { date: string; slot: st
     p_date: at.date,
     p_slot: at.slot,
     p_request_id: rid(),
-    p_car: { make: 'Dacia', model: 'Logan', year: 2019, plate: 'BV 11 MSG' },
+    p_car: { make: 'Dacia', model: 'Logan', year: 2019, plate: uniquePlate() },
     p_save_car: false,
   });
 }

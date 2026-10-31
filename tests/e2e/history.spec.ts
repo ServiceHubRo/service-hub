@@ -151,10 +151,11 @@ test.describe('repair history', () => {
     // Without B and V, so the search "BV <n>" can never match the other car's letters.
     const otherPlate = `CJ ${n} ${letters('ACDEFGHJKLMNPRSTUXZ')}`;
     const done = await book(client, shopId, a!, plate, true); // saves the car in the garage
-    const refused = await book(client, shopId, b!, plate, false);
     const other = await book(client, shopId, c!, otherPlate, false);
     await decide(shop, client, done.id, true);
     await finish(shop, done.id, 105400);
+    // One active booking per car at a shop (T60): the same car comes back once the first job is done.
+    const refused = await book(client, shopId, b!, plate, false);
     await decide(shop, client, refused.id, false);
     await decide(shop, client, other.id, true);
     await finish(shop, other.id, 50000);

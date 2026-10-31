@@ -57,7 +57,8 @@ select test.logout();
 -- ------------------------------------------------------------------ the booking remembers it
 select set_config('test.b1', pg_temp.book('test.client_c', '09:00', 'BV 01 NEW')::text, true);
 select test.eq(offer_percent, 10, 'the first booking carries the offer') from public.bookings where id = current_setting('test.b1')::uuid;
-select set_config('test.b2', pg_temp.book('test.client_c', '10:00', 'BV 01 NEW')::text, true);
+-- Another car (one car has one active booking at a shop, T60).
+select set_config('test.b2', pg_temp.book('test.client_c', '10:00', 'BV 02 NEW')::text, true);
 select test.eq(offer_percent, null::int, 'a second one, while the first is open, does not') from public.bookings where id = current_setting('test.b2')::uuid;
 select test.login(current_setting('test.client_c')::uuid);
 select test.eq(test.count(format('select 1 from public.new_client_offers(array[%L]::uuid[])', test.id('shop1'))), 0::bigint,
