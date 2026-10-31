@@ -1448,8 +1448,11 @@ Cerut de Eduard pe 31 oct 2026: firmele cu mai multe mașini își administreaz�
 
 Notă (31 oct): Eduard a aprobat politica de acces (7 zile de grație, apoi doar citire, devizele deja primite rămân de decis).
 
-### T63b — Firme și membri (migrare propusă)
-- Migrarea și testele: `docs/sql/proposed/` (nu sunt în `supabase/migrations`, deci nu ajung în Supabase). Verificate local: toate testele SQL existente + cele noi trec.
-- Firma, membrii cu roluri, invitații prin link (14 zile), ultimul administrator nu poate pleca, predarea administrării într-un pas, jurnal pentru fiecare schimbare. Totul oprit în producție până la comutatorul `fleet_enabled`.
+### T63b — Firme și membri ✅
+- Migrarea `companies` (schema 91), aprobată de Eduard pe 31 oct: firma, membrii cu roluri, invitații prin link (14 zile, doar adresa invitată), ultimul administrator nu poate pleca sau renunța la rol, predarea administrării într-un pas, jurnal pentru fiecare schimbare. Totul refuzat până la comutatorul `platform_settings.fleet_enabled` (oprit).
+- Cont → „Firmele mele”: lista, „Creează o firmă”, pagina firmei (date, reguli și bugete, invită, echipa: rol, scoate, predă administrarea, ieși din firmă) și pagina invitației. **Doar pe linkurile de test**, cu comutatorul pornit; site-ul publicat nu arată nimic.
+- Ștergerea contului e refuzată cât ești singurul administrator al unei firme cu alți membri.
+- Teste: `tests/sql/134_companies.sql`, `tests/e2e/companies.spec.ts` (390/820/1440, RO și EN), `published.spec.ts` (fără firme pe site-ul publicat), testul de drepturi SQL = aplicație.
+- Rămas: emailul cu invitația (acum linkul se copiază), comutatorul Personal/Firmă și ecranele flotei pe date reale (T63c, cu vehiculele firmei).
 
-- [ ] Migrarea aprobată de Eduard
+- [x] Făcut

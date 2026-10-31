@@ -16,6 +16,8 @@ Three roles, three completely separate interfaces:
 
 A user has exactly one role, fixed at sign-up. The role decides the whole navigation and every reachable route. A client can never reach a shop screen and vice versa; this is enforced in routing **and** in the database.
 
+**Company spaces (Eduard, 31 Oct 2026):** a client account may also belong to one or more companies (fleet accounts) with a role inside each (admin, manager, driver, accountant). This is not a fourth role and not a second sign-in: it lives under the client interface, and shops and admins never join companies (enforced in the database). Plan: `docs/FLEET_PLAN.md`.
+
 ## 2. Who you are working with
 
 - **Eduard** owns the product. He is not a programmer. He reads Romanian best, understands English.

@@ -8,6 +8,9 @@ import { BookingSent } from '../../screens/client/booking/BookingSent';
 import { ClaimScreen } from '../../screens/client/claim/ClaimScreen';
 import { ClientIntakeScreen } from '../../screens/client/intake/ClientIntakeScreen';
 import { CompanyScreen } from '../../screens/account/CompanyScreen';
+import { CompaniesScreen } from '../../screens/client/companies/CompaniesScreen';
+import { CompanyDetailScreen } from '../../screens/client/companies/CompanyDetailScreen';
+import { CompanyInviteScreen } from '../../screens/client/companies/CompanyInviteScreen';
 import { ClientBookingsProvider } from '../../screens/client/bookings/ClientBookingsProvider';
 import { ClientBookingsScreen } from '../../screens/client/bookings/ClientBookingsScreen';
 import { FavoritesScreen } from '../../screens/client/favorites/FavoritesScreen';
@@ -90,6 +93,10 @@ export default function ClientApp() {
           <Route path="cont/rapoarte" element={<MyReportsScreen />} />
           <Route path="cont/notificari" element={<ClientNotificationsScreen />} />
           <Route path="cont/firma" element={<CompanyScreen />} />
+          {/* T63b: companies (fleet accounts). The Cont tile shows only in test builds with fleets on. */}
+          <Route path="cont/firme" element={<CompaniesScreen />} />
+          <Route path="cont/firme/:companyId" element={<CompanyDetailScreen />} />
+          <Route path="firme/invitatie/:token" element={<CompanyInviteScreen />} />
           <Route path="preia/:token" element={<ClaimScreen />} />
           {messageRoutes('client')}
         </Route>

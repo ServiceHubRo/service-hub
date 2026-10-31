@@ -1,4 +1,4 @@
-import { Bell, Building2, CreditCard, Download, FileCheck, FileText, Heart, Landmark, History, LifeBuoy, Lightbulb, ListTree, MapPinned, Megaphone, QrCode, ScrollText, Settings, SlidersHorizontal, Star } from 'lucide-react';
+import { Bell, Building2, CreditCard, Download, FileCheck, FileText, Heart, Landmark, History, LifeBuoy, Lightbulb, ListTree, MapPinned, Megaphone, QrCode, ScrollText, Settings, SlidersHorizontal, Star, Truck } from 'lucide-react';
 import { useCallback, useRef, useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import type { ShellOutletContext } from '../../app/AppShell';
@@ -31,6 +31,8 @@ import { SETTINGS_PATH } from '../shop/settings/paths';
 import { OwnerTiles } from '../shop/OwnerTiles';
 import { DataSection } from './DataSection';
 import { COMPANY_PATH, helpPath, notificationsPath, suggestionsPath } from './paths';
+import { COMPANIES_PATH } from '../client/companies/paths';
+import { useFleetVisible } from '../client/companies/useFleetVisible';
 import { IdentityCard } from './IdentityCard';
 import { InviteCard } from './InviteCard';
 import { LocationRow } from './LocationRow';
@@ -88,6 +90,7 @@ export function AccountScreen({ role }: { role: Role }) {
               <Tile to={MY_REPORTS_PATH} icon={FileCheck} label={t('reports.title')} hint={t('reports.tileHint')} />
               <Tile to={FAVORITES_PATH} icon={Heart} label={t('favorites.title')} hint={t('favorites.hint')} />
               <Tile to={COMPANY_PATH} icon={Building2} label={t('co.title')} hint={t('co.tileHint')} />
+              <CompaniesTile />
             </div>
             <InviteCard />
           </>
@@ -156,6 +159,12 @@ export function AccountScreen({ role }: { role: Role }) {
  * Every notification setting in one place (Eduard, 26 Oct): push and the reminders for a client;
  * push, the new-booking sound and the summaries for a shop.
  */
+/** Firmele mele (T63b): only where fleets are visible (test builds with the switch on). */
+function CompaniesTile() {
+  const { t } = useI18n();
+  return useFleetVisible() ? <Tile to={COMPANIES_PATH} icon={Truck} label={t('cos.title')} hint={t('cos.tileHint')} /> : null;
+}
+
 function NotificationsTile({ role }: { role: 'client' | 'shop' }) {
   const { t } = useI18n();
   return <Tile to={notificationsPath(role)} icon={Bell} label={t('settings.notifications')} hint={t(`account.notifications.hint.${role}`)} />;
