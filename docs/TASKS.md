@@ -1399,3 +1399,13 @@ Cerut de Eduard pe 30 oct 2026 („pot programa o mașină de două sau mai mult
 - **Teste:** `tests/sql/133_one_booking_per_car.sql`; testele care programau aceeași mașină de mai multe ori la același service folosesc acum mașini diferite (`test.book` și `uniquePlate()` din testele de browser dau fiecărei programări un număr al ei; testele de kilometraj programează a doua lucrare după ce prima e gata). Tot aici, două teste care depindeau de ora zilei în săptămânile de după schimbarea orei (`79_history_report`, `101_engagement`) calculează ziua în ora României.
 
 - [x] Făcut
+
+## T61 — Propozițiile umplu din nou rândul ✅
+
+Cerut de Eduard pe 31 oct 2026 (pagina de start pe telefon: „mi-ai despărțit propozițiile și le-am pus de două rânduri fără logică și arată urat”). Doar stiluri, fără migrare, fără pachete noi.
+
+- **Textul obișnuit** (titluri, paragrafe, carduri) umple rândul ca înainte de T56. Rămâne o singură protecție: ultimul rând nu are un cuvânt singur (`text-wrap: pretty`). Rândurile „egale” din T56 rupeau propozițiile devreme („Plătești / doar reparația”).
+- **Butoanele și filele** păstrează rândurile egale din T56: un buton pe două rânduri nu se rupe după primul cuvânt.
+- **Verificare:** pagina de start în română și engleză la 390, 430, 820 și 1440 px; testele pagina de start și ale interfeței comune pe telefon, tabletă și PC.
+
+- [x] Făcut
