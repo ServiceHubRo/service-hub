@@ -58,10 +58,18 @@
 }
 
 .groupTitle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   margin-bottom: 7px;
   font-size: 13px;
   font-weight: 600;
   color: var(--muted);
+  overflow-wrap: anywhere;
+}
+
+.groupIcon {
+  flex: none;
 }
 
 .options {
@@ -394,4 +402,8 @@
     align-items: start;
     column-gap: 20px;
   }
+}
+
+.companyNote {
+  margin-top: 8px;
 }

@@ -1,3 +1,4 @@
+import type { Quote, QuoteItem } from '../clientBookings';
 import type { BookingStatus } from '../status';
 
 /**
@@ -34,29 +35,18 @@ export interface FleetVehicle {
   vehicle_type: string | null;
 }
 
-export interface FleetQuoteItem {
-  id: string;
-  name: string;
-  price: number;
-  kind: 'labor' | 'part' | null;
-  approved: boolean | null;
-}
+/** One line of a company quote: the same fields a client reads (variants, labor/part detail). */
+export type FleetQuoteItem = QuoteItem;
 
-/** The quote in force on a company booking (the same rows a client reads today). */
-export interface FleetQuote {
-  id: string;
-  version: number;
-  status: 'sent' | 'accepted' | 'partially_accepted' | 'refused' | 'expired' | 'superseded' | 'withdrawn';
-  total_sent: number;
-  total_approved: number | null;
-  sent_at: string;
-  decided_at: string | null;
-  /** Proposed: the member who decided, for the decision log. */
+/** The quote in force on a company booking (the same rows a client reads, plus who decided). */
+export interface FleetQuote extends Quote {
+  /** The member's account that decided (`quotes.decided_by_user`). */
   decided_by_member: string | null;
+  decided_by_name?: string | null;
   items: FleetQuoteItem[];
 }
 
-/** A booking made in the company's space (`bookings.company_id`, proposed). */
+/** A booking made in the company's space (`bookings.company_id`, T63d). */
 export interface FleetJob {
   id: string;
   ref: string;
@@ -73,6 +63,11 @@ export interface FleetJob {
   service_category: string;
   service_name_ro: string;
   service_name_en: string;
+  /** The services added to the booking (T21). */
+  extra_services?: { name_ro: string; name_en: string }[];
+  /** The member's account that booked it (the booking's client) and their name. */
+  booked_by?: string | null;
+  booked_by_name?: string;
   /** Only `done` jobs carry the final cost; refused quotes carry the inspection fee. */
   cost: number | null;
   odometer: number | null;
@@ -121,6 +116,9 @@ export interface FleetMember {
   email: string;
   role: FleetRole;
   accepted_at: string | null;
+  /** The rights the admin gave beyond the role (T63i) and the member's own approval limit. */
+  extra_caps?: string[];
+  approval_limit?: number | null;
 }
 
 /** A driver's report about a car (`fleet_issues`, proposed). */
@@ -153,7 +151,8 @@ export interface FleetCompany {
 /** Everything one read answers, already narrowed to what the caller may see. */
 export interface FleetOverview {
   company: FleetCompany;
-  me: { member_id: string; role: FleetRole };
+  /** The member reading: role, the rights the admin gave (T63i) and their approval limit (own, else the company's). */
+  me: { member_id: string; role: FleetRole; extra_caps?: string[]; approval_limit?: number | null };
   vehicles: FleetVehicle[];
   jobs: FleetJob[];
   expenses: FleetExpense[];

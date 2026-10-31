@@ -1,4 +1,4 @@
-import { call, failure, RpcError } from './rpc';
+import { call, failure, RpcError, type Booking } from './rpc';
 import { supabase } from './supabase';
 import type { FleetOverview, FleetPlanRow, FleetPlanSummary, FleetSubscriptionView, FleetVehicle } from '../lib/fleet';
 
@@ -54,6 +54,38 @@ export async function setUnavailable(vehicleId: string, unavailable: boolean, re
   return (await call('fleet_set_unavailable', { p_vehicle: vehicleId, p_unavailable: unavailable, p_request_id: requestId })) as unknown as FleetVehicle;
 }
 
+// ------------------------------------------------------------------------------------ bookings (T63d)
+
+/** The company's answer to a quote: admin, or a manager up to the company's limit. */
+export async function fleetDecideQuote(bookingId: string, quoteId: string, approvedItemIds: string[], requestId: string): Promise<Booking> {
+  return (await call('fleet_decide_quote', {
+    p_booking_id: bookingId,
+    p_quote_id: quoteId,
+    p_approved_item_ids: approvedItemIds,
+    p_request_id: requestId,
+  } as never)) as unknown as Booking;
+}
+
+export interface BookableVehicle {
+  id: string;
+  make: string;
+  model: string;
+  year: number | null;
+  plate: string | null;
+}
+
+export interface BookableCompany {
+  company_id: string;
+  company_name: string;
+  read_only: boolean;
+  vehicles: BookableVehicle[];
+}
+
+/** The company vehicles the caller may book (a driver: the one assigned), for the car step. */
+export async function fetchBookableVehicles(): Promise<BookableCompany[]> {
+  return (await call('fleet_bookable_vehicles', {} as never)) as unknown as BookableCompany[];
+}
+
 // ------------------------------------------------------------------------------------ plans (T64a)
 
 /** The plan as every member's frame needs it (badge, banners): no price. */
@@ -101,14 +133,15 @@ export async function adminExtendCompanyTrial(company: string, days: number, req
 
 export async function adminUpdateFleetPlan(
   key: string,
-  v: { price: number | null; vehicleLimit: number | null; memberLimit: number | null },
+  v: { price: number | null; vehicleLimit: number | null; includedMembers: number | null; memberPrice: number | null },
   requestId: string,
 ): Promise<void> {
   await call('admin_update_fleet_plan', {
     p_key: key,
     p_price_ron: v.price,
     p_vehicle_limit: v.vehicleLimit,
-    p_member_limit: v.memberLimit,
+    p_included_members: v.includedMembers,
+    p_member_price_ron: v.memberPrice,
     p_request_id: requestId,
   } as never);
 }

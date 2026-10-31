@@ -91,7 +91,9 @@ test('create a company, invite a driver, hand over the administration', async ({
   await page.reload();
   const row = page.locator('li', { hasText: driver });
   await expect(row).toBeVisible();
-  await row.getByRole('button', { name: 'Predă administrarea' }).click();
+  // The member's actions sit behind "Mai multe" (T63e).
+  await row.getByRole('button', { name: 'Mai multe' }).click();
+  await page.getByRole('menuitem', { name: 'Predă administrarea' }).click();
   await row.getByRole('button', { name: 'Predă administrarea' }).click();
   await expect(page.getByRole('heading', { name: 'Reguli și bugete' })).toHaveCount(0);
   await expect(page.getByText('Manager de flotă').first()).toBeVisible();

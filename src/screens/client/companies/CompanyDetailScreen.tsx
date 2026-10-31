@@ -1,13 +1,15 @@
-import { Building2, Copy, Truck, UserPlus } from 'lucide-react';
+import { Building2, Copy, KeyRound, Repeat, ShieldCheck, Truck, UserMinus, UserPlus } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { buttonClass } from '../../../components/buttonClass';
 import { ActionButton } from '../../../components/ActionButton';
 import { Button } from '../../../components/Button';
 import { Card } from '../../../components/Card';
+import { Checkbox } from '../../../components/Checkbox';
 import { EmptyState } from '../../../components/EmptyState';
 import { Field } from '../../../components/Field';
 import { LoadError } from '../../../components/LoadError';
+import { MoreActions } from '../../../components/MoreActions';
 import { PageHeader } from '../../../components/PageHeader';
 import { SelectField } from '../../../components/SelectField';
 import { SkeletonList } from '../../../components/Skeleton';
@@ -19,6 +21,7 @@ import {
   listCompanyMembers,
   newInviteToken,
   removeCompanyMember,
+  setCompanyMemberRights,
   setCompanyMemberRole,
   setCompanyRules,
   transferCompanyAdmin,
@@ -29,13 +32,14 @@ import {
 import { rpcErrorMessage } from '../../../data/rpc';
 import { useI18n } from '../../../i18n/context';
 import { formatDate, formatMoney } from '../../../i18n/format';
-import { can, FLEET_ROLES, type FleetRole } from '../../../lib/fleet';
+import { can, FLEET_ROLES, memberCan, type FleetRole } from '../../../lib/fleet';
 import { importAmount } from '../../../lib/importRows';
 import { looksLikeEmail } from '../../../lib/password';
 import { useLoad } from '../../../lib/useLoad';
 import { isValidCui, isValidRegCom, normalizeCode } from '../../../lib/validators';
 import { COMPANIES_PATH, fleetSpacePath } from './paths';
 import { RolePill } from './RolePill';
+import { rightsSummary, ticksFor } from './rights';
 import styles from './companies.module.css';
 
 interface Loaded {
@@ -107,18 +111,23 @@ export function CompanyDetailScreen() {
 function Company({ data, onChange, refresh }: { data: Loaded; onChange: (next: Loaded) => void; refresh: () => Promise<void> }) {
   const { company, role, members } = data;
   const refreshMembers = async () => onChange({ ...data, members: await listCompanyMembers(company.id) });
-  const isAdmin = can(role, 'members.manage');
   const me = members.find((m) => m.is_me);
+  // The admin's part stays the admin's (Eduard, 31 Oct: "la fel ca la service"); a member may invite
+  // or manage the budget only when the admin gave them that right (T63i).
+  const isAdmin = role === 'admin';
+  const canInvite = memberCan(role, me?.extra_caps, 'members.manage');
 
   return (
     <div className={styles.columns}>
       <div className={styles.stack}>
         <DetailsCard company={company} canEdit={can(role, 'company.manage')} onSaved={(c) => onChange({ ...data, company: c })} />
-        {can(role, 'budget.manage') && <RulesCard company={company} onSaved={(c) => onChange({ ...data, company: c })} />}
+        {memberCan(role, me?.extra_caps, 'budget.manage') && (
+          <RulesCard company={company} limitEditable={isAdmin} onSaved={(c) => onChange({ ...data, company: c })} />
+        )}
       </div>
       <div className={styles.stack}>
-        {isAdmin && <InviteCard companyId={company.id} onInvited={refreshMembers} />}
-        <MembersCard members={members} isAdmin={isAdmin} onChanged={refreshMembers} onRoleChanged={refresh} />
+        {canInvite && <InviteCard companyId={company.id} adminInvite={isAdmin} onInvited={refreshMembers} />}
+        <MembersCard members={members} isAdmin={isAdmin} canInvite={canInvite} onChanged={refreshMembers} onRoleChanged={refresh} />
         {me && <LeaveCard me={me} members={members} />}
       </div>
     </div>
@@ -214,7 +223,7 @@ function Fact({ label, value, mono }: { label: string; value: string | null; mon
 
 // ------------------------------------------------------------------ rules
 
-function RulesCard({ company, onSaved }: { company: Company; onSaved: (c: Company) => void }) {
+function RulesCard({ company, limitEditable, onSaved }: { company: Company; limitEditable: boolean; onSaved: (c: Company) => void }) {
   const { t, lang } = useI18n();
   const text = (n: number | null) => (n === null ? '' : String(n).replace('.', lang === 'ro' ? ',' : '.'));
   const [limit, setLimit] = useState(text(company.manager_approval_limit));
@@ -242,7 +251,7 @@ function RulesCard({ company, onSaved }: { company: Company; onSaved: (c: Compan
       <h2 className={styles.cardTitle}>{t('cos.rules')}</h2>
       <p className={styles.note}>{t('cos.rules.note')}</p>
       <form className={styles.stack} noValidate onSubmit={(e) => e.preventDefault()}>
-        {amountField(t('cos.rules.limit'), t('cos.rules.limitHint'), limit, setLimit)}
+        {limitEditable && amountField(t('cos.rules.limit'), t('cos.rules.limitHint'), limit, setLimit)}
         <div className={styles.twoCols}>
           {amountField(t('fleet.budget.month'), t('cos.rules.emptyNone'), monthly, setMonthly)}
           {amountField(t('fleet.budget.year'), t('cos.rules.emptyNone'), yearly, setYearly)}
@@ -265,7 +274,9 @@ function RulesCard({ company, onSaved }: { company: Company; onSaved: (c: Compan
                 setError(t('rpcError.company_rules_invalid'));
                 return;
               }
-              onSaved(await setCompanyRules(company.id, { approvalLimit: values[0] ?? null, budgetMonthly: values[1] ?? null, budgetYearly: values[2] ?? null }, requestId));
+              // Only the admin changes the approval limit: the others send it back as it is.
+              const approvalLimit = limitEditable ? (values[0] ?? null) : company.manager_approval_limit;
+              onSaved(await setCompanyRules(company.id, { approvalLimit, budgetMonthly: values[1] ?? null, budgetYearly: values[2] ?? null }, requestId));
             }}
           >
             {t('common.save')}
@@ -281,7 +292,7 @@ function RulesCard({ company, onSaved }: { company: Company; onSaved: (c: Compan
 
 // ------------------------------------------------------------------ team
 
-function InviteCard({ companyId, onInvited }: { companyId: string; onInvited: () => Promise<void> }) {
+function InviteCard({ companyId, adminInvite, onInvited }: { companyId: string; adminInvite: boolean; onInvited: () => Promise<void> }) {
   const { t, lang } = useI18n();
   const [email, setEmail] = useState('');
   const [role, setRole] = useState<FleetRole>('driver');
@@ -311,9 +322,10 @@ function InviteCard({ companyId, onInvited }: { companyId: string; onInvited: ()
             label={t('cos.invite.role')}
             value={role}
             onChange={(e) => setRole(e.target.value as FleetRole)}
-            options={FLEET_ROLES.map((r) => ({ value: r, label: t(`fleet.role.${r}`) }))}
+            options={FLEET_ROLES.filter((r) => adminInvite || r !== 'admin').map((r) => ({ value: r, label: t(`fleet.role.${r}`) }))}
           />
         </div>
+        <p className={styles.note}>{t('cos.invite.billed')}</p>
         <div>
           <ActionButton
             submit
@@ -376,11 +388,13 @@ function LinkPanel({ email, url }: { email: string; url: string }) {
 function MembersCard({
   members,
   isAdmin,
+  canInvite,
   onChanged,
   onRoleChanged,
 }: {
   members: CompanyMember[];
   isAdmin: boolean;
+  canInvite: boolean;
   onChanged: () => Promise<void>;
   onRoleChanged: () => Promise<void>;
 }) {
@@ -390,29 +404,64 @@ function MembersCard({
       <h2 className={styles.cardTitle}>{t('cos.team')}</h2>
       <ul className={styles.members}>
         {members.map((m) => (
-          <MemberRow key={m.id} member={m} isAdmin={isAdmin} onChanged={onChanged} onRoleChanged={onRoleChanged} />
+          <MemberRow key={m.id} member={m} isAdmin={isAdmin} canInvite={canInvite} onChanged={onChanged} onRoleChanged={onRoleChanged} />
         ))}
       </ul>
     </Card>
   );
 }
 
+/**
+ * One member: name, address, role and the rights the admin gave. The actions sit behind "Mai multe"
+ * (Eduard, 31 Oct: not a pile of buttons): Drepturi, the role, the administration and removing —
+ * the admin's; someone the admin let invite removes members who are not admins.
+ */
 function MemberRow({
   member,
   isAdmin,
+  canInvite,
   onChanged,
   onRoleChanged,
 }: {
   member: CompanyMember;
   isAdmin: boolean;
+  canInvite: boolean;
   onChanged: () => Promise<void>;
   onRoleChanged: () => Promise<void>;
 }) {
   const { t, lang } = useI18n();
-  const [mode, setMode] = useState<'view' | 'role' | 'remove' | 'transfer'>('view');
+  const [mode, setMode] = useState<'view' | 'rights' | 'role' | 'remove' | 'transfer'>('view');
   const [role, setRole] = useState<FleetRole>(member.role);
   const pending = member.accepted_at === null;
   const who = member.name || member.email;
+  const rights = member.role === 'admin' ? '' : rightsSummary(lang, member.role, member.extra_caps, member.approval_limit);
+  const canRemove = isAdmin || (canInvite && member.role !== 'admin');
+
+  const items =
+    member.is_me || mode !== 'view'
+      ? []
+      : [
+          ...(isAdmin && member.role !== 'admin'
+            ? [{ key: 'rights', label: t('cos.member.rights'), icon: <KeyRound size={18} aria-hidden="true" />, onSelect: () => setMode('rights') }]
+            : []),
+          ...(isAdmin && !pending
+            ? [{ key: 'role', label: t('cos.member.changeRole'), icon: <Repeat size={18} aria-hidden="true" />, onSelect: () => setMode('role') }]
+            : []),
+          ...(isAdmin && !pending && member.role !== 'admin'
+            ? [{ key: 'transfer', label: t('cos.member.makeAdmin'), icon: <ShieldCheck size={18} aria-hidden="true" />, onSelect: () => setMode('transfer') }]
+            : []),
+          ...(canRemove
+            ? [
+                {
+                  key: 'remove',
+                  label: t(pending ? 'staff.cancelInvite' : 'staff.remove'),
+                  icon: <UserMinus size={18} aria-hidden="true" />,
+                  onSelect: () => setMode('remove'),
+                  danger: true,
+                },
+              ]
+            : []),
+        ];
 
   return (
     <li className={styles.member}>
@@ -428,19 +477,18 @@ function MemberRow({
               {member.expired ? t('staff.expired') : t('staff.pending', { date: formatDate(lang, new Date(member.invited_at)) })}
             </span>
           )}
+          {rights && <span className={styles.rightsLine}>{rights}</span>}
         </div>
-        <RolePill role={member.role} />
+        <div className={styles.memberEnd}>
+          <RolePill role={member.role} />
+          {items.length > 0 && <MoreActions items={items} />}
+        </div>
       </div>
 
-      {isAdmin && !member.is_me && mode === 'view' && (
-        <div className={styles.memberActions}>
-          {!pending && <Button onClick={() => setMode('role')}>{t('cos.member.changeRole')}</Button>}
-          {!pending && member.role !== 'admin' && <Button onClick={() => setMode('transfer')}>{t('cos.member.makeAdmin')}</Button>}
-          <Button variant="ghost" onClick={() => setMode('remove')}>
-            {t(pending ? 'staff.cancelInvite' : 'staff.remove')}
-          </Button>
-        </div>
-      )}
+      {mode === 'rights' && <RightsPanel member={member} onDone={async () => {
+        await onChanged();
+        setMode('view');
+      }} onCancel={() => setMode('view')} />}
 
       {mode === 'role' && (
         <div className={styles.confirm}>
@@ -501,6 +549,81 @@ function MemberRow({
         </div>
       )}
     </li>
+  );
+}
+
+/**
+ * Drepturi (T63i): what the admin lets this member do beyond the role — one tick each, only the
+ * ticks the role does not have already — and, for someone who approves, their own limit (empty =
+ * the company's). Inviting members says that each colleague after the included ones is billed.
+ */
+function RightsPanel({ member, onDone, onCancel }: { member: CompanyMember; onDone: () => Promise<void>; onCancel: () => void }) {
+  const { t, lang } = useI18n();
+  const ticks = ticksFor(member.role);
+  const [caps, setCaps] = useState<ReadonlySet<string>>(() => new Set(member.extra_caps ?? []));
+  const text = (n: number | null) => (n === null ? '' : String(n).replace('.', lang === 'ro' ? ',' : '.'));
+  const [limit, setLimit] = useState(text(member.approval_limit ?? null));
+  const [error, setError] = useState<string | null>(null);
+  const approves = memberCan(member.role, [...caps], 'quotes.approve');
+
+  function toggle(tick: (typeof ticks)[number], on: boolean) {
+    setCaps((prev) => {
+      const next = new Set(prev);
+      for (const c of tick.caps) {
+        if (on) next.add(c);
+        else next.delete(c);
+      }
+      return next;
+    });
+  }
+
+  return (
+    <div className={styles.confirm}>
+      <p className={styles.panelTitle}>{t('cos.rights.title', { name: member.name || member.email })}</p>
+      <div className={styles.rightsList}>
+        {ticks.map((tick) => (
+          <div key={tick.key}>
+            <Checkbox checked={tick.caps.every((c) => caps.has(c))} onChange={(e) => toggle(tick, e.target.checked)}>
+              {t(`cos.right.${tick.key}` as 'cos.right.approve')}
+            </Checkbox>
+            {tick.key === 'members' && tick.caps.every((c) => caps.has(c)) && <p className={styles.note}>{t('cos.rights.membersBilled')}</p>}
+          </div>
+        ))}
+      </div>
+      {approves && (
+        <Field
+          label={t('cos.rights.limit')}
+          hint={t('cos.rights.limitHint')}
+          value={limit}
+          inputMode="decimal"
+          mono
+          error={error}
+          end={<span className={styles.fieldEnd}>{t('fleet.form.currency')}</span>}
+          onChange={(e) => {
+            setLimit(e.target.value);
+            setError(null);
+          }}
+        />
+      )}
+      <div className={styles.buttons}>
+        <ActionButton
+          variant="primary"
+          errorMessage={(e) => rpcErrorMessage(lang, e)}
+          onAction={async (requestId) => {
+            const value = approves && limit.trim() ? importAmount(limit) : null;
+            if (approves && limit.trim() && value === null) {
+              setError(t('rpcError.company_rights_invalid'));
+              return;
+            }
+            await setCompanyMemberRights(member.id, [...caps], value, requestId);
+            await onDone();
+          }}
+        >
+          {t('common.save')}
+        </ActionButton>
+        <Button onClick={onCancel}>{t('common.cancel')}</Button>
+      </div>
+    </div>
   );
 }
 

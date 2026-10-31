@@ -1,4 +1,4 @@
-import { ClipboardCheck, History, MessageSquare, Phone, RotateCcw, Star } from 'lucide-react';
+import { Building2, ClipboardCheck, History, MessageSquare, Phone, RotateCcw, Star } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { WarrantyNote } from '../../../components/WarrantyNote';
@@ -35,6 +35,7 @@ import { formatPhone, normalizePhone } from '../../../lib/validators';
 import { bookingMessagesPath } from '../../messages/paths';
 import { bookingCarHistoryPath, bookingIntakePath, bookingPath, SEARCH_PATH, type VehicleHistoryLinkState } from '../paths';
 import { NoShowDisputePanel, NoShowDisputeStatus } from './NoShowDispute';
+import { fleetSpacePath } from '../companies/paths';
 import { QuoteDecision } from './QuoteDecision';
 import { ReviewForm } from './ReviewForm';
 import styles from './bookings.module.css';
@@ -122,7 +123,17 @@ export function ClientBookingCard({
 
   // A wide card (T58) puts the quote, its decision or the finished job on the right of the booking.
   const aside =
-    b.status === 'quote_sent' && quote ? (
+    b.status === 'quote_sent' && quote && b.company_id ? (
+      // A company car (T63d): the company answers, in its fleet space.
+      <div className={styles.companyQuote}>
+        <p className={styles.muted}>
+          <Building2 size={16} aria-hidden="true" /> {t('cb.company.quote')}
+        </p>
+        <Link to={`${fleetSpacePath(b.company_id)}?sectiune=programari`} className={buttonClass('secondary')}>
+          {t('cb.company.open')}
+        </Link>
+      </div>
+    ) : b.status === 'quote_sent' && quote ? (
       // A replaced quote starts with every line ticked again.
       <QuoteDecision key={quote.id} bookingId={b.id} quote={quote} act={act} />
     ) : (b.status === 'approved' && quote) || b.status === 'done' ? (
@@ -133,7 +144,7 @@ export function ClientBookingCard({
   const statusInMain = !(b.status === 'approved' && quote) && b.status !== 'done';
 
   return (
-    <Card highlight={b.status === 'quote_sent'} className={`${styles.card} ${aside ? styles.split : ''}`}>
+    <Card highlight={b.status === 'quote_sent' && !b.company_id} className={`${styles.card} ${aside ? styles.split : ''}`}>
       <div className={styles.main}>
         <div className={styles.top}>
           <ServiceIcon name={b.service?.icon} className={styles.icon} />
@@ -162,6 +173,7 @@ export function ClientBookingCard({
             </span>
           )}
           {car && <span className={styles.muted}> · {car}</span>}
+          {b.company_id && <span className={styles.muted}> · {t('cb.company.badge')}</span>}
         </p>
         {b.status === 'done' && <WarrantyNote months={b.warranty_months} until={b.warranty_until} />}
         {b.status !== 'done' && <BookingProgress status={b.status} />}

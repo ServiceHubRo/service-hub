@@ -1,4 +1,4 @@
-import { BarChart3, Building2, CarFront, CreditCard, LayoutDashboard, ReceiptText, User, Users, type LucideIcon } from 'lucide-react';
+import { Building2, CalendarDays, CarFront, CreditCard, LayoutDashboard, ReceiptText, User, UserRound, type LucideIcon } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { LangSwitch } from '../../app/LangSwitch';
@@ -12,6 +12,8 @@ import { overLimit, planState, trialDaysLeft, TRIAL_WARN_DAYS } from '../../lib/
 import { FleetCosts } from './FleetCosts';
 import { FleetDashboard } from './FleetDashboard';
 import { FleetMembers } from './FleetMembers';
+import { FleetAccount } from './FleetAccount';
+import { FleetBookings } from './FleetBookings';
 import { FleetReports } from './FleetReports';
 import { FleetVehicle } from './FleetVehicle';
 import { FleetSubscription } from './FleetSubscription';
@@ -19,13 +21,21 @@ import { FleetVehicles } from './FleetVehicles';
 import { useFleet, type FleetSection } from './fleetContext';
 import styles from './fleet.module.css';
 
+// Five pages, as in every interface (T63d): the rarer ones are tiles in Cont.
 const NAV: { section: FleetSection; icon: LucideIcon }[] = [
   { section: 'panou', icon: LayoutDashboard },
   { section: 'vehicule', icon: CarFront },
+  { section: 'programari', icon: CalendarDays },
   { section: 'costuri', icon: ReceiptText },
-  { section: 'rapoarte', icon: BarChart3 },
-  { section: 'membri', icon: Users },
+  { section: 'cont', icon: UserRound },
 ];
+
+/** The nav item a page belongs to: a vehicle to Vehicule, the Cont tiles to Cont. */
+function navOf(section: FleetSection): FleetSection {
+  if (section === 'vehicul') return 'vehicule';
+  if (section === 'rapoarte' || section === 'membri' || section === 'abonament') return 'cont';
+  return section;
+}
 
 /** The page of the current section (inside a FleetContext). */
 export function FleetSectionBody({ section, vehicleId, filter }: { section: FleetSection; vehicleId: string | null; filter: string | undefined }) {
@@ -36,8 +46,12 @@ export function FleetSectionBody({ section, vehicleId, filter }: { section: Flee
       return <FleetVehicles key={filter ?? ''} initialStatus={filter} />;
     case 'vehicul':
       return <FleetVehicle key={vehicleId ?? ''} vehicleId={vehicleId ?? ''} />;
+    case 'programari':
+      return <FleetBookings key={filter ?? ''} initialGroup={filter} />;
     case 'costuri':
       return <FleetCosts key={filter ?? ''} initialPeriod={filter} />;
+    case 'cont':
+      return <FleetAccount />;
     case 'rapoarte':
       return <FleetReports key={filter ?? ''} initialReport={filter} />;
     case 'membri':
@@ -123,7 +137,7 @@ export function FleetFrame({
   children: ReactNode;
 }) {
   const { t } = useI18n();
-  const active = section === 'vehicul' ? 'vehicule' : section;
+  const active = navOf(section);
   return (
     <div className={styles.frame}>
       <header className={styles.topBar}>

@@ -147,8 +147,14 @@ function CompanyRow({ c, plans, onChanged }: { c: AdminFleetCompany; plans: Plan
             <dd className="mono">{c.plan.vehicle_limit === null ? c.vehicles : `${c.vehicles} / ${c.plan.vehicle_limit}`}</dd>
           </div>
           <div>
-            <dt>{t('admin.fleets.memberLimit')}</dt>
-            <dd className="mono">{c.members}</dd>
+            <dt>{t('fleet.sub.colleagues')}</dt>
+            <dd className="mono">
+              {c.plan.included_members === null ? c.plan.colleagues : t('fleet.sub.colleaguesOf', { n: c.plan.colleagues, included: c.plan.included_members })}
+            </dd>
+          </div>
+          <div>
+            <dt>{t('fleet.sub.totalMonth')}</dt>
+            <dd className="mono">{c.plan.monthly_total === null ? t('fleet.sub.customPrice') : formatMoney(lang, c.plan.monthly_total)}</dd>
           </div>
           <div>
             <dt>{t('admin.fleets.trialEnds')}</dt>
@@ -230,7 +236,8 @@ function PlanRow({ p, onChanged }: { p: Plan; onChanged: () => Promise<void> }) 
   const text = (n: number | null) => (n === null ? '' : String(n));
   const [price, setPrice] = useState(text(p.price_ron));
   const [vehicles, setVehicles] = useState(text(p.vehicle_limit));
-  const [members, setMembers] = useState(text(p.member_limit));
+  const [included, setIncluded] = useState(text(p.included_members));
+  const [memberPrice, setMemberPrice] = useState(text(p.member_price_ron));
   const [error, setError] = useState<string | null>(null);
   const num = (v: string) => (v.trim() === '' ? null : Number(v.replace(',', '.')));
 
@@ -243,7 +250,10 @@ function PlanRow({ p, onChanged }: { p: Plan; onChanged: () => Promise<void> }) 
         </div>
         <p className={styles.muted}>
           {p.vehicle_limit === null ? t('fleet.sub.vehiclesCustom') : t('fleet.sub.vehiclesUpTo', { n: p.vehicle_limit })} ·{' '}
-          {p.member_limit === null ? t('fleet.sub.membersUnlimited') : t('fleet.sub.membersUpTo', { n: p.member_limit })}
+          {p.included_members === null
+            ? t('fleet.sub.colleaguesCustom')
+            : t('fleet.sub.colleaguesIncluded', { n: plural(lang, 'unit.colleagues', p.included_members) })}
+          {p.included_members !== null && p.member_price_ron !== null ? ` · ${t('fleet.sub.colleaguePrice', { price: formatMoney(lang, p.member_price_ron) })}` : ''}
         </p>
         {!editing ? (
           <MoreActions items={[{ key: 'edit', label: t('admin.fleets.editPlan'), icon: <Pencil size={18} aria-hidden="true" />, onSelect: () => setEditing(true) }]} />
@@ -252,7 +262,8 @@ function PlanRow({ p, onChanged }: { p: Plan; onChanged: () => Promise<void> }) 
             <div className={own.fields}>
               <Field label={t('admin.fleets.price')} hint={t('admin.fleets.emptyCustom')} inputMode="decimal" mono value={price} onChange={(e) => setPrice(e.target.value)} />
               <Field label={t('admin.fleets.vehicleLimit')} hint={t('admin.fleets.emptyNone')} inputMode="numeric" mono value={vehicles} onChange={(e) => setVehicles(e.target.value)} />
-              <Field label={t('admin.fleets.memberLimit')} hint={t('admin.fleets.emptyNone')} inputMode="numeric" mono value={members} onChange={(e) => setMembers(e.target.value)} />
+              <Field label={t('admin.fleets.included')} hint={t('admin.fleets.emptyCustom')} inputMode="numeric" mono value={included} onChange={(e) => setIncluded(e.target.value)} />
+              <Field label={t('admin.fleets.memberPrice')} hint={t('admin.fleets.emptyCustom')} inputMode="decimal" mono value={memberPrice} onChange={(e) => setMemberPrice(e.target.value)} />
             </div>
             {error && (
               <p className={styles.warning} role="alert">
@@ -265,12 +276,20 @@ function PlanRow({ p, onChanged }: { p: Plan; onChanged: () => Promise<void> }) 
                 errorMessage={(e) => rpcErrorMessage(lang, e)}
                 canRetry={canRetryRpc}
                 onAction={async (requestId) => {
-                  const values = [num(price), num(vehicles), num(members)];
-                  if (values.some((v) => v != null && (!Number.isFinite(v) || v < 0)) || [values[1], values[2]].some((v) => v != null && (!Number.isInteger(v) || v < 1))) {
+                  const values = [num(price), num(vehicles), num(included), num(memberPrice)];
+                  if (
+                    values.some((v) => v != null && (!Number.isFinite(v) || v < 0)) ||
+                    (values[1] != null && (!Number.isInteger(values[1]) || values[1] < 1)) ||
+                    (values[2] != null && !Number.isInteger(values[2]))
+                  ) {
                     setError(t('admin.fleets.planInvalid'));
                     return;
                   }
-                  await adminUpdateFleetPlan(p.key, { price: values[0] ?? null, vehicleLimit: values[1] ?? null, memberLimit: values[2] ?? null }, requestId);
+                  await adminUpdateFleetPlan(
+                    p.key,
+                    { price: values[0] ?? null, vehicleLimit: values[1] ?? null, includedMembers: values[2] ?? null, memberPrice: values[3] ?? null },
+                    requestId,
+                  );
                   await onChanged();
                   setEditing(false);
                 }}

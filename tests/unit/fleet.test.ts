@@ -1,6 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import {
   approvalDecision,
+  extraColleagues,
+  memberCan,
+  monthlyTotal,
+  filterJobs,
+  jobGroup,
+  jobShops,
+  NO_JOB_FILTER,
+  sortJobs,
   averagePerVehicle,
   budgetUsage,
   buildLedger,
@@ -362,7 +370,7 @@ describe('fleet overview', () => {
       jobs: [
         job('a', {
           cost: 500,
-          quote: { id: 'q', version: 1, status: 'accepted', total_sent: 520, total_approved: 500, sent_at: '2026-10-08T10:00:00Z', decided_at: '2026-10-08T12:00:00Z', decided_by_member: 'm1', items: [] },
+          quote: { id: 'q', version: 1, status: 'accepted', note: null, inspection_fee: 0, expires_at: null, total_sent: 520, total_approved: 500, sent_at: '2026-10-08T10:00:00Z', decided_at: '2026-10-08T12:00:00Z', decided_by_member: 'm1', items: [] },
         }),
         job('b', { status: 'quote_sent', cost: null, done_at: null, date: '2026-10-29' }),
       ],
@@ -405,6 +413,9 @@ describe('fleet overview', () => {
       id: 'q',
       version: 1,
       status: 'accepted' as const,
+      note: null,
+      inspection_fee: 0,
+      expires_at: null,
       total_sent: 0,
       total_approved: 0,
       sent_at: '',
@@ -416,14 +427,14 @@ describe('fleet overview', () => {
       partsAndLabor(
         job('a', {
           quote: q([
-            { id: '1', name: 'Plăcuțe', price: 200, kind: 'part', approved: true },
-            { id: '2', name: 'Manoperă', price: 150, kind: 'labor', approved: true },
-            { id: '3', name: 'Discuri', price: 400, kind: 'part', approved: false },
+            { id: '1', position: 0, name: 'Plăcuțe', price: 200, kind: 'part', approved: true },
+            { id: '2', position: 1, name: 'Manoperă', price: 150, kind: 'labor', approved: true },
+            { id: '3', position: 2, name: 'Discuri', price: 400, kind: 'part', approved: false },
           ]),
         }),
       ),
     ).toEqual({ parts: 200, labor: 150, other: 0 });
-    expect(partsAndLabor(job('a', { quote: q([{ id: '1', name: 'X', price: 1, kind: null, approved: true }]) }))).toBeNull();
+    expect(partsAndLabor(job('a', { quote: q([{ id: '1', position: 0, name: 'X', price: 1, kind: null, approved: true }]) }))).toBeNull();
   });
 });
 
@@ -468,11 +479,17 @@ describe('fleet scope (what the company read answers each role)', () => {
 });
 
 describe('fleet rights in the database', () => {
-  /** The arrays of `fleet_role_can` in the companies migration, per role. */
+  /** The arrays of `fleet_role_can` in the newest migration that (re)defines it, per role. */
   function sqlMatrix(): Record<string, string[] | 'all'> {
-    const files = import.meta.glob('../../supabase/migrations/*_companies.sql', { query: '?raw', import: 'default', eager: true });
-    const sql = Object.values(files)[0] as string;
-    const body = sql.slice(sql.indexOf('create function public.fleet_role_can'), sql.indexOf('create function public.fleet_can'));
+    const files = import.meta.glob('../../supabase/migrations/*.sql', { query: '?raw', import: 'default', eager: true });
+    const marker = /create (or replace )?function public\.fleet_role_can\(/;
+    const name = Object.keys(files)
+      .sort()
+      .filter((f) => marker.test(files[f] as string))
+      .pop()!;
+    const sql = files[name] as string;
+    const from = sql.search(marker);
+    const body = sql.slice(from, sql.indexOf('$$;', from));
     const out: Record<string, string[] | 'all'> = {};
     for (const m of body.matchAll(/when '([a-z]+)' then (true|p_capability = any \(array\[([^\]]*)\]\))/g)) {
       out[m[1]!] = m[2] === 'true' ? 'all' : [...m[3]!.matchAll(/'([a-zA-Z.]+)'/g)].map((x) => x[1]!);
@@ -520,5 +537,93 @@ describe('fleet plans', () => {
     expect(overLimit(18, 15)).toBe(3);
     expect(overLimit(4, 15)).toBe(0);
     expect(overLimit(400, null)).toBe(0);
+  });
+});
+
+describe('fleet bookings (Programări)', () => {
+  const jobs = [
+    job('done1', { status: 'done', date: '2026-10-01', slot: '09:00' }),
+    job('pend', { status: 'pending', date: '2026-11-10', slot: '10:00', shop_id: 's2', shop_name: 'Atelier Doi', shop_city: 'Codlea' }),
+    job('quote', { status: 'quote_sent', date: '2026-11-02', slot: '09:00', vehicle_id: 'v2' }),
+    job('conf', { status: 'confirmed', date: '2026-11-03', slot: '08:00' }),
+    job('canc', { status: 'cancelled', date: '2026-10-20', slot: '09:00' }),
+  ];
+
+  it('groups a booking: a waiting quote, still going on, or ended', () => {
+    expect(jobGroup({ status: 'quote_sent' })).toBe('approve');
+    expect(jobGroup({ status: 'in_progress' })).toBe('active');
+    expect(jobGroup({ status: 'quote_refused' })).toBe('ended');
+  });
+
+  it('puts the quotes to approve first, then what is going on soonest first, then what ended newest first', () => {
+    expect(sortJobs(jobs).map((j) => j.id)).toEqual(['quote', 'conf', 'pend', 'canc', 'done1']);
+  });
+
+  it('filters by group, vehicle and shop', () => {
+    expect(filterJobs(jobs, { ...NO_JOB_FILTER, group: 'approve' }).map((j) => j.id)).toEqual(['quote']);
+    expect(filterJobs(jobs, { ...NO_JOB_FILTER, group: 'ended' }).map((j) => j.id)).toEqual(['done1', 'canc']);
+    expect(filterJobs(jobs, { ...NO_JOB_FILTER, vehicleId: 'v2' }).map((j) => j.id)).toEqual(['quote']);
+    expect(filterJobs(jobs, { ...NO_JOB_FILTER, shopId: 's2' }).map((j) => j.id)).toEqual(['pend']);
+    expect(filterJobs(jobs, NO_JOB_FILTER)).toHaveLength(5);
+  });
+
+  it('lists each shop once, by name', () => {
+    expect(jobShops(jobs).map((s) => s.id)).toHaveLength(2);
+    expect(jobShops(jobs).find((s) => s.id === 's2')?.name).toBe('Atelier Doi, Codlea');
+  });
+
+  it('lets a driver book (the database limits it to the vehicle assigned)', () => {
+    expect(can('driver', 'bookings.create')).toBe(true);
+    expect(can('accountant', 'bookings.create')).toBe(false);
+    expect(can('driver', 'quotes.approve')).toBe(false);
+  });
+});
+
+describe('rights the admin gives (T63i)', () => {
+  it('adds a right to the role, with what it needs to be used', () => {
+    expect(memberCan('accountant', [], 'quotes.approve')).toBe(false);
+    expect(memberCan('accountant', ['quotes.approve'], 'quotes.approve')).toBe(true);
+    expect(memberCan('driver', ['quotes.approve'], 'bookings.viewAll')).toBe(true);
+    expect(memberCan('driver', ['quotes.approve'], 'costs.view')).toBe(true);
+    expect(memberCan('driver', ['vehicles.manage'], 'vehicles.viewAll')).toBe(true);
+    expect(memberCan('driver', ['vehicles.manage'], 'costs.view')).toBe(false);
+    expect(memberCan('manager', ['budget.manage'], 'budget.manage')).toBe(true);
+    // Never the admin's part.
+    expect(memberCan('manager', ['members.manage'], 'subscription.manage')).toBe(false);
+    expect(memberCan('manager', ['members.manage'], 'company.manage')).toBe(false);
+  });
+
+  it('approves up to the member\'s own limit, else the company\'s', () => {
+    expect(approvalDecision('accountant', 250, 300, ['quotes.approve'])).toBe('allowed');
+    expect(approvalDecision('accountant', 400, 300, ['quotes.approve'])).toBe('over_limit');
+    expect(approvalDecision('accountant', 100, null, [])).toBe('not_allowed');
+    expect(approvalDecision('manager', 1000, null)).toBe('allowed');
+    expect(approvalDecision('admin', 1_000_000, 10)).toBe('allowed');
+  });
+});
+
+describe('colleagues billed per person (T64d)', () => {
+  it('counts the colleagues past the included ones', () => {
+    expect(extraColleagues(4, 3)).toBe(1);
+    expect(extraColleagues(2, 3)).toBe(0);
+    expect(extraColleagues(9, null)).toBe(0);
+  });
+
+  it('adds each one to the plan\'s price; nothing for a price agreed per company', () => {
+    expect(monthlyTotal(59, 19, 4, 3)).toBe(78);
+    expect(monthlyTotal(29, 19, 1, 1)).toBe(29);
+    expect(monthlyTotal(119, 19, 8, 5)).toBe(176);
+    expect(monthlyTotal(null, 19, 8, 5)).toBeNull();
+  });
+});
+
+describe('the rights line of a member', () => {
+  it('names only the rights the role does not have, with the limit', async () => {
+    const { rightsSummary, ticksFor } = await import('../../src/screens/client/companies/rights');
+    expect(ticksFor('manager').map((x) => x.key)).toEqual(['budget', 'members']);
+    expect(rightsSummary('ro', 'accountant', ['quotes.approve'], 300)).toBe('Aprobă devize până la 300 lei');
+    expect(rightsSummary('en', 'driver', ['vehicles.manage', 'costs.view', 'reports.view'], null)).toBe('Adds and edits vehicles · Sees costs and reports');
+    expect(rightsSummary('ro', 'manager', [], 500)).toBe('Limita lui: 500 lei');
+    expect(rightsSummary('ro', 'driver', [], null)).toBe('');
   });
 });

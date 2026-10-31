@@ -19,7 +19,8 @@ const STATE_TONE = { trial: 'amber', trial_over: 'muted', active: 'green', past_
 /**
  * Abonament și facturare (T64a, docs/FLEET_BILLING_PLAN.md §C.8): the plan, its price, the trial
  * days left, what the company uses against the plan's limits, and the plans side by side — only
- * features that exist. No payment yet: no pay or change buttons, one line saying so. Admin,
+ * features that exist, the colleagues included and each one after them (T64d). No payment yet: no
+ * pay or change buttons, one line saying so. Admin,
  * manager and accountant; a driver never gets here.
  */
 export function FleetSubscription() {
@@ -57,8 +58,20 @@ function Subscription({ view }: { view: FleetSubscriptionView }) {
           </div>
           <p className={styles.planName}>{name}</p>
           <p className={styles.planPrice}>
-            {plan.price_ron === null ? t('fleet.sub.customPrice') : t('fleet.sub.perMonth', { amount: formatMoney(lang, plan.price_ron) })}
+            {plan.monthly_total === null ? t('fleet.sub.customPrice') : t('fleet.sub.perMonth', { amount: formatMoney(lang, plan.monthly_total) })}
           </p>
+          {plan.price_ron !== null && plan.extra_members > 0 && (
+            <dl className={styles.priceSplit}>
+              <div>
+                <dt>{t('fleet.sub.planPart')}</dt>
+                <dd className="mono">{formatMoney(lang, plan.price_ron)}</dd>
+              </div>
+              <div>
+                <dt>{t('fleet.sub.extraPart', { n: plural(lang, 'unit.colleagues', plan.extra_members) })}</dt>
+                <dd className="mono">{formatMoney(lang, plan.extra_members * (plan.member_price_ron ?? 0))}</dd>
+              </div>
+            </dl>
+          )}
           {st === 'trial' && days !== null && plan.trial_ends_at && (
             <div className={styles.meterBlock}>
               <Meter share={trialUsed(plan.trial_started_at, plan.trial_ends_at, now)} tone={days <= 7 ? 'amber' : 'green'} />
@@ -76,7 +89,7 @@ function Subscription({ view }: { view: FleetSubscriptionView }) {
         <Card className={styles.card}>
           <h2 className={styles.cardTitle}>{t('fleet.sub.usage')}</h2>
           {usageRow(t('fleet.sub.vehicles'), usage.vehicles, plan.vehicle_limit)}
-          {usageRow(t('fleet.sub.members'), usage.members, plan.member_limit)}
+          {colleaguesRow()}
           {vehiclesOver > 0 && (
             <p className={styles.warnLine}>
               {t('fleet.sub.overVehicles', { n: vehiclesOver, limit: plan.vehicle_limit ?? 0, plan: name })}
@@ -97,6 +110,28 @@ function Subscription({ view }: { view: FleetSubscriptionView }) {
       </section>
     </div>
   );
+
+  // Colleagues (T64d): the included ones on the bar, each one after them billed — never refused.
+  function colleaguesRow() {
+    const included = plan.included_members;
+    return (
+      <div className={styles.meterBlock}>
+        <div className={styles.usageTop}>
+          <span>{t('fleet.sub.colleagues')}</span>
+          <span className="mono">
+            {included === null ? plan.colleagues : t('fleet.sub.colleaguesOf', { n: plan.colleagues, included })}
+          </span>
+        </div>
+        {included !== null && included > 0 && <Meter share={Math.min(1, plan.colleagues / included)} tone={plan.extra_members > 0 ? 'amber' : 'green'} />}
+        {plan.extra_members > 0 && plan.member_price_ron !== null && (
+          <p className={styles.note}>
+            {t('fleet.sub.extraLine', { n: plural(lang, 'unit.colleagues', plan.extra_members), price: formatMoney(lang, plan.member_price_ron) })}
+          </p>
+        )}
+        <p className={styles.hintLine}>{t('fleet.sub.adminNotCounted')}</p>
+      </div>
+    );
+  }
 
   function usageRow(label: string, used: number, limit: number | null) {
     const over = limit !== null && used > limit;
@@ -133,12 +168,13 @@ function PlanCard({ p, current }: { p: FleetPlanRow; current: boolean }) {
       <ul className={styles.planLimits}>
         <li>{p.vehicle_limit === null ? t('fleet.sub.vehiclesCustom') : t('fleet.sub.vehiclesUpTo', { n: p.vehicle_limit })}</li>
         <li>
-          {p.member_limit === null
-            ? t('fleet.sub.membersUnlimited')
-            : p.member_limit === 1
-              ? t('fleet.sub.adminOnly')
-              : t('fleet.sub.membersUpTo', { n: p.member_limit })}
+          {p.included_members === null
+            ? t('fleet.sub.colleaguesCustom')
+            : t('fleet.sub.colleaguesIncluded', { n: plural(lang, 'unit.colleagues', p.included_members) })}
         </li>
+        {p.included_members !== null && p.member_price_ron !== null && (
+          <li>{t('fleet.sub.colleaguePrice', { price: formatMoney(lang, p.member_price_ron) })}</li>
+        )}
       </ul>
       <ul className={styles.planFeatures}>
         {features.map((f) => (

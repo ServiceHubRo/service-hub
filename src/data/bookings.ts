@@ -20,6 +20,8 @@ export interface CarSnapshot {
 
 export interface ClientBooking {
   id: string;
+  /** Set when the booking is for a company vehicle (T63d): the company approves its quote. */
+  company_id?: string | null;
   ref: string;
   status: BookingStatus;
   date: string; // YYYY-MM-DD, Europe/Bucharest
@@ -86,7 +88,7 @@ export interface ClientBookingsData {
 }
 
 const COLUMNS = [
-  'id, ref, status, date, slot, note, car_id, car_snapshot, created_at, shop_id, service_id, extra_service_ids, offer_percent, offer_kind, loyalty_percent, loyalty_level, share_history',
+  'id, ref, status, date, slot, note, car_id, car_snapshot, created_at, shop_id, service_id, extra_service_ids, offer_percent, offer_kind, loyalty_percent, loyalty_level, share_history, company_id',
   'inspection_started_at, started_at, done_at, odometer, work, cost, warranty_months, warranty_until, quote_number, intake_sent_at, intake_confirmed_at, cancelled_by, cancel_reason, decline_reason, closed_reason',
   'shop:shops(name, city, phone, cancel_deadline_hours, street, latitude, longitude, slot_minutes)',
   'service:services(name_ro, name_en, icon, category_key)',

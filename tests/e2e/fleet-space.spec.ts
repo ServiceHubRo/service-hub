@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
-import { BACKEND, PASSWORD, SEED, SEED_PASSWORD, createFleetUser, expectNoHorizontalScroll, rpcAs, serviceRest, shot, signIn, uniquePlate } from './support';
+import { BACKEND, PASSWORD, SEED, SEED_PASSWORD, createBookableShop, createFleetUser, expectNoHorizontalScroll, rpcAs, serviceRest, shot, signIn, uniquePlate } from './support';
 
 // The company's fleet space (T63c): the admin opens the fleet from the company page, adds a vehicle
 // with the form (a plate already in the fleet is refused), assigns it to the driver, archives
@@ -183,4 +183,158 @@ test('the plan: Abonament, the limits of Fleet Start, and the admin changes the 
   // The company sees Fleet Pro (live) and can add the sixth vehicle.
   await page.getByRole('button', { name: 'Salvează vehiculul' }).click();
   await expect(page.getByRole('heading', { level: 2, name: 'Ford Transit' }).or(page.getByText('Fără număr').first())).toBeVisible();
+});
+
+test('bookings: the driver books a company vehicle, the manager approves within the limit', async ({ page, browser }) => {
+  test.skip(!BACKEND, 'needs the local Supabase stack');
+  const admin = await createFleetUser();
+  const manager = await createFleetUser();
+  const driver = await createFleetUser();
+  const company = await rpcAs<{ id: string }>(admin, 'create_company', {
+    p_name: `Programări Test ${Date.now()}`,
+    p_vat_id: null,
+    p_reg_com: null,
+    p_address: null,
+    p_request_id: crypto.randomUUID(),
+  });
+  const token = () => Array.from(crypto.getRandomValues(new Uint8Array(32)), (b) => b.toString(16).padStart(2, '0')).join('');
+  for (const [email, role] of [
+    [manager, 'manager'],
+    [driver, 'driver'],
+  ] as const) {
+    const tk = token();
+    await rpcAs(admin, 'invite_company_member', { p_company: company.id, p_email: email, p_role: role, p_token: tk, p_request_id: crypto.randomUUID() });
+    await rpcAs(email, 'accept_company_invite', { p_token: tk, p_request_id: crypto.randomUUID() });
+  }
+  const plate = uniquePlate('B');
+  const vehicle = await rpcAs<{ id: string }>(admin, 'fleet_save_vehicle', {
+    p_company: company.id,
+    p_vehicle: null,
+    p_fields: { make: 'Dacia', model: 'Logan', plate },
+    p_request_id: crypto.randomUUID(),
+  });
+  const members = await serviceRest<{ id: string }[]>(`company_members?company_id=eq.${company.id}&role=eq.driver&select=id`, 'GET');
+  await rpcAs(admin, 'fleet_assign_driver', { p_vehicle: vehicle.id, p_member: members[0]!.id, p_request_id: crypto.randomUUID() });
+  await rpcAs(admin, 'set_company_rules', {
+    p_company: company.id,
+    p_manager_approval_limit: 500,
+    p_budget_monthly: null,
+    p_budget_yearly: null,
+    p_request_id: crypto.randomUUID(),
+  });
+  const { email: shop, shopId } = await createBookableShop(`Atelier Flotă ${Date.now()}`, ['ulei']);
+
+  // The driver books from the vehicle page: the vehicle is already picked on the car step.
+  await signIn(page, driver, PASSWORD);
+  await expect(page).toHaveURL(/\/c\/cauta/);
+  await page.goto(`/c/firme/${company.id}?sectiune=vehicul&vehicul=${vehicle.id}`);
+  await page.getByRole('button', { name: 'Programează la service' }).click();
+  await expect(page).toHaveURL(/\/c\/cauta/);
+  await page.goto(`/c/service/${shopId}/programare?pas=2&serviciu=ulei`);
+  await page.getByRole('button', { name: /: \d+ loc/ }).first().click();
+  await page.getByRole('button', { name: /^\d{2}:\d{2}$/, disabled: false }).first().click();
+  await expect(page.getByRole('button', { name: new RegExp(plate), pressed: true })).toBeVisible();
+  await expect(page.getByText('Devizul îl aprobă firma.')).toBeVisible();
+  await expectNoHorizontalScroll(page);
+  await shot(page, 'fleet-book-car-step', name());
+  await page.getByRole('button', { name: 'Trimite cererea' }).click();
+  await expect(page.getByRole('heading', { level: 1, name: 'Cerere trimisă' })).toBeVisible();
+
+  // The shop inspects and sends a quote of 600 lei.
+  const [booking] = await serviceRest<{ id: string }[]>(`bookings?company_id=eq.${company.id}&select=id`, 'GET');
+  await rpcAs(shop, 'confirm_booking', { p_booking_id: booking!.id, p_request_id: crypto.randomUUID() });
+  await rpcAs(shop, 'start_inspection', { p_booking_id: booking!.id, p_request_id: crypto.randomUUID() });
+  await rpcAs(shop, 'send_quote', {
+    p_booking_id: booking!.id,
+    p_items: [
+      { name: 'Plăcuțe', price: 420 },
+      { name: 'Manoperă', price: 180 },
+    ],
+    p_request_id: crypto.randomUUID(),
+  });
+
+  // The driver's Programări: a company car, its quote answered by the company.
+  await page.goto('/c/programari');
+  await expect(page.getByText('Devizul îl aprobă firma, în spațiul flotei.')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Accept', exact: true })).toHaveCount(0);
+  await shot(page, 'fleet-driver-bookings', name());
+
+  // The manager: over the limit refused; one line within it approved.
+  const context = await browser.newContext();
+  await context.addInitScript(() => localStorage.setItem('sh_lang', 'ro'));
+  const mgr = await context.newPage();
+  await signIn(mgr, manager, PASSWORD);
+  await expect(mgr).toHaveURL(/\/c\/cauta/);
+  await mgr.goto(`/c/firme/${company.id}`);
+  await mgr.getByRole('button', { name: 'Programări', exact: true }).filter({ visible: true }).first().click();
+  await expect(mgr.getByRole('heading', { level: 1, name: 'Programări' })).toBeVisible();
+  await expect(mgr.getByText('Poți aproba până la 500 lei.')).toBeVisible();
+  await expectNoHorizontalScroll(mgr);
+  await shot(mgr, 'fleet-bookings-quote', name());
+  await mgr.getByRole('button', { name: 'Accept', exact: true }).click();
+  await expect(mgr.getByText('Suma depășește limita ta de aprobare (500 lei). O aprobă un administrator.')).toBeVisible();
+  await mgr.getByRole('checkbox', { name: /Manoperă/ }).uncheck();
+  await mgr.getByRole('button', { name: 'Accept selectate' }).click();
+  await expect(mgr.getByText('Deviz aprobat').first()).toBeVisible();
+  await expect(mgr.getByText('Aprobat: 420 lei')).toBeVisible();
+  await shot(mgr, 'fleet-bookings-approved', name());
+
+  // Cont: the rarer pages as tiles; the manager has no Membri tile.
+  await mgr.getByRole('button', { name: 'Cont', exact: true }).filter({ visible: true }).first().click();
+  await expect(mgr.getByRole('link', { name: /Rapoarte/ })).toBeVisible();
+  await expect(mgr.getByRole('link', { name: /Membri și roluri/ })).toHaveCount(0);
+  await expect(mgr.getByRole('link', { name: /Pagina firmei/ })).toBeVisible();
+  await expectNoHorizontalScroll(mgr);
+  await shot(mgr, 'fleet-account', name());
+
+  // In English: the five pages and the bookings.
+  await mgr.getByRole('button', { name: 'English' }).filter({ visible: true }).first().click();
+  await expect(mgr.getByRole('heading', { level: 1, name: 'Account' })).toBeVisible();
+  await mgr.getByRole('button', { name: 'Bookings', exact: true }).filter({ visible: true }).first().click();
+  await expect(mgr.getByText('Approved: 420 RON')).toBeVisible();
+  await expectNoHorizontalScroll(mgr);
+  await shot(mgr, 'fleet-bookings-en', name());
+  await context.close();
+});
+
+test('rights and colleagues: the admin lets the accountant approve up to 300 lei; Abonament counts the colleagues', async ({ page }) => {
+  test.skip(!BACKEND, 'needs the local Supabase stack');
+  const admin = await createFleetUser();
+  const accountant = await createFleetUser();
+  const company = await rpcAs<{ id: string }>(admin, 'create_company', {
+    p_name: `Drepturi Test ${Date.now()}`,
+    p_vat_id: null,
+    p_reg_com: null,
+    p_address: null,
+    p_request_id: crypto.randomUUID(),
+  });
+  const tk = Array.from(crypto.getRandomValues(new Uint8Array(32)), (b) => b.toString(16).padStart(2, '0')).join('');
+  await rpcAs(admin, 'invite_company_member', { p_company: company.id, p_email: accountant, p_role: 'accountant', p_token: tk, p_request_id: crypto.randomUUID() });
+  await rpcAs(accountant, 'accept_company_invite', { p_token: tk, p_request_id: crypto.randomUUID() });
+
+  await signIn(page, admin, PASSWORD);
+  await expect(page).toHaveURL(/\/c\/cauta/);
+  await page.goto(`/c/cont/firme/${company.id}`);
+  const row = page.locator('li', { hasText: accountant });
+  await row.getByRole('button', { name: 'Mai multe' }).click();
+  await page.getByRole('menuitem', { name: 'Drepturi' }).click();
+  await expect(row.getByText('Ce mai poate face')).toBeVisible();
+  // An accountant already sees the costs: that tick is not offered.
+  await expect(row.getByRole('checkbox', { name: 'Vede costurile și rapoartele' })).toHaveCount(0);
+  await row.getByRole('checkbox', { name: 'Aprobă devize' }).check();
+  await row.getByLabel('Limita lui de aprobare').fill('300');
+  await expectNoHorizontalScroll(page);
+  await shot(page, 'company-rights', name());
+  await row.getByRole('button', { name: 'Salvează' }).click();
+  await expect(row.getByText('Aprobă devize până la 300 lei')).toBeVisible();
+  const overview = await rpcAs<{ me: { approval_limit: number } }>(accountant, 'fleet_overview', { p_company: company.id });
+  expect(Number(overview.me.approval_limit)).toBe(300);
+
+  // Abonament: one colleague of the three included; the admin is not counted.
+  await page.goto(`/c/firme/${company.id}?sectiune=abonament`);
+  await expect(page.getByText('1 din 3 incluși')).toBeVisible();
+  await expect(page.getByText('Administratorul nu se numără.')).toBeVisible();
+  await expect(page.getByText('19 lei / coleg în plus').first()).toBeVisible();
+  await expectNoHorizontalScroll(page);
+  await shot(page, 'fleet-subscription-colleagues', name());
 });

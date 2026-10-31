@@ -225,3 +225,26 @@
   align-items: center;
   gap: 10px;
 }
+
+/* T63i: the member's role and "Mai multe" side by side; the rights the admin gave, under the name. */
+.memberEnd {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: none;
+}
+
+.rightsLine {
+  font-size: 13px;
+  color: var(--amber);
+}
+
+.panelTitle {
+  font-weight: 600;
+}
+
+.rightsList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}

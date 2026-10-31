@@ -9,6 +9,7 @@ import { EmptyState } from '../../components/EmptyState';
 import { useI18n } from '../../i18n/context';
 import { formatMoney } from '../../i18n/format';
 import { can, FLEET_CAPABILITIES, FLEET_ROLES, type FleetCapability, type FleetRole } from '../../lib/fleet';
+import { rightsSummary } from '../client/companies/rights';
 import { useFleet } from './fleetContext';
 import pill from '../../components/StatusBadge.module.css';
 import styles from './fleet.module.css';
@@ -50,6 +51,9 @@ export function FleetMembers() {
               <span className={styles.lineText}>
                 <span>{m.name || m.email}</span>
                 <span className={styles.muted}>{m.accepted_at ? m.email : t('fleet.members.pending', { email: m.email })}</span>
+                {m.role !== 'admin' && rightsSummary(lang, m.role, m.extra_caps, m.approval_limit) && (
+                  <span className={styles.rightsLine}>{rightsSummary(lang, m.role, m.extra_caps, m.approval_limit)}</span>
+                )}
               </span>
               <span className={`${pill.pill} ${pill[ROLE_TONE[m.role]]}`}>{t(`fleet.role.${m.role}`)}</span>
             </li>

@@ -131,7 +131,8 @@ select test.eq(
   || 'admin_withdraw_notice, booking_thread, can_read_booking, can_read_notice, can_read_shop, can_read_thread, cancel_booking, '
   || 'cancel_email_change, check_phone_code, claim_booking, client_no_show_count, company_role, complete_job, complete_signup, confirm_booking, '
   || 'confirm_vehicle_intake, create_booking, create_company, decide_quote, decline_booking, dispute_no_show, export_my_data, '
-  || 'fleet_archive_vehicle, fleet_assign_driver, fleet_can, fleet_overview, fleet_plan_summary, fleet_role_can, fleet_save_vehicle, '
+  || 'fleet_archive_vehicle, fleet_assign_driver, fleet_bookable_vehicles, fleet_can, fleet_decide_quote, fleet_overview, fleet_plan_summary, '
+  || 'fleet_role_can, fleet_save_vehicle, '
   || 'fleet_set_unavailable, fleet_subscription, get_availability, get_shop_page, get_shop_setup, history_report_preview, invite_company_member, '
   || 'invite_staff, is_admin, is_booking_shop_member, is_shop_member, is_shop_owner, is_shop_public, join_area_waitlist, join_slot_waitlist, '
   || 'last_odometer_for_booking, leave_area_waitlist, leave_slot_waitlist, list_company_members, list_imported_jobs, list_service_areas, '
@@ -139,7 +140,7 @@ select test.eq(
   || 'my_fleet_access, my_imported_jobs, my_member_id, my_no_show_summary, my_phone_verification, my_quote_numbering, my_referrals, my_shop_id, '
   || 'my_subscription_offers, new_client_offers, phone_digits, remove_company_member, replace_quote, reply_review, report_review, '
   || 'reschedule_booking, save_native_push_token, save_push_subscription, save_shop_hours, save_vehicle_intake, search_card_extras, '
-  || 'search_cities, search_shops, send_message, send_quote, set_booking_history_share, set_company_member_role, set_company_rules, '
+  || 'search_cities, search_shops, send_message, send_quote, set_booking_history_share, set_company_member_rights, set_company_member_role, set_company_rules, '
   || 'set_quote_next_number, set_shop_services, shop_cancel_booking, shop_create_booking, shop_decide_quote, shop_import_add, shop_import_begin, '
   || 'shop_import_undo, shop_offers, shop_reports, shop_vehicle_file, start_inspection, start_work, submit_review, submit_suggestion, '
   || 'toggle_favorite, touch_last_active, transfer_company_admin, update_company, withdraw_quote',
