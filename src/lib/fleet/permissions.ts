@@ -59,8 +59,11 @@ const MANAGER: readonly FleetCapability[] = [
   'issues.manage',
 ];
 
-/** A driver sees only the cars assigned to them; `documents.view` is limited to those cars. */
-const DRIVER: readonly FleetCapability[] = ['issues.report', 'documents.view'];
+/**
+ * A driver sees only the cars assigned to them; `bookings.create` and `documents.view` are limited to
+ * those cars (the database checks the vehicle, T63d).
+ */
+const DRIVER: readonly FleetCapability[] = ['bookings.create', 'issues.report', 'documents.view'];
 
 /** Money and papers, never bookings or approvals. */
 const ACCOUNTANT: readonly FleetCapability[] = [

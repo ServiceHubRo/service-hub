@@ -148,7 +148,7 @@ alter table public.cars
 - Plan limit: `fleet_save_vehicle` refuses a new car above the plan's vehicle limit
   (`fleet_plan_limit`); existing cars, history and edits are never blocked or deleted.
 
-### 3.3 Stage 4 — company bookings and approvals
+### 3.3 Stage 4 — company bookings and approvals (built in T63d; ARCHITECTURE.md §2 is the reference)
 ```sql
 alter table public.bookings add column company_id uuid references public.companies(id);
 alter table public.quotes   add column decided_by_user uuid references public.profiles(id);
@@ -267,7 +267,7 @@ create table public.fleet_expenses (
 | 1 ✅ | Audit, plan, `src/lib/fleet/` logic + tests, `/dev/flota` design preview | – |
 | 2 | `companies`, `company_members`, audit log, invitations, space switcher, create company | **Migration** + rule change R8 |
 | 3 | Company cars, Panou and Vehicule on real data | **Migration** (cars columns) |
-| 4 | Company bookings, approvals with thresholds, decision log, vehicle history | **Migration** (bookings/quotes, `decide_quote` replaced) |
+| 4 ✅ | Company bookings, approvals with thresholds, decision log, vehicle history (T63d, migration `fleet_bookings`) | **Migration** (bookings/quotes, `decide_quote` replaced) |
 | 5 | Expenses, receipts bucket, reports, exports | **Migration** + storage bucket |
 | 6 | Driver/accountant flows, issues | **Migration** |
 | 7 | Fleet notifications; plans and billing → `docs/FLEET_BILLING_PLAN.md` (T64) | **Migration**; payments = separate decision |

@@ -1,6 +1,8 @@
 /** What the client picked or typed on step 4; kept by the flow, so going back a step loses nothing. */
 export interface CarDraft {
   carId: string | null;
+  /** One of a company's vehicles (T63d) instead of a garage car. */
+  companyVehicleId: string | null;
   /** "Altă mașină": the typed car instead of one from the garage. */
   manual: boolean;
   make: string;
@@ -13,4 +15,4 @@ export interface CarDraft {
   /** "Arată service-ului ce s-a făcut la mașină la alte service-uri" (T27): off unless ticked (consent). */
 }
 
-export const EMPTY_CAR_DRAFT: CarDraft = { carId: null, manual: false, make: '', model: '', year: '', plate: '', save: true, note: '' };
+export const EMPTY_CAR_DRAFT: CarDraft = { carId: null, companyVehicleId: null, manual: false, make: '', model: '', year: '', plate: '', save: true, note: '' };

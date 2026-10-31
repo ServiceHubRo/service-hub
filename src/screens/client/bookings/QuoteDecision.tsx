@@ -23,15 +23,18 @@ const HEADING: Record<QuoteSectionKind, MessageKey> = { labor: 'qe.labor', part:
  * unticking everything leaves only "Refuz". Refusing asks first and names the inspection fee
  * (never mentioned when the fee is 0). The answer names the version seen, so a quote the shop
  * replaced meanwhile is refused by the database instead of accepted blindly.
+ * A company's quote (T63d) is answered the same way through `decide` (fleet_decide_quote).
  */
 export function QuoteDecision({
   bookingId,
   quote,
   act,
+  decide = decideQuote,
 }: {
   bookingId: string;
   quote: Quote;
   act: (run: () => Promise<Booking>) => Promise<void>;
+  decide?: (bookingId: string, quoteId: string, approvedItemIds: string[], requestId: string) => Promise<Booking>;
 }) {
   const { t, lang } = useI18n();
   const [selected, setSelected] = useState<ReadonlySet<string>>(() => initialSelection(quote.items));
@@ -127,7 +130,7 @@ export function QuoteDecision({
             <ActionButton
               variant="danger"
               block={false}
-              onAction={(rid) => act(() => decideQuote(bookingId, quote.id, [], rid))}
+              onAction={(rid) => act(() => decide(bookingId, quote.id, [], rid))}
               errorMessage={errorMessage}
               canRetry={canRetryRpc}
             >
@@ -146,7 +149,7 @@ export function QuoteDecision({
               variant="success"
               block={false}
               disabled={kind === 'none'}
-              onAction={(rid) => act(() => decideQuote(bookingId, quote.id, [...selected], rid))}
+              onAction={(rid) => act(() => decide(bookingId, quote.id, [...selected], rid))}
               errorMessage={errorMessage}
               canRetry={canRetryRpc}
             >

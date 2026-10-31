@@ -1495,3 +1495,111 @@ button.kpi:hover {
   font-weight: 600;
   font-size: 14px;
 }
+
+/* Programări (T63d): one card per booking; a quote waiting for the company opens inside it. */
+.quoteBody {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+.bookingList {
+  list-style: none;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 10px;
+}
+
+@media (min-width: 1024px) {
+  .bookingList {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+  }
+}
+
+.bookingHead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.bookingVehicle {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  border-radius: var(--radius-input);
+  min-height: 44px;
+  justify-content: center;
+}
+
+.bookingVehicle:hover .bookingPlate {
+  color: var(--amber);
+}
+
+.bookingPlate {
+  font-size: 16px;
+  font-weight: 650;
+  transition: color var(--motion-quick) var(--ease);
+}
+
+.bookingService {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.bookingMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.bookingMeta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.bookingMoney {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  font-size: 13.5px;
+}
+
+.bookingDivider {
+  border-top: 1px solid var(--border);
+  padding-top: 12px;
+}
+
+.sectionLabel {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: none;
+}
+
+/* Cont in the company space (T63d): the tiles, two columns on a laptop. */
+.tiles {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 8px;
+}
+
+@media (min-width: 1024px) {
+  .tiles {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
