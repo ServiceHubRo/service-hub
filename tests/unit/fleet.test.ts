@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import {
   approvalDecision,
+  extraColleagues,
+  memberCan,
+  monthlyTotal,
   filterJobs,
   jobGroup,
   jobShops,
@@ -573,5 +576,54 @@ describe('fleet bookings (Programări)', () => {
     expect(can('driver', 'bookings.create')).toBe(true);
     expect(can('accountant', 'bookings.create')).toBe(false);
     expect(can('driver', 'quotes.approve')).toBe(false);
+  });
+});
+
+describe('rights the admin gives (T63i)', () => {
+  it('adds a right to the role, with what it needs to be used', () => {
+    expect(memberCan('accountant', [], 'quotes.approve')).toBe(false);
+    expect(memberCan('accountant', ['quotes.approve'], 'quotes.approve')).toBe(true);
+    expect(memberCan('driver', ['quotes.approve'], 'bookings.viewAll')).toBe(true);
+    expect(memberCan('driver', ['quotes.approve'], 'costs.view')).toBe(true);
+    expect(memberCan('driver', ['vehicles.manage'], 'vehicles.viewAll')).toBe(true);
+    expect(memberCan('driver', ['vehicles.manage'], 'costs.view')).toBe(false);
+    expect(memberCan('manager', ['budget.manage'], 'budget.manage')).toBe(true);
+    // Never the admin's part.
+    expect(memberCan('manager', ['members.manage'], 'subscription.manage')).toBe(false);
+    expect(memberCan('manager', ['members.manage'], 'company.manage')).toBe(false);
+  });
+
+  it('approves up to the member\'s own limit, else the company\'s', () => {
+    expect(approvalDecision('accountant', 250, 300, ['quotes.approve'])).toBe('allowed');
+    expect(approvalDecision('accountant', 400, 300, ['quotes.approve'])).toBe('over_limit');
+    expect(approvalDecision('accountant', 100, null, [])).toBe('not_allowed');
+    expect(approvalDecision('manager', 1000, null)).toBe('allowed');
+    expect(approvalDecision('admin', 1_000_000, 10)).toBe('allowed');
+  });
+});
+
+describe('colleagues billed per person (T64d)', () => {
+  it('counts the colleagues past the included ones', () => {
+    expect(extraColleagues(4, 3)).toBe(1);
+    expect(extraColleagues(2, 3)).toBe(0);
+    expect(extraColleagues(9, null)).toBe(0);
+  });
+
+  it('adds each one to the plan\'s price; nothing for a price agreed per company', () => {
+    expect(monthlyTotal(59, 19, 4, 3)).toBe(78);
+    expect(monthlyTotal(29, 19, 1, 1)).toBe(29);
+    expect(monthlyTotal(119, 19, 8, 5)).toBe(176);
+    expect(monthlyTotal(null, 19, 8, 5)).toBeNull();
+  });
+});
+
+describe('the rights line of a member', () => {
+  it('names only the rights the role does not have, with the limit', async () => {
+    const { rightsSummary, ticksFor } = await import('../../src/screens/client/companies/rights');
+    expect(ticksFor('manager').map((x) => x.key)).toEqual(['budget', 'members']);
+    expect(rightsSummary('ro', 'accountant', ['quotes.approve'], 300)).toBe('Aprobă devize până la 300 lei');
+    expect(rightsSummary('en', 'driver', ['vehicles.manage', 'costs.view', 'reports.view'], null)).toBe('Adds and edits vehicles · Sees costs and reports');
+    expect(rightsSummary('ro', 'manager', [], 500)).toBe('Limita lui: 500 lei');
+    expect(rightsSummary('ro', 'driver', [], null)).toBe('');
   });
 });

@@ -631,8 +631,10 @@ export type Database = {
       company_members: {
         Row: {
           accepted_at: string | null
+          approval_limit: number | null
           company_id: string
           created_at: string
+          extra_caps: string[]
           id: string
           invite_token_hash: string | null
           invited_at: string
@@ -643,8 +645,10 @@ export type Database = {
         }
         Insert: {
           accepted_at?: string | null
+          approval_limit?: number | null
           company_id: string
           created_at?: string
+          extra_caps?: string[]
           id?: string
           invite_token_hash?: string | null
           invited_at?: string
@@ -655,8 +659,10 @@ export type Database = {
         }
         Update: {
           accepted_at?: string | null
+          approval_limit?: number | null
           company_id?: string
           created_at?: string
+          extra_caps?: string[]
           id?: string
           invite_token_hash?: string | null
           invited_at?: string
@@ -761,9 +767,11 @@ export type Database = {
           company_id: string
           created_at: string
           current_period_end: string | null
+          custom_included_members: number | null
           custom_member_limit: number | null
           custom_vehicle_limit: number | null
           ended_reason: string | null
+          member_price_ron: number | null
           plan_key: string
           price_ron: number | null
           status: string
@@ -779,9 +787,11 @@ export type Database = {
           company_id: string
           created_at?: string
           current_period_end?: string | null
+          custom_included_members?: number | null
           custom_member_limit?: number | null
           custom_vehicle_limit?: number | null
           ended_reason?: string | null
+          member_price_ron?: number | null
           plan_key: string
           price_ron?: number | null
           status: string
@@ -797,9 +807,11 @@ export type Database = {
           company_id?: string
           created_at?: string
           current_period_end?: string | null
+          custom_included_members?: number | null
           custom_member_limit?: number | null
           custom_vehicle_limit?: number | null
           ended_reason?: string | null
+          member_price_ron?: number | null
           plan_key?: string
           price_ron?: number | null
           status?: string
@@ -987,8 +999,10 @@ export type Database = {
         Row: {
           active: boolean
           features: string[]
+          included_members: number | null
           key: string
           member_limit: number | null
+          member_price_ron: number | null
           name_en: string
           name_ro: string
           position: number
@@ -1000,8 +1014,10 @@ export type Database = {
         Insert: {
           active?: boolean
           features?: string[]
+          included_members?: number | null
           key: string
           member_limit?: number | null
+          member_price_ron?: number | null
           name_en: string
           name_ro: string
           position?: number
@@ -1013,8 +1029,10 @@ export type Database = {
         Update: {
           active?: boolean
           features?: string[]
+          included_members?: number | null
           key?: string
           member_limit?: number | null
+          member_price_ron?: number | null
           name_en?: string
           name_ro?: string
           position?: number
@@ -3978,8 +3996,9 @@ export type Database = {
       }
       admin_update_fleet_plan: {
         Args: {
+          p_included_members: number
           p_key: string
-          p_member_limit: number
+          p_member_price_ron: number
           p_price_ron: number
           p_request_id: string
           p_vehicle_limit: number
@@ -4792,6 +4811,10 @@ export type Database = {
         }
         Returns: Json
       }
+      fleet_member_can: {
+        Args: { p_capability: string; p_extra: string[]; p_role: string }
+        Returns: boolean
+      }
       fleet_overview: { Args: { p_company: string }; Returns: Json }
       fleet_plan_summary: { Args: { p_company: string }; Returns: Json }
       fleet_role_can: {
@@ -5244,6 +5267,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      my_approval_limit: { Args: { p_company: string }; Returns: number }
       my_client_referrals: { Args: never; Returns: Json }
       my_companies: { Args: never; Returns: Json }
       my_fleet_access: { Args: never; Returns: boolean }
@@ -5628,6 +5652,29 @@ export type Database = {
       }
       require_company: {
         Args: { p_capability: string; p_company: string }
+        Returns: {
+          address: string | null
+          archived_at: string | null
+          budget_monthly: number | null
+          budget_yearly: number | null
+          created_at: string
+          created_by: string | null
+          id: string
+          manager_approval_limit: number | null
+          name: string
+          reg_com: string | null
+          updated_at: string
+          vat_id: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "companies"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      require_company_admin: {
+        Args: { p_company: string }
         Returns: {
           address: string | null
           archived_at: string | null
@@ -6084,6 +6131,15 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      set_company_member_rights: {
+        Args: {
+          p_approval_limit: number
+          p_caps: string[]
+          p_member: string
+          p_request_id: string
+        }
+        Returns: Json
       }
       set_company_member_role: {
         Args: { p_member: string; p_request_id: string; p_role: string }

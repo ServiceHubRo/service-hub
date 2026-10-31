@@ -31,8 +31,15 @@ export interface FleetPlanSummary {
   name_ro: string;
   name_en: string;
   vehicle_limit: number | null;
+  /** A member limit agreed for one company; null for the plans (colleagues past the included ones are billed). */
   member_limit: number | null;
   features: string[];
+  /** Colleagues in the price (the admin not counted), null = agreed per company (T64d). */
+  included_members: number | null;
+  /** Members with an account, the admin not counted. */
+  colleagues: number;
+  /** Colleagues past the included ones (each one billed). */
+  extra_members: number;
   status: SubscriptionStatus;
   ended_reason: string | null;
   trial_started_at: string | null;
@@ -53,10 +60,20 @@ export interface FleetPlanRow {
   vehicle_limit: number | null;
   member_limit: number | null;
   features: string[];
+  /** Colleagues in the price and each one after them, a month (T64d); null = agreed per company. */
+  included_members: number | null;
+  member_price_ron: number | null;
 }
 
 export interface FleetSubscriptionView {
-  plan: Omit<FleetPlanSummary, 'vehicles'> & { price_ron: number | null; billing_months: number };
+  plan: Omit<FleetPlanSummary, 'vehicles'> & {
+    price_ron: number | null;
+    billing_months: number;
+    /** Each colleague past the included ones, fixed with the subscription. */
+    member_price_ron: number | null;
+    /** The plan plus the colleagues past the included ones; null for a price agreed per company. */
+    monthly_total: number | null;
+  };
   usage: { vehicles: number; members: number };
   plans: FleetPlanRow[];
 }
@@ -100,6 +117,17 @@ export function planState(plan: Pick<FleetPlanSummary, 'status' | 'trial_ends_at
 /** Over a limit (after a downgrade, or a limit the admin lowered): never when there is none. */
 export function overLimit(count: number, limit: number | null): number {
   return limit === null ? 0 : Math.max(0, count - limit);
+}
+
+/** Colleagues past the included ones (T64d): none when the plan has no fixed number. */
+export function extraColleagues(colleagues: number, included: number | null): number {
+  return included === null ? 0 : Math.max(0, colleagues - included);
+}
+
+/** The month: the plan plus each colleague past the included ones (the database answers the same). */
+export function monthlyTotal(price: number | null, memberPrice: number | null, colleagues: number, included: number | null): number | null {
+  if (price === null) return null;
+  return Math.round((price + (memberPrice ?? 0) * extraColleagues(colleagues, included)) * 100) / 100;
 }
 
 /** The trial warning shows in its last week. */

@@ -39,8 +39,9 @@ export function FleetQuoteBody({ job }: { job: FleetJob }) {
   if (!q) return null;
   const money = allowed('costs.view');
   const waiting = job.status === 'quote_sent' && q.status === 'sent';
-  const limit = data.company.manager_approval_limit;
-  const decision = approvalDecision(data.me.role, q.total_sent, limit);
+  // The reader's own limit (else the company's): the database answers it with the overview.
+  const limit = data.me.approval_limit !== undefined ? data.me.approval_limit : data.company.manager_approval_limit;
+  const decision = approvalDecision(data.me.role, q.total_sent, limit, data.me.extra_caps);
   const decides = waiting && decision !== 'not_allowed';
   const decidedBy =
     q.decided_by_name ?? data.members.find((m) => m.user_id === q.decided_by_member || m.id === q.decided_by_member)?.name ?? null;
@@ -49,7 +50,7 @@ export function FleetQuoteBody({ job }: { job: FleetJob }) {
     <div className={styles.quoteBody}>
       {decides && mode === 'live' && actions ? (
         <>
-          {data.me.role === 'manager' && limit !== null && (
+          {data.me.role !== 'admin' && limit !== null && (
             <p className={decision === 'over_limit' ? styles.warnLine : styles.hintLine}>{t('fleet.bk.limitHint', { limit: formatMoney(lang, limit) })}</p>
           )}
           <QuoteDecision

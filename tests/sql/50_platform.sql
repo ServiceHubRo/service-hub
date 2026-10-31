@@ -140,7 +140,7 @@ select test.eq(
   || 'my_fleet_access, my_imported_jobs, my_member_id, my_no_show_summary, my_phone_verification, my_quote_numbering, my_referrals, my_shop_id, '
   || 'my_subscription_offers, new_client_offers, phone_digits, remove_company_member, replace_quote, reply_review, report_review, '
   || 'reschedule_booking, save_native_push_token, save_push_subscription, save_shop_hours, save_vehicle_intake, search_card_extras, '
-  || 'search_cities, search_shops, send_message, send_quote, set_booking_history_share, set_company_member_role, set_company_rules, '
+  || 'search_cities, search_shops, send_message, send_quote, set_booking_history_share, set_company_member_rights, set_company_member_role, set_company_rules, '
   || 'set_quote_next_number, set_shop_services, shop_cancel_booking, shop_create_booking, shop_decide_quote, shop_import_add, shop_import_begin, '
   || 'shop_import_undo, shop_offers, shop_reports, shop_vehicle_file, start_inspection, start_work, submit_review, submit_suggestion, '
   || 'toggle_favorite, touch_last_active, transfer_company_admin, update_company, withdraw_quote',

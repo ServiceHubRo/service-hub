@@ -296,3 +296,45 @@ test('bookings: the driver books a company vehicle, the manager approves within 
   await shot(mgr, 'fleet-bookings-en', name());
   await context.close();
 });
+
+test('rights and colleagues: the admin lets the accountant approve up to 300 lei; Abonament counts the colleagues', async ({ page }) => {
+  test.skip(!BACKEND, 'needs the local Supabase stack');
+  const admin = await createFleetUser();
+  const accountant = await createFleetUser();
+  const company = await rpcAs<{ id: string }>(admin, 'create_company', {
+    p_name: `Drepturi Test ${Date.now()}`,
+    p_vat_id: null,
+    p_reg_com: null,
+    p_address: null,
+    p_request_id: crypto.randomUUID(),
+  });
+  const tk = Array.from(crypto.getRandomValues(new Uint8Array(32)), (b) => b.toString(16).padStart(2, '0')).join('');
+  await rpcAs(admin, 'invite_company_member', { p_company: company.id, p_email: accountant, p_role: 'accountant', p_token: tk, p_request_id: crypto.randomUUID() });
+  await rpcAs(accountant, 'accept_company_invite', { p_token: tk, p_request_id: crypto.randomUUID() });
+
+  await signIn(page, admin, PASSWORD);
+  await expect(page).toHaveURL(/\/c\/cauta/);
+  await page.goto(`/c/cont/firme/${company.id}`);
+  const row = page.locator('li', { hasText: accountant });
+  await row.getByRole('button', { name: 'Mai multe' }).click();
+  await page.getByRole('menuitem', { name: 'Drepturi' }).click();
+  await expect(row.getByText('Ce mai poate face')).toBeVisible();
+  // An accountant already sees the costs: that tick is not offered.
+  await expect(row.getByRole('checkbox', { name: 'Vede costurile și rapoartele' })).toHaveCount(0);
+  await row.getByRole('checkbox', { name: 'Aprobă devize' }).check();
+  await row.getByLabel('Limita lui de aprobare').fill('300');
+  await expectNoHorizontalScroll(page);
+  await shot(page, 'company-rights', name());
+  await row.getByRole('button', { name: 'Salvează' }).click();
+  await expect(row.getByText('Aprobă devize până la 300 lei')).toBeVisible();
+  const overview = await rpcAs<{ me: { approval_limit: number } }>(accountant, 'fleet_overview', { p_company: company.id });
+  expect(Number(overview.me.approval_limit)).toBe(300);
+
+  // Abonament: one colleague of the three included; the admin is not counted.
+  await page.goto(`/c/firme/${company.id}?sectiune=abonament`);
+  await expect(page.getByText('1 din 3 incluși')).toBeVisible();
+  await expect(page.getByText('Administratorul nu se numără.')).toBeVisible();
+  await expect(page.getByText('19 lei / coleg în plus').first()).toBeVisible();
+  await expectNoHorizontalScroll(page);
+  await shot(page, 'fleet-subscription-colleagues', name());
+});

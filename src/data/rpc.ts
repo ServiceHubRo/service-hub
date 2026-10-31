@@ -201,6 +201,7 @@ export const RPC_ERROR_CODES = [
   'fleet_limit_active_shop',
   'fleet_limit_active_total',
   'fleet_limit_daily',
+  'company_rights_invalid',
 ] as const;
 
 export type RpcErrorCode = (typeof RPC_ERROR_CODES)[number] | 'network' | 'unknown';

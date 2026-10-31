@@ -87,15 +87,56 @@ export function can(role: FleetRole, capability: FleetCapability): boolean {
   return MATRIX[role].has(capability);
 }
 
+/**
+ * The rights the admin may give one member beyond their role (T63i), in the order the company page
+ * shows them. Each tick of the page is one or two of them (`RIGHT_TICKS`). The company's details, the
+ * subscription, roles and the administration are never given.
+ */
+export const GRANTABLE_CAPABILITIES = [
+  'quotes.approve',
+  'budget.manage',
+  'bookings.create',
+  'vehicles.manage',
+  'costs.view',
+  'reports.view',
+  'members.manage',
+] as const satisfies readonly FleetCapability[];
+export type GrantableCapability = (typeof GRANTABLE_CAPABILITIES)[number];
+
+/** The ticks of "Drepturi": one label each; "costs" gives costs and reports together. */
+export const RIGHT_TICKS: readonly { key: string; caps: readonly GrantableCapability[] }[] = [
+  { key: 'approve', caps: ['quotes.approve'] },
+  { key: 'budget', caps: ['budget.manage'] },
+  { key: 'book', caps: ['bookings.create'] },
+  { key: 'vehicles', caps: ['vehicles.manage'] },
+  { key: 'costs', caps: ['costs.view', 'reports.view'] },
+  { key: 'members', caps: ['members.manage'] },
+];
+
+/**
+ * What a member may do: their role's rights, the rights the admin gave and what those need to be
+ * used (approving sees all vehicles, bookings and costs; managing vehicles sees them all; the budget
+ * sees the costs). The database's `fleet_member_can` is the same rule (a SQL test proves it).
+ */
+export function memberCan(role: FleetRole, extra: readonly string[] | null | undefined, capability: FleetCapability): boolean {
+  if (can(role, capability)) return true;
+  const given = new Set(extra ?? []);
+  if (given.has(capability)) return true;
+  if (given.has('quotes.approve') && (capability === 'vehicles.viewAll' || capability === 'bookings.viewAll' || capability === 'costs.view')) return true;
+  if (given.has('vehicles.manage') && capability === 'vehicles.viewAll') return true;
+  return given.has('budget.manage') && capability === 'costs.view';
+}
+
 export type ApprovalDecision = 'allowed' | 'over_limit' | 'not_allowed';
 
 /**
  * Whether a member may approve a quote for `amount` (the total of the lines being approved):
- * the admin always; a manager up to the company's limit (none set = any amount); nobody else.
+ * the admin always; anyone with the right to approve (a manager by role, others when the admin gave
+ * it) up to their limit — their own, else the company's; none set = any amount.
  */
-export function approvalDecision(role: FleetRole, amount: number, managerLimit: number | null): ApprovalDecision {
+export function approvalDecision(role: FleetRole, amount: number, limit: number | null, extra: readonly string[] = []): ApprovalDecision {
   if (role === 'admin') return 'allowed';
-  if (role !== 'manager') return 'not_allowed';
-  if (managerLimit === null) return 'allowed';
-  return amount <= managerLimit ? 'allowed' : 'over_limit';
+  if (!memberCan(role, extra, 'quotes.approve')) return 'not_allowed';
+  if (limit === null) return 'allowed';
+  return amount <= limit ? 'allowed' : 'over_limit';
 }

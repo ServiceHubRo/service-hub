@@ -1603,3 +1603,27 @@ button.kpi:hover {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
+
+/* Abonament (T64d): the month's total split into the plan and the colleagues past the included ones. */
+.priceSplit {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 13.5px;
+}
+
+.priceSplit div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.priceSplit dt {
+  color: var(--muted);
+}
+
+/* The rights the admin gave a member, under the name (T63i). */
+.rightsLine {
+  font-size: 12.5px;
+  color: var(--amber);
+}

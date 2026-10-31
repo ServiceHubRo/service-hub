@@ -1,5 +1,6 @@
 import { ymdInBucharest } from '../../i18n/format';
 import type { FleetExpense, FleetJob, FleetOverview, FleetPlanRow, FleetPlanSummary, FleetQuote, FleetSubscriptionView, FleetVehicle } from '../../lib/fleet';
+import { extraColleagues, monthlyTotal } from '../../lib/fleet';
 
 /**
  * SAMPLE DATA for the design preview (`/dev/flota`, test builds only). Invented company, cars, shops
@@ -255,10 +256,10 @@ export function emptyFleet(): FleetOverview {
 
 /** SAMPLE plans for the preview, as `fleet_subscription` answers them (T64a). */
 const SAMPLE_PLANS: FleetPlanRow[] = [
-  { key: 'fleet_start', name_ro: 'Fleet Start', name_en: 'Fleet Start', price_ron: 29, vehicle_limit: 5, member_limit: 1, features: ['dashboard', 'vehicles', 'history', 'doc_alerts', 'costs_basic'] },
-  { key: 'fleet_business', name_ro: 'Fleet Business', name_en: 'Fleet Business', price_ron: 59, vehicle_limit: 15, member_limit: 10, features: ['dashboard', 'vehicles', 'history', 'doc_alerts', 'costs_basic', 'members', 'reports', 'export_csv', 'budget', 'cost_per_km'] },
-  { key: 'fleet_pro', name_ro: 'Fleet Pro', name_en: 'Fleet Pro', price_ron: 119, vehicle_limit: 40, member_limit: null, features: ['dashboard', 'vehicles', 'history', 'doc_alerts', 'costs_basic', 'members', 'reports', 'export_csv', 'budget', 'cost_per_km'] },
-  { key: 'enterprise', name_ro: 'Enterprise', name_en: 'Enterprise', price_ron: null, vehicle_limit: null, member_limit: null, features: ['dashboard', 'vehicles', 'history', 'doc_alerts', 'costs_basic', 'members', 'reports', 'export_csv', 'budget', 'cost_per_km'] },
+  { key: 'fleet_start', name_ro: 'Fleet Start', name_en: 'Fleet Start', price_ron: 29, vehicle_limit: 5, member_limit: null, features: ['dashboard', 'vehicles', 'history', 'doc_alerts', 'costs_basic', 'members'], included_members: 1, member_price_ron: 19 },
+  { key: 'fleet_business', name_ro: 'Fleet Business', name_en: 'Fleet Business', price_ron: 59, vehicle_limit: 15, member_limit: null, features: ['dashboard', 'vehicles', 'history', 'doc_alerts', 'costs_basic', 'members', 'reports', 'export_csv', 'budget', 'cost_per_km'], included_members: 3, member_price_ron: 19 },
+  { key: 'fleet_pro', name_ro: 'Fleet Pro', name_en: 'Fleet Pro', price_ron: 119, vehicle_limit: 40, member_limit: null, features: ['dashboard', 'vehicles', 'history', 'doc_alerts', 'costs_basic', 'members', 'reports', 'export_csv', 'budget', 'cost_per_km'], included_members: 5, member_price_ron: 19 },
+  { key: 'enterprise', name_ro: 'Enterprise', name_en: 'Enterprise', price_ron: null, vehicle_limit: null, member_limit: null, features: ['dashboard', 'vehicles', 'history', 'doc_alerts', 'costs_basic', 'members', 'reports', 'export_csv', 'budget', 'cost_per_km'], included_members: null, member_price_ron: null },
 ];
 
 export function sampleSubscription(now: Date = new Date(), vehicles = 5, members = 7): FleetSubscriptionView {
@@ -273,6 +274,9 @@ export function sampleSubscription(now: Date = new Date(), vehicles = 5, members
       vehicle_limit: business.vehicle_limit,
       member_limit: business.member_limit,
       features: business.features,
+      included_members: business.included_members,
+      colleagues: members - 1,
+      extra_members: extraColleagues(members - 1, business.included_members),
       status: 'trial',
       ended_reason: null,
       trial_started_at: started,
@@ -283,6 +287,8 @@ export function sampleSubscription(now: Date = new Date(), vehicles = 5, members
       billing_enabled: false,
       price_ron: business.price_ron,
       billing_months: 1,
+      member_price_ron: business.member_price_ron,
+      monthly_total: monthlyTotal(business.price_ron, business.member_price_ron, members - 1, business.included_members),
     },
     usage: { vehicles, members },
     plans: SAMPLE_PLANS,
@@ -293,5 +299,7 @@ export function samplePlanSummary(now: Date = new Date(), vehicles = 5): FleetPl
   const plan: Partial<FleetSubscriptionView['plan']> = { ...sampleSubscription(now, vehicles).plan };
   delete plan.price_ron;
   delete plan.billing_months;
+  delete plan.member_price_ron;
+  delete plan.monthly_total;
   return { ...(plan as FleetSubscriptionView['plan']), vehicles };
 }

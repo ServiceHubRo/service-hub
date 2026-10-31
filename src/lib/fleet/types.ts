@@ -116,6 +116,9 @@ export interface FleetMember {
   email: string;
   role: FleetRole;
   accepted_at: string | null;
+  /** The rights the admin gave beyond the role (T63i) and the member's own approval limit. */
+  extra_caps?: string[];
+  approval_limit?: number | null;
 }
 
 /** A driver's report about a car (`fleet_issues`, proposed). */
@@ -148,7 +151,8 @@ export interface FleetCompany {
 /** Everything one read answers, already narrowed to what the caller may see. */
 export interface FleetOverview {
   company: FleetCompany;
-  me: { member_id: string; role: FleetRole };
+  /** The member reading: role, the rights the admin gave (T63i) and their approval limit (own, else the company's). */
+  me: { member_id: string; role: FleetRole; extra_caps?: string[]; approval_limit?: number | null };
   vehicles: FleetVehicle[];
   jobs: FleetJob[];
   expenses: FleetExpense[];

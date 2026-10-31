@@ -133,14 +133,15 @@ export async function adminExtendCompanyTrial(company: string, days: number, req
 
 export async function adminUpdateFleetPlan(
   key: string,
-  v: { price: number | null; vehicleLimit: number | null; memberLimit: number | null },
+  v: { price: number | null; vehicleLimit: number | null; includedMembers: number | null; memberPrice: number | null },
   requestId: string,
 ): Promise<void> {
   await call('admin_update_fleet_plan', {
     p_key: key,
     p_price_ron: v.price,
     p_vehicle_limit: v.vehicleLimit,
-    p_member_limit: v.memberLimit,
+    p_included_members: v.includedMembers,
+    p_member_price_ron: v.memberPrice,
     p_request_id: requestId,
   } as never);
 }

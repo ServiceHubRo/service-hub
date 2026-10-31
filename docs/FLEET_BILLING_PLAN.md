@@ -267,7 +267,7 @@ price, limits or trial dates by a direct write.
 
 ## F. Decisions for Eduard
 1. Approve the access policy §C.3 (grace 7 days, then read-only; open quotes stay decidable).
-2. Fleet Start with **one member** only (the admin, no drivers)? Proposed member limits 1 / 10 / unlimited.
+2. Fleet Start with **one member** only (the admin, no drivers)? Proposed member limits 1 / 10 / unlimited. **Replaced on 31 Oct 2026 (T64d): colleagues included 1 / 3 / 5, then 19 lei each a month, prices set in Admin → Flote; no fixed member limit.**
 3. Trial plan: Fleet Business for 30 days, no card, one per CUI — and kept **off in production**
    until you switch it on.
 4. Longer periods (3/6/12 months with the shops' discounts) from the start, or monthly only first.

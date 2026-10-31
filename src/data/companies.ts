@@ -30,6 +30,9 @@ export interface CompanyMember {
   accepted_at: string | null;
   expired: boolean;
   is_me: boolean;
+  /** The rights the admin gave beyond the role (T63i) and the member's own approval limit. */
+  extra_caps: string[];
+  approval_limit: number | null;
 }
 
 export interface CompanyInvite {
@@ -133,6 +136,11 @@ export async function acceptCompanyInvite(token: string, requestId: string): Pro
 
 export async function setCompanyMemberRole(member: string, role: FleetRole, requestId: string): Promise<void> {
   await call('set_company_member_role', { p_member: member, p_role: role, p_request_id: requestId });
+}
+
+/** The admin gives one member rights beyond their role and, with the right to approve, their own limit. */
+export async function setCompanyMemberRights(member: string, caps: string[], approvalLimit: number | null, requestId: string): Promise<void> {
+  await call('set_company_member_rights', { p_member: member, p_caps: caps, p_approval_limit: approvalLimit, p_request_id: requestId } as never);
 }
 
 /** Removes a member or a pending invitation; on one's own row it means leaving the company. */

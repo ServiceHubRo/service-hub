@@ -57,9 +57,16 @@ select test.ok(true, 'after archiving one, a new one fits');
 select test.fails(format($$select public.fleet_archive_vehicle(%L, false, gen_random_uuid())$$, current_setting('test.v1')),
   'fleet_vehicle_limit', 'bringing the archived one back over the limit: refused');
 
--- Member limit (Fleet Start: the admin only).
+-- No fixed member limit since T64d (colleagues past the included ones are billed); a limit agreed
+-- for one company (custom_member_limit) still refuses the member over it.
+select test.logout();
+update public.company_subscriptions set custom_member_limit = 1 where company_id = current_setting('test.co')::uuid;
+select test.login(test.id('client_a'));
 select test.fails(format($$select public.invite_company_member(%L, 'x@test.local', 'driver', repeat('a1', 32), gen_random_uuid())$$,
-  current_setting('test.co')), 'fleet_member_limit', 'Fleet Start: no second member');
+  current_setting('test.co')), 'fleet_member_limit', 'a member limit agreed for the company: no second member');
+select test.logout();
+update public.company_subscriptions set custom_member_limit = null where company_id = current_setting('test.co')::uuid;
+select test.login(test.id('client_a'));
 
 -- Budgets need Fleet Business.
 select test.fails(format($$select public.set_company_rules(%L, null, 4000, null, gen_random_uuid())$$, current_setting('test.co')),
@@ -111,7 +118,7 @@ select test.ok(not (public.fleet_plan_summary(current_setting('test.co')::uuid)-
 select test.fails(format($$select public.admin_set_company_plan(%L, 'fleet_pro', gen_random_uuid())$$, current_setting('test.co')),
   'not_allowed', 'a member cannot change the plan through the admin function');
 select test.login(test.id('admin'));
-select public.admin_update_fleet_plan('fleet_start', 35, 6, 1, gen_random_uuid());
+select public.admin_update_fleet_plan('fleet_start', 35, 6, 1, 19, gen_random_uuid());
 select test.eq((select price_ron from public.fleet_plans where key = 'fleet_start'), 35.00::numeric(10,2), 'the admin sets a plan''s price');
 select test.ok((select count(*) from public.admin_audit_log where action in ('set_company_plan', 'extend_company_trial', 'update_fleet_plan')) >= 6,
   'every admin change is logged');

@@ -2,7 +2,7 @@ import { createContext, useCallback, useContext } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import type { VehicleFields } from '../../data/fleet';
 import type { Booking } from '../../data/rpc';
-import { can, type FleetCapability, type FleetOverview, type FleetPlanSummary, type FleetSubscriptionView, type FleetVehicle } from '../../lib/fleet';
+import { memberCan, type FleetCapability, type FleetOverview, type FleetPlanSummary, type FleetSubscriptionView, type FleetVehicle } from '../../lib/fleet';
 
 /**
  * What every fleet screen needs: the company read (already narrowed to the member's role), what the
@@ -58,7 +58,7 @@ export function useFleet(): FleetContextValue & { allowed: (c: FleetCapability) 
   if (!value) throw new Error('useFleet outside FleetContext');
   return {
     ...value,
-    allowed: (c) => can(value.data.me.role, c),
+    allowed: (c) => memberCan(value.data.me.role, value.data.me.extra_caps, c),
     vehicle: (id) => value.data.vehicles.find((v) => v.id === id),
   };
 }
