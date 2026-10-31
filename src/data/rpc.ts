@@ -170,6 +170,22 @@ export const RPC_ERROR_CODES = [
   'waitlist_limit',
   'warranty_invalid',
   'wrong_status',
+  'fleet_disabled',
+  'company_clients_only',
+  'company_not_found',
+  'company_name_invalid',
+  'company_vat_invalid',
+  'company_regcom_invalid',
+  'company_address_invalid',
+  'limit_companies',
+  'company_rules_invalid',
+  'company_role_invalid',
+  'member_exists',
+  'limit_members',
+  'invite_other_email',
+  'member_not_found',
+  'last_admin',
+  'transfer_invalid',
 ] as const;
 
 export type RpcErrorCode = (typeof RPC_ERROR_CODES)[number] | 'network' | 'unknown';

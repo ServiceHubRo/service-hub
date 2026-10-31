@@ -5,6 +5,8 @@ import {
   budgetUsage,
   buildLedger,
   can,
+  FLEET_CAPABILITIES,
+  FLEET_ROLES,
   categoryOfService,
   costPerKm,
   costsCsv,
@@ -456,5 +458,31 @@ describe('fleet scope (what the company read answers each role)', () => {
     expect(ledger.duplicates.map((e) => e.id)).toEqual(['e9']);
     expect(ledger.foreign.map((e) => e.id)).toEqual(['e10']);
     expect(ledger.entries.filter((e) => e.booking_id === 'j3')).toHaveLength(1);
+  });
+});
+
+describe('fleet rights in the database', () => {
+  /** The arrays of `fleet_role_can` in the companies migration, per role. */
+  function sqlMatrix(): Record<string, string[] | 'all'> {
+    const files = import.meta.glob('../../supabase/migrations/*_companies.sql', { query: '?raw', import: 'default', eager: true });
+    const sql = Object.values(files)[0] as string;
+    const body = sql.slice(sql.indexOf('create function public.fleet_role_can'), sql.indexOf('create function public.fleet_can'));
+    const out: Record<string, string[] | 'all'> = {};
+    for (const m of body.matchAll(/when '([a-z]+)' then (true|p_capability = any \(array\[([^\]]*)\]\))/g)) {
+      out[m[1]!] = m[2] === 'true' ? 'all' : [...m[3]!.matchAll(/'([a-zA-Z.]+)'/g)].map((x) => x[1]!);
+    }
+    return out;
+  }
+
+  it('equals src/lib/fleet/permissions.ts for every role and capability', () => {
+    const matrix = sqlMatrix();
+    expect(Object.keys(matrix).sort()).toEqual([...FLEET_ROLES].sort());
+    for (const role of FLEET_ROLES) {
+      for (const c of FLEET_CAPABILITIES) {
+        const inSql = matrix[role] === 'all' || (matrix[role] as string[]).includes(c);
+        expect(inSql, `${role} ${c}`).toBe(can(role, c));
+      }
+      if (matrix[role] !== 'all') for (const c of matrix[role] as string[]) expect(FLEET_CAPABILITIES, `${role}: ${c} exists`).toContain(c);
+    }
   });
 });

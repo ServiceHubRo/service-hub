@@ -1,4 +1,4 @@
--- T63b — companies and members (PROPOSED; becomes tests/sql/134_companies.sql with the migration).
+-- T63b — companies and members (Eduard approved the migration on 31 Oct 2026).
 -- Fleets are off until the switch; only client accounts take part; company A never sees company B;
 -- every write goes through the functions, with the role checked there; the last admin stays.
 begin;

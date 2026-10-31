@@ -1,9 +1,9 @@
--- T63b — Companies and their members (docs/FLEET_PLAN.md §3.1). PROPOSED, NOT APPLIED.
--- Moves to supabase/migrations/<timestamp>_companies.sql only after Eduard approves it.
+-- T63b — Companies and their members (docs/FLEET_PLAN.md §3.1). Approved by Eduard, 31 Oct 2026.
 --
 -- A company is a space inside client accounts (Eduard, 31 Oct 2026: not a fourth role). Only client
--- accounts create or join companies. Everything here is additive: no existing table, row, policy or
--- function changes. Nothing works in production until `platform_settings.fleet_enabled` is switched on.
+-- accounts create or join companies. Everything here is additive: one new column on platform_settings,
+-- otherwise no existing table, row, policy or function changes. Nothing works in production until
+-- `platform_settings.fleet_enabled` is switched on.
 --
 -- · companies — the company's own details and its rules (manager approval limit, budgets)
 -- · company_members — one row per person or pending invitation, with the role

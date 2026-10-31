@@ -3315,6 +3315,24 @@ export const en: Record<MessageKey, string> = {
   'sysmsg.intake_confirmed.client': 'You confirmed the intake sheet ({ref}).',
   'sysmsg.intake_confirmed.shop': 'The client confirmed the intake sheet ({ref}).',
 
+  // T63b — companies and members
+  'rpcError.fleet_disabled': 'Fleet accounts are not available yet.',
+  'rpcError.company_clients_only': 'Only client accounts can create or join a company.',
+  'rpcError.company_not_found': 'The company does not exist or you do not have access to it.',
+  'rpcError.company_name_invalid': 'Enter the company name (2–120 characters).',
+  'rpcError.company_vat_invalid': 'The tax ID (CUI) is not valid.',
+  'rpcError.company_regcom_invalid': 'The Trade Register number is not valid.',
+  'rpcError.company_address_invalid': 'The address can have at most 300 characters.',
+  'rpcError.limit_companies': 'You can create at most {limit} companies.',
+  'rpcError.company_rules_invalid': 'Check the amounts: the limit and the budgets must be above 0.',
+  'rpcError.company_role_invalid': 'Choose a role from the list.',
+  'rpcError.member_exists': 'This person is already a member of the company.',
+  'rpcError.limit_members': 'A company can have at most {limit} members and invitations.',
+  'rpcError.invite_other_email': 'The invitation is for another email address. Sign in with the invited address.',
+  'rpcError.member_not_found': 'The member no longer exists.',
+  'rpcError.last_admin': 'The company needs an administrator. Hand the administration to another member first.',
+  'rpcError.transfer_invalid': 'The administration can only go to another member who has accepted the invitation.',
+
   // T63a — fleet account (design preview; docs/FLEET_PLAN.md)
   'fleet.preview.tag': 'Fleet (preview)',
   'fleet.preview.banner': 'Design preview of the fleet account. The data is made up, nothing is saved and this page does not exist in the published app.',
