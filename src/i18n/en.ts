@@ -3315,6 +3315,26 @@ export const en: Record<MessageKey, string> = {
   'sysmsg.intake_confirmed.client': 'You confirmed the intake sheet ({ref}).',
   'sysmsg.intake_confirmed.shop': 'The client confirmed the intake sheet ({ref}).',
 
+  // T63c — company vehicles
+  'fleet.vehicle.assignTo': 'Assigned to',
+  'fleet.members.manage': 'Manage team',
+  'fleet.form.editVehicle': 'Edit vehicle',
+  'fleet.form.saveVehicle': 'Save vehicle',
+  'fleet.vehicle.available': 'Mark available',
+  'fleet.vehicle.markUnavailable': 'Mark unavailable',
+  'fleet.vehicle.unarchive': 'Bring back to the fleet',
+  'fleet.vehicle.archiveConfirm': 'The vehicle leaves the active fleet and loses its driver. History and costs stay.',
+  'fleet.vehicle.archiveYes': 'Archive',
+  'fleet.space.loading': 'Company fleet',
+  'fleet.space.companyPage': 'Company',
+  'cos.openFleet': 'Open the fleet',
+  'rpcError.vehicle_invalid_field': 'Check “{field}”.',
+  'rpcError.vehicle_invalid': 'Check the vehicle details.',
+  'rpcError.limit_vehicles': 'A company can have at most {limit} active vehicles.',
+  'rpcError.vehicle_not_found': 'The vehicle does not exist or you do not have access to it.',
+  'rpcError.vehicle_plate_exists': 'An active company vehicle already has this license plate.',
+  'rpcError.vehicle_archived': 'The vehicle is archived. Bring it back to the fleet first.',
+
   // T63b — companies and members
   'cos.title': 'My companies',
   'cos.tileHint': 'Your company’s fleet, apart from your own cars',

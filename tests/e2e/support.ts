@@ -146,6 +146,14 @@ export async function userIdOf(email: string, password = PASSWORD): Promise<stri
   return ((await res.json()) as { user: { id: string } }).user.id;
 }
 
+/** A client account marked as a fleet test account (T63c: fleets work for it while they are off). */
+export async function createFleetUser(extra: Record<string, string> = {}): Promise<string> {
+  const email = await createUser('client', extra);
+  const id = await userIdOf(email);
+  await serviceRest(`profiles?id=eq.${id}`, 'PATCH', { fleet_beta: true });
+  return email;
+}
+
 /** Calls a database function as a signed-in user, the way the app does (RLS and checks apply). */
 export async function rpcAs<T = unknown>(email: string, fn: string, args: Record<string, unknown>, password = PASSWORD): Promise<T> {
   const auth = await fetch(`${API}/auth/v1/token?grant_type=password`, {

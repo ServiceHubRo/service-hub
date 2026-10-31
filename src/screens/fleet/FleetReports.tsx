@@ -1,6 +1,8 @@
 import { ArrowDownRight, ArrowRight, ArrowUpRight, Download, Lock, PiggyBank, Printer } from 'lucide-react';
 import { useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Button } from '../../components/Button';
+import { buttonClass } from '../../components/buttonClass';
 import { Card } from '../../components/Card';
 import { Chip, ChipRow } from '../../components/Chip';
 import { EmptyState } from '../../components/EmptyState';
@@ -47,7 +49,7 @@ const HIGH_COST = 1.5;
  */
 export function FleetReports({ initialReport }: { initialReport?: string }) {
   const { t, lang } = useI18n();
-  const { data, go, allowed, vehicle } = useFleet();
+  const { data, go, allowed, vehicle, companyPage } = useFleet();
   const today = ymdInBucharest(new Date());
   const [report, setReport] = useState<ReportKey>(REPORT_KEYS.includes(initialReport as ReportKey) ? (initialReport as ReportKey) : 'totals');
   const [period, setPeriod] = useState<CostPeriod>('year');
@@ -276,7 +278,17 @@ export function FleetReports({ initialReport }: { initialReport?: string }) {
           icon={PiggyBank}
           title={t('fleet.budget.emptyTitle')}
           body={allowed('budget.manage') ? t('fleet.budget.emptyBody') : t('fleet.budget.emptyBodyOther')}
-          action={allowed('budget.manage') ? <Button disabled title={t('fleet.preview.notSaved')}>{t('fleet.budget.set')}</Button> : undefined}
+          action={
+            !allowed('budget.manage') ? undefined : companyPage ? (
+              <Link to={companyPage} className={buttonClass('primary')}>
+                {t('fleet.budget.set')}
+              </Link>
+            ) : (
+              <Button disabled title={t('fleet.preview.notSaved')}>
+                {t('fleet.budget.set')}
+              </Button>
+            )
+          }
         />
       );
     }

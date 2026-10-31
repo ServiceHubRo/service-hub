@@ -1,19 +1,17 @@
 import { useEffect, useState } from 'react';
-import { fetchFleetEnabled } from '../../../data/companies';
-import { IS_TEST_BUILD } from '../../../lib/env';
+import { fetchMyFleetAccess } from '../../../data/fleet';
 
 /**
- * Whether the companies part of Cont is shown (T63b). Only in test builds until the fleet launch
- * (T63h), and only while `platform_settings.fleet_enabled` is on: the published site shows nothing
- * even if a test and the real site share a database. The database refuses everything when the
- * switch is off, whatever the browser shows.
+ * Whether the companies part of Cont is shown (T63b/T63c): when the database says this account may
+ * use fleets (`my_fleet_access()`: `platform_settings.fleet_enabled` on, or the account is a fleet
+ * test account). Until the fleet launch the switch stays off on the real project, so there only the
+ * test accounts Eduard marks see it. The database refuses everything else, whatever the browser shows.
  */
 export function useFleetVisible(): boolean {
   const [on, setOn] = useState(false);
   useEffect(() => {
-    if (!IS_TEST_BUILD) return;
     let alive = true;
-    fetchFleetEnabled().then(
+    fetchMyFleetAccess().then(
       (enabled) => {
         if (alive) setOn(enabled);
       },

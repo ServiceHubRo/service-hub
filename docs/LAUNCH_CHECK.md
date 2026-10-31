@@ -154,6 +154,9 @@ Lista „Final check” din `docs/lovable-prompts.md` și cerințele din `docs/F
 
 După pașii din `docs/LANSARE.md`, Partea 4, cu un service și un client reali (de exemplu un prieten cu service și telefonul tău ca client). Bifezi aici.
 
+**Flotele (T63c)**
+- ☐ Hotărăști dacă flotele rămân pornite pentru toți clienții la lansare. Sunt pornite din 31 oct 2026 (migrarea `fleet_on`), cât aplicația nu e publică. Le oprești cu `update public.platform_settings set fleet_enabled = false;`; conturile marcate cu `fleet_beta` le folosesc în continuare.
+
 **Domeniul și contul**
 - ☐ `https://service-hub.ro` deschide aplicația, cu lacăt; `www.service-hub.ro` și `service-hubapp.netlify.app` duc singure acolo.
 - ☐ La **Intră în cont** apare căsuța Cloudflare și logarea merge.

@@ -186,6 +186,11 @@ export const RPC_ERROR_CODES = [
   'member_not_found',
   'last_admin',
   'transfer_invalid',
+  'vehicle_invalid',
+  'limit_vehicles',
+  'vehicle_not_found',
+  'vehicle_plate_exists',
+  'vehicle_archived',
 ] as const;
 
 export type RpcErrorCode = (typeof RPC_ERROR_CODES)[number] | 'network' | 'unknown';
@@ -299,6 +304,23 @@ export function rpcErrorMessage(lang: Lang, error: unknown): string {
       return key in ro
         ? translate(lang, 'rpcError.field_invalid_named', { field: translate(lang, key as MessageKey) })
         : translate(lang, 'rpcError.field_invalid');
+    }
+    case 'vehicle_invalid': {
+      // T63c: the field the database refused, by its label on the vehicle form.
+      const labels: Record<string, MessageKey> = {
+        make: 'fleet.col.make',
+        model: 'fleet.col.model',
+        year: 'fleet.col.year',
+        plate: 'fleet.col.plate',
+        vin: 'fleet.col.vin',
+        department: 'fleet.col.department',
+        vehicle_type: 'fleet.col.type',
+        expiry: 'fleet.vtab.documents',
+      };
+      const label = typeof p.field === 'string' ? labels[p.field] : undefined;
+      return label
+        ? translate(lang, 'rpcError.vehicle_invalid_field', { field: translate(lang, label) })
+        : translate(lang, 'rpcError.vehicle_invalid');
     }
     case 'quote_item_invalid':
       return num(p.position) === null

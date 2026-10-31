@@ -21,6 +21,8 @@ import {
 } from '../../lib/fleet';
 import { isActiveStatus } from '../../lib/status';
 import { JobStagePill, SourcePill, VehicleStatusPill } from './FleetPills';
+import { FleetVehicleForm } from './FleetVehicleForm';
+import { VehicleControls } from './VehicleControls';
 import { useFleet } from './fleetContext';
 import pill from '../../components/StatusBadge.module.css';
 import styles from './fleet.module.css';
@@ -35,7 +37,8 @@ type Tab = 'overview' | 'history' | 'costs' | 'bookings' | 'quotes' | 'documents
  */
 export function FleetVehicle({ vehicleId }: { vehicleId: string }) {
   const { t, lang } = useI18n();
-  const { data, go, allowed, vehicle } = useFleet();
+  const { data, go, allowed, vehicle, mode } = useFleet();
+  const [editing, setEditing] = useState(false);
   const v = vehicle(vehicleId);
   const [tab, setTab] = useState<Tab>('overview');
   const jobs = useMemo(() => data.jobs.filter((j) => j.vehicle_id === vehicleId), [data.jobs, vehicleId]);
@@ -100,6 +103,10 @@ export function FleetVehicle({ vehicleId }: { vehicleId: string }) {
         </dl>
       </Card>
 
+      {editing && (
+        <FleetVehicleForm vehicle={v} onCancel={() => setEditing(false)} onDone={() => setEditing(false)} />
+      )}
+
       <ChipRow label={t('fleet.vehicle.sections')}>
         {tabs.map((x) => (
           <Chip key={x.key} selected={tab === x.key} onClick={() => setTab(x.key)}>
@@ -128,19 +135,23 @@ export function FleetVehicle({ vehicleId }: { vehicleId: string }) {
             ) : (
               <p className={styles.note}>{t('fleet.vehicle.nothingOpen')}</p>
             )}
-            <div className={styles.actions}>
-              {allowed('bookings.create') && (
-                <Button variant="primary" disabled title={t('fleet.preview.notSaved')}>
-                  <CalendarPlus size={18} aria-hidden="true" /> {t('fleet.vehicle.book')}
-                </Button>
-              )}
-              {allowed('issues.report') && (
-                <Button disabled title={t('fleet.preview.notSaved')}>
-                  <AlertTriangle size={18} aria-hidden="true" /> {t('fleet.vehicle.report')}
-                </Button>
-              )}
-            </div>
-            <p className={styles.hintLine}>{t('fleet.preview.actionsLater')}</p>
+            {mode === 'preview' && (
+              <>
+                <div className={styles.actions}>
+                  {allowed('bookings.create') && (
+                    <Button variant="primary" disabled title={t('fleet.preview.notSaved')}>
+                      <CalendarPlus size={18} aria-hidden="true" /> {t('fleet.vehicle.book')}
+                    </Button>
+                  )}
+                  {allowed('issues.report') && (
+                    <Button disabled title={t('fleet.preview.notSaved')}>
+                      <AlertTriangle size={18} aria-hidden="true" /> {t('fleet.vehicle.report')}
+                    </Button>
+                  )}
+                </div>
+                <p className={styles.hintLine}>{t('fleet.preview.actionsLater')}</p>
+              </>
+            )}
           </Card>
           <Card className={styles.card}>
             <h3 className={styles.cardTitle}>{t('fleet.vtab.documents')}</h3>
@@ -250,12 +261,13 @@ export function FleetVehicle({ vehicleId }: { vehicleId: string }) {
             <Fact label={t('fleet.col.type')} value={v.vehicle_type ? t(`fleet.type.${v.vehicle_type}` as 'fleet.type.car') : null} />
             <Fact label={t('fleet.vehicle.added')} value={formatDate(lang, new Date(v.created_at))} />
           </dl>
-          {allowed('vehicles.manage') && (
+          {allowed('vehicles.manage') && mode === 'preview' && (
             <div className={styles.actions}>
               <Button disabled title={t('fleet.preview.notSaved')}>{t('fleet.vehicle.assign')}</Button>
               <Button disabled title={t('fleet.preview.notSaved')}>{t('fleet.vehicle.archive')}</Button>
             </div>
           )}
+          {allowed('vehicles.manage') && mode === 'live' && <VehicleControls vehicle={v} onEdit={() => setEditing(true)} />}
         </Card>
       )}
 
@@ -336,7 +348,7 @@ export function FleetVehicle({ vehicleId }: { vehicleId: string }) {
                   ? t('fleet.quote.overLimit', { limit: formatMoney(lang, data.company.manager_approval_limit ?? 0) })
                   : t('fleet.quote.cannotApprove')}
             </p>
-            {decision === 'allowed' && (
+            {decision === 'allowed' && mode === 'preview' && (
               <div className={styles.actions}>
                 <Button variant="success" disabled title={t('fleet.preview.notSaved')}>
                   {t('fleet.quote.approve')}

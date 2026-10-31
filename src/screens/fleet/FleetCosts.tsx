@@ -35,7 +35,7 @@ import styles from './fleet.module.css';
  */
 export function FleetCosts({ initialPeriod }: { initialPeriod?: string }) {
   const { t, lang } = useI18n();
-  const { data, allowed, vehicle } = useFleet();
+  const { data, allowed, vehicle, addExpense } = useFleet();
   const today = ymdInBucharest(new Date());
   const ledger = useMemo(() => buildLedger(data.jobs, data.expenses), [data.jobs, data.expenses]);
   const [period, setPeriod] = useState<CostPeriod>(COST_PERIODS.includes(initialPeriod as CostPeriod) ? (initialPeriod as CostPeriod) : 'year');
@@ -81,7 +81,7 @@ export function FleetCosts({ initialPeriod }: { initialPeriod?: string }) {
           options={COST_PERIODS.map((p) => ({ value: p, label: t(`fleet.period.${p}`) }))}
         />
         <div className={styles.toolbarActions}>
-          {allowed('costs.manage') && (
+          {allowed('costs.manage') && addExpense && (
             <Button variant="primary" onClick={() => setAdding((a) => !a)} aria-expanded={adding}>
               <Plus size={18} aria-hidden="true" /> {t('fleet.costs.add')}
             </Button>
@@ -253,6 +253,7 @@ function ExpenseForm({ onDone }: { onDone: () => void }) {
       return;
     }
     if (next.vehicle) return;
+    if (!addExpense) return;
     addExpense({
       id: crypto.randomUUID(),
       vehicle_id: vehicleId,

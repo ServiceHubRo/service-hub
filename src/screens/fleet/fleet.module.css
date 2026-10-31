@@ -1235,3 +1235,42 @@ button.kpi:hover {
     animation: none;
   }
 }
+
+/* ---------------------------------------------------------------- live space (T63c) */
+.spaceStatus {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  width: 100%;
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: var(--page-pad);
+}
+
+.subTitle {
+  font-size: 15px;
+  font-weight: 650;
+}
+
+.assignRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 8px;
+  align-items: end;
+}
+
+@media (min-width: 600px) {
+  .assignRow {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+}
+
+.confirm {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-input);
+}

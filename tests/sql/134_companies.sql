@@ -5,6 +5,8 @@ begin;
 select test.make_world();
 
 -- ------------------------------------------------------------------ the switch and who may
+-- Fleets are on since migration fleet_on; the switch still works when turned off.
+update public.platform_settings set fleet_enabled = false where id = 1;
 select test.login(test.id('client_a'));
 select test.fails($$select public.create_company('Firma Ana', null, null, null, gen_random_uuid())$$, 'fleet_disabled',
   'fleets are off by default: nothing can be created in production before the switch');

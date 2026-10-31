@@ -1,6 +1,7 @@
-import { Building2, Copy, UserPlus } from 'lucide-react';
+import { Building2, Copy, Truck, UserPlus } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { buttonClass } from '../../../components/buttonClass';
 import { ActionButton } from '../../../components/ActionButton';
 import { Button } from '../../../components/Button';
 import { Card } from '../../../components/Card';
@@ -33,7 +34,7 @@ import { importAmount } from '../../../lib/importRows';
 import { looksLikeEmail } from '../../../lib/password';
 import { useLoad } from '../../../lib/useLoad';
 import { isValidCui, isValidRegCom, normalizeCode } from '../../../lib/validators';
-import { COMPANIES_PATH } from './paths';
+import { COMPANIES_PATH, fleetSpacePath } from './paths';
 import { RolePill } from './RolePill';
 import styles from './companies.module.css';
 
@@ -90,6 +91,13 @@ export function CompanyDetailScreen() {
         back={{ to: COMPANIES_PATH, label: t('cos.title') }}
         title={state.status === 'ready' && state.data ? state.data.company.name : t('cos.company')}
         subtitle={state.status === 'ready' && state.data ? <RolePill role={state.data.role} /> : undefined}
+        actions={
+          state.status === 'ready' && state.data ? (
+            <Link to={fleetSpacePath(companyId)} className={buttonClass('primary')}>
+              <Truck size={18} aria-hidden="true" /> {t('cos.openFleet')}
+            </Link>
+          ) : undefined
+        }
       />
       {body}
     </div>
