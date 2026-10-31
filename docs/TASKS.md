@@ -1377,3 +1377,13 @@ Cerut de Eduard pe 30 oct 2026, cu poze de pe PC („spațiu gol peste tot”): 
 - **Pagina service-ului** (decizia lui Eduard: „Listă scurtă”): o coloană pe toată lățimea. Serviciile apar ca plăci de categorii cu numărul lor („Motor · 12 servicii”); o atingere arată serviciile acelei categorii (pe telefon sub placă, pe ecran lat sub toate plăcile). Programul, contactul și regulile pe două coloane în cardul lor; recenziile una lângă alta.
 
 - [x] Făcut
+
+## T61 — Propozițiile umplu din nou rândul
+
+Cerut de Eduard pe 31 oct 2026 (pagina de start pe telefon: „mi-ai despărțit propozițiile și le-am pus de două rânduri fără logică și arată urat”). Doar stiluri, fără migrare, fără pachete noi.
+
+- **Textul obișnuit** (titluri, paragrafe, carduri) umple rândul ca înainte de T56. Rămâne o singură protecție: ultimul rând nu are un cuvânt singur (`text-wrap: pretty`). Rândurile „egale” din T56 rupeau propozițiile devreme („Plătești / doar reparația”).
+- **Butoanele și filele** păstrează rândurile egale din T56: un buton pe două rânduri nu se rupe după primul cuvânt.
+- **Verificare:** pagina de start în română și engleză la 390, 430, 820 și 1440 px; testele pagina de start și ale interfeței comune pe telefon, tabletă și PC.
+
+- [x] Făcut

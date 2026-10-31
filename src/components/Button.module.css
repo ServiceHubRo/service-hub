@@ -16,6 +16,8 @@
   text-align: center;
   text-decoration: none;
   line-height: 1.2;
+  /* A link drawn as a button balances its label like a button. */
+  text-wrap: balance;
   transition:
     background-color var(--motion-quick) var(--ease),
     border-color var(--motion-quick) var(--ease),
