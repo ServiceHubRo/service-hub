@@ -11,8 +11,11 @@ const name = () => test.info().project.name;
 /** The vehicle's sections: a dropdown on phones and tablets, tabs on a laptop. */
 async function openVehicleSection(page: Page, label: string) {
   const select = page.getByRole('combobox', { name: 'Secțiunile vehiculului' });
+  const tab = page.getByRole('button', { name: new RegExp(label) });
+  // Wait for the vehicle page: one of the two is on screen once it is drawn.
+  await expect(select.or(tab).filter({ visible: true }).first()).toBeVisible();
   if (await select.isVisible()) await select.selectOption({ label });
-  else await page.getByRole('button', { name: new RegExp(label) }).click();
+  else await tab.click();
 }
 
 test.beforeEach(async ({ context }) => {
