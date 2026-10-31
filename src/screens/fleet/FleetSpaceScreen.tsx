@@ -1,18 +1,20 @@
 import { Building2 } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useDocumentTitle } from '../../app/useDocumentTitle';
 import { buttonClass } from '../../components/buttonClass';
 import { EmptyState } from '../../components/EmptyState';
 import { LoadError } from '../../components/LoadError';
 import { PageHeader } from '../../components/PageHeader';
 import { SkeletonList } from '../../components/Skeleton';
-import { archiveVehicle, assignDriver, fetchFleetOverview, fetchPlanSummary, fetchSubscription, saveVehicle, setUnavailable } from '../../data/fleet';
+import { archiveVehicle, assignDriver, fetchFleetOverview, fetchPlanSummary, fetchSubscription, fleetDecideQuote, saveVehicle, setUnavailable } from '../../data/fleet';
 import { subscribeRows } from '../../data/realtime';
 import { toRpcError } from '../../data/rpc';
 import { useI18n } from '../../i18n/context';
 import { useLoad } from '../../lib/useLoad';
+import { clearFleetBookingHint, setFleetBookingHint } from '../client/booking/fleetBookingHint';
 import { COMPANIES_PATH, companyPath } from '../client/companies/paths';
+import { SEARCH_PATH } from '../client/paths';
 import { FleetContext, useFleetLocation, type FleetActions } from './fleetContext';
 import { FleetFrame, FleetPlanNotice, FleetSectionBody } from './FleetFrame';
 import styles from './fleet.module.css';
@@ -27,6 +29,7 @@ export function FleetSpaceScreen() {
   const { t } = useI18n();
   const { companyId = '' } = useParams();
   const { section, vehicleId, filter, go } = useFleetLocation();
+  const navigate = useNavigate();
   const load = useCallback(async () => {
     const [overview, plan] = await Promise.all([fetchFleetOverview(companyId), fetchPlanSummary(companyId)]);
     return { overview, plan };
@@ -53,11 +56,15 @@ export function FleetSpaceScreen() {
     const offVehicles = subscribeRows({ channel: `fleet-vehicles:${companyId}`, table: 'company_vehicles', filter: `company_id=eq.${companyId}`, onChange: later, onResync: later });
     const offMembers = subscribeRows({ channel: `fleet-members:${companyId}`, table: 'company_members', filter: `company_id=eq.${companyId}`, onChange: later, onResync: later });
     const offPlan = subscribeRows({ channel: `fleet-plan:${companyId}`, table: 'company_subscriptions', filter: `company_id=eq.${companyId}`, onChange: later, onResync: later });
+    // The company's bookings (T63d): readable live by those who see them all; a driver's own come
+    // through their personal row.
+    const offBookings = subscribeRows({ channel: `fleet-bookings:${companyId}`, table: 'bookings', filter: `company_id=eq.${companyId}`, onChange: later, onResync: later });
     return () => {
       window.clearTimeout(timer);
       offVehicles();
       offMembers();
       offPlan();
+      offBookings();
     };
   }, [ready, companyId, refresh]);
 
@@ -81,8 +88,18 @@ export function FleetSpaceScreen() {
         await setUnavailable(id, unavailable, requestId);
         await refresh();
       },
+      decideQuote: async (bookingId, quoteId, ids, requestId) => {
+        const row = await fleetDecideQuote(bookingId, quoteId, ids, requestId);
+        await refresh();
+        return row;
+      },
+      book: (id) => {
+        if (id) setFleetBookingHint(id);
+        else clearFleetBookingHint();
+        navigate(SEARCH_PATH);
+      },
     }),
-    [companyId, refresh],
+    [companyId, refresh, navigate],
   );
 
   const title = section === 'vehicul' ? t('fleet.nav.vehicle') : t(`fleet.nav.${section}`);

@@ -1,5 +1,5 @@
-import { Car as CarIcon, Check, Plus } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { Building2, Car as CarIcon, Check, Plus } from 'lucide-react';
+import { useCallback, useEffect, useState } from 'react';
 import { useSession } from '../../../app/sessionContext';
 import { ActionButton } from '../../../components/ActionButton';
 import { Banner } from '../../../components/Banner';
@@ -12,6 +12,7 @@ import { LoadError } from '../../../components/LoadError';
 import { OfferNote } from '../../../components/OfferNote';
 import { SkeletonList } from '../../../components/Skeleton';
 import { TextArea } from '../../../components/TextArea';
+import { fetchBookableVehicles, type BookableCompany } from '../../../data/fleet';
 import { fetchCars, type Car } from '../../../data/garage';
 import { acknowledgeNoShowNotice, fetchNoShowSummary, needsAcknowledgement } from '../../../data/noShows';
 import {
@@ -35,6 +36,7 @@ import { SERVICE_SEPARATOR } from '../../../lib/bookingServices';
 import { serviceName } from '../shop/serviceGroups';
 import { SummaryRow } from './BookingSent';
 import type { CarDraft } from './carDraft';
+import { clearFleetBookingHint, fleetBookingHint } from './fleetBookingHint';
 import styles from './booking.module.css';
 
 const NOTE_MAX = 1000;
@@ -51,6 +53,8 @@ const SYMPTOMS_LINE_MAX = 300;
  * The client may let the shop see what was done on the car at other shops (T27), unticked by default.
  * For a constatare tehnică the note describes the symptoms: a selected symptom or a few words are
  * needed, and the selected ones go first in the note ("Simptome semnalate: …").
+ * A member of a company also picks among the company vehicles they may book (T63d), grouped under
+ * the company's name; such a booking's quote is approved by the company.
  */
 export function CarStep({
   shop,
@@ -81,7 +85,12 @@ export function CarStep({
 }) {
   const { t, lang } = useI18n();
   const session = useSession();
-  const { state, reload } = useLoad(fetchCars);
+  const load = useCallback(async () => {
+    // The company vehicles never stop a personal booking: without them, the garage as before.
+    const [cars, companies] = await Promise.all([fetchCars(), fetchBookableVehicles().catch((): BookableCompany[] => [])]);
+    return { cars, companies: companies.filter((c) => !c.read_only && c.vehicles.length > 0) };
+  }, []);
+  const { state, reload } = useLoad(load);
   const [yearTouched, setYearTouched] = useState(false);
   /** null, or why the phone must be confirmed first: the number of no-shows (T25). */
   const [phoneNeeded, setPhoneNeeded] = useState<number | null>(null);
@@ -104,21 +113,49 @@ export function CarStep({
   }, []);
   const set = (changes: Partial<CarDraft>) => onDraft({ ...draft, ...changes });
 
+  // "Programează la service" from a company vehicle: that vehicle is picked, once nothing else is.
+  const loaded = state.status === 'ready' ? state.data : null;
+  useEffect(() => {
+    if (!loaded || draft.carId || draft.companyVehicleId || draft.manual) return;
+    const hint = fleetBookingHint();
+    if (hint && loaded.companies.some((c) => c.vehicles.some((v) => v.id === hint))) onDraft({ ...draft, companyVehicleId: hint });
+    // Only when the vehicles arrive.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loaded]);
+
   if (state.status === 'loading') return <SkeletonList count={2} />;
   if (state.status === 'error') return <LoadError message={t('booking.car.loadError')} onRetry={reload} />;
 
-  const cars = state.data;
-  const manual = draft.manual || cars.length === 0;
-  const picked = manual ? null : (cars.find((c) => c.id === draft.carId) ?? null);
+  const { cars, companies } = state.data;
+  const manual = draft.manual || (cars.length === 0 && companies.length === 0);
+  const vehicle = manual || !draft.companyVehicleId ? null : (companies.flatMap((c) => c.vehicles).find((v) => v.id === draft.companyVehicleId) ?? null);
+  const picked = manual || vehicle ? null : (cars.find((c) => c.id === draft.carId) ?? null);
   const yearProblem = manual && !isValidCarYear(draft.year) ? t('car.yearInvalid', { max: carYearMax() }) : null;
   const typedOk = draft.make.trim() !== '' && draft.model.trim() !== '' && !yearProblem;
   const described = !unsure || unsureDescribed(symptoms, draft.note);
-  const ready = (manual ? typedOk : picked !== null) && described && (ackNeeded === null || acked);
+  const ready = (manual ? typedOk : picked !== null || vehicle !== null) && described && (ackNeeded === null || acked);
   const symptomNames = symptoms.map((s) => t(`booking.symptom.${s}`));
   const symptomsLine = symptomNames.length
     ? t('booking.unsure.notePrefix', { symptoms: symptomNames.map(lowerFirst).join(', ') })
     : null;
-  const carText = manual ? typedCarText(draft) : picked ? carLabel(picked) : '';
+  const carText = manual ? typedCarText(draft) : vehicle ? carLabel(vehicle) : picked ? carLabel(picked) : '';
+
+  function otherOption() {
+    return (
+      <li>
+        <button
+          type="button"
+          className={`${styles.option} ${styles.dashed} ${manual ? styles.optionOn : ''}`}
+          aria-pressed={manual}
+          onClick={() => set({ manual: true, carId: null, companyVehicleId: null })}
+        >
+          <Plus size={18} className={styles.optionIcon} aria-hidden="true" />
+          <span className={styles.optionText}>{t('booking.car.other')}</span>
+          {manual && <Check size={18} className={styles.check} aria-hidden="true" />}
+        </button>
+      </li>
+    );
+  }
 
   async function send(requestId: string) {
     const typedYear = draft.year.trim();
@@ -131,7 +168,9 @@ export function CarStep({
           extraServiceIds: services.slice(1).map((x) => x.id),
           date: day,
           slot: time,
-          car: manual
+          car: vehicle
+            ? { companyVehicleId: vehicle.id }
+            : manual
             ? {
                 car: {
                   make: draft.make.trim(),
@@ -146,6 +185,7 @@ export function CarStep({
         },
         requestId,
       );
+      if (vehicle) clearFleetBookingHint();
       onSent(booking, carText);
     } catch (e) {
       // The day filled up or the time went while the screen was open: back to a fresh calendar.
@@ -177,10 +217,15 @@ export function CarStep({
           </h2>
           <ul className={styles.options}>
             {cars.map((c) => {
-              const on = !manual && c.id === draft.carId;
+              const on = !manual && !vehicle && c.id === draft.carId;
               return (
                 <li key={c.id}>
-                  <button type="button" className={`${styles.option} ${on ? styles.optionOn : ''}`} aria-pressed={on} onClick={() => set({ carId: c.id, manual: false })}>
+                  <button
+                    type="button"
+                    className={`${styles.option} ${on ? styles.optionOn : ''}`}
+                    aria-pressed={on}
+                    onClick={() => set({ carId: c.id, companyVehicleId: null, manual: false })}
+                  >
                     <CarIcon size={18} className={styles.optionIcon} aria-hidden="true" />
                     <span className={styles.optionText}>
                       <span className={styles.carName}>
@@ -193,21 +238,44 @@ export function CarStep({
                 </li>
               );
             })}
-            <li>
-              <button
-                type="button"
-                className={`${styles.option} ${styles.dashed} ${manual ? styles.optionOn : ''}`}
-                aria-pressed={manual}
-                onClick={() => set({ manual: true, carId: null })}
-              >
-                <Plus size={18} className={styles.optionIcon} aria-hidden="true" />
-                <span className={styles.optionText}>{t('booking.car.other')}</span>
-                {manual && <Check size={18} className={styles.check} aria-hidden="true" />}
-              </button>
-            </li>
+            {otherOption()}
           </ul>
         </section>
       )}
+
+      {companies.map((co) => (
+        <section key={co.company_id} aria-labelledby={`company-cars-${co.company_id}`}>
+          <h2 id={`company-cars-${co.company_id}`} className={styles.groupTitle}>
+            <Building2 size={16} aria-hidden="true" className={styles.groupIcon} /> {co.company_name}
+          </h2>
+          <ul className={styles.options}>
+            {co.vehicles.map((v) => {
+              const on = !manual && vehicle?.id === v.id;
+              return (
+                <li key={v.id}>
+                  <button
+                    type="button"
+                    className={`${styles.option} ${on ? styles.optionOn : ''}`}
+                    aria-pressed={on}
+                    onClick={() => set({ companyVehicleId: v.id, carId: null, manual: false })}
+                  >
+                    <CarIcon size={18} className={styles.optionIcon} aria-hidden="true" />
+                    <span className={styles.optionText}>
+                      <span className={styles.carName}>
+                        {v.make} {v.model} {v.year && <span className={styles.muted}>{v.year}</span>}
+                      </span>
+                      {v.plate && <span className={`mono ${styles.plate}`}>{v.plate}</span>}
+                    </span>
+                    {on && <Check size={18} className={styles.check} aria-hidden="true" />}
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+          {vehicle && co.vehicles.some((v) => v.id === vehicle.id) && <p className={`${styles.muted} ${styles.companyNote}`}>{t('booking.car.companyNote')}</p>}
+        </section>
+      ))}
+      {cars.length === 0 && companies.length > 0 && <ul className={styles.options}>{otherOption()}</ul>}
 
       {manual && (
         <Card className={styles.form}>

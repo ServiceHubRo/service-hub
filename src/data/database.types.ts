@@ -162,6 +162,8 @@ export type Database = {
           client_name: string | null
           client_phone: string | null
           closed_reason: string | null
+          company_id: string | null
+          company_vehicle_id: string | null
           confirmed_at: string | null
           cost: number | null
           created_at: string
@@ -214,6 +216,8 @@ export type Database = {
           client_name?: string | null
           client_phone?: string | null
           closed_reason?: string | null
+          company_id?: string | null
+          company_vehicle_id?: string | null
           confirmed_at?: string | null
           cost?: number | null
           created_at?: string
@@ -266,6 +270,8 @@ export type Database = {
           client_name?: string | null
           client_phone?: string | null
           closed_reason?: string | null
+          company_id?: string | null
+          company_vehicle_id?: string | null
           confirmed_at?: string | null
           cost?: number | null
           created_at?: string
@@ -317,6 +323,20 @@ export type Database = {
             columns: ["client_id"]
             isOneToOne: false
             referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bookings_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bookings_company_vehicle_id_fkey"
+            columns: ["company_vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "company_vehicles"
             referencedColumns: ["id"]
           },
           {
@@ -662,6 +682,71 @@ export type Database = {
           },
           {
             foreignKeyName: "company_members_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      company_quote_decisions: {
+        Row: {
+          amount: number
+          booking_id: string
+          company_id: string
+          created_at: string
+          decision: string
+          id: number
+          quote_id: string
+          role: string
+          user_id: string | null
+        }
+        Insert: {
+          amount: number
+          booking_id: string
+          company_id: string
+          created_at?: string
+          decision: string
+          id?: never
+          quote_id: string
+          role: string
+          user_id?: string | null
+        }
+        Update: {
+          amount?: number
+          booking_id?: string
+          company_id?: string
+          created_at?: string
+          decision?: string
+          id?: never
+          quote_id?: string
+          role?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_quote_decisions_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "company_quote_decisions_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "company_quote_decisions_quote_id_fkey"
+            columns: ["quote_id"]
+            isOneToOne: false
+            referencedRelation: "quotes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "company_quote_decisions_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
@@ -1966,6 +2051,7 @@ export type Database = {
           created_at: string
           decided_at: string | null
           decided_by: string | null
+          decided_by_user: string | null
           est_hours: number | null
           expires_at: string | null
           expiry_reminded_at: string | null
@@ -1988,6 +2074,7 @@ export type Database = {
           created_at?: string
           decided_at?: string | null
           decided_by?: string | null
+          decided_by_user?: string | null
           est_hours?: number | null
           expires_at?: string | null
           expiry_reminded_at?: string | null
@@ -2010,6 +2097,7 @@ export type Database = {
           created_at?: string
           decided_at?: string | null
           decided_by?: string | null
+          decided_by_user?: string | null
           est_hours?: number | null
           expires_at?: string | null
           expiry_reminded_at?: string | null
@@ -2033,6 +2121,13 @@ export type Database = {
             columns: ["booking_id"]
             isOneToOne: false
             referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quotes_decided_by_user_fkey"
+            columns: ["decided_by_user"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
           {
@@ -3697,6 +3792,8 @@ export type Database = {
           client_name: string | null
           client_phone: string | null
           closed_reason: string | null
+          company_id: string | null
+          company_vehicle_id: string | null
           confirmed_at: string | null
           cost: number | null
           created_at: string
@@ -4008,6 +4105,8 @@ export type Database = {
           client_name: string | null
           client_phone: string | null
           closed_reason: string | null
+          company_id: string | null
+          company_vehicle_id: string | null
           confirmed_at: string | null
           cost: number | null
           created_at: string
@@ -4191,6 +4290,8 @@ export type Database = {
           client_name: string | null
           client_phone: string | null
           closed_reason: string | null
+          company_id: string | null
+          company_vehicle_id: string | null
           confirmed_at: string | null
           cost: number | null
           created_at: string
@@ -4266,6 +4367,8 @@ export type Database = {
           client_name: string | null
           client_phone: string | null
           closed_reason: string | null
+          company_id: string | null
+          company_vehicle_id: string | null
           confirmed_at: string | null
           cost: number | null
           created_at: string
@@ -4319,6 +4422,7 @@ export type Database = {
         Args: {
           p_car?: Json
           p_car_id?: string
+          p_company_vehicle_id?: string
           p_date: string
           p_extra_service_ids?: string[]
           p_note?: string
@@ -4343,6 +4447,8 @@ export type Database = {
           client_name: string | null
           client_phone: string | null
           closed_reason: string | null
+          company_id: string | null
+          company_vehicle_id: string | null
           confirmed_at: string | null
           cost: number | null
           created_at: string
@@ -4405,6 +4511,7 @@ export type Database = {
           created_at: string
           decided_at: string | null
           decided_by: string | null
+          decided_by_user: string | null
           est_hours: number | null
           expires_at: string | null
           expiry_reminded_at: string | null
@@ -4450,6 +4557,8 @@ export type Database = {
           client_name: string | null
           client_phone: string | null
           closed_reason: string | null
+          company_id: string | null
+          company_vehicle_id: string | null
           confirmed_at: string | null
           cost: number | null
           created_at: string
@@ -4511,6 +4620,8 @@ export type Database = {
           client_name: string | null
           client_phone: string | null
           closed_reason: string | null
+          company_id: string | null
+          company_vehicle_id: string | null
           confirmed_at: string | null
           cost: number | null
           created_at: string
@@ -4597,13 +4708,89 @@ export type Database = {
         Args: { p_member: string; p_request_id: string; p_vehicle: string }
         Returns: Json
       }
+      fleet_bookable_vehicles: { Args: never; Returns: Json }
       fleet_can: {
         Args: { p_capability: string; p_company: string }
         Returns: boolean
       }
+      fleet_decide_quote: {
+        Args: {
+          p_approved_item_ids: string[]
+          p_booking_id: string
+          p_quote_id: string
+          p_request_id: string
+        }
+        Returns: {
+          cancel_reason: string | null
+          cancelled_at: string | null
+          cancelled_by: string | null
+          car_id: string | null
+          car_snapshot: Json
+          checked_by: string | null
+          claimed_at: string | null
+          client_email: string | null
+          client_id: string | null
+          client_lang: string
+          client_name: string | null
+          client_phone: string | null
+          closed_reason: string | null
+          company_id: string | null
+          company_vehicle_id: string | null
+          confirmed_at: string | null
+          cost: number | null
+          created_at: string
+          date: string
+          decline_reason: string | null
+          done_at: string | null
+          extra_service_ids: string[]
+          followup_sent_at: string | null
+          id: string
+          inspection_started_at: string | null
+          intake_confirmed_at: string | null
+          intake_sent_at: string | null
+          invite_sent_at: string | null
+          invite_token: string | null
+          loyalty_level: number | null
+          loyalty_percent: number | null
+          note: string | null
+          odometer: number | null
+          offer_kind: string | null
+          offer_percent: number | null
+          quote_number: number | null
+          ref: string
+          reminder_sent_at: string | null
+          service_id: string
+          share_history: boolean
+          share_history_at: string | null
+          shop_id: string
+          slot: string
+          source: string
+          started_at: string | null
+          status: string
+          status_changed_at: string
+          updated_at: string
+          warranty_months: number | null
+          warranty_until: string | null
+          work: string | null
+          work_by: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "bookings"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       fleet_has_feature: {
         Args: { p_company: string; p_feature: string }
         Returns: boolean
+      }
+      fleet_job_json: {
+        Args: {
+          b: Database["public"]["Tables"]["bookings"]["Row"]
+          p_money: boolean
+        }
+        Returns: Json
       }
       fleet_overview: { Args: { p_company: string }; Returns: Json }
       fleet_plan_summary: { Args: { p_company: string }; Returns: Json }
@@ -4682,6 +4869,7 @@ export type Database = {
           created_at: string
           decided_at: string | null
           decided_by: string | null
+          decided_by_user: string | null
           est_hours: number | null
           expires_at: string | null
           expiry_reminded_at: string | null
@@ -4852,6 +5040,8 @@ export type Database = {
           client_name: string | null
           client_phone: string | null
           closed_reason: string | null
+          company_id: string | null
+          company_vehicle_id: string | null
           confirmed_at: string | null
           cost: number | null
           created_at: string
@@ -4913,6 +5103,8 @@ export type Database = {
           client_name: string | null
           client_phone: string | null
           closed_reason: string | null
+          company_id: string | null
+          company_vehicle_id: string | null
           confirmed_at: string | null
           cost: number | null
           created_at: string
@@ -4983,6 +5175,8 @@ export type Database = {
           client_name: string | null
           client_phone: string | null
           closed_reason: string | null
+          company_id: string | null
+          company_vehicle_id: string | null
           confirmed_at: string | null
           cost: number | null
           created_at: string
@@ -5224,6 +5418,8 @@ export type Database = {
           client_name: string | null
           client_phone: string | null
           closed_reason: string | null
+          company_id: string | null
+          company_vehicle_id: string | null
           confirmed_at: string | null
           cost: number | null
           created_at: string
@@ -5569,6 +5765,8 @@ export type Database = {
           client_name: string | null
           client_phone: string | null
           closed_reason: string | null
+          company_id: string | null
+          company_vehicle_id: string | null
           confirmed_at: string | null
           cost: number | null
           created_at: string
@@ -5743,6 +5941,8 @@ export type Database = {
           client_name: string | null
           client_phone: string | null
           closed_reason: string | null
+          company_id: string | null
+          company_vehicle_id: string | null
           confirmed_at: string | null
           cost: number | null
           created_at: string
@@ -5838,6 +6038,8 @@ export type Database = {
           client_name: string | null
           client_phone: string | null
           closed_reason: string | null
+          company_id: string | null
+          company_vehicle_id: string | null
           confirmed_at: string | null
           cost: number | null
           created_at: string
@@ -5933,6 +6135,8 @@ export type Database = {
           client_name: string | null
           client_phone: string | null
           closed_reason: string | null
+          company_id: string | null
+          company_vehicle_id: string | null
           confirmed_at: string | null
           cost: number | null
           created_at: string
@@ -6008,6 +6212,8 @@ export type Database = {
           client_name: string | null
           client_phone: string | null
           closed_reason: string | null
+          company_id: string | null
+          company_vehicle_id: string | null
           confirmed_at: string | null
           cost: number | null
           created_at: string
@@ -6074,6 +6280,8 @@ export type Database = {
           client_name: string | null
           client_phone: string | null
           closed_reason: string | null
+          company_id: string | null
+          company_vehicle_id: string | null
           confirmed_at: string | null
           cost: number | null
           created_at: string
@@ -6218,6 +6426,8 @@ export type Database = {
           client_name: string | null
           client_phone: string | null
           closed_reason: string | null
+          company_id: string | null
+          company_vehicle_id: string | null
           confirmed_at: string | null
           cost: number | null
           created_at: string
@@ -6279,6 +6489,8 @@ export type Database = {
           client_name: string | null
           client_phone: string | null
           closed_reason: string | null
+          company_id: string | null
+          company_vehicle_id: string | null
           confirmed_at: string | null
           cost: number | null
           created_at: string
@@ -6480,6 +6692,8 @@ export type Database = {
           client_name: string | null
           client_phone: string | null
           closed_reason: string | null
+          company_id: string | null
+          company_vehicle_id: string | null
           confirmed_at: string | null
           cost: number | null
           created_at: string

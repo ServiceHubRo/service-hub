@@ -581,3 +581,17 @@
     width: 100%;
   }
 }
+
+/* A company car's quote (T63d): answered in the company's fleet space. */
+.companyQuote {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.companyQuote p {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}

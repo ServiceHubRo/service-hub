@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import type { VehicleFields } from '../../data/fleet';
+import type { Booking } from '../../data/rpc';
 import { can, type FleetCapability, type FleetOverview, type FleetPlanSummary, type FleetSubscriptionView, type FleetVehicle } from '../../lib/fleet';
 
 /**
@@ -8,8 +9,8 @@ import { can, type FleetCapability, type FleetOverview, type FleetPlanSummary, t
  * member may do, and the way to another fleet page. The design preview fills it from sample data;
  * stage 3 fills it from `fleet_overview()` (docs/FLEET_PLAN.md).
  */
-export type FleetSection = 'panou' | 'vehicule' | 'vehicul' | 'costuri' | 'rapoarte' | 'membri' | 'abonament';
-export const FLEET_SECTIONS: readonly FleetSection[] = ['panou', 'vehicule', 'vehicul', 'costuri', 'rapoarte', 'membri', 'abonament'];
+export type FleetSection = 'panou' | 'vehicule' | 'vehicul' | 'programari' | 'costuri' | 'cont' | 'rapoarte' | 'membri' | 'abonament';
+export const FLEET_SECTIONS: readonly FleetSection[] = ['panou', 'vehicule', 'vehicul', 'programari', 'costuri', 'cont', 'rapoarte', 'membri', 'abonament'];
 
 export interface FleetLink {
   section: FleetSection;
@@ -24,6 +25,10 @@ export interface FleetActions {
   archiveVehicle: (vehicleId: string, archived: boolean, requestId: string) => Promise<void>;
   assignDriver: (vehicleId: string, memberId: string | null, requestId: string) => Promise<void>;
   setUnavailable: (vehicleId: string, unavailable: boolean, requestId: string) => Promise<void>;
+  /** The company's answer to a quote (T63d). */
+  decideQuote: (bookingId: string, quoteId: string, approvedItemIds: string[], requestId: string) => Promise<Booking>;
+  /** "Programează la service": the search, with this vehicle picked on the car step. */
+  book: (vehicleId: string | null) => void;
 }
 
 export interface FleetContextValue {

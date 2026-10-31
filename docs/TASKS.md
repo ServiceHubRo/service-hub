@@ -1478,3 +1478,15 @@ Notă (31 oct): Eduard a aprobat politica de acces (7 zile de grație, apoi doar
 - Rămas: notificările înainte de sfârșitul testului (au sens când pornim plățile), plata (T64b, aprobare separată), facturile fiscale (T64c, cu T14b).
 
 - [x] Făcut
+
+### T63d — Programările firmei și aprobarea devizelor ✅
+- Migrarea `fleet_bookings` (schema 95), aprobată de Eduard pe 31 oct („Da. Dar vezi că doar administratorul are voie să modifice chestii importante în cont. La fel ca la service”): datele firmei, membrii, limita de aprobare, bugetele și abonamentul rămân doar ale administratorului (verificat în baza de date și în teste).
+- **Programarea:** la pasul „Mașina” apar și vehiculele firmei, sub numele firmei. Administratorul și managerul programează orice vehicul activ, șoferul doar vehiculul lui, contabilul niciunul. „Programează la service” (Programări, pagina vehiculului) deschide căutarea cu vehiculul deja ales. Pentru service e o programare obișnuită; mesajele sunt ale celui care a programat.
+- **Limite pentru firme** (Setări platformă): 100 de programări active, 20 la același service, 30 noi în 24 de ore. Programările firmei nu mai intră în limitele personale. Un vehicul are o singură programare activă la un service, oricine din firmă ar programa.
+- **Aprobarea:** devizul unei mașini de firmă îl aprobă doar administratorul sau managerul (managerul până la limita firmei; peste ea: „Suma depășește limita ta de aprobare”). Șoferul care a programat nu îl poate aproba, nici ocolind aplicația. Fiecare decizie e scrisă: cine, ce, cât, când (jurnalul firmei).
+- **Ecrane:** meniul flotei are 5 pagini — Panou, Vehicule, Programări, Costuri, Cont (Rapoarte, Membri și roluri, Abonament și facturare și Pagina firmei sunt țigle în Cont). Programări: un singur buton „Filtre” (stare, vehicul, service) lângă „Programează la service”; devizele de aprobat primele, deschise în programare, cu același panou de deviz ca la clienți. Șoferul vede programările vehiculului lui, fără sume.
+- **În Programările personale:** o programare de firmă scrie „Mașină de firmă”; când devizul așteaptă: „Devizul îl aprobă firma, în spațiul flotei.” și „Deschide flota”. Nu intră în numărul de devize de pe meniu.
+- Teste: `tests/sql/137_fleet_bookings.sql` (rolurile, vehiculul șoferului, limitele firmei, citirea pe roluri, ocolirea prin `decide_quote`, limita managerului, jurnalul, flotele oprite), `tests/e2e/fleet-space.spec.ts` (șoferul programează, managerul aprobă o parte în limită; 390/820/1440, RO și EN), `tests/unit/fleet.test.ts`.
+- Rămas: „cere modificări” la deviz și anularea de către manager a programării făcute de șofer (după ce le vezi în folosire), notificările flotei (T63g: manager anunțat când vine un deviz), cheltuieli și documente (T63e).
+
+- [x] Făcut

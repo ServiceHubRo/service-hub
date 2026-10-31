@@ -6,7 +6,7 @@ import { reportSessionLost } from './sessionEvents';
 import { addBreadcrumb, captureError } from '../lib/monitoring';
 import { authStorage, rememberMe } from '../lib/remember';
 import { supabase } from './supabase';
-import { formatDate, formatKm } from '../i18n/format';
+import { formatDate, formatKm, formatMoney } from '../i18n/format';
 import { ro, type MessageKey } from '../i18n/ro';
 import { plural, translate, type Lang } from '../i18n/translate';
 
@@ -196,6 +196,11 @@ export const RPC_ERROR_CODES = [
   'fleet_member_limit',
   'plan_feature_missing',
   'plan_not_found',
+  'fleet_use_company_approval',
+  'fleet_over_limit',
+  'fleet_limit_active_shop',
+  'fleet_limit_active_total',
+  'fleet_limit_daily',
 ] as const;
 
 export type RpcErrorCode = (typeof RPC_ERROR_CODES)[number] | 'network' | 'unknown';
@@ -327,6 +332,8 @@ export function rpcErrorMessage(lang: Lang, error: unknown): string {
         ? translate(lang, 'rpcError.vehicle_invalid_field', { field: translate(lang, label) })
         : translate(lang, 'rpcError.vehicle_invalid');
     }
+    case 'fleet_over_limit':
+      return translate(lang, 'rpcError.fleet_over_limit', { limit: formatMoney(lang, num(p.limit) ?? 0) });
     case 'quote_item_invalid':
       return num(p.position) === null
         ? translate(lang, 'rpcError.quote_item_invalid')
@@ -611,7 +618,8 @@ export interface CreateBookingInput {
   extraServiceIds?: string[];
   date: string; // YYYY-MM-DD
   slot: string; // HH:MM
-  car: { carId: string } | { car: CarInput; saveCar: boolean };
+  /** A garage car, a typed car, or one of a company's vehicles (T63d). */
+  car: { carId: string } | { car: CarInput; saveCar: boolean } | { companyVehicleId: string };
   note?: string;
 }
 
@@ -625,7 +633,9 @@ export function createBooking(input: CreateBookingInput, requestId: string): Pro
     p_request_id: requestId,
     ...('carId' in car
       ? { p_car_id: car.carId }
-      : { p_car: car.car as unknown as Json, p_save_car: car.saveCar }),
+      : 'companyVehicleId' in car
+        ? { p_company_vehicle_id: car.companyVehicleId }
+        : { p_car: car.car as unknown as Json, p_save_car: car.saveCar }),
     p_note: input.note,
     p_extra_service_ids: input.extraServiceIds ?? [],
   });

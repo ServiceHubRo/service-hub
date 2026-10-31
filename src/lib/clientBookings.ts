@@ -124,7 +124,10 @@ export function reviewToAsk<T extends { id: string; status: BookingStatus; done_
   return open[0] ? { booking: open[0], count: open.length } : null;
 }
 
-/** Quotes waiting for the client's decision (the badge on the Programări tab). */
-export function quotesWaiting(bookings: readonly { status: BookingStatus }[]): number {
-  return bookings.filter((b) => b.status === 'quote_sent').length;
+/**
+ * Quotes waiting for the client's decision (the badge on the Programări tab). A company car's quote
+ * is the company's to decide (T63d), so it is not counted here.
+ */
+export function quotesWaiting(bookings: readonly { status: BookingStatus; company_id?: string | null }[]): number {
+  return bookings.filter((b) => b.status === 'quote_sent' && !b.company_id).length;
 }

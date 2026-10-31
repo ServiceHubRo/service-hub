@@ -104,9 +104,9 @@ export function FleetDashboard() {
         {kpi({ icon: CarFront, label: allowed('vehicles.viewAll') ? t('fleet.kpi.vehicles') : t('fleet.kpi.myVehicles'), value: String(k.vehicles), link: { section: 'vehicule' } })}
         {kpi({ icon: CheckCircle2, label: t('fleet.kpi.active'), value: String(k.active), link: { section: 'vehicule', filter: 'active' } })}
         {kpi({ icon: Wrench, label: t('fleet.kpi.inService'), value: String(k.inService), link: { section: 'vehicule', filter: 'in_service' }, tone: k.inService > 0 ? 'amber' : undefined })}
-        {kpi({ icon: CalendarClock, label: t('fleet.kpi.upcoming'), value: String(k.upcoming), link: { section: 'vehicule', filter: 'scheduled' } })}
+        {kpi({ icon: CalendarClock, label: t('fleet.kpi.upcoming'), value: String(k.upcoming), link: { section: 'programari', filter: 'active' } })}
         {(allowed('quotes.approve') || money) &&
-          kpi({ icon: ClipboardCheck, label: t('fleet.kpi.quotes'), value: String(k.quotesWaiting), link: { section: 'vehicule', filter: 'in_service' }, tone: k.quotesWaiting > 0 ? 'amber' : undefined })}
+          kpi({ icon: ClipboardCheck, label: t('fleet.kpi.quotes'), value: String(k.quotesWaiting), link: { section: 'programari', filter: 'approve' }, tone: k.quotesWaiting > 0 ? 'amber' : undefined })}
         {kpi({ icon: FileWarning, label: t('fleet.kpi.docs'), value: String(k.docsExpiring), link: { section: allowed('reports.view') ? 'rapoarte' : 'vehicule', filter: 'documents' }, tone: k.docsExpiring > 0 ? 'red' : undefined })}
         {money && (
           <>

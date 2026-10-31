@@ -1,4 +1,4 @@
-import { AlertTriangle, ArrowLeft, CalendarPlus, FileText, Info, ShieldCheck } from 'lucide-react';
+import { AlertTriangle, ArrowLeft, CalendarPlus, FileText, Info } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { Button } from '../../components/Button';
 import { Card } from '../../components/Card';
@@ -9,7 +9,6 @@ import { useI18n } from '../../i18n/context';
 import { formatDate, formatKm, formatMoney } from '../../i18n/format';
 import { CAR_DOCS } from '../../lib/expiry';
 import {
-  approvalDecision,
   buildLedger,
   documentStates,
   jobEndDay,
@@ -22,6 +21,7 @@ import {
 } from '../../lib/fleet';
 import { isActiveStatus } from '../../lib/status';
 import { JobStagePill, SourcePill, VehicleStatusPill } from './FleetPills';
+import { FleetQuoteCard } from './FleetQuoteCard';
 import { FleetVehicleForm } from './FleetVehicleForm';
 import { VehicleControls } from './VehicleControls';
 import { useFleet } from './fleetContext';
@@ -38,7 +38,7 @@ type Tab = 'overview' | 'history' | 'costs' | 'bookings' | 'quotes' | 'documents
  */
 export function FleetVehicle({ vehicleId }: { vehicleId: string }) {
   const { t, lang } = useI18n();
-  const { data, go, allowed, vehicle, mode } = useFleet();
+  const { data, go, allowed, vehicle, mode, actions } = useFleet();
   const [editing, setEditing] = useState(false);
   const v = vehicle(vehicleId);
   const [tab, setTab] = useState<Tab>('overview');
@@ -146,6 +146,13 @@ export function FleetVehicle({ vehicleId }: { vehicleId: string }) {
             ) : (
               <p className={styles.note}>{t('fleet.vehicle.nothingOpen')}</p>
             )}
+            {mode === 'live' && actions && allowed('bookings.create') && !v.archived_at && (
+              <div className={styles.actions}>
+                <Button variant="primary" onClick={() => actions.book(v.id)}>
+                  <CalendarPlus size={18} aria-hidden="true" /> {t('fleet.vehicle.book')}
+                </Button>
+              </div>
+            )}
             {mode === 'preview' && (
               <>
                 <div className={styles.actions}>
@@ -252,7 +259,7 @@ export function FleetVehicle({ vehicleId }: { vehicleId: string }) {
               <p className={styles.note}>{t('fleet.quotes.none')}</p>
             </Card>
           ) : (
-            quoted.map((j) => quoteCard(j))
+            quoted.map((j) => <FleetQuoteCard key={j.id} job={j} />)
           )}
         </div>
       )}
@@ -305,76 +312,6 @@ export function FleetVehicle({ vehicleId }: { vehicleId: string }) {
       )}
     </div>
   );
-
-  function quoteCard(job: FleetJob) {
-    const q = job.quote!;
-    const waiting = job.status === 'quote_sent';
-    const decision = approvalDecision(data.me.role, q.total_sent, data.company.manager_approval_limit);
-    return (
-      <Card key={job.id} className={styles.card}>
-        <div className={styles.cardHead}>
-          <h3 className={styles.cardTitle}>
-            {job.shop_name} · <span className="mono">{job.ref}</span>
-          </h3>
-          <JobStagePill stage={jobStage(job)} />
-        </div>
-        <ul className={styles.plainList}>
-          {q.items.map((i) => (
-            <li key={i.id} className={styles.lineRow}>
-              <span>
-                {i.name}
-                {i.kind && <span className={styles.muted}> · {t(`fleet.kind.${i.kind}`)}</span>}
-              </span>
-              {money && <span className="mono">{formatMoney(lang, i.price)}</span>}
-            </li>
-          ))}
-        </ul>
-        {money && (
-          <dl className={styles.quoteTotals}>
-            <div>
-              <dt>{t('fleet.quote.estimate')}</dt>
-              <dd className="mono">{formatMoney(lang, q.total_sent)}</dd>
-            </div>
-            <div>
-              <dt>{t('fleet.quote.approved')}</dt>
-              <dd className="mono">{q.total_approved === null ? '—' : formatMoney(lang, q.total_approved)}</dd>
-            </div>
-            <div>
-              <dt>{t('fleet.quote.final')}</dt>
-              <dd className="mono">{job.status === 'done' && job.cost !== null ? formatMoney(lang, job.cost) : '—'}</dd>
-            </div>
-          </dl>
-        )}
-        {q.decided_at && q.decided_by_member && (
-          <p className={styles.hintLine}>
-            <ShieldCheck size={14} aria-hidden="true" /> {t('fleet.quote.decidedBy', { name: memberName(q.decided_by_member), when: formatDate(lang, new Date(q.decided_at)) })}
-          </p>
-        )}
-        {waiting && (
-          <>
-            <p className={decision === 'allowed' ? styles.note : styles.warnLine}>
-              {decision === 'allowed'
-                ? t('fleet.quote.canApprove')
-                : decision === 'over_limit'
-                  ? t('fleet.quote.overLimit', { limit: formatMoney(lang, data.company.manager_approval_limit ?? 0) })
-                  : t('fleet.quote.cannotApprove')}
-            </p>
-            {decision === 'allowed' && mode === 'preview' && (
-              <div className={styles.actions}>
-                <Button variant="success" disabled title={t('fleet.preview.notSaved')}>
-                  {t('fleet.quote.approve')}
-                </Button>
-                <Button disabled title={t('fleet.preview.notSaved')}>{t('fleet.quote.changes')}</Button>
-                <Button variant="danger" disabled title={t('fleet.preview.notSaved')}>
-                  {t('fleet.quote.refuse')}
-                </Button>
-              </div>
-            )}
-          </>
-        )}
-      </Card>
-    );
-  }
 
   function historyItem(job: FleetJob) {
     const showMoney = money;

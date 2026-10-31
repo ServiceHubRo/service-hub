@@ -76,6 +76,7 @@ describe('partial approval (P15c)', () => {
 
   it('the tab badge counts quotes waiting for a decision', () => {
     expect(quotesWaiting([{ status: 'quote_sent' }, { status: 'approved' }, { status: 'quote_sent' }])).toBe(2);
+    expect(quotesWaiting([{ status: 'quote_sent' }, { status: 'quote_sent', company_id: 'co' }])).toBe(1);
   });
 });
 

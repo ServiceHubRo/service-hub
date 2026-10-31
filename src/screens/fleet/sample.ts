@@ -209,12 +209,15 @@ export function sampleFleet(now: Date = new Date()): FleetOverview {
       id,
       version: 1,
       status,
+      note: null,
+      inspection_fee: 0,
       total_sent: total,
       total_approved: status === 'accepted' ? total : null,
       sent_at: sent,
+      expires_at: null,
       decided_at: decided,
       decided_by_member: decided ? 'm2' : null,
-      items: lines.map(([name, price, kind], i) => ({ id: `${id}-${i}`, name, price, kind, approved: status === 'accepted' ? true : null })),
+      items: lines.map(([name, price, kind], i) => ({ id: `${id}-${i}`, position: i, name, price, kind, approved: status === 'accepted' ? true : null })),
     };
   }
 
