@@ -1378,6 +1378,16 @@ Cerut de Eduard pe 30 oct 2026, cu poze de pe PC („spațiu gol peste tot”): 
 
 - [x] Făcut
 
+## T59 — Stelele, cardul de recenzie și formularul „Adaugă programare” ✅
+
+Cerut de Eduard pe 30 oct 2026, cu poze: stelele unei recenzii „nu sunt întregi”, cardul de recenzie nu arăta bine, iar în „Adaugă programare” butonul stătea la mijlocul paginii.
+
+- **Stelele** (`Stars`, peste tot în aplicație): rândul portocaliu stătea cu 3 px mai jos decât conturul gri de sub el și era tăiat jos. Acum cele două rânduri se suprapun exact; stelele goale sunt pline, gri, fără contur. Tot aici: într-o coloană flex, stelele se întindeau pe toată lățimea și o notă de 4 apărea cu 5 stele pline; acum stelele au lățimea lor.
+- **Cardul de recenzie** (pagina service-ului): inițialele, numele și data în stânga, stelele, textul și răspunsul service-ului în dreapta, ca la Recenziile service-ului; pe telefon unul sub altul. Recenziile una sub alta: o singură recenzie nu mai e un card lat și gol.
+- **Adaugă programare:** pe ecran lat, ce se programează în stânga (client, mașină, serviciu, notă), ziua și ora cu butonul „Adaugă programarea” în dreapta, la vedere cât derulezi. Pe telefon: client, mașină, serviciu, notă, zi și oră, buton. Fără limita de 640 px între 1024 și 1279 px.
+
+- [x] Făcut
+
 ## T61 — Propozițiile umplu din nou rândul
 
 Cerut de Eduard pe 31 oct 2026 (pagina de start pe telefon: „mi-ai despărțit propozițiile și le-am pus de două rânduri fără logică și arată urat”). Doar stiluri, fără migrare, fără pachete noi.
