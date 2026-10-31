@@ -87,6 +87,14 @@ async function toQuote(shop: string, bookingId: string) {
   await rpcAs(shop, 'send_quote', { p_booking_id: bookingId, p_items: QUOTE, p_request_id: rid() });
 }
 
+/** To "În lucru": the quote sent, every line accepted by the client, the work started. */
+async function toWork(shop: string, client: string, bookingId: string) {
+  await toQuote(shop, bookingId);
+  const quote = await clientQuote(client, bookingId);
+  await rpcAs(client, 'decide_quote', { p_booking_id: bookingId, p_quote_id: quote.id, p_approved_item_ids: quote.items, p_request_id: rid() });
+  await rpcAs(shop, 'start_work', { p_booking_id: bookingId, p_request_id: rid() });
+}
+
 function plate(): string {
   const letters = Array.from({ length: 3 }, () => 'ABCDEFGHJKLMNPRSTUVWXZ'[Math.floor(Math.random() * 22)]).join('');
   return `BV ${10 + Math.floor(Math.random() * 89)} ${letters}`;
@@ -114,10 +122,10 @@ test.describe('quote, work, completion, review', () => {
     const { email: shop, shopId } = await createBookableShop(`Atelier T09 ${Date.now()}`, ['frane'], { inspection_fee: 100 });
     const client = await createUser('client');
     const [a, b, c] = await freeSlots(client, shopId, 3);
-    const carPlate = plate();
-    const accepted = await book(client, shopId, a!, carPlate);
-    const refused = await book(client, shopId, b!, carPlate);
-    const pendingBooking = await book(client, shopId, c!, carPlate);
+    // Three cars: one active booking per car at a shop (T60).
+    const accepted = await book(client, shopId, a!, plate());
+    const refused = await book(client, shopId, b!, plate());
+    const pendingBooking = await book(client, shopId, c!, plate());
     await toQuote(shop, accepted.id);
     await toQuote(shop, refused.id);
 
@@ -239,16 +247,12 @@ test.describe('quote, work, completion, review', () => {
     const client = await createUser('client');
     const [a, b] = await freeSlots(client, shopId, 2);
     const carPlate = plate();
+    // One active booking per car at a shop (T60): the car comes back once the first job is done.
     const first = await book(client, shopId, a!, carPlate);
-    const second = await book(client, shopId, b!, carPlate);
-    for (const id of [first.id, second.id]) await toQuote(shop, id);
-    // Accept every line of both quotes and start the work (as the client and the shop would).
-    for (const id of [first.id, second.id]) {
-      const quote = await clientQuote(client, id);
-      await rpcAs(client, 'decide_quote', { p_booking_id: id, p_quote_id: quote.id, p_approved_item_ids: quote.items, p_request_id: rid() });
-      await rpcAs(shop, 'start_work', { p_booking_id: id, p_request_id: rid() });
-    }
+    await toWork(shop, client, first.id);
     await rpcAs(shop, 'complete_job', { p_booking_id: first.id, p_odometer: 105400, p_request_id: rid() });
+    const second = await book(client, shopId, b!, carPlate);
+    await toWork(shop, client, second.id);
 
     await signIn(page, shop, PASSWORD);
     await expect(page).toHaveURL(/\/s\/panou$/);
@@ -278,16 +282,12 @@ test.describe('quote, work, completion, review', () => {
     const [a, b] = await freeSlots(client, shopId, 2);
     const carPlate = plate();
     const first = await book(client, shopId, a!, carPlate);
-    const second = await book(client, shopId, b!, carPlate);
-    for (const id of [first.id, second.id]) await toQuote(shop, id);
-    for (const id of [first.id, second.id]) {
-      const quote = await clientQuote(client, id);
-      await rpcAs(client, 'decide_quote', { p_booking_id: id, p_quote_id: quote.id, p_approved_item_ids: quote.items, p_request_id: rid() });
-      await rpcAs(shop, 'start_work', { p_booking_id: id, p_request_id: rid() });
-    }
+    await toWork(shop, client, first.id);
     await rpcAs(shop, 'complete_job', { p_booking_id: first.id, p_odometer: 105400, p_request_id: rid() });
     // That job was finished two months ago.
     await serviceRest(`bookings?id=eq.${first.id}`, 'PATCH', { done_at: new Date(Date.now() - 60 * 86_400_000).toISOString() });
+    const second = await book(client, shopId, b!, carPlate);
+    await toWork(shop, client, second.id);
 
     await signIn(page, shop, PASSWORD);
     await expect(page).toHaveURL(/\/s\/panou$/);

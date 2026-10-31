@@ -894,6 +894,8 @@ export const en: Record<MessageKey, string> = {
   'rpcError.already_reported': 'You already reported this review.',
   'rpcError.dispute_not_found': 'This dispute no longer exists.',
   'rpcError.dispute_window_closed': 'This no-show can no longer be disputed.',
+  'rpcError.car_already_booked': 'This car already has an active booking at this shop ({ref}, {when}). Add any extra work to it.',
+  'rpcError.car_booked_that_day': 'This car already has a booking at another shop on {date}. Pick another day.',
   'rpcError.no_show_ack_required': 'Confirm that you will come, then send the request again.',
   'rpcError.booking_not_found': 'This booking no longer exists.',
   'rpcError.cancel_deadline_passed': "You can't cancel less than {hours} before. Contact the shop.",

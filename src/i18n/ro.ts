@@ -892,6 +892,8 @@ export const ro = {
   'rpcError.already_reported': 'Ai raportat deja această recenzie.',
   'rpcError.dispute_not_found': 'Contestația nu mai există.',
   'rpcError.dispute_window_closed': 'Această neprezentare nu mai poate fi contestată.',
+  'rpcError.car_already_booked': 'Mașina are deja o programare activă la acest service ({ref}, {when}). Lucrările în plus se adaugă la ea.',
+  'rpcError.car_booked_that_day': 'Mașina are deja o programare la alt service pe {date}. Alege altă zi.',
   'rpcError.no_show_ack_required': 'Confirmă că vii la programare, apoi trimite cererea din nou.',
   'rpcError.booking_not_found': 'Programarea nu mai există.',
   'rpcError.cancel_deadline_passed': 'Nu mai poți anula cu mai puțin de {hours} înainte. Contactează service-ul.',

@@ -37,7 +37,8 @@ select test.logout();
 select test.login(test.id('client_a'));
 select set_config('test.b2', (public.create_booking(p_shop_id => test.id('shop1'), p_service_id => 'ulei',
   p_date => current_setting('test.day')::date, p_slot => '10:00', p_request_id => gen_random_uuid(),
-  p_car_id => (select id from public.cars where owner_id = test.id('client_a')), p_share_history => true)).id::text, true);
+  -- Another car (one car has one active booking at a shop, T60).
+  p_car => '{"make":"Dacia","model":"Logan","plate":"B 122 TWO"}', p_share_history => true)).id::text, true);
 select test.logout();
 select test.eq(share_history, false, 'off: a new booking is not shared') from public.bookings where id = current_setting('test.b2')::uuid;
 select test.login(test.id('client_a'));

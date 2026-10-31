@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
-import { BACKEND, PASSWORD, createBookableShop, createUser, expectNoHorizontalScroll, rpcAs, shot, signIn } from './support';
+import { BACKEND, PASSWORD, createBookableShop, createUser, expectNoHorizontalScroll, rpcAs, shot, signIn, uniquePlate } from './support';
 
 // T47: the new-booking chime. The shop hears it in the open app when a client's request arrives;
 // it is turned off (and tried with "Ascultă") per device in Cont → Notificări, under push. Every chime played
@@ -39,7 +39,7 @@ async function bookAs(client: string, shopId: string) {
     p_date: day,
     p_slot: slots.slots.find((s) => s.available)!.time,
     p_request_id: crypto.randomUUID(),
-    p_car: { make: 'Dacia', model: 'Logan', year: 2019, plate: 'BV 47 SNT' },
+    p_car: { make: 'Dacia', model: 'Logan', year: 2019, plate: uniquePlate() },
     p_save_car: false,
     p_note: 'Cerere cu sunet',
   });

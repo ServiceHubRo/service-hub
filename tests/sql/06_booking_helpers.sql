@@ -70,9 +70,10 @@ end
 $$;
 
 -- Books a slot through create_booking as the given client; returns the booking id.
--- Without a car id, a typed car with the given plate is used (not saved).
+-- Without a car id, a typed car with the given plate is used (not saved); without a plate, a plate
+-- of its own ("TST 3FA21C"), since one car has one active booking at a shop (T60).
 create function test.book(p_client uuid, p_shop uuid, p_date date, p_slot time,
-                          p_service text default 'ulei', p_plate text default 'BV 01 TST',
+                          p_service text default 'ulei', p_plate text default null,
                           p_car_id uuid default null) returns uuid
 language plpgsql
 as $$
@@ -84,7 +85,8 @@ begin
     p_shop_id => p_shop, p_service_id => p_service, p_date => p_date, p_slot => p_slot,
     p_request_id => gen_random_uuid(), p_car_id => p_car_id,
     p_car => case when p_car_id is null
-                  then jsonb_build_object('make', 'Dacia', 'model', 'Logan', 'plate', p_plate) end);
+                  then jsonb_build_object('make', 'Dacia', 'model', 'Logan',
+                         'plate', coalesce(p_plate, 'TST ' || upper(left(md5(random()::text), 6)))) end);
   perform test.logout();
   return v.id;
 end
