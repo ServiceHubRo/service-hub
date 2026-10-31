@@ -56,7 +56,7 @@ export function HoursSettings() {
   const hours = useLoad(loadHours);
 
   return (
-    <div className={styles.page}>
+    <div className={styles.page} data-layout="sections">
       <PageHeader back={{ to: SETTINGS_PATH, label: t('settings.title') }} title={t('settings.hours')} />
       <Section title={t('hours.week')} description={t('hours.sec.week.desc')}>
         {hours.state.status === 'loading' && <SkeletonList count={3} />}

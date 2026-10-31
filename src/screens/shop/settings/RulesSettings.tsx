@@ -150,7 +150,7 @@ export function RulesSettings() {
   }
 
   return (
-    <div className={styles.page}>
+    <div className={styles.page} data-layout="sections">
       <PageHeader back={{ to: SETTINGS_PATH, label: t('settings.title') }} title={t('settings.rules')} />
 
       <Section title={t('rules.sec.capacity')} description={t('rules.sec.capacity.desc')}>

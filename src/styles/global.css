@@ -112,6 +112,8 @@ textarea {
               takes the whole width and lays its content out across it (container queries).
    - tiles:   the links of Cont and Setări, 2–3 columns from 1024 px, equal height in a row.
    - columns: two halves of a page or a form, side by side.
+   - sections: a page of settings, its sections (Section) two side by side from 1280 px; whatever
+              is not a section (header, notice, save bar) takes the whole row.
    A title, the back link and a child with `data-span="all"` (an intro, a notice) take the whole row.
    `html` in front outranks the container's own one-column class from its CSS module. */
 @media (min-width: 1024px) {
@@ -142,6 +144,18 @@ textarea {
   }
 
   html [data-layout] > :is([data-span='all'], h1, h2, [data-back-bar]) {
+    grid-column: 1 / -1;
+  }
+
+  html [data-layout='sections'] {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: var(--space-10);
+    row-gap: var(--section-gap);
+    align-items: start;
+  }
+
+  html [data-layout='sections'] > :not(section) {
     grid-column: 1 / -1;
   }
 }

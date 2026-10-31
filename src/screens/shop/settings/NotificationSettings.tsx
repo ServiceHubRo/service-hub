@@ -32,7 +32,7 @@ export function NotificationSettings() {
   }
 
   return (
-    <div className={styles.page}>
+    <div className={styles.page} data-layout="sections">
       <PageHeader back={{ to: NAV.shop.account.path, label: t('nav.account') }} title={t('settings.notifications')} />
       <Section title={t('notif.sec.device')} description={t('notif.sec.device.desc')}>
         <PushRow />

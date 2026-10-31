@@ -38,20 +38,19 @@
   min-width: 0;
 }
 
-/* Desktop: the title column and the controls column, the same proportions on every page. */
-@media (min-width: 1024px) {
-  .section {
-    grid-template-columns: minmax(200px, 1fr) minmax(0, 2.6fr);
-    column-gap: var(--space-12);
-    align-items: start;
-  }
+/* The title and its sentence above the controls on every width (Eduard, 31 Oct 2026: on a computer
+   the title column stood empty under the title). The sentence keeps a reading width. */
+.description {
+  max-width: 65ch;
+}
 
-  .head {
-    padding-top: var(--space-4);
-  }
-
-  .description {
-    max-width: 32ch;
+/* A page of settings with `data-layout="sections"` (global.css) puts its sections two side by side
+   on a wide screen: there each one is a block of its own, without the hairline between them. */
+@media (min-width: 1280px) {
+  :global([data-layout='sections']) > .section + .section {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: 0;
   }
 }
 

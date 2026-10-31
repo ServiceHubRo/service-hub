@@ -2,6 +2,8 @@
   display: flex;
   flex-direction: column;
   gap: 14px;
+  /* The counters follow the width of the page, not of the screen (the sidebar takes its part). */
+  container-type: inline-size;
 }
 
 .hiddenTitle {
@@ -70,14 +72,22 @@
 }
 
 /* ---------------------------------------------------------------- counters (P8b, P8c): 3 → 6 in a row */
+/* Six counters: two per row where three would squeeze "În constatare" out of its box (320 px
+   phone), three per row from 330 px of page, all six on one row from 700 px. */
 .stats {
   list-style: none;
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
 }
 
-@media (min-width: 1024px) {
+@container (min-width: 330px) {
+  .stats {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@container (min-width: 700px) {
   .stats {
     grid-template-columns: repeat(6, minmax(0, 1fr));
   }
@@ -94,7 +104,7 @@
   flex-direction: column;
   gap: 2px;
   min-height: 96px;
-  padding: var(--space-4);
+  padding: var(--space-4) var(--space-3);
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-card);
@@ -150,7 +160,7 @@ a.stat:active {
   font-weight: 500;
   color: var(--text-2);
   line-height: 1.3;
-  padding-right: 12px;
+  overflow-wrap: break-word;
 }
 
 .statChevron {

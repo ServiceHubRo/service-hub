@@ -125,7 +125,7 @@ function BillingForm({ initial }: { initial: ShopBilling | null }) {
   }
 
   return (
-    <form ref={formRef} className={styles.page} noValidate onSubmit={(e) => e.preventDefault()}>
+    <form ref={formRef} className={styles.page} data-layout="sections" noValidate onSubmit={(e) => e.preventDefault()}>
       <Section title={t('billing.company')} description={t('billing.sec.company.desc')}>
         <Card className={styles.form}>
           <Field

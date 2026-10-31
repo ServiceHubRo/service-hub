@@ -11,9 +11,10 @@ export interface SectionProps {
 }
 
 /**
- * A group of settings (T51): on a desktop the title and its sentence on the left, the controls on
- * the right; on a phone the title above. Sections follow each other with a hairline between them, so
- * every page of settings has the same rhythm and the same left edge.
+ * A group of settings (T51): the title and its sentence above the controls on every width (T62).
+ * Sections follow each other with a hairline between them, so every page of settings has the same
+ * rhythm and the same left edge; a page with `data-layout="sections"` sets them two side by side on
+ * a wide screen.
  */
 export function Section({ title, description, id, children }: SectionProps) {
   const headingId = useId();
