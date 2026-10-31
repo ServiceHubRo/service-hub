@@ -39,6 +39,9 @@ const VerifyScreen = lazyChunk(() => import('../screens/public/VerifyScreen').th
 const ComponentGallery = lazyChunk(() =>
   import('../screens/dev/ComponentGallery').then((m) => ({ default: m.ComponentGallery })),
 );
+const FleetPreviewScreen = lazyChunk(() =>
+  import('../screens/fleet/FleetPreviewScreen').then((m) => ({ default: m.FleetPreviewScreen })),
+);
 
 function roleRoutes(role: Role) {
   const RoleApp = ROLE_APPS[role];
@@ -152,6 +155,17 @@ export function App({ location }: { location?: string }) {
                       element={
                         <ChunkBoundary>
                           <ComponentGallery />
+                        </ChunkBoundary>
+                      }
+                    />
+                  )}
+                  {/* T63a: the fleet account's design preview, sample data, nothing saved. */}
+                  {IS_TEST_BUILD && (
+                    <Route
+                      path="/dev/flota"
+                      element={
+                        <ChunkBoundary>
+                          <FleetPreviewScreen />
                         </ChunkBoundary>
                       }
                     />

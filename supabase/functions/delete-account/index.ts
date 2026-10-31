@@ -6,6 +6,8 @@
 //      'delete'    → the login is deleted; the database cascades the rest;
 //      'anonymize' → a shop with bookings or invoices keeps its records (required by law): the
 //                    login is closed for good — banned, email and password replaced.
+// 1b. T63b: the only admin of a company that has other members must hand the administration over
+//     first (`last_admin`): the company, its cars and history stay with its people.
 // 3. A shop owner's running Stripe subscription is cancelled first (T14), so the card is never
 //    charged again; if Stripe cannot be reached nothing is deleted and the app can try again.
 // Safe to retry: both steps give the same result the second time.
@@ -15,7 +17,7 @@ import { bearerToken, corsHeaders, json } from '../_shared/http.ts';
 import { reportError } from '../_shared/monitor.ts';
 
 /** Refusals the app translates (src/data/account.ts). */
-const KNOWN_CODES = new Set(['not_allowed', 'account_has_active_bookings', 'shop_has_active_bookings']);
+const KNOWN_CODES = new Set(['not_allowed', 'account_has_active_bookings', 'shop_has_active_bookings', 'last_admin']);
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
@@ -25,6 +27,9 @@ Deno.serve(async (req) => {
     const api = adminApi();
     const user = await api.userFromToken(bearerToken(req));
     if (!user) return json({ error: 'not_signed_in' }, 401);
+
+    const blockers = (await api.rpc('company_deletion_blockers', { p_user: user.id })) as unknown[] | null;
+    if (Array.isArray(blockers) && blockers.length > 0) return json({ error: 'last_admin' }, 409);
 
     let mode: unknown;
     try {

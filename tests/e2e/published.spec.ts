@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { PUBLISHED_PORT } from './ports';
+import { BACKEND, PASSWORD, createUser, openAccount, serviceRest, signIn } from './support';
 
 // The published site (not a deploy preview): real accounts only — the T01 role switch is gone —
 // and developer-only pages stay hidden.
@@ -53,4 +54,17 @@ test('published site: the public page carries its official address and structure
   expect(organization.url).toBe(canonical);
   expect(organization.email).toBe('contact@service-hub.ro');
   expect(html).toMatch(/<h1[^>]*>Programarea la service/);
+});
+
+test('published site: no companies tile in Cont and no fleet preview, even with fleets on (T63b)', async ({ page }) => {
+  await page.goto('/dev/flota');
+  await expect(page.getByRole('heading', { level: 1, name: 'Pagina nu există' })).toBeVisible();
+  test.skip(!BACKEND, 'the Cont check needs the local Supabase stack');
+  await serviceRest('platform_settings?id=eq.1', 'PATCH', { fleet_enabled: true });
+  const email = await createUser('client');
+  await signIn(page, email, PASSWORD);
+  await expect(page).toHaveURL(/\/c\/cauta/);
+  await openAccount(page);
+  await expect(page.getByRole('link', { name: /Date pentru deviz/ })).toBeVisible();
+  await expect(page.getByRole('link', { name: /Firmele mele/ })).toHaveCount(0);
 });

@@ -1425,3 +1425,34 @@ Cerut de Eduard pe 31 oct 2026, după auditul pe toate paginile (10 dimensiuni d
 - **Butoanele din carduri (a doua rundă):** „Trimite deviz” lua tot rândul și „Mai multe” rămânea singur dedesubt (un buton simplu primea lățimea direct, nu prin învelișul de la „În constatare”). Acum, pe telefon, acțiunea principală și „Mai multe” stau pe un rând, aceeași înălțime, cea principală ia spațiul liber; doar când nu încap (320 px, etichete lungi) fiecare ia un rând întreg. La fel pe cardurile clientului („Recenzie trimisă” pe rândul ei) și la panourile cu confirmare + „Renunță”. Pe telefon butoanele din aceste rânduri au 14 px lateral în loc de 18 (aceeași înălțime de 44 px).
 
 - [x] Făcut
+
+## T63 — Cont de flotă pentru firme
+
+Cerut de Eduard pe 31 oct 2026: firmele cu mai multe mașini își administrează flota în Service-Hub (vehicule, programări, devize aprobate de cine are dreptul, costuri, rapoarte, membri cu roluri). Planul complet, auditul și propunerea de bază de date: `docs/FLEET_PLAN.md`. Fiecare etapă cu migrare așteaptă aprobarea lui Eduard.
+
+### T63a — Audit, plan, calcule și previzualizare de design ✅
+- Audit al aplicației (ce se refolosește, ce lipsește, riscuri) și plan în 8 etape: `docs/FLEET_PLAN.md`. **Nicio migrare**, nimic schimbat în baza de date, în conturile existente sau în abonamente.
+- Calculele flotei în `src/lib/fleet/` (teste: `tests/unit/fleet.test.ts`): un singur registru de costuri — lucrarea finalizată se numără o dată, la costul final; devizul trimis sau aprobat nu e cheltuială; cheltuiala introdusă pentru o lucrare deja numărată și cea în altă monedă nu intră în totaluri. Cost pe km doar cu citiri de kilometraj verificabile (altfel spune motivul), buget (nimic când nu e setat), cost mediu pe vehicul (vehiculele din flotă în acea perioadă), statusul vehiculului numai din date sigure, drepturile fiecărui rol și limita de aprobare a managerului, ce primește fiecare rol de la server (șoferul: fără nicio sumă).
+- Previzualizare de design la `/dev/flota` (doar pe linkurile de test, ca galeria de componente): Panou, Vehicule, pagina vehiculului (8 secțiuni), Costuri (cu formularul de cheltuială), Rapoarte (6), Membri și roluri; rolul, datele (exemplu, firmă nouă, se încarcă, eroare) și pagina se aleg din pagină. Date inventate, marcate clar; nimic nu se salvează.
+- Decizii: flota e un spațiu în contul de client, nu un al patrulea rol (de aprobat, §2 R8 din plan); fără limită setată, managerul aprobă orice sumă (de aprobat); comparația perioadelor e cea din Rapoartele service-ului; prețurile planurilor sunt ipoteze, fără plăți.
+- Rămas: T63b (firme și membri), T63c (vehiculele firmei), T63d (programări și aprobări), T63e (cheltuieli, documente, rapoarte pe date reale), T63f (șofer și contabil), T63g (notificări, planuri), T63h (teste SQL și de browser, regresii).
+
+- [x] Făcut
+
+### T64 — Abonamentele flotelor (propunere)
+- Analiza abonamentelor existente și propunerea completă: `docs/FLEET_BILLING_PLAN.md` (planuri configurabile, vehicul activ, limite în baza de date, perioada de testare, ce se întâmplă la plată eșuată, expirare, anulare, upgrade și downgrade, schema, Stripe, facturare, admin, teste). **Niciun cod și nicio migrare.**
+- Abonamentele service-urilor și conturile personale nu se ating: tabele separate pentru firme, aceeași firmă Stripe, o ramură nouă în webhook.
+- Depinde de T63b/T63c (firmele și vehiculele lor) și, pentru plăți reale, de T14b (facturi fiscale, e-Factura).
+
+- [ ] Aprobat de Eduard
+
+Notă (31 oct): Eduard a aprobat politica de acces (7 zile de grație, apoi doar citire, devizele deja primite rămân de decis).
+
+### T63b — Firme și membri ✅
+- Migrarea `companies` (schema 91), aprobată de Eduard pe 31 oct: firma, membrii cu roluri, invitații prin link (14 zile, doar adresa invitată), ultimul administrator nu poate pleca sau renunța la rol, predarea administrării într-un pas, jurnal pentru fiecare schimbare. Totul refuzat până la comutatorul `platform_settings.fleet_enabled` (oprit).
+- Cont → „Firmele mele”: lista, „Creează o firmă”, pagina firmei (date, reguli și bugete, invită, echipa: rol, scoate, predă administrarea, ieși din firmă) și pagina invitației. **Doar pe linkurile de test**, cu comutatorul pornit; site-ul publicat nu arată nimic.
+- Ștergerea contului e refuzată cât ești singurul administrator al unei firme cu alți membri.
+- Teste: `tests/sql/134_companies.sql`, `tests/e2e/companies.spec.ts` (390/820/1440, RO și EN), `published.spec.ts` (fără firme pe site-ul publicat), testul de drepturi SQL = aplicație.
+- Rămas: emailul cu invitația (acum linkul se copiază), comutatorul Personal/Firmă și ecranele flotei pe date reale (T63c, cu vehiculele firmei).
+
+- [x] Făcut
