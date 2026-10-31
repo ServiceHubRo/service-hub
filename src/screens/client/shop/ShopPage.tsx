@@ -299,19 +299,26 @@ function ShopDetails({ page, day, onFavorite }: { page: ShopPageData; day: strin
               <ul className={styles.plainList}>
                 {page.reviews.map((r) => (
                   <li key={r.id}>
+                    {/* T59: who wrote it and when on the left, the stars and the words on the right
+                        (one under the other on a phone), like the shop's own Recenzii. */}
                     <Card className={styles.review}>
-                      <div className={styles.reviewHead}>
-                        <span className={styles.reviewer}>{r.display_name}</span>
-                        <span className={styles.muted}>{formatDayMonth(lang, new Date(r.created_at))}</span>
+                      <div className={styles.reviewAuthor}>
+                        <ShopAvatar name={r.display_name} logoUrl={null} size={40} />
+                        <div className={styles.reviewWho}>
+                          <p className={styles.reviewer}>{r.display_name}</p>
+                          <p className={styles.muted}>{formatDayMonth(lang, new Date(r.created_at))}</p>
+                        </div>
                       </div>
-                      <Stars value={r.rating} />
-                      {r.text && <p className={styles.reviewText}>{r.text}</p>}
-                      {r.reply && (
-                        <Card inset className={styles.reply}>
-                          <p className={styles.replyLabel}>{t('shop.reply')}</p>
-                          <p className={styles.reviewText}>{r.reply}</p>
-                        </Card>
-                      )}
+                      <div className={styles.reviewBody}>
+                        <Stars value={r.rating} size={16} />
+                        {r.text && <p className={styles.reviewText}>{r.text}</p>}
+                        {r.reply && (
+                          <Card inset className={styles.reply}>
+                            <p className={styles.replyLabel}>{t('shop.reply')}</p>
+                            <p className={styles.reviewText}>{r.reply}</p>
+                          </Card>
+                        )}
+                      </div>
                     </Card>
                   </li>
                 ))}

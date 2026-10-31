@@ -339,18 +339,30 @@
 .review {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 12px;
 }
 
-.reviewHead {
+.reviewAuthor {
   display: flex;
-  justify-content: space-between;
-  align-items: baseline;
+  align-items: center;
   gap: 12px;
+  min-width: 0;
+}
+
+.reviewWho {
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .reviewer {
   font-weight: 650;
+}
+
+.reviewBody {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
 }
 
 .reviewText {
@@ -466,10 +478,12 @@
     padding-block: 7px;
   }
 
-  /* The reviews side by side. */
-  .reviews .plainList {
+  /* A review on a wide page (T59): who and when on the left, the stars and the words across the
+     rest; one review under the other, so a single review is never a stretched, empty card. */
+  .review {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+    grid-template-columns: minmax(180px, 240px) minmax(0, 1fr);
     align-items: start;
+    column-gap: var(--space-8);
   }
 }
