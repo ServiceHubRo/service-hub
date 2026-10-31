@@ -8,6 +8,7 @@ import { LoadError } from '../../components/LoadError';
 import { PageHeader } from '../../components/PageHeader';
 import { SelectField } from '../../components/SelectField';
 import { SkeletonList } from '../../components/Skeleton';
+import { LogoTile } from '../../components/LogoTile';
 import { Wordmark } from '../../components/Wordmark';
 import { useI18n } from '../../i18n/context';
 import { FLEET_ROLES, scopeFor, type FleetExpense, type FleetRole } from '../../lib/fleet';
@@ -99,9 +100,18 @@ export function FleetPreviewScreen() {
   return (
     <FleetContext.Provider value={{ data, go, addExpense }}>
       <div className={styles.frame}>
+        {/* The same top bar as the app (AppShell): the logo and name on the left, the language on the right. */}
+        <header className={styles.topBar}>
+          <LogoTile />
+          <Wordmark />
+          <div className={styles.topBarEnd}>
+            <LangSwitch />
+          </div>
+        </header>
         <aside className={styles.side} aria-label={t('fleet.nav.label')}>
           <Link to="/" className={styles.sideBrand} aria-label={t('app.title')}>
-            <Wordmark />
+            <LogoTile size={32} />
+            <Wordmark size={19} />
           </Link>
           <SpaceSwitch company={data.company.name} />
           <nav className={styles.sideNav}>
@@ -112,6 +122,9 @@ export function FleetPreviewScreen() {
               </button>
             ))}
           </nav>
+          <div className={styles.sideBottom}>
+            <LangSwitch />
+          </div>
         </aside>
 
         <main id="fleet-main" className={styles.main}>
@@ -130,9 +143,6 @@ export function FleetPreviewScreen() {
                 onChange={(e) => update({ date: e.target.value })}
                 options={DATA_MODES.map((m) => ({ value: m, label: t(`fleet.preview.mode.${m}`) }))}
               />
-              <div className={styles.controlsLang}>
-                <LangSwitch />
-              </div>
             </div>
             <div className={styles.mobileSpace}>
               <SpaceSwitch company={data.company.name} />

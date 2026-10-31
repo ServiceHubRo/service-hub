@@ -962,7 +962,9 @@ button.kpi:hover {
 
 /* ---------------------------------------------------------------- preview frame */
 .frame {
-  height: 100%;
+  /* Like the app's shell: the space left under the offline and schema bars. */
+  flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
 }
@@ -996,19 +998,28 @@ button.kpi:hover {
   gap: 10px;
 }
 
-.controlsLang {
-  grid-column: 1 / -1;
-}
-
 @media (min-width: 768px) {
   .controls {
-    grid-template-columns: repeat(2, minmax(0, 220px)) auto;
+    grid-template-columns: repeat(2, minmax(0, 220px));
   }
+}
 
-  .controlsLang {
-    grid-column: auto;
-    justify-self: end;
-  }
+/* The app's top bar on phones and tablets (AppShell .header): logo and name left, language right. */
+.topBar {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 12px 8px 16px;
+  padding-top: max(8px, calc(var(--safe-top) + 4px));
+  background: var(--bg-deep);
+  border-bottom: 1px solid var(--border);
+}
+
+.topBarEnd {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
 }
 
 .spaceLine {
@@ -1116,7 +1127,8 @@ button.kpi:hover {
   }
 
   .bottomNav,
-  .mobileSpace {
+  .mobileSpace,
+  .topBar {
     display: none;
   }
 
@@ -1133,7 +1145,18 @@ button.kpi:hover {
   }
 
   .sideBrand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
     padding: 0 var(--space-2);
+    text-decoration: none;
+  }
+
+  /* The language at the foot of the sidebar, as in the app. */
+  .sideBottom {
+    margin-top: auto;
+    padding: var(--space-3) var(--space-2) 0;
+    border-top: 1px solid var(--border);
   }
 
   .side .space {
@@ -1189,6 +1212,7 @@ button.kpi:hover {
 }
 
 @media print {
+  .topBar,
   .side,
   .bottomNav,
   .controls,
