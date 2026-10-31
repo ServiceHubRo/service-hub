@@ -1445,3 +1445,11 @@ Cerut de Eduard pe 31 oct 2026: firmele cu mai multe mașini își administreaz�
 - Depinde de T63b/T63c (firmele și vehiculele lor) și, pentru plăți reale, de T14b (facturi fiscale, e-Factura).
 
 - [ ] Aprobat de Eduard
+
+Notă (31 oct): Eduard a aprobat politica de acces (7 zile de grație, apoi doar citire, devizele deja primite rămân de decis).
+
+### T63b — Firme și membri (migrare propusă)
+- Migrarea și testele: `docs/sql/proposed/` (nu sunt în `supabase/migrations`, deci nu ajung în Supabase). Verificate local: toate testele SQL existente + cele noi trec.
+- Firma, membrii cu roluri, invitații prin link (14 zile), ultimul administrator nu poate pleca, predarea administrării într-un pas, jurnal pentru fiecare schimbare. Totul oprit în producție până la comutatorul `fleet_enabled`.
+
+- [ ] Migrarea aprobată de Eduard
