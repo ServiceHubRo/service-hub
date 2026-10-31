@@ -46,7 +46,7 @@ select test.eq(public, false, 'reports bucket private') from storage.buckets whe
 
 -- Realtime publication.
 select test.eq(array_agg(tablename::text order by tablename),
-               array['bookings', 'company_members', 'company_vehicles', 'history_reports', 'invoices', 'messages', 'no_show_disputes', 'notices', 'profiles', 'reviews', 'shops', 'subscriptions', 'threads'],
+               array['bookings', 'company_members', 'company_subscriptions', 'company_vehicles', 'history_reports', 'invoices', 'messages', 'no_show_disputes', 'notices', 'profiles', 'reviews', 'shops', 'subscriptions', 'threads'],
                'realtime tables')
 from pg_publication_tables where pubname = 'supabase_realtime' and schemaname = 'public';
 
@@ -120,19 +120,20 @@ select test.eq(
     where has_function_privilege('authenticated', p.oid, 'execute')
       and not has_function_privilege('anon', p.oid, 'execute')),
   'accept_company_invite, acknowledge_no_show_notice, admin_create_category, admin_create_service, admin_decide_no_show_dispute, '
-  || 'admin_decide_review, admin_decide_suspect_review, admin_export, admin_extend_trial, admin_force_cancel, admin_get_booking, '
-  || 'admin_get_client, admin_get_shop, admin_get_thread, admin_grant_report_credit, admin_list_audit, admin_list_bookings, admin_list_catalog, '
-  || 'admin_list_clients, admin_list_company_checks, admin_list_history_reports, admin_list_no_show_disputes, admin_list_notices, '
-  || 'admin_list_reviews, admin_list_service_areas, admin_list_shops, admin_list_subscriptions, admin_list_suggestions, '
-  || 'admin_list_suspect_reviews, admin_move_catalog_item, admin_notice_preview, admin_overview, admin_send_notice, admin_set_account_suspended, '
-  || 'admin_set_area_mode, admin_set_notification_text, admin_set_service_reminder, admin_set_shop_suspended, admin_set_subscription_price, '
-  || 'admin_set_subscription_status, admin_set_suggestion_status, admin_update_category, admin_update_service, admin_update_settings, '
-  || 'admin_update_shop, admin_verify_phone, admin_void_history_report, admin_withdraw_notice, booking_thread, can_read_booking, can_read_notice, '
-  || 'can_read_shop, can_read_thread, cancel_booking, cancel_email_change, check_phone_code, claim_booking, client_no_show_count, company_role, '
-  || 'complete_job, complete_signup, confirm_booking, confirm_vehicle_intake, create_booking, create_company, decide_quote, decline_booking, '
-  || 'dispute_no_show, export_my_data, fleet_archive_vehicle, fleet_assign_driver, fleet_can, fleet_overview, fleet_role_can, fleet_save_vehicle, '
-  || 'fleet_set_unavailable, get_availability, get_shop_page, get_shop_setup, history_report_preview, invite_company_member, invite_staff, '
-  || 'is_admin, is_booking_shop_member, is_shop_member, is_shop_owner, is_shop_public, join_area_waitlist, join_slot_waitlist, '
+  || 'admin_decide_review, admin_decide_suspect_review, admin_export, admin_extend_company_trial, admin_extend_trial, admin_force_cancel, '
+  || 'admin_get_booking, admin_get_client, admin_get_shop, admin_get_thread, admin_grant_report_credit, admin_list_audit, admin_list_bookings, '
+  || 'admin_list_catalog, admin_list_clients, admin_list_company_checks, admin_list_fleet_companies, admin_list_history_reports, '
+  || 'admin_list_no_show_disputes, admin_list_notices, admin_list_reviews, admin_list_service_areas, admin_list_shops, admin_list_subscriptions, '
+  || 'admin_list_suggestions, admin_list_suspect_reviews, admin_move_catalog_item, admin_notice_preview, admin_overview, admin_send_notice, '
+  || 'admin_set_account_suspended, admin_set_area_mode, admin_set_company_plan, admin_set_notification_text, admin_set_service_reminder, '
+  || 'admin_set_shop_suspended, admin_set_subscription_price, admin_set_subscription_status, admin_set_suggestion_status, admin_update_category, '
+  || 'admin_update_fleet_plan, admin_update_service, admin_update_settings, admin_update_shop, admin_verify_phone, admin_void_history_report, '
+  || 'admin_withdraw_notice, booking_thread, can_read_booking, can_read_notice, can_read_shop, can_read_thread, cancel_booking, '
+  || 'cancel_email_change, check_phone_code, claim_booking, client_no_show_count, company_role, complete_job, complete_signup, confirm_booking, '
+  || 'confirm_vehicle_intake, create_booking, create_company, decide_quote, decline_booking, dispute_no_show, export_my_data, '
+  || 'fleet_archive_vehicle, fleet_assign_driver, fleet_can, fleet_overview, fleet_plan_summary, fleet_role_can, fleet_save_vehicle, '
+  || 'fleet_set_unavailable, fleet_subscription, get_availability, get_shop_page, get_shop_setup, history_report_preview, invite_company_member, '
+  || 'invite_staff, is_admin, is_booking_shop_member, is_shop_member, is_shop_owner, is_shop_public, join_area_waitlist, join_slot_waitlist, '
   || 'last_odometer_for_booking, leave_area_waitlist, leave_slot_waitlist, list_company_members, list_imported_jobs, list_service_areas, '
   || 'list_shop_bookings, list_shop_history, list_shop_staff, list_threads, mark_no_show, mark_thread_read, my_client_referrals, my_companies, '
   || 'my_fleet_access, my_imported_jobs, my_member_id, my_no_show_summary, my_phone_verification, my_quote_numbering, my_referrals, my_shop_id, '

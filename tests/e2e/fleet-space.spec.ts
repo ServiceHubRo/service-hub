@@ -1,5 +1,5 @@
-import { expect, test } from '@playwright/test';
-import { BACKEND, PASSWORD, createFleetUser, expectNoHorizontalScroll, rpcAs, shot, signIn, uniquePlate } from './support';
+import { expect, test, type Page } from '@playwright/test';
+import { BACKEND, PASSWORD, SEED, SEED_PASSWORD, createFleetUser, expectNoHorizontalScroll, rpcAs, serviceRest, shot, signIn, uniquePlate } from './support';
 
 // The company's fleet space (T63c): the admin opens the fleet from the company page, adds a vehicle
 // with the form (a plate already in the fleet is refused), assigns it to the driver, archives
@@ -7,6 +7,16 @@ import { BACKEND, PASSWORD, createFleetUser, expectNoHorizontalScroll, rpcAs, sh
 // money or the add button. Its own frame: top bar with the language, the five fleet pages.
 
 const name = () => test.info().project.name;
+
+/** The vehicle's sections: a dropdown on phones and tablets, tabs on a laptop. */
+async function openVehicleSection(page: Page, label: string) {
+  const select = page.getByRole('combobox', { name: 'Secțiunile vehiculului' });
+  const tab = page.getByRole('button', { name: new RegExp(label) });
+  // Wait for the vehicle page: one of the two is on screen once it is drawn.
+  await expect(select.or(tab).filter({ visible: true }).first()).toBeVisible();
+  if (await select.isVisible()) await select.selectOption({ label });
+  else await tab.click();
+}
 
 test.beforeEach(async ({ context }) => {
   await context.addInitScript(() => {
@@ -64,7 +74,7 @@ test('admin adds and assigns vehicles; the driver sees only theirs', async ({ pa
   await expectNoHorizontalScroll(page);
 
   // Assigns it to the driver.
-  await page.getByRole('button', { name: /Șofer și responsabil/ }).click();
+  await openVehicleSection(page, 'Șofer și responsabil');
   await page.getByLabel('Alocat lui').selectOption({ label: `Maria Pop · Șofer` });
   await page.getByRole('button', { name: 'Schimbă șoferul' }).click();
   await expect(page.locator('dd', { hasText: driver })).toBeVisible();
@@ -74,8 +84,9 @@ test('admin adds and assigns vehicles; the driver sees only theirs', async ({ pa
   await page.getByRole('button', { name: 'Vehicule' }).filter({ visible: true }).first().click();
   await expect(page.getByText('2 din 2 vehicule')).toBeVisible();
   await page.getByRole('button', { name: new RegExp(plate2) }).click();
-  await page.getByRole('button', { name: /Șofer și responsabil/ }).click();
-  await page.getByRole('button', { name: 'Arhivează vehiculul' }).click();
+  await openVehicleSection(page, 'Șofer și responsabil');
+  await page.getByRole('button', { name: 'Mai multe' }).click();
+  await page.getByRole('menuitem', { name: 'Arhivează vehiculul' }).click();
   await page.getByRole('button', { name: 'Arhivează', exact: true }).click();
   await expect(page.getByText('Arhivat').first()).toBeVisible();
   await page.getByRole('button', { name: 'Vehicule' }).filter({ visible: true }).first().click();
@@ -104,4 +115,72 @@ test('admin adds and assigns vehicles; the driver sees only theirs', async ({ pa
   await expect(page.getByRole('heading', { level: 1, name: 'Vehicles' })).toBeVisible();
   await expectNoHorizontalScroll(page);
   await shot(page, 'fleet-live-en', name());
+});
+
+test('the plan: Abonament, the limits of Fleet Start, and the admin changes the plan', async ({ page, browser }) => {
+  test.skip(!BACKEND, 'needs the local Supabase stack');
+  const admin = await createFleetUser();
+  const company = await rpcAs<{ id: string }>(admin, 'create_company', {
+    p_name: `Plan Test ${Date.now()}`,
+    p_vat_id: null,
+    p_reg_com: null,
+    p_address: null,
+    p_request_id: crypto.randomUUID(),
+  });
+  await signIn(page, admin, PASSWORD);
+  await expect(page).toHaveURL(/\/c\/cauta/);
+
+  // A new company: Fleet Business on trial; the badge opens Abonament.
+  await page.goto(`/c/firme/${company.id}`);
+  await page.getByRole('button', { name: /Fleet Business/ }).filter({ visible: true }).first().click();
+  await expect(page.getByRole('heading', { level: 1, name: 'Abonament și facturare' })).toBeVisible();
+  await expect(page.getByText(/Mai ai 30 de zile din perioada de test|Mai ai 29 de zile din perioada de test/)).toBeVisible();
+  await expect(page.getByText('Plata cu cardul și schimbarea planului nu sunt încă disponibile.')).toBeVisible();
+  await expect(page.getByText('Planul tău')).toBeVisible();
+  for (const plan of ['Fleet Start', 'Fleet Pro', 'Enterprise']) await expect(page.getByText(plan, { exact: true }).first()).toBeVisible();
+  await expect(page.getByText('Aprobarea devizelor după rol')).toHaveCount(0);
+  await expectNoHorizontalScroll(page);
+  await shot(page, 'fleet-subscription', name());
+
+  // On Fleet Start: reports locked, no CSV, the sixth vehicle refused.
+  await serviceRest(`company_subscriptions?company_id=eq.${company.id}`, 'PATCH', { plan_key: 'fleet_start' });
+  for (let i = 0; i < 5; i++) {
+    await rpcAs(admin, 'fleet_save_vehicle', {
+      p_company: company.id,
+      p_vehicle: null,
+      p_fields: { make: 'Dacia', model: 'Logan', plate: uniquePlate('B') },
+      p_request_id: crypto.randomUUID(),
+    });
+  }
+  await page.goto(`/c/firme/${company.id}?sectiune=rapoarte`);
+  await expect(page.getByText('Rapoartele sunt incluse din Fleet Business', { exact: true })).toBeVisible();
+  await page.goto(`/c/firme/${company.id}?sectiune=vehicule`);
+  await expect(page.getByText('5 din 5 vehicule')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Descarcă CSV' })).toHaveCount(0);
+  await page.getByRole('button', { name: 'Adaugă vehicul' }).click();
+  await page.getByLabel('Marcă').fill('Ford');
+  await page.getByLabel('Model', { exact: true }).fill('Transit');
+  await page.getByRole('button', { name: 'Salvează vehiculul' }).click();
+  await expect(page.getByText('Planul permite 5 vehicule active. Arhivează un vehicul sau alege un plan mai mare.')).toBeVisible();
+
+  // The platform admin moves it to Fleet Pro from Flote.
+  const context = await browser.newContext();
+  await context.addInitScript(() => localStorage.setItem('sh_lang', 'ro'));
+  const adminPage = await context.newPage();
+  await signIn(adminPage, SEED.admin, SEED_PASSWORD);
+  await adminPage.goto('/admin/cont/flote');
+  const row = adminPage.locator('li', { hasText: 'Plan Test' }).filter({ hasText: admin }).first();
+  await expect(row).toBeVisible();
+  await row.getByRole('button', { name: 'Mai multe' }).click();
+  await adminPage.getByRole('menuitem', { name: 'Schimbă planul' }).click();
+  await row.getByLabel('Plan', { exact: true }).selectOption('fleet_pro');
+  await row.getByRole('button', { name: 'Salvează' }).click();
+  await expect(row.getByText('5 / 40')).toBeVisible();
+  await expectNoHorizontalScroll(adminPage);
+  await shot(adminPage, 'admin-fleets', name());
+  await context.close();
+
+  // The company sees Fleet Pro (live) and can add the sixth vehicle.
+  await page.getByRole('button', { name: 'Salvează vehiculul' }).click();
+  await expect(page.getByRole('heading', { level: 2, name: 'Ford Transit' }).or(page.getByText('Fără număr').first())).toBeVisible();
 });

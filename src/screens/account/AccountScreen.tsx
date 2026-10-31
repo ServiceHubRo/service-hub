@@ -23,6 +23,7 @@ import {
   ADMIN_REPORTS_PATH,
   ADMIN_SETTINGS_PATH,
   ADMIN_SUBSCRIPTIONS_PATH,
+  ADMIN_FLEETS_PATH,
   ADMIN_SUGGESTIONS_PATH,
 } from '../admin/paths';
 import { FAVORITES_PATH, MY_REPORTS_PATH, VEHICLE_HISTORY_PICK_PATH } from '../client/paths';
@@ -107,6 +108,7 @@ export function AccountScreen({ role }: { role: Role }) {
         {role === 'admin' && (
           <div className={styles.tiles} data-layout="tiles">
             <Tile to={ADMIN_SUBSCRIPTIONS_PATH} icon={CreditCard} label={t('admin.subs.title')} hint={t('admin.subs.tileHint')} />
+            <Tile to={ADMIN_FLEETS_PATH} icon={Truck} label={t('admin.fleets.title')} hint={t('admin.fleets.tileHint')} />
             <Tile to={ADMIN_REPORTS_PATH} icon={FileCheck} label={t('admin.reports.title')} hint={t('admin.reports.tileHint')} />
             <Tile to={ADMIN_CATALOG_PATH} icon={ListTree} label={t('admin.catalog.title')} hint={t('admin.catalog.tileHint')} />
             <Tile to={ADMIN_SETTINGS_PATH} icon={SlidersHorizontal} label={t('admin.settings.title')} hint={t('admin.settings.tileHint')} />

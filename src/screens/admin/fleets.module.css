@@ -1,0 +1,74 @@
+/* Flote (T64a): the companies and the plans, cards in columns on a laptop. */
+.list,
+.planGrid {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr));
+  gap: 10px;
+}
+
+.row {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+  height: 100%;
+}
+
+.rowHead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.rowText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.rowName {
+  font-weight: 650;
+  font-size: 15.5px;
+}
+
+.facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 14px;
+}
+
+.facts dt {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.facts dd {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-input);
+}
+
+.panelButtons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr));
+  gap: 10px;
+}

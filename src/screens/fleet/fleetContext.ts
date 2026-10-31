@@ -1,15 +1,15 @@
 import { createContext, useCallback, useContext } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import type { VehicleFields } from '../../data/fleet';
-import { can, type FleetCapability, type FleetOverview, type FleetVehicle } from '../../lib/fleet';
+import { can, type FleetCapability, type FleetOverview, type FleetPlanSummary, type FleetSubscriptionView, type FleetVehicle } from '../../lib/fleet';
 
 /**
  * What every fleet screen needs: the company read (already narrowed to the member's role), what the
  * member may do, and the way to another fleet page. The design preview fills it from sample data;
  * stage 3 fills it from `fleet_overview()` (docs/FLEET_PLAN.md).
  */
-export type FleetSection = 'panou' | 'vehicule' | 'vehicul' | 'costuri' | 'rapoarte' | 'membri';
-export const FLEET_SECTIONS: readonly FleetSection[] = ['panou', 'vehicule', 'vehicul', 'costuri', 'rapoarte', 'membri'];
+export type FleetSection = 'panou' | 'vehicule' | 'vehicul' | 'costuri' | 'rapoarte' | 'membri' | 'abonament';
+export const FLEET_SECTIONS: readonly FleetSection[] = ['panou', 'vehicule', 'vehicul', 'costuri', 'rapoarte', 'membri', 'abonament'];
 
 export interface FleetLink {
   section: FleetSection;
@@ -40,6 +40,10 @@ export interface FleetContextValue {
   companyPage: string | null;
   /** Preview only: adds an expense typed in the form, kept in memory. */
   addExpense: ((e: FleetOverview['expenses'][number]) => void) | null;
+  /** The company's plan (T64a); null in the preview when none is shown. */
+  plan: FleetPlanSummary | null;
+  /** Reads the Abonament page (live: `fleet_subscription`; preview: the sample). */
+  loadSubscription: () => Promise<FleetSubscriptionView>;
 }
 
 export const FleetContext = createContext<FleetContextValue | null>(null);

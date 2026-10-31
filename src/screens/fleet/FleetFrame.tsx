@@ -1,17 +1,22 @@
-import { BarChart3, Building2, CarFront, LayoutDashboard, ReceiptText, User, Users, type LucideIcon } from 'lucide-react';
+import { BarChart3, Building2, CarFront, CreditCard, LayoutDashboard, ReceiptText, User, Users, type LucideIcon } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { LangSwitch } from '../../app/LangSwitch';
+import { Banner } from '../../components/Banner';
+import { Button } from '../../components/Button';
 import { LogoTile } from '../../components/LogoTile';
 import { Wordmark } from '../../components/Wordmark';
 import { useI18n } from '../../i18n/context';
+import { plural } from '../../i18n/translate';
+import { overLimit, planState, trialDaysLeft, TRIAL_WARN_DAYS } from '../../lib/fleet';
 import { FleetCosts } from './FleetCosts';
 import { FleetDashboard } from './FleetDashboard';
 import { FleetMembers } from './FleetMembers';
 import { FleetReports } from './FleetReports';
 import { FleetVehicle } from './FleetVehicle';
+import { FleetSubscription } from './FleetSubscription';
 import { FleetVehicles } from './FleetVehicles';
-import type { FleetSection } from './fleetContext';
+import { useFleet, type FleetSection } from './fleetContext';
 import styles from './fleet.module.css';
 
 const NAV: { section: FleetSection; icon: LucideIcon }[] = [
@@ -37,7 +42,66 @@ export function FleetSectionBody({ section, vehicleId, filter }: { section: Flee
       return <FleetReports key={filter ?? ''} initialReport={filter} />;
     case 'membri':
       return <FleetMembers />;
+    case 'abonament':
+      return <FleetSubscription />;
   }
+}
+
+/**
+ * The plan's notices at the top of Panou and Vehicule only (T64a): read-only, over the vehicle limit,
+ * or the trial's last week. One at a time, the most serious first, with the way to the plan.
+ */
+export function FleetPlanNotice({ section, onOpen }: { section: FleetSection; onOpen: () => void }) {
+  const { t, lang } = useI18n();
+  const { plan, data } = useFleet();
+  if (!plan || (section !== 'panou' && section !== 'vehicule')) return null;
+  const canSee = data.me.role !== 'driver';
+  const action = canSee ? (
+    <Button variant="ghost" onClick={onOpen}>
+      {t('fleet.sub.open')}
+    </Button>
+  ) : undefined;
+  const name = lang === 'ro' ? plan.name_ro : plan.name_en;
+  const over = overLimit(plan.vehicles, plan.vehicle_limit);
+  const days = trialDaysLeft(plan.trial_ends_at);
+  if (plan.read_only)
+    return (
+      <Banner tone="warning" action={action}>
+        {t('rpcError.fleet_read_only')}
+      </Banner>
+    );
+  if (over > 0)
+    return (
+      <Banner tone="warning" action={action}>
+        {t('fleet.sub.overVehicles', { n: over, limit: plan.vehicle_limit ?? 0, plan: name })}
+      </Banner>
+    );
+  if (planState(plan) === 'trial' && days !== null && days <= TRIAL_WARN_DAYS && canSee)
+    return (
+      <Banner tone="info" action={action}>
+        {t('fleet.sub.trialEnding', { days: plural(lang, 'unit.days', days) })}
+      </Banner>
+    );
+  return null;
+}
+
+/** The plan in a word under the space switch: opens Abonament (not for a driver). */
+function PlanBadge({ onOpen }: { onOpen: () => void }) {
+  const { t, lang } = useI18n();
+  const { plan, data } = useFleet();
+  if (!plan || data.me.role === 'driver') return null;
+  const st = planState(plan);
+  const days = trialDaysLeft(plan.trial_ends_at);
+  const detail = st === 'trial' && days !== null ? t('fleet.sub.badgeTrial', { days: plural(lang, 'unit.days', days) }) : t(`fleet.sub.state.${st}`);
+  return (
+    <button type="button" className={styles.planBadge} onClick={onOpen}>
+      <CreditCard size={15} aria-hidden="true" />
+      <span className={styles.planBadgeText}>
+        <span className={styles.planBadgeName}>{lang === 'ro' ? plan.name_ro : plan.name_en}</span>
+        <span className={styles.muted}>{detail}</span>
+      </span>
+    </button>
+  );
 }
 
 /**
@@ -75,6 +139,7 @@ export function FleetFrame({
           <Wordmark size={19} />
         </Link>
         <SpaceSwitch company={companyName} personalTo={personalTo} />
+        <PlanBadge onOpen={() => onNav('abonament')} />
         <nav className={styles.sideNav}>
           {NAV.map(({ section: s, icon: Icon }) => (
             <button key={s} type="button" className={`${styles.sideItem} ${active === s ? styles.sideOn : ''}`} aria-current={active === s ? 'page' : undefined} onClick={() => onNav(s)}>
@@ -92,6 +157,7 @@ export function FleetFrame({
         <div className={styles.mainInner}>
           <div className={styles.mobileSpace}>
             <SpaceSwitch company={companyName} personalTo={personalTo} />
+            <PlanBadge onOpen={() => onNav('abonament')} />
           </div>
           {children}
         </div>
