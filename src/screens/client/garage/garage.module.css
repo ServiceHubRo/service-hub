@@ -262,6 +262,25 @@
   margin-top: 4px;
 }
 
+/* ---------------------------------------------------------------- copies of one car (T66) */
+.dup {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 12px;
+  border-color: var(--amber-line);
+}
+
+.dupHead {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.dupQuestion {
+  font-size: 14px;
+}
+
 /* ---------------------------------------------------------------- history row (P16c) */
 .history,
 .historyNone {

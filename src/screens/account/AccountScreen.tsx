@@ -1,4 +1,4 @@
-import { Bell, Building2, CreditCard, Download, FileCheck, FileText, Heart, Landmark, History, LifeBuoy, Lightbulb, ListTree, MapPinned, Megaphone, QrCode, ScrollText, Settings, SlidersHorizontal, Star, Truck } from 'lucide-react';
+import { Bell, Building2, Copy, CreditCard, Download, FileCheck, FileText, Heart, Landmark, History, LifeBuoy, Lightbulb, ListTree, MapPinned, Megaphone, QrCode, ScrollText, Settings, SlidersHorizontal, Star, Truck } from 'lucide-react';
 import { useCallback, useRef, useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import type { ShellOutletContext } from '../../app/AppShell';
@@ -23,6 +23,7 @@ import {
   ADMIN_REPORTS_PATH,
   ADMIN_SETTINGS_PATH,
   ADMIN_SUBSCRIPTIONS_PATH,
+  ADMIN_DUPLICATES_PATH,
   ADMIN_FLEETS_PATH,
   ADMIN_SUGGESTIONS_PATH,
 } from '../admin/paths';
@@ -109,6 +110,7 @@ export function AccountScreen({ role }: { role: Role }) {
           <div className={styles.tiles} data-layout="tiles">
             <Tile to={ADMIN_SUBSCRIPTIONS_PATH} icon={CreditCard} label={t('admin.subs.title')} hint={t('admin.subs.tileHint')} />
             <Tile to={ADMIN_FLEETS_PATH} icon={Truck} label={t('admin.fleets.title')} hint={t('admin.fleets.tileHint')} />
+            <Tile to={ADMIN_DUPLICATES_PATH} icon={Copy} label={t('admin.dup.tile')} hint={t('admin.dup.tileHint')} />
             <Tile to={ADMIN_REPORTS_PATH} icon={FileCheck} label={t('admin.reports.title')} hint={t('admin.reports.tileHint')} />
             <Tile to={ADMIN_CATALOG_PATH} icon={ListTree} label={t('admin.catalog.title')} hint={t('admin.catalog.tileHint')} />
             <Tile to={ADMIN_SETTINGS_PATH} icon={SlidersHorizontal} label={t('admin.settings.title')} hint={t('admin.settings.tileHint')} />

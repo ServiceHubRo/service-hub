@@ -1,12 +1,16 @@
-import { Car as CarIcon, ChevronRight, FileCheck, History, Pencil, Plus } from 'lucide-react';
+import { Car as CarIcon, ChevronRight, Copy, FileCheck, History, Pencil, Plus } from 'lucide-react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { ActionButton } from '../../../components/ActionButton';
+import { Button } from '../../../components/Button';
 import { buttonClass } from '../../../components/buttonClass';
 import { Card } from '../../../components/Card';
 import { EmptyState } from '../../../components/EmptyState';
 import { LoadError } from '../../../components/LoadError';
 import { PageHeader } from '../../../components/PageHeader';
 import { SkeletonList } from '../../../components/Skeleton';
-import { fetchCars, fetchOilStandard, type Car } from '../../../data/garage';
+import { fetchCars, fetchOilStandard, mergeCars, type Car } from '../../../data/garage';
+import { canRetryRpc, rpcErrorMessage } from '../../../data/rpc';
 import { fetchMyImportedJobsQuietly } from '../../../data/myImported';
 import { useI18n } from '../../../i18n/context';
 import { daysFromToday, formatDayMonth, formatMonthShortYear } from '../../../i18n/format';
@@ -15,7 +19,9 @@ import { plural } from '../../../i18n/translate';
 import { CAR_DOCS, urgencyOf, type CarDoc } from '../../../lib/expiry';
 import { jobsOf, sameVehicle } from '../../../lib/history';
 import { lastOilChange, oilDue } from '../../../lib/oil';
+import { newRequestId } from '../../../lib/requestId';
 import { useLoad } from '../../../lib/useLoad';
+import { duplicateGroups } from '../../../lib/vehicleIdentity';
 import { useClientBookings } from '../bookings/clientBookingsContext';
 import { carHistoryPath, carPath, carReportPath, NEW_CAR_PATH, type ReportLinkState, type VehicleHistoryLinkState } from '../paths';
 import { ExpiryRing } from './ExpiryRing';
@@ -59,6 +65,15 @@ export function GarageScreen() {
           />
         ) : (
           <>
+            {/* T66: copies of one car the garage already had before the check existed; the owner merges them. */}
+            {duplicateGroups(state.data).map((group) => (
+              <DuplicateCard
+                key={group.map((c) => c.id).join()}
+                cars={group}
+                jobs={(car) => (bookings ? jobsOf(bookings, car).length : 0)}
+                onMerged={reload}
+              />
+            ))}
             <ul className={styles.list} data-layout="cards">
               {state.data.map((car) => (
                 <li key={car.id}>
@@ -82,6 +97,67 @@ export function GarageScreen() {
           </>
         ))}
     </div>
+  );
+}
+
+/**
+ * Two (or more) records of the same car (T66). One merge at a time: the record with more jobs is kept
+ * by default, the other's bookings and reports move to it and the copy goes; a third copy shows again.
+ */
+function DuplicateCard({ cars, jobs, onMerged }: { cars: Car[]; jobs: (car: Car) => number; onMerged: () => void }) {
+  const { t, lang } = useI18n();
+  const [open, setOpen] = useState(false);
+  const [swap, setSwap] = useState(false);
+  const [requestId, setRequestId] = useState(newRequestId);
+  const [first, second] = cars[0] && cars[1] && jobs(cars[1]) > jobs(cars[0]) ? [cars[1], cars[0]] : [cars[0], cars[1]];
+  if (!first || !second) return null;
+  const [keep, drop] = swap ? [second, first] : [first, second];
+  const label = (car: Car) => [`${car.make} ${car.model}`, car.plate].filter(Boolean).join(' · ');
+  const byVin = Boolean(first.vin && second.vin);
+  const merge = async () => {
+    await mergeCars(keep.id, drop.id, requestId);
+    setRequestId(newRequestId());
+    setOpen(false);
+    onMerged();
+  };
+  return (
+    <Card className={styles.dup} role="group" aria-labelledby={`dup-${first.id}`}>
+      <div className={styles.dupHead}>
+        <span className={styles.carTile} aria-hidden="true">
+          <Copy size={18} />
+        </span>
+        <div>
+          <p id={`dup-${first.id}`} className={styles.confirmTitle}>
+            {t('garage.dupTitle')}
+          </p>
+          <p className={styles.sub}>
+            {t('garage.dupBody', {
+              a: label(first),
+              b: label(second),
+              key: t(byVin ? 'garage.dupKeyVin' : 'garage.dupKeyPlate'),
+            })}
+          </p>
+        </div>
+      </div>
+      {open ? (
+        <div className={styles.confirmActions}>
+          <p className={styles.dupQuestion}>{t('garage.mergeConfirm', { keep: label(keep), drop: label(drop) })}</p>
+          <ActionButton onAction={merge} errorMessage={(e) => rpcErrorMessage(lang, e)} canRetry={canRetryRpc}>
+            {t('garage.mergeYes')}
+          </ActionButton>
+          <Button block onClick={() => setSwap((v) => !v)}>
+            {t('garage.mergeSwap')}
+          </Button>
+          <Button block variant="ghost" onClick={() => setOpen(false)}>
+            {t('common.cancel')}
+          </Button>
+        </div>
+      ) : (
+        <Button block onClick={() => setOpen(true)}>
+          {t('garage.merge')}
+        </Button>
+      )}
+    </Card>
   );
 }
 

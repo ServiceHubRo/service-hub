@@ -44,6 +44,8 @@ export function sameVehicle(a: VehicleFields, b: VehicleFields): boolean {
 interface VehicleJob {
   status: BookingStatus;
   car_snapshot: VehicleFields;
+  /** The garage car the booking is linked to (T66): the history follows it through a new plate. */
+  car_id?: string | null;
   date: string;
   slot: string;
   done_at: string | null;
@@ -59,10 +61,16 @@ function newestFirst<T extends { date: string; slot: string; done_at: string | n
   return (b.done_at ?? `${b.date} ${b.slot}`).localeCompare(a.done_at ?? `${a.date} ${a.slot}`);
 }
 
-/** The finished jobs on one car, newest first. Only `done` counts as history. */
-export function jobsOf<T extends VehicleJob>(bookings: readonly T[], vehicle: VehicleFields): T[] {
+/**
+ * The finished jobs on one car, newest first. Only `done` counts as history. A job belongs to the car
+ * when it is linked to that garage car (`car_id`, T66: a new plate never cuts the history) or was
+ * remembered under the car's plate (a booking made without the garage car, or before T66).
+ */
+export function jobsOf<T extends VehicleJob>(bookings: readonly T[], vehicle: VehicleFields & { id?: string }): T[] {
   const key = vehicleKey(vehicle);
-  return bookings.filter((b) => b.status === 'done' && vehicleKey(b.car_snapshot) === key).sort(newestFirst);
+  return bookings
+    .filter((b) => b.status === 'done' && ((vehicle.id !== undefined && b.car_id === vehicle.id) || vehicleKey(b.car_snapshot) === key))
+    .sort(newestFirst);
 }
 
 /** Sum of amounts, counted in bani so 0,10 + 0,20 stays 0,30. */
@@ -74,13 +82,14 @@ export function sumCosts(items: readonly { cost: number | null }[]): number {
  * Cars that have finished jobs but are not (or no longer) in the garage — a car deleted from the
  * garage, or booked without saving it. Each is shown by its newest job.
  */
-export function otherVehicles<T extends VehicleJob>(bookings: readonly T[], garage: readonly VehicleFields[]): { latest: T; jobs: number }[] {
+export function otherVehicles<T extends VehicleJob>(bookings: readonly T[], garage: readonly (VehicleFields & { id?: string })[]): { latest: T; jobs: number }[] {
   const known = new Set(garage.map(vehicleKey));
+  const garageIds = new Set(garage.map((c) => c.id).filter(Boolean));
   const groups = new Map<string, { latest: T; jobs: number }>();
   for (const b of [...bookings].sort(newestFirst)) {
     if (b.status !== 'done') continue;
     const key = vehicleKey(b.car_snapshot);
-    if (known.has(key)) continue;
+    if (known.has(key) || (b.car_id && garageIds.has(b.car_id))) continue;
     const group = groups.get(key);
     if (group) group.jobs += 1;
     else groups.set(key, { latest: b, jobs: 1 });

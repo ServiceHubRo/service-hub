@@ -1,15 +1,19 @@
 import { useRef, useState } from 'react';
 import { ActionButton } from '../../components/ActionButton';
+import { Banner } from '../../components/Banner';
 import { Button } from '../../components/Button';
 import { Card } from '../../components/Card';
 import { Field } from '../../components/Field';
 import { SelectField } from '../../components/SelectField';
 import type { VehicleFields } from '../../data/fleet';
+import { fetchCars } from '../../data/garage';
 import { rpcErrorMessage } from '../../data/rpc';
 import { useI18n } from '../../i18n/context';
 import { carYearMax, isValidCarYear } from '../../lib/car';
 import type { FleetVehicle } from '../../lib/fleet';
+import { useLoad } from '../../lib/useLoad';
 import { isValidVin, normalizeCode } from '../../lib/validators';
+import { sameIdentity } from '../../lib/vehicleIdentity';
 import { useFleet } from './fleetContext';
 import styles from './fleet.module.css';
 
@@ -42,6 +46,11 @@ export function FleetVehicleForm({ vehicle, onDone, onCancel }: { vehicle: Fleet
   const modelRef = useRef<HTMLInputElement>(null);
   const yearRef = useRef<HTMLInputElement>(null);
   const vinRef = useRef<HTMLInputElement>(null);
+  // T66: the same car in the caller's own garage is allowed (a company car the owner also drives);
+  // the form only says so. Never another person's garage or another company.
+  const { state: garage } = useLoad(fetchCars);
+  const inGarage =
+    garage.status === 'ready' && garage.data.some((car) => sameIdentity(car, { id: '', plate: f.plate, vin: normalizeCode(f.vin) }));
   const set = (k: keyof VehicleFields, v: string) => {
     setF((x) => ({ ...x, [k]: v }));
     setErrors((e) => ({ ...e, [k]: undefined }));
@@ -84,6 +93,7 @@ export function FleetVehicleForm({ vehicle, onDone, onCancel }: { vehicle: Fleet
           <Field label={t('doc.long.rca')} type="date" value={f.rca_expiry} onChange={(e) => set('rca_expiry', e.target.value)} />
           <Field label={t('doc.long.vignette')} type="date" value={f.vignette_expiry} onChange={(e) => set('vignette_expiry', e.target.value)} />
         </div>
+        {inGarage && <Banner>{t('fleet.vehicle.inGarage')}</Banner>}
         <div className={styles.actions}>
           <ActionButton submit variant="primary" errorMessage={(e) => rpcErrorMessage(lang, e)} onAction={save}>
             {t('fleet.form.saveVehicle')}

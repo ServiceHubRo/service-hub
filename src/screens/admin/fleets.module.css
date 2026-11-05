@@ -72,3 +72,12 @@
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr));
   gap: 10px;
 }
+
+/* Vehicule duplicate (T66): the records of one car, one per line. */
+.carList {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}

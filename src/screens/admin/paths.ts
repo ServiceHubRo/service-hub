@@ -22,6 +22,8 @@ export const ADMIN_ZONES_PATH = '/admin/cont/zone';
 export const ADMIN_SUGGESTIONS_PATH = '/admin/cont/sugestii';
 /** Flote (T64a): companies, their plans and trials. */
 export const ADMIN_FLEETS_PATH = '/admin/cont/flote';
+/** Vehicule duplicate (T66): the same car recorded twice by one owner. */
+export const ADMIN_DUPLICATES_PATH = '/admin/cont/duplicate';
 
 export const adminShopPath = (id: string) => `${ADMIN_SHOPS_PATH}/${id}`;
 export const adminClientPath = (id: string) => `${ADMIN_CLIENTS_PATH}/${id}`;

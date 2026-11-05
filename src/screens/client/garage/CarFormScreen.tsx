@@ -12,7 +12,7 @@ import { LoadError } from '../../../components/LoadError';
 import { SelectField } from '../../../components/SelectField';
 import { SkeletonList } from '../../../components/Skeleton';
 import { createCar, deleteCar, fetchCar, fetchOilStandard, updateCar, type Car, type CarFields } from '../../../data/garage';
-import { canRetryRpc, rpcErrorMessage } from '../../../data/rpc';
+import { canRetryRpc, rpcErrorMessage, toRpcError } from '../../../data/rpc';
 import { useI18n } from '../../../i18n/context';
 import { ymdInBucharest } from '../../../i18n/format';
 import type { MessageKey } from '../../../i18n/ro';
@@ -23,7 +23,7 @@ import { OIL_MONTH_CHOICES } from '../../../lib/oil';
 import { newRequestId } from '../../../lib/requestId';
 import { useLoad } from '../../../lib/useLoad';
 import { isValidVin, normalizeCode } from '../../../lib/validators';
-import { GARAGE_PATH } from '../paths';
+import { carPath as carEditPath, GARAGE_PATH } from '../paths';
 import styles from './garage.module.css';
 
 /** Garaj → "Adaugă mașină" (`/c/garaj/nou`) or the pencil on a car (`/c/garaj/:carId`). */
@@ -62,6 +62,8 @@ function CarEditor({ car }: { car: Car | null }) {
   const navigate = useNavigate();
   // The id of a new car is made once, so "Încearcă din nou" never adds it twice (data/garage.ts).
   const [newId] = useState(newRequestId);
+  /** The car already in the garage when a save was refused as a copy (T66). */
+  const [duplicateOf, setDuplicateOf] = useState<string | null>(null);
   const [make, setMake] = useState(car?.make ?? '');
   const [model, setModel] = useState(car?.model ?? '');
   const [year, setYear] = useState(car?.year ? String(car.year) : '');
@@ -102,8 +104,15 @@ function CarEditor({ car }: { car: Car | null }) {
       oil_change_months: oilMonths ? Number(oilMonths) : null,
       last_oil_change: oilLast || null,
     };
-    if (car) await updateCar(car.id, fields);
-    else await createCar(newId, fields);
+    try {
+      if (car) await updateCar(car.id, fields);
+      else await createCar(newId, fields);
+    } catch (e) {
+      // The same car is already in the garage (T66): the message says so, and a link opens it.
+      const err = toRpcError(e);
+      if (err.code === 'car_duplicate' && typeof err.params.car_id === 'string') setDuplicateOf(err.params.car_id);
+      throw e;
+    }
     navigate(GARAGE_PATH);
   }
 
@@ -218,6 +227,11 @@ function CarEditor({ car }: { car: Car | null }) {
         <ActionButton submit onAction={save} disabled={!canSave} errorMessage={(e) => rpcErrorMessage(lang, e)} canRetry={canRetryRpc}>
           {t('common.save')}
         </ActionButton>
+        {duplicateOf && (
+          <Link to={carEditPath(duplicateOf)} className={buttonClass('secondary')} data-span="all">
+            {t('garage.openExisting')}
+          </Link>
+        )}
       </form>
 
       {car &&

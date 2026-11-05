@@ -1516,3 +1516,12 @@ Notă (31 oct): Eduard a aprobat politica de acces (7 zile de grație, apoi doar
 - Rămas: funcțiile planurilor editabile din Admin (acum prin migrare), schimbarea planului de către firmă (după plăți, T64b), cheltuielile manuale (T63e).
 
 - [x] Făcut
+
+### T66 — O mașină, o singură înregistrare ✅
+- **Audit** (5 nov): aceeași mașină putea fi adăugată de mai multe ori în același garaj (alt fel de scris numărul, VIN cu litere mici); o programare cu mașina scrisă de mână și „salvează” crea o copie; preluarea unei programări sau un import puteau adăuga a doua oară mașina; în flotă, același VIN putea fi pe două vehicule active; istoricul se lega doar de număr, deci se rupea la schimbarea numărului.
+- **Migrarea `vehicle_identity`** (schema 99; Eduard: „Fă ce trebuie. Dar logic”): aceeași mașină = același VIN; fără VIN, același număr (oricum ar fi scris), doar dacă VIN-urile nu diferă. Refuzat pe orice cale (`car_duplicate`), cu „Deschide mașina din garaj”. Programarea, preluarea și importul folosesc mașina deja existentă. În firmă: un VIN o singură dată între vehiculele active (`vehicle_vin_exists`). Între persoane sau firme diferite nu se verifică nimic (ar dezvălui vehiculele altcuiva); același VIN în garajul tău și în firma ta e permis, cu o notă.
+- **Istoricul urmează mașina**, și după un număr nou; fiecare service își vede doar lucrările lui.
+- **Copiile existente** nu se șterg singure: Garajul arată „Aceeași mașină apare de două ori” → „Unește” (cu confirmare); programările și rapoartele trec pe mașina păstrată, totul scris în `car_merges`. Adminul are „Vehicule duplicate” în Cont (doar citire).
+- Teste: `tests/sql/141_vehicle_identity.sql`, `tests/unit/vehicleIdentity.test.ts`, `tests/unit/history.test.ts`, `tests/e2e/vehicle-identity.spec.ts`.
+
+- [x] Făcut
