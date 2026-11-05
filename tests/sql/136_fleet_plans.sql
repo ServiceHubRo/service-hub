@@ -12,7 +12,7 @@ select test.eq(public.fleet_subscription(current_setting('test.co')::uuid)->'pla
 select test.eq(public.fleet_subscription(current_setting('test.co')::uuid)->'plan'->>'status', 'trial', 'on trial');
 select test.ok((public.fleet_subscription(current_setting('test.co')::uuid)->'plan'->>'trial_ends_at')::timestamptz
   between now() + interval '29 days' and now() + interval '31 days', 'for 30 days');
-select test.eq(public.fleet_subscription(current_setting('test.co')::uuid)->'plan'->>'price_ron', '59.00', 'its price fixed at 59 lei');
+select test.eq(public.fleet_subscription(current_setting('test.co')::uuid)->'plan'->>'price_ron', '99.00', 'its price fixed at 99 lei');
 select test.eq(jsonb_array_length(public.fleet_subscription(current_setting('test.co')::uuid)->'plans'), 4, 'four plans to compare');
 
 -- A second company of the same account: no second trial.

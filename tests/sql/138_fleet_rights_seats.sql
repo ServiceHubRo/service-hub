@@ -38,28 +38,28 @@ select set_config('test.m_acc', public.my_member_id(current_setting('test.co')::
 select test.login(test.id('client_a'));
 select public.fleet_assign_driver(current_setting('test.v1')::uuid, current_setting('test.m_b')::uuid, gen_random_uuid());
 select test.eq(public.fleet_subscription(current_setting('test.co')::uuid)->'plan'->>'extra_members', '0', 'three colleagues: all included');
-select test.eq(public.fleet_subscription(current_setting('test.co')::uuid)->'plan'->>'monthly_total', '59.00', 'the plan''s price alone');
+select test.eq(public.fleet_subscription(current_setting('test.co')::uuid)->'plan'->>'monthly_total', '99.00', 'the plan''s price alone');
 select public.invite_company_member(current_setting('test.co')::uuid, 'ioana@test.local', 'driver', repeat('e4', 32), gen_random_uuid());
 select test.login(current_setting('test.c4')::uuid);
 select public.accept_company_invite(repeat('e4', 32), gen_random_uuid());
 select test.login(test.id('client_a'));
 select test.eq(public.fleet_subscription(current_setting('test.co')::uuid)->'plan'->>'extra_members', '1', 'a fourth colleague is not refused: one past the plan');
-select test.eq(public.fleet_subscription(current_setting('test.co')::uuid)->'plan'->>'monthly_total', '78.00', '59 + 19 lei');
+select test.eq(public.fleet_subscription(current_setting('test.co')::uuid)->'plan'->>'monthly_total', '118.00', '99 + 19 lei');
 select test.ok(not (public.fleet_plan_summary(current_setting('test.co')::uuid) ? 'member_price_ron')
   and not (public.fleet_plan_summary(current_setting('test.co')::uuid) ? 'monthly_total'), 'the frame never sees a price');
 
 -- The platform admin sets the plan: colleagues included for everyone, the price fixed until a plan change.
 select test.login(test.id('admin'));
-select public.admin_update_fleet_plan('fleet_business', 59, 15, 2, 25, gen_random_uuid());
+select public.admin_update_fleet_plan('fleet_business', 99, 10, 2, 25, gen_random_uuid());
 select test.login(test.id('client_a'));
-select test.eq(public.fleet_subscription(current_setting('test.co')::uuid)->'plan'->>'monthly_total', '97.00',
-  'two included now; the running subscription keeps 19 lei: 59 + 2 × 19');
+select test.eq(public.fleet_subscription(current_setting('test.co')::uuid)->'plan'->>'monthly_total', '137.00',
+  'two included now; the running subscription keeps 19 lei: 99 + 2 × 19');
 select test.login(test.id('admin'));
 select public.admin_set_company_plan(current_setting('test.co')::uuid, 'fleet_business', gen_random_uuid());
 select test.login(test.id('client_a'));
-select test.eq(public.fleet_subscription(current_setting('test.co')::uuid)->'plan'->>'monthly_total', '109.00',
-  'after a plan change the new colleague''s price: 59 + 2 × 25');
-select test.fails($$select public.admin_update_fleet_plan('fleet_business', 59, 15, 2, 25, gen_random_uuid())$$, 'not_allowed',
+select test.eq(public.fleet_subscription(current_setting('test.co')::uuid)->'plan'->>'monthly_total', '149.00',
+  'after a plan change the new colleague''s price: 99 + 2 × 25');
+select test.fails($$select public.admin_update_fleet_plan('fleet_business', 99, 10, 2, 25, gen_random_uuid())$$, 'not_allowed',
   'a company member cannot change a plan');
 
 -- ------------------------------------------------------------------ only the admin gives rights

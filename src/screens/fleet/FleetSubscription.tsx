@@ -45,6 +45,7 @@ function Subscription({ view }: { view: FleetSubscriptionView }) {
   const days = trialDaysLeft(plan.trial_ends_at, now);
   const name = lang === 'ro' ? plan.name_ro : plan.name_en;
   const vehiclesOver = overLimit(usage.vehicles, plan.vehicle_limit);
+  const largest = Math.max(0, ...plans.map((p) => p.vehicle_limit ?? 0));
 
   return (
     <div className={styles.stack}>
@@ -103,8 +104,9 @@ function Subscription({ view }: { view: FleetSubscriptionView }) {
           {t('fleet.sub.compare')}
         </h2>
         <ul className={styles.planGrid}>
+          {/* Enterprise: over the largest plan's vehicles (Admin → Flote sets them). */}
           {plans.map((p) => (
-            <PlanCard key={p.key} p={p} current={p.key === plan.plan_key} have={plan.features} />
+            <PlanCard key={p.key} p={p} current={p.key === plan.plan_key} have={plan.features} largest={largest} />
           ))}
         </ul>
         <p className={styles.hintLine}>
@@ -154,7 +156,7 @@ function Subscription({ view }: { view: FleetSubscriptionView }) {
  * One plan of the comparison (T65): a tick for what the company has today, an amber plus for what
  * this plan would add to it — the upgrade's gains, without a separate list.
  */
-function PlanCard({ p, current, have }: { p: FleetPlanRow; current: boolean; have: readonly string[] }) {
+function PlanCard({ p, current, have, largest }: { p: FleetPlanRow; current: boolean; have: readonly string[]; largest: number }) {
   const { t, lang } = useI18n();
   const features = offeredFeatures(p.features);
   return (
@@ -173,7 +175,13 @@ function PlanCard({ p, current, have }: { p: FleetPlanRow; current: boolean; hav
         )}
       </p>
       <ul className={styles.planLimits}>
-        <li>{p.vehicle_limit === null ? t('fleet.sub.vehiclesCustom') : t('fleet.sub.vehiclesUpTo', { n: p.vehicle_limit })}</li>
+        <li>
+          {p.vehicle_limit !== null
+            ? t('fleet.sub.vehiclesUpTo', { n: p.vehicle_limit })
+            : largest > 0
+              ? t('fleet.sub.vehiclesOver', { n: largest })
+              : t('fleet.sub.vehiclesCustom')}
+        </li>
         <li>
           {p.included_members === null
             ? t('fleet.sub.colleaguesCustom')

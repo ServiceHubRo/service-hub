@@ -256,9 +256,9 @@ export function emptyFleet(): FleetOverview {
 
 /** SAMPLE plans for the preview, as `fleet_subscription` answers them (T64a). */
 export const SAMPLE_PLANS: FleetPlanRow[] = [
-  { key: 'fleet_start', name_ro: 'Fleet Start', name_en: 'Fleet Start', price_ron: 29, vehicle_limit: 5, member_limit: null, features: ['dashboard', 'vehicles', 'history', 'doc_alerts', 'costs_basic', 'members'], included_members: 1, member_price_ron: 19 },
-  { key: 'fleet_business', name_ro: 'Fleet Business', name_en: 'Fleet Business', price_ron: 59, vehicle_limit: 15, member_limit: null, features: ['dashboard', 'vehicles', 'history', 'doc_alerts', 'costs_basic', 'members', 'reports', 'export_csv', 'budget', 'cost_per_km'], included_members: 3, member_price_ron: 19 },
-  { key: 'fleet_pro', name_ro: 'Fleet Pro', name_en: 'Fleet Pro', price_ron: 119, vehicle_limit: 40, member_limit: null, features: ['dashboard', 'vehicles', 'history', 'doc_alerts', 'costs_basic', 'members', 'reports', 'export_csv', 'budget', 'cost_per_km'], included_members: 5, member_price_ron: 19 },
+  { key: 'fleet_start', name_ro: 'Fleet Start', name_en: 'Fleet Start', price_ron: 49, vehicle_limit: 5, member_limit: null, features: ['dashboard', 'vehicles', 'history', 'doc_alerts', 'costs_basic', 'members'], included_members: 1, member_price_ron: 19 },
+  { key: 'fleet_business', name_ro: 'Fleet Business', name_en: 'Fleet Business', price_ron: 99, vehicle_limit: 10, member_limit: null, features: ['dashboard', 'vehicles', 'history', 'doc_alerts', 'costs_basic', 'members', 'reports', 'export_csv', 'budget', 'cost_per_km'], included_members: 3, member_price_ron: 19 },
+  { key: 'fleet_pro', name_ro: 'Fleet Pro', name_en: 'Fleet Pro', price_ron: 149, vehicle_limit: 15, member_limit: null, features: ['dashboard', 'vehicles', 'history', 'doc_alerts', 'costs_basic', 'members', 'reports', 'export_csv', 'budget', 'cost_per_km'], included_members: 5, member_price_ron: 19 },
   { key: 'enterprise', name_ro: 'Enterprise', name_en: 'Enterprise', price_ron: null, vehicle_limit: null, member_limit: null, features: ['dashboard', 'vehicles', 'history', 'doc_alerts', 'costs_basic', 'members', 'reports', 'export_csv', 'budget', 'cost_per_km'], included_members: null, member_price_ron: null },
 ];
 

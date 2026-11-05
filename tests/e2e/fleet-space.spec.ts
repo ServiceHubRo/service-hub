@@ -176,7 +176,7 @@ test('the plan: Abonament, the limits of Fleet Start, and the admin changes the 
   await adminPage.getByRole('menuitem', { name: 'Schimbă planul' }).click();
   await row.getByLabel('Plan', { exact: true }).selectOption('fleet_pro');
   await row.getByRole('button', { name: 'Salvează' }).click();
-  await expect(row.getByText('5 / 40')).toBeVisible();
+  await expect(row.getByText('5 / 15')).toBeVisible();
   await expectNoHorizontalScroll(adminPage);
   await shot(adminPage, 'admin-fleets', name());
   await context.close();

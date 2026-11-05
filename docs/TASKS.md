@@ -1511,6 +1511,7 @@ Notă (31 oct): Eduard a aprobat politica de acces (7 zile de grație, apoi doar
 - **Start:** panou esențial, „Termene apropiate”, vehicule, istoric, programări, aprobări, costuri Service-Hub. **Business:** + panou financiar, rapoarte, cost/km, bugete, CSV, limita managerilor, drepturi suplimentare. **Pro:** + evoluție pe vehicul și față de perioada dinainte, vehicule cu costuri ridicate, filtre și „Interval ales”, estimarea bugetului, Excel, limite proprii. Enterprise = Pro, limite configurabile.
 - Ce lipsește din plan apare cu „Disponibil în <plan>” și „Compară planurile”, discret; pe Abonament, cardurile planurilor mai mari arată cu plus portocaliu ce adaugă.
 - Teste: `tests/sql/139_fleet_plan_features.sql`, `tests/e2e/workspace.spec.ts`, `tests/e2e/fleet-plans.spec.ts`, `tests/unit/fleet.test.ts`; actualizate `136`, `138`, `fleet-space.spec.ts`, `companies.spec.ts`.
+- **Prețuri noi** (Eduard, 5 nov; migrarea `fleet_plan_prices`, schema 98): Fleet Start 49 lei · 5 vehicule · 1 coleg inclus; Fleet Business 99 lei · 10 vehicule · 3 colegi; Fleet Pro 149 lei · 15 vehicule · 5 colegi; Enterprise personalizat; 19 lei / coleg în plus. Abonamentele în test sau neîncepute au primit noile prețuri (nicio firmă n-a plătit). O firmă cu mai multe vehicule decât noua limită le păstrează pe toate; doar nu mai poate adăuga.
 - Rămas: funcțiile planurilor editabile din Admin (acum prin migrare), schimbarea planului de către firmă (după plăți, T64b), cheltuielile manuale (T63e).
 
 - [x] Făcut

@@ -56,6 +56,10 @@ language sql as $$
 $$;
 grant execute on function pg_temp.job(text, text, text, int, numeric, int), pg_temp.report(jsonb) to public;
 
+create function pg_temp.per_km(p_report jsonb, p_vehicle text) returns jsonb
+language sql as $$ select x from jsonb_array_elements(p_report->'per_km'->'per_vehicle') x where x->>'vehicle_id' = p_vehicle $$;
+grant execute on function pg_temp.per_km(jsonb, text) to public;
+
 create function pg_temp.set_plan(p_plan text) returns void
 language plpgsql as $$
 begin
@@ -91,10 +95,10 @@ select test.eq(pg_temp.report()->'by_vehicle'->1->>'top_category', 'maintenance'
 select test.eq(pg_temp.report()->'by_category'->0->>'key', 'repairs', 'repairs first');
 select test.eq((pg_temp.report()->'by_category'->0->>'total')::numeric, 680.00, 'repairs: 600 + the 80 lei fee');
 select test.eq((pg_temp.report()->'repairs'->0->>'count')::int, 2, 'two finished jobs on the Logan (a refused quote is not a repair)');
-select test.eq(pg_temp.report()->'per_km'->'per_vehicle'->0->>'status', 'ok', 'the Logan has a cost per km');
-select test.eq((pg_temp.report()->'per_km'->'per_vehicle'->0->>'km')::int, 1000, 'over 1000 km');
-select test.eq((pg_temp.report()->'per_km'->'per_vehicle'->0->>'per_km')::numeric, 0.60, '600 lei after the first reading: 0.60 lei/km');
-select test.eq(pg_temp.report()->'per_km'->'per_vehicle'->1->>'status', 'one_reading', 'one reading: no figure for the Transit');
+select test.eq(pg_temp.per_km(pg_temp.report(), current_setting('test.v1'))->>'status', 'ok', 'the Logan has a cost per km');
+select test.eq((pg_temp.per_km(pg_temp.report(), current_setting('test.v1'))->>'km')::int, 1000, 'over 1000 km');
+select test.eq((pg_temp.per_km(pg_temp.report(), current_setting('test.v1'))->>'per_km')::numeric, 0.60, '600 lei after the first reading: 0.60 lei/km');
+select test.eq(pg_temp.per_km(pg_temp.report(), current_setting('test.v2'))->>'status', 'one_reading', 'one reading: no figure for the Transit');
 select test.eq((pg_temp.report()->'per_km'->'total'->>'per_km')::numeric, 0.60, 'the fleet: only cars with a figure');
 select test.ok(pg_temp.report() ? 'budget', 'Business: budgets');
 select test.ok(not (pg_temp.report() ? 'advanced'), 'Business: no advanced part');

@@ -66,8 +66,8 @@ asks. Vehicles, history, reports and the subscription never move with a person.
 |---|---|---|---|---|
 | `personal` | Personal | free | — (personal garage, unchanged) | — |
 | `fleet_start` | Fleet Start | 29 lei | 5 | 1 *(proposed; see question 2)* |
-| `fleet_business` | Fleet Business | 59 lei | 15 | 10 *(proposed)* |
-| `fleet_pro` | Fleet Pro | 119 lei | 40 | unlimited *(proposed)* |
+| `fleet_business` | Fleet Business | 59 lei | 15 | 10 *(proposed)* — **99 lei · 10 vehicles · 3 colleagues since 5 Nov 2026** |
+| `fleet_pro` | Fleet Pro | 119 lei | 40 | unlimited *(proposed)* — **149 lei · 15 vehicles · 5 colleagues since 5 Nov 2026** |
 | `enterprise` | Enterprise | custom (set by admin per company) | custom | custom |
 
 `personal` is not a row: personal accounts are never billed. Prices are fixed on the company's
