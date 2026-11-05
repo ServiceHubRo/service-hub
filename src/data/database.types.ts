@@ -4811,12 +4811,60 @@ export type Database = {
         }
         Returns: Json
       }
+      fleet_ledger: {
+        Args: { p_company: string }
+        Returns: {
+          amount: number
+          category: string
+          day: string
+          done: boolean
+          id: string
+          odometer: number
+          shop_id: string
+          shop_name: string
+          vehicle_id: string
+        }[]
+      }
+      fleet_log_export: {
+        Args: { p_company: string; p_kind: string; p_rows: number }
+        Returns: undefined
+      }
       fleet_member_can: {
         Args: { p_capability: string; p_extra: string[]; p_role: string }
         Returns: boolean
       }
       fleet_overview: { Args: { p_company: string }; Returns: Json }
       fleet_plan_summary: { Args: { p_company: string }; Returns: Json }
+      fleet_report: {
+        Args: {
+          p_company: string
+          p_filters?: Json
+          p_from: string
+          p_prev_from?: string
+          p_prev_to?: string
+          p_to: string
+        }
+        Returns: Json
+      }
+      fleet_report_entries: {
+        Args: {
+          p_categories: string[]
+          p_company: string
+          p_shops: string[]
+          p_vehicles: string[]
+        }
+        Returns: {
+          amount: number
+          category: string
+          day: string
+          done: boolean
+          id: string
+          odometer: number
+          shop_id: string
+          shop_name: string
+          vehicle_id: string
+        }[]
+      }
       fleet_role_can: {
         Args: { p_capability: string; p_role: string }
         Returns: boolean
@@ -4839,6 +4887,15 @@ export type Database = {
         Returns: Json
       }
       fleet_subscription: { Args: { p_company: string }; Returns: Json }
+      fleet_vehicle_cost_per_km: {
+        Args: {
+          p_company: string
+          p_from: string
+          p_to: string
+          p_vehicle: string
+        }
+        Returns: Json
+      }
       fold_text: { Args: { p: string }; Returns: string }
       format_sequence_id: {
         Args: { p_number: number; p_prefix: string; p_width?: number }

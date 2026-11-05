@@ -63,6 +63,9 @@ select test.fails($$select public.admin_update_fleet_plan('fleet_business', 59, 
   'a company member cannot change a plan');
 
 -- ------------------------------------------------------------------ only the admin gives rights
+-- A member's own limit is a Fleet Pro feature since T65 (139_fleet_plan_features.sql tests the plans).
+select test.login(test.id('admin'));
+select public.admin_set_company_plan(current_setting('test.co')::uuid, 'fleet_pro', gen_random_uuid());
 select test.login(current_setting('test.mgr')::uuid);
 select test.fails(format($$select public.set_company_member_rights(%L, '{quotes.approve}', null, gen_random_uuid())$$,
   current_setting('test.m_acc')), 'not_allowed', 'a manager cannot give rights');
