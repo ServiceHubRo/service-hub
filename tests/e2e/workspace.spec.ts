@@ -1,5 +1,5 @@
-import { expect, test, type Page } from '@playwright/test';
-import { BACKEND, PASSWORD, createFleetUser, createUser, expectNoHorizontalScroll, rpcAs, shot, signIn, uniquePlate } from './support';
+import { expect, test, type Browser, type Page } from '@playwright/test';
+import { BACKEND, PASSWORD, createFleetUser, createUser, expectNoHorizontalScroll, rpcAs, serviceRest, shot, signIn, uniquePlate } from './support';
 
 // The workspace switch (T65): one dropdown in the shell — hidden for a client without a company;
 // Personal and every company of the client otherwise. Switching keeps the page when the new company
@@ -94,4 +94,102 @@ test('another company is not reachable by changing the address', async ({ page }
   await page.goto(`/c/firme/${other}?sectiune=vehicule`);
   await expect(page.getByText('Firma nu există sau nu ai acces la ea.')).toBeVisible();
   await expect(page.getByRole('heading', { level: 1, name: 'Vehicule' })).toHaveCount(0);
+});
+
+/** The menu's spaces, as listed (names only). */
+async function spaces(page: Page): Promise<string[]> {
+  await switcher(page).click();
+  const names = await page.getByRole('menuitemradio').allInnerTexts();
+  await page.keyboard.press('Escape');
+  return names.map((n) => n.split('\n')[0]!.trim());
+}
+
+async function invite(admin: string, companyId: string, email: string, role: string) {
+  const tk = Array.from(crypto.getRandomValues(new Uint8Array(32)), (b) => b.toString(16).padStart(2, '0')).join('');
+  await rpcAs(admin, 'invite_company_member', { p_company: companyId, p_email: email, p_role: role, p_token: tk, p_request_id: crypto.randomUUID() });
+  await rpcAs(email, 'accept_company_invite', { p_token: tk, p_request_id: crypto.randomUUID() });
+}
+
+async function freshPage(browser: Browser) {
+  const context = await browser.newContext();
+  await context.addInitScript(() => localStorage.setItem('sh_lang', 'ro'));
+  return { context, page: await context.newPage() };
+}
+
+test('the switch sits under the logo on a phone and a tablet, and stays on every page and after signing in again', async ({ page, browser }) => {
+  test.skip(!BACKEND, 'needs the local Supabase stack');
+  const admin = await createFleetUser();
+  const id = await company(admin, `Unica ${Date.now()}`, uniquePlate('B'));
+  await signIn(page, admin, PASSWORD);
+  await expect(page).toHaveURL(/\/c\/cauta/);
+
+  // Phone and tablet: logo and language on the first row, the switch alone under the logo.
+  if (test.info().project.name !== 'desktop-1440') {
+    const header = page.getByRole('banner');
+    const firstRow = await header.locator('> div').first().boundingBox();
+    const lang = await header.getByRole('group', { name: 'Limba' }).boundingBox();
+    const sw = await switcher(page).boundingBox();
+    // Under the first row (logo and language), aligned with the logo on the left.
+    expect(sw!.y).toBeGreaterThanOrEqual(firstRow!.y + firstRow!.height - 1);
+    expect(Math.abs(sw!.x - firstRow!.x)).toBeLessThan(4);
+    expect(lang!.y).toBeLessThan(sw!.y);
+    await shot(page, 'workspace-header', name());
+  }
+
+  // Every page, personal or the company's.
+  for (const path of ['/c/garaj', '/c/programari', '/c/mesaje', '/c/cont', `/c/firme/${id}?sectiune=vehicule`, `/c/firme/${id}?sectiune=cont`]) {
+    await page.goto(path);
+    await expect(switcher(page)).toBeVisible();
+  }
+  expect(await spaces(page)).toEqual(['Personal', expect.stringMatching(/^Unica /)]);
+
+  // Signed in again elsewhere: the same switch.
+  const other = await freshPage(browser);
+  await signIn(other.page, admin, PASSWORD);
+  await expect(other.page).toHaveURL(/\/c\/cauta/);
+  await expect(switcher(other.page)).toBeVisible();
+  await other.context.close();
+});
+
+test('a member sees only the companies they belong to; removed, the company is gone and refused', async ({ page, browser }) => {
+  test.skip(!BACKEND, 'needs the local Supabase stack');
+  const owner = await createFleetUser();
+  const member = await createFleetUser();
+  const stamp = Date.now();
+  const a = await company(owner, `Alfa ${stamp}`, uniquePlate('B'));
+  const plateB = uniquePlate('B');
+  await company(owner, `Beta ${stamp}`, plateB);
+  const c = await company(owner, `Gama ${stamp}`, uniquePlate('B'));
+
+  // The owner: Personal and the three.
+  const own = await freshPage(browser);
+  await signIn(own.page, owner, PASSWORD);
+  await expect(own.page).toHaveURL(/\/c\/cauta/);
+  expect(await spaces(own.page)).toEqual(['Personal', `Alfa ${stamp}`, `Beta ${stamp}`, `Gama ${stamp}`]);
+  await own.context.close();
+
+  // Invited into Alfa: Alfa only.
+  await invite(owner, a, member, 'driver');
+  await signIn(page, member, PASSWORD);
+  await expect(page).toHaveURL(/\/c\/cauta/);
+  expect(await spaces(page)).toEqual(['Personal', `Alfa ${stamp}`]);
+
+  // Into Gama too: exactly those two, never Beta.
+  await invite(owner, c, member, 'accountant');
+  await page.reload();
+  expect(await spaces(page)).toEqual(['Personal', `Alfa ${stamp}`, `Gama ${stamp}`]);
+  await page.goto(`/c/firme/${c}?sectiune=vehicule`);
+  await expect(page.getByText(plateB)).toHaveCount(0);
+
+  // Removed from Alfa while its page is open: the page empties and Alfa leaves the switch.
+  await page.goto(`/c/firme/${a}?sectiune=panou`);
+  await expect(page.getByRole('heading', { level: 1, name: 'Panou' })).toBeVisible();
+  const members = await serviceRest<{ id: string }[]>(`company_members?company_id=eq.${a}&role=eq.driver&select=id`, 'GET');
+  await rpcAs(owner, 'remove_company_member', { p_member: members[0]!.id, p_request_id: crypto.randomUUID() });
+  await expect(page.getByText('Firma nu există sau nu ai acces la ea.')).toBeVisible({ timeout: 15_000 });
+  expect(await spaces(page)).toEqual(['Personal', `Gama ${stamp}`]);
+  // And by its address, after a reload.
+  await page.reload();
+  await expect(page.getByText('Firma nu există sau nu ai acces la ea.')).toBeVisible();
+  await expectNoHorizontalScroll(page);
 });

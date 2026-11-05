@@ -10,13 +10,21 @@
 .header {
   flex-shrink: 0;
   display: flex;
-  align-items: center;
-  gap: 9px;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
   padding: 8px 12px 8px 16px;
   padding-top: max(8px, calc(var(--safe-top) + 4px));
   /* The same darkest layer as the desktop sidebar and the bottom bar (T52). */
   background: var(--bg-deep);
   border-bottom: 1px solid var(--border);
+}
+
+.headerRow {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
 }
 
 .headerEnd {
@@ -357,14 +365,3 @@
   }
 }
 
-/* T65: the wordmark beside the logo; on a narrow phone it gives its place to the workspace switch. */
-.headerWordmark {
-  display: inline-flex;
-  min-width: 0;
-}
-
-@media (max-width: 599px) {
-  .header:has([data-ws]) .headerWordmark {
-    display: none;
-  }
-}

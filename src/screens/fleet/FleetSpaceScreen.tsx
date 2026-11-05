@@ -22,6 +22,7 @@ import {
 } from '../../data/fleet';
 import { subscribeRows } from '../../data/realtime';
 import { toRpcError } from '../../data/rpc';
+import { useOptionalWorkspace } from '../../app/workspace/workspaceContext';
 import { useI18n } from '../../i18n/context';
 import { useLoad } from '../../lib/useLoad';
 import { clearFleetBookingHint, setFleetBookingHint } from '../client/booking/fleetBookingHint';
@@ -121,6 +122,11 @@ function FleetSpace({ companyId }: { companyId: string }) {
     [companyId, refresh, navigate],
   );
 
+  // Removed from the company while the page was open (the workspace list no longer has it): nothing
+  // of the company stays on screen; the database refuses every read and write anyway.
+  const workspace = useOptionalWorkspace();
+  const revoked = !!workspace?.ready && !workspace.companies.some((c) => c.id === companyId);
+
   const title = section === 'vehicul' ? t('fleet.nav.vehicle') : t(`fleet.nav.${section}`);
   useDocumentTitle(state.status === 'ready' ? `${title} · ${state.data.overview.company.name}` : t('fleet.space.loading'));
 
@@ -131,8 +137,8 @@ function FleetSpace({ companyId }: { companyId: string }) {
       </div>
     );
   }
-  if (state.status === 'error') {
-    const code = toRpcError(state.error).code;
+  if (state.status === 'error' || revoked) {
+    const code = state.status === 'error' ? toRpcError(state.error).code : 'company_not_found';
     return (
       <div className={styles.spaceStatus}>
         {code === 'company_not_found' || code === 'fleet_disabled' ? (

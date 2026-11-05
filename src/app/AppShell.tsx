@@ -234,23 +234,25 @@ export function AppShell({ role }: { role: Role }) {
         {t('nav.skipToContent')}
       </a>
       <header className={styles.header} data-fixed-top>
-        <LogoTile />
-        <span className={styles.headerWordmark}>
+        {/* First row: the logo left, the language (and the admin's Cont) right; second row, for a
+            client in a company: the workspace switch, under the logo (Eduard, 5 Nov 2026). */}
+        <div className={styles.headerRow}>
+          <LogoTile />
           <Wordmark />
-        </span>
-        {role === 'client' && <WorkspaceSwitcher placement="header" />}
-        <div className={styles.headerEnd}>
-          <LangSwitch />
-          {role === 'admin' && (
-            <NavLink
-              to={nav.account.path}
-              className={({ isActive }) => `${styles.iconLink} ${isActive ? styles.iconActive : ''}`}
-              aria-label={t('nav.account')}
-            >
-              <User size={20} aria-hidden="true" />
-            </NavLink>
-          )}
+          <div className={styles.headerEnd}>
+            <LangSwitch />
+            {role === 'admin' && (
+              <NavLink
+                to={nav.account.path}
+                className={({ isActive }) => `${styles.iconLink} ${isActive ? styles.iconActive : ''}`}
+                aria-label={t('nav.account')}
+              >
+                <User size={20} aria-hidden="true" />
+              </NavLink>
+            )}
+          </div>
         </div>
+        {role === 'client' && <WorkspaceSwitcher placement="header" />}
       </header>
 
       <div className={styles.body}>

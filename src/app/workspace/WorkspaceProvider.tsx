@@ -57,16 +57,27 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
     );
   }, []);
 
+  // Read again when a membership changes. Not filtered: a removal arrives as a DELETE, which Realtime
+  // never filters (it carries only the row's id); inserts and updates come only for rows the caller
+  // may read. Several changes in a row cost one read. Also when the tab comes back to the front.
   const uid = user?.id;
   useEffect(() => {
     if (!uid) return;
-    return subscribeRows({
-      channel: `workspaces:${uid}`,
-      table: 'company_members',
-      filter: `user_id=eq.${uid}`,
-      onChange: () => void reload(),
-      onResync: () => void reload(),
-    });
+    let timer: number | undefined;
+    const later = () => {
+      window.clearTimeout(timer);
+      timer = window.setTimeout(() => void reload(), 400);
+    };
+    const off = subscribeRows({ channel: `workspaces:${uid}`, table: 'company_members', onChange: later, onResync: later });
+    const visible = () => {
+      if (document.visibilityState === 'visible') later();
+    };
+    document.addEventListener('visibilitychange', visible);
+    return () => {
+      window.clearTimeout(timer);
+      off();
+      document.removeEventListener('visibilitychange', visible);
+    };
   }, [uid, reload]);
 
   const companyId = companyOfPath(pathname);

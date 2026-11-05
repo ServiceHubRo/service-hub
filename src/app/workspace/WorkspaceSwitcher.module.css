@@ -5,8 +5,9 @@
 }
 
 .header {
-  flex: 0 1 auto;
-  max-width: min(52vw, 260px);
+  align-self: flex-start;
+  width: auto;
+  max-width: min(100%, 420px);
 }
 
 .sidebar {
@@ -95,8 +96,8 @@
 }
 
 .header .menu {
-  min-width: 248px;
-  max-width: min(320px, calc(100vw - 64px));
+  min-width: 260px;
+  max-width: min(360px, calc(100vw - 32px));
 }
 
 .up {
