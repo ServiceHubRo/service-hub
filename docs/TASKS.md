@@ -1503,3 +1503,14 @@ Notă (31 oct): Eduard a aprobat politica de acces (7 zile de grație, apoi doar
 - Rămas: încasarea efectivă (T64b, aprobare separată), facturile (T64c).
 
 - [x] Făcut
+
+### T65 — Selector de spațiu și trei planuri reale ✅
+- **Audit** (5 nov): spațiul firmei avea un cadru separat, cu un comutator de două butoane doar acolo; Business, Pro și Enterprise aveau aceleași funcții; rapoartele și exporturile erau oprite doar în interfață; drepturile suplimentare mergeau pe orice plan.
+- **Un singur selector** „Personal ▾ / numele firmei ▾”, în layout-ul aplicației (sus pe telefon, în capul barei laterale pe laptop), ascuns fără firmă. Spațiul firmei e acum în același layout; meniul se schimbă cu spațiul. La schimbare: aceeași pagină dacă există, altfel Panou; ecranul se golește și citește din nou (nu se vede nimic din firma anterioară); refresh-ul păstrează spațiul; altă firmă prin adresă → „nu ai acces”.
+- **Migrarea `fleet_plan_features`** (schema 97), aprobată de Eduard pe 5 nov: funcțiile fiecărui plan în `fleet_plans.features` și verificate pe server — drepturi suplimentare (Business), limita managerilor (Business), bugete (Business), limite proprii pe membru (Pro), rapoarte calculate în baza de date (`fleet_report`: Business; partea avansată, filtrele și estimarea: Pro), exporturi verificate și scrise în jurnal (`fleet_log_export`: CSV Business, Excel Pro). La downgrade nu se șterge nimic și nimic nu devine mai permisiv.
+- **Start:** panou esențial, „Termene apropiate”, vehicule, istoric, programări, aprobări, costuri Service-Hub. **Business:** + panou financiar, rapoarte, cost/km, bugete, CSV, limita managerilor, drepturi suplimentare. **Pro:** + evoluție pe vehicul și față de perioada dinainte, vehicule cu costuri ridicate, filtre și „Interval ales”, estimarea bugetului, Excel, limite proprii. Enterprise = Pro, limite configurabile.
+- Ce lipsește din plan apare cu „Disponibil în <plan>” și „Compară planurile”, discret; pe Abonament, cardurile planurilor mai mari arată cu plus portocaliu ce adaugă.
+- Teste: `tests/sql/139_fleet_plan_features.sql`, `tests/e2e/workspace.spec.ts`, `tests/e2e/fleet-plans.spec.ts`, `tests/unit/fleet.test.ts`; actualizate `136`, `138`, `fleet-space.spec.ts`, `companies.spec.ts`.
+- Rămas: funcțiile planurilor editabile din Admin (acum prin migrare), schimbarea planului de către firmă (după plăți, T64b), cheltuielile manuale (T63e).
+
+- [x] Făcut
