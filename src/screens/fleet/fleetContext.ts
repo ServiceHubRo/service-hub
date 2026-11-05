@@ -97,7 +97,7 @@ export function useFleetLocation() {
   const go = useCallback(
     (link: FleetLink) => {
       update({ sectiune: link.section, vehicul: link.vehicle ?? null, filtru: link.filter ?? null });
-      document.getElementById('fleet-main')?.scrollTo?.({ top: 0 });
+      document.getElementById('continut')?.scrollTo?.({ top: 0 });
     },
     [update],
   );

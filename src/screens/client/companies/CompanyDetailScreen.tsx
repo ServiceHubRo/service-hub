@@ -41,6 +41,7 @@ import { COMPANIES_PATH, fleetSpacePath } from './paths';
 import { RolePill } from './RolePill';
 import { rightsSummary, ticksFor } from './rights';
 import styles from './companies.module.css';
+import { useOptionalWorkspace } from '../../../app/workspace/workspaceContext';
 
 interface Loaded {
   company: Company;
@@ -628,6 +629,7 @@ function RightsPanel({ member, onDone, onCancel }: { member: CompanyMember; onDo
 }
 
 function LeaveCard({ me, members }: { me: CompanyMember; members: CompanyMember[] }) {
+  const workspace = useOptionalWorkspace();
   const { t, lang } = useI18n();
   const navigate = useNavigate();
   const [confirming, setConfirming] = useState(false);
@@ -653,6 +655,8 @@ function LeaveCard({ me, members }: { me: CompanyMember; members: CompanyMember[
               errorMessage={(e) => rpcErrorMessage(lang, e)}
               onAction={async (requestId) => {
                 await removeCompanyMember(me.id, requestId);
+                // The company leaves the workspace switch at once.
+                await workspace?.reload();
                 navigate(COMPANIES_PATH, { replace: true });
               }}
             >

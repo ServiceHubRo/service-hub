@@ -15,6 +15,7 @@ import { useLoad } from '../../../lib/useLoad';
 import { companyPath } from './paths';
 import { RolePill } from './RolePill';
 import styles from './companies.module.css';
+import { useOptionalWorkspace } from '../../../app/workspace/workspaceContext';
 
 /**
  * An invitation link (T63b): `/c/firme/invitatie/<token>`. Inside the client app, so a visitor signs
@@ -25,6 +26,7 @@ export function CompanyInviteScreen() {
   const { t, lang } = useI18n();
   const { token = '' } = useParams();
   const navigate = useNavigate();
+  const workspace = useOptionalWorkspace();
   const { user } = useSession();
   const load = useCallback(() => getCompanyInvite(token), [token]);
   const { state, reload } = useLoad(load);
@@ -52,6 +54,7 @@ export function CompanyInviteScreen() {
             errorMessage={(e) => rpcErrorMessage(lang, e)}
             onAction={async (requestId) => {
               const company = await acceptCompanyInvite(token, requestId);
+              await workspace?.reload();
               navigate(companyPath(company.id), { replace: true });
             }}
           >

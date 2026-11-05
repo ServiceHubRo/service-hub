@@ -16,18 +16,23 @@ import { clearFleetBookingHint, setFleetBookingHint } from '../client/booking/fl
 import { COMPANIES_PATH, companyPath } from '../client/companies/paths';
 import { SEARCH_PATH } from '../client/paths';
 import { FleetContext, useFleetLocation, type FleetActions } from './fleetContext';
-import { FleetFrame, FleetPlanNotice, FleetSectionBody } from './FleetFrame';
+import { FleetPlanNotice, FleetSectionBody, PlanBadge } from './FleetSections';
 import styles from './fleet.module.css';
 
 /**
- * The company's fleet space (T63c): `/c/firme/<company>?sectiune=…`. Its own frame (top bar, sidebar,
- * the five fleet pages), the company's real data from `fleet_overview()` already narrowed to the
+ * The company's fleet space (T63c): `/c/firme/<company>?sectiune=…`, inside the client's shell since T65
+ * (the workspace switch and the company's five pages are the shell's), the company's real data from `fleet_overview()` already narrowed to the
  * member's role, and the vehicle writes. Live: a vehicle or a member changed on another device shows
  * here without a reload (Realtime on the company's rows, then a quiet re-read).
  */
 export function FleetSpaceScreen() {
-  const { t } = useI18n();
   const { companyId = '' } = useParams();
+  // A new company is a new screen (T65): nothing of the previous one is ever drawn while the new one loads.
+  return <FleetSpace key={companyId} companyId={companyId} />;
+}
+
+function FleetSpace({ companyId }: { companyId: string }) {
+  const { t } = useI18n();
   const { section, vehicleId, filter, go } = useFleetLocation();
   const navigate = useNavigate();
   const load = useCallback(async () => {
@@ -136,9 +141,10 @@ export function FleetSpaceScreen() {
   const { overview: data, plan } = state.data;
   return (
     <FleetContext.Provider value={{ data, go, mode: 'live', actions, companyPage: companyPath(companyId), addExpense: null, plan, loadSubscription }}>
-      <FleetFrame companyName={data.company.name} section={section} onNav={(s) => go({ section: s })} personalTo="/c/cauta">
-        <PageHeader
-          back={{ to: companyPath(companyId), label: t('fleet.space.companyPage') }}
+      <div className={styles.spaceTop}>
+        <PlanBadge onOpen={() => go({ section: 'abonament' })} />
+      </div>
+      <PageHeader
           title={title}
           subtitle={
             <span className={styles.spaceLine}>
@@ -148,7 +154,6 @@ export function FleetSpaceScreen() {
         />
         <FleetPlanNotice section={section} onOpen={() => go({ section: 'abonament' })} />
         <FleetSectionBody section={section} vehicleId={vehicleId} filter={filter} />
-      </FleetFrame>
     </FleetContext.Provider>
   );
 }

@@ -960,37 +960,7 @@ button.kpi:hover {
   color: var(--muted);
 }
 
-/* ---------------------------------------------------------------- preview frame */
-.frame {
-  /* Like the app's shell: the space left under the offline and schema bars. */
-  flex: 1;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-}
-
-.side {
-  display: none;
-}
-
-.main {
-  flex: 1;
-  min-height: 0;
-  min-width: 0;
-  overflow-y: auto;
-}
-
-.mainInner {
-  width: 100%;
-  max-width: var(--content-max);
-  margin: 0 auto;
-  padding: var(--page-pad);
-  padding-top: max(var(--page-pad), calc(var(--safe-top) + 8px));
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
+/* ---------------------------------------------------------------- the space's top (T65) */
 .controls {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1004,247 +974,37 @@ button.kpi:hover {
   }
 }
 
-/* The app's top bar on phones and tablets (AppShell .header): logo and name left, language right. */
-.topBar {
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  padding: 8px 12px 8px 16px;
-  padding-top: max(8px, calc(var(--safe-top) + 4px));
-  background: var(--bg-deep);
-  border-bottom: 1px solid var(--border);
-}
-
-.topBarEnd {
-  margin-left: auto;
-  display: flex;
-  align-items: center;
-}
-
 .spaceLine {
   display: inline-flex;
   align-items: center;
   gap: 6px;
 }
 
-.space {
+/* The plan badge above the page title; the shell holds the switch and the pages. */
+.spaceTop {
   display: flex;
-  gap: 2px;
-  padding: 3px;
-  border-radius: calc(var(--radius-button) + 2px);
-  background: var(--bg-deep);
-  border: 1px solid var(--border);
+  margin-bottom: 8px;
 }
 
-.spaceItem {
-  flex: 1;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  min-width: 0;
-  min-height: var(--tap);
-  padding: 6px 10px;
-  border-radius: var(--radius-button);
-  color: var(--muted);
-  font-size: 13.5px;
-  font-weight: 550;
-  text-decoration: none;
-}
-
-.spaceItem:hover:not(.spaceOn) {
-  color: var(--text);
-}
-
-.spaceOn {
-  background: var(--surface3);
-  color: var(--text);
-  font-weight: 650;
-}
-
-.spaceOn svg {
-  color: var(--amber);
-}
-
-.spaceName {
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.bottomNav {
-  flex-shrink: 0;
-  display: flex;
-  background: var(--bg-deep);
-  border-top: 1px solid var(--border);
-  padding-bottom: var(--safe-bottom);
-}
-
-.bottomItem {
-  position: relative;
-  flex: 1;
-  min-width: 0;
-  min-height: 56px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 3px;
-  padding: 6px 2px 8px;
-  color: var(--muted);
-  font-size: 11px;
-}
-
-.bottomItem span {
+.spaceTop .planBadge {
+  width: auto;
   max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
-.bottomOn {
-  color: var(--amber);
-  font-weight: 700;
-}
-
-.bottomOn::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 50%;
-  width: 28px;
-  height: 3px;
-  margin-left: -14px;
-  border-radius: 0 0 3px 3px;
-  background: var(--amber);
-}
-
-@media (min-width: 1024px) {
-  .frame {
-    flex-direction: row;
-  }
-
-  .bottomNav,
-  .mobileSpace,
-  .topBar {
-    display: none;
-  }
-
-  .side {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-4);
-    flex-shrink: 0;
-    width: var(--sidebar-w);
-    padding: var(--space-6) var(--space-3);
-    background: var(--bg-deep);
-    border-right: 1px solid var(--border);
-    overflow-y: auto;
-  }
-
-  .sideBrand {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 0 var(--space-2);
-    text-decoration: none;
-  }
-
-  /* The language at the foot of the sidebar, as in the app. */
-  .sideBottom {
-    margin-top: auto;
-    padding: var(--space-3) var(--space-2) 0;
-    border-top: 1px solid var(--border);
-  }
-
-  .side .space {
-    flex-direction: column;
-  }
-
-  .side .spaceItem {
-    justify-content: flex-start;
-  }
-
-  .sideNav {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-  }
-
-  .sideItem {
-    display: flex;
-    align-items: center;
-    gap: var(--space-3);
-    width: 100%;
-    min-height: var(--tap);
-    padding: 10px var(--space-3);
-    border-radius: var(--radius-button);
-    color: var(--text-2);
-    font-size: 14.5px;
-    font-weight: 500;
-    text-align: left;
-    transition:
-      background-color var(--motion-quick) var(--ease),
-      color var(--motion-quick) var(--ease);
-  }
-
-  .sideItem svg {
-    color: var(--muted);
-  }
-
-  .sideItem:hover {
-    background: var(--surface);
-    color: var(--text);
-  }
-
-  .sideOn,
-  .sideOn:hover {
-    background: var(--amber-tint);
-    color: var(--text);
-    font-weight: 650;
-  }
-
-  .sideOn svg {
-    color: var(--amber);
-  }
-}
-
-@media print {
-  .topBar,
-  .side,
-  .bottomNav,
-  .controls,
-  .mobileSpace {
-    display: none !important;
-  }
-
-  .frame,
-  .main {
-    display: block;
-    overflow: visible;
-    height: auto;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .grow .bar,
-  .grow .barOver,
-  .grow .barValue {
-    animation: none;
-  }
-}
-
-/* ---------------------------------------------------------------- live space (T63c) */
-.spaceStatus {
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
+/* The design preview (/dev/flota, test builds): a page of its own. */
+.previewPage {
   width: 100%;
   max-width: var(--content-max);
   margin: 0 auto;
   padding: var(--page-pad);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* ---------------------------------------------------------------- live space (T63c) */
+.spaceStatus {
+  width: 100%;
 }
 
 .subTitle {
@@ -1379,13 +1139,6 @@ button.kpi:hover {
   font-weight: 650;
 }
 
-@media (max-width: 1023px) {
-  .mobileSpace {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-}
 
 .meterBlock {
   display: flex;

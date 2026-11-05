@@ -356,3 +356,15 @@
     transform: none;
   }
 }
+
+/* T65: the wordmark beside the logo; on a narrow phone it gives its place to the workspace switch. */
+.headerWordmark {
+  display: inline-flex;
+  min-width: 0;
+}
+
+@media (max-width: 599px) {
+  .header:has([data-ws]) .headerWordmark {
+    display: none;
+  }
+}

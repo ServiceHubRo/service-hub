@@ -13,7 +13,7 @@ export function FleetAccount() {
   const { t } = useI18n();
   const { allowed, companyPage, data } = useFleet();
   const to = (s: FleetSection) => `?sectiune=${s}`;
-  const top = () => document.getElementById('fleet-main')?.scrollTo?.({ top: 0 });
+  const top = () => document.getElementById('continut')?.scrollTo?.({ top: 0 });
   return (
     <div className={styles.tiles}>
       {allowed('reports.view') && <Tile to={to('rapoarte')} onClick={top} icon={BarChart3} label={t('fleet.nav.rapoarte')} />}

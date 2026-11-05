@@ -8,8 +8,8 @@ import { SelectField } from '../../components/SelectField';
 import { SkeletonList } from '../../components/Skeleton';
 import { useI18n } from '../../i18n/context';
 import { FLEET_ROLES, scopeFor, type FleetExpense, type FleetRole } from '../../lib/fleet';
-import { FleetContext, useFleetLocation } from './fleetContext';
-import { FleetFrame, FleetPlanNotice, FleetSectionBody } from './FleetFrame';
+import { FLEET_SECTIONS, FleetContext, useFleetLocation } from './fleetContext';
+import { FleetPlanNotice, FleetSectionBody, PlanBadge } from './FleetSections';
 import { emptyFleet, SAMPLE_MEMBER_FOR_ROLE, sampleFleet, samplePlanSummary, sampleSubscription } from './sample';
 import styles from './fleet.module.css';
 
@@ -20,6 +20,7 @@ const DATA_MODES: readonly DataMode[] = ['sample', 'empty', 'loading', 'error'];
  * The fleet account's design preview (T63a, docs/FLEET_PLAN.md): test builds only (`/dev/flota`,
  * like the component gallery), invented sample data clearly marked, nothing saved. The role, the
  * data (sample, empty, loading, error) and the page are in the address, so a link shows one state.
+ * Since T65 the real space lives in the client's shell; the preview is a plain page with a page picker.
  * The screens are the real components; stage 3 gives them `fleet_overview()` instead of the sample.
  */
 export function FleetPreviewScreen() {
@@ -49,7 +50,7 @@ export function FleetPreviewScreen() {
 
   return (
     <FleetContext.Provider value={{ data, go, mode: 'preview', actions: null, companyPage: null, addExpense, plan, loadSubscription }}>
-      <FleetFrame companyName={data.company.name} section={section} onNav={(s) => go({ section: s })} personalTo="/c/garaj">
+      <div className={styles.previewPage}>
         <Banner tone="warning">{t('fleet.preview.banner')}</Banner>
         <div className={styles.controls}>
           <SelectField
@@ -64,6 +65,15 @@ export function FleetPreviewScreen() {
             onChange={(e) => update({ date: e.target.value })}
             options={DATA_MODES.map((m) => ({ value: m, label: t(`fleet.preview.mode.${m}`) }))}
           />
+          <SelectField
+            label={t('fleet.preview.page')}
+            value={section === 'vehicul' ? 'vehicule' : section}
+            onChange={(e) => go({ section: e.target.value as typeof section })}
+            options={FLEET_SECTIONS.filter((x) => x !== 'vehicul').map((x) => ({ value: x, label: t(`fleet.nav.${x}`) }))}
+          />
+        </div>
+        <div className={styles.spaceTop}>
+          <PlanBadge onOpen={() => go({ section: 'abonament' })} />
         </div>
         <PageHeader
           title={title}
@@ -75,7 +85,7 @@ export function FleetPreviewScreen() {
         />
         <FleetPlanNotice section={section} onOpen={() => go({ section: 'abonament' })} />
         {body}
-      </FleetFrame>
+      </div>
     </FleetContext.Provider>
   );
 }
