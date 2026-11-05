@@ -1,6 +1,6 @@
 import { call, failure, RpcError, type Booking } from './rpc';
 import { supabase } from './supabase';
-import type { FleetOverview, FleetPlanRow, FleetPlanSummary, FleetSubscriptionView, FleetVehicle } from '../lib/fleet';
+import type { FleetOverview, FleetPlanRow, FleetPlanSummary, FleetReport, FleetSubscriptionView, FleetVehicle, ReportFilters } from '../lib/fleet';
 
 /**
  * The company's fleet (T63c, docs/FLEET_PLAN.md): one read, `fleet_overview(company)`, already
@@ -84,6 +84,43 @@ export interface BookableCompany {
 /** The company vehicles the caller may book (a driver: the one assigned), for the car step. */
 export async function fetchBookableVehicles(): Promise<BookableCompany[]> {
   return (await call('fleet_bookable_vehicles', {} as never)) as unknown as BookableCompany[];
+}
+
+// ------------------------------------------------------------------------------------ reports (T65)
+
+/** The plans sold today, in order (every signed-in user reads them): the "Disponibil în …" tags. */
+export async function fetchFleetPlans(): Promise<FleetPlanRow[]> {
+  if (!supabase) throw new RpcError('network');
+  const { data, error } = await supabase
+    .from('fleet_plans')
+    .select('key, name_ro, name_en, price_ron, vehicle_limit, member_limit, features, included_members, member_price_ron')
+    .eq('public', true)
+    .eq('active', true)
+    .order('position');
+  if (error) throw failure(error);
+  return data as unknown as FleetPlanRow[];
+}
+
+/** A report computed by the database for the company's plan and the member's role. */
+export async function fetchFleetReport(
+  company: string,
+  range: { from: string | null; to: string },
+  previous: { from: string | null; to: string } | null,
+  filters: ReportFilters,
+): Promise<FleetReport> {
+  return (await call('fleet_report', {
+    p_company: company,
+    p_from: range.from,
+    p_to: range.to,
+    p_prev_from: previous?.from ?? null,
+    p_prev_to: previous?.to ?? null,
+    p_filters: filters,
+  } as never)) as unknown as FleetReport;
+}
+
+/** Checks that the plan and the role allow an export, and logs it; the file is written afterwards. */
+export async function logFleetExport(company: string, kind: 'vehicles_csv' | 'costs_csv' | 'report_csv' | 'report_xlsx', rows: number): Promise<void> {
+  await call('fleet_log_export', { p_company: company, p_kind: kind, p_rows: rows } as never);
 }
 
 // ------------------------------------------------------------------------------------ plans (T64a)

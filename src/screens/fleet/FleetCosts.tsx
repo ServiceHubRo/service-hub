@@ -8,6 +8,7 @@ import { EmptyState } from '../../components/EmptyState';
 import { Field } from '../../components/Field';
 import { SelectField } from '../../components/SelectField';
 import { TextArea } from '../../components/TextArea';
+import { canRetryRpc, rpcErrorMessage } from '../../data/rpc';
 import { useI18n } from '../../i18n/context';
 import { formatDate, formatDateRange, formatMoney, ymdInBucharest } from '../../i18n/format';
 import { importAmount, importOdometer } from '../../lib/importRows';
@@ -36,7 +37,7 @@ import styles from './fleet.module.css';
  */
 export function FleetCosts({ initialPeriod }: { initialPeriod?: string }) {
   const { t, lang } = useI18n();
-  const { data, allowed, vehicle, addExpense, plan } = useFleet();
+  const { data, allowed, vehicle, addExpense, plan, logExport } = useFleet();
   const today = ymdInBucharest(new Date());
   const ledger = useMemo(() => buildLedger(data.jobs, data.expenses), [data.jobs, data.expenses]);
   const [period, setPeriod] = useState<CostPeriod>(COST_PERIODS.includes(initialPeriod as CostPeriod) ? (initialPeriod as CostPeriod) : 'year');
@@ -69,6 +70,8 @@ export function FleetCosts({ initialPeriod }: { initialPeriod?: string }) {
       category: (e) => t(`fleet.cat.${e.category}`) + (e.fee ? ` (${t('fleet.costs.fee')})` : ''),
       source: (e) => t(`fleet.source.${e.source}`),
     });
+    // The plan and the role are checked, and the export logged, before the file is written (T65).
+    await logExport('costs_csv', shown.length);
     await saveFile(new Blob([csv], { type: 'text/csv;charset=utf-8' }), `${t('fleet.costs.file')}-${today}.csv`);
   }
 
@@ -136,9 +139,9 @@ export function FleetCosts({ initialPeriod }: { initialPeriod?: string }) {
         end={
           <div className={styles.toolbarEnd}>
             {shown.length > 0 && hasFeature(plan, 'export_csv') && (
-              <Button variant="ghost" className={styles.tool} onClick={() => void exportCsv()}>
+              <ActionButton variant="ghost" block={false} className={styles.tool} onAction={() => exportCsv()} errorMessage={(e) => rpcErrorMessage(lang, e)} canRetry={canRetryRpc}>
                 <Download size={18} aria-hidden="true" /> {t('fleet.export.csv')}
-              </Button>
+              </ActionButton>
             )}
             {allowed('costs.manage') && addExpense && (
               <Button variant="primary" onClick={() => setAdding((a) => !a)} aria-expanded={adding}>

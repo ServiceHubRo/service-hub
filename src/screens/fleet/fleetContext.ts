@@ -2,7 +2,17 @@ import { createContext, useCallback, useContext } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import type { VehicleFields } from '../../data/fleet';
 import type { Booking } from '../../data/rpc';
-import { memberCan, type FleetCapability, type FleetOverview, type FleetPlanSummary, type FleetSubscriptionView, type FleetVehicle } from '../../lib/fleet';
+import {
+  memberCan,
+  type FleetCapability,
+  type FleetOverview,
+  type FleetPlanRow,
+  type FleetPlanSummary,
+  type FleetReport,
+  type FleetSubscriptionView,
+  type FleetVehicle,
+  type ReportFilters,
+} from '../../lib/fleet';
 
 /**
  * What every fleet screen needs: the company read (already narrowed to the member's role), what the
@@ -49,6 +59,12 @@ export interface FleetContextValue {
   plan: FleetPlanSummary | null;
   /** Reads the Abonament page (live: `fleet_subscription`; preview: the sample). */
   loadSubscription: () => Promise<FleetSubscriptionView>;
+  /** The plans sold today, for the "Disponibil în …" tags (T65). */
+  plans: FleetPlanRow[];
+  /** A report for the plan and the role (live: `fleet_report`, computed by the database). */
+  loadReport: (range: { from: string | null; to: string }, previous: { from: string | null; to: string } | null, filters: ReportFilters) => Promise<FleetReport>;
+  /** Checks and logs an export before the file is written (live: `fleet_log_export`). */
+  logExport: (kind: 'vehicles_csv' | 'costs_csv' | 'report_csv' | 'report_xlsx', rows: number) => Promise<void>;
 }
 
 export const FleetContext = createContext<FleetContextValue | null>(null);

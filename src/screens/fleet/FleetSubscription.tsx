@@ -1,4 +1,4 @@
-import { Check, CreditCard, Lock } from 'lucide-react';
+import { Check, CreditCard, Lock, Plus } from 'lucide-react';
 import { useCallback } from 'react';
 import { Card } from '../../components/Card';
 import { EmptyState } from '../../components/EmptyState';
@@ -104,9 +104,12 @@ function Subscription({ view }: { view: FleetSubscriptionView }) {
         </h2>
         <ul className={styles.planGrid}>
           {plans.map((p) => (
-            <PlanCard key={p.key} p={p} current={p.key === plan.plan_key} />
+            <PlanCard key={p.key} p={p} current={p.key === plan.plan_key} have={plan.features} />
           ))}
         </ul>
+        <p className={styles.hintLine}>
+          <Plus size={14} aria-hidden="true" className={styles.amberIcon} /> {t('fleet.sub.gainLegend')}
+        </p>
       </section>
     </div>
   );
@@ -147,7 +150,11 @@ function Subscription({ view }: { view: FleetSubscriptionView }) {
   }
 }
 
-function PlanCard({ p, current }: { p: FleetPlanRow; current: boolean }) {
+/**
+ * One plan of the comparison (T65): a tick for what the company has today, an amber plus for what
+ * this plan would add to it — the upgrade's gains, without a separate list.
+ */
+function PlanCard({ p, current, have }: { p: FleetPlanRow; current: boolean; have: readonly string[] }) {
   const { t, lang } = useI18n();
   const features = offeredFeatures(p.features);
   return (
@@ -177,11 +184,16 @@ function PlanCard({ p, current }: { p: FleetPlanRow; current: boolean }) {
         )}
       </ul>
       <ul className={styles.planFeatures}>
-        {features.map((f) => (
-          <li key={f}>
-            <Check size={15} aria-hidden="true" className={styles.green} /> {t(`fleet.feature.${f}`)}
-          </li>
-        ))}
+        {features.map((f) => {
+          const gain = !current && !have.includes(f);
+          return (
+            <li key={f} className={gain ? styles.gain : undefined}>
+              {gain ? <Plus size={15} aria-hidden="true" className={styles.amberIcon} /> : <Check size={15} aria-hidden="true" className={styles.green} />}{' '}
+              {t(`fleet.feature.${f}`)}
+              {gain && <span className="visually-hidden"> ({t('fleet.sub.gain')})</span>}
+            </li>
+          );
+        })}
       </ul>
       {p.price_ron === null && (
         <a className={styles.planContact} href="mailto:contact@service-hub.ro">

@@ -153,7 +153,8 @@ test('the plan: Abonament, the limits of Fleet Start, and the admin changes the 
     });
   }
   await page.goto(`/c/firme/${company.id}?sectiune=rapoarte`);
-  await expect(page.getByText('Rapoartele sunt incluse din Fleet Business', { exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Rapoartele de costuri' })).toBeVisible();
+  await expect(page.getByText('Disponibil în Fleet Business').first()).toBeVisible();
   await page.goto(`/c/firme/${company.id}?sectiune=vehicule`);
   await expect(page.getByText('5 din 5 vehicule')).toBeVisible();
   await expect(page.getByRole('button', { name: 'Descarcă CSV' })).toHaveCount(0);
@@ -315,7 +316,18 @@ test('rights and colleagues: the admin lets the accountant approve up to 300 lei
   await signIn(page, admin, PASSWORD);
   await expect(page).toHaveURL(/\/c\/cauta/);
   await page.goto(`/c/cont/firme/${company.id}`);
-  const row = page.locator('li', { hasText: accountant });
+  let row = page.locator('li', { hasText: accountant });
+  await row.getByRole('button', { name: 'Mai multe' }).click();
+  await page.getByRole('menuitem', { name: 'Drepturi' }).click();
+  await expect(row.getByText('Ce mai poate face')).toBeVisible();
+  // On Fleet Business (the trial) a member's own limit is named with its plan (T65).
+  await row.getByRole('checkbox', { name: 'Aprobă devize' }).check();
+  await expect(row.getByText('Disponibil în Fleet Pro')).toBeVisible();
+  await expect(row.getByLabel('Limita lui de aprobare')).toHaveCount(0);
+  // On Fleet Pro it can be set.
+  await serviceRest(`company_subscriptions?company_id=eq.${company.id}`, 'PATCH', { plan_key: 'fleet_pro' });
+  await page.reload();
+  row = page.locator('li', { hasText: accountant });
   await row.getByRole('button', { name: 'Mai multe' }).click();
   await page.getByRole('menuitem', { name: 'Drepturi' }).click();
   await expect(row.getByText('Ce mai poate face')).toBeVisible();
@@ -330,9 +342,9 @@ test('rights and colleagues: the admin lets the accountant approve up to 300 lei
   const overview = await rpcAs<{ me: { approval_limit: number } }>(accountant, 'fleet_overview', { p_company: company.id });
   expect(Number(overview.me.approval_limit)).toBe(300);
 
-  // Abonament: one colleague of the three included; the admin is not counted.
+  // Abonament: one colleague of the five included on Pro; the admin is not counted.
   await page.goto(`/c/firme/${company.id}?sectiune=abonament`);
-  await expect(page.getByText('1 din 3 incluși')).toBeVisible();
+  await expect(page.getByText('1 din 5 incluși')).toBeVisible();
   await expect(page.getByText('Administratorul nu se numără.')).toBeVisible();
   await expect(page.getByText('19 lei / coleg în plus').first()).toBeVisible();
   await expectNoHorizontalScroll(page);

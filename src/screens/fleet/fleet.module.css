@@ -1380,3 +1380,49 @@ button.kpi:hover {
   font-size: 12.5px;
   color: var(--amber);
 }
+
+/* T65: what the plan does not include — a discreet tag and a quiet card, never a fake preview. */
+.planTag {
+  white-space: nowrap;
+}
+
+.locked {
+  border-style: dashed;
+}
+
+.lockedHead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 10px;
+}
+
+.lockedIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  color: var(--amber);
+  background: var(--amber-tint);
+  border-radius: 8px;
+}
+
+/* Rapoarte (T65, Pro): the chosen range, two dates side by side. */
+.twoFields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  max-width: 480px;
+}
+
+/* Abonament (T65): what a plan would add to the company's, in amber. */
+.amberIcon {
+  color: var(--amber);
+  flex-shrink: 0;
+}
+
+.gain {
+  color: var(--text);
+  font-weight: 600;
+}

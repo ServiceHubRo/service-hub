@@ -8,3 +8,4 @@ export * from './export';
 export * from './scope';
 export * from './plans';
 export * from './bookings';
+export * from './report';

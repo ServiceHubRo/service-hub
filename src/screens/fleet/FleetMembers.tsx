@@ -8,7 +8,7 @@ import { Card } from '../../components/Card';
 import { EmptyState } from '../../components/EmptyState';
 import { useI18n } from '../../i18n/context';
 import { formatMoney } from '../../i18n/format';
-import { can, FLEET_CAPABILITIES, FLEET_ROLES, type FleetCapability, type FleetRole } from '../../lib/fleet';
+import { can, FLEET_CAPABILITIES, FLEET_ROLES, hasFeature, type FleetCapability, type FleetRole } from '../../lib/fleet';
 import { rightsSummary } from '../client/companies/rights';
 import { useFleet } from './fleetContext';
 import pill from '../../components/StatusBadge.module.css';
@@ -22,7 +22,10 @@ const ROLE_TONE = { admin: 'amber', manager: 'blue', driver: 'muted', accountant
  */
 export function FleetMembers() {
   const { t, lang } = useI18n();
-  const { data, allowed, companyPage } = useFleet();
+  const { data, allowed, companyPage, plan } = useFleet();
+  // The rights given show only while the plan applies them (T65).
+  const rightsOn = hasFeature(plan, 'member_rights');
+  const ownLimit = hasFeature(plan, 'approval_custom');
   const [phoneRole, setPhoneRole] = useState<FleetRole>('manager');
 
   if (!allowed('members.manage')) {
@@ -51,8 +54,8 @@ export function FleetMembers() {
               <span className={styles.lineText}>
                 <span>{m.name || m.email}</span>
                 <span className={styles.muted}>{m.accepted_at ? m.email : t('fleet.members.pending', { email: m.email })}</span>
-                {m.role !== 'admin' && rightsSummary(lang, m.role, m.extra_caps, m.approval_limit) && (
-                  <span className={styles.rightsLine}>{rightsSummary(lang, m.role, m.extra_caps, m.approval_limit)}</span>
+                {m.role !== 'admin' && rightsOn && rightsSummary(lang, m.role, m.extra_caps, ownLimit ? m.approval_limit : null) && (
+                  <span className={styles.rightsLine}>{rightsSummary(lang, m.role, m.extra_caps, ownLimit ? m.approval_limit : null)}</span>
                 )}
               </span>
               <span className={`${pill.pill} ${pill[ROLE_TONE[m.role]]}`}>{t(`fleet.role.${m.role}`)}</span>

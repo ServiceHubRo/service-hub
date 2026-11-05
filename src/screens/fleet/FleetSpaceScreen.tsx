@@ -7,7 +7,19 @@ import { EmptyState } from '../../components/EmptyState';
 import { LoadError } from '../../components/LoadError';
 import { PageHeader } from '../../components/PageHeader';
 import { SkeletonList } from '../../components/Skeleton';
-import { archiveVehicle, assignDriver, fetchFleetOverview, fetchPlanSummary, fetchSubscription, fleetDecideQuote, saveVehicle, setUnavailable } from '../../data/fleet';
+import {
+  archiveVehicle,
+  assignDriver,
+  fetchFleetOverview,
+  fetchFleetPlans,
+  fetchFleetReport,
+  fetchPlanSummary,
+  fetchSubscription,
+  fleetDecideQuote,
+  logFleetExport,
+  saveVehicle,
+  setUnavailable,
+} from '../../data/fleet';
 import { subscribeRows } from '../../data/realtime';
 import { toRpcError } from '../../data/rpc';
 import { useI18n } from '../../i18n/context';
@@ -15,7 +27,7 @@ import { useLoad } from '../../lib/useLoad';
 import { clearFleetBookingHint, setFleetBookingHint } from '../client/booking/fleetBookingHint';
 import { COMPANIES_PATH, companyPath } from '../client/companies/paths';
 import { SEARCH_PATH } from '../client/paths';
-import { FleetContext, useFleetLocation, type FleetActions } from './fleetContext';
+import { FleetContext, useFleetLocation, type FleetActions, type FleetContextValue } from './fleetContext';
 import { FleetPlanNotice, FleetSectionBody, PlanBadge } from './FleetSections';
 import styles from './fleet.module.css';
 
@@ -36,11 +48,13 @@ function FleetSpace({ companyId }: { companyId: string }) {
   const { section, vehicleId, filter, go } = useFleetLocation();
   const navigate = useNavigate();
   const load = useCallback(async () => {
-    const [overview, plan] = await Promise.all([fetchFleetOverview(companyId), fetchPlanSummary(companyId)]);
-    return { overview, plan };
+    const [overview, plan, plans] = await Promise.all([fetchFleetOverview(companyId), fetchPlanSummary(companyId), fetchFleetPlans()]);
+    return { overview, plan, plans };
   }, [companyId]);
   const { state, reload, setData } = useLoad(load);
   const loadSubscription = useCallback(() => fetchSubscription(companyId), [companyId]);
+  const loadReport = useCallback<FleetContextValue['loadReport']>((range, previous, filters) => fetchFleetReport(companyId, range, previous, filters), [companyId]);
+  const logExport = useCallback<FleetContextValue['logExport']>((kind, rows) => logFleetExport(companyId, kind, rows), [companyId]);
 
   // Quiet re-read: several changes in a row cost one read; an older answer never replaces a newer one.
   const generation = useRef(0);
@@ -138,9 +152,9 @@ function FleetSpace({ companyId }: { companyId: string }) {
     );
   }
 
-  const { overview: data, plan } = state.data;
+  const { overview: data, plan, plans } = state.data;
   return (
-    <FleetContext.Provider value={{ data, go, mode: 'live', actions, companyPage: companyPath(companyId), addExpense: null, plan, loadSubscription }}>
+    <FleetContext.Provider value={{ data, go, mode: 'live', actions, companyPage: companyPath(companyId), addExpense: null, plan, loadSubscription, plans, loadReport, logExport }}>
       <div className={styles.spaceTop}>
         <PlanBadge onOpen={() => go({ section: 'abonament' })} />
       </div>

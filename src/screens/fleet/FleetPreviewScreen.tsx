@@ -7,10 +7,10 @@ import { PageHeader } from '../../components/PageHeader';
 import { SelectField } from '../../components/SelectField';
 import { SkeletonList } from '../../components/Skeleton';
 import { useI18n } from '../../i18n/context';
-import { FLEET_ROLES, scopeFor, type FleetExpense, type FleetRole } from '../../lib/fleet';
-import { FLEET_SECTIONS, FleetContext, useFleetLocation } from './fleetContext';
+import { buildReport, FLEET_ROLES, scopeFor, type FleetExpense, type FleetRole } from '../../lib/fleet';
+import { FLEET_SECTIONS, FleetContext, useFleetLocation, type FleetContextValue } from './fleetContext';
 import { FleetPlanNotice, FleetSectionBody, PlanBadge } from './FleetSections';
-import { emptyFleet, SAMPLE_MEMBER_FOR_ROLE, sampleFleet, samplePlanSummary, sampleSubscription } from './sample';
+import { emptyFleet, SAMPLE_MEMBER_FOR_ROLE, SAMPLE_PLANS, sampleFleet, samplePlanSummary, sampleSubscription } from './sample';
 import styles from './fleet.module.css';
 
 type DataMode = 'sample' | 'empty' | 'loading' | 'error';
@@ -40,6 +40,10 @@ export function FleetPreviewScreen() {
   const activeVehicles = data.vehicles.filter((v) => !v.archived_at).length;
   const plan = useMemo(() => (mode === 'sample' || mode === 'empty' ? samplePlanSummary(new Date(), activeVehicles) : null), [mode, activeVehicles]);
   const loadSubscription = useCallback(async () => sampleSubscription(new Date(), activeVehicles, data.members.length), [activeVehicles, data.members.length]);
+  // The preview's plan is Fleet Business with every feature shown (no plan = everything, hasFeature).
+  const features = useMemo(() => SAMPLE_PLANS[2]!.features, []);
+  const loadReport = useCallback<FleetContextValue['loadReport']>(async (range, previous, filters) => buildReport(data, features, range, previous, filters), [data, features]);
+  const logExport = useCallback<FleetContextValue['logExport']>(async () => undefined, []);
   const title = section === 'vehicul' ? t('fleet.nav.vehicle') : t(`fleet.nav.${section}`);
   useDocumentTitle(`${title} · ${t('fleet.preview.tag')}`);
 
@@ -49,7 +53,7 @@ export function FleetPreviewScreen() {
   else body = <FleetSectionBody section={section} vehicleId={vehicleId} filter={filter} />;
 
   return (
-    <FleetContext.Provider value={{ data, go, mode: 'preview', actions: null, companyPage: null, addExpense, plan, loadSubscription }}>
+    <FleetContext.Provider value={{ data, go, mode: 'preview', actions: null, companyPage: null, addExpense, plan, loadSubscription, plans: SAMPLE_PLANS, loadReport, logExport }}>
       <div className={styles.previewPage}>
         <Banner tone="warning">{t('fleet.preview.banner')}</Banner>
         <div className={styles.controls}>
