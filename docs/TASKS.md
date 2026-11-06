@@ -1590,3 +1590,10 @@ Aprobate de Eduard pe 6 nov („aprob T71–T75”; T71 era deja folosit, așa c
 - Rămas: verificarea pe proiectul de TEST că fiecare migrare se aplică într-o tranzacție (la primul deploy); ecran de istoric al modificărilor de cheltuieli (în jurnal, neafișat).
 
 - [x] Făcut
+
+### P2 — Fără insigna planului în antetul firmei ✅
+- Insigna permanentă cu planul și perioada de test a fost scoasă din antetul spațiului firmei. Planul se vede în Cont → „Abonament și facturare”.
+- Pe Panou rămâne doar un avertisment, când e cazul, cu „Vezi abonamentul” pentru cine are acces la abonament: abonament expirat (toți), plata restantă, colegi peste limită, ultima săptămână din perioada de test (nu șoferului), vehicule peste limită (toți). Un singur avertisment o dată, cel mai grav: `planNotice()` în `src/lib/fleet/plans.ts`.
+- Teste: `tests/unit/fleetPlanNotice.test.ts`, `tests/e2e/fleet-space.spec.ts` (fără insignă, avertismentul în ultima săptămână, linkul spre abonament).
+
+- [x] Făcut
