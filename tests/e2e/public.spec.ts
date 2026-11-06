@@ -99,7 +99,7 @@ test('landing: every section, in Romanian and English, without horizontal scroll
     await expect(page.getByRole('heading', { level: 2, name: heading })).toBeVisible();
   }
   for (const card of [
-    'Cauți după oraș sau intervenție',
+    'Cauți după oraș sau serviciu',
     'Primești deviz și decizi tu',
     'Afli când mașina este gata',
     'Clienții se programează singuri',
@@ -120,7 +120,7 @@ test('landing: every section, in Romanian and English, without horizontal scroll
     await expect(page.getByText('Reducere de 33%')).toHaveCount(1);
     await expect(page.getByText(/TVA/)).toHaveCount(0);
     await expect(page.getByText('primele 90 de zile gratuite')).toBeVisible();
-    await expect(page.getByText('Exclusiv pentru primele service-uri partenere din fiecare oraș. Prețul de lansare rămâne al tău cât timp ești cu noi.')).toBeVisible();
+    await expect(page.getByText('Exclusiv pentru primele service-uri partenere din fiecare oraș. Prețul de lansare se păstrează cât timp abonamentul rămâne activ.')).toBeVisible();
     await expect(page.getByRole('link', { name: 'Profită acum' })).toBeVisible();
     await expect(
       page.getByText('Primul coleg cu cont în service este inclus în abonament. Fiecare coleg în plus: 19 lei pe lună. În perioada gratuită nu plătești nimic.'),
@@ -150,7 +150,7 @@ test('landing: every section, in Romanian and English, without horizontal scroll
     await expect(page.getByText(/VAT/)).toHaveCount(0);
     await expect(page.getByText('Launch offer · Limited places')).toBeVisible();
     await expect(page.getByText('33% off')).toHaveCount(1);
-    await expect(page.getByText("Exclusive to the first partner shops in each city. The launch price stays yours for as long as you're with us.")).toBeVisible();
+    await expect(page.getByText("Exclusive to the first partner shops in each city. The launch price is kept for as long as your subscription stays active.")).toBeVisible();
     await expect(page.getByRole('link', { name: 'Claim it now' })).toBeVisible();
   }
   await expectNoHorizontalScroll(page);
@@ -175,10 +175,10 @@ test('landing: the way in is "Intră în cont" and "Creează cont"; the shops se
   await expect(page).toHaveURL(/\/cont-nou\?rol=service$/);
   await expect(page.getByRole('button', { name: 'Sunt service' })).toHaveAttribute('aria-pressed', 'true');
   if (BACKEND) {
-    await expect(page.getByText('Ofertă de lansare, locuri limitate: 99 lei pe lună în loc de 149 lei, păstrat cât timp rămâi cu noi. Profită acum.')).toBeVisible();
+    await expect(page.getByText('Ofertă de lansare, locuri limitate: 99 lei pe lună în loc de 149 lei, păstrat cât timp abonamentul rămâne activ. Profită acum.')).toBeVisible();
     // The same for every city: where places are left is the admin's business (Eduard, 9 Oct).
     await page.getByLabel('Oraș').fill('Brașov');
-    await expect(page.getByText('Ofertă de lansare, locuri limitate: 99 lei pe lună în loc de 149 lei, păstrat cât timp rămâi cu noi. Profită acum.')).toBeVisible();
+    await expect(page.getByText('Ofertă de lansare, locuri limitate: 99 lei pe lună în loc de 149 lei, păstrat cât timp abonamentul rămâne activ. Profită acum.')).toBeVisible();
     await expect(page.getByText(/Ofertă de lansare în/)).toHaveCount(0);
     await shot(page, 'signup-shop-launch', name());
   }

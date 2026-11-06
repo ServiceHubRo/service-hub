@@ -68,7 +68,7 @@ test('a new client: welcome, the lit spots one by one, "Primii pași" ticks itse
   await shot(page, 'tour-client-welcome', name());
 
   const stops: [string, string, Locator][] = [
-    ['Primii pași', 'Câțiva pași și ești gata pentru prima programare.', page.locator('[data-tour="guide"]')],
+    ['Primii pași', 'Câțiva pași până la prima programare.', page.locator('[data-tour="guide"]')],
     ['Caută un service', 'După reparație, nume sau oraș.', page.locator('#search-q')],
     ['Garaj', 'Mașinile tale, cu ITP, RCA și rovinieta la vedere.', navItem(page, '/c/garaj')],
     ['Programări', 'Programările tale și devizele de acceptat.', navItem(page, '/c/programari')],

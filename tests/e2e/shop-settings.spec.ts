@@ -65,7 +65,7 @@ test.describe('shop settings', () => {
     await expect(page.getByText('0 din 4', { exact: true })).toBeVisible();
     await expect(page.getByText('Service-ul tău nu apare încă în căutări.')).toBeVisible();
     await expect(page.getByText('Alege cel puțin un serviciu.')).toBeVisible();
-    await expect(page.getByText(/^Îți trimitem un cod de 6 cifre prin SMS la 07\d{2} \d{3} \d{3}\.$/)).toBeVisible();
+    await expect(page.getByText(/^Un cod de 6 cifre va fi trimis prin SMS la 07\d{2} \d{3} \d{3}\.$/)).toBeVisible();
     await expectNoHorizontalScroll(page);
     await shot(page, 't05-panou-new', name());
 
@@ -73,7 +73,7 @@ test.describe('shop settings', () => {
     await page.getByRole('link', { name: /Alege serviciile pe care le faci/ }).click();
     await expect(page.getByRole('heading', { level: 1, name: 'Servicii oferite' })).toBeVisible();
     await expect(page.getByText('Selectate: 0 din 151')).toBeVisible();
-    const kind = page.getByLabel('Pornește de la tipul atelierului');
+    const kind = page.getByLabel('Pornește de la tipul service-ului');
     await kind.selectOption('tires');
     await expect(page.getByRole('status').filter({ hasText: 'Vulcanizare: 7 servicii bifate.' })).toBeVisible();
     await expect(page.getByText('Selectate: 7 din 151')).toBeVisible();
@@ -119,7 +119,7 @@ test.describe('shop settings', () => {
     await expectNoHorizontalScroll(page);
     await shot(page, 't05-services', name());
     await page.getByRole('button', { name: 'Salvează serviciile' }).click();
-    await expect(page.getByRole('button', { name: '✓ Salvat' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Salvat' })).toBeVisible();
     await page.reload();
     await expect(page.getByText('Selectate: 3 din 151')).toBeVisible();
 
@@ -135,7 +135,7 @@ test.describe('shop settings', () => {
     await expect(saturday.getByText('09:00')).toBeVisible();
     await expect(saturday.getByText('13:00')).toBeVisible();
     await page.getByRole('button', { name: 'Salvează programul' }).click();
-    await expect(page.getByRole('button', { name: '✓ Salvat' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Salvat' })).toBeVisible();
 
     // Days off: 3 days, then edit the label, then it stays after a reload.
     await page.getByRole('button', { name: 'Adaugă zile libere' }).click();
@@ -166,7 +166,7 @@ test.describe('shop settings', () => {
     await expect(page.getByText('Scrie o sumă între 0 și 10.000 lei.')).toBeVisible();
     await page.getByLabel('Taxă de constatare (lei)').fill('80');
     await page.getByRole('button', { name: 'Salvează regulile' }).click();
-    await expect(page.getByRole('button', { name: '✓ Salvat' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Salvat' })).toBeVisible();
     await expectNoHorizontalScroll(page);
     await shot(page, 't05-rules', name());
 
@@ -188,7 +188,7 @@ test.describe('shop settings', () => {
     await expect(page.locator('#capacitate')).toBeInViewport();
   });
 
-  test('public profile and billing: validation, "Copiază adresa atelierului", saved values', async ({ page }) => {
+  test('public profile and billing: validation, "Copiază adresa service-ului", saved values', async ({ page }) => {
     const email = await createUser('shop');
     await signIn(page, email, PASSWORD);
     await openSettings(page, 'Profil public');
@@ -199,12 +199,12 @@ test.describe('shop settings', () => {
     await page.getByLabel('Site (opțional)').fill('atelier');
     await page.getByRole('button', { name: 'Salvează profilul' }).click();
     await expect(page.getByText('Codul poștal are exact 6 cifre.')).toBeVisible();
-    await expect(page.getByText('Adresă invalidă. Exemplu: www.atelier.ro')).toBeVisible();
+    await expect(page.getByText('Adresă invalidă. Exemplu: www.service-ul-meu.ro')).toBeVisible();
     await page.getByLabel('Cod poștal').fill('500059');
     await page.getByLabel('Site (opțional)').fill('www.atelier-test.ro');
     await page.getByLabel('Descriere scurtă').fill('Service auto multimarcă.');
     await page.getByRole('button', { name: 'Salvează profilul' }).click();
-    await expect(page.getByRole('button', { name: '✓ Salvat' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Salvat' })).toBeVisible();
     // The map lookup answers one way or another (the test stack may have no internet).
     await expect(page.getByText(/Am găsit|Nu am găsit|Harta nu răspunde/)).toBeVisible({ timeout: 30_000 });
     await expectNoHorizontalScroll(page);
@@ -225,11 +225,11 @@ test.describe('shop settings', () => {
     await expect(page.getByLabel('CUI / Cod fiscal')).toBeFocused();
     await page.getByLabel('CUI / Cod fiscal').fill('RO14872301');
     await page.getByLabel('IBAN').fill('RO49 AAAA 1B31 0075 9384 0000');
-    await page.getByRole('button', { name: 'Copiază adresa atelierului' }).click();
+    await page.getByRole('button', { name: 'Copiază adresa service-ului' }).click();
     await expect(page.getByLabel('Sediul social')).toHaveValue('Str. Lungă 42, Brașov, Brașov');
     await page.getByRole('switch', { name: 'Plătitor de TVA' }).check();
     await page.getByRole('button', { name: 'Salvează datele de facturare' }).click();
-    await expect(page.getByRole('button', { name: '✓ Salvat' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Salvat' })).toBeVisible();
     await expectNoHorizontalScroll(page);
     await shot(page, 't05-billing', name());
     await page.reload();
@@ -249,7 +249,7 @@ test.describe('shop settings', () => {
     await expect(page.getByRole('heading', { name: 'Confirmă numărul de telefon' })).toHaveCount(0);
     await page.getByLabel('Telefonul service-ului').fill('0268 400 500');
     await page.getByRole('button', { name: 'Salvează profilul' }).click();
-    await expect(page.getByRole('button', { name: '✓ Salvat' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Salvat' })).toBeVisible();
     const panel = page.getByRole('region', { name: 'Confirmă numărul de telefon' });
     await expect(panel).toBeVisible();
     await expect(panel.getByRole('button', { name: 'Trimite codul' })).toBeVisible();

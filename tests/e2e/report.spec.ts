@@ -231,7 +231,7 @@ test.describe('history report', () => {
 
     await buyer.getByLabel('Codul raportului').fill('SH-2020-999999');
     await buyer.getByRole('button', { name: 'Verifică' }).click();
-    await expect(buyer.getByText('Nu am găsit niciun raport cu acest cod. Verifică literele și cifrele.')).toBeVisible();
+    await expect(buyer.getByText('Nu există niciun raport cu acest cod. Verifică literele și cifrele.')).toBeVisible();
     await buyer.getByLabel('Codul raportului').fill('ABC');
     await buyer.getByRole('button', { name: 'Verifică' }).click();
     await expect(buyer.getByText('Codul are forma SH-2026-000147.')).toBeVisible();

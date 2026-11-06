@@ -128,11 +128,11 @@ test.describe('client search', () => {
     // As before launch: the search answers no shop at all (nothing typed, no filter).
     await page.route('**/rest/v1/rpc/search_shops', (route) => route.fulfill({ status: 200, contentType: 'application/json', body: '[]' }));
     await signInNewClient(page);
-    await expect(page.getByText('Momentan nu există service-uri disponibile pentru programare.')).toBeVisible();
+    await expect(page.getByText('Nu există service-uri disponibile pentru programare.')).toBeVisible();
     await expect(page.getByText('Nu există service-uri pentru filtrele selectate.')).toHaveCount(0);
     await page.getByRole('button', { name: 'Hartă' }).click();
     await expect(page.getByRole('region', { name: 'Harta service-urilor găsite' })).toBeVisible();
-    await expect(page.getByText('Momentan nu există service-uri disponibile pentru programare.')).toBeVisible();
+    await expect(page.getByText('Nu există service-uri disponibile pentru programare.')).toBeVisible();
     await expectNoHorizontalScroll(page);
     await shot(page, 'search-none-map', name());
   });
@@ -145,7 +145,7 @@ test.describe('client search', () => {
     const before = await scrollTopOf(page);
     await heart.click();
     expect(await scrollTopOf(page)).toBe(before);
-    await expect(page.getByRole('button', { name: 'Scoate Rapid Service din favorite' })).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.getByRole('button', { name: 'Elimină Rapid Service din favorite' })).toHaveAttribute('aria-pressed', 'true');
 
     await openFilters(page);
     await page.getByRole('switch', { name: 'Favorite' }).check();
@@ -249,7 +249,7 @@ test.describe('client search', () => {
     await page.goto('/c/cauta?q=vulcanizare');
     await result(page, 'Vulcanizare Roți Expres').click();
     await expect(page.getByRole('heading', { level: 1, name: 'Vulcanizare Roți Expres' })).toBeVisible();
-    await expect(page.getByText('Fără recenzii încă')).toBeVisible();
+    await expect(page.getByText('Fără recenzii')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Recenzii' })).toHaveCount(0);
 
     // An unknown shop.

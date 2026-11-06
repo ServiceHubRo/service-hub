@@ -54,7 +54,7 @@ test.describe('email and SMS', () => {
     const email = await createUser('shop', { phone: phone.e164 });
     await signIn(page, email, PASSWORD);
     await expect(page).toHaveURL(/\/s\/panou$/);
-    await expect(page.getByText(`Îți trimitem un cod de 6 cifre prin SMS la ${phone.shown}.`)).toBeVisible();
+    await expect(page.getByText(`Un cod de 6 cifre va fi trimis prin SMS la ${phone.shown}.`)).toBeVisible();
     await expectNoHorizontalScroll(page);
 
     await page.getByRole('button', { name: 'Trimite codul' }).click();
@@ -62,7 +62,7 @@ test.describe('email and SMS', () => {
     expect(sms.body).toMatch(/^Codul tau Service-Hub: \d{6}\. Expira in 10 minute\. Nu il da nimanui\.$/);
     const field = await codeField(page);
     await expect(field).toBeFocused();
-    await expect(page.getByText(`L-am trimis la ${phone.shown}. Este valabil 10 minute.`)).toBeVisible();
+    await expect(page.getByText(`Codul a fost trimis la ${phone.shown}. Este valabil 10 minute.`)).toBeVisible();
     await expect(page.getByRole('button', { name: /Poți cere alt cod în \d+ s/ })).toBeDisabled();
     await shot(page, 't13-phone-code', name());
 

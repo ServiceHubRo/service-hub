@@ -40,7 +40,7 @@ for (const [role, email, prefix] of [
     await expect(page).toHaveTitle('Cont · Service-Hub');
 
     const id = (await page.getByText(new RegExp(`^${prefix}\\d{5}$`)).textContent())!;
-    const mail = page.getByRole('link', { name: /Trimite-ne un email/ });
+    const mail = page.getByRole('link', { name: /Contactează suportul prin email/ });
     await expect(mail).toHaveAttribute('href', `mailto:contact@service-hub.ro?subject=${encodeURIComponent(`Service-Hub · ${id}`)}`);
     const whatsapp = page.getByRole('link', { name: /Contact pe WhatsApp/ });
     const href = (await whatsapp.getAttribute('href'))!;

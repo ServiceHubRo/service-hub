@@ -281,7 +281,7 @@ test.describe('booking', () => {
     });
     await page2.getByRole('button', { name: 'Send request' }).click();
     await expect(page2.getByRole('heading', { level: 1, name: 'Pick a day' })).toBeVisible();
-    await expect(page2.getByText('That day just filled up. Pick another day.')).toBeVisible();
+    await expect(page2.getByText('That day is now full. Choose another day.')).toBeVisible();
     await expect(page2.getByRole('button', { name: `${formatDate('en', picked.day)}: full` })).toBeVisible();
     await expectNoHorizontalScroll(page2);
     await shot(page2, 't07-day-filled-en', name());

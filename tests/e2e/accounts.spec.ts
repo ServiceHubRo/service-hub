@@ -347,7 +347,7 @@ test.describe('with accounts', () => {
     await page.goto('/parola-uitata');
     await page.getByLabel('Email').fill(uniqueEmail('nimeni'));
     await page.getByRole('button', { name: 'Trimite linkul' }).click();
-    const neutral = page.getByText('Dacă adresa există, ți-am trimis un link de resetare.');
+    const neutral = page.getByText('Dacă adresa există, a fost trimis un link de resetare.');
     await expect(neutral).toBeVisible();
 
     await page.getByLabel('Email').fill(email);

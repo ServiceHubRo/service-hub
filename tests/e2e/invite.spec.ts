@@ -146,7 +146,7 @@ test.describe('invite a friend', () => {
     await friend.getByRole('checkbox').check();
     await codeField.fill('C-99999');
     await friend.getByRole('button', { name: 'Creează cont' }).click();
-    await expect(friend.getByText('Nu am găsit acest cod. Verifică-l sau lasă câmpul gol.')).toBeVisible();
+    await expect(friend.getByText('Codul nu a fost găsit. Verifică-l sau lasă câmpul gol.')).toBeVisible();
     await expect(codeField).toBeFocused();
     await expectNoHorizontalScroll(friend);
     await shot(friend, 'invite-signup', name());

@@ -469,7 +469,7 @@ export async function openFilters(page: Page) {
 
 /** Caută: closes the "Filtre" panel with its "Arată …" button. */
 export async function closeFilters(page: Page) {
-  await page.getByRole('dialog').getByRole('button', { name: /^(Arată|Show|Gata|Done)/ }).click();
+  await page.getByRole('dialog').getByRole('button', { name: /^(Arată|Show|Aplică|Apply)/ }).click();
   await expect(page.getByRole('dialog')).toBeHidden();
 }
 

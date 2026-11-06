@@ -36,7 +36,7 @@ test.describe('instant booking', () => {
     await expect(page.getByText(/Cererile pentru locurile libere se confirmă singure/)).toBeVisible();
     await instant.check();
     await page.getByRole('button', { name: 'Salvează regulile' }).click();
-    await expect(page.getByRole('button', { name: '✓ Salvat' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Salvat' })).toBeVisible();
     await expectNoHorizontalScroll(page);
     await shot(page, 't28-rules-instant', name());
     const [saved] = await serviceRest<{ auto_confirm: boolean }[]>(`shops?id=eq.${shopId}&select=auto_confirm`, 'GET');

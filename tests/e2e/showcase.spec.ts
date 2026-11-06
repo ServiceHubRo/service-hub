@@ -51,16 +51,16 @@ test.describe('the shop window', () => {
     await expect(page.getByText('2 din 10 fotografii')).toBeVisible();
     await expect(page.getByText(/Unele fișiere nu au fost adăugate \(1\)/)).toBeVisible();
     const firstUrl = await page.getByRole('img', { name: 'Fotografia 1 a service-ului' }).getAttribute('src');
-    await page.getByRole('button', { name: 'Mută poza 2 mai în față' }).click();
+    await page.getByRole('button', { name: 'Mută fotografia 2 mai în față' }).click();
     await expect(page.getByRole('img', { name: 'Fotografia 2 a service-ului' })).toHaveAttribute('src', firstUrl!);
-    await page.getByRole('button', { name: 'Șterge poza 2' }).click();
+    await page.getByRole('button', { name: 'Șterge fotografia 2' }).click();
     await page.getByRole('button', { name: 'Da, șterge' }).click();
     await expect(page.getByText('1 din 10 fotografii')).toBeVisible();
 
     await page.getByLabel('Wi-Fi pentru clienți').check();
     await page.getByLabel('Mașină la schimb').check();
     await page.getByRole('button', { name: 'Salvează facilitățile' }).click();
-    await expect(page.getByRole('button', { name: '✓ Salvat' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Salvat' })).toBeVisible();
     await expectNoHorizontalScroll(page);
     await shot(page, 't28b-showcase', name());
     const [saved] = await serviceRest<{ amenities: string[] }[]>(`shops?id=eq.${shopId}&select=amenities`, 'GET');
@@ -135,7 +135,7 @@ test.describe('the shop window', () => {
     await expect(c.getByText('Răspunde de obicei în mai puțin de o oră')).toBeVisible();
     await expectNoHorizontalScroll(c);
     await shot(c, 't28b-shop-page', name());
-    await c.getByRole('button', { name: 'Deschide poza 1 din 1' }).click();
+    await c.getByRole('button', { name: 'Deschide fotografia 1 din 1' }).click();
     const viewer = c.getByRole('dialog', { name: `Fotografii cu ${shopName}` });
     await expect(viewer.getByRole('img', { name: `Fotografia 1 din 1, ${shopName}` })).toBeVisible();
     await c.keyboard.press('Escape');

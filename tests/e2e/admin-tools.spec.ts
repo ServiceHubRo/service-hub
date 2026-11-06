@@ -292,7 +292,7 @@ test.describe('admin tools', () => {
     await openTool(page, 'Rapoarte de istoric');
     await page.getByLabel('Caută cod, număr, mașină, client').fill(r!.code);
     const card = page.getByRole('listitem').filter({ hasText: r!.code });
-    await expect(card.getByText('Generat')).toBeVisible();
+    await expect(card.getByText('Generat', { exact: true })).toBeVisible();
     await expectNoHorizontalScroll(page);
     await shot(page, 't16b-reports', name());
     await card.getByRole('button', { name: 'Anulează raportul' }).click();
@@ -396,7 +396,7 @@ test.describe('Raport ANAF', () => {
 
     // Checked from the list: ANAF knows the CUI under another name, as a VAT payer; the VAT tick follows ANAF.
     await mismatchCard.getByRole('button', { name: /^Verifică (la ANAF|din nou)$/ }).click();
-    await expect(page.getByText(`Am verificat din nou ${mismatchName} la ANAF.`)).toBeVisible();
+    await expect(page.getByText(`${mismatchName} a fost verificat din nou la ANAF.`)).toBeVisible();
     await expect(mismatchCard).toContainText('Nume diferit');
     await expect(mismatchCard).toContainText('AUTO TEST S.R.L.');
     await expect(mismatchCard).not.toContainText('TVA diferit');

@@ -110,7 +110,7 @@ test.describe('T24 notifications', () => {
 
     await monthly.uncheck();
     await page.getByRole('button', { name: 'Salvează notificările' }).click();
-    await expect(page.getByRole('button', { name: '✓ Salvat' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Salvat' })).toBeVisible();
     const [shop] = await serviceRest<{ monthly_report: boolean }[]>(`shops?id=eq.${shopId}&select=monthly_report`, 'GET');
     expect(shop!.monthly_report).toBe(false);
 

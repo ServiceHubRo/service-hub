@@ -67,7 +67,7 @@ test.describe('shop referrals', () => {
     await newcomer.getByRole('checkbox').check();
     await codeField.fill('S-99999');
     await newcomer.getByRole('button', { name: 'Creează cont' }).click();
-    await expect(newcomer.getByText('Nu am găsit acest cod. Verifică-l sau lasă câmpul gol.')).toBeVisible();
+    await expect(newcomer.getByText('Codul nu a fost găsit. Verifică-l sau lasă câmpul gol.')).toBeVisible();
     await expect(codeField).toBeFocused();
     await expectNoHorizontalScroll(newcomer);
     await shot(newcomer, 'referral-signup-wrong-code', name());

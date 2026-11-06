@@ -314,7 +314,7 @@ test.describe('shop flow', () => {
     // Meanwhile another client takes the last place of that day.
     await book(clients[2]!, shopId, dayC!, await slotOf(dayC!), 'BV 03 ZZZ');
     await cx.getByRole('button', { name: 'Move and confirm' }).click();
-    await expect(cx.getByText('That day just filled up. Pick another day.')).toBeVisible();
+    await expect(cx.getByText('That day is now full. Choose another day.')).toBeVisible();
     const [unchanged] = await serviceRest<{ date: string; status: string }[]>(`bookings?id=eq.${x.id}&select=date,status`, 'GET');
     expect(unchanged).toEqual({ date: dayA, status: 'pending' });
     await expectNoHorizontalScroll(page);
