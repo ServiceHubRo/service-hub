@@ -276,3 +276,41 @@ test.describe('M5 — quote changes and the manager\'s cancel', () => {
     await driver.context().close();
   });
 });
+
+test.describe('M4 — maintenance', () => {
+  test.describe.configure({ timeout: 120_000 });
+
+  test('an item without a reading is never ok; marked done it is; the driver only reads it', async ({ browser }) => {
+    test.skip(!BACKEND, 'needs the local Supabase stack');
+    const f = await fleetSetup();
+    const page = await openAs(browser, f.manager, 'ro', `/c/firme/${f.company}?sectiune=vehicul&vehicul=${f.vehicle}`);
+    await page.getByRole('combobox', { name: 'Secțiunile vehiculului' }).selectOption('maintenance');
+    await page.getByRole('button', { name: 'Adaugă element' }).click();
+    await page.getByRole('combobox', { name: 'Element' }).selectOption('oil');
+    await page.getByLabel('Interval (km)').fill('10000');
+    await page.getByLabel('Interval (luni)').fill('12');
+    await page.getByLabel('Kilometraj la ultima efectuare').fill('50000');
+    await page.getByRole('button', { name: 'Salvează elementul' }).click();
+    const row = page.locator('li').filter({ hasText: 'Ulei și filtru' });
+    await expect(row).toContainText('Date insuficiente');
+    await expect(row).toContainText('Lipsește data ultimei efectuări');
+
+    await row.getByRole('button', { name: 'Mai multe' }).click();
+    await page.getByRole('menuitem', { name: 'Marchează efectuat' }).click();
+    await page.getByLabel('Kilometraj', { exact: true }).fill('52000');
+    await page.getByRole('button', { name: 'Marchează efectuat' }).last().click();
+    await expect(row).toContainText('În regulă');
+    await expect(row).toContainText('Mai sunt 10.000 km');
+    await expectNoHorizontalScroll(page);
+    await shot(page, 'maintenance-manager', name());
+    await page.context().close();
+
+    const driver = await openAs(browser, f.driver, 'en', `/c/firme/${f.company}?sectiune=vehicul&vehicul=${f.vehicle}`);
+    await driver.getByRole('combobox', { name: 'Vehicle sections' }).selectOption('maintenance');
+    await expect(driver.locator('li').filter({ hasText: 'Oil and filter' })).toContainText('OK');
+    await expect(driver.getByRole('button', { name: 'Add item' })).toHaveCount(0);
+    await expect(driver.getByRole('button', { name: 'More' })).toHaveCount(0);
+    await expectNoRomanianText(driver, 'maintenance');
+    await driver.context().close();
+  });
+});

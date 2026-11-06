@@ -1,6 +1,6 @@
 import { call, failure, RpcError, type Booking } from './rpc';
 import { supabase } from './supabase';
-import type { ExpenseFields, FleetExpense, FleetIssue, FleetReading, FuelStats, FleetIssueDetail, FleetOverview, IssueFields, IssueUpdate, FleetPlanRow, FleetPlanSummary, FleetReport, FleetSubscriptionView, FleetVehicle, ReportFilters } from '../lib/fleet';
+import type { ExpenseFields, FleetExpense, FleetIssue, FleetMaintenanceItem, MaintenanceFields, FleetReading, FuelStats, FleetIssueDetail, FleetOverview, IssueFields, IssueUpdate, FleetPlanRow, FleetPlanSummary, FleetReport, FleetSubscriptionView, FleetVehicle, ReportFilters } from '../lib/fleet';
 
 /**
  * The company's fleet (T63c, docs/FLEET_PLAN.md): one read, `fleet_overview(company)`, already
@@ -289,4 +289,19 @@ export async function fleetCancelBooking(booking: string, reason: string, reques
 
 export async function fleetRequestQuoteChanges(booking: string, quote: string, reason: string, requestId: string): Promise<Booking> {
   return (await call('fleet_request_quote_changes', { p_booking_id: booking, p_quote_id: quote, p_reason: reason, p_request_id: requestId } as never)) as unknown as Booking;
+}
+
+// ------------------------------------------------------------------------------------ maintenance (M4)
+
+export async function saveMaintenance(company: string, item: string | null, fields: MaintenanceFields, requestId: string): Promise<FleetMaintenanceItem> {
+  return (await call('fleet_save_maintenance', { p_company: company, p_item: item, p_fields: fields, p_request_id: requestId } as never)) as unknown as FleetMaintenanceItem;
+}
+
+export async function deleteMaintenance(item: string, requestId: string): Promise<void> {
+  await call('fleet_delete_maintenance', { p_item: item, p_request_id: requestId } as never);
+}
+
+/** Done on a day at a km, or by a finished Service-Hub job of the vehicle. */
+export async function markMaintenanceDone(item: string, fields: { day?: string; km?: number | null; booking_id?: string }, requestId: string): Promise<FleetMaintenanceItem> {
+  return (await call('fleet_mark_maintenance_done', { p_item: item, p_fields: fields, p_request_id: requestId } as never)) as unknown as FleetMaintenanceItem;
 }

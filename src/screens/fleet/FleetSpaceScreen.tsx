@@ -11,6 +11,7 @@ import {
   addReading,
   archiveVehicle,
   correctReading,
+  deleteMaintenance,
   fetchFuelStats,
   ignoreJobOdometer,
   assignDriver,
@@ -26,10 +27,12 @@ import {
   fetchSubscription,
   fleetDecideQuote,
   logFleetExport,
+  markMaintenanceDone,
   markExpense,
   receiptUrl,
   reportIssue,
   saveExpense,
+  saveMaintenance,
   saveVehicle,
   setUnavailable,
   updateIssue,
@@ -183,6 +186,19 @@ function FleetSpace({ companyId }: { companyId: string }) {
       },
       cancelBooking: async (bookingId, reason, requestId) => {
         await fleetCancelBooking(bookingId, reason, requestId);
+        await refresh();
+      },
+      saveMaintenance: async (itemId, fields, requestId) => {
+        const saved = await saveMaintenance(companyId, itemId, fields, requestId);
+        await refresh();
+        return saved;
+      },
+      deleteMaintenance: async (itemId, requestId) => {
+        await deleteMaintenance(itemId, requestId);
+        await refresh();
+      },
+      markMaintenanceDone: async (itemId, fields, requestId) => {
+        await markMaintenanceDone(itemId, fields, requestId);
         await refresh();
       },
     }),

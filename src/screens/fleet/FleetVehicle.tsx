@@ -29,11 +29,12 @@ import { VehicleControls } from './VehicleControls';
 import { ExpenseForm } from './FleetCosts';
 import { VehicleIssues } from './FleetIssues';
 import { VehicleOdometer } from './FleetOdometer';
+import { VehicleMaintenance } from './FleetMaintenance';
 import { useFleet } from './fleetContext';
 import pill from '../../components/StatusBadge.module.css';
 import styles from './fleet.module.css';
 
-type Tab = 'overview' | 'history' | 'costs' | 'odometer' | 'bookings' | 'quotes' | 'documents' | 'driver' | 'notes';
+type Tab = 'overview' | 'history' | 'costs' | 'odometer' | 'maintenance' | 'bookings' | 'quotes' | 'documents' | 'driver' | 'notes';
 
 /**
  * One company car (docs/FLEET_PLAN.md §4): eight sections on one page. The history is the car's
@@ -80,6 +81,11 @@ export function FleetVehicle({ vehicleId }: { vehicleId: string }) {
     { key: 'history', label: t('fleet.vtab.history'), count: done.length },
     ...(money ? [{ key: 'costs' as const, label: t('fleet.vtab.costs') }] : []),
     { key: 'odometer', label: t('fleet.vtab.odometer') },
+    {
+      key: 'maintenance',
+      label: t('fleet.vtab.maintenance'),
+      count: (data.maintenance ?? []).filter((m) => m.vehicle_id === v.id && (m.state.status === 'soon' || m.state.status === 'overdue')).length,
+    },
     { key: 'bookings', label: t('fleet.vtab.bookings'), count: active.length },
     { key: 'quotes', label: t('fleet.vtab.quotes'), count: quoted.filter((j) => j.status === 'quote_sent').length },
     { key: 'documents', label: t('fleet.vtab.documents') },
@@ -309,6 +315,8 @@ export function FleetVehicle({ vehicleId }: { vehicleId: string }) {
       )}
 
       {tab === 'odometer' && <VehicleOdometer vehicle={v} />}
+
+      {tab === 'maintenance' && <VehicleMaintenance vehicle={v} />}
 
       {tab === 'notes' && <VehicleIssues vehicle={v} reporting={reporting} onReporting={setReporting} />}
     </div>

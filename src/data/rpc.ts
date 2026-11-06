@@ -216,6 +216,8 @@ export const RPC_ERROR_CODES = [
   'reading_not_found',
   'booking_started',
   'changes_already_requested',
+  'maintenance_invalid',
+  'maintenance_not_found',
 ] as const;
 
 export type RpcErrorCode = (typeof RPC_ERROR_CODES)[number] | 'network' | 'unknown';

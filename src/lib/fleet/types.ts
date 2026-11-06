@@ -1,5 +1,6 @@
 import type { Quote, QuoteItem } from '../clientBookings';
 import type { BookingStatus } from '../status';
+import type { FleetMaintenanceItem } from './maintenance';
 import type { FleetReading, IgnoredJob, OdometerException } from './odometer';
 
 /**
@@ -247,4 +248,6 @@ export interface FleetOverview {
   readings?: FleetReading[];
   ignored_jobs?: IgnoredJob[];
   odometer_exceptions?: OdometerException[];
+  /** M4: the maintenance plans of the vehicles the member sees, with their computed status. */
+  maintenance?: FleetMaintenanceItem[];
 }

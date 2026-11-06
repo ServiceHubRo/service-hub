@@ -9,7 +9,9 @@ import {
   type FleetExpense,
   type FleetIssue,
   type FleetIssueDetail,
+  type FleetMaintenanceItem,
   type FleetOverview,
+  type MaintenanceFields,
   type FleetReading,
   type FuelStats,
   type IssueFields,
@@ -70,6 +72,10 @@ export interface FleetActions {
   /** „Cere modificări” and „Anulează programarea” (M5), for approvers. */
   requestQuoteChanges: (bookingId: string, quoteId: string, reason: string, requestId: string) => Promise<void>;
   cancelBooking: (bookingId: string, reason: string, requestId: string) => Promise<void>;
+  /** Maintenance plans (M4). */
+  saveMaintenance: (itemId: string | null, fields: MaintenanceFields, requestId: string) => Promise<FleetMaintenanceItem>;
+  deleteMaintenance: (itemId: string, requestId: string) => Promise<void>;
+  markMaintenanceDone: (itemId: string, fields: { day?: string; km?: number | null; booking_id?: string }, requestId: string) => Promise<void>;
 }
 
 export interface FleetContextValue {

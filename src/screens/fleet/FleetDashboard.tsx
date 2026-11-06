@@ -26,6 +26,7 @@ import { useI18n } from '../../i18n/context';
 import { formatDate, formatKm, formatMoney, formatPercent, formatRelativeDays, ymdInBucharest } from '../../i18n/format';
 import {
   documentStates,
+  maintenanceDue,
   fleetKpis,
   hasFeature,
   recentActivity,
@@ -39,6 +40,8 @@ import { useFleet, vehicleLabel, type FleetLink } from './fleetContext';
 import { LockedFeature } from './PlanGate';
 import { useFleetReport } from './useFleetReport';
 import pill from '../../components/StatusBadge.module.css';
+import { MaintenancePill } from './FleetMaintenance';
+import { useMaintenanceName } from './maintenanceName';
 import styles from './fleet.module.css';
 
 const ACTIVITY_ICON: Record<ActivityKind, LucideIcon> = {
@@ -58,6 +61,7 @@ const ACTIVITY_ICON: Record<ActivityKind, LucideIcon> = {
  * may not see it (the read holds none), and a chart without data says why instead of drawing zeros.
  */
 export function FleetDashboard() {
+  const maintenanceName = useMaintenanceName();
   const { t, lang } = useI18n();
   const { data, go, allowed, vehicle, plan } = useFleet();
   const now = useMemo(() => new Date(), []);
@@ -91,6 +95,8 @@ export function FleetDashboard() {
   const months = r?.monthly ?? [];
   const anyMonth = months.some((m) => m.total > 0);
   const deadlines = documentStates(data.vehicles, now).filter((d) => d.urgency === 'expired' || d.urgency === 'soon').slice(0, 5);
+  // M4: maintenance due soon or overdue, next to the documents.
+  const maintenance = maintenanceDue(data.maintenance ?? []).slice(0, 5);
 
   return (
     <div className={styles.stack}>
@@ -114,7 +120,7 @@ export function FleetDashboard() {
 
       <Card className={styles.card}>
         <h2 className={styles.cardTitle}>{t('fleet.deadlines.title')}</h2>
-        {deadlines.length === 0 ? (
+        {deadlines.length === 0 && maintenance.length === 0 ? (
           <p className={styles.note}>{t('fleet.docs.allGood')}</p>
         ) : (
           <ul className={styles.plainList}>
@@ -128,6 +134,19 @@ export function FleetDashboard() {
                     <span className={styles.muted}>{d.date ? formatDate(lang, d.date) : ''}</span>
                   </span>
                   <span className={`${pill.pill} ${pill[d.urgency === 'expired' ? 'red' : 'amber']}`}>{t(`fleet.docs.${d.urgency}`)}</span>
+                </button>
+              </li>
+            ))}
+            {maintenance.map((m) => (
+              <li key={`m:${m.id}`}>
+                <button type="button" className={styles.lineButton} onClick={() => go({ section: 'vehicul', vehicle: m.vehicle_id })}>
+                  <span className={styles.lineText}>
+                    <span>
+                      {maintenanceName(m)} · {vehicleLabel(vehicle(m.vehicle_id))}
+                    </span>
+                    <span className={styles.muted}>{m.state.due_on ? formatDate(lang, m.state.due_on) : ''}</span>
+                  </span>
+                  <MaintenancePill status={m.state.status} />
                 </button>
               </li>
             ))}
