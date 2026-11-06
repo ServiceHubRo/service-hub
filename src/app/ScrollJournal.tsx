@@ -25,7 +25,7 @@ export function ScrollJournal() {
     if (!on) return;
     const t0 = performance.now();
     const stamp = () => `${((performance.now() - t0) / 1000).toFixed(2)}s`;
-    const add = (text: string) => setLines((prev) => [...prev.slice(-13), `${stamp()} ${text}`]);
+    const add = (text: string) => setLines((prev) => [...prev.slice(-19), `${stamp()} ${text}`]);
     const el = (document.scrollingElement as HTMLElement | null) ?? document.documentElement;
     let last = el?.scrollTop ?? 0;
     let touchedAt = -Infinity;
@@ -70,6 +70,57 @@ export function ScrollJournal() {
     window.addEventListener('scroll', onScroll, { passive: true });
     document.addEventListener('touchstart', touched, { passive: true, capture: true });
     add(`on ${size()}`);
+
+    // The page getting shorter for a moment (a screen replaced by its skeleton, an empty state):
+    // the browser then cuts the scroll to what is left.
+    const main = document.getElementById('continut');
+    let height = main?.offsetHeight ?? 0;
+    const shrink = main && typeof ResizeObserver !== 'undefined'
+      ? new ResizeObserver(() => {
+          const h = main.offsetHeight;
+          if (h < height - 200) {
+            const text = (main.innerText || '').replace(/\s+/g, ' ').slice(0, 40);
+            add(`SHRINK ${height}→${h} top ${Math.round(el.scrollTop)} «${text}»`);
+          }
+          height = h;
+        })
+      : null;
+    if (main) shrink?.observe(main);
+
+    // What the app asked the server just before (after the first seconds).
+    const realFetch = window.fetch;
+    window.fetch = (input: RequestInfo | URL, init?: RequestInit) => {
+      const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url;
+      const name = url.match(/rest\/v1\/(rpc\/)?([a-z_]+)/)?.[2] ?? (url.includes('/auth/') ? `auth ${url.split('/auth/v1/')[1]?.split('?')[0]}` : null);
+      const result = realFetch(input, init);
+      if (name && performance.now() - t0 > 3000) {
+        result.then(
+          (r) => add(`req ${name} ${r.status}`),
+          () => add(`req ${name} failed`),
+        );
+      }
+      return result;
+    };
+
+    // Anything in the app that scrolls or focuses on its own.
+    const proto = { into: Element.prototype.scrollIntoView, to: Element.prototype.scrollTo, focus: HTMLElement.prototype.focus, win: window.scrollTo };
+    const label = (e: Element) => `${e.tagName.toLowerCase()}${e.id ? `#${e.id}` : ''}.${String(e.className).split(' ')[0]?.slice(0, 24) ?? ''}`;
+    Element.prototype.scrollIntoView = function (this: Element, ...args: Parameters<Element['scrollIntoView']>) {
+      add(`call scrollIntoView ${label(this)}`);
+      return proto.into.apply(this, args);
+    };
+    HTMLElement.prototype.focus = function (this: HTMLElement, ...args: Parameters<HTMLElement['focus']>) {
+      add(`call focus ${label(this)}`);
+      return proto.focus.apply(this, args);
+    };
+    window.scrollTo = ((...args: unknown[]) => {
+      add(`call window.scrollTo ${JSON.stringify(args).slice(0, 30)}`);
+      return (proto.win as (...a: unknown[]) => void).apply(window, args);
+    }) as typeof window.scrollTo;
+    Element.prototype.scrollTo = function (this: Element, ...args: unknown[]) {
+      add(`call scrollTo ${label(this)} ${JSON.stringify(args).slice(0, 30)}`);
+      return (proto.to as (...a: unknown[]) => void).apply(this, args);
+    } as typeof Element.prototype.scrollTo;
     // A jump that fires no scroll event (seen only by looking): checked a few times a second.
     const timer = window.setInterval(() => {
       if (el && Math.abs(el.scrollTop - last) > 200) onScroll();
@@ -80,6 +131,12 @@ export function ScrollJournal() {
       document.removeEventListener('touchstart', touched, { capture: true });
       window.clearInterval(timer);
       print.removeEventListener('change', onPrintMedia);
+      shrink?.disconnect();
+      window.fetch = realFetch;
+      Element.prototype.scrollIntoView = proto.into;
+      Element.prototype.scrollTo = proto.to;
+      HTMLElement.prototype.focus = proto.focus;
+      window.scrollTo = proto.win;
     };
   }, [on]);
 
