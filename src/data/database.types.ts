@@ -4744,6 +4744,69 @@ export type Database = {
         Args: { p_booking: Database["public"]["Tables"]["bookings"]["Row"] }
         Returns: Json
       }
+      booking_for_caller: {
+        Args: { b: Database["public"]["Tables"]["bookings"]["Row"] }
+        Returns: {
+          cancel_reason: string | null
+          cancelled_at: string | null
+          cancelled_by: string | null
+          car_id: string | null
+          car_snapshot: Json
+          checked_by: string | null
+          claimed_at: string | null
+          client_email: string | null
+          client_id: string | null
+          client_lang: string
+          client_name: string | null
+          client_phone: string | null
+          closed_reason: string | null
+          company_id: string | null
+          company_vehicle_id: string | null
+          confirmed_at: string | null
+          cost: number | null
+          created_at: string
+          date: string
+          decline_reason: string | null
+          done_at: string | null
+          extra_service_ids: string[]
+          followup_sent_at: string | null
+          id: string
+          inspection_started_at: string | null
+          intake_confirmed_at: string | null
+          intake_sent_at: string | null
+          invite_sent_at: string | null
+          invite_token: string | null
+          loyalty_level: number | null
+          loyalty_percent: number | null
+          note: string | null
+          odometer: number | null
+          offer_kind: string | null
+          offer_percent: number | null
+          quote_number: number | null
+          ref: string
+          reminder_sent_at: string | null
+          service_id: string
+          share_history: boolean
+          share_history_at: string | null
+          shop_id: string
+          slot: string
+          source: string
+          started_at: string | null
+          status: string
+          status_changed_at: string
+          updated_at: string
+          warranty_months: number | null
+          warranty_until: string | null
+          work: string | null
+          work_by: string | null
+        }
+        SetofOptions: {
+          from: "bookings"
+          to: "bookings"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       booking_offer: {
         Args: {
           p_client_id: string
@@ -4767,6 +4830,10 @@ export type Database = {
       }
       caller_aal: { Args: never; Returns: string }
       can_read_booking: { Args: { p_booking_id: string }; Returns: boolean }
+      can_read_booking_money: {
+        Args: { p_booking_id: string }
+        Returns: boolean
+      }
       can_read_notice: {
         Args: { p_audience: string; p_city: string; p_created_at: string }
         Returns: boolean
@@ -4774,6 +4841,69 @@ export type Database = {
       can_read_shop: { Args: { p_shop_id: string }; Returns: boolean }
       can_read_thread: { Args: { p_thread_id: string }; Returns: boolean }
       cancel_booking: {
+        Args: { p_booking_id: string; p_request_id: string }
+        Returns: {
+          cancel_reason: string | null
+          cancelled_at: string | null
+          cancelled_by: string | null
+          car_id: string | null
+          car_snapshot: Json
+          checked_by: string | null
+          claimed_at: string | null
+          client_email: string | null
+          client_id: string | null
+          client_lang: string
+          client_name: string | null
+          client_phone: string | null
+          closed_reason: string | null
+          company_id: string | null
+          company_vehicle_id: string | null
+          confirmed_at: string | null
+          cost: number | null
+          created_at: string
+          date: string
+          decline_reason: string | null
+          done_at: string | null
+          extra_service_ids: string[]
+          followup_sent_at: string | null
+          id: string
+          inspection_started_at: string | null
+          intake_confirmed_at: string | null
+          intake_sent_at: string | null
+          invite_sent_at: string | null
+          invite_token: string | null
+          loyalty_level: number | null
+          loyalty_percent: number | null
+          note: string | null
+          odometer: number | null
+          offer_kind: string | null
+          offer_percent: number | null
+          quote_number: number | null
+          ref: string
+          reminder_sent_at: string | null
+          service_id: string
+          share_history: boolean
+          share_history_at: string | null
+          shop_id: string
+          slot: string
+          source: string
+          started_at: string | null
+          status: string
+          status_changed_at: string
+          updated_at: string
+          warranty_months: number | null
+          warranty_until: string | null
+          work: string | null
+          work_by: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "bookings"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      cancel_booking_t77: {
         Args: { p_booking_id: string; p_request_id: string }
         Returns: {
           cancel_reason: string | null
@@ -5306,6 +5436,74 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      decide_quote_t77: {
+        Args: {
+          p_approved_item_ids: string[]
+          p_booking_id: string
+          p_quote_id: string
+          p_request_id: string
+        }
+        Returns: {
+          cancel_reason: string | null
+          cancelled_at: string | null
+          cancelled_by: string | null
+          car_id: string | null
+          car_snapshot: Json
+          checked_by: string | null
+          claimed_at: string | null
+          client_email: string | null
+          client_id: string | null
+          client_lang: string
+          client_name: string | null
+          client_phone: string | null
+          closed_reason: string | null
+          company_id: string | null
+          company_vehicle_id: string | null
+          confirmed_at: string | null
+          cost: number | null
+          created_at: string
+          date: string
+          decline_reason: string | null
+          done_at: string | null
+          extra_service_ids: string[]
+          followup_sent_at: string | null
+          id: string
+          inspection_started_at: string | null
+          intake_confirmed_at: string | null
+          intake_sent_at: string | null
+          invite_sent_at: string | null
+          invite_token: string | null
+          loyalty_level: number | null
+          loyalty_percent: number | null
+          note: string | null
+          odometer: number | null
+          offer_kind: string | null
+          offer_percent: number | null
+          quote_number: number | null
+          ref: string
+          reminder_sent_at: string | null
+          service_id: string
+          share_history: boolean
+          share_history_at: string | null
+          shop_id: string
+          slot: string
+          source: string
+          started_at: string | null
+          status: string
+          status_changed_at: string
+          updated_at: string
+          warranty_months: number | null
+          warranty_until: string | null
+          work: string | null
+          work_by: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "bookings"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       decline_booking: {
         Args: { p_booking_id: string; p_reason?: string; p_request_id: string }
         Returns: {
@@ -5396,6 +5594,7 @@ export type Database = {
       export_my_data_t32: { Args: never; Returns: Json }
       export_my_data_t35: { Args: never; Returns: Json }
       export_my_data_t37b: { Args: never; Returns: Json }
+      export_my_data_t77: { Args: never; Returns: Json }
       fail: { Args: { p_code: string; p_params?: Json }; Returns: undefined }
       finish_history_report: {
         Args: { p_generated_at?: string; p_path: string; p_report_id: string }
@@ -6037,6 +6236,15 @@ export type Database = {
         }
         Returns: Json
       }
+      job_document_data_t77: {
+        Args: {
+          p_aal?: string
+          p_booking_id: string
+          p_kind: string
+          p_user_id: string
+        }
+        Returns: Json
+      }
       join_area_waitlist: {
         Args: {
           p_area: string
@@ -6336,6 +6544,7 @@ export type Database = {
       my_approval_limit: { Args: { p_company: string }; Returns: number }
       my_client_referrals: { Args: never; Returns: Json }
       my_companies: { Args: never; Returns: Json }
+      my_company_bookings: { Args: never; Returns: Json }
       my_fleet_access: { Args: never; Returns: boolean }
       my_imported_jobs: { Args: never; Returns: Json }
       my_member_id: { Args: { p_company: string }; Returns: string }
@@ -6588,6 +6797,10 @@ export type Database = {
       }
       report_facts: { Args: { p_jobs: Json }; Returns: Json }
       report_jobs: {
+        Args: { p_client_id: string; p_vehicle_key: string }
+        Returns: Json
+      }
+      report_jobs_t77: {
         Args: { p_client_id: string; p_vehicle_key: string }
         Returns: Json
       }
@@ -6927,6 +7140,74 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      reschedule_booking_t77: {
+        Args: {
+          p_booking_id: string
+          p_date: string
+          p_request_id: string
+          p_slot: string
+        }
+        Returns: {
+          cancel_reason: string | null
+          cancelled_at: string | null
+          cancelled_by: string | null
+          car_id: string | null
+          car_snapshot: Json
+          checked_by: string | null
+          claimed_at: string | null
+          client_email: string | null
+          client_id: string | null
+          client_lang: string
+          client_name: string | null
+          client_phone: string | null
+          closed_reason: string | null
+          company_id: string | null
+          company_vehicle_id: string | null
+          confirmed_at: string | null
+          cost: number | null
+          created_at: string
+          date: string
+          decline_reason: string | null
+          done_at: string | null
+          extra_service_ids: string[]
+          followup_sent_at: string | null
+          id: string
+          inspection_started_at: string | null
+          intake_confirmed_at: string | null
+          intake_sent_at: string | null
+          invite_sent_at: string | null
+          invite_token: string | null
+          loyalty_level: number | null
+          loyalty_percent: number | null
+          note: string | null
+          odometer: number | null
+          offer_kind: string | null
+          offer_percent: number | null
+          quote_number: number | null
+          ref: string
+          reminder_sent_at: string | null
+          service_id: string
+          share_history: boolean
+          share_history_at: string | null
+          shop_id: string
+          slot: string
+          source: string
+          started_at: string | null
+          status: string
+          status_changed_at: string
+          updated_at: string
+          warranty_months: number | null
+          warranty_until: string | null
+          work: string | null
+          work_by: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "bookings"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       review_display_name: { Args: { p_name: string }; Returns: string }
       review_signals: {
         Args: { p_review: Database["public"]["Tables"]["reviews"]["Row"] }
@@ -7138,6 +7419,69 @@ export type Database = {
         Returns: undefined
       }
       set_booking_history_share: {
+        Args: { p_booking_id: string; p_request_id: string; p_share: boolean }
+        Returns: {
+          cancel_reason: string | null
+          cancelled_at: string | null
+          cancelled_by: string | null
+          car_id: string | null
+          car_snapshot: Json
+          checked_by: string | null
+          claimed_at: string | null
+          client_email: string | null
+          client_id: string | null
+          client_lang: string
+          client_name: string | null
+          client_phone: string | null
+          closed_reason: string | null
+          company_id: string | null
+          company_vehicle_id: string | null
+          confirmed_at: string | null
+          cost: number | null
+          created_at: string
+          date: string
+          decline_reason: string | null
+          done_at: string | null
+          extra_service_ids: string[]
+          followup_sent_at: string | null
+          id: string
+          inspection_started_at: string | null
+          intake_confirmed_at: string | null
+          intake_sent_at: string | null
+          invite_sent_at: string | null
+          invite_token: string | null
+          loyalty_level: number | null
+          loyalty_percent: number | null
+          note: string | null
+          odometer: number | null
+          offer_kind: string | null
+          offer_percent: number | null
+          quote_number: number | null
+          ref: string
+          reminder_sent_at: string | null
+          service_id: string
+          share_history: boolean
+          share_history_at: string | null
+          shop_id: string
+          slot: string
+          source: string
+          started_at: string | null
+          status: string
+          status_changed_at: string
+          updated_at: string
+          warranty_months: number | null
+          warranty_until: string | null
+          work: string | null
+          work_by: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "bookings"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      set_booking_history_share_t77: {
         Args: { p_booking_id: string; p_request_id: string; p_share: boolean }
         Returns: {
           cancel_reason: string | null

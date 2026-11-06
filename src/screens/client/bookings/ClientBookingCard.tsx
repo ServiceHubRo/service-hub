@@ -199,11 +199,16 @@ export function ClientBookingCard({
           bookingId={b.id}
           bookingRef={b.ref}
           quoteNumber={b.quote_number}
-          kinds={[
-            ...(b.status === 'done' && quote ? (['final'] as const) : []),
-            ...(quote ? (['quote'] as const) : []),
-            ...(b.intake_sent_at ? (['intake'] as const) : []),
-          ]}
+          // 107: the documents of a company booking read without costs.view are refused by the server.
+          kinds={
+            b.money_hidden
+              ? []
+              : [
+                  ...(b.status === 'done' && quote ? (['final'] as const) : []),
+                  ...(quote ? (['quote'] as const) : []),
+                  ...(b.intake_sent_at ? (['intake'] as const) : []),
+                ]
+          }
         />
       </div>
 

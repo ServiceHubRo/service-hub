@@ -386,3 +386,51 @@ test.describe('M6 — fleet notifications', () => {
     await ctx.close();
   });
 });
+
+test.describe('107 — amounts hidden from a driver without costs.view', () => {
+  test.describe.configure({ timeout: 150_000 });
+
+  test('the driver who booked sees the company booking in Programări without any amount; the manager sees them', async ({ browser }) => {
+    test.skip(!BACKEND, 'needs the local Supabase stack');
+    const f = await fleetSetup();
+    const { email: shop, shopId } = await createBookableShop(`Atelier Sume ${Date.now()}`, ['ulei']);
+    const b = await rpcAs<{ id: string; ref: string }>(f.driver, 'create_booking', {
+      p_shop_id: shopId,
+      p_service_id: 'ulei',
+      p_date: weekday(9),
+      p_slot: '10:00',
+      p_request_id: crypto.randomUUID(),
+      p_company_vehicle_id: f.vehicle,
+    });
+    await rpcAs(shop, 'confirm_booking', { p_booking_id: b.id, p_request_id: crypto.randomUUID() });
+    await rpcAs(shop, 'start_inspection', { p_booking_id: b.id, p_request_id: crypto.randomUUID() });
+    await rpcAs(shop, 'send_quote', {
+      p_booking_id: b.id,
+      p_items: [
+        { name: 'Plăcuțe', price: 420 },
+        { name: 'Manoperă', price: 180 },
+      ],
+      p_request_id: crypto.randomUUID(),
+    });
+    const [quote] = await serviceRest<{ id: string }[]>(`quotes?booking_id=eq.${b.id}&status=eq.sent&select=id`, 'GET');
+    const items = await serviceRest<{ id: string }[]>(`quote_items?quote_id=eq.${quote!.id}&select=id`, 'GET');
+    await rpcAs(f.manager, 'fleet_decide_quote', { p_booking_id: b.id, p_quote_id: quote!.id, p_approved_item_ids: items.map((i) => i.id), p_request_id: crypto.randomUUID() });
+
+    const driver = await openAs(browser, f.driver, 'ro', '/c/programari');
+    const card = driver.locator('article, div').filter({ hasText: b.ref }).filter({ hasText: 'Plăcuțe' }).last();
+    await expect(card).toContainText('Devizul a fost aprobat de firmă.');
+    await expect(card).not.toContainText('600');
+    await expect(card).not.toContainText(/\d\s?lei/);
+    await expect(card.getByRole('button', { name: 'Deviz (PDF)' })).toHaveCount(0);
+    await expectNoHorizontalScroll(driver);
+    await shot(driver, '107-driver-bookings', name());
+    // The thread: the automatic messages name no amount either.
+    const [msg] = await serviceRest<{ params: Record<string, unknown> }[]>(`messages?booking_id=eq.${b.id}&event=eq.quote_sent&select=params`, 'GET');
+    expect(msg!.params).not.toHaveProperty('total');
+    await driver.context().close();
+
+    const manager = await openAs(browser, f.manager, 'ro', `/c/firme/${f.company}?sectiune=programari`);
+    await expect(manager.locator('div').filter({ hasText: b.ref }).last()).toContainText('600');
+    await manager.context().close();
+  });
+});
