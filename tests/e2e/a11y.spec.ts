@@ -18,7 +18,9 @@ import {
 
 test.skip(!BACKEND, 'needs the local Supabase stack');
 // Many screens per test.
-test.setTimeout(180_000);
+// The page scrolls as a whole (6 Nov 2026): axe now measures every row of the long admin lists,
+// not only those inside a scrolling area (about 3 minutes for the admin screens).
+test.setTimeout(300_000);
 
 async function seedId(path: string): Promise<string> {
   const rows = await serviceRest<{ id: string }[]>(path, 'GET');

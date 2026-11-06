@@ -407,7 +407,13 @@ export async function expectAccessible(page: Page, label: string) {
     const finite = document.getAnimations().filter((a) => a.effect?.getComputedTiming().iterations !== Infinity);
     await Promise.all(finite.map((a) => a.finished.catch(() => undefined)));
   });
+  // The page scrolls under the app's header and tab bar: while checking, they stand in the page's
+  // flow (still checked themselves) so no text is measured against them.
+  await page.addStyleTag({ content: '[data-fixed-top], [data-fixed-bottom] { position: static !important; }' }).then((tag) =>
+    tag.evaluate((el) => el.setAttribute('data-axe-flow', '')),
+  );
   const result = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']).analyze();
+  await page.evaluate(() => document.querySelector('style[data-axe-flow]')?.remove());
   const violations = result.violations.map(
     (v) => `${v.id} (${v.impact}): ${v.help}\n    ${v.nodes.map((n) => n.target.join(' ')).slice(0, 6).join('\n    ')}`,
   );

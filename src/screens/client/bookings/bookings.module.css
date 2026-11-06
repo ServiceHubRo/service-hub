@@ -291,6 +291,11 @@
   color: var(--muted);
 }
 
+/* On the blue box of a finished job the grey labels need one step more to stay readable (4.5:1). */
+.doneBox .facts dt {
+  color: var(--muted-strong);
+}
+
 .facts dd {
   min-width: 0;
   overflow-wrap: anywhere;
