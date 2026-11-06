@@ -235,7 +235,7 @@ test.describe('quote, work, completion, review', () => {
     await shot(page, 't09-client-list', name());
 
     // English.
-    await page.getByRole('button', { name: 'English' }).filter({ visible: true }).first().click();
+    await page.getByRole('combobox', { name: /^(Limba|Language)$/ }).filter({ visible: true }).first().selectOption('en');
     await expect(page.getByText('Ready for pickup')).toBeVisible();
     await expect(page.getByText('Quote declined. Inspection fee: 100 RON.')).toBeVisible();
     await shot(page, 't09-client-list-en', name());
@@ -299,10 +299,10 @@ test.describe('quote, work, completion, review', () => {
     await expect(job.getByText('Același kilometraj ca la o lucrare din altă zi (105.400 km).', { exact: false })).toBeVisible();
     await expect(job.getByRole('button', { name: 'Confirmă finalizarea' })).toBeDisabled();
     await shot(page, 't09-shop-odometer-same', name());
-    await page.getByRole('button', { name: 'English' }).filter({ visible: true }).first().click();
+    await page.getByRole('combobox', { name: /^(Limba|Language)$/ }).filter({ visible: true }).first().selectOption('en');
     await expect(job.getByText('Same odometer as a job on another day (105,400 km).', { exact: false })).toBeVisible();
     await shot(page, 't09-shop-odometer-same-en', name());
-    await page.getByRole('button', { name: 'Română' }).filter({ visible: true }).first().click();
+    await page.getByRole('combobox', { name: /^(Limba|Language)$/ }).filter({ visible: true }).first().selectOption('ro');
     await job.getByText('Da, kilometrajul este corect').click();
     await job.getByRole('button', { name: 'Confirmă finalizarea' }).click();
     await expect(page.getByText(`Lucrarea ${second.ref} este finalizată.`, { exact: false })).toBeVisible();

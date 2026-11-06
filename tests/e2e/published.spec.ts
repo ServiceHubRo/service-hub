@@ -16,7 +16,7 @@ test('published site: the landing page leads to sign-in and sign-up, no test lin
   await expect(page.getByText('Rol de test')).toHaveCount(0);
   await page.getByRole('link', { name: 'Creează cont' }).click();
   await expect(page).toHaveURL(/\/cont-nou$/);
-  await expect(page.getByRole('button', { name: 'Sunt client' })).toBeVisible();
+  await expect(page.getByRole('combobox', { name: 'Tip cont' })).toBeVisible();
   await page.screenshot({ path: `test-results/shots/published-signup-${test.info().project.name}.png` });
 });
 

@@ -61,40 +61,10 @@
   text-align: center;
 }
 
-.roles {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-}
 
-.role {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  min-height: 96px;
-  padding: 14px 8px;
-  border-radius: var(--radius-card);
-  border: 1.5px solid var(--border);
-  background: var(--surface);
-  color: var(--text);
-  font-weight: 700;
-  text-align: center;
-}
 
-.role svg {
-  color: var(--muted);
-}
 
-.role[aria-pressed='true'] {
-  border-color: var(--amber);
-  background: var(--amber-tint);
-}
 
-.role[aria-pressed='true'] svg {
-  color: var(--amber);
-}
 
 .groupLabel {
   font-size: 13px;
@@ -184,4 +154,29 @@
   flex: 1;
   height: 1px;
   background: var(--border);
+}
+
+/* The heading and the way to the other form (Eduard, 6 Nov: a link, not tabs). */
+.head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 4px;
+}
+
+.switch {
+  font-size: 14px;
+  color: var(--muted);
+  text-align: center;
+}
+
+.switchLink {
+  color: var(--amber);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.switchLink:hover {
+  text-decoration: underline;
 }

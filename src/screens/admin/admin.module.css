@@ -514,3 +514,10 @@ a.stat:hover {
 .signalAmber {
   color: var(--amber);
 }
+
+/* A dropdown that picks a list (Eduard, 6 Nov): never the whole width of a laptop screen. */
+@media (min-width: 768px) {
+  .narrowSelect {
+    max-width: 320px;
+  }
+}

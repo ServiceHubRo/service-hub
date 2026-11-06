@@ -1033,6 +1033,104 @@ export type Database = {
           },
         ]
       }
+      fleet_expenses: {
+        Row: {
+          amount: number
+          booking_id: string | null
+          category: string
+          company_id: string
+          created_at: string
+          created_by: string | null
+          currency: string
+          day: string
+          deleted_at: string | null
+          description: string | null
+          fuel_type: string | null
+          full_tank: boolean | null
+          id: string
+          liters: number | null
+          odometer: number | null
+          receipt_path: string | null
+          status: string
+          supplier: string | null
+          updated_at: string | null
+          vehicle_id: string
+        }
+        Insert: {
+          amount: number
+          booking_id?: string | null
+          category: string
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          day: string
+          deleted_at?: string | null
+          description?: string | null
+          fuel_type?: string | null
+          full_tank?: boolean | null
+          id?: string
+          liters?: number | null
+          odometer?: number | null
+          receipt_path?: string | null
+          status?: string
+          supplier?: string | null
+          updated_at?: string | null
+          vehicle_id: string
+        }
+        Update: {
+          amount?: number
+          booking_id?: string | null
+          category?: string
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          day?: string
+          deleted_at?: string | null
+          description?: string | null
+          fuel_type?: string | null
+          full_tank?: boolean | null
+          id?: string
+          liters?: number | null
+          odometer?: number | null
+          receipt_path?: string | null
+          status?: string
+          supplier?: string | null
+          updated_at?: string | null
+          vehicle_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fleet_expenses_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fleet_expenses_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fleet_expenses_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fleet_expenses_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "company_vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       fleet_plans: {
         Row: {
           active: boolean
@@ -4857,6 +4955,18 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      fleet_delete_expense: {
+        Args: { p_expense: string; p_request_id: string }
+        Returns: Json
+      }
+      fleet_expense_json: {
+        Args: { e: Database["public"]["Tables"]["fleet_expenses"]["Row"] }
+        Returns: Json
+      }
+      fleet_file_can_write: {
+        Args: { p_company: string; p_vehicle: string }
+        Returns: boolean
+      }
       fleet_has_feature: {
         Args: { p_company: string; p_feature: string }
         Returns: boolean
@@ -4885,6 +4995,10 @@ export type Database = {
       fleet_log_export: {
         Args: { p_company: string; p_kind: string; p_rows: number }
         Returns: undefined
+      }
+      fleet_mark_expense: {
+        Args: { p_expense: string; p_request_id: string; p_status: string }
+        Returns: Json
       }
       fleet_member_can: {
         Args: { p_capability: string; p_extra: string[]; p_role: string }
@@ -4925,6 +5039,15 @@ export type Database = {
       fleet_role_can: {
         Args: { p_capability: string; p_role: string }
         Returns: boolean
+      }
+      fleet_save_expense: {
+        Args: {
+          p_company: string
+          p_expense: string
+          p_fields: Json
+          p_request_id: string
+        }
+        Returns: Json
       }
       fleet_save_vehicle: {
         Args: {
@@ -5465,6 +5588,7 @@ export type Database = {
       }
       phone_verify_cancel: { Args: { p_id: string }; Returns: undefined }
       plate_norm: { Args: { p_plate: string }; Returns: string }
+      plate_valid: { Args: { p_plate: string }; Returns: boolean }
       post_booking_event: {
         Args: {
           p_booking: Database["public"]["Tables"]["bookings"]["Row"]

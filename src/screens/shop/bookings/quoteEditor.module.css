@@ -37,6 +37,12 @@
   gap: 8px;
 }
 
+@media (min-width: 768px) {
+  .mode {
+    max-width: 320px;
+  }
+}
+
 .section {
   display: flex;
   flex-direction: column;

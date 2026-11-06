@@ -11,7 +11,7 @@ import { EmptyState } from '../../../components/EmptyState';
 import { LoadError } from '../../../components/LoadError';
 import { PageHeader } from '../../../components/PageHeader';
 import { SkeletonList } from '../../../components/Skeleton';
-import { Tabs } from '../../../components/Tabs';
+import { ViewSelect } from '../../../components/ViewSelect';
 import { RpcError, type Booking } from '../../../data/rpc';
 import type { ShopBooking } from '../../../data/shopBookings';
 import { useI18n } from '../../../i18n/context';
@@ -162,8 +162,7 @@ export function ShopBookingsScreen() {
         : null;
     body = (
       <>
-        <Tabs
-          label={t('nav.bookings')}
+        <ViewSelect
           value={tab}
           onChange={(key) => {
             setNotice(null);

@@ -142,6 +142,9 @@ create table public.fleet_expenses (
 
 ## 3. Order and approvals
 
+Status (6 Nov 2026): M7 and M1 approved and built (T69, T70; schema 100–101). The rest waits for approval.
+
+
 1. Merge PR #107 (T65–T67).
 2. M7 + M1 (plates, expenses with receipts) — the base the other stages use.
 3. M3 (issues/incidents) + driver screens.

@@ -107,7 +107,7 @@ test('the companies screen in English', async ({ page }) => {
   await signIn(page, email, PASSWORD);
   await expect(page).toHaveURL(/\/c\/cauta/);
   await page.goto('/c/cont/firme');
-  await page.getByRole('button', { name: 'English' }).filter({ visible: true }).first().click();
+  await page.getByRole('combobox', { name: /^(Limba|Language)$/ }).filter({ visible: true }).first().selectOption('en');
   await expect(page.getByText('No companies.', { exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'Create a company' }).click();
   await expect(page.getByLabel('Company name')).toBeVisible();

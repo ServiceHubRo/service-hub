@@ -323,8 +323,8 @@ test.describe('admin tools', () => {
     expect(csv.text).toContain(shopName);
     expect(csv.text.trim().split('\r\n')).toHaveLength(2);
 
-    await page.getByRole('tab', { name: /Plăți/ }).click();
-    await page.getByRole('tab', { name: /Abonamente/ }).click();
+    await page.getByRole('combobox', { name: 'Afișează' }).selectOption('plati');
+    await page.getByRole('combobox', { name: 'Afișează' }).selectOption('abonamente');
     await page.getByRole('link', { name: new RegExp(shopName) }).click();
     await expect(page).toHaveURL(new RegExp(`/admin/service-uri/${shopId}$`));
     await expect(page.getByRole('heading', { level: 1, name: shopName })).toBeVisible();
@@ -351,7 +351,7 @@ test.describe('admin tools', () => {
 
   test('the tools in English', async ({ page }) => {
     await signInAdmin(page);
-    await page.getByRole('button', { name: 'English' }).filter({ visible: true }).first().click();
+    await page.getByRole('combobox', { name: /^(Limba|Language)$/ }).filter({ visible: true }).first().selectOption('en');
     await expect(page.getByRole('heading', { level: 1, name: 'Dashboard' })).toBeVisible();
     for (const tile of ['Subscriptions and payments', 'Service catalog', 'Platform settings', 'Notices', 'History reports', 'Export']) {
       await page.getByRole('link', { name: 'Account', exact: true }).filter({ visible: true }).first().click();

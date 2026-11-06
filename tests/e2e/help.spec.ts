@@ -52,7 +52,7 @@ for (const [role, email, prefix] of [
     await expectAccessible(page, `${role} help (ro)`);
     await shot(page, `help-${role}-ro`, name());
 
-    await page.getByRole('button', { name: 'English' }).filter({ visible: true }).first().click();
+    await page.getByRole('combobox', { name: /^(Limba|Language)$/ }).filter({ visible: true }).first().selectOption('en');
     await expect(page.getByRole('heading', { level: 1, name: 'Help and contact' })).toBeVisible();
     expect(decodeURIComponent((await page.getByRole('link', { name: /Contact on WhatsApp/ }).getAttribute('href'))!)).toContain(
       `My account ID: ${id}.`,

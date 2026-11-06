@@ -112,7 +112,7 @@ test.describe('new-client offers', () => {
       inspection_started_at: new Date().toISOString(),
     });
     await page.reload();
-    await page.getByRole('tab', { name: /Programate/ }).click();
+    await page.getByRole('combobox', { name: 'Afișează' }).selectOption('programate');
     await page.locator('li').filter({ hasText: 'Skoda Octavia' }).getByRole('button', { name: 'Trimite deviz' }).click();
     await expect(page.getByText('Scade reducerea din prețul manoperei înainte să trimiți devizul.', { exact: false })).toBeVisible();
     await expectNoHorizontalScroll(page);

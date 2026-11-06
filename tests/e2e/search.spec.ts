@@ -314,7 +314,7 @@ test.describe('client search', () => {
 
   test('English: search, "Offers", the shop page', async ({ page }) => {
     await signInNewClient(page);
-    await page.getByRole('button', { name: 'English' }).first().click();
+    await page.getByRole('combobox', { name: /^(Limba|Language)$/ }).filter({ visible: true }).first().selectOption('en');
     await expect(page.getByRole('heading', { level: 1, name: 'Search' })).toBeVisible();
     await page.getByLabel('Search for a shop').fill('brakes');
     await expect(result(page, 'Atelier Demo')).toContainText('Offers: Brake pads');

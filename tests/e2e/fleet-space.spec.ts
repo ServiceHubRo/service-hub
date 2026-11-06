@@ -8,14 +8,12 @@ import { BACKEND, PASSWORD, SEED, SEED_PASSWORD, createBookableShop, createFleet
 
 const name = () => test.info().project.name;
 
-/** The vehicle's sections: a dropdown on phones and tablets, tabs on a laptop. */
+/** The vehicle's sections: one dropdown on every width (Eduard, 6 Nov). */
 async function openVehicleSection(page: Page, label: string) {
   const select = page.getByRole('combobox', { name: 'Secțiunile vehiculului' });
-  const tab = page.getByRole('button', { name: new RegExp(label) });
-  // Wait for the vehicle page: one of the two is on screen once it is drawn.
-  await expect(select.or(tab).filter({ visible: true }).first()).toBeVisible();
-  if (await select.isVisible()) await select.selectOption({ label });
-  else await tab.click();
+  await expect(select).toBeVisible();
+  const option = select.locator('option', { hasText: label });
+  await select.selectOption(await option.first().getAttribute('value') ?? label);
 }
 
 test.beforeEach(async ({ context }) => {
@@ -111,7 +109,7 @@ test('admin adds and assigns vehicles; the driver sees only theirs', async ({ pa
   await context.close();
 
   // The language switch of the frame.
-  await page.getByRole('button', { name: 'English' }).filter({ visible: true }).first().click();
+  await page.getByRole('combobox', { name: /^(Limba|Language)$/ }).filter({ visible: true }).first().selectOption('en');
   await expect(page.getByRole('heading', { level: 1, name: 'Vehicles' })).toBeVisible();
   await expectNoHorizontalScroll(page);
   await shot(page, 'fleet-live-en', name());
@@ -289,7 +287,7 @@ test('bookings: the driver books a company vehicle, the manager approves within 
   await shot(mgr, 'fleet-account', name());
 
   // In English: the five pages and the bookings.
-  await mgr.getByRole('button', { name: 'English' }).filter({ visible: true }).first().click();
+  await mgr.getByRole('combobox', { name: /^(Limba|Language)$/ }).filter({ visible: true }).first().selectOption('en');
   await expect(mgr.getByRole('heading', { level: 1, name: 'Account' })).toBeVisible();
   await mgr.getByRole('link', { name: 'Bookings', exact: true }).filter({ visible: true }).first().click();
   await expect(mgr.getByText('Approved: 420 RON')).toBeVisible();

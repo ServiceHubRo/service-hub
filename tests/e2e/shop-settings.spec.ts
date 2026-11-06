@@ -206,7 +206,7 @@ test.describe('shop settings', () => {
     await page.getByRole('button', { name: 'Salvează profilul' }).click();
     await expect(page.getByRole('button', { name: 'Salvat' })).toBeVisible();
     // The map lookup answers one way or another (the test stack may have no internet).
-    await expect(page.getByText(/Am găsit|Nu am găsit|Harta nu răspunde/)).toBeVisible({ timeout: 30_000 });
+    await expect(page.getByText(/Adresa a fost găsită|A fost găsit doar orașul|Adresa nu a fost găsită|Harta nu răspunde/)).toBeVisible({ timeout: 30_000 });
     await expectNoHorizontalScroll(page);
     await shot(page, 't05-profile', name());
     await page.reload();

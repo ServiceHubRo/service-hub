@@ -141,7 +141,7 @@ test('landing: every section, in Romanian and English, without horizontal scroll
   await expectNoHorizontalScroll(page);
   await shot(page, 'landing-ro', name());
 
-  await page.getByRole('button', { name: 'English' }).click();
+  await page.getByRole('combobox', { name: /^(Limba|Language)$/ }).filter({ visible: true }).first().selectOption('en');
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Booking a car repair should take 2 minutes.');
   await expect(page.getByRole('link', { name: 'Sign in' })).toBeVisible();
   await expect(page.getByRole('heading', { level: 2, name: 'Own an auto repair shop?' })).toBeVisible();
@@ -165,15 +165,15 @@ test('landing: the way in is "Intră în cont" and "Creează cont"; the shops se
   await page.getByRole('link', { name: 'Creează cont' }).first().click();
   await expect(page).toHaveURL(/\/cont-nou$/);
   // The role is chosen on the form.
-  await expect(page.getByRole('button', { name: 'Sunt client' })).toBeVisible();
-  await page.getByRole('button', { name: 'Sunt service' }).click();
+  await expect(page.getByRole('combobox', { name: 'Tip cont' })).toBeVisible();
+  await page.getByRole('combobox', { name: 'Tip cont' }).selectOption('shop');
   await expect(page.getByLabel('Numele service-ului')).toBeVisible();
 
   await page.goto('/');
   // While launch places are left the button says so (needs the backend for the price).
   await page.getByRole('link', { name: /^(Înscrie-ți service-ul|Profită acum)$/ }).click();
   await expect(page).toHaveURL(/\/cont-nou\?rol=service$/);
-  await expect(page.getByRole('button', { name: 'Sunt service' })).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByRole('combobox', { name: 'Tip cont' })).toHaveValue('shop');
   if (BACKEND) {
     await expect(page.getByText('Ofertă de lansare, locuri limitate: 99 lei pe lună în loc de 149 lei, păstrat cât timp abonamentul rămâne activ. Profită acum.')).toBeVisible();
     // The same for every city: where places are left is the admin's business (Eduard, 9 Oct).
@@ -199,7 +199,7 @@ test('landing: the logo, the language switch and the two account buttons stay at
     await expect.poll(async () => (await header.boundingBox())!.y).toBe(top);
     await expect(signUp).toBeInViewport();
     await expect(header.getByRole('link', { name: 'Intră în cont' })).toBeInViewport();
-    await expect(header.getByRole('button', { name: 'English' })).toBeInViewport();
+    await expect(header.getByRole('combobox', { name: /^(Limba|Language)$/ })).toBeInViewport();
   }
   await expectNoHorizontalScroll(page);
   await shot(page, 'landing-sticky-header', name());

@@ -1,3 +1,4 @@
+import { canonicalPlate } from './plate';
 import { ymdInBucharest } from '../i18n/format';
 import { matchesWords, searchWords } from './text';
 import type { BookingStatus } from './status';
@@ -18,9 +19,9 @@ export interface VehicleFields {
   plate?: string | null;
 }
 
-/** `bv-12 abc` → `BV12ABC`: upper-case, letters and digits only. */
+/** `bv-12 abc` → `BV12ABC`: the one plate rule (src/lib/plate.ts, `plate_norm()` in SQL). */
 export function normalizePlate(plate: string | null | undefined): string {
-  return (plate ?? '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+  return canonicalPlate(plate);
 }
 
 function word(value: string | null | undefined): string {

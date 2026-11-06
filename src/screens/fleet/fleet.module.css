@@ -684,20 +684,6 @@ button.kpi:hover {
   color: var(--muted);
 }
 
-.chipCount {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 18px;
-  height: 18px;
-  padding: 0 5px;
-  border-radius: var(--radius-pill);
-  background: var(--surface3);
-  color: var(--text);
-  font-size: 11px;
-  font-weight: 700;
-}
-
 .plainList {
   list-style: none;
   display: flex;
@@ -1068,21 +1054,14 @@ button.kpi:hover {
 }
 
 /* The vehicle's sections: a dropdown on phones and tablets, a row of tabs on a laptop. */
+/* The vehicle's sections: one dropdown on every width (Eduard, 6 Nov: no tabs). */
 .sectionSelect {
   display: block;
 }
 
-.sectionTabs {
-  display: none;
-}
-
-@media (min-width: 1024px) {
+@media (min-width: 768px) {
   .sectionSelect {
-    display: none;
-  }
-
-  .sectionTabs {
-    display: block;
+    max-width: 360px;
   }
 }
 
@@ -1412,4 +1391,65 @@ button.kpi:hover {
 .gain {
   color: var(--text);
   font-weight: 600;
+}
+
+/* ---------------------------------------------------------------- expenses (M1) */
+.receiptField {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.receiptLabel {
+  font-size: 13px;
+  font-weight: 550;
+  color: var(--text-2);
+}
+
+/* The receipt: the app's own button (the native one speaks the browser's language) and the file's name. */
+.receiptPick {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.receiptName {
+  min-width: 0;
+  font-size: 14px;
+  color: var(--text-2);
+  overflow-wrap: anywhere;
+}
+
+/* The hidden input still takes the keyboard: its focus shows on the button next to it. */
+.receiptInput:focus-visible + label {
+  box-shadow: var(--focus-ring);
+}
+
+.fieldErrorLine {
+  font-size: 13px;
+  color: var(--red-text);
+}
+
+/* An inline confirmation (a possible duplicate, a delete): never a browser dialog (CLAUDE.md §6.7). */
+.confirmPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid var(--amber-line);
+  border-radius: var(--radius-input);
+  background: var(--amber-tint);
+  font-size: 14px;
+}
+
+.wrapRow {
+  flex-wrap: wrap;
+}
+
+.rowActions {
+  flex-basis: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }

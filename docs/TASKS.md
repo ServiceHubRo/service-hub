@@ -1547,3 +1547,24 @@ Notă (31 oct): Eduard a aprobat politica de acces (7 zile de grație, apoi doar
 - **„Drepturile fiecărui rol”** (Eduard, 6 nov): în locul celor patru butoane și al tabelului, „Selectează rolul” (dropdown) și drepturile rolului în 9 grupuri care se deschid pe rând (Datele firmei, Membri și roluri, Abonament, Buget, Vehicule, Programări, Devize, Cheltuieli, Rapoarte), fiecare cu „n din m permise” și „Permis” / „Nepermis” în cuvinte, cu un semn discret.
 - **Componente:** dropdown-ul unic rămâne `SelectField` (listă nativă stilizată: în stilul aplicației pe Chrome și Android, selectorul sistemului pe iPhone); nou `Disclosure` / `DisclosureGroup` (`<details>`, deschidere scurtă, fără animație cu „Reduce motion”). Grupurile drepturilor: `FLEET_CAPABILITY_GROUPS` (test: fiecare drept într-un singur grup).
 - Rămas: aplicarea în restul aplicației, după aprobarea listei din propunere.
+
+### T68b — Dropdown-uri în toată aplicația, butoane discrete ✅
+- Aprobat de Eduard pe 6 nov („lista da; butoane da”). Devin dropdown (`SelectField` / `ViewSelect`): secțiunile vehiculului (pe toate lățimile), Programări la service („Afișează: Cereri (n) / Programate (n)”), Admin → Abonamente / Plăți, Admin → Sugestii (stare), „Devizele se emit pe”, „Cu TVA / Fără TVA”, fișa de preluare (Da / Nu / Necompletat, nivelul combustibilului), limba („RO ▾”), tipul contului la înscriere („Tip cont”).
+- Logarea: fără taburi; titlul paginii și „Nu ai cont? Creează cont” / „Ai deja cont? Intră în cont”. Componenta `Tabs` a fost scoasă.
+- Butonul „Filtre” cu colțuri ca dropdown-urile; filtrele active erau deja un rând de text.
+- Butoanele: text mai subțire, cel principal fără relief, cel secundar doar un contur fin.
+- Teste de browser actualizate (limba, taburi, tipul contului, fișa de preluare).
+
+### T69 — O singură regulă pentru numerele de înmatriculare (M7) ✅
+- Migrarea `plate_rule` (schema 100), aprobată de Eduard pe 6 nov. `plate_norm()` în baza de date și `src/lib/plate.ts` în aplicație: majuscule, fără spații, cratime, puncte, „/”, „_” și „·”; literele cu diacritice rămân. `BV98LGY`, `BV-98-LGY`, `bv 98 lgy`, `B V 98 L G Y`, `BV.98.LGY` sunt același număr în garaj, flotă, programări, istoric și verificarea duplicatelor.
+- Validare doar pentru numere noi sau schimbate (2–10 litere sau cifre, cel puțin o cifră; numerele străine trec): garaj, pasul „Mașina”, vehiculul firmei, „Adaugă programare”, și în baza de date (triggere). Numerele salvate înainte nu sunt refuzate; importurile se normalizează, nu se refuză.
+- Nicio valoare scrisă nu se schimbă. Rollback pregătit: `docs/sql/rollback_plate_rule.sql`; verificare dinainte, doar citire: `docs/sql/precheck_plate_rule.sql`.
+- Teste: `tests/sql/142_plate_rule.sql`, `tests/unit/plate.test.ts`.
+
+### T70 — Cheltuielile firmei, cu bon (M1, T63e) ✅
+- Migrarea `fleet_expenses` (schema 101), aprobată de Eduard pe 6 nov: categorii (combustibil, piese, reparații externe, manoperă, taxe și parcări, consumabile, asigurări, altele), furnizor, descriere, kilometraj, pentru combustibil litri / tip / rezervor plin, bonul (fotografie sau PDF, 5 MB) în spațiul privat `fleet-files`.
+- Drepturi: administratorul, managerul și contabilul adaugă, editează, șterg (recuperabil) și marchează „verificată”; șoferul adaugă doar bonuri de combustibil pentru vehiculul lui, care intră „De verificat”, și vede doar ce a adăugat. Fiecare schimbare în jurnalul firmei (înainte / după).
+- Fără dublare: o cheltuială pentru o lucrare deja numărată din Service-Hub apare, dar nu se adună; o cheltuială identică (vehicul, zi, sumă, furnizor) cere confirmare; alte monede apar, nu se adună. Rapoartele includ cheltuielile (nu și în „Service-uri folosite” sau „Istoric reparații”).
+- Ecrane: Costuri → „Adaugă cheltuială”, „Mai multe” pe fiecare cheltuială (Editează, Vezi bonul, Marchează verificată, Șterge); pagina vehiculului → „Adaugă alimentare” pentru șofer.
+- Teste: `tests/sql/143_fleet_expenses.sql`, `tests/e2e/fleet-expenses.spec.ts`.
+- Rămas: istoricul modificărilor pe ecran (e în jurnal, nu încă afișat), notificările (M6), consumul (M2).

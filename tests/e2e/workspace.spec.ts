@@ -127,7 +127,7 @@ test('the switch sits under the logo on a phone and a tablet, and stays on every
   if (test.info().project.name !== 'desktop-1440') {
     const header = page.getByRole('banner');
     const firstRow = await header.locator('> div').first().boundingBox();
-    const lang = await header.getByRole('group', { name: 'Limba' }).boundingBox();
+    const lang = await header.getByRole('combobox', { name: 'Limba' }).boundingBox();
     const sw = await switcher(page).boundingBox();
     // Under the first row (logo and language), aligned with the logo on the left.
     expect(sw!.y).toBeGreaterThanOrEqual(firstRow!.y + firstRow!.height - 1);

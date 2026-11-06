@@ -91,7 +91,13 @@ export const FLEET_CATEGORIES = [
 ] as const;
 export type FleetCategory = (typeof FLEET_CATEGORIES)[number];
 
-/** A cost typed in by the company (`fleet_expenses`, proposed). */
+/** The categories an expense of the company's own can have (M1; `fleet_expenses.category`). */
+export const EXPENSE_CATEGORIES = ['fuel', 'parts', 'repairs', 'labor', 'tolls', 'consumables', 'insurance', 'other'] as const;
+export type ExpenseCategory = (typeof EXPENSE_CATEGORIES)[number];
+export const FUEL_TYPES = ['diesel', 'petrol', 'lpg', 'electric', 'other'] as const;
+export type FuelType = (typeof FUEL_TYPES)[number];
+
+/** A cost typed in by the company (`fleet_expenses`, M1). */
 export interface FleetExpense {
   id: string;
   vehicle_id: string;
@@ -105,8 +111,37 @@ export interface FleetExpense {
   /** Set when the expense documents a Service-Hub job; such a job is already counted. */
   booking_id: string | null;
   created_at: string;
-  created_by: string;
+  created_by: string | null;
   deleted_at: string | null;
+  /** Fuel only. */
+  liters?: number | null;
+  fuel_type?: FuelType | null;
+  full_tank?: boolean | null;
+  /** `<company>/<vehicle>/<file>` in the private bucket `fleet-files`. */
+  receipt_path?: string | null;
+  /** A driver's fuel arrives `to_check` until someone with costs.manage checks it. */
+  status?: 'ok' | 'to_check';
+  created_by_name?: string | null;
+  updated_at?: string | null;
+}
+
+/** What the expense form sends (`fleet_save_expense`). */
+export interface ExpenseFields {
+  vehicle_id: string;
+  category: ExpenseCategory;
+  day: string;
+  amount: number;
+  currency?: string;
+  supplier: string | null;
+  description: string | null;
+  odometer: number | null;
+  liters?: number | null;
+  fuel_type?: FuelType | null;
+  full_tank?: boolean | null;
+  booking_id?: string | null;
+  receipt_path?: string | null;
+  /** The member confirmed it is not a duplicate of an identical expense. */
+  confirm_duplicate?: boolean;
 }
 
 export interface FleetMember {

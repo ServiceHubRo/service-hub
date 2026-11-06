@@ -106,7 +106,7 @@ test.describe('admin', () => {
     await expect(page.getByText('Toate recenziile')).toBeVisible();
     await shot(page, 't16a-moderation', name());
 
-    await page.getByRole('button', { name: 'English' }).filter({ visible: true }).first().click();
+    await page.getByRole('combobox', { name: /^(Limba|Language)$/ }).filter({ visible: true }).first().selectOption('en');
     await expect(page.getByRole('heading', { level: 1, name: 'Moderation' })).toBeVisible();
     await expect(page.getByText('All reviews')).toBeVisible();
     await navLink(page, /^Dashboard/).click();

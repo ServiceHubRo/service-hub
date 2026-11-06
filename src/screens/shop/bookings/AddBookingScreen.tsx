@@ -19,6 +19,7 @@ import { useI18n } from '../../../i18n/context';
 import type { MessageKey } from '../../../i18n/ro';
 import type { Lang, Msg } from '../../../i18n/translate';
 import { carYearMax, isValidCarYear } from '../../../lib/car';
+import { isValidPlate } from '../../../lib/plate';
 import { useLoad } from '../../../lib/useLoad';
 import { normalizePhone } from '../../../lib/validators';
 import { CalendarPlus, FileUp } from 'lucide-react';
@@ -55,6 +56,7 @@ function problems(d: Draft, day: string | null, time: string | null): Partial<Re
   if (d.email.trim() && !EMAIL_RE.test(d.email.trim())) p.email = 'rpcError.email_invalid';
   if (!d.make.trim() || !d.model.trim()) p.car = 'wi.err.car';
   if (!d.plate.trim()) p.plate = 'rpcError.car_plate_required';
+  else if (!isValidPlate(d.plate)) p.plate = 'rpcError.car_plate_invalid';
   if (!isValidCarYear(d.year)) p.year = 'car.yearInvalid';
   if (!d.serviceId) p.service = 'wi.err.service';
   if (!day || !time) p.slot = 'wi.err.slot';

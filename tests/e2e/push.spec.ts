@@ -204,7 +204,7 @@ test.describe('push notifications', () => {
     await expect(row.getByRole('switch')).toBeEnabled();
     await shot(page, 't12-account-client', name());
 
-    await page.getByRole('button', { name: 'English' }).filter({ visible: true }).first().click();
+    await page.getByRole('combobox', { name: /^(Limba|Language)$/ }).filter({ visible: true }).first().selectOption('en');
     await expect(pushRow(page, 'Push notifications')).toContainText('Off');
     await expect(pushRow(page, 'Push notifications').getByRole('switch', { name: /^Push notifications/ })).not.toBeChecked();
     await shot(page, 't12-account-client-en', name());
@@ -238,7 +238,7 @@ test.describe('push notifications', () => {
     await expect(pushBanner(page)).toContainText('pentru cereri noi și răspunsurile clienților la deviz');
     await expectNoHorizontalScroll(page);
     await shot(page, 't12-banner-shop', name());
-    await page.getByRole('button', { name: 'English' }).filter({ visible: true }).first().click();
+    await page.getByRole('combobox', { name: /^(Limba|Language)$/ }).filter({ visible: true }).first().selectOption('en');
     await expect(page.getByRole('region', { name: 'Push notifications' })).toContainText(
       'Turn on notifications for new requests and quote responses.',
     );
@@ -248,7 +248,7 @@ test.describe('push notifications', () => {
     const langSaved = page.waitForResponse(
       (r) => r.url().includes('/rest/v1/profiles') && r.request().method() === 'PATCH',
     );
-    await page.getByRole('button', { name: 'Română' }).filter({ visible: true }).first().click();
+    await page.getByRole('combobox', { name: /^(Limba|Language)$/ }).filter({ visible: true }).first().selectOption('ro');
     await langSaved;
     await page.goto('/s/cont/notificari');
     await expect(page.getByRole('heading', { level: 1, name: 'Notificări' })).toBeVisible();

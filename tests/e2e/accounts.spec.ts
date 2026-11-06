@@ -33,29 +33,29 @@ const name = () => test.info().project.name;
 test('sign-in and sign-up screens, RO and EN', async ({ page }) => {
   await page.goto('/intra');
   await expect(page.getByText('Programări auto, fără telefoane')).toBeVisible();
-  await expect(page.getByRole('tab', { name: 'Autentificare' })).toHaveAttribute('aria-selected', 'true');
+  await expect(page.getByRole('heading', { level: 1, name: 'Autentificare' })).toBeVisible();
   await expect(page.getByRole('checkbox', { name: 'Ține-mă minte' })).toBeChecked();
   await expect(page.getByRole('link', { name: 'Ai uitat parola?' })).toBeVisible();
   await expectNoHorizontalScroll(page);
   await shot(page, 'auth-signin-ro', name());
 
-  await page.getByRole('tab', { name: 'Cont nou' }).click();
+  await page.getByRole('link', { name: 'Creează cont' }).click();
   await expect(page).toHaveURL(/\/cont-nou$/);
-  await expect(page.getByRole('button', { name: 'Sunt client' })).toBeVisible();
+  await expect(page.getByRole('combobox', { name: 'Tip cont' })).toBeVisible();
   await expect(page.getByLabel('Numele service-ului')).toHaveCount(0);
-  await page.getByRole('button', { name: 'Sunt service' }).click();
-  await expect(page.getByRole('button', { name: 'Sunt service' })).toHaveAttribute('aria-pressed', 'true');
+  await page.getByRole('combobox', { name: 'Tip cont' }).selectOption('shop');
+  await expect(page.getByRole('combobox', { name: 'Tip cont' })).toHaveValue('shop');
   await expect(page.getByLabel('Numele service-ului')).toBeVisible();
   await expect(page.getByLabel('Oraș')).toBeVisible();
   await expectNoHorizontalScroll(page);
   await shot(page, 'auth-signup-shop-ro', name());
 
-  await page.getByRole('button', { name: 'English' }).click();
+  await page.getByRole('combobox', { name: /^(Limba|Language)$/ }).filter({ visible: true }).first().selectOption('en');
   await expect(page.getByText('Car service booking, no phone calls')).toBeVisible();
-  await expect(page.getByRole('button', { name: "I'm a shop" })).toBeVisible();
+  await expect(page.getByRole('combobox', { name: 'Account type' })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Create account' })).toBeVisible();
   await shot(page, 'auth-signup-shop-en', name());
-  await page.getByRole('tab', { name: 'Sign in' }).click();
+  await page.getByRole('link', { name: 'Sign in', exact: true }).click();
   await expect(page.getByRole('checkbox', { name: 'Keep me signed in' })).toBeChecked();
   await shot(page, 'auth-signin-en', name());
 });
@@ -72,7 +72,7 @@ test('sign-up refuses missing data with a specific message per field', async ({ 
   await shot(page, 'auth-signup-errors', name());
 
   // A shop without a city.
-  await page.getByRole('button', { name: 'Sunt service' }).click();
+  await page.getByRole('combobox', { name: 'Tip cont' }).selectOption('shop');
   await page.getByLabel('Nume și prenume').fill('Ion Popescu');
   await page.getByLabel('Numele service-ului').fill('Atelier Nou');
   await page.getByLabel('Telefon').fill('0723 375 248');
@@ -105,7 +105,7 @@ test('the terms open as a screen of their own and the form keeps what was typed'
   // Nothing of the form under the document, even at the very end of it.
   await expect(page.getByLabel('Nume și prenume')).toBeHidden();
   await expect(page.getByRole('button', { name: 'Creează cont' })).toBeHidden();
-  await expect(page.getByRole('tab', { name: 'Cont nou' })).toBeHidden();
+  await expect(page.getByRole('link', { name: 'Creează cont' })).toBeHidden();
   await expectNoHorizontalScroll(page);
   await shot(page, 'auth-terms-screen', name());
   await page.getByRole('button', { name: 'Înapoi la formular' }).last().click();
@@ -131,7 +131,7 @@ test('legal documents are public, with tables and headings', async ({ page }) =>
   await shot(page, 'legal-privacy', name());
   // The operator's data: the contact from the landing page, a visible mark for what is not filled in yet.
   await expect(page.getByText('contact@service-hub.ro').first()).toBeVisible();
-  await page.getByRole('button', { name: 'English' }).click();
+  await page.getByRole('combobox', { name: /^(Limba|Language)$/ }).filter({ visible: true }).first().selectOption('en');
   await expect(page.getByRole('heading', { level: 1, name: 'Privacy policy' })).toBeVisible();
   await expect(page.getByRole('heading', { level: 2, name: '7. Your rights' })).toBeVisible();
   await expect(page.getByText('Your position is used only on your device')).toBeVisible();
@@ -140,7 +140,7 @@ test('legal documents are public, with tables and headings', async ({ page }) =>
   await page.goto('/legal/cookies');
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(/cookie/i);
   await expect(page.getByRole('cell', { name: 'sh_lang' })).toBeVisible();
-  await page.getByRole('button', { name: 'Română' }).click();
+  await page.getByRole('combobox', { name: /^(Limba|Language)$/ }).filter({ visible: true }).first().selectOption('ro');
   await expect(page.getByRole('heading', { level: 2, name: '2. Ce păstrăm în browser' })).toBeVisible();
   await page.goto('/legal/termeni');
   await expect(page.getByRole('heading', { level: 2, name: '3. Pentru Clienți' })).toBeVisible();
@@ -180,7 +180,7 @@ test.describe('with accounts', () => {
   test('client: a phone from another country, picked with its prefix, kept and edited in Cont', async ({ page }) => {
     const email = uniqueEmail('client-intl');
     await page.goto('/cont-nou');
-    await page.getByRole('button', { name: 'Sunt client' }).click();
+    await page.getByRole('combobox', { name: 'Tip cont' }).selectOption('client');
     await page.getByLabel('Nume și prenume').fill('Anna Weber');
     await expect(page.getByLabel('Telefon')).toHaveAttribute('placeholder', '07xx xxx xxx');
     await page.getByLabel('Prefixul țării').selectOption('DE');
@@ -210,7 +210,7 @@ test.describe('with accounts', () => {
 
   test('a temporary email address is refused with its own message', async ({ page }) => {
     await page.goto('/cont-nou');
-    await page.getByRole('button', { name: 'Sunt client' }).click();
+    await page.getByRole('combobox', { name: 'Tip cont' }).selectOption('client');
     await page.getByLabel('Nume și prenume').fill('Ion Test');
     await page.getByLabel('Telefon').fill(uniquePhone().national);
     await page.getByLabel('Email').fill(`ion.${Date.now()}@sharklasers.com`);
@@ -227,7 +227,7 @@ test.describe('with accounts', () => {
     const email = uniqueEmail('client-ui');
     const phone = uniquePhone();
     await page.goto('/cont-nou');
-    await page.getByRole('button', { name: 'Sunt client' }).click();
+    await page.getByRole('combobox', { name: 'Tip cont' }).selectOption('client');
     await page.getByLabel('Nume și prenume').fill('Andreea Ionescu');
     await page.getByLabel('Telefon').fill(phone.national);
     await page.getByLabel('Email').fill(email);
@@ -267,7 +267,7 @@ test.describe('with accounts', () => {
   test('shop: sign up with shop name and city, land on Panou', async ({ page }) => {
     const email = uniqueEmail('shop-ui');
     await page.goto('/cont-nou');
-    await page.getByRole('button', { name: 'Sunt service' }).click();
+    await page.getByRole('combobox', { name: 'Tip cont' }).selectOption('shop');
     await page.getByLabel('Nume și prenume').fill('Ion Popescu');
     await page.getByLabel('Numele service-ului').fill('Atelier Nou');
     await page.getByLabel('Oraș').fill('Codlea');
@@ -289,7 +289,7 @@ test.describe('with accounts', () => {
 
   test('an address that already has an account is refused clearly', async ({ page }) => {
     await page.goto('/cont-nou');
-    await page.getByRole('button', { name: 'Sunt client' }).click();
+    await page.getByRole('combobox', { name: 'Tip cont' }).selectOption('client');
     await page.getByLabel('Nume și prenume').fill('Andrei Marin');
     await page.getByLabel('Telefon').fill('0723 375 248');
     await page.getByLabel('Email').fill(SEED.client);
@@ -413,7 +413,7 @@ test.describe('with accounts', () => {
     expect(accountSheet).toContain('Cod cont');
 
     // Language: saved on the profile, so it follows the account to another browser.
-    await page.getByRole('button', { name: 'English' }).filter({ visible: true }).first().click();
+    await page.getByRole('combobox', { name: /^(Limba|Language)$/ }).filter({ visible: true }).first().selectOption('en');
     await expect(page.getByRole('heading', { level: 1, name: 'Account' })).toBeVisible();
     await shot(page, 'account-client-en', name());
     const context = await browser.newContext({ baseURL: test.info().project.use.baseURL, viewport: page.viewportSize() });

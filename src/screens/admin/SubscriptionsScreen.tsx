@@ -9,7 +9,7 @@ import { ChoiceFilters } from '../../components/Filters';
 import { LoadError } from '../../components/LoadError';
 import { SearchField } from '../../components/SearchField';
 import { SkeletonList } from '../../components/Skeleton';
-import { Tabs } from '../../components/Tabs';
+import { ViewSelect } from '../../components/ViewSelect';
 import { fetchSubscriptions, type AdminInvoiceRow, type AdminSubscriptionRow } from '../../data/adminTools';
 import { useI18n } from '../../i18n/context';
 import type { MessageKey } from '../../i18n/ro';
@@ -126,8 +126,7 @@ export function SubscriptionsScreen() {
       {state.status === 'error' && <LoadError message={t('admin.loadError')} onRetry={reload} />}
       {data && (
         <>
-          <Tabs<Tab>
-            label={t('admin.subs.title')}
+          <ViewSelect<Tab>
             value={tab}
             onChange={(k) => setParam({ tab: k === 'plati' ? 'plati' : null })}
             items={[

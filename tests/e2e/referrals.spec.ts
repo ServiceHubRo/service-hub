@@ -52,7 +52,7 @@ test.describe('shop referrals', () => {
     await other.addInitScript(() => localStorage.setItem('sh_lang', 'ro'));
     const newcomer = await other.newPage();
     await newcomer.goto(new URL(link).pathname + new URL(link).search);
-    await expect(newcomer.getByRole('button', { name: 'Sunt service' })).toHaveAttribute('aria-pressed', 'true');
+    await expect(newcomer.getByRole('combobox', { name: 'Tip cont' })).toHaveValue('shop');
     const codeField = newcomer.getByLabel('Cod de recomandare (opțional)');
     await expect(codeField).toHaveValue(code);
     const newEmail = uniqueEmail('shop-referred');

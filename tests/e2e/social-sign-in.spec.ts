@@ -60,7 +60,7 @@ test('a first Google sign-in finishes the account: a shop, with its shop and fre
   await expect(page.getByRole('heading', { level: 1, name: 'Finalizează contul' })).toBeVisible();
   await expect(page.getByText(`Conectat cu Google: ${email}`)).toBeVisible();
   await expect(page.getByLabel('Nume și prenume')).toHaveValue('Ion Google');
-  await expect(page.getByRole('button', { name: 'Sunt service' })).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByRole('combobox', { name: 'Tip cont' })).toHaveValue('shop');
   await expect(page.getByLabel('Parolă', { exact: true })).toHaveCount(0);
   // No other screen opens meanwhile.
   await page.goto('/s/panou');
@@ -95,7 +95,7 @@ test('Finish your account in English; Cancel signs out', async ({ page }) => {
   await page.getByLabel('Password', { exact: true }).fill(PASSWORD);
   await page.getByRole('button', { name: 'Sign in', exact: true }).click();
   await expect(page.getByRole('heading', { level: 1, name: 'Finish your account' })).toBeVisible();
-  await expect(page.getByRole('button', { name: "I'm a client" })).toHaveAttribute('aria-pressed', 'false');
+  await expect(page.getByRole('combobox', { name: 'Account type' })).toHaveValue('');
   await expectNoHorizontalScroll(page);
   await shot(page, 't48-complete-en', name());
   await page.getByRole('button', { name: 'Cancel', exact: true }).click();

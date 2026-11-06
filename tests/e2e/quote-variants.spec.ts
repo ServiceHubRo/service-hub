@@ -118,7 +118,7 @@ test.describe('quote variants', () => {
     await expect(quote.getByRole('button', { name: 'Accept', exact: true })).toBeVisible();
     await expectNoHorizontalScroll(clientPage);
     await shot(clientPage, 't37c-client-ro', name());
-    await clientPage.getByRole('button', { name: 'English' }).filter({ visible: true }).first().click();
+    await clientPage.getByRole('combobox', { name: /^(Limba|Language)$/ }).filter({ visible: true }).first().selectOption('en');
     await expect(quote.getByRole('radio', { name: /^Alternative part, Bosch/ })).toBeChecked();
     await shot(clientPage, 't37c-client-en', name());
     await quote.getByRole('button', { name: 'Accept', exact: true }).click();

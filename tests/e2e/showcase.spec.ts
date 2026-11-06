@@ -142,7 +142,7 @@ test.describe('the shop window', () => {
     await expect(viewer).toBeHidden();
 
     // In English too.
-    await c.getByRole('button', { name: 'English' }).filter({ visible: true }).first().click();
+    await c.getByRole('combobox', { name: /^(Limba|Language)$/ }).filter({ visible: true }).first().selectOption('en');
     await expect(c.getByText('Courtesy car')).toBeVisible();
     await expect(c.getByText('Usually answers within an hour')).toBeVisible();
     await context.close();

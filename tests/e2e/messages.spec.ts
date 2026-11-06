@@ -189,7 +189,7 @@ test.describe('messages and reviews', () => {
     await expect(log.getByText('Ne vedem mâine.')).toBeVisible({ timeout: 20_000 });
 
     // English: the same automatic message in the reader's language.
-    await page.getByRole('button', { name: /English/ }).filter({ visible: true }).first().click();
+    await page.getByRole('combobox', { name: /^(Limba|Language)$/ }).filter({ visible: true }).first().selectOption('en');
     await expect(log).toContainText(`Booking ${booking.ref} is confirmed:`);
     await expect(log).toContainText('automatic message');
     await shot(page, 't11-client-conversation-en', name());

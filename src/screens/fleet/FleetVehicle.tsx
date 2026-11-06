@@ -1,8 +1,7 @@
-import { AlertTriangle, ArrowLeft, CalendarPlus, FileText, Info } from 'lucide-react';
+import { AlertTriangle, ArrowLeft, CalendarPlus, FileText, Fuel, Info } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { Button } from '../../components/Button';
 import { Card } from '../../components/Card';
-import { Chip, ChipRow } from '../../components/Chip';
 import { EmptyState } from '../../components/EmptyState';
 import { SelectField } from '../../components/SelectField';
 import { useI18n } from '../../i18n/context';
@@ -24,6 +23,7 @@ import { JobStagePill, SourcePill, VehicleStatusPill } from './FleetPills';
 import { FleetQuoteCard } from './FleetQuoteCard';
 import { FleetVehicleForm } from './FleetVehicleForm';
 import { VehicleControls } from './VehicleControls';
+import { ExpenseForm } from './FleetCosts';
 import { useFleet } from './fleetContext';
 import pill from '../../components/StatusBadge.module.css';
 import styles from './fleet.module.css';
@@ -40,6 +40,7 @@ export function FleetVehicle({ vehicleId }: { vehicleId: string }) {
   const { t, lang } = useI18n();
   const { data, go, allowed, vehicle, mode, actions } = useFleet();
   const [editing, setEditing] = useState(false);
+  const [addingFuel, setAddingFuel] = useState(false);
   const v = vehicle(vehicleId);
   const [tab, setTab] = useState<Tab>('overview');
   const jobs = useMemo(() => data.jobs.filter((j) => j.vehicle_id === vehicleId), [data.jobs, vehicleId]);
@@ -116,16 +117,6 @@ export function FleetVehicle({ vehicleId }: { vehicleId: string }) {
           options={tabs.map((x) => ({ value: x.key, label: x.count ? `${x.label} (${x.count})` : x.label }))}
         />
       </div>
-      <div className={styles.sectionTabs}>
-        <ChipRow label={t('fleet.vehicle.sections')}>
-          {tabs.map((x) => (
-            <Chip key={x.key} selected={tab === x.key} onClick={() => setTab(x.key)}>
-              {x.label}
-              {x.count ? <span className={styles.chipCount}>{x.count}</span> : null}
-            </Chip>
-          ))}
-        </ChipRow>
-      </div>
 
       {tab === 'overview' && (
         <div className={styles.grid2}>
@@ -151,8 +142,15 @@ export function FleetVehicle({ vehicleId }: { vehicleId: string }) {
                 <Button variant="primary" onClick={() => actions.book(v.id)}>
                   <CalendarPlus size={18} aria-hidden="true" /> {t('fleet.vehicle.book')}
                 </Button>
+                {/* M1: the driver's fuel receipt, for the vehicle assigned to them; checked later by costs.manage. */}
+                {data.me.role === 'driver' && (
+                  <Button onClick={() => setAddingFuel((a) => !a)} aria-expanded={addingFuel}>
+                    <Fuel size={18} aria-hidden="true" /> {t('fleet.costs.addFuel')}
+                  </Button>
+                )}
               </div>
             )}
+            {addingFuel && <ExpenseForm fuelOnly fixedVehicle={v.id} onDone={() => setAddingFuel(false)} />}
             {mode === 'preview' && (
               <>
                 <div className={styles.actions}>

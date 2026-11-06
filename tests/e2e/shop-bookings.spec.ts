@@ -114,7 +114,7 @@ test.describe('demo shop', () => {
     await expect(page).not.toHaveURL(/filtru=/);
 
     // Cereri: the request with the note, the car and the client's account id.
-    await page.getByRole('tab', { name: /Cereri/ }).click();
+    await page.getByRole('combobox', { name: 'Afișează' }).selectOption('cereri');
     await openAllBookings(page);
     const request = card(page, 'Aș vrea și verificarea lichidelor.');
     await expect(request).toContainText('Andrei Marin');
@@ -136,7 +136,7 @@ test.describe('demo shop', () => {
     await expect(request.getByRole('button', { name: 'Confirmă' })).toBeVisible();
 
     // Programate: every state; the no-show mark; "Neprezentat" only after the booking's time.
-    await page.getByRole('tab', { name: /Programate/ }).click();
+    await page.getByRole('combobox', { name: 'Afișează' }).selectOption('programate');
     await openAllBookings(page);
     const george = card(page, 'George Toma');
     await expect(george).toContainText('Client cu 3 neprezentări');
@@ -329,7 +329,7 @@ test.describe('shop flow', () => {
     await expect(card(page, 'BV 01 XXX')).toHaveCount(0);
 
     // Cancel needs a reason, which the client gets.
-    await page.getByRole('tab', { name: /Scheduled/ }).click();
+    await page.getByRole('combobox', { name: 'Show' }).selectOption('programate');
     await openAllBookings(page);
     const cy = card(page, 'BV 02 YYY');
     await (await cardAction(cy, 'Cancel')).click();
@@ -345,7 +345,7 @@ test.describe('shop flow', () => {
     // Decline: the reason is optional.
     const freeNow = await freeDays(clients[3]!, shopId);
     const z = await book(clients[3]!, shopId, freeNow[0]!, await slotOf(freeNow[0]!), 'BV 04 WWW', 'Booking Z');
-    await page.getByRole('tab', { name: /Requests/ }).click();
+    await page.getByRole('combobox', { name: 'Show' }).selectOption('cereri');
     await openAllBookings(page);
     const cz = card(page, 'BV 04 WWW');
     await (await cardAction(cz, 'Decline')).click();

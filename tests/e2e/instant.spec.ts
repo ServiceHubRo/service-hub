@@ -119,7 +119,7 @@ test.describe('instant booking', () => {
     await shot(c, 't28-bookings', name());
 
     // In English too.
-    await c.getByRole('button', { name: 'English' }).filter({ visible: true }).first().click();
+    await c.getByRole('combobox', { name: /^(Limba|Language)$/ }).filter({ visible: true }).first().selectOption('en');
     await expect(await cardAction(mine, 'Add to calendar')).toBeVisible();
     await expect(mine.getByRole('menuitem', { name: 'Directions' })).toBeVisible();
     await context.close();

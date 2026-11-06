@@ -134,7 +134,7 @@ test.describe('invite a friend', () => {
     await other.addInitScript(() => localStorage.setItem('sh_lang', 'ro'));
     const friend = await other.newPage();
     await friend.goto(new URL(link).pathname + new URL(link).search);
-    await expect(friend.getByRole('button', { name: 'Sunt client' })).toHaveAttribute('aria-pressed', 'true');
+    await expect(friend.getByRole('combobox', { name: 'Tip cont' })).toHaveValue('client');
     const codeField = friend.getByLabel('Cod de invitare (opțional)');
     await expect(codeField).toHaveValue(code);
     const friendEmail = uniqueEmail('friend');

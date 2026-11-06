@@ -22,6 +22,7 @@ import { CAR_DOCS } from '../../../lib/expiry';
 import { OIL_MONTH_CHOICES } from '../../../lib/oil';
 import { newRequestId } from '../../../lib/requestId';
 import { useLoad } from '../../../lib/useLoad';
+import { canonicalPlate, isValidPlate } from '../../../lib/plate';
 import { isValidVin, normalizeCode } from '../../../lib/validators';
 import { carPath as carEditPath, GARAGE_PATH } from '../paths';
 import styles from './garage.module.css';
@@ -77,16 +78,19 @@ function CarEditor({ car }: { car: Car | null }) {
   const [oilMonths, setOilMonths] = useState(car?.oil_change_months ? String(car.oil_change_months) : '');
   const [oilLast, setOilLast] = useState(car?.last_oil_change ?? '');
   const { state: oilStandard } = useLoad(fetchOilStandard);
-  const [touched, setTouched] = useState({ year: false, vin: false });
+  const [touched, setTouched] = useState({ year: false, vin: false, plate: false });
   const [confirmDelete, setConfirmDelete] = useState(false);
 
   const vinNorm = normalizeCode(vin);
   const yearError = isValidCarYear(year) ? null : t('car.yearInvalid', { max: carYearMax() });
   const vinError = vinNorm && !isValidVin(vinNorm) ? t('rpcError.car_vin_invalid') : null;
+  // M7: a new or changed plate must be a plate; one already saved is left as it is.
+  const plateChanged = canonicalPlate(plate) !== canonicalPlate(car?.plate);
+  const plateError = plateChanged && plate.trim() !== '' && !isValidPlate(plate) ? t('rpcError.car_plate_invalid') : null;
   const today = ymdInBucharest(new Date());
   const oilLastError = oilLast && oilLast > today ? t('rpcError.car_oil_date_invalid') : null;
   const filled = make.trim() !== '' && model.trim() !== '';
-  const canSave = filled && !yearError && !vinError && !oilLastError;
+  const canSave = filled && !yearError && !vinError && !plateError && !oilLastError;
   const standardMonths = oilStandard.status === 'ready' ? oilStandard.data.months : null;
 
   // No request id here: an edit gives the same result however often it is sent, and a new car
@@ -153,6 +157,8 @@ function CarEditor({ car }: { car: Car | null }) {
               upper
               autoCapitalize="characters"
               autoComplete="off"
+              error={touched.plate ? plateError : null}
+              onBlur={() => setTouched((s) => ({ ...s, plate: true }))}
               onChange={(e) => setPlate(e.target.value)}
             />
           </div>

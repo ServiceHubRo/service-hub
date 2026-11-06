@@ -10,6 +10,7 @@ import { SkeletonList } from '../../components/Skeleton';
 import {
   archiveVehicle,
   assignDriver,
+  deleteExpense,
   fetchFleetOverview,
   fetchFleetPlans,
   fetchFleetReport,
@@ -17,8 +18,12 @@ import {
   fetchSubscription,
   fleetDecideQuote,
   logFleetExport,
+  markExpense,
+  receiptUrl,
+  saveExpense,
   saveVehicle,
   setUnavailable,
+  uploadReceipt,
 } from '../../data/fleet';
 import { subscribeRows } from '../../data/realtime';
 import { toRpcError } from '../../data/rpc';
@@ -118,6 +123,21 @@ function FleetSpace({ companyId }: { companyId: string }) {
         else clearFleetBookingHint();
         navigate(SEARCH_PATH);
       },
+      saveExpense: async (id, fields, requestId) => {
+        const saved = await saveExpense(companyId, id, fields, requestId);
+        await refresh();
+        return saved;
+      },
+      deleteExpense: async (id, requestId) => {
+        await deleteExpense(id, requestId);
+        await refresh();
+      },
+      markExpense: async (id, status, requestId) => {
+        await markExpense(id, status, requestId);
+        await refresh();
+      },
+      uploadReceipt: (vehicleId, file) => uploadReceipt(companyId, vehicleId, file),
+      receiptUrl: (path) => receiptUrl(path),
     }),
     [companyId, refresh, navigate],
   );

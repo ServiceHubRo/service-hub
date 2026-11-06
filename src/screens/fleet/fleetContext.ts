@@ -4,7 +4,9 @@ import type { VehicleFields } from '../../data/fleet';
 import type { Booking } from '../../data/rpc';
 import {
   memberCan,
+  type ExpenseFields,
   type FleetCapability,
+  type FleetExpense,
   type FleetOverview,
   type FleetPlanRow,
   type FleetPlanSummary,
@@ -39,6 +41,14 @@ export interface FleetActions {
   decideQuote: (bookingId: string, quoteId: string, approvedItemIds: string[], requestId: string) => Promise<Booking>;
   /** "Programează la service": the search, with this vehicle picked on the car step. */
   book: (vehicleId: string | null) => void;
+  /** The company's own expenses (M1). */
+  saveExpense: (expenseId: string | null, fields: ExpenseFields, requestId: string) => Promise<FleetExpense>;
+  deleteExpense: (expenseId: string, requestId: string) => Promise<void>;
+  markExpense: (expenseId: string, status: 'ok' | 'to_check', requestId: string) => Promise<void>;
+  /** A receipt's photo or PDF, before the expense is saved; answers its path. */
+  uploadReceipt: (vehicleId: string, file: File) => Promise<string>;
+  /** A link to look at a receipt. */
+  receiptUrl: (path: string) => Promise<string>;
 }
 
 export interface FleetContextValue {

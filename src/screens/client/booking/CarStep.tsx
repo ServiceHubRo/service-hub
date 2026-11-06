@@ -27,6 +27,7 @@ import type { ShopPageService, ShopPageShop } from '../../../data/search';
 import { useI18n } from '../../../i18n/context';
 import { formatDate, formatMoney } from '../../../i18n/format';
 import { carYearMax, isValidCarYear } from '../../../lib/car';
+import { isValidPlate } from '../../../lib/plate';
 import { useLoad } from '../../../lib/useLoad';
 import type { OfferKind } from '../../../lib/offers';
 import { composeUnsureNote, unsureDescribed, type Symptom } from '../../../lib/symptoms';
@@ -92,6 +93,7 @@ export function CarStep({
   }, []);
   const { state, reload } = useLoad(load);
   const [yearTouched, setYearTouched] = useState(false);
+  const [plateTouched, setPlateTouched] = useState(false);
   /** null, or why the phone must be confirmed first: the number of no-shows (T25). */
   const [phoneNeeded, setPhoneNeeded] = useState<number | null>(null);
   const [phoneDone, setPhoneDone] = useState(false);
@@ -131,7 +133,8 @@ export function CarStep({
   const vehicle = manual || !draft.companyVehicleId ? null : (companies.flatMap((c) => c.vehicles).find((v) => v.id === draft.companyVehicleId) ?? null);
   const picked = manual || vehicle ? null : (cars.find((c) => c.id === draft.carId) ?? null);
   const yearProblem = manual && !isValidCarYear(draft.year) ? t('car.yearInvalid', { max: carYearMax() }) : null;
-  const typedOk = draft.make.trim() !== '' && draft.model.trim() !== '' && !yearProblem;
+  const plateProblem = manual && draft.plate.trim() !== '' && !isValidPlate(draft.plate) ? t('rpcError.car_plate_invalid') : null;
+  const typedOk = draft.make.trim() !== '' && draft.model.trim() !== '' && !yearProblem && !plateProblem;
   const described = !unsure || unsureDescribed(symptoms, draft.note);
   const ready = (manual ? typedOk : picked !== null || vehicle !== null) && described && (ackNeeded === null || acked);
   const symptomNames = symptoms.map((s) => t(`booking.symptom.${s}`));
@@ -304,6 +307,8 @@ export function CarStep({
               upper
               autoCapitalize="characters"
               autoComplete="off"
+              error={plateTouched ? plateProblem : null}
+              onBlur={() => setPlateTouched(true)}
               onChange={(e) => set({ plate: e.target.value })}
             />
           </div>

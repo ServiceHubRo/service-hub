@@ -136,7 +136,7 @@ test.describe('T25 fraud checks', () => {
     await page.getByLabel('Parolă', { exact: true }).fill(SEED_PASSWORD);
     await page.getByRole('button', { name: 'Intră în cont' }).click();
     await expect(page.getByText('Scrie codul de 6 cifre din aplicația de autentificare de pe telefon.')).toBeVisible();
-    await page.getByRole('button', { name: 'English' }).click();
+    await page.getByRole('combobox', { name: /^(Limba|Language)$/ }).filter({ visible: true }).first().selectOption('en');
     await expect(page.getByText('Type the 6-digit code from the authenticator app on your phone.')).toBeVisible();
     await expectNoHorizontalScroll(page);
     await shot(page, 't25-mfa-challenge-en', name());

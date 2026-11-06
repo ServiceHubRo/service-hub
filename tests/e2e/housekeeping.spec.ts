@@ -130,11 +130,11 @@ test.describe('Bookings that look after themselves', () => {
     await expectNoHorizontalScroll(page);
     await shot(page, 'request-unanswered', name());
     // In English too.
-    await page.getByRole('button', { name: 'English' }).filter({ visible: true }).first().click();
+    await page.getByRole('combobox', { name: /^(Limba|Language)$/ }).filter({ visible: true }).first().selectOption('en');
     await expect(card.getByText("The shop didn't answer in time.", { exact: false })).toBeVisible();
     await expectNoHorizontalScroll(page);
     await shot(page, 'request-unanswered-en', name());
-    await page.getByRole('button', { name: 'Română' }).filter({ visible: true }).first().click();
+    await page.getByRole('combobox', { name: /^(Limba|Language)$/ }).filter({ visible: true }).first().selectOption('ro');
     await card.getByRole('link', { name: 'Caută alt service' }).click();
     await expect(page).toHaveURL(/\/c\/cauta\?cat=cat_rev&oras=Bra%C8%99ov$/);
   });

@@ -1,10 +1,10 @@
-import { Car, Wrench } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ActionButton } from '../../components/ActionButton';
 import { useCaptcha } from '../../components/useCaptcha';
 import { Checkbox } from '../../components/Checkbox';
 import { Field } from '../../components/Field';
+import { SelectField } from '../../components/SelectField';
 import { PasswordField } from '../../components/PasswordField';
 import { PhoneField } from '../../components/PhoneField';
 import { homeOf } from '../../app/roles';
@@ -177,36 +177,21 @@ export function SignUpForm({
   return (
     <form ref={formRef} className={styles.form} noValidate onSubmit={(e) => e.preventDefault()}>
       <div hidden={!!invite}>
-        <p className={styles.groupLabel} id="signup-role">
-          {t('auth.roleQuestion')}
-        </p>
-        <div className={styles.roles} role="group" aria-labelledby="signup-role">
-          <button
-            type="button"
-            className={styles.role}
-            aria-pressed={role === 'client'}
-            aria-invalid={errors.role ? true : undefined}
-            onClick={() => {
-              setRole('client');
-              clear('role');
-            }}
-          >
-            <Car size={28} aria-hidden="true" />
-            {t('auth.roleClient')}
-          </button>
-          <button
-            type="button"
-            className={styles.role}
-            aria-pressed={role === 'shop'}
-            onClick={() => {
-              setRole('shop');
-              clear('role');
-            }}
-          >
-            <Wrench size={28} aria-hidden="true" />
-            {t('auth.roleShop')}
-          </button>
-        </div>
+        {/* The account type (Eduard, 6 Nov: a dropdown, not two big buttons). */}
+        <SelectField
+          label={t('auth.roleLabel')}
+          value={role ?? ''}
+          aria-invalid={errors.role ? true : undefined}
+          onChange={(e) => {
+            setRole(e.target.value === '' ? null : (e.target.value as SignUpRole));
+            clear('role');
+          }}
+          options={[
+            { value: '', label: t('auth.rolePick') },
+            { value: 'client', label: t('auth.roleClient') },
+            { value: 'shop', label: t('auth.roleShop') },
+          ]}
+        />
         {errors.role && (
           <p className={styles.fieldError} role="alert">
             {errors.role}
