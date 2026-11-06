@@ -248,7 +248,7 @@ test.describe('messages and reviews', () => {
     await signIn(page, client, PASSWORD);
     await expect(page).toHaveURL(/\/c\//);
     await page.goto('/c/mesaje');
-    await expect(page.getByText('Nicio conversație.')).toBeVisible();
+    await expect(page.getByText('Nu există conversații.')).toBeVisible();
     await shot(page, 't11-client-empty', name());
   });
 

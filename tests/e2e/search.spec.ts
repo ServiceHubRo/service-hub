@@ -88,7 +88,7 @@ test.describe('client search', () => {
     await selectInPanel(page, 'Codlea');
     await expect(page.getByRole('dialog').getByRole('button', { name: 'Arată 0 service-uri' })).toBeVisible();
     await closeFilters(page);
-    await expect(page.getByText('Niciun service cu filtrele alese.')).toBeVisible();
+    await expect(page.getByText('Nu există service-uri pentru filtrele selectate.')).toBeVisible();
     // The filters on show above the list in one line.
     await expect(activeFilters(page)).toContainText('Anvelope & Jante · Codlea');
     await openFilters(page);
@@ -113,7 +113,7 @@ test.describe('client search', () => {
 
     // Nothing at all.
     await search(page).fill('zzzz');
-    await expect(page.getByText('Niciun service pentru „zzzz”.')).toBeVisible();
+    await expect(page.getByText('Nu există service-uri pentru „zzzz”.')).toBeVisible();
 
     // The order explained.
     await page.getByRole('button', { name: 'Cum este ordonată lista?' }).click();
@@ -129,7 +129,7 @@ test.describe('client search', () => {
     await page.route('**/rest/v1/rpc/search_shops', (route) => route.fulfill({ status: 200, contentType: 'application/json', body: '[]' }));
     await signInNewClient(page);
     await expect(page.getByText('Momentan nu există service-uri disponibile pentru programare.')).toBeVisible();
-    await expect(page.getByText('Niciun service cu filtrele alese.')).toHaveCount(0);
+    await expect(page.getByText('Nu există service-uri pentru filtrele selectate.')).toHaveCount(0);
     await page.getByRole('button', { name: 'Hartă' }).click();
     await expect(page.getByRole('region', { name: 'Harta service-urilor găsite' })).toBeVisible();
     await expect(page.getByText('Momentan nu există service-uri disponibile pentru programare.')).toBeVisible();
@@ -158,7 +158,7 @@ test.describe('client search', () => {
     await result(page, 'Atelier Demo').click();
     await expect(page.getByRole('heading', { level: 1, name: 'Atelier Demo' })).toBeVisible();
     await page.getByRole('button', { name: 'Salvează Atelier Demo la favorite' }).click();
-    await expect(page.getByRole('button', { name: 'Scoate Atelier Demo din favorite' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Elimină Atelier Demo din favorite' })).toBeVisible();
 
     await openAccount(page);
     await page.getByRole('link', { name: /Favorite/ }).click();

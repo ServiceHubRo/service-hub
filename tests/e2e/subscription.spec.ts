@@ -228,12 +228,12 @@ test.describe('subscription', () => {
     const customer = (await subscriptionOf(shopId)).stripe_customer_id!;
     await stripeFailPayment(customer);
     await expect(page.getByText('Plată restantă', { exact: true })).toBeVisible();
-    await expect(page.getByText(/^Plata nu a reușit\. Reîncercăm pe .+\. Verifică sau schimbă cardul din Gestionează\.$/)).toBeVisible();
+    await expect(page.getByText(/^Plata nu a reușit\. Următoarea încercare: .+\. Verifică sau schimbă cardul din Gestionează\.$/)).toBeVisible();
     // The thank-you from the checkout does not stay over a later failed payment.
     await expect(page.getByText('Mulțumim. Abonamentul este activ.')).toHaveCount(0);
     await shot(page, 't14-subscription-past-due', name());
     const failedMail = await emailWith(email, 'Plata abonamentului nu a reușit');
-    expect(failedMail.text).toMatch(/Reîncercăm pe \d{1,2} [a-z]+\./);
+    expect(failedMail.text).toMatch(/Următoarea încercare: \d{1,2} [a-z]+\./);
 
     await page.goto('/s/panou');
     await expect(page.getByText('Plata abonamentului nu a reușit. Verifică cardul ca service-ul să rămână în căutări.')).toBeVisible();

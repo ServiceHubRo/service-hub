@@ -42,7 +42,7 @@ for (const [role, email, prefix] of [
     const id = (await page.getByText(new RegExp(`^${prefix}\\d{5}$`)).textContent())!;
     const mail = page.getByRole('link', { name: /Trimite-ne un email/ });
     await expect(mail).toHaveAttribute('href', `mailto:contact@service-hub.ro?subject=${encodeURIComponent(`Service-Hub · ${id}`)}`);
-    const whatsapp = page.getByRole('link', { name: /Scrie-ne pe WhatsApp/ });
+    const whatsapp = page.getByRole('link', { name: /Contact pe WhatsApp/ });
     const href = (await whatsapp.getAttribute('href'))!;
     expect(href.startsWith('https://wa.me/40723375248?text=')).toBe(true);
     expect(decodeURIComponent(href.split('text=')[1]!)).toContain(`ID-ul contului meu: ${id}.`);
@@ -54,7 +54,7 @@ for (const [role, email, prefix] of [
 
     await page.getByRole('button', { name: 'English' }).filter({ visible: true }).first().click();
     await expect(page.getByRole('heading', { level: 1, name: 'Help and contact' })).toBeVisible();
-    expect(decodeURIComponent((await page.getByRole('link', { name: /Message us on WhatsApp/ }).getAttribute('href'))!)).toContain(
+    expect(decodeURIComponent((await page.getByRole('link', { name: /Contact on WhatsApp/ }).getAttribute('href'))!)).toContain(
       `My account ID: ${id}.`,
     );
     await expectAccessible(page, `${role} help (en)`);

@@ -61,7 +61,7 @@ test('a client sends a suggestion, the admin plans it, the client sees it planne
   await page.getByRole('link', { name: /^Sugestii/ }).click();
   await expect(page).toHaveURL(/\/c\/cont\/sugestii$/);
   await expect(page.getByRole('heading', { level: 1, name: 'Sugestii' })).toBeVisible();
-  await expect(page.getByText('Nicio sugestie trimisă.')).toBeVisible();
+  await expect(page.getByText('Nu există sugestii trimise.')).toBeVisible();
 
   const send = page.getByRole('button', { name: 'Trimite sugestia' });
   await expect(send).toBeDisabled();

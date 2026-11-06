@@ -292,7 +292,7 @@ test.describe('admin tools', () => {
     await openTool(page, 'Rapoarte de istoric');
     await page.getByLabel('Caută cod, număr, mașină, client').fill(r!.code);
     const card = page.getByRole('listitem').filter({ hasText: r!.code });
-    await expect(card.getByText('Gata')).toBeVisible();
+    await expect(card.getByText('Generat')).toBeVisible();
     await expectNoHorizontalScroll(page);
     await shot(page, 't16b-reports', name());
     await card.getByRole('button', { name: 'Anulează raportul' }).click();
@@ -410,7 +410,7 @@ test.describe('Raport ANAF', () => {
     await expect(unknownCard).toBeVisible();
     await expect(mismatchCard).toBeVisible();
     await pickFilter(page, /^Firmă activă · \d+$/);
-    await expect(page.getByText('Niciun rezultat pentru filtrele alese.')).toBeVisible();
+    await expect(page.getByText('Nu există rezultate pentru filtrele selectate.')).toBeVisible();
     await pickFilter(page, /^Toate · \d+$/);
 
     // The Excel file holds what the screen shows.
@@ -482,7 +482,7 @@ test.describe('Raport ANAF', () => {
     expect(await events('company_problem')).toBe(1);
     expect(await events('company_hidden')).toBe(1);
     await page.reload();
-    await expect(page.getByText('Nu am putut confirma încă firma la ANAF. Verifică CUI-ul în Date de facturare și service-ul revine automat.')).toBeVisible();
+    await expect(page.getByText('Firma nu a putut fi confirmată încă la ANAF. Verifică CUI-ul în Date de facturare; service-ul revine automat în căutări.')).toBeVisible();
     await expect(banner).toHaveCount(0);
     await shot(page, 'anaf-hidden-banner', name());
 
@@ -493,7 +493,7 @@ test.describe('Raport ANAF', () => {
     expect(await billing()).toMatchObject({ anaf_status: 'active', anaf_problem_since: null });
     expect(await events('company_ok')).toBe(1);
     await page.reload();
-    await expect(page.getByText('Nu am putut confirma încă firma la ANAF.', { exact: false })).toHaveCount(0);
+    await expect(page.getByText('Firma nu a putut fi confirmată încă la ANAF.', { exact: false })).toHaveCount(0);
     await expect(banner).toHaveCount(0);
   });
 });

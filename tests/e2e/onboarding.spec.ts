@@ -103,7 +103,7 @@ test('a new client: welcome, the lit spots one by one, "Primii pași" ticks itse
     if (route.request().method() === 'PATCH') await new Promise((r) => setTimeout(r, 1500));
     await route.continue();
   });
-  await page.getByRole('button', { name: 'Gata' }).click();
+  await page.getByRole('button', { name: 'Încheie turul' }).click();
   await expect(tour(page)).toHaveCount(0);
   await page.waitForTimeout(2500);
   await expect(tour(page)).toHaveCount(0);

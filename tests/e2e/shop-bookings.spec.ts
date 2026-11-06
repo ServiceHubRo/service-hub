@@ -175,7 +175,7 @@ test.describe('shop flow', () => {
 
     await signIn(page, shopEmail, PASSWORD);
     await expect(page).toHaveURL(/\/s\/panou$/);
-    await expect(page.getByText('Nicio programare azi.')).toBeVisible();
+    await expect(page.getByText('Nu există programări azi.')).toBeVisible();
     // A counter at zero is not a link.
     await expect(page.getByRole('link', { name: /^\d+ Cereri noi$/ })).toHaveCount(0);
     await expect(page.getByText('Cereri noi', { exact: true })).toBeVisible();

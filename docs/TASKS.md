@@ -1533,3 +1533,12 @@ Notă (31 oct): Eduard a aprobat politica de acces (7 zile de grație, apoi doar
 - Fără schimbări de calcule, drepturi, planuri sau bază de date. Teste: `tests/unit/menuPlacement.test.ts`, `tests/e2e/fleet-plans.spec.ts` (320 și 360 px).
 
 - [x] Făcut
+
+### T67 — Standard editorial global ✅
+- **Standardul** (Eduard, 6 nov): `docs/EDITORIAL.md` — vocea aplicației (impersonală, fără „eu/noi”, fără exclamații, emoji sau cuvinte colocviale), un verb pentru fiecare acțiune, un termen pentru fiecare concept, modele fixe pentru listă goală, eroare la încărcare, confirmare, plată reîncercată. Glosarul RO/EN în cod: `src/i18n/glossary.ts`.
+- **Inventar:** 3.852 de chei pe limbă plus textele notificărilor, e-mailurilor, SMS-urilor și PDF-urilor. Schimbate: 189 de chei din aplicație și 26 de rânduri din textele serverului (`templates.ts`, `emails.ts`, `report.ts`). Sensul fiecărui mesaj a rămas același.
+- **Verificat automat:** `tests/unit/editorial.test.ts` pică la orice text nou care încalcă standardul (aplicație, notificări, e-mailuri, SMS, PDF) și arată ce trebuie scris în loc. CLAUDE.md §10 trimite la standard.
+- Bifele din texte („✓ Salvat”, „✓ Copiat”) au devenit iconițe lângă text.
+- Neverificate automat: textele de notificare suprascrise de admin din Admin → Texte.
+
+- [x] Făcut

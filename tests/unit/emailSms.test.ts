@@ -220,7 +220,7 @@ describe('app emails', () => {
     const params = { area: 'CJ', area_ro: 'Cluj', area_en: 'Cluj', shops: 3 };
     const ro = emailForEvent({ event: 'area_launched', lang: 'ro', role: 'client', params } as never, 'https://app.ro')!;
     expect(ro.subject).toBe('Service-Hub este disponibil în județul Cluj');
-    expect(ro.text).toContain('Ne-ai cerut să te anunțăm când Service-Hub ajunge în județul Cluj.');
+    expect(ro.text).toContain('Ai cerut să fii anunțat când Service-Hub ajunge în județul Cluj.');
     expect(ro.html).toContain('https://app.ro/c/cauta');
     const en = emailForEvent({ event: 'area_launched', lang: 'en', role: 'client', params: { ...params, area: 'B', area_en: 'Bucharest' } } as never, 'https://app.ro')!;
     expect(en.subject).toBe('Service-Hub is now available in Bucharest');

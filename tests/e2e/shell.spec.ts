@@ -311,7 +311,7 @@ test('component gallery: action button, stepper, errors', async ({ page }) => {
   await expect(ok).toBeEnabled();
 
   await page.getByRole('button', { name: 'Trimite (eșuează)' }).click();
-  await expect(page.getByText('Nu s-a putut trimite. Verifică internetul și încearcă din nou.')).toBeVisible();
+  await expect(page.getByText('Nu s-a putut trimite. Verifică conexiunea și încearcă din nou.')).toBeVisible();
   await expect(page.getByRole('button', { name: 'Încearcă din nou' })).toBeVisible();
 
   await page.screenshot({ path: `test-results/shots/components-${test.info().project.name}.png`, fullPage: false });

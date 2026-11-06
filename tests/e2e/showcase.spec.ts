@@ -33,29 +33,29 @@ test.describe('the shop window', () => {
     const { email: owner, shopId } = await createBookableShop(shopName, ['ulei']);
     await serviceRest(`shops?id=eq.${shopId}`, 'PATCH', { latitude: 45.6427, longitude: 25.5887 });
 
-    // The owner: Setări service → Poze și facilități.
+    // The owner: Setări service → Fotografii și facilități.
     await signIn(page, owner, PASSWORD);
     await expect(page).toHaveURL(/\/s\/panou/);
     await page.goto('/s/cont/setari');
-    await page.getByRole('link', { name: /Poze și facilități/ }).click();
-    await expect(page.getByRole('heading', { level: 1, name: 'Poze și facilități' })).toBeVisible();
-    await expect(page.getByText('0 din 10 poze')).toBeVisible();
+    await page.getByRole('link', { name: /Fotografii și facilități/ }).click();
+    await expect(page.getByRole('heading', { level: 1, name: 'Fotografii și facilități' })).toBeVisible();
+    await expect(page.getByText('0 din 10 fotografii')).toBeVisible();
     const chooser = page.waitForEvent('filechooser');
-    await page.getByRole('button', { name: 'Adaugă poze' }).click();
+    await page.getByRole('button', { name: 'Adaugă fotografii' }).click();
     await (await chooser).setFiles([
       { name: 'atelier.png', mimeType: 'image/png', buffer: png() },
       { name: 'receptie.png', mimeType: 'image/png', buffer: png() },
       { name: 'notes.txt', mimeType: 'text/plain', buffer: Buffer.from('nu e poza') },
     ]);
-    await page.getByRole('button', { name: 'Încarcă 3 poze' }).click();
-    await expect(page.getByText('2 din 10 poze')).toBeVisible();
+    await page.getByRole('button', { name: 'Încarcă 3 fotografii' }).click();
+    await expect(page.getByText('2 din 10 fotografii')).toBeVisible();
     await expect(page.getByText(/Unele fișiere nu au fost adăugate \(1\)/)).toBeVisible();
-    const firstUrl = await page.getByRole('img', { name: 'Poza 1 a atelierului' }).getAttribute('src');
+    const firstUrl = await page.getByRole('img', { name: 'Fotografia 1 a service-ului' }).getAttribute('src');
     await page.getByRole('button', { name: 'Mută poza 2 mai în față' }).click();
-    await expect(page.getByRole('img', { name: 'Poza 2 a atelierului' })).toHaveAttribute('src', firstUrl!);
+    await expect(page.getByRole('img', { name: 'Fotografia 2 a service-ului' })).toHaveAttribute('src', firstUrl!);
     await page.getByRole('button', { name: 'Șterge poza 2' }).click();
     await page.getByRole('button', { name: 'Da, șterge' }).click();
-    await expect(page.getByText('1 din 10 poze')).toBeVisible();
+    await expect(page.getByText('1 din 10 fotografii')).toBeVisible();
 
     await page.getByLabel('Wi-Fi pentru clienți').check();
     await page.getByLabel('Mașină la schimb').check();
@@ -136,8 +136,8 @@ test.describe('the shop window', () => {
     await expectNoHorizontalScroll(c);
     await shot(c, 't28b-shop-page', name());
     await c.getByRole('button', { name: 'Deschide poza 1 din 1' }).click();
-    const viewer = c.getByRole('dialog', { name: `Poze cu ${shopName}` });
-    await expect(viewer.getByRole('img', { name: `Poza 1 din 1, ${shopName}` })).toBeVisible();
+    const viewer = c.getByRole('dialog', { name: `Fotografii cu ${shopName}` });
+    await expect(viewer.getByRole('img', { name: `Fotografia 1 din 1, ${shopName}` })).toBeVisible();
     await c.keyboard.press('Escape');
     await expect(viewer).toBeHidden();
 

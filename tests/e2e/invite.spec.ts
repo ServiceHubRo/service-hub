@@ -235,7 +235,7 @@ test.describe('invite a friend', () => {
     await page.getByRole('button', { name: 'Folosește raportul gratuit' }).click();
     await expect(page).toHaveURL(/\/c\/cont\/rapoarte\?raport=/);
     const reportCard = page.locator('main li').first();
-    await expect(reportCard).toContainText('Gata', { timeout: 30_000 });
+    await expect(reportCard).toContainText('Generat', { timeout: 30_000 });
     await expect(reportCard.locator('.mono').filter({ hasText: /^SH-\d{4}-\d{6}$/ })).toBeVisible();
     await expect(page.getByText(/Alege mașina mai jos/)).toHaveCount(0);
     await shot(page, 'invite-report-done', name());

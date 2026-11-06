@@ -128,6 +128,7 @@ If the network blocks a download or API you need, stop and tell Eduard the exact
 
 - Romanian UI copy follows the reference demo and the Lovable prompts: short, concrete, friendly, no exclamation marks, no marketing words. Address the user with "tu".
 - Professional, never chatty (Eduard, Oct 2026): no colloquialisms, rhetorical questions, apologies or cute phrasing. No explanations of how or why the system works (database, Stripe, "so that…", reassurances): a hint exists only when it prevents a mistake, in one short sentence. Keep what the user must do, deadlines, money and consequences.
+- **Editorial standard (Eduard, 6 Nov 2026):** every text — app, notifications, emails, SMS, PDFs, admin — follows `docs/EDITORIAL.md`: impersonal system voice (never „eu/noi”, never "I/we"), one verb per action and one term per concept from `src/i18n/glossary.ts`, fixed patterns for empty lists, load errors and confirmations. `tests/unit/editorial.test.ts` fails on a text that breaks it.
 - English copy: natural US English, same brevity ("Book now", "Send quote", "Your car is being inspected").
 - Money: RO `1.250 lei`, EN `1,250 RON`. Odometer: RO `105.400 km`, EN `105,400 km`. Dates: RO `Mar 14 oct`, EN `Tue, Oct 14`.
 - Brand: "Service-Hub" in text; wordmark `SERVICE-` in `#EAE8E2` and `HUB` in `#F5A524`, one component, never wraps.

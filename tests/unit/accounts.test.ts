@@ -71,7 +71,7 @@ describe('auth errors are specific and translated', () => {
       { code: 'over_request_rate_limit', status: 429, message: 'For security purposes, you can only request this after 42 seconds.' },
       'Prea multe încercări. Încearcă din nou peste 42 secunde.',
     ],
-    [{ name: 'AuthRetryableFetchError', message: 'Failed to fetch', status: 0 }, 'Nu s-a putut trimite. Verifică internetul și încearcă din nou.'],
+    [{ name: 'AuthRetryableFetchError', message: 'Failed to fetch', status: 0 }, 'Nu s-a putut trimite. Verifică conexiunea și încearcă din nou.'],
     [new AuthFailure('wrong_current_password'), 'Parola actuală nu este corectă.'],
     [new AuthFailure('email_disposable'), 'Adresele de email temporare nu sunt acceptate. Folosește o adresă permanentă.'],
     [{ code: 'something_new', status: 500 }, 'A apărut o eroare. Încearcă din nou.'],

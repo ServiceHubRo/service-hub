@@ -110,7 +110,7 @@ test.describe('shop settings', () => {
     await expect(page.getByRole('checkbox', { name: 'Plăcuțe de frână' })).toBeVisible();
     await expect(page.getByRole('checkbox', { name: 'Schimb ulei + filtru ulei' })).toHaveCount(0);
     await page.getByLabel('Caută un serviciu').fill('xyz nimic');
-    await expect(page.getByText('Niciun serviciu nu se potrivește cu „xyz nimic”.')).toBeVisible();
+    await expect(page.getByText('Nu există servicii pentru „xyz nimic”.')).toBeVisible();
     await page.getByRole('button', { name: 'Șterge căutarea' }).click();
     await page.getByLabel('Caută un serviciu').fill('frâne');
     await clickInPlace(page, page.getByRole('checkbox', { name: 'Plăcuțe de frână' }));

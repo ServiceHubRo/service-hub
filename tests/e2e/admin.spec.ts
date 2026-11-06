@@ -85,7 +85,7 @@ test.describe('admin', () => {
     await expect(page.getByRole('link', { name: new RegExp(shopName) })).toHaveCount(1);
     await expect(page).toHaveURL(/q=Atelier/);
     await pickFilter(page, 'Suspendate');
-    await expect(page.getByText('Niciun rezultat pentru filtrele alese.')).toBeVisible();
+    await expect(page.getByText('Nu există rezultate pentru filtrele selectate.')).toBeVisible();
     await page.getByRole('button', { name: 'Șterge filtrele' }).first().click();
     await expectNoHorizontalScroll(page);
     await shot(page, 't16a-shops', name());

@@ -1,3 +1,4 @@
+import { Check } from 'lucide-react';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { ActionButton } from '../../../components/ActionButton';
 import { rpcErrorMessage } from '../../../data/rpc';
@@ -5,7 +6,7 @@ import { useI18n } from '../../../i18n/context';
 import styles from './settings.module.css';
 
 /**
- * The save button of a settings page: an ActionButton that reads "✓ Salvat" for 1.5 s after a
+ * The save button of a settings page: an ActionButton that reads "Salvat", with a check mark, for 1.5 s after a
  * save (P5). `onSave` returns false when the form did not validate (nothing was sent).
  *
  * T51: by default a quiet bar held at the bottom of the screen across the whole content width, the
@@ -47,7 +48,14 @@ export function SaveButton({
           timer.current = window.setTimeout(() => setSaved(false), 1500);
         }}
       >
-        {saved ? t('common.saved') : children}
+        {saved ? (
+          <>
+            <Check size={18} aria-hidden="true" />
+            {t('common.saved')}
+          </>
+        ) : (
+          children
+        )}
       </ActionButton>
       </div>
       <span className="visually-hidden" role="status">

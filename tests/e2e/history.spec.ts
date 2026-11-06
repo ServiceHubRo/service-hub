@@ -206,7 +206,7 @@ test.describe('repair history', () => {
 
     // A search with no match offers to clear the filters.
     await page.getByLabel('Caută în istoric').fill('zzzz');
-    await expect(page.getByText('Niciun rezultat pentru „zzzz”.')).toBeVisible();
+    await expect(page.getByText('Nu există rezultate pentru „zzzz”.')).toBeVisible();
     await page.getByRole('button', { name: 'Șterge filtrele' }).click();
     await expect(jobCards(page)).toHaveCount(3);
 

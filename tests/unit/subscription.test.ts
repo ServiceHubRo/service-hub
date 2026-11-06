@@ -312,10 +312,10 @@ describe('subscription notices and emails', () => {
       'Perioada gratuită se termină azi. Activează abonamentul ca service-ul să rămână în căutări.',
     );
     expect(renderNotification(ev('payment_failed', 'ro', { total: 100, final: false, expiry: '2026-10-12' }), {}, NOW)!.body).toBe(
-      'Nu am putut încasa abonamentul de 100 lei. Verifică sau schimbă cardul din Abonament. Reîncercăm pe 12 oct.',
+      'Plata abonamentului de 100 lei nu a reușit. Verifică sau schimbă cardul din Abonament. Următoarea încercare: 12 oct.',
     );
     expect(renderNotification(ev('payment_failed', 'en', { total: 100, final: true, expiry: null }), {}, NOW)!.body).toBe(
-      "We couldn't charge the 100 RON subscription. That was the last try: pay under Subscription to stay in search results.",
+      'The 100 RON subscription payment failed. That was the last attempt: pay under Subscription to stay in search results.',
     );
     expect(renderNotification(ev('shop_inactive', 'ro', { reason: 'payment_failed' }), {}, NOW)!.body).toMatch(/^Plata abonamentului nu a reușit/);
     expect(renderNotification(ev('shop_inactive', 'en', { reason: 'cancelled' }), {}, NOW)!.body).toMatch(/^Your subscription has ended/);
@@ -343,7 +343,7 @@ describe('subscription notices and emails', () => {
     expect(ending.text).toContain('Activate the subscription: https://app.test/s/cont/abonament');
 
     const failed = emailForEvent(ev('payment_failed', 'ro', { total: 100, expiry: '2026-10-12' }), 'https://app.test')!;
-    expect(failed.text).toContain('Reîncercăm pe 12 oct.');
+    expect(failed.text).toContain('Următoarea încercare: 12 oct.');
 
     const inactive = emailForEvent(ev('shop_inactive', 'ro', { reason: 'trial_ended' }), 'https://app.test')!;
     expect(inactive.subject).toBe('Atelier Unu nu mai apare în căutări');

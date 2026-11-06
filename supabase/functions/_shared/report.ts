@@ -75,7 +75,7 @@ export const REPORT_TEXT = {
       'Lucrări din zile diferite au același kilometraj ({km}). Service-ul a confirmat cifra la introducere, dar poate să nu fie exactă: verificați kilometrajul mașinii.',
     disclaimerLead: 'Important.',
     disclaimer:
-      'Acest raport conține exclusiv lucrările efectuate prin platforma Service-Hub și înregistrate de service-urile partenere. Nu reprezintă istoricul complet de service al vehiculului: lucrările efectuate în alte ateliere, în regie proprie sau înainte de înregistrarea vehiculului în aplicație nu apar aici. Datele sunt cele raportate de service-urile care au efectuat lucrările. Service-Hub este intermediar și nu răspunde pentru calitatea lucrărilor. Raport generat automat la {date} · Service-Hub · {host}',
+      'Acest raport conține exclusiv lucrările efectuate prin platforma Service-Hub și înregistrate de service-urile partenere. Nu reprezintă istoricul complet de service al vehiculului: lucrările efectuate la alte service-uri, în regie proprie sau înainte de înregistrarea vehiculului în aplicație nu apar aici. Datele sunt cele raportate de service-urile care au efectuat lucrările. Service-Hub este intermediar și nu răspunde pentru calitatea lucrărilor. Raport generat automat la {date} · Service-Hub · {host}',
     page: 'Pagina {n} din {total}',
     continued: 'continuare',
     footerNote:

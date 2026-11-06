@@ -237,7 +237,7 @@ test.describe('with accounts', () => {
     await page.getByRole('button', { name: 'Creează cont' }).click();
 
     await expect(page).toHaveURL(/\/confirma-email$/);
-    await expect(page.getByText(`Ți-am trimis un link la ${email}.`, { exact: false })).toBeVisible();
+    await expect(page.getByText(`Un link a fost trimis la ${email}.`, { exact: false })).toBeVisible();
     await shot(page, 'auth-check-email', name());
     // "Retrimite" waits 60 s after the first email.
     await expect(page.getByRole('button', { name: /Retrimite emailul în \d+ s/ })).toBeDisabled();
@@ -248,7 +248,7 @@ test.describe('with accounts', () => {
     await page.evaluate(() => localStorage.removeItem('sh_email_log')); // skip the 60 s wait
     await page.waitForTimeout(1100); // the local Auth server allows one email per second
     await page.getByRole('button', { name: 'Retrimite emailul' }).click();
-    await expect(page.getByText(`Ți-am trimis un link nou la ${email}.`)).toBeVisible();
+    await expect(page.getByText(`Un link nou a fost trimis la ${email}.`)).toBeVisible();
     await expect(page.getByRole('button', { name: /Retrimite emailul în \d+ s/ })).toBeDisabled();
     await shot(page, 'auth-unconfirmed', name());
 

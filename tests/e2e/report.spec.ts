@@ -184,7 +184,7 @@ test.describe('history report', () => {
     await expect(page.getByRole('heading', { level: 1, name: 'Rapoartele mele' })).toBeVisible();
     await expect(page.getByText('Mulțumim. Raportul este gata de descărcat.')).toBeVisible({ timeout: 30_000 });
     const card = page.locator('main li').filter({ hasText: plate });
-    await expect(card).toContainText('Gata');
+    await expect(card).toContainText('Generat');
     await expect(card).toContainText('3 lucrări');
     const code = (await card.locator('.mono').filter({ hasText: /^SH-\d{4}-\d{6}$/ }).textContent())!.trim();
     await expectNoHorizontalScroll(page);

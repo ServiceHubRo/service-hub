@@ -1,4 +1,4 @@
-import { Building2, Copy, KeyRound, Repeat, ShieldCheck, Truck, UserMinus, UserPlus } from 'lucide-react';
+import { Building2, Check, Copy, KeyRound, Repeat, ShieldCheck, Truck, UserMinus, UserPlus } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { buttonClass } from '../../../components/buttonClass';
@@ -423,7 +423,7 @@ function LinkPanel({ email, url }: { email: string; url: string }) {
       </label>
       <input id="company-invite-link" ref={inputRef} readOnly className={`mono ${styles.linkInput}`} value={url} onFocus={(e) => e.target.select()} />
       <Button variant="primary" block onClick={() => void copy()}>
-        <Copy size={18} aria-hidden="true" />
+        {copied ? <Check size={18} aria-hidden="true" /> : <Copy size={18} aria-hidden="true" />}
         {copied ? t('staff.copied') : t('staff.copy')}
       </Button>
     </Card>

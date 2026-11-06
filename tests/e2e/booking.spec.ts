@@ -54,7 +54,7 @@ test.describe('garage', () => {
     await signInClient(page);
     await navLink(page, 'Garaj').click();
     await expect(page.getByRole('heading', { level: 1, name: 'Garaj' })).toBeVisible();
-    await expect(page.getByText('Nicio mașină salvată.')).toBeVisible();
+    await expect(page.getByText('Nu există mașini salvate.')).toBeVisible();
     await shot(page, 't07-garage-empty', name());
 
     await page.getByRole('link', { name: 'Adaugă mașină' }).click();
@@ -116,7 +116,7 @@ test.describe('garage', () => {
     await page.getByRole('button', { name: 'Șterge mașina' }).click();
     await page.getByRole('button', { name: 'Da, șterge' }).click();
     await expect(page).toHaveURL(/\/c\/garaj$/);
-    await expect(page.getByText('Nicio mașină salvată.')).toBeVisible();
+    await expect(page.getByText('Nu există mașini salvate.')).toBeVisible();
     await navLink(page, 'Caută').click();
     await expect(page.getByRole('heading', { level: 1, name: 'Caută' })).toBeVisible();
     await expect(page.getByRole('link', { name: /la Golf 7/ })).toHaveCount(0);
