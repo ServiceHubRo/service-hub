@@ -1,9 +1,12 @@
-import { CalendarDays, CalendarPlus, Clock, SearchX, Store, User } from 'lucide-react';
+import { CalendarDays, CalendarPlus, CalendarX, Clock, SearchX, Store, User } from 'lucide-react';
 import { useMemo, useState } from 'react';
+import { ActionButton } from '../../components/ActionButton';
 import { Button } from '../../components/Button';
 import { Card } from '../../components/Card';
 import { ChoiceFilters } from '../../components/Filters';
 import { EmptyState } from '../../components/EmptyState';
+import { TextArea } from '../../components/TextArea';
+import { canRetryRpc, rpcErrorMessage } from '../../data/rpc';
 import { useI18n } from '../../i18n/context';
 import { formatDate, formatMoney } from '../../i18n/format';
 import { filterJobs, JOB_GROUPS, jobShops, jobStage, NO_JOB_FILTER, sortJobs, type FleetJob, type JobFilter, type JobGroup } from '../../lib/fleet';
@@ -174,6 +177,45 @@ function BookingCard({ job }: { job: FleetJob }) {
           <FleetQuoteBody job={job} />
         </div>
       )}
+      <CancelBooking job={job} />
     </Card>
+  );
+}
+
+/** „Anulează programarea” (M5): approvers, before the booking starts, with a reason, after an inline confirm. */
+function CancelBooking({ job }: { job: FleetJob }) {
+  const { t, lang } = useI18n();
+  const { actions, allowed, mode } = useFleet();
+  const [open, setOpen] = useState(false);
+  const [reason, setReason] = useState('');
+  const [error, setError] = useState<string | undefined>();
+  if (mode !== 'live' || !actions || !allowed('quotes.approve') || (job.status !== 'pending' && job.status !== 'confirmed')) return null;
+
+  async function cancel(requestId: string) {
+    if (reason.trim().length < 3) return setError(t('fleet.m5.reasonShort'));
+    setError(undefined);
+    await actions!.cancelBooking(job.id, reason.trim(), requestId);
+  }
+
+  if (!open) {
+    return (
+      <div className={styles.actions}>
+        <Button variant="ghost" onClick={() => setOpen(true)}>
+          <CalendarX size={18} aria-hidden="true" /> {t('fleet.m5.cancel')}
+        </Button>
+      </div>
+    );
+  }
+  return (
+    <div className={styles.confirmPanel} role="group" aria-labelledby={`cancel-${job.id}`}>
+      <p id={`cancel-${job.id}`}>{t('fleet.m5.cancelConfirm', { ref: job.ref })}</p>
+      <TextArea label={t('fleet.m5.cancelReason')} value={reason} maxLength={500} rows={2} error={error} onChange={(e) => setReason(e.target.value)} />
+      <div className={styles.actions}>
+        <ActionButton variant="danger" onAction={cancel} errorMessage={(e) => rpcErrorMessage(lang, e)} canRetry={canRetryRpc}>
+          {t('fleet.m5.cancel')}
+        </ActionButton>
+        <Button onClick={() => setOpen(false)}>{t('fleet.form.cancel')}</Button>
+      </div>
+    </div>
   );
 }

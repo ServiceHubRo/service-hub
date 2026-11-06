@@ -208,6 +208,7 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
       body: '{client} vine {when}: {service}. {car_plate}.',
     },
     'shop.booking_cancelled_client': { title: 'Programare anulată', body: '{client} a anulat programarea {ref} din {when}.' },
+    'shop.quote_changes_requested': { title: 'Modificare de deviz cerută', body: '{client} cere modificarea devizului pentru {ref}. Motiv: {reason}' },
     'shop.booking_cancelled_admin': {
       title: 'Programare anulată',
       body: 'Echipa Service-Hub a anulat programarea {ref} ({client}, {when}). Motiv: {reason}',
@@ -509,6 +510,7 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
       body: '{client} is coming {when}: {service}. {car_plate}.',
     },
     'shop.booking_cancelled_client': { title: 'Booking canceled', body: '{client} canceled booking {ref} on {when}.' },
+    'shop.quote_changes_requested': { title: 'Quote changes requested', body: '{client} asks for changes to the quote for {ref}. Reason: {reason}' },
     'shop.booking_cancelled_admin': {
       title: 'Booking canceled',
       body: 'The Service-Hub team canceled booking {ref} ({client}, {when}). Reason: {reason}',
@@ -744,7 +746,7 @@ export const EVENTS: Record<Side, readonly string[]> = {
   ],
   shop: [
     'booking_requested', 'booking_auto_confirmed', 'booking_cancelled_client', 'booking_cancelled_admin', 'intake_confirmed', 'quote_accepted',
-    'quote_partially_accepted', 'quote_refused', 'quote_expiring', 'quote_expired', 'new_message', 'new_review',
+    'quote_partially_accepted', 'quote_refused', 'quote_changes_requested', 'quote_expiring', 'quote_expired', 'new_message', 'new_review',
     'daily_digest', 'trial_ending', 'payment_failed', 'shop_inactive', 'review_report_decided', 'account_suspended',
     'account_reactivated', 'referral_reward', 'referral_revoked', 'booking_request_waiting', 'booking_request_last_call', 'monthly_report',
     'company_problem', 'company_name_mismatch', 'company_hidden', 'company_ok', 'request_expired', 'booking_followup',

@@ -18,6 +18,8 @@ import {
   fetchFleetOverview,
   fetchFleetPlans,
   fetchIssueDetail,
+  fleetCancelBooking,
+  fleetRequestQuoteChanges,
   fleetFileUrl,
   fetchFleetReport,
   fetchPlanSummary,
@@ -175,6 +177,14 @@ function FleetSpace({ companyId }: { companyId: string }) {
         await refresh();
       },
       fuelStats: (vehicleId, from, to) => fetchFuelStats(companyId, vehicleId, from, to),
+      requestQuoteChanges: async (bookingId, quoteId, reason, requestId) => {
+        await fleetRequestQuoteChanges(bookingId, quoteId, reason, requestId);
+        await refresh();
+      },
+      cancelBooking: async (bookingId, reason, requestId) => {
+        await fleetCancelBooking(bookingId, reason, requestId);
+        await refresh();
+      },
     }),
     [companyId, refresh, navigate],
   );

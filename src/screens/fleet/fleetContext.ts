@@ -67,6 +67,9 @@ export interface FleetActions {
   correctReading: (readingId: string, km: number, reason: string, requestId: string) => Promise<FleetReading>;
   ignoreJobOdometer: (bookingId: string, reason: string, requestId: string) => Promise<void>;
   fuelStats: (vehicleId: string, from: string | null, to: string) => Promise<FuelStats>;
+  /** „Cere modificări” and „Anulează programarea” (M5), for approvers. */
+  requestQuoteChanges: (bookingId: string, quoteId: string, reason: string, requestId: string) => Promise<void>;
+  cancelBooking: (bookingId: string, reason: string, requestId: string) => Promise<void>;
 }
 
 export interface FleetContextValue {

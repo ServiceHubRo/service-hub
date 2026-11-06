@@ -280,3 +280,13 @@ export async function ignoreJobOdometer(booking: string, reason: string, request
 export async function fetchFuelStats(company: string, vehicle: string, from: string | null, to: string): Promise<FuelStats> {
   return (await call('fleet_fuel_stats', { p_company: company, p_vehicle: vehicle, p_from: from, p_to: to } as never)) as unknown as FuelStats;
 }
+
+// ------------------------------------------------------------------------------------ quote changes, cancel (M5)
+
+export async function fleetCancelBooking(booking: string, reason: string, requestId: string): Promise<Booking> {
+  return (await call('fleet_cancel_booking', { p_booking_id: booking, p_reason: reason, p_request_id: requestId } as never)) as unknown as Booking;
+}
+
+export async function fleetRequestQuoteChanges(booking: string, quote: string, reason: string, requestId: string): Promise<Booking> {
+  return (await call('fleet_request_quote_changes', { p_booking_id: booking, p_quote_id: quote, p_reason: reason, p_request_id: requestId } as never)) as unknown as Booking;
+}

@@ -1,5 +1,5 @@
 import { expect, test, type Browser, type Page } from '@playwright/test';
-import { BACKEND, PASSWORD, createFleetUser, expectNoHorizontalScroll, expectNoRomanianText, rpcAs, serviceRest, shot, signIn, uniquePlate, userIdOf } from './support';
+import { BACKEND, PASSWORD, bucharestDay, createBookableShop, createFleetUser, expectNoHorizontalScroll, expectNoRomanianText, rpcAs, serviceRest, shot, signIn, uniquePlate, userIdOf } from './support';
 
 // T72–T77 — the fleet stages in the browser: issues and incidents (M3), odometer and fuel (M2), quote
 // changes and the manager's cancel (M5), maintenance (M4), notifications (M6), amounts hidden from a
@@ -195,6 +195,84 @@ test.describe('M2 — odometer and fuel', () => {
     await expect(driver.getByRole('button', { name: 'Add reading' })).toBeVisible();
     await expectNoRomanianText(driver, 'odometer');
     await shot(driver, 'odometer-driver-en', name());
+    await driver.context().close();
+  });
+});
+
+/** A weekday at least `n` days ahead (the shop is open Monday to Friday). */
+function weekday(n: number): string {
+  let d = n;
+  while ([0, 6].includes(new Date(`${bucharestDay(d)}T12:00:00Z`).getUTCDay())) d += 1;
+  return bucharestDay(d);
+}
+
+test.describe('M5 — quote changes and the manager\'s cancel', () => {
+  test.describe.configure({ timeout: 150_000 });
+
+  test('the manager cancels a confirmed booking with a reason and asks for changes to a quote', async ({ browser }) => {
+    test.skip(!BACKEND, 'needs the local Supabase stack');
+    const f = await fleetSetup();
+    const { email: shop, shopId } = await createBookableShop(`Atelier Etape ${Date.now()}`, ['ulei']);
+    const second = await rpcAs<{ id: string }>(f.admin, 'fleet_save_vehicle', {
+      p_company: f.company,
+      p_vehicle: null,
+      p_fields: { make: 'Ford', model: 'Transit', plate: uniquePlate('B') },
+      p_request_id: crypto.randomUUID(),
+    });
+    const book = (email: string, vehicle: string, day: string) =>
+      rpcAs<{ id: string; ref: string }>(email, 'create_booking', {
+        p_shop_id: shopId,
+        p_service_id: 'ulei',
+        p_date: day,
+        p_slot: '10:00',
+        p_request_id: crypto.randomUUID(),
+        p_company_vehicle_id: vehicle,
+      });
+    const a = await book(f.driver, f.vehicle, weekday(7));
+    await rpcAs(shop, 'confirm_booking', { p_booking_id: a.id, p_request_id: crypto.randomUUID() });
+    const b = await book(f.admin, second.id, weekday(8));
+    await rpcAs(shop, 'confirm_booking', { p_booking_id: b.id, p_request_id: crypto.randomUUID() });
+    await rpcAs(shop, 'start_inspection', { p_booking_id: b.id, p_request_id: crypto.randomUUID() });
+    await rpcAs(shop, 'send_quote', {
+      p_booking_id: b.id,
+      p_items: [
+        { name: 'Plăcuțe', price: 420 },
+        { name: 'Manoperă', price: 180 },
+      ],
+      p_request_id: crypto.randomUUID(),
+    });
+
+    const page = await openAs(browser, f.manager, 'ro', `/c/firme/${f.company}?sectiune=programari`);
+    // The quote: „Cere modificări”, with a reason; the quote stays open.
+    const quoteCard = page.locator('article, section, div').filter({ hasText: b.ref }).filter({ has: page.getByRole('button', { name: 'Cere modificări' }) }).last();
+    await quoteCard.getByRole('button', { name: 'Cere modificări' }).click();
+    await page.getByRole('button', { name: 'Trimite cererea' }).click();
+    await expect(page.getByText('Motivul are cel puțin 3 caractere.')).toBeVisible();
+    await page.getByLabel('Ce trebuie modificat').fill('Fără manopera de diagnoză');
+    await page.getByRole('button', { name: 'Trimite cererea' }).click();
+    await expect(page.getByText('Cererea de modificare a fost trimisă.')).toBeVisible();
+    const [decision] = await serviceRest<{ decision: string; reason: string }[]>(`company_quote_decisions?booking_id=eq.${b.id}&select=decision,reason`, 'GET');
+    expect(decision).toEqual({ decision: 'changes_requested', reason: 'Fără manopera de diagnoză' });
+
+    // The confirmed booking: „Anulează programarea”, after an inline confirm with a reason.
+    const card = page.locator('div').filter({ hasText: a.ref }).filter({ has: page.getByRole('button', { name: 'Anulează programarea' }) }).last();
+    await card.getByRole('button', { name: 'Anulează programarea' }).click();
+    await expect(page.getByText(`Anulezi programarea ${a.ref}?`)).toBeVisible();
+    await page.getByRole('textbox', { name: 'Motiv' }).fill('Vehiculul nu mai este disponibil');
+    await expectNoHorizontalScroll(page);
+    await shot(page, 'm5-cancel-confirm', name());
+    await page.getByRole('group').getByRole('button', { name: 'Anulează programarea' }).click();
+    await expect.poll(async () => (await serviceRest<{ status: string; cancel_reason: string }[]>(`bookings?id=eq.${a.id}&select=status,cancel_reason`, 'GET'))[0]).toEqual({
+      status: 'cancelled',
+      cancel_reason: 'Vehiculul nu mai este disponibil',
+    });
+    await page.context().close();
+
+    // The driver of the vehicle cannot cancel company bookings here (no quotes.approve).
+    const driver = await openAs(browser, f.driver, 'en', `/c/firme/${f.company}?sectiune=programari`);
+    await expect(driver.getByRole('heading', { level: 1 })).toBeVisible();
+    await expect(driver.getByRole('button', { name: 'Cancel booking' })).toHaveCount(0);
+    await expect(driver.getByRole('button', { name: 'Request changes' })).toHaveCount(0);
     await driver.context().close();
   });
 });

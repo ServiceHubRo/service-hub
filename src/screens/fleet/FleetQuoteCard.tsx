@@ -1,5 +1,9 @@
-import { ShieldCheck } from 'lucide-react';
+import { MessageSquareWarning, ShieldCheck } from 'lucide-react';
+import { useState } from 'react';
+import { ActionButton } from '../../components/ActionButton';
 import { Button } from '../../components/Button';
+import { TextArea } from '../../components/TextArea';
+import { canRetryRpc, rpcErrorMessage } from '../../data/rpc';
 import { Card } from '../../components/Card';
 import { useI18n } from '../../i18n/context';
 import { formatDate, formatMoney } from '../../i18n/format';
@@ -62,6 +66,7 @@ export function FleetQuoteBody({ job }: { job: FleetJob }) {
               await run();
             }}
           />
+          <QuoteChanges job={job} />
         </>
       ) : (
         <>
@@ -119,6 +124,54 @@ export function FleetQuoteBody({ job }: { job: FleetJob }) {
           <ShieldCheck size={14} aria-hidden="true" /> {t('fleet.quote.decidedBy', { name: decidedBy, when: formatDate(lang, new Date(q.decided_at)) })}
         </p>
       )}
+    </div>
+  );
+}
+
+/** „Cere modificări” (M5): the shop is asked to change the quote, with a reason; the quote stays open. */
+function QuoteChanges({ job }: { job: FleetJob }) {
+  const { t, lang } = useI18n();
+  const { actions } = useFleet();
+  const [open, setOpen] = useState(false);
+  const [reason, setReason] = useState('');
+  const [error, setError] = useState<string | undefined>();
+  const [sent, setSent] = useState(false);
+  if (!actions || !job.quote) return null;
+
+  async function send(requestId: string) {
+    if (reason.trim().length < 3) return setError(t('fleet.m5.reasonShort'));
+    setError(undefined);
+    await actions!.requestQuoteChanges(job.id, job.quote!.id, reason.trim(), requestId);
+    setOpen(false);
+    setSent(true);
+  }
+
+  if (sent) {
+    return (
+      <p className={styles.hintLine} role="status">
+        {t('fleet.m5.changesSent')}
+      </p>
+    );
+  }
+  if (!open) {
+    return (
+      <div className={styles.actions}>
+        <Button onClick={() => setOpen(true)}>
+          <MessageSquareWarning size={18} aria-hidden="true" /> {t('fleet.m5.askChanges')}
+        </Button>
+      </div>
+    );
+  }
+  return (
+    <div className={styles.confirmPanel} role="group" aria-labelledby={`changes-${job.id}`}>
+      <p id={`changes-${job.id}`}>{t('fleet.m5.changesHint')}</p>
+      <TextArea label={t('fleet.m5.changesReason')} value={reason} maxLength={500} rows={2} error={error} onChange={(e) => setReason(e.target.value)} />
+      <div className={styles.actions}>
+        <ActionButton variant="primary" onAction={send} errorMessage={(e) => rpcErrorMessage(lang, e)} canRetry={canRetryRpc}>
+          {t('fleet.m5.sendChanges')}
+        </ActionButton>
+        <Button onClick={() => setOpen(false)}>{t('fleet.form.cancel')}</Button>
+      </div>
     </div>
   );
 }

@@ -742,6 +742,7 @@ export type Database = {
           decision: string
           id: number
           quote_id: string
+          reason: string | null
           role: string
           user_id: string | null
         }
@@ -753,6 +754,7 @@ export type Database = {
           decision: string
           id?: never
           quote_id: string
+          reason?: string | null
           role: string
           user_id?: string | null
         }
@@ -764,6 +766,7 @@ export type Database = {
           decision?: string
           id?: never
           quote_id?: string
+          reason?: string | null
           role?: string
           user_id?: string | null
         }
@@ -5176,6 +5179,69 @@ export type Database = {
         Args: { p_capability: string; p_company: string }
         Returns: boolean
       }
+      fleet_cancel_booking: {
+        Args: { p_booking_id: string; p_reason: string; p_request_id: string }
+        Returns: {
+          cancel_reason: string | null
+          cancelled_at: string | null
+          cancelled_by: string | null
+          car_id: string | null
+          car_snapshot: Json
+          checked_by: string | null
+          claimed_at: string | null
+          client_email: string | null
+          client_id: string | null
+          client_lang: string
+          client_name: string | null
+          client_phone: string | null
+          closed_reason: string | null
+          company_id: string | null
+          company_vehicle_id: string | null
+          confirmed_at: string | null
+          cost: number | null
+          created_at: string
+          date: string
+          decline_reason: string | null
+          done_at: string | null
+          extra_service_ids: string[]
+          followup_sent_at: string | null
+          id: string
+          inspection_started_at: string | null
+          intake_confirmed_at: string | null
+          intake_sent_at: string | null
+          invite_sent_at: string | null
+          invite_token: string | null
+          loyalty_level: number | null
+          loyalty_percent: number | null
+          note: string | null
+          odometer: number | null
+          offer_kind: string | null
+          offer_percent: number | null
+          quote_number: number | null
+          ref: string
+          reminder_sent_at: string | null
+          service_id: string
+          share_history: boolean
+          share_history_at: string | null
+          shop_id: string
+          slot: string
+          source: string
+          started_at: string | null
+          status: string
+          status_changed_at: string
+          updated_at: string
+          warranty_months: number | null
+          warranty_until: string | null
+          work: string | null
+          work_by: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "bookings"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       fleet_correct_reading: {
         Args: {
           p_km: number
@@ -5421,6 +5487,74 @@ export type Database = {
           p_request_id: string
         }
         Returns: Json
+      }
+      fleet_request_quote_changes: {
+        Args: {
+          p_booking_id: string
+          p_quote_id: string
+          p_reason: string
+          p_request_id: string
+        }
+        Returns: {
+          cancel_reason: string | null
+          cancelled_at: string | null
+          cancelled_by: string | null
+          car_id: string | null
+          car_snapshot: Json
+          checked_by: string | null
+          claimed_at: string | null
+          client_email: string | null
+          client_id: string | null
+          client_lang: string
+          client_name: string | null
+          client_phone: string | null
+          closed_reason: string | null
+          company_id: string | null
+          company_vehicle_id: string | null
+          confirmed_at: string | null
+          cost: number | null
+          created_at: string
+          date: string
+          decline_reason: string | null
+          done_at: string | null
+          extra_service_ids: string[]
+          followup_sent_at: string | null
+          id: string
+          inspection_started_at: string | null
+          intake_confirmed_at: string | null
+          intake_sent_at: string | null
+          invite_sent_at: string | null
+          invite_token: string | null
+          loyalty_level: number | null
+          loyalty_percent: number | null
+          note: string | null
+          odometer: number | null
+          offer_kind: string | null
+          offer_percent: number | null
+          quote_number: number | null
+          ref: string
+          reminder_sent_at: string | null
+          service_id: string
+          share_history: boolean
+          share_history_at: string | null
+          shop_id: string
+          slot: string
+          source: string
+          started_at: string | null
+          status: string
+          status_changed_at: string
+          updated_at: string
+          warranty_months: number | null
+          warranty_until: string | null
+          work: string | null
+          work_by: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "bookings"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       fleet_role_can: {
         Args: { p_capability: string; p_role: string }

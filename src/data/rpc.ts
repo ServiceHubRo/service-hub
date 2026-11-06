@@ -214,6 +214,8 @@ export const RPC_ERROR_CODES = [
   'odometer_higher_than_later',
   'reading_invalid',
   'reading_not_found',
+  'booking_started',
+  'changes_already_requested',
 ] as const;
 
 export type RpcErrorCode = (typeof RPC_ERROR_CODES)[number] | 'network' | 'unknown';
