@@ -1265,6 +1265,86 @@ export type Database = {
           },
         ]
       }
+      fleet_maintenance: {
+        Row: {
+          company_id: string
+          created_at: string
+          created_by: string | null
+          deleted_at: string | null
+          id: string
+          interval_km: number | null
+          interval_months: number | null
+          kind: string
+          label: string | null
+          last_booking_id: string | null
+          last_done_km: number | null
+          last_done_on: string | null
+          updated_at: string | null
+          vehicle_id: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          id?: string
+          interval_km?: number | null
+          interval_months?: number | null
+          kind: string
+          label?: string | null
+          last_booking_id?: string | null
+          last_done_km?: number | null
+          last_done_on?: string | null
+          updated_at?: string | null
+          vehicle_id: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          id?: string
+          interval_km?: number | null
+          interval_months?: number | null
+          kind?: string
+          label?: string | null
+          last_booking_id?: string | null
+          last_done_km?: number | null
+          last_done_on?: string | null
+          updated_at?: string | null
+          vehicle_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fleet_maintenance_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fleet_maintenance_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fleet_maintenance_last_booking_id_fkey"
+            columns: ["last_booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fleet_maintenance_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "company_vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       fleet_odometer_ignored_jobs: {
         Row: {
           at: string
@@ -5323,6 +5403,10 @@ export type Database = {
         Args: { p_expense: string; p_request_id: string }
         Returns: Json
       }
+      fleet_delete_maintenance: {
+        Args: { p_item: string; p_request_id: string }
+        Returns: Json
+      }
       fleet_expense_json: {
         Args: { e: Database["public"]["Tables"]["fleet_expenses"]["Row"] }
         Returns: Json
@@ -5414,8 +5498,23 @@ export type Database = {
         Args: { p_company: string; p_kind: string; p_rows: number }
         Returns: undefined
       }
+      fleet_maintenance_json: {
+        Args: { m: Database["public"]["Tables"]["fleet_maintenance"]["Row"] }
+        Returns: Json
+      }
+      fleet_maintenance_status: {
+        Args: {
+          m: Database["public"]["Tables"]["fleet_maintenance"]["Row"]
+          p_today?: string
+        }
+        Returns: Json
+      }
       fleet_mark_expense: {
         Args: { p_expense: string; p_request_id: string; p_status: string }
+        Returns: Json
+      }
+      fleet_mark_maintenance_done: {
+        Args: { p_fields: Json; p_item: string; p_request_id: string }
         Returns: Json
       }
       fleet_member_can: {
@@ -5565,6 +5664,15 @@ export type Database = {
           p_company: string
           p_expense: string
           p_fields: Json
+          p_request_id: string
+        }
+        Returns: Json
+      }
+      fleet_save_maintenance: {
+        Args: {
+          p_company: string
+          p_fields: Json
+          p_item: string
           p_request_id: string
         }
         Returns: Json
