@@ -44,6 +44,7 @@ export type PluralUnit =
   | 'unit.services'
   | 'unit.servicesTicked'
   | 'unit.places'
+  | 'unit.photos'
   | 'unit.savedCars'
   | 'unit.cars'
   | 'unit.rows'

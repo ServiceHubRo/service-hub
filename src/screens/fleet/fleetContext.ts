@@ -7,7 +7,11 @@ import {
   type ExpenseFields,
   type FleetCapability,
   type FleetExpense,
+  type FleetIssue,
+  type FleetIssueDetail,
   type FleetOverview,
+  type IssueFields,
+  type IssueUpdate,
   type FleetPlanRow,
   type FleetPlanSummary,
   type FleetReport,
@@ -49,6 +53,13 @@ export interface FleetActions {
   uploadReceipt: (vehicleId: string, file: File) => Promise<string>;
   /** A link to look at a receipt. */
   receiptUrl: (path: string) => Promise<string>;
+  /** Issues and incidents (M3). */
+  uploadIssuePhoto: (vehicleId: string, issueId: string, file: File) => Promise<string>;
+  reportIssue: (issueId: string, fields: IssueFields, requestId: string) => Promise<FleetIssue>;
+  updateIssue: (issueId: string, fields: IssueUpdate, requestId: string) => Promise<FleetIssue>;
+  issueDetail: (issueId: string) => Promise<FleetIssueDetail>;
+  /** A link to a company file, valid for 60 seconds. */
+  fileUrl: (path: string) => Promise<string>;
 }
 
 export interface FleetContextValue {

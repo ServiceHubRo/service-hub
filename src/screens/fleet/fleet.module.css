@@ -1453,3 +1453,37 @@ button.kpi:hover {
   flex-direction: column;
   gap: 8px;
 }
+
+/* A report's title in a list (M3): opens the report; text that reads as a link, 44 px tall to tap. */
+.linkButton {
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--text);
+  font: inherit;
+  font-weight: 550;
+  text-align: left;
+  text-decoration: underline;
+  text-decoration-color: var(--border-lit);
+  text-underline-offset: 3px;
+  cursor: pointer;
+  overflow-wrap: anywhere;
+}
+
+.linkButton:hover {
+  text-decoration-color: currentColor;
+}
+
+.linkButton:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+  border-radius: 4px;
+}
+
+/* The photos picked for a report, before it is sent. */
+.fileList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}

@@ -208,6 +208,9 @@ export const RPC_ERROR_CODES = [
   'expense_invalid',
   'expense_not_found',
   'expense_possible_duplicate',
+  'issue_invalid',
+  'issue_not_found',
+  'photo_expired',
 ] as const;
 
 export type RpcErrorCode = (typeof RPC_ERROR_CODES)[number] | 'network' | 'unknown';

@@ -1,6 +1,6 @@
 import { call, failure, RpcError, type Booking } from './rpc';
 import { supabase } from './supabase';
-import type { ExpenseFields, FleetExpense, FleetOverview, FleetPlanRow, FleetPlanSummary, FleetReport, FleetSubscriptionView, FleetVehicle, ReportFilters } from '../lib/fleet';
+import type { ExpenseFields, FleetExpense, FleetIssue, FleetIssueDetail, FleetOverview, IssueFields, IssueUpdate, FleetPlanRow, FleetPlanSummary, FleetReport, FleetSubscriptionView, FleetVehicle, ReportFilters } from '../lib/fleet';
 
 /**
  * The company's fleet (T63c, docs/FLEET_PLAN.md): one read, `fleet_overview(company)`, already
@@ -222,10 +222,43 @@ export async function uploadReceipt(company: string, vehicle: string, file: File
   return path;
 }
 
-/** A link to look at a receipt, valid for 10 minutes. */
+/** A link to look at a receipt (60 seconds, as every company file). */
 export async function receiptUrl(path: string): Promise<string> {
+  return fleetFileUrl(path);
+}
+
+/** A link to look at a file of the company (receipt or incident photo), valid for 60 seconds: a member
+ * whose access is revoked cannot keep using an old one. */
+export async function fleetFileUrl(path: string): Promise<string> {
   if (!supabase) throw new RpcError('network');
-  const { data, error } = await supabase.storage.from(FLEET_FILES_BUCKET).createSignedUrl(path, 600);
+  const { data, error } = await supabase.storage.from(FLEET_FILES_BUCKET).createSignedUrl(path, 60);
   if (error || !data) throw new RpcError('unknown');
   return data.signedUrl;
+}
+
+// ------------------------------------------------------------------------------------ issues (M3)
+
+export const ISSUE_PHOTO_TYPES = ['image/jpeg', 'image/png', 'image/webp'] as const;
+export const ISSUE_PHOTO_MAX = 6;
+
+/** A photo of a report, uploaded before the report is sent: `<company>/<vehicle>/issues/<issue>/<random>.<ext>`. */
+export async function uploadIssuePhoto(company: string, vehicle: string, issue: string, file: File): Promise<string> {
+  if (!supabase) throw new RpcError('network');
+  const ext = file.type === 'image/png' ? 'png' : file.type === 'image/webp' ? 'webp' : 'jpg';
+  const path = `${company}/${vehicle}/issues/${issue}/${crypto.randomUUID()}.${ext}`;
+  const { error } = await supabase.storage.from(FLEET_FILES_BUCKET).upload(path, file, { contentType: file.type, upsert: false });
+  if (error) throw new RpcError('unknown');
+  return path;
+}
+
+export async function reportIssue(company: string, issue: string, fields: IssueFields, requestId: string): Promise<FleetIssue> {
+  return (await call('fleet_report_issue', { p_company: company, p_issue: issue, p_fields: fields, p_request_id: requestId } as never)) as unknown as FleetIssue;
+}
+
+export async function updateIssue(issue: string, fields: IssueUpdate, requestId: string): Promise<FleetIssue> {
+  return (await call('fleet_update_issue', { p_issue: issue, p_fields: fields, p_request_id: requestId } as never)) as unknown as FleetIssue;
+}
+
+export async function fetchIssueDetail(issue: string): Promise<FleetIssueDetail> {
+  return (await call('fleet_issue_detail', { p_issue: issue } as never)) as unknown as FleetIssueDetail;
 }

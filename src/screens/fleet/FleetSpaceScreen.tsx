@@ -13,6 +13,8 @@ import {
   deleteExpense,
   fetchFleetOverview,
   fetchFleetPlans,
+  fetchIssueDetail,
+  fleetFileUrl,
   fetchFleetReport,
   fetchPlanSummary,
   fetchSubscription,
@@ -20,9 +22,12 @@ import {
   logFleetExport,
   markExpense,
   receiptUrl,
+  reportIssue,
   saveExpense,
   saveVehicle,
   setUnavailable,
+  updateIssue,
+  uploadIssuePhoto,
   uploadReceipt,
 } from '../../data/fleet';
 import { subscribeRows } from '../../data/realtime';
@@ -138,6 +143,19 @@ function FleetSpace({ companyId }: { companyId: string }) {
       },
       uploadReceipt: (vehicleId, file) => uploadReceipt(companyId, vehicleId, file),
       receiptUrl: (path) => receiptUrl(path),
+      uploadIssuePhoto: (vehicleId, issueId, file) => uploadIssuePhoto(companyId, vehicleId, issueId, file),
+      reportIssue: async (issueId, fields, requestId) => {
+        const saved = await reportIssue(companyId, issueId, fields, requestId);
+        await refresh();
+        return saved;
+      },
+      updateIssue: async (issueId, fields, requestId) => {
+        const saved = await updateIssue(issueId, fields, requestId);
+        await refresh();
+        return saved;
+      },
+      issueDetail: (issueId) => fetchIssueDetail(issueId),
+      fileUrl: (path) => fleetFileUrl(path),
     }),
     [companyId, refresh, navigate],
   );
