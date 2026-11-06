@@ -69,6 +69,8 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
       timer = window.setTimeout(() => void reload(), 400);
     };
     const off = subscribeRows({ channel: `workspaces:${uid}`, table: 'company_members', onChange: later, onResync: later });
+    // M6 (decision 8): a role, a right or the plan changed: the list is read again.
+    const offRights = subscribeRows({ channel: `rights:${uid}`, table: 'member_rights_versions', filter: `user_id=eq.${uid}`, onChange: later, onResync: later });
     const visible = () => {
       if (document.visibilityState === 'visible') later();
     };
@@ -76,6 +78,7 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
     return () => {
       window.clearTimeout(timer);
       off();
+      offRights();
       document.removeEventListener('visibilitychange', visible);
     };
   }, [uid, reload]);

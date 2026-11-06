@@ -218,6 +218,7 @@ export const RPC_ERROR_CODES = [
   'changes_already_requested',
   'maintenance_invalid',
   'maintenance_not_found',
+  'fleet_event_not_found',
 ] as const;
 
 export type RpcErrorCode = (typeof RPC_ERROR_CODES)[number] | 'network' | 'unknown';

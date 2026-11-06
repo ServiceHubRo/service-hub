@@ -1036,6 +1036,78 @@ export type Database = {
           },
         ]
       }
+      fleet_events: {
+        Row: {
+          actor: string | null
+          attempts: number
+          booking_id: string | null
+          company_id: string
+          created_at: string
+          data: Json
+          entity_id: string
+          event: string
+          event_key: string
+          failed_at: string | null
+          id: number
+          last_error: string | null
+          last_error_code: string | null
+          locked_until: string | null
+          next_attempt_at: string
+          processed_at: string | null
+        }
+        Insert: {
+          actor?: string | null
+          attempts?: number
+          booking_id?: string | null
+          company_id: string
+          created_at?: string
+          data?: Json
+          entity_id: string
+          event: string
+          event_key: string
+          failed_at?: string | null
+          id?: never
+          last_error?: string | null
+          last_error_code?: string | null
+          locked_until?: string | null
+          next_attempt_at?: string
+          processed_at?: string | null
+        }
+        Update: {
+          actor?: string | null
+          attempts?: number
+          booking_id?: string | null
+          company_id?: string
+          created_at?: string
+          data?: Json
+          entity_id?: string
+          event?: string
+          event_key?: string
+          failed_at?: string | null
+          id?: never
+          last_error?: string | null
+          last_error_code?: string | null
+          locked_until?: string | null
+          next_attempt_at?: string
+          processed_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fleet_events_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fleet_events_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       fleet_expenses: {
         Row: {
           amount: number
@@ -1341,6 +1413,55 @@ export type Database = {
             columns: ["vehicle_id"]
             isOneToOne: false
             referencedRelation: "company_vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fleet_notices: {
+        Row: {
+          created_at: string
+          dedupe_key: string
+          fleet_event_id: number
+          id: number
+          notification_id: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          dedupe_key: string
+          fleet_event_id: number
+          id?: never
+          notification_id?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          dedupe_key?: string
+          fleet_event_id?: number
+          id?: never
+          notification_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fleet_notices_fleet_event_id_fkey"
+            columns: ["fleet_event_id"]
+            isOneToOne: false
+            referencedRelation: "fleet_events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fleet_notices_notification_id_fkey"
+            columns: ["notification_id"]
+            isOneToOne: false
+            referencedRelation: "notification_events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fleet_notices_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -1843,6 +1964,42 @@ export type Database = {
             columns: ["shop_id"]
             isOneToOne: false
             referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      member_rights_versions: {
+        Row: {
+          changed_at: string
+          company_id: string
+          user_id: string
+          version: number
+        }
+        Insert: {
+          changed_at?: string
+          company_id: string
+          user_id: string
+          version?: number
+        }
+        Update: {
+          changed_at?: string
+          company_id?: string
+          user_id?: string
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "member_rights_versions_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "member_rights_versions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -4382,6 +4539,7 @@ export type Database = {
       admin_list_catalog: { Args: never; Returns: Json }
       admin_list_clients: { Args: never; Returns: Json }
       admin_list_company_checks: { Args: never; Returns: Json }
+      admin_list_failed_fleet_events: { Args: never; Returns: Json }
       admin_list_fleet_companies: { Args: never; Returns: Json }
       admin_list_history_reports: { Args: never; Returns: Json }
       admin_list_no_show_disputes: { Args: never; Returns: Json }
@@ -4410,6 +4568,10 @@ export type Database = {
         Returns: Json
       }
       admin_overview: { Args: never; Returns: Json }
+      admin_retry_fleet_event: {
+        Args: { p_id: number; p_request_id: string }
+        Returns: Json
+      }
       admin_review_json: {
         Args: { p_review: Database["public"]["Tables"]["reviews"]["Row"] }
         Returns: Json
@@ -4599,6 +4761,10 @@ export type Database = {
       }
       booking_thread: { Args: { p_booking_id: string }; Returns: string }
       bucharest_today: { Args: never; Returns: string }
+      bump_rights_version: {
+        Args: { p_company: string; p_user: string }
+        Returns: undefined
+      }
       caller_aal: { Args: never; Returns: string }
       can_read_booking: { Args: { p_booking_id: string }; Returns: boolean }
       can_read_notice: {
@@ -5322,6 +5488,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      fleet_claim_event: { Args: never; Returns: number }
       fleet_correct_reading: {
         Args: {
           p_km: number
@@ -5331,6 +5498,7 @@ export type Database = {
         }
         Returns: Json
       }
+      fleet_daily: { Args: { p_today?: string }; Returns: Json }
       fleet_decide_quote: {
         Args: {
           p_approved_item_ids: string[]
@@ -5406,6 +5574,21 @@ export type Database = {
       fleet_delete_maintenance: {
         Args: { p_item: string; p_request_id: string }
         Returns: Json
+      }
+      fleet_enqueue: {
+        Args: {
+          p_booking: string
+          p_company: string
+          p_data: Json
+          p_entity: string
+          p_event: string
+          p_key: string
+        }
+        Returns: undefined
+      }
+      fleet_event_failed: {
+        Args: { p_code: string; p_error: string; p_id: number }
+        Returns: undefined
       }
       fleet_expense_json: {
         Args: { e: Database["public"]["Tables"]["fleet_expenses"]["Row"] }
@@ -5542,6 +5725,7 @@ export type Database = {
       }
       fleet_overview: { Args: { p_company: string }; Returns: Json }
       fleet_plan_summary: { Args: { p_company: string }; Returns: Json }
+      fleet_process_event: { Args: { p_id: number }; Returns: Json }
       fleet_reading_json: {
         Args: {
           r: Database["public"]["Tables"]["fleet_odometer_readings"]["Row"]
@@ -5702,6 +5886,10 @@ export type Database = {
       fleet_update_issue: {
         Args: { p_fields: Json; p_issue: string; p_request_id: string }
         Returns: Json
+      }
+      fleet_user_can: {
+        Args: { p_capability: string; p_company: string; p_user: string }
+        Returns: boolean
       }
       fleet_vehicle_cost_per_km: {
         Args: {

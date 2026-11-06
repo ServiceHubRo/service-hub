@@ -24,6 +24,7 @@ export const ADMIN_SUGGESTIONS_PATH = '/admin/cont/sugestii';
 export const ADMIN_FLEETS_PATH = '/admin/cont/flote';
 /** Vehicule duplicate (T66): the same car recorded twice by one owner. */
 export const ADMIN_DUPLICATES_PATH = '/admin/cont/duplicate';
+export const ADMIN_FLEET_FAILED_PATH = '/admin/cont/notificari-flota';
 
 export const adminShopPath = (id: string) => `${ADMIN_SHOPS_PATH}/${id}`;
 export const adminClientPath = (id: string) => `${ADMIN_CLIENTS_PATH}/${id}`;

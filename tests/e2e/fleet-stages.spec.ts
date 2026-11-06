@@ -1,5 +1,5 @@
 import { expect, test, type Browser, type Page } from '@playwright/test';
-import { BACKEND, PASSWORD, bucharestDay, createBookableShop, createFleetUser, expectNoHorizontalScroll, expectNoRomanianText, rpcAs, serviceRest, shot, signIn, uniquePlate, userIdOf } from './support';
+import { BACKEND, PASSWORD, SEED, SEED_PASSWORD, bucharestDay, createBookableShop, createFleetUser, expectNoHorizontalScroll, expectNoRomanianText, rpcAs, serviceRest, shot, signIn, uniquePlate, userIdOf } from './support';
 
 // T72–T77 — the fleet stages in the browser: issues and incidents (M3), odometer and fuel (M2), quote
 // changes and the manager's cancel (M5), maintenance (M4), notifications (M6), amounts hidden from a
@@ -312,5 +312,77 @@ test.describe('M4 — maintenance', () => {
     await expect(driver.getByRole('button', { name: 'More' })).toHaveCount(0);
     await expectNoRomanianText(driver, 'maintenance');
     await driver.context().close();
+  });
+});
+
+test.describe('M6 — fleet notifications', () => {
+  test.describe.configure({ timeout: 180_000 });
+
+  test('an issue reaches the managers through the outbox; the driver who reported gets nothing', async () => {
+    test.skip(!BACKEND, 'needs the local Supabase stack');
+    const f = await fleetSetup();
+    await rpcAs(f.driver, 'fleet_report_issue', {
+      p_company: f.company,
+      p_issue: crypto.randomUUID(),
+      p_fields: { vehicle_id: f.vehicle, kind: 'damage', title: 'Oglindă spartă', happened_on: bucharestDay(0) },
+      p_request_id: crypto.randomUUID(),
+    });
+    const [admin, manager, driver] = await Promise.all([userIdOf(f.admin), userIdOf(f.manager), userIdOf(f.driver)]);
+    // pg_cron runs the worker every minute.
+    await expect
+      .poll(async () => (await serviceRest<{ user_id: string }[]>(`notification_events?event=eq.fleet_issue_reported&user_id=in.(${admin},${manager},${driver})&select=user_id`, 'GET')).length, {
+        timeout: 150_000,
+        intervals: [5_000],
+      })
+      .toBe(2);
+    const rows = await serviceRest<{ user_id: string; params: Record<string, unknown> }[]>(
+      `notification_events?event=eq.fleet_issue_reported&user_id=in.(${admin},${manager},${driver})&select=user_id,params`,
+      'GET',
+    );
+    expect(rows.map((r) => r.user_id).sort()).toEqual([admin, manager].sort());
+    expect(rows[0]!.params).toMatchObject({ company_id: f.company, title: 'Oglindă spartă', plate: f.plate });
+  });
+
+  test('a role changed elsewhere: the open fleet space reads again by itself', async ({ browser }) => {
+    test.skip(!BACKEND, 'needs the local Supabase stack');
+    const f = await fleetSetup();
+    const page = await openAs(browser, f.manager, 'ro', `/c/firme/${f.company}?sectiune=panou`);
+    await expect(page.getByText(/· Manager de flotă$/)).toBeVisible();
+    const [member] = await serviceRest<{ id: string }[]>(`company_members?company_id=eq.${f.company}&role=eq.manager&select=id`, 'GET');
+    await rpcAs(f.admin, 'set_company_member_role', { p_member: member!.id, p_role: 'driver', p_request_id: crypto.randomUUID() });
+    // No reload: the rights version arrives through Realtime and the space is read again.
+    await expect(page.getByText(/· Șofer$/)).toBeVisible({ timeout: 20_000 });
+    await expect(page.getByText(/· Manager de flotă$/)).toHaveCount(0);
+    await page.context().close();
+  });
+
+  test('the admin sees a failed fleet event without its data and retries it', async ({ browser }) => {
+    test.skip(!BACKEND, 'needs the local Supabase stack');
+    const f = await fleetSetup();
+    await serviceRest('fleet_events', 'POST', {
+      company_id: f.company,
+      event: 'fleet_doc_expiring',
+      entity_id: f.vehicle,
+      data: { doc: 'itp', expiry: 'not a date' },
+      event_key: `poison:${crypto.randomUUID()}`,
+      attempts: 24,
+      failed_at: new Date().toISOString(),
+      last_error_code: '22007',
+      last_error: 'invalid input syntax for type date',
+    });
+    const ctx = await browser.newContext();
+    const page = await ctx.newPage();
+    await page.addInitScript(() => localStorage.setItem('sh_lang', 'ro'));
+    await signIn(page, SEED.admin, SEED_PASSWORD);
+    await page.goto('/admin/cont/notificari-flota');
+    const row = page.locator('li').filter({ hasText: 'Document care expiră' }).filter({ hasText: /Etape \d+/ }).first();
+    await expect(row).toContainText('22007');
+    await expect(page.getByText('invalid input syntax')).toHaveCount(0);
+    await expect(page.getByText(f.plate)).toHaveCount(0);
+    await expectNoHorizontalScroll(page);
+    await shot(page, 'admin-fleet-failed', name());
+    await row.getByRole('button', { name: 'Încearcă din nou' }).click();
+    await expect.poll(async () => (await serviceRest<{ failed_at: string | null }[]>(`fleet_events?company_id=eq.${f.company}&select=failed_at`, 'GET'))[0]!.failed_at).toBeNull();
+    await ctx.close();
   });
 });

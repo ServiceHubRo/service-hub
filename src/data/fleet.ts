@@ -305,3 +305,23 @@ export async function deleteMaintenance(item: string, requestId: string): Promis
 export async function markMaintenanceDone(item: string, fields: { day?: string; km?: number | null; booking_id?: string }, requestId: string): Promise<FleetMaintenanceItem> {
   return (await call('fleet_mark_maintenance_done', { p_item: item, p_fields: fields, p_request_id: requestId } as never)) as unknown as FleetMaintenanceItem;
 }
+
+// ------------------------------------------------------------------------------------ failed fleet notifications (M6, admin)
+
+export interface FailedFleetEvent {
+  id: number;
+  event: string;
+  company_name: string;
+  created_at: string;
+  attempts: number;
+  last_error_code: string | null;
+  failed_at: string;
+}
+
+export async function adminFailedFleetEvents(): Promise<FailedFleetEvent[]> {
+  return (await call('admin_list_failed_fleet_events', {} as never)) as unknown as FailedFleetEvent[];
+}
+
+export async function adminRetryFleetEvent(id: number, requestId: string): Promise<void> {
+  await call('admin_retry_fleet_event', { p_id: id, p_request_id: requestId } as never);
+}

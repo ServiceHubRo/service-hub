@@ -1,6 +1,7 @@
 import { Route, Routes } from 'react-router-dom';
 import { FleetsScreen } from '../../screens/admin/FleetsScreen';
 import { VehicleDuplicatesScreen } from '../../screens/admin/VehicleDuplicatesScreen';
+import { FleetFailedEventsScreen } from '../../screens/admin/FleetFailedEventsScreen';
 import { AdminProvider } from '../../screens/admin/AdminProvider';
 import { AnafScreen } from '../../screens/admin/AnafScreen';
 import { AuditScreen } from '../../screens/admin/AuditScreen';
@@ -65,6 +66,7 @@ export default function AdminApp() {
         <Route path="cont/sugestii" element={<SuggestionsScreen />} />
         <Route path="cont/flote" element={<FleetsScreen />} />
         <Route path="cont/duplicate" element={<VehicleDuplicatesScreen />} />
+        <Route path="cont/notificari-flota" element={<FleetFailedEventsScreen />} />
       </Route>
     </Routes>
   );

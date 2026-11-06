@@ -197,6 +197,31 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
       title: '{shop}',
       body: '{shop} îți oferă {percent} reducere la manoperă la prima programare.',
     },
+    // ------------------------------------------------------------------ fleet members (M6); amounts only in the _amount texts
+    'client.fleet_quote_waiting': { title: '{company}', body: 'Deviz de aprobat pentru {plate}: {shop}, {ref}.' },
+    'client.fleet_quote_waiting_amount': { title: '{company}', body: 'Deviz de aprobat pentru {plate}: {total}, {shop}, {ref}.' },
+    'client.fleet_quote_decided': { title: '{company}', body: 'Devizul pentru {plate} ({ref}) a fost aprobat.' },
+    'client.fleet_quote_decided_amount': { title: '{company}', body: 'Devizul pentru {plate} ({ref}) a fost aprobat: {total}.' },
+    'client.fleet_quote_decided_partial': { title: '{company}', body: 'Devizul pentru {plate} ({ref}) a fost aprobat parțial.' },
+    'client.fleet_quote_decided_partial_amount': { title: '{company}', body: 'Devizul pentru {plate} ({ref}) a fost aprobat parțial: {total}.' },
+    'client.fleet_quote_decided_refused': { title: '{company}', body: 'Devizul pentru {plate} ({ref}) a fost respins.' },
+    'client.fleet_quote_changes': { title: '{company}', body: 'Modificare cerută la devizul pentru {plate} ({ref}). Motiv: {reason}' },
+    'client.fleet_booking_changed': { title: '{company}', body: 'Programarea {ref} pentru {plate} s-a mutat: {when}.' },
+    'client.fleet_booking_changed_confirmed': { title: '{company}', body: 'Programarea {ref} pentru {plate} a fost confirmată: {when}, {shop}.' },
+    'client.fleet_booking_changed_declined': { title: '{company}', body: 'Service-ul a refuzat programarea {ref} pentru {plate}.' },
+    'client.fleet_booking_changed_in_inspection': { title: '{company}', body: '{plate} este în inspecție la {shop}.' },
+    'client.fleet_booking_changed_in_progress': { title: '{company}', body: 'Lucrarea la {plate} a început ({ref}).' },
+    'client.fleet_booking_changed_done': { title: '{company}', body: '{plate} este gata de ridicare de la {shop}.' },
+    'client.fleet_booking_changed_ended': { title: '{company}', body: 'Programarea {ref} pentru {plate} s-a încheiat.' },
+    'client.fleet_booking_cancelled': { title: '{company}', body: 'Programarea {ref} pentru {plate} a fost anulată.' },
+    'client.fleet_booking_cancelled_reason': { title: '{company}', body: 'Programarea {ref} pentru {plate} a fost anulată. Motiv: {reason}' },
+    'client.fleet_issue_reported': { title: '{company}', body: 'Problemă raportată pentru {plate}: {issue}.' },
+    'client.fleet_expense_to_check': { title: '{company}', body: 'Bon de verificat pentru {plate}.' },
+    'client.fleet_expense_to_check_amount': { title: '{company}', body: 'Bon de verificat pentru {plate}: {amount}.' },
+    'client.fleet_doc_expiring': { title: '{company}', body: '{doc} pentru {plate} expiră pe {expiry}.' },
+    'client.fleet_doc_expiring_today': { title: '{company}', body: '{doc} pentru {plate} expiră azi.' },
+    'client.fleet_maintenance_due': { title: '{company}', body: '{maint} pentru {plate}: termen apropiat.' },
+    'client.fleet_maintenance_due_overdue': { title: '{company}', body: '{maint} pentru {plate}: termen depășit.' },
     'client.review_report_decided': {
       title: 'Recenzie ștearsă',
       body: 'Echipa Service-Hub a șters recenzia ta pentru {shop} ({ref}), pentru că nu respectă regulile platformei.',
@@ -499,6 +524,31 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
       title: '{shop}',
       body: '{shop} offers you {percent} off labor on your first booking.',
     },
+    // ------------------------------------------------------------------ fleet members (M6); amounts only in the _amount texts
+    'client.fleet_quote_waiting': { title: '{company}', body: 'Quote to approve for {plate}: {shop}, {ref}.' },
+    'client.fleet_quote_waiting_amount': { title: '{company}', body: 'Quote to approve for {plate}: {total}, {shop}, {ref}.' },
+    'client.fleet_quote_decided': { title: '{company}', body: 'The quote for {plate} ({ref}) was approved.' },
+    'client.fleet_quote_decided_amount': { title: '{company}', body: 'The quote for {plate} ({ref}) was approved: {total}.' },
+    'client.fleet_quote_decided_partial': { title: '{company}', body: 'The quote for {plate} ({ref}) was partly approved.' },
+    'client.fleet_quote_decided_partial_amount': { title: '{company}', body: 'The quote for {plate} ({ref}) was partly approved: {total}.' },
+    'client.fleet_quote_decided_refused': { title: '{company}', body: 'The quote for {plate} ({ref}) was declined.' },
+    'client.fleet_quote_changes': { title: '{company}', body: 'Changes requested to the quote for {plate} ({ref}). Reason: {reason}' },
+    'client.fleet_booking_changed': { title: '{company}', body: 'Booking {ref} for {plate} was moved: {when}.' },
+    'client.fleet_booking_changed_confirmed': { title: '{company}', body: 'Booking {ref} for {plate} was confirmed: {when}, {shop}.' },
+    'client.fleet_booking_changed_declined': { title: '{company}', body: 'The shop declined booking {ref} for {plate}.' },
+    'client.fleet_booking_changed_in_inspection': { title: '{company}', body: '{plate} is being inspected at {shop}.' },
+    'client.fleet_booking_changed_in_progress': { title: '{company}', body: 'Work on {plate} has started ({ref}).' },
+    'client.fleet_booking_changed_done': { title: '{company}', body: '{plate} is ready for pickup at {shop}.' },
+    'client.fleet_booking_changed_ended': { title: '{company}', body: 'Booking {ref} for {plate} has ended.' },
+    'client.fleet_booking_cancelled': { title: '{company}', body: 'Booking {ref} for {plate} was canceled.' },
+    'client.fleet_booking_cancelled_reason': { title: '{company}', body: 'Booking {ref} for {plate} was canceled. Reason: {reason}' },
+    'client.fleet_issue_reported': { title: '{company}', body: 'Issue reported for {plate}: {issue}.' },
+    'client.fleet_expense_to_check': { title: '{company}', body: 'Receipt to check for {plate}.' },
+    'client.fleet_expense_to_check_amount': { title: '{company}', body: 'Receipt to check for {plate}: {amount}.' },
+    'client.fleet_doc_expiring': { title: '{company}', body: '{doc} for {plate} expires on {expiry}.' },
+    'client.fleet_doc_expiring_today': { title: '{company}', body: '{doc} for {plate} expires today.' },
+    'client.fleet_maintenance_due': { title: '{company}', body: '{maint} for {plate}: due soon.' },
+    'client.fleet_maintenance_due_overdue': { title: '{company}', body: '{maint} for {plate}: overdue.' },
     'client.review_report_decided': {
       title: 'Review removed',
       body: 'The Service-Hub team removed your review of {shop} ({ref}) because it breaks the platform rules.',
@@ -692,6 +742,13 @@ const WORDS: Record<Lang, Record<string, string>> = {
     'doc.itp': 'ITP-ul',
     'doc.rca': 'RCA-ul',
     'doc.vignette': 'Rovinieta',
+    'maint.oil': 'Schimbul de ulei',
+    'maint.filters': 'Filtrele',
+    'maint.brakes': 'Frânele',
+    'maint.tires': 'Anvelopele',
+    'maint.battery': 'Bateria',
+    'maint.fluids': 'Lichidele',
+    'maint.service': 'Revizia',
     'days.one': '{n} zi',
     'days.few': '{n} zile',
     'days.other': '{n} de zile',
@@ -716,6 +773,13 @@ const WORDS: Record<Lang, Record<string, string>> = {
     relAt: '{day} at {time}',
     relOn: 'on {date} at {time}',
     deadline: '{date}, {time}',
+    'maint.oil': 'Oil change',
+    'maint.filters': 'Filters',
+    'maint.brakes': 'Brakes',
+    'maint.tires': 'Tires',
+    'maint.battery': 'Battery',
+    'maint.fluids': 'Fluids',
+    'maint.service': 'Service',
     'doc.itp': 'ITP',
     'doc.rca': 'RCA insurance',
     'doc.vignette': 'road vignette',
@@ -743,6 +807,8 @@ export const EVENTS: Record<Side, readonly string[]> = {
     'review_report_decided', 'review_request', 'service_due', 'account_suspended', 'account_reactivated',
     'tire_season', 'welcome', 'favorite_offer', 'request_expired', 'area_launched', 'report_credit',
     'slot_freed',
+    'fleet_quote_waiting', 'fleet_quote_decided', 'fleet_quote_changes', 'fleet_booking_changed', 'fleet_booking_cancelled',
+    'fleet_issue_reported', 'fleet_expense_to_check', 'fleet_doc_expiring', 'fleet_maintenance_due',
   ],
   shop: [
     'booking_requested', 'booking_auto_confirmed', 'booking_cancelled_client', 'booking_cancelled_admin', 'intake_confirmed', 'quote_accepted',
@@ -881,6 +947,12 @@ function vars(e: NotificationEvent, lang: Lang, side: Side, now: Date): Record<s
     anaf_name: str(p.anaf_name),
     area: areaName(lang, p),
     count: String(num(p.count) ?? 0),
+    // Fleet members (M6).
+    company: str(p.company_name) || BRAND,
+    plate: plate || car,
+    issue: str(p.title),
+    amount: money(p.amount),
+    maint: str(p.kind) === 'custom' ? str(p.label) : (WORDS[lang][`maint.${str(p.kind)}`] ?? str(p.label)),
   };
 }
 
@@ -899,6 +971,26 @@ export function templateKey(side: Side, e: NotificationEvent, now: Date = new Da
   switch (e.event) {
     case 'booking_declined':
       return str(p.reason) ? `${base}_reason` : base;
+    // M6: the amount only in the texts of members with costs.view (the database leaves it out for the others).
+    case 'fleet_quote_waiting':
+    case 'fleet_expense_to_check':
+      return p.total !== undefined || p.amount !== undefined ? `${base}_amount` : base;
+    case 'fleet_quote_decided': {
+      const kind = p.decision === 'refused' ? '_refused' : p.decision === 'partially_accepted' ? '_partial' : '';
+      return kind !== '_refused' && p.total !== undefined ? `${base}${kind}_amount` : `${base}${kind}`;
+    }
+    case 'fleet_booking_changed': {
+      const st = str(p.status);
+      if (st === str(p.from_status)) return base;
+      if (['confirmed', 'declined', 'in_inspection', 'in_progress', 'done'].includes(st)) return `${base}_${st}`;
+      return ['no_show', 'expired'].includes(st) ? `${base}_ended` : base;
+    }
+    case 'fleet_booking_cancelled':
+      return str(p.reason) ? `${base}_reason` : base;
+    case 'fleet_doc_expiring':
+      return num(p.days) === 0 ? `${base}_today` : base;
+    case 'fleet_maintenance_due':
+      return p.status === 'overdue' ? `${base}_overdue` : base;
     case 'quote_refused':
       return (num(p.inspection_fee) ?? 0) > 0 ? `${base}_fee` : base;
     // Today or tomorrow as the phone shows it: a reminder that waited out the quiet hours (T24)
@@ -961,6 +1053,14 @@ export function urlFor(side: Side, e: NotificationEvent): string {
   const booking = e.booking_id ?? str(p.booking_id);
   const q = (params: Record<string, string>) => new URLSearchParams(params).toString();
   if (side === 'client') {
+    // M6: the company's fleet space, on the page the event is about.
+    if (e.event.startsWith('fleet_') && str(p.company_id)) {
+      const base = `/c/firme/${str(p.company_id)}`;
+      if (['fleet_issue_reported', 'fleet_doc_expiring', 'fleet_maintenance_due'].includes(e.event) && str(p.vehicle_id))
+        return `${base}?${q({ sectiune: 'vehicul', vehicul: str(p.vehicle_id) })}`;
+      if (e.event === 'fleet_expense_to_check') return `${base}?${q({ sectiune: 'costuri' })}`;
+      return `${base}?${q({ sectiune: 'programari' })}`;
+    }
     switch (e.event) {
       case 'new_message':
         return str(p.thread_id) ? `/c/mesaje/${str(p.thread_id)}` : '/c/mesaje';

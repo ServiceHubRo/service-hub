@@ -46,7 +46,7 @@ select test.eq(public, false, 'reports bucket private') from storage.buckets whe
 
 -- Realtime publication.
 select test.eq(array_agg(tablename::text order by tablename),
-               array['bookings', 'company_members', 'company_subscriptions', 'company_vehicles', 'history_reports', 'invoices', 'messages', 'no_show_disputes', 'notices', 'profiles', 'reviews', 'shops', 'subscriptions', 'threads'],
+               array['bookings', 'company_members', 'company_subscriptions', 'company_vehicles', 'history_reports', 'invoices', 'member_rights_versions', 'messages', 'no_show_disputes', 'notices', 'profiles', 'reviews', 'shops', 'subscriptions', 'threads'],
                'realtime tables')
 from pg_publication_tables where pubname = 'supabase_realtime' and schemaname = 'public';
 
@@ -122,9 +122,9 @@ select test.eq(
   'accept_company_invite, acknowledge_no_show_notice, admin_create_category, admin_create_service, admin_decide_no_show_dispute, '
   || 'admin_decide_review, admin_decide_suspect_review, admin_export, admin_extend_company_trial, admin_extend_trial, admin_force_cancel, '
   || 'admin_get_booking, admin_get_client, admin_get_shop, admin_get_thread, admin_grant_report_credit, admin_list_audit, admin_list_bookings, '
-  || 'admin_list_catalog, admin_list_clients, admin_list_company_checks, admin_list_fleet_companies, admin_list_history_reports, '
+  || 'admin_list_catalog, admin_list_clients, admin_list_company_checks, admin_list_failed_fleet_events, admin_list_fleet_companies, admin_list_history_reports, '
   || 'admin_list_no_show_disputes, admin_list_notices, admin_list_reviews, admin_list_service_areas, admin_list_shops, admin_list_subscriptions, '
-  || 'admin_list_suggestions, admin_list_suspect_reviews, admin_move_catalog_item, admin_notice_preview, admin_overview, admin_send_notice, '
+  || 'admin_list_suggestions, admin_list_suspect_reviews, admin_move_catalog_item, admin_notice_preview, admin_overview, admin_retry_fleet_event, admin_send_notice, '
   || 'admin_set_account_suspended, admin_set_area_mode, admin_set_company_plan, admin_set_notification_text, admin_set_service_reminder, '
   || 'admin_set_shop_suspended, admin_set_subscription_price, admin_set_subscription_status, admin_set_suggestion_status, admin_update_category, '
   || 'admin_update_fleet_plan, admin_update_service, admin_update_settings, admin_update_shop, admin_vehicle_duplicates, admin_verify_phone, admin_void_history_report, '
