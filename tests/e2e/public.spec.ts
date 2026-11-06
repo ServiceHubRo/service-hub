@@ -192,8 +192,8 @@ test('landing: the logo, the language switch and the two account buttons stay at
   const top = (await header.boundingBox())!.y;
   // Halfway down the page, then to the end: the bar is still at the top, and the page runs under it.
   for (const to of [0.5, 1]) {
-    await page.locator('main').evaluate((main, f) => {
-      const scroller = main.parentElement!;
+    await page.evaluate((f) => {
+      const scroller = document.scrollingElement!;
       scroller.scrollTop = (scroller.scrollHeight - scroller.clientHeight) * f;
     }, to);
     await expect.poll(async () => (await header.boundingBox())!.y).toBe(top);

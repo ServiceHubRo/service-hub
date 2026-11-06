@@ -132,7 +132,7 @@ test('"Mai multe" on the last card shows every entry, above the tab bar', async 
   await page.goto('/s/programari?tab=programate');
   const more = page.getByRole('button', { name: 'Mai multe' });
   await expect(more.first()).toBeVisible();
-  await page.locator('main').evaluate((m) => m.scrollTo(0, m.scrollHeight));
+  await page.evaluate(() => window.scrollTo(0, document.scrollingElement!.scrollHeight));
   await more.last().click();
   const items = page.getByRole('menu').getByRole('menuitem');
   await expect(items.first()).toBeVisible();
@@ -159,7 +159,7 @@ test('going back finds a screen where it was left; a new screen starts at the to
   await expect(page).toHaveURL(/\/c\/cauta$/);
   await page.getByRole('link', { name: 'Cont', exact: true }).filter({ visible: true }).first().click();
   await expect(page.getByRole('heading', { level: 1, name: 'Cont' })).toBeVisible();
-  const top = () => page.locator('main').evaluate((el) => el.scrollTop);
+  const top = () => page.evaluate(() => document.scrollingElement!.scrollTop);
   const suggestions = page.getByRole('link', { name: /^Sugestii/ });
   await suggestions.scrollIntoViewIfNeeded();
   const left = await top();
@@ -199,16 +199,17 @@ test('"‹ Înapoi" stays at the top of the screen while it scrolls', async ({ p
   // The document arrives a moment after the screen: scroll until it is long enough.
   await expect
     .poll(() =>
-      page.locator('main').evaluate((el) => {
-        el.scrollTo(0, 2000);
-        return el.scrollTop;
+      page.evaluate(() => {
+        window.scrollTo(0, 2000);
+        return document.scrollingElement!.scrollTop;
       }),
     )
     .toBeGreaterThan(1000);
-  const main = (await page.locator('main').boundingBox())!;
+  // Right under the app's header (none on a laptop).
+  const header = await page.evaluate(() => parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--nav-top')) || 0);
   const box = (await back.boundingBox())!;
-  expect(box.y).toBeGreaterThanOrEqual(main.y - 1);
-  expect(box.y).toBeLessThan(main.y + 20);
+  expect(box.y).toBeGreaterThanOrEqual(header - 1);
+  expect(box.y).toBeLessThan(header + 20);
   // Nothing scrolls over it: a tap there is a tap on it.
   const hit = await page.evaluate(
     ([x, y]) => document.elementFromPoint(x!, y!)?.closest('a')?.textContent ?? null,
@@ -289,8 +290,8 @@ test('component gallery: action button, stepper, errors', async ({ page }) => {
   await expectNoHorizontalScroll(page);
 
   const main = page.getByRole('main').or(page.locator('body'));
-  const scroller = page.locator('[class*="page"]').first();
-  await scroller.evaluate((el) => el.scrollTo(0, 600));
+  const scroller = page.locator('html');
+  await page.evaluate(() => window.scrollTo(0, 600));
   const before = await scroller.evaluate((el) => el.scrollTop);
   await page.getByRole('button', { name: /Crește/ }).click();
   await page.getByRole('button', { name: /Crește/ }).click();

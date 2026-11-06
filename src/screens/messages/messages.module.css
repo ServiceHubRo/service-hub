@@ -118,7 +118,7 @@
 
 :global(#continut) .top {
   position: sticky;
-  top: 0;
+  top: var(--nav-top, 0px);
   z-index: 5;
   padding-bottom: 8px;
   background: var(--bg);
@@ -261,7 +261,8 @@
 /* The box to write in stays at the bottom of the screen while the messages scroll. */
 .composerWrap {
   position: sticky;
-  bottom: calc(-1 * var(--page-pad));
+  /* Over the tab bar (the page scrolls; 0 on a laptop). */
+  bottom: calc(var(--nav-bottom, 0px) - var(--page-pad));
   margin-bottom: calc(-1 * var(--page-pad));
   padding: 10px 0 var(--page-pad);
   background: var(--bg);

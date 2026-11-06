@@ -38,7 +38,7 @@ const navLink = (page: Page, label: string) =>
 const stat = (page: Page, label: string) =>
   page.locator('main li').filter({ has: page.getByText(label, { exact: true }) }).locator('span').first();
 const scrollMain = (page: Page, to: 'top' | 'bottom') =>
-  page.locator('main').evaluate((el, where) => el.scrollTo(0, where === 'top' ? 0 : el.scrollHeight), to);
+  page.evaluate((where) => window.scrollTo(0, where === 'top' ? 0 : document.scrollingElement!.scrollHeight), to);
 
 test.describe('demo shop', () => {
   test.skip(!BACKEND, 'needs the local Supabase stack');

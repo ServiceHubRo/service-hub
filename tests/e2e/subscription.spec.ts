@@ -135,11 +135,11 @@ test.describe('subscription', () => {
 
     const twelve = periods.getByRole('radio', { name: /^12 luni/ });
     await twelve.scrollIntoViewIfNeeded();
-    const top = await page.evaluate(() => document.querySelector('main')?.scrollTop ?? 0);
+    const top = await page.evaluate(() => document.scrollingElement!.scrollTop);
     await twelve.check();
     await expect(twelve).toBeChecked();
     // Choosing never moves the page.
-    expect(await page.evaluate(() => document.querySelector('main')?.scrollTop ?? 0)).toBe(top);
+    expect(await page.evaluate(() => document.scrollingElement!.scrollTop)).toBe(top);
 
     await page.getByRole('button', { name: 'Activează abonamentul' }).click();
     await expect(page.getByText('Abonament: 1020 lei / 12 luni')).toBeVisible();

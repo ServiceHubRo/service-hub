@@ -388,9 +388,9 @@ export function shot(page: Page, name: string, projectName: string) {
   return page.screenshot({ path: `test-results/shots/${name}-${projectName}.png`, fullPage: true });
 }
 
-/** The app's scroll container (the page itself never scrolls inside the shell). */
+/** How far the page is scrolled (the document scrolls, not an area inside it). */
 export function scrollTopOf(page: Page): Promise<number> {
-  return page.locator('main').evaluate((el) => el.scrollTop);
+  return page.evaluate(() => document.scrollingElement!.scrollTop);
 }
 
 /**

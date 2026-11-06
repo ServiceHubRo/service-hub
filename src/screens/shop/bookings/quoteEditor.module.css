@@ -246,7 +246,7 @@
    of the settings; the total on the left, the buttons on the right. */
 .bar {
   position: sticky;
-  bottom: 0;
+  bottom: var(--nav-bottom, 0px);
   z-index: 4;
   display: flex;
   flex-wrap: wrap;

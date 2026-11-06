@@ -1,5 +1,5 @@
 import { CalendarDays, CarFront, LayoutDashboard, LogOut, ReceiptText, User, UserRound } from 'lucide-react';
-import { useCallback, useEffect, useRef, useState, type MouseEvent } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, type MouseEvent } from 'react';
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { LogoTile } from '../components/LogoTile';
 import { Wordmark } from '../components/Wordmark';
@@ -10,7 +10,7 @@ import { IN_ANDROID_APP, watchKeyboard } from '../lib/keyboard';
 import { motionOn } from '../lib/motion';
 import { IS_NATIVE } from '../lib/native';
 import { useScreenSlide } from '../lib/screenSlide';
-import { useKeepPlaceOnReturn, useScrollMemory } from '../lib/scrollMemory';
+import { useScrollMemory } from '../lib/scrollMemory';
 import { useBumps } from '../lib/useBumps';
 import { useOptionalAdminCounts } from '../screens/admin/adminContext';
 import { ADMIN_MODERATION_PATH } from '../screens/admin/paths';
@@ -198,10 +198,30 @@ export function AppShell({ role }: { role: Role }) {
   const current = [...nav.main, nav.account].find((item) => pathname === item.path || pathname.startsWith(`${item.path}/`));
   useDocumentTitle(current ? t(current.labelKey) : null);
 
-  // Only the content area scrolls: a new screen starts at the top, going back finds it where it was.
-  useScrollMemory(mainRef);
-  // …and stays where it is when the browser throws it to the top by itself (Safari, a screenshot).
-  useKeepPlaceOnReturn(mainRef);
+  // The page scrolls: a new screen starts at the top, going back finds it where it was.
+  useScrollMemory();
+
+  // The header (top) and the tab bar (bottom) stay over the scrolling page: their heights, for what
+  // sticks under them and for what is scrolled into view (0 where they are hidden, e.g. a laptop).
+  const headerRef = useRef<HTMLElement>(null);
+  const tabBarRef = useRef<HTMLElement>(null);
+  useLayoutEffect(() => {
+    const root = document.documentElement;
+    const measure = () => {
+      root.style.setProperty('--nav-top', `${headerRef.current?.offsetHeight ?? 0}px`);
+      root.style.setProperty('--nav-bottom', `${tabBarRef.current?.offsetHeight ?? 0}px`);
+    };
+    measure();
+    const observer = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(measure);
+    for (const el of [headerRef.current, tabBarRef.current]) if (el && observer) observer.observe(el);
+    window.addEventListener('resize', measure);
+    return () => {
+      observer?.disconnect();
+      window.removeEventListener('resize', measure);
+      root.style.removeProperty('--nav-top');
+      root.style.removeProperty('--nav-bottom');
+    };
+  }, []);
 
   // In the Android app the bottom bar steps aside while the keyboard is open (more room to type).
   useEffect(() => (IN_ANDROID_APP ? watchKeyboard() : undefined), []);
@@ -235,7 +255,7 @@ export function AppShell({ role }: { role: Role }) {
       <a href="#continut" className={styles.skipLink} onClick={skipToContent}>
         {t('nav.skipToContent')}
       </a>
-      <header className={styles.header} data-fixed-top>
+      <header ref={headerRef} className={styles.header} data-fixed-top>
         {/* One row (Eduard, 6 Nov 2026): the logo left; right, a client's workspace switch (the admin's
             Cont). The language is a preference in Cont now, not in the header. */}
         <div className={styles.headerRow}>
@@ -288,7 +308,7 @@ export function AppShell({ role }: { role: Role }) {
           </div>
         </aside>
 
-        <ScrollJournal mainRef={mainRef} />
+        <ScrollJournal />
         <main className={styles.main} ref={mainRef} id="continut" tabIndex={-1}>
           <div ref={contentRef} className={styles.content}>
             <EmailVerifyBanner role={role} />
@@ -300,7 +320,7 @@ export function AppShell({ role }: { role: Role }) {
         </main>
       </div>
 
-      <nav className={`${styles.bottomBar} ${motionOn('tabBounce') ? styles.bounce : ''}`} aria-label={t('nav.main')} data-fixed-bottom>
+      <nav ref={tabBarRef} className={`${styles.bottomBar} ${motionOn('tabBounce') ? styles.bounce : ''}`} aria-label={t('nav.main')} data-fixed-bottom>
         {companyNav?.map((item) => <CompanyNavLink key={item.key} item={item} variant="tab" />)}
         {!companyNav && nav.bottomBar.map((item) => {
           return (

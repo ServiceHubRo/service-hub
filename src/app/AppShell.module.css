@@ -1,6 +1,8 @@
+/* The page scrolls (Eduard, 6 Nov 2026: Safari on the iPhone lost the place of an inner scrolling
+   area at every screenshot). The header stays at the top and the tab bar at the bottom over the
+   page; AppShell writes their heights to --nav-top / --nav-bottom for what sticks under them. */
 .shell {
   flex: 1;
-  min-height: 0;
   display: flex;
   flex-direction: column;
 }
@@ -8,6 +10,9 @@
 /* ---------- mobile + tablet (< 1024 px) ---------- */
 
 .header {
+  position: sticky;
+  top: 0;
+  z-index: 30;
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
@@ -55,16 +60,17 @@
 
 .body {
   flex: 1;
-  min-height: 0;
   display: flex;
 }
 
+/* The content, over the whole height left: a short screen still reaches the tab bar, and a screen
+   that fills it (data-fill-screen) gets exactly what is visible. Its foot stays clear of the bar. */
 .main {
   flex: 1;
   min-width: 0;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  -webkit-overflow-scrolling: touch;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: var(--nav-bottom, 0px);
 }
 
 /* Focused only by "Sari la conținut": no ring around the whole screen. */
@@ -102,13 +108,17 @@
 
 /* A screen that fills the whole content area (a conversation keeps its box at the bottom). */
 .content:has(> [data-fill-screen]) {
-  min-height: 100%;
+  flex: 1 0 auto;
   display: flex;
   flex-direction: column;
 }
 
 .bottomBar {
-  flex-shrink: 0;
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 30;
   display: flex;
   background: var(--bg-deep);
   border-top: 1px solid var(--border);
@@ -175,7 +185,13 @@
 
   /* The sidebar (T51): one step darker than the page; rows inset with rounded corners; the chosen
      row lifted with a soft amber tint, its icon amber, its text white. */
+  /* Held on the screen while the page scrolls beside it. */
   .sidebar {
+    position: sticky;
+    top: 0;
+    align-self: flex-start;
+    height: 100vh;
+    height: 100dvh;
     display: flex;
     flex-direction: column;
     flex-shrink: 0;
@@ -260,18 +276,6 @@
   }
 }
 
-@media print {
-  .header,
-  .bottomBar,
-  .sidebar {
-    display: none !important;
-  }
-
-  .main {
-    overflow: visible;
-  }
-}
-
 /* ---------- badge on a navigation item (new requests on Programări) ---------- */
 
 .iconWrap {
@@ -325,7 +329,12 @@
   .body,
   .main {
     display: block;
-    overflow: visible;
+    padding-bottom: 0;
+  }
+
+  .sidebar {
+    position: static;
+    height: auto;
   }
 
   .content {

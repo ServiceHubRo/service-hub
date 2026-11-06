@@ -1,4 +1,4 @@
-import { useEffect, useState, type RefObject } from 'react';
+import { useEffect, useState } from 'react';
 import { IS_TEST_BUILD } from '../lib/env';
 import { storage } from '../lib/storage';
 
@@ -11,7 +11,7 @@ const KEY = 'sh_scroll_journal';
  * size changes, focus, and every jump of the content of more than 200 px, with what it jumped from
  * and to. Not translated on purpose: a diagnostic for the developer, removed once the cause is known.
  */
-export function ScrollJournal({ mainRef }: { mainRef: RefObject<HTMLElement | null> }) {
+export function ScrollJournal() {
   const [on] = useState(() => {
     if (!IS_TEST_BUILD) return false;
     const param = new URLSearchParams(window.location.search).get('jurnal');
@@ -26,10 +26,11 @@ export function ScrollJournal({ mainRef }: { mainRef: RefObject<HTMLElement | nu
     const t0 = performance.now();
     const stamp = () => `${((performance.now() - t0) / 1000).toFixed(2)}s`;
     const add = (text: string) => setLines((prev) => [...prev.slice(-13), `${stamp()} ${text}`]);
-    const el = mainRef.current;
+    const el = (document.scrollingElement as HTMLElement | null) ?? document.documentElement;
     let last = el?.scrollTop ?? 0;
     let touchedAt = -Infinity;
-    let child = el?.firstElementChild?.firstElementChild ?? null;
+    const content = () => document.querySelector('#continut > div')?.firstElementChild ?? null;
+    let child = content();
 
     const size = () => `${window.innerWidth}×${window.innerHeight} vv ${Math.round(window.visualViewport?.height ?? 0)}`;
     const onScroll = () => {
@@ -37,10 +38,10 @@ export function ScrollJournal({ mainRef }: { mainRef: RefObject<HTMLElement | nu
       const top = Math.round(el.scrollTop);
       if (Math.abs(top - last) > 200) {
         const touched = performance.now() - touchedAt < 1000 ? 'touch' : 'NO touch';
-        add(`JUMP ${Math.round(last)}→${top} (${touched}) h ${el.scrollHeight}/${el.clientHeight} vis ${document.visibilityState} overflow ${getComputedStyle(el).overflowY}`);
+        add(`JUMP ${Math.round(last)}→${top} (${touched}) h ${el.scrollHeight}/${el.clientHeight} vis ${document.visibilityState} main ${getComputedStyle(document.getElementById('continut') ?? el).overflowY}`);
       }
       last = el.scrollTop;
-      const now = el.firstElementChild?.firstElementChild ?? null;
+      const now = content();
       if (now !== child) {
         add('content replaced');
         child = now;
@@ -58,16 +59,15 @@ export function ScrollJournal({ mainRef }: { mainRef: RefObject<HTMLElement | nu
       [window, 'resize', () => add(`resize ${size()} top ${Math.round(el?.scrollTop ?? 0)}`)],
       [window, 'beforeprint', () => add('beforeprint')],
       [window, 'afterprint', () => add('afterprint')],
-      [window, 'scroll', () => add(`window scroll ${Math.round(window.scrollY)}`)],
       [document, 'focusin', () => add(`focusin ${(document.activeElement as HTMLElement | null)?.tagName ?? ''}`)],
     ];
     // Safari may lay the page out for print to make the „Full Page” screenshot (a PDF).
     const print = window.matchMedia('print');
-    const onPrintMedia = () => add(`media print ${print.matches ? 'ON' : 'off'} top ${Math.round(el?.scrollTop ?? 0)} overflow ${el ? getComputedStyle(el).overflowY : ''}`);
+    const onPrintMedia = () => add(`media print ${print.matches ? 'ON' : 'off'} top ${Math.round(el?.scrollTop ?? 0)} main ${getComputedStyle(document.getElementById('continut') ?? el).overflowY}`);
     print.addEventListener('change', onPrintMedia);
     if (window.visualViewport) handlers.push([window.visualViewport, 'resize', () => add(`vv resize ${size()}`)]);
     for (const [target, type, fn] of handlers) target.addEventListener(type, fn);
-    el?.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('scroll', onScroll, { passive: true });
     document.addEventListener('touchstart', touched, { passive: true, capture: true });
     add(`on ${size()}`);
     // A jump that fires no scroll event (seen only by looking): checked a few times a second.
@@ -76,12 +76,12 @@ export function ScrollJournal({ mainRef }: { mainRef: RefObject<HTMLElement | nu
     }, 250);
     return () => {
       for (const [target, type, fn] of handlers) target.removeEventListener(type, fn);
-      el?.removeEventListener('scroll', onScroll);
+      window.removeEventListener('scroll', onScroll);
       document.removeEventListener('touchstart', touched, { capture: true });
       window.clearInterval(timer);
       print.removeEventListener('change', onPrintMedia);
     };
-  }, [on, mainRef]);
+  }, [on]);
 
   if (!on) return null;
   return (

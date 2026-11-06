@@ -1,9 +1,8 @@
 /* The public page (P18): a website that scrolls, same tokens, fonts and radii as the app. */
 .page {
   flex: 1;
-  min-height: 0;
-  overflow-y: auto;
-  overflow-x: hidden;
+  /* Clipped sideways without becoming a scroll container: the header stays sticky to the page. */
+  overflow-x: clip;
   font-size: 15px;
   line-height: 1.6;
 }

@@ -1,15 +1,9 @@
-/* The page itself never scrolls; each screen decides which area scrolls. */
+/* The page itself scrolls (Eduard, 6 Nov 2026): Safari on the iPhone keeps the place of the page
+   when it makes a screenshot, never that of an area inside it. At least the screen's height, so a
+   short screen still fills it. */
 .app {
-  height: 100vh;
-  height: 100dvh;
+  min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
-}
-
-@media print {
-  .app {
-    height: auto;
-    overflow: visible;
-  }
 }

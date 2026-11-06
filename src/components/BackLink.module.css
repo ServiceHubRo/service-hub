@@ -6,7 +6,8 @@
    23 Oct): the page's own color, across the whole width, so nothing shows through. */
 :global(#continut) .bar {
   position: sticky;
-  top: 0;
+  /* Under the app's header (the page scrolls; 0 on a laptop). */
+  top: var(--nav-top, 0px);
   z-index: 5;
   background: var(--bg);
   /* The side margins too, without widening the screen. */
