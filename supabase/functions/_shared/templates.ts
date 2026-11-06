@@ -187,7 +187,7 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
     },
     'client.welcome_garage': {
       title: 'Adaugă mașina în Garaj',
-      body: 'Îți amintim din timp de ITP, RCA și rovinietă, iar la programare nu mai completezi nimic.',
+      body: 'Primești din timp memento-uri pentru ITP, RCA și rovinietă, iar la programare datele mașinii se completează automat.',
     },
     'client.welcome_later': {
       title: 'Service-Hub',
@@ -276,11 +276,11 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
     },
     'shop.payment_failed': {
       title: 'Plata nu a reușit',
-      body: 'Nu am putut încasa abonamentul de {total}. Verifică sau schimbă cardul din Abonament. Reîncercăm pe {expiry}.',
+      body: 'Plata abonamentului de {total} nu a reușit. Verifică sau schimbă cardul din Abonament. Următoarea încercare: {expiry}.',
     },
     'shop.payment_failed_final': {
       title: 'Plata nu a reușit',
-      body: 'Nu am putut încasa abonamentul de {total}. A fost ultima încercare: plătește din Abonament ca service-ul să rămână în căutări.',
+      body: 'Plata abonamentului de {total} nu a reușit. A fost ultima încercare: plătește din Abonament pentru ca service-ul să rămână în căutări.',
     },
     'shop.shop_inactive': {
       title: 'Service-ul nu mai apare în căutări',
@@ -296,15 +296,15 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
     },
     'shop.shop_inactive_admin': {
       title: 'Service-ul nu mai apare în căutări',
-      body: 'Echipa Service-Hub a oprit abonamentul. Scrie-ne dacă ai întrebări. Datele tale rămân.',
+      body: 'Echipa Service-Hub a oprit abonamentul. Pentru întrebări, contactează suportul. Datele tale rămân.',
     },
     'shop.review_report_decided': {
       title: 'Recenzia rămâne publicată',
-      body: 'Am verificat recenzia raportată pentru {ref} ({rating} din 5 stele). Respectă regulile platformei și rămâne publicată.',
+      body: 'Recenzia raportată pentru {ref} ({rating} din 5 stele) a fost verificată. Respectă regulile platformei și rămâne publicată.',
     },
     'shop.review_report_decided_removed': {
       title: 'Recenzia raportată a fost ștearsă',
-      body: 'Am șters recenzia pentru {ref} ({rating} din 5 stele). Nu mai apare și nu mai contează la medie.',
+      body: 'Recenzia pentru {ref} ({rating} din 5 stele) a fost ștearsă. Nu mai apare și nu mai contează la medie.',
     },
     // ------------------------------------------------------------------ account / shop suspended, reactivated
     'shop.account_suspended': {
@@ -339,7 +339,7 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
     // ------------------------------------------------------------------ the company at ANAF (Raport ANAF, automated)
     'shop.company_problem': {
       title: 'Verifică CUI-ul firmei',
-      body: 'Nu am găsit CUI-ul {cui} în registrul ANAF. Verifică-l în Date de facturare până pe {expiry}, ca service-ul să rămână vizibil în căutări.',
+      body: 'CUI-ul {cui} nu a fost găsit în registrul ANAF. Verifică-l în Date de facturare până pe {expiry}, pentru ca service-ul să rămână vizibil în căutări.',
     },
     'shop.company_problem_inactive': {
       title: 'Verifică datele firmei',
@@ -488,7 +488,7 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
     },
     'client.welcome_garage': {
       title: 'Add your car to the Garage',
-      body: "We'll remind you of the ITP, RCA and road vignette in time, and booking takes no typing.",
+      body: 'You receive ITP, RCA and road vignette reminders in time, and booking fills in the car details automatically.',
     },
     'client.welcome_later': {
       title: 'Service-Hub',
@@ -577,11 +577,11 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
     },
     'shop.payment_failed': {
       title: 'Payment failed',
-      body: "We couldn't charge the {total} subscription. Check or change your card under Subscription. We'll try again on {expiry}.",
+      body: 'The {total} subscription payment failed. Check or change your card under Subscription. Next attempt: {expiry}.',
     },
     'shop.payment_failed_final': {
       title: 'Payment failed',
-      body: "We couldn't charge the {total} subscription. That was the last try: pay under Subscription to stay in search results.",
+      body: 'The {total} subscription payment failed. That was the last attempt: pay under Subscription to stay in search results.',
     },
     'shop.shop_inactive': {
       title: 'Your shop is no longer in search',
@@ -597,24 +597,24 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
     },
     'shop.shop_inactive_admin': {
       title: 'Your shop is no longer in search',
-      body: 'The Service-Hub team stopped your subscription. Write to us if you have questions. Your data is kept.',
+      body: 'The Service-Hub team stopped your subscription. Contact support with any questions. Your data is kept.',
     },
     'shop.review_report_decided': {
       title: 'The review stays up',
-      body: 'We checked the review you reported for {ref} ({rating} of 5 stars). It follows the platform rules and stays published.',
+      body: 'The review you reported for {ref} ({rating} of 5 stars) was checked. It follows the platform rules and stays published.',
     },
     'shop.review_report_decided_removed': {
       title: 'The reported review was removed',
-      body: 'We removed the review for {ref} ({rating} of 5 stars). It no longer shows and no longer counts toward your rating.',
+      body: 'The review for {ref} ({rating} of 5 stars) was removed. It no longer shows and no longer counts toward your rating.',
     },
     // ------------------------------------------------------------------ account / shop suspended, reactivated
     'shop.account_suspended': {
       title: 'Account suspended',
-      body: 'The Service-Hub team suspended your account. Your shop no longer appears in search and takes no new bookings. Details in the email we sent.',
+      body: 'The Service-Hub team suspended your account. Your shop no longer appears in search and takes no new bookings. Details in the email sent to you.',
     },
     'shop.account_suspended_shop': {
       title: 'Shop suspended',
-      body: 'The Service-Hub team suspended {shop}. It no longer appears in search and takes no new bookings. Details in the email we sent.',
+      body: 'The Service-Hub team suspended {shop}. It no longer appears in search and takes no new bookings. Details in the email sent to you.',
     },
     'shop.account_reactivated': {
       title: 'Account reactivated',
@@ -640,7 +640,7 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
     // ------------------------------------------------------------------ the company at ANAF (ANAF report, automated)
     'shop.company_problem': {
       title: 'Please check your tax ID',
-      body: "We couldn't find tax ID {cui} in the ANAF register. Check it under Billing details by {expiry} so your shop stays visible in search.",
+      body: 'Tax ID {cui} was not found in the ANAF register. Check it under Billing details by {expiry} so your shop stays visible in search.',
     },
     'shop.company_problem_inactive': {
       title: 'Please check your company details',
@@ -665,7 +665,7 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
     // ------------------------------------------------------------------ account suspended / reactivated
     'client.account_suspended': {
       title: 'Account suspended',
-      body: "The Service-Hub team suspended your account. You can still see your data, but you can't book, send messages or write reviews. Details in the email we sent.",
+      body: "The Service-Hub team suspended your account. You can still see your data, but you can't book, send messages or write reviews. Details in the email sent to you.",
     },
     'client.account_reactivated': {
       title: 'Account reactivated',

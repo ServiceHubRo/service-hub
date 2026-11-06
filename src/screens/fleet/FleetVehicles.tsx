@@ -1,10 +1,12 @@
 import { CarFront, ChevronRight, Download, Plus, SearchX } from 'lucide-react';
 import { useMemo, useState } from 'react';
+import { ActionButton } from '../../components/ActionButton';
 import { Button } from '../../components/Button';
 import { ChoiceFilters } from '../../components/Filters';
 import { EmptyState } from '../../components/EmptyState';
 import { InlinePanel } from '../../components/InlinePanel';
 import { SearchField } from '../../components/SearchField';
+import { canRetryRpc, rpcErrorMessage } from '../../data/rpc';
 import { useI18n } from '../../i18n/context';
 import { formatDate, formatKm, formatMoney, ymdInBucharest } from '../../i18n/format';
 import { csvFormat, toCsv } from '../../lib/history';
@@ -37,7 +39,7 @@ import styles from './fleet.module.css';
  */
 export function FleetVehicles({ initialStatus }: { initialStatus?: string }) {
   const { t, lang } = useI18n();
-  const { data, go, allowed, mode, plan } = useFleet();
+  const { data, go, allowed, mode, plan, logExport } = useFleet();
   const today = ymdInBucharest(new Date());
   const ledger = useMemo(() => ledgerFor(data), [data]);
   const rows = useMemo(() => vehicleRows(data.vehicles, data.jobs, ledger?.entries ?? null, yearRange(today), data.expenses), [data, ledger, today]);
@@ -66,6 +68,7 @@ export function FleetVehicles({ initialStatus }: { initialStatus?: string }) {
       if (money) row.push(r.cost === null ? '' : String(r.cost).replace('.', csvFormat(lang).decimal));
       return row;
     });
+    await logExport('vehicles_csv', body.length);
     await saveFile(new Blob([toCsv([header, ...body], separator)], { type: 'text/csv;charset=utf-8' }), `${t('fleet.vehicles.file')}-${today}.csv`);
   }
 
@@ -154,9 +157,9 @@ export function FleetVehicles({ initialStatus }: { initialStatus?: string }) {
         doneLabel={t('fleet.filters.show', { n: shown.length })}
         end={
           shown.length > 0 && hasFeature(plan, 'export_csv') ? (
-            <Button variant="ghost" className={styles.tool} onClick={() => void exportCsv()}>
+            <ActionButton variant="ghost" block={false} className={styles.tool} onAction={() => exportCsv()} errorMessage={(e) => rpcErrorMessage(lang, e)} canRetry={canRetryRpc}>
               <Download size={18} aria-hidden="true" /> {t('fleet.export.csv')}
-            </Button>
+            </ActionButton>
           ) : undefined
         }
       />

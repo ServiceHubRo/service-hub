@@ -1,3 +1,4 @@
+import { canonicalPlate } from './plate';
 /**
  * Validators and normalizers (ARCHITECTURE §14). The same rules live in SQL
  * (supabase/migrations/*_foundation.sql); both are tested against tests/fixtures/validator-vectors.json.
@@ -54,9 +55,9 @@ export function isValidVin(value: string): boolean {
   return /^[A-HJ-NPR-Z0-9]{17}$/.test(compact(value));
 }
 
-/** Plate as matched across bookings: upper-case, no spaces or dashes (`bv-12 abc` → `BV12ABC`). */
+/** Plate as matched across bookings: the one rule of src/lib/plate.ts (`bv-12 abc` → `BV12ABC`). */
 export function normalizePlate(value: string): string | null {
-  const v = value.replace(/[\s-]/g, '').toUpperCase();
+  const v = canonicalPlate(value);
   return v === '' ? null : v;
 }
 

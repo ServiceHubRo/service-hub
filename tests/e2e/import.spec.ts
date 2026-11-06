@@ -287,7 +287,7 @@ test.describe('import from another program', () => {
     const v = await visitor.newPage();
     await v.goto(`/atelier/${shop.shopId}`);
     await expect(v.getByRole('heading', { level: 1, name: 'Programează-te la Atelier Link' })).toBeVisible();
-    await expect(v.getByText('Fără recenzii încă')).toBeVisible();
+    await expect(v.getByText('Fără recenzii')).toBeVisible();
     await expectNoHorizontalScroll(v);
     await expectAccessible(v, 'shop link visitor');
     await shot(v, 't31b-visitor', name());

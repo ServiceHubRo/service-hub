@@ -11,6 +11,7 @@ import {
   shot,
   signIn,
   userIdOf,
+  switchLanguage,
 } from './support';
 
 // T07 — the garage with its expiry alerts, the 4-step booking, capacity, a day that fills up while
@@ -54,7 +55,7 @@ test.describe('garage', () => {
     await signInClient(page);
     await navLink(page, 'Garaj').click();
     await expect(page.getByRole('heading', { level: 1, name: 'Garaj' })).toBeVisible();
-    await expect(page.getByText('Nicio mașină salvată.')).toBeVisible();
+    await expect(page.getByText('Nu există mașini salvate.')).toBeVisible();
     await shot(page, 't07-garage-empty', name());
 
     await page.getByRole('link', { name: 'Adaugă mașină' }).click();
@@ -116,7 +117,7 @@ test.describe('garage', () => {
     await page.getByRole('button', { name: 'Șterge mașina' }).click();
     await page.getByRole('button', { name: 'Da, șterge' }).click();
     await expect(page).toHaveURL(/\/c\/garaj$/);
-    await expect(page.getByText('Nicio mașină salvată.')).toBeVisible();
+    await expect(page.getByText('Nu există mașini salvate.')).toBeVisible();
     await navLink(page, 'Caută').click();
     await expect(page.getByRole('heading', { level: 1, name: 'Caută' })).toBeVisible();
     await expect(page.getByRole('link', { name: /la Golf 7/ })).toHaveCount(0);
@@ -219,7 +220,7 @@ test.describe('booking', () => {
     await expect(request).toContainText('Schimb ulei + filtru ulei, Plăcuțe de frână');
     await expectNoHorizontalScroll(shopPage);
     await shot(shopPage, 't21-shop-request', name());
-    await shopPage.getByRole('button', { name: 'English' }).filter({ visible: true }).first().click();
+    await switchLanguage(shopPage, 'en');
     await expect(request).toContainText('Oil & oil filter change, Brake pads');
     await shot(shopPage, 't21-shop-request-en', name());
     await shopContext.close();
@@ -257,10 +258,13 @@ test.describe('booking', () => {
     await expect(page2.getByRole('button', { name: `${formatDate('en', day)}: full, Waiting for a spot` })).toBeVisible();
     await expectNoHorizontalScroll(page2);
     await shot(page2, 't37-waitlist-en', name());
-    await page2.getByRole('button', { name: 'Română' }).filter({ visible: true }).first().click();
+    // The language is in Cont (Eduard, 6 Nov 2026): back on the step, the day is picked again; the wait stays.
+    await switchLanguage(page2, 'ro');
+    await page2.getByRole('button', { name: new RegExp(`^${formatDate('ro', day)}`) }).click();
     await expect(page2.getByRole('switch', { name: 'Anunță-mă dacă se eliberează un loc' })).toBeChecked();
     await shot(page2, 't37-waitlist-ro', name());
-    await page2.getByRole('button', { name: 'English' }).filter({ visible: true }).first().click();
+    await switchLanguage(page2, 'en');
+    await fullDay.click();
     await notify.uncheck();
     await expect(page2.getByRole('button', { name: `${formatDate('en', day)}: full` })).toBeVisible();
     await fullDay.click();
@@ -281,7 +285,7 @@ test.describe('booking', () => {
     });
     await page2.getByRole('button', { name: 'Send request' }).click();
     await expect(page2.getByRole('heading', { level: 1, name: 'Pick a day' })).toBeVisible();
-    await expect(page2.getByText('That day just filled up. Pick another day.')).toBeVisible();
+    await expect(page2.getByText('That day is now full. Choose another day.')).toBeVisible();
     await expect(page2.getByRole('button', { name: `${formatDate('en', picked.day)}: full` })).toBeVisible();
     await expectNoHorizontalScroll(page2);
     await shot(page2, 't07-day-filled-en', name());

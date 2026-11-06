@@ -15,7 +15,7 @@ import { SkeletonList } from '../../components/Skeleton';
 import { StatusBadge } from '../../components/StatusBadge';
 import { BOOKING_STATUSES } from '../../lib/status';
 import { Stepper } from '../../components/Stepper';
-import { Tabs } from '../../components/Tabs';
+import { ViewSelect } from '../../components/ViewSelect';
 import { Switch } from '../../components/Switch';
 import { useI18n } from '../../i18n/context';
 import { captureError, monitoringEnabled } from '../../lib/monitoring';
@@ -158,8 +158,7 @@ export function ComponentGallery() {
         </Section>
 
         <Section title={t('demo.tabs')}>
-          <Tabs
-            label={t('demo.tabs')}
+          <ViewSelect
             value={tab}
             onChange={setTab}
             items={[

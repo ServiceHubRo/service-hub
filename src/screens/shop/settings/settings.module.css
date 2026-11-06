@@ -121,7 +121,7 @@
 
 .saveBar {
   position: sticky;
-  bottom: 0;
+  bottom: var(--nav-bottom, 0px);
   z-index: 4;
   margin: var(--space-4) calc(-1 * var(--page-pad)) calc(-1 * var(--page-pad));
   padding: var(--space-3) var(--page-pad);

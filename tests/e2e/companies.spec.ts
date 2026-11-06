@@ -1,5 +1,5 @@
 import { expect, test, type Browser } from '@playwright/test';
-import { BACKEND, PASSWORD, createFleetUser, expectNoHorizontalScroll, openAccount, shot, signIn } from './support';
+import { BACKEND, PASSWORD, createFleetUser, expectNoHorizontalScroll, openAccount, shot, signIn, switchLanguage } from './support';
 
 // Companies (T63b): a client creates a company from Cont, invites a colleague as driver by link,
 // the colleague accepts with their own account and sees only what a driver sees; the admin hands the
@@ -35,7 +35,7 @@ test('create a company, invite a driver, hand over the administration', async ({
   await expect(page).toHaveURL(/\/c\/cauta/);
   await openAccount(page);
   await page.getByRole('link', { name: /Firmele mele/ }).click();
-  await expect(page.getByText('Nicio firmă', { exact: true })).toBeVisible();
+  await expect(page.getByText('Nu există firme.', { exact: true })).toBeVisible();
   await expectNoHorizontalScroll(page);
   await shot(page, 'companies-empty', name());
 
@@ -107,8 +107,8 @@ test('the companies screen in English', async ({ page }) => {
   await signIn(page, email, PASSWORD);
   await expect(page).toHaveURL(/\/c\/cauta/);
   await page.goto('/c/cont/firme');
-  await page.getByRole('button', { name: 'English' }).filter({ visible: true }).first().click();
-  await expect(page.getByText('No companies', { exact: true })).toBeVisible();
+  await switchLanguage(page, 'en');
+  await expect(page.getByText('No companies.', { exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'Create a company' }).click();
   await expect(page.getByLabel('Company name')).toBeVisible();
   await expectNoHorizontalScroll(page);

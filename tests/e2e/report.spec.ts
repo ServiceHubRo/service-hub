@@ -184,7 +184,7 @@ test.describe('history report', () => {
     await expect(page.getByRole('heading', { level: 1, name: 'Rapoartele mele' })).toBeVisible();
     await expect(page.getByText('Mulțumim. Raportul este gata de descărcat.')).toBeVisible({ timeout: 30_000 });
     const card = page.locator('main li').filter({ hasText: plate });
-    await expect(card).toContainText('Gata');
+    await expect(card).toContainText('Generat');
     await expect(card).toContainText('3 lucrări');
     const code = (await card.locator('.mono').filter({ hasText: /^SH-\d{4}-\d{6}$/ }).textContent())!.trim();
     await expectNoHorizontalScroll(page);
@@ -231,7 +231,7 @@ test.describe('history report', () => {
 
     await buyer.getByLabel('Codul raportului').fill('SH-2020-999999');
     await buyer.getByRole('button', { name: 'Verifică' }).click();
-    await expect(buyer.getByText('Nu am găsit niciun raport cu acest cod. Verifică literele și cifrele.')).toBeVisible();
+    await expect(buyer.getByText('Nu există niciun raport cu acest cod. Verifică literele și cifrele.')).toBeVisible();
     await buyer.getByLabel('Codul raportului').fill('ABC');
     await buyer.getByRole('button', { name: 'Verifică' }).click();
     await expect(buyer.getByText('Codul are forma SH-2026-000147.')).toBeVisible();
@@ -254,7 +254,7 @@ test.describe('history report', () => {
     await expect(page).toHaveURL(/\/c\//);
     await page.goto('/c/cont/rapoarte');
     await expect(page.getByRole('heading', { level: 1, name: 'My reports' })).toBeVisible();
-    await expect(page.getByText('No reports yet.')).toBeVisible();
+    await expect(page.getByText('No reports.')).toBeVisible();
     await page.getByRole('link', { name: /Volkswagen Golf 7/ }).click();
     await expect(page.getByRole('heading', { level: 1, name: 'Official report' })).toBeVisible();
     await expect(page.getByText('This report covers only work carried out through Service-Hub.')).toBeVisible();

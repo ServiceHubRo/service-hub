@@ -409,17 +409,17 @@ function subscriptionEmail(e: EmailEvent, lang: Lang, app: string): EmailContent
         blocks: [
           {
             p: en
-              ? `We couldn't charge the ${total} subscription for ${shop}.`
-              : `Nu am putut încasa abonamentul de ${total} pentru ${shop}.`,
+              ? `The ${total} subscription payment for ${shop} failed.`
+              : `Plata abonamentului de ${total} pentru ${shop} nu a reușit.`,
           },
           {
             p: final
               ? en
-                ? 'That was the last try. Pay under Subscription so the shop stays in search results.'
-                : 'A fost ultima încercare. Plătește din Abonament ca service-ul să rămână în căutări.'
+                ? 'That was the last attempt. Pay under Subscription so the shop stays in search results.'
+                : 'A fost ultima încercare. Plătește din Abonament pentru ca service-ul să rămână în căutări.'
               : en
-                ? `We'll try again on ${next}. Check or change the card under Subscription → Manage.`
-                : `Reîncercăm pe ${next}. Verifică sau schimbă cardul din Abonament → Gestionează.`,
+                ? `Next attempt: ${next}. Check or change the card under Subscription → Manage.`
+                : `Următoarea încercare: ${next}. Verifică sau schimbă cardul din Abonament → Gestionează.`,
           },
         ],
         button: open,
@@ -626,8 +626,8 @@ function areaLaunchedEmail(p: Record<string, unknown>, lang: Lang, app: string):
     blocks: [
       {
         p: en
-          ? `You asked us to let you know when Service-Hub reaches ${area}. Starting today, shops there take bookings in the app.`
-          : `Ne-ai cerut să te anunțăm când Service-Hub ajunge în ${area}. De azi, service-urile de acolo primesc programări prin aplicație.`,
+          ? `You asked to be notified when Service-Hub reaches ${area}. Starting today, shops there take bookings in the app.`
+          : `Ai cerut să fii anunțat când Service-Hub ajunge în ${area}. De azi, service-urile de acolo primesc programări prin aplicație.`,
       },
       {
         p: en

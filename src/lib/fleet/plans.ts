@@ -6,7 +6,11 @@ import { daysFromToday, ymdInBucharest } from '../../i18n/format';
  * draw the Abonament page, the badge and the banners.
  */
 
-/** Every feature a plan can list, in the order the comparison shows them. `available` = built. */
+/**
+ * Every feature a plan can list, in the order the comparison shows them, and the plan that first
+ * includes it in the standard offer (T65). The database holds which plan has which
+ * (`fleet_plans.features`) and checks every one of them; `available` = built.
+ */
 export const PLAN_FEATURES = [
   { key: 'dashboard', available: true },
   { key: 'vehicles', available: true },
@@ -14,12 +18,17 @@ export const PLAN_FEATURES = [
   { key: 'history', available: true },
   { key: 'costs_basic', available: true },
   { key: 'members', available: true },
+  { key: 'dashboard_finance', available: true },
   { key: 'reports', available: true },
-  { key: 'export_csv', available: true },
-  { key: 'budget', available: true },
   { key: 'cost_per_km', available: true },
-  // Not built yet: never offered on the comparison until it is.
-  { key: 'approval_flow', available: false },
+  { key: 'budget', available: true },
+  { key: 'export_csv', available: true },
+  { key: 'approval_flow', available: true },
+  { key: 'member_rights', available: true },
+  { key: 'reports_advanced', available: true },
+  { key: 'budget_forecast', available: true },
+  { key: 'approval_custom', available: true },
+  { key: 'export_excel', available: true },
 ] as const;
 export type PlanFeature = (typeof PLAN_FEATURES)[number]['key'];
 
@@ -132,3 +141,16 @@ export function monthlyTotal(price: number | null, memberPrice: number | null, c
 
 /** The trial warning shows in its last week. */
 export const TRIAL_WARN_DAYS = 7;
+
+/**
+ * The first public plan, in the comparison's order, that includes a feature — the name the "Disponibil
+ * în …" tag shows. Null when no plan sold today includes it.
+ */
+export function requiredPlan<P extends Pick<FleetPlanRow, 'key' | 'features'>>(feature: PlanFeature, plans: readonly P[]): P | null {
+  return plans.find((p) => p.features.includes(feature)) ?? null;
+}
+
+/** What the next plan adds to this one (the comparison's "La upgrade primești"). */
+export function upgradeGains(current: readonly string[], next: readonly string[]): PlanFeature[] {
+  return offeredFeatures(next).filter((f) => !current.includes(f));
+}

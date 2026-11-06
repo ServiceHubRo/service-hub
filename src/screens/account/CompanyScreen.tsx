@@ -2,7 +2,7 @@ import { useRef, useState } from 'react';
 import { useSession } from '../../app/sessionContext';
 import { BackLink } from '../../components/BackLink';
 import { Card } from '../../components/Card';
-import { Chip, ChipRow } from '../../components/Chip';
+import { SelectField } from '../../components/SelectField';
 import { Field } from '../../components/Field';
 import { updateDocParty, type DocParty } from '../../data/profile';
 import { useI18n } from '../../i18n/context';
@@ -85,15 +85,15 @@ export function CompanyScreen() {
       <BackLink to="/c/cont" label={t('nav.account')} />
       <h1>{t('co.title')}</h1>
       <Card className={styles.stack}>
-        <span className={styles.label}>{t('co.kind')}</span>
-        <ChipRow label={t('co.kind')}>
-          <Chip selected={kind === 'person'} onClick={() => setKind('person')}>
-            {t('co.kind.person')}
-          </Chip>
-          <Chip selected={kind === 'company'} onClick={() => setKind('company')}>
-            {t('co.kind.company')}
-          </Chip>
-        </ChipRow>
+        <SelectField
+          label={t('co.kind')}
+          value={kind}
+          onChange={(e) => setKind(e.target.value as typeof kind)}
+          options={[
+            { value: 'person', label: t('co.kind.person') },
+            { value: 'company', label: t('co.kind.company') },
+          ]}
+        />
         {kind === 'person' ? (
           <>
             <p className={styles.intro}>{t('co.person.body', { name: profile?.name ?? '' })}</p>

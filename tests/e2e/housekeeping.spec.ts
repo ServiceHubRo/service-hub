@@ -10,6 +10,7 @@ import {
   shot,
   signIn,
   userIdOf,
+  switchLanguage,
 } from './support';
 
 // Bookings that look after themselves (Eduard, 3 oct): a request the shop never answers closes at
@@ -130,11 +131,11 @@ test.describe('Bookings that look after themselves', () => {
     await expectNoHorizontalScroll(page);
     await shot(page, 'request-unanswered', name());
     // In English too.
-    await page.getByRole('button', { name: 'English' }).filter({ visible: true }).first().click();
+    await switchLanguage(page, 'en');
     await expect(card.getByText("The shop didn't answer in time.", { exact: false })).toBeVisible();
     await expectNoHorizontalScroll(page);
     await shot(page, 'request-unanswered-en', name());
-    await page.getByRole('button', { name: 'Română' }).filter({ visible: true }).first().click();
+    await switchLanguage(page, 'ro');
     await card.getByRole('link', { name: 'Caută alt service' }).click();
     await expect(page).toHaveURL(/\/c\/cauta\?cat=cat_rev&oras=Bra%C8%99ov$/);
   });

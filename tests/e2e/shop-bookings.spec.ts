@@ -114,7 +114,7 @@ test.describe('demo shop', () => {
     await expect(page).not.toHaveURL(/filtru=/);
 
     // Cereri: the request with the note, the car and the client's account id.
-    await page.getByRole('tab', { name: /Cereri/ }).click();
+    await page.getByRole('combobox', { name: 'Afișează' }).selectOption('cereri');
     await openAllBookings(page);
     const request = card(page, 'Aș vrea și verificarea lichidelor.');
     await expect(request).toContainText('Andrei Marin');
@@ -136,7 +136,7 @@ test.describe('demo shop', () => {
     await expect(request.getByRole('button', { name: 'Confirmă' })).toBeVisible();
 
     // Programate: every state; the no-show mark; "Neprezentat" only after the booking's time.
-    await page.getByRole('tab', { name: /Programate/ }).click();
+    await page.getByRole('combobox', { name: 'Afișează' }).selectOption('programate');
     await openAllBookings(page);
     const george = card(page, 'George Toma');
     await expect(george).toContainText('Client cu 3 neprezentări');
@@ -175,7 +175,7 @@ test.describe('shop flow', () => {
 
     await signIn(page, shopEmail, PASSWORD);
     await expect(page).toHaveURL(/\/s\/panou$/);
-    await expect(page.getByText('Nicio programare azi.')).toBeVisible();
+    await expect(page.getByText('Nu există programări azi.')).toBeVisible();
     // A counter at zero is not a link.
     await expect(page.getByRole('link', { name: /^\d+ Cereri noi$/ })).toHaveCount(0);
     await expect(page.getByText('Cereri noi', { exact: true })).toBeVisible();
@@ -314,7 +314,7 @@ test.describe('shop flow', () => {
     // Meanwhile another client takes the last place of that day.
     await book(clients[2]!, shopId, dayC!, await slotOf(dayC!), 'BV 03 ZZZ');
     await cx.getByRole('button', { name: 'Move and confirm' }).click();
-    await expect(cx.getByText('That day just filled up. Pick another day.')).toBeVisible();
+    await expect(cx.getByText('That day is now full. Choose another day.')).toBeVisible();
     const [unchanged] = await serviceRest<{ date: string; status: string }[]>(`bookings?id=eq.${x.id}&select=date,status`, 'GET');
     expect(unchanged).toEqual({ date: dayA, status: 'pending' });
     await expectNoHorizontalScroll(page);
@@ -329,7 +329,7 @@ test.describe('shop flow', () => {
     await expect(card(page, 'BV 01 XXX')).toHaveCount(0);
 
     // Cancel needs a reason, which the client gets.
-    await page.getByRole('tab', { name: /Scheduled/ }).click();
+    await page.getByRole('combobox', { name: 'Show' }).selectOption('programate');
     await openAllBookings(page);
     const cy = card(page, 'BV 02 YYY');
     await (await cardAction(cy, 'Cancel')).click();
@@ -345,7 +345,7 @@ test.describe('shop flow', () => {
     // Decline: the reason is optional.
     const freeNow = await freeDays(clients[3]!, shopId);
     const z = await book(clients[3]!, shopId, freeNow[0]!, await slotOf(freeNow[0]!), 'BV 04 WWW', 'Booking Z');
-    await page.getByRole('tab', { name: /Requests/ }).click();
+    await page.getByRole('combobox', { name: 'Show' }).selectOption('cereri');
     await openAllBookings(page);
     const cz = card(page, 'BV 04 WWW');
     await (await cardAction(cz, 'Decline')).click();

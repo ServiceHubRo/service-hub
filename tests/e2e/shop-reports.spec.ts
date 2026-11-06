@@ -38,7 +38,7 @@ const navLink = (page: Page, label: string) =>
 const stat = (page: Page, label: string) =>
   page.locator('main li').filter({ has: page.getByText(label, { exact: true }) }).locator('span').first();
 const scrollMain = (page: Page, to: 'top' | 'bottom') =>
-  page.locator('main').evaluate((el, where) => el.scrollTo(0, where === 'top' ? 0 : el.scrollHeight), to);
+  page.evaluate((where) => window.scrollTo(0, where === 'top' ? 0 : document.scrollingElement!.scrollHeight), to);
 
 test.describe('demo shop', () => {
   test.skip(!BACKEND, 'needs the local Supabase stack');
@@ -128,7 +128,8 @@ async function freeSlot(client: string, shopId: string, count: number): Promise<
 /** A booking taken all the way to "done" (or to a refused quote), through the real functions. */
 async function job(shop: string, client: string, shopId: string, at: { date: string; slot: string }, accept: boolean, km: number) {
   // A plate of its own per shop: the odometer is checked against every earlier job on a plate.
-  const plate = `BV ${shopId.slice(0, 2).toUpperCase()} ${shopId.slice(2, 5).toUpperCase().replace(/[^A-Z]/g, 'X')}`;
+  // Digits from the shop's id (a plate needs one, M7) and letters from it: one plate per shop.
+  const plate = `BV ${10 + (parseInt(shopId.slice(0, 2), 16) % 90)} ${shopId.slice(2, 5).toUpperCase().replace(/[^A-Z]/g, 'X')}`;
   const b = await rpcAs<{ id: string }>(client, 'create_booking', {
     p_shop_id: shopId,
     p_service_id: 'frane',

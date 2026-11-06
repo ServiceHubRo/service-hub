@@ -2,13 +2,14 @@ import { Check, Lock, Minus, UserPlus } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { buttonClass } from '../../components/buttonClass';
-import { Chip, ChipRow } from '../../components/Chip';
 import { Button } from '../../components/Button';
 import { Card } from '../../components/Card';
+import { Disclosure, DisclosureGroup } from '../../components/Disclosure';
 import { EmptyState } from '../../components/EmptyState';
+import { SelectField } from '../../components/SelectField';
 import { useI18n } from '../../i18n/context';
 import { formatMoney } from '../../i18n/format';
-import { can, FLEET_CAPABILITIES, FLEET_ROLES, type FleetCapability, type FleetRole } from '../../lib/fleet';
+import { can, FLEET_CAPABILITY_GROUPS, FLEET_ROLES, hasFeature, type FleetCapability, type FleetRole } from '../../lib/fleet';
 import { rightsSummary } from '../client/companies/rights';
 import { useFleet } from './fleetContext';
 import pill from '../../components/StatusBadge.module.css';
@@ -22,8 +23,11 @@ const ROLE_TONE = { admin: 'amber', manager: 'blue', driver: 'muted', accountant
  */
 export function FleetMembers() {
   const { t, lang } = useI18n();
-  const { data, allowed, companyPage } = useFleet();
-  const [phoneRole, setPhoneRole] = useState<FleetRole>('manager');
+  const { data, allowed, companyPage, plan } = useFleet();
+  // The rights given show only while the plan applies them (T65).
+  const rightsOn = hasFeature(plan, 'member_rights');
+  const ownLimit = hasFeature(plan, 'approval_custom');
+  const [role, setRole] = useState<FleetRole>('manager');
 
   if (!allowed('members.manage')) {
     return <EmptyState icon={Lock} title={t('fleet.members.locked')} body={t('fleet.members.lockedBody')} />;
@@ -51,8 +55,8 @@ export function FleetMembers() {
               <span className={styles.lineText}>
                 <span>{m.name || m.email}</span>
                 <span className={styles.muted}>{m.accepted_at ? m.email : t('fleet.members.pending', { email: m.email })}</span>
-                {m.role !== 'admin' && rightsSummary(lang, m.role, m.extra_caps, m.approval_limit) && (
-                  <span className={styles.rightsLine}>{rightsSummary(lang, m.role, m.extra_caps, m.approval_limit)}</span>
+                {m.role !== 'admin' && rightsOn && rightsSummary(lang, m.role, m.extra_caps, ownLimit ? m.approval_limit : null) && (
+                  <span className={styles.rightsLine}>{rightsSummary(lang, m.role, m.extra_caps, ownLimit ? m.approval_limit : null)}</span>
                 )}
               </span>
               <span className={`${pill.pill} ${pill[ROLE_TONE[m.role]]}`}>{t(`fleet.role.${m.role}`)}</span>
@@ -64,63 +68,45 @@ export function FleetMembers() {
 
       <Card className={styles.card}>
         <h2 className={styles.cardTitle}>{t('fleet.members.rights')}</h2>
-        <div className={styles.rightsPhone}>
-          <ChipRow label={t('fleet.members.rights')}>
-            {FLEET_ROLES.map((r) => (
-              <Chip key={r} selected={phoneRole === r} onClick={() => setPhoneRole(r)}>
-                {t(`fleet.role.${r}`)}
-              </Chip>
-            ))}
-          </ChipRow>
-          <ul className={styles.plainList}>
-            {FLEET_CAPABILITIES.map((c) => {
-              const yes = can(phoneRole, c);
-              const note = limitNote(phoneRole, c);
-              return (
-                <li key={c} className={styles.lineRow}>
-                  <span className={styles.lineText}>
-                    <span className={yes ? undefined : styles.muted}>{t(`fleet.cap.${c}`)}</span>
-                    {note && <span className={styles.muted}>{t(note)}</span>}
-                  </span>
-                  {yes ? <Check size={18} className={styles.green} aria-label={t('fleet.members.yes')} /> : <Minus size={18} className={styles.muted} aria-label={t('fleet.members.no')} />}
-                </li>
-              );
-            })}
-          </ul>
-        </div>
-        <div className={styles.tableWrap}>
-          <table className={styles.matrix}>
-            <caption className="visually-hidden">{t('fleet.members.rights')}</caption>
-            <thead>
-              <tr>
-                <th scope="col">{t('fleet.members.right')}</th>
-                {FLEET_ROLES.map((r) => (
-                  <th key={r} scope="col">
-                    {t(`fleet.role.${r}`)}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {FLEET_CAPABILITIES.map((c) => (
-                <tr key={c}>
-                  <th scope="row">{t(`fleet.cap.${c}`)}</th>
-                  {FLEET_ROLES.map((r) => {
-                    const yes = can(r, c);
-                    const note = limitNote(r, c);
+        {/* One role at a time (Eduard, 6 Nov): a dropdown, then its rights grouped in sections. */}
+        <SelectField
+          className={styles.roleSelect}
+          label={t('fleet.members.selectRole')}
+          value={role}
+          onChange={(e) => setRole(e.target.value as FleetRole)}
+          options={FLEET_ROLES.map((r) => ({ value: r, label: t(`fleet.role.${r}`) }))}
+        />
+        <DisclosureGroup label={t('fleet.members.rightsOf', { role: t(`fleet.role.${role}`) })}>
+          {FLEET_CAPABILITY_GROUPS.map((g) => {
+            const allowedHere = g.caps.filter((c) => can(role, c)).length;
+            return (
+              <Disclosure
+                key={g.key}
+                title={t(`fleet.capGroup.${g.key}` as 'fleet.capGroup.company')}
+                summary={t('fleet.members.allowedOf', { n: allowedHere, total: g.caps.length })}
+              >
+                <ul className={styles.rightsList}>
+                  {g.caps.map((c) => {
+                    const yes = can(role, c);
+                    const note = limitNote(role, c);
                     return (
-                      <td key={r}>
-                        {yes ? <Check size={16} className={styles.green} aria-hidden="true" /> : <Minus size={16} className={styles.muted} aria-hidden="true" />}
-                        <span className="visually-hidden">{yes ? t('fleet.members.yes') : t('fleet.members.no')}</span>
-                        {note && <span className={styles.limited}>{t(note)}</span>}
-                      </td>
+                      <li key={c} className={styles.rightRow}>
+                        <span className={styles.lineText}>
+                          <span className={yes ? undefined : styles.muted}>{t(`fleet.cap.${c}`)}</span>
+                          {note && <span className={styles.muted}>{t(note)}</span>}
+                        </span>
+                        <span className={`${styles.rightState} ${yes ? styles.rightYes : styles.rightNo}`}>
+                          {yes ? <Check size={14} aria-hidden="true" /> : <Minus size={14} aria-hidden="true" />}
+                          {yes ? t('fleet.members.allowed') : t('fleet.members.denied')}
+                        </span>
+                      </li>
                     );
                   })}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                </ul>
+              </Disclosure>
+            );
+          })}
+        </DisclosureGroup>
       </Card>
     </div>
   );

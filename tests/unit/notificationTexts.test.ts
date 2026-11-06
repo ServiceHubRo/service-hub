@@ -362,7 +362,7 @@ describe('notification texts', () => {
   it('tells both sides how a reported review was decided (T16a)', () => {
     expect(render('review_report_decided', 'shop', 'ro')).toMatchObject({
       title: 'Recenzia raportată a fost ștearsă',
-      body: 'Am șters recenzia pentru P-000123 (1 din 5 stele). Nu mai apare și nu mai contează la medie.',
+      body: 'Recenzia pentru P-000123 (1 din 5 stele) a fost ștearsă. Nu mai apare și nu mai contează la medie.',
       url: '/s/cont/recenzii',
       tag: 'review-r-1',
     });
@@ -372,7 +372,7 @@ describe('notification texts', () => {
       url: '/c/programari?p=b-1',
     });
     expect(render('shop_inactive', 'shop', 'ro', { reason: 'admin' })!.body).toBe(
-      'Echipa Service-Hub a oprit abonamentul. Scrie-ne dacă ai întrebări. Datele tale rămân.',
+      'Echipa Service-Hub a oprit abonamentul. Pentru întrebări, contactează suportul. Datele tale rămân.',
     );
   });
 

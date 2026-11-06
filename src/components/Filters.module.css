@@ -13,7 +13,7 @@
   gap: 8px;
   min-height: var(--tap);
   padding: 0 16px;
-  border-radius: var(--radius-pill);
+  border-radius: var(--radius-input);
   border: 1px solid var(--border-lit);
   color: var(--text);
   font-size: 14px;

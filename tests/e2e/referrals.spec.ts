@@ -37,7 +37,7 @@ test.describe('shop referrals', () => {
     await page.goto('/s/cont/abonament');
     await expect(page.getByRole('heading', { name: 'Recomandă Service-Hub' })).toBeVisible();
     const code = (await page.locator('span.mono').filter({ hasText: /^S-\d{5,}$/ }).textContent())!.trim();
-    await expect(page.getByText('Niciun service recomandat încă.')).toBeVisible();
+    await expect(page.getByText('Nu există service-uri recomandate.')).toBeVisible();
     await expect(page.getByText('Luni gratuite primite: 0 din 12')).toBeVisible();
     const whatsapp = page.getByRole('link', { name: 'Trimite pe WhatsApp' });
     await expect(whatsapp).toHaveAttribute('href', new RegExp(`^https://wa\\.me/\\?text=.*${code}`));
@@ -52,7 +52,7 @@ test.describe('shop referrals', () => {
     await other.addInitScript(() => localStorage.setItem('sh_lang', 'ro'));
     const newcomer = await other.newPage();
     await newcomer.goto(new URL(link).pathname + new URL(link).search);
-    await expect(newcomer.getByRole('button', { name: 'Sunt service' })).toHaveAttribute('aria-pressed', 'true');
+    await expect(newcomer.getByRole('combobox', { name: 'Tip cont' })).toHaveValue('shop');
     const codeField = newcomer.getByLabel('Cod de recomandare (opțional)');
     await expect(codeField).toHaveValue(code);
     const newEmail = uniqueEmail('shop-referred');
@@ -67,7 +67,7 @@ test.describe('shop referrals', () => {
     await newcomer.getByRole('checkbox').check();
     await codeField.fill('S-99999');
     await newcomer.getByRole('button', { name: 'Creează cont' }).click();
-    await expect(newcomer.getByText('Nu am găsit acest cod. Verifică-l sau lasă câmpul gol.')).toBeVisible();
+    await expect(newcomer.getByText('Codul nu a fost găsit. Verifică-l sau lasă câmpul gol.')).toBeVisible();
     await expect(codeField).toBeFocused();
     await expectNoHorizontalScroll(newcomer);
     await shot(newcomer, 'referral-signup-wrong-code', name());

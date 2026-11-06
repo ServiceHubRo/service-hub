@@ -1,6 +1,6 @@
-import { LogOut, User } from 'lucide-react';
-import { useCallback, useEffect, useRef, useState, type MouseEvent } from 'react';
-import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { CalendarDays, CarFront, LayoutDashboard, LogOut, ReceiptText, User, UserRound } from 'lucide-react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, type MouseEvent } from 'react';
+import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { LogoTile } from '../components/LogoTile';
 import { Wordmark } from '../components/Wordmark';
 import { useI18n } from '../i18n/context';
@@ -23,14 +23,17 @@ import { unreadThreads, useOptionalThreads } from '../screens/messages/threadsCo
 import { useOptionalNotices } from '../screens/notices/noticesContext';
 import { PermissionsIntro } from '../screens/onboarding/PermissionsIntro';
 import { EmailVerifyBanner } from './EmailVerifyBanner';
-import { LangSwitch } from './LangSwitch';
 import { LogoutConfirm } from './LogoutConfirm';
 import { PushBridge } from './PushBridge';
 import { ScreenErrorBoundary } from './ScreenErrorBoundary';
 import { NAV, type NavItem, type Role } from './roles';
+import type { MessageKey } from '../i18n/ro';
 import { useSession } from './sessionContext';
 import { TourHost } from './tour/TourHost';
 import { useDocumentTitle } from './useDocumentTitle';
+import { useOptionalWorkspace } from './workspace/workspaceContext';
+import { WorkspaceSwitcher } from './workspace/WorkspaceSwitcher';
+import { fleetSpacePath } from '../screens/client/companies/paths';
 import styles from './AppShell.module.css';
 
 /**
@@ -113,6 +116,67 @@ function useNavBadges(): Record<string, Badge> {
   return badges;
 }
 
+/** A company space's five pages (T65): the rarer ones are tiles in its Cont. */
+const COMPANY_NAV: { section: string; icon: NavItem['icon'] }[] = [
+  { section: 'panou', icon: LayoutDashboard },
+  { section: 'vehicule', icon: CarFront },
+  { section: 'programari', icon: CalendarDays },
+  { section: 'costuri', icon: ReceiptText },
+  { section: 'cont', icon: UserRound },
+];
+
+/** The nav item a fleet page belongs to: a vehicle to Vehicule, the Cont tiles to Cont. */
+function companyNavOf(section: string | null): string {
+  if (section === 'vehicul') return 'vehicule';
+  if (section === 'rapoarte' || section === 'membri' || section === 'abonament') return 'cont';
+  return section ?? 'panou';
+}
+
+interface CompanyLink {
+  key: string;
+  to: string;
+  label: MessageKey;
+  short: MessageKey;
+  icon: NavItem['icon'];
+  active: boolean;
+}
+
+function useCompanyNav(): CompanyLink[] | null {
+  const ws = useOptionalWorkspace();
+  const { search } = useLocation();
+  if (ws?.active.kind !== 'company') return null;
+  const base = fleetSpacePath(ws.active.id);
+  const current = companyNavOf(new URLSearchParams(search).get('sectiune'));
+  return COMPANY_NAV.map(({ section, icon }) => ({
+    key: section,
+    to: `${base}?sectiune=${section}`,
+    label: `fleet.nav.${section}` as MessageKey,
+    short: `fleet.nav.${section}Short` as MessageKey,
+    icon,
+    active: current === section,
+  }));
+}
+
+/** A company page in the sidebar or the bottom bar (the section is in the address, not the path). */
+function CompanyNavLink({ item, variant }: { item: CompanyLink; variant: 'side' | 'tab' }) {
+  const { t } = useI18n();
+  const Icon = item.icon;
+  if (variant === 'side') {
+    return (
+      <Link to={item.to} className={`${styles.sideLink} ${item.active ? styles.sideActive : ''}`} aria-current={item.active ? 'page' : undefined}>
+        <Icon size={20} aria-hidden="true" />
+        <span>{t(item.label)}</span>
+      </Link>
+    );
+  }
+  return (
+    <Link to={item.to} className={`${styles.tab} ${item.active ? styles.tabActive : ''}`} aria-current={item.active ? 'page' : undefined}>
+      <Icon size={21} aria-hidden="true" />
+      <span className={styles.tabLabel}>{t(item.short)}</span>
+    </Link>
+  );
+}
+
 /**
  * Role shell (ARCHITECTURE §17): header + scrolling content + 5-item bottom bar below 1024 px;
  * fixed 240 px sidebar with Cont and Deconectare pinned at the bottom from 1024 px.
@@ -127,12 +191,36 @@ export function AppShell({ role }: { role: Role }) {
   const contentRef = useRef<HTMLDivElement>(null);
   useScreenSlide(contentRef);
   const badges = useNavBadges();
+  // In a company's space the navigation is the company's (T65); everything else stays the role's.
+  const companyNav = useCompanyNav();
   // The tab title follows the navigation item the screen belongs to (Cont for its tiles).
   const current = [...nav.main, nav.account].find((item) => pathname === item.path || pathname.startsWith(`${item.path}/`));
   useDocumentTitle(current ? t(current.labelKey) : null);
 
-  // Only the content area scrolls: a new screen starts at the top, going back finds it where it was.
-  useScrollMemory(mainRef);
+  // The page scrolls: a new screen starts at the top, going back finds it where it was.
+  useScrollMemory();
+
+  // The header (top) and the tab bar (bottom) stay over the scrolling page: their heights, for what
+  // sticks under them and for what is scrolled into view (0 where they are hidden, e.g. a laptop).
+  const headerRef = useRef<HTMLElement>(null);
+  const tabBarRef = useRef<HTMLElement>(null);
+  useLayoutEffect(() => {
+    const root = document.documentElement;
+    const measure = () => {
+      root.style.setProperty('--nav-top', `${headerRef.current?.offsetHeight ?? 0}px`);
+      root.style.setProperty('--nav-bottom', `${tabBarRef.current?.offsetHeight ?? 0}px`);
+    };
+    measure();
+    const observer = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(measure);
+    for (const el of [headerRef.current, tabBarRef.current]) if (el && observer) observer.observe(el);
+    window.addEventListener('resize', measure);
+    return () => {
+      observer?.disconnect();
+      window.removeEventListener('resize', measure);
+      root.style.removeProperty('--nav-top');
+      root.style.removeProperty('--nav-bottom');
+    };
+  }, []);
 
   // In the Android app the bottom bar steps aside while the keyboard is open (more room to type).
   useEffect(() => (IN_ANDROID_APP ? watchKeyboard() : undefined), []);
@@ -166,20 +254,24 @@ export function AppShell({ role }: { role: Role }) {
       <a href="#continut" className={styles.skipLink} onClick={skipToContent}>
         {t('nav.skipToContent')}
       </a>
-      <header className={styles.header} data-fixed-top>
-        <LogoTile />
-        <Wordmark />
-        <div className={styles.headerEnd}>
-          <LangSwitch />
-          {role === 'admin' && (
-            <NavLink
-              to={nav.account.path}
-              className={({ isActive }) => `${styles.iconLink} ${isActive ? styles.iconActive : ''}`}
-              aria-label={t('nav.account')}
-            >
-              <User size={20} aria-hidden="true" />
-            </NavLink>
-          )}
+      <header ref={headerRef} className={styles.header} data-fixed-top>
+        {/* One row (Eduard, 6 Nov 2026): the logo left; right, a client's workspace switch (the admin's
+            Cont). The language is a preference in Cont now, not in the header. */}
+        <div className={styles.headerRow}>
+          <LogoTile />
+          <Wordmark />
+          <div className={styles.headerEnd}>
+            {role === 'client' && <WorkspaceSwitcher placement="header" />}
+            {role === 'admin' && (
+              <NavLink
+                to={nav.account.path}
+                className={({ isActive }) => `${styles.iconLink} ${isActive ? styles.iconActive : ''}`}
+                aria-label={t('nav.account')}
+              >
+                <User size={20} aria-hidden="true" />
+              </NavLink>
+            )}
+          </div>
         </div>
       </header>
 
@@ -189,16 +281,14 @@ export function AppShell({ role }: { role: Role }) {
             <LogoTile size={32} />
             <Wordmark size={19} />
           </div>
+          {role === 'client' && <WorkspaceSwitcher placement="sidebar" />}
           <nav className={styles.sideNav} aria-label={t('nav.main')}>
-            {nav.main.map((item) => (
-              <SidebarLink key={item.path} item={item} badge={badges[item.path]} />
-            ))}
+            {companyNav
+              ? companyNav.slice(0, 4).map((item) => <CompanyNavLink key={item.key} item={item} variant="side" />)
+              : nav.main.map((item) => <SidebarLink key={item.path} item={item} badge={badges[item.path]} />)}
           </nav>
           <div className={styles.sideBottom}>
-            <div className={styles.sideLang}>
-              <LangSwitch />
-            </div>
-            <SidebarLink item={nav.account} />
+            {companyNav ? <CompanyNavLink item={companyNav[4]!} variant="side" /> : <SidebarLink item={nav.account} />}
             {askLogout ? (
               <div className={styles.sideConfirm}>
                 <LogoutConfirm onConfirm={() => void logOut()} onCancel={cancelLogout} />
@@ -228,8 +318,9 @@ export function AppShell({ role }: { role: Role }) {
         </main>
       </div>
 
-      <nav className={`${styles.bottomBar} ${motionOn('tabBounce') ? styles.bounce : ''}`} aria-label={t('nav.main')} data-fixed-bottom>
-        {nav.bottomBar.map((item) => {
+      <nav ref={tabBarRef} className={`${styles.bottomBar} ${motionOn('tabBounce') ? styles.bounce : ''}`} aria-label={t('nav.main')} data-fixed-bottom>
+        {companyNav?.map((item) => <CompanyNavLink key={item.key} item={item} variant="tab" />)}
+        {!companyNav && nav.bottomBar.map((item) => {
           return (
             <NavLink
               key={item.path}

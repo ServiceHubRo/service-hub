@@ -66,12 +66,12 @@ test.describe('zones', () => {
 
     const card = page.getByRole('region', { name: `În curând și în ${zone.ro}` });
     await expect(card).toBeVisible();
-    await expect(card).toContainText('Te anunțăm pe email când devin disponibile');
+    await expect(card).toContainText('Primești un email când devin disponibile');
     await expectNoHorizontalScroll(page);
     await shot(page, 'zones-offer', name());
     await card.getByRole('button', { name: 'Anunță-mă' }).click();
 
-    const waiting = page.getByRole('region', { name: `Te anunțăm când ajungem în ${zone.ro}` });
+    const waiting = page.getByRole('region', { name: `Primești o notificare când Service-Hub ajunge în ${zone.ro}` });
     await expect(waiting).toBeVisible();
     await expect(waiting.getByRole('link', { name: 'Adaugă mașina' })).toBeVisible();
     await shot(page, 'zones-waiting', name());
@@ -95,7 +95,7 @@ test.describe('zones', () => {
 
     // In English.
     await setLang(page, clientId, 'en');
-    await expect(page.getByRole('region', { name: `We'll let you know when we reach ${zone.en}` })).toBeVisible();
+    await expect(page.getByRole('region', { name: `You will be notified when Service-Hub reaches ${zone.en}` })).toBeVisible();
     await shot(page, 'zones-waiting-en', name());
     await setLang(page, clientId, 'ro');
 

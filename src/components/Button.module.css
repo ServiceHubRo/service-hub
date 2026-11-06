@@ -1,5 +1,6 @@
-/* One button shape everywhere (T51): 44 px high, the same radius, semibold label. The primary is
-   the one amber action of a screen; secondary is quiet; ghost is text only. */
+/* One button shape everywhere (T51): 44 px high, the same radius. Quieter since 6 Nov 2026 (Eduard,
+   premium UI): a lighter label, the primary amber without a raised look, the secondary only a fine
+   outline over the card. Ghost is text only. */
 .button {
   position: relative;
   display: inline-flex;
@@ -10,8 +11,8 @@
   padding: 10px 18px;
   border: 1px solid transparent;
   border-radius: var(--radius-button);
-  font-size: 14.5px;
-  font-weight: 650;
+  font-size: 14px;
+  font-weight: 600;
   letter-spacing: -0.005em;
   text-align: center;
   text-decoration: none;
@@ -38,7 +39,6 @@
 .primary {
   background: var(--amber);
   color: var(--ink);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22), 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 .primary:hover:not(:disabled) {
@@ -50,13 +50,14 @@
 }
 
 .secondary {
-  background: var(--surface2);
+  background: transparent;
   border-color: var(--border-lit);
   color: var(--text);
 }
 
 .secondary:hover:not(:disabled) {
-  background: var(--surface3);
+  background: var(--surface2);
+  border-color: #46505c;
 }
 
 .success {

@@ -43,7 +43,7 @@ test('a test error from the component page reaches Sentry, without tokens in the
   await page.goto(`/dev/componente?t=${marker}#access_token=eyJsecretsecret.eyJsecretsecret.sig`);
   await expect(page.getByText('Pornită: erorile ajung în Sentry.')).toBeVisible();
   await page.getByRole('button', { name: 'Trimite o eroare de test' }).click();
-  await expect(page.getByText('Am trimis eroarea de test. Apare în Sentry în câteva secunde.')).toBeVisible();
+  await expect(page.getByText('Eroarea de test a fost trimisă. Apare în Sentry în câteva secunde.')).toBeVisible();
 
   await expect.poll(async () => (await reportsFrom(marker)).length, { timeout: 10_000 }).toBe(1);
   const [event] = await reportsFrom(marker);

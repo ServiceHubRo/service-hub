@@ -7,35 +7,60 @@ import { EmptyState } from '../../components/EmptyState';
 import { LoadError } from '../../components/LoadError';
 import { PageHeader } from '../../components/PageHeader';
 import { SkeletonList } from '../../components/Skeleton';
-import { archiveVehicle, assignDriver, fetchFleetOverview, fetchPlanSummary, fetchSubscription, fleetDecideQuote, saveVehicle, setUnavailable } from '../../data/fleet';
+import {
+  archiveVehicle,
+  assignDriver,
+  deleteExpense,
+  fetchFleetOverview,
+  fetchFleetPlans,
+  fetchFleetReport,
+  fetchPlanSummary,
+  fetchSubscription,
+  fleetDecideQuote,
+  logFleetExport,
+  markExpense,
+  receiptUrl,
+  saveExpense,
+  saveVehicle,
+  setUnavailable,
+  uploadReceipt,
+} from '../../data/fleet';
 import { subscribeRows } from '../../data/realtime';
 import { toRpcError } from '../../data/rpc';
+import { useOptionalWorkspace } from '../../app/workspace/workspaceContext';
 import { useI18n } from '../../i18n/context';
 import { useLoad } from '../../lib/useLoad';
 import { clearFleetBookingHint, setFleetBookingHint } from '../client/booking/fleetBookingHint';
 import { COMPANIES_PATH, companyPath } from '../client/companies/paths';
 import { SEARCH_PATH } from '../client/paths';
-import { FleetContext, useFleetLocation, type FleetActions } from './fleetContext';
-import { FleetFrame, FleetPlanNotice, FleetSectionBody } from './FleetFrame';
+import { FleetContext, useFleetLocation, type FleetActions, type FleetContextValue } from './fleetContext';
+import { FleetPlanNotice, FleetSectionBody, PlanBadge } from './FleetSections';
 import styles from './fleet.module.css';
 
 /**
- * The company's fleet space (T63c): `/c/firme/<company>?sectiune=…`. Its own frame (top bar, sidebar,
- * the five fleet pages), the company's real data from `fleet_overview()` already narrowed to the
+ * The company's fleet space (T63c): `/c/firme/<company>?sectiune=…`, inside the client's shell since T65
+ * (the workspace switch and the company's five pages are the shell's), the company's real data from `fleet_overview()` already narrowed to the
  * member's role, and the vehicle writes. Live: a vehicle or a member changed on another device shows
  * here without a reload (Realtime on the company's rows, then a quiet re-read).
  */
 export function FleetSpaceScreen() {
-  const { t } = useI18n();
   const { companyId = '' } = useParams();
+  // A new company is a new screen (T65): nothing of the previous one is ever drawn while the new one loads.
+  return <FleetSpace key={companyId} companyId={companyId} />;
+}
+
+function FleetSpace({ companyId }: { companyId: string }) {
+  const { t } = useI18n();
   const { section, vehicleId, filter, go } = useFleetLocation();
   const navigate = useNavigate();
   const load = useCallback(async () => {
-    const [overview, plan] = await Promise.all([fetchFleetOverview(companyId), fetchPlanSummary(companyId)]);
-    return { overview, plan };
+    const [overview, plan, plans] = await Promise.all([fetchFleetOverview(companyId), fetchPlanSummary(companyId), fetchFleetPlans()]);
+    return { overview, plan, plans };
   }, [companyId]);
   const { state, reload, setData } = useLoad(load);
   const loadSubscription = useCallback(() => fetchSubscription(companyId), [companyId]);
+  const loadReport = useCallback<FleetContextValue['loadReport']>((range, previous, filters) => fetchFleetReport(companyId, range, previous, filters), [companyId]);
+  const logExport = useCallback<FleetContextValue['logExport']>((kind, rows) => logFleetExport(companyId, kind, rows), [companyId]);
 
   // Quiet re-read: several changes in a row cost one read; an older answer never replaces a newer one.
   const generation = useRef(0);
@@ -98,9 +123,29 @@ export function FleetSpaceScreen() {
         else clearFleetBookingHint();
         navigate(SEARCH_PATH);
       },
+      saveExpense: async (id, fields, requestId) => {
+        const saved = await saveExpense(companyId, id, fields, requestId);
+        await refresh();
+        return saved;
+      },
+      deleteExpense: async (id, requestId) => {
+        await deleteExpense(id, requestId);
+        await refresh();
+      },
+      markExpense: async (id, status, requestId) => {
+        await markExpense(id, status, requestId);
+        await refresh();
+      },
+      uploadReceipt: (vehicleId, file) => uploadReceipt(companyId, vehicleId, file),
+      receiptUrl: (path) => receiptUrl(path),
     }),
     [companyId, refresh, navigate],
   );
+
+  // Removed from the company while the page was open (the workspace list no longer has it): nothing
+  // of the company stays on screen; the database refuses every read and write anyway.
+  const workspace = useOptionalWorkspace();
+  const revoked = !!workspace?.ready && !workspace.companies.some((c) => c.id === companyId);
 
   const title = section === 'vehicul' ? t('fleet.nav.vehicle') : t(`fleet.nav.${section}`);
   useDocumentTitle(state.status === 'ready' ? `${title} · ${state.data.overview.company.name}` : t('fleet.space.loading'));
@@ -112,8 +157,8 @@ export function FleetSpaceScreen() {
       </div>
     );
   }
-  if (state.status === 'error') {
-    const code = toRpcError(state.error).code;
+  if (state.status === 'error' || revoked) {
+    const code = state.status === 'error' ? toRpcError(state.error).code : 'company_not_found';
     return (
       <div className={styles.spaceStatus}>
         {code === 'company_not_found' || code === 'fleet_disabled' ? (
@@ -133,12 +178,13 @@ export function FleetSpaceScreen() {
     );
   }
 
-  const { overview: data, plan } = state.data;
+  const { overview: data, plan, plans } = state.data;
   return (
-    <FleetContext.Provider value={{ data, go, mode: 'live', actions, companyPage: companyPath(companyId), addExpense: null, plan, loadSubscription }}>
-      <FleetFrame companyName={data.company.name} section={section} onNav={(s) => go({ section: s })} personalTo="/c/cauta">
-        <PageHeader
-          back={{ to: companyPath(companyId), label: t('fleet.space.companyPage') }}
+    <FleetContext.Provider value={{ data, go, mode: 'live', actions, companyPage: companyPath(companyId), addExpense: null, plan, loadSubscription, plans, loadReport, logExport }}>
+      <div className={styles.spaceTop}>
+        <PlanBadge onOpen={() => go({ section: 'abonament' })} />
+      </div>
+      <PageHeader
           title={title}
           subtitle={
             <span className={styles.spaceLine}>
@@ -148,7 +194,6 @@ export function FleetSpaceScreen() {
         />
         <FleetPlanNotice section={section} onOpen={() => go({ section: 'abonament' })} />
         <FleetSectionBody section={section} vehicleId={vehicleId} filter={filter} />
-      </FleetFrame>
     </FleetContext.Provider>
   );
 }

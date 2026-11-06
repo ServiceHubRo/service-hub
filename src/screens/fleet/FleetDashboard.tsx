@@ -20,17 +20,15 @@ import { useMemo, type ReactNode } from 'react';
 import { Button } from '../../components/Button';
 import { Card } from '../../components/Card';
 import { EmptyState } from '../../components/EmptyState';
+import { LoadError } from '../../components/LoadError';
+import { SkeletonList } from '../../components/Skeleton';
 import { useI18n } from '../../i18n/context';
-import { formatKm, formatMoney, formatPercent, formatRelativeDays, ymdInBucharest } from '../../i18n/format';
+import { formatDate, formatKm, formatMoney, formatPercent, formatRelativeDays, ymdInBucharest } from '../../i18n/format';
 import {
-  fleetCostPerKm,
+  documentStates,
   fleetKpis,
-  filterCosts,
-  lastMonths,
-  ledgerFor,
-  monthlyTotals,
+  hasFeature,
   recentActivity,
-  totalsBy,
   yearRange,
   type Activity,
   type ActivityKind,
@@ -38,6 +36,9 @@ import {
 } from '../../lib/fleet';
 import { MonthBars, ShareBars } from './FleetCharts';
 import { useFleet, vehicleLabel, type FleetLink } from './fleetContext';
+import { LockedFeature } from './PlanGate';
+import { useFleetReport } from './useFleetReport';
+import pill from '../../components/StatusBadge.module.css';
 import styles from './fleet.module.css';
 
 const ACTIVITY_ICON: Record<ActivityKind, LucideIcon> = {
@@ -58,13 +59,15 @@ const ACTIVITY_ICON: Record<ActivityKind, LucideIcon> = {
  */
 export function FleetDashboard() {
   const { t, lang } = useI18n();
-  const { data, go, allowed, vehicle } = useFleet();
+  const { data, go, allowed, vehicle, plan } = useFleet();
   const now = useMemo(() => new Date(), []);
   const today = ymdInBucharest(now);
   const k = useMemo(() => fleetKpis(data, now), [data, now]);
-  const ledger = useMemo(() => ledgerFor(data), [data]);
   const activity = useMemo(() => recentActivity(data), [data]);
   const money = allowed('costs.view');
+  // Fleet Business and up (T65): the financial part, computed by the database for the plan and role.
+  const finance = money && hasFeature(plan, 'dashboard_finance');
+  const report = useFleetReport(finance && allowed('reports.view') ? { range: yearRange(today), previous: null, filters: {} } : null);
 
   if (data.vehicles.length === 0) {
     return (
@@ -84,19 +87,10 @@ export function FleetDashboard() {
   }
 
   const money0 = (n: number | null) => (n === null ? '—' : formatMoney(lang, n));
-  const year = yearRange(today);
-  const yearEntries = ledger ? filterCosts(ledger.entries, { range: year }) : [];
-  const months = ledger ? monthlyTotals(ledger.entries, lastMonths(today, 12)) : [];
+  const r = report.state.status === 'ready' ? report.state.data : null;
+  const months = r?.monthly ?? [];
   const anyMonth = months.some((m) => m.total > 0);
-  const perKm = ledger
-    ? fleetCostPerKm(
-        data.vehicles.filter((v) => !v.archived_at).map((v) => v.id),
-        data.jobs,
-        data.expenses,
-        ledger.entries,
-        year,
-      )
-    : null;
+  const deadlines = documentStates(data.vehicles, now).filter((d) => d.urgency === 'expired' || d.urgency === 'soon').slice(0, 5);
 
   return (
     <div className={styles.stack}>
@@ -107,18 +101,45 @@ export function FleetDashboard() {
         {kpi({ icon: CalendarClock, label: t('fleet.kpi.upcoming'), value: String(k.upcoming), link: { section: 'programari', filter: 'active' } })}
         {(allowed('quotes.approve') || money) &&
           kpi({ icon: ClipboardCheck, label: t('fleet.kpi.quotes'), value: String(k.quotesWaiting), link: { section: 'programari', filter: 'approve' }, tone: k.quotesWaiting > 0 ? 'amber' : undefined })}
-        {kpi({ icon: FileWarning, label: t('fleet.kpi.docs'), value: String(k.docsExpiring), link: { section: allowed('reports.view') ? 'rapoarte' : 'vehicule', filter: 'documents' }, tone: k.docsExpiring > 0 ? 'red' : undefined })}
-        {money && (
+        {kpi({ icon: FileWarning, label: t('fleet.kpi.docs'), value: String(k.docsExpiring), link: { section: allowed('reports.view') && hasFeature(plan, 'reports') ? 'rapoarte' : 'vehicule', filter: 'documents' }, tone: k.docsExpiring > 0 ? 'red' : undefined })}
+        {money && kpi({ icon: Wallet, label: t('fleet.kpi.month'), value: money0(k.monthSpend), link: { section: 'costuri', filter: 'month' }, wide: true })}
+        {finance && (
           <>
-            {kpi({ icon: Wallet, label: t('fleet.kpi.month'), value: money0(k.monthSpend), link: { section: 'costuri', filter: 'month' }, wide: true })}
-            {kpi({ icon: BarChart3, label: t('fleet.kpi.year'), value: money0(k.yearSpend), link: { section: 'costuri', filter: 'year' }, wide: true })}
-            {kpi({ icon: Gauge, label: t('fleet.kpi.avg'), value: money0(k.avgPerVehicle), hint: t('fleet.kpi.avgHint'), link: { section: 'rapoarte', filter: 'vehicles' }, wide: true })}
+            {kpi({ icon: BarChart3, label: t('fleet.kpi.year'), value: r ? money0(r.total) : '…', link: { section: 'costuri', filter: 'year' }, wide: true })}
+            {kpi({ icon: Gauge, label: t('fleet.kpi.avg'), value: r ? money0(r.avg_per_vehicle) : '…', hint: t('fleet.kpi.avgHint'), link: { section: 'rapoarte', filter: 'vehicles' }, wide: true })}
             {budgetKpi(k.monthBudget, allowed('budget.manage'))}
           </>
         )}
       </ul>
 
-      {money && (
+      <Card className={styles.card}>
+        <h2 className={styles.cardTitle}>{t('fleet.deadlines.title')}</h2>
+        {deadlines.length === 0 ? (
+          <p className={styles.note}>{t('fleet.docs.allGood')}</p>
+        ) : (
+          <ul className={styles.plainList}>
+            {deadlines.map((d) => (
+              <li key={`${d.vehicle_id}:${d.doc}`}>
+                <button type="button" className={styles.lineButton} onClick={() => go({ section: 'vehicul', vehicle: d.vehicle_id })}>
+                  <span className={styles.lineText}>
+                    <span>
+                      {t(`doc.${d.doc}`)} · {vehicleLabel(vehicle(d.vehicle_id))}
+                    </span>
+                    <span className={styles.muted}>{d.date ? formatDate(lang, d.date) : ''}</span>
+                  </span>
+                  <span className={`${pill.pill} ${pill[d.urgency === 'expired' ? 'red' : 'amber']}`}>{t(`fleet.docs.${d.urgency}`)}</span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </Card>
+
+      {money && !finance && <LockedFeature feature="dashboard_finance" title={t('fleet.plan.lockedFinance')} body={t('fleet.plan.lockedFinanceBody')} />}
+
+      {finance && report.state.status === 'error' && <LoadError message={t('fleet.loadError')} onRetry={report.reload} />}
+      {finance && report.state.status === 'loading' && <SkeletonList cards />}
+      {finance && r && (
         <div className={styles.grid2}>
           <ChartCard title={t('fleet.chart.monthly')} hint={t('fleet.chart.monthlyHint')}>
             {anyMonth ? (
@@ -130,17 +151,17 @@ export function FleetDashboard() {
           </ChartCard>
 
           <ChartCard title={t('fleet.chart.categories')} hint={t('fleet.chart.yearHint')}>
-            {yearEntries.length > 0 ? (
-              <ShareBars rows={totalsBy(yearEntries, (e) => e.category).map((g) => ({ key: g.key, label: t(`fleet.cat.${g.key}` as 'fleet.cat.repairs'), value: g.total }))} />
+            {r.count > 0 ? (
+              <ShareBars rows={r.by_category.map((g) => ({ key: g.key, label: t(`fleet.cat.${g.key}` as 'fleet.cat.repairs'), value: g.total }))} />
             ) : (
               <NoData text={t('fleet.chart.noCosts')} />
             )}
           </ChartCard>
 
           <ChartCard title={t('fleet.chart.vehicles')} hint={t('fleet.chart.yearHint')}>
-            {yearEntries.length > 0 ? (
+            {r.count > 0 ? (
               <ShareBars
-                rows={totalsBy(yearEntries, (e) => e.vehicle_id).map((g) => ({ key: g.key, label: vehicleLabel(vehicle(g.key)), value: g.total }))}
+                rows={r.by_vehicle.map((g) => ({ key: g.key, label: vehicleLabel(vehicle(g.key)), value: g.total }))}
                 onPick={(id) => go({ section: 'vehicul', vehicle: id })}
               />
             ) : (
@@ -149,16 +170,16 @@ export function FleetDashboard() {
           </ChartCard>
 
           <ChartCard title={t('fleet.chart.perKm')} hint={t('fleet.chart.yearHint')}>
-            {perKm?.total ? (
+            {r.per_km?.total ? (
               <>
                 <p className={styles.bigFigure}>
-                  {formatMoney(lang, perKm.total.perKm)} <span className={styles.unit}>{t('fleet.perKm.unit')}</span>
+                  {formatMoney(lang, r.per_km.total.per_km)} <span className={styles.unit}>{t('fleet.perKm.unit')}</span>
                 </p>
                 <p className={styles.note}>
                   {t('fleet.perKm.basis', {
-                    cars: perKm.perVehicle.filter((p) => p.result.status === 'ok').length,
-                    total: perKm.perVehicle.length,
-                    km: formatKm(lang, perKm.total.km),
+                    cars: r.per_km.per_vehicle.filter((p) => p.status === 'ok').length,
+                    total: r.per_km.per_vehicle.length,
+                    km: formatKm(lang, r.per_km.total.km),
                   })}
                 </p>
                 <Button variant="ghost" onClick={() => go({ section: 'rapoarte', filter: 'perKm' })}>

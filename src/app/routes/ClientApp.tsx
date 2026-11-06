@@ -28,6 +28,7 @@ import { MessagesScreen } from '../../screens/messages/MessagesScreen';
 import { ThreadsProvider } from '../../screens/messages/ThreadsProvider';
 import { NoticesProvider } from '../../screens/notices/NoticesProvider';
 import { AppShell } from '../AppShell';
+import { WorkspaceProvider } from '../workspace/WorkspaceProvider';
 import { commonRoutes, messageRoutes } from './shared';
 
 /**
@@ -67,7 +68,10 @@ export default function ClientApp() {
             <ClientBookingsProvider>
               <ThreadsProvider side="client">
                 <NoticesProvider>
-                  <AppShell role="client" />
+                  {/* Personal or one of the client's companies (T65): one switch, in the shell. */}
+                  <WorkspaceProvider>
+                    <AppShell role="client" />
+                  </WorkspaceProvider>
                 </NoticesProvider>
               </ThreadsProvider>
             </ClientBookingsProvider>
@@ -99,10 +103,11 @@ export default function ClientApp() {
           <Route path="cont/firme/:companyId" element={<CompanyDetailScreen />} />
           <Route path="firme/invitatie/:token" element={<CompanyInviteScreen />} />
           <Route path="preia/:token" element={<ClaimScreen />} />
+          {/* A company's fleet space (T63c), inside the same shell since T65: the switch and the
+              company's five pages replace the personal ones. */}
+          <Route path="firme/:companyId" element={<FleetSpaceScreen />} />
           {messageRoutes('client')}
         </Route>
-        {/* T63c: a company's fleet space has its own frame (top bar, sidebar, the fleet pages). */}
-        <Route path="firme/:companyId" element={<FleetSpaceScreen />} />
       </Routes>
     </>
   );

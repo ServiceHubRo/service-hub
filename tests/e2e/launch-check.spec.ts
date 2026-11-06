@@ -150,12 +150,12 @@ test('loading shows three skeleton cards, never the empty state first', async ({
   const skeleton = page.locator('main [aria-busy="true"]');
   await expect(skeleton).toBeVisible();
   await expect(skeleton.locator(':scope > [aria-hidden="true"]')).toHaveCount(3);
-  await expect(page.getByText('Nicio programare încă.')).toHaveCount(0);
+  await expect(page.getByText('Nu există programări.')).toHaveCount(0);
   await shot(page, 't19c-loading', name());
 
   // Once the (empty) answer arrives: the empty state, and the skeletons are gone.
   release();
-  await expect(page.getByText('Nicio programare încă.')).toBeVisible();
+  await expect(page.getByText('Nu există programări.')).toBeVisible();
   await expect(skeleton).toHaveCount(0);
   await shot(page, 't19c-empty', name());
 });

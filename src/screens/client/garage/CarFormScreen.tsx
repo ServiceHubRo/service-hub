@@ -12,7 +12,7 @@ import { LoadError } from '../../../components/LoadError';
 import { SelectField } from '../../../components/SelectField';
 import { SkeletonList } from '../../../components/Skeleton';
 import { createCar, deleteCar, fetchCar, fetchOilStandard, updateCar, type Car, type CarFields } from '../../../data/garage';
-import { canRetryRpc, rpcErrorMessage } from '../../../data/rpc';
+import { canRetryRpc, rpcErrorMessage, toRpcError } from '../../../data/rpc';
 import { useI18n } from '../../../i18n/context';
 import { ymdInBucharest } from '../../../i18n/format';
 import type { MessageKey } from '../../../i18n/ro';
@@ -22,8 +22,9 @@ import { CAR_DOCS } from '../../../lib/expiry';
 import { OIL_MONTH_CHOICES } from '../../../lib/oil';
 import { newRequestId } from '../../../lib/requestId';
 import { useLoad } from '../../../lib/useLoad';
+import { canonicalPlate, isValidPlate } from '../../../lib/plate';
 import { isValidVin, normalizeCode } from '../../../lib/validators';
-import { GARAGE_PATH } from '../paths';
+import { carPath as carEditPath, GARAGE_PATH } from '../paths';
 import styles from './garage.module.css';
 
 /** Garaj → "Adaugă mașină" (`/c/garaj/nou`) or the pencil on a car (`/c/garaj/:carId`). */
@@ -62,6 +63,8 @@ function CarEditor({ car }: { car: Car | null }) {
   const navigate = useNavigate();
   // The id of a new car is made once, so "Încearcă din nou" never adds it twice (data/garage.ts).
   const [newId] = useState(newRequestId);
+  /** The car already in the garage when a save was refused as a copy (T66). */
+  const [duplicateOf, setDuplicateOf] = useState<string | null>(null);
   const [make, setMake] = useState(car?.make ?? '');
   const [model, setModel] = useState(car?.model ?? '');
   const [year, setYear] = useState(car?.year ? String(car.year) : '');
@@ -75,16 +78,19 @@ function CarEditor({ car }: { car: Car | null }) {
   const [oilMonths, setOilMonths] = useState(car?.oil_change_months ? String(car.oil_change_months) : '');
   const [oilLast, setOilLast] = useState(car?.last_oil_change ?? '');
   const { state: oilStandard } = useLoad(fetchOilStandard);
-  const [touched, setTouched] = useState({ year: false, vin: false });
+  const [touched, setTouched] = useState({ year: false, vin: false, plate: false });
   const [confirmDelete, setConfirmDelete] = useState(false);
 
   const vinNorm = normalizeCode(vin);
   const yearError = isValidCarYear(year) ? null : t('car.yearInvalid', { max: carYearMax() });
   const vinError = vinNorm && !isValidVin(vinNorm) ? t('rpcError.car_vin_invalid') : null;
+  // M7: a new or changed plate must be a plate; one already saved is left as it is.
+  const plateChanged = canonicalPlate(plate) !== canonicalPlate(car?.plate);
+  const plateError = plateChanged && plate.trim() !== '' && !isValidPlate(plate) ? t('rpcError.car_plate_invalid') : null;
   const today = ymdInBucharest(new Date());
   const oilLastError = oilLast && oilLast > today ? t('rpcError.car_oil_date_invalid') : null;
   const filled = make.trim() !== '' && model.trim() !== '';
-  const canSave = filled && !yearError && !vinError && !oilLastError;
+  const canSave = filled && !yearError && !vinError && !plateError && !oilLastError;
   const standardMonths = oilStandard.status === 'ready' ? oilStandard.data.months : null;
 
   // No request id here: an edit gives the same result however often it is sent, and a new car
@@ -102,8 +108,15 @@ function CarEditor({ car }: { car: Car | null }) {
       oil_change_months: oilMonths ? Number(oilMonths) : null,
       last_oil_change: oilLast || null,
     };
-    if (car) await updateCar(car.id, fields);
-    else await createCar(newId, fields);
+    try {
+      if (car) await updateCar(car.id, fields);
+      else await createCar(newId, fields);
+    } catch (e) {
+      // The same car is already in the garage (T66): the message says so, and a link opens it.
+      const err = toRpcError(e);
+      if (err.code === 'car_duplicate' && typeof err.params.car_id === 'string') setDuplicateOf(err.params.car_id);
+      throw e;
+    }
     navigate(GARAGE_PATH);
   }
 
@@ -144,6 +157,8 @@ function CarEditor({ car }: { car: Car | null }) {
               upper
               autoCapitalize="characters"
               autoComplete="off"
+              error={touched.plate ? plateError : null}
+              onBlur={() => setTouched((s) => ({ ...s, plate: true }))}
               onChange={(e) => setPlate(e.target.value)}
             />
           </div>
@@ -218,6 +233,11 @@ function CarEditor({ car }: { car: Car | null }) {
         <ActionButton submit onAction={save} disabled={!canSave} errorMessage={(e) => rpcErrorMessage(lang, e)} canRetry={canRetryRpc}>
           {t('common.save')}
         </ActionButton>
+        {duplicateOf && (
+          <Link to={carEditPath(duplicateOf)} className={buttonClass('secondary')} data-span="all">
+            {t('garage.openExisting')}
+          </Link>
+        )}
       </form>
 
       {car &&

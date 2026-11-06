@@ -1,5 +1,5 @@
 import type { Database } from './database.types';
-import { failure, RpcError } from './rpc';
+import { call, failure, RpcError } from './rpc';
 import { supabase } from './supabase';
 
 /**
@@ -80,4 +80,28 @@ export async function fetchOilStandard(): Promise<{ enabled: boolean; months: nu
 export async function deleteCar(id: string): Promise<void> {
   const { error } = await db().from('cars').delete().eq('id', id);
   if (error) throw failure(error);
+}
+
+/** The owner keeps one of two copies of the same car (T66): bookings and reports move to it; logged. */
+export async function mergeCars(keepId: string, dropId: string, requestId: string): Promise<void> {
+  await call('merge_cars', { p_keep: keepId, p_drop: dropId, p_request_id: requestId });
+}
+
+export interface DuplicateCar {
+  id: string;
+  make: string;
+  model: string;
+  plate: string | null;
+  vin: string | null;
+  bookings: number;
+}
+
+export interface VehicleDuplicates {
+  personal: { owner_id: string; email: string | null; key: string; cars: DuplicateCar[] }[];
+  company: { company_id: string; company: string | null; vin: string; vehicles: Omit<DuplicateCar, 'vin' | 'bookings'>[] }[];
+}
+
+/** The platform admin's list of copies (T66): read only; the owners merge their own cars. */
+export async function adminVehicleDuplicates(): Promise<VehicleDuplicates> {
+  return (await call('admin_vehicle_duplicates', {} as never)) as unknown as VehicleDuplicates;
 }

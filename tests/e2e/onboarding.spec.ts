@@ -53,6 +53,8 @@ async function expectLit(page: Page, target: Locator) {
 const navItem = (page: Page, path: string) => page.locator(`[data-tour="${path}"]`).filter({ visible: true }).first();
 
 test('a new client: welcome, the lit spots one by one, "Primii pași" ticks itself, the tour once', async ({ page }) => {
+  // A long walk with fixed pauses (the tour's glide, a slow save): about 30 s on its own.
+  test.setTimeout(60_000);
   // Headless Chromium reports notifications as blocked: here the browser has not been asked yet.
   await page.addInitScript(() => {
     Object.defineProperty(Notification, 'permission', { configurable: true, get: () => 'default' });
@@ -68,7 +70,7 @@ test('a new client: welcome, the lit spots one by one, "Primii pași" ticks itse
   await shot(page, 'tour-client-welcome', name());
 
   const stops: [string, string, Locator][] = [
-    ['Primii pași', 'Câțiva pași și ești gata pentru prima programare.', page.locator('[data-tour="guide"]')],
+    ['Primii pași', 'Câțiva pași până la prima programare.', page.locator('[data-tour="guide"]')],
     ['Caută un service', 'După reparație, nume sau oraș.', page.locator('#search-q')],
     ['Garaj', 'Mașinile tale, cu ITP, RCA și rovinieta la vedere.', navItem(page, '/c/garaj')],
     ['Programări', 'Programările tale și devizele de acceptat.', navItem(page, '/c/programari')],
@@ -103,7 +105,7 @@ test('a new client: welcome, the lit spots one by one, "Primii pași" ticks itse
     if (route.request().method() === 'PATCH') await new Promise((r) => setTimeout(r, 1500));
     await route.continue();
   });
-  await page.getByRole('button', { name: 'Gata' }).click();
+  await page.getByRole('button', { name: 'Încheie turul' }).click();
   await expect(tour(page)).toHaveCount(0);
   await page.waitForTimeout(2500);
   await expect(tour(page)).toHaveCount(0);

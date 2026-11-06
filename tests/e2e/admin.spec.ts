@@ -14,6 +14,7 @@ import {
   signIn,
   userIdOf,
   pickFilter,
+  switchLanguage,
 } from './support';
 
 // T16a — the admin: overview, shops, clients, bookings, moderation, the audit log. Every action
@@ -85,7 +86,7 @@ test.describe('admin', () => {
     await expect(page.getByRole('link', { name: new RegExp(shopName) })).toHaveCount(1);
     await expect(page).toHaveURL(/q=Atelier/);
     await pickFilter(page, 'Suspendate');
-    await expect(page.getByText('Niciun rezultat pentru filtrele alese.')).toBeVisible();
+    await expect(page.getByText('Nu există rezultate pentru filtrele selectate.')).toBeVisible();
     await page.getByRole('button', { name: 'Șterge filtrele' }).first().click();
     await expectNoHorizontalScroll(page);
     await shot(page, 't16a-shops', name());
@@ -106,7 +107,7 @@ test.describe('admin', () => {
     await expect(page.getByText('Toate recenziile')).toBeVisible();
     await shot(page, 't16a-moderation', name());
 
-    await page.getByRole('button', { name: 'English' }).filter({ visible: true }).first().click();
+    await switchLanguage(page, 'en');
     await expect(page.getByRole('heading', { level: 1, name: 'Moderation' })).toBeVisible();
     await expect(page.getByText('All reviews')).toBeVisible();
     await navLink(page, /^Dashboard/).click();

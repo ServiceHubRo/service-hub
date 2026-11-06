@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
-import { BACKEND, PASSWORD, closeFilters, createUser, expectAccessible, expectNoHorizontalScroll, openAccount, openFilters, scrollTopOf, selectInPanel, shot, signIn } from './support';
+import { BACKEND, PASSWORD, closeFilters, createUser, expectAccessible, expectNoHorizontalScroll, openAccount, openFilters, scrollTopOf, selectInPanel, shot, signIn, switchLanguage } from './support';
 
 // T06 — client search, favorites, "Aproape de tine", the shop page. Runs on the demo seed
 // (supabase/seed/dev_seed.sql): Atelier Demo, Rapid Service, Vulcanizare Roți Expres (Brașov) and
@@ -88,7 +88,7 @@ test.describe('client search', () => {
     await selectInPanel(page, 'Codlea');
     await expect(page.getByRole('dialog').getByRole('button', { name: 'Arată 0 service-uri' })).toBeVisible();
     await closeFilters(page);
-    await expect(page.getByText('Niciun service cu filtrele alese.')).toBeVisible();
+    await expect(page.getByText('Nu există service-uri pentru filtrele selectate.')).toBeVisible();
     // The filters on show above the list in one line.
     await expect(activeFilters(page)).toContainText('Anvelope & Jante · Codlea');
     await openFilters(page);
@@ -113,7 +113,7 @@ test.describe('client search', () => {
 
     // Nothing at all.
     await search(page).fill('zzzz');
-    await expect(page.getByText('Niciun service pentru „zzzz”.')).toBeVisible();
+    await expect(page.getByText('Nu există service-uri pentru „zzzz”.')).toBeVisible();
 
     // The order explained.
     await page.getByRole('button', { name: 'Cum este ordonată lista?' }).click();
@@ -128,11 +128,11 @@ test.describe('client search', () => {
     // As before launch: the search answers no shop at all (nothing typed, no filter).
     await page.route('**/rest/v1/rpc/search_shops', (route) => route.fulfill({ status: 200, contentType: 'application/json', body: '[]' }));
     await signInNewClient(page);
-    await expect(page.getByText('Momentan nu există service-uri disponibile pentru programare.')).toBeVisible();
-    await expect(page.getByText('Niciun service cu filtrele alese.')).toHaveCount(0);
+    await expect(page.getByText('Nu există service-uri disponibile pentru programare.')).toBeVisible();
+    await expect(page.getByText('Nu există service-uri pentru filtrele selectate.')).toHaveCount(0);
     await page.getByRole('button', { name: 'Hartă' }).click();
     await expect(page.getByRole('region', { name: 'Harta service-urilor găsite' })).toBeVisible();
-    await expect(page.getByText('Momentan nu există service-uri disponibile pentru programare.')).toBeVisible();
+    await expect(page.getByText('Nu există service-uri disponibile pentru programare.')).toBeVisible();
     await expectNoHorizontalScroll(page);
     await shot(page, 'search-none-map', name());
   });
@@ -145,7 +145,7 @@ test.describe('client search', () => {
     const before = await scrollTopOf(page);
     await heart.click();
     expect(await scrollTopOf(page)).toBe(before);
-    await expect(page.getByRole('button', { name: 'Scoate Rapid Service din favorite' })).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.getByRole('button', { name: 'Elimină Rapid Service din favorite' })).toHaveAttribute('aria-pressed', 'true');
 
     await openFilters(page);
     await page.getByRole('switch', { name: 'Favorite' }).check();
@@ -158,7 +158,7 @@ test.describe('client search', () => {
     await result(page, 'Atelier Demo').click();
     await expect(page.getByRole('heading', { level: 1, name: 'Atelier Demo' })).toBeVisible();
     await page.getByRole('button', { name: 'Salvează Atelier Demo la favorite' }).click();
-    await expect(page.getByRole('button', { name: 'Scoate Atelier Demo din favorite' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Elimină Atelier Demo din favorite' })).toBeVisible();
 
     await openAccount(page);
     await page.getByRole('link', { name: /Favorite/ }).click();
@@ -249,7 +249,7 @@ test.describe('client search', () => {
     await page.goto('/c/cauta?q=vulcanizare');
     await result(page, 'Vulcanizare Roți Expres').click();
     await expect(page.getByRole('heading', { level: 1, name: 'Vulcanizare Roți Expres' })).toBeVisible();
-    await expect(page.getByText('Fără recenzii încă')).toBeVisible();
+    await expect(page.getByText('Fără recenzii')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Recenzii' })).toHaveCount(0);
 
     // An unknown shop.
@@ -314,7 +314,7 @@ test.describe('client search', () => {
 
   test('English: search, "Offers", the shop page', async ({ page }) => {
     await signInNewClient(page);
-    await page.getByRole('button', { name: 'English' }).first().click();
+    await switchLanguage(page, 'en');
     await expect(page.getByRole('heading', { level: 1, name: 'Search' })).toBeVisible();
     await page.getByLabel('Search for a shop').fill('brakes');
     await expect(result(page, 'Atelier Demo')).toContainText('Offers: Brake pads');

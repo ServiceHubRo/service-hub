@@ -17,6 +17,7 @@ import { isValidCui, isValidRegCom, normalizeCode } from '../../../lib/validator
 import { companyPath } from './paths';
 import { RolePill } from './RolePill';
 import styles from './companies.module.css';
+import { useOptionalWorkspace } from '../../../app/workspace/workspaceContext';
 
 /**
  * Firmele mele (T63b): the companies the client belongs to, with their role, and a new company. The
@@ -84,6 +85,7 @@ export function CompaniesScreen() {
 type FieldName = 'name' | 'vat' | 'regCom';
 
 function CreateForm({ onCancel }: { onCancel: () => void }) {
+  const workspace = useOptionalWorkspace();
   const { t, lang } = useI18n();
   const navigate = useNavigate();
   const [name, setName] = useState('');
@@ -166,6 +168,8 @@ function CreateForm({ onCancel }: { onCancel: () => void }) {
                 },
                 requestId,
               );
+              // The new company shows in the workspace switch at once.
+              await workspace?.reload();
               navigate(companyPath(company.id));
             }}
           >

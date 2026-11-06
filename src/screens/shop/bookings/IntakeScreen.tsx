@@ -7,7 +7,6 @@ import { ActionButton } from '../../../components/ActionButton';
 import { PageHeader } from '../../../components/PageHeader';
 import { Button } from '../../../components/Button';
 import { Card } from '../../../components/Card';
-import { Chip, ChipRow } from '../../../components/Chip';
 import { Field } from '../../../components/Field';
 import { CarDiagram } from '../../../components/intake/CarDiagram';
 import { IntakeView } from '../../../components/intake/IntakeView';
@@ -217,18 +216,19 @@ function IntakeForm({
     }
   }
 
+  // A yes / no answer (Eduard, 6 Nov: a dropdown, not two buttons); empty until the shop answers.
   const choice = (label: string, value: Choice, set: (v: Choice) => void) => (
-    <div className={styles.choice}>
-      <span className={styles.label}>{label}</span>
-      <ChipRow label={label}>
-        <Chip selected={value === true} onClick={() => set(value === true ? null : true)}>
-          {t('common.yes')}
-        </Chip>
-        <Chip selected={value === false} onClick={() => set(value === false ? null : false)}>
-          {t('common.no')}
-        </Chip>
-      </ChipRow>
-    </div>
+    <SelectField
+      className={styles.choice}
+      label={label}
+      value={value === null ? '' : value ? 'yes' : 'no'}
+      onChange={(e) => set(e.target.value === '' ? null : e.target.value === 'yes')}
+      options={[
+        { value: '', label: t('in.unset') },
+        { value: 'yes', label: t('common.yes') },
+        { value: 'no', label: t('common.no') },
+      ]}
+    />
   );
 
   return (
@@ -251,16 +251,13 @@ function IntakeForm({
             setOdometerError(null);
           }}
         />
-        <div className={styles.choice}>
-          <span className={styles.label}>{t('in.fuel')}</span>
-          <ChipRow label={t('in.fuel')}>
-            {FUEL_LEVELS.map((f) => (
-              <Chip key={f} selected={fuel === f} onClick={() => setFuel(fuel === f ? null : f)}>
-                {fuelText(lang, f)}
-              </Chip>
-            ))}
-          </ChipRow>
-        </div>
+        <SelectField
+          className={styles.choice}
+          label={t('in.fuel')}
+          value={fuel === null ? '' : String(fuel)}
+          onChange={(e) => setFuel(e.target.value === '' ? null : Number(e.target.value))}
+          options={[{ value: '', label: t('in.unset') }, ...FUEL_LEVELS.map((f) => ({ value: String(f), label: fuelText(lang, f) }))]}
+        />
       </div>
 
       <section className={styles.damage} aria-labelledby="in-marks">

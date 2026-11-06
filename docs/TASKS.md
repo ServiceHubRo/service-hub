@@ -1503,3 +1503,76 @@ Notă (31 oct): Eduard a aprobat politica de acces (7 zile de grație, apoi doar
 - Rămas: încasarea efectivă (T64b, aprobare separată), facturile (T64c).
 
 - [x] Făcut
+
+### T65 — Selector de spațiu și trei planuri reale ✅
+- **Audit** (5 nov): spațiul firmei avea un cadru separat, cu un comutator de două butoane doar acolo; Business, Pro și Enterprise aveau aceleași funcții; rapoartele și exporturile erau oprite doar în interfață; drepturile suplimentare mergeau pe orice plan.
+- **Un singur selector** „Personal ▾ / numele firmei ▾”, în layout-ul aplicației (sus pe telefon, în capul barei laterale pe laptop), ascuns fără firmă. Spațiul firmei e acum în același layout; meniul se schimbă cu spațiul. La schimbare: aceeași pagină dacă există, altfel Panou; ecranul se golește și citește din nou (nu se vede nimic din firma anterioară); refresh-ul păstrează spațiul; altă firmă prin adresă → „nu ai acces”.
+- **Migrarea `fleet_plan_features`** (schema 97), aprobată de Eduard pe 5 nov: funcțiile fiecărui plan în `fleet_plans.features` și verificate pe server — drepturi suplimentare (Business), limita managerilor (Business), bugete (Business), limite proprii pe membru (Pro), rapoarte calculate în baza de date (`fleet_report`: Business; partea avansată, filtrele și estimarea: Pro), exporturi verificate și scrise în jurnal (`fleet_log_export`: CSV Business, Excel Pro). La downgrade nu se șterge nimic și nimic nu devine mai permisiv.
+- **Start:** panou esențial, „Termene apropiate”, vehicule, istoric, programări, aprobări, costuri Service-Hub. **Business:** + panou financiar, rapoarte, cost/km, bugete, CSV, limita managerilor, drepturi suplimentare. **Pro:** + evoluție pe vehicul și față de perioada dinainte, vehicule cu costuri ridicate, filtre și „Interval ales”, estimarea bugetului, Excel, limite proprii. Enterprise = Pro, limite configurabile.
+- Ce lipsește din plan apare cu „Disponibil în <plan>” și „Compară planurile”, discret; pe Abonament, cardurile planurilor mai mari arată cu plus portocaliu ce adaugă.
+- Teste: `tests/sql/139_fleet_plan_features.sql`, `tests/e2e/workspace.spec.ts`, `tests/e2e/fleet-plans.spec.ts`, `tests/unit/fleet.test.ts`; actualizate `136`, `138`, `fleet-space.spec.ts`, `companies.spec.ts`.
+- **Corecție (Eduard, 5 nov):** pe telefon și tabletă, primul rând are sigla (stânga) și limba (dreapta), al doilea rând doar selectorul, sub siglă; pe laptop: sigla, selectorul, meniul. Lista de spații se recitește la orice schimbare de apartenență (și când revii în tab); o firmă din care ai fost scos dispare din selector și pagina ei se golește imediat. Izolarea era deja în baza de date (`my_companies`, RLS, funcțiile); acum e dovedită de `tests/sql/140_workspace_isolation.sql` și de testele din `tests/e2e/workspace.spec.ts`. Fără migrare.
+- **Prețuri noi** (Eduard, 5 nov; migrarea `fleet_plan_prices`, schema 98): Fleet Start 49 lei · 5 vehicule · 1 coleg inclus; Fleet Business 99 lei · 10 vehicule · 3 colegi; Fleet Pro 149 lei · 15 vehicule · 5 colegi; Enterprise personalizat; 19 lei / coleg în plus. Abonamentele în test sau neîncepute au primit noile prețuri (nicio firmă n-a plătit). O firmă cu mai multe vehicule decât noua limită le păstrează pe toate; doar nu mai poate adăuga.
+- Rămas: funcțiile planurilor editabile din Admin (acum prin migrare), schimbarea planului de către firmă (după plăți, T64b), cheltuielile manuale (T63e).
+
+- [x] Făcut
+
+### T66 — O mașină, o singură înregistrare ✅
+- **Audit** (5 nov): aceeași mașină putea fi adăugată de mai multe ori în același garaj (alt fel de scris numărul, VIN cu litere mici); o programare cu mașina scrisă de mână și „salvează” crea o copie; preluarea unei programări sau un import puteau adăuga a doua oară mașina; în flotă, același VIN putea fi pe două vehicule active; istoricul se lega doar de număr, deci se rupea la schimbarea numărului.
+- **Migrarea `vehicle_identity`** (schema 99; Eduard: „Fă ce trebuie. Dar logic”): aceeași mașină = același VIN; fără VIN, același număr (oricum ar fi scris), doar dacă VIN-urile nu diferă. Refuzat pe orice cale (`car_duplicate`), cu „Deschide mașina din garaj”. Programarea, preluarea și importul folosesc mașina deja existentă. În firmă: un VIN o singură dată între vehiculele active (`vehicle_vin_exists`). Între persoane sau firme diferite nu se verifică nimic (ar dezvălui vehiculele altcuiva); același VIN în garajul tău și în firma ta e permis, cu o notă.
+- **Istoricul urmează mașina**, și după un număr nou; fiecare service își vede doar lucrările lui.
+- **Copiile existente** nu se șterg singure: Garajul arată „Aceeași mașină apare de două ori” → „Unește” (cu confirmare); programările și rapoartele trec pe mașina păstrată, totul scris în `car_merges`. Adminul are „Vehicule duplicate” în Cont (doar citire).
+- Teste: `tests/sql/141_vehicle_identity.sql`, `tests/unit/vehicleIdentity.test.ts`, `tests/unit/history.test.ts`, `tests/e2e/vehicle-identity.spec.ts`.
+
+- [x] Făcut
+
+### T66b — Meniul „Mai multe” și limbaj profesional ✅
+- **„Mai multe”** (Eduard, 6 nov): pe telefon meniul se deschidea spre stânga chiar când butonul era în stânga (Rapoarte) și ieșea din ecran. Acum își calculează poziția după spațiul real: spre stânga sub un buton din dreapta, spre dreapta sub unul din stânga, mereu întreg în ecran (16 px margine); textul unei opțiuni lungi trece pe rândul următor, nu se taie. Se închide la alegere, la atingere în afară și cu Escape (`src/lib/menuPlacement.ts`, `MenuButton`).
+- **Texte:** „Nicio … încă” → „Nu există …” în toată aplicația; „Disponibil în” → „Inclus în planul”; „perioada dinainte” → „perioada precedentă”; indicatorii: Total cheltuieli, Număr de înregistrări, Cost mediu per vehicul, Evoluție lunară, Buget utilizat, Buget disponibil; explicațiile despre sistem scoase.
+- **Comparația cu perioada precedentă:** gri, fără săgeată, când perioada precedentă nu are cheltuieli; procentul are semn (+/−); roșu doar la creștere, verde doar la o scădere reală, gri la egalitate.
+- Fără schimbări de calcule, drepturi, planuri sau bază de date. Teste: `tests/unit/menuPlacement.test.ts`, `tests/e2e/fleet-plans.spec.ts` (320 și 360 px).
+
+- [x] Făcut
+
+### T67 — Standard editorial global ✅
+- **Standardul** (Eduard, 6 nov): `docs/EDITORIAL.md` — vocea aplicației (impersonală, fără „eu/noi”, fără exclamații, emoji sau cuvinte colocviale), un verb pentru fiecare acțiune, un termen pentru fiecare concept, modele fixe pentru listă goală, eroare la încărcare, confirmare, plată reîncercată. Glosarul RO/EN în cod: `src/i18n/glossary.ts`.
+- **Inventar:** 3.852 de chei pe limbă plus textele notificărilor, e-mailurilor, SMS-urilor și PDF-urilor. Schimbate: 189 de chei din aplicație și 26 de rânduri din textele serverului (`templates.ts`, `emails.ts`, `report.ts`). Sensul fiecărui mesaj a rămas același.
+- **Verificat automat:** `tests/unit/editorial.test.ts` pică la orice text nou care încalcă standardul (aplicație, notificări, e-mailuri, SMS, PDF) și arată ce trebuie scris în loc. CLAUDE.md §10 trimite la standard.
+- Bifele din texte („✓ Salvat”, „✓ Copiat”) au devenit iconițe lângă text.
+- Neverificate automat: textele de notificare suprascrise de admin din Admin → Texte.
+
+- [x] Făcut
+
+### T68a — Interfață premium cu dropdown-uri: drepturile rolurilor
+- **„Drepturile fiecărui rol”** (Eduard, 6 nov): în locul celor patru butoane și al tabelului, „Selectează rolul” (dropdown) și drepturile rolului în 9 grupuri care se deschid pe rând (Datele firmei, Membri și roluri, Abonament, Buget, Vehicule, Programări, Devize, Cheltuieli, Rapoarte), fiecare cu „n din m permise” și „Permis” / „Nepermis” în cuvinte, cu un semn discret.
+- **Componente:** dropdown-ul unic rămâne `SelectField` (listă nativă stilizată: în stilul aplicației pe Chrome și Android, selectorul sistemului pe iPhone); nou `Disclosure` / `DisclosureGroup` (`<details>`, deschidere scurtă, fără animație cu „Reduce motion”). Grupurile drepturilor: `FLEET_CAPABILITY_GROUPS` (test: fiecare drept într-un singur grup).
+- Rămas: aplicarea în restul aplicației, după aprobarea listei din propunere.
+
+### T68b — Dropdown-uri în toată aplicația, butoane discrete ✅
+- Aprobat de Eduard pe 6 nov („lista da; butoane da”). Devin dropdown (`SelectField` / `ViewSelect`): secțiunile vehiculului (pe toate lățimile), Programări la service („Afișează: Cereri (n) / Programate (n)”), Admin → Abonamente / Plăți, Admin → Sugestii (stare), „Devizele se emit pe”, „Cu TVA / Fără TVA”, fișa de preluare (Da / Nu / Necompletat, nivelul combustibilului), limba („RO ▾”), tipul contului la înscriere („Tip cont”).
+- Logarea: fără taburi; titlul paginii și „Nu ai cont? Creează cont” / „Ai deja cont? Intră în cont”. Componenta `Tabs` a fost scoasă.
+- Butonul „Filtre” cu colțuri ca dropdown-urile; filtrele active erau deja un rând de text.
+- Butoanele: text mai subțire, cel principal fără relief, cel secundar doar un contur fin.
+- Teste de browser actualizate (limba, taburi, tipul contului, fișa de preluare).
+
+### T69 — O singură regulă pentru numerele de înmatriculare (M7) ✅
+- Migrarea `plate_rule` (schema 100), aprobată de Eduard pe 6 nov. `plate_norm()` în baza de date și `src/lib/plate.ts` în aplicație: majuscule, fără spații, cratime, puncte, „/”, „_” și „·”; literele cu diacritice rămân. `BV98LGY`, `BV-98-LGY`, `bv 98 lgy`, `B V 98 L G Y`, `BV.98.LGY` sunt același număr în garaj, flotă, programări, istoric și verificarea duplicatelor.
+- Validare doar pentru numere noi sau schimbate (2–10 litere sau cifre, cel puțin o cifră; numerele străine trec): garaj, pasul „Mașina”, vehiculul firmei, „Adaugă programare”, și în baza de date (triggere). Numerele salvate înainte nu sunt refuzate; importurile se normalizează, nu se refuză.
+- Nicio valoare scrisă nu se schimbă. Rollback pregătit: `docs/sql/rollback_plate_rule.sql`; verificare dinainte, doar citire: `docs/sql/precheck_plate_rule.sql`.
+- Teste: `tests/sql/142_plate_rule.sql`, `tests/unit/plate.test.ts`.
+
+### T70 — Cheltuielile firmei, cu bon (M1, T63e) ✅
+- Migrarea `fleet_expenses` (schema 101), aprobată de Eduard pe 6 nov: categorii (combustibil, piese, reparații externe, manoperă, taxe și parcări, consumabile, asigurări, altele), furnizor, descriere, kilometraj, pentru combustibil litri / tip / rezervor plin, bonul (fotografie sau PDF, 5 MB) în spațiul privat `fleet-files`.
+- Drepturi: administratorul, managerul și contabilul adaugă, editează, șterg (recuperabil) și marchează „verificată”; șoferul adaugă doar bonuri de combustibil pentru vehiculul lui, care intră „De verificat”, și vede doar ce a adăugat. Fiecare schimbare în jurnalul firmei (înainte / după).
+- Fără dublare: o cheltuială pentru o lucrare deja numărată din Service-Hub apare, dar nu se adună; o cheltuială identică (vehicul, zi, sumă, furnizor) cere confirmare; alte monede apar, nu se adună. Rapoartele includ cheltuielile (nu și în „Service-uri folosite” sau „Istoric reparații”).
+- Ecrane: Costuri → „Adaugă cheltuială”, „Mai multe” pe fiecare cheltuială (Editează, Vezi bonul, Marchează verificată, Șterge); pagina vehiculului → „Adaugă alimentare” pentru șofer.
+- Teste: `tests/sql/143_fleet_expenses.sql`, `tests/e2e/fleet-expenses.spec.ts`.
+- Rămas: istoricul modificărilor pe ecran (e în jurnal, nu încă afișat), notificările (M6), consumul (M2).
+
+### T71 — Limba în Cont, selectorul de spațiu în dreapta sus ✅
+- Antetul (Eduard, 6 nov): un singur rând — sigla în stânga, selectorul de spațiu („Personal ▾” / firma) în dreapta, unde era limba; meniul lui se deschide spre stânga, întreg în ecran. Fără firmă: niciun selector, ca înainte. Pe laptop selectorul rămâne sus în bara laterală; limba a ieșit și de acolo.
+- Cont → „Preferințe” → „Limba” (Română / English), același dropdown ca restul aplicației, pentru client, service și admin. Mecanismul existent: limba e salvată în profil (`profiles.lang`) și aplicată la fiecare autentificare, pe orice dispozitiv; schimbarea spațiului nu o atinge. Fără bază de date, fără migrare.
+- Paginile publice (prima pagină, logare, verificare raport, documente legale, 404) își păstrează selectorul de limbă: acolo nu există cont.
+- Teste: `tests/e2e/workspace.spec.ts` (poziția, meniul în ecran, limba după refresh și o nouă autentificare); celelalte teste schimbă limba prin `switchLanguage()` (Cont, apoi înapoi).
+- Safari pe iPhone (Eduard, 6 nov): după o captură de ecran pagina sărea sus. Nu se reproduce în Chrome; protecție în `useKeepPlaceOnReturn` (`src/lib/scrollMemory.ts`): un salt sus fără atingere, în cele 2 s după revenirea în pagină sau o schimbare de dimensiune, e anulat. Un jurnal temporar (doar în previzualizări) a arătat pe iPhone a arătat `JUMP 2015→179` fără atingere, fără ascundere, fără schimbare de dimensiune — Safari reface așezarea paginii pentru captura „Pagină întreagă” și pierde poziția unei zone interioare care se derulează. Cauza: aplicația derula `<main>`, nu documentul. Reparat: documentul se derulează (antet sticky, bara de jos fixă, bara laterală sticky; `--nav-top` / `--nav-bottom` pentru ce se lipește sub ele; memoria derulării pe document); protecția anterioară scoasă. Jurnalul temporar a fost șters după confirmarea pe iPhone.
+- „1 coleg inclus” la singular pe cardurile planurilor.

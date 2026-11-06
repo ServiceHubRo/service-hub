@@ -12,6 +12,7 @@ import {
   signIn,
   userIdOf,
   openBooking,
+  switchLanguage,
 } from './support';
 
 // T50 — the complete quote, the intake sheet and the client's company: the owner sets the hourly
@@ -113,7 +114,7 @@ test.describe('the complete quote and the intake sheet', () => {
     await card.getByRole('link', { name: 'Completează fișa de preluare' }).click();
     await expect(page.getByRole('heading', { level: 1, name: 'Fișa de preluare' })).toBeVisible();
     await page.getByLabel('Km la intrare').fill('23611');
-    await page.getByRole('button', { name: '1/2' }).click();
+    await page.getByRole('combobox', { name: 'Combustibil' }).selectOption('2');
     const drawing = page.getByRole('button', { name: 'Desenul mașinii. Atinge pentru a marca un defect.' });
     await drawing.scrollIntoViewIfNeeded();
     await drawing.click({ position: { x: 60, y: 230 } });
@@ -122,8 +123,8 @@ test.describe('the complete quote and the intake sheet', () => {
     await drawing.click({ position: { x: 125, y: 50 } });
     await page.getByLabel('Defectul 2', { exact: true }).selectOption({ label: 'Lovitură' });
     await page.getByLabel('Obiecte personale').fill('Scaun copil');
-    await page.getByRole('group', { name: 'Clientul păstrează piesele înlocuite' }).getByRole('button', { name: 'Da' }).click();
-    await page.getByRole('group', { name: 'Acord pentru proba de drum' }).getByRole('button', { name: 'Da' }).click();
+    await page.getByRole('combobox', { name: 'Clientul păstrează piesele înlocuite' }).selectOption('yes');
+    await page.getByRole('combobox', { name: 'Acord pentru proba de drum' }).selectOption('yes');
     await expectNoHorizontalScroll(page);
     await shot(page, 't50-intake', name());
     await page.getByRole('button', { name: 'Trimite clientului' }).click();
@@ -165,7 +166,7 @@ test.describe('the complete quote and the intake sheet', () => {
     await page.getByLabel('Preț unitar, lei').fill('129');
     await expect(page.getByText('788,25 lei').last()).toBeVisible();
     await expect(page.getByText('TVA 21%')).toBeVisible();
-    await page.getByRole('button', { name: 'Fără TVA' }).click();
+    await page.getByRole('combobox', { name: 'Prețuri introduse' }).selectOption('net');
     await expect(page.getByLabel('Tarif / oră, lei')).toHaveValue('150');
     await expect(page.getByText('788,25 lei').last()).toBeVisible();
     await page.getByLabel('Termen de execuție').selectOption({ label: '2 ore' });
@@ -191,11 +192,11 @@ test.describe('the complete quote and the intake sheet', () => {
     await expect(cc).toContainText('Termen de execuție: 2 ore.');
     await expectNoHorizontalScroll(clientPage);
     await shot(clientPage, 't50-client-quote', name());
-    await clientPage.getByRole('button', { name: 'English' }).filter({ visible: true }).first().click();
+    await switchLanguage(clientPage, 'en');
     await expect(cc).toContainText('Parts and materials');
     await expect(cc).toContainText('Estimated time: 2 hours.');
     await shot(clientPage, 't50-client-quote-en', name());
-    await page.getByRole('button', { name: 'English' }).filter({ visible: true }).first().click();
+    await switchLanguage(page, 'en');
     await (await cardAction(card, 'Edit quote')).click();
     await expect(page.getByRole('heading', { level: 1, name: 'Edit quote' })).toBeVisible();
     await expectNoHorizontalScroll(page);
@@ -211,14 +212,14 @@ test.describe('the complete quote and the intake sheet', () => {
     await page.getByRole('link', { name: /Date pentru deviz/ }).click();
     await expect(page.getByRole('heading', { level: 1, name: 'Date pentru deviz' })).toBeVisible();
     // A person: the account's name, an optional address.
-    await expect(page.getByRole('button', { name: 'Persoană fizică' })).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.getByRole('combobox', { name: 'Devizele se emit pe' })).toHaveValue('person');
     await expect(page.getByText('Devizele se emit pe numele Maria Pop, cu telefonul din cont.')).toBeVisible();
     await page.getByLabel('Adresa (opțional)').fill('Str. Mică 3, Brașov');
     await shot(page, 't50-person', name());
     await page.getByRole('button', { name: 'Salvează' }).click();
     await expect(page.getByRole('button', { name: 'Salvat' })).toBeVisible();
     // A company: the name is required, the codes optional but valid.
-    await page.getByRole('button', { name: 'Persoană juridică' }).click();
+    await page.getByRole('combobox', { name: 'Devizele se emit pe' }).selectOption('company');
     await page.getByLabel('CUI (opțional)').fill('123');
     await page.getByRole('button', { name: 'Salvează' }).click();
     await expect(page.getByText('Scrie denumirea firmei.')).toBeVisible();
@@ -243,9 +244,9 @@ test.describe('the complete quote and the intake sheet', () => {
       company_vat_id: null,
       company_reg_com: 'J08/1249/2013',
     });
-    await page.getByRole('button', { name: 'English' }).filter({ visible: true }).first().click();
+    await switchLanguage(page, 'en');
     await expect(page.getByRole('heading', { level: 1, name: 'Details for quotes' })).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Company' })).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.getByRole('combobox', { name: 'Quotes are issued to' })).toHaveValue('company');
     await shot(page, 't50-company-en', name());
   });
 });

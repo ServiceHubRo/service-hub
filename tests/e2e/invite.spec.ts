@@ -134,7 +134,7 @@ test.describe('invite a friend', () => {
     await other.addInitScript(() => localStorage.setItem('sh_lang', 'ro'));
     const friend = await other.newPage();
     await friend.goto(new URL(link).pathname + new URL(link).search);
-    await expect(friend.getByRole('button', { name: 'Sunt client' })).toHaveAttribute('aria-pressed', 'true');
+    await expect(friend.getByRole('combobox', { name: 'Tip cont' })).toHaveValue('client');
     const codeField = friend.getByLabel('Cod de invitare (opțional)');
     await expect(codeField).toHaveValue(code);
     const friendEmail = uniqueEmail('friend');
@@ -146,7 +146,7 @@ test.describe('invite a friend', () => {
     await friend.getByRole('checkbox').check();
     await codeField.fill('C-99999');
     await friend.getByRole('button', { name: 'Creează cont' }).click();
-    await expect(friend.getByText('Nu am găsit acest cod. Verifică-l sau lasă câmpul gol.')).toBeVisible();
+    await expect(friend.getByText('Codul nu a fost găsit. Verifică-l sau lasă câmpul gol.')).toBeVisible();
     await expect(codeField).toBeFocused();
     await expectNoHorizontalScroll(friend);
     await shot(friend, 'invite-signup', name());
@@ -235,7 +235,7 @@ test.describe('invite a friend', () => {
     await page.getByRole('button', { name: 'Folosește raportul gratuit' }).click();
     await expect(page).toHaveURL(/\/c\/cont\/rapoarte\?raport=/);
     const reportCard = page.locator('main li').first();
-    await expect(reportCard).toContainText('Gata', { timeout: 30_000 });
+    await expect(reportCard).toContainText('Generat', { timeout: 30_000 });
     await expect(reportCard.locator('.mono').filter({ hasText: /^SH-\d{4}-\d{6}$/ })).toBeVisible();
     await expect(page.getByText(/Alege mașina mai jos/)).toHaveCount(0);
     await shot(page, 'invite-report-done', name());

@@ -1,5 +1,5 @@
 import { expect, test, type Browser, type Page } from '@playwright/test';
-import { BACKEND, PASSWORD, cardAction, createBookableShop, createUser, expectNoHorizontalScroll, rpcAs, shot, signIn } from './support';
+import { BACKEND, PASSWORD, cardAction, createBookableShop, createUser, expectNoHorizontalScroll, rpcAs, shot, signIn, switchLanguage } from './support';
 
 // T37c — a quote line with an original and an alternative part: the shop adds the alternative in
 // the composer, the client picks it and accepts, the shop sees which variant was taken.
@@ -118,7 +118,9 @@ test.describe('quote variants', () => {
     await expect(quote.getByRole('button', { name: 'Accept', exact: true })).toBeVisible();
     await expectNoHorizontalScroll(clientPage);
     await shot(clientPage, 't37c-client-ro', name());
-    await clientPage.getByRole('button', { name: 'English' }).filter({ visible: true }).first().click();
+    // In English (set in Cont: the choice is made again on the quote).
+    await switchLanguage(clientPage, 'en');
+    await quote.getByRole('radio', { name: /^Alternative part, Bosch/ }).check();
     await expect(quote.getByRole('radio', { name: /^Alternative part, Bosch/ })).toBeChecked();
     await shot(clientPage, 't37c-client-en', name());
     await quote.getByRole('button', { name: 'Accept', exact: true }).click();

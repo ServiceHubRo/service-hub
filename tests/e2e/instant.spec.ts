@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { BACKEND, PASSWORD, closeFilters, createBookableShop, createUser, expectNoHorizontalScroll, openFilters, rpcAs, serviceRest, shot, signIn, userIdOf, cardAction, selectInPanel } from './support';
+import { BACKEND, PASSWORD, closeFilters, createBookableShop, createUser, expectNoHorizontalScroll, openFilters, rpcAs, serviceRest, shot, signIn, userIdOf, cardAction, selectInPanel, switchLanguage } from './support';
 
 // T28a — "like Booking, for car shops": the owner turns on instant confirmation; a client sees in
 // search which shops are free on a day and which confirm at once, opens the shop on its first
@@ -36,7 +36,7 @@ test.describe('instant booking', () => {
     await expect(page.getByText(/Cererile pentru locurile libere se confirmă singure/)).toBeVisible();
     await instant.check();
     await page.getByRole('button', { name: 'Salvează regulile' }).click();
-    await expect(page.getByRole('button', { name: '✓ Salvat' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Salvat' })).toBeVisible();
     await expectNoHorizontalScroll(page);
     await shot(page, 't28-rules-instant', name());
     const [saved] = await serviceRest<{ auto_confirm: boolean }[]>(`shops?id=eq.${shopId}&select=auto_confirm`, 'GET');
@@ -119,7 +119,7 @@ test.describe('instant booking', () => {
     await shot(c, 't28-bookings', name());
 
     // In English too.
-    await c.getByRole('button', { name: 'English' }).filter({ visible: true }).first().click();
+    await switchLanguage(c, 'en');
     await expect(await cardAction(mine, 'Add to calendar')).toBeVisible();
     await expect(mine.getByRole('menuitem', { name: 'Directions' })).toBeVisible();
     await context.close();

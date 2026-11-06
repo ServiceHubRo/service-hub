@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
-import { BACKEND, PASSWORD, SEED, SEED_PASSWORD, createBookableShop, createFleetUser, expectNoHorizontalScroll, rpcAs, serviceRest, shot, signIn, uniquePlate } from './support';
+import { BACKEND, PASSWORD, SEED, SEED_PASSWORD, createBookableShop, createFleetUser, expectNoHorizontalScroll, rpcAs, serviceRest, shot, signIn, uniquePlate, switchLanguage } from './support';
 
 // The company's fleet space (T63c): the admin opens the fleet from the company page, adds a vehicle
 // with the form (a plate already in the fleet is refused), assigns it to the driver, archives
@@ -8,14 +8,12 @@ import { BACKEND, PASSWORD, SEED, SEED_PASSWORD, createBookableShop, createFleet
 
 const name = () => test.info().project.name;
 
-/** The vehicle's sections: a dropdown on phones and tablets, tabs on a laptop. */
+/** The vehicle's sections: one dropdown on every width (Eduard, 6 Nov). */
 async function openVehicleSection(page: Page, label: string) {
   const select = page.getByRole('combobox', { name: 'Secțiunile vehiculului' });
-  const tab = page.getByRole('button', { name: new RegExp(label) });
-  // Wait for the vehicle page: one of the two is on screen once it is drawn.
-  await expect(select.or(tab).filter({ visible: true }).first()).toBeVisible();
-  if (await select.isVisible()) await select.selectOption({ label });
-  else await tab.click();
+  await expect(select).toBeVisible();
+  const option = select.locator('option', { hasText: label });
+  await select.selectOption(await option.first().getAttribute('value') ?? label);
 }
 
 test.beforeEach(async ({ context }) => {
@@ -61,7 +59,7 @@ test('admin adds and assigns vehicles; the driver sees only theirs', async ({ pa
   await shot(page, 'fleet-live-dashboard', name());
 
   // Adds a vehicle with the form; the plate of the Transit is refused.
-  await page.getByRole('button', { name: 'Vehicule' }).filter({ visible: true }).first().click();
+  await page.getByRole('link', { name: 'Vehicule', exact: true }).filter({ visible: true }).first().click();
   await page.getByRole('button', { name: 'Adaugă vehicul' }).click();
   await page.getByLabel('Marcă').fill('Dacia');
   await page.getByLabel('Model', { exact: true }).fill('Logan');
@@ -81,7 +79,7 @@ test('admin adds and assigns vehicles; the driver sees only theirs', async ({ pa
   await shot(page, 'fleet-live-vehicle', name());
 
   // Archives the Transit, after the confirmation.
-  await page.getByRole('button', { name: 'Vehicule' }).filter({ visible: true }).first().click();
+  await page.getByRole('link', { name: 'Vehicule', exact: true }).filter({ visible: true }).first().click();
   await expect(page.getByText('2 din 2 vehicule')).toBeVisible();
   await page.getByRole('button', { name: new RegExp(plate2) }).click();
   await openVehicleSection(page, 'Șofer și responsabil');
@@ -89,7 +87,7 @@ test('admin adds and assigns vehicles; the driver sees only theirs', async ({ pa
   await page.getByRole('menuitem', { name: 'Arhivează vehiculul' }).click();
   await page.getByRole('button', { name: 'Arhivează', exact: true }).click();
   await expect(page.getByText('Arhivat').first()).toBeVisible();
-  await page.getByRole('button', { name: 'Vehicule' }).filter({ visible: true }).first().click();
+  await page.getByRole('link', { name: 'Vehicule', exact: true }).filter({ visible: true }).first().click();
   await expect(page.getByText('1 din 1 vehicule')).toBeVisible();
   await shot(page, 'fleet-live-vehicles', name());
 
@@ -111,7 +109,7 @@ test('admin adds and assigns vehicles; the driver sees only theirs', async ({ pa
   await context.close();
 
   // The language switch of the frame.
-  await page.getByRole('button', { name: 'English' }).filter({ visible: true }).first().click();
+  await switchLanguage(page, 'en');
   await expect(page.getByRole('heading', { level: 1, name: 'Vehicles' })).toBeVisible();
   await expectNoHorizontalScroll(page);
   await shot(page, 'fleet-live-en', name());
@@ -134,9 +132,9 @@ test('the plan: Abonament, the limits of Fleet Start, and the admin changes the 
   await page.goto(`/c/firme/${company.id}`);
   await page.getByRole('button', { name: /Fleet Business/ }).filter({ visible: true }).first().click();
   await expect(page.getByRole('heading', { level: 1, name: 'Abonament și facturare' })).toBeVisible();
-  await expect(page.getByText(/Mai ai 30 de zile din perioada de test|Mai ai 29 de zile din perioada de test/)).toBeVisible();
+  await expect(page.getByText(/Perioada de test: (30|29) de zile, până pe/)).toBeVisible();
   await expect(page.getByText('Plata cu cardul și schimbarea planului nu sunt încă disponibile.')).toBeVisible();
-  await expect(page.getByText('Planul tău')).toBeVisible();
+  await expect(page.getByText('Planul actual', { exact: true })).toBeVisible();
   for (const plan of ['Fleet Start', 'Fleet Pro', 'Enterprise']) await expect(page.getByText(plan, { exact: true }).first()).toBeVisible();
   await expect(page.getByText('Aprobarea devizelor după rol')).toHaveCount(0);
   await expectNoHorizontalScroll(page);
@@ -153,7 +151,8 @@ test('the plan: Abonament, the limits of Fleet Start, and the admin changes the 
     });
   }
   await page.goto(`/c/firme/${company.id}?sectiune=rapoarte`);
-  await expect(page.getByText('Rapoartele sunt incluse din Fleet Business', { exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Rapoartele de costuri' })).toBeVisible();
+  await expect(page.getByText('Inclus în planul Fleet Business').first()).toBeVisible();
   await page.goto(`/c/firme/${company.id}?sectiune=vehicule`);
   await expect(page.getByText('5 din 5 vehicule')).toBeVisible();
   await expect(page.getByRole('button', { name: 'Descarcă CSV' })).toHaveCount(0);
@@ -161,7 +160,7 @@ test('the plan: Abonament, the limits of Fleet Start, and the admin changes the 
   await page.getByLabel('Marcă').fill('Ford');
   await page.getByLabel('Model', { exact: true }).fill('Transit');
   await page.getByRole('button', { name: 'Salvează vehiculul' }).click();
-  await expect(page.getByText('Planul permite 5 vehicule active. Arhivează un vehicul sau alege un plan mai mare.')).toBeVisible();
+  await expect(page.getByText('Planul permite 5 vehicule active. Arhivează un vehicul sau alege un plan superior.')).toBeVisible();
 
   // The platform admin moves it to Fleet Pro from Flote.
   const context = await browser.newContext();
@@ -175,7 +174,7 @@ test('the plan: Abonament, the limits of Fleet Start, and the admin changes the 
   await adminPage.getByRole('menuitem', { name: 'Schimbă planul' }).click();
   await row.getByLabel('Plan', { exact: true }).selectOption('fleet_pro');
   await row.getByRole('button', { name: 'Salvează' }).click();
-  await expect(row.getByText('5 / 40')).toBeVisible();
+  await expect(row.getByText('5 / 15')).toBeVisible();
   await expectNoHorizontalScroll(adminPage);
   await shot(adminPage, 'admin-fleets', name());
   await context.close();
@@ -266,9 +265,9 @@ test('bookings: the driver books a company vehicle, the manager approves within 
   await signIn(mgr, manager, PASSWORD);
   await expect(mgr).toHaveURL(/\/c\/cauta/);
   await mgr.goto(`/c/firme/${company.id}`);
-  await mgr.getByRole('button', { name: 'Programări', exact: true }).filter({ visible: true }).first().click();
+  await mgr.getByRole('link', { name: 'Programări', exact: true }).filter({ visible: true }).first().click();
   await expect(mgr.getByRole('heading', { level: 1, name: 'Programări' })).toBeVisible();
-  await expect(mgr.getByText('Poți aproba până la 500 lei.')).toBeVisible();
+  await expect(mgr.getByText('Limita ta de aprobare: 500 lei.')).toBeVisible();
   await expectNoHorizontalScroll(mgr);
   await shot(mgr, 'fleet-bookings-quote', name());
   await mgr.getByRole('button', { name: 'Accept', exact: true }).click();
@@ -280,7 +279,7 @@ test('bookings: the driver books a company vehicle, the manager approves within 
   await shot(mgr, 'fleet-bookings-approved', name());
 
   // Cont: the rarer pages as tiles; the manager has no Membri tile.
-  await mgr.getByRole('button', { name: 'Cont', exact: true }).filter({ visible: true }).first().click();
+  await mgr.getByRole('link', { name: 'Cont', exact: true }).filter({ visible: true }).first().click();
   await expect(mgr.getByRole('link', { name: /Rapoarte/ })).toBeVisible();
   await expect(mgr.getByRole('link', { name: /Membri și roluri/ })).toHaveCount(0);
   await expect(mgr.getByRole('link', { name: /Pagina firmei/ })).toBeVisible();
@@ -288,9 +287,9 @@ test('bookings: the driver books a company vehicle, the manager approves within 
   await shot(mgr, 'fleet-account', name());
 
   // In English: the five pages and the bookings.
-  await mgr.getByRole('button', { name: 'English' }).filter({ visible: true }).first().click();
+  await switchLanguage(mgr, 'en');
   await expect(mgr.getByRole('heading', { level: 1, name: 'Account' })).toBeVisible();
-  await mgr.getByRole('button', { name: 'Bookings', exact: true }).filter({ visible: true }).first().click();
+  await mgr.getByRole('link', { name: 'Bookings', exact: true }).filter({ visible: true }).first().click();
   await expect(mgr.getByText('Approved: 420 RON')).toBeVisible();
   await expectNoHorizontalScroll(mgr);
   await shot(mgr, 'fleet-bookings-en', name());
@@ -315,7 +314,18 @@ test('rights and colleagues: the admin lets the accountant approve up to 300 lei
   await signIn(page, admin, PASSWORD);
   await expect(page).toHaveURL(/\/c\/cauta/);
   await page.goto(`/c/cont/firme/${company.id}`);
-  const row = page.locator('li', { hasText: accountant });
+  let row = page.locator('li', { hasText: accountant });
+  await row.getByRole('button', { name: 'Mai multe' }).click();
+  await page.getByRole('menuitem', { name: 'Drepturi' }).click();
+  await expect(row.getByText('Ce mai poate face')).toBeVisible();
+  // On Fleet Business (the trial) a member's own limit is named with its plan (T65).
+  await row.getByRole('checkbox', { name: 'Aprobă devize' }).check();
+  await expect(row.getByText('Inclus în planul Fleet Pro')).toBeVisible();
+  await expect(row.getByLabel('Limita lui de aprobare')).toHaveCount(0);
+  // On Fleet Pro it can be set.
+  await serviceRest(`company_subscriptions?company_id=eq.${company.id}`, 'PATCH', { plan_key: 'fleet_pro' });
+  await page.reload();
+  row = page.locator('li', { hasText: accountant });
   await row.getByRole('button', { name: 'Mai multe' }).click();
   await page.getByRole('menuitem', { name: 'Drepturi' }).click();
   await expect(row.getByText('Ce mai poate face')).toBeVisible();
@@ -330,9 +340,9 @@ test('rights and colleagues: the admin lets the accountant approve up to 300 lei
   const overview = await rpcAs<{ me: { approval_limit: number } }>(accountant, 'fleet_overview', { p_company: company.id });
   expect(Number(overview.me.approval_limit)).toBe(300);
 
-  // Abonament: one colleague of the three included; the admin is not counted.
+  // Abonament: one colleague of the five included on Pro; the admin is not counted.
   await page.goto(`/c/firme/${company.id}?sectiune=abonament`);
-  await expect(page.getByText('1 din 3 incluși')).toBeVisible();
+  await expect(page.getByText('1 din 5 incluși')).toBeVisible();
   await expect(page.getByText('Administratorul nu se numără.')).toBeVisible();
   await expect(page.getByText('19 lei / coleg în plus').first()).toBeVisible();
   await expectNoHorizontalScroll(page);

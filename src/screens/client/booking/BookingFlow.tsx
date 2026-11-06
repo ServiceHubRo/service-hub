@@ -112,7 +112,7 @@ function Flow({ page }: { page: ShopPage }) {
   useEffect(() => {
     if (shownStep.current === step) return;
     shownStep.current = step;
-    headingRef.current?.closest('main')?.scrollTo(0, 0);
+    window.scrollTo(0, 0);
     headingRef.current?.focus({ preventScroll: true });
   }, [step]);
 

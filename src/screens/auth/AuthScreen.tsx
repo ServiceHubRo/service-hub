@@ -1,7 +1,6 @@
 import { useState } from 'react';
-import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useLocation, useSearchParams } from 'react-router-dom';
 import { Banner } from '../../components/Banner';
-import { Tabs } from '../../components/Tabs';
 import { takeAuthLinkError } from '../../data/supabase';
 import { useI18n } from '../../i18n/context';
 import { AuthLayout } from './AuthLayout';
@@ -24,12 +23,11 @@ export interface AuthLocationState {
 }
 
 /**
- * "Autentificare" / "Cont nou" (P4b). A legal document opens as a screen of its own; the form is
+ * "Autentificare" / "Cont nou" (P4b), each with a link to the other. A legal document opens as a screen of its own; the form is
  * hidden meanwhile and keeps its data.
  */
 export function AuthScreen({ tab }: { tab: AuthTab }) {
   const { t } = useI18n();
-  const navigate = useNavigate();
   const location = useLocation();
   const state = (location.state ?? {}) as AuthLocationState;
   const [params] = useSearchParams();
@@ -45,20 +43,22 @@ export function AuthScreen({ tab }: { tab: AuthTab }) {
     <AuthLayout title={t(tab === 'signin' ? 'auth.tab.signin' : 'auth.tab.signup')}>
       {doc && <LegalDocScreen doc={doc} onBack={closeDoc} />}
       <div className={styles.stack} hidden={doc !== null}>
-        <h1 className="visually-hidden">{t(tab === 'signin' ? 'auth.tab.signin' : 'auth.tab.signup')}</h1>
-        <Tabs
-          segmented
-          label={t('auth.tabs')}
-          items={[
-            { key: 'signin', label: t('auth.tab.signin') },
-            { key: 'signup', label: t('auth.tab.signup') },
-          ]}
-          value={tab}
-          onChange={(next) =>
-            // The role and a referral code stay in the address, for coming back to Cont nou.
-            navigate(`${next === 'signin' ? '/intra' : '/cont-nou'}${location.search}`, { replace: true, state: { ...state, email } })
-          }
-        />
+        {/* One form at a time, the other one a link away (Eduard, 6 Nov: no tabs). */}
+        <div className={styles.head}>
+          <h1 className={styles.title}>{t(tab === 'signin' ? 'auth.tab.signin' : 'auth.tab.signup')}</h1>
+          <p className={styles.switch}>
+            {t(tab === 'signin' ? 'auth.switch.noAccount' : 'auth.switch.haveAccount')}{' '}
+            <Link
+              // The role and a referral code stay in the address, for coming back to Cont nou.
+              to={`${tab === 'signin' ? '/cont-nou' : '/intra'}${location.search}`}
+              replace
+              state={{ ...state, email }}
+              className={styles.switchLink}
+            >
+              {t(tab === 'signin' ? 'auth.switch.toSignup' : 'auth.switch.toSignin')}
+            </Link>
+          </p>
+        </div>
         {state.linkError && <Banner tone="warning">{t('auth.linkExpired')}</Banner>}
         {socialFailed && <Banner tone="warning">{t('auth.social.failed')}</Banner>}
         <SocialSignIn role={initialRole} referral={referralCode} />

@@ -1,4 +1,4 @@
-import { Copy, Lock, UserPlus } from 'lucide-react';
+import { Check, Copy, Lock, UserPlus } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { ActionButton } from '../../../components/ActionButton';
 import { Button } from '../../../components/Button';
@@ -208,7 +208,7 @@ function LinkPanel({ email, url, mailed }: { email: string; url: string; mailed:
         />
       </div>
       <Button variant="primary" block onClick={() => void copy()}>
-        <Copy size={18} aria-hidden="true" />
+        {copied ? <Check size={18} aria-hidden="true" /> : <Copy size={18} aria-hidden="true" />}
         {copied ? t('staff.copied') : t('staff.copy')}
       </Button>
     </Card>

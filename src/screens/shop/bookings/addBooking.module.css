@@ -28,7 +28,7 @@
 
   .aside {
     position: sticky;
-    top: var(--space-4);
+    top: calc(var(--nav-top, 0px) + var(--space-4));
   }
 }
 

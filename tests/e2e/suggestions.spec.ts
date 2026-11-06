@@ -45,7 +45,7 @@ async function adminMarks(browser: Browser, page: Page, text: string, who: RegEx
   await expect(card.getByRole('button', { name: mark, exact: true })).toHaveCount(0);
   await expect(card).toContainText(mark);
   // The "Noi" filter no longer shows it; the change is in the audit log.
-  await admin.getByRole('button', { name: /^Nouă \(\d+\)$/ }).click();
+  await admin.getByRole('combobox', { name: 'Stare' }).selectOption('new');
   await expect(admin.getByRole('listitem').filter({ hasText: text })).toHaveCount(0);
   await admin.goto('/admin/cont/jurnal');
   await expect(admin.getByText('Stare sugestie schimbată').first()).toBeVisible();
@@ -61,7 +61,7 @@ test('a client sends a suggestion, the admin plans it, the client sees it planne
   await page.getByRole('link', { name: /^Sugestii/ }).click();
   await expect(page).toHaveURL(/\/c\/cont\/sugestii$/);
   await expect(page.getByRole('heading', { level: 1, name: 'Sugestii' })).toBeVisible();
-  await expect(page.getByText('Nicio sugestie trimisă.')).toBeVisible();
+  await expect(page.getByText('Nu există sugestii trimise.')).toBeVisible();
 
   const send = page.getByRole('button', { name: 'Trimite sugestia' });
   await expect(send).toBeDisabled();

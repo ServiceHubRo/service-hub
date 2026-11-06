@@ -388,9 +388,9 @@ export function shot(page: Page, name: string, projectName: string) {
   return page.screenshot({ path: `test-results/shots/${name}-${projectName}.png`, fullPage: true });
 }
 
-/** The app's scroll container (the page itself never scrolls inside the shell). */
+/** How far the page is scrolled (the document scrolls, not an area inside it). */
 export function scrollTopOf(page: Page): Promise<number> {
-  return page.locator('main').evaluate((el) => el.scrollTop);
+  return page.evaluate(() => document.scrollingElement!.scrollTop);
 }
 
 /**
@@ -407,7 +407,13 @@ export async function expectAccessible(page: Page, label: string) {
     const finite = document.getAnimations().filter((a) => a.effect?.getComputedTiming().iterations !== Infinity);
     await Promise.all(finite.map((a) => a.finished.catch(() => undefined)));
   });
+  // The page scrolls under the app's header and tab bar: while checking, they stand in the page's
+  // flow (still checked themselves) so no text is measured against them.
+  await page.addStyleTag({ content: '[data-fixed-top], [data-fixed-bottom] { position: static !important; }' }).then((tag) =>
+    tag.evaluate((el) => (el as Element).setAttribute('data-axe-flow', '')),
+  );
   const result = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']).analyze();
+  await page.evaluate(() => document.querySelector('style[data-axe-flow]')?.remove());
   const violations = result.violations.map(
     (v) => `${v.id} (${v.impact}): ${v.help}\n    ${v.nodes.map((n) => n.target.join(' ')).slice(0, 6).join('\n    ')}`,
   );
@@ -469,7 +475,7 @@ export async function openFilters(page: Page) {
 
 /** Caută: closes the "Filtre" panel with its "Arată …" button. */
 export async function closeFilters(page: Page) {
-  await page.getByRole('dialog').getByRole('button', { name: /^(Arată|Show|Gata|Done)/ }).click();
+  await page.getByRole('dialog').getByRole('button', { name: /^(Arată|Show|Aplică|Apply)/ }).click();
   await expect(page.getByRole('dialog')).toBeHidden();
 }
 
@@ -513,4 +519,40 @@ export async function cardAction(scope: Locator, name: string | RegExp, exact = 
     return scope.getByRole('menuitem', { name, exact });
   }
   return direct;
+}
+
+/**
+ * Switches the language (Eduard, 6 Nov 2026: in Cont → Preferințe once signed in; in the header of the
+ * public pages). A signed-in page without the dropdown goes to its Cont, changes it (saved on the
+ * profile) and comes back to where it was.
+ */
+export async function switchLanguage(page: Page, lang: 'ro' | 'en') {
+  const select = () => page.getByRole('combobox', { name: /^(Limba|Language)$/ }).filter({ visible: true }).first();
+  if ((await select().count()) > 0) {
+    await select().selectOption(lang);
+    return;
+  }
+  // To the person's own Cont and back inside the app (no reload, so a language not saved — the shared
+  // admin's tests answer the profile write themselves — stays for the rest of the test). From a
+  // company's space too, whose own „Cont” has no language.
+  const back = page.url();
+  const path = new URL(back).pathname;
+  const account = path.startsWith('/admin') ? '/admin/cont' : path.startsWith('/s/') ? '/s/cont' : '/c/cont';
+  const there = path === account;
+  if (!there) {
+    await page.evaluate((to) => {
+      history.pushState(history.state, '', to);
+      window.dispatchEvent(new PopStateEvent('popstate', { state: history.state }));
+    }, account);
+  }
+  await expect(select()).toBeVisible();
+  const saved = page
+    .waitForResponse((r) => r.url().includes('/rest/v1/profiles') && r.request().method() === 'PATCH', { timeout: 10_000 })
+    .catch(() => null);
+  await select().selectOption(lang);
+  await saved;
+  if (!there) {
+    await page.goBack();
+    await page.waitForURL(back);
+  }
 }

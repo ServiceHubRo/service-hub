@@ -149,7 +149,7 @@ function CompanyRow({ c, plans, onChanged }: { c: AdminFleetCompany; plans: Plan
           <div>
             <dt>{t('fleet.sub.colleagues')}</dt>
             <dd className="mono">
-              {c.plan.included_members === null ? c.plan.colleagues : t('fleet.sub.colleaguesOf', { n: c.plan.colleagues, included: c.plan.included_members })}
+              {c.plan.included_members === null ? c.plan.colleagues : t(c.plan.included_members === 1 ? 'fleet.sub.colleaguesOfOne' : 'fleet.sub.colleaguesOf', { n: c.plan.colleagues, included: c.plan.included_members })}
             </dd>
           </div>
           <div>
@@ -252,7 +252,7 @@ function PlanRow({ p, onChanged }: { p: Plan; onChanged: () => Promise<void> }) 
           {p.vehicle_limit === null ? t('fleet.sub.vehiclesCustom') : t('fleet.sub.vehiclesUpTo', { n: p.vehicle_limit })} ·{' '}
           {p.included_members === null
             ? t('fleet.sub.colleaguesCustom')
-            : t('fleet.sub.colleaguesIncluded', { n: plural(lang, 'unit.colleagues', p.included_members) })}
+            : t(p.included_members === 1 ? 'fleet.sub.colleaguesIncludedOne' : 'fleet.sub.colleaguesIncluded', { n: plural(lang, 'unit.colleagues', p.included_members) })}
           {p.included_members !== null && p.member_price_ron !== null ? ` · ${t('fleet.sub.colleaguePrice', { price: formatMoney(lang, p.member_price_ron) })}` : ''}
         </p>
         {!editing ? (

@@ -65,6 +65,13 @@ describe('vehicle matching (P16c)', () => {
     expect(others[0]?.jobs).toBe(2);
   });
 
+  it('T66: the jobs follow the garage car through a new plate', () => {
+    const moved = [{ ...job('g', 'done', 'BV 12 ABC', '2026-10-01T10:00:00Z'), car_id: 'car-1' }];
+    expect(jobsOf(moved, { id: 'car-1', plate: 'B 999 NOU' }).map((b) => b.id)).toEqual(['g']);
+    expect(jobsOf(moved, { id: 'car-2', plate: 'B 999 NOU' })).toHaveLength(0);
+    expect(otherVehicles(moved, [{ id: 'car-1', plate: 'B 999 NOU' }])).toHaveLength(0);
+  });
+
   it('counts money in bani', () => {
     expect(sumCosts([{ cost: 0.1 }, { cost: 0.2 }, { cost: null }])).toBe(0.3);
   });

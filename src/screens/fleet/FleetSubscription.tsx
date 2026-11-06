@@ -1,4 +1,4 @@
-import { Check, CreditCard, Lock } from 'lucide-react';
+import { Check, CreditCard, Lock, Plus } from 'lucide-react';
 import { useCallback } from 'react';
 import { Card } from '../../components/Card';
 import { EmptyState } from '../../components/EmptyState';
@@ -45,6 +45,7 @@ function Subscription({ view }: { view: FleetSubscriptionView }) {
   const days = trialDaysLeft(plan.trial_ends_at, now);
   const name = lang === 'ro' ? plan.name_ro : plan.name_en;
   const vehiclesOver = overLimit(usage.vehicles, plan.vehicle_limit);
+  const largest = Math.max(0, ...plans.map((p) => p.vehicle_limit ?? 0));
 
   return (
     <div className={styles.stack}>
@@ -103,10 +104,14 @@ function Subscription({ view }: { view: FleetSubscriptionView }) {
           {t('fleet.sub.compare')}
         </h2>
         <ul className={styles.planGrid}>
+          {/* Enterprise: over the largest plan's vehicles (Admin → Flote sets them). */}
           {plans.map((p) => (
-            <PlanCard key={p.key} p={p} current={p.key === plan.plan_key} />
+            <PlanCard key={p.key} p={p} current={p.key === plan.plan_key} have={plan.features} largest={largest} />
           ))}
         </ul>
+        <p className={styles.hintLine}>
+          <Plus size={14} aria-hidden="true" className={styles.amberIcon} /> {t('fleet.sub.gainLegend')}
+        </p>
       </section>
     </div>
   );
@@ -119,7 +124,7 @@ function Subscription({ view }: { view: FleetSubscriptionView }) {
         <div className={styles.usageTop}>
           <span>{t('fleet.sub.colleagues')}</span>
           <span className="mono">
-            {included === null ? plan.colleagues : t('fleet.sub.colleaguesOf', { n: plan.colleagues, included })}
+            {included === null ? plan.colleagues : t(included === 1 ? 'fleet.sub.colleaguesOfOne' : 'fleet.sub.colleaguesOf', { n: plan.colleagues, included })}
           </span>
         </div>
         {included !== null && included > 0 && <Meter share={Math.min(1, plan.colleagues / included)} tone={plan.extra_members > 0 ? 'amber' : 'green'} />}
@@ -147,7 +152,11 @@ function Subscription({ view }: { view: FleetSubscriptionView }) {
   }
 }
 
-function PlanCard({ p, current }: { p: FleetPlanRow; current: boolean }) {
+/**
+ * One plan of the comparison (T65): a tick for what the company has today, an amber plus for what
+ * this plan would add to it — the upgrade's gains, without a separate list.
+ */
+function PlanCard({ p, current, have, largest }: { p: FleetPlanRow; current: boolean; have: readonly string[]; largest: number }) {
   const { t, lang } = useI18n();
   const features = offeredFeatures(p.features);
   return (
@@ -166,22 +175,33 @@ function PlanCard({ p, current }: { p: FleetPlanRow; current: boolean }) {
         )}
       </p>
       <ul className={styles.planLimits}>
-        <li>{p.vehicle_limit === null ? t('fleet.sub.vehiclesCustom') : t('fleet.sub.vehiclesUpTo', { n: p.vehicle_limit })}</li>
+        <li>
+          {p.vehicle_limit !== null
+            ? t('fleet.sub.vehiclesUpTo', { n: p.vehicle_limit })
+            : largest > 0
+              ? t('fleet.sub.vehiclesOver', { n: largest })
+              : t('fleet.sub.vehiclesCustom')}
+        </li>
         <li>
           {p.included_members === null
             ? t('fleet.sub.colleaguesCustom')
-            : t('fleet.sub.colleaguesIncluded', { n: plural(lang, 'unit.colleagues', p.included_members) })}
+            : t(p.included_members === 1 ? 'fleet.sub.colleaguesIncludedOne' : 'fleet.sub.colleaguesIncluded', { n: plural(lang, 'unit.colleagues', p.included_members) })}
         </li>
         {p.included_members !== null && p.member_price_ron !== null && (
           <li>{t('fleet.sub.colleaguePrice', { price: formatMoney(lang, p.member_price_ron) })}</li>
         )}
       </ul>
       <ul className={styles.planFeatures}>
-        {features.map((f) => (
-          <li key={f}>
-            <Check size={15} aria-hidden="true" className={styles.green} /> {t(`fleet.feature.${f}`)}
-          </li>
-        ))}
+        {features.map((f) => {
+          const gain = !current && !have.includes(f);
+          return (
+            <li key={f} className={gain ? styles.gain : undefined}>
+              {gain ? <Plus size={15} aria-hidden="true" className={styles.amberIcon} /> : <Check size={15} aria-hidden="true" className={styles.green} />}{' '}
+              {t(`fleet.feature.${f}`)}
+              {gain && <span className="visually-hidden"> ({t('fleet.sub.gain')})</span>}
+            </li>
+          );
+        })}
       </ul>
       {p.price_ron === null && (
         <a className={styles.planContact} href="mailto:contact@service-hub.ro">

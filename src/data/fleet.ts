@@ -1,6 +1,6 @@
 import { call, failure, RpcError, type Booking } from './rpc';
 import { supabase } from './supabase';
-import type { FleetOverview, FleetPlanRow, FleetPlanSummary, FleetSubscriptionView, FleetVehicle } from '../lib/fleet';
+import type { ExpenseFields, FleetExpense, FleetOverview, FleetPlanRow, FleetPlanSummary, FleetReport, FleetSubscriptionView, FleetVehicle, ReportFilters } from '../lib/fleet';
 
 /**
  * The company's fleet (T63c, docs/FLEET_PLAN.md): one read, `fleet_overview(company)`, already
@@ -86,6 +86,43 @@ export async function fetchBookableVehicles(): Promise<BookableCompany[]> {
   return (await call('fleet_bookable_vehicles', {} as never)) as unknown as BookableCompany[];
 }
 
+// ------------------------------------------------------------------------------------ reports (T65)
+
+/** The plans sold today, in order (every signed-in user reads them): the "Disponibil în …" tags. */
+export async function fetchFleetPlans(): Promise<FleetPlanRow[]> {
+  if (!supabase) throw new RpcError('network');
+  const { data, error } = await supabase
+    .from('fleet_plans')
+    .select('key, name_ro, name_en, price_ron, vehicle_limit, member_limit, features, included_members, member_price_ron')
+    .eq('public', true)
+    .eq('active', true)
+    .order('position');
+  if (error) throw failure(error);
+  return data as unknown as FleetPlanRow[];
+}
+
+/** A report computed by the database for the company's plan and the member's role. */
+export async function fetchFleetReport(
+  company: string,
+  range: { from: string | null; to: string },
+  previous: { from: string | null; to: string } | null,
+  filters: ReportFilters,
+): Promise<FleetReport> {
+  return (await call('fleet_report', {
+    p_company: company,
+    p_from: range.from,
+    p_to: range.to,
+    p_prev_from: previous?.from ?? null,
+    p_prev_to: previous?.to ?? null,
+    p_filters: filters,
+  } as never)) as unknown as FleetReport;
+}
+
+/** Checks that the plan and the role allow an export, and logs it; the file is written afterwards. */
+export async function logFleetExport(company: string, kind: 'vehicles_csv' | 'costs_csv' | 'report_csv' | 'report_xlsx', rows: number): Promise<void> {
+  await call('fleet_log_export', { p_company: company, p_kind: kind, p_rows: rows } as never);
+}
+
 // ------------------------------------------------------------------------------------ plans (T64a)
 
 /** The plan as every member's frame needs it (badge, banners): no price. */
@@ -144,4 +181,51 @@ export async function adminUpdateFleetPlan(
     p_member_price_ron: v.memberPrice,
     p_request_id: requestId,
   } as never);
+}
+
+// ------------------------------------------------------------------------------------ expenses (M1)
+
+/** Adds (expense null) or changes an expense; the database checks the rights, the fields and duplicates. */
+export async function saveExpense(company: string, expense: string | null, fields: ExpenseFields, requestId: string): Promise<FleetExpense> {
+  return (await call('fleet_save_expense', {
+    p_company: company,
+    p_expense: expense,
+    p_fields: fields,
+    p_request_id: requestId,
+  } as never)) as unknown as FleetExpense;
+}
+
+/** Deletes an expense (recoverable: kept with the date it was deleted, and in the company log). */
+export async function deleteExpense(expense: string, requestId: string): Promise<void> {
+  await call('fleet_delete_expense', { p_expense: expense, p_request_id: requestId } as never);
+}
+
+/** „Verificată” / „De verificat”. */
+export async function markExpense(expense: string, status: 'ok' | 'to_check', requestId: string): Promise<FleetExpense> {
+  return (await call('fleet_mark_expense', { p_expense: expense, p_status: status, p_request_id: requestId } as never)) as unknown as FleetExpense;
+}
+
+export const FLEET_FILES_BUCKET = 'fleet-files';
+export const RECEIPT_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'] as const;
+export const RECEIPT_MAX_BYTES = 5 * 1024 * 1024;
+
+/**
+ * The photo or PDF of a receipt, uploaded before the expense is saved: `<company>/<vehicle>/<random>.<ext>`
+ * in the private bucket (the storage policies let only costs.manage, or the vehicle's driver, write there).
+ */
+export async function uploadReceipt(company: string, vehicle: string, file: File): Promise<string> {
+  if (!supabase) throw new RpcError('network');
+  const ext = file.type === 'application/pdf' ? 'pdf' : file.type === 'image/png' ? 'png' : file.type === 'image/webp' ? 'webp' : 'jpg';
+  const path = `${company}/${vehicle}/${crypto.randomUUID()}.${ext}`;
+  const { error } = await supabase.storage.from(FLEET_FILES_BUCKET).upload(path, file, { contentType: file.type, upsert: false });
+  if (error) throw new RpcError('unknown');
+  return path;
+}
+
+/** A link to look at a receipt, valid for 10 minutes. */
+export async function receiptUrl(path: string): Promise<string> {
+  if (!supabase) throw new RpcError('network');
+  const { data, error } = await supabase.storage.from(FLEET_FILES_BUCKET).createSignedUrl(path, 600);
+  if (error || !data) throw new RpcError('unknown');
+  return data.signedUrl;
 }

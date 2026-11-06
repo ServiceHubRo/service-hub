@@ -5,7 +5,6 @@ import { ActionButton } from '../../../components/ActionButton';
 import { BackLink } from '../../../components/BackLink';
 import { Button } from '../../../components/Button';
 import { Card } from '../../../components/Card';
-import { Chip, ChipRow } from '../../../components/Chip';
 import { Field } from '../../../components/Field';
 import { LoadError } from '../../../components/LoadError';
 import { OfferNote } from '../../../components/OfferNote';
@@ -452,15 +451,15 @@ function Editor({
 
       {vatRate !== null && (
         <div className={styles.mode}>
-          <span className={styles.label}>{t('qe.prices')}</span>
-          <ChipRow label={t('qe.prices')}>
-            <Chip selected={!priceMode.net} onClick={() => switchMode(false)}>
-              {t('qe.prices.gross')}
-            </Chip>
-            <Chip selected={priceMode.net} onClick={() => switchMode(true)}>
-              {t('qe.prices.net')}
-            </Chip>
-          </ChipRow>
+          <SelectField
+            label={t('qe.prices')}
+            value={priceMode.net ? 'net' : 'gross'}
+            onChange={(e) => switchMode(e.target.value === 'net')}
+            options={[
+              { value: 'gross', label: t('qe.prices.gross') },
+              { value: 'net', label: t('qe.prices.net') },
+            ]}
+          />
         </div>
       )}
 

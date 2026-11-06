@@ -86,7 +86,7 @@ test.describe('subscription', () => {
     await expect(page.getByRole('meter', { name: 'Mai ai 90 de zile gratuite' })).toHaveAttribute('aria-valuenow', '90');
     await expect(page.getByText('100 lei', { exact: true })).toBeVisible();
     await expect(page.getByText('Fără contract, anulezi oricând')).toBeVisible();
-    await expect(page.getByText('Nicio plată încă.')).toBeVisible();
+    await expect(page.getByText('Nu există plăți.')).toBeVisible();
     // No invoice without the company's details: the button is a link to them.
     await expect(page.getByText('Completează datele de facturare înainte de plată.')).toBeVisible();
     await expect(page.getByRole('button', { name: 'Activează abonamentul' })).toHaveCount(0);
@@ -109,7 +109,7 @@ test.describe('subscription', () => {
     await expect(page.getByText(/^Cardul este salvat\. Prima plată, 100 lei, pe \d{1,2} [a-z]+( \d{4})?\.$/)).toBeVisible();
     await expect(page.getByRole('button', { name: 'Activează abonamentul' })).toHaveCount(0);
     await expect(page.getByRole('button', { name: 'Gestionează abonamentul' })).toBeVisible();
-    await expect(page.getByText('Nicio plată încă.')).toBeVisible();
+    await expect(page.getByText('Nu există plăți.')).toBeVisible();
     await shot(page, 't14-subscription-card-saved', name());
 
     const sub = await subscriptionOf(shopId);
@@ -135,11 +135,11 @@ test.describe('subscription', () => {
 
     const twelve = periods.getByRole('radio', { name: /^12 luni/ });
     await twelve.scrollIntoViewIfNeeded();
-    const top = await page.evaluate(() => document.querySelector('main')?.scrollTop ?? 0);
+    const top = await page.evaluate(() => document.scrollingElement!.scrollTop);
     await twelve.check();
     await expect(twelve).toBeChecked();
     // Choosing never moves the page.
-    expect(await page.evaluate(() => document.querySelector('main')?.scrollTop ?? 0)).toBe(top);
+    expect(await page.evaluate(() => document.scrollingElement!.scrollTop)).toBe(top);
 
     await page.getByRole('button', { name: 'Activează abonamentul' }).click();
     await expect(page.getByText('Abonament: 1020 lei / 12 luni')).toBeVisible();
@@ -228,12 +228,12 @@ test.describe('subscription', () => {
     const customer = (await subscriptionOf(shopId)).stripe_customer_id!;
     await stripeFailPayment(customer);
     await expect(page.getByText('Plată restantă', { exact: true })).toBeVisible();
-    await expect(page.getByText(/^Plata nu a reușit\. Reîncercăm pe .+\. Verifică sau schimbă cardul din Gestionează\.$/)).toBeVisible();
+    await expect(page.getByText(/^Plata nu a reușit\. Următoarea încercare: .+\. Verifică sau schimbă cardul din Gestionează\.$/)).toBeVisible();
     // The thank-you from the checkout does not stay over a later failed payment.
     await expect(page.getByText('Mulțumim. Abonamentul este activ.')).toHaveCount(0);
     await shot(page, 't14-subscription-past-due', name());
     const failedMail = await emailWith(email, 'Plata abonamentului nu a reușit');
-    expect(failedMail.text).toMatch(/Reîncercăm pe \d{1,2} [a-z]+\./);
+    expect(failedMail.text).toMatch(/Următoarea încercare: \d{1,2} [a-z]+\./);
 
     await page.goto('/s/panou');
     await expect(page.getByText('Plata abonamentului nu a reușit. Verifică cardul ca service-ul să rămână în căutări.')).toBeVisible();

@@ -1,13 +1,19 @@
-import { Download, Plus, ReceiptText } from 'lucide-react';
+import { CheckCheck, Download, FileText, Flag, Paperclip, Pencil, Plus, ReceiptText, Trash2 } from 'lucide-react';
 import { useMemo, useRef, useState } from 'react';
 import { ActionButton } from '../../components/ActionButton';
 import { Button } from '../../components/Button';
+import { buttonClass } from '../../components/buttonClass';
 import { Card } from '../../components/Card';
+import { Checkbox } from '../../components/Checkbox';
 import { ChoiceFilters } from '../../components/Filters';
 import { EmptyState } from '../../components/EmptyState';
 import { Field } from '../../components/Field';
+import type { MenuItem } from '../../components/MenuButton';
+import { MoreActions } from '../../components/MoreActions';
 import { SelectField } from '../../components/SelectField';
 import { TextArea } from '../../components/TextArea';
+import { RECEIPT_MAX_BYTES, RECEIPT_TYPES } from '../../data/fleet';
+import { canRetryRpc, rpcErrorMessage, toRpcError } from '../../data/rpc';
 import { useI18n } from '../../i18n/context';
 import { formatDate, formatDateRange, formatMoney, ymdInBucharest } from '../../i18n/format';
 import { importAmount, importOdometer } from '../../lib/importRows';
@@ -15,17 +21,25 @@ import {
   buildLedger,
   costsCsv,
   filterCosts,
+  EXPENSE_CATEGORIES,
   FLEET_CATEGORIES,
+  FUEL_TYPES,
   hasFeature,
   sumAmounts,
   totalsBy,
   type CostSource,
+  type ExpenseCategory,
+  type ExpenseFields,
   type FleetCategory,
+  type FleetExpense,
+  type FuelType,
 } from '../../lib/fleet';
+import { newRequestId } from '../../lib/requestId';
 import { saveFile } from '../../lib/saveFile';
 import { SourcePill } from './FleetPills';
 import { COST_PERIODS, periodRange, type CostPeriod } from './periods';
 import { useFleet, vehicleLabel } from './fleetContext';
+import pill from '../../components/StatusBadge.module.css';
 import styles from './fleet.module.css';
 
 /**
@@ -36,7 +50,7 @@ import styles from './fleet.module.css';
  */
 export function FleetCosts({ initialPeriod }: { initialPeriod?: string }) {
   const { t, lang } = useI18n();
-  const { data, allowed, vehicle, addExpense, plan } = useFleet();
+  const { data, allowed, vehicle, addExpense, actions, plan, logExport } = useFleet();
   const today = ymdInBucharest(new Date());
   const ledger = useMemo(() => buildLedger(data.jobs, data.expenses), [data.jobs, data.expenses]);
   const [period, setPeriod] = useState<CostPeriod>(COST_PERIODS.includes(initialPeriod as CostPeriod) ? (initialPeriod as CostPeriod) : 'year');
@@ -45,6 +59,9 @@ export function FleetCosts({ initialPeriod }: { initialPeriod?: string }) {
   const [shopId, setShopId] = useState('');
   const [source, setSource] = useState<CostSource | ''>('');
   const [adding, setAdding] = useState(false);
+  const [editing, setEditing] = useState<FleetExpense | null>(null);
+  // A ledger row of an expense is `exp:<id>` (buildLedger).
+  const expenseOf = (id: string) => data.expenses.find((x) => `exp:${x.id}` === id);
   const shops = useMemo(() => {
     const map = new Map<string, string>();
     for (const j of data.jobs) map.set(j.shop_id, j.shop_name);
@@ -69,6 +86,8 @@ export function FleetCosts({ initialPeriod }: { initialPeriod?: string }) {
       category: (e) => t(`fleet.cat.${e.category}`) + (e.fee ? ` (${t('fleet.costs.fee')})` : ''),
       source: (e) => t(`fleet.source.${e.source}`),
     });
+    // The plan and the role are checked, and the export logged, before the file is written (T65).
+    await logExport('costs_csv', shown.length);
     await saveFile(new Blob([csv], { type: 'text/csv;charset=utf-8' }), `${t('fleet.costs.file')}-${today}.csv`);
   }
 
@@ -136,11 +155,11 @@ export function FleetCosts({ initialPeriod }: { initialPeriod?: string }) {
         end={
           <div className={styles.toolbarEnd}>
             {shown.length > 0 && hasFeature(plan, 'export_csv') && (
-              <Button variant="ghost" className={styles.tool} onClick={() => void exportCsv()}>
+              <ActionButton variant="ghost" block={false} className={styles.tool} onAction={() => exportCsv()} errorMessage={(e) => rpcErrorMessage(lang, e)} canRetry={canRetryRpc}>
                 <Download size={18} aria-hidden="true" /> {t('fleet.export.csv')}
-              </Button>
+              </ActionButton>
             )}
-            {allowed('costs.manage') && addExpense && (
+            {allowed('costs.manage') && (addExpense || actions) && (
               <Button variant="primary" onClick={() => setAdding((a) => !a)} aria-expanded={adding}>
                 <Plus size={18} aria-hidden="true" /> {t('fleet.costs.add')}
               </Button>
@@ -151,6 +170,7 @@ export function FleetCosts({ initialPeriod }: { initialPeriod?: string }) {
       {range.from && <p className={styles.count}>{formatDateRange(lang, range.from, range.to)}</p>}
 
       {adding && <ExpenseForm onDone={() => setAdding(false)} />}
+      {editing && <ExpenseForm key={editing.id} expense={editing} onDone={() => setEditing(null)} />}
 
       <ul className={styles.summary}>
         <li className={styles.summaryItem}>
@@ -181,7 +201,7 @@ export function FleetCosts({ initialPeriod }: { initialPeriod?: string }) {
           )}
           <ul className={styles.plainList}>
             {shown.map((e) => (
-              <li key={e.id} className={styles.lineRow}>
+              <li key={e.id} className={`${styles.lineRow} ${e.source === 'manual' && actions ? styles.wrapRow : ''}`}>
                 <span className={styles.lineText}>
                   <span>
                     {t(`fleet.cat.${e.category}`)}
@@ -195,8 +215,14 @@ export function FleetCosts({ initialPeriod }: { initialPeriod?: string }) {
                 </span>
                 <span className={styles.lineEnd}>
                   <SourcePill source={e.source} />
+                  {expenseOf(e.id)?.status === 'to_check' && <span className={`${pill.pill} ${pill.amber}`}>{t('fleet.expense.toCheck')}</span>}
                   <span className="mono">{formatMoney(lang, e.amount)}</span>
                 </span>
+                {e.source === 'manual' && expenseOf(e.id) && (
+                  <div className={styles.rowActions}>
+                    <ExpenseActions expense={expenseOf(e.id)!} onEdit={() => setEditing(expenseOf(e.id)!)} />
+                  </div>
+                )}
               </li>
             ))}
           </ul>
@@ -238,80 +264,140 @@ export function FleetCosts({ initialPeriod }: { initialPeriod?: string }) {
   );
 }
 
-type FormField = 'vehicle' | 'day' | 'amount' | 'odometer';
+type FormField = 'vehicle' | 'day' | 'amount' | 'odometer' | 'liters' | 'receipt';
 
 /**
- * A manual expense. The checks here mirror `fleet_add_expense` (proposed), which repeats them: a car,
- * a category, a day no later than today (Bucharest), an amount above 0, a plausible odometer.
- * Preview: the expense is kept in memory only.
+ * An expense of the company's own (M1), new or changed. The checks mirror `fleet_save_expense`, which
+ * repeats them: a vehicle, a category, a day no later than today (Bucharest), an amount above 0, a
+ * plausible odometer; for fuel the liters, the fuel and whether the tank was filled. The receipt (a
+ * photo or a PDF, 5 MB at most) goes to the private bucket before the expense is saved. An expense
+ * identical to another one asks once more before it is saved. A driver (`fuelOnly`) adds fuel for the
+ * vehicle assigned to them. Preview: kept in memory only.
  */
-function ExpenseForm({ onDone }: { onDone: () => void }) {
-  const { t } = useI18n();
-  const { data, addExpense } = useFleet();
+export function ExpenseForm({ expense, fuelOnly = false, fixedVehicle, onDone }: { expense?: FleetExpense; fuelOnly?: boolean; fixedVehicle?: string; onDone: () => void }) {
+  const { t, lang } = useI18n();
+  const { data, addExpense, actions } = useFleet();
   const today = ymdInBucharest(new Date());
-  const cars = data.vehicles.filter((v) => !v.archived_at);
-  const [vehicleId, setVehicleId] = useState(cars[0]?.id ?? '');
-  const [category, setCategory] = useState<FleetCategory>('fuel');
-  const [day, setDay] = useState(today);
-  const [amount, setAmount] = useState('');
-  const [supplier, setSupplier] = useState('');
-  const [odometer, setOdometer] = useState('');
-  const [description, setDescription] = useState('');
+  const cars = data.vehicles.filter((v) => !v.archived_at || v.id === expense?.vehicle_id);
+  const [vehicleId, setVehicleId] = useState(expense?.vehicle_id ?? fixedVehicle ?? cars[0]?.id ?? '');
+  const [category, setCategory] = useState<ExpenseCategory>(fuelOnly ? 'fuel' : ((expense?.category as ExpenseCategory | undefined) ?? 'fuel'));
+  const [day, setDay] = useState(expense?.day ?? today);
+  const [amount, setAmount] = useState(expense ? String(expense.amount) : '');
+  const [supplier, setSupplier] = useState(expense?.supplier ?? '');
+  const [odometer, setOdometer] = useState(expense?.odometer != null ? String(expense.odometer) : '');
+  const [liters, setLiters] = useState(expense?.liters != null ? String(expense.liters) : '');
+  const [fuelType, setFuelType] = useState<FuelType | ''>(expense?.fuel_type ?? '');
+  const [fullTank, setFullTank] = useState(expense?.full_tank ?? false);
+  const [description, setDescription] = useState(expense?.description ?? '');
+  const [file, setFile] = useState<File | null>(null);
+  const [duplicate, setDuplicate] = useState(false);
   const [errors, setErrors] = useState<Partial<Record<FormField, string>>>({});
   const dayRef = useRef<HTMLInputElement>(null);
   const amountRef = useRef<HTMLInputElement>(null);
   const odometerRef = useRef<HTMLInputElement>(null);
+  const litersRef = useRef<HTMLInputElement>(null);
+  const fuel = category === 'fuel';
 
-  async function save() {
+  function pickFile(f: File | null) {
+    setErrors((e) => ({ ...e, receipt: undefined }));
+    if (f && !(RECEIPT_TYPES as readonly string[]).includes(f.type)) {
+      setErrors((e) => ({ ...e, receipt: t('fleet.form.receiptType') }));
+      return;
+    }
+    if (f && f.size > RECEIPT_MAX_BYTES) {
+      setErrors((e) => ({ ...e, receipt: t('fleet.form.receiptTooBig') }));
+      return;
+    }
+    setFile(f);
+  }
+
+  async function save(requestId: string, confirmDuplicate = false) {
     const next: Partial<Record<FormField, string>> = {};
     const value = importAmount(amount);
     const km = odometer.trim() ? importOdometer(odometer) : null;
+    const l = fuel && liters.trim() ? importAmount(liters) : null;
     if (!vehicleId) next.vehicle = t('fleet.form.vehicleRequired');
     if (!day || day > today) next.day = t('fleet.form.dayFuture');
     if (value === null || value <= 0) next.amount = t('fleet.form.amountInvalid');
     if (odometer.trim() && km === null) next.odometer = t('fleet.form.kmInvalid');
-    setErrors(next);
-    const first = (['day', 'amount', 'odometer'] as const).find((f) => next[f]);
+    if (fuel && liters.trim() && (l === null || l <= 0)) next.liters = t('fleet.form.litersInvalid');
+    setErrors((e) => ({ ...next, receipt: e.receipt }));
+    const first = (['day', 'amount', 'odometer', 'liters'] as const).find((f) => next[f]);
     if (first) {
-      ({ day: dayRef, amount: amountRef, odometer: odometerRef })[first].current?.focus();
+      ({ day: dayRef, amount: amountRef, odometer: odometerRef, liters: litersRef })[first].current?.focus();
       return;
     }
-    if (next.vehicle) return;
-    if (!addExpense) return;
-    addExpense({
-      id: crypto.randomUUID(),
+    if (next.vehicle || errors.receipt) return;
+    if (!actions) {
+      // The design preview: kept in memory.
+      addExpense?.({
+        id: crypto.randomUUID(),
+        vehicle_id: vehicleId,
+        category,
+        day,
+        amount: value!,
+        currency: 'RON',
+        description: description.trim() || null,
+        supplier: supplier.trim() || null,
+        odometer: km,
+        booking_id: null,
+        created_at: new Date().toISOString(),
+        created_by: data.me.member_id,
+        deleted_at: null,
+      });
+      onDone();
+      return;
+    }
+    const receipt = file ? await actions.uploadReceipt(vehicleId, file) : (expense?.receipt_path ?? null);
+    const fields: ExpenseFields = {
       vehicle_id: vehicleId,
       category,
       day,
       amount: value!,
-      currency: 'RON',
-      description: description.trim() || null,
       supplier: supplier.trim() || null,
+      description: description.trim() || null,
       odometer: km,
-      booking_id: null,
-      created_at: new Date().toISOString(),
-      created_by: data.me.member_id,
-      deleted_at: null,
-    });
+      liters: fuel ? l : null,
+      fuel_type: fuel ? fuelType || null : null,
+      full_tank: fuel ? fullTank : null,
+      booking_id: expense?.booking_id ?? null,
+      receipt_path: receipt,
+      confirm_duplicate: confirmDuplicate,
+    };
+    try {
+      await actions.saveExpense(expense?.id ?? null, fields, requestId);
+    } catch (e) {
+      if (toRpcError(e).code === 'expense_possible_duplicate') {
+        // Asked once more, in the page: an identical expense is often the same receipt twice.
+        setDuplicate(true);
+        return;
+      }
+      throw e;
+    }
     onDone();
   }
 
+  const categories = fuelOnly ? (['fuel'] as const) : EXPENSE_CATEGORIES;
   return (
     <Card className={styles.card}>
-      <h2 className={styles.cardTitle}>{t('fleet.costs.add')}</h2>
+      <h2 className={styles.cardTitle}>{expense ? t('fleet.costs.editTitle') : fuelOnly ? t('fleet.costs.addFuel') : t('fleet.costs.add')}</h2>
       <div className={styles.formGrid}>
-        <SelectField
-          label={t('fleet.col.vehicle')}
-          value={vehicleId}
-          onChange={(e) => setVehicleId(e.target.value)}
-          options={cars.map((v) => ({ value: v.id, label: vehicleLabel(v) }))}
-        />
-        <SelectField
-          label={t('fleet.col.category')}
-          value={category}
-          onChange={(e) => setCategory(e.target.value as FleetCategory)}
-          options={FLEET_CATEGORIES.map((c) => ({ value: c, label: t(`fleet.cat.${c}`) }))}
-        />
+        {!fixedVehicle && (
+          <SelectField
+            label={t('fleet.col.vehicle')}
+            value={vehicleId}
+            onChange={(e) => setVehicleId(e.target.value)}
+            options={cars.map((v) => ({ value: v.id, label: vehicleLabel(v) }))}
+          />
+        )}
+        {!fuelOnly && (
+          <SelectField
+            label={t('fleet.col.category')}
+            value={category}
+            onChange={(e) => setCategory(e.target.value as ExpenseCategory)}
+            options={categories.map((c) => ({ value: c, label: t(c === 'repairs' ? 'fleet.cat.externalRepairs' : `fleet.cat.${c}`) }))}
+          />
+        )}
         <Field ref={dayRef} label={t('fleet.col.date')} type="date" max={today} value={day} error={errors.day} onChange={(e) => setDay(e.target.value)} />
         <Field
           ref={amountRef}
@@ -323,6 +409,25 @@ function ExpenseForm({ onDone }: { onDone: () => void }) {
           end={<span className={styles.fieldEnd}>{t('fleet.form.currency')}</span>}
           onChange={(e) => setAmount(e.target.value)}
         />
+        {fuel && (
+          <>
+            <Field
+              ref={litersRef}
+              label={t('fleet.form.liters')}
+              inputMode="decimal"
+              mono
+              value={liters}
+              error={errors.liters}
+              onChange={(e) => setLiters(e.target.value)}
+            />
+            <SelectField
+              label={t('fleet.form.fuelType')}
+              value={fuelType}
+              onChange={(e) => setFuelType(e.target.value as FuelType | '')}
+              options={[{ value: '', label: t('in.unset') }, ...FUEL_TYPES.map((f) => ({ value: f, label: t(`fleet.fuel.${f}`) }))]}
+            />
+          </>
+        )}
         <Field label={t('fleet.col.vendor')} value={supplier} maxLength={120} onChange={(e) => setSupplier(e.target.value)} />
         <Field
           ref={odometerRef}
@@ -335,14 +440,108 @@ function ExpenseForm({ onDone }: { onDone: () => void }) {
           onChange={(e) => setOdometer(e.target.value)}
         />
       </div>
+      {fuel && (
+        <Checkbox checked={fullTank} onChange={(e) => setFullTank(e.target.checked)}>
+          {t('fleet.form.fullTank')}
+        </Checkbox>
+      )}
       <TextArea label={t('fleet.form.description')} value={description} maxLength={500} rows={2} onChange={(e) => setDescription(e.target.value)} />
-      <p className={styles.hintLine}>{t('fleet.form.receiptLater')}</p>
-      <div className={styles.actions}>
-        <ActionButton variant="primary" onAction={save}>
-          {t('fleet.form.save')}
-        </ActionButton>
-        <Button onClick={onDone}>{t('fleet.form.cancel')}</Button>
-      </div>
+      {actions && (
+        <div className={styles.receiptField}>
+          <span className={styles.receiptLabel} id="expense-receipt-label">
+            {t('fleet.form.receipt')}
+          </span>
+          {/* The browser's own file button speaks the browser's language; this one speaks the app's. */}
+          <div className={styles.receiptPick}>
+            <input
+              id="expense-receipt"
+              type="file"
+              accept={RECEIPT_TYPES.join(',')}
+              className={`visually-hidden ${styles.receiptInput}`}
+              aria-labelledby="expense-receipt-label"
+              aria-describedby="expense-receipt-hint"
+              aria-invalid={errors.receipt ? true : undefined}
+              onChange={(e) => pickFile(e.target.files?.[0] ?? null)}
+            />
+            <label htmlFor="expense-receipt" className={buttonClass('secondary', false)}>
+              <Paperclip size={18} aria-hidden="true" /> {t('fleet.form.receiptPick')}
+            </label>
+            <span className={styles.receiptName}>{file ? file.name : expense?.receipt_path ? t('fleet.form.receiptAttached') : t('fleet.form.receiptNone')}</span>
+          </div>
+          <p id="expense-receipt-hint" className={errors.receipt ? styles.fieldErrorLine : styles.hintLine}>
+            {errors.receipt ?? (expense?.receipt_path && !file ? t('fleet.form.receiptKept') : t('fleet.form.receiptHint'))}
+          </p>
+        </div>
+      )}
+      {duplicate ? (
+        <div className={styles.confirmPanel} role="group" aria-labelledby="expense-dup">
+          <p id="expense-dup">{t('rpcError.expense_possible_duplicate')}</p>
+          <div className={styles.actions}>
+            <ActionButton variant="primary" onAction={(rid) => save(rid, true)} errorMessage={(e) => rpcErrorMessage(lang, e)} canRetry={canRetryRpc}>
+              {t('fleet.form.saveAnyway')}
+            </ActionButton>
+            <Button onClick={() => setDuplicate(false)}>{t('fleet.form.cancel')}</Button>
+          </div>
+        </div>
+      ) : (
+        <div className={styles.actions}>
+          <ActionButton variant="primary" onAction={(rid) => save(rid)} errorMessage={(e) => rpcErrorMessage(lang, e)} canRetry={canRetryRpc}>
+            {t('fleet.form.save')}
+          </ActionButton>
+          <Button onClick={onDone}>{t('fleet.form.cancel')}</Button>
+        </div>
+      )}
     </Card>
+  );
+}
+
+/** „Mai multe” on an expense of the company's own: edit, the receipt, checked or not, delete. */
+function ExpenseActions({ expense, onEdit }: { expense: FleetExpense; onEdit: () => void }) {
+  const { t, lang } = useI18n();
+  const { actions, allowed } = useFleet();
+  const [confirm, setConfirm] = useState(false);
+  if (!actions) return null;
+  const items: MenuItem[] = [];
+  if (allowed('costs.manage')) items.push({ key: 'edit', label: t('fleet.expense.edit'), icon: <Pencil size={18} aria-hidden="true" />, onSelect: onEdit });
+  if (expense.receipt_path) {
+    items.push({
+      key: 'receipt',
+      label: t('fleet.expense.viewReceipt'),
+      icon: <FileText size={18} aria-hidden="true" />,
+      onSelect: () => {
+        // Opened at once (a browser blocks a window opened after a wait), then pointed at the file.
+        const win = window.open('', '_blank');
+        void actions.receiptUrl(expense.receipt_path!).then(
+          (url) => {
+            if (win) win.location.href = url;
+          },
+          () => win?.close(),
+        );
+      },
+    });
+  }
+  if (allowed('costs.manage')) {
+    items.push(
+      expense.status === 'to_check'
+        ? { key: 'ok', label: t('fleet.expense.markOk'), icon: <CheckCheck size={18} aria-hidden="true" />, onSelect: () => void actions.markExpense(expense.id, 'ok', newRequestId()) }
+        : { key: 'check', label: t('fleet.expense.markToCheck'), icon: <Flag size={18} aria-hidden="true" />, onSelect: () => void actions.markExpense(expense.id, 'to_check', newRequestId()) },
+      { key: 'delete', label: t('fleet.expense.delete'), icon: <Trash2 size={18} aria-hidden="true" />, danger: true, onSelect: () => setConfirm(true) },
+    );
+  }
+  return (
+    <>
+      <MoreActions items={items} />
+      {confirm && (
+        <div className={styles.confirmPanel} role="group" aria-labelledby={`del-${expense.id}`}>
+          <p id={`del-${expense.id}`}>{t('fleet.expense.deleteConfirm')}</p>
+          <div className={styles.actions}>
+            <ActionButton variant="danger" onAction={(rid) => actions.deleteExpense(expense.id, rid)} errorMessage={(e) => rpcErrorMessage(lang, e)} canRetry={canRetryRpc}>
+              {t('fleet.expense.deleteYes')}
+            </ActionButton>
+            <Button onClick={() => setConfirm(false)}>{t('fleet.form.cancel')}</Button>
+          </div>
+        </div>
+      )}
+    </>
   );
 }

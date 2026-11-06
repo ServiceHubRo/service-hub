@@ -68,17 +68,14 @@ export function Tour({ role, name, onDone }: { role: 'client' | 'shop'; name: st
   const layerRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const root = document.getElementById('root');
-    const main = document.querySelector<HTMLElement>('main');
     const layer = layerRef.current;
     const block = (event: Event) => event.preventDefault();
     if (root) root.inert = true;
-    if (main) main.style.overflow = 'hidden';
     document.documentElement.style.overflow = 'hidden';
     layer?.addEventListener('wheel', block, { passive: false });
     layer?.addEventListener('touchmove', block, { passive: false });
     return () => {
       if (root) root.inert = false;
-      if (main) main.style.overflow = '';
       document.documentElement.style.overflow = '';
       layer?.removeEventListener('wheel', block);
       layer?.removeEventListener('touchmove', block);

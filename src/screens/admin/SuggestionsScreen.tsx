@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { ActionButton } from '../../components/ActionButton';
 import { BackLink } from '../../components/BackLink';
 import { Card } from '../../components/Card';
-import { Chip, ChipRow } from '../../components/Chip';
+import { SelectField } from '../../components/SelectField';
 import { EmptyState } from '../../components/EmptyState';
 import { LoadError } from '../../components/LoadError';
 import { SkeletonList } from '../../components/Skeleton';
@@ -104,13 +104,13 @@ export function SuggestionsScreen() {
       <div>
         <h1>{t('admin.sugg.title')}</h1>
       </div>
-      <ChipRow label={t('admin.sugg.filter')}>
-        {(['all', ...SUGGESTION_STATUSES] as const).map((f) => (
-          <Chip key={f} selected={filter === f} onClick={() => setFilter(f)}>
-            {label(f)}
-          </Chip>
-        ))}
-      </ChipRow>
+      <SelectField
+        className={styles.narrowSelect}
+        label={t('admin.sugg.filter')}
+        value={filter}
+        onChange={(e) => setFilter(e.target.value as Filter)}
+        options={(['all', ...SUGGESTION_STATUSES] as const).map((f) => ({ value: f, label: label(f) }))}
+      />
       {state.status === 'loading' && <SkeletonList />}
       {state.status === 'error' && <LoadError message={t('admin.loadError')} onRetry={reload} />}
       {state.status === 'ready' &&

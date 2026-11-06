@@ -13,6 +13,7 @@ import {
   shot,
   signIn,
   userIdOf,
+  switchLanguage,
 } from './support';
 
 // T24 — the switches for the new notifications: the client's tires and tips in Cont, the owner's
@@ -35,7 +36,7 @@ async function setLanguage(page: Page, lang: 'ro' | 'en') {
   await page.getByRole('link', { name: lang === 'en' ? 'Cont' : 'Account', exact: true }).filter({ visible: true }).first().click();
   // Saved on the account before the test reloads: the account's language wins on the next start.
   const saved = page.waitForResponse((r) => r.url().includes('/rest/v1/profiles') && r.request().method() === 'PATCH');
-  await page.getByRole('button', { name: lang === 'en' ? 'English' : 'Română' }).filter({ visible: true }).first().click();
+  await switchLanguage(page, lang);
   await expect(page.getByRole('heading', { level: 1, name: lang === 'en' ? 'Account' : 'Cont' })).toBeVisible();
   await saved;
 }
@@ -110,7 +111,7 @@ test.describe('T24 notifications', () => {
 
     await monthly.uncheck();
     await page.getByRole('button', { name: 'Salvează notificările' }).click();
-    await expect(page.getByRole('button', { name: '✓ Salvat' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Salvat' })).toBeVisible();
     const [shop] = await serviceRest<{ monthly_report: boolean }[]>(`shops?id=eq.${shopId}&select=monthly_report`, 'GET');
     expect(shop!.monthly_report).toBe(false);
 

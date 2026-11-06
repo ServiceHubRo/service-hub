@@ -47,7 +47,7 @@ test('a favorite: the heart pops once saved, not when removed', async ({ page })
 
   const save = page.getByRole('button', { name: `Salvează ${shopName} la favorite` });
   await save.click();
-  const remove = page.getByRole('button', { name: `Scoate ${shopName} din favorite` });
+  const remove = page.getByRole('button', { name: `Elimină ${shopName} din favorite` });
   await expect(remove).toBeVisible();
   expect(await running(remove.locator('svg'))).toBeGreaterThan(0);
   await shot(page, 'motion-favorite', name());
@@ -63,7 +63,7 @@ test('a request arriving live: the count jumps, the number of "Cereri noi" and t
   await signIn(page, shop, PASSWORD);
   await expect(page).toHaveURL(/\/s\/panou$/);
   // Panou has loaded with no request: a request already there when it loads does not light up.
-  await expect(page.getByText('Nicio programare azi.')).toBeVisible();
+  await expect(page.getByText('Nu există programări azi.')).toBeVisible();
   await expect(page.getByRole('link', { name: /^\d+ Cereri noi$/ })).toHaveCount(0);
   await expect(page.getByText('Cereri noi', { exact: true })).toBeVisible();
 

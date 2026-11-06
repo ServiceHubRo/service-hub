@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
-import { BACKEND, SEED, SEED_PASSWORD, expectNoHorizontalScroll, isDesktop, signIn } from './support';
+import { BACKEND, SEED, SEED_PASSWORD, expectNoHorizontalScroll, isDesktop, signIn, switchLanguage } from './support';
 
 const NAV = {
   client: ['Caută', 'Garaj', 'Programări', 'Mesaje', 'Cont'],
@@ -51,7 +51,7 @@ test('public pages keep the language switch below the iPhone status bar', async 
   await cdp.send('Emulation.setSafeAreaInsetsOverride' as never, { insets: { top: 59, bottom: 34, left: 0, right: 0 } } as never);
   for (const path of ['/', '/intra', '/verifica', '/legal/termeni']) {
     await page.goto(path);
-    const ro = page.getByRole('button', { name: /^(RO|Română)$/ }).filter({ visible: true }).first();
+    const ro = page.getByRole('combobox', { name: /^(Limba|Language)$/ }).filter({ visible: true }).first();
     await expect(ro).toBeVisible();
     const box = (await ro.boundingBox())!;
     expect(box.y, path).toBeGreaterThanOrEqual(59);
@@ -117,7 +117,7 @@ for (const role of Object.keys(NAV) as (keyof typeof NAV)[]) {
     }
 
     // Switching to English changes every label.
-    await page.getByRole('button', { name: 'English' }).filter({ visible: true }).first().click();
+    await switchLanguage(page, 'en');
     const en = await navLabels(page);
     if (isDesktop(page) && role !== 'admin') expect(en.slice(0, 4)).toEqual(NAV_EN[role].slice(0, 4));
     else expect(en).toEqual(isDesktop(page) ? [...NAV_EN[role]] : inBar(NAV_EN[role]));
@@ -132,7 +132,7 @@ test('"Mai multe" on the last card shows every entry, above the tab bar', async 
   await page.goto('/s/programari?tab=programate');
   const more = page.getByRole('button', { name: 'Mai multe' });
   await expect(more.first()).toBeVisible();
-  await page.locator('main').evaluate((m) => m.scrollTo(0, m.scrollHeight));
+  await page.evaluate(() => window.scrollTo(0, document.scrollingElement!.scrollHeight));
   await more.last().click();
   const items = page.getByRole('menu').getByRole('menuitem');
   await expect(items.first()).toBeVisible();
@@ -159,7 +159,7 @@ test('going back finds a screen where it was left; a new screen starts at the to
   await expect(page).toHaveURL(/\/c\/cauta$/);
   await page.getByRole('link', { name: 'Cont', exact: true }).filter({ visible: true }).first().click();
   await expect(page.getByRole('heading', { level: 1, name: 'Cont' })).toBeVisible();
-  const top = () => page.locator('main').evaluate((el) => el.scrollTop);
+  const top = () => page.evaluate(() => document.scrollingElement!.scrollTop);
   const suggestions = page.getByRole('link', { name: /^Sugestii/ });
   await suggestions.scrollIntoViewIfNeeded();
   const left = await top();
@@ -199,16 +199,17 @@ test('"‹ Înapoi" stays at the top of the screen while it scrolls', async ({ p
   // The document arrives a moment after the screen: scroll until it is long enough.
   await expect
     .poll(() =>
-      page.locator('main').evaluate((el) => {
-        el.scrollTo(0, 2000);
-        return el.scrollTop;
+      page.evaluate(() => {
+        window.scrollTo(0, 2000);
+        return document.scrollingElement!.scrollTop;
       }),
     )
     .toBeGreaterThan(1000);
-  const main = (await page.locator('main').boundingBox())!;
+  // Right under the app's header (none on a laptop).
+  const header = await page.evaluate(() => parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--nav-top')) || 0);
   const box = (await back.boundingBox())!;
-  expect(box.y).toBeGreaterThanOrEqual(main.y - 1);
-  expect(box.y).toBeLessThan(main.y + 20);
+  expect(box.y).toBeGreaterThanOrEqual(header - 1);
+  expect(box.y).toBeLessThan(header + 20);
   // Nothing scrolls over it: a tap there is a tap on it.
   const hit = await page.evaluate(
     ([x, y]) => document.elementFromPoint(x!, y!)?.closest('a')?.textContent ?? null,
@@ -266,7 +267,7 @@ test('log out asks first, then returns to the public page and closes the role sc
   await page.route('**/rest/v1/profiles?*', (route) =>
     route.request().method() === 'PATCH' ? route.fulfill({ status: 204 }) : route.continue(),
   );
-  await page.getByRole('button', { name: 'English' }).filter({ visible: true }).first().click();
+  await switchLanguage(page, 'en');
   await page.getByRole('button', { name: 'Log out' }).filter({ visible: true }).click();
   await expect(page.getByRole('heading', { name: 'Log out?' })).toBeVisible();
   await page.screenshot({ path: `test-results/shots/logout-confirm-en-${test.info().project.name}.png` });
@@ -289,8 +290,10 @@ test('component gallery: action button, stepper, errors', async ({ page }) => {
   await expectNoHorizontalScroll(page);
 
   const main = page.getByRole('main').or(page.locator('body'));
-  const scroller = page.locator('[class*="page"]').first();
-  await scroller.evaluate((el) => el.scrollTo(0, 600));
+  const scroller = page.locator('html');
+  await expect(page.locator('output')).toBeVisible();
+  // The stepper in the middle of the screen, the page scrolled down to it.
+  await page.getByRole('button', { name: /Crește/ }).evaluate((el) => el.scrollIntoView({ block: 'center' }));
   const before = await scroller.evaluate((el) => el.scrollTop);
   await page.getByRole('button', { name: /Crește/ }).click();
   await page.getByRole('button', { name: /Crește/ }).click();
@@ -311,7 +314,7 @@ test('component gallery: action button, stepper, errors', async ({ page }) => {
   await expect(ok).toBeEnabled();
 
   await page.getByRole('button', { name: 'Trimite (eșuează)' }).click();
-  await expect(page.getByText('Nu s-a putut trimite. Verifică internetul și încearcă din nou.')).toBeVisible();
+  await expect(page.getByText('Nu s-a putut trimite. Verifică conexiunea și încearcă din nou.')).toBeVisible();
   await expect(page.getByRole('button', { name: 'Încearcă din nou' })).toBeVisible();
 
   await page.screenshot({ path: `test-results/shots/components-${test.info().project.name}.png`, fullPage: false });

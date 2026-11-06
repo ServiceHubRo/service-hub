@@ -2,7 +2,19 @@ import { createContext, useCallback, useContext } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import type { VehicleFields } from '../../data/fleet';
 import type { Booking } from '../../data/rpc';
-import { memberCan, type FleetCapability, type FleetOverview, type FleetPlanSummary, type FleetSubscriptionView, type FleetVehicle } from '../../lib/fleet';
+import {
+  memberCan,
+  type ExpenseFields,
+  type FleetCapability,
+  type FleetExpense,
+  type FleetOverview,
+  type FleetPlanRow,
+  type FleetPlanSummary,
+  type FleetReport,
+  type FleetSubscriptionView,
+  type FleetVehicle,
+  type ReportFilters,
+} from '../../lib/fleet';
 
 /**
  * What every fleet screen needs: the company read (already narrowed to the member's role), what the
@@ -29,6 +41,14 @@ export interface FleetActions {
   decideQuote: (bookingId: string, quoteId: string, approvedItemIds: string[], requestId: string) => Promise<Booking>;
   /** "Programează la service": the search, with this vehicle picked on the car step. */
   book: (vehicleId: string | null) => void;
+  /** The company's own expenses (M1). */
+  saveExpense: (expenseId: string | null, fields: ExpenseFields, requestId: string) => Promise<FleetExpense>;
+  deleteExpense: (expenseId: string, requestId: string) => Promise<void>;
+  markExpense: (expenseId: string, status: 'ok' | 'to_check', requestId: string) => Promise<void>;
+  /** A receipt's photo or PDF, before the expense is saved; answers its path. */
+  uploadReceipt: (vehicleId: string, file: File) => Promise<string>;
+  /** A link to look at a receipt. */
+  receiptUrl: (path: string) => Promise<string>;
 }
 
 export interface FleetContextValue {
@@ -49,6 +69,12 @@ export interface FleetContextValue {
   plan: FleetPlanSummary | null;
   /** Reads the Abonament page (live: `fleet_subscription`; preview: the sample). */
   loadSubscription: () => Promise<FleetSubscriptionView>;
+  /** The plans sold today, for the "Disponibil în …" tags (T65). */
+  plans: FleetPlanRow[];
+  /** A report for the plan and the role (live: `fleet_report`, computed by the database). */
+  loadReport: (range: { from: string | null; to: string }, previous: { from: string | null; to: string } | null, filters: ReportFilters) => Promise<FleetReport>;
+  /** Checks and logs an export before the file is written (live: `fleet_log_export`). */
+  logExport: (kind: 'vehicles_csv' | 'costs_csv' | 'report_csv' | 'report_xlsx', rows: number) => Promise<void>;
 }
 
 export const FleetContext = createContext<FleetContextValue | null>(null);
@@ -97,7 +123,8 @@ export function useFleetLocation() {
   const go = useCallback(
     (link: FleetLink) => {
       update({ sectiune: link.section, vehicul: link.vehicle ?? null, filtru: link.filter ?? null });
-      document.getElementById('fleet-main')?.scrollTo?.({ top: 0 });
+      // Another section starts at the top of the page (the page scrolls, not an area inside it).
+      window.scrollTo?.({ top: 0 });
     },
     [update],
   );

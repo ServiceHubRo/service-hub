@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import {
   approvalDecision,
+  buildReport,
+  requiredPlan,
+  upgradeGains,
   extraColleagues,
   memberCan,
   monthlyTotal,
@@ -519,8 +522,9 @@ describe('fleet plans', () => {
     expect(hasFeature(null, 'budget')).toBe(true);
   });
 
-  it('never offers a feature that is not built', () => {
-    expect(offeredFeatures(plan.features)).toEqual(['dashboard', 'vehicles', 'reports']);
+  it('never offers a feature that is not built or not known', () => {
+    expect(offeredFeatures(plan.features)).toEqual(['dashboard', 'vehicles', 'reports', 'approval_flow']);
+    expect(offeredFeatures(['dashboard', 'fleet_ai'])).toEqual(['dashboard']);
   });
 
   it('counts the trial in Bucharest days', () => {
@@ -625,5 +629,77 @@ describe('the rights line of a member', () => {
     expect(rightsSummary('en', 'driver', ['vehicles.manage', 'costs.view', 'reports.view'], null)).toBe('Adds and edits vehicles · Sees costs and reports');
     expect(rightsSummary('ro', 'manager', [], 500)).toBe('Limita lui: 500 lei');
     expect(rightsSummary('ro', 'driver', [], null)).toBe('');
+  });
+});
+
+describe('the fleet report (T65, the same case as tests/sql/139_fleet_plan_features.sql)', () => {
+  const today = '2026-11-05';
+  const at = (day: string) => `${day}T14:00:00Z`; // 16:00 in Bucharest
+  const fleet: FleetOverview = {
+    company: { id: 'c', name: 'Transport Ana SRL', vat_id: null, plan_key: 'none', manager_approval_limit: null, budget: { monthly: 4000, yearly: null } },
+    me: { member_id: 'm1', role: 'admin' },
+    vehicles: [vehicle('v1', { department: 'Vânzări' }), vehicle('v2', { department: 'Livrări' })],
+    jobs: [
+      job('j1', { vehicle_id: 'v1', service_category: 'cat_rev', date: '2026-09-26', done_at: at('2026-09-26'), cost: 400, odometer: 100_000 }),
+      job('j2', { vehicle_id: 'v1', service_category: 'cat_fra', date: '2026-10-26', done_at: at('2026-10-26'), cost: 600, odometer: 101_000 }),
+      job('j3', { vehicle_id: 'v2', service_category: 'cat_rev', date: '2026-10-16', done_at: at('2026-10-16'), cost: 200, odometer: 50_000 }),
+      job('j4', { vehicle_id: 'v2', status: 'quote_refused', service_category: 'cat_fra', date: '2026-10-31', done_at: null, cost: 80, odometer: null }),
+    ],
+    expenses: [],
+    members: [],
+    issues: [],
+  };
+  const range = { from: '2026-09-06', to: today };
+  const prev = { from: '2026-07-07', to: '2026-09-05' };
+  const business = ['reports', 'cost_per_km', 'budget'];
+  const pro = [...business, 'reports_advanced', 'budget_forecast'];
+
+  it('totals, groups and cost per km as the database computes them', () => {
+    const r = buildReport(fleet, business, range, prev, {}, today);
+    expect(r.total).toBe(1280);
+    expect(r.count).toBe(4);
+    expect(r.avg_per_vehicle).toBe(640);
+    expect(r.previous?.total).toBe(0);
+    expect(r.by_vehicle.map((g) => [g.key, g.total, g.top_category])).toEqual([
+      ['v1', 1000, 'repairs'],
+      ['v2', 280, 'maintenance'],
+    ]);
+    expect(r.by_category[0]).toEqual({ key: 'repairs', total: 680, count: 2 });
+    expect(r.repairs[0]).toMatchObject({ vehicle_id: 'v1', count: 2 });
+    expect(r.per_km?.per_vehicle[0]).toEqual({ vehicle_id: 'v1', status: 'ok', km: 1000, cost: 600, per_km: 0.6 });
+    expect(r.per_km?.per_vehicle[1]).toEqual({ vehicle_id: 'v2', status: 'one_reading' });
+    expect(r.per_km?.total?.per_km).toBe(0.6);
+    expect(r.advanced).toBeUndefined();
+    expect(r.forecast).toBeUndefined();
+  });
+
+  it('Pro: high-cost vehicles, filters and the forecast', () => {
+    const r = buildReport(fleet, pro, range, prev, {}, today);
+    expect(r.advanced?.high_cost).toEqual(['v1']);
+    expect(r.advanced?.vehicle_monthly).toHaveLength(2);
+    expect(r.forecast?.month_spent).toBe(0);
+    expect(buildReport(fleet, pro, range, prev, { categories: ['repairs'] }, today).total).toBe(680);
+    expect(buildReport(fleet, pro, range, prev, { departments: ['Livrări'] }, today).total).toBe(280);
+  });
+
+  it('names the plan a feature needs, and what the next plan adds', () => {
+    const plans = [
+      { key: 'fleet_start', features: ['dashboard', 'vehicles'] },
+      { key: 'fleet_business', features: ['dashboard', 'vehicles', 'reports', 'export_csv'] },
+      { key: 'fleet_pro', features: ['dashboard', 'vehicles', 'reports', 'export_csv', 'reports_advanced'] },
+    ];
+    expect(requiredPlan('reports', plans)?.key).toBe('fleet_business');
+    expect(requiredPlan('reports_advanced', plans)?.key).toBe('fleet_pro');
+    expect(requiredPlan('export_excel', plans)).toBeNull();
+    expect(upgradeGains(plans[0]!.features, plans[1]!.features)).toEqual(['reports', 'export_csv']);
+  });
+});
+
+describe('rights grouped for „Drepturile fiecărui rol”', () => {
+  it('every right is in exactly one group', async () => {
+    const { FLEET_CAPABILITIES, FLEET_CAPABILITY_GROUPS } = await import('../../src/lib/fleet');
+    const grouped = FLEET_CAPABILITY_GROUPS.flatMap((g) => g.caps);
+    expect([...grouped].sort()).toEqual([...FLEET_CAPABILITIES].sort());
+    expect(new Set(grouped).size).toBe(grouped.length);
   });
 });
