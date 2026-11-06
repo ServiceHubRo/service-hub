@@ -362,6 +362,44 @@ export type Database = {
           },
         ]
       }
+      car_merges: {
+        Row: {
+          created_at: string
+          dropped_car: Json
+          id: number
+          kept_car_id: string
+          moved_bookings: string[]
+          moved_reports: string[]
+          owner_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          dropped_car: Json
+          id?: never
+          kept_car_id: string
+          moved_bookings?: string[]
+          moved_reports?: string[]
+          owner_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          dropped_car?: Json
+          id?: never
+          kept_car_id?: string
+          moved_bookings?: string[]
+          moved_reports?: string[]
+          owner_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "car_merges_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       cars: {
         Row: {
           created_at: string
@@ -4030,6 +4068,7 @@ export type Database = {
         }
         Returns: Json
       }
+      admin_vehicle_duplicates: { Args: never; Returns: Json }
       admin_verify_phone: {
         Args: { p_request_id: string; p_user_id: string }
         Returns: Json
@@ -4174,6 +4213,24 @@ export type Database = {
       cancel_email_change: {
         Args: { p_request_id: string }
         Returns: undefined
+      }
+      car_match: {
+        Args: {
+          p_except: string
+          p_owner: string
+          p_plate_norm: string
+          p_vin: string
+        }
+        Returns: string
+      }
+      car_same: {
+        Args: {
+          p_plate_a: string
+          p_plate_b: string
+          p_vin_a: string
+          p_vin_b: string
+        }
+        Returns: boolean
       }
       catalog_icon: { Args: { p_icon: string }; Returns: string }
       catalog_names: {
@@ -5316,6 +5373,10 @@ export type Database = {
       }
       mark_thread_read: { Args: { p_thread_id: string }; Returns: string }
       mask_plate: { Args: { p_plate: string }; Returns: string }
+      merge_cars: {
+        Args: { p_drop: string; p_keep: string; p_request_id: string }
+        Returns: Json
+      }
       message_is_own_side: {
         Args: {
           p_client_id: string
@@ -5403,6 +5464,7 @@ export type Database = {
         Returns: Json
       }
       phone_verify_cancel: { Args: { p_id: string }; Returns: undefined }
+      plate_norm: { Args: { p_plate: string }; Returns: string }
       post_booking_event: {
         Args: {
           p_booking: Database["public"]["Tables"]["bookings"]["Row"]

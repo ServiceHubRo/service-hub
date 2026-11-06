@@ -84,7 +84,7 @@ export async function deleteCar(id: string): Promise<void> {
 
 /** The owner keeps one of two copies of the same car (T66): bookings and reports move to it; logged. */
 export async function mergeCars(keepId: string, dropId: string, requestId: string): Promise<void> {
-  await call('merge_cars', { p_keep: keepId, p_drop: dropId, p_request_id: requestId } as never);
+  await call('merge_cars', { p_keep: keepId, p_drop: dropId, p_request_id: requestId });
 }
 
 export interface DuplicateCar {
