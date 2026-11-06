@@ -135,8 +135,11 @@ select test.eq(test.count(format($$select 1 from public.bookings where company_i
   'so does the accountant');
 select test.login(test.id('client_b'));
 select test.eq(jsonb_array_length(public.fleet_overview(current_setting('test.co')::uuid)->'jobs'), 1, 'a driver: the booking of the vehicle assigned');
-select test.eq(test.count(format($$select 1 from public.bookings where company_id = %L$$, current_setting('test.co'))), 1::bigint,
-  'and reads only their own row');
+-- 107: without costs.view the row is not read directly (it carries the cost) but through
+-- my_company_bookings(), without amounts.
+select test.eq(test.count(format($$select 1 from public.bookings where company_id = %L$$, current_setting('test.co'))), 0::bigint,
+  'and reads no company row directly (107)');
+select test.eq(jsonb_array_length(public.my_company_bookings()), 1, 'but their own booking through my_company_bookings');
 select test.login(current_setting('test.out')::uuid);
 select test.eq(test.count(format($$select 1 from public.bookings where company_id = %L$$, current_setting('test.co'))), 0::bigint,
   'a stranger reads none');

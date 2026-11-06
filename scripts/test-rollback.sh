@@ -20,7 +20,7 @@ mkdir -p "$OUT"
 
 dump() {
   # pg_dump's \restrict key is random on every run: left out of the comparison.
-  pg_dump --schema-only --no-owner --no-privileges "$DB" | grep -v -E '^\\(un)?restrict ' > "$1.schema.sql"
+  pg_dump --schema-only --no-owner "$DB" | grep -v -E '^\\(un)?restrict ' > "$1.schema.sql"
   pg_dump --data-only --no-owner --inserts --rows-per-insert=1 --exclude-table-data=public.request_log "$DB" \
     | grep -v -E '^\\(un)?restrict ' | sort > "$1.data.sql"
 }

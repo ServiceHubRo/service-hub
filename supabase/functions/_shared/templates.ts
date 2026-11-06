@@ -108,6 +108,9 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
     },
     'client.inspection_started': { title: '{shop}', body: '{car} este în constatare. Vei primi devizul în aplicație.' },
     'client.quote_sent': { title: '{shop}', body: 'Devizul pentru {car} este gata: {total}. Răspunde până pe {deadline}.' },
+    'client.quote_sent_plain': { title: '{shop}', body: 'Devizul pentru {car} este gata. Îl aprobă firma, în spațiul flotei.' },
+    'client.quote_replaced_plain': { title: '{shop}', body: 'Service-ul a modificat devizul pentru {car}.' },
+    'client.job_done_plain': { title: '{shop}', body: '{car} este gata de ridicare.' },
     'client.quote_replaced': { title: '{shop}', body: 'Service-ul a modificat devizul pentru {car}: {total}.' },
     'client.intake_sent': { title: '{shop}', body: 'Fișa de preluare pentru {car} este completată. Verific-o și confirm-o.' },
     'client.intake_updated': { title: '{shop}', body: 'Service-ul a modificat fișa de preluare pentru {car}.' },
@@ -436,6 +439,9 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
     },
     'client.inspection_started': { title: '{shop}', body: 'Your {car} is being inspected. The quote will come in the app.' },
     'client.quote_sent': { title: '{shop}', body: 'The quote for your {car} is ready: {total}. Please answer by {deadline}.' },
+    'client.quote_sent_plain': { title: '{shop}', body: 'The quote for the {car} is ready. The company approves it in the fleet space.' },
+    'client.quote_replaced_plain': { title: '{shop}', body: 'The shop changed the quote for the {car}.' },
+    'client.job_done_plain': { title: '{shop}', body: '{car} is ready for pickup.' },
     'client.quote_replaced': { title: '{shop}', body: 'The shop changed the quote for your {car}: {total}.' },
     'client.intake_sent': { title: '{shop}', body: 'The intake sheet for your {car} is ready. Check it and confirm.' },
     'client.intake_updated': { title: '{shop}', body: 'The shop changed the intake sheet for your {car}.' },
@@ -971,6 +977,12 @@ export function templateKey(side: Side, e: NotificationEvent, now: Date = new Da
   switch (e.event) {
     case 'booking_declined':
       return str(p.reason) ? `${base}_reason` : base;
+    // 107: a company booking for a member without costs.view arrives without the amount.
+    case 'quote_sent':
+    case 'quote_replaced':
+      return side === 'client' && p.total === undefined ? `${base}_plain` : base;
+    case 'job_done':
+      return side === 'client' && p.cost === undefined ? `${base}_plain` : base;
     // M6: the amount only in the texts of members with costs.view (the database leaves it out for the others).
     case 'fleet_quote_waiting':
     case 'fleet_expense_to_check':

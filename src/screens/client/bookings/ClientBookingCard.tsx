@@ -139,7 +139,7 @@ export function ClientBookingCard({
     ) : (b.status === 'approved' && quote) || b.status === 'done' ? (
       <StatusDetail booking={b} quote={quote} now={now} decided={decided} />
     ) : b.status === 'in_progress' && quote ? (
-      <DecidedLines quote={quote} />
+      <DecidedLines quote={quote} hideMoney={b.money_hidden} />
     ) : null;
   const statusInMain = !(b.status === 'approved' && quote) && b.status !== 'done';
 
@@ -342,7 +342,7 @@ function pickupState(doneAt: string | null, now: Date): boolean {
 }
 
 /** The accepted quote after the decision: refused lines struck through (and said in words). */
-function DecidedLines({ quote }: { quote: Quote }) {
+function DecidedLines({ quote, hideMoney = false }: { quote: Quote; hideMoney?: boolean }) {
   const { t, lang } = useI18n();
   return (
     <div className={styles.quote}>
@@ -357,11 +357,14 @@ function DecidedLines({ quote }: { quote: Quote }) {
                 {refused && <span className="visually-hidden">, {t('cb.quote.refusedLine')}</span>}
                 {detail && <span className={styles.lineDetail}>{detail}</span>}
               </span>
-              <span className="mono">{formatMoney(lang, item.price)}</span>
+              {!hideMoney && <span className="mono">{formatMoney(lang, item.price)}</span>}
             </li>
           );
         })}
       </ul>
+      {/* 107: a company booking for a member without costs.view comes without amounts. */}
+      {!hideMoney && (
+        <>
       <p className={styles.quoteTotal}>
         <span>{t('cb.quote.totalApproved')}</span>
         <span className="mono">{formatMoney(lang, quote.total_approved ?? quote.total_sent)}</span>
@@ -370,6 +373,8 @@ function DecidedLines({ quote }: { quote: Quote }) {
         <p className={styles.quoteVat}>
           {t('quote.vatIncluded', { rate: quote.vat_rate, vat: formatMoney(lang, vatOf(quote.total_approved ?? quote.total_sent, quote.vat_rate)) })}
         </p>
+      )}
+        </>
       )}
     </div>
   );
@@ -416,13 +421,15 @@ function StatusDetail({
       const amount = formatMoney(lang, quote.total_approved ?? quote.total_sent);
       return (
         <>
-          <DecidedLines quote={quote} />
+          <DecidedLines quote={quote} hideMoney={b.money_hidden} />
           <p className={decided ? `${styles.ok} ${styles.okFresh}` : styles.ok}>
             {decided && <SuccessCheck size={30} />}
             <span>
-              {quote.status === 'partially_accepted'
-                ? t('cb.approvedPartial', { n: accepted, total: quote.items.length, amount })
-                : t('cb.approved', { amount })}
+              {b.money_hidden
+                ? t('cb.company.approved')
+                : quote.status === 'partially_accepted'
+                  ? t('cb.approvedPartial', { n: accepted, total: quote.items.length, amount })
+                  : t('cb.approved', { amount })}
             </span>
           </p>
         </>
@@ -461,6 +468,7 @@ function StatusDetail({
         </div>
       );
     case 'quote_refused': {
+      if (b.money_hidden) return <p className={styles.muted}>{t('cb.company.refused')}</p>;
       const fee = b.cost ?? quote?.inspection_fee ?? 0;
       return (
         <p className={styles.muted}>
