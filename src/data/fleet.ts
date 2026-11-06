@@ -1,6 +1,6 @@
 import { call, failure, RpcError, type Booking } from './rpc';
 import { supabase } from './supabase';
-import type { ExpenseFields, FleetExpense, FleetOverview, FleetPlanRow, FleetPlanSummary, FleetReport, FleetSubscriptionView, FleetVehicle, ReportFilters } from '../lib/fleet';
+import type { ExpenseFields, FleetExpense, FleetIssue, FleetMaintenanceItem, MaintenanceFields, FleetReading, FuelStats, FleetIssueDetail, FleetOverview, IssueFields, IssueUpdate, FleetPlanRow, FleetPlanSummary, FleetReport, FleetSubscriptionView, FleetVehicle, ReportFilters } from '../lib/fleet';
 
 /**
  * The company's fleet (T63c, docs/FLEET_PLAN.md): one read, `fleet_overview(company)`, already
@@ -222,10 +222,106 @@ export async function uploadReceipt(company: string, vehicle: string, file: File
   return path;
 }
 
-/** A link to look at a receipt, valid for 10 minutes. */
+/** A link to look at a receipt (60 seconds, as every company file). */
 export async function receiptUrl(path: string): Promise<string> {
+  return fleetFileUrl(path);
+}
+
+/** A link to look at a file of the company (receipt or incident photo), valid for 60 seconds: a member
+ * whose access is revoked cannot keep using an old one. */
+export async function fleetFileUrl(path: string): Promise<string> {
   if (!supabase) throw new RpcError('network');
-  const { data, error } = await supabase.storage.from(FLEET_FILES_BUCKET).createSignedUrl(path, 600);
+  const { data, error } = await supabase.storage.from(FLEET_FILES_BUCKET).createSignedUrl(path, 60);
   if (error || !data) throw new RpcError('unknown');
   return data.signedUrl;
+}
+
+// ------------------------------------------------------------------------------------ issues (M3)
+
+export const ISSUE_PHOTO_TYPES = ['image/jpeg', 'image/png', 'image/webp'] as const;
+export const ISSUE_PHOTO_MAX = 6;
+
+/** A photo of a report, uploaded before the report is sent: `<company>/<vehicle>/issues/<issue>/<random>.<ext>`. */
+export async function uploadIssuePhoto(company: string, vehicle: string, issue: string, file: File): Promise<string> {
+  if (!supabase) throw new RpcError('network');
+  const ext = file.type === 'image/png' ? 'png' : file.type === 'image/webp' ? 'webp' : 'jpg';
+  const path = `${company}/${vehicle}/issues/${issue}/${crypto.randomUUID()}.${ext}`;
+  const { error } = await supabase.storage.from(FLEET_FILES_BUCKET).upload(path, file, { contentType: file.type, upsert: false });
+  if (error) throw new RpcError('unknown');
+  return path;
+}
+
+export async function reportIssue(company: string, issue: string, fields: IssueFields, requestId: string): Promise<FleetIssue> {
+  return (await call('fleet_report_issue', { p_company: company, p_issue: issue, p_fields: fields, p_request_id: requestId } as never)) as unknown as FleetIssue;
+}
+
+export async function updateIssue(issue: string, fields: IssueUpdate, requestId: string): Promise<FleetIssue> {
+  return (await call('fleet_update_issue', { p_issue: issue, p_fields: fields, p_request_id: requestId } as never)) as unknown as FleetIssue;
+}
+
+export async function fetchIssueDetail(issue: string): Promise<FleetIssueDetail> {
+  return (await call('fleet_issue_detail', { p_issue: issue } as never)) as unknown as FleetIssueDetail;
+}
+
+// ------------------------------------------------------------------------------------ odometer (M2)
+
+export async function addReading(company: string, vehicle: string, day: string, km: number, requestId: string): Promise<FleetReading> {
+  return (await call('fleet_add_reading', { p_company: company, p_vehicle: vehicle, p_day: day, p_km: km, p_request_id: requestId } as never)) as unknown as FleetReading;
+}
+
+export async function correctReading(reading: string, km: number, reason: string, requestId: string): Promise<FleetReading> {
+  return (await call('fleet_correct_reading', { p_reading: reading, p_km: km, p_reason: reason, p_request_id: requestId } as never)) as unknown as FleetReading;
+}
+
+export async function ignoreJobOdometer(booking: string, reason: string, requestId: string): Promise<void> {
+  await call('fleet_ignore_job_odometer', { p_booking: booking, p_reason: reason, p_request_id: requestId } as never);
+}
+
+export async function fetchFuelStats(company: string, vehicle: string, from: string | null, to: string): Promise<FuelStats> {
+  return (await call('fleet_fuel_stats', { p_company: company, p_vehicle: vehicle, p_from: from, p_to: to } as never)) as unknown as FuelStats;
+}
+
+// ------------------------------------------------------------------------------------ quote changes, cancel (M5)
+
+export async function fleetCancelBooking(booking: string, reason: string, requestId: string): Promise<Booking> {
+  return (await call('fleet_cancel_booking', { p_booking_id: booking, p_reason: reason, p_request_id: requestId } as never)) as unknown as Booking;
+}
+
+export async function fleetRequestQuoteChanges(booking: string, quote: string, reason: string, requestId: string): Promise<Booking> {
+  return (await call('fleet_request_quote_changes', { p_booking_id: booking, p_quote_id: quote, p_reason: reason, p_request_id: requestId } as never)) as unknown as Booking;
+}
+
+// ------------------------------------------------------------------------------------ maintenance (M4)
+
+export async function saveMaintenance(company: string, item: string | null, fields: MaintenanceFields, requestId: string): Promise<FleetMaintenanceItem> {
+  return (await call('fleet_save_maintenance', { p_company: company, p_item: item, p_fields: fields, p_request_id: requestId } as never)) as unknown as FleetMaintenanceItem;
+}
+
+export async function deleteMaintenance(item: string, requestId: string): Promise<void> {
+  await call('fleet_delete_maintenance', { p_item: item, p_request_id: requestId } as never);
+}
+
+/** Done on a day at a km, or by a finished Service-Hub job of the vehicle. */
+export async function markMaintenanceDone(item: string, fields: { day?: string; km?: number | null; booking_id?: string }, requestId: string): Promise<FleetMaintenanceItem> {
+  return (await call('fleet_mark_maintenance_done', { p_item: item, p_fields: fields, p_request_id: requestId } as never)) as unknown as FleetMaintenanceItem;
+}
+
+// ------------------------------------------------------------------------------------ failed fleet notifications (M6, admin)
+
+export interface FailedFleetEvent {
+  id: number;
+  event: string;
+  company_name: string;
+  created_at: string;
+  attempts: number;
+  last_error_code: string | null;
+  failed_at: string;
+}
+
+export async function adminFailedFleetEvents(): Promise<FailedFleetEvent[]> {
+  return (await call('admin_list_failed_fleet_events', {} as never)) as unknown as FailedFleetEvent[];
+}
+
+export async function adminRetryFleetEvent(id: number, requestId: string): Promise<void> {
+  await call('admin_retry_fleet_event', { p_id: id, p_request_id: requestId } as never);
 }

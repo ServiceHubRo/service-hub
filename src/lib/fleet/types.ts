@@ -1,5 +1,7 @@
 import type { Quote, QuoteItem } from '../clientBookings';
 import type { BookingStatus } from '../status';
+import type { FleetMaintenanceItem } from './maintenance';
+import type { FleetReading, IgnoredJob, OdometerException } from './odometer';
 
 /**
  * Fleet accounts (docs/FLEET_PLAN.md): the shapes the company read (`fleet_overview(company)`, a
@@ -156,16 +158,65 @@ export interface FleetMember {
   approval_limit?: number | null;
 }
 
-/** A driver's report about a car (`fleet_issues`, proposed). */
+export const ISSUE_KINDS = ['defect', 'damage', 'accident', 'technical', 'other'] as const;
+export type IssueKind = (typeof ISSUE_KINDS)[number];
+export const ISSUE_STATUSES = ['new', 'in_review', 'scheduled', 'resolved', 'closed'] as const;
+export type IssueStatus = (typeof ISSUE_STATUSES)[number];
+
+/** A reported issue or incident (`fleet_issues`, M3). Title and description stay as reported. */
 export interface FleetIssue {
   id: string;
   vehicle_id: string;
-  kind: 'problem' | 'incident' | 'note';
-  body: string;
-  status: 'open' | 'scheduled' | 'closed';
-  reported_by: string;
-  created_at: string;
+  /** The vehicle as it was at report time. */
+  vehicle_label: { plate: string | null; make: string; model: string };
+  kind: IssueKind;
+  title: string;
+  description: string | null;
+  happened_on: string;
+  status: IssueStatus;
   booking_id: string | null;
+  /** Storage paths in `fleet-files`. */
+  photos: string[];
+  /** The user who reported it. */
+  reported_by: string | null;
+  reported_by_name: string | null;
+  created_at: string;
+  updated_at: string | null;
+}
+
+/** One change of a report (`fleet_issue_events`). */
+export interface FleetIssueEvent {
+  id: number;
+  from_status: IssueStatus | null;
+  to_status: IssueStatus | null;
+  note: string | null;
+  booking_id: string | null;
+  photos_added: number;
+  by_name: string | null;
+  at: string;
+}
+
+export interface FleetIssueDetail extends FleetIssue {
+  events: FleetIssueEvent[];
+}
+
+/** What the report form sends. */
+export interface IssueFields {
+  vehicle_id: string;
+  kind: IssueKind;
+  title: string;
+  description: string | null;
+  happened_on: string;
+  booking_id: string | null;
+  photos: string[];
+}
+
+/** What a follow-up sends (issues.manage); a missing key changes nothing. */
+export interface IssueUpdate {
+  status?: IssueStatus;
+  note?: string | null;
+  booking_id?: string | null;
+  add_photos?: string[];
 }
 
 export interface FleetBudget {
@@ -193,4 +244,10 @@ export interface FleetOverview {
   expenses: FleetExpense[];
   members: FleetMember[];
   issues: FleetIssue[];
+  /** M2: the odometer log, the jobs whose km is left out, the receipts the import could not take. */
+  readings?: FleetReading[];
+  ignored_jobs?: IgnoredJob[];
+  odometer_exceptions?: OdometerException[];
+  /** M4: the maintenance plans of the vehicles the member sees, with their computed status. */
+  maintenance?: FleetMaintenanceItem[];
 }

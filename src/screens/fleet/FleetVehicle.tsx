@@ -9,10 +9,13 @@ import { formatDate, formatKm, formatMoney } from '../../i18n/format';
 import { CAR_DOCS } from '../../lib/expiry';
 import {
   buildLedger,
+  canReportOn,
   documentStates,
   jobEndDay,
   jobStage,
   lastOdometer,
+  latestKm,
+  odometerLog,
   partsAndLabor,
   sumAmounts,
   vehicleStatus,
@@ -24,11 +27,14 @@ import { FleetQuoteCard } from './FleetQuoteCard';
 import { FleetVehicleForm } from './FleetVehicleForm';
 import { VehicleControls } from './VehicleControls';
 import { ExpenseForm } from './FleetCosts';
+import { VehicleIssues } from './FleetIssues';
+import { VehicleOdometer } from './FleetOdometer';
+import { VehicleMaintenance } from './FleetMaintenance';
 import { useFleet } from './fleetContext';
 import pill from '../../components/StatusBadge.module.css';
 import styles from './fleet.module.css';
 
-type Tab = 'overview' | 'history' | 'costs' | 'bookings' | 'quotes' | 'documents' | 'driver' | 'notes';
+type Tab = 'overview' | 'history' | 'costs' | 'odometer' | 'maintenance' | 'bookings' | 'quotes' | 'documents' | 'driver' | 'notes';
 
 /**
  * One company car (docs/FLEET_PLAN.md §4): eight sections on one page. The history is the car's
@@ -41,6 +47,7 @@ export function FleetVehicle({ vehicleId }: { vehicleId: string }) {
   const { data, go, allowed, vehicle, mode, actions } = useFleet();
   const [editing, setEditing] = useState(false);
   const [addingFuel, setAddingFuel] = useState(false);
+  const [reporting, setReporting] = useState(false);
   const v = vehicle(vehicleId);
   const [tab, setTab] = useState<Tab>('overview');
   const jobs = useMemo(() => data.jobs.filter((j) => j.vehicle_id === vehicleId), [data.jobs, vehicleId]);
@@ -59,24 +66,31 @@ export function FleetVehicle({ vehicleId }: { vehicleId: string }) {
   }
 
   const status = vehicleStatus(v, data.jobs);
-  const km = lastOdometer(v.id, data.jobs, data.expenses);
+  // M2: the odometer log (readings and jobs, ignored jobs left out); before M2 data, the expenses.
+  const km = data.readings ? latestKm(odometerLog(v.id, data.readings, data.jobs, data.ignored_jobs ?? [])) : lastOdometer(v.id, data.jobs, data.expenses);
   const done = jobs.filter((j) => j.status === 'done').sort((a, b) => jobEndDay(b).localeCompare(jobEndDay(a)));
   const active = jobs.filter((j) => isActiveStatus(j.status));
   const quoted = jobs.filter((j) => j.quote).sort((a, b) => (b.quote!.sent_at ?? '').localeCompare(a.quote!.sent_at ?? ''));
   const docs = documentStates([v]);
   const issues = data.issues.filter((i) => i.vehicle_id === v.id);
+  const canReport = canReportOn(v, allowed, data.me.member_id);
   const driver = data.members.find((m) => m.id === v.driver_id);
-  const memberName = (id: string | null) => data.members.find((m) => m.id === id)?.name ?? t('fleet.member.someone');
 
   const tabs: { key: Tab; label: string; count?: number }[] = [
     { key: 'overview', label: t('fleet.vtab.overview') },
     { key: 'history', label: t('fleet.vtab.history'), count: done.length },
     ...(money ? [{ key: 'costs' as const, label: t('fleet.vtab.costs') }] : []),
+    { key: 'odometer', label: t('fleet.vtab.odometer') },
+    {
+      key: 'maintenance',
+      label: t('fleet.vtab.maintenance'),
+      count: (data.maintenance ?? []).filter((m) => m.vehicle_id === v.id && (m.state.status === 'soon' || m.state.status === 'overdue')).length,
+    },
     { key: 'bookings', label: t('fleet.vtab.bookings'), count: active.length },
     { key: 'quotes', label: t('fleet.vtab.quotes'), count: quoted.filter((j) => j.status === 'quote_sent').length },
     { key: 'documents', label: t('fleet.vtab.documents') },
     { key: 'driver', label: t('fleet.vtab.driver') },
-    { key: 'notes', label: t('fleet.vtab.notes'), count: issues.filter((i) => i.status !== 'closed').length },
+    { key: 'notes', label: t('fleet.vtab.notes'), count: issues.filter((i) => i.status !== 'closed' && i.status !== 'resolved').length },
   ];
 
   return (
@@ -148,6 +162,19 @@ export function FleetVehicle({ vehicleId }: { vehicleId: string }) {
                     <Fuel size={18} aria-hidden="true" /> {t('fleet.costs.addFuel')}
                   </Button>
                 )}
+              </div>
+            )}
+            {/* M3: report an issue from the overview too; the form opens in the section. */}
+            {mode === 'live' && actions && canReport && (
+              <div className={styles.actions}>
+                <Button
+                  onClick={() => {
+                    setReporting(true);
+                    setTab('notes');
+                  }}
+                >
+                  <AlertTriangle size={18} aria-hidden="true" /> {t('fleet.vehicle.report')}
+                </Button>
               </div>
             )}
             {addingFuel && <ExpenseForm fuelOnly fixedVehicle={v.id} onDone={() => setAddingFuel(false)} />}
@@ -287,27 +314,11 @@ export function FleetVehicle({ vehicleId }: { vehicleId: string }) {
         </Card>
       )}
 
-      {tab === 'notes' && (
-        <Card className={styles.card}>
-          {issues.length === 0 ? (
-            <p className={styles.note}>{t('fleet.issues.none')}</p>
-          ) : (
-            <ul className={styles.plainList}>
-              {issues.map((i) => (
-                <li key={i.id} className={styles.lineRow}>
-                  <span className={styles.lineText}>
-                    <span>{i.body}</span>
-                    <span className={styles.muted}>
-                      {t(`fleet.issue.${i.kind}`)} · {memberName(i.reported_by)} · {formatDate(lang, new Date(i.created_at))}
-                    </span>
-                  </span>
-                  <span className={`${pill.pill} ${pill[i.status === 'open' ? 'amber' : i.status === 'scheduled' ? 'blue' : 'muted']}`}>{t(`fleet.issueStatus.${i.status}`)}</span>
-                </li>
-              ))}
-            </ul>
-          )}
-        </Card>
-      )}
+      {tab === 'odometer' && <VehicleOdometer vehicle={v} />}
+
+      {tab === 'maintenance' && <VehicleMaintenance vehicle={v} />}
+
+      {tab === 'notes' && <VehicleIssues vehicle={v} reporting={reporting} onReporting={setReporting} />}
     </div>
   );
 

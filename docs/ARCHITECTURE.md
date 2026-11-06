@@ -194,6 +194,16 @@ Settings writes (T05): public data, booking rules, fee, preferences, closures an
 - `logos` bucket — public read; write only by that shop's members, path `shop_id/…`, images ≤ 2 MB.
 - `intake-photos` bucket (T50) — private; insert/delete by the booking's shop members, read by whoever reads the booking (`can_read_booking` on the first folder); 5 MB, png/jpeg/webp (the app sends ≤ 1600 px JPEG). The app shows them through short signed links.
 - `reports` bucket — private; downloads through an Edge Function after checking ownership (T15: `report-download` answers the file itself instead of a signed link).
+- `fleet-files` bucket (T70, T72) — private, 5 MB. Receipts `<company>/<vehicle>/<file>`: written by `costs.manage` or the vehicle's driver, read by `costs.view` or the uploader. Incident photos `<company>/<vehicle>/issues/<issue>/<file>`: before the report, only the uploader (still allowed to report on that vehicle); after it, whoever reads the report; deleted only by `issues.manage`. A photo is attached by its uploader within 23 h; unattached ones older than 48 h are deleted daily by `fleet-files-cleanup`. Signed links live 60 s.
+
+### Fleet stages (T72–T77, schema 102–107; plan: `docs/FLEET_EXTENSION_PLAN.md` §4)
+
+- `fleet_issues` + `fleet_issue_events` (M3): reports with photos and every follow-up; read through `fleet_overview` / `fleet_issue_detail`.
+- `fleet_odometer_readings`, `fleet_odometer_ignored_jobs`, `fleet_odometer_import_exceptions` (M2): one odometer log per company vehicle. Chronological rule against readings and finished jobs (same day not compared); expenses keep their reading in step; corrections need `vehicles.manage` and a reason. `fleet_fuel_stats`: consumption only between full tanks, never estimated.
+- `company_quote_decisions.decision = 'changes_requested'` + `reason` (M5); `fleet_cancel_booking` for approvers (pending, or confirmed before the deadline and the slot start; allowed in a read-only company).
+- `fleet_maintenance` (M4): status computed by `fleet_maintenance_status` (1,000 km / 30 days „soon”; a reading older than 60 days or before the service is never used → `insufficient_data`).
+- `fleet_events` → `fleet_notices` → `notification_events` (M6): the durable outbox; `process_fleet_events()` every minute, one event per transaction, retries, `failed_at` after 24 attempts, admin list and retry without private data. `member_rights_versions` (realtime) makes open screens read again after a rights change. `fleet_can(company, cap)` = `fleet_user_can(auth.uid(), company, cap)`.
+- 107: a company booking's amounts only with `costs.view` in that company — `bookings_select`, `quotes_select`, `quote_items_select` (`can_read_booking_money`), `my_company_bookings()` (no amounts), client RPCs answer `cost = null`, export/PDF/report filtered, thread messages and notifications without money keys.
 
 ---
 

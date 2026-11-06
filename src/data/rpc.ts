@@ -208,6 +208,17 @@ export const RPC_ERROR_CODES = [
   'expense_invalid',
   'expense_not_found',
   'expense_possible_duplicate',
+  'issue_invalid',
+  'issue_not_found',
+  'photo_expired',
+  'odometer_higher_than_later',
+  'reading_invalid',
+  'reading_not_found',
+  'booking_started',
+  'changes_already_requested',
+  'maintenance_invalid',
+  'maintenance_not_found',
+  'fleet_event_not_found',
 ] as const;
 
 export type RpcErrorCode = (typeof RPC_ERROR_CODES)[number] | 'network' | 'unknown';

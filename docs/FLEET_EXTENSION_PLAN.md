@@ -142,7 +142,9 @@ create table public.fleet_expenses (
 
 ## 3. Order and approvals
 
-Status (6 Nov 2026): M7 and M1 approved and built (T69, T70; schema 100–101). The rest waits for approval.
+Status (6 Nov 2026): M7 and M1 approved and built (T69, T70; schema 100–101). M2–M6 and the money
+visibility migration approved by Eduard on 6 Nov („aprob T71–T75”) and built in one PR (T72–T77, schema
+102–107) following §4, which replaces §2 for those stages.
 
 
 1. Merge PR #107 (T65–T67).
@@ -155,3 +157,129 @@ Status (6 Nov 2026): M7 and M1 approved and built (T69, T70; schema 100–101). 
 
 Each one: its own branch from `main`, SQL tests (rights, isolation between companies, concurrency,
 idempotency), unit tests, browser tests at 390/820/1440 in RO and EN, a PR with „Pașii tăi”.
+
+
+## 4. Final plan for M2–M6 and migration 107 (approved by Eduard, 6 Nov 2026)
+
+This section replaces §2 and §3 for M2–M6 and adds migration 107. Base: `main` at schema 101. One branch,
+`t71-fleet-stages`, one PR; migrations 102–107 in this order: M3 (102), M2 (103), M5 (104), M4 (105),
+M6 (106), money visibility (107), each a separate file with a tested rollback in `supabase/rollback/`.
+PRs deploy only to the TEST project. **No existing data is modified by this delivery.**
+
+### Eduard's decisions (6 Nov 2026)
+
+1. Maintenance: „soon” at 1,000 km / 30 days. A reading older than 60 days, or dated before the last
+   maintenance, is never used → `insufficient_data`. Never a false „ok”.
+2. Manager cancel: refused after the slot start time, even when the shop has no cancel deadline.
+3. Read-only company (expired plan): admin, manager, `quotes.approve` may only cancel existing bookings.
+4. An odometer step over 2,000 km/day is an anomaly „de verificat”, not proof of a wrong value.
+5. Durable outbox (A), photo protection and cleanup (B), money visibility as migration 107 (C) — accepted.
+6. Money visibility: the row-level variant. Only what a driver without `costs.view` can see on company
+   bookings changes; protected on the server on every access path.
+7. Failed fleet notifications: a count in the admin digest, a list of failed events and a retry —
+   without access to the fleets' private data.
+8. Rights changes: checked on the server at every operation; open screens read again when they change.
+9. Real project on 6 Nov: 0 receipts with an odometer, 0 system messages with amounts → the M2 import
+   creates nothing there; the historical message rewrite is dropped.
+
+### M3 — issues and incidents (102)
+
+`fleet_issues` (id from the app = photo folder; vehicle label at report time; kind defect/damage/accident/
+technical/other; title 3–120; description ≤ 2,000; day not in the future; status new → in_review →
+scheduled → resolved → closed; booking link; ≤ 6 photos) and `fleet_issue_events`. `fleet_report_issue`,
+`fleet_update_issue` (`issues.manage`), `fleet_issue_detail`. Report: `issues.manage`, or `issues.report`
+on a vehicle the member sees (a driver: their own). Read: reporter while a member, the vehicle's driver,
+`issues.manage`, `vehicles.viewAll`. Title and description stay as reported.
+
+Photos `<company>/<vehicle>/issues/<issue>/<file>`; the three M1 policies replaced by variants branching
+on the path (receipts keep the M1 expressions). Before the report only the uploader; after it the
+report's readers; delete by `issues.manage`. Attach: own upload, ≤ 23 h old (`photo_expired`). Cleanup:
+`fleet-files-cleanup` daily (pg_cron 03:23 UTC through `kick_fleet_files_cleanup`), candidates from
+`fleet_issue_photo_orphans` (exact issue paths, > 48 h, unattached), re-checked before each delete.
+The 14 photo scenarios of the plan: tests 1–12 in `tests/sql/144_fleet_issues.sql`, 13–14 in
+`tests/unit/fleetFilesCleanup.test.ts`.
+
+### M2 — odometer and fuel (103)
+
+`fleet_odometer_readings`, `fleet_odometer_ignored_jobs`, `fleet_odometer_import_exceptions`. Rule: a
+reading for day D ≥ the highest km before D and ≤ the lowest km after D; same day not compared; evidence
+= readings + finished jobs of that vehicle minus ignored jobs (`odometer_lower`,
+`odometer_higher_than_later`). Expenses keep their reading in step. `fleet_add_reading` (`vehicles.manage`
+or the vehicle's driver), `fleet_correct_reading` (`vehicles.manage`, reason, before/after; a reading of
+an expense is corrected on the expense too), `fleet_ignore_job_odometer`, `fleet_fuel_stats`. Import
+(`fleet_import_expense_readings`, run once by the migration): a receipt becomes a reading only when
+consistent; otherwise listed with `below_earlier`, `above_later`, `jump`; both sides of a contradiction
+listed; receipts never modified.
+
+### M5 — quote changes and manager cancel (104)
+
+`company_quote_decisions_decision_check` widened with `changes_requested` (dropped without IF EXISTS),
+column `reason`. `fleet_cancel_booking(booking, reason, request)` and
+`fleet_request_quote_changes(booking, quote, reason, request)` as in the plan.
+
+### M4 — maintenance (105)
+
+`fleet_maintenance` and `fleet_maintenance_status` (rules in decision 1, reasons `no_last_done_km`,
+`no_last_done_on`, `no_reading`, `reading_old`, `reading_before_service`), `fleet_save_maintenance`,
+`fleet_delete_maintenance`, `fleet_mark_maintenance_done` (a day and km writes a reading under the M2
+rule; a finished job of that vehicle is offered, never automatic).
+
+### M6 — fleet notifications with a durable outbox (106)
+
+`fleet_events` (written by triggers on quotes, bookings, company_quote_decisions, fleet_issues,
+fleet_expenses and by the daily part; references only), `fleet_notices` (unique per user and key),
+`process_fleet_events()` every minute (claim committed first; one event per transaction; retries after
+1, 5, 15, 60 minutes, then hourly; `failed_at` after 24 attempts), recipients by `fleet_user_can` among
+current accepted members, actor excluded, amounts only for `costs.view`. Daily part `fleet_daily` at 10:xx
+(documents at 30/7/0 days, maintenance soon/overdue, purge after 90/400 days). Admin:
+`admin_list_failed_fleet_events` (no data, no error text, no vehicle, person or amount),
+`admin_retry_fleet_event`, digest counts `fleet_failed` and `fleet_gave_up`. `member_rights_versions`
+(realtime) bumped by membership, role, rights and plan changes.
+
+| Event | Key | Recipients (actor excluded) |
+|---|---|---|
+| fleet_quote_waiting | `quote_waiting:<quote>` | `quotes.approve`, minus the booker |
+| fleet_quote_decided | `quote_decided:<quote>` | booker + vehicle driver |
+| fleet_quote_changes | `quote_changes:<quote>` | booker + approvers |
+| fleet_booking_changed | `booking_changed:<booking>:<txid>` | vehicle driver if not the booker |
+| fleet_booking_cancelled | `booking_cancelled:<booking>` | booker + driver |
+| fleet_issue_reported | `issue_reported:<issue>` | `issues.manage` |
+| fleet_expense_to_check | `expense_to_check:<expense>` | `costs.manage` |
+| fleet_doc_expiring | `doc:<vehicle>:<doc>:<expiry>:<30/7/0>` | `vehicles.manage` + driver |
+| fleet_maintenance_due | `maint:<item>:<last_done_on>:<last_done_km>:<soon/overdue>` | `vehicles.manage` + driver |
+
+### 107 — quote money visibility, row-level
+
+For a company booking, a member without `costs.view` in that company cannot obtain amounts through any
+path; personal bookings, shops and platform admins unchanged. Paths and fixes (numbered as in the audit):
+1 `bookings_select` (company row to its client only with `costs.view`; `my_company_bookings()` without
+amounts), 2 realtime follows RLS (refresh on the booking's thread messages), 5–6 the four client RPCs
+answer `cost = null` (replays too), 7 `export_my_data`, 8 `job_document_data` refused, 9 `report_jobs`
+filtered, 10 `post_booking_event` without money keys for company bookings, 11 `notify_user` without money
+keys for such recipients (texts without amounts), 12 quote policies through `can_read_booking_money`.
+Unchanged (tested): fleet reads with `p_money`, shop and admin RPCs. Invariant tested: every holder of
+`bookings.viewAll` has `costs.view`; the accountant always has it.
+
+### Implementation notes (T72–T77)
+
+- Task numbers: T71 was already used (language in Cont), so the stages are T72 (M3), T73 (M2), T74 (M5),
+  T75 (M4), T76 (M6), T77 (107). The branch keeps the approved name `t71-fleet-stages`.
+- Error codes: the existing `wrong_status` (with the status) is used where the plan wrote
+  `invalid_status`; a started booking answers `booking_started`. New codes: `issue_invalid`,
+  `issue_not_found`, `photo_expired`, `odometer_higher_than_later`, `reading_invalid`,
+  `reading_not_found`, `changes_already_requested`, `maintenance_invalid`, `maintenance_not_found`,
+  `fleet_event_not_found`.
+- The manager's cancel writes the thread message `booking_cancelled_company` („Firma a anulat
+  programarea …” for the client side); the shop gets `booking_cancelled_client` with the reason, as planned.
+- 107 wraps the functions it changes (`cancel_booking`, `decide_quote`, `reschedule_booking`,
+  `set_booking_history_share`, `export_my_data`, `job_document_data`, `report_jobs`): the previous
+  versions are renamed `…_t77` and called unchanged, so the rollback renames them back.
+- Rollbacks: `supabase/rollback/<migration>.sql`, run only in reverse order; `npm run test:rollback`
+  builds the database up to the previous migration with the demo seed, applies the migration and its
+  rollback, and compares structure (privileges included) and every row byte for byte, then applies the
+  migration again.
+- pg_cron: `call public.process_fleet_events()` verified on the local Supabase stack (`succeeded`).
+- Concurrency (two real sessions): `tests/sql/149_fleet_concurrency.sql` (two cancels, two expenses, a
+  worker killed mid-event, two workers at once).
+- Not verified from the development container: that `supabase db push` applies each file in its own
+  transaction on the TEST project (the CLI's documented behavior); check on the first deploy.

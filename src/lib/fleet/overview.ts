@@ -136,7 +136,7 @@ export function recentActivity(data: FleetOverview, limit = 12): Activity[] {
     out.push({ id: `v:${v.id}`, kind: 'vehicle_added', at: v.created_at, vehicle_id: v.id, amount: null, detail: null, job_id: null });
   }
   for (const i of data.issues) {
-    out.push({ id: `i:${i.id}`, kind: 'issue_reported', at: i.created_at, vehicle_id: i.vehicle_id, amount: null, detail: i.body, job_id: null });
+    out.push({ id: `i:${i.id}`, kind: 'issue_reported', at: i.created_at, vehicle_id: i.vehicle_id, amount: null, detail: i.title, job_id: null });
   }
   return out.sort((a, b) => b.at.localeCompare(a.at) || a.id.localeCompare(b.id)).slice(0, limit);
 }

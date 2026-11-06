@@ -22,6 +22,8 @@ export interface ClientBooking {
   id: string;
   /** Set when the booking is for a company vehicle (T63d): the company approves its quote. */
   company_id?: string | null;
+  /** 107: a company booking read without costs.view: no cost, totals or prices (the screens hide them). */
+  money_hidden?: boolean;
   ref: string;
   status: BookingStatus;
   date: string; // YYYY-MM-DD, Europe/Bucharest
@@ -134,14 +136,17 @@ function normalize(row: ClientBooking): ClientBooking {
 }
 
 export async function fetchClientBookings(clientId: string): Promise<ClientBooking[]> {
-  const { data, error } = await db()
-    .from('bookings')
-    .select(COLUMNS)
-    .eq('client_id', clientId)
-    .order('date', { ascending: false })
-    .order('slot', { ascending: false });
-  if (error) throw failure(error);
-  const rows = (data as unknown as ClientBooking[]).map(normalize);
+  // 107: the company bookings this client may not see the money of come from my_company_bookings(),
+  // without cost, totals or prices; the direct read no longer returns them.
+  const [direct, hidden] = await Promise.all([
+    db().from('bookings').select(COLUMNS).eq('client_id', clientId).order('date', { ascending: false }).order('slot', { ascending: false }),
+    db().rpc('my_company_bookings' as never),
+  ]);
+  if (direct.error) throw failure(direct.error);
+  if (hidden.error) throw failure(hidden.error);
+  const rows = [...(direct.data as unknown as ClientBooking[]), ...((hidden.data ?? []) as unknown as ClientBooking[])]
+    .map(normalize)
+    .sort((a, b) => `${b.date} ${b.slot}`.localeCompare(`${a.date} ${a.slot}`));
   // The names of the services added to a booking (T21), from the catalog (readable by everyone).
   const ids = [...new Set(rows.flatMap((b) => b.extra_service_ids ?? []))];
   if (ids.length === 0) return rows.map((b) => ({ ...b, extra_service_ids: b.extra_service_ids ?? [], extra_services: [] }));

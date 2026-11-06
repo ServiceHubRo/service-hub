@@ -742,6 +742,7 @@ export type Database = {
           decision: string
           id: number
           quote_id: string
+          reason: string | null
           role: string
           user_id: string | null
         }
@@ -753,6 +754,7 @@ export type Database = {
           decision: string
           id?: never
           quote_id: string
+          reason?: string | null
           role: string
           user_id?: string | null
         }
@@ -764,6 +766,7 @@ export type Database = {
           decision?: string
           id?: never
           quote_id?: string
+          reason?: string | null
           role?: string
           user_id?: string | null
         }
@@ -1033,6 +1036,78 @@ export type Database = {
           },
         ]
       }
+      fleet_events: {
+        Row: {
+          actor: string | null
+          attempts: number
+          booking_id: string | null
+          company_id: string
+          created_at: string
+          data: Json
+          entity_id: string
+          event: string
+          event_key: string
+          failed_at: string | null
+          id: number
+          last_error: string | null
+          last_error_code: string | null
+          locked_until: string | null
+          next_attempt_at: string
+          processed_at: string | null
+        }
+        Insert: {
+          actor?: string | null
+          attempts?: number
+          booking_id?: string | null
+          company_id: string
+          created_at?: string
+          data?: Json
+          entity_id: string
+          event: string
+          event_key: string
+          failed_at?: string | null
+          id?: never
+          last_error?: string | null
+          last_error_code?: string | null
+          locked_until?: string | null
+          next_attempt_at?: string
+          processed_at?: string | null
+        }
+        Update: {
+          actor?: string | null
+          attempts?: number
+          booking_id?: string | null
+          company_id?: string
+          created_at?: string
+          data?: Json
+          entity_id?: string
+          event?: string
+          event_key?: string
+          failed_at?: string | null
+          id?: never
+          last_error?: string | null
+          last_error_code?: string | null
+          locked_until?: string | null
+          next_attempt_at?: string
+          processed_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fleet_events_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fleet_events_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       fleet_expenses: {
         Row: {
           amount: number
@@ -1124,6 +1199,414 @@ export type Database = {
           },
           {
             foreignKeyName: "fleet_expenses_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "company_vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fleet_issue_events: {
+        Row: {
+          at: string
+          booking_id: string | null
+          by_user: string | null
+          from_status: string | null
+          id: number
+          issue_id: string
+          note: string | null
+          photos_added: number
+          to_status: string | null
+        }
+        Insert: {
+          at?: string
+          booking_id?: string | null
+          by_user?: string | null
+          from_status?: string | null
+          id?: never
+          issue_id: string
+          note?: string | null
+          photos_added?: number
+          to_status?: string | null
+        }
+        Update: {
+          at?: string
+          booking_id?: string | null
+          by_user?: string | null
+          from_status?: string | null
+          id?: never
+          issue_id?: string
+          note?: string | null
+          photos_added?: number
+          to_status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fleet_issue_events_by_user_fkey"
+            columns: ["by_user"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fleet_issue_events_issue_id_fkey"
+            columns: ["issue_id"]
+            isOneToOne: false
+            referencedRelation: "fleet_issues"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fleet_issues: {
+        Row: {
+          booking_id: string | null
+          company_id: string
+          created_at: string
+          description: string | null
+          happened_on: string
+          id: string
+          kind: string
+          photos: string[]
+          reported_by: string | null
+          status: string
+          title: string
+          updated_at: string | null
+          vehicle_id: string
+          vehicle_label: Json
+        }
+        Insert: {
+          booking_id?: string | null
+          company_id: string
+          created_at?: string
+          description?: string | null
+          happened_on: string
+          id: string
+          kind: string
+          photos?: string[]
+          reported_by?: string | null
+          status?: string
+          title: string
+          updated_at?: string | null
+          vehicle_id: string
+          vehicle_label: Json
+        }
+        Update: {
+          booking_id?: string | null
+          company_id?: string
+          created_at?: string
+          description?: string | null
+          happened_on?: string
+          id?: string
+          kind?: string
+          photos?: string[]
+          reported_by?: string | null
+          status?: string
+          title?: string
+          updated_at?: string | null
+          vehicle_id?: string
+          vehicle_label?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fleet_issues_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fleet_issues_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fleet_issues_reported_by_fkey"
+            columns: ["reported_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fleet_issues_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "company_vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fleet_maintenance: {
+        Row: {
+          company_id: string
+          created_at: string
+          created_by: string | null
+          deleted_at: string | null
+          id: string
+          interval_km: number | null
+          interval_months: number | null
+          kind: string
+          label: string | null
+          last_booking_id: string | null
+          last_done_km: number | null
+          last_done_on: string | null
+          updated_at: string | null
+          vehicle_id: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          id?: string
+          interval_km?: number | null
+          interval_months?: number | null
+          kind: string
+          label?: string | null
+          last_booking_id?: string | null
+          last_done_km?: number | null
+          last_done_on?: string | null
+          updated_at?: string | null
+          vehicle_id: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          created_by?: string | null
+          deleted_at?: string | null
+          id?: string
+          interval_km?: number | null
+          interval_months?: number | null
+          kind?: string
+          label?: string | null
+          last_booking_id?: string | null
+          last_done_km?: number | null
+          last_done_on?: string | null
+          updated_at?: string | null
+          vehicle_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fleet_maintenance_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fleet_maintenance_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fleet_maintenance_last_booking_id_fkey"
+            columns: ["last_booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fleet_maintenance_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "company_vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fleet_notices: {
+        Row: {
+          created_at: string
+          dedupe_key: string
+          fleet_event_id: number
+          id: number
+          notification_id: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          dedupe_key: string
+          fleet_event_id: number
+          id?: never
+          notification_id?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          dedupe_key?: string
+          fleet_event_id?: number
+          id?: never
+          notification_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fleet_notices_fleet_event_id_fkey"
+            columns: ["fleet_event_id"]
+            isOneToOne: false
+            referencedRelation: "fleet_events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fleet_notices_notification_id_fkey"
+            columns: ["notification_id"]
+            isOneToOne: false
+            referencedRelation: "notification_events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fleet_notices_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fleet_odometer_ignored_jobs: {
+        Row: {
+          at: string
+          booking_id: string
+          by_user: string | null
+          company_id: string
+          reason: string
+        }
+        Insert: {
+          at?: string
+          booking_id: string
+          by_user?: string | null
+          company_id: string
+          reason: string
+        }
+        Update: {
+          at?: string
+          booking_id?: string
+          by_user?: string | null
+          company_id?: string
+          reason?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fleet_odometer_ignored_jobs_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: true
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fleet_odometer_ignored_jobs_by_user_fkey"
+            columns: ["by_user"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fleet_odometer_ignored_jobs_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fleet_odometer_import_exceptions: {
+        Row: {
+          day: string
+          expense_id: string
+          km: number
+          reasons: string[]
+          vehicle_id: string
+        }
+        Insert: {
+          day: string
+          expense_id: string
+          km: number
+          reasons: string[]
+          vehicle_id: string
+        }
+        Update: {
+          day?: string
+          expense_id?: string
+          km?: number
+          reasons?: string[]
+          vehicle_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fleet_odometer_import_exceptions_expense_id_fkey"
+            columns: ["expense_id"]
+            isOneToOne: true
+            referencedRelation: "fleet_expenses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fleet_odometer_readings: {
+        Row: {
+          company_id: string
+          corrected_from: number | null
+          correction_reason: string | null
+          created_at: string
+          created_by: string | null
+          day: string
+          deleted_at: string | null
+          id: string
+          km: number
+          ref_id: string | null
+          source: string
+          updated_at: string | null
+          vehicle_id: string
+        }
+        Insert: {
+          company_id: string
+          corrected_from?: number | null
+          correction_reason?: string | null
+          created_at?: string
+          created_by?: string | null
+          day: string
+          deleted_at?: string | null
+          id?: string
+          km: number
+          ref_id?: string | null
+          source: string
+          updated_at?: string | null
+          vehicle_id: string
+        }
+        Update: {
+          company_id?: string
+          corrected_from?: number | null
+          correction_reason?: string | null
+          created_at?: string
+          created_by?: string | null
+          day?: string
+          deleted_at?: string | null
+          id?: string
+          km?: number
+          ref_id?: string | null
+          source?: string
+          updated_at?: string | null
+          vehicle_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fleet_odometer_readings_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fleet_odometer_readings_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fleet_odometer_readings_vehicle_id_fkey"
             columns: ["vehicle_id"]
             isOneToOne: false
             referencedRelation: "company_vehicles"
@@ -1481,6 +1964,42 @@ export type Database = {
             columns: ["shop_id"]
             isOneToOne: false
             referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      member_rights_versions: {
+        Row: {
+          changed_at: string
+          company_id: string
+          user_id: string
+          version: number
+        }
+        Insert: {
+          changed_at?: string
+          company_id: string
+          user_id: string
+          version?: number
+        }
+        Update: {
+          changed_at?: string
+          company_id?: string
+          user_id?: string
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "member_rights_versions_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "member_rights_versions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -4020,6 +4539,7 @@ export type Database = {
       admin_list_catalog: { Args: never; Returns: Json }
       admin_list_clients: { Args: never; Returns: Json }
       admin_list_company_checks: { Args: never; Returns: Json }
+      admin_list_failed_fleet_events: { Args: never; Returns: Json }
       admin_list_fleet_companies: { Args: never; Returns: Json }
       admin_list_history_reports: { Args: never; Returns: Json }
       admin_list_no_show_disputes: { Args: never; Returns: Json }
@@ -4048,6 +4568,10 @@ export type Database = {
         Returns: Json
       }
       admin_overview: { Args: never; Returns: Json }
+      admin_retry_fleet_event: {
+        Args: { p_id: number; p_request_id: string }
+        Returns: Json
+      }
       admin_review_json: {
         Args: { p_review: Database["public"]["Tables"]["reviews"]["Row"] }
         Returns: Json
@@ -4220,6 +4744,69 @@ export type Database = {
         Args: { p_booking: Database["public"]["Tables"]["bookings"]["Row"] }
         Returns: Json
       }
+      booking_for_caller: {
+        Args: { b: Database["public"]["Tables"]["bookings"]["Row"] }
+        Returns: {
+          cancel_reason: string | null
+          cancelled_at: string | null
+          cancelled_by: string | null
+          car_id: string | null
+          car_snapshot: Json
+          checked_by: string | null
+          claimed_at: string | null
+          client_email: string | null
+          client_id: string | null
+          client_lang: string
+          client_name: string | null
+          client_phone: string | null
+          closed_reason: string | null
+          company_id: string | null
+          company_vehicle_id: string | null
+          confirmed_at: string | null
+          cost: number | null
+          created_at: string
+          date: string
+          decline_reason: string | null
+          done_at: string | null
+          extra_service_ids: string[]
+          followup_sent_at: string | null
+          id: string
+          inspection_started_at: string | null
+          intake_confirmed_at: string | null
+          intake_sent_at: string | null
+          invite_sent_at: string | null
+          invite_token: string | null
+          loyalty_level: number | null
+          loyalty_percent: number | null
+          note: string | null
+          odometer: number | null
+          offer_kind: string | null
+          offer_percent: number | null
+          quote_number: number | null
+          ref: string
+          reminder_sent_at: string | null
+          service_id: string
+          share_history: boolean
+          share_history_at: string | null
+          shop_id: string
+          slot: string
+          source: string
+          started_at: string | null
+          status: string
+          status_changed_at: string
+          updated_at: string
+          warranty_months: number | null
+          warranty_until: string | null
+          work: string | null
+          work_by: string | null
+        }
+        SetofOptions: {
+          from: "bookings"
+          to: "bookings"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       booking_offer: {
         Args: {
           p_client_id: string
@@ -4237,8 +4824,16 @@ export type Database = {
       }
       booking_thread: { Args: { p_booking_id: string }; Returns: string }
       bucharest_today: { Args: never; Returns: string }
+      bump_rights_version: {
+        Args: { p_company: string; p_user: string }
+        Returns: undefined
+      }
       caller_aal: { Args: never; Returns: string }
       can_read_booking: { Args: { p_booking_id: string }; Returns: boolean }
+      can_read_booking_money: {
+        Args: { p_booking_id: string }
+        Returns: boolean
+      }
       can_read_notice: {
         Args: { p_audience: string; p_city: string; p_created_at: string }
         Returns: boolean
@@ -4246,6 +4841,69 @@ export type Database = {
       can_read_shop: { Args: { p_shop_id: string }; Returns: boolean }
       can_read_thread: { Args: { p_thread_id: string }; Returns: boolean }
       cancel_booking: {
+        Args: { p_booking_id: string; p_request_id: string }
+        Returns: {
+          cancel_reason: string | null
+          cancelled_at: string | null
+          cancelled_by: string | null
+          car_id: string | null
+          car_snapshot: Json
+          checked_by: string | null
+          claimed_at: string | null
+          client_email: string | null
+          client_id: string | null
+          client_lang: string
+          client_name: string | null
+          client_phone: string | null
+          closed_reason: string | null
+          company_id: string | null
+          company_vehicle_id: string | null
+          confirmed_at: string | null
+          cost: number | null
+          created_at: string
+          date: string
+          decline_reason: string | null
+          done_at: string | null
+          extra_service_ids: string[]
+          followup_sent_at: string | null
+          id: string
+          inspection_started_at: string | null
+          intake_confirmed_at: string | null
+          intake_sent_at: string | null
+          invite_sent_at: string | null
+          invite_token: string | null
+          loyalty_level: number | null
+          loyalty_percent: number | null
+          note: string | null
+          odometer: number | null
+          offer_kind: string | null
+          offer_percent: number | null
+          quote_number: number | null
+          ref: string
+          reminder_sent_at: string | null
+          service_id: string
+          share_history: boolean
+          share_history_at: string | null
+          shop_id: string
+          slot: string
+          source: string
+          started_at: string | null
+          status: string
+          status_changed_at: string
+          updated_at: string
+          warranty_months: number | null
+          warranty_until: string | null
+          work: string | null
+          work_by: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "bookings"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      cancel_booking_t77: {
         Args: { p_booking_id: string; p_request_id: string }
         Returns: {
           cancel_reason: string | null
@@ -4778,6 +5436,74 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      decide_quote_t77: {
+        Args: {
+          p_approved_item_ids: string[]
+          p_booking_id: string
+          p_quote_id: string
+          p_request_id: string
+        }
+        Returns: {
+          cancel_reason: string | null
+          cancelled_at: string | null
+          cancelled_by: string | null
+          car_id: string | null
+          car_snapshot: Json
+          checked_by: string | null
+          claimed_at: string | null
+          client_email: string | null
+          client_id: string | null
+          client_lang: string
+          client_name: string | null
+          client_phone: string | null
+          closed_reason: string | null
+          company_id: string | null
+          company_vehicle_id: string | null
+          confirmed_at: string | null
+          cost: number | null
+          created_at: string
+          date: string
+          decline_reason: string | null
+          done_at: string | null
+          extra_service_ids: string[]
+          followup_sent_at: string | null
+          id: string
+          inspection_started_at: string | null
+          intake_confirmed_at: string | null
+          intake_sent_at: string | null
+          invite_sent_at: string | null
+          invite_token: string | null
+          loyalty_level: number | null
+          loyalty_percent: number | null
+          note: string | null
+          odometer: number | null
+          offer_kind: string | null
+          offer_percent: number | null
+          quote_number: number | null
+          ref: string
+          reminder_sent_at: string | null
+          service_id: string
+          share_history: boolean
+          share_history_at: string | null
+          shop_id: string
+          slot: string
+          source: string
+          started_at: string | null
+          status: string
+          status_changed_at: string
+          updated_at: string
+          warranty_months: number | null
+          warranty_until: string | null
+          work: string | null
+          work_by: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "bookings"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       decline_booking: {
         Args: { p_booking_id: string; p_reason?: string; p_request_id: string }
         Returns: {
@@ -4868,12 +5594,23 @@ export type Database = {
       export_my_data_t32: { Args: never; Returns: Json }
       export_my_data_t35: { Args: never; Returns: Json }
       export_my_data_t37b: { Args: never; Returns: Json }
+      export_my_data_t77: { Args: never; Returns: Json }
       fail: { Args: { p_code: string; p_params?: Json }; Returns: undefined }
       finish_history_report: {
         Args: { p_generated_at?: string; p_path: string; p_report_id: string }
         Returns: boolean
       }
       finish_notifications: { Args: { p_results: Json }; Returns: number }
+      fleet_add_reading: {
+        Args: {
+          p_company: string
+          p_day: string
+          p_km: number
+          p_request_id: string
+          p_vehicle: string
+        }
+        Returns: Json
+      }
       fleet_archive_vehicle: {
         Args: { p_archived: boolean; p_request_id: string; p_vehicle: string }
         Returns: Json
@@ -4887,6 +5624,80 @@ export type Database = {
         Args: { p_capability: string; p_company: string }
         Returns: boolean
       }
+      fleet_cancel_booking: {
+        Args: { p_booking_id: string; p_reason: string; p_request_id: string }
+        Returns: {
+          cancel_reason: string | null
+          cancelled_at: string | null
+          cancelled_by: string | null
+          car_id: string | null
+          car_snapshot: Json
+          checked_by: string | null
+          claimed_at: string | null
+          client_email: string | null
+          client_id: string | null
+          client_lang: string
+          client_name: string | null
+          client_phone: string | null
+          closed_reason: string | null
+          company_id: string | null
+          company_vehicle_id: string | null
+          confirmed_at: string | null
+          cost: number | null
+          created_at: string
+          date: string
+          decline_reason: string | null
+          done_at: string | null
+          extra_service_ids: string[]
+          followup_sent_at: string | null
+          id: string
+          inspection_started_at: string | null
+          intake_confirmed_at: string | null
+          intake_sent_at: string | null
+          invite_sent_at: string | null
+          invite_token: string | null
+          loyalty_level: number | null
+          loyalty_percent: number | null
+          note: string | null
+          odometer: number | null
+          offer_kind: string | null
+          offer_percent: number | null
+          quote_number: number | null
+          ref: string
+          reminder_sent_at: string | null
+          service_id: string
+          share_history: boolean
+          share_history_at: string | null
+          shop_id: string
+          slot: string
+          source: string
+          started_at: string | null
+          status: string
+          status_changed_at: string
+          updated_at: string
+          warranty_months: number | null
+          warranty_until: string | null
+          work: string | null
+          work_by: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "bookings"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      fleet_claim_event: { Args: never; Returns: number }
+      fleet_correct_reading: {
+        Args: {
+          p_km: number
+          p_reading: string
+          p_reason: string
+          p_request_id: string
+        }
+        Returns: Json
+      }
+      fleet_daily: { Args: { p_today?: string }; Returns: Json }
       fleet_decide_quote: {
         Args: {
           p_approved_item_ids: string[]
@@ -4959,6 +5770,25 @@ export type Database = {
         Args: { p_expense: string; p_request_id: string }
         Returns: Json
       }
+      fleet_delete_maintenance: {
+        Args: { p_item: string; p_request_id: string }
+        Returns: Json
+      }
+      fleet_enqueue: {
+        Args: {
+          p_booking: string
+          p_company: string
+          p_data: Json
+          p_entity: string
+          p_event: string
+          p_key: string
+        }
+        Returns: undefined
+      }
+      fleet_event_failed: {
+        Args: { p_code: string; p_error: string; p_id: number }
+        Returns: undefined
+      }
       fleet_expense_json: {
         Args: { e: Database["public"]["Tables"]["fleet_expenses"]["Row"] }
         Returns: Json
@@ -4967,9 +5797,63 @@ export type Database = {
         Args: { p_company: string; p_vehicle: string }
         Returns: boolean
       }
+      fleet_fuel_stats: {
+        Args: {
+          p_company: string
+          p_from: string
+          p_to: string
+          p_vehicle: string
+        }
+        Returns: Json
+      }
       fleet_has_feature: {
         Args: { p_company: string; p_feature: string }
         Returns: boolean
+      }
+      fleet_ignore_job_odometer: {
+        Args: { p_booking: string; p_reason: string; p_request_id: string }
+        Returns: Json
+      }
+      fleet_import_expense_readings: { Args: never; Returns: Json }
+      fleet_issue_can_read: {
+        Args: { p_issue: Database["public"]["Tables"]["fleet_issues"]["Row"] }
+        Returns: boolean
+      }
+      fleet_issue_can_report: {
+        Args: { p_company: string; p_vehicle: string }
+        Returns: boolean
+      }
+      fleet_issue_check_photos: {
+        Args: {
+          p_company: string
+          p_issue: string
+          p_photos: Json
+          p_vehicle: string
+        }
+        Returns: string[]
+      }
+      fleet_issue_detail: { Args: { p_issue: string }; Returns: Json }
+      fleet_issue_json: {
+        Args: { i: Database["public"]["Tables"]["fleet_issues"]["Row"] }
+        Returns: Json
+      }
+      fleet_issue_path: { Args: { p_name: string }; Returns: boolean }
+      fleet_issue_photo_can_delete: {
+        Args: { p_name: string; p_owner: string }
+        Returns: boolean
+      }
+      fleet_issue_photo_can_read: {
+        Args: { p_name: string; p_owner: string }
+        Returns: boolean
+      }
+      fleet_issue_photo_can_upload: {
+        Args: { p_name: string }
+        Returns: boolean
+      }
+      fleet_issue_photo_orphan: { Args: { p_name: string }; Returns: boolean }
+      fleet_issue_photo_orphans: {
+        Args: { p_limit?: number }
+        Returns: string[]
       }
       fleet_job_json: {
         Args: {
@@ -4996,16 +5880,57 @@ export type Database = {
         Args: { p_company: string; p_kind: string; p_rows: number }
         Returns: undefined
       }
+      fleet_maintenance_json: {
+        Args: { m: Database["public"]["Tables"]["fleet_maintenance"]["Row"] }
+        Returns: Json
+      }
+      fleet_maintenance_status: {
+        Args: {
+          m: Database["public"]["Tables"]["fleet_maintenance"]["Row"]
+          p_today?: string
+        }
+        Returns: Json
+      }
       fleet_mark_expense: {
         Args: { p_expense: string; p_request_id: string; p_status: string }
+        Returns: Json
+      }
+      fleet_mark_maintenance_done: {
+        Args: { p_fields: Json; p_item: string; p_request_id: string }
         Returns: Json
       }
       fleet_member_can: {
         Args: { p_capability: string; p_extra: string[]; p_role: string }
         Returns: boolean
       }
+      fleet_odometer_check: {
+        Args: {
+          p_day: string
+          p_km: number
+          p_skip?: string
+          p_vehicle: string
+        }
+        Returns: undefined
+      }
+      fleet_odometer_points: {
+        Args: { p_vehicle: string }
+        Returns: {
+          day: string
+          id: string
+          km: number
+          ref_id: string
+          source: string
+        }[]
+      }
       fleet_overview: { Args: { p_company: string }; Returns: Json }
       fleet_plan_summary: { Args: { p_company: string }; Returns: Json }
+      fleet_process_event: { Args: { p_id: number }; Returns: Json }
+      fleet_reading_json: {
+        Args: {
+          r: Database["public"]["Tables"]["fleet_odometer_readings"]["Row"]
+        }
+        Returns: Json
+      }
       fleet_report: {
         Args: {
           p_company: string
@@ -5036,6 +5961,83 @@ export type Database = {
           vehicle_id: string
         }[]
       }
+      fleet_report_issue: {
+        Args: {
+          p_company: string
+          p_fields: Json
+          p_issue: string
+          p_request_id: string
+        }
+        Returns: Json
+      }
+      fleet_request_quote_changes: {
+        Args: {
+          p_booking_id: string
+          p_quote_id: string
+          p_reason: string
+          p_request_id: string
+        }
+        Returns: {
+          cancel_reason: string | null
+          cancelled_at: string | null
+          cancelled_by: string | null
+          car_id: string | null
+          car_snapshot: Json
+          checked_by: string | null
+          claimed_at: string | null
+          client_email: string | null
+          client_id: string | null
+          client_lang: string
+          client_name: string | null
+          client_phone: string | null
+          closed_reason: string | null
+          company_id: string | null
+          company_vehicle_id: string | null
+          confirmed_at: string | null
+          cost: number | null
+          created_at: string
+          date: string
+          decline_reason: string | null
+          done_at: string | null
+          extra_service_ids: string[]
+          followup_sent_at: string | null
+          id: string
+          inspection_started_at: string | null
+          intake_confirmed_at: string | null
+          intake_sent_at: string | null
+          invite_sent_at: string | null
+          invite_token: string | null
+          loyalty_level: number | null
+          loyalty_percent: number | null
+          note: string | null
+          odometer: number | null
+          offer_kind: string | null
+          offer_percent: number | null
+          quote_number: number | null
+          ref: string
+          reminder_sent_at: string | null
+          service_id: string
+          share_history: boolean
+          share_history_at: string | null
+          shop_id: string
+          slot: string
+          source: string
+          started_at: string | null
+          status: string
+          status_changed_at: string
+          updated_at: string
+          warranty_months: number | null
+          warranty_until: string | null
+          work: string | null
+          work_by: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "bookings"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       fleet_role_can: {
         Args: { p_capability: string; p_role: string }
         Returns: boolean
@@ -5045,6 +6047,15 @@ export type Database = {
           p_company: string
           p_expense: string
           p_fields: Json
+          p_request_id: string
+        }
+        Returns: Json
+      }
+      fleet_save_maintenance: {
+        Args: {
+          p_company: string
+          p_fields: Json
+          p_item: string
           p_request_id: string
         }
         Returns: Json
@@ -5067,6 +6078,18 @@ export type Database = {
         Returns: Json
       }
       fleet_subscription: { Args: { p_company: string }; Returns: Json }
+      fleet_sync_expense_reading: {
+        Args: { e: Database["public"]["Tables"]["fleet_expenses"]["Row"] }
+        Returns: undefined
+      }
+      fleet_update_issue: {
+        Args: { p_fields: Json; p_issue: string; p_request_id: string }
+        Returns: Json
+      }
+      fleet_user_can: {
+        Args: { p_capability: string; p_company: string; p_user: string }
+        Returns: boolean
+      }
       fleet_vehicle_cost_per_km: {
         Args: {
           p_company: string
@@ -5213,6 +6236,15 @@ export type Database = {
         }
         Returns: Json
       }
+      job_document_data_t77: {
+        Args: {
+          p_aal?: string
+          p_booking_id: string
+          p_kind: string
+          p_user_id: string
+        }
+        Returns: Json
+      }
       join_area_waitlist: {
         Args: {
           p_area: string
@@ -5232,6 +6264,7 @@ export type Database = {
       }
       kick_company_checks: { Args: never; Returns: boolean }
       kick_dispatcher: { Args: never; Returns: boolean }
+      kick_fleet_files_cleanup: { Args: never; Returns: boolean }
       last_odometer_for_booking: {
         Args: { p_booking_id: string }
         Returns: number
@@ -5511,6 +6544,7 @@ export type Database = {
       my_approval_limit: { Args: { p_company: string }; Returns: number }
       my_client_referrals: { Args: never; Returns: Json }
       my_companies: { Args: never; Returns: Json }
+      my_company_bookings: { Args: never; Returns: Json }
       my_fleet_access: { Args: never; Returns: boolean }
       my_imported_jobs: { Args: never; Returns: Json }
       my_member_id: { Args: { p_company: string }; Returns: string }
@@ -5763,6 +6797,10 @@ export type Database = {
       }
       report_facts: { Args: { p_jobs: Json }; Returns: Json }
       report_jobs: {
+        Args: { p_client_id: string; p_vehicle_key: string }
+        Returns: Json
+      }
+      report_jobs_t77: {
         Args: { p_client_id: string; p_vehicle_key: string }
         Returns: Json
       }
@@ -6102,6 +7140,74 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      reschedule_booking_t77: {
+        Args: {
+          p_booking_id: string
+          p_date: string
+          p_request_id: string
+          p_slot: string
+        }
+        Returns: {
+          cancel_reason: string | null
+          cancelled_at: string | null
+          cancelled_by: string | null
+          car_id: string | null
+          car_snapshot: Json
+          checked_by: string | null
+          claimed_at: string | null
+          client_email: string | null
+          client_id: string | null
+          client_lang: string
+          client_name: string | null
+          client_phone: string | null
+          closed_reason: string | null
+          company_id: string | null
+          company_vehicle_id: string | null
+          confirmed_at: string | null
+          cost: number | null
+          created_at: string
+          date: string
+          decline_reason: string | null
+          done_at: string | null
+          extra_service_ids: string[]
+          followup_sent_at: string | null
+          id: string
+          inspection_started_at: string | null
+          intake_confirmed_at: string | null
+          intake_sent_at: string | null
+          invite_sent_at: string | null
+          invite_token: string | null
+          loyalty_level: number | null
+          loyalty_percent: number | null
+          note: string | null
+          odometer: number | null
+          offer_kind: string | null
+          offer_percent: number | null
+          quote_number: number | null
+          ref: string
+          reminder_sent_at: string | null
+          service_id: string
+          share_history: boolean
+          share_history_at: string | null
+          shop_id: string
+          slot: string
+          source: string
+          started_at: string | null
+          status: string
+          status_changed_at: string
+          updated_at: string
+          warranty_months: number | null
+          warranty_until: string | null
+          work: string | null
+          work_by: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "bookings"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       review_display_name: { Args: { p_name: string }; Returns: string }
       review_signals: {
         Args: { p_review: Database["public"]["Tables"]["reviews"]["Row"] }
@@ -6313,6 +7419,69 @@ export type Database = {
         Returns: undefined
       }
       set_booking_history_share: {
+        Args: { p_booking_id: string; p_request_id: string; p_share: boolean }
+        Returns: {
+          cancel_reason: string | null
+          cancelled_at: string | null
+          cancelled_by: string | null
+          car_id: string | null
+          car_snapshot: Json
+          checked_by: string | null
+          claimed_at: string | null
+          client_email: string | null
+          client_id: string | null
+          client_lang: string
+          client_name: string | null
+          client_phone: string | null
+          closed_reason: string | null
+          company_id: string | null
+          company_vehicle_id: string | null
+          confirmed_at: string | null
+          cost: number | null
+          created_at: string
+          date: string
+          decline_reason: string | null
+          done_at: string | null
+          extra_service_ids: string[]
+          followup_sent_at: string | null
+          id: string
+          inspection_started_at: string | null
+          intake_confirmed_at: string | null
+          intake_sent_at: string | null
+          invite_sent_at: string | null
+          invite_token: string | null
+          loyalty_level: number | null
+          loyalty_percent: number | null
+          note: string | null
+          odometer: number | null
+          offer_kind: string | null
+          offer_percent: number | null
+          quote_number: number | null
+          ref: string
+          reminder_sent_at: string | null
+          service_id: string
+          share_history: boolean
+          share_history_at: string | null
+          shop_id: string
+          slot: string
+          source: string
+          started_at: string | null
+          status: string
+          status_changed_at: string
+          updated_at: string
+          warranty_months: number | null
+          warranty_until: string | null
+          work: string | null
+          work_by: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "bookings"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      set_booking_history_share_t77: {
         Args: { p_booking_id: string; p_request_id: string; p_share: boolean }
         Returns: {
           cancel_reason: string | null

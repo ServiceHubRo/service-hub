@@ -98,6 +98,29 @@ export function ClientBookingsProvider({ children }: { children: ReactNode }) {
     });
   }, [clientId, ready, apply, refresh]);
 
+  // 107: a company booking read without costs.view does not come through Realtime on bookings (the
+  // row carries the cost); a new automatic message of its thread says it changed, and the list is
+  // read again. The thread messages carry no amounts for company bookings.
+  const hidden = useMemo(
+    () => new Set(state.status === 'ready' ? state.data.bookings.filter((b) => b.money_hidden).map((b) => b.id) : []),
+    [state],
+  );
+  const hasHidden = hidden.size > 0;
+  const hiddenRef = useRef(hidden);
+  hiddenRef.current = hidden;
+  useEffect(() => {
+    if (!clientId || !ready || !hasHidden) return;
+    return subscribeRows<{ booking_id: string | null; kind: string }>({
+      channel: `client-company-bookings:${clientId}`,
+      table: 'messages',
+      onChange: (payload) => {
+        const row = payload.new as { booking_id?: string | null };
+        if (row.booking_id && hiddenRef.current.has(row.booking_id)) refresh();
+      },
+      onResync: refresh,
+    });
+  }, [clientId, ready, hasHidden, refresh]);
+
   // T53: the admin decided a dispute of a no-show: the card says how.
   useEffect(() => {
     if (!clientId || !ready) return;

@@ -23,6 +23,7 @@ const EVENTS = [
   'booking_cancelled_client',
   'booking_cancelled_shop',
   'booking_cancelled_admin',
+  'booking_cancelled_company',
   'no_show',
   'inspection_started',
   'quote_sent',
@@ -31,6 +32,7 @@ const EVENTS = [
   'quote_accepted',
   'quote_partially_accepted',
   'quote_refused',
+  'quote_changes_requested',
   'quote_expired',
   'request_expired',
   'booking_auto_closed',
@@ -42,6 +44,8 @@ const EVENTS = [
 ] as const;
 
 const known: ReadonlySet<string> = new Set(EVENTS);
+/** The events whose text names an amount, with a variant without it (`…Plain`). */
+const PLAIN: ReadonlySet<string> = new Set(['quote_sent', 'quote_replaced', 'quote_accepted', 'quote_partially_accepted']);
 
 /** `sysmsg.<event>.<side>` for every event in EVENTS: the i18n test checks both languages have them. */
 export function systemMessageKeys(): MessageKey[] {
@@ -77,7 +81,9 @@ export function systemMessageText(lang: Lang, side: Side, event: string | null, 
     total: money(p.total),
     totalSent: money(p.total_sent),
   };
-  let text = translate(lang, `sysmsg.${event}.${side}` as MessageKey, values);
+  // 107: a company booking's messages carry no amounts: the texts without them.
+  const plain = PLAIN.has(event) && p.total === undefined;
+  let text = translate(lang, `sysmsg.${event}.${side}${plain ? 'Plain' : ''}` as MessageKey, values);
 
   const reason = str(p.reason).trim();
   if (reason) text += ` ${translate(lang, 'sysmsg.reason', { reason })}`;

@@ -1,5 +1,5 @@
 import { ymdInBucharest } from '../../i18n/format';
-import type { FleetExpense, FleetJob, FleetOverview, FleetPlanRow, FleetPlanSummary, FleetQuote, FleetSubscriptionView, FleetVehicle } from '../../lib/fleet';
+import type { FleetExpense, FleetIssue, FleetJob, FleetOverview, FleetPlanRow, FleetPlanSummary, FleetQuote, FleetSubscriptionView, FleetVehicle } from '../../lib/fleet';
 import { extraColleagues, monthlyTotal } from '../../lib/fleet';
 
 /**
@@ -120,10 +120,29 @@ export function sampleFleet(now: Date = new Date()): FleetOverview {
       { ...member('m7', '', 'nou@exemplu.ro', 'driver'), user_id: null, accepted_at: null },
     ],
     issues: [
-      { id: 'i1', vehicle_id: 'v4', kind: 'problem', body: 'Scârțâie frânele la oprire.', status: 'scheduled', reported_by: 'm2', created_at: at(ago(4), 8), booking_id: 'j11' },
-      { id: 'i2', vehicle_id: 'v1', kind: 'incident', body: 'Zgârietură pe ușa din spate, parcare client.', status: 'open', reported_by: 'm3', created_at: at(ago(1), 17), booking_id: null },
+      issue('i1', 'v4', 'defect', 'Scârțâie frânele la oprire.', 'scheduled', 'Mihai Pop', 4, 'j11'),
+      issue('i2', 'v1', 'damage', 'Zgârietură pe ușa din spate, parcare client.', 'new', 'Ion Marin', 1, null),
     ],
   };
+
+  function issue(id: string, vehicle: string, kind: FleetIssue['kind'], title: string, status: FleetIssue['status'], by: string, days: number, booking: string | null): FleetIssue {
+    return {
+      id,
+      vehicle_id: vehicle,
+      vehicle_label: { plate: null, make: '', model: '' },
+      kind,
+      title,
+      description: null,
+      happened_on: ago(days),
+      status,
+      booking_id: booking,
+      photos: [],
+      reported_by: null,
+      reported_by_name: by,
+      created_at: at(ago(days), 8),
+      updated_at: null,
+    };
+  }
 
   function car(
     id: string,

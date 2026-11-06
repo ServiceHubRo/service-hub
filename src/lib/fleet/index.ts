@@ -9,3 +9,6 @@ export * from './scope';
 export * from './plans';
 export * from './bookings';
 export * from './report';
+export * from './issues';
+export * from './odometer';
+export * from './maintenance';

@@ -8,21 +8,35 @@ import { LoadError } from '../../components/LoadError';
 import { PageHeader } from '../../components/PageHeader';
 import { SkeletonList } from '../../components/Skeleton';
 import {
+  addReading,
   archiveVehicle,
+  correctReading,
+  deleteMaintenance,
+  fetchFuelStats,
+  ignoreJobOdometer,
   assignDriver,
   deleteExpense,
   fetchFleetOverview,
   fetchFleetPlans,
+  fetchIssueDetail,
+  fleetCancelBooking,
+  fleetRequestQuoteChanges,
+  fleetFileUrl,
   fetchFleetReport,
   fetchPlanSummary,
   fetchSubscription,
   fleetDecideQuote,
   logFleetExport,
+  markMaintenanceDone,
   markExpense,
   receiptUrl,
+  reportIssue,
   saveExpense,
+  saveMaintenance,
   saveVehicle,
   setUnavailable,
+  updateIssue,
+  uploadIssuePhoto,
   uploadReceipt,
 } from '../../data/fleet';
 import { subscribeRows } from '../../data/realtime';
@@ -71,6 +85,7 @@ function FleetSpace({ companyId }: { companyId: string }) {
   }, [load, setData]);
 
   const ready = state.status === 'ready';
+  const workspace = useOptionalWorkspace();
   useEffect(() => {
     if (!ready) return;
     let timer: number | undefined;
@@ -84,12 +99,16 @@ function FleetSpace({ companyId }: { companyId: string }) {
     // The company's bookings (T63d): readable live by those who see them all; a driver's own come
     // through their personal row.
     const offBookings = subscribeRows({ channel: `fleet-bookings:${companyId}`, table: 'bookings', filter: `company_id=eq.${companyId}`, onChange: later, onResync: later });
+    // M6 (decision 8): the member's rights changed (role, extra rights, plan): everything is read again.
+    // Unfiltered: the table's policy lets each user read only their own rows, and Realtime follows it.
+    const offRights = subscribeRows({ channel: `fleet-rights:${companyId}`, table: 'member_rights_versions', onChange: later, onResync: later });
     return () => {
       window.clearTimeout(timer);
       offVehicles();
       offMembers();
       offPlan();
       offBookings();
+      offRights();
     };
   }, [ready, companyId, refresh]);
 
@@ -138,13 +157,61 @@ function FleetSpace({ companyId }: { companyId: string }) {
       },
       uploadReceipt: (vehicleId, file) => uploadReceipt(companyId, vehicleId, file),
       receiptUrl: (path) => receiptUrl(path),
+      uploadIssuePhoto: (vehicleId, issueId, file) => uploadIssuePhoto(companyId, vehicleId, issueId, file),
+      reportIssue: async (issueId, fields, requestId) => {
+        const saved = await reportIssue(companyId, issueId, fields, requestId);
+        await refresh();
+        return saved;
+      },
+      updateIssue: async (issueId, fields, requestId) => {
+        const saved = await updateIssue(issueId, fields, requestId);
+        await refresh();
+        return saved;
+      },
+      issueDetail: (issueId) => fetchIssueDetail(issueId),
+      fileUrl: (path) => fleetFileUrl(path),
+      addReading: async (vehicleId, day, km, requestId) => {
+        const saved = await addReading(companyId, vehicleId, day, km, requestId);
+        await refresh();
+        return saved;
+      },
+      correctReading: async (readingId, km, reason, requestId) => {
+        const saved = await correctReading(readingId, km, reason, requestId);
+        await refresh();
+        return saved;
+      },
+      ignoreJobOdometer: async (bookingId, reason, requestId) => {
+        await ignoreJobOdometer(bookingId, reason, requestId);
+        await refresh();
+      },
+      fuelStats: (vehicleId, from, to) => fetchFuelStats(companyId, vehicleId, from, to),
+      requestQuoteChanges: async (bookingId, quoteId, reason, requestId) => {
+        await fleetRequestQuoteChanges(bookingId, quoteId, reason, requestId);
+        await refresh();
+      },
+      cancelBooking: async (bookingId, reason, requestId) => {
+        await fleetCancelBooking(bookingId, reason, requestId);
+        await refresh();
+      },
+      saveMaintenance: async (itemId, fields, requestId) => {
+        const saved = await saveMaintenance(companyId, itemId, fields, requestId);
+        await refresh();
+        return saved;
+      },
+      deleteMaintenance: async (itemId, requestId) => {
+        await deleteMaintenance(itemId, requestId);
+        await refresh();
+      },
+      markMaintenanceDone: async (itemId, fields, requestId) => {
+        await markMaintenanceDone(itemId, fields, requestId);
+        await refresh();
+      },
     }),
     [companyId, refresh, navigate],
   );
 
   // Removed from the company while the page was open (the workspace list no longer has it): nothing
   // of the company stays on screen; the database refuses every read and write anyway.
-  const workspace = useOptionalWorkspace();
   const revoked = !!workspace?.ready && !workspace.companies.some((c) => c.id === companyId);
 
   const title = section === 'vehicul' ? t('fleet.nav.vehicle') : t(`fleet.nav.${section}`);

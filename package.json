@@ -19,7 +19,8 @@
     "icons": "node scripts/gen-icons.mjs",
     "db:types": "bash scripts/db-types.sh",
     "android:sync": "APP_PLATFORM=android npm run build && cap sync android",
-    "android:assets": "node scripts/gen-android-assets.mjs"
+    "android:assets": "node scripts/gen-android-assets.mjs",
+    "test:rollback": "bash scripts/test-rollback.sh"
   },
   "dependencies": {
     "@capacitor/android": "^8.5.2",
