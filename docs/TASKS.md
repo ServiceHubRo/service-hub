@@ -1590,3 +1590,12 @@ Aprobate de Eduard pe 6 nov („aprob T71–T75”; T71 era deja folosit, așa c
 - Rămas: verificarea pe proiectul de TEST că fiecare migrare se aplică într-o tranzacție (la primul deploy); ecran de istoric al modificărilor de cheltuieli (în jurnal, neafișat).
 
 - [x] Făcut
+
+### P1 — „Înapoi” fără bucle ✅
+- Auditul din 6 nov a reprodus bucla din captura lui Eduard. Butonul „‹ Înapoi” din aplicație (`BackLink`, pe 32 de ecrane) deschidea pagina-părinte ca intrare nouă în istoric, așa că „Înapoi” al telefonului și cel din aplicație se alternau (Cont ↔ Firmele mele).
+- Acum „‹ Înapoi” se întoarce în istoric când pagina dinainte e chiar părintele. Altfel înlocuiește pagina curentă cu părintele (link deschis direct, refresh, pagină venită din altă parte). Nu mai adaugă niciodată o intrare. La fel „Înapoi la vehicule” din spațiul firmei.
+- Adresa fiecărei intrări din istoric e ținută per tab: `src/lib/navHistory.ts`, înregistrată în `RouteGuard`.
+- Teste: `tests/unit/navHistory.test.ts`, `tests/e2e/navigation.spec.ts` (toate traseele din audit, cu lungimea istoricului verificată după fiecare pas, 390/820/1440).
+- Neverificat: gestul de revenire din Safari pe iPhone (containerul are doar Chromium). Folosește același istoric, dar se confirmă pe telefon.
+
+- [x] Făcut
