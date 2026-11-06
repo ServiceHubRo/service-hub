@@ -86,7 +86,7 @@ begin
     p_request_id => gen_random_uuid(), p_car_id => p_car_id,
     p_car => case when p_car_id is null
                   then jsonb_build_object('make', 'Dacia', 'model', 'Logan',
-                         'plate', coalesce(p_plate, 'TST ' || upper(left(md5(random()::text), 6)))) end);
+                         'plate', coalesce(p_plate, 'TST ' || upper(left(md5(random()::text), 5)) || '1')) end);
   perform test.logout();
   return v.id;
 end

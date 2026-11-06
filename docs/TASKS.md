@@ -1590,3 +1590,9 @@ Aprobate de Eduard pe 6 nov („aprob T71–T75”; T71 era deja folosit, așa c
 - Rămas: verificarea pe proiectul de TEST că fiecare migrare se aplică într-o tranzacție (la primul deploy); ecran de istoric al modificărilor de cheltuieli (în jurnal, neafișat).
 
 - [x] Făcut
+
+### P8 — Testele SQL generează doar numere de înmatriculare valide ✅
+- Auditul din 6 nov: `119_client_referrals` pica rar și aleator. Numărul de înmatriculare era făcut din primele 6 caractere ale unui UUID; când toate erau litere (a–f), regula T69 (cel puțin o cifră) îl refuza. Același tipar era în `118_offers` și în `test.raw_booking` (`06_booking_helpers`, cu `md5`).
+- Toate trei adaugă acum o cifră fixă; regula de validare a numerelor nu s-a schimbat. Doar teste, fără cod de aplicație sau bază de date.
+
+- [x] Făcut
