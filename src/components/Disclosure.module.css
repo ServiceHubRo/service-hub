@@ -1,0 +1,85 @@
+.group {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  overflow: hidden;
+}
+
+.disclosure + .disclosure {
+  border-top: 1px solid var(--border);
+}
+
+.summary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 52px;
+  padding: 0 16px;
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+  transition: background-color var(--motion-quick) var(--ease);
+}
+
+.summary::-webkit-details-marker {
+  display: none;
+}
+
+.summary:hover {
+  background: var(--surface-hover);
+}
+
+.summary:focus-visible {
+  outline: none;
+  box-shadow: inset var(--focus-ring);
+}
+
+.title {
+  flex: 1;
+  min-width: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.meta {
+  font-size: 13px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.chevron {
+  flex-shrink: 0;
+  color: var(--muted);
+  transition: transform var(--motion-quick) var(--ease);
+}
+
+.disclosure[open] > .summary .chevron {
+  transform: rotate(180deg);
+}
+
+.content {
+  padding: 2px 16px 14px;
+}
+
+.disclosure[open] > .content {
+  animation: reveal var(--motion-quick) var(--ease);
+}
+
+@keyframes reveal {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .summary,
+  .chevron {
+    transition: none;
+  }
+
+  .disclosure[open] > .content {
+    animation: none;
+  }
+}

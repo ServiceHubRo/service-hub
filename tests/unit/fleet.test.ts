@@ -694,3 +694,12 @@ describe('the fleet report (T65, the same case as tests/sql/139_fleet_plan_featu
     expect(upgradeGains(plans[0]!.features, plans[1]!.features)).toEqual(['reports', 'export_csv']);
   });
 });
+
+describe('rights grouped for „Drepturile fiecărui rol”', () => {
+  it('every right is in exactly one group', async () => {
+    const { FLEET_CAPABILITIES, FLEET_CAPABILITY_GROUPS } = await import('../../src/lib/fleet');
+    const grouped = FLEET_CAPABILITY_GROUPS.flatMap((g) => g.caps);
+    expect([...grouped].sort()).toEqual([...FLEET_CAPABILITIES].sort());
+    expect(new Set(grouped).size).toBe(grouped.length);
+  });
+});

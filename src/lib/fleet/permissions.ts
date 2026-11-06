@@ -44,6 +44,19 @@ export const FLEET_CAPABILITIES: readonly FleetCapability[] = [
   'audit.view',
 ];
 
+/** The rights in the groups „Drepturile fiecărui rol” opens one by one (each right in exactly one). */
+export const FLEET_CAPABILITY_GROUPS: readonly { key: string; caps: readonly FleetCapability[] }[] = [
+  { key: 'company', caps: ['company.manage', 'audit.view'] },
+  { key: 'members', caps: ['members.manage'] },
+  { key: 'subscription', caps: ['subscription.manage'] },
+  { key: 'budget', caps: ['budget.manage'] },
+  { key: 'vehicles', caps: ['vehicles.viewAll', 'vehicles.manage', 'documents.view', 'documents.manage', 'issues.report', 'issues.manage'] },
+  { key: 'bookings', caps: ['bookings.create', 'bookings.viewAll'] },
+  { key: 'quotes', caps: ['quotes.approve'] },
+  { key: 'costs', caps: ['costs.view', 'costs.manage'] },
+  { key: 'reports', caps: ['reports.view'] },
+];
+
 const MANAGER: readonly FleetCapability[] = [
   'vehicles.viewAll',
   'vehicles.manage',

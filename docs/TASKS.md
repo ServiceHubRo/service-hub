@@ -1542,3 +1542,8 @@ Notă (31 oct): Eduard a aprobat politica de acces (7 zile de grație, apoi doar
 - Neverificate automat: textele de notificare suprascrise de admin din Admin → Texte.
 
 - [x] Făcut
+
+### T68a — Interfață premium cu dropdown-uri: drepturile rolurilor
+- **„Drepturile fiecărui rol”** (Eduard, 6 nov): în locul celor patru butoane și al tabelului, „Selectează rolul” (dropdown) și drepturile rolului în 9 grupuri care se deschid pe rând (Datele firmei, Membri și roluri, Abonament, Buget, Vehicule, Programări, Devize, Cheltuieli, Rapoarte), fiecare cu „n din m permise” și „Permis” / „Nepermis” în cuvinte, cu un semn discret.
+- **Componente:** dropdown-ul unic rămâne `SelectField` (listă nativă stilizată: în stilul aplicației pe Chrome și Android, selectorul sistemului pe iPhone); nou `Disclosure` / `DisclosureGroup` (`<details>`, deschidere scurtă, fără animație cu „Reduce motion”). Grupurile drepturilor: `FLEET_CAPABILITY_GROUPS` (test: fiecare drept într-un singur grup).
+- Rămas: aplicarea în restul aplicației, după aprobarea listei din propunere.

@@ -897,66 +897,53 @@ button.kpi:hover {
 }
 
 /* ---------------------------------------------------------------- members */
-/* The rights: one role at a time on a phone (no sideways scrolling), the whole table from 768 px. */
-.rightsPhone {
+/* The rights of one role (Eduard, 6 Nov): a dropdown, then quiet groups that open one by one. */
+@media (min-width: 768px) {
+  .roleSelect {
+    max-width: 360px;
+  }
+}
+
+.rightsList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 10px;
 }
 
-@media (min-width: 768px) {
-  .rightsPhone {
-    display: none;
-  }
+.rightRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0;
+  font-size: 14px;
 }
 
-@media (max-width: 767px) {
-  .tableWrap {
-    display: none;
-  }
-}
-
-.tableWrap {
-  overflow-x: auto;
-  margin: 0 calc(var(--card-pad) * -1);
-  padding: 0 var(--card-pad);
-}
-
-.matrix {
-  width: 100%;
-  min-width: 520px;
-  border-collapse: collapse;
-  font-size: 13.5px;
-}
-
-.matrix th,
-.matrix td {
-  padding: 9px 8px;
+.rightRow + .rightRow {
   border-top: 1px solid var(--border);
-  text-align: center;
-  vertical-align: middle;
 }
 
-.matrix thead th {
-  border-top: 0;
+/* The state in words, with a small mark: never colour alone. */
+.rightState {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
   font-size: 12.5px;
-  color: var(--muted);
   font-weight: 600;
 }
 
-.matrix th[scope='row'],
-.matrix thead th:first-child {
-  text-align: left;
-  font-weight: 500;
+.rightYes {
+  color: var(--text-2);
 }
 
-.matrix td svg {
-  vertical-align: middle;
+.rightYes svg {
+  color: var(--amber);
 }
 
-.limited {
-  display: block;
-  font-size: 11px;
+.rightNo {
   color: var(--muted);
 }
 
