@@ -46,7 +46,7 @@ export function VehicleDuplicatesScreen() {
                         </Link>
                         <span className={`mono ${styles.muted}`}>{g.key}</span>
                       </div>
-                      <span className={styles.muted}>{t('admin.dup.copies', { count: g.cars.length })}</span>
+                      <span className={`${styles.muted} ${own.dupCount}`}>{t('admin.dup.copies', { count: g.cars.length })}</span>
                     </div>
                     <CarList cars={g.cars} />
                   </Card>
@@ -69,7 +69,7 @@ export function VehicleDuplicatesScreen() {
                         <span className={own.rowName}>{g.company}</span>
                         <span className={`mono ${styles.muted}`}>{g.vin}</span>
                       </div>
-                      <span className={styles.muted}>{t('admin.dup.copies', { count: g.vehicles.length })}</span>
+                      <span className={`${styles.muted} ${own.dupCount}`}>{t('admin.dup.copies', { count: g.vehicles.length })}</span>
                     </div>
                     <CarList cars={g.vehicles} />
                   </Card>
