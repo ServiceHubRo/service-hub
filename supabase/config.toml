@@ -512,6 +512,10 @@ verify_jwt = false
 [functions.job-document]
 verify_jwt = false
 
+# Called once a day by the database (pg_net, with the dispatcher's token).
+[functions.fleet-files-cleanup]
+verify_jwt = false
+
 # The wordmark image in emails: fetched by email programs, no sign-in.
 [functions.email-logo]
 verify_jwt = false

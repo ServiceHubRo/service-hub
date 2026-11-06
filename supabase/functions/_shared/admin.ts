@@ -86,6 +86,10 @@ export function adminApi() {
       if (!res.ok) throw new AdminError(res.status, `storage download: ${(await res.text()).slice(0, 200)}`);
       return new Uint8Array(await res.arrayBuffer());
     },
+    /** Deletes files from a Storage bucket, as the service role (files already gone are not an error). */
+    async remove(bucket: string, paths: string[]): Promise<void> {
+      await request('DELETE', `/storage/v1/object/${bucket}`, { prefixes: paths });
+    },
     deleteUser: (id: string) => request('DELETE', `/auth/v1/admin/users/${id}`),
     updateUser: (id: string, attributes: Record<string, unknown>) =>
       request('PUT', `/auth/v1/admin/users/${id}`, attributes),
