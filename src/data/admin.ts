@@ -364,16 +364,12 @@ export async function fetchBookings(f: BookingFilters): Promise<AdminBookingList
   })) as unknown as AdminBookingList;
 }
 
-export interface AdminMessage {
+/** An automatic event of a booking (P3): never a message written by the client or the shop. */
+export interface AdminBookingEvent {
   id: string;
-  kind: 'user' | 'system';
-  body: string | null;
   event: string | null;
   params: Record<string, unknown>;
-  booking_id: string | null;
   created_at: string;
-  side: 'client' | 'shop' | 'system' | 'unknown';
-  sender_name: string | null;
 }
 
 export interface AdminQuote {
@@ -431,30 +427,13 @@ export interface AdminBookingDetail {
     removed_at: string | null;
     created_at: string;
   } | null;
-  thread_id: string | null;
-  messages: AdminMessage[];
+  /** P3: the booking's automatic events only. */
+  events: AdminBookingEvent[];
   audit: AuditEntry[];
 }
 
 export async function fetchBooking(bookingId: string): Promise<AdminBookingDetail> {
   return (await call('admin_get_booking', { p_booking_id: bookingId })) as unknown as AdminBookingDetail;
-}
-
-export interface AdminThread {
-  thread: {
-    id: string;
-    shop_id: string;
-    client_id: string | null;
-    client_name: string | null;
-    client_display_id: string | null;
-    shop_name: string;
-    last_message_at: string | null;
-  };
-  messages: AdminMessage[];
-}
-
-export async function fetchThread(threadId: string): Promise<AdminThread> {
-  return (await call('admin_get_thread', { p_thread_id: threadId })) as unknown as AdminThread;
 }
 
 // ------------------------------------------------------------------------------------ moderation

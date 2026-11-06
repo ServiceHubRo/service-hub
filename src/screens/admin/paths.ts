@@ -29,7 +29,6 @@ export const ADMIN_FLEET_FAILED_PATH = '/admin/cont/notificari-flota';
 export const adminShopPath = (id: string) => `${ADMIN_SHOPS_PATH}/${id}`;
 export const adminClientPath = (id: string) => `${ADMIN_CLIENTS_PATH}/${id}`;
 export const adminBookingPath = (id: string) => `${ADMIN_BOOKINGS_PATH}/${id}`;
-export const adminThreadPath = (id: string) => `/admin/mesaje/${id}`;
 
 /** Rezervări already filtered to one shop or one client. */
 export function adminBookingsLink(filter: { shop?: string; client?: string }): string {

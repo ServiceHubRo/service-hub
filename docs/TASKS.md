@@ -1590,3 +1590,16 @@ Aprobate de Eduard pe 6 nov („aprob T71–T75”; T71 era deja folosit, așa c
 - Rămas: verificarea pe proiectul de TEST că fiecare migrare se aplică într-o tranzacție (la primul deploy); ecran de istoric al modificărilor de cheltuieli (în jurnal, neafișat).
 
 - [x] Făcut
+
+### P3 — Adminul nu mai citește conversațiile private (varianta A) ✅
+- Decizia lui Eduard, 6 nov: accesul adminului la conversațiile client–service e scos complet. S-au eliminat:
+  - ramura de admin din regula `threads_select` și din `can_read_thread` (deci și din mesaje și din Realtime);
+  - funcțiile `admin_get_thread` și `admin_thread_messages`;
+  - ecranul `admin/mesaje/:id` și linkurile spre el.
+- Rămân pentru reclamații:
+  - în fișa clientului, conversațiile doar ca listă: service-ul, numărul de mesaje și data ultimului mesaj, fără conținut;
+  - în fișa programării, „Istoricul programării”: doar evenimentele automate (confirmată, deviz trimis, anulată…), niciun mesaj scris de client sau de service.
+- Migrarea `admin_no_private_messages` (schema 108), cu rollback testat. Clienții și service-urile au exact accesul de dinainte. Nicio dată nu a fost modificată.
+- Teste: `tests/sql/80_admin.sql` (nicio cale nu mai dă conversații adminului), `tests/e2e/admin.spec.ts`.
+
+- [x] Făcut
