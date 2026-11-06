@@ -18,7 +18,7 @@ export function FleetAccount() {
   const reportsPlan = hasFeature(plan, 'reports') ? null : requiredPlan('reports', plans);
   const reportsHint = reportsPlan ? t('fleet.plan.availableIn', { plan: lang === 'ro' ? reportsPlan.name_ro : reportsPlan.name_en }) : undefined;
   const to = (s: FleetSection) => `?sectiune=${s}`;
-  const top = () => document.getElementById('continut')?.scrollTo?.({ top: 0 });
+  const top = () => window.scrollTo?.({ top: 0 });
   return (
     <div className={styles.tiles}>
       {allowed('reports.view') && <Tile to={to('rapoarte')} onClick={top} icon={BarChart3} label={t('fleet.nav.rapoarte')} hint={reportsHint} />}

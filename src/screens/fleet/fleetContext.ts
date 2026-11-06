@@ -123,7 +123,8 @@ export function useFleetLocation() {
   const go = useCallback(
     (link: FleetLink) => {
       update({ sectiune: link.section, vehicul: link.vehicle ?? null, filtru: link.filter ?? null });
-      document.getElementById('continut')?.scrollTo?.({ top: 0 });
+      // Another section starts at the top of the page (the page scrolls, not an area inside it).
+      window.scrollTo?.({ top: 0 });
     },
     [update],
   );

@@ -135,19 +135,24 @@ export function ConversationScreen() {
     const onScroll = () => {
       stick = nearBottom(scroller);
     };
-    const observer = new ResizeObserver(() => {
+    const onResize = () => {
       if (scroller.clientHeight === height) return;
       const shrank = scroller.clientHeight < height;
       height = scroller.clientHeight;
       if (stick || (shrank && document.activeElement === inputRef.current)) scroller.scrollTop = scroller.scrollHeight;
-    });
+    };
+    const observer = new ResizeObserver(onResize);
     observer.observe(scroller);
-    // The page itself reports its scrolling on the window.
+    // The page itself (the app scrolls the document): its visible height changes with the window,
+    // not with the page's own box.
     const page = scroller === document.scrollingElement || scroller === document.documentElement;
+    if (page) window.addEventListener('resize', onResize);
+    // The page itself reports its scrolling on the window.
     const scrollTarget: HTMLElement | Window = page ? window : scroller;
     scrollTarget.addEventListener('scroll', onScroll, { passive: true });
     return () => {
       observer.disconnect();
+      window.removeEventListener('resize', onResize);
       scrollTarget.removeEventListener('scroll', onScroll);
     };
   }, [ready]);

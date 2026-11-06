@@ -113,10 +113,13 @@ test.describe('T53 no-shows', () => {
     await ack.scrollIntoViewIfNeeded();
     await expectNoHorizontalScroll(page);
     await shot(page, 't53-ack', name());
+    // In the middle of the screen, clear of the bars that stay over the page: a click needs no scroll.
+    await ack.getByText('Confirm că vin la programare').evaluate((el) => el.scrollIntoView({ block: 'center' }));
     const before = await page.evaluate(() => window.scrollY);
     await ack.getByText('Confirm că vin la programare').click();
-    // Ticking never moves the page.
-    expect(Math.abs((await page.evaluate(() => window.scrollY)) - before)).toBeLessThan(2);
+    // Ticking never throws the page: it moves at most by the hint under the button that goes away
+    // („Bifează…”, one line), never to the top.
+    expect(Math.abs((await page.evaluate(() => window.scrollY)) - before)).toBeLessThan(40);
     await page.getByRole('button', { name: 'Trimite cererea' }).click();
     await expect(page.getByRole('heading', { level: 1, name: 'Cerere trimisă' })).toBeVisible();
 

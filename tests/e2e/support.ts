@@ -532,16 +532,27 @@ export async function switchLanguage(page: Page, lang: 'ro' | 'en') {
     await select().selectOption(lang);
     return;
   }
-  // Through the app's own Cont link and back: no reload, so a language not saved (the shared admin's
-  // tests answer the profile write themselves) stays for the rest of the test.
+  // To the person's own Cont and back inside the app (no reload, so a language not saved — the shared
+  // admin's tests answer the profile write themselves — stays for the rest of the test). From a
+  // company's space too, whose own „Cont” has no language.
   const back = page.url();
-  await page.getByRole('link', { name: /^(Cont|Account)$/ }).filter({ visible: true }).first().click();
+  const path = new URL(back).pathname;
+  const account = path.startsWith('/admin') ? '/admin/cont' : path.startsWith('/s/') ? '/s/cont' : '/c/cont';
+  const there = path === account;
+  if (!there) {
+    await page.evaluate((to) => {
+      history.pushState(history.state, '', to);
+      window.dispatchEvent(new PopStateEvent('popstate', { state: history.state }));
+    }, account);
+  }
   await expect(select()).toBeVisible();
   const saved = page
     .waitForResponse((r) => r.url().includes('/rest/v1/profiles') && r.request().method() === 'PATCH', { timeout: 10_000 })
     .catch(() => null);
   await select().selectOption(lang);
   await saved;
-  await page.goBack();
-  await page.waitForURL(back);
+  if (!there) {
+    await page.goBack();
+    await page.waitForURL(back);
+  }
 }

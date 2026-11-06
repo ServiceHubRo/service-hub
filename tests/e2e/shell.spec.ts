@@ -291,7 +291,9 @@ test('component gallery: action button, stepper, errors', async ({ page }) => {
 
   const main = page.getByRole('main').or(page.locator('body'));
   const scroller = page.locator('html');
-  await page.evaluate(() => window.scrollTo(0, 600));
+  await expect(page.locator('output')).toBeVisible();
+  // The stepper in the middle of the screen, the page scrolled down to it.
+  await page.getByRole('button', { name: /Crește/ }).evaluate((el) => el.scrollIntoView({ block: 'center' }));
   const before = await scroller.evaluate((el) => el.scrollTop);
   await page.getByRole('button', { name: /Crește/ }).click();
   await page.getByRole('button', { name: /Crește/ }).click();
