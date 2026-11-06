@@ -1262,6 +1262,154 @@ export type Database = {
           },
         ]
       }
+      fleet_odometer_ignored_jobs: {
+        Row: {
+          at: string
+          booking_id: string
+          by_user: string | null
+          company_id: string
+          reason: string
+        }
+        Insert: {
+          at?: string
+          booking_id: string
+          by_user?: string | null
+          company_id: string
+          reason: string
+        }
+        Update: {
+          at?: string
+          booking_id?: string
+          by_user?: string | null
+          company_id?: string
+          reason?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fleet_odometer_ignored_jobs_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: true
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fleet_odometer_ignored_jobs_by_user_fkey"
+            columns: ["by_user"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fleet_odometer_ignored_jobs_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fleet_odometer_import_exceptions: {
+        Row: {
+          day: string
+          expense_id: string
+          km: number
+          reasons: string[]
+          vehicle_id: string
+        }
+        Insert: {
+          day: string
+          expense_id: string
+          km: number
+          reasons: string[]
+          vehicle_id: string
+        }
+        Update: {
+          day?: string
+          expense_id?: string
+          km?: number
+          reasons?: string[]
+          vehicle_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fleet_odometer_import_exceptions_expense_id_fkey"
+            columns: ["expense_id"]
+            isOneToOne: true
+            referencedRelation: "fleet_expenses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fleet_odometer_readings: {
+        Row: {
+          company_id: string
+          corrected_from: number | null
+          correction_reason: string | null
+          created_at: string
+          created_by: string | null
+          day: string
+          deleted_at: string | null
+          id: string
+          km: number
+          ref_id: string | null
+          source: string
+          updated_at: string | null
+          vehicle_id: string
+        }
+        Insert: {
+          company_id: string
+          corrected_from?: number | null
+          correction_reason?: string | null
+          created_at?: string
+          created_by?: string | null
+          day: string
+          deleted_at?: string | null
+          id?: string
+          km: number
+          ref_id?: string | null
+          source: string
+          updated_at?: string | null
+          vehicle_id: string
+        }
+        Update: {
+          company_id?: string
+          corrected_from?: number | null
+          correction_reason?: string | null
+          created_at?: string
+          created_by?: string | null
+          day?: string
+          deleted_at?: string | null
+          id?: string
+          km?: number
+          ref_id?: string | null
+          source?: string
+          updated_at?: string | null
+          vehicle_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fleet_odometer_readings_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fleet_odometer_readings_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fleet_odometer_readings_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "company_vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       fleet_plans: {
         Row: {
           active: boolean
@@ -5005,6 +5153,16 @@ export type Database = {
         Returns: boolean
       }
       finish_notifications: { Args: { p_results: Json }; Returns: number }
+      fleet_add_reading: {
+        Args: {
+          p_company: string
+          p_day: string
+          p_km: number
+          p_request_id: string
+          p_vehicle: string
+        }
+        Returns: Json
+      }
       fleet_archive_vehicle: {
         Args: { p_archived: boolean; p_request_id: string; p_vehicle: string }
         Returns: Json
@@ -5017,6 +5175,15 @@ export type Database = {
       fleet_can: {
         Args: { p_capability: string; p_company: string }
         Returns: boolean
+      }
+      fleet_correct_reading: {
+        Args: {
+          p_km: number
+          p_reading: string
+          p_reason: string
+          p_request_id: string
+        }
+        Returns: Json
       }
       fleet_decide_quote: {
         Args: {
@@ -5098,10 +5265,24 @@ export type Database = {
         Args: { p_company: string; p_vehicle: string }
         Returns: boolean
       }
+      fleet_fuel_stats: {
+        Args: {
+          p_company: string
+          p_from: string
+          p_to: string
+          p_vehicle: string
+        }
+        Returns: Json
+      }
       fleet_has_feature: {
         Args: { p_company: string; p_feature: string }
         Returns: boolean
       }
+      fleet_ignore_job_odometer: {
+        Args: { p_booking: string; p_reason: string; p_request_id: string }
+        Returns: Json
+      }
+      fleet_import_expense_readings: { Args: never; Returns: Json }
       fleet_issue_can_read: {
         Args: { p_issue: Database["public"]["Tables"]["fleet_issues"]["Row"] }
         Returns: boolean
@@ -5175,8 +5356,33 @@ export type Database = {
         Args: { p_capability: string; p_extra: string[]; p_role: string }
         Returns: boolean
       }
+      fleet_odometer_check: {
+        Args: {
+          p_day: string
+          p_km: number
+          p_skip?: string
+          p_vehicle: string
+        }
+        Returns: undefined
+      }
+      fleet_odometer_points: {
+        Args: { p_vehicle: string }
+        Returns: {
+          day: string
+          id: string
+          km: number
+          ref_id: string
+          source: string
+        }[]
+      }
       fleet_overview: { Args: { p_company: string }; Returns: Json }
       fleet_plan_summary: { Args: { p_company: string }; Returns: Json }
+      fleet_reading_json: {
+        Args: {
+          r: Database["public"]["Tables"]["fleet_odometer_readings"]["Row"]
+        }
+        Returns: Json
+      }
       fleet_report: {
         Args: {
           p_company: string
@@ -5247,6 +5453,10 @@ export type Database = {
         Returns: Json
       }
       fleet_subscription: { Args: { p_company: string }; Returns: Json }
+      fleet_sync_expense_reading: {
+        Args: { e: Database["public"]["Tables"]["fleet_expenses"]["Row"] }
+        Returns: undefined
+      }
       fleet_update_issue: {
         Args: { p_fields: Json; p_issue: string; p_request_id: string }
         Returns: Json
