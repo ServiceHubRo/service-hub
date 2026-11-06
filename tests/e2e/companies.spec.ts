@@ -35,7 +35,7 @@ test('create a company, invite a driver, hand over the administration', async ({
   await expect(page).toHaveURL(/\/c\/cauta/);
   await openAccount(page);
   await page.getByRole('link', { name: /Firmele mele/ }).click();
-  await expect(page.getByText('Nicio firmă', { exact: true })).toBeVisible();
+  await expect(page.getByText('Nu există firme.', { exact: true })).toBeVisible();
   await expectNoHorizontalScroll(page);
   await shot(page, 'companies-empty', name());
 
@@ -108,7 +108,7 @@ test('the companies screen in English', async ({ page }) => {
   await expect(page).toHaveURL(/\/c\/cauta/);
   await page.goto('/c/cont/firme');
   await page.getByRole('button', { name: 'English' }).filter({ visible: true }).first().click();
-  await expect(page.getByText('No companies', { exact: true })).toBeVisible();
+  await expect(page.getByText('No companies.', { exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'Create a company' }).click();
   await expect(page.getByLabel('Company name')).toBeVisible();
   await expectNoHorizontalScroll(page);

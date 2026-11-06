@@ -1525,3 +1525,11 @@ Notă (31 oct): Eduard a aprobat politica de acces (7 zile de grație, apoi doar
 - Teste: `tests/sql/141_vehicle_identity.sql`, `tests/unit/vehicleIdentity.test.ts`, `tests/unit/history.test.ts`, `tests/e2e/vehicle-identity.spec.ts`.
 
 - [x] Făcut
+
+### T66b — Meniul „Mai multe” și limbaj profesional ✅
+- **„Mai multe”** (Eduard, 6 nov): pe telefon meniul se deschidea spre stânga chiar când butonul era în stânga (Rapoarte) și ieșea din ecran. Acum își calculează poziția după spațiul real: spre stânga sub un buton din dreapta, spre dreapta sub unul din stânga, mereu întreg în ecran (16 px margine); textul unei opțiuni lungi trece pe rândul următor, nu se taie. Se închide la alegere, la atingere în afară și cu Escape (`src/lib/menuPlacement.ts`, `MenuButton`).
+- **Texte:** „Nicio … încă” → „Nu există …” în toată aplicația; „Disponibil în” → „Inclus în planul”; „perioada dinainte” → „perioada precedentă”; indicatorii: Total cheltuieli, Număr de înregistrări, Cost mediu per vehicul, Evoluție lunară, Buget utilizat, Buget disponibil; explicațiile despre sistem scoase.
+- **Comparația cu perioada precedentă:** gri, fără săgeată, când perioada precedentă nu are cheltuieli; procentul are semn (+/−); roșu doar la creștere, verde doar la o scădere reală, gri la egalitate.
+- Fără schimbări de calcule, drepturi, planuri sau bază de date. Teste: `tests/unit/menuPlacement.test.ts`, `tests/e2e/fleet-plans.spec.ts` (320 și 360 px).
+
+- [x] Făcut

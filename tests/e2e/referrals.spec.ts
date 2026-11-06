@@ -37,7 +37,7 @@ test.describe('shop referrals', () => {
     await page.goto('/s/cont/abonament');
     await expect(page.getByRole('heading', { name: 'Recomandă Service-Hub' })).toBeVisible();
     const code = (await page.locator('span.mono').filter({ hasText: /^S-\d{5,}$/ }).textContent())!.trim();
-    await expect(page.getByText('Niciun service recomandat încă.')).toBeVisible();
+    await expect(page.getByText('Nu există service-uri recomandate.')).toBeVisible();
     await expect(page.getByText('Luni gratuite primite: 0 din 12')).toBeVisible();
     const whatsapp = page.getByRole('link', { name: 'Trimite pe WhatsApp' });
     await expect(whatsapp).toHaveAttribute('href', new RegExp(`^https://wa\\.me/\\?text=.*${code}`));

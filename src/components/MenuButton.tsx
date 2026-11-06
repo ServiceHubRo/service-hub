@@ -1,7 +1,7 @@
 import { useEffect, useId, useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { buttonClass, type ButtonVariant } from './buttonClass';
-import { opensUp, visibleArea } from '../lib/menuPlacement';
+import { horizontalPlacement, opensUp, visibleArea } from '../lib/menuPlacement';
 import styles from './MenuButton.module.css';
 
 export type MenuItem =
@@ -43,13 +43,31 @@ export function MenuButton({
   useLayoutEffect(() => {
     const menu = menuRef.current;
     const button = buttonRef.current;
-    if (!open || !menu || !button) return;
+    const wrap = wrapRef.current;
+    if (!open || !menu || !button || !wrap) return;
+    // Across (the small "Mai multe" menu, wider than its button; a wide button's menu is its width): whole inside the window, on whichever side has the room (never past an edge).
+    const place = () => {
+      const viewport = document.documentElement.clientWidth;
+      menu.style.left = '';
+      menu.style.right = '';
+      menu.style.maxWidth = '';
+      const natural = menu.offsetWidth;
+      const { left, maxWidth } = horizontalPlacement(button.getBoundingClientRect(), natural, viewport, { preferRight: narrow });
+      menu.style.maxWidth = `${maxWidth}px`;
+      menu.style.right = 'auto';
+      menu.style.left = `${left - wrap.getBoundingClientRect().left}px`;
+    };
+    if (narrow) {
+      place();
+      window.addEventListener('resize', place);
+    }
     const { top, bottom } = visibleArea();
     const flip = opensUp(button.getBoundingClientRect(), menu.offsetHeight, bottom, top);
     menu.classList.toggle(styles.menuUp ?? '', flip);
     // No room either way (a very short window): the page scrolls just enough to show it.
     if (!flip && menu.getBoundingClientRect().bottom > bottom) menu.scrollIntoView?.({ block: 'nearest' });
-  }, [open]);
+    return () => window.removeEventListener('resize', place);
+  }, [open, narrow]);
 
   const close = (focus: boolean) => {
     setOpen(false);
@@ -112,7 +130,7 @@ export function MenuButton({
                 onClick={() => close(false)}
               >
                 {item.icon}
-                {item.label}
+                <span className={styles.itemText}>{item.label}</span>
               </Link>
             ) : 'href' in item ? (
               <a
@@ -124,7 +142,7 @@ export function MenuButton({
                 onClick={() => close(false)}
               >
                 {item.icon}
-                {item.label}
+                <span className={styles.itemText}>{item.label}</span>
               </a>
             ) : (
               <button
@@ -138,7 +156,7 @@ export function MenuButton({
                 }}
               >
                 {item.icon}
-                {item.label}
+                <span className={styles.itemText}>{item.label}</span>
               </button>
             ),
           )}

@@ -254,7 +254,7 @@ test.describe('history report', () => {
     await expect(page).toHaveURL(/\/c\//);
     await page.goto('/c/cont/rapoarte');
     await expect(page.getByRole('heading', { level: 1, name: 'My reports' })).toBeVisible();
-    await expect(page.getByText('No reports yet.')).toBeVisible();
+    await expect(page.getByText('No reports.')).toBeVisible();
     await page.getByRole('link', { name: /Volkswagen Golf 7/ }).click();
     await expect(page.getByRole('heading', { level: 1, name: 'Official report' })).toBeVisible();
     await expect(page.getByText('This report covers only work carried out through Service-Hub.')).toBeVisible();

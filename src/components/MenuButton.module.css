@@ -26,6 +26,12 @@
   max-width: calc(100vw - 32px);
 }
 
+/* The item's text wraps inside the menu rather than being cut (a long label on a narrow phone). */
+.itemText {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
 .menuUp {
   top: auto;
   bottom: calc(100% + 4px);
@@ -36,7 +42,7 @@
   align-items: center;
   gap: 10px;
   min-height: var(--tap);
-  padding: 0 12px;
+  padding: 6px 12px;
   border-radius: calc(var(--radius-input) - 2px);
   color: var(--text);
   font-size: 15px;

@@ -261,8 +261,22 @@ function Reports({ initialReport }: { initialReport?: string }) {
     </div>
   );
 
+  /** +12%, −8%, 0%: the sign always written, so the color is never the only cue. */
+  function signedPercent(change: number): string {
+    if (Math.abs(change) < 0.005) return formatPercent(lang, 0);
+    return `${change > 0 ? '+' : '−'}${formatPercent(lang, Math.abs(change))}`;
+  }
+
+  /** Costs up: red; down: green; about the same: grey. */
+  function changeTone(change: number): string {
+    if (Math.abs(change) < 0.005) return styles.muted ?? '';
+    return (change > 0 ? styles.red : styles.green) ?? '';
+  }
+
   function totalsReport(rep: FleetReport) {
     const prev = rep.previous;
+    // A comparison only against a previous period that had spending: no data is never shown as a
+    // change, and green only for a real decrease (red for an increase, grey when equal or unknown).
     const change = prev && prev.total > 0 ? (rep.total - prev.total) / prev.total : null;
     const Arrow = change === null || Math.abs(change) < 0.005 ? ArrowRight : change > 0 ? ArrowUpRight : ArrowDownRight;
     return (
@@ -271,12 +285,15 @@ function Reports({ initialReport }: { initialReport?: string }) {
           <li className={styles.summaryItem}>
             <span className={styles.kpiLabel}>{t('fleet.costs.total')}</span>
             <span className={`mono ${styles.summaryValue}`}>{formatMoney(lang, rep.total)}</span>
-            {prev && (
-              <span className={`${styles.change} ${change !== null && change > 0 ? styles.red : styles.green}`}>
-                <Arrow size={14} aria-hidden="true" />
-                {change === null ? t('fleet.reports.noBefore') : t('fleet.reports.vsBefore', { pct: formatPercent(lang, Math.abs(change)), amount: formatMoney(lang, prev.total) })}
-              </span>
-            )}
+            {prev &&
+              (change === null ? (
+                <span className={`${styles.change} ${styles.muted}`}>{t('fleet.reports.noBefore')}</span>
+              ) : (
+                <span className={`${styles.change} ${changeTone(change)}`}>
+                  <Arrow size={14} aria-hidden="true" />
+                  {t('fleet.reports.vsBefore', { pct: signedPercent(change), amount: formatMoney(lang, prev.total) })}
+                </span>
+              ))}
           </li>
           <li className={styles.summaryItem}>
             <span className={styles.kpiLabel}>{t('fleet.reports.entries')}</span>
@@ -488,9 +505,7 @@ function Reports({ initialReport }: { initialReport?: string }) {
                         {formatMoney(lang, x.before)} → {formatMoney(lang, x.now)}
                       </span>
                     </span>
-                    <span className={`mono ${change !== null && change > 0 ? styles.red : styles.green}`}>
-                      {change === null ? '—' : `${change > 0 ? '+' : '−'}${formatPercent(lang, Math.abs(change))}`}
-                    </span>
+                    <span className={`mono ${change === null ? styles.muted : changeTone(change)}`}>{change === null ? '—' : signedPercent(change)}</span>
                   </li>
                 );
               })}

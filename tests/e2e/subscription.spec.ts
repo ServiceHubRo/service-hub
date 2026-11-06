@@ -86,7 +86,7 @@ test.describe('subscription', () => {
     await expect(page.getByRole('meter', { name: 'Mai ai 90 de zile gratuite' })).toHaveAttribute('aria-valuenow', '90');
     await expect(page.getByText('100 lei', { exact: true })).toBeVisible();
     await expect(page.getByText('Fără contract, anulezi oricând')).toBeVisible();
-    await expect(page.getByText('Nicio plată încă.')).toBeVisible();
+    await expect(page.getByText('Nu există plăți.')).toBeVisible();
     // No invoice without the company's details: the button is a link to them.
     await expect(page.getByText('Completează datele de facturare înainte de plată.')).toBeVisible();
     await expect(page.getByRole('button', { name: 'Activează abonamentul' })).toHaveCount(0);
@@ -109,7 +109,7 @@ test.describe('subscription', () => {
     await expect(page.getByText(/^Cardul este salvat\. Prima plată, 100 lei, pe \d{1,2} [a-z]+( \d{4})?\.$/)).toBeVisible();
     await expect(page.getByRole('button', { name: 'Activează abonamentul' })).toHaveCount(0);
     await expect(page.getByRole('button', { name: 'Gestionează abonamentul' })).toBeVisible();
-    await expect(page.getByText('Nicio plată încă.')).toBeVisible();
+    await expect(page.getByText('Nu există plăți.')).toBeVisible();
     await shot(page, 't14-subscription-card-saved', name());
 
     const sub = await subscriptionOf(shopId);
