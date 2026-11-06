@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
-import { BACKEND, expectAccessible, expectNoHorizontalScroll, expectNoRomanianText, shot } from './support';
+import { BACKEND, expectAccessible, expectNoHorizontalScroll, expectNoRomanianText, shot, switchLanguage } from './support';
 
 // T18: the public page at `/`, the 404 page, link previews, and the public screens checked for
 // accessibility and keyboard use (P17b, P18).
@@ -141,7 +141,7 @@ test('landing: every section, in Romanian and English, without horizontal scroll
   await expectNoHorizontalScroll(page);
   await shot(page, 'landing-ro', name());
 
-  await page.getByRole('combobox', { name: /^(Limba|Language)$/ }).filter({ visible: true }).first().selectOption('en');
+  await switchLanguage(page, 'en');
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Booking a car repair should take 2 minutes.');
   await expect(page.getByRole('link', { name: 'Sign in' })).toBeVisible();
   await expect(page.getByRole('heading', { level: 2, name: 'Own an auto repair shop?' })).toBeVisible();

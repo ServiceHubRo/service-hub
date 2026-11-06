@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
-import { BACKEND, PASSWORD, closeFilters, createUser, expectAccessible, expectNoHorizontalScroll, openAccount, openFilters, scrollTopOf, selectInPanel, shot, signIn } from './support';
+import { BACKEND, PASSWORD, closeFilters, createUser, expectAccessible, expectNoHorizontalScroll, openAccount, openFilters, scrollTopOf, selectInPanel, shot, signIn, switchLanguage } from './support';
 
 // T06 — client search, favorites, "Aproape de tine", the shop page. Runs on the demo seed
 // (supabase/seed/dev_seed.sql): Atelier Demo, Rapid Service, Vulcanizare Roți Expres (Brașov) and
@@ -314,7 +314,7 @@ test.describe('client search', () => {
 
   test('English: search, "Offers", the shop page', async ({ page }) => {
     await signInNewClient(page);
-    await page.getByRole('combobox', { name: /^(Limba|Language)$/ }).filter({ visible: true }).first().selectOption('en');
+    await switchLanguage(page, 'en');
     await expect(page.getByRole('heading', { level: 1, name: 'Search' })).toBeVisible();
     await page.getByLabel('Search for a shop').fill('brakes');
     await expect(result(page, 'Atelier Demo')).toContainText('Offers: Brake pads');

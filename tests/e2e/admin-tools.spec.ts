@@ -16,6 +16,7 @@ import {
   userIdOf,
   xlsxText,
   pickFilter,
+  switchLanguage,
 } from './support';
 
 // T16b — the admin's platform tools: subscriptions and payments, history reports, the catalog,
@@ -351,7 +352,7 @@ test.describe('admin tools', () => {
 
   test('the tools in English', async ({ page }) => {
     await signInAdmin(page);
-    await page.getByRole('combobox', { name: /^(Limba|Language)$/ }).filter({ visible: true }).first().selectOption('en');
+    await switchLanguage(page, 'en');
     await expect(page.getByRole('heading', { level: 1, name: 'Dashboard' })).toBeVisible();
     for (const tile of ['Subscriptions and payments', 'Service catalog', 'Platform settings', 'Notices', 'History reports', 'Export']) {
       await page.getByRole('link', { name: 'Account', exact: true }).filter({ visible: true }).first().click();

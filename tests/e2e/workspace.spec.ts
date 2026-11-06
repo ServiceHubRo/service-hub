@@ -116,25 +116,54 @@ async function freshPage(browser: Browser) {
   return { context, page: await context.newPage() };
 }
 
-test('the switch sits under the logo on a phone and a tablet, and stays on every page and after signing in again', async ({ page, browser }) => {
+test('the switch sits right of the logo, the language is in Cont, and both stay after signing in again', async ({ page, browser }) => {
   test.skip(!BACKEND, 'needs the local Supabase stack');
   const admin = await createFleetUser();
   const id = await company(admin, `Unica ${Date.now()}`, uniquePlate('B'));
   await signIn(page, admin, PASSWORD);
   await expect(page).toHaveURL(/\/c\/cauta/);
 
-  // Phone and tablet: logo and language on the first row, the switch alone under the logo.
+  // Phone and tablet (Eduard, 6 Nov 2026): one header row, the logo left, the switch right, no language.
   if (test.info().project.name !== 'desktop-1440') {
     const header = page.getByRole('banner');
-    const firstRow = await header.locator('> div').first().boundingBox();
-    const lang = await header.getByRole('combobox', { name: 'Limba' }).boundingBox();
+    // Once the switch has come in (the row settles around it): centered on the logo's line.
+    await expect
+      .poll(async () => {
+        const box = (await switcher(page).boundingBox())!;
+        const mark = (await header.getByRole('img', { name: 'Service-Hub' }).boundingBox())!;
+        return Math.abs(box.y + box.height / 2 - (mark.y + mark.height / 2));
+      })
+      .toBeLessThan(4);
+    const logo = await header.getByRole('img', { name: 'Service-Hub' }).boundingBox();
     const sw = await switcher(page).boundingBox();
-    // Under the first row (logo and language), aligned with the logo on the left.
-    expect(sw!.y).toBeGreaterThanOrEqual(firstRow!.y + firstRow!.height - 1);
-    expect(Math.abs(sw!.x - firstRow!.x)).toBeLessThan(4);
-    expect(lang!.y).toBeLessThan(sw!.y);
+    const viewport = page.viewportSize()!;
+    expect(sw!.x).toBeGreaterThan(logo!.x + logo!.width);
+    expect(viewport.width - (sw!.x + sw!.width)).toBeLessThan(24);
+    await expect(header.getByRole('combobox', { name: /^(Limba|Language)$/ })).toHaveCount(0);
+    // The menu opens whole inside the screen, from the right.
+    await switcher(page).click();
+    const menu = await page.getByRole('menu').boundingBox();
+    expect(menu!.x).toBeGreaterThanOrEqual(0);
+    expect(menu!.x + menu!.width).toBeLessThanOrEqual(viewport.width);
     await shot(page, 'workspace-header', name());
+    await page.keyboard.press('Escape');
   }
+
+  // The language: Cont → Preferințe, kept on the profile, the same in the company's space.
+  await page.goto('/c/cont');
+  await page.getByRole('combobox', { name: 'Limba' }).selectOption('en');
+  await expect(page.getByRole('heading', { level: 1, name: 'Account' })).toBeVisible();
+  await page.goto(`/c/firme/${id}?sectiune=vehicule`);
+  await expect(page.getByRole('heading', { level: 1, name: 'Vehicles' })).toBeVisible();
+  await page.reload();
+  await expect(page.getByRole('heading', { level: 1, name: 'Vehicles' })).toBeVisible();
+  const again = await freshPage(browser);
+  await signIn(again.page, admin, PASSWORD);
+  await expect(again.page.getByRole('link', { name: 'Search' }).filter({ visible: true }).first()).toBeVisible();
+  await again.context.close();
+  await page.goto('/c/cont');
+  await page.getByRole('combobox', { name: 'Language' }).selectOption('ro');
+  await expect(page.getByRole('heading', { level: 1, name: 'Cont' })).toBeVisible();
 
   // Every page, personal or the company's.
   for (const path of ['/c/garaj', '/c/programari', '/c/mesaje', '/c/cont', `/c/firme/${id}?sectiune=vehicule`, `/c/firme/${id}?sectiune=cont`]) {

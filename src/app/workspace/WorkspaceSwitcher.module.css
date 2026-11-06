@@ -5,9 +5,9 @@
 }
 
 .header {
-  align-self: flex-start;
   width: auto;
-  max-width: min(100%, 420px);
+  /* Right of the logo (Eduard, 6 Nov): a long company name is cut, never the logo. */
+  max-width: min(56vw, 280px);
 }
 
 .sidebar {

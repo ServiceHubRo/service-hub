@@ -288,6 +288,7 @@ export const en: Record<MessageKey, string> = {
   'account.sec.profile': 'Profile',
   'account.sec.profile.desc': 'Your name, phone number and account details.',
   'account.sec.tools': 'Settings and tools',
+  'account.sec.prefs': 'Preferences',
   'account.sec.security.desc': 'The email and password you sign in with.',
   'account.sec.help.desc': 'Answers to common questions, and suggestions for the Service-Hub team.',
   'account.sec.data.desc': 'A copy of your data, or deleting your account.',

@@ -31,7 +31,11 @@
   margin-left: auto;
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   gap: 6px;
+  /* The workspace switch takes what the logo leaves, never pushing it off the row. */
+  min-width: 0;
+  flex: 0 1 auto;
 }
 
 .iconLink {
@@ -204,9 +208,6 @@
     padding: var(--space-3) var(--space-3) var(--space-4);
   }
 
-  .sideLang {
-    padding: var(--space-1) var(--space-2) var(--space-2);
-  }
 
   .sideLink {
     position: relative;

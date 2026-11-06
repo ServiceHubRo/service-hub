@@ -14,6 +14,7 @@ import {
   shot,
   signIn,
   userIdOf,
+  switchLanguage,
 } from './support';
 
 // T19d — client reminders in the app: a finished job still waiting for a review shows a card on
@@ -81,7 +82,7 @@ async function finishedJob(client: string, shop: string, shopId: string): Promis
 /** The language lives on the profile: switched in Cont, then back to the tab `to`. */
 async function setLanguage(page: Page, lang: 'ro' | 'en', to?: string) {
   await page.getByRole('link', { name: lang === 'en' ? 'Cont' : 'Account', exact: true }).filter({ visible: true }).first().click();
-  await page.getByRole('combobox', { name: /^(Limba|Language)$/ }).filter({ visible: true }).first().selectOption(lang);
+  await switchLanguage(page, lang);
   await expect(page.getByRole('heading', { level: 1, name: lang === 'en' ? 'Account' : 'Cont' })).toBeVisible();
   if (to) await page.getByRole('link', { name: to, exact: true }).filter({ visible: true }).first().click();
 }
@@ -158,7 +159,6 @@ test.describe('client reminders', () => {
     await expect(row).toContainText('Oprite.');
     await setLanguage(page, 'en');
     await openNotifications(page);
-    await expect(page.getByRole('combobox', { name: /^(Limba|Language)$/ }).filter({ visible: true }).first()).toBeVisible();
     const rowEn = page.getByRole('group', { name: 'Service reminders' });
     await expect(rowEn).toContainText('Off.');
     await shot(page, 't19d-account-reminders-en', name());

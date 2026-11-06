@@ -53,6 +53,8 @@ async function expectLit(page: Page, target: Locator) {
 const navItem = (page: Page, path: string) => page.locator(`[data-tour="${path}"]`).filter({ visible: true }).first();
 
 test('a new client: welcome, the lit spots one by one, "Primii pași" ticks itself, the tour once', async ({ page }) => {
+  // A long walk with fixed pauses (the tour's glide, a slow save): about 30 s on its own.
+  test.setTimeout(60_000);
   // Headless Chromium reports notifications as blocked: here the browser has not been asked yet.
   await page.addInitScript(() => {
     Object.defineProperty(Notification, 'permission', { configurable: true, get: () => 'default' });

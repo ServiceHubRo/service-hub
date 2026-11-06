@@ -514,3 +514,28 @@ export async function cardAction(scope: Locator, name: string | RegExp, exact = 
   }
   return direct;
 }
+
+/**
+ * Switches the language (Eduard, 6 Nov 2026: in Cont → Preferințe once signed in; in the header of the
+ * public pages). A signed-in page without the dropdown goes to its Cont, changes it (saved on the
+ * profile) and comes back to where it was.
+ */
+export async function switchLanguage(page: Page, lang: 'ro' | 'en') {
+  const select = () => page.getByRole('combobox', { name: /^(Limba|Language)$/ }).filter({ visible: true }).first();
+  if ((await select().count()) > 0) {
+    await select().selectOption(lang);
+    return;
+  }
+  // Through the app's own Cont link and back: no reload, so a language not saved (the shared admin's
+  // tests answer the profile write themselves) stays for the rest of the test.
+  const back = page.url();
+  await page.getByRole('link', { name: /^(Cont|Account)$/ }).filter({ visible: true }).first().click();
+  await expect(select()).toBeVisible();
+  const saved = page
+    .waitForResponse((r) => r.url().includes('/rest/v1/profiles') && r.request().method() === 'PATCH', { timeout: 10_000 })
+    .catch(() => null);
+  await select().selectOption(lang);
+  await saved;
+  await page.goBack();
+  await page.waitForURL(back);
+}

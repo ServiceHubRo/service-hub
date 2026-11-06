@@ -9,9 +9,11 @@ import { AnpcSal } from '../../components/AnpcSal';
 import { Button } from '../../components/Button';
 import { PageHeader } from '../../components/PageHeader';
 import { Section } from '../../components/Section';
+import { SelectField } from '../../components/SelectField';
 import { Tile } from '../../components/Tile';
 import { useI18n } from '../../i18n/context';
 import type { MessageKey } from '../../i18n/ro';
+import type { Lang } from '../../i18n/translate';
 import { LEGAL_DOCS } from '../../lib/legal';
 import {
   ADMIN_AUDIT_PATH,
@@ -81,6 +83,12 @@ export function AccountScreen({ role }: { role: Role }) {
             <ReminderRow setting="share_history" />
           </>
         )}
+      </Section>
+
+      {/* The language, a preference of the person (Eduard, 6 Nov 2026): saved on the profile, so it
+          follows them to every device and stays the same whichever workspace is open. */}
+      <Section title={t('account.sec.prefs')}>
+        <LanguagePreference />
       </Section>
 
       <Section title={t('account.sec.tools')}>
@@ -172,4 +180,22 @@ function CompaniesTile() {
 function NotificationsTile({ role }: { role: 'client' | 'shop' }) {
   const { t } = useI18n();
   return <Tile to={notificationsPath(role)} icon={Bell} label={t('settings.notifications')} hint={t(`account.notifications.hint.${role}`)} />;
+}
+
+/** „Limba”: Română / English, each in its own language; the whole interface follows at once. */
+function LanguagePreference() {
+  const { t, lang } = useI18n();
+  const { setLanguage } = useSession();
+  return (
+    <SelectField
+      className={styles.prefSelect}
+      label={t('lang.switch')}
+      value={lang}
+      onChange={(e) => setLanguage(e.target.value as Lang)}
+      options={[
+        { value: 'ro', label: t('lang.ro') },
+        { value: 'en', label: t('lang.en') },
+      ]}
+    />
+  );
 }

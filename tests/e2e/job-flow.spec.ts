@@ -11,6 +11,7 @@ import {
   signIn,
   cardAction,
   openBooking,
+  switchLanguage,
 } from './support';
 
 // T09 — the client decides on the quote (partially), the shop starts and completes the job with a
@@ -235,7 +236,7 @@ test.describe('quote, work, completion, review', () => {
     await shot(page, 't09-client-list', name());
 
     // English.
-    await page.getByRole('combobox', { name: /^(Limba|Language)$/ }).filter({ visible: true }).first().selectOption('en');
+    await switchLanguage(page, 'en');
     await expect(page.getByText('Ready for pickup')).toBeVisible();
     await expect(page.getByText('Quote declined. Inspection fee: 100 RON.')).toBeVisible();
     await shot(page, 't09-client-list-en', name());
@@ -299,10 +300,17 @@ test.describe('quote, work, completion, review', () => {
     await expect(job.getByText('Același kilometraj ca la o lucrare din altă zi (105.400 km).', { exact: false })).toBeVisible();
     await expect(job.getByRole('button', { name: 'Confirmă finalizarea' })).toBeDisabled();
     await shot(page, 't09-shop-odometer-same', name());
-    await page.getByRole('combobox', { name: /^(Limba|Language)$/ }).filter({ visible: true }).first().selectOption('en');
+    // In English (the language is set in Cont, so the form is opened again after it).
+    await switchLanguage(page, 'en');
+    await job.getByRole('button', { name: 'Complete', exact: true }).click();
+    await job.getByLabel('Odometer').fill('105400');
+    await job.getByRole('button', { name: 'Confirm completion' }).click();
     await expect(job.getByText('Same odometer as a job on another day (105,400 km).', { exact: false })).toBeVisible();
     await shot(page, 't09-shop-odometer-same-en', name());
-    await page.getByRole('combobox', { name: /^(Limba|Language)$/ }).filter({ visible: true }).first().selectOption('ro');
+    await switchLanguage(page, 'ro');
+    await job.getByRole('button', { name: 'Finalizare' }).click();
+    await job.getByLabel('Kilometraj').fill('105400');
+    await job.getByRole('button', { name: 'Confirmă finalizarea' }).click();
     await job.getByText('Da, kilometrajul este corect').click();
     await job.getByRole('button', { name: 'Confirmă finalizarea' }).click();
     await expect(page.getByText(`Lucrarea ${second.ref} este finalizată.`, { exact: false })).toBeVisible();

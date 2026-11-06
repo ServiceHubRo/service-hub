@@ -286,6 +286,7 @@ export const ro = {
   'account.sec.profile': 'Profil',
   'account.sec.profile.desc': 'Numele, telefonul și datele contului.',
   'account.sec.tools': 'Setări și instrumente',
+  'account.sec.prefs': 'Preferințe',
   'account.sec.security.desc': 'Emailul și parola cu care intri în cont.',
   'account.sec.help.desc': 'Răspunsuri la întrebări și sugestii pentru echipa Service-Hub.',
   'account.sec.data.desc': 'O copie a datelor tale sau ștergerea contului.',

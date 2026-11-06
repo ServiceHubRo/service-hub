@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { BACKEND, SEED, SEED_PASSWORD, expectAccessible, expectNoHorizontalScroll, isDesktop, openAccount, shot, signIn } from './support';
+import { BACKEND, SEED, SEED_PASSWORD, expectAccessible, expectNoHorizontalScroll, isDesktop, openAccount, shot, signIn, switchLanguage } from './support';
 
 // Cont → Ajutor și contact: email and WhatsApp to the Service-Hub team, with the account ID
 // written in the message; for clients and shops (the admin is the team).
@@ -52,7 +52,7 @@ for (const [role, email, prefix] of [
     await expectAccessible(page, `${role} help (ro)`);
     await shot(page, `help-${role}-ro`, name());
 
-    await page.getByRole('combobox', { name: /^(Limba|Language)$/ }).filter({ visible: true }).first().selectOption('en');
+    await switchLanguage(page, 'en');
     await expect(page.getByRole('heading', { level: 1, name: 'Help and contact' })).toBeVisible();
     expect(decodeURIComponent((await page.getByRole('link', { name: /Contact on WhatsApp/ }).getAttribute('href'))!)).toContain(
       `My account ID: ${id}.`,

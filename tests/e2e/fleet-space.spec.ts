@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
-import { BACKEND, PASSWORD, SEED, SEED_PASSWORD, createBookableShop, createFleetUser, expectNoHorizontalScroll, rpcAs, serviceRest, shot, signIn, uniquePlate } from './support';
+import { BACKEND, PASSWORD, SEED, SEED_PASSWORD, createBookableShop, createFleetUser, expectNoHorizontalScroll, rpcAs, serviceRest, shot, signIn, uniquePlate, switchLanguage } from './support';
 
 // The company's fleet space (T63c): the admin opens the fleet from the company page, adds a vehicle
 // with the form (a plate already in the fleet is refused), assigns it to the driver, archives
@@ -109,7 +109,7 @@ test('admin adds and assigns vehicles; the driver sees only theirs', async ({ pa
   await context.close();
 
   // The language switch of the frame.
-  await page.getByRole('combobox', { name: /^(Limba|Language)$/ }).filter({ visible: true }).first().selectOption('en');
+  await switchLanguage(page, 'en');
   await expect(page.getByRole('heading', { level: 1, name: 'Vehicles' })).toBeVisible();
   await expectNoHorizontalScroll(page);
   await shot(page, 'fleet-live-en', name());
@@ -287,7 +287,7 @@ test('bookings: the driver books a company vehicle, the manager approves within 
   await shot(mgr, 'fleet-account', name());
 
   // In English: the five pages and the bookings.
-  await mgr.getByRole('combobox', { name: /^(Limba|Language)$/ }).filter({ visible: true }).first().selectOption('en');
+  await switchLanguage(mgr, 'en');
   await expect(mgr.getByRole('heading', { level: 1, name: 'Account' })).toBeVisible();
   await mgr.getByRole('link', { name: 'Bookings', exact: true }).filter({ visible: true }).first().click();
   await expect(mgr.getByText('Approved: 420 RON')).toBeVisible();

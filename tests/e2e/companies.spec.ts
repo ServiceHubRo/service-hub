@@ -1,5 +1,5 @@
 import { expect, test, type Browser } from '@playwright/test';
-import { BACKEND, PASSWORD, createFleetUser, expectNoHorizontalScroll, openAccount, shot, signIn } from './support';
+import { BACKEND, PASSWORD, createFleetUser, expectNoHorizontalScroll, openAccount, shot, signIn, switchLanguage } from './support';
 
 // Companies (T63b): a client creates a company from Cont, invites a colleague as driver by link,
 // the colleague accepts with their own account and sees only what a driver sees; the admin hands the
@@ -107,7 +107,7 @@ test('the companies screen in English', async ({ page }) => {
   await signIn(page, email, PASSWORD);
   await expect(page).toHaveURL(/\/c\/cauta/);
   await page.goto('/c/cont/firme');
-  await page.getByRole('combobox', { name: /^(Limba|Language)$/ }).filter({ visible: true }).first().selectOption('en');
+  await switchLanguage(page, 'en');
   await expect(page.getByText('No companies.', { exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'Create a company' }).click();
   await expect(page.getByLabel('Company name')).toBeVisible();

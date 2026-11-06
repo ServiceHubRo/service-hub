@@ -1568,3 +1568,9 @@ Notă (31 oct): Eduard a aprobat politica de acces (7 zile de grație, apoi doar
 - Ecrane: Costuri → „Adaugă cheltuială”, „Mai multe” pe fiecare cheltuială (Editează, Vezi bonul, Marchează verificată, Șterge); pagina vehiculului → „Adaugă alimentare” pentru șofer.
 - Teste: `tests/sql/143_fleet_expenses.sql`, `tests/e2e/fleet-expenses.spec.ts`.
 - Rămas: istoricul modificărilor pe ecran (e în jurnal, nu încă afișat), notificările (M6), consumul (M2).
+
+### T71 — Limba în Cont, selectorul de spațiu în dreapta sus ✅
+- Antetul (Eduard, 6 nov): un singur rând — sigla în stânga, selectorul de spațiu („Personal ▾” / firma) în dreapta, unde era limba; meniul lui se deschide spre stânga, întreg în ecran. Fără firmă: niciun selector, ca înainte. Pe laptop selectorul rămâne sus în bara laterală; limba a ieșit și de acolo.
+- Cont → „Preferințe” → „Limba” (Română / English), același dropdown ca restul aplicației, pentru client, service și admin. Mecanismul existent: limba e salvată în profil (`profiles.lang`) și aplicată la fiecare autentificare, pe orice dispozitiv; schimbarea spațiului nu o atinge. Fără bază de date, fără migrare.
+- Paginile publice (prima pagină, logare, verificare raport, documente legale, 404) își păstrează selectorul de limbă: acolo nu există cont.
+- Teste: `tests/e2e/workspace.spec.ts` (poziția, meniul în ecran, limba după refresh și o nouă autentificare); celelalte teste schimbă limba prin `switchLanguage()` (Cont, apoi înapoi).

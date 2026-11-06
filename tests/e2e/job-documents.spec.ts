@@ -12,6 +12,7 @@ import {
   signIn,
   userIdOf,
   openBooking,
+  switchLanguage,
 } from './support';
 
 // T50 — the complete quote, the intake sheet and the client's company: the owner sets the hourly
@@ -191,11 +192,11 @@ test.describe('the complete quote and the intake sheet', () => {
     await expect(cc).toContainText('Termen de execuție: 2 ore.');
     await expectNoHorizontalScroll(clientPage);
     await shot(clientPage, 't50-client-quote', name());
-    await clientPage.getByRole('combobox', { name: /^(Limba|Language)$/ }).filter({ visible: true }).first().selectOption('en');
+    await switchLanguage(clientPage, 'en');
     await expect(cc).toContainText('Parts and materials');
     await expect(cc).toContainText('Estimated time: 2 hours.');
     await shot(clientPage, 't50-client-quote-en', name());
-    await page.getByRole('combobox', { name: /^(Limba|Language)$/ }).filter({ visible: true }).first().selectOption('en');
+    await switchLanguage(page, 'en');
     await (await cardAction(card, 'Edit quote')).click();
     await expect(page.getByRole('heading', { level: 1, name: 'Edit quote' })).toBeVisible();
     await expectNoHorizontalScroll(page);
@@ -243,7 +244,7 @@ test.describe('the complete quote and the intake sheet', () => {
       company_vat_id: null,
       company_reg_com: 'J08/1249/2013',
     });
-    await page.getByRole('combobox', { name: /^(Limba|Language)$/ }).filter({ visible: true }).first().selectOption('en');
+    await switchLanguage(page, 'en');
     await expect(page.getByRole('heading', { level: 1, name: 'Details for quotes' })).toBeVisible();
     await expect(page.getByRole('combobox', { name: 'Quotes are issued to' })).toHaveValue('company');
     await shot(page, 't50-company-en', name());

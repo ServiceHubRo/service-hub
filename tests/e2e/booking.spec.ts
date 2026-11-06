@@ -11,6 +11,7 @@ import {
   shot,
   signIn,
   userIdOf,
+  switchLanguage,
 } from './support';
 
 // T07 — the garage with its expiry alerts, the 4-step booking, capacity, a day that fills up while
@@ -219,7 +220,7 @@ test.describe('booking', () => {
     await expect(request).toContainText('Schimb ulei + filtru ulei, Plăcuțe de frână');
     await expectNoHorizontalScroll(shopPage);
     await shot(shopPage, 't21-shop-request', name());
-    await shopPage.getByRole('combobox', { name: /^(Limba|Language)$/ }).filter({ visible: true }).first().selectOption('en');
+    await switchLanguage(shopPage, 'en');
     await expect(request).toContainText('Oil & oil filter change, Brake pads');
     await shot(shopPage, 't21-shop-request-en', name());
     await shopContext.close();
@@ -257,10 +258,13 @@ test.describe('booking', () => {
     await expect(page2.getByRole('button', { name: `${formatDate('en', day)}: full, Waiting for a spot` })).toBeVisible();
     await expectNoHorizontalScroll(page2);
     await shot(page2, 't37-waitlist-en', name());
-    await page2.getByRole('combobox', { name: /^(Limba|Language)$/ }).filter({ visible: true }).first().selectOption('ro');
+    // The language is in Cont (Eduard, 6 Nov 2026): back on the step, the day is picked again; the wait stays.
+    await switchLanguage(page2, 'ro');
+    await page2.getByRole('button', { name: new RegExp(`^${formatDate('ro', day)}`) }).click();
     await expect(page2.getByRole('switch', { name: 'Anunță-mă dacă se eliberează un loc' })).toBeChecked();
     await shot(page2, 't37-waitlist-ro', name());
-    await page2.getByRole('combobox', { name: /^(Limba|Language)$/ }).filter({ visible: true }).first().selectOption('en');
+    await switchLanguage(page2, 'en');
+    await fullDay.click();
     await notify.uncheck();
     await expect(page2.getByRole('button', { name: `${formatDate('en', day)}: full` })).toBeVisible();
     await fullDay.click();

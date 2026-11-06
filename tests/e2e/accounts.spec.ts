@@ -15,6 +15,7 @@ import {
   signIn,
   uniqueEmail,
   uniquePhone,
+  switchLanguage,
 } from './support';
 
 test.beforeEach(async ({ context }) => {
@@ -50,7 +51,7 @@ test('sign-in and sign-up screens, RO and EN', async ({ page }) => {
   await expectNoHorizontalScroll(page);
   await shot(page, 'auth-signup-shop-ro', name());
 
-  await page.getByRole('combobox', { name: /^(Limba|Language)$/ }).filter({ visible: true }).first().selectOption('en');
+  await switchLanguage(page, 'en');
   await expect(page.getByText('Car service booking, no phone calls')).toBeVisible();
   await expect(page.getByRole('combobox', { name: 'Account type' })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Create account' })).toBeVisible();
@@ -131,7 +132,7 @@ test('legal documents are public, with tables and headings', async ({ page }) =>
   await shot(page, 'legal-privacy', name());
   // The operator's data: the contact from the landing page, a visible mark for what is not filled in yet.
   await expect(page.getByText('contact@service-hub.ro').first()).toBeVisible();
-  await page.getByRole('combobox', { name: /^(Limba|Language)$/ }).filter({ visible: true }).first().selectOption('en');
+  await switchLanguage(page, 'en');
   await expect(page.getByRole('heading', { level: 1, name: 'Privacy policy' })).toBeVisible();
   await expect(page.getByRole('heading', { level: 2, name: '7. Your rights' })).toBeVisible();
   await expect(page.getByText('Your position is used only on your device')).toBeVisible();
@@ -140,7 +141,7 @@ test('legal documents are public, with tables and headings', async ({ page }) =>
   await page.goto('/legal/cookies');
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(/cookie/i);
   await expect(page.getByRole('cell', { name: 'sh_lang' })).toBeVisible();
-  await page.getByRole('combobox', { name: /^(Limba|Language)$/ }).filter({ visible: true }).first().selectOption('ro');
+  await switchLanguage(page, 'ro');
   await expect(page.getByRole('heading', { level: 2, name: '2. Ce păstrăm în browser' })).toBeVisible();
   await page.goto('/legal/termeni');
   await expect(page.getByRole('heading', { level: 2, name: '3. Pentru Clienți' })).toBeVisible();
@@ -413,7 +414,7 @@ test.describe('with accounts', () => {
     expect(accountSheet).toContain('Cod cont');
 
     // Language: saved on the profile, so it follows the account to another browser.
-    await page.getByRole('combobox', { name: /^(Limba|Language)$/ }).filter({ visible: true }).first().selectOption('en');
+    await switchLanguage(page, 'en');
     await expect(page.getByRole('heading', { level: 1, name: 'Account' })).toBeVisible();
     await shot(page, 'account-client-en', name());
     const context = await browser.newContext({ baseURL: test.info().project.use.baseURL, viewport: page.viewportSize() });

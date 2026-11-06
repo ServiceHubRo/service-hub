@@ -2,7 +2,7 @@ import { Building2, Check, ChevronDown, Settings2, User } from 'lucide-react';
 import { useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useI18n } from '../../i18n/context';
-import { opensUp, visibleArea } from '../../lib/menuPlacement';
+import { horizontalPlacement, opensUp, visibleArea } from '../../lib/menuPlacement';
 import { COMPANIES_PATH } from '../../screens/client/companies/paths';
 import { useOptionalWorkspace, type ActiveWorkspace } from './workspaceContext';
 import styles from './WorkspaceSwitcher.module.css';
@@ -28,7 +28,19 @@ export function WorkspaceSwitcher({ placement }: { placement: 'header' | 'sideba
     if (!open || !menu || !button) return;
     const { top, bottom } = visibleArea();
     menu.classList.toggle(styles.up ?? '', opensUp(button.getBoundingClientRect(), menu.offsetHeight, bottom, top));
-  }, [open]);
+    // In the header the switch sits at the right edge: the menu grows leftwards, whole on screen.
+    const wrap = wrapRef.current;
+    if (placement === 'header' && wrap) {
+      menu.style.left = '';
+      menu.style.maxWidth = '';
+      const { left, maxWidth } = horizontalPlacement(button.getBoundingClientRect(), menu.offsetWidth, document.documentElement.clientWidth, {
+        preferRight: true,
+        margin: 12,
+      });
+      menu.style.maxWidth = `${maxWidth}px`;
+      menu.style.left = `${left - wrap.getBoundingClientRect().left}px`;
+    }
+  }, [open, placement]);
 
   useEffect(() => {
     if (!open) return;

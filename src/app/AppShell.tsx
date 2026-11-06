@@ -23,7 +23,6 @@ import { unreadThreads, useOptionalThreads } from '../screens/messages/threadsCo
 import { useOptionalNotices } from '../screens/notices/noticesContext';
 import { PermissionsIntro } from '../screens/onboarding/PermissionsIntro';
 import { EmailVerifyBanner } from './EmailVerifyBanner';
-import { LangSwitch } from './LangSwitch';
 import { LogoutConfirm } from './LogoutConfirm';
 import { PushBridge } from './PushBridge';
 import { ScreenErrorBoundary } from './ScreenErrorBoundary';
@@ -234,13 +233,13 @@ export function AppShell({ role }: { role: Role }) {
         {t('nav.skipToContent')}
       </a>
       <header className={styles.header} data-fixed-top>
-        {/* First row: the logo left, the language (and the admin's Cont) right; second row, for a
-            client in a company: the workspace switch, under the logo (Eduard, 5 Nov 2026). */}
+        {/* One row (Eduard, 6 Nov 2026): the logo left; right, a client's workspace switch (the admin's
+            Cont). The language is a preference in Cont now, not in the header. */}
         <div className={styles.headerRow}>
           <LogoTile />
           <Wordmark />
           <div className={styles.headerEnd}>
-            <LangSwitch />
+            {role === 'client' && <WorkspaceSwitcher placement="header" />}
             {role === 'admin' && (
               <NavLink
                 to={nav.account.path}
@@ -252,7 +251,6 @@ export function AppShell({ role }: { role: Role }) {
             )}
           </div>
         </div>
-        {role === 'client' && <WorkspaceSwitcher placement="header" />}
       </header>
 
       <div className={styles.body}>
@@ -268,9 +266,6 @@ export function AppShell({ role }: { role: Role }) {
               : nav.main.map((item) => <SidebarLink key={item.path} item={item} badge={badges[item.path]} />)}
           </nav>
           <div className={styles.sideBottom}>
-            <div className={styles.sideLang}>
-              <LangSwitch />
-            </div>
             {companyNav ? <CompanyNavLink item={companyNav[4]!} variant="side" /> : <SidebarLink item={nav.account} />}
             {askLogout ? (
               <div className={styles.sideConfirm}>

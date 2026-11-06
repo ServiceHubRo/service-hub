@@ -14,6 +14,7 @@ import {
   signIn,
   userIdOf,
   pickFilter,
+  switchLanguage,
 } from './support';
 
 // T16a — the admin: overview, shops, clients, bookings, moderation, the audit log. Every action
@@ -106,7 +107,7 @@ test.describe('admin', () => {
     await expect(page.getByText('Toate recenziile')).toBeVisible();
     await shot(page, 't16a-moderation', name());
 
-    await page.getByRole('combobox', { name: /^(Limba|Language)$/ }).filter({ visible: true }).first().selectOption('en');
+    await switchLanguage(page, 'en');
     await expect(page.getByRole('heading', { level: 1, name: 'Moderation' })).toBeVisible();
     await expect(page.getByText('All reviews')).toBeVisible();
     await navLink(page, /^Dashboard/).click();

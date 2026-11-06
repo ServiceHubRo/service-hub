@@ -15,6 +15,7 @@ import {
   userIdOf,
   cardAction,
   uniquePlate,
+  switchLanguage,
 } from './support';
 
 // T11 — messages between a client and a shop, live on both sides, with automatic messages in the
@@ -189,7 +190,7 @@ test.describe('messages and reviews', () => {
     await expect(log.getByText('Ne vedem mâine.')).toBeVisible({ timeout: 20_000 });
 
     // English: the same automatic message in the reader's language.
-    await page.getByRole('combobox', { name: /^(Limba|Language)$/ }).filter({ visible: true }).first().selectOption('en');
+    await switchLanguage(page, 'en');
     await expect(log).toContainText(`Booking ${booking.ref} is confirmed:`);
     await expect(log).toContainText('automatic message');
     await shot(page, 't11-client-conversation-en', name());

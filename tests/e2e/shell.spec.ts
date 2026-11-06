@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
-import { BACKEND, SEED, SEED_PASSWORD, expectNoHorizontalScroll, isDesktop, signIn } from './support';
+import { BACKEND, SEED, SEED_PASSWORD, expectNoHorizontalScroll, isDesktop, signIn, switchLanguage } from './support';
 
 const NAV = {
   client: ['Caută', 'Garaj', 'Programări', 'Mesaje', 'Cont'],
@@ -117,7 +117,7 @@ for (const role of Object.keys(NAV) as (keyof typeof NAV)[]) {
     }
 
     // Switching to English changes every label.
-    await page.getByRole('combobox', { name: /^(Limba|Language)$/ }).filter({ visible: true }).first().selectOption('en');
+    await switchLanguage(page, 'en');
     const en = await navLabels(page);
     if (isDesktop(page) && role !== 'admin') expect(en.slice(0, 4)).toEqual(NAV_EN[role].slice(0, 4));
     else expect(en).toEqual(isDesktop(page) ? [...NAV_EN[role]] : inBar(NAV_EN[role]));
@@ -266,7 +266,7 @@ test('log out asks first, then returns to the public page and closes the role sc
   await page.route('**/rest/v1/profiles?*', (route) =>
     route.request().method() === 'PATCH' ? route.fulfill({ status: 204 }) : route.continue(),
   );
-  await page.getByRole('combobox', { name: /^(Limba|Language)$/ }).filter({ visible: true }).first().selectOption('en');
+  await switchLanguage(page, 'en');
   await page.getByRole('button', { name: 'Log out' }).filter({ visible: true }).click();
   await expect(page.getByRole('heading', { name: 'Log out?' })).toBeVisible();
   await page.screenshot({ path: `test-results/shots/logout-confirm-en-${test.info().project.name}.png` });

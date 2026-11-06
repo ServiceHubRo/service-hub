@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { BACKEND, PASSWORD, closeFilters, createBookableShop, createUser, expectNoHorizontalScroll, openFilters, serviceRest, shot, signIn, userIdOf } from './support';
+import { BACKEND, PASSWORD, closeFilters, createBookableShop, createUser, expectNoHorizontalScroll, openFilters, serviceRest, shot, signIn, userIdOf, switchLanguage } from './support';
 
 // T28b — the shop's window: photos and facilities set by the owner, seen by clients on the shop
 // page; facility filters and a map in search; the "answers quickly" note.
@@ -142,7 +142,7 @@ test.describe('the shop window', () => {
     await expect(viewer).toBeHidden();
 
     // In English too.
-    await c.getByRole('combobox', { name: /^(Limba|Language)$/ }).filter({ visible: true }).first().selectOption('en');
+    await switchLanguage(c, 'en');
     await expect(c.getByText('Courtesy car')).toBeVisible();
     await expect(c.getByText('Usually answers within an hour')).toBeVisible();
     await context.close();

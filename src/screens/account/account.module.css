@@ -216,3 +216,10 @@
     min-width: 220px;
   }
 }
+
+/* „Preferințe” → „Limba” (Eduard, 6 Nov 2026): the same dropdown as every other choice. */
+@media (min-width: 768px) {
+  .prefSelect {
+    max-width: 320px;
+  }
+}
