@@ -410,7 +410,7 @@ export async function expectAccessible(page: Page, label: string) {
   // The page scrolls under the app's header and tab bar: while checking, they stand in the page's
   // flow (still checked themselves) so no text is measured against them.
   await page.addStyleTag({ content: '[data-fixed-top], [data-fixed-bottom] { position: static !important; }' }).then((tag) =>
-    tag.evaluate((el) => el.setAttribute('data-axe-flow', '')),
+    tag.evaluate((el) => (el as Element).setAttribute('data-axe-flow', '')),
   );
   const result = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']).analyze();
   await page.evaluate(() => document.querySelector('style[data-axe-flow]')?.remove());
