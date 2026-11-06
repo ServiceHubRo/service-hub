@@ -10,6 +10,8 @@ import {
   type FleetIssue,
   type FleetIssueDetail,
   type FleetOverview,
+  type FleetReading,
+  type FuelStats,
   type IssueFields,
   type IssueUpdate,
   type FleetPlanRow,
@@ -60,6 +62,11 @@ export interface FleetActions {
   issueDetail: (issueId: string) => Promise<FleetIssueDetail>;
   /** A link to a company file, valid for 60 seconds. */
   fileUrl: (path: string) => Promise<string>;
+  /** The odometer log (M2). */
+  addReading: (vehicleId: string, day: string, km: number, requestId: string) => Promise<FleetReading>;
+  correctReading: (readingId: string, km: number, reason: string, requestId: string) => Promise<FleetReading>;
+  ignoreJobOdometer: (bookingId: string, reason: string, requestId: string) => Promise<void>;
+  fuelStats: (vehicleId: string, from: string | null, to: string) => Promise<FuelStats>;
 }
 
 export interface FleetContextValue {

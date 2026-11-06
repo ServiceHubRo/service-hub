@@ -138,3 +138,63 @@ test.describe('M3 — issues and incidents', () => {
     await page.context().close();
   });
 });
+
+test.describe('M2 — odometer and fuel', () => {
+  test.describe.configure({ timeout: 120_000 });
+
+  test('readings follow the rule; a correction needs a reason; consumption between two full tanks', async ({ browser }) => {
+    test.skip(!BACKEND, 'needs the local Supabase stack');
+    const f = await fleetSetup();
+    const day = (n: number) => new Date(Date.now() - n * 86_400_000).toISOString().slice(0, 10);
+    // Two full-tank fills by the driver, 500 km apart: 30 l → 6 l/100 km.
+    for (const [d, km, liters] of [
+      [3, 100000, 40],
+      [1, 100500, 30],
+    ] as const) {
+      await rpcAs(f.driver, 'fleet_save_expense', {
+        p_company: f.company,
+        p_expense: null,
+        p_fields: { vehicle_id: f.vehicle, category: 'fuel', day: day(d), amount: 300, odometer: km, liters, fuel_type: 'diesel', full_tank: true, supplier: `Petrom ${km}` },
+        p_request_id: crypto.randomUUID(),
+      });
+    }
+
+    const page = await openAs(browser, f.manager, 'ro', `/c/firme/${f.company}?sectiune=vehicul&vehicul=${f.vehicle}`);
+    await expect(page.getByText('100.500 km').first()).toBeVisible();
+    await page.getByRole('combobox', { name: 'Secțiunile vehiculului' }).selectOption('odometer');
+    await expect(page.getByText('6 l/100 km')).toBeVisible();
+
+    // A reading lower than an earlier one is refused with the reason.
+    await page.getByRole('button', { name: 'Adaugă citire' }).click();
+    await page.getByLabel('Kilometraj', { exact: true }).fill('99000');
+    await page.getByRole('button', { name: 'Salvează citirea' }).click();
+    await expect(page.getByText('Ultima valoare înregistrată a fost', { exact: false })).toBeVisible();
+    await page.getByLabel('Kilometraj', { exact: true }).fill('100700');
+    await page.getByRole('button', { name: 'Salvează citirea' }).click();
+    const row = page.locator('li').filter({ hasText: '100.700 km' });
+    await expect(row).toContainText('Citire introdusă');
+
+    // A correction with a reason.
+    await row.getByRole('button', { name: 'Corectează' }).click();
+    await page.getByLabel('Kilometraj corect').fill('100650');
+    await page.getByRole('button', { name: 'Salvează corecția' }).click();
+    await expect(page.getByText('Motivul are cel puțin 3 caractere.')).toBeVisible();
+    await page.getByLabel('Motiv').fill('Cifră citită greșit');
+    await page.getByRole('button', { name: 'Salvează corecția' }).click();
+    await expect(page.locator('li').filter({ hasText: '100.650 km' })).toContainText('corectat de la 100.700 km: Cifră citită greșit');
+    await expectNoHorizontalScroll(page);
+    await shot(page, 'odometer-manager', name());
+    await page.context().close();
+
+    // The driver: consumption without money, adds a reading, never corrects.
+    const driver = await openAs(browser, f.driver, 'en', `/c/firme/${f.company}?sectiune=vehicul&vehicul=${f.vehicle}`);
+    await driver.getByRole('combobox', { name: 'Vehicle sections' }).selectOption('odometer');
+    await expect(driver.getByText('6 l/100 km')).toBeVisible();
+    await expect(driver.getByText('Fuel cost per km')).toHaveCount(0);
+    await expect(driver.getByRole('button', { name: 'Correct' })).toHaveCount(0);
+    await expect(driver.getByRole('button', { name: 'Add reading' })).toBeVisible();
+    await expectNoRomanianText(driver, 'odometer');
+    await shot(driver, 'odometer-driver-en', name());
+    await driver.context().close();
+  });
+});

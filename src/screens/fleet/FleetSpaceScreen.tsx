@@ -8,7 +8,11 @@ import { LoadError } from '../../components/LoadError';
 import { PageHeader } from '../../components/PageHeader';
 import { SkeletonList } from '../../components/Skeleton';
 import {
+  addReading,
   archiveVehicle,
+  correctReading,
+  fetchFuelStats,
+  ignoreJobOdometer,
   assignDriver,
   deleteExpense,
   fetchFleetOverview,
@@ -156,6 +160,21 @@ function FleetSpace({ companyId }: { companyId: string }) {
       },
       issueDetail: (issueId) => fetchIssueDetail(issueId),
       fileUrl: (path) => fleetFileUrl(path),
+      addReading: async (vehicleId, day, km, requestId) => {
+        const saved = await addReading(companyId, vehicleId, day, km, requestId);
+        await refresh();
+        return saved;
+      },
+      correctReading: async (readingId, km, reason, requestId) => {
+        const saved = await correctReading(readingId, km, reason, requestId);
+        await refresh();
+        return saved;
+      },
+      ignoreJobOdometer: async (bookingId, reason, requestId) => {
+        await ignoreJobOdometer(bookingId, reason, requestId);
+        await refresh();
+      },
+      fuelStats: (vehicleId, from, to) => fetchFuelStats(companyId, vehicleId, from, to),
     }),
     [companyId, refresh, navigate],
   );

@@ -10,3 +10,4 @@ export * from './plans';
 export * from './bookings';
 export * from './report';
 export * from './issues';
+export * from './odometer';

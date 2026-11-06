@@ -14,6 +14,8 @@ import {
   jobEndDay,
   jobStage,
   lastOdometer,
+  latestKm,
+  odometerLog,
   partsAndLabor,
   sumAmounts,
   vehicleStatus,
@@ -26,11 +28,12 @@ import { FleetVehicleForm } from './FleetVehicleForm';
 import { VehicleControls } from './VehicleControls';
 import { ExpenseForm } from './FleetCosts';
 import { VehicleIssues } from './FleetIssues';
+import { VehicleOdometer } from './FleetOdometer';
 import { useFleet } from './fleetContext';
 import pill from '../../components/StatusBadge.module.css';
 import styles from './fleet.module.css';
 
-type Tab = 'overview' | 'history' | 'costs' | 'bookings' | 'quotes' | 'documents' | 'driver' | 'notes';
+type Tab = 'overview' | 'history' | 'costs' | 'odometer' | 'bookings' | 'quotes' | 'documents' | 'driver' | 'notes';
 
 /**
  * One company car (docs/FLEET_PLAN.md §4): eight sections on one page. The history is the car's
@@ -62,7 +65,8 @@ export function FleetVehicle({ vehicleId }: { vehicleId: string }) {
   }
 
   const status = vehicleStatus(v, data.jobs);
-  const km = lastOdometer(v.id, data.jobs, data.expenses);
+  // M2: the odometer log (readings and jobs, ignored jobs left out); before M2 data, the expenses.
+  const km = data.readings ? latestKm(odometerLog(v.id, data.readings, data.jobs, data.ignored_jobs ?? [])) : lastOdometer(v.id, data.jobs, data.expenses);
   const done = jobs.filter((j) => j.status === 'done').sort((a, b) => jobEndDay(b).localeCompare(jobEndDay(a)));
   const active = jobs.filter((j) => isActiveStatus(j.status));
   const quoted = jobs.filter((j) => j.quote).sort((a, b) => (b.quote!.sent_at ?? '').localeCompare(a.quote!.sent_at ?? ''));
@@ -75,6 +79,7 @@ export function FleetVehicle({ vehicleId }: { vehicleId: string }) {
     { key: 'overview', label: t('fleet.vtab.overview') },
     { key: 'history', label: t('fleet.vtab.history'), count: done.length },
     ...(money ? [{ key: 'costs' as const, label: t('fleet.vtab.costs') }] : []),
+    { key: 'odometer', label: t('fleet.vtab.odometer') },
     { key: 'bookings', label: t('fleet.vtab.bookings'), count: active.length },
     { key: 'quotes', label: t('fleet.vtab.quotes'), count: quoted.filter((j) => j.status === 'quote_sent').length },
     { key: 'documents', label: t('fleet.vtab.documents') },
@@ -302,6 +307,8 @@ export function FleetVehicle({ vehicleId }: { vehicleId: string }) {
           {allowed('vehicles.manage') && mode === 'live' && <VehicleControls vehicle={v} onEdit={() => setEditing(true)} />}
         </Card>
       )}
+
+      {tab === 'odometer' && <VehicleOdometer vehicle={v} />}
 
       {tab === 'notes' && <VehicleIssues vehicle={v} reporting={reporting} onReporting={setReporting} />}
     </div>

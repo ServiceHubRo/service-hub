@@ -211,6 +211,9 @@ export const RPC_ERROR_CODES = [
   'issue_invalid',
   'issue_not_found',
   'photo_expired',
+  'odometer_higher_than_later',
+  'reading_invalid',
+  'reading_not_found',
 ] as const;
 
 export type RpcErrorCode = (typeof RPC_ERROR_CODES)[number] | 'network' | 'unknown';

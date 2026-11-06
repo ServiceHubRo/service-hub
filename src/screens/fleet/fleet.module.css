@@ -1487,3 +1487,20 @@ button.kpi:hover {
   padding: 0;
   list-style: none;
 }
+
+/* One entry of the odometer log (M2), with its inline correction under it. */
+.odoRow {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* A small form inside a card (a reading, a correction): set off from the list around it. */
+.inlineForm {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1px solid var(--border-lit);
+  border-radius: var(--radius-input);
+}

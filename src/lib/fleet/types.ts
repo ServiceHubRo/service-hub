@@ -1,5 +1,6 @@
 import type { Quote, QuoteItem } from '../clientBookings';
 import type { BookingStatus } from '../status';
+import type { FleetReading, IgnoredJob, OdometerException } from './odometer';
 
 /**
  * Fleet accounts (docs/FLEET_PLAN.md): the shapes the company read (`fleet_overview(company)`, a
@@ -242,4 +243,8 @@ export interface FleetOverview {
   expenses: FleetExpense[];
   members: FleetMember[];
   issues: FleetIssue[];
+  /** M2: the odometer log, the jobs whose km is left out, the receipts the import could not take. */
+  readings?: FleetReading[];
+  ignored_jobs?: IgnoredJob[];
+  odometer_exceptions?: OdometerException[];
 }

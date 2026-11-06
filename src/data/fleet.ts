@@ -1,6 +1,6 @@
 import { call, failure, RpcError, type Booking } from './rpc';
 import { supabase } from './supabase';
-import type { ExpenseFields, FleetExpense, FleetIssue, FleetIssueDetail, FleetOverview, IssueFields, IssueUpdate, FleetPlanRow, FleetPlanSummary, FleetReport, FleetSubscriptionView, FleetVehicle, ReportFilters } from '../lib/fleet';
+import type { ExpenseFields, FleetExpense, FleetIssue, FleetReading, FuelStats, FleetIssueDetail, FleetOverview, IssueFields, IssueUpdate, FleetPlanRow, FleetPlanSummary, FleetReport, FleetSubscriptionView, FleetVehicle, ReportFilters } from '../lib/fleet';
 
 /**
  * The company's fleet (T63c, docs/FLEET_PLAN.md): one read, `fleet_overview(company)`, already
@@ -261,4 +261,22 @@ export async function updateIssue(issue: string, fields: IssueUpdate, requestId:
 
 export async function fetchIssueDetail(issue: string): Promise<FleetIssueDetail> {
   return (await call('fleet_issue_detail', { p_issue: issue } as never)) as unknown as FleetIssueDetail;
+}
+
+// ------------------------------------------------------------------------------------ odometer (M2)
+
+export async function addReading(company: string, vehicle: string, day: string, km: number, requestId: string): Promise<FleetReading> {
+  return (await call('fleet_add_reading', { p_company: company, p_vehicle: vehicle, p_day: day, p_km: km, p_request_id: requestId } as never)) as unknown as FleetReading;
+}
+
+export async function correctReading(reading: string, km: number, reason: string, requestId: string): Promise<FleetReading> {
+  return (await call('fleet_correct_reading', { p_reading: reading, p_km: km, p_reason: reason, p_request_id: requestId } as never)) as unknown as FleetReading;
+}
+
+export async function ignoreJobOdometer(booking: string, reason: string, requestId: string): Promise<void> {
+  await call('fleet_ignore_job_odometer', { p_booking: booking, p_reason: reason, p_request_id: requestId } as never);
+}
+
+export async function fetchFuelStats(company: string, vehicle: string, from: string | null, to: string): Promise<FuelStats> {
+  return (await call('fleet_fuel_stats', { p_company: company, p_vehicle: vehicle, p_from: from, p_to: to } as never)) as unknown as FuelStats;
 }
