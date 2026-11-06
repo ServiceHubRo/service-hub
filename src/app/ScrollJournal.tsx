@@ -37,7 +37,7 @@ export function ScrollJournal({ mainRef }: { mainRef: RefObject<HTMLElement | nu
       const top = Math.round(el.scrollTop);
       if (Math.abs(top - last) > 200) {
         const touched = performance.now() - touchedAt < 1000 ? 'touch' : 'NO touch';
-        add(`JUMP ${Math.round(last)}→${top} (${touched}) h ${el.scrollHeight}/${el.clientHeight} vis ${document.visibilityState}`);
+        add(`JUMP ${Math.round(last)}→${top} (${touched}) h ${el.scrollHeight}/${el.clientHeight} vis ${document.visibilityState} overflow ${getComputedStyle(el).overflowY}`);
       }
       last = el.scrollTop;
       const now = el.firstElementChild?.firstElementChild ?? null;
@@ -61,6 +61,10 @@ export function ScrollJournal({ mainRef }: { mainRef: RefObject<HTMLElement | nu
       [window, 'scroll', () => add(`window scroll ${Math.round(window.scrollY)}`)],
       [document, 'focusin', () => add(`focusin ${(document.activeElement as HTMLElement | null)?.tagName ?? ''}`)],
     ];
+    // Safari may lay the page out for print to make the „Full Page” screenshot (a PDF).
+    const print = window.matchMedia('print');
+    const onPrintMedia = () => add(`media print ${print.matches ? 'ON' : 'off'} top ${Math.round(el?.scrollTop ?? 0)} overflow ${el ? getComputedStyle(el).overflowY : ''}`);
+    print.addEventListener('change', onPrintMedia);
     if (window.visualViewport) handlers.push([window.visualViewport, 'resize', () => add(`vv resize ${size()}`)]);
     for (const [target, type, fn] of handlers) target.addEventListener(type, fn);
     el?.addEventListener('scroll', onScroll, { passive: true });
@@ -75,6 +79,7 @@ export function ScrollJournal({ mainRef }: { mainRef: RefObject<HTMLElement | nu
       el?.removeEventListener('scroll', onScroll);
       document.removeEventListener('touchstart', touched, { capture: true });
       window.clearInterval(timer);
+      print.removeEventListener('change', onPrintMedia);
     };
   }, [on, mainRef]);
 
