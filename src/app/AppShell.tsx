@@ -26,6 +26,7 @@ import { EmailVerifyBanner } from './EmailVerifyBanner';
 import { LogoutConfirm } from './LogoutConfirm';
 import { PushBridge } from './PushBridge';
 import { ScreenErrorBoundary } from './ScreenErrorBoundary';
+import { ScrollJournal } from './ScrollJournal';
 import { NAV, type NavItem, type Role } from './roles';
 import type { MessageKey } from '../i18n/ro';
 import { useSession } from './sessionContext';
@@ -287,6 +288,7 @@ export function AppShell({ role }: { role: Role }) {
           </div>
         </aside>
 
+        <ScrollJournal mainRef={mainRef} />
         <main className={styles.main} ref={mainRef} id="continut" tabIndex={-1}>
           <div ref={contentRef} className={styles.content}>
             <EmailVerifyBanner role={role} />
