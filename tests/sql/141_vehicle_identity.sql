@@ -119,10 +119,12 @@ select set_config('test.orig', (select id::text from public.cars where owner_id 
 update public.bookings set car_id = current_setting('test.dup')::uuid
 where id = (select id from public.bookings where client_id = test.id('client_b') order by created_at limit 1);
 select test.login(test.id('admin'));
-select test.ok(exists (select 1 from jsonb_array_elements(public.admin_vehicle_duplicates()->'personal') g where g->>'key' = 'BV44KLM'),
+select test.ok(exists (select 1 from jsonb_array_elements(public.admin_vehicle_duplicates()->'personal') g, jsonb_array_elements(g->'cars') c
+  where c->>'id' = current_setting('test.dup')),
   'the admin sees the copy listed');
 select test.eq((select jsonb_array_length(g->'cars') from jsonb_array_elements(public.admin_vehicle_duplicates()->'personal') g
-  where g->>'owner_id' = test.id('client_a')::text and g->>'key' = 'WVWZZZAUZGW123456'), 2,
+  where g->>'owner_id' = test.id('client_a')::text
+    and exists (select 1 from jsonb_array_elements(g->'cars') c where c->>'id' = current_setting('test.car_a'))), 2,
   'and a plate-only copy of a car with a VIN, in one group with it');
 select test.eq((select count(*) from jsonb_array_elements(public.admin_vehicle_duplicates()->'personal') g, jsonb_array_elements(g->'cars') c
   where c->>'vin' = 'UU1LSDAAG12345678'), 0::bigint, 'a plate moved to a car with another VIN is not called a copy');
