@@ -1,5 +1,6 @@
 import { useEffect, type ReactNode } from 'react';
 import { BrowserRouter, Route, Routes, StaticRouter, useLocation } from 'react-router-dom';
+import { recordEntry } from '../lib/navHistory';
 import { OfflineBar } from '../components/OfflineBar';
 import { I18nProvider } from '../i18n/I18nProvider';
 import { IS_TEST_BUILD } from '../lib/env';
@@ -71,7 +72,9 @@ function RouteGuard({ children }: { children: ReactNode }) {
   const location = useLocation();
   useEffect(() => {
     addBreadcrumb('navigation', safePath(window.location.href));
-  }, [location.pathname, location.search]);
+    // P1: the address of each history entry, for the in-app „‹ Înapoi” (src/lib/navHistory.ts).
+    recordEntry(location.pathname + location.search);
+  }, [location.pathname, location.search, location.key]);
   return (
     <ScreenErrorBoundary resetKey={location.pathname} fullScreen>
       {children}

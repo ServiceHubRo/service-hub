@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+import { goUp } from '../../lib/navHistory';
 import type { VehicleFields } from '../../data/fleet';
 import type { Booking } from '../../data/rpc';
 import {
@@ -88,6 +89,8 @@ export interface FleetContextValue {
   mode: 'preview' | 'live';
   /** Live only. */
   actions: FleetActions | null;
+  /** Back to a page of the space without a new history entry (P1). */
+  back: (link: FleetLink) => void;
   /** Live only: the company's page in Cont (team, rules and budgets). */
   companyPage: string | null;
   /** Preview only: adds an expense typed in the form, kept in memory. */
@@ -156,6 +159,20 @@ export function useFleetLocation() {
     [update],
   );
 
-  return { section, vehicleId, filter, update, go, params };
+  // „Înapoi la …” inside the space (P1): back through the history when that page is the entry before,
+  // else in place of this entry; never a new entry.
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const back = useCallback(
+    (link: FleetLink) => {
+      const q = new URLSearchParams({ sectiune: link.section });
+      if (link.vehicle) q.set('vehicul', link.vehicle);
+      if (link.filter) q.set('filtru', link.filter);
+      goUp(navigate as (to: string | number, options?: { replace?: boolean }) => void, `${pathname}?${q.toString()}`);
+    },
+    [navigate, pathname],
+  );
+
+  return { section, vehicleId, filter, update, go, back, params };
 }
 
