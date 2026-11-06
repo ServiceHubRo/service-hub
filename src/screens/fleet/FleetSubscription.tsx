@@ -124,7 +124,7 @@ function Subscription({ view }: { view: FleetSubscriptionView }) {
         <div className={styles.usageTop}>
           <span>{t('fleet.sub.colleagues')}</span>
           <span className="mono">
-            {included === null ? plan.colleagues : t('fleet.sub.colleaguesOf', { n: plan.colleagues, included })}
+            {included === null ? plan.colleagues : t(included === 1 ? 'fleet.sub.colleaguesOfOne' : 'fleet.sub.colleaguesOf', { n: plan.colleagues, included })}
           </span>
         </div>
         {included !== null && included > 0 && <Meter share={Math.min(1, plan.colleagues / included)} tone={plan.extra_members > 0 ? 'amber' : 'green'} />}
@@ -185,7 +185,7 @@ function PlanCard({ p, current, have, largest }: { p: FleetPlanRow; current: boo
         <li>
           {p.included_members === null
             ? t('fleet.sub.colleaguesCustom')
-            : t('fleet.sub.colleaguesIncluded', { n: plural(lang, 'unit.colleagues', p.included_members) })}
+            : t(p.included_members === 1 ? 'fleet.sub.colleaguesIncludedOne' : 'fleet.sub.colleaguesIncluded', { n: plural(lang, 'unit.colleagues', p.included_members) })}
         </li>
         {p.included_members !== null && p.member_price_ron !== null && (
           <li>{t('fleet.sub.colleaguePrice', { price: formatMoney(lang, p.member_price_ron) })}</li>
