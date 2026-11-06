@@ -10,7 +10,7 @@ import { IN_ANDROID_APP, watchKeyboard } from '../lib/keyboard';
 import { motionOn } from '../lib/motion';
 import { IS_NATIVE } from '../lib/native';
 import { useScreenSlide } from '../lib/screenSlide';
-import { useScrollMemory } from '../lib/scrollMemory';
+import { useKeepPlaceOnReturn, useScrollMemory } from '../lib/scrollMemory';
 import { useBumps } from '../lib/useBumps';
 import { useOptionalAdminCounts } from '../screens/admin/adminContext';
 import { ADMIN_MODERATION_PATH } from '../screens/admin/paths';
@@ -199,6 +199,8 @@ export function AppShell({ role }: { role: Role }) {
 
   // Only the content area scrolls: a new screen starts at the top, going back finds it where it was.
   useScrollMemory(mainRef);
+  // …and stays where it is when the browser throws it to the top by itself (Safari, a screenshot).
+  useKeepPlaceOnReturn(mainRef);
 
   // In the Android app the bottom bar steps aside while the keyboard is open (more room to type).
   useEffect(() => (IN_ANDROID_APP ? watchKeyboard() : undefined), []);
