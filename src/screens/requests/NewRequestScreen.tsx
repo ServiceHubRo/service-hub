@@ -21,6 +21,7 @@ import { formatDecimal } from '../../i18n/format';
 import { useLoad } from '../../lib/useLoad';
 import accountStyles from '../account/account.module.css';
 import { requestPath, requestsPath } from '../account/paths';
+import { AttachmentPicker } from './Attachments';
 import styles from './requests.module.css';
 
 type Field_ = 'category' | 'title' | 'body';
@@ -39,6 +40,7 @@ export function NewRequestScreen({ role }: { role: 'client' | 'shop' }) {
   const [body, setBody] = useState('');
   const [bookingRef, setBookingRef] = useState(params.get('programare') ?? '');
   const [missing, setMissing] = useState<Set<Field_>>(new Set());
+  const [fileIds, setFileIds] = useState<string[]>([]);
   const clear = (f: Field_) => setMissing((m) => (m.has(f) ? new Set([...m].filter((x) => x !== f)) : m));
   const categories = state.status === 'ready' ? state.data : [];
   const chosen = categories.some((c) => c.key === category) ? category : '';
@@ -99,6 +101,7 @@ export function NewRequestScreen({ role }: { role: 'client' | 'shop' }) {
               onChange={(e) => setBookingRef(e.target.value)}
             />
             <p className={styles.warning}>{t('support.new.privacy')}</p>
+            <AttachmentPicker onChange={setFileIds} />
             <ActionButton
               submit
               onAction={async (requestId) => {
@@ -110,7 +113,7 @@ export function NewRequestScreen({ role }: { role: 'client' | 'shop' }) {
                   setMissing(gaps);
                   return;
                 }
-                const { id } = await createRequest({ category: chosen, title: title.trim(), body: body.trim(), bookingRef: bookingRef.trim() }, requestId);
+                const { id } = await createRequest({ category: chosen, title: title.trim(), body: body.trim(), bookingRef: bookingRef.trim(), fileIds }, requestId);
                 navigate(requestPath(role, id), { replace: true });
               }}
               errorMessage={(e) => {

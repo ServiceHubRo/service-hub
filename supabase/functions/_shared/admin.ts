@@ -19,7 +19,7 @@ function env(name: string): string {
   return value;
 }
 
-export { tokenAal } from './jwt.ts';
+export { tokenAal, tokenSession } from './jwt.ts';
 
 export function adminApi() {
   const url = env('SUPABASE_URL');
@@ -85,6 +85,19 @@ export function adminApi() {
       if (res.status === 404 || res.status === 400) return null;
       if (!res.ok) throw new AdminError(res.status, `storage download: ${(await res.text()).slice(0, 200)}`);
       return new Uint8Array(await res.arrayBuffer());
+    },
+    /**
+     * A link to one file of a private bucket, valid `seconds` (A3b): the path and query to append to the
+     * project's public URL (`/storage/v1/object/sign/…?token=…`), so the caller uses its own address of
+     * the project. With `download`, the browser saves the file under that name instead of showing it.
+     */
+    async signedPath(bucket: string, path: string, seconds: number, download?: string): Promise<string> {
+      const data = (await request('POST', `/storage/v1/object/sign/${bucket}/${path}`, { expiresIn: seconds })) as {
+        signedURL?: string;
+      } | null;
+      if (!data?.signedURL) throw new AdminError(500, 'storage sign: no link');
+      const link = `/storage/v1${data.signedURL.startsWith('/') ? '' : '/'}${data.signedURL}`;
+      return download === undefined ? link : `${link}&download=${encodeURIComponent(download)}`;
     },
     /** Deletes files from a Storage bucket, as the service role (files already gone are not an error). */
     async remove(bucket: string, paths: string[]): Promise<void> {

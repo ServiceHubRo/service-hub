@@ -516,6 +516,11 @@ verify_jwt = false
 [functions.fleet-files-cleanup]
 verify_jwt = false
 
+# A3b: the support files — the app (it checks the caller's token itself) and, once a day, the
+# database's cleanup (pg_net, with the dispatcher's token).
+[functions.support-files]
+verify_jwt = false
+
 # The wordmark image in emails: fetched by email programs, no sign-in.
 [functions.email-logo]
 verify_jwt = false

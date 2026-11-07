@@ -11,6 +11,7 @@ import { fetchMyRequest, fetchSupportCategories, REQUEST_BODY_MAX, replyMyReques
 import { useI18n } from '../../i18n/context';
 import { useLoad } from '../../lib/useLoad';
 import { NotFound } from '../public/NotFound';
+import { AttachmentPicker } from './Attachments';
 import accountStyles from '../account/account.module.css';
 import { newRequestPath, requestsPath } from '../account/paths';
 import { categoryName, dayText, whenText } from './format';
@@ -35,6 +36,9 @@ export function MyRequestScreen({ role }: { role: 'client' | 'shop' }) {
   const { state, reload, setData } = useLoad(load);
   const [text, setText] = useState('');
   const [sent, setSent] = useState(false);
+  const [fileIds, setFileIds] = useState<string[]>([]);
+  // A new picker after each message (its list empties).
+  const [pickerKey, setPickerKey] = useState(0);
   const back = { to: requestsPath(role), label: t('support.my.title') };
 
   if (!valid || (state.status === 'error' && toRpcError(state.error).code === 'request_not_found')) return <NotFound inShell />;
@@ -50,8 +54,9 @@ export function MyRequestScreen({ role }: { role: 'client' | 'shop' }) {
 
   const [r, categories] = state.data;
   const items: ConversationItem[] = [
-    { id: 'first', side: 'author', who: t('support.req.me'), when: whenText(lang, r.created_at), body: r.body },
+    { id: 'first', side: 'author', who: t('support.req.me'), when: whenText(lang, r.created_at), body: r.body, files: r.files.filter((f) => !f.message_id) },
     ...r.messages.map((m) => ({
+      files: r.files.filter((f) => f.message_id === m.id),
       id: m.id,
       side: m.from_staff ? ('team' as const) : ('author' as const),
       who: m.from_staff ? t('support.req.team') : t('support.req.me'),
@@ -91,15 +96,18 @@ export function MyRequestScreen({ role }: { role: 'client' | 'shop' }) {
                 setSent(false);
               }}
             />
+            <AttachmentPicker key={pickerKey} onChange={setFileIds} />
             <ActionButton
               submit
               disabled={!text.trim()}
               onAction={async (requestId) => {
-                await replyMyRequest(r.id, text.trim(), requestId);
+                await replyMyRequest(r.id, text.trim(), requestId, fileIds);
                 // The conversation again, quietly: no skeleton, the page stays where it is.
                 const fresh = await fetchMyRequest(r.id).catch(() => null);
                 setText('');
                 setSent(true);
+                setFileIds([]);
+                setPickerKey((k) => k + 1);
                 if (fresh) setData(([, cats]) => [fresh, cats]);
               }}
               errorMessage={(e) => rpcErrorMessage(lang, e)}
@@ -115,9 +123,12 @@ export function MyRequestScreen({ role }: { role: 'client' | 'shop' }) {
           </form>
         </Card>
       ) : (
-        <p className={styles.muted}>
-          {t('support.req.closed')} <Link to={newRequestPath(role)}>{t('support.my.new')}</Link>
-        </p>
+        <>
+          <p className={styles.muted}>
+            {t('support.req.closed')} <Link to={newRequestPath(role)}>{t('support.my.new')}</Link>
+          </p>
+          {r.status === 'closed' && <p className={styles.muted}>{t('support.files.closedNote')}</p>}
+        </>
       )}
     </div>
   );
