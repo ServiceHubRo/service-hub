@@ -65,7 +65,7 @@ export function FleetSpaceScreen() {
 
 function FleetSpace({ companyId }: { companyId: string }) {
   const { t } = useI18n();
-  const { section, vehicleId, filter, go } = useFleetLocation();
+  const { section, vehicleId, filter, go, back } = useFleetLocation();
   const navigate = useNavigate();
   const load = useCallback(async () => {
     const [overview, plan, plans] = await Promise.all([fetchFleetOverview(companyId), fetchPlanSummary(companyId), fetchFleetPlans()]);
@@ -247,7 +247,7 @@ function FleetSpace({ companyId }: { companyId: string }) {
 
   const { overview: data, plan, plans } = state.data;
   return (
-    <FleetContext.Provider value={{ data, go, mode: 'live', actions, companyPage: companyPath(companyId), addExpense: null, plan, loadSubscription, plans, loadReport, logExport }}>
+    <FleetContext.Provider value={{ data, go, back, mode: 'live', actions, companyPage: companyPath(companyId), addExpense: null, plan, loadSubscription, plans, loadReport, logExport }}>
       <div className={styles.spaceTop}>
         <PlanBadge onOpen={() => go({ section: 'abonament' })} />
       </div>
