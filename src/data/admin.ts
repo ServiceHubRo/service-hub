@@ -37,6 +37,10 @@ export interface AuditEntry {
   created_at: string;
   admin_display_id: string | null;
   admin_name: string | null;
+  /** Who acted (A2): an admin or a support agent; null for the automatic entries. */
+  actor_role?: 'admin' | 'support' | null;
+  /** Why (A2: appointing or withdrawing an agent). */
+  reason?: string | null;
   /** Only in the full log: the shop's name, the booking's code, the account id. */
   label?: string | null;
 }

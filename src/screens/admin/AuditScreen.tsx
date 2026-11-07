@@ -13,7 +13,7 @@ import { useI18n } from '../../i18n/context';
 import type { MessageKey } from '../../i18n/ro';
 import { useLoad } from '../../lib/useLoad';
 import { AuditList } from './parts';
-import { ADMIN_AUDIT_PATH, ADMIN_CATALOG_PATH, ADMIN_MODERATION_PATH, ADMIN_NOTICES_PATH, ADMIN_REPORTS_PATH, ADMIN_SUGGESTIONS_PATH, ADMIN_TEXTS_PATH, adminBookingPath, adminClientPath, adminShopPath } from './paths';
+import { ADMIN_AUDIT_PATH, ADMIN_TEAM_PATH, ADMIN_CATALOG_PATH, ADMIN_MODERATION_PATH, ADMIN_NOTICES_PATH, ADMIN_REPORTS_PATH, ADMIN_SUGGESTIONS_PATH, ADMIN_TEXTS_PATH, adminBookingPath, adminClientPath, adminShopPath } from './paths';
 import styles from './admin.module.css';
 
 /** „‹ Înapoi” goes to the screen's zone (A1). */
@@ -57,7 +57,9 @@ function entityLink(e: AuditEntry, t: (key: MessageKey) => string) {
         </Link>
       );
     case 'profile':
-      // Only a client account has a detail screen (a shop owner's is reached through the shop).
+      // Only a client account has a detail screen (a shop owner's is reached through the shop); a
+      // support agent (E-, A2) leads to the support team.
+      if (label.startsWith('E-')) return toolLink(ADMIN_TEAM_PATH, label);
       return label.startsWith('C-') ? (
         <Link className={styles.link} to={adminClientPath(e.entity_id)}>
           {label}
@@ -75,6 +77,7 @@ function entityLink(e: AuditEntry, t: (key: MessageKey) => string) {
     case 'suggestion':
       return toolLink(ADMIN_SUGGESTIONS_PATH, t('admin.sugg.auditLabel'));
     case 'export':
+    case 'search':
       return null;
     default:
       return <span className={styles.muted}>{label}</span>;

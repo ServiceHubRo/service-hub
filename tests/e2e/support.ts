@@ -557,7 +557,13 @@ export async function switchLanguage(page: Page, lang: 'ro' | 'en') {
   // company's space too, whose own „Cont” has no language.
   const back = page.url();
   const path = new URL(back).pathname;
-  const account = path.startsWith('/admin') ? '/admin/cont' : path.startsWith('/s/') ? '/s/cont' : '/c/cont';
+  const account = path.startsWith('/admin')
+    ? '/admin/cont'
+    : path.startsWith('/suport')
+      ? '/suport/cont'
+      : path.startsWith('/s/')
+        ? '/s/cont'
+        : '/c/cont';
   const there = path === account;
   if (!there) {
     await page.evaluate((to) => {

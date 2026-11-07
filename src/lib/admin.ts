@@ -155,6 +155,11 @@ export const AUDIT_ACTIONS = [
   'update_area',
   // T26
   'update_suggestion',
+  // A2
+  'grant_support',
+  'revoke_support',
+  'support_search',
+  'support_view_account',
 ] as const;
 
 export interface AuditChange {
@@ -165,7 +170,7 @@ export interface AuditChange {
 }
 
 /** Keys that describe the action rather than a changed value: shown on their own line. */
-const DETAIL_KEYS = new Set(['reason', 'note', 'days', 'mode', 'services_off', 'kind', 'filters', 'rows', 'recipients', 'push_recipients']);
+const DETAIL_KEYS = new Set(['reason', 'note', 'days', 'mode', 'services_off', 'kind', 'filters', 'rows', 'recipients', 'push_recipients', 'q', 'results']);
 
 /** Values kept whole (an export's filters): shown as one line, not split into their keys. */
 const WHOLE_KEYS = new Set(['filters']);

@@ -1,7 +1,7 @@
 import { Banner } from '../components/Banner';
 import { useI18n } from '../i18n/context';
 import { ResendConfirmation } from '../screens/auth/ResendConfirmation';
-import type { Role } from './roles';
+import { isStaff, type Role } from './roles';
 import styles from './EmailVerifyBanner.module.css';
 import { useSession } from './sessionContext';
 
@@ -14,7 +14,7 @@ export function EmailVerifyBanner({ role }: { role: Role }) {
   const { t } = useI18n();
   const session = useSession();
   const email = session.user?.email;
-  if (session.status !== 'signedIn' || session.emailVerified || role === 'admin' || !email) return null;
+  if (session.status !== 'signedIn' || session.emailVerified || isStaff(role) || !email) return null;
   return (
     <div className={styles.wrap}>
       <Banner tone="warning">

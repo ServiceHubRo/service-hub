@@ -121,10 +121,10 @@ select test.eq(
       and not has_function_privilege('anon', p.oid, 'execute')),
   'accept_company_invite, acknowledge_no_show_notice, admin_create_category, admin_create_service, admin_decide_no_show_dispute, '
   || 'admin_decide_review, admin_decide_suspect_review, admin_export, admin_extend_company_trial, admin_extend_trial, admin_force_cancel, '
-  || 'admin_get_booking, admin_get_client, admin_get_shop, admin_grant_report_credit, admin_list_audit, admin_list_bookings, '
+  || 'admin_get_booking, admin_get_client, admin_get_shop, admin_grant_report_credit, admin_grant_support, admin_list_audit, admin_list_bookings, '
   || 'admin_list_catalog, admin_list_clients, admin_list_company_checks, admin_list_failed_fleet_events, admin_list_fleet_companies, admin_list_history_reports, '
   || 'admin_list_no_show_disputes, admin_list_notices, admin_list_reviews, admin_list_service_areas, admin_list_shops, admin_list_subscriptions, '
-  || 'admin_list_suggestions, admin_list_suspect_reviews, admin_move_catalog_item, admin_notice_preview, admin_overview, admin_retry_fleet_event, admin_send_notice, '
+  || 'admin_list_suggestions, admin_list_support_agents, admin_list_suspect_reviews, admin_move_catalog_item, admin_notice_preview, admin_overview, admin_retry_fleet_event, admin_revoke_support, admin_send_notice, '
   || 'admin_set_account_suspended, admin_set_area_mode, admin_set_company_plan, admin_set_notification_text, admin_set_service_reminder, '
   || 'admin_set_shop_suspended, admin_set_subscription_price, admin_set_subscription_status, admin_set_suggestion_status, admin_update_category, '
   || 'admin_update_fleet_plan, admin_update_service, admin_update_settings, admin_update_shop, admin_vehicle_duplicates, admin_verify_phone, admin_void_history_report, '
@@ -146,6 +146,7 @@ select test.eq(
   || 'search_cities, search_shops, send_message, send_quote, set_booking_history_share, set_company_member_rights, set_company_member_role, set_company_rules, '
   || 'set_quote_next_number, set_shop_services, shop_cancel_booking, shop_create_booking, shop_decide_quote, shop_import_add, shop_import_begin, '
   || 'shop_import_undo, shop_offers, shop_reports, shop_vehicle_file, start_inspection, start_work, submit_review, submit_suggestion, '
+  || 'support_get_account, support_list_suggestions, support_search_accounts, support_set_suggestion_status, '
   || 'toggle_favorite, touch_last_active, transfer_company_admin, update_company, withdraw_quote',
   'functions callable only when signed in')
 from pg_proc p where p.pronamespace = 'public'::regnamespace;

@@ -1,0 +1,50 @@
+/* The support agent's screens (A2) and the admin's support team: the admin layout (admin.module.css)
+   plus the search form and the team's forms. */
+
+.searchForm {
+  display: grid;
+  gap: 12px;
+  align-items: end;
+  max-width: 720px;
+}
+
+@media (min-width: 600px) {
+  .searchForm {
+    grid-template-columns: 1fr auto;
+  }
+  /* The button lines up with the input, not with the hint under it. */
+  .searchForm > button {
+    margin-bottom: 26px;
+  }
+}
+
+.form {
+  display: grid;
+  gap: 12px;
+  max-width: 560px;
+}
+
+.agent {
+  display: grid;
+  gap: 8px;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.confirm {
+  display: grid;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid var(--border-lit);
+  border-radius: var(--radius-card);
+  background: var(--surface2);
+}
+
+.notice {
+  color: var(--green);
+  font-weight: 600;
+}

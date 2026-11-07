@@ -1640,3 +1640,18 @@ Aprobate de Eduard pe 6 nov („aprob T71–T75”; T71 era deja folosit, așa c
 - Neverificat: gestul de revenire din Safari pe iPhone (în container există doar Chromium).
 
 - [x] Făcut
+
+### A2 — Rolul de agent de suport și permisiunile ✅
+- Aprobat de Eduard pe 7 nov (planul A2, cu precizările: numire reversibilă și jurnalizată complet, verificarea în doi pași înainte ca rolul să funcționeze, acces pierdut imediat — sesiuni și API — la retragere sau suspendare, istoricul acțiunilor păstrat).
+- Rol nou `support` (ID `E-00001`). Îl dă doar adminul, din **Platformă → Echipa de suport**, cu motiv obligatoriu, numai unui cont de client nou (email confirmat, fără mașini, programări, conversații, firme sau service). Retragerea: tot de acolo, cu motiv; contul redevine client, sesiunile lui se închid imediat, ID-ul `E-` rămâne, poate fi numit din nou. Ambele în Jurnalul de audit, cu motivul.
+- Agentul nu vede nimic până nu își configurează verificarea în doi pași. Apoi are trei secțiuni: **Solicitări** (sugestiile, aceeași listă ca la admin, cu schimbarea stării), **Căutare** (după ID, email exact, telefon sau nume; emailul mascat, doar ultimele 3 cifre ale telefonului, fără programări, mașini, firme, plăți sau mesaje) și **Cont**. Help Center și Proceduri vin în A4 și A5, fără butoane goale până atunci.
+- Fiecare căutare, fiecare cont deschis și fiecare schimbare a agentului apar în Jurnalul de audit, cu rolul și ID-ul lui (păstrate și după ștergerea contului). Cel mult 120 de căutări pe oră.
+- Toate funcțiile de admin refuză agentul (test care le verifică automat pe toate, și pe cele viitoare). Agentul nu își poate schimba rolul, nu își poate șterge singur contul, nu citește conversații, programări, firme, devize sau date de facturare ale altora.
+- Locurile din interfață care tratau „nu e admin” ca „client sau service” folosesc acum `isStaff()`: agentul nu primește turul, notificările push, Ajutor și contact, Sugestii, ștergerea contului sau simbolul ANPC.
+- Migrarea `support_role` (schema 109), cu rollback testat (structură și date identice, și cu un agent existent). Niciun rând existent nu se modifică.
+- Documentație: `docs/PERMISSIONS.md` (matricea rolurilor și a funcțiilor), ARCHITECTURE §2 și §15, CLAUDE.md §1, `docs/LANSARE.md` 4.6b2.
+- Teste: `tests/sql/151_support_role.sql`, `tests/e2e/support-agent.spec.ts` (390/820/1440, RO și EN), `tests/unit/roles.test.ts`, `tests/unit/adminZones.test.ts`, `tests/e2e/admin-navigation.spec.ts`.
+- **Mutat după A3 (aprobat):** retrimiterea emailului de confirmare de către agent.
+- **De știut:** un token deja emis al unui agent retras e refuzat imediat de funcțiile de suport (rolul și sesiunea se verifică la fiecare apel); pentru restul aplicației contul e deja un cont de client fără date.
+
+- [x] Făcut

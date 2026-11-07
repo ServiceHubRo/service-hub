@@ -126,3 +126,39 @@ grant execute on function storage.foldername(text) to anon, authenticated, servi
 set client_min_messages = error; -- local clusters warn that wal_level is not logical
 create publication supabase_realtime;
 reset client_min_messages;
+
+-- auth sessions and the second step (A2): an agent's access ends with its sessions; the admin's team
+-- list shows whether an agent set up its authenticator app. Same names as Supabase Auth; the status and
+-- factor type are enums there, text here.
+create table auth.sessions (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users (id) on delete cascade,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now(),
+  factor_id uuid,
+  aal text,
+  not_after timestamptz
+);
+
+create table auth.refresh_tokens (
+  instance_id uuid,
+  id bigserial primary key,
+  token varchar(255) unique,
+  user_id varchar(255),
+  revoked boolean,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now(),
+  parent varchar(255),
+  session_id uuid references auth.sessions (id) on delete cascade
+);
+
+create table auth.mfa_factors (
+  id uuid primary key,
+  user_id uuid not null references auth.users (id) on delete cascade,
+  friendly_name text,
+  factor_type text not null,
+  status text not null,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  secret text
+);

@@ -14,12 +14,13 @@ describe('admin zones (A1)', () => {
   it('every function of the inventory has exactly one place', () => {
     const paths = subSections.map((i) => i.path);
     expect(new Set(paths).size).toBe(paths.length);
-    expect(paths.length).toBe(19);
+    // 19 at A1, plus Echipa de suport (A2).
+    expect(paths.length).toBe(20);
   });
 
   it('Platformă splits Configurare and Control; the other zones have no groups', () => {
     const platform = ADMIN_ZONES.find((z) => z.path === '/admin/platforma')!;
-    expect(platform.items.map((i) => i.group)).toEqual(['config', 'config', 'config', 'config', 'config', 'control', 'control']);
+    expect(platform.items.map((i) => i.group)).toEqual(['config', 'config', 'config', 'config', 'config', 'control', 'control', 'control']);
     for (const zone of ADMIN_ZONES.filter((z) => z !== platform)) expect(zone.items.every((i) => !i.group)).toBe(true);
   });
 

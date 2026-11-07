@@ -357,6 +357,16 @@ where user_id = (select id from auth.users where email = 'adresa-ta@exemplu.ro')
 
 La următoarea intrare ca admin, aplicația îți cere să o configurezi din nou (cod QR nou). Nu da comanda nimănui: cine o poate rula are deja acces la tot proiectul.
 
+### 4.6b2 Agenții de suport (din A2)
+
+Un agent de suport lucrează în aplicație la `/suport`: Solicitări, Căutare de conturi, Cont. Nu are acces la funcțiile de admin, la conversații, la programările altora, la firme sau la plăți.
+
+**Numești un agent:** persoana își face un cont nou de client, doar pentru suport (email confirmat, fără mașini sau programări). Tu: **Platformă → Echipa de suport** → „ID cont sau email” (de ex. `C-00042`) → „Motiv” → **Numește agentul**. Contul primește un ID `E-…`. La prima intrare, agentul își configurează codul de 6 cifre; până atunci nu vede nimic.
+
+**Retragi rolul:** în aceeași pagină, pe cardul agentului → **Retrage rolul** → motiv → **Retrage rolul**. Agentul este scos imediat din aplicație, pe toate dispozitivele; contul redevine cont de client. Tot ce a făcut rămâne în Jurnalul de audit.
+
+**Agentul și-a pierdut telefonul:** aceeași comandă ca la 4.6b, cu adresa agentului; la următoarea intrare își configurează codul din nou.
+
 ### 4.6c Securitatea conturilor tale și a setărilor (după T36)
 
 Partea din cod e făcută (headerele de securitate, regulile din baza de date, limitele). Ce rămâne ține de conturile tale, pe care eu nu le pot atinge. În ordinea importanței:

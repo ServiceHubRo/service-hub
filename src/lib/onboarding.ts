@@ -9,7 +9,7 @@ import type { LocationStatus } from './location';
 export type OnboardingStep = 'location' | 'push';
 
 export interface OnboardingInput {
-  role: 'client' | 'shop' | 'admin';
+  role: 'client' | 'shop' | 'admin' | 'support';
   location: LocationStatus;
   push: PushStatus;
   locationPutOff: boolean;
@@ -18,7 +18,7 @@ export interface OnboardingInput {
 
 /** The steps to show, or null while a permission is still being read. */
 export function onboardingSteps({ role, location, push, locationPutOff, pushPutOff }: OnboardingInput): OnboardingStep[] | null {
-  if (role === 'admin') return [];
+  if (role === 'admin' || role === 'support') return [];
   if (push === 'unknown' || (role === 'client' && location === 'unknown')) return null;
   const steps: OnboardingStep[] = [];
   if (role === 'client' && location === 'prompt' && !locationPutOff) steps.push('location');

@@ -3,7 +3,7 @@ import { useCallback, useRef, useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import type { ShellOutletContext } from '../../app/AppShell';
 import { LogoutConfirm } from '../../app/LogoutConfirm';
-import { NAV, type Role } from '../../app/roles';
+import { isStaff, NAV, type Role } from '../../app/roles';
 import { useSession } from '../../app/sessionContext';
 import { AnpcSal } from '../../components/AnpcSal';
 import { Button } from '../../components/Button';
@@ -35,6 +35,7 @@ const SUBTITLE: Record<Role, MessageKey> = {
   client: 'account.kind.client',
   shop: 'account.kind.shop',
   admin: 'account.kind.admin',
+  support: 'account.kind.support',
 };
 
 /**
@@ -77,8 +78,8 @@ export function AccountScreen({ role }: { role: Role }) {
         <LanguagePreference />
       </Section>
 
-      {/* The admin's tools live in its five zones since A1; its Cont is its own account. */}
-      {role !== 'admin' && (
+      {/* The team's tools live in its own sections (admin: five zones, A1; agent: A2); its Cont is its own account. */}
+      {!isStaff(role) && (
         <Section title={t('account.sec.tools')}>
           {role === 'client' && (
             <>
@@ -107,7 +108,7 @@ export function AccountScreen({ role }: { role: Role }) {
 
       <SecuritySection />
 
-      {role !== 'admin' && (
+      {!isStaff(role) && (
         <Section title={t('help.title')} description={t('account.sec.help.desc')}>
           <div className={styles.tiles} data-layout="tiles">
             <Tile to={helpPath(role)} icon={LifeBuoy} label={t('help.title')} hint={t('help.tileHint')} />
@@ -122,7 +123,7 @@ export function AccountScreen({ role }: { role: Role }) {
             <Tile key={doc.id} to={`${NAV[role].account.path}/legal/${doc.id}`} icon={FileText} label={t(doc.titleKey)} />
           ))}
         </div>
-        {role !== 'admin' && <AnpcSal />}
+        {!isStaff(role) && <AnpcSal />}
       </Section>
 
       <DataSection />

@@ -30,34 +30,47 @@ const ZONE_BACK = adminZoneBack(ADMIN_SUGGESTIONS_PATH);
 
 type Filter = SuggestionStatus | 'all';
 
-/** Who wrote it: "Client · C-00012 · Maria Pop" (to the client) or "Service · Atelier Unu" (to the shop). */
-function Author({ s }: { s: AdminSuggestion }) {
+/** Where the author's line leads, or null for plain text (the board's owner decides: A2). */
+export type AuthorLink = (s: AdminSuggestion) => string | null;
+
+/** The admin: a shop's suggestion to the shop, a client's to the client. */
+const adminAuthorLink: AuthorLink = (s) => (s.role === 'shop' ? (s.shop_id ? adminShopPath(s.shop_id) : null) : adminClientPath(s.author_id));
+
+/** Who wrote it: "Client · C-00012 · Maria Pop" or "Service · Atelier Unu". */
+function Author({ s, link }: { s: AdminSuggestion; link: AuthorLink }) {
   const { t } = useI18n();
-  if (s.role === 'shop') {
-    const who = [t('admin.sugg.fromShop'), s.shop_name ?? s.display_id].join(' · ');
-    return s.shop_id ? (
-      <Link className={styles.link} to={adminShopPath(s.shop_id)}>
-        {who}
-      </Link>
-    ) : (
-      <span>{who}</span>
-    );
-  }
-  return (
-    <Link className={styles.link} to={adminClientPath(s.author_id)}>
-      {[t('admin.sugg.fromClient'), s.display_id, s.author_name].filter(Boolean).join(' · ')}
+  const who =
+    s.role === 'shop'
+      ? [t('admin.sugg.fromShop'), s.shop_name ?? s.display_id].join(' · ')
+      : [t('admin.sugg.fromClient'), s.display_id, s.author_name].filter(Boolean).join(' · ');
+  const to = link(s);
+  return to ? (
+    <Link className={styles.link} to={to}>
+      {who}
     </Link>
+  ) : (
+    <span>{who}</span>
   );
 }
 
-function SuggestionCard({ s, onChanged }: { s: AdminSuggestion; onChanged: (status: SuggestionStatus) => void }) {
+function SuggestionCard({
+  s,
+  onChanged,
+  setStatus,
+  authorLink,
+}: {
+  s: AdminSuggestion;
+  onChanged: (status: SuggestionStatus) => void;
+  setStatus: SetStatus;
+  authorLink: AuthorLink;
+}) {
   const { t, lang } = useI18n();
   return (
     <Card className={suggestionStyles.item}>
       <p className={suggestionStyles.body}>{s.body}</p>
       <div className={suggestionStyles.meta}>
         <SuggestionStatusPill status={s.status} admin />
-        <Author s={s} />
+        <Author s={s} link={authorLink} />
         <span>{dateTime(lang, s.created_at)}</span>
       </div>
       <span id={`sugg-state-${s.id}`} className={suggestionStyles.meta}>
@@ -70,7 +83,7 @@ function SuggestionCard({ s, onChanged }: { s: AdminSuggestion; onChanged: (stat
             variant="secondary"
             block={false}
             onAction={async (requestId) => {
-              await adminSetSuggestionStatus(s.id, next, requestId);
+              await setStatus(s.id, next, requestId);
               onChanged(next);
             }}
             errorMessage={(e) => rpcErrorMessage(lang, e)}
@@ -84,14 +97,25 @@ function SuggestionCard({ s, onChanged }: { s: AdminSuggestion; onChanged: (stat
   );
 }
 
+type SetStatus = (id: string, status: SuggestionStatus, requestId: string) => Promise<void>;
+
 /**
- * Admin → Cont → Sugestii (T26): every idea clients and shops sent, newest first, filtered by state.
- * Each gets a state the author sees (planned, done, not now; back to new); every change is in the
- * audit log.
+ * Sugestii (T26): every idea clients and shops sent, newest first, filtered by state. Each gets a state
+ * the author sees (planned, done, not now; back to new); every change is in the audit log. The admin's
+ * screen and the support agent's Solicitări (A2) show the same board, each through its own database
+ * functions.
  */
-export function SuggestionsScreen() {
+export function SuggestionsBoard({
+  load,
+  setStatus,
+  authorLink,
+}: {
+  load: () => Promise<{ new: number; items: AdminSuggestion[] }>;
+  setStatus: SetStatus;
+  authorLink: AuthorLink;
+}) {
   const { t } = useI18n();
-  const { state, reload, setData } = useLoad(adminListSuggestions);
+  const { state, reload, setData } = useLoad(load);
   const [filter, setFilter] = useState<Filter>('all');
 
   const count = (f: Filter) =>
@@ -103,11 +127,7 @@ export function SuggestionsScreen() {
   };
 
   return (
-    <div className={styles.page}>
-      <BackLink to={ZONE_BACK.to} label={t(ZONE_BACK.label)} />
-      <div>
-        <h1>{t('admin.sugg.title')}</h1>
-      </div>
+    <>
       <SelectField
         className={styles.narrowSelect}
         label={t('admin.sugg.filter')}
@@ -129,6 +149,8 @@ export function SuggestionsScreen() {
                 <li key={s.id}>
                   <SuggestionCard
                     s={s}
+                    setStatus={setStatus}
+                    authorLink={authorLink}
                     onChanged={(status) =>
                       setData((d) => ({
                         new: d.new + (status === 'new' ? 1 : 0) - (s.status === 'new' ? 1 : 0),
@@ -141,6 +163,20 @@ export function SuggestionsScreen() {
             </ul>
           );
         })()}
+    </>
+  );
+}
+
+/** Admin → Suport → Sugestii (T26, A1). */
+export function SuggestionsScreen() {
+  const { t } = useI18n();
+  return (
+    <div className={styles.page}>
+      <BackLink to={ZONE_BACK.to} label={t(ZONE_BACK.label)} />
+      <div>
+        <h1>{t('admin.sugg.title')}</h1>
+      </div>
+      <SuggestionsBoard load={adminListSuggestions} setStatus={adminSetSuggestionStatus} authorLink={adminAuthorLink} />
     </div>
   );
 }

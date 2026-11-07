@@ -26,7 +26,7 @@ import { EmailVerifyBanner } from './EmailVerifyBanner';
 import { LogoutConfirm } from './LogoutConfirm';
 import { PushBridge } from './PushBridge';
 import { ScreenErrorBoundary } from './ScreenErrorBoundary';
-import { NAV, type NavItem, type Role } from './roles';
+import { isStaff, NAV, type NavItem, type Role } from './roles';
 import type { MessageKey } from '../i18n/ro';
 import { useSession } from './sessionContext';
 import { TourHost } from './tour/TourHost';
@@ -285,7 +285,7 @@ export function AppShell({ role }: { role: Role }) {
       {/* The phone app's first start asks for the permissions one by one (on the site: the banners). */}
       {IS_NATIVE && <PermissionsIntro role={role} />}
       {/* The short tour of the main features, once per account (T39). */}
-      {role !== 'admin' && <TourHost role={role} />}
+      {!isStaff(role) && <TourHost role={role} />}
       <a href="#continut" className={styles.skipLink} onClick={skipToContent}>
         {t('nav.skipToContent')}
       </a>
@@ -351,7 +351,7 @@ export function AppShell({ role }: { role: Role }) {
         <main className={styles.main} ref={mainRef} id="continut" tabIndex={-1}>
           <div ref={contentRef} className={styles.content}>
             <EmailVerifyBanner role={role} />
-            {role !== 'admin' && <PushBridge />}
+            {!isStaff(role) && <PushBridge />}
             <ScreenErrorBoundary resetKey={pathname}>
               <Outlet context={{ logOut } satisfies ShellOutletContext} />
             </ScreenErrorBoundary>

@@ -30,6 +30,7 @@ const ROLE_APPS: Record<Role, ReturnType<typeof lazyChunk>> = {
   client: lazyChunk(() => import('./routes/ClientApp')),
   shop: lazyChunk(() => import('./routes/ShopApp')),
   admin: lazyChunk(() => import('./routes/AdminApp')),
+  support: lazyChunk(() => import('./routes/SupportApp')),
 };
 const PublicLegal = lazyChunk(() => import('../screens/legal/LegalPages').then((m) => ({ default: m.PublicLegal })));
 const BookingLinkScreen = lazyChunk(() =>
@@ -176,6 +177,7 @@ export function App({ location }: { location?: string }) {
                   {roleRoutes('client')}
                   {roleRoutes('shop')}
                   {roleRoutes('admin')}
+                  {roleRoutes('support')}
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </SignUpGate>

@@ -42,6 +42,8 @@ export const ADMIN_ZONES_PATH = `${ADMIN_PLATFORM_PATH}/zone`;
 export const ADMIN_CATALOG_PATH = `${ADMIN_PLATFORM_PATH}/catalog`;
 export const ADMIN_AUDIT_PATH = `${ADMIN_PLATFORM_PATH}/jurnal`;
 export const ADMIN_FLEET_FAILED_PATH = `${ADMIN_PLATFORM_PATH}/notificari-flota`;
+/** Echipa de suport (A2): the support agents, appointing and withdrawing the role. */
+export const ADMIN_TEAM_PATH = `${ADMIN_PLATFORM_PATH}/echipa`;
 
 export const adminShopPath = (id: string) => `${ADMIN_SHOPS_PATH}/${id}`;
 export const adminClientPath = (id: string) => `${ADMIN_CLIENTS_PATH}/${id}`;
