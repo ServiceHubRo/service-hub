@@ -240,10 +240,12 @@ select test.eq(title_en || '|' || body_en, 'Program de sărbători|Închis pe 1 
        test.eq(recipients, 1, 'one recipient'),
        test.eq(push_recipients, 1, 'one push')
 from public.notices where id = current_setting('test.notice')::uuid;
+select test.logout();
 select test.eq(count(*), 1::bigint, 'one broadcast push, to the client in Codlea')
 from public.notification_events
 where event = 'broadcast' and user_id = test.id('client_b') and params->>'notice_id' = current_setting('test.notice')
   and channels = array['push'] and params->>'title_en' = 'Program de sărbători';
+select test.login(test.id('admin'));
 select test.eq(count(*), 1::bigint, 'the notice is logged with its audience')
 from public.admin_audit_log where action = 'send_notice' and after->>'audience' = 'clients' and after->>'city' = 'Codlea';
 
