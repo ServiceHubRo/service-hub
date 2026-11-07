@@ -1606,6 +1606,13 @@ Aprobate de Eduard pe 6 nov („aprob T71–T75”; T71 era deja folosit, așa c
 
 - [x] Făcut
 
+### P2 — Fără insigna planului în antetul firmei ✅
+- Insigna permanentă cu planul și perioada de test a fost scoasă din antetul spațiului firmei. Planul se vede în Cont → „Abonament și facturare”.
+- Pe Panou rămâne doar un avertisment, când e cazul, cu „Vezi abonamentul” pentru cine are acces la abonament: abonament expirat (toți), plata restantă, colegi peste limită, ultima săptămână din perioada de test (nu șoferului), vehicule peste limită (toți). Un singur avertisment o dată, cel mai grav: `planNotice()` în `src/lib/fleet/plans.ts`.
+- Teste: `tests/unit/fleetPlanNotice.test.ts`, `tests/e2e/fleet-space.spec.ts` (fără insignă, avertismentul în ultima săptămână, linkul spre abonament).
+
+- [x] Făcut
+
 ### P3 — Adminul nu mai citește conversațiile private (varianta A) ✅
 - Decizia lui Eduard, 6 nov: accesul adminului la conversațiile client–service e scos complet. S-au eliminat:
   - ramura de admin din regula `threads_select` și din `can_read_thread` (deci și din mesaje și din Realtime);

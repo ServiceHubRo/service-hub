@@ -128,10 +128,21 @@ test('the plan: Abonament, the limits of Fleet Start, and the admin changes the 
   await signIn(page, admin, PASSWORD);
   await expect(page).toHaveURL(/\/c\/cauta/);
 
-  // A new company: Fleet Business on trial; the badge opens Abonament.
+  // A new company: Fleet Business on trial. P2: the plan is not repeated in the header; Cont →
+  // „Abonament și facturare” has it. The last week of the trial is said on Panou.
   await page.goto(`/c/firme/${company.id}`);
-  await page.getByRole('button', { name: /Fleet Business/ }).filter({ visible: true }).first().click();
+  await expect(page.getByRole('heading', { level: 1, name: 'Panou' })).toBeVisible();
+  await expect(page.getByRole('button', { name: /Fleet Business/ })).toHaveCount(0);
+  await expect(page.getByText(/Perioada de test se încheie în/)).toHaveCount(0);
+  // Three Bucharest calendar days from today, at midday there: the count never depends on the hour the test runs.
+  const in3Days = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Bucharest' }).format(new Date(Date.now() + 3 * 86_400_000));
+  await serviceRest(`company_subscriptions?company_id=eq.${company.id}`, 'PATCH', { trial_ends_at: `${in3Days}T10:00:00Z` });
+  await page.reload();
+  await expect(page.getByText('Perioada de test se încheie în 3 zile.')).toBeVisible();
+  await page.getByRole('button', { name: 'Vezi abonamentul' }).click();
   await expect(page.getByRole('heading', { level: 1, name: 'Abonament și facturare' })).toBeVisible();
+  await serviceRest(`company_subscriptions?company_id=eq.${company.id}`, 'PATCH', { trial_ends_at: new Date(Date.now() + 30 * 86_400_000 - 3_600_000).toISOString() });
+  await page.reload();
   await expect(page.getByText(/Perioada de test: (30|29) de zile, până pe/)).toBeVisible();
   await expect(page.getByText('Plata cu cardul și schimbarea planului nu sunt încă disponibile.')).toBeVisible();
   await expect(page.getByText('Planul actual', { exact: true })).toBeVisible();
