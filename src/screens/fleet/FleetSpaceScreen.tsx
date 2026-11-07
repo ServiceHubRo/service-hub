@@ -48,7 +48,7 @@ import { clearFleetBookingHint, setFleetBookingHint } from '../client/booking/fl
 import { COMPANIES_PATH, companyPath } from '../client/companies/paths';
 import { SEARCH_PATH } from '../client/paths';
 import { FleetContext, useFleetLocation, type FleetActions, type FleetContextValue } from './fleetContext';
-import { FleetPlanNotice, FleetSectionBody, PlanBadge } from './FleetSections';
+import { FleetPlanNotice, FleetSectionBody } from './FleetSections';
 import styles from './fleet.module.css';
 
 /**
@@ -248,9 +248,6 @@ function FleetSpace({ companyId }: { companyId: string }) {
   const { overview: data, plan, plans } = state.data;
   return (
     <FleetContext.Provider value={{ data, go, back, mode: 'live', actions, companyPage: companyPath(companyId), addExpense: null, plan, loadSubscription, plans, loadReport, logExport }}>
-      <div className={styles.spaceTop}>
-        <PlanBadge onOpen={() => go({ section: 'abonament' })} />
-      </div>
       <PageHeader
           title={title}
           subtitle={

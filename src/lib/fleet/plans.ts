@@ -154,3 +154,34 @@ export function requiredPlan<P extends Pick<FleetPlanRow, 'key' | 'features'>>(f
 export function upgradeGains(current: readonly string[], next: readonly string[]): PlanFeature[] {
   return offeredFeatures(next).filter((f) => !current.includes(f));
 }
+
+/**
+ * The one warning a company space shows about its plan (P2, 6 Nov 2026): the plan itself is no
+ * longer repeated in the header (Cont → Abonament și facturare has it); only what needs action stays,
+ * the most urgent first. A driver gets only what limits their own work.
+ */
+export type PlanNoticeKind = 'expired' | 'payment' | 'overVehicles' | 'overMembers' | 'trialEnding';
+export interface PlanNotice {
+  kind: PlanNoticeKind;
+  tone: 'warning' | 'info';
+  over?: number;
+  limit?: number;
+  days?: number;
+}
+
+export function planNotice(
+  plan: Pick<FleetPlanSummary, 'read_only' | 'status' | 'trial_ends_at' | 'vehicles' | 'vehicle_limit' | 'colleagues' | 'member_limit'>,
+  role: string,
+  now: Date = new Date(),
+): PlanNotice | null {
+  if (plan.read_only) return { kind: 'expired', tone: 'warning' };
+  const manages = role !== 'driver';
+  if (plan.status === 'past_due' && manages) return { kind: 'payment', tone: 'warning' };
+  const vehicles = overLimit(plan.vehicles, plan.vehicle_limit);
+  if (vehicles > 0) return { kind: 'overVehicles', tone: 'warning', over: vehicles, limit: plan.vehicle_limit ?? 0 };
+  const members = overLimit(plan.colleagues, plan.member_limit);
+  if (members > 0 && manages) return { kind: 'overMembers', tone: 'warning', over: members, limit: plan.member_limit ?? 0 };
+  const days = trialDaysLeft(plan.trial_ends_at, now);
+  if (planState(plan, now) === 'trial' && days !== null && days <= TRIAL_WARN_DAYS && manages) return { kind: 'trialEnding', tone: 'info', days };
+  return null;
+}

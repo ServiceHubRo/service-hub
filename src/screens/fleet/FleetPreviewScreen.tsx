@@ -9,7 +9,7 @@ import { SkeletonList } from '../../components/Skeleton';
 import { useI18n } from '../../i18n/context';
 import { buildReport, FLEET_ROLES, scopeFor, type FleetExpense, type FleetRole } from '../../lib/fleet';
 import { FLEET_SECTIONS, FleetContext, useFleetLocation, type FleetContextValue } from './fleetContext';
-import { FleetPlanNotice, FleetSectionBody, PlanBadge } from './FleetSections';
+import { FleetPlanNotice, FleetSectionBody } from './FleetSections';
 import { emptyFleet, SAMPLE_MEMBER_FOR_ROLE, SAMPLE_PLANS, sampleFleet, samplePlanSummary, sampleSubscription } from './sample';
 import styles from './fleet.module.css';
 
@@ -75,9 +75,6 @@ export function FleetPreviewScreen() {
             onChange={(e) => go({ section: e.target.value as typeof section })}
             options={FLEET_SECTIONS.filter((x) => x !== 'vehicul').map((x) => ({ value: x, label: t(`fleet.nav.${x}`) }))}
           />
-        </div>
-        <div className={styles.spaceTop}>
-          <PlanBadge onOpen={() => go({ section: 'abonament' })} />
         </div>
         <PageHeader
           title={title}

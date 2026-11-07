@@ -954,16 +954,6 @@ button.kpi:hover {
 }
 
 /* The plan badge above the page title; the shell holds the switch and the pages. */
-.spaceTop {
-  display: flex;
-  margin-bottom: 8px;
-}
-
-.spaceTop .planBadge {
-  width: auto;
-  max-width: 100%;
-}
-
 /* The design preview (/dev/flota, test builds): a page of its own. */
 .previewPage {
   width: 100%;
@@ -1064,47 +1054,6 @@ button.kpi:hover {
     max-width: 360px;
   }
 }
-
-/* ---------------------------------------------------------------- plan and subscription (T64a) */
-.planBadge {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  width: 100%;
-  min-height: var(--tap);
-  padding: 8px 12px;
-  text-align: left;
-  border-radius: var(--radius-button);
-  border: 1px solid var(--border);
-  background: var(--surface);
-  color: var(--text);
-  transition:
-    border-color var(--motion-quick) var(--ease),
-    background-color var(--motion-quick) var(--ease);
-}
-
-.planBadge:hover {
-  border-color: var(--border-lit);
-  background: var(--surface-hover);
-}
-
-.planBadge svg {
-  flex-shrink: 0;
-  color: var(--amber);
-}
-
-.planBadgeText {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-  font-size: 13px;
-  line-height: 1.35;
-}
-
-.planBadgeName {
-  font-weight: 650;
-}
-
 
 .meterBlock {
   display: flex;
