@@ -4248,6 +4248,7 @@ export const en: Record<MessageKey, string> = {
   'rpcError.support_email_unverified': "The account's email is not confirmed.",
   'rpcError.support_account_has_data': 'The account already has cars, bookings, conversations or companies. Use a new account.',
   // A3a — support requests
+  'admin.requests.auditLabel': 'Request',
   'support.new.bookingUnknown': 'None of your bookings has this code.',
   'support.my.title': 'My requests',
   'support.my.hint': 'Write to the Service-Hub team and follow the answers',

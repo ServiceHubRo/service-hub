@@ -75,7 +75,7 @@ function entityLink(e: AuditEntry, t: (key: MessageKey) => string) {
     case 'service':
       return toolLink(`${ADMIN_CATALOG_PATH}?q=${encodeURIComponent(e.entity_id)}`, label);
     case 'suggestion':
-      return e.entity_id ? toolLink(adminRequestPath(e.entity_id), t('admin.sugg.auditLabel')) : null;
+      return e.entity_id ? toolLink(adminRequestPath(e.entity_id), t('admin.requests.auditLabel')) : null;
     case 'export':
     case 'search':
       return null;

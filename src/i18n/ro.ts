@@ -4247,6 +4247,7 @@ export const ro = {
   'rpcError.support_email_unverified': 'Emailul contului nu este confirmat.',
   'rpcError.support_account_has_data': 'Contul are deja mașini, programări, conversații sau firme. Folosește un cont nou.',
   // A3a — support requests
+  'admin.requests.auditLabel': 'Solicitare',
   'support.new.bookingUnknown': 'Nu există o programare a ta cu acest cod.',
   'support.my.title': 'Solicitările mele',
   'support.my.hint': 'Scrie echipei Service-Hub și urmărește răspunsurile',
