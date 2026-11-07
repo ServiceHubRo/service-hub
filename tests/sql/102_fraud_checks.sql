@@ -65,8 +65,10 @@ delete from public.notification_events;
 select test.login(test.id('admin'));
 select public.admin_decide_suspect_review(current_setting('test.review')::uuid, 'remove', '', gen_random_uuid());
 select test.ok((select removed_at is not null from public.reviews where id = current_setting('test.review')::uuid), 'removed');
+select test.logout();
 select test.eq((select count(*) from public.notification_events where event = 'review_report_decided' and user_id = test.id('client_a')),
   1::bigint, 'the client is told');
+select test.login(test.id('admin'));
 select test.fails($$select public.admin_decide_suspect_review(current_setting('test.review')::uuid, 'remove', '', gen_random_uuid())$$,
   'wrong_status', 'not twice');
 select test.logout();

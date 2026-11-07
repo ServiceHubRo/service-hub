@@ -13,7 +13,7 @@ select test.fails($$select public.admin_list_clients()$$, 'not_allowed', 'nor th
 select test.fails($$select public.admin_get_client(test.id('client_b'))$$, 'not_allowed', 'nor another client');
 select test.fails($$select public.admin_list_bookings()$$, 'not_allowed', 'nor all bookings');
 select test.fails($$select public.admin_get_booking(test.id('booking_b'))$$, 'not_allowed', 'nor a booking');
-select test.fails($$select public.admin_get_thread(test.id('thread_b'))$$, 'not_allowed', 'nor a conversation');
+select test.fails($$select public.admin_get_thread(test.id('thread_b'))$$, 'does not exist', 'nor a conversation (P3: no such function)');
 select test.fails($$select public.admin_list_reviews()$$, 'not_allowed', 'nor the moderation queue');
 select test.fails($$select public.admin_list_audit()$$, 'not_allowed', 'nor the audit log');
 select test.fails($$select public.admin_verify_phone(test.id('owner2'), test.rid())$$, 'not_allowed', 'nor verify a phone');
@@ -113,15 +113,26 @@ from public.admin_list_bookings(p_limit => 1) b;
 
 select test.eq(jsonb_array_length(b->'quotes'), 1, 'the booking''s quote'),
        test.eq(jsonb_array_length(b->'quotes'->0->'items'), 2, 'with its lines'),
-       test.eq(jsonb_array_length(b->'messages'), 2, 'the conversation'),
-       test.eq((select string_agg(m->>'side', ',' order by m->>'side') from jsonb_array_elements(b->'messages') m),
-               'client,system', 'an automatic message and the client''s own'),
+       -- P3: the booking's automatic events only, never a message written by the client or the shop.
+       test.eq(jsonb_array_length(b->'events'), 1, 'the booking''s automatic event'),
+       test.eq(b->'events'->0->>'event', 'booking_confirmed', 'its event'),
+       test.ok(not (b ? 'messages') and not (b ? 'thread_id') and not (b->'events'->0 ? 'body'), 'no conversation, no text'),
        test.eq((b->'review'->>'rating')::int, 5, 'the review'),
        test.eq(b->'client'->>'email', 'ana@test.local', 'the client')
 from public.admin_get_booking(test.id('booking_a')) b;
-select test.eq(jsonb_array_length(t->'messages'), 1, 'any conversation, read-only'),
-       test.eq(t->'thread'->>'shop_name', 'Atelier Doi', 'with the shop')
-from public.admin_get_thread(test.id('thread_b')) t;
+-- P3 (Eduard, 6 Nov 2026, option A): the admin reads no conversation, through no path.
+select test.fails($$select public.admin_get_thread(test.id('thread_b'))$$, 'does not exist', 'no admin function reads a conversation');
+select test.fails($$select public.admin_thread_messages(test.id('thread_b'))$$, 'does not exist', 'nor its messages');
+select test.eq(test.count('select 1 from public.threads'), 0::bigint, 'the threads are not readable directly');
+select test.eq(test.count('select 1 from public.messages'), 0::bigint, 'nor the messages (Realtime follows the same policy)');
+select test.ok(not public.can_read_thread(test.id('thread_b')), 'can_read_thread says no for the admin');
+-- A new-message notification keeps the start of the message (its preview): not readable by the admin either.
+select test.logout();
+select public.notify_user(test.id('client_a'), 'new_message', jsonb_build_object('preview', 'Textul unui mesaj privat'), null);
+select test.ok(exists (select 1 from public.notification_events where event = 'new_message' and params->>'preview' = 'Textul unui mesaj privat'),
+  '(the preview is stored, for the delivery)');
+select test.login(test.id('admin'));
+select test.eq(test.count('select 1 from public.notification_events'), 0::bigint, 'the notifications are not readable by the admin');
 
 -- ------------------------------------------------------------------ verify a phone
 select test.logout();

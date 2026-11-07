@@ -15,7 +15,7 @@ import { NO_SHOW_FLAG } from '../../lib/admin';
 import { formatPhone } from '../../lib/validators';
 import { ConfirmPanel } from './ActionPanels';
 import { AuditList, Facts, Money, Pill, RowLink, SectionTitle, Verified } from './parts';
-import { ADMIN_CLIENTS_PATH, adminBookingPath, adminBookingsLink, adminThreadPath } from './paths';
+import { ADMIN_CLIENTS_PATH, adminBookingPath, adminBookingsLink } from './paths';
 import { useLiveData } from './useLiveData';
 import { carText, dateTime, day } from './format';
 import styles from './admin.module.css';
@@ -260,13 +260,16 @@ export function ClientDetailScreen() {
         <ul className={styles.list}>
           {c.threads.map((th) => (
             <li key={th.id}>
-              <RowLink to={adminThreadPath(th.id)}>
-                <span className={styles.rowTitle}>{th.shop_name}</span>
-                <span className={styles.rowMeta}>
-                  <span>{t('admin.client.messages', { n: th.messages })}</span>
-                  {th.last_message_at && <span>{dateTime(lang, th.last_message_at)}</span>}
+              {/* P3: the conversation's shop, size and date only; its messages are private. */}
+              <div className={styles.row}>
+                <span className={styles.rowMain}>
+                  <span className={styles.rowTitle}>{th.shop_name}</span>
+                  <span className={styles.rowMeta}>
+                    <span>{t('admin.client.messages', { n: th.messages })}</span>
+                    {th.last_message_at && <span>{dateTime(lang, th.last_message_at)}</span>}
+                  </span>
                 </span>
-              </RowLink>
+              </div>
             </li>
           ))}
         </ul>

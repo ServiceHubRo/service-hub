@@ -22,7 +22,6 @@ import { ShopsScreen } from '../../screens/admin/ShopsScreen';
 import { SubscriptionsScreen } from '../../screens/admin/SubscriptionsScreen';
 import { SuggestionsScreen } from '../../screens/admin/SuggestionsScreen';
 import { TextsScreen } from '../../screens/admin/TextsScreen';
-import { ThreadScreen } from '../../screens/admin/ThreadScreen';
 import { ZonesScreen } from '../../screens/admin/ZonesScreen';
 import { AppShell } from '../AppShell';
 import { commonRoutes } from './shared';
@@ -52,7 +51,6 @@ export default function AdminApp() {
         <Route path="service-uri/:shopId" element={<ShopDetailScreen />} />
         <Route path="clienti/:clientId" element={<ClientDetailScreen />} />
         <Route path="rezervari/:bookingId" element={<BookingDetailScreen />} />
-        <Route path="mesaje/:threadId" element={<ThreadScreen />} />
         <Route path="cont/jurnal" element={<AuditScreen />} />
         <Route path="cont/abonamente" element={<SubscriptionsScreen />} />
         <Route path="cont/rapoarte" element={<ReportsScreen />} />

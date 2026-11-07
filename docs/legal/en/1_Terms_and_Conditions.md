@@ -1,6 +1,6 @@
 # Terms and Conditions — Service-Hub
 
-**Last updated:** October 10, 2026
+**Last updated:** November 7, 2026
 
 These terms (the “Terms”) apply to your use of Service-Hub: the website and app at service-hub.ro (the “Platform”). By creating an account, you confirm that you have read and agree to them. How we use your data is described in the Privacy Policy, and what we keep in your browser in the Cookie Policy.
 
@@ -177,7 +177,7 @@ In the **Vehicle file** you see the jobs done on that car at other shops only wh
 - You can message a Shop (or a customer) only if there is at least one booking between you. There is a limit on messages per hour to prevent spam.
 - The conversation also shows automatic messages about the booking (confirmation, quote, job), each read in the reader’s language.
 - Messages are for bookings and repairs. They must not be used for advertising, harassment, or asking for card details or passwords.
-- The Platform administrator may view a conversation only when needed for support, a complaint or stopping abuse.
+- The Platform Administrator does not have access to the content of conversations. To report a message, please submit a screenshot to Support.
 
 ---
 

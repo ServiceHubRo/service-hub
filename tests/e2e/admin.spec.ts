@@ -194,7 +194,7 @@ test.describe('admin', () => {
     await shot(page, 't16a-audit', name());
   });
 
-  test('a booking: found by its code, force-canceled with a reason, conversation read-only', async ({ page }) => {
+  test('a booking: found by its code, force-canceled with a reason; its history without private messages (P3)', async ({ page }) => {
     const { email: shop, shopId } = await createBookableShop(`Atelier Anulare ${tag()}`, ['ulei']);
     const client = await createUser('client');
     const at = await freeSlot(client, shopId);
@@ -208,6 +208,10 @@ test.describe('admin', () => {
       p_save_car: false,
     });
     await rpcAs(shop, 'confirm_booking', { p_booking_id: booking.id, p_request_id: rid() });
+    // A private message of the client: never shown to the admin (P3).
+    const [thread] = await serviceRest<{ id: string }[]>(`threads?shop_id=eq.${shopId}&select=id`, 'GET');
+    const secret = `Mesaj privat ${tag()}`;
+    await rpcAs(client, 'send_message', { p_thread_id: thread!.id, p_body: secret, p_request_id: rid() });
 
     await signInAdmin(page);
     await navLink(page, /^Rezervări/).click();
@@ -215,7 +219,8 @@ test.describe('admin', () => {
     await expect(page.getByText('Afișate 1 din 1')).toBeVisible();
     await page.getByRole('link', { name: new RegExp(booking.ref) }).click();
     await expect(page.getByRole('heading', { level: 1, name: /Schimb ulei/ })).toBeVisible();
-    await expect(page.getByRole('heading', { level: 2, name: 'Conversația' })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 2, name: 'Istoricul programării' })).toBeVisible();
+    await expect(page.getByText(secret)).toHaveCount(0);
 
     await page.getByRole('button', { name: 'Anulează rezervarea' }).click();
     await page.getByLabel('Motivul anulării').fill('Service închis temporar');
@@ -229,11 +234,12 @@ test.describe('admin', () => {
     await expectNoHorizontalScroll(page);
     await shot(page, 't16a-booking', name());
 
-    await page.getByRole('link', { name: 'Deschide conversația' }).click();
-    await expect(page.getByText('Doar citire.')).toBeVisible();
+    // The automatic events stay (the cancel is one of them); no link to the conversation, no route for it.
     await expect(page.getByText(`Programarea ${booking.ref} a fost anulată de echipa Service-Hub.`)).toBeVisible();
-    await expect(page.getByRole('textbox')).toHaveCount(0);
-    await shot(page, 't16a-thread', name());
+    await expect(page.getByText(secret)).toHaveCount(0);
+    await expect(page.getByRole('link', { name: 'Deschide conversația' })).toHaveCount(0);
+    await page.goto(`/admin/mesaje/${thread!.id}`);
+    await expect(page.getByText(secret)).toHaveCount(0);
   });
 
   test('moderation: a reported review is removed and leaves the average', async ({ page }) => {

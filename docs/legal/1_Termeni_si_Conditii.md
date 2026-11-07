@@ -1,6 +1,6 @@
 # Termeni și condiții — Service-Hub
 
-**Ultima actualizare:** 10 octombrie 2026
+**Ultima actualizare:** 7 noiembrie 2026
 
 Acești termeni („Termenii”) se aplică folosirii Service-Hub: site-ul și aplicația de la adresa service-hub.ro („Platforma”). Când îți faci cont, confirmi că i-ai citit și că ești de acord cu ei. Cum folosim datele tale scrie în Politica de confidențialitate, iar ce păstrăm în browser, în Politica de cookies.
 
@@ -177,7 +177,7 @@ Pentru datele pe care le primiți despre clienți (nume, telefon, mașină, note
 - Poți trimite mesaje unui Service (sau unui client) doar dacă există cel puțin o programare între voi. Există o limită de mesaje pe oră, ca să nu se trimită spam.
 - În conversație apar și mesaje automate despre programare (confirmare, deviz, lucrare), fiecare citit în limba celui care îl citește.
 - Mesajele sunt pentru programări și reparații. Nu se folosesc pentru reclame, pentru hărțuire sau pentru a cere date de card sau parole.
-- Administratorul Platformei poate vedea o conversație doar când este nevoie pentru suport, pentru o sesizare sau pentru a opri un abuz.
+- Administratorul Platformei nu are acces la conținutul conversațiilor. Pentru o sesizare despre un mesaj, trimite o captură de ecran la suport.
 
 ---
 

@@ -18,9 +18,9 @@ import { NO_SHOW_FLAG } from '../../lib/admin';
 import { isActiveStatus } from '../../lib/status';
 import { formatPhone } from '../../lib/validators';
 import { ConfirmPanel } from './ActionPanels';
-import { Conversation } from './Conversation';
+import { BookingEvents } from './BookingEvents';
 import { AuditList, Facts, Money, Pill, SectionTitle } from './parts';
-import { ADMIN_BOOKINGS_PATH, adminClientPath, adminShopPath, adminThreadPath } from './paths';
+import { ADMIN_BOOKINGS_PATH, adminClientPath, adminShopPath } from './paths';
 import { useLiveData } from './useLiveData';
 import { carText, dateTime, day } from './format';
 import styles from './admin.module.css';
@@ -233,13 +233,8 @@ export function BookingDetailScreen() {
         </>
       )}
 
-      <SectionTitle>{t('admin.booking.conversation')}</SectionTitle>
-      <Conversation messages={d.messages} shopName={d.shop?.name ?? ''} clientName={clientName} />
-      {d.thread_id && (
-        <Link to={adminThreadPath(d.thread_id)} className={styles.link}>
-          {t('admin.booking.openThread')}
-        </Link>
-      )}
+      <SectionTitle>{t('admin.booking.events')}</SectionTitle>
+      <BookingEvents events={d.events} />
 
       <SectionTitle>{t('admin.audit.title')}</SectionTitle>
       <AuditList entries={d.audit} />

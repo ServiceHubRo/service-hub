@@ -1612,3 +1612,20 @@ Aprobate de Eduard pe 6 nov („aprob T71–T75”; T71 era deja folosit, așa c
 - Teste: `tests/unit/fleetPlanNotice.test.ts`, `tests/e2e/fleet-space.spec.ts` (fără insignă, avertismentul în ultima săptămână, linkul spre abonament).
 
 - [x] Făcut
+
+### P3 — Adminul nu mai citește conversațiile private (varianta A) ✅
+- Decizia lui Eduard, 6 nov: accesul adminului la conversațiile client–service e scos complet. S-au eliminat:
+  - ramura de admin din regula `threads_select` și din `can_read_thread` (deci și din mesaje și din Realtime);
+  - funcțiile `admin_get_thread` și `admin_thread_messages`;
+  - citirea directă a tabelului `notification_events` (notificarea „mesaj nou” păstrează începutul mesajului; niciun ecran nu citea tabelul);
+  - ecranul `admin/mesaje/:id` și linkurile spre el.
+- Verificat că nu mai rămâne altă cale: funcțiile care citesc `messages` sunt doar ale clientului și ale service-ului (`list_threads`, `send_message`, exportul propriilor date) și fișa clientului (doar numărul de mesaje); Edge Functions nu citesc mesajele; conversațiile nu au fișiere atașate.
+- Rămân pentru reclamații:
+  - în fișa clientului, conversațiile doar ca listă: service-ul, numărul de mesaje și data ultimului mesaj, fără conținut;
+  - în fișa programării, „Istoricul programării”: doar evenimentele automate (confirmată, deviz trimis, anulată…), niciun mesaj scris de client sau de service.
+- Migrarea `admin_no_private_messages` (schema 108), cu rollback testat. Clienții și service-urile au exact accesul de dinainte. Nicio dată nu a fost modificată.
+- Termeni și condiții (RO și EN), aprobat de Eduard pe 7 nov: „Administratorul Platformei nu are acces la conținutul conversațiilor. Pentru o sesizare despre un mesaj, trimite o captură de ecran la suport.” Data actualizării 7 noiembrie 2026, `TERMS_VERSION` = `2026-11-07` (conturile noi o înregistrează; nu se cere reacceptarea, aplicația nici nu are un asemenea pas).
+- Reclamațiile despre mesaje: prin capturi de ecran în Solicitări (P5), cu condițiile lui Eduard: bucket privat, acces doar pentru cine rezolvă solicitarea, jurnal al accesărilor, avertisment să fie scoase datele personale inutile, retenție și ștergere stabilite; o captură nu deschide conversația.
+- Teste: `tests/sql/80_admin.sql` (nicio cale nu mai dă conversații adminului), `tests/e2e/admin.spec.ts`.
+
+- [x] Făcut
