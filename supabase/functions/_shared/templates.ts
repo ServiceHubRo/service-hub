@@ -66,6 +66,8 @@ export const BILLING_PATH = '/s/cont/setari/facturare';
 
 /** The owner's Rapoarte (T17): where the monthly report (T24) leads. */
 export const SHOP_REPORTS_PATH = '/s/cont/rapoarte';
+/** Solicitările mele (A3a), as in src/screens/account/paths.ts. */
+export const SUPPORT_REQUESTS_PATHS = { client: '/c/cont/ajutor/solicitari', shop: '/s/cont/ajutor/solicitari' } as const;
 
 export const TEMPLATES: Record<Lang, Record<string, Text>> = {
   ro: {
@@ -399,6 +401,11 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
       title: 'Cont reactivat',
       body: 'Contul tău Service-Hub este din nou activ. Poți face programări ca înainte.',
     },
+    // A3a: the team answered a support request (the answer itself stays in the app).
+    'client.support_reply': { title: BRAND, body: 'Echipa Service-Hub a răspuns la solicitarea „{request}”.' },
+    'client.support_resolved': { title: BRAND, body: 'Solicitarea „{request}” este rezolvată.' },
+    'shop.support_reply': { title: BRAND, body: 'Echipa Service-Hub a răspuns la solicitarea „{request}”.' },
+    'shop.support_resolved': { title: BRAND, body: 'Solicitarea „{request}” este rezolvată.' },
   },
   en: {
     // ------------------------------------------------------------------ to the client
@@ -729,6 +736,10 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
       title: 'Account reactivated',
       body: 'Your Service-Hub account is active again. You can book as before.',
     },
+    'client.support_reply': { title: BRAND, body: 'The Service-Hub team answered your request "{request}".' },
+    'client.support_resolved': { title: BRAND, body: 'Your request "{request}" is resolved.' },
+    'shop.support_reply': { title: BRAND, body: 'The Service-Hub team answered your request "{request}".' },
+    'shop.support_resolved': { title: BRAND, body: 'Your request "{request}" is resolved.' },
   },
 };
 
@@ -815,6 +826,7 @@ export const EVENTS: Record<Side, readonly string[]> = {
     'slot_freed',
     'fleet_quote_waiting', 'fleet_quote_decided', 'fleet_quote_changes', 'fleet_booking_changed', 'fleet_booking_cancelled',
     'fleet_issue_reported', 'fleet_expense_to_check', 'fleet_doc_expiring', 'fleet_maintenance_due',
+    'support_reply', 'support_resolved',
   ],
   shop: [
     'booking_requested', 'booking_auto_confirmed', 'booking_cancelled_client', 'booking_cancelled_admin', 'intake_confirmed', 'quote_accepted',
@@ -822,7 +834,7 @@ export const EVENTS: Record<Side, readonly string[]> = {
     'daily_digest', 'trial_ending', 'payment_failed', 'shop_inactive', 'review_report_decided', 'account_suspended',
     'account_reactivated', 'referral_reward', 'referral_revoked', 'booking_request_waiting', 'booking_request_last_call', 'monthly_report',
     'company_problem', 'company_name_mismatch', 'company_hidden', 'company_ok', 'request_expired', 'booking_followup',
-    'booking_auto_closed',
+    'booking_auto_closed', 'support_reply', 'support_resolved',
   ],
 };
 
@@ -957,6 +969,8 @@ function vars(e: NotificationEvent, lang: Lang, side: Side, now: Date): Record<s
     company: str(p.company_name) || BRAND,
     plate: plate || car,
     issue: str(p.title),
+    // A3a: a support request's title (the author's own words), short enough for a notification.
+    request: clip(str(p.title), 60),
     amount: money(p.amount),
     maint: str(p.kind) === 'custom' ? str(p.label) : (WORDS[lang][`maint.${str(p.kind)}`] ?? str(p.label)),
   };
@@ -1074,6 +1088,10 @@ export function urlFor(side: Side, e: NotificationEvent): string {
       return `${base}?${q({ sectiune: 'programari' })}`;
     }
     switch (e.event) {
+      // A3a: the request, in Cont → Ajutor și contact → Solicitările mele.
+      case 'support_reply':
+      case 'support_resolved':
+        return str(p.request_id) ? `${SUPPORT_REQUESTS_PATHS.client}/${str(p.request_id)}` : SUPPORT_REQUESTS_PATHS.client;
       case 'new_message':
         return str(p.thread_id) ? `/c/mesaje/${str(p.thread_id)}` : '/c/mesaje';
       case 'doc_expiry':
@@ -1119,6 +1137,9 @@ export function urlFor(side: Side, e: NotificationEvent): string {
     }
   }
   switch (e.event) {
+    case 'support_reply':
+    case 'support_resolved':
+      return str(p.request_id) ? `${SUPPORT_REQUESTS_PATHS.shop}/${str(p.request_id)}` : SUPPORT_REQUESTS_PATHS.shop;
     case 'new_message':
       return str(p.thread_id) ? `/s/mesaje/${str(p.thread_id)}` : '/s/mesaje';
     case 'new_review':
@@ -1167,6 +1188,9 @@ function tagFor(e: NotificationEvent): string {
   switch (e.event) {
     case 'new_message':
       return `thread-${str(p.thread_id)}`;
+    case 'support_reply':
+    case 'support_resolved':
+      return `support-${str(p.request_id)}`;
     case 'doc_expiry':
       return `car-${str(p.car_id)}-${str(p.doc)}`;
     case 'daily_digest':

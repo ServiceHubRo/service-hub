@@ -5,6 +5,20 @@ export function helpPath(role: Role): string {
   return `${NAV[role].account.path}/ajutor`;
 }
 
+/** Cont → Ajutor și contact → Solicitările mele (A3a): `/c/cont/ajutor/solicitari`. */
+export function requestsPath(role: Role): string {
+  return `${helpPath(role)}/solicitari`;
+}
+
+/** A new request; `?categorie=` picks the category. */
+export function newRequestPath(role: Role): string {
+  return `${requestsPath(role)}/noua`;
+}
+
+export function requestPath(role: Role, id: string): string {
+  return `${requestsPath(role)}/${id}`;
+}
+
 /** Cont → Sugestii (T26): `/c/cont/sugestii`, `/s/cont/sugestii`. */
 export function suggestionsPath(role: Role): string {
   return `${NAV[role].account.path}/sugestii`;

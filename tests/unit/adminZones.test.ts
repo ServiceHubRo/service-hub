@@ -37,7 +37,8 @@ describe('the admin addresses from before A1', () => {
       expect(legacyAdminPath(old)).toBe(now);
       expect(adminZoneOf(now)).toBeDefined();
     }
-    expect(ADMIN_LEGACY_ROUTES.length).toBe(19);
+    // 19 at A1, plus Sugestii → Solicitări (A3a).
+    expect(ADMIN_LEGACY_ROUTES.length).toBe(20);
   });
 
   it('fișe keep their ID, exactly as written (encoded characters included)', () => {

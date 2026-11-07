@@ -39,7 +39,7 @@ import {
   ADMIN_SETTINGS_PATH,
   ADMIN_SHOPS_PATH,
   ADMIN_SUBSCRIPTIONS_PATH,
-  ADMIN_SUGGESTIONS_PATH,
+  ADMIN_REQUESTS_PATH,
   ADMIN_SUPPORT_PATH,
   ADMIN_TEAM_PATH,
   ADMIN_TEXTS_PATH,
@@ -50,8 +50,9 @@ import { SettingsScreen } from '../../screens/admin/SettingsScreen';
 import { ShopDetailScreen } from '../../screens/admin/ShopDetailScreen';
 import { ShopsScreen } from '../../screens/admin/ShopsScreen';
 import { SubscriptionsScreen } from '../../screens/admin/SubscriptionsScreen';
-import { SuggestionsScreen } from '../../screens/admin/SuggestionsScreen';
 import { TeamScreen } from '../../screens/admin/TeamScreen';
+import { InboxScreen } from '../../screens/requests/InboxScreen';
+import { RequestScreen } from '../../screens/requests/RequestScreen';
 import { TextsScreen } from '../../screens/admin/TextsScreen';
 import { ZoneScreen } from '../../screens/admin/ZoneScreen';
 import { ZonesScreen } from '../../screens/admin/ZonesScreen';
@@ -104,7 +105,8 @@ export default function AdminApp() {
         <Route path={at(ADMIN_REPORTS_PATH)} element={<ReportsScreen />} />
         <Route path={at(ADMIN_EXPORT_PATH)} element={<ExportScreen />} />
         {/* Suport */}
-        <Route path={at(ADMIN_SUGGESTIONS_PATH)} element={<SuggestionsScreen />} />
+        <Route path={at(ADMIN_REQUESTS_PATH)} element={<InboxScreen mode="admin" />} />
+        <Route path={`${at(ADMIN_REQUESTS_PATH)}/:requestId`} element={<RequestScreen mode="admin" />} />
         {/* Platformă */}
         <Route path={at(ADMIN_SETTINGS_PATH)} element={<SettingsScreen />} />
         <Route path={at(ADMIN_TEXTS_PATH)} element={<TextsScreen />} />

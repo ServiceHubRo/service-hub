@@ -111,7 +111,7 @@ const FUNCTIONS = (page: Page): Fn[] => [
       await expect(main(page).getByRole('button', { name: 'Descarcă tot' }).first()).toBeVisible();
     },
   },
-  { zone: 'Suport', item: 'Sugestii', path: '/admin/suport/sugestii', title: 'Sugestii' },
+  { zone: 'Suport', item: 'Solicitări', path: '/admin/suport/solicitari', title: 'Solicitări' },
   {
     zone: 'Platformă',
     item: 'Setări platformă',
@@ -330,7 +330,8 @@ test.describe('A1 — admin navigation', () => {
       ['/admin/cont/abonamente', '/admin/activitate/abonamente'],
       ['/admin/cont/rapoarte', '/admin/activitate/rapoarte'],
       ['/admin/cont/export', '/admin/activitate/export'],
-      ['/admin/cont/sugestii', '/admin/suport/sugestii'],
+      ['/admin/cont/sugestii', '/admin/suport/solicitari'],
+      ['/admin/suport/sugestii', '/admin/suport/solicitari'],
       ['/admin/cont/setari/texte', '/admin/platforma/texte'],
       ['/admin/cont/setari', '/admin/platforma/setari'],
       ['/admin/cont/anunturi', '/admin/platforma/anunturi'],
@@ -420,7 +421,7 @@ test.describe('A1 — admin navigation', () => {
     await expect(page.getByLabel('Limba')).toBeVisible();
     await expect(main(page).getByRole('link', { name: /^Termeni și condiții/ })).toBeVisible();
     // No tool tile any more: they live in the zones.
-    for (const tool of ['Abonamente și plăți', 'Jurnal de audit', 'Setări platformă', 'Sugestii', 'Export']) {
+    for (const tool of ['Abonamente și plăți', 'Jurnal de audit', 'Setări platformă', 'Solicitări', 'Export']) {
       await expect(main(page).getByRole('link', { name: new RegExp(`^${tool}`) })).toHaveCount(0);
     }
     await shot(page, 'a1-account', name());

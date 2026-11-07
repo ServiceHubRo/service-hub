@@ -30,8 +30,9 @@ export const ADMIN_REPORTS_PATH = `${ADMIN_ACTIVITY_PATH}/rapoarte`;
 export const ADMIN_EXPORT_PATH = `${ADMIN_ACTIVITY_PATH}/export`;
 
 // Suport
-/** Sugestii (T26): ideas from clients and shops. */
-export const ADMIN_SUGGESTIONS_PATH = `${ADMIN_SUPPORT_PATH}/sugestii`;
+/** Solicitări (A3a): the support requests, the suggestions (T26) among them, and the escalations. */
+export const ADMIN_REQUESTS_PATH = `${ADMIN_SUPPORT_PATH}/solicitari`;
+export const adminRequestPath = (id: string) => `${ADMIN_REQUESTS_PATH}/${id}`;
 
 // Platformă
 export const ADMIN_SETTINGS_PATH = `${ADMIN_PLATFORM_PATH}/setari`;
@@ -75,7 +76,9 @@ export const ADMIN_LEGACY_ROUTES: readonly (readonly [old: string, now: string])
   ['/admin/cont/abonamente', ADMIN_SUBSCRIPTIONS_PATH],
   ['/admin/cont/rapoarte', ADMIN_REPORTS_PATH],
   ['/admin/cont/export', ADMIN_EXPORT_PATH],
-  ['/admin/cont/sugestii', ADMIN_SUGGESTIONS_PATH],
+  ['/admin/cont/sugestii', ADMIN_REQUESTS_PATH],
+  // A3a: Sugestii became Solicitări.
+  ['/admin/suport/sugestii', ADMIN_REQUESTS_PATH],
   ['/admin/cont/setari/texte', ADMIN_TEXTS_PATH],
   ['/admin/cont/setari', ADMIN_SETTINGS_PATH],
   ['/admin/cont/anunturi', ADMIN_NOTICES_PATH],

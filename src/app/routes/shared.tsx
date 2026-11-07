@@ -2,7 +2,10 @@ import type { ReactElement } from 'react';
 import { Navigate, Route } from 'react-router-dom';
 import { AccountScreen } from '../../screens/account/AccountScreen';
 import { HelpScreen } from '../../screens/account/HelpScreen';
-import { helpPath, suggestionsPath } from '../../screens/account/paths';
+import { helpPath, newRequestPath, requestsPath, suggestionsPath } from '../../screens/account/paths';
+import { MyRequestScreen } from '../../screens/requests/MyRequestScreen';
+import { MyRequestsScreen } from '../../screens/requests/MyRequestsScreen';
+import { NewRequestScreen } from '../../screens/requests/NewRequestScreen';
 import { AccountLegal } from '../../screens/legal/LegalPages';
 import { BookingThreadRedirect } from '../../screens/messages/BookingThreadRedirect';
 import { ConversationScreen } from '../../screens/messages/ConversationScreen';
@@ -38,6 +41,10 @@ export function commonRoutes(role: Role, screens: Record<string, ReactElement>) 
       <Route path={`${rel(role, nav.account.path)}/legal/:doc`} element={<AccountLegal role={role} />} />
       {!isStaff(role) && <Route path={rel(role, helpPath(role))} element={<HelpScreen role={role} />} />}
       {!isStaff(role) && <Route path={rel(role, suggestionsPath(role))} element={<SuggestionsScreen role={role} />} />}
+      {/* A3a: Cont → Ajutor și contact → Solicitările mele. */}
+      {!isStaff(role) && <Route path={rel(role, requestsPath(role))} element={<MyRequestsScreen role={role} />} />}
+      {!isStaff(role) && <Route path={rel(role, newRequestPath(role))} element={<NewRequestScreen role={role} />} />}
+      {!isStaff(role) && <Route path={`${rel(role, requestsPath(role))}/:requestId`} element={<MyRequestScreen role={role} />} />}
       <Route path="*" element={<NotFound inShell />} />
     </>
   );

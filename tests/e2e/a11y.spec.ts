@@ -83,6 +83,8 @@ for (const lang of ['ro', 'en'] as const) {
       '/c/cont/istoric',
       '/c/cont/rapoarte',
       '/c/cont/sugestii',
+      '/c/cont/ajutor/solicitari',
+      '/c/cont/ajutor/solicitari/noua',
       '/c/cont/legal/termeni',
       '/c/nu-exista',
     ]);
@@ -114,6 +116,8 @@ for (const lang of ['ro', 'en'] as const) {
       '/s/cont/abonament',
       '/s/cont/rapoarte',
       '/s/cont/sugestii',
+      '/s/cont/ajutor/solicitari',
+      '/s/cont/ajutor/solicitari/noua',
     ]);
   });
 
@@ -142,7 +146,7 @@ for (const lang of ['ro', 'en'] as const) {
       '/admin/activitate/rapoarte',
       '/admin/activitate/export',
       '/admin/suport',
-      '/admin/suport/sugestii',
+      '/admin/suport/solicitari',
       '/admin/platforma',
       '/admin/platforma/setari',
       '/admin/platforma/texte',

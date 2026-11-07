@@ -13,7 +13,7 @@ import { useI18n } from '../../i18n/context';
 import type { MessageKey } from '../../i18n/ro';
 import { useLoad } from '../../lib/useLoad';
 import { AuditList } from './parts';
-import { ADMIN_AUDIT_PATH, ADMIN_TEAM_PATH, ADMIN_CATALOG_PATH, ADMIN_MODERATION_PATH, ADMIN_NOTICES_PATH, ADMIN_REPORTS_PATH, ADMIN_SUGGESTIONS_PATH, ADMIN_TEXTS_PATH, adminBookingPath, adminClientPath, adminShopPath } from './paths';
+import { ADMIN_AUDIT_PATH, ADMIN_TEAM_PATH, ADMIN_CATALOG_PATH, ADMIN_MODERATION_PATH, ADMIN_NOTICES_PATH, ADMIN_REPORTS_PATH, adminRequestPath, ADMIN_TEXTS_PATH, adminBookingPath, adminClientPath, adminShopPath } from './paths';
 import styles from './admin.module.css';
 
 /** „‹ Înapoi” goes to the screen's zone (A1). */
@@ -75,7 +75,7 @@ function entityLink(e: AuditEntry, t: (key: MessageKey) => string) {
     case 'service':
       return toolLink(`${ADMIN_CATALOG_PATH}?q=${encodeURIComponent(e.entity_id)}`, label);
     case 'suggestion':
-      return toolLink(ADMIN_SUGGESTIONS_PATH, t('admin.sugg.auditLabel'));
+      return e.entity_id ? toolLink(adminRequestPath(e.entity_id), t('admin.sugg.auditLabel')) : null;
     case 'export':
     case 'search':
       return null;

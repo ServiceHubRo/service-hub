@@ -151,7 +151,7 @@ begin
 end
 $$;
 select test.eq(test.count('select * from public.profiles'), 1::bigint, 'of the profiles, only its own');
-select test.eq(test.count('select * from public.suggestions'), 0::bigint, 'no suggestion row directly (only through support_*)');
+select test.eq(test.count('select id from public.suggestions'), 0::bigint, 'no suggestion row directly (only through support_*)');
 select test.eq(test.count('select * from public.list_threads()'), 0::bigint, 'no conversation through the inbox');
 select test.eq(jsonb_array_length(public.my_companies()), 0, 'no company');
 

@@ -5,5 +5,8 @@
 export const SUPPORT_REQUESTS_PATH = '/suport/solicitari';
 export const SUPPORT_SEARCH_PATH = '/suport/cautare';
 
+/** One request (A3a). */
+export const supportRequestPath = (id: string) => `${SUPPORT_REQUESTS_PATH}/${id}`;
+
 /** One account's card, reached from a search or a request. */
 export const supportAccountPath = (id: string) => `${SUPPORT_SEARCH_PATH}/${id}`;

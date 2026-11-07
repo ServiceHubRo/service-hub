@@ -104,6 +104,7 @@ function valueText(t: (key: MessageKey) => string, lang: Lang, key: string, valu
     if (booking in ro) return t(booking as MessageKey);
   }
   if (key === 'role' && `account.kind.${String(value)}` in ro) return t(`account.kind.${String(value)}` as MessageKey);
+  if (key === 'request_status' && `support.staffStatus.${String(value)}` in ro) return t(`support.staffStatus.${String(value)}` as MessageKey);
   if (key === 'suggestion_status') return t((value === 'new' ? 'admin.sugg.status.new' : `sugg.status.${String(value)}`) as MessageKey);
   if (key === 'report_status' && `admin.reportStatus.${String(value)}` in ro) return t(`admin.reportStatus.${String(value)}` as MessageKey);
   if (key === 'mode' && `admin.deleteMode.${String(value)}` in ro) return t(`admin.deleteMode.${String(value)}` as MessageKey);
