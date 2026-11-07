@@ -68,7 +68,7 @@ for (const [role, email, prefix] of [
 
 test('admin: no Ajutor și contact (the admin is the team)', async ({ page }) => {
   await signIn(page, SEED.admin, SEED_PASSWORD);
-  await expect(page).toHaveURL(/\/admin\/prezentare$/);
+  await expect(page).toHaveURL(/\/admin\/panou$/);
   await openAccount(page);
   await expect(page.getByRole('link', { name: /Ajutor și contact/ })).toHaveCount(0);
   await expect(page.getByRole('link', { name: /^ANPC/ })).toHaveCount(0);

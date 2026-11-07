@@ -1,4 +1,4 @@
-import { Bell, BellOff, Building2, Copy, CreditCard, Download, FileCheck, FileText, Heart, Landmark, History, LifeBuoy, Lightbulb, ListTree, MapPinned, Megaphone, QrCode, ScrollText, Settings, SlidersHorizontal, Star, Truck } from 'lucide-react';
+import { Bell, Building2, FileCheck, FileText, Heart, History, LifeBuoy, Lightbulb, QrCode, Settings, Star, Truck } from 'lucide-react';
 import { useCallback, useRef, useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import type { ShellOutletContext } from '../../app/AppShell';
@@ -15,21 +15,6 @@ import { useI18n } from '../../i18n/context';
 import type { MessageKey } from '../../i18n/ro';
 import type { Lang } from '../../i18n/translate';
 import { LEGAL_DOCS } from '../../lib/legal';
-import {
-  ADMIN_AUDIT_PATH,
-  ADMIN_CATALOG_PATH,
-  ADMIN_ANAF_PATH,
-  ADMIN_ZONES_PATH,
-  ADMIN_EXPORT_PATH,
-  ADMIN_NOTICES_PATH,
-  ADMIN_REPORTS_PATH,
-  ADMIN_SETTINGS_PATH,
-  ADMIN_SUBSCRIPTIONS_PATH,
-  ADMIN_DUPLICATES_PATH,
-  ADMIN_FLEET_FAILED_PATH,
-  ADMIN_FLEETS_PATH,
-  ADMIN_SUGGESTIONS_PATH,
-} from '../admin/paths';
 import { FAVORITES_PATH, MY_REPORTS_PATH, VEHICLE_HISTORY_PICK_PATH } from '../client/paths';
 import { REVIEWS_PATH, SHOP_LINK_PATH } from '../shop/paths';
 import { SETTINGS_PATH } from '../shop/settings/paths';
@@ -55,8 +40,8 @@ const SUBTITLE: Record<Role, MessageKey> = {
 /**
  * Cont, the part every role shares (P13b): identity, language, push notifications on this device
  * (clients and shops, T12), email and password, legal documents, my data, log out. Clients also get Locație, Favorite (T06), "Istoricul mașinilor
- * mele" (T10), "Rapoartele mele" (T15) and "Invită un prieten" (T35); shops get the Setări and Recenzii tiles, and the owner Abonament (T14) and Rapoarte (T17); the admin gets the platform tools (T16b) and the audit log
- * (T16a).
+ * mele" (T10), "Rapoartele mele" (T15) and "Invită un prieten" (T35); shops get the Setări and Recenzii tiles, and the owner Abonament (T14) and Rapoarte (T17). The admin's platform tools
+ * (T16b) and the audit log (T16a) are in its five zones since A1 (src/app/adminZones.ts).
  */
 export function AccountScreen({ role }: { role: Role }) {
   const { t } = useI18n();
@@ -92,47 +77,33 @@ export function AccountScreen({ role }: { role: Role }) {
         <LanguagePreference />
       </Section>
 
-      <Section title={t('account.sec.tools')}>
-        {role === 'client' && (
-          <>
+      {/* The admin's tools live in its five zones since A1; its Cont is its own account. */}
+      {role !== 'admin' && (
+        <Section title={t('account.sec.tools')}>
+          {role === 'client' && (
+            <>
+              <div className={styles.tiles} data-layout="tiles">
+                <NotificationsTile role="client" />
+                <Tile to={VEHICLE_HISTORY_PICK_PATH} icon={History} label={t('vh.title')} hint={t('vh.tileHint')} />
+                <Tile to={MY_REPORTS_PATH} icon={FileCheck} label={t('reports.title')} hint={t('reports.tileHint')} />
+                <Tile to={FAVORITES_PATH} icon={Heart} label={t('favorites.title')} hint={t('favorites.hint')} />
+                <Tile to={COMPANY_PATH} icon={Building2} label={t('co.title')} hint={t('co.tileHint')} />
+                <CompaniesTile />
+              </div>
+              <InviteCard />
+            </>
+          )}
+          {role === 'shop' && (
             <div className={styles.tiles} data-layout="tiles">
-              <NotificationsTile role="client" />
-              <Tile to={VEHICLE_HISTORY_PICK_PATH} icon={History} label={t('vh.title')} hint={t('vh.tileHint')} />
-              <Tile to={MY_REPORTS_PATH} icon={FileCheck} label={t('reports.title')} hint={t('reports.tileHint')} />
-              <Tile to={FAVORITES_PATH} icon={Heart} label={t('favorites.title')} hint={t('favorites.hint')} />
-              <Tile to={COMPANY_PATH} icon={Building2} label={t('co.title')} hint={t('co.tileHint')} />
-              <CompaniesTile />
+              <NotificationsTile role="shop" />
+              <Tile to={SETTINGS_PATH} icon={Settings} label={t('account.tile.settings')} />
+              <Tile to={REVIEWS_PATH} icon={Star} label={t('reviews.title')} />
+              <Tile to={SHOP_LINK_PATH} icon={QrCode} label={t('slk.title')} hint={t('slk.tileHint')} />
+              <OwnerTiles />
             </div>
-            <InviteCard />
-          </>
-        )}
-        {role === 'shop' && (
-          <div className={styles.tiles} data-layout="tiles">
-            <NotificationsTile role="shop" />
-            <Tile to={SETTINGS_PATH} icon={Settings} label={t('account.tile.settings')} />
-            <Tile to={REVIEWS_PATH} icon={Star} label={t('reviews.title')} />
-            <Tile to={SHOP_LINK_PATH} icon={QrCode} label={t('slk.title')} hint={t('slk.tileHint')} />
-            <OwnerTiles />
-          </div>
-        )}
-        {role === 'admin' && (
-          <div className={styles.tiles} data-layout="tiles">
-            <Tile to={ADMIN_SUBSCRIPTIONS_PATH} icon={CreditCard} label={t('admin.subs.title')} hint={t('admin.subs.tileHint')} />
-            <Tile to={ADMIN_FLEETS_PATH} icon={Truck} label={t('admin.fleets.title')} hint={t('admin.fleets.tileHint')} />
-            <Tile to={ADMIN_DUPLICATES_PATH} icon={Copy} label={t('admin.dup.tile')} hint={t('admin.dup.tileHint')} />
-            <Tile to={ADMIN_FLEET_FAILED_PATH} icon={BellOff} label={t('admin.fleetFailed.title')} hint={t('admin.fleetFailed.tileHint')} />
-            <Tile to={ADMIN_REPORTS_PATH} icon={FileCheck} label={t('admin.reports.title')} hint={t('admin.reports.tileHint')} />
-            <Tile to={ADMIN_CATALOG_PATH} icon={ListTree} label={t('admin.catalog.title')} hint={t('admin.catalog.tileHint')} />
-            <Tile to={ADMIN_SETTINGS_PATH} icon={SlidersHorizontal} label={t('admin.settings.title')} hint={t('admin.settings.tileHint')} />
-            <Tile to={ADMIN_NOTICES_PATH} icon={Megaphone} label={t('admin.notices.title')} hint={t('admin.notices.tileHint')} />
-            <Tile to={ADMIN_ZONES_PATH} icon={MapPinned} label={t('admin.areas.title')} hint={t('admin.areas.tileHint')} />
-            <Tile to={ADMIN_SUGGESTIONS_PATH} icon={Lightbulb} label={t('admin.sugg.title')} hint={t('admin.sugg.tileHint')} />
-            <Tile to={ADMIN_ANAF_PATH} icon={Landmark} label={t('anaf.title')} hint={t('anaf.tileHint')} />
-            <Tile to={ADMIN_EXPORT_PATH} icon={Download} label={t('admin.export.title')} hint={t('admin.export.tileHint')} />
-            <Tile to={ADMIN_AUDIT_PATH} icon={ScrollText} label={t('admin.audit.title')} hint={t('admin.audit.tileHint')} />
-          </div>
-        )}
-      </Section>
+          )}
+        </Section>
+      )}
 
       <SecuritySection />
 

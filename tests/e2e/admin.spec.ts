@@ -7,7 +7,8 @@ import {
   createBookableShop,
   createUser,
   expectNoHorizontalScroll,
-  openAccount,
+  adminOpen,
+  adminZoneLink,
   rpcAs,
   serviceRest,
   shot,
@@ -80,7 +81,7 @@ test.describe('admin', () => {
     await expectNoHorizontalScroll(page);
     await shot(page, 't16a-overview', name());
 
-    await navLink(page, 'Service-uri').click();
+    await adminOpen(page, 'Parteneri', 'Service-uri');
     await expect(page.getByRole('heading', { level: 1, name: 'Service-uri' })).toBeVisible();
     await page.getByLabel('Caută după nume, oraș, email, telefon sau S-00001').fill(shopName);
     await expect(page.getByRole('link', { name: new RegExp(shopName) })).toHaveCount(1);
@@ -91,18 +92,18 @@ test.describe('admin', () => {
     await expectNoHorizontalScroll(page);
     await shot(page, 't16a-shops', name());
 
-    await navLink(page, /^Clienți/).click();
+    await adminOpen(page, 'Parteneri', 'Clienți');
     await expect(page.getByRole('heading', { level: 1, name: 'Clienți' })).toBeVisible();
     await expect(page.getByText('client@service-hub.test')).toBeVisible();
     await shot(page, 't16a-clients', name());
 
-    await navLink(page, /^Rezervări/).click();
-    await expect(page.getByRole('heading', { level: 1, name: 'Rezervări' })).toBeVisible();
+    await adminOpen(page, 'Activitate', 'Programări');
+    await expect(page.getByRole('heading', { level: 1, name: 'Programări' })).toBeVisible();
     await expect(page.getByText(/Afișate \d+ din \d+/)).toBeVisible();
     await expectNoHorizontalScroll(page);
     await shot(page, 't16a-bookings', name());
 
-    await navLink(page, /^Moderare/).click();
+    await adminOpen(page, 'Activitate', 'Moderare');
     await expect(page.getByRole('heading', { level: 1, name: 'Moderare' })).toBeVisible();
     await expect(page.getByText('Toate recenziile')).toBeVisible();
     await shot(page, 't16a-moderation', name());
@@ -123,7 +124,7 @@ test.describe('admin', () => {
     expect(await inSearch(client, shopName)).toBe(true);
 
     await signInAdmin(page);
-    await page.goto(`/admin/service-uri/${shopId}`);
+    await page.goto(`/admin/parteneri/service-uri/${shopId}`);
     await expect(page.getByRole('heading', { level: 1, name: shopName })).toBeVisible();
     await expect(page.getByText('Apare în căutări și primește programări.')).toBeVisible();
     await shot(page, 't16a-shop', name());
@@ -186,8 +187,7 @@ test.describe('admin', () => {
     await expect(audit.getByText('Reclamații repetate')).toBeVisible();
     await shot(page, 't16a-shop-audit', name());
 
-    await openAccount(page);
-    await page.getByRole('link', { name: /Jurnal de audit/ }).click();
+    await adminOpen(page, 'Platformă', 'Jurnal de audit');
     await expect(page.getByRole('heading', { level: 1, name: 'Jurnal de audit' })).toBeVisible();
     await expect(page.getByRole('link', { name: shopName }).first()).toBeVisible();
     await expectNoHorizontalScroll(page);
@@ -214,7 +214,7 @@ test.describe('admin', () => {
     await rpcAs(client, 'send_message', { p_thread_id: thread!.id, p_body: secret, p_request_id: rid() });
 
     await signInAdmin(page);
-    await navLink(page, /^Rezervări/).click();
+    await adminOpen(page, 'Activitate', 'Programări');
     await page.getByLabel('Caută după cod, număr, client sau service').fill(booking.ref);
     await expect(page.getByText('Afișate 1 din 1')).toBeVisible();
     await page.getByRole('link', { name: new RegExp(booking.ref) }).click();
@@ -268,9 +268,11 @@ test.describe('admin', () => {
     await rpcAs(shop, 'report_review', { p_review_id: review!.id, p_reason: 'abusive', p_request_id: rid() });
 
     await signInAdmin(page);
-    // The badge on Moderare counts the reports waiting.
-    await expect(navLink(page, /^Moderare\s*,\s*(\d+ (de )?recenzii raportate|o recenzie raportată)$/)).toBeVisible();
-    await navLink(page, /^Moderare/).click();
+    // The badge on Activitate (Moderare's zone, A1) counts the reports waiting; Moderare's tile too.
+    await expect(navLink(page, /^Activitate\s*,\s*(\d+ (de )?recenzii raportate|o recenzie raportată)$/)).toBeVisible();
+    await adminZoneLink(page, 'Activitate').click();
+    await expect(page.locator('main').getByRole('link', { name: /^Moderare.*(recenzii raportate|o recenzie raportată)/ })).toBeVisible();
+    await adminOpen(page, 'Activitate', 'Moderare');
     const card = page.locator('main li').filter({ hasText: text }).first();
     await expect(card.getByText('Limbaj abuziv')).toBeVisible();
     await expect(card.getByText(/Așteaptă de/)).toBeVisible();
@@ -301,7 +303,7 @@ test.describe('admin', () => {
     const client = await createUser('client');
     const clientId = await userIdOf(client);
     await signInAdmin(page);
-    await navLink(page, /^Clienți/).click();
+    await adminOpen(page, 'Parteneri', 'Clienți');
     await page.getByLabel('Caută după nume, email, telefon sau C-00001').fill(client);
     await page.getByRole('link', { name: new RegExp(client.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')) }).click();
     await expect(page.getByRole('heading', { level: 1, name: 'Maria Pop' })).toBeVisible();
@@ -334,7 +336,7 @@ test.describe('admin', () => {
     const client = await createUser('client');
     const clientId = await userIdOf(client);
     await signInAdmin(page);
-    await navLink(page, /^Clienți/).click();
+    await adminOpen(page, 'Parteneri', 'Clienți');
     await page.getByLabel('Caută după nume, email, telefon sau C-00001').fill(client);
     await page.getByRole('link', { name: new RegExp(client.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')) }).click();
     await expect(page.getByText('disponibile: 0 · folosite: 0')).toBeVisible();
@@ -377,7 +379,7 @@ test.describe('admin', () => {
   test('only the admin reaches the admin screens', async ({ page }) => {
     await signIn(page, SEED.client, SEED_PASSWORD);
     await expect(page).toHaveURL(/\/c\/cauta/);
-    await page.goto('/admin/service-uri');
+    await page.goto('/admin/parteneri/service-uri');
     await expect(page).toHaveURL(/\/c\/cauta/);
     const res = await fetch(`${process.env.VITE_SUPABASE_URL ?? 'http://127.0.0.1:54321'}/auth/v1/token?grant_type=password`, {
       method: 'POST',

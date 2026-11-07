@@ -1,6 +1,8 @@
-import { ShieldCheck, Star } from 'lucide-react';
+import { ShieldCheck, Star, UserX } from 'lucide-react';
 import { useCallback, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { adminZoneBack } from '../../app/adminZones';
+import { BackLink } from '../../components/BackLink';
 import { Button } from '../../components/Button';
 import { Card } from '../../components/Card';
 import { EmptyState } from '../../components/EmptyState';
@@ -8,6 +10,7 @@ import { LoadError } from '../../components/LoadError';
 import { SearchField } from '../../components/SearchField';
 import { SkeletonList } from '../../components/Skeleton';
 import { Stars } from '../../components/Stars';
+import { Tile } from '../../components/Tile';
 import {
   decideReview,
   decideSuspectReview,
@@ -25,15 +28,15 @@ import { reportAge } from '../../lib/admin';
 import { useNow } from '../../lib/useNow';
 import { ConfirmPanel } from './ActionPanels';
 import { ExportButton } from './ExportButton';
-import { NoShowDisputesSection } from './NoShowDisputes';
 import { Pill, SectionTitle } from './parts';
-import { adminBookingPath, adminShopPath } from './paths';
+import { ADMIN_DISPUTES_PATH, ADMIN_MODERATION_PATH, adminBookingPath, adminShopPath } from './paths';
 import { useLiveData } from './useLiveData';
 import { useUrlParams } from './useUrlParams';
 import { dateTime, day } from './format';
 import styles from './admin.module.css';
 
 const LIVE = [{ table: 'reviews' }, { table: 'no_show_disputes' }];
+const back = adminZoneBack(ADMIN_MODERATION_PATH);
 
 function ReviewBody({ r }: { r: AdminReview }) {
   const { t, lang } = useI18n();
@@ -168,7 +171,7 @@ function statusPill(r: AdminReview, t: (k: 'admin.reportStatus.removed' | 'admin
  * searchable. Live.
  */
 export function ModerationScreen() {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const now = useNow();
   const { params, setParam, text, setText } = useUrlParams();
   const q = params.get('q') ?? '';
@@ -186,6 +189,7 @@ export function ModerationScreen() {
 
   return (
     <div className={styles.page}>
+      <BackLink to={back.to} label={t(back.label)} />
       <h1>{t('nav.admin.moderation')}</h1>
       {state.status === 'loading' && <SkeletonList />}
       {state.status === 'error' && <LoadError message={t('admin.loadError')} onRetry={reload} />}
@@ -238,12 +242,16 @@ export function ModerationScreen() {
             </>
           )}
 
-          <NoShowDisputesSection
-            data={state.data.disputes}
-            onDecided={() => {
-              setNotice({ key: 'admin.done.decided' });
-              void refetch().catch(() => {});
-            }}
+          {/* The contested no-shows have a page of their own since A1; here, the way to it. */}
+          <Tile
+            to={ADMIN_DISPUTES_PATH}
+            icon={UserX}
+            label={t('admin.disputes.title')}
+            hint={
+              state.data.disputes.pending.length > 0
+                ? plural(lang, 'unit.disputesPending', state.data.disputes.pending.length)
+                : t('admin.zone.disputes.hint')
+            }
           />
 
           <SectionTitle>{t('admin.moderation.all')}</SectionTitle>

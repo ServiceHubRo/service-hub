@@ -14,15 +14,19 @@ import { SkeletonList } from '../../components/Skeleton';
 import { TextArea } from '../../components/TextArea';
 import { fetchSettings, setNotificationText, type NotificationTexts, type TextInput } from '../../data/adminTools';
 import { canRetryRpc, rpcErrorMessage } from '../../data/rpc';
+import { adminZoneBack } from '../../app/adminZones';
 import { useI18n } from '../../i18n/context';
 import { placeholdersOf, unknownPlaceholders } from '../../lib/adminTools';
 import { matchesWords, searchWords } from '../../lib/text';
 import { useLoad } from '../../lib/useLoad';
 import { Pill, SectionTitle } from './parts';
-import { ADMIN_SETTINGS_PATH } from './paths';
+import { ADMIN_TEXTS_PATH } from './paths';
 import { useUrlParams } from './useUrlParams';
 import styles from './admin.module.css';
 import tools from './tools.module.css';
+
+/** „‹ Înapoi” goes to the screen's zone (A1). */
+const ZONE_BACK = adminZoneBack(ADMIN_TEXTS_PATH);
 
 const KEYS = Object.keys(TEMPLATES.ro);
 const SIDES = ['client', 'shop'] as const;
@@ -135,7 +139,7 @@ export function TextsScreen() {
 
   return (
     <div className={styles.page}>
-      <BackLink to={ADMIN_SETTINGS_PATH} label={t('admin.settings.title')} />
+      <BackLink to={ZONE_BACK.to} label={t(ZONE_BACK.label)} />
       <div>
         <h1>{t('admin.texts.title')}</h1>
         <p className={styles.sub}>{t('admin.texts.sub')}</p>

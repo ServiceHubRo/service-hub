@@ -489,7 +489,7 @@ test.describe('with accounts', () => {
 
   test('admin: Cont without account deletion', async ({ page }) => {
     await signIn(page, SEED.admin, SEED_PASSWORD);
-    await expect(page).toHaveURL(/\/admin\/prezentare$/);
+    await expect(page).toHaveURL(/\/admin\/panou$/);
     await openAccount(page);
     await expect(page.getByText('Cont de administrator')).toBeVisible();
     await expect(page.getByText(/^A-\d{5}$/)).toBeVisible();

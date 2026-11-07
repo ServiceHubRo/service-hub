@@ -269,6 +269,22 @@
     color: var(--muted);
   }
 
+  /* An admin zone's sub-sections (A1): one level, set in under the zone, a step smaller. */
+  .sideSub {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin: 2px 0 var(--space-2);
+    padding: 0 0 0 var(--space-4);
+    list-style: none;
+  }
+
+  .sideSubLink {
+    font-size: 13.5px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
+
   /* The bottom block already insets its rows: no second inset, so „Deconectează-mă” stays on one
      line in the 240 px sidebar (Eduard, 30 Oct 2026). */
   .sideConfirm {

@@ -7,17 +7,22 @@ import { LoadError } from '../../components/LoadError';
 import { SearchField } from '../../components/SearchField';
 import { SkeletonList } from '../../components/Skeleton';
 import { fetchClients, type AdminClientRow } from '../../data/admin';
+import { BackLink } from '../../components/BackLink';
+import { adminZoneBack } from '../../app/adminZones';
 import { useI18n } from '../../i18n/context';
 import { plural } from '../../i18n/translate';
 import { ExportButton } from './ExportButton';
 import { CLIENT_FILTERS, filterClients, isClientFilter, NO_SHOW_FLAG } from '../../lib/admin';
 import { formatPhone } from '../../lib/validators';
 import { Pill, RowLink, Verified } from './parts';
-import { adminClientPath } from './paths';
+import { ADMIN_CLIENTS_PATH, adminClientPath } from './paths';
 import { useLiveData } from './useLiveData';
 import { useUrlParams } from './useUrlParams';
 import { day } from './format';
 import styles from './admin.module.css';
+
+/** „‹ Înapoi” goes to the screen's zone (A1). */
+const ZONE_BACK = adminZoneBack(ADMIN_CLIENTS_PATH);
 
 const LIVE = [{ table: 'profiles' }, { table: 'bookings' }];
 
@@ -37,6 +42,7 @@ export function ClientsScreen() {
 
   return (
     <div className={styles.page}>
+      <BackLink to={ZONE_BACK.to} label={t(ZONE_BACK.label)} />
       <div>
         <h1>{t('nav.admin.clients')}</h1>
         {all && <p className={styles.sub}>{plural(lang, 'unit.clients', shown.length)}</p>}

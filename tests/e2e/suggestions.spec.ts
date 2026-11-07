@@ -31,7 +31,7 @@ async function adminMarks(browser: Browser, page: Page, text: string, who: RegEx
   const admin = await context.newPage();
   await signIn(admin, SEED.admin, SEED_PASSWORD);
   await expect(admin).toHaveURL(/\/admin\//);
-  await admin.goto('/admin/cont/sugestii');
+  await admin.goto('/admin/suport/sugestii');
   await expect(admin.getByRole('heading', { level: 1, name: 'Sugestii' })).toBeVisible();
   const card = admin.getByRole('listitem').filter({ hasText: text });
   await expect(card).toContainText('Nouă');
@@ -47,7 +47,7 @@ async function adminMarks(browser: Browser, page: Page, text: string, who: RegEx
   // The "Noi" filter no longer shows it; the change is in the audit log.
   await admin.getByRole('combobox', { name: 'Stare' }).selectOption('new');
   await expect(admin.getByRole('listitem').filter({ hasText: text })).toHaveCount(0);
-  await admin.goto('/admin/cont/jurnal');
+  await admin.goto('/admin/platforma/jurnal');
   await expect(admin.getByText('Stare sugestie schimbată').first()).toBeVisible();
   await context.close();
 }

@@ -16,13 +16,17 @@ import {
   type AdminSuggestion,
   type SuggestionStatus,
 } from '../../data/suggestions';
+import { adminZoneBack } from '../../app/adminZones';
 import { useI18n } from '../../i18n/context';
 import { useLoad } from '../../lib/useLoad';
 import { SuggestionStatusPill } from '../suggestions/SuggestionStatusPill';
 import suggestionStyles from '../suggestions/suggestions.module.css';
 import { dateTime } from './format';
-import { ADMIN_ACCOUNT_PATH, adminClientPath, adminShopPath } from './paths';
+import { ADMIN_SUGGESTIONS_PATH, adminClientPath, adminShopPath } from './paths';
 import styles from './admin.module.css';
+
+/** „‹ Înapoi” goes to the screen's zone (A1). */
+const ZONE_BACK = adminZoneBack(ADMIN_SUGGESTIONS_PATH);
 
 type Filter = SuggestionStatus | 'all';
 
@@ -100,7 +104,7 @@ export function SuggestionsScreen() {
 
   return (
     <div className={styles.page}>
-      <BackLink to={ADMIN_ACCOUNT_PATH} label={t('nav.account')} />
+      <BackLink to={ZONE_BACK.to} label={t(ZONE_BACK.label)} />
       <div>
         <h1>{t('admin.sugg.title')}</h1>
       </div>

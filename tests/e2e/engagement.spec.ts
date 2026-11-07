@@ -7,7 +7,7 @@ import {
   createBookableShop,
   createUser,
   expectNoHorizontalScroll,
-  openAccount,
+  adminOpen,
   openNotifications,
   serviceRest,
   shot,
@@ -131,8 +131,7 @@ test.describe('T24 notifications', () => {
     );
     await signIn(page, SEED.admin, SEED_PASSWORD);
     await expect(page.getByRole('heading', { level: 1, name: 'Panou principal' })).toBeVisible();
-    await openAccount(page);
-    await page.getByRole('link', { name: /^Setări platformă/ }).click();
+    await adminOpen(page, 'Platformă', 'Setări platformă');
     const section = page.getByRole('region', { name: 'Notificări automate' });
     await expect(section.getByLabel('Ore de liniște: de la ora')).toHaveValue(/^\d+$/);
     await expect(section.getByLabel('Ore de liniște: până la ora')).toHaveValue(/^\d+$/);

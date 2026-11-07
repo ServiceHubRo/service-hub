@@ -11,17 +11,21 @@ import { SearchField } from '../../components/SearchField';
 import { SkeletonList } from '../../components/Skeleton';
 import { ViewSelect } from '../../components/ViewSelect';
 import { fetchSubscriptions, type AdminInvoiceRow, type AdminSubscriptionRow } from '../../data/adminTools';
+import { adminZoneBack } from '../../app/adminZones';
 import { useI18n } from '../../i18n/context';
 import type { MessageKey } from '../../i18n/ro';
 import { plural } from '../../i18n/translate';
 import { filterSubscriptions, isSubscriptionFilter, SUBSCRIPTION_FILTERS } from '../../lib/adminTools';
 import { ExportButton } from './ExportButton';
 import { Money, Pill, RowLink, SubscriptionPill } from './parts';
-import { ADMIN_ACCOUNT_PATH, adminShopPath } from './paths';
+import { ADMIN_SUBSCRIPTIONS_PATH, adminShopPath } from './paths';
 import { useLiveData } from './useLiveData';
 import { useUrlParams } from './useUrlParams';
 import { day } from './format';
 import styles from './admin.module.css';
+
+/** „‹ Înapoi” goes to the screen's zone (A1). */
+const ZONE_BACK = adminZoneBack(ADMIN_SUBSCRIPTIONS_PATH);
 
 const LIVE = [{ table: 'subscriptions' }, { table: 'invoices' }];
 
@@ -118,7 +122,7 @@ export function SubscriptionsScreen() {
 
   return (
     <div className={styles.page}>
-      <BackLink to={ADMIN_ACCOUNT_PATH} label={t('nav.account')} />
+      <BackLink to={ZONE_BACK.to} label={t(ZONE_BACK.label)} />
       <div>
         <h1>{t('admin.subs.title')}</h1>
       </div>

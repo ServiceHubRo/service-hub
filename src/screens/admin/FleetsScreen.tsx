@@ -20,15 +20,19 @@ import {
   type AdminFleetCompany,
 } from '../../data/fleet';
 import { canRetryRpc, rpcErrorMessage } from '../../data/rpc';
+import { adminZoneBack } from '../../app/adminZones';
 import { useI18n } from '../../i18n/context';
 import { formatDate, formatMoney } from '../../i18n/format';
 import { plural } from '../../i18n/translate';
 import { planState, trialDaysLeft, type FleetPlanRow, type PlanState } from '../../lib/fleet';
 import { useLoad } from '../../lib/useLoad';
 import pill from '../../components/StatusBadge.module.css';
-import { ADMIN_ACCOUNT_PATH } from './paths';
+import { ADMIN_FLEETS_PATH } from './paths';
 import styles from './admin.module.css';
 import own from './fleets.module.css';
+
+/** „‹ Înapoi” goes to the screen's zone (A1). */
+const ZONE_BACK = adminZoneBack(ADMIN_FLEETS_PATH);
 
 type Plan = FleetPlanRow & { position: number; public: boolean; active: boolean };
 const STATE_TONE: Record<PlanState, string> = { trial: 'amber', trial_over: 'muted', active: 'green', past_due: 'red', cancelled: 'muted', inactive: 'muted' };
@@ -112,7 +116,7 @@ export function FleetsScreen() {
 
   return (
     <div className={styles.page}>
-      <PageHeader back={{ to: ADMIN_ACCOUNT_PATH, label: t('nav.account') }} title={t('admin.fleets.title')} subtitle={t('admin.fleets.subtitle')} />
+      <PageHeader back={{ to: ZONE_BACK.to, label: t(ZONE_BACK.label) }} title={t('admin.fleets.title')} subtitle={t('admin.fleets.subtitle')} />
       {body}
     </div>
   );

@@ -318,7 +318,7 @@ test.describe('M6 — fleet notifications', () => {
     const page = await ctx.newPage();
     await page.addInitScript(() => localStorage.setItem('sh_lang', 'ro'));
     await signIn(page, SEED.admin, SEED_PASSWORD);
-    await page.goto('/admin/cont/notificari-flota');
+    await page.goto('/admin/platforma/notificari-flota');
     const row = page.locator('li').filter({ hasText: 'Document care expiră' }).filter({ hasText: /Etape \d+/ }).first();
     await expect(row).toContainText('22007');
     await expect(page.getByText('invalid input syntax')).toHaveCount(0);

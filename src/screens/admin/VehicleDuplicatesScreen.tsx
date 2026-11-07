@@ -6,12 +6,16 @@ import { LoadError } from '../../components/LoadError';
 import { PageHeader } from '../../components/PageHeader';
 import { SkeletonList } from '../../components/Skeleton';
 import { adminVehicleDuplicates, type DuplicateCar } from '../../data/garage';
+import { adminZoneBack } from '../../app/adminZones';
 import { useI18n } from '../../i18n/context';
 import { plural } from '../../i18n/translate';
 import { useLoad } from '../../lib/useLoad';
-import { ADMIN_ACCOUNT_PATH, adminClientPath } from './paths';
+import { ADMIN_DUPLICATES_PATH, adminClientPath } from './paths';
 import styles from './admin.module.css';
 import own from './fleets.module.css';
+
+/** „‹ Înapoi” goes to the screen's zone (A1). */
+const ZONE_BACK = adminZoneBack(ADMIN_DUPLICATES_PATH);
 
 /**
  * Vehicule duplicate (T66, platform admin): the same car recorded more than once by one owner, in a
@@ -84,7 +88,7 @@ export function VehicleDuplicatesScreen() {
 
   return (
     <div className={styles.page}>
-      <PageHeader back={{ to: ADMIN_ACCOUNT_PATH, label: t('nav.account') }} title={t('admin.dup.title')} />
+      <PageHeader back={{ to: ZONE_BACK.to, label: t(ZONE_BACK.label) }} title={t('admin.dup.title')} />
       {body}
     </div>
   );

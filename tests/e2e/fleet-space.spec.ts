@@ -178,7 +178,7 @@ test('the plan: Abonament, the limits of Fleet Start, and the admin changes the 
   await context.addInitScript(() => localStorage.setItem('sh_lang', 'ro'));
   const adminPage = await context.newPage();
   await signIn(adminPage, SEED.admin, SEED_PASSWORD);
-  await adminPage.goto('/admin/cont/flote');
+  await adminPage.goto('/admin/parteneri/firme');
   const row = adminPage.locator('li', { hasText: 'Plan Test' }).filter({ hasText: admin }).first();
   await expect(row).toBeVisible();
   await row.getByRole('button', { name: 'Mai multe' }).click();

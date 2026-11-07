@@ -13,6 +13,7 @@ import { SkeletonList } from '../../components/Skeleton';
 import { fetchCompanyChecks, type CompanyCategory, type CompanyCheckRow } from '../../data/adminTools';
 import { canRetryRpc, rpcErrorMessage } from '../../data/rpc';
 import { verifyCompany } from '../../data/shop';
+import { adminZoneBack } from '../../app/adminZones';
 import { useI18n } from '../../i18n/context';
 import type { MessageKey } from '../../i18n/ro';
 import { formatDayMonth } from '../../i18n/format';
@@ -27,10 +28,13 @@ import {
 import { useLoad } from '../../lib/useLoad';
 import { ExportButton } from './ExportButton';
 import { Facts, Pill, ShopStatePill } from './parts';
-import { ADMIN_ACCOUNT_PATH, adminShopPath } from './paths';
+import { ADMIN_ANAF_PATH, adminShopPath } from './paths';
 import { useUrlParams } from './useUrlParams';
 import { dateTime } from './format';
 import styles from './admin.module.css';
+
+/** „‹ Înapoi” goes to the screen's zone (A1). */
+const ZONE_BACK = adminZoneBack(ADMIN_ANAF_PATH);
 
 const TONE: Record<CompanyCategory, 'green' | 'amber' | 'red' | 'grey' | 'blue'> = {
   ok: 'green',
@@ -134,7 +138,7 @@ export function AnafScreen() {
 
   return (
     <div className={styles.page}>
-      <BackLink to={ADMIN_ACCOUNT_PATH} label={t('nav.account')} />
+      <BackLink to={ZONE_BACK.to} label={t(ZONE_BACK.label)} />
       <div>
         <h1>{t('anaf.title')}</h1>
         <p className={styles.sub}>{all ? plural(lang, 'unit.shops', shown.length) : null}</p>

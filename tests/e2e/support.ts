@@ -317,6 +317,26 @@ async function secondStep(page: Page, password: string, options: { remember?: bo
 
 export const isDesktop = (page: Page) => (page.viewportSize()?.width ?? 0) >= 1024;
 
+const escapeRe = (text: string) => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+/** An admin zone in the visible navigation (the bottom bar on a phone, the sidebar from 1024 px), A1. */
+export function adminZoneLink(page: Page, zone: string): Locator {
+  return page
+    .getByRole('navigation', { name: /^(Navigare principală|Main navigation)$/ })
+    .filter({ visible: true })
+    .getByRole('link', { name: new RegExp(`^${escapeRe(zone)}( ?,.*)?$`) })
+    .first();
+}
+
+/**
+ * Opens an admin sub-section the way a person does (A1): the zone in the navigation, then its tile
+ * on the zone's page. `zone` and `item` are the labels in the language on screen.
+ */
+export async function adminOpen(page: Page, zone: string, item: string) {
+  await adminZoneLink(page, zone).click();
+  await page.locator('main').getByRole('link', { name: new RegExp(`^${escapeRe(item)}`) }).first().click();
+}
+
 /**
  * T57: a shop booking card shows its summary; its details (phone, quote lines, intake, PDFs) open
  * with a tap on the summary. Opens the card if it is closed.

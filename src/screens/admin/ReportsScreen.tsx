@@ -13,6 +13,7 @@ import { SkeletonList } from '../../components/Skeleton';
 import { fetchHistoryReports, voidHistoryReport, type AdminReportRow } from '../../data/adminTools';
 import { downloadReport, ReportError } from '../../data/reports';
 import { canRetryRpc, rpcErrorMessage } from '../../data/rpc';
+import { adminZoneBack } from '../../app/adminZones';
 import { useI18n } from '../../i18n/context';
 import type { MessageKey } from '../../i18n/ro';
 import { plural, type Msg } from '../../i18n/translate';
@@ -20,11 +21,14 @@ import { filterReports, isReportFilter, REPORT_FILTERS } from '../../lib/adminTo
 import { reportFileName, saveFile } from '../../lib/report';
 import { ConfirmPanel } from './ActionPanels';
 import { Facts, Money, Pill } from './parts';
-import { ADMIN_ACCOUNT_PATH, adminClientPath } from './paths';
+import { ADMIN_REPORTS_PATH, adminClientPath } from './paths';
 import { useLiveData } from './useLiveData';
 import { useUrlParams } from './useUrlParams';
 import { carText, dateTime } from './format';
 import styles from './admin.module.css';
+
+/** „‹ Înapoi” goes to the screen's zone (A1). */
+const ZONE_BACK = adminZoneBack(ADMIN_REPORTS_PATH);
 
 const LIVE = [{ table: 'history_reports' }];
 
@@ -128,7 +132,7 @@ export function ReportsScreen() {
 
   return (
     <div className={styles.page}>
-      <BackLink to={ADMIN_ACCOUNT_PATH} label={t('nav.account')} />
+      <BackLink to={ZONE_BACK.to} label={t(ZONE_BACK.label)} />
       <div>
         <h1>{t('admin.reports.title')}</h1>
         <p className={styles.sub}>{all ? plural(lang, 'unit.reports', shown.length) : t('admin.reports.sub')}</p>
