@@ -199,11 +199,13 @@ from public.support_get_request(current_setting('test.req')::uuid) r, jsonb_arra
 select test.logout();
 
 -- "Datele mele": the files of the author's requests, the team's signed „Service-Hub”, never another's.
+select set_config('test.a_files', (select count(*) from public.suggestion_files f join public.suggestions s on s.id = f.suggestion_id
+                                     where s.author_id = test.id('client_a'))::text, true);
+select test.ok(current_setting('test.a_files')::int >= 3, 'the author''s requests have files');
 select test.login(test.id('client_a'));
 select test.ok(public.export_my_data() ? 'support_requests', 'the export keeps what was there before'),
        test.eq((select count(*) from jsonb_array_elements(public.export_my_data()->'support_files')),
-               (select count(*) from public.suggestion_files f join public.suggestions s on s.id = f.suggestion_id
-                where s.author_id = test.id('client_a')), 'the export lists every file of the author''s requests'),
+               current_setting('test.a_files')::bigint, 'the export lists every file of the author''s requests'),
        test.ok(exists (select 1 from jsonb_array_elements(public.export_my_data()->'support_files') x
                        where x->>'from' = 'Service-Hub' and x->>'name' = 'pasi.png'), 'the team''s file signed Service-Hub'),
        test.ok(not public.export_my_data()::text like '%' || current_setting('test.ag') || '%', 'never the agent''s id');
