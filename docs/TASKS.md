@@ -1591,6 +1591,21 @@ Aprobate de Eduard pe 6 nov („aprob T71–T75”; T71 era deja folosit, așa c
 
 - [x] Făcut
 
+### P8 — Testele SQL generează doar numere de înmatriculare valide ✅
+- Auditul din 6 nov: `119_client_referrals` pica rar și aleator. Numărul de înmatriculare era făcut din primele 6 caractere ale unui UUID; când toate erau litere (a–f), regula T69 (cel puțin o cifră) îl refuza. Același tipar era în `118_offers` și în `test.raw_booking` (`06_booking_helpers`, cu `md5`).
+- Toate trei adaugă acum o cifră fixă; regula de validare a numerelor nu s-a schimbat. Doar teste, fără cod de aplicație sau bază de date.
+
+- [x] Făcut
+
+### P1 — „Înapoi” fără bucle ✅
+- Auditul din 6 nov a reprodus bucla din captura lui Eduard. Butonul „‹ Înapoi” din aplicație (`BackLink`, pe 32 de ecrane) deschidea pagina-părinte ca intrare nouă în istoric, așa că „Înapoi” al telefonului și cel din aplicație se alternau (Cont ↔ Firmele mele).
+- Acum „‹ Înapoi” se întoarce în istoric când pagina dinainte e chiar părintele. Altfel înlocuiește pagina curentă cu părintele (link deschis direct, refresh, pagină venită din altă parte). Nu mai adaugă niciodată o intrare. La fel „Înapoi la vehicule” din spațiul firmei.
+- Adresa fiecărei intrări din istoric e ținută per tab: `src/lib/navHistory.ts`, înregistrată în `RouteGuard`.
+- Teste: `tests/unit/navHistory.test.ts`, `tests/e2e/navigation.spec.ts` (toate traseele din audit, cu lungimea istoricului verificată după fiecare pas, 390/820/1440).
+- Neverificat: gestul de revenire din Safari pe iPhone (containerul are doar Chromium). Folosește același istoric, dar se confirmă pe telefon.
+
+- [x] Făcut
+
 ### P2 — Fără insigna planului în antetul firmei ✅
 - Insigna permanentă cu planul și perioada de test a fost scoasă din antetul spațiului firmei. Planul se vede în Cont → „Abonament și facturare”.
 - Pe Panou rămâne doar un avertisment, când e cazul, cu „Vezi abonamentul” pentru cine are acces la abonament: abonament expirat (toți), plata restantă, colegi peste limită, ultima săptămână din perioada de test (nu șoferului), vehicule peste limită (toți). Un singur avertisment o dată, cel mai grav: `planNotice()` în `src/lib/fleet/plans.ts`.

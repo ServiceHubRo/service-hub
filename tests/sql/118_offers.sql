@@ -17,7 +17,7 @@ declare
 begin
   perform test.login(p_client);
   v := public.create_booking(p_shop_id => test.id('shop1'), p_service_id => p_service, p_date => p_day, p_slot => p_slot,
-    p_request_id => gen_random_uuid(), p_car => jsonb_build_object('make', 'Dacia', 'model', 'Logan', 'plate', 'B ' || left(p_client::text, 6)));
+    p_request_id => gen_random_uuid(), p_car => jsonb_build_object('make', 'Dacia', 'model', 'Logan', 'plate', 'B ' || left(p_client::text, 6) || ' 1'));
   perform test.logout();
   return v;
 end

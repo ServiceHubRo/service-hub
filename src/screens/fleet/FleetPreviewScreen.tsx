@@ -25,7 +25,7 @@ const DATA_MODES: readonly DataMode[] = ['sample', 'empty', 'loading', 'error'];
  */
 export function FleetPreviewScreen() {
   const { t } = useI18n();
-  const { section, vehicleId, filter, update, go, params } = useFleetLocation();
+  const { section, vehicleId, filter, update, go, back, params } = useFleetLocation();
   const role: FleetRole = FLEET_ROLES.includes(params.get('rol') as FleetRole) ? (params.get('rol') as FleetRole) : 'admin';
   const mode: DataMode = DATA_MODES.includes(params.get('date') as DataMode) ? (params.get('date') as DataMode) : 'sample';
   const [added, setAdded] = useState<FleetExpense[]>([]);
@@ -53,7 +53,7 @@ export function FleetPreviewScreen() {
   else body = <FleetSectionBody section={section} vehicleId={vehicleId} filter={filter} />;
 
   return (
-    <FleetContext.Provider value={{ data, go, mode: 'preview', actions: null, companyPage: null, addExpense, plan, loadSubscription, plans: SAMPLE_PLANS, loadReport, logExport }}>
+    <FleetContext.Provider value={{ data, go, back, mode: 'preview', actions: null, companyPage: null, addExpense, plan, loadSubscription, plans: SAMPLE_PLANS, loadReport, logExport }}>
       <div className={styles.previewPage}>
         <Banner tone="warning">{t('fleet.preview.banner')}</Banner>
         <div className={styles.controls}>

@@ -44,7 +44,7 @@ type Tab = 'overview' | 'history' | 'costs' | 'odometer' | 'maintenance' | 'book
  */
 export function FleetVehicle({ vehicleId }: { vehicleId: string }) {
   const { t, lang } = useI18n();
-  const { data, go, allowed, vehicle, mode, actions } = useFleet();
+  const { data, back, allowed, vehicle, mode, actions } = useFleet();
   const [editing, setEditing] = useState(false);
   const [addingFuel, setAddingFuel] = useState(false);
   const [reporting, setReporting] = useState(false);
@@ -60,7 +60,7 @@ export function FleetVehicle({ vehicleId }: { vehicleId: string }) {
         icon={Info}
         title={t('fleet.vehicle.notFound')}
         body={t('fleet.vehicle.notFoundBody')}
-        action={<Button onClick={() => go({ section: 'vehicule' })}>{t('fleet.vehicle.back')}</Button>}
+        action={<Button onClick={() => back({ section: 'vehicule' })}>{t('fleet.vehicle.back')}</Button>}
       />
     );
   }
@@ -96,7 +96,7 @@ export function FleetVehicle({ vehicleId }: { vehicleId: string }) {
   return (
     <div className={styles.stack}>
       <div>
-        <Button variant="ghost" onClick={() => go({ section: 'vehicule' })}>
+        <Button variant="ghost" onClick={() => back({ section: 'vehicule' })}>
           <ArrowLeft size={18} aria-hidden="true" /> {t('fleet.vehicle.back')}
         </Button>
       </div>
