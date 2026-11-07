@@ -1,7 +1,9 @@
 -- P3 — the platform admin no longer reads private conversations (Eduard, 6 Nov 2026: option A).
 --
 -- Removed for the admin: the threads policy branch, the admin branch of can_read_thread (which the
--- messages policy uses, so messages and Realtime follow), admin_get_thread and admin_thread_messages.
+-- messages policy uses, so messages and Realtime follow), admin_get_thread and admin_thread_messages,
+-- and the direct read of notification_events, whose new-message events keep the start of the message
+-- (params.preview). No screen reads that table; the admin's counters use security definer functions.
 -- Kept: on the client's page, each conversation's shop, date of the last message and number of messages
 -- (no content); on a booking's page, its automatic events (confirmed, quote sent, cancelled, …), never a
 -- message written by the client or the shop. Clients and shops keep exactly their access.
@@ -72,6 +74,8 @@ begin
     'audit', public.audit_entries(array[v.id::text]));
 end
 $$;
+
+drop policy notification_events_select_admin on public.notification_events;
 
 drop function public.admin_get_thread(uuid);
 drop function public.admin_thread_messages(uuid);

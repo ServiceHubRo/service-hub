@@ -117,4 +117,7 @@ grant execute on function public.admin_get_thread(uuid) to authenticated;
 alter policy threads_select on public.threads
   using ((client_id = auth.uid()) or public.is_shop_member(shop_id) or public.is_admin());
 
+create policy notification_events_select_admin on public.notification_events for select to authenticated
+  using (public.is_admin());
+
 update public.schema_version set version = 107;

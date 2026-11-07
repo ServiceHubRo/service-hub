@@ -126,6 +126,13 @@ select test.fails($$select public.admin_thread_messages(test.id('thread_b'))$$, 
 select test.eq(test.count('select 1 from public.threads'), 0::bigint, 'the threads are not readable directly');
 select test.eq(test.count('select 1 from public.messages'), 0::bigint, 'nor the messages (Realtime follows the same policy)');
 select test.ok(not public.can_read_thread(test.id('thread_b')), 'can_read_thread says no for the admin');
+-- A new-message notification keeps the start of the message (its preview): not readable by the admin either.
+select test.logout();
+select public.notify_user(test.id('client_a'), 'new_message', jsonb_build_object('preview', 'Textul unui mesaj privat'), null);
+select test.ok(exists (select 1 from public.notification_events where event = 'new_message' and params->>'preview' = 'Textul unui mesaj privat'),
+  '(the preview is stored, for the delivery)');
+select test.login(test.id('admin'));
+select test.eq(test.count('select 1 from public.notification_events'), 0::bigint, 'the notifications are not readable by the admin');
 
 -- ------------------------------------------------------------------ verify a phone
 select test.logout();
