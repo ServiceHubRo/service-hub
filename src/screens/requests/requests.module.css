@@ -1,0 +1,235 @@
+/* Support requests (A3a): the author's screens and the team's. */
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.rowTop {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+}
+
+.rowTitle {
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 12px;
+  color: var(--muted);
+  font-size: 13.5px;
+}
+
+.pill {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: var(--radius-pill);
+  white-space: nowrap;
+}
+
+.blue {
+  color: var(--blue);
+  background: var(--blue-soft);
+}
+
+.amber {
+  color: var(--amber);
+  background: var(--amber-soft);
+}
+
+.green {
+  color: var(--green);
+  background: var(--green-soft);
+}
+
+.red {
+  color: var(--red);
+  background: var(--red-soft);
+}
+
+.grey {
+  color: var(--muted-strong);
+  background: var(--muted-soft);
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: flex-end;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.filters {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+/* The conversation: the author's messages on one side, the team's on the other. */
+.conversation {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.message {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-width: min(640px, 92%);
+  padding: 10px 14px;
+  border-radius: var(--radius-card);
+  background: var(--surface2);
+  border: 1px solid var(--border);
+}
+
+.message[data-side='team'] {
+  align-self: flex-start;
+}
+
+.message[data-side='author'] {
+  align-self: flex-end;
+  border-color: var(--border-lit);
+}
+
+.messageHead {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.messageWho {
+  font-weight: 700;
+  color: var(--text-2);
+}
+
+.messageBody {
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/* Internal notes: never shown to the author, so they look unlike the conversation. */
+.notes {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+  border: 1px dashed var(--amber);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+}
+
+.note {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.banner {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 14px;
+  border-radius: var(--radius-card);
+  border: 1px solid var(--border-lit);
+  background: var(--surface2);
+}
+
+.banner[data-tone='escalated'] {
+  border-color: var(--red);
+}
+
+.facts {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 6px 16px;
+  margin: 0;
+}
+
+.facts dt {
+  color: var(--muted);
+}
+
+.facts dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: flex-end;
+}
+
+.actions > * {
+  min-width: 0;
+}
+
+.notice {
+  color: var(--green);
+  font-weight: 600;
+  margin: 0;
+}
+
+.muted {
+  color: var(--muted);
+  font-size: 13.5px;
+  margin: 0;
+}
+
+.warning {
+  color: var(--text-2);
+  font-size: 13.5px;
+  margin: 0;
+}
+
+/* A whole card that opens the request. */
+.cardLink {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+  border-radius: var(--radius-card);
+}
+
+.cardLink:hover > * {
+  border-color: var(--border-lit);
+}
+
+/* A link standing on its own in a fact (the author): a full tap target. */
+.factLink {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}

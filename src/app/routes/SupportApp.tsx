@@ -1,8 +1,9 @@
 import { Route, Routes } from 'react-router-dom';
 import { MfaGate } from '../../screens/admin/MfaGate';
 import { AccountScreen as SupportAccountScreen } from '../../screens/support/AccountScreen';
+import { InboxScreen } from '../../screens/requests/InboxScreen';
+import { RequestScreen } from '../../screens/requests/RequestScreen';
 import { SUPPORT_REQUESTS_PATH, SUPPORT_SEARCH_PATH } from '../../screens/support/paths';
-import { RequestsScreen } from '../../screens/support/RequestsScreen';
 import { SearchScreen } from '../../screens/support/SearchScreen';
 import { AppShell } from '../AppShell';
 import { commonRoutes, rel } from './shared';
@@ -23,9 +24,10 @@ export default function SupportApp() {
         }
       >
         {commonRoutes('support', {
-          [SUPPORT_REQUESTS_PATH]: <RequestsScreen />,
+          [SUPPORT_REQUESTS_PATH]: <InboxScreen mode="support" />,
           [SUPPORT_SEARCH_PATH]: <SearchScreen />,
         })}
+        <Route path={`${rel('support', SUPPORT_REQUESTS_PATH)}/:requestId`} element={<RequestScreen mode="support" />} />
         <Route path={`${rel('support', SUPPORT_SEARCH_PATH)}/:accountId`} element={<SupportAccountScreen />} />
       </Route>
     </Routes>

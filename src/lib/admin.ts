@@ -160,6 +160,15 @@ export const AUDIT_ACTIONS = [
   'revoke_support',
   'support_search',
   'support_view_account',
+  // A3a
+  'take_request',
+  'assign_request',
+  'reply_request',
+  'add_request_note',
+  'set_request_status',
+  'escalate_request',
+  'return_request',
+  'support_view_request',
 ] as const;
 
 export interface AuditChange {
@@ -170,7 +179,7 @@ export interface AuditChange {
 }
 
 /** Keys that describe the action rather than a changed value: shown on their own line. */
-const DETAIL_KEYS = new Set(['reason', 'note', 'days', 'mode', 'services_off', 'kind', 'filters', 'rows', 'recipients', 'push_recipients', 'q', 'results']);
+const DETAIL_KEYS = new Set(['reason', 'note', 'days', 'mode', 'services_off', 'kind', 'filters', 'rows', 'recipients', 'push_recipients', 'q', 'results', 'message_id', 'note_id']);
 
 /** Values kept whole (an export's filters): shown as one line, not split into their keys. */
 const WHOLE_KEYS = new Set(['filters']);

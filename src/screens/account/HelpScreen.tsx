@@ -1,4 +1,4 @@
-import { Compass, LifeBuoy, Mail, MessageCircle } from 'lucide-react';
+import { Compass, Inbox, LifeBuoy, Mail, MessageCircle } from 'lucide-react';
 import { homeOf, NAV } from '../../app/roles';
 import { requestTour } from '../../app/tour/tourStore';
 import { useSession } from '../../app/sessionContext';
@@ -8,6 +8,7 @@ import { Tile } from '../../components/Tile';
 import { useI18n } from '../../i18n/context';
 import { CONTACT, whatsappLink } from '../../lib/contact';
 import { formatPhone } from '../../lib/validators';
+import { requestsPath } from './paths';
 import styles from './account.module.css';
 
 /**
@@ -24,6 +25,11 @@ export function HelpScreen({ role }: { role: 'client' | 'shop' }) {
   return (
     <div className={styles.page}>
       <PageHeader back={{ to: NAV[role].account.path, label: t('nav.account') }} title={t('help.title')} />
+
+      {/* A3a: requests written in the app, answered by the Service-Hub team. */}
+      <div className={styles.tiles} data-layout="tiles">
+        <Tile to={requestsPath(role)} icon={Inbox} label={t('support.my.title')} hint={t('support.my.hint')} />
+      </div>
 
       <div className={styles.tiles} data-layout="tiles">
         <Tile

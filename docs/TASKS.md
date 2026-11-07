@@ -1655,3 +1655,21 @@ Aprobate de Eduard pe 6 nov („aprob T71–T75”; T71 era deja folosit, așa c
 - **De știut:** un token deja emis al unui agent retras e refuzat imediat de funcțiile de suport (rolul și sesiunea se verifică la fiecare apel); pentru restul aplicației contul e deja un cont de client fără date.
 
 - [x] Făcut
+
+### A3 — Solicitări și tichete (în trei părți, aprobat de Eduard pe 7 nov)
+- **A3a** solicitări, conversație, note interne, escaladare — făcut (mai jos).
+- **A3b** atașamente (spațiu privat, verificarea conținutului pe server, linkuri de 60 s, jurnal la deschidere, ștergere la 90 de zile) și textul nou din Politica de confidențialitate (aprobat de Eduard înainte de merge).
+- **A3c** panoul de suport (contoare, avertizări la 24 și 48 de ore), timp real, păstrare legală (motiv, responsabil, dată, revizuire periodică) și regulile la ștergerea contului; propunerea de retenție pe scop și categorie (decizia 6 a lui Eduard: fără termenul general de 2 ani).
+- Butonul „Raportează o problemă” pe cardul programării: amânat, PR separat (decizia 4).
+
+### A3a — Solicitări: conversație, note interne, escaladare ✅
+- Tabela `suggestions` rămâne singurul sistem, extins: titlu, categorie (9, editabile din bază), programarea legată (doar a autorului sau a service-ului lui), responsabil, escaladare, datele primului răspuns, rezolvării și închiderii. Sugestiile existente rămân neschimbate, în categoria „Sugestii și îmbunătățiri”, cu stările lor.
+- Utilizatorul: **Cont → Ajutor și contact → Solicitările mele**: listă (cu „Răspuns nou”), solicitare nouă (categorie, titlu, descriere, codul programării opțional, avertisment despre datele sensibile), conversația cu „Echipa Service-Hub”, răspuns. „Rezolvată” se redeschide cu un mesaj în 14 zile; apoi se închide singură (zilnic). Un cont suspendat poate scrie la suport (contestare). Emailul și WhatsApp-ul rămân.
+- Echipa: **Solicitări** (agentul la `/suport`, adminul în Suport): listă cu filtre (responsabil, stare, categorie, fără răspuns peste 24/48 de ore), fișa cu autorul (ca în căutarea agentului), referința minimă a programării (cod, dată, service, stare), conversația cu cine a răspuns, preluare, atribuire, răspuns cu starea după, schimbarea stării, **note interne** (doar echipa), escaladare cu motiv. Adminul răspunde la cele escaladate și le returnează cu motiv.
+- Notele interne: tabelă separată, fără nicio regulă de acces sau drept pentru utilizatori, în afara Realtime; doar două funcții ale echipei o ating (verificat de un test care le listează), iar niciun ecran și nicio Edge Function nu o citește (test unitar). Exportul datelor, notificările și jurnalul nu conțin textul notelor.
+- Notificări către autor la răspuns și la „Rezolvată” (push și email, fără textul răspunsului); email către admin la escaladare.
+- Compatibilitate: `submit_suggestion` și citirea veche a sugestiilor (aplicația Android veche) funcționează; ecranul Sugestii arată doar sugestiile; adresa veche `/admin/suport/sugestii` duce la Solicitări.
+- Migrarea `support_requests` (schema 110). Rollback-ul refuză să ruleze dacă există solicitări, mesaje sau note scrise după A3a (spune câte), ca să nu se piardă nimic real.
+- Teste: `tests/sql/152_support_requests.sql`, `tests/unit/supportRequests.test.ts`, `tests/e2e/support-requests.spec.ts` (390/820/1440, RO și EN); actualizate `support-agent`, `suggestions`, `admin-navigation`, `a11y`.
+
+- [x] Făcut

@@ -39,6 +39,8 @@ export async function fetchMySuggestions(): Promise<MySuggestion[]> {
   const { data, error } = await db()
     .from('suggestions')
     .select('id, body, status, created_at')
+    // A3a: the other support requests are in Solicitările mele.
+    .eq('category', 'suggestions')
     .order('created_at', { ascending: false });
   if (error) throw failure(error);
   return (data ?? []) as MySuggestion[];

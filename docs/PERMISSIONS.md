@@ -57,7 +57,13 @@ key) plus `actor_role` and `actor_display_id`, filled by a trigger at insert, so
 | **Companies and fleets** (vehicles, costs, members) | own companies | ❌ | per company right | ❌ (`company_clients_only`) | 👁 list of companies and plans |
 | **Subscriptions, payments, invoices, fiscal data** | — | owner | per right (company plan) | ❌ | ✅ |
 | **Reviews and ranking** (moderate, remove) | ❌ | reply, report | — | ❌ | ✅ |
-| **Suggestions** (T26) | write, read own | write, read own | — | 👁 all + set state | 👁 all + set state |
+| **Support requests** (A3a): write, read own conversation | ✅ own | ✅ own (its shop's bookings linkable) | ✅ (as a client) | — | — |
+| Support requests: list, take, assign, answer, set the state | — | — | — | ✅ (not an escalated one) | ✅ |
+| Escalate a request (reason required) | — | — | — | ✅ | — |
+| Give an escalated request back (reason required) | — | — | — | ❌ | ✅ |
+| **Internal notes** of a request | ❌ (no grant, no policy, no function) | ❌ | ❌ | ✅ read and write (read only when escalated) | ✅ |
+| Who answered a request | ❌ („Echipa Service-Hub”) | ❌ | ❌ | ✅ | ✅ (also in the audit log) |
+| A request's booking | own: code, day, shop, state | its shop's: the same | — | code, day, shop, state only | the same |
 | **Account search** | — | — | — | ✅ masked: ID, name, role, state, `m***@…`, phone's last 3 digits, shop name and city, created, last active | ✅ full lists |
 | **Account card** | — | — | — | ✅ the same fields + its suggestions; never bookings, cars, companies, billing, messages, reviews | ✅ full card |
 | Find admin or agent accounts | — | — | — | ❌ (never in results) | ✅ |
@@ -104,6 +110,12 @@ key) plus `actor_role` and `actor_display_id`, filled by a trigger at insert, so
 | `admin_list_support_agents()` | admin | `{agents, former}` (`mfa_ready`, `granted_at`, reason of withdrawal) | — |
 | `admin_grant_support(account, reason, request)` | admin | `{id, display_id}` | `reason_required`, `reason_too_long`, `not_found`, `wrong_status` (already an agent), `support_not_client`, `support_account_inactive`, `support_email_unverified`, `support_account_has_data` |
 | `admin_revoke_support(user, reason, request)` | admin | `{id, role: 'client'}` | `reason_required`, `reason_too_long`, `not_found` |
+| `support_list_requests()`, `support_list_staff()` (A3a) | agent, admin | the requests, open first; the team | — |
+| `support_get_request(id)` | agent, admin (logged) | request, author card, booking reference, messages with their author, notes, escalation | `request_not_found` |
+| `support_take_request`, `support_assign_request`, `support_reply_request`, `support_add_note`, `support_set_request_status` | agent, admin | — | `request_escalated` (agent), `request_closed`, `status_invalid`, `assignee_invalid`, `request_invalid` |
+| `support_escalate_request(id, reason, request)` | agent | `{id, escalated}` | `not_allowed` (admin), `reason_required`, `request_escalated` |
+| `admin_return_request(id, reason, request)` | admin | `{id, escalated: false, assigned_to}` | `reason_required`, `wrong_status` |
+| `my_support_requests()`, `get_my_support_request(id)`, `create_support_request(...)`, `reply_my_support_request(...)` | client, shop (suspended included) | own requests only, never notes or who answered | `request_not_found`, `request_invalid`, `request_closed`, `booking_not_found`, `limit_suggestions`, `limit_support_messages` |
 
 Every caller check also answers `not_signed_in`, `account_suspended`, `not_allowed`, `mfa_required`.
 
@@ -111,4 +123,5 @@ Every caller check also answers `not_signed_in`, `account_suspended`, `not_allow
 
 | Migration | Schema | Rollback | Rollback test |
 |---|---|---|---|
+| `20261107193110_support_requests.sql` (A3a) | 110 | `supabase/rollback/20261107193110_support_requests.sql`: **refuses to run** (error listing how many) while a request, message or note written after A3a exists, so real messages and notes are never lost; otherwise everything returns to schema 109 | `npm run test:rollback`; the refusal checked by hand with one message present (nothing changed) |
 | `20261107173549_support_role.sql` (A2) | 109 | `supabase/rollback/20261107173549_support_role.sql`: agents become clients (sessions end), the support functions, triggers and audit columns go, account deletion and the audit list are restored as before | `npm run test:rollback`: structure and data identical byte for byte, then the migration applies again; also run by hand with an agent and its audit entries present |

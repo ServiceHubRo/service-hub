@@ -14,6 +14,7 @@ import {
   REPORTS_PATH,
   SHOP_REPORTS_PATH,
   SUBSCRIPTION_PATH,
+  SUPPORT_REQUESTS_PATHS,
   urlFor,
   type NotificationEvent,
 } from './templates.ts';
@@ -606,6 +607,11 @@ export function emailForEvent(e: EmailEvent, app: string): EmailContent | null {
       return areaLaunchedEmail(p, lang, app);
     case 'report_credit':
       return reportCreditEmail(p, lang, app);
+    case 'support_reply':
+    case 'support_resolved':
+      return supportRequestEmail(e, lang, app);
+    case 'support_escalated':
+      return supportEscalatedEmail(p, app);
     default:
       return subscriptionEmail(e, lang, app);
   }
@@ -865,5 +871,75 @@ function walkInInviteEmail(p: Record<string, unknown>, lang: Lang, app: string):
     footer: en
       ? `You are receiving this email because ${shop} entered your booking on Service-Hub.`
       : `Primești acest email pentru că ${shop} ți-a trecut programarea pe Service-Hub.`,
+  });
+}
+
+/**
+ * A3a: the Service-Hub team answered a support request, or marked it solved. The answer itself stays
+ * in the app (the email only leads there), so nothing the team wrote travels by email.
+ */
+function supportRequestEmail(e: EmailEvent, lang: Lang, app: string): EmailContent {
+  const p = e.params ?? {};
+  const title = str(p.title);
+  const base = e.role === 'shop' ? SUPPORT_REQUESTS_PATHS.shop : SUPPORT_REQUESTS_PATHS.client;
+  const url = `${app}${str(p.request_id) ? `${base}/${str(p.request_id)}` : base}`;
+  const en = lang === 'en';
+  const solved = e.event === 'support_resolved';
+  const quoted = en ? `"${title}"` : `„${title}”`;
+  return email(
+    solved ? (en ? 'Your request is resolved' : 'Solicitarea ta este rezolvată') : en ? 'Answer to your request' : 'Răspuns la solicitarea ta',
+    {
+      lang,
+      preheader: solved
+        ? en
+          ? `Your request ${quoted} is resolved.`
+          : `Solicitarea ${quoted} este rezolvată.`
+        : en
+          ? `The Service-Hub team answered your request ${quoted}.`
+          : `Echipa Service-Hub a răspuns la solicitarea ${quoted}.`,
+      title: solved ? (en ? 'Request resolved' : 'Solicitare rezolvată') : en ? 'New answer' : 'Răspuns nou',
+      blocks: solved
+        ? [
+            { p: en ? `Your request ${quoted} is resolved.` : `Solicitarea ${quoted} este rezolvată.` },
+            {
+              p: en
+                ? 'If the problem continues, write a message in the request within 14 days and it reopens.'
+                : 'Dacă problema continuă, scrie un mesaj în solicitare în cel mult 14 zile și se redeschide.',
+            },
+          ]
+        : [
+            { p: en ? `The Service-Hub team answered your request ${quoted}.` : `Echipa Service-Hub a răspuns la solicitarea ${quoted}.` },
+            { p: en ? 'The answer is in the app, in Account → Help and contact.' : 'Răspunsul este în aplicație, în Cont → Ajutor și contact.' },
+          ],
+      button: { label: en ? 'Open Service-Hub' : 'Deschide Service-Hub', url },
+      footer: en
+        ? 'You are receiving this email because you wrote to the Service-Hub team.'
+        : 'Primești acest email pentru că ai scris echipei Service-Hub.',
+    },
+  );
+}
+
+/** A3a: an agent escalated a request; to the platform's admin address, in Romanian. */
+function supportEscalatedEmail(p: Record<string, unknown>, app: string): EmailContent {
+  const title = str(p.title) || 'Solicitare';
+  const rows: [string, string][] = [
+    ['Solicitarea', title],
+    ['Categorie', str(p.category)],
+    ['Agent', str(p.agent)],
+  ];
+  return email(`Solicitare escaladată: ${title}`, {
+    lang: 'ro',
+    preheader: `${str(p.agent) || 'Un agent'} a escaladat o solicitare.`,
+    title: 'Solicitare escaladată',
+    blocks: [
+      { p: 'Un agent de suport a escaladat o solicitare. Până o rezolvi sau o returnezi, agentul doar o poate citi.' },
+      { rows },
+      ...(str(p.reason) ? [{ quote: str(p.reason) }] : []),
+    ],
+    button: {
+      label: 'Deschide Service-Hub',
+      url: `${app}/admin/suport/solicitari${str(p.request_id) ? `/${str(p.request_id)}` : ''}`,
+    },
+    footer: 'Primești acest email ca administrator Service-Hub (ADMIN_EMAIL).',
   });
 }

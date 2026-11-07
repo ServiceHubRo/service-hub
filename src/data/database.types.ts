@@ -4117,41 +4117,195 @@ export type Database = {
           },
         ]
       }
-      suggestions: {
+      suggestion_messages: {
         Row: {
-          author_id: string
-          author_role: string
+          author_id: string | null
+          body: string
+          created_at: string
+          from_staff: boolean
+          id: string
+          suggestion_id: string
+        }
+        Insert: {
+          author_id?: string | null
+          body: string
+          created_at?: string
+          from_staff: boolean
+          id?: string
+          suggestion_id: string
+        }
+        Update: {
+          author_id?: string | null
+          body?: string
+          created_at?: string
+          from_staff?: boolean
+          id?: string
+          suggestion_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "suggestion_messages_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "suggestion_messages_suggestion_id_fkey"
+            columns: ["suggestion_id"]
+            isOneToOne: false
+            referencedRelation: "suggestions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      suggestion_notes: {
+        Row: {
+          author_display_id: string | null
+          author_id: string | null
           body: string
           created_at: string
           id: string
-          shop_id: string | null
-          status: string
-          updated_at: string
+          suggestion_id: string
         }
         Insert: {
-          author_id: string
-          author_role: string
+          author_display_id?: string | null
+          author_id?: string | null
           body: string
           created_at?: string
           id?: string
-          shop_id?: string | null
-          status?: string
-          updated_at?: string
+          suggestion_id: string
         }
         Update: {
-          author_id?: string
-          author_role?: string
+          author_display_id?: string | null
+          author_id?: string | null
           body?: string
           created_at?: string
           id?: string
+          suggestion_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "suggestion_notes_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "suggestion_notes_suggestion_id_fkey"
+            columns: ["suggestion_id"]
+            isOneToOne: false
+            referencedRelation: "suggestions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      suggestions: {
+        Row: {
+          assigned_at: string | null
+          assigned_to: string | null
+          author_id: string
+          author_read_at: string | null
+          author_role: string
+          body: string
+          booking_id: string | null
+          category: string
+          closed_at: string | null
+          created_at: string
+          escalated_at: string | null
+          escalated_by: string | null
+          escalation_reason: string | null
+          first_response_at: string | null
+          id: string
+          last_staff_message_at: string | null
+          last_user_message_at: string | null
+          resolved_at: string | null
+          shop_id: string | null
+          status: string
+          title: string | null
+          updated_at: string
+        }
+        Insert: {
+          assigned_at?: string | null
+          assigned_to?: string | null
+          author_id: string
+          author_read_at?: string | null
+          author_role: string
+          body: string
+          booking_id?: string | null
+          category?: string
+          closed_at?: string | null
+          created_at?: string
+          escalated_at?: string | null
+          escalated_by?: string | null
+          escalation_reason?: string | null
+          first_response_at?: string | null
+          id?: string
+          last_staff_message_at?: string | null
+          last_user_message_at?: string | null
+          resolved_at?: string | null
           shop_id?: string | null
           status?: string
+          title?: string | null
+          updated_at?: string
+        }
+        Update: {
+          assigned_at?: string | null
+          assigned_to?: string | null
+          author_id?: string
+          author_read_at?: string | null
+          author_role?: string
+          body?: string
+          booking_id?: string | null
+          category?: string
+          closed_at?: string | null
+          created_at?: string
+          escalated_at?: string | null
+          escalated_by?: string | null
+          escalation_reason?: string | null
+          first_response_at?: string | null
+          id?: string
+          last_staff_message_at?: string | null
+          last_user_message_at?: string | null
+          resolved_at?: string | null
+          shop_id?: string | null
+          status?: string
+          title?: string | null
           updated_at?: string
         }
         Relationships: [
           {
+            foreignKeyName: "suggestions_assigned_to_fkey"
+            columns: ["assigned_to"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "suggestions_author_id_fkey"
             columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "suggestions_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "suggestions_category_fkey"
+            columns: ["category"]
+            isOneToOne: false
+            referencedRelation: "support_categories"
+            referencedColumns: ["key"]
+          },
+          {
+            foreignKeyName: "suggestions_escalated_by_fkey"
+            columns: ["escalated_by"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
@@ -4171,6 +4325,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      support_categories: {
+        Row: {
+          active: boolean
+          created_at: string
+          key: string
+          name_en: string
+          name_ro: string
+          position: number
+          roles: string[]
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          key: string
+          name_en: string
+          name_ro: string
+          position?: number
+          roles?: string[]
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          key?: string
+          name_en?: string
+          name_ro?: string
+          position?: number
+          roles?: string[]
+        }
+        Relationships: []
       }
       threads: {
         Row: {
@@ -4583,6 +4767,10 @@ export type Database = {
       admin_overview: { Args: never; Returns: Json }
       admin_retry_fleet_event: {
         Args: { p_id: number; p_request_id: string }
+        Returns: Json
+      }
+      admin_return_request: {
+        Args: { p_id: string; p_reason: string; p_request_id: string }
         Returns: Json
       }
       admin_review_json: {
@@ -5050,6 +5238,10 @@ export type Database = {
         Args: { p_client_id: string; p_days?: number }
         Returns: number
       }
+      close_resolved_support_requests: {
+        Args: { p_now?: string }
+        Returns: number
+      }
       close_stale_bookings: { Args: { p_now?: string }; Returns: number }
       company_admin_count: { Args: { p_company: string }; Returns: number }
       company_audit: {
@@ -5353,6 +5545,16 @@ export type Database = {
         }
         Returns: Json
       }
+      create_support_request: {
+        Args: {
+          p_body: string
+          p_booking_ref: string
+          p_category: string
+          p_request_id: string
+          p_title: string
+        }
+        Returns: Json
+      }
       current_sent_quote: {
         Args: { p_booking_id: string }
         Returns: {
@@ -5607,6 +5809,7 @@ export type Database = {
       expire_quotes: { Args: never; Returns: number }
       expire_unanswered_requests: { Args: { p_now?: string }; Returns: number }
       export_my_data: { Args: never; Returns: Json }
+      export_my_data_a3a: { Args: never; Returns: Json }
       export_my_data_base: { Args: never; Returns: Json }
       export_my_data_t32: { Args: never; Returns: Json }
       export_my_data_t35: { Args: never; Returns: Json }
@@ -6132,6 +6335,7 @@ export type Database = {
         Returns: Json
       }
       get_company_invite: { Args: { p_token: string }; Returns: Json }
+      get_my_support_request: { Args: { p_id: string }; Returns: Json }
       get_schema_version: { Args: never; Returns: number }
       get_shop_page: { Args: { p_shop_id: string }; Returns: Json }
       get_shop_setup: { Args: never; Returns: Json }
@@ -6238,6 +6442,10 @@ export type Database = {
       is_shop_member: { Args: { p_shop_id: string }; Returns: boolean }
       is_shop_owner: { Args: { p_shop_id: string }; Returns: boolean }
       is_shop_public: { Args: { p_shop_id: string }; Returns: boolean }
+      is_support_request_author: {
+        Args: { p_suggestion_id: string }
+        Returns: boolean
+      }
       is_suspect_review: { Args: { p_signals: string[] }; Returns: boolean }
       is_valid_cui: { Args: { p: string }; Returns: boolean }
       is_valid_iban: { Args: { p: string }; Returns: boolean }
@@ -6572,6 +6780,7 @@ export type Database = {
       my_referrals: { Args: never; Returns: Json }
       my_shop_id: { Args: never; Returns: string }
       my_subscription_offers: { Args: never; Returns: Json }
+      my_support_requests: { Args: never; Returns: Json }
       new_client_offers: {
         Args: { p_shop_ids: string[] }
         Returns: {
@@ -6783,6 +6992,10 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      reply_my_support_request: {
+        Args: { p_body: string; p_id: string; p_request_id: string }
+        Returns: Json
       }
       reply_review: {
         Args: { p_reply: string; p_request_id: string; p_review_id: string }
@@ -7132,6 +7345,49 @@ export type Database = {
           p_booking: Database["public"]["Tables"]["bookings"]["Row"]
         }
         Returns: undefined
+      }
+      require_support_author: {
+        Args: never
+        Returns: {
+          app_tips: boolean
+          company_address: string | null
+          company_name: string | null
+          company_reg_com: string | null
+          company_vat_id: string | null
+          created_at: string
+          deleted_at: string | null
+          display_id: string
+          doc_party: string
+          email_verified_at: string | null
+          fleet_beta: boolean
+          guide_hidden_at: string | null
+          id: string
+          lang: string
+          last_active_at: string | null
+          location_prompt_dismissed_at: string | null
+          name: string | null
+          person_address: string | null
+          phone: string | null
+          phone_verified_at: string | null
+          phone_verified_by_admin: boolean
+          promo_notifications: boolean
+          push_prompt_dismissed_at: string | null
+          review_requests: boolean
+          role: string
+          season_reminders: boolean
+          service_reminders: boolean
+          share_history: boolean
+          suspended: boolean
+          terms_accepted_at: string | null
+          terms_version: string | null
+          tour_seen_at: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "profiles"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       reschedule_booking: {
         Args: {
@@ -8184,11 +8440,74 @@ export type Database = {
         Returns: number
       }
       support_account_card: { Args: { p_id: string }; Returns: Json }
+      support_add_note: {
+        Args: { p_body: string; p_id: string; p_request_id: string }
+        Returns: Json
+      }
+      support_apply_status: {
+        Args: {
+          p_me: Database["public"]["Tables"]["profiles"]["Row"]
+          p_status: string
+          s: Database["public"]["Tables"]["suggestions"]["Row"]
+        }
+        Returns: string
+      }
+      support_assign_request: {
+        Args: { p_assignee: string; p_id: string; p_request_id: string }
+        Returns: Json
+      }
+      support_booking_ref: { Args: { p_booking_id: string }; Returns: Json }
+      support_categories_for_me: { Args: never; Returns: Json }
+      support_escalate_request: {
+        Args: { p_id: string; p_reason: string; p_request_id: string }
+        Returns: Json
+      }
       support_get_account: { Args: { p_id: string }; Returns: Json }
+      support_get_request: { Args: { p_id: string }; Returns: Json }
+      support_guard: {
+        Args: {
+          p_me: Database["public"]["Tables"]["profiles"]["Row"]
+          s: Database["public"]["Tables"]["suggestions"]["Row"]
+        }
+        Returns: undefined
+      }
+      support_list_requests: { Args: never; Returns: Json }
+      support_list_staff: { Args: never; Returns: Json }
       support_list_suggestions: { Args: never; Returns: Json }
+      support_reopen_until: {
+        Args: { s: Database["public"]["Tables"]["suggestions"]["Row"] }
+        Returns: string
+      }
+      support_reply_request: {
+        Args: {
+          p_body: string
+          p_id: string
+          p_request_id: string
+          p_status: string
+        }
+        Returns: Json
+      }
+      support_request_label: {
+        Args: { s: Database["public"]["Tables"]["suggestions"]["Row"] }
+        Returns: string
+      }
+      support_request_open: { Args: { p_status: string }; Returns: boolean }
       support_search_accounts: { Args: { p_q: string }; Returns: Json }
+      support_set_request_status: {
+        Args: { p_id: string; p_request_id: string; p_status: string }
+        Returns: Json
+      }
       support_set_suggestion_status: {
         Args: { p_id: string; p_request_id: string; p_status: string }
+        Returns: Json
+      }
+      support_staff_ref: { Args: { p_id: string }; Returns: Json }
+      support_status_allowed: {
+        Args: { p_category: string; p_status: string }
+        Returns: boolean
+      }
+      support_take_request: {
+        Args: { p_id: string; p_request_id: string }
         Returns: Json
       }
       sync_stripe_subscription: {
