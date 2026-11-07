@@ -20,7 +20,7 @@ create function pg_temp.finish(p_client uuid, p_cost numeric, p_source text defa
 language plpgsql as $$
 declare
   v uuid := test.raw_booking(test.id('shop1'), p_client, 'in_progress', test.today() - 1, '10:00',
-                             'B ' || left(p_client::text, 6));
+                             'B ' || left(p_client::text, 6) || ' 1');
 begin
   alter table public.bookings disable trigger bookings_guard;
   update public.bookings set source = p_source where id = v;

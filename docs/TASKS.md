@@ -1591,6 +1591,12 @@ Aprobate de Eduard pe 6 nov („aprob T71–T75”; T71 era deja folosit, așa c
 
 - [x] Făcut
 
+### P8 — Testele SQL generează doar numere de înmatriculare valide ✅
+- Auditul din 6 nov: `119_client_referrals` pica rar și aleator. Numărul de înmatriculare era făcut din primele 6 caractere ale unui UUID; când toate erau litere (a–f), regula T69 (cel puțin o cifră) îl refuza. Același tipar era în `118_offers` și în `test.raw_booking` (`06_booking_helpers`, cu `md5`).
+- Toate trei adaugă acum o cifră fixă; regula de validare a numerelor nu s-a schimbat. Doar teste, fără cod de aplicație sau bază de date.
+
+- [x] Făcut
+
 ### P3 — Adminul nu mai citește conversațiile private (varianta A) ✅
 - Decizia lui Eduard, 6 nov: accesul adminului la conversațiile client–service e scos complet. S-au eliminat:
   - ramura de admin din regula `threads_select` și din `can_read_thread` (deci și din mesaje și din Realtime);
