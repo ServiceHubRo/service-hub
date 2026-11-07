@@ -168,9 +168,13 @@ test.describe('M5 — quote changes and the manager\'s cancel', () => {
         p_request_id: crypto.randomUUID(),
         p_company_vehicle_id: vehicle,
       });
-    const a = await book(f.driver, f.vehicle, weekday(7));
+    const dayA = weekday(7);
+    const a = await book(f.driver, f.vehicle, dayA);
     await rpcAs(shop, 'confirm_booking', { p_booking_id: a.id, p_request_id: crypto.randomUUID() });
-    const b = await book(f.admin, second.id, weekday(8));
+    // Another day than the first booking (on a weekend, weekday(7) and weekday(8) are the same Monday).
+    let n = 8;
+    while (weekday(n) === dayA) n += 1;
+    const b = await book(f.admin, second.id, weekday(n));
     await rpcAs(shop, 'confirm_booking', { p_booking_id: b.id, p_request_id: crypto.randomUUID() });
     await rpcAs(shop, 'start_inspection', { p_booking_id: b.id, p_request_id: crypto.randomUUID() });
     await rpcAs(shop, 'send_quote', {
