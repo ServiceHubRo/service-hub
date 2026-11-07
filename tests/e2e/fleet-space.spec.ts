@@ -134,7 +134,9 @@ test('the plan: Abonament, the limits of Fleet Start, and the admin changes the 
   await expect(page.getByRole('heading', { level: 1, name: 'Panou' })).toBeVisible();
   await expect(page.getByRole('button', { name: /Fleet Business/ })).toHaveCount(0);
   await expect(page.getByText(/Perioada de test se încheie în/)).toHaveCount(0);
-  await serviceRest(`company_subscriptions?company_id=eq.${company.id}`, 'PATCH', { trial_ends_at: new Date(Date.now() + 3 * 86_400_000 - 3_600_000).toISOString() });
+  // Three Bucharest calendar days from today, at midday there: the count never depends on the hour the test runs.
+  const in3Days = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Bucharest' }).format(new Date(Date.now() + 3 * 86_400_000));
+  await serviceRest(`company_subscriptions?company_id=eq.${company.id}`, 'PATCH', { trial_ends_at: `${in3Days}T10:00:00Z` });
   await page.reload();
   await expect(page.getByText('Perioada de test se încheie în 3 zile.')).toBeVisible();
   await page.getByRole('button', { name: 'Vezi abonamentul' }).click();
