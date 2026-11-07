@@ -21,6 +21,7 @@ export function ConfirmPanel({
   danger,
   onConfirm,
   onCancel,
+  errorMessage,
 }: {
   title: string;
   body?: string;
@@ -31,6 +32,8 @@ export function ConfirmPanel({
   danger?: boolean;
   onConfirm: (text: string, requestId: string) => Promise<unknown>;
   onCancel: () => void;
+  /** The text of a refusal, when the generic one would mislead (A2). */
+  errorMessage?: (error: unknown) => string;
 }) {
   const { t, lang } = useI18n();
   const [text, setText] = useState('');
@@ -62,7 +65,7 @@ export function ConfirmPanel({
             }
             await onConfirm(text.trim(), requestId);
           }}
-          errorMessage={(e) => rpcErrorMessage(lang, e)}
+          errorMessage={errorMessage ?? ((e) => rpcErrorMessage(lang, e))}
           canRetry={canRetryRpc}
         >
           {confirmLabel}

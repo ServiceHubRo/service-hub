@@ -10,10 +10,10 @@ import { TeamNoticesScreen } from '../../screens/notices/TeamNoticesScreen';
 import { messagesPath } from '../../screens/messages/paths';
 import { NotFound } from '../../screens/public/NotFound';
 import { SuggestionsScreen } from '../../screens/suggestions/SuggestionsScreen';
-import { homeOf, NAV, type Role } from '../roles';
+import { homeOf, isStaff, NAV, type Role } from '../roles';
 
 /**
- * A role's routes live under its base (`/c/*`, `/s/*`, `/admin/*`) in a file of their own, so the
+ * A role's routes live under its base (`/c/*`, `/s/*`, `/admin/*`, `/suport/*`) in a file of their own, so the
  * paths inside are relative to it. The screens keep using absolute paths everywhere else.
  */
 export function rel(role: Role, path: string): string {
@@ -23,8 +23,8 @@ export function rel(role: Role, path: string): string {
 }
 
 /**
- * Every role: its navigation screens, Cont with the legal documents and (clients and shops) Ajutor
- * și contact and Sugestii, and a 404 inside the shell.
+ * Every role: its navigation screens, Cont with the legal documents and (clients and shops, never the
+ * team: isStaff) Ajutor și contact and Sugestii, and a 404 inside the shell.
  */
 export function commonRoutes(role: Role, screens: Record<string, ReactElement>) {
   const nav = NAV[role];
@@ -36,8 +36,8 @@ export function commonRoutes(role: Role, screens: Record<string, ReactElement>) 
       ))}
       <Route path={rel(role, nav.account.path)} element={<AccountScreen role={role} />} />
       <Route path={`${rel(role, nav.account.path)}/legal/:doc`} element={<AccountLegal role={role} />} />
-      {role !== 'admin' && <Route path={rel(role, helpPath(role))} element={<HelpScreen role={role} />} />}
-      {role !== 'admin' && <Route path={rel(role, suggestionsPath(role))} element={<SuggestionsScreen role={role} />} />}
+      {!isStaff(role) && <Route path={rel(role, helpPath(role))} element={<HelpScreen role={role} />} />}
+      {!isStaff(role) && <Route path={rel(role, suggestionsPath(role))} element={<SuggestionsScreen role={role} />} />}
       <Route path="*" element={<NotFound inShell />} />
     </>
   );

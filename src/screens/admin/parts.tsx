@@ -103,6 +103,7 @@ function valueText(t: (key: MessageKey) => string, lang: Lang, key: string, valu
     if (status in ro) return t(status as MessageKey);
     if (booking in ro) return t(booking as MessageKey);
   }
+  if (key === 'role' && `account.kind.${String(value)}` in ro) return t(`account.kind.${String(value)}` as MessageKey);
   if (key === 'suggestion_status') return t((value === 'new' ? 'admin.sugg.status.new' : `sugg.status.${String(value)}`) as MessageKey);
   if (key === 'report_status' && `admin.reportStatus.${String(value)}` in ro) return t(`admin.reportStatus.${String(value)}` as MessageKey);
   if (key === 'mode' && `admin.deleteMode.${String(value)}` in ro) return t(`admin.deleteMode.${String(value)}` as MessageKey);
@@ -130,7 +131,9 @@ export function AuditList({ entries, entityLink }: { entries: AuditEntry[]; enti
             {entityLink?.(e)}
             <span className={styles.muted}>
               {e.admin_display_id || e.admin_name
-                ? t('admin.audit.by', { admin: [e.admin_display_id, e.admin_name].filter(Boolean).join(' · ') })
+                ? t(e.actor_role === 'support' ? 'admin.audit.byAgent' : 'admin.audit.by', {
+                    admin: [e.admin_display_id, e.admin_name].filter(Boolean).join(' · '),
+                  })
                 : t('admin.audit.auto')}
             </span>
             {changes.map((c) =>
@@ -155,6 +158,12 @@ export function AuditList({ entries, entityLink }: { entries: AuditEntry[]; enti
                   {valueText(t, lang, c.key, c.after)}
                 </span>
               ),
+            )}
+            {e.reason && (
+              <span className={styles.change}>
+                <span className={styles.changeKey}>{t('admin.audit.detail.reason')}: </span>
+                {e.reason}
+              </span>
             )}
             {details.map((d) => (
               <span key={d.key} className={styles.change}>

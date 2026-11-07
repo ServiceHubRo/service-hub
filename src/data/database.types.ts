@@ -60,6 +60,8 @@ export type Database = {
       admin_audit_log: {
         Row: {
           action: string
+          actor_display_id: string | null
+          actor_role: string | null
           admin_id: string | null
           after: Json | null
           before: Json | null
@@ -67,9 +69,12 @@ export type Database = {
           entity_id: string | null
           entity_type: string
           id: string
+          reason: string | null
         }
         Insert: {
           action: string
+          actor_display_id?: string | null
+          actor_role?: string | null
           admin_id?: string | null
           after?: Json | null
           before?: Json | null
@@ -77,9 +82,12 @@ export type Database = {
           entity_id?: string | null
           entity_type: string
           id?: string
+          reason?: string | null
         }
         Update: {
           action?: string
+          actor_display_id?: string | null
+          actor_role?: string | null
           admin_id?: string | null
           after?: Json | null
           before?: Json | null
@@ -87,6 +95,7 @@ export type Database = {
           entity_id?: string | null
           entity_type?: string
           id?: string
+          reason?: string | null
         }
         Relationships: []
       }
@@ -4515,9 +4524,12 @@ export type Database = {
       admin_get_booking: { Args: { p_booking_id: string }; Returns: Json }
       admin_get_client: { Args: { p_user_id: string }; Returns: Json }
       admin_get_shop: { Args: { p_shop_id: string }; Returns: Json }
-      admin_get_thread: { Args: { p_thread_id: string }; Returns: Json }
       admin_grant_report_credit: {
         Args: { p_request_id: string; p_user_id: string }
+        Returns: Json
+      }
+      admin_grant_support: {
+        Args: { p_account: string; p_reason: string; p_request_id: string }
         Returns: Json
       }
       admin_list_audit: {
@@ -4549,6 +4561,7 @@ export type Database = {
       admin_list_shops: { Args: never; Returns: Json }
       admin_list_subscriptions: { Args: never; Returns: Json }
       admin_list_suggestions: { Args: never; Returns: Json }
+      admin_list_support_agents: { Args: never; Returns: Json }
       admin_list_suspect_reviews: { Args: never; Returns: Json }
       admin_move_catalog_item: {
         Args: {
@@ -4574,6 +4587,10 @@ export type Database = {
       }
       admin_review_json: {
         Args: { p_review: Database["public"]["Tables"]["reviews"]["Row"] }
+        Returns: Json
+      }
+      admin_revoke_support: {
+        Args: { p_reason: string; p_request_id: string; p_user_id: string }
         Returns: Json
       }
       admin_send_notice: {
@@ -4643,7 +4660,6 @@ export type Database = {
         Returns: Json
       }
       admin_subscription_rows: { Args: never; Returns: Json }
-      admin_thread_messages: { Args: { p_thread_id: string }; Returns: Json }
       admin_update_category: {
         Args: {
           p_enabled: boolean
@@ -4829,6 +4845,7 @@ export type Database = {
         Returns: undefined
       }
       caller_aal: { Args: never; Returns: string }
+      caller_session_alive: { Args: never; Returns: boolean }
       can_read_booking: { Args: { p_booking_id: string }; Returns: boolean }
       can_read_booking_money: {
         Args: { p_booking_id: string }
@@ -6528,6 +6545,7 @@ export type Database = {
         Returns: undefined
       }
       mark_thread_read: { Args: { p_thread_id: string }; Returns: string }
+      mask_email: { Args: { p_email: string }; Returns: string }
       mask_plate: { Args: { p_plate: string }; Returns: string }
       merge_cars: {
         Args: { p_drop: string; p_keep: string; p_request_id: string }
@@ -7023,6 +7041,49 @@ export type Database = {
       require_my_shop: { Args: never; Returns: string }
       require_my_shop_owner: { Args: never; Returns: string }
       require_reader: {
+        Args: never
+        Returns: {
+          app_tips: boolean
+          company_address: string | null
+          company_name: string | null
+          company_reg_com: string | null
+          company_vat_id: string | null
+          created_at: string
+          deleted_at: string | null
+          display_id: string
+          doc_party: string
+          email_verified_at: string | null
+          fleet_beta: boolean
+          guide_hidden_at: string | null
+          id: string
+          lang: string
+          last_active_at: string | null
+          location_prompt_dismissed_at: string | null
+          name: string | null
+          person_address: string | null
+          phone: string | null
+          phone_verified_at: string | null
+          phone_verified_by_admin: boolean
+          promo_notifications: boolean
+          push_prompt_dismissed_at: string | null
+          review_requests: boolean
+          role: string
+          season_reminders: boolean
+          service_reminders: boolean
+          share_history: boolean
+          suspended: boolean
+          terms_accepted_at: string | null
+          terms_version: string | null
+          tour_seen_at: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "profiles"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      require_staff: {
         Args: never
         Returns: {
           app_tips: boolean
@@ -7878,6 +7939,17 @@ export type Database = {
         Args: { p_date: string; p_slot: string }
         Returns: string
       }
+      staff_audit: {
+        Args: {
+          p_action: string
+          p_after: Json
+          p_before: Json
+          p_entity_id: string
+          p_entity_type: string
+          p_reason?: string
+        }
+        Returns: undefined
+      }
       start_inspection: {
         Args: { p_booking_id: string; p_request_id: string }
         Returns: {
@@ -8110,6 +8182,14 @@ export type Database = {
       subscription_period_price: {
         Args: { p_discount: number; p_monthly: number; p_months: number }
         Returns: number
+      }
+      support_account_card: { Args: { p_id: string }; Returns: Json }
+      support_get_account: { Args: { p_id: string }; Returns: Json }
+      support_list_suggestions: { Args: never; Returns: Json }
+      support_search_accounts: { Args: { p_q: string }; Returns: Json }
+      support_set_suggestion_status: {
+        Args: { p_id: string; p_request_id: string; p_status: string }
+        Returns: Json
       }
       sync_stripe_subscription: {
         Args: { p_customer: string; p_shop_id: string; p_sub: Json }

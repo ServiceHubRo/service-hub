@@ -127,6 +127,8 @@ const FUNCTIONS = (page: Page): Fn[] => [
   { zone: 'Platformă', item: 'Catalog de servicii', path: '/admin/platforma/catalog', title: 'Catalog de servicii' },
   { zone: 'Platformă', item: 'Jurnal de audit', path: '/admin/platforma/jurnal', title: 'Jurnal de audit' },
   { zone: 'Platformă', item: 'Notificări flotă eșuate', path: '/admin/platforma/notificari-flota', title: 'Notificări flotă eșuate' },
+  // A2
+  { zone: 'Platformă', item: 'Echipa de suport', path: '/admin/platforma/echipa', title: 'Echipa de suport', shows: label(page, 'ID cont sau email') },
 ];
 
 const ZONES = [
@@ -219,6 +221,7 @@ test.describe('A1 — admin navigation', () => {
         'Catalog de servicii',
         'Jurnal de audit',
         'Notificări flotă eșuate',
+        'Echipa de suport',
       ]);
       await sub.getByRole('link', { name: 'Anunțuri' }).click();
       await expect(h1(page)).toHaveText('Anunțuri');

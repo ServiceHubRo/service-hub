@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSession } from '../../app/sessionContext';
+import { isStaff } from '../../app/roles';
 import { ActionButton } from '../../components/ActionButton';
 import { Button } from '../../components/Button';
 import { Section } from '../../components/Section';
@@ -45,14 +46,14 @@ export function DataSection() {
           <ActionButton variant="secondary" onAction={exportData} errorMessage={(e) => authErrorMessage(lang, e)}>
             {t('account.data.export')}
           </ActionButton>
-          {profile.role !== 'admin' && !confirming && (
+          {!isStaff(profile.role) && !confirming && (
             <Button variant="danger" block onClick={() => setConfirming(true)}>
               {t('account.delete')}
             </Button>
           )}
         </div>
       </Card>
-      {profile.role !== 'admin' && confirming && (
+      {!isStaff(profile.role) && confirming && (
         <Card className={styles.danger}>
           <div className={styles.cardStack}>
             <p>

@@ -41,6 +41,7 @@ import {
   ADMIN_SUBSCRIPTIONS_PATH,
   ADMIN_SUGGESTIONS_PATH,
   ADMIN_SUPPORT_PATH,
+  ADMIN_TEAM_PATH,
   ADMIN_TEXTS_PATH,
   ADMIN_ZONES_PATH,
 } from '../../screens/admin/paths';
@@ -50,6 +51,7 @@ import { ShopDetailScreen } from '../../screens/admin/ShopDetailScreen';
 import { ShopsScreen } from '../../screens/admin/ShopsScreen';
 import { SubscriptionsScreen } from '../../screens/admin/SubscriptionsScreen';
 import { SuggestionsScreen } from '../../screens/admin/SuggestionsScreen';
+import { TeamScreen } from '../../screens/admin/TeamScreen';
 import { TextsScreen } from '../../screens/admin/TextsScreen';
 import { ZoneScreen } from '../../screens/admin/ZoneScreen';
 import { ZonesScreen } from '../../screens/admin/ZonesScreen';
@@ -111,6 +113,7 @@ export default function AdminApp() {
         <Route path={at(ADMIN_CATALOG_PATH)} element={<CatalogScreen />} />
         <Route path={at(ADMIN_AUDIT_PATH)} element={<AuditScreen />} />
         <Route path={at(ADMIN_FLEET_FAILED_PATH)} element={<FleetFailedEventsScreen />} />
+        <Route path={at(ADMIN_TEAM_PATH)} element={<TeamScreen />} />
         {/* The addresses from before A1 (kept at least until A8). */}
         {ADMIN_LEGACY_ROUTES.map(([old]) => (
           <Route key={old} path={`${at(old)}/*`} element={<LegacyRedirect />} />

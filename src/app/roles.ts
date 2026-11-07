@@ -1,8 +1,17 @@
-import { CalendarDays, Car, History, LayoutDashboard, MessageSquare, Search, User, type LucideIcon } from 'lucide-react';
+import { CalendarDays, Car, History, Inbox, LayoutDashboard, MessageSquare, Search, User, UserSearch, type LucideIcon } from 'lucide-react';
 import type { MessageKey } from '../i18n/ro';
+import { SUPPORT_REQUESTS_PATH, SUPPORT_SEARCH_PATH } from '../screens/support/paths';
 import { ADMIN_ZONES } from './adminZones';
 
-export type Role = 'client' | 'shop' | 'admin';
+export type Role = 'client' | 'shop' | 'admin' | 'support';
+
+/**
+ * The Service-Hub team (A2): the admin and the support agents. Never a client's or a shop's screens
+ * (tour, push, Ajutor și contact, Sugestii, account deletion, the ANPC mark).
+ */
+export function isStaff(role: string | null | undefined): role is 'admin' | 'support' {
+  return role === 'admin' || role === 'support';
+}
 
 export interface NavItem {
   path: string;
@@ -51,10 +60,17 @@ const adminMain: NavItem[] = ADMIN_ZONES.map((zone) => ({
   children: zone.items.map((item) => ({ path: item.path, labelKey: item.labelKey, icon: item.icon })),
 }));
 
+// Support agent (A2): its requests and the account search; Help Center and Proceduri join in A4 / A5.
+const supportMain: NavItem[] = [
+  { path: SUPPORT_REQUESTS_PATH, labelKey: 'nav.support.requests', icon: Inbox },
+  { path: SUPPORT_SEARCH_PATH, labelKey: 'nav.support.search', icon: UserSearch },
+];
+
 export const NAV: Record<Role, RoleNav> = {
   client: { base: '/c', main: clientMain, account: account('/c'), bottomBar: [...clientMain, account('/c')] },
   shop: { base: '/s', main: shopMain, account: account('/s'), bottomBar: [...shopMain, account('/s')] },
   admin: { base: '/admin', main: adminMain, account: account('/admin'), bottomBar: adminMain },
+  support: { base: '/suport', main: supportMain, account: account('/suport'), bottomBar: [...supportMain, account('/suport')] },
 };
 
 export function homeOf(role: Role): string {

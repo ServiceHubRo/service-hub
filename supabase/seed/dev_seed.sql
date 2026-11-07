@@ -13,6 +13,8 @@
 --   client@service-hub.test       client Andrei Marin — Golf 7 + Duster, bookings in every status
 --   admin@service-hub.test        admin — second step: the authenticator key at the end of this file
 --   admin-nou@service-hub.test    admin without an authenticator app yet (the first setup, T25)
+--   suport@service-hub.test       support agent (A2), appointed by the demo admin — second step: the
+--                                 authenticator key at the end of this file
 
 -- Creates a confirmed email/password account; the sign-up trigger builds profile and shop.
 create function pg_temp.seed_user(p_id uuid, p_email text, p_meta jsonb) returns uuid
@@ -372,7 +374,7 @@ $$;
 
 -- The demo admin's authenticator app (T25): admin work needs the second step of sign-in. The
 -- browser tests type codes made from this key (tests/e2e/support.ts, SEED_ADMIN_TOTP). Local
--- stack only (the SQL tests' stand-in has no auth.mfa_factors).
+-- stack and the SQL tests' stand-in (which has auth.mfa_factors since A2).
 do $$
 begin
   if to_regclass('auth.mfa_factors') is not null then
@@ -389,3 +391,33 @@ $$;
 -- The demo accounts know the app already (T39): no tour and no "Primii pași" for them (the browser
 -- tests open them all the time; tests/e2e/onboarding.spec.ts makes its own new accounts).
 update public.profiles set tour_seen_at = now(), guide_hidden_at = now();
+
+-- A2: the demo support agent, appointed by the demo admin the way the app does it (reason in the
+-- audit log), with its own authenticator key (tests/e2e/support.ts, SEED_SUPPORT_TOTP). Only once
+-- the database has the support role (the rollback test loads this file before that migration).
+do $$
+begin
+  if to_regprocedure('public.admin_grant_support(text, text, uuid)') is not null
+     and not exists (select 1 from auth.users where email = 'suport@service-hub.test') then
+    perform pg_temp.seed_user('30000000-0000-4000-8000-000000000003', 'suport@service-hub.test',
+      '{"role":"client","name":"Ioana Suport","lang":"ro","terms_version":"2026-09"}');
+    perform set_config('request.jwt.claim.sub', '30000000-0000-4000-8000-000000000001', true);
+    perform set_config('request.jwt.claims',
+      '{"sub":"30000000-0000-4000-8000-000000000001","role":"authenticated","aal":"aal2"}', true);
+    perform public.admin_grant_support('suport@service-hub.test', 'Cont demo', '30000000-0000-4000-8000-0000000000a2');
+    perform set_config('request.jwt.claim.sub', '', true);
+    perform set_config('request.jwt.claims', '', true);
+    update public.profiles set tour_seen_at = now(), guide_hidden_at = now()
+    where id = '30000000-0000-4000-8000-000000000003';
+  end if;
+  if to_regclass('auth.mfa_factors') is not null
+     and exists (select 1 from auth.users where id = '30000000-0000-4000-8000-000000000003') then
+    execute $sql$
+      insert into auth.mfa_factors (id, user_id, friendly_name, factor_type, status, created_at, updated_at, secret)
+      values ('30000000-0000-4000-8000-0000000000f3', '30000000-0000-4000-8000-000000000003', 'Service-Hub',
+              'totp', 'verified', now(), now(), 'KRSXG5CTKVIFAT2SKRSXG5CTKVIFAT2S')
+      on conflict (id) do nothing
+    $sql$;
+  end if;
+end
+$$;

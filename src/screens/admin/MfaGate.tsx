@@ -14,11 +14,11 @@ import { AuthLayout } from '../auth/AuthLayout';
 import styles from './mfa.module.css';
 
 /**
- * The admin interface opens only after the second step of sign-in (T25): the code from an
+ * The admin's and the support agent's interfaces (A2) open only after the second step of sign-in (T25): the code from an
  * authenticator app, or, the first time, setting the app up. The database refuses admin work to
  * a session without it (is_admin, require_admin), so this screen only leads the way.
  */
-export function MfaGate({ children }: { children: ReactNode }) {
+export function MfaGate({ children, role = 'admin' }: { children: ReactNode; role?: 'admin' | 'support' }) {
   const { t } = useI18n();
   const load = useCallback(() => mfaState(), []);
   const { state, reload } = useLoad(load);
@@ -29,12 +29,12 @@ export function MfaGate({ children }: { children: ReactNode }) {
     <AuthLayout title={t('mfa.title')}>
       {state.status === 'loading' && <SkeletonList count={1} />}
       {state.status === 'error' && <LoadError message={t('mfa.loadError')} onRetry={reload} />}
-      {state.status === 'ready' && <MfaStep state={state.data} onPassed={() => setPassed(true)} />}
+      {state.status === 'ready' && <MfaStep state={state.data} role={role} onPassed={() => setPassed(true)} />}
     </AuthLayout>
   );
 }
 
-function MfaStep({ state, onPassed }: { state: MfaState; onPassed: () => void }) {
+function MfaStep({ state, role, onPassed }: { state: MfaState; role: 'admin' | 'support'; onPassed: () => void }) {
   const { t, lang } = useI18n();
   const session = useSession();
   const [enrollment, setEnrollment] = useState<Enrollment | null>(null);
@@ -61,7 +61,7 @@ function MfaStep({ state, onPassed }: { state: MfaState; onPassed: () => void })
       {state.step === 'challenge' && <p className={styles.muted}>{t('mfa.challenge')}</p>}
       {state.step === 'enroll' && !enrollment && (
         <>
-          <p className={styles.muted}>{t('mfa.enrollIntro')}</p>
+          <p className={styles.muted}>{t(role === 'support' ? 'mfa.enrollIntro.support' : 'mfa.enrollIntro')}</p>
           <ActionButton onAction={async () => setEnrollment(await startEnrollment())} errorMessage={(e) => rpcErrorMessage(lang, e)}>
             {t('mfa.start')}
           </ActionButton>
@@ -95,7 +95,7 @@ function MfaStep({ state, onPassed }: { state: MfaState; onPassed: () => void })
           </ActionButton>
         </form>
       )}
-      <p className={styles.muted}>{t('mfa.lost')}</p>
+      <p className={styles.muted}>{t(role === 'support' ? 'mfa.lost.support' : 'mfa.lost')}</p>
       <Button variant="secondary" onClick={() => void session.signOut()}>
         {t('mfa.signOut')}
       </Button>

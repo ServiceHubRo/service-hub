@@ -17,7 +17,7 @@ import styles from './onboarding.module.css';
  * prompt only after "Permite". "Nu acum" puts it off like the banners do (saved on the profile),
  * so Caută and Panou do not ask again at once. Once per account on a device.
  */
-export function PermissionsIntro({ role }: { role: 'client' | 'shop' | 'admin' }) {
+export function PermissionsIntro({ role }: { role: 'client' | 'shop' | 'admin' | 'support' }) {
   const { t, lang } = useI18n();
   const session = useSession();
   const profile = session.profile;

@@ -21,6 +21,7 @@ import {
   SlidersHorizontal,
   Store,
   Truck,
+  UserCog,
   UserX,
   Users,
   type LucideIcon,
@@ -49,6 +50,7 @@ import {
   ADMIN_SUBSCRIPTIONS_PATH,
   ADMIN_SUGGESTIONS_PATH,
   ADMIN_SUPPORT_PATH,
+  ADMIN_TEAM_PATH,
   ADMIN_TEXTS_PATH,
   ADMIN_ZONES_PATH,
 } from '../screens/admin/paths';
@@ -147,6 +149,7 @@ export const ADMIN_ZONES: readonly AdminZone[] = [
       { path: ADMIN_CATALOG_PATH, labelKey: 'admin.catalog.title', hintKey: 'admin.catalog.tileHint', icon: ListTree, group: 'config' },
       { path: ADMIN_AUDIT_PATH, labelKey: 'admin.audit.title', hintKey: 'admin.audit.tileHint', icon: ScrollText, group: 'control' },
       { path: ADMIN_FLEET_FAILED_PATH, labelKey: 'admin.fleetFailed.title', hintKey: 'admin.fleetFailed.tileHint', icon: BellOff, group: 'control' },
+      { path: ADMIN_TEAM_PATH, labelKey: 'admin.team.title', hintKey: 'admin.team.tileHint', icon: UserCog, group: 'control' },
     ],
   },
 ];
