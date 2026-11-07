@@ -14,14 +14,18 @@ import { SkeletonList } from '../../components/Skeleton';
 import { fetchAdminAreas, setAreaMode, type AdminArea, type AdminAreas, type AreaMode } from '../../data/areas';
 import { canRetryRpc, rpcErrorMessage } from '../../data/rpc';
 import { fetchCategories, type SearchCategory } from '../../data/search';
+import { adminZoneBack } from '../../app/adminZones';
 import { useI18n } from '../../i18n/context';
 import { plural } from '../../i18n/translate';
 import { useLoad } from '../../lib/useLoad';
 import { day } from './format';
 import { Facts, Pill } from './parts';
-import { ADMIN_ACCOUNT_PATH, adminShopPath } from './paths';
+import { ADMIN_ZONES_PATH, adminShopPath } from './paths';
 import { useUrlParams } from './useUrlParams';
 import styles from './admin.module.css';
+
+/** „‹ Înapoi” goes to the screen's zone (A1). */
+const ZONE_BACK = adminZoneBack(ADMIN_ZONES_PATH);
 
 const FILTERS = ['all', 'live', 'off', 'waiting'] as const;
 type ZoneFilter = (typeof FILTERS)[number];
@@ -70,7 +74,7 @@ export function ZonesScreen() {
 
   return (
     <div className={styles.page}>
-      <PageHeader back={{ to: ADMIN_ACCOUNT_PATH, label: t('nav.account') }} title={t('admin.areas.title')} />
+      <PageHeader back={{ to: ZONE_BACK.to, label: t(ZONE_BACK.label) }} title={t('admin.areas.title')} />
       <p className={styles.muted}>{t('admin.areas.intro')}</p>
       {state.status === 'loading' && <SkeletonList />}
       {state.status === 'error' && <LoadError message={t('admin.areas.loadError')} onRetry={reload} />}

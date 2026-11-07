@@ -151,8 +151,11 @@ test.describe('T53 no-shows', () => {
     });
 
     await signInAdmin(page);
-    await page.goto('/admin/moderare');
+    // Contestațiile have a page of their own since A1; Moderare links to it.
+    await page.goto('/admin/activitate/moderare');
     await expect(page.getByRole('heading', { level: 1, name: 'Moderare' })).toBeVisible();
+    await page.locator('main').getByRole('link', { name: /^Contestații de neprezentare/ }).click();
+    await expect(page.getByRole('heading', { level: 1, name: 'Contestații de neprezentare' })).toBeVisible();
     const item = page.getByRole('listitem').filter({ hasText: shopName }).filter({ hasText: 'Service-ul a amânat programarea' });
     await expect(item).toBeVisible();
     await expect(item).toContainText(bookings[0]!.ref);

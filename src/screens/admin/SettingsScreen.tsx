@@ -14,15 +14,19 @@ import {
   NOTIFICATION_LIMIT_KEYS,
   updateSettings, type LimitKey, type PlatformSettings, type SettingKey } from '../../data/adminTools';
 import { canRetryRpc, rpcErrorMessage } from '../../data/rpc';
+import { adminZoneBack } from '../../app/adminZones';
 import { useI18n } from '../../i18n/context';
 import type { Msg } from '../../i18n/translate';
 import type { MessageKey } from '../../i18n/ro';
 import { DECIMAL_SETTINGS, SETTING_SECTIONS, settingsChange, type SettingsDraft } from '../../lib/adminTools';
 import { useLoad } from '../../lib/useLoad';
 import { SectionTitle } from './parts';
-import { ADMIN_ACCOUNT_PATH, ADMIN_TEXTS_PATH } from './paths';
+import { ADMIN_SETTINGS_PATH, ADMIN_TEXTS_PATH } from './paths';
 import { dateTime } from './format';
 import styles from './admin.module.css';
+
+/** „‹ Înapoi” goes to the screen's zone (A1). */
+const ZONE_BACK = adminZoneBack(ADMIN_SETTINGS_PATH);
 
 /** The form's text for a value: `29,5` in Romanian, `29.5` in English. */
 function shown(lang: string, n: number): string {
@@ -134,7 +138,7 @@ export function SettingsScreen() {
 
   return (
     <div className={styles.page}>
-      <BackLink to={ADMIN_ACCOUNT_PATH} label={t('nav.account')} />
+      <BackLink to={ZONE_BACK.to} label={t(ZONE_BACK.label)} />
       <div>
         <h1>{t('admin.settings.title')}</h1>
         <p className={styles.sub}>

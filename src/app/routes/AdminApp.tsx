@@ -11,10 +11,39 @@ import { CatalogScreen } from '../../screens/admin/CatalogScreen';
 import { ClientDetailScreen } from '../../screens/admin/ClientDetailScreen';
 import { ClientsScreen } from '../../screens/admin/ClientsScreen';
 import { ExportScreen } from '../../screens/admin/ExportScreen';
+import { LegacyRedirect } from '../../screens/admin/LegacyRedirect';
 import { MfaGate } from '../../screens/admin/MfaGate';
 import { ModerationScreen } from '../../screens/admin/ModerationScreen';
+import { NoShowDisputesScreen } from '../../screens/admin/NoShowDisputesScreen';
 import { NoticesScreen } from '../../screens/admin/NoticesScreen';
 import { OverviewScreen } from '../../screens/admin/OverviewScreen';
+import {
+  ADMIN_ACTIVITY_PATH,
+  ADMIN_ANAF_PATH,
+  ADMIN_AUDIT_PATH,
+  ADMIN_BOOKINGS_PATH,
+  ADMIN_CATALOG_PATH,
+  ADMIN_CLIENTS_PATH,
+  ADMIN_DISPUTES_PATH,
+  ADMIN_DUPLICATES_PATH,
+  ADMIN_EXPORT_PATH,
+  ADMIN_FLEET_FAILED_PATH,
+  ADMIN_FLEETS_PATH,
+  ADMIN_LEGACY_ROUTES,
+  ADMIN_MODERATION_PATH,
+  ADMIN_NOTICES_PATH,
+  ADMIN_PANEL_PATH,
+  ADMIN_PARTNERS_PATH,
+  ADMIN_PLATFORM_PATH,
+  ADMIN_REPORTS_PATH,
+  ADMIN_SETTINGS_PATH,
+  ADMIN_SHOPS_PATH,
+  ADMIN_SUBSCRIPTIONS_PATH,
+  ADMIN_SUGGESTIONS_PATH,
+  ADMIN_SUPPORT_PATH,
+  ADMIN_TEXTS_PATH,
+  ADMIN_ZONES_PATH,
+} from '../../screens/admin/paths';
 import { ReportsScreen } from '../../screens/admin/ReportsScreen';
 import { SettingsScreen } from '../../screens/admin/SettingsScreen';
 import { ShopDetailScreen } from '../../screens/admin/ShopDetailScreen';
@@ -22,11 +51,19 @@ import { ShopsScreen } from '../../screens/admin/ShopsScreen';
 import { SubscriptionsScreen } from '../../screens/admin/SubscriptionsScreen';
 import { SuggestionsScreen } from '../../screens/admin/SuggestionsScreen';
 import { TextsScreen } from '../../screens/admin/TextsScreen';
+import { ZoneScreen } from '../../screens/admin/ZoneScreen';
 import { ZonesScreen } from '../../screens/admin/ZonesScreen';
 import { AppShell } from '../AppShell';
-import { commonRoutes } from './shared';
+import { commonRoutes, rel } from './shared';
 
-/** Everything under /admin, loaded only by admins (T18). */
+/** A sub-section's route, relative to /admin. */
+const at = (path: string) => rel('admin', path);
+
+/**
+ * Everything under /admin, loaded only by admins (T18). Since A1 the five zones (src/app/adminZones.ts)
+ * and their sub-sections; every address from before A1 still opens its page at the new address
+ * (LegacyRedirect, replacing the history entry).
+ */
 export default function AdminApp() {
   return (
     <Routes>
@@ -42,29 +79,42 @@ export default function AdminApp() {
         }
       >
         {commonRoutes('admin', {
-          '/admin/prezentare': <OverviewScreen />,
-          '/admin/service-uri': <ShopsScreen />,
-          '/admin/clienti': <ClientsScreen />,
-          '/admin/rezervari': <BookingsScreen />,
-          '/admin/moderare': <ModerationScreen />,
+          [ADMIN_PANEL_PATH]: <OverviewScreen />,
+          [ADMIN_PARTNERS_PATH]: <ZoneScreen path={ADMIN_PARTNERS_PATH} />,
+          [ADMIN_ACTIVITY_PATH]: <ZoneScreen path={ADMIN_ACTIVITY_PATH} />,
+          [ADMIN_SUPPORT_PATH]: <ZoneScreen path={ADMIN_SUPPORT_PATH} />,
+          [ADMIN_PLATFORM_PATH]: <ZoneScreen path={ADMIN_PLATFORM_PATH} />,
         })}
-        <Route path="service-uri/:shopId" element={<ShopDetailScreen />} />
-        <Route path="clienti/:clientId" element={<ClientDetailScreen />} />
-        <Route path="rezervari/:bookingId" element={<BookingDetailScreen />} />
-        <Route path="cont/jurnal" element={<AuditScreen />} />
-        <Route path="cont/abonamente" element={<SubscriptionsScreen />} />
-        <Route path="cont/rapoarte" element={<ReportsScreen />} />
-        <Route path="cont/catalog" element={<CatalogScreen />} />
-        <Route path="cont/setari" element={<SettingsScreen />} />
-        <Route path="cont/setari/texte" element={<TextsScreen />} />
-        <Route path="cont/anunturi" element={<NoticesScreen />} />
-        <Route path="cont/export" element={<ExportScreen />} />
-        <Route path="cont/anaf" element={<AnafScreen />} />
-        <Route path="cont/zone" element={<ZonesScreen />} />
-        <Route path="cont/sugestii" element={<SuggestionsScreen />} />
-        <Route path="cont/flote" element={<FleetsScreen />} />
-        <Route path="cont/duplicate" element={<VehicleDuplicatesScreen />} />
-        <Route path="cont/notificari-flota" element={<FleetFailedEventsScreen />} />
+        {/* Parteneri */}
+        <Route path={at(ADMIN_CLIENTS_PATH)} element={<ClientsScreen />} />
+        <Route path={`${at(ADMIN_CLIENTS_PATH)}/:clientId`} element={<ClientDetailScreen />} />
+        <Route path={at(ADMIN_SHOPS_PATH)} element={<ShopsScreen />} />
+        <Route path={`${at(ADMIN_SHOPS_PATH)}/:shopId`} element={<ShopDetailScreen />} />
+        <Route path={at(ADMIN_FLEETS_PATH)} element={<FleetsScreen />} />
+        <Route path={at(ADMIN_ANAF_PATH)} element={<AnafScreen />} />
+        <Route path={at(ADMIN_DUPLICATES_PATH)} element={<VehicleDuplicatesScreen />} />
+        {/* Activitate */}
+        <Route path={at(ADMIN_BOOKINGS_PATH)} element={<BookingsScreen />} />
+        <Route path={`${at(ADMIN_BOOKINGS_PATH)}/:bookingId`} element={<BookingDetailScreen />} />
+        <Route path={at(ADMIN_MODERATION_PATH)} element={<ModerationScreen />} />
+        <Route path={at(ADMIN_DISPUTES_PATH)} element={<NoShowDisputesScreen />} />
+        <Route path={at(ADMIN_SUBSCRIPTIONS_PATH)} element={<SubscriptionsScreen />} />
+        <Route path={at(ADMIN_REPORTS_PATH)} element={<ReportsScreen />} />
+        <Route path={at(ADMIN_EXPORT_PATH)} element={<ExportScreen />} />
+        {/* Suport */}
+        <Route path={at(ADMIN_SUGGESTIONS_PATH)} element={<SuggestionsScreen />} />
+        {/* Platformă */}
+        <Route path={at(ADMIN_SETTINGS_PATH)} element={<SettingsScreen />} />
+        <Route path={at(ADMIN_TEXTS_PATH)} element={<TextsScreen />} />
+        <Route path={at(ADMIN_NOTICES_PATH)} element={<NoticesScreen />} />
+        <Route path={at(ADMIN_ZONES_PATH)} element={<ZonesScreen />} />
+        <Route path={at(ADMIN_CATALOG_PATH)} element={<CatalogScreen />} />
+        <Route path={at(ADMIN_AUDIT_PATH)} element={<AuditScreen />} />
+        <Route path={at(ADMIN_FLEET_FAILED_PATH)} element={<FleetFailedEventsScreen />} />
+        {/* The addresses from before A1 (kept at least until A8). */}
+        {ADMIN_LEGACY_ROUTES.map(([old]) => (
+          <Route key={old} path={`${at(old)}/*`} element={<LegacyRedirect />} />
+        ))}
       </Route>
     </Routes>
   );

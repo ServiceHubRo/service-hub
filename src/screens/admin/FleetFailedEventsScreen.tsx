@@ -7,12 +7,16 @@ import { PageHeader } from '../../components/PageHeader';
 import { SkeletonList } from '../../components/Skeleton';
 import { adminFailedFleetEvents, adminRetryFleetEvent } from '../../data/fleet';
 import { canRetryRpc, rpcErrorMessage } from '../../data/rpc';
+import { adminZoneBack } from '../../app/adminZones';
 import { useI18n } from '../../i18n/context';
 import { formatDate, formatTime } from '../../i18n/format';
 import { useLoad } from '../../lib/useLoad';
-import { ADMIN_ACCOUNT_PATH } from './paths';
+import { ADMIN_FLEET_FAILED_PATH } from './paths';
 import styles from './admin.module.css';
 import own from './fleets.module.css';
+
+/** „‹ Înapoi” goes to the screen's zone (A1). */
+const ZONE_BACK = adminZoneBack(ADMIN_FLEET_FAILED_PATH);
 
 /**
  * „Notificări flotă eșuate” (M6, platform admin): the fleet events the outbox gave up on after 24
@@ -66,7 +70,7 @@ export function FleetFailedEventsScreen() {
 
   return (
     <div className={styles.page}>
-      <PageHeader back={{ to: ADMIN_ACCOUNT_PATH, label: t('nav.account') }} title={t('admin.fleetFailed.title')} />
+      <PageHeader back={{ to: ZONE_BACK.to, label: t(ZONE_BACK.label) }} title={t('admin.fleetFailed.title')} />
       {body}
     </div>
   );

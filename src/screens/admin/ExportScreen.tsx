@@ -2,10 +2,14 @@ import { Link } from 'react-router-dom';
 import { BackLink } from '../../components/BackLink';
 import { Card } from '../../components/Card';
 import { EXPORT_KINDS, type ExportKind } from '../../data/adminTools';
+import { adminZoneBack } from '../../app/adminZones';
 import { useI18n } from '../../i18n/context';
 import { ExportButton } from './ExportButton';
-import { ADMIN_ACCOUNT_PATH, ADMIN_ANAF_PATH, ADMIN_BOOKINGS_PATH, ADMIN_CLIENTS_PATH, ADMIN_MODERATION_PATH, ADMIN_SHOPS_PATH, ADMIN_SUBSCRIPTIONS_PATH } from './paths';
+import { ADMIN_ANAF_PATH, ADMIN_BOOKINGS_PATH, ADMIN_CLIENTS_PATH, ADMIN_EXPORT_PATH, ADMIN_MODERATION_PATH, ADMIN_SHOPS_PATH, ADMIN_SUBSCRIPTIONS_PATH } from './paths';
 import styles from './admin.module.css';
+
+/** „‹ Înapoi” goes to the screen's zone (A1). */
+const ZONE_BACK = adminZoneBack(ADMIN_EXPORT_PATH);
 
 /** The list screen whose filters narrow each export. */
 const LIST_PATH: Record<ExportKind, string> = {
@@ -25,7 +29,7 @@ export function ExportScreen() {
   const { t } = useI18n();
   return (
     <div className={styles.page}>
-      <BackLink to={ADMIN_ACCOUNT_PATH} label={t('nav.account')} />
+      <BackLink to={ZONE_BACK.to} label={t(ZONE_BACK.label)} />
       <div>
         <h1>{t('admin.export.title')}</h1>
       </div>

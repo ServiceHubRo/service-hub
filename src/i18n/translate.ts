@@ -61,6 +61,7 @@ export type PluralUnit =
   | 'unit.trialLeft'
   | 'unit.clients'
   | 'unit.reportsPending'
+  | 'unit.disputesPending'
   | 'unit.subscriptions'
   | 'unit.reports'
   | 'unit.people'

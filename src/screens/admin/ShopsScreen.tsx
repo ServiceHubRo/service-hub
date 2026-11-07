@@ -7,17 +7,22 @@ import { LoadError } from '../../components/LoadError';
 import { SearchField } from '../../components/SearchField';
 import { SkeletonList } from '../../components/Skeleton';
 import { fetchShops, type AdminShopRow } from '../../data/admin';
+import { BackLink } from '../../components/BackLink';
+import { adminZoneBack } from '../../app/adminZones';
 import { useI18n } from '../../i18n/context';
 import { plural } from '../../i18n/translate';
 import { filterShops, isShopFilter, SHOP_FILTERS } from '../../lib/admin';
 import { formatPhone } from '../../lib/validators';
 import { ExportButton } from './ExportButton';
 import { RowLink, ShopStatePill, Verified } from './parts';
-import { adminShopPath } from './paths';
+import { ADMIN_SHOPS_PATH, adminShopPath } from './paths';
 import { useLiveData } from './useLiveData';
 import { useUrlParams } from './useUrlParams';
 import { day } from './format';
 import styles from './admin.module.css';
+
+/** „‹ Înapoi” goes to the screen's zone (A1). */
+const ZONE_BACK = adminZoneBack(ADMIN_SHOPS_PATH);
 
 const LIVE = [{ table: 'shops' }, { table: 'subscriptions' }, { table: 'profiles' }];
 
@@ -37,6 +42,7 @@ export function ShopsScreen() {
 
   return (
     <div className={styles.page}>
+      <BackLink to={ZONE_BACK.to} label={t(ZONE_BACK.label)} />
       <div>
         <h1>{t('nav.admin.shops')}</h1>
         {all && <p className={styles.sub}>{plural(lang, 'unit.shops', shown.length)}</p>}

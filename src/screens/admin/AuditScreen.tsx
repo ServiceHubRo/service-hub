@@ -8,23 +8,16 @@ import { LoadError } from '../../components/LoadError';
 import { SkeletonList } from '../../components/Skeleton';
 import { AUDIT_PAGE, fetchAudit, type AuditEntry } from '../../data/admin';
 import { rpcErrorMessage } from '../../data/rpc';
+import { adminZoneBack } from '../../app/adminZones';
 import { useI18n } from '../../i18n/context';
 import type { MessageKey } from '../../i18n/ro';
 import { useLoad } from '../../lib/useLoad';
 import { AuditList } from './parts';
-import {
-  ADMIN_ACCOUNT_PATH,
-  ADMIN_CATALOG_PATH,
-  ADMIN_MODERATION_PATH,
-  ADMIN_NOTICES_PATH,
-  ADMIN_REPORTS_PATH,
-  ADMIN_SUGGESTIONS_PATH,
-  ADMIN_TEXTS_PATH,
-  adminBookingPath,
-  adminClientPath,
-  adminShopPath,
-} from './paths';
+import { ADMIN_AUDIT_PATH, ADMIN_CATALOG_PATH, ADMIN_MODERATION_PATH, ADMIN_NOTICES_PATH, ADMIN_REPORTS_PATH, ADMIN_SUGGESTIONS_PATH, ADMIN_TEXTS_PATH, adminBookingPath, adminClientPath, adminShopPath } from './paths';
 import styles from './admin.module.css';
+
+/** „‹ Înapoi” goes to the screen's zone (A1). */
+const ZONE_BACK = adminZoneBack(ADMIN_AUDIT_PATH);
 
 const loadFirst = () => fetchAudit();
 
@@ -112,7 +105,7 @@ export function AuditScreen() {
 
   return (
     <div className={styles.page}>
-      <BackLink to={ADMIN_ACCOUNT_PATH} label={t('nav.account')} />
+      <BackLink to={ZONE_BACK.to} label={t(ZONE_BACK.label)} />
       <div>
         <h1>{t('admin.audit.title')}</h1>
       </div>

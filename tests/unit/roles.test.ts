@@ -11,10 +11,9 @@ describe('navigation per role (CLAUDE.md §1)', () => {
   it('shop has exactly its five items, no garage', () => {
     expect(labels('shop')).toEqual(['Panou', 'Programări', 'Istoric', 'Mesaje', 'Cont']);
   });
-  it('admin has exactly its five items', () => {
-    expect(labels('admin')).toEqual(['Panou', 'Service-uri', 'Clienți', 'Rezervări', 'Moderare']);
-    // The full name on the desktop sidebar and as the screen's title.
-    expect(translate('ro', NAV.admin.main[0]!.labelKey)).toBe('Panou principal');
+  it('admin has exactly its five zones (A1), each but Panou with its sub-sections', () => {
+    expect(labels('admin')).toEqual(['Panou', 'Parteneri', 'Activitate', 'Suport', 'Platformă']);
+    expect(NAV.admin.main.map((z) => z.children?.length ?? 0)).toEqual([0, 5, 6, 1, 7]);
   });
   it('every route stays under its role prefix', () => {
     for (const nav of Object.values(NAV)) {
@@ -24,6 +23,6 @@ describe('navigation per role (CLAUDE.md §1)', () => {
   it('each role has its home', () => {
     expect(homeOf('client')).toBe('/c/cauta');
     expect(homeOf('shop')).toBe('/s/panou');
-    expect(homeOf('admin')).toBe('/admin/prezentare');
+    expect(homeOf('admin')).toBe('/admin/panou');
   });
 });

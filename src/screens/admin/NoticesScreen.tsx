@@ -22,17 +22,21 @@ import {
 } from '../../data/adminTools';
 import { canRetryRpc, rpcErrorMessage } from '../../data/rpc';
 import { fetchCities, type SearchCity } from '../../data/search';
+import { adminZoneBack } from '../../app/adminZones';
 import { useI18n } from '../../i18n/context';
 import type { MessageKey } from '../../i18n/ro';
 import { plural, type Msg } from '../../i18n/translate';
 import { NoticeBubble } from '../notices/NoticeBubble';
 import { ConfirmPanel } from './ActionPanels';
 import { SectionTitle } from './parts';
-import { ADMIN_ACCOUNT_PATH } from './paths';
+import { ADMIN_NOTICES_PATH } from './paths';
 import { useLiveData } from './useLiveData';
 import { dateTime } from './format';
 import styles from './admin.module.css';
 import tools from './tools.module.css';
+
+/** „‹ Înapoi” goes to the screen's zone (A1). */
+const ZONE_BACK = adminZoneBack(ADMIN_NOTICES_PATH);
 
 const LIVE = [{ table: 'notices' }];
 
@@ -230,7 +234,7 @@ export function NoticesScreen() {
 
   return (
     <div className={styles.page}>
-      <BackLink to={ADMIN_ACCOUNT_PATH} label={t('nav.account')} />
+      <BackLink to={ZONE_BACK.to} label={t(ZONE_BACK.label)} />
       <div>
         <h1>{t('admin.notices.title')}</h1>
         <p className={styles.sub}>{t('admin.notices.sub')}</p>

@@ -13,7 +13,7 @@ import { useScreenSlide } from '../lib/screenSlide';
 import { useScrollMemory } from '../lib/scrollMemory';
 import { useBumps } from '../lib/useBumps';
 import { useOptionalAdminCounts } from '../screens/admin/adminContext';
-import { ADMIN_MODERATION_PATH } from '../screens/admin/paths';
+import { ADMIN_ACTIVITY_PATH, ADMIN_MODERATION_PATH } from '../screens/admin/paths';
 import { useOptionalClientBookings } from '../screens/client/bookings/clientBookingsContext';
 import { BOOKINGS_PATH } from '../screens/client/paths';
 import { useOptionalShopBookings } from '../screens/shop/bookings/shopBookingsContext';
@@ -76,6 +76,37 @@ function SidebarLink({ item, badge }: { item: NavItem; badge?: Badge }) {
   );
 }
 
+/**
+ * An admin zone in the sidebar (A1): the zone, and under it, while the zone is open, its
+ * sub-sections — one level, the current one marked like the zone (tint, amber icon, bold).
+ */
+function SidebarZone({ item, badges }: { item: NavItem; badges: Record<string, Badge> }) {
+  const { t } = useI18n();
+  const { pathname } = useLocation();
+  const open = pathname === item.path || pathname.startsWith(`${item.path}/`);
+  return (
+    <>
+      <SidebarLink item={item} badge={badges[item.path]} />
+      {open && item.children && item.children.length > 0 && (
+        <ul className={styles.sideSub} aria-label={t(item.labelKey)}>
+          {item.children.map((child) => (
+            <li key={child.path}>
+              <NavLink
+                to={child.path}
+                className={({ isActive }) => `${styles.sideLink} ${styles.sideSubLink} ${isActive ? styles.sideActive : ''}`}
+              >
+                <NavIcon item={child} size={17} badge={badges[child.path]?.count ?? 0} />
+                <span>{t(child.labelKey)}</span>
+                <BadgeText badge={badges[child.path]} />
+              </NavLink>
+            </li>
+          ))}
+        </ul>
+      )}
+    </>
+  );
+}
+
 /** A count on a navigation item and what it counts (read out after the label). */
 interface Badge {
   count: number;
@@ -96,7 +127,9 @@ function useNavBadges(): Record<string, Badge> {
   const admin = useOptionalAdminCounts();
   const badges: Record<string, Badge> = {};
   if (admin?.pendingReports != null) {
+    // On Moderare and on its zone, Activitate (A1), so the count shows whichever zone is open.
     badges[ADMIN_MODERATION_PATH] = { count: admin.pendingReports, unit: 'unit.reportsPending' };
+    badges[ADMIN_ACTIVITY_PATH] = { count: admin.pendingReports, unit: 'unit.reportsPending' };
   }
   if (shopBookings?.state.status === 'ready') {
     const count = shopBookings.state.data.bookings.filter((b) => b.status === 'pending').length;
@@ -194,7 +227,9 @@ export function AppShell({ role }: { role: Role }) {
   // In a company's space the navigation is the company's (T65); everything else stays the role's.
   const companyNav = useCompanyNav();
   // The tab title follows the navigation item the screen belongs to (Cont for its tiles).
-  const current = [...nav.main, nav.account].find((item) => pathname === item.path || pathname.startsWith(`${item.path}/`));
+  // An admin sub-section names the tab, not its zone (A1).
+  const under = (item: NavItem) => pathname === item.path || pathname.startsWith(`${item.path}/`);
+  const current = nav.main.flatMap((item) => item.children ?? []).find(under) ?? [...nav.main, nav.account].find(under);
   useDocumentTitle(current ? t(current.labelKey) : null);
 
   // The page scrolls: a new screen starts at the top, going back finds it where it was.
@@ -285,7 +320,13 @@ export function AppShell({ role }: { role: Role }) {
           <nav className={styles.sideNav} aria-label={t('nav.main')}>
             {companyNav
               ? companyNav.slice(0, 4).map((item) => <CompanyNavLink key={item.key} item={item} variant="side" />)
-              : nav.main.map((item) => <SidebarLink key={item.path} item={item} badge={badges[item.path]} />)}
+              : nav.main.map((item) =>
+                  item.children ? (
+                    <SidebarZone key={item.path} item={item} badges={badges} />
+                  ) : (
+                    <SidebarLink key={item.path} item={item} badge={badges[item.path]} />
+                  ),
+                )}
           </nav>
           <div className={styles.sideBottom}>
             {companyNav ? <CompanyNavLink item={companyNav[4]!} variant="side" /> : <SidebarLink item={nav.account} />}

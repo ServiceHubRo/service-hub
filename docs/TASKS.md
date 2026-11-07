@@ -1629,3 +1629,14 @@ Aprobate de Eduard pe 6 nov („aprob T71–T75”; T71 era deja folosit, așa c
 - Teste: `tests/sql/80_admin.sql` (nicio cale nu mai dă conversații adminului), `tests/e2e/admin.spec.ts`.
 
 - [x] Făcut
+
+### A1 — Navigarea adminului: cinci zone ✅
+- Aprobat de Eduard pe 7 nov (O1, O2, E3; planul A1). Adminul lucrează în cinci zone: **Panou · Parteneri · Activitate · Suport · Platformă**, fiecare cu un singur nivel de sub-secțiuni. Pe telefon și tabletă, cele cinci zone sunt în bara de jos, iar pagina unei zone își arată sub-secțiunile. De la 1024 px, zona deschisă își arată sub-secțiunile sub ea, în bara laterală. Contul adminului (din antet) are doar limba, documentele legale, datele și deconectarea.
+- Unde a ajuns fiecare funcție: Parteneri (Clienți, Service-uri, Firme și flote, Verificare ANAF, Vehicule duplicate), Activitate (Programări, Moderare, Contestații de neprezentare — pagină proprie, Abonamente și plăți, Rapoarte de istoric, Export), Suport (Sugestii), Platformă (Configurare: Setări platformă, Textele notificărilor, Anunțuri, Zone, Catalog de servicii; Control: Jurnal de audit, Notificări flotă eșuate). Nicio funcție nu s-a schimbat. „‹ Înapoi” din fiecare instrument duce la zona lui.
+- Denumiri noi: „Rezervări” → „Programări”, „Raport ANAF” → „Verificare ANAF”, „Flote” → „Firme și flote”.
+- Adresele vechi (`/admin/clienti/…`, `/admin/cont/flote` etc.) deschid aceeași pagină la adresa nouă, cu filtrele și ancora păstrate, fără o intrare nouă în istoric (`ADMIN_LEGACY_ROUTES`, `LegacyRedirect`). Rămân cel puțin până la A8.
+- Fără bază de date, fără funcții noi, fără drepturi schimbate. Clientul, service-ul și spațiul firmei arată identic (comparație vizuală la 390 și 1440 px, 0 pixeli diferență).
+- Teste: `tests/unit/adminZones.test.ts`, `tests/unit/roles.test.ts`, `tests/e2e/admin-navigation.spec.ts` (fiecare funcție din meniu, fișele, adresele vechi cu filtre, ID-uri cu caractere speciale și ancore, intrarea după autentificare, Back și „‹ Înapoi”, lățimile 320–1920 px, RO și EN); testele de admin existente folosesc noile adrese.
+- Neverificat: gestul de revenire din Safari pe iPhone (în container există doar Chromium).
+
+- [x] Făcut

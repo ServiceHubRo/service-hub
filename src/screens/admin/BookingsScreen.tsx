@@ -10,6 +10,8 @@ import { SkeletonList } from '../../components/Skeleton';
 import { StatusBadge } from '../../components/StatusBadge';
 import { fetchBookings } from '../../data/admin';
 import { ExportButton } from './ExportButton';
+import { BackLink } from '../../components/BackLink';
+import { adminZoneBack } from '../../app/adminZones';
 import { useI18n } from '../../i18n/context';
 import {
   BOOKING_STATUS_FILTERS,
@@ -20,11 +22,14 @@ import {
   statusesFor,
 } from '../../lib/admin';
 import { Money, RowLink } from './parts';
-import { adminBookingPath } from './paths';
+import { ADMIN_BOOKINGS_PATH, adminBookingPath } from './paths';
 import { useLiveData } from './useLiveData';
 import { useUrlParams } from './useUrlParams';
 import { carText, day } from './format';
 import styles from './admin.module.css';
+
+/** „‹ Înapoi” goes to the screen's zone (A1). */
+const ZONE_BACK = adminZoneBack(ADMIN_BOOKINGS_PATH);
 
 const LIVE = [{ table: 'bookings' }];
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -63,6 +68,7 @@ export function BookingsScreen() {
 
   return (
     <div className={styles.page}>
+      <BackLink to={ZONE_BACK.to} label={t(ZONE_BACK.label)} />
       <div>
         <h1>{t('nav.admin.bookings')}</h1>
         {data && <p className={styles.sub}>{t('admin.bookings.count', { shown: data.bookings.length, total: data.total })}</p>}

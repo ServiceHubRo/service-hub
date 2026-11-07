@@ -4,17 +4,19 @@ import { BACKEND, SEED, SEED_PASSWORD, expectNoHorizontalScroll, isDesktop, sign
 const NAV = {
   client: ['Caută', 'Garaj', 'Programări', 'Mesaje', 'Cont'],
   service: ['Panou', 'Programări', 'Istoric', 'Mesaje', 'Cont'],
-  admin: ['Panou principal', 'Service-uri', 'Clienți', 'Rezervări', 'Moderare'],
+  // The admin's five zones (A1); Panou's page is titled „Panou principal”.
+  admin: ['Panou', 'Parteneri', 'Activitate', 'Suport', 'Platformă'],
 } as const;
 
 const NAV_EN = {
   client: ['Search', 'Garage', 'Bookings', 'Messages', 'Account'],
   service: ['Dashboard', 'Bookings', 'History', 'Messages', 'Account'],
-  admin: ['Dashboard', 'Shops', 'Clients', 'Bookings', 'Moderation'],
+  admin: ['Dashboard', 'Partners', 'Activity', 'Support', 'Platform'],
 } as const;
 
 /** Screens whose title says more than their navigation label (P16b: "Istoric reparații"). */
 const HEADING: Partial<Record<string, string>> = { Istoric: 'Istoric reparații' };
+const headingOf = (role: keyof typeof NAV, label: string) => (role === 'admin' && label === 'Panou' ? 'Panou principal' : (HEADING[label] ?? label));
 
 /** Labels shortened in the phone's bottom bar, where five items share 390 px. */
 const BAR_LABEL: Partial<Record<string, string>> = { 'Panou principal': 'Panou' };
@@ -79,7 +81,7 @@ test('no red database bar when the build reaches a database at the expected vers
 });
 
 test('role screens need an account: signed-out visitors go to sign-in', async ({ page }) => {
-  for (const path of ['/c/cauta', '/s/panou', '/admin/prezentare', '/c/cont']) {
+  for (const path of ['/c/cauta', '/s/panou', '/admin/panou', '/c/cont']) {
     await page.goto(path);
     await expect(page).toHaveURL(/\/intra$/);
     await expect(page.getByRole('button', { name: 'Intră în cont' })).toBeVisible();
@@ -95,7 +97,7 @@ for (const role of Object.keys(NAV) as (keyof typeof NAV)[]) {
       route.request().method() === 'PATCH' ? route.fulfill({ status: 204 }) : route.continue(),
     );
     await signIn(page, SEED[role === 'service' ? 'shop' : role], SEED_PASSWORD);
-    await expect(page.getByRole('heading', { level: 1 })).toHaveText(NAV[role][0]);
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText(headingOf(role, NAV[role][0]));
     const labels = await navLabels(page);
     if (isDesktop(page) && role !== 'admin') {
       // Desktop: four main rows on top; Cont is pinned at the bottom.
@@ -113,7 +115,12 @@ for (const role of Object.keys(NAV) as (keyof typeof NAV)[]) {
       // A count badge is read out after the label ("Programări, 1 cerere nouă").
       const shown = isDesktop(page) ? label : (BAR_LABEL[label] ?? label);
       await page.getByRole('link', { name: new RegExp(`^${shown}( ?,.*)?$`) }).filter({ visible: true }).first().click();
-      await expect(page.getByRole('heading', { level: 1 })).toHaveText(HEADING[label] ?? label);
+      await expect(page.getByRole('heading', { level: 1 })).toHaveText(headingOf(role, label));
+    }
+    // An open admin zone lists its sub-sections in the sidebar: back on Panou (none) to compare the zones.
+    if (role === 'admin') {
+      await page.getByRole('link', { name: /^Panou( ?,.*)?$/ }).filter({ visible: true }).first().click();
+      await expect(page.getByRole('heading', { level: 1 })).toHaveText('Panou principal');
     }
 
     // Switching to English changes every label.
@@ -227,7 +234,7 @@ test('a client cannot open shop or admin screens', async ({ page }) => {
   await expect(page).toHaveURL(/\/c\/cauta$/);
   await page.goto('/s/panou');
   await expect(page).toHaveURL(/\/c\/cauta$/);
-  await page.goto('/admin/prezentare');
+  await page.goto('/admin/panou');
   await expect(page).toHaveURL(/\/c\/cauta$/);
 });
 

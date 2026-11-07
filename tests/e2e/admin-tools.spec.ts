@@ -8,7 +8,7 @@ import {
   createUser,
   expectAccessible,
   expectNoHorizontalScroll,
-  openAccount,
+  adminOpen,
   rpcAs,
   serviceRest,
   shot,
@@ -45,9 +45,19 @@ async function signInAdmin(page: Page) {
   await expect(page.getByRole('heading', { level: 1, name: 'Panou principal' })).toBeVisible();
 }
 
+/** The zone each tool lives in since A1. */
+const TOOL_ZONE: Record<string, string> = {
+  Anunțuri: 'Platformă',
+  'Catalog de servicii': 'Platformă',
+  'Setări platformă': 'Platformă',
+  'Abonamente și plăți': 'Activitate',
+  'Rapoarte de istoric': 'Activitate',
+  Export: 'Activitate',
+  'Verificare ANAF': 'Parteneri',
+};
+
 async function openTool(page: Page, label: string) {
-  await openAccount(page);
-  await page.getByRole('link', { name: new RegExp(`^${label}`) }).click();
+  await adminOpen(page, TOOL_ZONE[label]!, label);
   await expect(page.getByRole('heading', { level: 1, name: label })).toBeVisible();
 }
 
@@ -171,8 +181,7 @@ test.describe('admin tools', () => {
     await page.getByRole('listitem').filter({ hasText: title }).getByRole('button', { name: 'Retrage anunțul' }).click();
     await page.getByRole('listitem').filter({ hasText: title }).getByRole('button', { name: 'Retrage anunțul' }).last().click();
     await expect(page.getByText('Anunțul este retras.')).toBeVisible();
-    await openAccount(page);
-    await page.getByRole('link', { name: /^Jurnal de audit/ }).click();
+    await adminOpen(page, 'Platformă', 'Jurnal de audit');
     await expect(page.getByText('Anunț trimis').first()).toBeVisible();
     await expect(page.getByText('Anunț retras').first()).toBeVisible();
   });
@@ -233,8 +242,7 @@ test.describe('admin tools', () => {
     const [svc] = await serviceRest<{ enabled: boolean }[]>(`services?id=eq.revizie_tractor_${t}&select=enabled`, 'GET');
     expect(svc!.enabled).toBe(false);
 
-    await openAccount(page);
-    await page.getByRole('link', { name: /^Jurnal de audit/ }).click();
+    await adminOpen(page, 'Platformă', 'Jurnal de audit');
     await expect(page.getByText('Serviciu adăugat').first()).toBeVisible();
     await expect(page.getByText('Categorie modificată').first()).toBeVisible();
   });
@@ -264,7 +272,8 @@ test.describe('admin tools', () => {
       await expect(page.getByText('Setările sunt salvate.')).toBeVisible();
     }
 
-    await page.getByRole('link', { name: /^Textele notificărilor/ }).click();
+    // The link on Setări platformă (a shortcut; the tool has its own place in Platformă since A1).
+    await page.locator('main').getByRole('link', { name: /^Textele notificărilor/ }).click();
     await expect(page.getByRole('heading', { level: 1, name: 'Textele notificărilor' })).toBeVisible();
     await page.getByLabel('Caută în texte').fill('shop.new_review');
     const row = page.getByRole('listitem').filter({ hasText: 'shop.new_review' });
@@ -327,7 +336,7 @@ test.describe('admin tools', () => {
     await page.getByRole('combobox', { name: 'Afișează' }).selectOption('plati');
     await page.getByRole('combobox', { name: 'Afișează' }).selectOption('abonamente');
     await page.getByRole('link', { name: new RegExp(shopName) }).click();
-    await expect(page).toHaveURL(new RegExp(`/admin/service-uri/${shopId}$`));
+    await expect(page).toHaveURL(new RegExp(`/admin/parteneri/service-uri/${shopId}$`));
     await expect(page.getByRole('heading', { level: 1, name: shopName })).toBeVisible();
     await page.getByRole('button', { name: 'Schimbă prețul' }).click();
     await page.getByLabel('Preț pe lună (lei)').fill('79,50');
@@ -336,7 +345,7 @@ test.describe('admin tools', () => {
     await expect(page.getByText('79,50 lei').first()).toBeVisible();
 
     // The shops list exports what it shows.
-    await page.goto(`/admin/service-uri?q=${encodeURIComponent(shopName)}`);
+    await page.goto(`/admin/parteneri/service-uri?q=${encodeURIComponent(shopName)}`);
     const shops = await downloadCsv(page, page.getByRole('button', { name: 'Descarcă Excel' }));
     expect(shops.text.trim().split('\r\n')).toHaveLength(2);
     expect(shops.text).toContain('79.5');
@@ -344,8 +353,7 @@ test.describe('admin tools', () => {
     // The export screen and the log.
     await openTool(page, 'Export');
     await shot(page, 't16b-export', name());
-    await openAccount(page);
-    await page.getByRole('link', { name: /^Jurnal de audit/ }).click();
+    await adminOpen(page, 'Platformă', 'Jurnal de audit');
     await expect(page.getByText('Export Excel').first()).toBeVisible();
     await expect(page.getByText('Preț abonament schimbat').first()).toBeVisible();
   });
@@ -354,9 +362,16 @@ test.describe('admin tools', () => {
     await signInAdmin(page);
     await switchLanguage(page, 'en');
     await expect(page.getByRole('heading', { level: 1, name: 'Dashboard' })).toBeVisible();
-    for (const tile of ['Subscriptions and payments', 'Service catalog', 'Platform settings', 'Notices', 'History reports', 'Export']) {
-      await page.getByRole('link', { name: 'Account', exact: true }).filter({ visible: true }).first().click();
-      await page.getByRole('link', { name: new RegExp(`^${tile}`) }).click();
+    const zones: [string, string][] = [
+      ['Subscriptions and payments', 'Activity'],
+      ['Service catalog', 'Platform'],
+      ['Platform settings', 'Platform'],
+      ['Notices', 'Platform'],
+      ['History reports', 'Activity'],
+      ['Export', 'Activity'],
+    ];
+    for (const [tile, zone] of zones) {
+      await adminOpen(page, zone, tile);
       await expect(page.getByRole('heading', { level: 1, name: tile })).toBeVisible();
       await expectNoHorizontalScroll(page);
       await shot(page, `t16b-en-${tile.split(' ')[0]!.toLowerCase()}`, name());
@@ -384,7 +399,7 @@ test.describe('Raport ANAF', () => {
     await serviceRest(`shop_billing?shop_id=eq.${mismatch}`, 'PATCH', { vat_id: 'RO18000003', legal_name: 'Alt Nume SRL', vat_payer: false });
 
     await signInAdmin(page);
-    await openTool(page, 'Raport ANAF');
+    await openTool(page, 'Verificare ANAF');
     await page.getByLabel('Caută după service, cod, CUI sau denumire').fill(id);
     const unknownCard = page.locator('li').filter({ hasText: unknownName });
     const mismatchCard = page.locator('li').filter({ hasText: mismatchName });

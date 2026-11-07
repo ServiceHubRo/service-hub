@@ -7,7 +7,7 @@ import {
   createBookableShop,
   createUser,
   expectNoHorizontalScroll,
-  openAccount,
+  adminOpen,
   rpcAs,
   serviceRest,
   shot,
@@ -128,8 +128,7 @@ test.describe('zones', () => {
     );
     await signIn(page, SEED.admin, SEED_PASSWORD);
     await expect(page.getByRole('heading', { level: 1, name: 'Panou principal' })).toBeVisible();
-    await openAccount(page);
-    await page.getByRole('link', { name: /^Zone/ }).click();
+    await adminOpen(page, 'Platformă', 'Zone');
     await expect(page.getByRole('heading', { level: 1, name: 'Zone' })).toBeVisible();
     await expectNoHorizontalScroll(page);
     await shot(page, 'zones-admin', name());

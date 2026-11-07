@@ -1,18 +1,6 @@
-import {
-  CalendarDays,
-  Car,
-  ClipboardList,
-  History,
-  LayoutDashboard,
-  MessageSquare,
-  Search,
-  ShieldCheck,
-  Store,
-  User,
-  Users,
-  type LucideIcon,
-} from 'lucide-react';
+import { CalendarDays, Car, History, LayoutDashboard, MessageSquare, Search, User, type LucideIcon } from 'lucide-react';
 import type { MessageKey } from '../i18n/ro';
+import { ADMIN_ZONES } from './adminZones';
 
 export type Role = 'client' | 'shop' | 'admin';
 
@@ -22,6 +10,8 @@ export interface NavItem {
   /** A shorter label for the mobile bottom bar, where five items share 390 px. */
   shortLabelKey?: MessageKey;
   icon: LucideIcon;
+  /** The admin's zones (A1): their sub-sections, under the zone in the sidebar. */
+  children?: NavItem[];
 }
 
 export interface RoleNav {
@@ -51,14 +41,15 @@ const shopMain: NavItem[] = [
   { path: '/s/mesaje', labelKey: 'nav.messages', icon: MessageSquare },
 ];
 
-// Admin has five main items; its Cont (platform tools) is reached from the header/sidebar.
-const adminMain: NavItem[] = [
-  { path: '/admin/prezentare', labelKey: 'nav.admin.overview', shortLabelKey: 'nav.admin.overviewShort', icon: LayoutDashboard },
-  { path: '/admin/service-uri', labelKey: 'nav.admin.shops', icon: Store },
-  { path: '/admin/clienti', labelKey: 'nav.admin.clients', icon: Users },
-  { path: '/admin/rezervari', labelKey: 'nav.admin.bookings', icon: ClipboardList },
-  { path: '/admin/moderare', labelKey: 'nav.admin.moderation', icon: ShieldCheck },
-];
+// Admin: five zones (A1, src/app/adminZones.ts), each with its sub-sections; its own Cont is reached
+// from the header (and the bottom of the sidebar).
+const adminMain: NavItem[] = ADMIN_ZONES.map((zone) => ({
+  path: zone.path,
+  labelKey: zone.labelKey,
+  shortLabelKey: zone.shortLabelKey,
+  icon: zone.icon,
+  children: zone.items.map((item) => ({ path: item.path, labelKey: item.labelKey, icon: item.icon })),
+}));
 
 export const NAV: Record<Role, RoleNav> = {
   client: { base: '/c', main: clientMain, account: account('/c'), bottomBar: [...clientMain, account('/c')] },

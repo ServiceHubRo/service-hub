@@ -25,6 +25,7 @@ import {
   type CatalogService,
 } from '../../data/adminTools';
 import { canRetryRpc, rpcErrorMessage } from '../../data/rpc';
+import { adminZoneBack } from '../../app/adminZones';
 import { useI18n } from '../../i18n/context';
 import {
   CATEGORY_KEY_PATTERN,
@@ -38,10 +39,13 @@ import { newRequestId } from '../../lib/requestId';
 import { SERVICE_ICON_NAMES } from '../../lib/serviceIcons';
 import { useLoad } from '../../lib/useLoad';
 import { Pill } from './parts';
-import { ADMIN_ACCOUNT_PATH } from './paths';
+import { ADMIN_CATALOG_PATH } from './paths';
 import { useUrlParams } from './useUrlParams';
 import styles from './admin.module.css';
 import tools from './tools.module.css';
+
+/** „‹ Înapoi” goes to the screen's zone (A1). */
+const ZONE_BACK = adminZoneBack(ADMIN_CATALOG_PATH);
 
 type Panel =
   | { kind: 'new-category' }
@@ -345,7 +349,7 @@ export function CatalogScreen() {
 
   return (
     <div className={styles.page}>
-      <BackLink to={ADMIN_ACCOUNT_PATH} label={t('nav.account')} />
+      <BackLink to={ZONE_BACK.to} label={t(ZONE_BACK.label)} />
       <div>
         <h1>{t('admin.catalog.title')}</h1>
         <p className={styles.sub}>{t('admin.catalog.sub')}</p>
