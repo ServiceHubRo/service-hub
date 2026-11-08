@@ -95,6 +95,8 @@ test.describe('support requests (A3a)', () => {
     await expect(h1(page)).toHaveText(title);
     await expect(page.locator('main').getByText('Primită', { exact: true })).toBeVisible();
     const requestUrl = page.url();
+    // Away from the request: an open request shows the team's answer live and counts it as read (A3c1).
+    await page.goto('/c/cont/ajutor');
 
     // The agent takes it, writes a note and answers.
     const agentPage = await newPage(browser);

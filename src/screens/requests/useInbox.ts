@@ -52,31 +52,28 @@ export function useInbox(query: InboxQuery) {
     return { key, dashboard, ...rows };
   }, [key]);
   const live = useLiveData(load, TEAM_SIGNALS, 'support-inbox');
-  const { setData } = live;
 
   // „Arată mai multe”: busy or failed for one set of filters only.
   const [moreState, setMore] = useState<{ key: string; busy: boolean; failed: boolean }>({ key, busy: false, failed: false });
   const more = moreState.key === key ? moreState : { key, busy: false, failed: false };
 
+  // One more page: the list is read again with 30 more rows, through the same read as a live update,
+  // so an update already on its way (with fewer rows) can never replace the longer list.
+  const { refetch } = live;
   const loadMore = useCallback(
     async (data: InboxData) => {
       if (!data.next) return;
       setMore({ key: data.key, busy: true, failed: false });
+      shown.current = { key: data.key, n: data.items.length + INBOX_PAGE };
       try {
-        const page = await fetchInbox(JSON.parse(data.key) as InboxQuery, data.next);
-        setData((prev) => {
-          if (prev.key !== data.key) return prev;
-          const seen = new Set(prev.items.map((r) => r.id));
-          const items = [...prev.items, ...page.items.filter((r) => !seen.has(r.id))];
-          shown.current = { key: data.key, n: items.length };
-          return { ...prev, items, next: page.next };
-        });
+        await refetch();
         setMore({ key: data.key, busy: false, failed: false });
       } catch {
+        shown.current = { key: data.key, n: data.items.length };
         setMore({ key: data.key, busy: false, failed: true });
       }
     },
-    [setData],
+    [refetch],
   );
 
   return { ...live, key, more, loadMore };

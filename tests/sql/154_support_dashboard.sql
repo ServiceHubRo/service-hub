@@ -153,6 +153,14 @@ delete from auth.users where id = test.id('client_b');
 select test.eq((select count(*) from public.support_signals where suggestion_id = current_setting('test.req_b')::uuid), 0::bigint,
   'an account deleted: its requests'' signals go with them');
 
+-- A change nobody signed in made (a job, a service action, an import) signals nothing: thousands at
+-- once would go over Realtime's events-per-second limit and lose other people's events.
+select set_config('test.t2', test.changed(current_setting('test.req')::uuid, 'team')::text, true);
+update public.suggestions set status = 'closed', closed_at = now() where id = current_setting('test.req')::uuid;
+select test.eq(test.changed(current_setting('test.req')::uuid, 'team'), current_setting('test.t2')::timestamptz,
+  'a change without a signed-in person: no signal');
+select set_config('test.signals_before_bulk', (select count(*) from public.support_signals)::text, true);
+
 -- ------------------------------------------------------------------ many requests: counters and pages
 -- 3,000 requests as the API would leave them: every state, nine categories, half with someone
 -- responsible, some escalated, the author waiting from minutes to days.
@@ -174,6 +182,8 @@ cross join lateral (select key from public.support_categories order by position 
 -- The expected numbers, read past RLS (a view runs with its owner's rights).
 create view test.all_suggestions as select * from public.suggestions;
 grant select on test.all_suggestions to public;
+select test.eq((select count(*) from public.support_signals), current_setting('test.signals_before_bulk')::bigint,
+  '3,000 requests written at once by no one signed in: not a single signal');
 select test.as_ag();
 -- The counters count every request, not a page.
 select test.eq((d->'counts'->>'new')::bigint, (select count(*) from test.all_suggestions where status = 'new'), 'Noi'),

@@ -49,3 +49,11 @@ export const supabase: SupabaseClient<Database> | null =
         },
       })
     : null;
+
+// Realtime gets the new access token when signing in and at each refresh, but not after the second
+// step (MFA_CHALLENGE_VERIFIED): until the next refresh (up to an hour) it would keep listening with
+// the first step's token, and every row reserved to aal2 (the team's support signals, A3c1) would
+// stay silent. The new token goes to Realtime at once, including channels already joined.
+supabase?.auth.onAuthStateChange((event, session) => {
+  if (event === 'MFA_CHALLENGE_VERIFIED' && session) void supabase?.realtime.setAuth(session.access_token);
+});
