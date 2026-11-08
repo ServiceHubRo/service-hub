@@ -66,6 +66,8 @@ key) plus `actor_role` and `actor_display_id`, filled by a trigger at insert, so
 | **Attachments** (A3b): send with a request or message | ✅ own requests | ✅ own requests | ✅ (as a client) | ✅ with a reply (not on an escalated request); never on a note | ✅ with a reply |
 | Attachments: open | own requests' files | own requests' files | — | ✅ (logged) | ✅ (logged) |
 | Who opened a file | ❌ | ❌ | ❌ | ❌ | ✅ (on the request and in the audit log) |
+| **Support dashboard** (A3c1): counters, oldest request without answer, the list page by page | — | — | — | ✅ | ✅ (also in Panou) |
+| Live signals of a request (Realtime, `support_signals`: only "changed", no content) | own requests, never the team's internal work | own requests, the same | — | every request (aal2, live session) | every request |
 | A request's booking | own: code, day, shop, state | its shop's: the same | — | code, day, shop, state only | the same |
 | **Account search** | — | — | — | ✅ masked: ID, name, role, state, `m***@…`, phone's last 3 digits, shop name and city, created, last active | ✅ full lists |
 | **Account card** | — | — | — | ✅ the same fields + its suggestions; never bookings, cars, companies, billing, messages, reviews | ✅ full card |
@@ -121,6 +123,7 @@ key) plus `actor_role` and `actor_display_id`, filled by a trigger at insert, so
 | `my_support_requests()`, `get_my_support_request(id)`, `create_support_request(...)`, `reply_my_support_request(...)` | client, shop (suspended included) | own requests only, never notes or who answered | `request_not_found`, `request_invalid`, `request_closed`, `booking_not_found`, `limit_suggestions`, `limit_support_messages` |
 | Edge Function `support-files` (upload, `open`) (A3b) | author (client, shop, suspended included), agent (aal2, live session), admin (aal2) | `{id, name, mime, size}`; `{url}` signed for 60 s | `file_type`, `file_corrupt`, `file_pdf_active`, `file_pdf_encrypted`, `file_too_large`, `too_many_files`, `limit_support_uploads`, `file_not_found` |
 | `support_file_begin`, `support_file_register`, `support_file_open`, `support_files_collect`, `support_file_deletions_next/done`, `support_files_stray` | `service_role` only (the function above) | — | — |
+| `support_dashboard()`, `support_inbox(owner, status, category, age, after…, limit)` (A3c1) | agent, admin (aal2) | counters + oldest; one page `{me, items, next}` | `request_invalid {field}` |
 
 Every caller check also answers `not_signed_in`, `account_suspended`, `not_allowed`, `mfa_required`.
 
@@ -128,6 +131,7 @@ Every caller check also answers `not_signed_in`, `account_suspended`, `not_allow
 
 | Migration | Schema | Rollback | Rollback test |
 |---|---|---|---|
+| `20261108045828_support_dashboard.sql` (A3c1) | 112 | `supabase/rollback/20261108045828_support_dashboard.sql`: drops the signals (made again by the next change), the dashboard and list functions, the index; nothing real is lost | `npm run test:rollback` |
 | `20261107220601_support_files.sql` (A3b) | 111 | `supabase/rollback/20261107220601_support_files.sql`: **refuses to run** (error listing how many) while a file row, an object in `support-files` or a path waiting for deletion exists; otherwise the A3a functions and export return and everything goes back to schema 110 | `npm run test:rollback`; the refusal checked by hand with one stored object (nothing changed) |
 | `20261107193110_support_requests.sql` (A3a) | 110 | `supabase/rollback/20261107193110_support_requests.sql`: **refuses to run** (error listing how many) while a request, message or note written after A3a exists, so real messages and notes are never lost; otherwise everything returns to schema 109 | `npm run test:rollback`; the refusal checked by hand with one message present (nothing changed) |
 | `20261107173549_support_role.sql` (A2) | 109 | `supabase/rollback/20261107173549_support_role.sql`: agents become clients (sessions end), the support functions, triggers and audit columns go, account deletion and the audit list are restored as before | `npm run test:rollback`: structure and data identical byte for byte, then the migration applies again; also run by hand with an agent and its audit entries present |

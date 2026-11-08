@@ -1,8 +1,9 @@
-import { isOpen, type RequestStatus, type StaffRequestItem } from '../data/supportRequests';
+import type { InboxQuery, RequestStatus, StaffRequestItem } from '../data/supportRequests';
 
 /**
  * The team's request list (A3a): its filters, kept in the address (?responsabil=&stare=&categorie=&vechime=).
- * Pure, so the list can be filtered on the device without asking the database again.
+ * Since A3c1 the database filters and pages the list (support_inbox); these turn the address into its
+ * arguments and say how long an author has been waiting.
  */
 
 /** Everyone, the caller's own, nobody's, the escalated ones, or one member's (their id). */
@@ -45,29 +46,25 @@ export function waitingHours(item: Pick<StaffRequestItem, 'waiting_since'>, now:
   return Number.isFinite(since) ? Math.max(0, (now.getTime() - since) / 3_600_000) : null;
 }
 
-export function filterRequests(items: StaffRequestItem[], f: RequestFilters, me: string, now: Date): StaffRequestItem[] {
-  return items.filter((r) => {
-    switch (f.owner) {
-      case 'all':
-        break;
-      case 'mine':
-        if (r.assigned?.id !== me) return false;
-        break;
-      case 'none':
-        if (r.assigned || r.escalated) return false;
-        break;
-      case 'escalated':
-        if (!r.escalated) return false;
-        break;
-      default:
-        if (r.assigned?.id !== f.owner) return false;
-    }
-    if (f.status === 'open' ? !isOpen(r.status) : f.status !== 'all' && r.status !== f.status) return false;
-    if (f.category !== 'all' && r.category !== f.category) return false;
-    if (f.age !== 'all') {
-      const hours = waitingHours(r, now);
-      if (hours === null || hours < Number(f.age)) return false;
-    }
-    return true;
-  });
+/** The filters as support_inbox takes them. */
+export function inboxArgs(f: RequestFilters): InboxQuery {
+  return { owner: f.owner, status: f.status, category: f.category, age: f.age === 'all' ? null : (Number(f.age) as 24 | 48) };
+}
+
+/** The address of the list with only this filter set (the others at their default). */
+export function filterSearch(key: keyof RequestFilters, value: string): string {
+  return value === DEFAULT_FILTERS[key] ? '' : `?${FILTER_PARAMS[key]}=${encodeURIComponent(value)}`;
+}
+
+/** The warning a wait deserves: none, over 24 hours, over 48 hours (calendar hours). */
+export function waitingLevel(hours: number | null): 'none' | 'late' | 'urgent' {
+  if (hours === null) return 'none';
+  return hours >= 48 ? 'urgent' : hours >= 24 ? 'late' : 'none';
+}
+
+/** A wait as words: under an hour, whole hours up to 48, then whole days. */
+export function waitingSpan(hours: number): { unit: 'lessThanHour' | 'hours' | 'days'; n: number } {
+  if (hours < 1) return { unit: 'lessThanHour', n: 0 };
+  if (hours < 48) return { unit: 'hours', n: Math.floor(hours) };
+  return { unit: 'days', n: Math.floor(hours / 24) };
 }

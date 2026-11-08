@@ -2,9 +2,9 @@ import { describe, expect, it } from 'vitest';
 import { emailForEvent } from '../../supabase/functions/_shared/emails.ts';
 import { renderNotification } from '../../supabase/functions/_shared/templates.ts';
 import { isOpen, settableStatuses, type StaffRequestItem } from '../../src/data/supportRequests';
-import { DEFAULT_FILTERS, filterRequests, filtersFrom, waitingHours } from '../../src/lib/supportRequests';
+import { DEFAULT_FILTERS, filterSearch, filtersFrom, inboxArgs, waitingHours, waitingLevel, waitingSpan } from '../../src/lib/supportRequests';
 
-// A3a — support requests: the team's list filters, the states by category, the notifications, and
+// A3a — support requests (A3c1: the list filtered and paged in the database): the team's list filters, the states by category, the notifications, and
 // that nothing outside the team's two database functions touches the internal notes.
 
 const NOW = new Date('2026-11-08T12:00:00Z');
@@ -31,39 +31,39 @@ function item(over: Partial<StaffRequestItem>): StaffRequestItem {
   };
 }
 
-const agent = { id: 'me', display_id: 'E-00001', name: 'Ioana', role: 'support' as const };
-const other = { id: 'o', display_id: 'E-00002', name: 'Radu', role: 'support' as const };
-
-const LIST: StaffRequestItem[] = [
-  item({ id: 'a', assigned: agent, status: 'in_progress', waiting_since: hoursAgo(30) }),
-  item({ id: 'b', assigned: other, status: 'waiting_user', waiting_since: null }),
-  item({ id: 'c', status: 'new', waiting_since: hoursAgo(50), category: 'account' }),
-  item({ id: 'd', escalated: true, escalated_at: hoursAgo(2), status: 'in_progress' }),
-  item({ id: 'e', status: 'closed', waiting_since: null }),
-  item({ id: 'f', status: 'planned', category: 'suggestions', waiting_since: hoursAgo(3) }),
-];
-const ids = (list: StaffRequestItem[]) => list.map((r) => r.id);
-
-describe('the team’s request list (A3a)', () => {
-  it('shows the open requests by default', () => {
-    expect(ids(filterRequests(LIST, DEFAULT_FILTERS, 'me', NOW))).toEqual(['a', 'b', 'c', 'd', 'f']);
+describe('the team’s request list (A3a, filtered in the database since A3c1)', () => {
+  it('passes the address’s filters to the database as they are', () => {
+    expect(inboxArgs(DEFAULT_FILTERS)).toEqual({ owner: 'all', status: 'open', category: 'all', age: null });
+    expect(inboxArgs({ owner: 'mine', status: 'waiting_user', category: 'account', age: '48' })).toEqual({
+      owner: 'mine',
+      status: 'waiting_user',
+      category: 'account',
+      age: 48,
+    });
+    expect(inboxArgs({ ...DEFAULT_FILTERS, age: '24' }).age).toBe(24);
   });
 
-  it('filters by who is responsible', () => {
-    const f = (owner: string) => ids(filterRequests(LIST, { ...DEFAULT_FILTERS, owner, status: 'all' }, 'me', NOW));
-    expect(f('mine')).toEqual(['a']);
-    expect(f('none')).toEqual(['c', 'e', 'f']);
-    expect(f('escalated')).toEqual(['d']);
-    expect(f('o')).toEqual(['b']);
+  it('a counter opens the list with only its filter', () => {
+    expect(filterSearch('status', 'new')).toBe('?stare=new');
+    expect(filterSearch('owner', 'escalated')).toBe('?responsabil=escalated');
+    expect(filterSearch('age', '48')).toBe('?vechime=48');
+    expect(filterSearch('status', 'open')).toBe('');
   });
 
-  it('filters by state, category and how long the author waits', () => {
-    expect(ids(filterRequests(LIST, { ...DEFAULT_FILTERS, status: 'closed' }, 'me', NOW))).toEqual(['e']);
-    expect(ids(filterRequests(LIST, { ...DEFAULT_FILTERS, category: 'account' }, 'me', NOW))).toEqual(['c']);
-    expect(ids(filterRequests(LIST, { ...DEFAULT_FILTERS, age: '24' }, 'me', NOW))).toEqual(['a', 'c']);
-    expect(ids(filterRequests(LIST, { ...DEFAULT_FILTERS, age: '48' }, 'me', NOW))).toEqual(['c']);
+  it('measures the wait and warns at 24 and 48 calendar hours', () => {
     expect(waitingHours(item({ waiting_since: null }), NOW)).toBeNull();
     expect(Math.round(waitingHours(item({ waiting_since: hoursAgo(30) }), NOW)!)).toBe(30);
+    expect(waitingHours(item({ waiting_since: hoursAgo(-1) }), NOW)).toBe(0);
+    expect(waitingLevel(null)).toBe('none');
+    expect(waitingLevel(23.99)).toBe('none');
+    expect(waitingLevel(24)).toBe('late');
+    expect(waitingLevel(47.9)).toBe('late');
+    expect(waitingLevel(48)).toBe('urgent');
+    expect(waitingSpan(0.5)).toEqual({ unit: 'lessThanHour', n: 0 });
+    expect(waitingSpan(26.7)).toEqual({ unit: 'hours', n: 26 });
+    expect(waitingSpan(47.99)).toEqual({ unit: 'hours', n: 47 });
+    expect(waitingSpan(50)).toEqual({ unit: 'days', n: 2 });
+    expect(waitingSpan(24 * 9 + 5)).toEqual({ unit: 'days', n: 9 });
   });
 
   it('reads the filters from the address, unknown values falling back', () => {

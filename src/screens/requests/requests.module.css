@@ -353,3 +353,79 @@ input:focus-visible + .attachButton {
     animation: none;
   }
 }
+
+/* A3c1 — the dashboard above Solicitări: ten counters, two to a row on a phone, five from 1024 px. */
+.dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+@media (min-width: 1024px) {
+  .dashStats {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+}
+
+.dashStats a {
+  min-height: 72px;
+  transition: border-color var(--motion-quick) var(--ease), background-color var(--motion-quick) var(--ease);
+}
+
+.statLate {
+  border-color: var(--amber-line);
+  background: var(--amber-tint);
+}
+
+.statUrgent {
+  border-color: var(--red-line);
+  background: var(--red-soft);
+}
+
+.statCurrent {
+  border-color: var(--amber);
+  box-shadow: inset 0 0 0 1px var(--amber);
+}
+
+.oldest {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+}
+
+.oldestLabel {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.oldestBody {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 12px;
+  min-width: 0;
+}
+
+.oldestTitle {
+  font-weight: 700;
+  overflow-wrap: anywhere;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.more {
+  align-self: center;
+  margin-top: 4px;
+}
+
+/* Over 48 hours without an answer: the lighter red reads on a card (contrast ≥ 4.5:1). */
+.urgent {
+  color: var(--red-text);
+  background: var(--red-soft);
+}
