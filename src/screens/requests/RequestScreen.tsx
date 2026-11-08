@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useSession } from '../../app/sessionContext';
 import { ActionButton } from '../../components/ActionButton';
@@ -9,6 +9,7 @@ import { PageHeader } from '../../components/PageHeader';
 import { SelectField } from '../../components/SelectField';
 import { SkeletonList } from '../../components/Skeleton';
 import { TextArea } from '../../components/TextArea';
+import { subscribeRows } from '../../data/realtime';
 import { canRetryRpc, rpcErrorMessage, toRpcError } from '../../data/rpc';
 import {
   addNote,
@@ -50,7 +51,7 @@ const staffName = (s: Partial<StaffRef> | null | undefined) => [s?.display_id, s
  * minimal reference, the conversation with which member answered, the internal notes (never the
  * author's), and the work: take, assign, answer, change the state, note, escalate (agent) or give back
  * (admin). An escalated request is read-only for an agent; a closed one for everybody. Every opening
- * and every action is in the audit log (the database writes it).
+ * and every action is in the audit log (the database writes it). Live since A3c1.
  */
 export function RequestScreen({ mode }: { mode: 'support' | 'admin' }) {
   const { t, lang } = useI18n();
@@ -66,10 +67,42 @@ export function RequestScreen({ mode }: { mode: 'support' | 'admin' }) {
   const back = { to: mode === 'admin' ? ADMIN_REQUESTS_PATH : SUPPORT_REQUESTS_PATH, label: t('support.requests.title') };
 
   // After an action: the request again, quietly (no skeleton; the page stays where it is).
+  const lastRead = useRef(0);
   const refresh = useCallback(async () => {
+    lastRead.current = Date.now();
     const fresh = await getRequest(requestId).catch(() => null);
     if (fresh) setData(([, cats, staff]) => [fresh, cats, staff]);
   }, [requestId, setData]);
+
+  // A3c1 — live: someone else answered, noted, took or escalated it. The signal names only the
+  // request. Each read is an opening in the audit log, so changes in a row cost one read, at most
+  // one read every 2 s (a change right after a read waits for the rest of the 2 s, it is never
+  // dropped), and none when the subscription first starts.
+  const ready = state.status === 'ready';
+  useEffect(() => {
+    if (!ready || !valid) return;
+    let timer: number | undefined;
+    let started = false;
+    const fire = () => {
+      window.clearTimeout(timer);
+      const wait = Math.max(300, 2000 - (Date.now() - lastRead.current));
+      timer = window.setTimeout(() => void refresh(), wait);
+    };
+    const off = subscribeRows({
+      channel: `support-request:${requestId}`,
+      table: 'support_signals',
+      filter: `suggestion_id=eq.${requestId}`,
+      onChange: fire,
+      onResync: () => {
+        if (started) fire();
+        started = true;
+      },
+    });
+    return () => {
+      window.clearTimeout(timer);
+      off();
+    };
+  }, [ready, valid, requestId, refresh]);
 
   if (!valid || (state.status === 'error' && toRpcError(state.error).code === 'request_not_found')) return <NotFound inShell />;
   if (state.status !== 'ready') {

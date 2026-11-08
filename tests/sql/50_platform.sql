@@ -46,7 +46,7 @@ select test.eq(public, false, 'reports bucket private') from storage.buckets whe
 
 -- Realtime publication.
 select test.eq(array_agg(tablename::text order by tablename),
-               array['bookings', 'company_members', 'company_subscriptions', 'company_vehicles', 'history_reports', 'invoices', 'member_rights_versions', 'messages', 'no_show_disputes', 'notices', 'profiles', 'reviews', 'shops', 'subscriptions', 'threads'],
+               array['bookings', 'company_members', 'company_subscriptions', 'company_vehicles', 'history_reports', 'invoices', 'member_rights_versions', 'messages', 'no_show_disputes', 'notices', 'profiles', 'reviews', 'shops', 'subscriptions', 'support_signals', 'threads'],
                'realtime tables')
 from pg_publication_tables where pubname = 'supabase_realtime' and schemaname = 'public';
 
@@ -146,9 +146,9 @@ select test.eq(
   || 'search_cities, search_shops, send_message, send_quote, set_booking_history_share, set_company_member_rights, set_company_member_role, set_company_rules, '
   || 'set_quote_next_number, set_shop_services, shop_cancel_booking, shop_create_booking, shop_decide_quote, shop_import_add, shop_import_begin, '
   || 'shop_import_undo, shop_offers, shop_reports, shop_vehicle_file, start_inspection, start_work, submit_review, submit_suggestion, '
-  || 'support_add_note, support_assign_request, support_categories_for_me, support_escalate_request, support_get_account, support_get_request, '
+  || 'support_add_note, support_assign_request, support_categories_for_me, support_dashboard, support_escalate_request, support_get_account, support_get_request, support_inbox, '
   || 'support_list_requests, support_list_staff, support_list_suggestions, support_reply_request, support_search_accounts, support_set_request_status, '
-  || 'support_set_suggestion_status, support_take_request, '
+  || 'support_set_suggestion_status, support_signal_reader, support_take_request, '
   || 'toggle_favorite, touch_last_active, transfer_company_admin, update_company, withdraw_quote',
   'functions callable only when signed in')
 from pg_proc p where p.pronamespace = 'public'::regnamespace;

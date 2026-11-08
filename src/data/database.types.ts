@@ -4438,6 +4438,38 @@ export type Database = {
         }
         Relationships: []
       }
+      support_signals: {
+        Row: {
+          audience: string
+          author_id: string | null
+          changed_at: string
+          id: number
+          suggestion_id: string
+        }
+        Insert: {
+          audience: string
+          author_id?: string | null
+          changed_at?: string
+          id?: never
+          suggestion_id: string
+        }
+        Update: {
+          audience?: string
+          author_id?: string | null
+          changed_at?: string
+          id?: never
+          suggestion_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "support_signals_suggestion_id_fkey"
+            columns: ["suggestion_id"]
+            isOneToOne: false
+            referencedRelation: "suggestions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       threads: {
         Row: {
           client_id: string | null
@@ -5903,6 +5935,7 @@ export type Database = {
       expire_unanswered_requests: { Args: { p_now?: string }; Returns: number }
       export_my_data: { Args: never; Returns: Json }
       export_my_data_a3a: { Args: never; Returns: Json }
+      export_my_data_a3b: { Args: never; Returns: Json }
       export_my_data_base: { Args: never; Returns: Json }
       export_my_data_t32: { Args: never; Returns: Json }
       export_my_data_t35: { Args: never; Returns: Json }
@@ -8571,6 +8604,7 @@ export type Database = {
       }
       support_booking_ref: { Args: { p_booking_id: string }; Returns: Json }
       support_categories_for_me: { Args: never; Returns: Json }
+      support_dashboard: { Args: never; Returns: Json }
       support_escalate_request: {
         Args: { p_id: string; p_reason: string; p_request_id: string }
         Returns: Json
@@ -8667,6 +8701,19 @@ export type Database = {
         }
         Returns: undefined
       }
+      support_inbox: {
+        Args: {
+          p_after_at?: string
+          p_after_id?: string
+          p_after_open?: boolean
+          p_age?: number
+          p_category?: string
+          p_limit?: number
+          p_owner?: string
+          p_status?: string
+        }
+        Returns: Json
+      }
       support_list_requests: { Args: never; Returns: Json }
       support_list_staff: { Args: never; Returns: Json }
       support_list_suggestions: { Args: never; Returns: Json }
@@ -8711,6 +8758,11 @@ export type Database = {
         Args: { p_id: string; p_request_id: string; p_status: string }
         Returns: Json
       }
+      support_signal: {
+        Args: { p_author: boolean; p_suggestion: string }
+        Returns: undefined
+      }
+      support_signal_reader: { Args: never; Returns: boolean }
       support_staff_ref: { Args: { p_id: string }; Returns: Json }
       support_status_allowed: {
         Args: { p_category: string; p_status: string }
@@ -8719,6 +8771,10 @@ export type Database = {
       support_take_request: {
         Args: { p_id: string; p_request_id: string }
         Returns: Json
+      }
+      support_waiting_since: {
+        Args: { s: Database["public"]["Tables"]["suggestions"]["Row"] }
+        Returns: string
       }
       sync_stripe_subscription: {
         Args: { p_customer: string; p_shop_id: string; p_sub: Json }

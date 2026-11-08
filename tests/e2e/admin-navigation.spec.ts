@@ -303,15 +303,16 @@ test.describe('A1 — admin navigation', () => {
     await page.goBack();
     await expect(page).not.toHaveURL(/\/admin\/activitate\/programari/);
 
-    // A tool: Platformă → Setări → (shortcut) Textele notificărilor → „‹ Platformă”.
+    // Each tool in one place only: Setări platformă has no second way into Textele notificărilor.
     await adminZoneLink(page, 'Platformă').click();
     await main(page).getByRole('link', { name: /^Setări platformă/ }).click();
+    await expect(h1(page)).toHaveText('Setări platformă');
+    await expect(main(page).getByRole('link', { name: /^Textele notificărilor/ })).toHaveCount(0);
+    await backLink(page).click();
     await main(page).getByRole('link', { name: /^Textele notificărilor/ }).click();
     await expect(h1(page)).toHaveText('Textele notificărilor');
     await backLink(page).click();
     await expect(h1(page)).toHaveText('Platformă');
-    await page.goBack();
-    await expect(h1(page)).toHaveText('Setări platformă');
   });
 
   test('every address from before A1 opens its page at the new address, with its query, ID and anchor', async ({ page }) => {

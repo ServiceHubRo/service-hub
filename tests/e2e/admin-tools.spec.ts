@@ -272,8 +272,9 @@ test.describe('admin tools', () => {
       await expect(page.getByText('Setările sunt salvate.')).toBeVisible();
     }
 
-    // The link on Setări platformă (a shortcut; the tool has its own place in Platformă since A1).
-    await page.locator('main').getByRole('link', { name: /^Textele notificărilor/ }).click();
+    // The texts have one place: Platformă → Textele notificărilor (no shortcut on Setări platformă).
+    await expect(page.locator('main').getByRole('link', { name: /^Textele notificărilor/ })).toHaveCount(0);
+    await adminOpen(page, 'Platformă', 'Textele notificărilor');
     await expect(page.getByRole('heading', { level: 1, name: 'Textele notificărilor' })).toBeVisible();
     await page.getByLabel('Caută în texte').fill('shop.new_review');
     const row = page.getByRole('listitem').filter({ hasText: 'shop.new_review' });

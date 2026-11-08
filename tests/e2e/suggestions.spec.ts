@@ -8,6 +8,7 @@ import {
   createUser,
   expectAccessible,
   expectNoHorizontalScroll,
+  inboxRow,
   openAccount,
   shot,
   signIn,
@@ -39,7 +40,7 @@ async function adminMarks(browser: Browser, page: Page, text: string, who: RegEx
   await expect(admin).toHaveURL(/\/admin\/suport\/solicitari$/);
   await admin.goto('/admin/suport/solicitari?categorie=suggestions');
   await expect(admin.getByRole('heading', { level: 1, name: 'Solicitări' })).toBeVisible();
-  const row = admin.getByRole('link').filter({ hasText: text });
+  const row = inboxRow(admin, text);
   await expect(row).toContainText('Nouă');
   await expect(row).toContainText(who);
   await expectAccessible(admin, 'admin suggestions');

@@ -185,8 +185,68 @@ export interface StaffRequestDetail {
   files: RequestFile[];
 }
 
-export async function listRequests(): Promise<{ me: string; items: StaffRequestItem[] }> {
-  return (await call('support_list_requests', {} as never)) as unknown as { me: string; items: StaffRequestItem[] };
+/** A3c1: where the next page starts (the last row of the previous one). */
+export interface InboxCursor {
+  open: boolean;
+  at: string;
+  id: string;
+}
+
+export interface InboxPage {
+  me: string;
+  items: StaffRequestItem[];
+  /** Null on the last page. */
+  next: InboxCursor | null;
+}
+
+/** The list's filters as the database takes them (see lib/supportRequests inboxArgs). */
+export interface InboxQuery {
+  owner: string;
+  status: string;
+  category: string;
+  age: 24 | 48 | null;
+}
+
+export const INBOX_PAGE = 30;
+
+/** One page of the team's list, filtered and ordered in the database (A3c1). */
+export async function fetchInbox(q: InboxQuery, after: InboxCursor | null = null, limit = INBOX_PAGE): Promise<InboxPage> {
+  return (await call('support_inbox', {
+    p_owner: q.owner,
+    p_status: q.status,
+    p_category: q.category,
+    p_age: q.age ?? undefined,
+    p_after_open: after?.open,
+    p_after_at: after?.at,
+    p_after_id: after?.id,
+    p_limit: limit,
+  })) as unknown as InboxPage;
+}
+
+export interface SupportCounts {
+  new: number;
+  in_progress: number;
+  waiting_user: number;
+  resolved: number;
+  closed: number;
+  escalated: number;
+  unassigned: number;
+  mine: number;
+  over_24: number;
+  over_48: number;
+}
+
+export interface SupportDashboard {
+  me: string;
+  /** The database's clock: waiting is measured from it. */
+  now: string;
+  counts: SupportCounts;
+  /** The request whose author has waited longest for an answer; null when every one has an answer. */
+  oldest: { id: string; title: string; waiting_since: string; escalated: boolean; assigned: StaffRef | null } | null;
+}
+
+export async function fetchSupportDashboard(): Promise<SupportDashboard> {
+  return (await call('support_dashboard', {} as never)) as unknown as SupportDashboard;
 }
 
 export async function listStaff(): Promise<StaffRef[]> {

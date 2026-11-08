@@ -1659,7 +1659,7 @@ Aprobate de Eduard pe 6 nov („aprob T71–T75”; T71 era deja folosit, așa c
 ### A3 — Solicitări și tichete (în trei părți, aprobat de Eduard pe 7 nov)
 - **A3a** solicitări, conversație, note interne, escaladare — făcut (mai jos).
 - **A3b** atașamente — făcut (mai jos), textul din Politica de confidențialitate așteaptă aprobarea lui Eduard înainte de merge. Plan: atașamente (spațiu privat, verificarea conținutului pe server, linkuri de 60 s, jurnal la deschidere, ștergere la 90 de zile) și textul nou din Politica de confidențialitate (aprobat de Eduard înainte de merge).
-- **A3c** panoul de suport (contoare, avertizări la 24 și 48 de ore), timp real, păstrare legală (motiv, responsabil, dată, revizuire periodică) și regulile la ștergerea contului; propunerea de retenție pe scop și categorie (decizia 6 a lui Eduard: fără termenul general de 2 ani).
+- **A3c** împărțit (aprobat de Eduard pe 8 nov): **A3c1** panoul de suport și timpul real — făcut (mai jos); **A3c2** păstrarea legală și retenția (12 luni după închidere; sugestiile anonimizate, inclusiv identificatorii din text; legal hold doar de admin, revizuire la 90 de zile, fără ridicare automată; cuvintele căutate șterse la 90 de zile, restul jurnalului echipei 12 luni). Planul inițial: panoul de suport (contoare, avertizări la 24 și 48 de ore), timp real, păstrare legală (motiv, responsabil, dată, revizuire periodică) și regulile la ștergerea contului; propunerea de retenție pe scop și categorie (decizia 6 a lui Eduard: fără termenul general de 2 ani).
 - Butonul „Raportează o problemă” pe cardul programării: amânat, PR separat (decizia 4).
 
 ### A3a — Solicitări: conversație, note interne, escaladare ✅
@@ -1684,5 +1684,16 @@ Aprobate de Eduard pe 6 nov („aprob T71–T75”; T71 era deja folosit, așa c
 - Politica de confidențialitate (RO și EN, versiunea 2026-11-08): §2.1, §3, §4.2, §5, §6 — textul complet în PR, pentru aprobare înainte de merge.
 - Migrarea `support_files` (schema 111). Rollback-ul refuză să ruleze cât există un fișier (rând, obiect în Storage sau ștergere în așteptare).
 - Teste: `tests/unit/supportFiles.test.ts`, `tests/sql/153_support_files.sql`, `tests/e2e/support-files.spec.ts` (390/820/1440, RO și EN; link expirat după 60 s; ștergerea automată).
+
+- [x] Făcut
+
+### A3c1 — Panoul de suport și timpul real ✅
+- **Solicitări** (agent și admin): zece contoare deasupra listei — Noi, În lucru, Așteaptă utilizatorul, Escaladate, Fără responsabil, Ale mele, Fără răspuns peste 24 h (galben), peste 48 h (roșu), Rezolvate, Închise —, fiecare deschide lista cu filtrul lui; cea mai veche solicitare fără răspuns, de cât timp și cine răspunde de ea; la fiecare rând „Fără răspuns de 26 h / 3 zile”.
+- Lista se filtrează și se împarte în pagini în baza de date (30, „Arată mai multe”), deci contoarele și lista sunt corecte și peste 1.000 de solicitări (lista din A3a citea cel mult 1.000).
+- **Panou** (admin): rândul „Suport” — noi, fără responsabil, escaladate, peste 48 h.
+- **Timp real** fără conținut: o tabelă de semnale („solicitarea X s-a schimbat”), singura din suport transmisă prin Realtime. Echipa le primește pe toate; autorul doar pe ale lui și niciodată pentru notele interne, atribuire sau escaladare. Ecranele citesc din nou prin funcțiile care verifică drepturile. Lista, contoarele, solicitarea deschisă (echipă) și solicitările mele (autor) se actualizează singure.
+- Migrările `support_dashboard` (schema 112) și `support_signals_people_only` (113: semnale doar din acțiunile unei persoane autentificate, ca un job care schimbă mii de solicitări să nu depășească limita Realtime), fără nicio schimbare a datelor existente; rollback-urile nu pierd nimic.
+- Reparat: după al doilea pas al autentificării, Realtime primește imediat noul token (altfel un agent abia autentificat nu primea actualizări timp de până la o oră).
+- Teste: `tests/sql/154_support_dashboard.sql` (roluri, izolare, 3.000 de solicitări, toate filtrele, fiecare rând o singură dată), `tests/e2e/support-dashboard.spec.ts` (390/820/1440, RO și EN; 1.100 de solicitări; ascultători Realtime pentru autor, alt client, service, agent fără al doilea pas, vizitator neautentificat, echipă, agent retras).
 
 - [x] Făcut

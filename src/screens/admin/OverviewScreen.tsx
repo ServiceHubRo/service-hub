@@ -5,11 +5,23 @@ import { EmptyState } from '../../components/EmptyState';
 import { LoadError } from '../../components/LoadError';
 import { SkeletonList } from '../../components/Skeleton';
 import { fetchOverview, type ActivityItem, type BookingWindow } from '../../data/admin';
+import { fetchSupportDashboard } from '../../data/supportRequests';
 import { useI18n } from '../../i18n/context';
 import { formatMoney } from '../../i18n/format';
 import { BOOKING_STATUSES } from '../../lib/status';
 import { Pill, RowLink, SectionTitle } from './parts';
-import { ADMIN_BOOKINGS_PATH, ADMIN_CLIENTS_PATH, ADMIN_MODERATION_PATH, ADMIN_SHOPS_PATH, adminBookingPath, adminClientPath, adminShopPath } from './paths';
+import { filterSearch } from '../../lib/supportRequests';
+import { TEAM_SIGNALS } from '../requests/useInbox';
+import {
+  ADMIN_BOOKINGS_PATH,
+  ADMIN_CLIENTS_PATH,
+  ADMIN_MODERATION_PATH,
+  ADMIN_REQUESTS_PATH,
+  ADMIN_SHOPS_PATH,
+  adminBookingPath,
+  adminClientPath,
+  adminShopPath,
+} from './paths';
 import { useLiveData } from './useLiveData';
 import { dateTime } from './format';
 import styles from './admin.module.css';
@@ -92,6 +104,8 @@ function ActivityText({ a }: { a: ActivityItem }) {
 export function OverviewScreen() {
   const { t, lang } = useI18n();
   const { state, reload } = useLiveData(fetchOverview, LIVE, 'admin-overview');
+  // A3c1: the support requests at a glance, live; on its own, so a failure here hides only this part.
+  const support = useLiveData(fetchSupportDashboard, TEAM_SIGNALS, 'admin-overview-support');
 
   return (
     <div className={styles.page}>
@@ -122,6 +136,24 @@ export function OverviewScreen() {
                 />
                 <Stat n={o.shops.total} label={t('admin.overview.shopsTotal')} to={ADMIN_SHOPS_PATH} />
               </ul>
+
+              {support.state.status === 'ready' &&
+                (() => {
+                  const c = support.state.data.counts;
+                  const to = (key: Parameters<typeof filterSearch>[0], value: string) => `${ADMIN_REQUESTS_PATH}${filterSearch(key, value)}`;
+                  return (
+                    <>
+                      <SectionTitle>{t('admin.overview.support')}</SectionTitle>
+                      <ul className={styles.stats}>
+                        <Stat n={c.new} label={t('support.dash.new')} to={to('status', 'new')} />
+                        <Stat n={c.unassigned} label={t('support.dash.unassigned')} to={to('owner', 'none')} alert={c.unassigned > 0} />
+                        <Stat n={c.escalated} label={t('support.dash.escalated')} to={to('owner', 'escalated')} alert={c.escalated > 0} />
+                        <Stat n={c.over_48} label={t('support.dash.over48')} to={to('age', '48')} alert={c.over_48 > 0} />
+                      </ul>
+                    </>
+                  );
+                })()}
+              {support.state.status === 'error' && <LoadError message={t('support.dash.loadError')} onRetry={support.reload} />}
 
               <SectionTitle>{t('admin.overview.bookings')}</SectionTitle>
               <ul className={styles.stats}>

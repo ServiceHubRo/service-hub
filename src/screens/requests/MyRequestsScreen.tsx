@@ -13,17 +13,21 @@ import accountStyles from '../account/account.module.css';
 import { helpPath, newRequestPath, requestPath } from '../account/paths';
 import { categoryName, whenText } from './format';
 import { RequestStatusPill } from './parts';
+import { useAuthorSignals } from './useAuthorSignals';
 import styles from './requests.module.css';
 
 const load = () => Promise.all([fetchMyRequests(), fetchSupportCategories()]);
 
 /**
  * Cont → Ajutor și contact → Solicitările mele (A3a): the author's requests, the ones with a new answer
- * marked, and „Solicitare nouă”.
+ * marked, and „Solicitare nouă”. Live (A3c1): an answer or a new state appears without reloading.
  */
 export function MyRequestsScreen({ role }: { role: 'client' | 'shop' }) {
   const { t, lang } = useI18n();
-  const { state, reload } = useLoad(load);
+  const { state, reload, setData } = useLoad(load);
+  useAuthorSignals(() => {
+    if (state.status === 'ready') load().then(setData, () => {}); // what is on screen stays on a failure
+  });
 
   return (
     <div className={accountStyles.page}>

@@ -11,6 +11,7 @@ import {
   expectAccessible,
   expectNoHorizontalScroll,
   expectNoRomanianText,
+  inboxRow,
   isDesktop,
   rpcAs,
   shot,
@@ -61,7 +62,7 @@ test.describe('support agent (A2)', () => {
     await shot(page, 'a2-requests', name());
 
     // Solicitări (A3a): the suggestion opens on its own page; a state change.
-    await page.getByRole('link').filter({ hasText: idea }).click();
+    await inboxRow(page, idea).click();
     await expect(h1(page)).toHaveText(idea);
     await page.getByRole('combobox', { name: 'Stare', exact: true }).selectOption({ label: 'Planificată' });
     await page.getByRole('button', { name: 'Schimbă starea' }).click();

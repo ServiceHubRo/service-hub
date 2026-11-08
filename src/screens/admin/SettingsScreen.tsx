@@ -1,4 +1,3 @@
-import { MessageSquareText } from 'lucide-react';
 import { useState } from 'react';
 import { ActionButton } from '../../components/ActionButton';
 import { BackLink } from '../../components/BackLink';
@@ -6,7 +5,6 @@ import { Card } from '../../components/Card';
 import { Field } from '../../components/Field';
 import { LoadError } from '../../components/LoadError';
 import { SkeletonList } from '../../components/Skeleton';
-import { Tile } from '../../components/Tile';
 import {
   ABUSE_LIMIT_KEYS,
   fetchSettings,
@@ -21,7 +19,7 @@ import type { MessageKey } from '../../i18n/ro';
 import { DECIMAL_SETTINGS, SETTING_SECTIONS, settingsChange, type SettingsDraft } from '../../lib/adminTools';
 import { useLoad } from '../../lib/useLoad';
 import { SectionTitle } from './parts';
-import { ADMIN_SETTINGS_PATH, ADMIN_TEXTS_PATH } from './paths';
+import { ADMIN_SETTINGS_PATH } from './paths';
 import { dateTime } from './format';
 import styles from './admin.module.css';
 
@@ -128,7 +126,8 @@ function SettingsForm({ settings, onSaved }: { settings: PlatformSettings; onSav
 
 /**
  * Setări platformă (FR §5.10, P21): prices, free period, quote expiry, ranking constants, the
- * booking rules a new shop starts with, the abuse limits — and a tile to the push texts. Only what
+ * booking rules a new shop starts with, the abuse limits. The notification texts have their own
+ * place in Platformă (no second way in from here, Eduard 8 Nov 2026). Only what
  * changed is sent; every value is read when a record is made, so bookings, quotes and
  * subscriptions that already exist never change.
  */
@@ -145,7 +144,6 @@ export function SettingsScreen() {
           {state.status === 'ready' ? t('admin.settings.updated', { date: dateTime(lang, state.data.updated_at) }) : null}
         </p>
       </div>
-      <Tile to={ADMIN_TEXTS_PATH} icon={MessageSquareText} label={t('admin.texts.title')} hint={t('admin.texts.tileHint')} />
       {state.status === 'loading' && <SkeletonList />}
       {state.status === 'error' && <LoadError message={t('admin.loadError')} onRetry={reload} />}
       {state.status === 'ready' && <SettingsForm key={lang} settings={state.data} onSaved={setData} />}

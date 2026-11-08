@@ -16,6 +16,7 @@ import accountStyles from '../account/account.module.css';
 import { newRequestPath, requestsPath } from '../account/paths';
 import { categoryName, dayText, whenText } from './format';
 import { Conversation, RequestStatusPill, type ConversationItem } from './parts';
+import { useAuthorSignals } from './useAuthorSignals';
 import styles from './requests.module.css';
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -23,7 +24,8 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 /**
  * One of the author's requests (A3a): its state, the booking it is about, the conversation with
  * „Echipa Service-Hub” (never who answered, never the team's notes) and a new message. A message within
- * 14 days of „Rezolvată” reopens it; a closed one points to a new request.
+ * 14 days of „Rezolvată” reopens it; a closed one points to a new request. Live (A3c1): the team's
+ * answer and a new state appear without reloading; what is being typed stays.
  */
 export function MyRequestScreen({ role }: { role: 'client' | 'shop' }) {
   const { t, lang } = useI18n();
@@ -34,6 +36,11 @@ export function MyRequestScreen({ role }: { role: 'client' | 'shop' }) {
     [valid, requestId],
   );
   const { state, reload, setData } = useLoad(load);
+  useAuthorSignals(() => {
+    if (state.status === 'ready') {
+      fetchMyRequest(requestId).then((fresh) => setData(([, cats]) => [fresh, cats]), () => {});
+    }
+  });
   const [text, setText] = useState('');
   const [sent, setSent] = useState(false);
   const [fileIds, setFileIds] = useState<string[]>([]);
