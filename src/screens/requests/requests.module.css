@@ -362,27 +362,28 @@ input:focus-visible + .attachButton {
 }
 
 @media (min-width: 1024px) {
-  .dashStats {
+  .dashboard .dashStats {
     grid-template-columns: repeat(5, minmax(0, 1fr));
   }
 }
 
+/* Inside the dashboard, so these win over the admin's .stat whatever order the styles load in. */
 .dashStats a {
   min-height: 72px;
   transition: border-color var(--motion-quick) var(--ease), background-color var(--motion-quick) var(--ease);
 }
 
-.statLate {
+.dashStats .statLate {
   border-color: var(--amber-line);
   background: var(--amber-tint);
 }
 
-.statUrgent {
+.dashStats .statUrgent {
   border-color: var(--red-line);
   background: var(--red-soft);
 }
 
-.statCurrent {
+.dashStats .statCurrent {
   border-color: var(--amber);
   box-shadow: inset 0 0 0 1px var(--amber);
 }
