@@ -131,6 +131,7 @@ Every caller check also answers `not_signed_in`, `account_suspended`, `not_allow
 
 | Migration | Schema | Rollback | Rollback test |
 |---|---|---|---|
+| `20261108054527_support_signals_people_only.sql` (A3c1) | 113 | `supabase/rollback/20261108054527_support_signals_people_only.sql`: jobs signal again; nothing lost | `npm run test:rollback` |
 | `20261108045828_support_dashboard.sql` (A3c1) | 112 | `supabase/rollback/20261108045828_support_dashboard.sql`: drops the signals (made again by the next change), the dashboard and list functions, the index; nothing real is lost | `npm run test:rollback` |
 | `20261107220601_support_files.sql` (A3b) | 111 | `supabase/rollback/20261107220601_support_files.sql`: **refuses to run** (error listing how many) while a file row, an object in `support-files` or a path waiting for deletion exists; otherwise the A3a functions and export return and everything goes back to schema 110 | `npm run test:rollback`; the refusal checked by hand with one stored object (nothing changed) |
 | `20261107193110_support_requests.sql` (A3a) | 110 | `supabase/rollback/20261107193110_support_requests.sql`: **refuses to run** (error listing how many) while a request, message or note written after A3a exists, so real messages and notes are never lost; otherwise everything returns to schema 109 | `npm run test:rollback`; the refusal checked by hand with one message present (nothing changed) |

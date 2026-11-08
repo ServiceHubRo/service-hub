@@ -1692,7 +1692,8 @@ Aprobate de Eduard pe 6 nov („aprob T71–T75”; T71 era deja folosit, așa c
 - Lista se filtrează și se împarte în pagini în baza de date (30, „Arată mai multe”), deci contoarele și lista sunt corecte și peste 1.000 de solicitări (lista din A3a citea cel mult 1.000).
 - **Panou** (admin): rândul „Suport” — noi, fără responsabil, escaladate, peste 48 h.
 - **Timp real** fără conținut: o tabelă de semnale („solicitarea X s-a schimbat”), singura din suport transmisă prin Realtime. Echipa le primește pe toate; autorul doar pe ale lui și niciodată pentru notele interne, atribuire sau escaladare. Ecranele citesc din nou prin funcțiile care verifică drepturile. Lista, contoarele, solicitarea deschisă (echipă) și solicitările mele (autor) se actualizează singure.
-- Migrarea `support_dashboard` (schema 112), fără nicio schimbare a datelor existente; rollback-ul nu pierde nimic.
+- Migrările `support_dashboard` (schema 112) și `support_signals_people_only` (113: semnale doar din acțiunile unei persoane autentificate, ca un job care schimbă mii de solicitări să nu depășească limita Realtime), fără nicio schimbare a datelor existente; rollback-urile nu pierd nimic.
+- Reparat: după al doilea pas al autentificării, Realtime primește imediat noul token (altfel un agent abia autentificat nu primea actualizări timp de până la o oră).
 - Teste: `tests/sql/154_support_dashboard.sql` (roluri, izolare, 3.000 de solicitări, toate filtrele, fiecare rând o singură dată), `tests/e2e/support-dashboard.spec.ts` (390/820/1440, RO și EN; 1.100 de solicitări; ascultători Realtime pentru autor, alt client, service, agent fără al doilea pas, vizitator neautentificat, echipă, agent retras).
 
 - [x] Făcut
