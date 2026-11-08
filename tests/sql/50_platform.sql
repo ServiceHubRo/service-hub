@@ -146,9 +146,9 @@ select test.eq(
   || 'search_cities, search_shops, send_message, send_quote, set_booking_history_share, set_company_member_rights, set_company_member_role, set_company_rules, '
   || 'set_quote_next_number, set_shop_services, shop_cancel_booking, shop_create_booking, shop_decide_quote, shop_import_add, shop_import_begin, '
   || 'shop_import_undo, shop_offers, shop_reports, shop_vehicle_file, start_inspection, start_work, submit_review, submit_suggestion, '
-  || 'support_add_note, support_assign_request, support_categories_for_me, support_escalate_request, support_get_account, support_get_request, '
+  || 'support_add_note, support_assign_request, support_categories_for_me, support_dashboard, support_escalate_request, support_get_account, support_get_request, support_inbox, '
   || 'support_list_requests, support_list_staff, support_list_suggestions, support_reply_request, support_search_accounts, support_set_request_status, '
-  || 'support_set_suggestion_status, support_take_request, '
+  || 'support_set_suggestion_status, support_signal_reader, support_take_request, '
   || 'toggle_favorite, touch_last_active, transfer_company_admin, update_company, withdraw_quote',
   'functions callable only when signed in')
 from pg_proc p where p.pronamespace = 'public'::regnamespace;
