@@ -1,6 +1,6 @@
 # Politica de confidențialitate — Service-Hub
 
-**Ultima actualizare:** 10 octombrie 2026
+**Ultima actualizare:** 8 noiembrie 2026
 
 Aici afli ce date personale folosește Service-Hub, de ce, cine le mai vede, cât timp le păstrăm și ce drepturi ai, conform Regulamentului (UE) 2016/679 („GDPR”) și legii române.
 
@@ -27,7 +27,8 @@ Aici afli ce date personale folosește Service-Hub, de ce, cine le mai vede, câ
 - versiunea Termenilor și a acestei politici pe care le-ai acceptat și data acceptării;
 - parola, doar sub formă criptată (nici noi nu o putem citi);
 - dacă intri cu Google sau Apple: numele, adresa de email și (la Google) poza de profil pe care ni le trimit; la Apple poți alege să primim o adresă ascunsă, care îți trimite mai departe emailurile; parola contului tău Google sau Apple nu ajunge la noi;
-- alegerile tale din aplicație (de exemplu, dacă ai amânat mesajul despre notificări).
+- alegerile tale din aplicație (de exemplu, dacă ai amânat mesajul despre notificări);
+- solicitările pe care le trimiți echipei Service-Hub (Cont → Ajutor și contact → Solicitările mele): categoria, titlul, descrierea, mesajele, codul programării, dacă îl adaugi, și fișierele atașate (imagini PNG, JPEG sau WebP și documente PDF, cel mult 5 MB fiecare). Din fotografii eliminăm la încărcare locația, datele aparatului, data și celelalte informații ascunse în fișier; păstrăm doar orientarea imaginii.
 
 ### 2.2 Dacă ești Client
 
@@ -93,6 +94,7 @@ Aici afli ce date personale folosește Service-Hub, de ce, cine le mai vede, câ
 | Limite împotriva abuzului, indicatorul de neprezentări, confirmarea telefonului după neprezentări, verificarea anti-robot, suspendări | Interesul legitim ca Platforma să fie corectă și sigură |
 | Verificarea CUI-ului service-urilor în registrul public ANAF și semnalarea recenziilor care par făcute de service (de exemplu, clientul a folosit telefonul service-ului) | Interesul legitim ca pe Platformă să fie firme reale și recenzii reale |
 | Perioada gratuită o singură dată de persoană și împiedicarea ocolirii unei suspendări cu un cont nou (amprente criptate ale emailului și telefonului, vezi secțiunea 5) | Interesul legitim ca Platforma să fie corectă și sigură |
+| Solicitările trimise echipei Service-Hub, fișierele atașate și jurnalul celor care le deschid | Contractul cu tine (lit. b); interesul legitim (lit. f) ca accesul la datele tale să poată fi verificat |
 | Rapoartele de erori și jurnalele tehnice | Interesul legitim ca Platforma să funcționeze și să fie sigură |
 | Anunțuri despre Platformă (schimbări, întreruperi) | Contractul și interesul legitim |
 | Răspunsuri la cererile tale; apărarea în caz de litigiu | Interesul legitim și obligațiile legale |
@@ -117,6 +119,8 @@ Aici afli ce date personale folosește Service-Hub, de ce, cine le mai vede, câ
 ### 4.2 Echipa Service-Hub
 
 Administratorul Platformei vede datele necesare pentru suport, pentru verificarea recenziilor raportate, pentru plăți și pentru oprirea abuzurilor. Orice modificare făcută de administrator este înregistrată într-un jurnal.
+
+Agenții de suport sunt membri ai echipei Service-Hub numiți de administrator. Ei văd solicitările tale, fișierele atașate și datele contului de care au nevoie ca să te ajute: codul contului, numele, emailul parțial ascuns, ultimele trei cifre ale telefonului, limba și starea contului. Nu văd programările, mașinile, plățile, firmele sau conversațiile tale cu service-urile. Răspunsurile lor apar semnate „Echipa Service-Hub”. Fiecare căutare, fiecare deschidere a unui cont, a unei solicitări sau a unui fișier atașat și fiecare răspuns sunt înregistrate într-un jurnal, pe care îl vede doar administratorul.
 
 ### 4.3 Furnizorii noștri
 
@@ -154,6 +158,7 @@ Dăm date autorităților doar când legea ne obligă (de exemplu, la o cerere a
 - **Amprentele emailului și telefonului** (nu adresa și numărul, ci un cod criptat din care nu se pot afla): pentru proprietarii de service, ca perioada gratuită să se acorde o singură dată aceleiași persoane și ca o recomandare către propriul service să nu aducă o lună gratuită, și pentru conturile sau service-urile suspendate, ca suspendarea să nu poată fi ocolită cu un cont nou. Un cont nou cu aceleași date nu primește a doua perioadă gratuită, respectiv este creat suspendat până când echipa Service-Hub verifică situația. Le păstrăm cât există contul și încă 3 ani după ștergerea lui; amprentele unei suspendări se șterg când suspendarea este ridicată.
 - **Invitațiile** („Invită un prieten”) și amprentele de la înscrierea prietenului invitat: cât există contul lui și încă 3 ani după ștergerea lui, ca aceeași persoană să nu aducă un al doilea raport gratuit. Rapoartele gratuite primite rămân în contul celui care a invitat cât există contul.
 - **Datele tehnice pentru evitarea dublei trimiteri** a unei acțiuni: 7 zile.
+- **Fișierele atașate solicitărilor de suport:** se șterg la 90 de zile după închiderea solicitării. Fișierele încărcate, dar netrimise, se șterg după 24 de ore.
 - **Rapoartele de erori:** cel mult 90 de zile.
 - **Jurnalele de server** ale furnizorilor: perioade scurte, după regulile lor.
 
@@ -165,6 +170,7 @@ Dăm date autorităților doar când legea ne obligă (de exemplu, la o cerere a
 - Regulile de acces sunt puse chiar în baza de date: un client vede doar datele lui, un service doar datele service-ului lui. Ascunderea unui buton nu este singura protecție.
 - Parolele sunt păstrate doar criptat. Datele cardului rămân la Stripe.
 - Rapoartele PDF sunt păstrate privat și se descarcă doar de proprietarul lor, după verificare.
+- Fișierele atașate solicitărilor de suport sunt păstrate privat. Le verificăm la încărcare (tipul real, integritatea, fără cod în PDF-uri) și se deschid doar prin legături valabile un minut, după verificarea dreptului de acces.
 - Notificările push sunt criptate de la noi până pe dispozitivul tău.
 - Rapoartele de erori nu conțin emailuri, telefoane, coduri de acces sau adresa IP.
 - Dacă datele tale ar fi expuse într-un incident de securitate, anunțăm Autoritatea Națională de Supraveghere în 72 de ore și pe tine, dacă riscul pentru tine este mare.

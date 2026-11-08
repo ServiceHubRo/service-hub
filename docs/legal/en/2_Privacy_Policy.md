@@ -1,6 +1,6 @@
 # Privacy Policy — Service-Hub
 
-**Last updated:** October 10, 2026
+**Last updated:** November 8, 2026
 
 This policy explains what personal data Service-Hub uses, why, who else sees it, how long we keep it and what rights you have, under Regulation (EU) 2016/679 (the “GDPR”) and Romanian law.
 
@@ -27,7 +27,8 @@ This policy explains what personal data Service-Hub uses, why, who else sees it,
 - the version of the Terms and of this policy you accepted, and when;
 - your password, only in encrypted form (we cannot read it either);
 - if you sign in with Google or Apple: the name, email address and (from Google) profile picture they send us; with Apple you may choose to give us a hidden address that forwards our emails to you; your Google or Apple password never reaches us;
-- your choices in the app (for example, if you postponed the message about notifications).
+- your choices in the app (for example, if you postponed the message about notifications);
+- the requests you send to the Service-Hub team (Account → Help and contact → My requests): the category, title, description, messages, the booking code if you add it, and the attached files (PNG, JPEG or WebP images and PDF documents, at most 5 MB each). When a photo is uploaded we remove its location, device details, date and the other information hidden in the file; we keep only the image's orientation.
 
 ### 2.2 If you are a Customer
 
@@ -93,6 +94,7 @@ This policy explains what personal data Service-Hub uses, why, who else sees it,
 | Limits against abuse, the no-show indicator, the phone confirmation after no-shows, the bot check, suspensions | Legitimate interest in a fair and safe Platform |
 | Checking shops’ tax IDs in ANAF’s public register and flagging reviews that look written by the shop (for example, the customer used the shop’s phone) | Legitimate interest in real companies and genuine reviews on the Platform |
 | One free period per person, and no way around a suspension with a new account (encrypted fingerprints of the email and phone, see section 5) | Legitimate interest in a fair and safe Platform |
+| Requests sent to the Service-Hub team, attached files and the log of who opens them | The contract with you (point b); our legitimate interest (point f) in access to your data being verifiable |
 | Error reports and technical logs | Legitimate interest in a Platform that works and is secure |
 | Announcements about the Platform (changes, outages) | The contract and legitimate interest |
 | Answering your requests; defending legal claims | Legitimate interest and legal obligations |
@@ -117,6 +119,8 @@ This policy explains what personal data Service-Hub uses, why, who else sees it,
 ### 4.2 The Service-Hub team
 
 The Platform administrator sees the data needed for support, checking reported reviews, payments and stopping abuse. Every change made by the administrator is recorded in a log.
+
+Support agents are members of the Service-Hub team appointed by the administrator. They see your requests, the attached files and the account data they need to help you: the account code, your name, your partly hidden email, the last three digits of your phone, your language and the account's status. They do not see your bookings, cars, payments, companies or your conversations with shops. Their answers are signed “Service-Hub team”. Every search, every opening of an account, a request or an attached file and every answer is recorded in a log that only the administrator sees.
 
 ### 4.3 Our providers
 
@@ -154,6 +158,7 @@ We share data with authorities only when the law requires us to (for example, a 
 - **Fingerprints of the email and phone** (not the address or the number, but an encrypted code they cannot be recovered from): for shop owners, so the free period is given only once to the same person and a referral of one's own shop brings no free month, and for suspended accounts or shops, so a suspension cannot be avoided with a new account. A new account with the same details gets no second free period, or is created suspended until the Service-Hub team looks into it. We keep them while the account exists and for 3 years after it is deleted; the fingerprints of a suspension are deleted when the suspension is lifted.
 - **Invitations** (“Invite a friend”) and the fingerprints taken when the invited friend signed up: while their account exists and for 3 years after it is deleted, so the same person does not bring a second free report. Free reports received stay in the inviting account while it exists.
 - **Technical data that prevents an action from being sent twice:** 7 days.
+- **Files attached to support requests:** deleted 90 days after the request is closed. Files uploaded but not sent are deleted after 24 hours.
 - **Error reports:** 90 days at most.
 - **Server logs** of our providers: short periods, under their own rules.
 
@@ -165,6 +170,7 @@ We share data with authorities only when the law requires us to (for example, a 
 - Access rules are enforced in the database itself: a customer sees only their own data, a shop only its own shop’s data. Hiding a button is never the only protection.
 - Passwords are kept only in encrypted form. Card details stay with Stripe.
 - PDF reports are stored privately and can be downloaded only by their owner, after a check.
+- Files attached to support requests are stored privately. They are checked when uploaded (their real type, that they are whole, no code inside PDFs) and open only through links valid for one minute, after a check of who may see them.
 - Push notifications are encrypted all the way from us to your device.
 - Error reports do not contain emails, phone numbers, access codes or IP addresses.
 - If your data were exposed in a security incident, we would notify the supervisory authority within 72 hours, and you too if the risk to you is high.

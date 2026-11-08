@@ -4117,6 +4117,73 @@ export type Database = {
           },
         ]
       }
+      suggestion_files: {
+        Row: {
+          attached_at: string | null
+          created_at: string
+          from_staff: boolean
+          id: string
+          message_id: string | null
+          mime: string
+          name: string
+          path: string
+          sha256: string
+          size: number
+          suggestion_id: string | null
+          uploaded_by: string | null
+        }
+        Insert: {
+          attached_at?: string | null
+          created_at?: string
+          from_staff: boolean
+          id?: string
+          message_id?: string | null
+          mime: string
+          name: string
+          path: string
+          sha256: string
+          size: number
+          suggestion_id?: string | null
+          uploaded_by?: string | null
+        }
+        Update: {
+          attached_at?: string | null
+          created_at?: string
+          from_staff?: boolean
+          id?: string
+          message_id?: string | null
+          mime?: string
+          name?: string
+          path?: string
+          sha256?: string
+          size?: number
+          suggestion_id?: string | null
+          uploaded_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "suggestion_files_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "suggestion_messages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "suggestion_files_suggestion_id_fkey"
+            columns: ["suggestion_id"]
+            isOneToOne: false
+            referencedRelation: "suggestions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "suggestion_files_uploaded_by_fkey"
+            columns: ["uploaded_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       suggestion_messages: {
         Row: {
           author_id: string | null
@@ -4353,6 +4420,21 @@ export type Database = {
           name_ro?: string
           position?: number
           roles?: string[]
+        }
+        Relationships: []
+      }
+      support_file_deletions: {
+        Row: {
+          path: string
+          queued_at: string
+        }
+        Insert: {
+          path: string
+          queued_at?: string
+        }
+        Update: {
+          path?: string
+          queued_at?: string
         }
         Relationships: []
       }
@@ -5550,6 +5632,17 @@ export type Database = {
           p_body: string
           p_booking_ref: string
           p_category: string
+          p_file_ids?: string[]
+          p_request_id: string
+          p_title: string
+        }
+        Returns: Json
+      }
+      create_support_request_a3a: {
+        Args: {
+          p_body: string
+          p_booking_ref: string
+          p_category: string
           p_request_id: string
           p_title: string
         }
@@ -6336,6 +6429,7 @@ export type Database = {
       }
       get_company_invite: { Args: { p_token: string }; Returns: Json }
       get_my_support_request: { Args: { p_id: string }; Returns: Json }
+      get_my_support_request_a3a: { Args: { p_id: string }; Returns: Json }
       get_schema_version: { Args: never; Returns: number }
       get_shop_page: { Args: { p_shop_id: string }; Returns: Json }
       get_shop_setup: { Args: never; Returns: Json }
@@ -6490,6 +6584,7 @@ export type Database = {
       kick_company_checks: { Args: never; Returns: boolean }
       kick_dispatcher: { Args: never; Returns: boolean }
       kick_fleet_files_cleanup: { Args: never; Returns: boolean }
+      kick_support_files_cleanup: { Args: never; Returns: boolean }
       last_odometer_for_booking: {
         Args: { p_booking_id: string }
         Returns: number
@@ -6994,6 +7089,15 @@ export type Database = {
         }
       }
       reply_my_support_request: {
+        Args: {
+          p_body: string
+          p_file_ids?: string[]
+          p_id: string
+          p_request_id: string
+        }
+        Returns: Json
+      }
+      reply_my_support_request_a3a: {
         Args: { p_body: string; p_id: string; p_request_id: string }
         Returns: Json
       }
@@ -8456,14 +8560,106 @@ export type Database = {
         Args: { p_assignee: string; p_id: string; p_request_id: string }
         Returns: Json
       }
+      support_attach_files: {
+        Args: {
+          p_files: string[]
+          p_message: string
+          p_suggestion: string
+          p_user: string
+        }
+        Returns: undefined
+      }
       support_booking_ref: { Args: { p_booking_id: string }; Returns: Json }
       support_categories_for_me: { Args: never; Returns: Json }
       support_escalate_request: {
         Args: { p_id: string; p_reason: string; p_request_id: string }
         Returns: Json
       }
+      support_file_begin: {
+        Args: { p_aal: string; p_session: string; p_user: string }
+        Returns: Json
+      }
+      support_file_caller: {
+        Args: { p_aal: string; p_session: string; p_user: string }
+        Returns: {
+          app_tips: boolean
+          company_address: string | null
+          company_name: string | null
+          company_reg_com: string | null
+          company_vat_id: string | null
+          created_at: string
+          deleted_at: string | null
+          display_id: string
+          doc_party: string
+          email_verified_at: string | null
+          fleet_beta: boolean
+          guide_hidden_at: string | null
+          id: string
+          lang: string
+          last_active_at: string | null
+          location_prompt_dismissed_at: string | null
+          name: string | null
+          person_address: string | null
+          phone: string | null
+          phone_verified_at: string | null
+          phone_verified_by_admin: boolean
+          promo_notifications: boolean
+          push_prompt_dismissed_at: string | null
+          review_requests: boolean
+          role: string
+          season_reminders: boolean
+          service_reminders: boolean
+          share_history: boolean
+          suspended: boolean
+          terms_accepted_at: string | null
+          terms_version: string | null
+          tour_seen_at: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "profiles"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      support_file_deletions_done: {
+        Args: { p_paths: string[] }
+        Returns: number
+      }
+      support_file_deletions_next: {
+        Args: { p_limit?: number }
+        Returns: string[]
+      }
+      support_file_open: {
+        Args: {
+          p_aal: string
+          p_file: string
+          p_session: string
+          p_user: string
+        }
+        Returns: Json
+      }
+      support_file_register: {
+        Args: {
+          p_aal: string
+          p_mime: string
+          p_name: string
+          p_path: string
+          p_session: string
+          p_sha256: string
+          p_size: number
+          p_user: string
+        }
+        Returns: Json
+      }
+      support_files_collect: { Args: { p_now?: string }; Returns: number }
+      support_files_stray: {
+        Args: { p_limit?: number; p_now?: string }
+        Returns: string[]
+      }
       support_get_account: { Args: { p_id: string }; Returns: Json }
       support_get_request: { Args: { p_id: string }; Returns: Json }
+      support_get_request_a3a: { Args: { p_id: string }; Returns: Json }
       support_guard: {
         Args: {
           p_me: Database["public"]["Tables"]["profiles"]["Row"]
@@ -8481,10 +8677,24 @@ export type Database = {
       support_reply_request: {
         Args: {
           p_body: string
+          p_file_ids?: string[]
           p_id: string
           p_request_id: string
           p_status: string
         }
+        Returns: Json
+      }
+      support_reply_request_a3a: {
+        Args: {
+          p_body: string
+          p_id: string
+          p_request_id: string
+          p_status: string
+        }
+        Returns: Json
+      }
+      support_request_files: {
+        Args: { p_suggestion: string; p_with_opens: boolean }
         Returns: Json
       }
       support_request_label: {

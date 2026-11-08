@@ -74,8 +74,9 @@ describe('legal documents', () => {
 
   it('does not describe features the app does not have', async () => {
     const all = (await Promise.all(LANGS.flatMap((l) => LEGAL_DOCS.map((d) => loadLegalDoc(d.id, l))))).join('\n');
-    // No public prices, no photo or document uploads, no work bays ("posturi"), no Start/Pro/Business plans, no ODR platform (closed in 2025).
-    expect(all).not.toMatch(/posturi|încărcarea|poze|Start \/ Pro|Business\)|ec\.europa\.eu\/consumers\/odr|photos|upload/i);
+    // No public prices, no work bays ("posturi"), no Start/Pro/Business plans, no ODR platform (closed in 2025).
+    // Uploads exist since A3b (files attached to support requests), so the policy describes them.
+    expect(all).not.toMatch(/posturi|poze|Start \/ Pro|Business\)|ec\.europa\.eu\/consumers\/odr/i);
   });
 
   it('fills the contact fields; the company fields come from docs/legal/company.json', () => {

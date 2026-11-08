@@ -16,3 +16,19 @@ export function tokenAal(token: string | null): 'aal1' | 'aal2' {
     return 'aal1';
   }
 }
+
+/**
+ * The session an access token belongs to (its `session_id` claim), or null. Like tokenAal, only for a
+ * token the Auth server has just accepted. A support agent's session must still exist (A2).
+ */
+export function tokenSession(token: string | null): string | null {
+  const part = token?.split('.')[1];
+  if (!part) return null;
+  try {
+    const b64 = part.replace(/-/g, '+').replace(/_/g, '/');
+    const payload = JSON.parse(atob(b64 + '='.repeat((4 - (b64.length % 4)) % 4))) as { session_id?: unknown };
+    return typeof payload.session_id === 'string' && /^[0-9a-f-]{36}$/i.test(payload.session_id) ? payload.session_id : null;
+  } catch {
+    return null;
+  }
+}

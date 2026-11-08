@@ -37,6 +37,7 @@ import adminStyles from '../admin/admin.module.css';
 import { NotFound } from '../public/NotFound';
 import { SUPPORT_REQUESTS_PATH, supportAccountPath } from '../support/paths';
 import { categoryName, dayText, whenText } from './format';
+import { AttachmentPicker } from './Attachments';
 import { Conversation, RequestStatusPill, type ConversationItem } from './parts';
 import styles from './requests.module.css';
 
@@ -86,8 +87,9 @@ export function RequestScreen({ mode }: { mode: 'support' | 'admin' }) {
   const editable = !closed && (mode === 'admin' || !escalated);
   const authorName = r.author ? [r.author.display_id, r.author.name].filter(Boolean).join(' · ') : t('support.detail.deletedAuthor');
   const items: ConversationItem[] = [
-    { id: 'first', side: 'author', who: authorName, when: whenText(lang, r.created_at), body: r.body },
+    { id: 'first', side: 'author', who: authorName, when: whenText(lang, r.created_at), body: r.body, files: r.files.filter((f) => !f.message_id) },
     ...r.messages.map((m) => ({
+      files: r.files.filter((f) => f.message_id === m.id),
       id: m.id,
       side: m.from_staff ? ('team' as const) : ('author' as const),
       who: m.from_staff ? staffName(m.by) || t('support.req.team') : authorName,
@@ -154,7 +156,7 @@ export function RequestScreen({ mode }: { mode: 'support' | 'admin' }) {
 
       <section className={styles.form} aria-label={t('support.req.conversation')}>
         <h2 className={adminStyles.sectionTitle}>{t('support.req.conversation')}</h2>
-        <Conversation items={items} label={t('support.req.conversation')} />
+        <Conversation items={items} label={t('support.req.conversation')} showOpens={mode === 'admin'} />
       </section>
 
       {closed && <p className={styles.muted}>{t('support.detail.closedNote')}</p>}
@@ -218,6 +220,8 @@ function Responsible({ request, me, staff, onDone }: { request: StaffRequestDeta
 function ReplyForm({ request, onDone }: { request: StaffRequestDetail; onDone: () => Promise<void> }) {
   const { t, lang } = useI18n();
   const [text, setText] = useState('');
+  const [fileIds, setFileIds] = useState<string[]>([]);
+  const [pickerKey, setPickerKey] = useState(0);
   const [after, setAfter] = useState<RequestStatus | ''>(request.category === 'suggestions' ? '' : 'waiting_user');
   return (
     <Card>
@@ -241,12 +245,15 @@ function ReplyForm({ request, onDone }: { request: StaffRequestDetail; onDone: (
               .map((s) => ({ value: s, label: t(`support.staffStatus.${s}`) })),
           ]}
         />
+        <AttachmentPicker key={pickerKey} onChange={setFileIds} />
         <ActionButton
           submit
           disabled={!text.trim()}
           onAction={async (requestId) => {
-            await replyRequest(request.id, text.trim(), after || null, requestId);
+            await replyRequest(request.id, text.trim(), after || null, requestId, fileIds);
             setText('');
+            setFileIds([]);
+            setPickerKey((k) => k + 1);
             await onDone();
           }}
           errorMessage={(e) => rpcErrorMessage(lang, e)}

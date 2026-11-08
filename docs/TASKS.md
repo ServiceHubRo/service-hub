@@ -1658,7 +1658,7 @@ Aprobate de Eduard pe 6 nov („aprob T71–T75”; T71 era deja folosit, așa c
 
 ### A3 — Solicitări și tichete (în trei părți, aprobat de Eduard pe 7 nov)
 - **A3a** solicitări, conversație, note interne, escaladare — făcut (mai jos).
-- **A3b** atașamente (spațiu privat, verificarea conținutului pe server, linkuri de 60 s, jurnal la deschidere, ștergere la 90 de zile) și textul nou din Politica de confidențialitate (aprobat de Eduard înainte de merge).
+- **A3b** atașamente — făcut (mai jos), textul din Politica de confidențialitate așteaptă aprobarea lui Eduard înainte de merge. Plan: atașamente (spațiu privat, verificarea conținutului pe server, linkuri de 60 s, jurnal la deschidere, ștergere la 90 de zile) și textul nou din Politica de confidențialitate (aprobat de Eduard înainte de merge).
 - **A3c** panoul de suport (contoare, avertizări la 24 și 48 de ore), timp real, păstrare legală (motiv, responsabil, dată, revizuire periodică) și regulile la ștergerea contului; propunerea de retenție pe scop și categorie (decizia 6 a lui Eduard: fără termenul general de 2 ani).
 - Butonul „Raportează o problemă” pe cardul programării: amânat, PR separat (decizia 4).
 
@@ -1671,5 +1671,18 @@ Aprobate de Eduard pe 6 nov („aprob T71–T75”; T71 era deja folosit, așa c
 - Compatibilitate: `submit_suggestion` și citirea veche a sugestiilor (aplicația Android veche) funcționează; ecranul Sugestii arată doar sugestiile; adresa veche `/admin/suport/sugestii` duce la Solicitări.
 - Migrarea `support_requests` (schema 110). Rollback-ul refuză să ruleze dacă există solicitări, mesaje sau note scrise după A3a (spune câte), ca să nu se piardă nimic real.
 - Teste: `tests/sql/152_support_requests.sql`, `tests/unit/supportRequests.test.ts`, `tests/e2e/support-requests.spec.ts` (390/820/1440, RO și EN); actualizate `support-agent`, `suggestions`, `admin-navigation`, `a11y`.
+
+- [x] Făcut
+
+### A3b — Atașamente la solicitări ✅
+- Utilizatorul (la solicitarea nouă și la răspuns) și echipa (la răspuns) atașează PNG, JPEG, WebP sau PDF: cel mult 5 MB fiecare, 5 la un mesaj, 20 la o solicitare, aceleași verificări pentru toți. Notele interne rămân doar text (alegerea 1).
+- Verificarea se face pe server, în funcția `support-files`, după conținut (nu după nume): fișiere cu tip fals, incomplete sau deteriorate sunt refuzate; PDF-urile criptate sau cu cod și acțiuni automate (JavaScript, lansare, fișiere încorporate, formulare trimise, legături externe) sunt refuzate, inclusiv când sunt ascunse în fluxuri comprimate.
+- Fotografiile sunt rescrise fără metadate (GPS, aparat, proprietar, date, XMP, comentarii, previzualizări), păstrând orientarea și profilul de culoare (alegerea 3).
+- Spațiu privat `support-files`, fără nicio regulă de acces; doar autorul și echipa deschid un fișier, prin link semnat valabil 60 de secunde; PDF-ul se descarcă (alegerea 2); fără miniaturi (alegerea 4). Fiecare deschidere e în jurnalul de audit; adminul vede pe solicitare cine a deschis fiecare fișier.
+- Ștergere completă (Storage + rânduri): fișierele netrimise după 24 de ore (alegerea 5), fișierele solicitărilor închise de 90 de zile, cele ale unui cont șters; zilnic la 03:37.
+- „Datele mele” listează fișierele solicitărilor (nume, tip, mărime, dată, cine le-a trimis).
+- Politica de confidențialitate (RO și EN, versiunea 2026-11-08): §2.1, §3, §4.2, §5, §6 — textul complet în PR, pentru aprobare înainte de merge.
+- Migrarea `support_files` (schema 111). Rollback-ul refuză să ruleze cât există un fișier (rând, obiect în Storage sau ștergere în așteptare).
+- Teste: `tests/unit/supportFiles.test.ts`, `tests/sql/153_support_files.sql`, `tests/e2e/support-files.spec.ts` (390/820/1440, RO și EN; link expirat după 60 s; ștergerea automată).
 
 - [x] Făcut

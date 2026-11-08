@@ -1,4 +1,6 @@
+import type { RequestFile } from '../../data/supportFiles';
 import type { RequestStatus } from '../../data/supportRequests';
+import { FileList } from './Attachments';
 import { useI18n } from '../../i18n/context';
 import styles from './requests.module.css';
 
@@ -28,10 +30,12 @@ export interface ConversationItem {
   who: string;
   when: string;
   body: string;
+  /** A3b: the files sent with it. */
+  files?: RequestFile[];
 }
 
-/** The request's description and its messages, oldest first. */
-export function Conversation({ items, label }: { items: ConversationItem[]; label: string }) {
+/** The request's description and its messages, oldest first, each with its files. */
+export function Conversation({ items, label, showOpens = false }: { items: ConversationItem[]; label: string; showOpens?: boolean }) {
   return (
     <ol className={styles.conversation} aria-label={label}>
       {items.map((m) => (
@@ -41,6 +45,7 @@ export function Conversation({ items, label }: { items: ConversationItem[]; labe
             <span>{m.when}</span>
           </span>
           <p className={styles.messageBody}>{m.body}</p>
+          {m.files && m.files.length > 0 && <FileList files={m.files} showOpens={showOpens} />}
         </li>
       ))}
     </ol>

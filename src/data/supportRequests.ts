@@ -1,4 +1,5 @@
 import { call } from './rpc';
+import type { RequestFile } from './supportFiles';
 
 /**
  * Support requests (A3a): the suggestions table extended into one support system. The author reads
@@ -70,6 +71,8 @@ export interface MyRequestDetail {
   reopen_until: string | null;
   can_reply: boolean;
   messages: RequestMessage[];
+  /** A3b: the files sent with the description (message_id null) and with the messages. */
+  files: RequestFile[];
 }
 
 export async function fetchSupportCategories(): Promise<SupportCategory[]> {
@@ -85,7 +88,7 @@ export async function fetchMyRequest(id: string): Promise<MyRequestDetail> {
 }
 
 export async function createRequest(
-  input: { category: string; title: string; body: string; bookingRef: string },
+  input: { category: string; title: string; body: string; bookingRef: string; fileIds?: string[] },
   requestId: string,
 ): Promise<{ id: string }> {
   return (await call('create_support_request', {
@@ -94,11 +97,17 @@ export async function createRequest(
     p_body: input.body,
     p_booking_ref: input.bookingRef,
     p_request_id: requestId,
+    p_file_ids: input.fileIds ?? [],
   })) as unknown as { id: string };
 }
 
-export async function replyMyRequest(id: string, body: string, requestId: string): Promise<{ status: RequestStatus; reopened: boolean }> {
-  return (await call('reply_my_support_request', { p_id: id, p_body: body, p_request_id: requestId })) as unknown as {
+export async function replyMyRequest(
+  id: string,
+  body: string,
+  requestId: string,
+  fileIds: string[] = [],
+): Promise<{ status: RequestStatus; reopened: boolean }> {
+  return (await call('reply_my_support_request', { p_id: id, p_body: body, p_request_id: requestId, p_file_ids: fileIds })) as unknown as {
     status: RequestStatus;
     reopened: boolean;
   };
@@ -172,6 +181,8 @@ export interface StaffRequestDetail {
   reopen_until: string | null;
   messages: StaffMessage[];
   notes: StaffNote[];
+  /** A3b: the files; for the admin with who opened each. */
+  files: RequestFile[];
 }
 
 export async function listRequests(): Promise<{ me: string; items: StaffRequestItem[] }> {
@@ -194,8 +205,14 @@ export async function assignRequest(id: string, assignee: string, requestId: str
   await call('support_assign_request', { p_id: id, p_assignee: assignee, p_request_id: requestId });
 }
 
-export async function replyRequest(id: string, body: string, status: RequestStatus | null, requestId: string): Promise<void> {
-  await call('support_reply_request', { p_id: id, p_body: body, p_status: status as string, p_request_id: requestId });
+export async function replyRequest(
+  id: string,
+  body: string,
+  status: RequestStatus | null,
+  requestId: string,
+  fileIds: string[] = [],
+): Promise<void> {
+  await call('support_reply_request', { p_id: id, p_body: body, p_status: status as string, p_request_id: requestId, p_file_ids: fileIds });
 }
 
 export async function addNote(id: string, body: string, requestId: string): Promise<void> {
