@@ -9,6 +9,7 @@ import {
   expectAccessible,
   expectNoHorizontalScroll,
   expectNoRomanianText,
+  inboxRow,
   serviceRest,
   shot,
   signIn,
@@ -52,7 +53,7 @@ async function newRequest(page: Page, title: string, body: string) {
 async function agentOpens(page: Page, agent: Agent, title: string) {
   await signInAgent(page, agent);
   await expect(h1(page)).toHaveText('Solicitări');
-  await page.getByRole('link').filter({ hasText: title }).click();
+  await inboxRow(page, title).click();
   await expect(h1(page)).toHaveText(title);
 }
 
@@ -213,7 +214,7 @@ test.describe('support requests (A3a)', () => {
     await expect(h1(adminPage)).toHaveText('Solicitări');
     await expectNoHorizontalScroll(adminPage);
     await shot(adminPage, 'a3a-admin-escalated', name());
-    await adminPage.getByRole('link').filter({ hasText: title }).click();
+    await inboxRow(adminPage, title).click();
     await expect(adminPage.getByText('Motiv: Posibil acces neautorizat')).toBeVisible();
     await adminPage.getByLabel('Răspuns către utilizator').fill('Am schimbat parola contului. Verifică emailul.');
     await adminPage.getByRole('button', { name: 'Trimite răspunsul' }).click();

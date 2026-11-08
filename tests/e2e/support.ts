@@ -582,3 +582,11 @@ export async function switchLanguage(page: Page, lang: 'ro' | 'en') {
     await page.waitForURL(back);
   }
 }
+
+/**
+ * A request in the team's Solicitări list (A3c1): only the rows of the list, never the same title in
+ * „Cea mai veche fără răspuns” above it.
+ */
+export function inboxRow(page: Page, text: string): Locator {
+  return page.getByRole('list', { name: /^(Lista solicitărilor|Request list)$/ }).getByRole('link').filter({ hasText: text });
+}

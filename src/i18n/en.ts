@@ -4341,6 +4341,7 @@ export const en: Record<MessageKey, string> = {
   'support.wait.days': '{n} days',
   'support.inbox.waitingFor': 'No answer for {time}',
   'support.inbox.more': 'Show more',
+  'support.inbox.list': 'Request list',
   'support.inbox.moreError': 'The next requests could not be loaded.',
   'support.detail.loadError': 'The request could not be loaded.',
   'support.detail.author': 'Author',

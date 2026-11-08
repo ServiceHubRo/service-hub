@@ -126,7 +126,7 @@ export function InboxScreen({ mode }: { mode: 'support' | 'admin' }) {
                 <EmptyState icon={SearchX} title={t('support.inbox.emptyFilter')} />
               ) : (
                 <>
-                  <ul className={styles.list}>
+                  <ul className={styles.list} aria-label={t('support.inbox.list')}>
                     {data.items.map((r) => (
                       <li key={r.id}>
                         <InboxRow r={r} now={now} to={detailPath(r.id)} categoryLabel={categoryName(categories, r.category, lang)} />

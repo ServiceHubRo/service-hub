@@ -4340,6 +4340,7 @@ export const ro = {
   'support.wait.days': '{n} zile',
   'support.inbox.waitingFor': 'Fără răspuns de {time}',
   'support.inbox.more': 'Arată mai multe',
+  'support.inbox.list': 'Lista solicitărilor',
   'support.inbox.moreError': 'Următoarele solicitări nu s-au încărcat.',
   'support.detail.loadError': 'Solicitarea nu s-a încărcat.',
   'support.detail.author': 'Autor',

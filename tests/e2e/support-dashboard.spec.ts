@@ -11,6 +11,7 @@ import {
   expectAccessible,
   expectNoHorizontalScroll,
   expectNoRomanianText,
+  inboxRow,
   rpcAs,
   serviceRest,
   shot,
@@ -176,13 +177,13 @@ test.describe('support dashboard (A3c1)', () => {
     await expect(page).toHaveURL(/\?vechime=48$/);
     await expect(tile(page, 'Fără răspuns peste 48 h')).toHaveAttribute('aria-current', 'true');
     await expect(page.getByLabel('Fără răspuns')).toHaveValue('48');
-    const row = page.getByRole('link').filter({ hasText: `Așteaptă de două zile ${s}` });
+    const row = inboxRow(page, `Așteaptă de două zile ${s}`);
     await expect(row).toBeVisible();
     await expect(row).toContainText(/Fără răspuns de [23] zile/);
-    await expect(page.getByRole('link').filter({ hasText: `Așteaptă de ieri ${s}` })).toHaveCount(0);
+    await expect(inboxRow(page, `Așteaptă de ieri ${s}`)).toHaveCount(0);
     await tile(page, 'Fără răspuns peste 24 h').click();
     await expect(page).toHaveURL(/\?vechime=24$/);
-    await expect(page.getByRole('link').filter({ hasText: `Așteaptă de ieri ${s}` })).toContainText('Fără răspuns de 30 h');
+    await expect(inboxRow(page, `Așteaptă de ieri ${s}`)).toContainText('Fără răspuns de 30 h');
     await tile(page, 'Fără responsabil').click();
     await expect(page).toHaveURL(/\?responsabil=none$/);
     await expect(page.getByLabel('Responsabil')).toHaveValue('none');
@@ -268,11 +269,11 @@ test.describe('support dashboard (A3c1)', () => {
       await tile(page, 'Ale mele').click();
       await expect(page).toHaveURL(/\?responsabil=mine$/);
       const titles = () => page.getByRole('list').last().getByRole('link').allInnerTexts();
-      await expect(page.getByRole('link').filter({ hasText: `Volum ${s}` })).toHaveCount(30);
+      await expect(inboxRow(page, `Volum ${s}`)).toHaveCount(30);
       for (const shown of [60, 90]) {
         const t0 = Date.now();
         await page.getByRole('button', { name: 'Arată mai multe' }).click();
-        await expect(page.getByRole('link').filter({ hasText: `Volum ${s}` })).toHaveCount(shown);
+        await expect(inboxRow(page, `Volum ${s}`)).toHaveCount(shown);
         expect(Date.now() - t0, 'a page in under 3 s').toBeLessThan(3_000);
       }
       const numbers = (await titles()).map((x) => Number(/Volum \w+ (\d{4})/.exec(x)?.[1] ?? 0)).filter(Boolean);
@@ -347,7 +348,7 @@ test.describe('support dashboard (A3c1)', () => {
 
     // A new request appears in the team's list and counters without reloading.
     const live = await request(clientA, `Live ${s}`);
-    await expect(page.getByRole('link').filter({ hasText: `Live ${s}` })).toBeVisible({ timeout: 15_000 });
+    await expect(inboxRow(page, `Live ${s}`)).toBeVisible({ timeout: 15_000 });
     await expect.poll(() => tileNumber(page, 'Noi'), { timeout: 15_000 }).toBeGreaterThan(newBefore);
 
     // The author has the request open; the agent takes it, notes, answers.

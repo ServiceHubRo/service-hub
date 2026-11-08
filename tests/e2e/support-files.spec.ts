@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto';
 import { expect, test, type Page } from '@playwright/test';
 import { JPEG, PNG } from '../unit/fixtures/support-files/images';
 import { appToken, createAgent, newPage, signInAgent } from './agent';
-import { BACKEND, PASSWORD, SEED, SEED_PASSWORD, createUser, expectAccessible, expectNoHorizontalScroll, serviceRest, shot, signIn, switchLanguage } from './support';
+import { BACKEND, PASSWORD, SEED, SEED_PASSWORD, createUser, expectAccessible, expectNoHorizontalScroll, inboxRow, serviceRest, shot, signIn, switchLanguage } from './support';
 
 // A3b — files of support requests, end to end with the Edge Function support-files: the real type and
 // soundness checked on the server (a text named .png, a broken image, an active PDF and a file over
@@ -171,7 +171,7 @@ test.describe('support files (A3b)', () => {
     // The team: the agent sees both files and answers with its own, checked the same way.
     const agentPage = await newPage(browser);
     await signInAgent(agentPage, agent);
-    await agentPage.getByRole('link').filter({ hasText: title }).click();
+    await inboxRow(agentPage, title).click();
     await expect(agentPage.getByText('IMG_2026.jpg')).toBeVisible();
     await agentPage.getByLabel('Răspuns către utilizator').fill('Urmează pașii din captură.');
     const teamPicker = agentPage.locator('input[type="file"]');
@@ -192,7 +192,7 @@ test.describe('support files (A3b)', () => {
     await signIn(adminPage, SEED.admin, SEED_PASSWORD);
     await expect(adminPage).toHaveURL(/\/admin\//);
     await adminPage.goto('/admin/suport/solicitari?stare=all');
-    await adminPage.getByRole('link').filter({ hasText: title }).click();
+    await inboxRow(adminPage, title).click();
     const photo = adminPage.getByRole('listitem').filter({ hasText: 'IMG_2026.jpg' });
     await expect(photo.getByText(/^Deschis de C-\d{5} · Ana Fișiere/)).toBeVisible();
     await expect(adminPage.getByRole('listitem').filter({ hasText: 'captura-ecran.png' }).getByText('Nedeschis')).toBeVisible();
