@@ -129,6 +129,17 @@ const FUNCTIONS = (page: Page): Fn[] => [
   { zone: 'Platformă', item: 'Notificări flotă eșuate', path: '/admin/platforma/notificari-flota', title: 'Notificări flotă eșuate' },
   // A2
   { zone: 'Platformă', item: 'Echipa de suport', path: '/admin/platforma/echipa', title: 'Echipa de suport', shows: label(page, 'ID cont sau email') },
+  // A3c2b1
+  { zone: 'Suport', item: 'Sugestii de verificat', path: '/admin/suport/sugestii-de-verificat', title: 'Sugestii de verificat', shows: label(page, 'Afișează') },
+  {
+    zone: 'Platformă',
+    item: 'Retenția datelor',
+    path: '/admin/platforma/retentie',
+    title: 'Retenția datelor',
+    shows: async () => {
+      await expect(main(page).getByRole('button', { name: 'Previzualizează' }).first()).toBeVisible();
+    },
+  },
 ];
 
 const ZONES = [
@@ -222,6 +233,7 @@ test.describe('A1 — admin navigation', () => {
         'Jurnal de audit',
         'Notificări flotă eșuate',
         'Echipa de suport',
+        'Retenția datelor',
       ]);
       await sub.getByRole('link', { name: 'Anunțuri' }).click();
       await expect(h1(page)).toHaveText('Anunțuri');
