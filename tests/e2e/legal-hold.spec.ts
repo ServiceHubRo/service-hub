@@ -10,6 +10,7 @@ import {
   expectAccessible,
   expectNoHorizontalScroll,
   expectNoRomanianText,
+  functionAs,
   inboxRow,
   rpcAs,
   serviceRest,
@@ -212,14 +213,13 @@ test.describe('legal hold (A3c2a)', () => {
     expect(direct.ok).toBe(false);
     expect(await direct.text()).toContain('legal_hold');
 
-    // The account goes the way delete-account does it: prepare, then the Auth admin API.
-    const mode = await serviceRest<string>('rpc/prepare_account_deletion', 'POST', { p_user_id: clientId });
-    expect(mode).toBe('delete');
-    const gone = await fetch(`${API}/auth/v1/admin/users/${clientId}`, {
-      method: 'DELETE',
+    // The client deletes its own account through the app's Edge Function (delete-account).
+    const deleted = await functionAs(client, 'delete-account', {});
+    expect(deleted.status, JSON.stringify(deleted.body)).toBe(200);
+    const login = await fetch(`${API}/auth/v1/admin/users/${clientId}`, {
       headers: { apikey: SERVICE_KEY, Authorization: `Bearer ${SERVICE_KEY}` },
     });
-    expect(gone.ok, await gone.clone().text()).toBe(true);
+    expect(login.status, 'the login itself is gone').toBe(404);
     expect(await serviceRest<unknown[]>(`profiles?id=eq.${clientId}&select=id`, 'GET')).toHaveLength(0);
     expect(await serviceRest<unknown[]>(`suggestions?id=eq.${other}&select=id`, 'GET')).toHaveLength(0);
     const kept = await serviceRest<{ author_id: string | null; former_author_id: string; status: string }[]>(
