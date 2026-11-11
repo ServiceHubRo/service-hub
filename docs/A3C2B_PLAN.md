@@ -1,7 +1,8 @@
 # A3c2b — Retention of support data and of the team's log: final specification
 
 Status: **specification approved by Eduard (11 Nov 2026, with the three confirmations in §7). A3c2b1 is
-built on top of #119 without merging it (Eduard, 11 Nov); A3c2b2 is not started.** Differences in A3c2b1 from
+built on top of #119 without merging it (Eduard, 11 Nov); A3c2b2 is built on top of #120, also without merging (Eduard, 11 Nov).** In A3c2b2 the report is on
+Retenția datelor, next to the jobs, and the admin_log job is locked in the database, not only off. Differences in A3c2b1 from
 the text below: the account-deletion closing and the take never move the activity; a run never takes a
 moment later than the clock; the deleting helpers are not callable with the service key; the Panou line for
 failed runs is not built (the runs and their failures are on Retenția datelor). No file in

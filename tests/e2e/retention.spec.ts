@@ -120,6 +120,22 @@ test.describe('retention (A3c2b1)', () => {
     await expect(card.getByText('Sub păstrare legală')).toBeVisible();
     await suggestions.getByRole('button', { name: 'Previzualizează' }).click();
     await expect(suggestions.getByText('Date găsite în texte')).toBeVisible();
+    // A3c2b2: the log jobs; the administrative one is locked until the legal validation.
+    const supportLog = page.getByRole('listitem').filter({ has: page.getByRole('heading', { name: 'Jurnalul echipei de suport' }) });
+    const adminLog = page.getByRole('listitem').filter({ has: page.getByRole('heading', { name: 'Jurnalul administrativ' }) });
+    await expect(adminLog.getByText('Blocat', { exact: true })).toBeVisible();
+    await expect(adminLog.getByText('Termenul de 3 ani așteaptă validarea juridică.', { exact: false })).toBeVisible();
+    await adminLog.getByRole('button', { name: 'Previzualizează' }).click();
+    await expect(adminLog.getByText('Înregistrări de șters')).toBeVisible();
+    await expect(adminLog.getByRole('button', { name: 'Activează', exact: true })).toHaveCount(0);
+    await supportLog.getByRole('button', { name: 'Previzualizează' }).click();
+    await expect(supportLog.getByText('Căutări din care se șterg cuvintele')).toBeVisible();
+    await expect(supportLog.getByText('Scrise înainte de această etapă (neatinse)')).toBeVisible();
+
+    // The report on the log: numbers only.
+    await page.getByRole('button', { name: 'Generează raportul' }).click();
+    await expect(page.getByText(/^Înregistrări în jurnal: /)).toBeVisible();
+    await expect(page.getByText('Cu cuvinte căutate', { exact: true })).toBeVisible();
     await expectNoHorizontalScroll(page);
     await expectAccessible(page, 'retention');
     await shot(page, 'a3c2b1-retention-preview', name());
