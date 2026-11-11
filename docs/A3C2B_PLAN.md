@@ -1,7 +1,10 @@
 # A3c2b — Retention of support data and of the team's log: final specification
 
-Status: **specification approved by Eduard (11 Nov 2026, with the three confirmations in §7). Nothing here is
-implemented yet.** A3c2b1 starts only after #119 (A3c2a) is merged. No file in
+Status: **specification approved by Eduard (11 Nov 2026, with the three confirmations in §7). A3c2b1 is
+built on top of #119 without merging it (Eduard, 11 Nov); A3c2b2 is not started.** Differences in A3c2b1 from
+the text below: the account-deletion closing and the take never move the activity; a run never takes a
+moment later than the clock; the deleting helpers are not callable with the service key; the Panou line for
+failed runs is not built (the runs and their failures are on Retenția datelor). No file in
 `supabase/migrations/` comes from this document, so "Deploy Supabase" cannot apply any of it. The
 privacy policy files are unchanged.
 

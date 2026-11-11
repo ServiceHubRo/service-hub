@@ -55,7 +55,7 @@ as $$
      where a.entity_type = 'suggestion' and a.entity_id = s.id::text and a.admin_id is not null
        and a.action in ('set_request_status', 'update_suggestion', 'reply_request')))
 $$;
-revoke execute on function public.support_initial_activity(public.suggestions) from public, anon, authenticated;
+revoke execute on function public.support_initial_activity(public.suggestions) from public, anon, authenticated, service_role;
 
 update public.suggestions s set last_activity_at = public.support_initial_activity(s);
 
@@ -85,7 +85,7 @@ begin
   return new;
 end
 $$;
-revoke execute on function public.suggestions_real_activity() from public, anon, authenticated;
+revoke execute on function public.suggestions_real_activity() from public, anon, authenticated, service_role;
 
 create trigger suggestions_real_activity before update on public.suggestions
   for each row execute function public.suggestions_real_activity();
@@ -124,7 +124,7 @@ begin
   return new;
 end
 $$;
-revoke execute on function public.retention_jobs_guard() from public, anon, authenticated;
+revoke execute on function public.retention_jobs_guard() from public, anon, authenticated, service_role;
 create trigger retention_jobs_guard before insert or update on public.retention_jobs
   for each row execute function public.retention_jobs_guard();
 
@@ -195,7 +195,7 @@ set search_path = ''
 as $$
   select coalesce((select j.enabled from public.retention_jobs j where j.key = p_key), false)
 $$;
-revoke execute on function public.retention_job_enabled(text) from public, anon, authenticated;
+revoke execute on function public.retention_job_enabled(text) from public, anon, authenticated, service_role;
 
 -- Eligible: 12 calendar months after the last real activity.
 create function public.retention_due(p_last_activity timestamptz, p_now timestamptz)
@@ -206,7 +206,7 @@ set search_path = ''
 as $$
   select p_last_activity + interval '12 months' <= p_now
 $$;
-revoke execute on function public.retention_due(timestamptz, timestamptz) from public, anon, authenticated;
+revoke execute on function public.retention_due(timestamptz, timestamptz) from public, anon, authenticated, service_role;
 
 -- Which hold keeps a request: 'request' (a hold on it), 'account' (a hold on its author's account) or
 -- null.
@@ -223,7 +223,7 @@ as $$
                  and h.subject_id = coalesce(s.author_id, s.former_author_id)) then 'account'
   end
 $$;
-revoke execute on function public.retention_hold_kind(public.suggestions) from public, anon, authenticated;
+revoke execute on function public.retention_hold_kind(public.suggestions) from public, anon, authenticated, service_role;
 
 -- Luhn check of a string of digits.
 create function public.luhn_ok(p_digits text)
@@ -250,7 +250,7 @@ begin
   return n > 0 and s % 10 = 0;
 end
 $$;
-revoke execute on function public.luhn_ok(text) from public, anon, authenticated;
+revoke execute on function public.luhn_ok(text) from public, anon, authenticated, service_role;
 
 -- A Romanian personal numeric code (CNP) with a valid control digit.
 create function public.cnp_ok(p text)
@@ -277,7 +277,7 @@ begin
   return c = substr(p, 13, 1)::int;
 end
 $$;
-revoke execute on function public.cnp_ok(text) from public, anon, authenticated;
+revoke execute on function public.cnp_ok(text) from public, anon, authenticated, service_role;
 
 -- What in a suggestion's text could identify somebody, masked: {masked, findings: {kind: n}, total,
 -- unmasked}. `unmasked` is true when text_has_secret still finds something after masking (the review
@@ -360,7 +360,7 @@ begin
   return jsonb_build_object('masked', v, 'findings', f, 'total', total, 'unmasked', public.text_has_secret(v));
 end
 $$;
-revoke execute on function public.suggestion_text_findings(text) from public, anon, authenticated;
+revoke execute on function public.suggestion_text_findings(text) from public, anon, authenticated, service_role;
 
 -- One request's contribution to the anonymous statistics.
 create function public.support_stats_add(s public.suggestions)
@@ -391,7 +391,7 @@ as $$
     resolution_count = x.resolution_count + excluded.resolution_count,
     resolution_minutes = x.resolution_minutes + excluded.resolution_minutes
 $$;
-revoke execute on function public.support_stats_add(public.suggestions) from public, anon, authenticated;
+revoke execute on function public.support_stats_add(public.suggestions) from public, anon, authenticated, service_role;
 
 -- Deletes one request whole (its numbers kept first): messages, notes and files go with it (foreign
 -- keys; the files' Storage objects queued by the A3b trigger), its signals too, and every notification
@@ -412,7 +412,7 @@ begin
   return v_files;
 end
 $$;
-revoke execute on function public.support_retention_delete(public.suggestions) from public, anon, authenticated;
+revoke execute on function public.support_retention_delete(public.suggestions) from public, anon, authenticated, service_role;
 
 -- Moves one suggestion to the anonymous table (review for 30 days) and deletes it whole.
 create function public.suggestion_anonymize(s public.suggestions, p_now timestamptz)
@@ -434,7 +434,7 @@ begin
   return public.support_retention_delete(s);
 end
 $$;
-revoke execute on function public.suggestion_anonymize(public.suggestions, timestamptz) from public, anon, authenticated;
+revoke execute on function public.suggestion_anonymize(public.suggestions, timestamptz) from public, anon, authenticated, service_role;
 
 -- ------------------------------------------------------------------ preview (no effect on data)
 
@@ -511,7 +511,7 @@ begin
   return v;
 end
 $$;
-revoke execute on function public.retention_preview_counts(text, timestamptz) from public, anon, authenticated;
+revoke execute on function public.retention_preview_counts(text, timestamptz) from public, anon, authenticated, service_role;
 
 create function public.admin_retention_preview(p_job text)
 returns jsonb
@@ -643,7 +643,7 @@ begin
           p_counts || jsonb_build_object('failed', p_failed, 'remaining', p_remaining), clock_timestamp());
 end
 $$;
-revoke execute on function public.retention_run_finish(text, timestamptz, jsonb, int, int) from public, anon, authenticated;
+revoke execute on function public.retention_run_finish(text, timestamptz, jsonb, int, int) from public, anon, authenticated, service_role;
 
 create function public.run_support_retention(p_now timestamptz default now())
 returns jsonb
@@ -661,6 +661,8 @@ declare
   v_remaining int;
   v_counts jsonb;
 begin
+  -- Never ahead of the clock: nobody makes data due earlier by passing a later moment.
+  p_now := least(p_now, now());
   select * into j from public.retention_jobs where key = 'support_requests';
   if not found or not j.enabled then
     return null;
@@ -715,6 +717,8 @@ declare
   v_remaining int;
   v_counts jsonb;
 begin
+  -- Never ahead of the clock: nobody makes data due earlier by passing a later moment.
+  p_now := least(p_now, now());
   -- The 30 days are a promise: a review past its term loses its text whatever the switch says now.
   with gone as (
     update public.suggestions_anonymous
@@ -1014,5 +1018,8 @@ begin
   return jsonb_build_object('me', v_me.id, 'now', now(), 'counts', v_counts, 'oldest', v_oldest);
 end
 $function$;
+
+-- The A3c2a function now deletes for retention too: the service key does not call it either.
+revoke execute on function public.legal_hold_apply_rules(uuid, timestamptz) from service_role;
 
 update public.schema_version set version = 115;

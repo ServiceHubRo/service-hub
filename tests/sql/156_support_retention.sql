@@ -460,11 +460,14 @@ select test.logout();
 insert into public.suggestions_anonymous (created_month, author_role, final_status, pending_text, proposed_text, findings, review_due_at)
 values ('2025-01-01', 'client', 'new', 'Text cu [email]', 'Text cu [email]', '{"email": 1}', now() + interval '3 days'),
        ('2025-01-01', 'shop', 'done', 'Text ascuns', null, '{"secret": 1}', now() + interval '3 days'),
-       ('2025-01-01', 'client', 'new', 'Text uitat 0722 123 456', 'Text uitat [telefon]', '{"phone": 1}', now() + interval '1 hour');
+       ('2025-01-01', 'client', 'new', 'Text uitat 0722 123 456', 'Text uitat [telefon]', '{"phone": 1}', now() - interval '1 minute');
 select set_config('test.a_email', (select id::text from public.suggestions_anonymous where pending_text = 'Text cu [email]'), true);
 select set_config('test.a_hidden', (select id::text from public.suggestions_anonymous where pending_text = 'Text ascuns'), true);
+select set_config('test.a_old', (select id::text from public.suggestions_anonymous where proposed_text = 'Text uitat [telefon]'), true);
 select test.login(test.id('admin'));
 select test.eq((public.support_dashboard())->'counts'->>'reviews_soon', '3', 'due within 7 days: counted apart');
+select test.eq(test.error_of(format($$select public.support_review_suggestion_text(%L, 'remove', null, test.rid())$$,
+  current_setting('test.a_old'))), 'text_review_expired', 'past its term: no review any more');
 select test.eq(r->>'state', 'confirmed', 'the admin confirms the proposed text')
 from public.support_review_suggestion_text(current_setting('test.a_email')::uuid, 'confirm', null, test.rid()) r;
 select test.eq(test.error_of(format($$select public.support_review_suggestion_text(%L, 'confirm', null, test.rid())$$,
@@ -474,13 +477,24 @@ from public.support_review_suggestion_text(current_setting('test.a_hidden')::uui
 select public.admin_set_retention_job('suggestions', false, 'Oprit pentru verificare', null, null, test.rid());
 select test.logout();
 select test.eq((r->>'expired_texts')::int, 1, 'after 30 days the text goes, even with the job off')
-from public.run_suggestion_anonymization(now() + interval '2 hours') r;
+from public.run_suggestion_anonymization() r;
 select test.ok(a.text is null and a.pending_text is null and a.proposed_text is null, 'only the month, role and state remain')
 from public.suggestions_anonymous a where a.text_state = 'expired';
 select test.eq((select count(*) from public.suggestions_anonymous where text_state = 'pending'), 0::bigint, 'no review open');
 select test.login(test.id('admin'));
 
+select test.login(test.id('admin'));
+select test.switch('support_requests', true, 500);
+select test.logout();
+select public.run_support_retention(now() + interval '5 years');
+select test.eq((select count(*) from public.suggestions where id = current_setting('test.recent')::uuid), 1::bigint,
+  'a later moment passed to a run is ignored (never ahead of the clock): the recent request stays');
+select test.ok(not has_function_privilege('service_role', 'public.support_retention_delete(public.suggestions)', 'execute')
+  and not has_function_privilege('service_role', 'public.legal_hold_apply_rules(uuid, timestamptz)', 'execute'),
+  'the service key cannot call the deleting helpers that skip the switch');
+
 -- ------------------------------------------------------------------ the statistics (admin)
+select test.login(test.id('admin'));
 select test.eq(jsonb_array_length(public.admin_support_stats(null, null)) > 0, true, 'the admin reads the statistics');
 select test.as_agent();
 select test.fails($$select public.admin_support_stats(null, null)$$, 'not_allowed', 'an agent does not');

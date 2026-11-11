@@ -4618,7 +4618,7 @@ export const ro = {
   'support.textReview.removed': 'Textul a fost șters.',
   'support.textReview.kind.email': 'email',
   'support.textReview.kind.phone': 'telefon',
-  'support.textReview.kind.plate': 'nr. înmatriculare',
+  'support.textReview.kind.plate': 'număr de înmatriculare',
   'support.textReview.kind.vin': 'serie de șasiu',
   'support.textReview.kind.booking_code': 'cod de programare',
   'support.textReview.kind.account_code': 'cod de cont',

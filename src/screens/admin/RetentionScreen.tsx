@@ -103,6 +103,14 @@ function PreviewFacts({ preview }: { preview: RetentionPreview }) {
             <dd>{n(c.without_proposal)}</dd>
           </>
         )}
+        {c.reviews && (
+          <>
+            <dt>{t('admin.retention.reviews')}</dt>
+            <dd>
+              {t('admin.retention.reviews.detail', { pending: n(c.reviews.pending), expiring: n(c.reviews.expiring), soon: n(c.reviews.due_7_days) })}
+            </dd>
+          </>
+        )}
       </dl>
       <h3 className={styles.rowTitle}>{t('admin.retention.exempt')}</h3>
       <dl className={styles.facts}>
@@ -120,14 +128,6 @@ function PreviewFacts({ preview }: { preview: RetentionPreview }) {
             </span>
           )}
         </dd>
-        {c.reviews && (
-          <>
-            <dt>{t('admin.retention.reviews')}</dt>
-            <dd>
-              {t('admin.retention.reviews.detail', { pending: n(c.reviews.pending), expiring: n(c.reviews.expiring), soon: n(c.reviews.due_7_days) })}
-            </dd>
-          </>
-        )}
       </dl>
       <p className={styles.muted}>
         {c.next_due_at ? t('admin.retention.nextDue', { date: dateTime(lang, c.next_due_at) }) : t('admin.retention.nextNone')}

@@ -109,6 +109,9 @@ begin
 end
 $function$;
 
+-- The grant the service key had before (A3c2b1 took it away).
+grant execute on function public.legal_hold_apply_rules(uuid, timestamptz) to service_role;
+
 -- ------------------------------------------------------------------ the new objects
 drop function public.admin_support_stats(date, date);
 drop function public.support_review_suggestion_text(uuid, text, text, uuid);
