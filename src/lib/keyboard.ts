@@ -76,6 +76,14 @@ export function scrollToShow(field: Band, band: Band, margin = 16): number {
   return Math.round(field.top - (band.top + Math.max(margin, (room - height) / 3)));
 }
 
+/** The field with its label when the label is just above it (so the person sees what is asked). */
+export function fieldArea(field: HTMLElement): Band {
+  const rect = field.getBoundingClientRect();
+  const label = (field as HTMLInputElement).labels?.[0]?.getBoundingClientRect();
+  const top = label && label.bottom <= rect.top + 1 && rect.top - label.top < 80 ? label.top : rect.top;
+  return { top, bottom: rect.bottom };
+}
+
 /** What stays at the top: the header (AppShell, --nav-top) and „‹ Înapoi” under it (BackLink, --back-bar). */
 function navTopPx(): number {
   const style = getComputedStyle(document.documentElement);
@@ -102,8 +110,12 @@ export function watchKeyboard(): () => void {
     showTimer = window.setTimeout(() => {
       const field = document.activeElement;
       if (!open || !(field instanceof HTMLElement) || !opensKeyboard(field)) return;
+      const band = visibleBand(viewport, window.innerHeight, navTopPx());
+      // With its label when both fit; the field alone (seen whole) when only it does.
+      const withLabel = fieldArea(field);
       const rect = field.getBoundingClientRect();
-      const delta = scrollToShow(rect, visibleBand(viewport, window.innerHeight, navTopPx()));
+      const fits = withLabel.bottom - withLabel.top + 32 <= band.bottom - band.top;
+      const delta = scrollToShow(fits ? withLabel : { top: rect.top, bottom: rect.bottom }, band);
       if (delta !== 0) window.scrollBy({ top: delta, behavior: 'auto' });
     }, 120);
   };

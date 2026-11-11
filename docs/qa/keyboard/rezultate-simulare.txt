@@ -1,0 +1,204 @@
+Intră în cont @320 iphone input Parolă: end of a short page, left to Safari
+Intră în cont @320 iphone: button at the end of a short page, left to Safari
+Intră în cont @320 iphone: ok (2 fields)
+Intră în cont @320 android: ok (2 fields)
+Intră în cont @375 iphone input Parolă: end of a short page, left to Safari
+Intră în cont @375 iphone: button at the end of a short page, left to Safari
+Intră în cont @375 iphone: ok (2 fields)
+Intră în cont @375 android: ok (2 fields)
+Intră în cont @390 iphone input Email: end of a short page, left to Safari
+Intră în cont @390 iphone input Parolă: end of a short page, left to Safari
+Intră în cont @390 iphone: button at the end of a short page, left to Safari
+Intră în cont @390 iphone: ok (2 fields)
+Intră în cont @390 android: ok (2 fields)
+Intră în cont @430 iphone input Email: end of a short page, left to Safari
+Intră în cont @430 iphone input Parolă: end of a short page, left to Safari
+Intră în cont @430 iphone: button at the end of a short page, left to Safari
+Intră în cont @430 iphone: ok (2 fields)
+Intră în cont @430 android: ok (2 fields)
+Cont nou @320 iphone input Repetă parola: end of a short page, left to Safari
+Cont nou @320 iphone: ok (3 fields)
+Cont nou @320 android: ok (3 fields)
+Cont nou @375 iphone input Repetă parola: end of a short page, left to Safari
+Cont nou @375 iphone: ok (3 fields)
+Cont nou @375 android: ok (3 fields)
+Cont nou @390 iphone input Repetă parola: end of a short page, left to Safari
+Cont nou @390 iphone: ok (3 fields)
+Cont nou @390 android: ok (3 fields)
+Cont nou @430 iphone input Repetă parola: end of a short page, left to Safari
+Cont nou @430 iphone: ok (3 fields)
+Cont nou @430 android: ok (3 fields)
+Programare: mașina @320 iphone: button at the end of a short page, left to Safari
+Programare: mașina @320 iphone: ok (2 fields)
+Programare: mașina @320 android: ok (2 fields)
+Programare: mașina @375 iphone textarea Observație (opțional): end of a short page, left to Safari
+Programare: mașina @375 iphone: button at the end of a short page, left to Safari
+Programare: mașina @375 iphone: ok (2 fields)
+Programare: mașina @375 android: ok (2 fields)
+Programare: mașina @390 iphone textarea Observație (opțional): end of a short page, left to Safari
+Programare: mașina @390 iphone: button at the end of a short page, left to Safari
+Programare: mașina @390 iphone: ok (2 fields)
+Programare: mașina @390 android: ok (2 fields)
+Programare: mașina @430 iphone textarea Observație (opțional): end of a short page, left to Safari
+Programare: mașina @430 iphone: button at the end of a short page, left to Safari
+Programare: mașina @430 iphone: ok (2 fields)
+Programare: mașina @430 android: ok (2 fields)
+Mesaje (client) @320 iphone textarea Mesaj: end of a short page, left to Safari
+Mesaje (client) @320 iphone: button at the end of a short page, left to Safari
+Mesaje (client) @320 iphone: ok (1 fields)
+Mesaje (client) @320 android: ok (1 fields)
+Mesaje (client) @375 iphone textarea Mesaj: end of a short page, left to Safari
+Mesaje (client) @375 iphone: button at the end of a short page, left to Safari
+Mesaje (client) @375 iphone: ok (1 fields)
+Mesaje (client) @375 android: ok (1 fields)
+Mesaje (client) @390 iphone textarea Mesaj: end of a short page, left to Safari
+Mesaje (client) @390 iphone: button at the end of a short page, left to Safari
+Mesaje (client) @390 iphone: ok (1 fields)
+Mesaje (client) @390 android: ok (1 fields)
+Mesaje (client) @430 iphone textarea Mesaj: end of a short page, left to Safari
+Mesaje (client) @430 iphone: button at the end of a short page, left to Safari
+Mesaje (client) @430 iphone: ok (1 fields)
+Mesaje (client) @430 android: ok (1 fields)
+Setări: profil @320 iphone input Anul înființării (opțional): end of a short page, left to Safari
+Setări: profil @320 iphone: button at the end of a short page, left to Safari
+Setări: profil @320 iphone: ok (3 fields)
+Setări: profil @320 android: ok (3 fields)
+Setări: profil @375 iphone input Anul înființării (opțional): end of a short page, left to Safari
+Setări: profil @375 iphone: button at the end of a short page, left to Safari
+Setări: profil @375 iphone: ok (3 fields)
+Setări: profil @375 android: ok (3 fields)
+Setări: profil @390 iphone input Anul înființării (opțional): end of a short page, left to Safari
+Setări: profil @390 iphone: button at the end of a short page, left to Safari
+Setări: profil @390 iphone: ok (3 fields)
+Setări: profil @390 android: ok (3 fields)
+Setări: profil @430 iphone input Anul înființării (opțional): end of a short page, left to Safari
+Setări: profil @430 iphone: button at the end of a short page, left to Safari
+Setări: profil @430 iphone: ok (3 fields)
+Setări: profil @430 android: ok (3 fields)
+Setări: facturare @320 iphone input Email pentru facturi: end of a short page, left to Safari
+Setări: facturare @320 iphone: button at the end of a short page, left to Safari
+Setări: facturare @320 iphone: ok (2 fields)
+Setări: facturare @320 android: ok (2 fields)
+Setări: facturare @375 iphone input Email pentru facturi: end of a short page, left to Safari
+Setări: facturare @375 iphone: button at the end of a short page, left to Safari
+Setări: facturare @375 iphone: ok (2 fields)
+Setări: facturare @375 android: ok (2 fields)
+Setări: facturare @390 iphone input Email pentru facturi: end of a short page, left to Safari
+Setări: facturare @390 iphone: button at the end of a short page, left to Safari
+Setări: facturare @390 iphone: ok (2 fields)
+Setări: facturare @390 android: ok (2 fields)
+Setări: facturare @430 iphone input Email pentru facturi: end of a short page, left to Safari
+Setări: facturare @430 iphone: button at the end of a short page, left to Safari
+Setări: facturare @430 iphone: ok (2 fields)
+Setări: facturare @430 android: ok (2 fields)
+Flotă: cheltuială @320 iphone: ok (4 fields)
+Flotă: cheltuială @320 android: ok (4 fields)
+Flotă: cheltuială @375 iphone: ok (4 fields)
+Flotă: cheltuială @375 android: ok (4 fields)
+Flotă: cheltuială @390 iphone: ok (4 fields)
+Flotă: cheltuială @390 android: ok (4 fields)
+Flotă: cheltuială @430 iphone: ok (4 fields)
+Flotă: cheltuială @430 android: ok (4 fields)
+Solicitare nouă @320 iphone: button at the end of a short page, left to Safari
+Solicitare nouă @320 iphone: ok (3 fields)
+Solicitare nouă @320 android: ok (3 fields)
+Solicitare nouă @320: errors ok
+Solicitare nouă @375 iphone: button at the end of a short page, left to Safari
+Solicitare nouă @375 iphone: ok (3 fields)
+Solicitare nouă @375 android: ok (3 fields)
+Solicitare nouă @375: errors ok
+Solicitare nouă @390 iphone: button at the end of a short page, left to Safari
+Solicitare nouă @390 iphone: ok (3 fields)
+Solicitare nouă @390 android: ok (3 fields)
+Solicitare nouă @390: errors ok
+Solicitare nouă @430 iphone: button at the end of a short page, left to Safari
+Solicitare nouă @430 iphone: ok (3 fields)
+Solicitare nouă @430 android: ok (3 fields)
+Solicitare nouă @430: errors ok
+Solicitare (răspuns) @320 iphone: button at the end of a short page, left to Safari
+Solicitare (răspuns) @320 iphone: ok (1 fields)
+Solicitare (răspuns) @320 android: ok (1 fields)
+Solicitare (răspuns) @375 iphone: button at the end of a short page, left to Safari
+Solicitare (răspuns) @375 iphone: ok (1 fields)
+Solicitare (răspuns) @375 android: ok (1 fields)
+Solicitare (răspuns) @390 iphone textarea Mesajul tău: end of a short page, left to Safari
+Solicitare (răspuns) @390 iphone: button at the end of a short page, left to Safari
+Solicitare (răspuns) @390 iphone: ok (1 fields)
+Solicitare (răspuns) @390 android: ok (1 fields)
+Solicitare (răspuns) @430 iphone textarea Mesajul tău: end of a short page, left to Safari
+Solicitare (răspuns) @430 iphone: button at the end of a short page, left to Safari
+Solicitare (răspuns) @430 iphone: ok (1 fields)
+Solicitare (răspuns) @430 android: ok (1 fields)
+Sugestii @320 iphone: ok (1 fields)
+Sugestii @320 android: ok (1 fields)
+Sugestii @375 iphone: ok (1 fields)
+Sugestii @375 android: ok (1 fields)
+Sugestii @390 iphone: ok (1 fields)
+Sugestii @390 android: ok (1 fields)
+Sugestii @430 iphone: ok (1 fields)
+Sugestii @430 android: ok (1 fields)
+Garaj: mașină nouă @320 iphone select La câte luni schimbi uleiul: end of a short page, left to Safari
+Garaj: mașină nouă @320 iphone input Ultimul schimb de ulei: end of a short page, left to Safari
+Garaj: mașină nouă @320 iphone: ok (3 fields)
+Garaj: mașină nouă @320 android: ok (3 fields)
+Garaj: mașină nouă @375 iphone select La câte luni schimbi uleiul: end of a short page, left to Safari
+Garaj: mașină nouă @375 iphone input Ultimul schimb de ulei: end of a short page, left to Safari
+Garaj: mașină nouă @375 iphone: ok (3 fields)
+Garaj: mașină nouă @375 android: ok (3 fields)
+Garaj: mașină nouă @390 iphone select La câte luni schimbi uleiul: end of a short page, left to Safari
+Garaj: mașină nouă @390 iphone input Ultimul schimb de ulei: end of a short page, left to Safari
+Garaj: mașină nouă @390 iphone: ok (3 fields)
+Garaj: mașină nouă @390 android: ok (3 fields)
+Garaj: mașină nouă @430 iphone select La câte luni schimbi uleiul: end of a short page, left to Safari
+Garaj: mașină nouă @430 iphone input Ultimul schimb de ulei: end of a short page, left to Safari
+Garaj: mașină nouă @430 iphone: ok (3 fields)
+Garaj: mașină nouă @430 android: ok (3 fields)
+Cont: datele mele @320 iphone: ok (1 fields)
+Cont: datele mele @320 android: ok (1 fields)
+Cont: datele mele @375 iphone: ok (1 fields)
+Cont: datele mele @375 android: ok (1 fields)
+Cont: datele mele @390 iphone: ok (1 fields)
+Cont: datele mele @390 android: ok (1 fields)
+Cont: datele mele @430 iphone: ok (1 fields)
+Cont: datele mele @430 android: ok (1 fields)
+Programare adăugată de service @320 iphone: button at the end of a short page, left to Safari
+Programare adăugată de service @320 iphone: ok (4 fields)
+Programare adăugată de service @320 android: ok (4 fields)
+Programare adăugată de service @375 iphone: button at the end of a short page, left to Safari
+Programare adăugată de service @375 iphone: ok (4 fields)
+Programare adăugată de service @375 android: ok (4 fields)
+Programare adăugată de service @390 iphone: button at the end of a short page, left to Safari
+Programare adăugată de service @390 iphone: ok (4 fields)
+Programare adăugată de service @390 android: ok (4 fields)
+Programare adăugată de service @430 iphone: button at the end of a short page, left to Safari
+Programare adăugată de service @430 iphone: ok (4 fields)
+Programare adăugată de service @430 android: ok (4 fields)
+Deviz @320 iphone: button at the end of a short page, left to Safari
+Deviz @320 iphone: ok (4 fields)
+Deviz @320 android: ok (4 fields)
+Deviz @375 iphone: button at the end of a short page, left to Safari
+Deviz @375 iphone: ok (4 fields)
+Deviz @375 android: ok (4 fields)
+Deviz @390 iphone: button at the end of a short page, left to Safari
+Deviz @390 iphone: ok (4 fields)
+Deviz @390 android: ok (4 fields)
+Deviz @430 iphone textarea Observație (opțional): end of a short page, left to Safari
+Deviz @430 iphone: button at the end of a short page, left to Safari
+Deviz @430 iphone: ok (4 fields)
+Deviz @430 android: ok (4 fields)
+Mesaje (service) @320 iphone textarea Mesaj: end of a short page, left to Safari
+Mesaje (service) @320 iphone: button at the end of a short page, left to Safari
+Mesaje (service) @320 iphone: ok (1 fields)
+Mesaje (service) @320 android: ok (1 fields)
+Mesaje (service) @375 iphone textarea Mesaj: end of a short page, left to Safari
+Mesaje (service) @375 iphone: button at the end of a short page, left to Safari
+Mesaje (service) @375 iphone: ok (1 fields)
+Mesaje (service) @375 android: ok (1 fields)
+Mesaje (service) @390 iphone textarea Mesaj: end of a short page, left to Safari
+Mesaje (service) @390 iphone: button at the end of a short page, left to Safari
+Mesaje (service) @390 iphone: ok (1 fields)
+Mesaje (service) @390 android: ok (1 fields)
+Mesaje (service) @430 iphone textarea Mesaj: end of a short page, left to Safari
+Mesaje (service) @430 iphone: button at the end of a short page, left to Safari
+Mesaje (service) @430 iphone: ok (1 fields)
+Mesaje (service) @430 android: ok (1 fields)

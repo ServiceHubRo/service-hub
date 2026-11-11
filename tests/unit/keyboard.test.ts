@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { isTextField, keyboardOpen, opensKeyboard, resizeForKeyboard, scrollToShow, visibleBand, watchKeyboard } from '../../src/lib/keyboard';
+import { fieldArea, isTextField, keyboardOpen, opensKeyboard, resizeForKeyboard, scrollToShow, visibleBand, watchKeyboard } from '../../src/lib/keyboard';
 
 describe('keyboard', () => {
   afterEach(() => {
@@ -69,6 +69,20 @@ describe('keyboard', () => {
     expect(scrollToShow({ top: 20, bottom: 70 }, band)).toBe(20 - (60 + Math.round((304 - 50) / 3)));
     // A text area taller than what is seen: its top under the header, with a margin.
     expect(scrollToShow({ top: 400, bottom: 800 }, band)).toBe(400 - 60 - 16);
+  });
+
+  it('a field is shown with its label just above it', () => {
+    document.body.innerHTML = '<label for="f">Descriere</label><textarea id="f"></textarea>';
+    const field = document.getElementById('f')!;
+    const label = document.querySelector('label')!;
+    const box = (top: number, bottom: number) => ({ top, bottom, left: 0, right: 100, width: 100, height: bottom - top, x: 0, y: top, toJSON: () => ({}) });
+    field.getBoundingClientRect = () => box(300, 400) as DOMRect;
+    label.getBoundingClientRect = () => box(270, 290) as DOMRect;
+    expect(fieldArea(field)).toEqual({ top: 270, bottom: 400 });
+    // A label far above (another layout): the field alone.
+    label.getBoundingClientRect = () => box(100, 120) as DOMRect;
+    expect(fieldArea(field)).toEqual({ top: 300, bottom: 400 });
+    document.body.innerHTML = '';
   });
 
   it('a drop-down list with the keyboard\'s height open hides the bottom bar too', () => {

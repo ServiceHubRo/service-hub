@@ -287,7 +287,10 @@ async function pictures(page: Page, open: (page: Page) => Promise<void>, prefix:
   for (const s of SIZES) {
     await setSize(page, s);
     await open(page);
+    await page.getByRole('button', { name: 'Trimite solicitarea' }).waitFor();
+    await page.waitForTimeout(300); // a new screen starts at the top first (useScrollMemory)
     await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+    await page.waitForTimeout(150);
     await shot(page, `${prefix}-end-${s.width}`);
     const body = page.getByLabel('Descriere');
     await body.focus();
