@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import { appendFileSync, mkdirSync } from 'node:fs';
-import { expect, test, type Locator, type Page } from '@playwright/test';
+import { expect, test, type BrowserContext, type Locator, type Page } from '@playwright/test';
 import { newPage } from './agent';
 import { fleetSetup } from './fleet-support';
 import { BACKEND, PASSWORD, SEED, SEED_PASSWORD, createBookableShop, createUser, rpcAs, serviceRest, signIn } from './support';
@@ -32,7 +32,8 @@ const OUT = process.env.KB_OUT ?? 'test-results/keyboard';
 const stamp = () => Math.random().toString(36).slice(2, 8);
 const h1 = (page: Page) => page.getByRole('heading', { level: 1 }).first();
 
-test.beforeEach(async ({ context }) => {
+/** The language, and the iPhone's keyboard played in the page (see the top of this file). */
+async function installKeyboard(context: BrowserContext) {
   await context.addInitScript(() => {
     if (!sessionStorage.getItem('sh_test_init')) {
       sessionStorage.setItem('sh_test_init', '1');
@@ -74,6 +75,10 @@ test.beforeEach(async ({ context }) => {
       vv?.dispatchEvent(new Event('resize'));
     };
   });
+}
+
+test.beforeEach(async ({ context }) => {
+  await installKeyboard(context);
 });
 
 async function setSize(page: Page, s: Size) {
@@ -415,6 +420,7 @@ test.describe('the phone keyboard over the forms', () => {
     const threads = await serviceRest<{ id: string }[]>(`threads?select=id&shop_id=eq.${shop!.id}&limit=1`, 'GET');
     // A new client (no car yet): the booking asks for the car in a form, its button held at the bottom.
     const fresh = await newPage(browser);
+    await installKeyboard(fresh.context());
     await signIn(fresh, await createUser('client'), PASSWORD);
     await expect(fresh).toHaveURL(/\/c\//);
     await checkForm(
@@ -433,6 +439,7 @@ test.describe('the phone keyboard over the forms', () => {
             .first()
             .click();
           await expect(p.getByRole('heading', { level: 1, name: 'Mașina' })).toBeVisible();
+          await expect(p.getByLabel('Marcă')).toBeVisible();
         },
         submit: (p) => p.getByRole('button', { name: 'Trimite cererea' }),
       },
@@ -494,7 +501,8 @@ test.describe('the phone keyboard over the forms', () => {
     await signIn(page, SEED.shop, SEED_PASSWORD);
     await expect(page).toHaveURL(/\/s\//);
     const [booking] = await serviceRest<{ id: string }[]>('bookings?select=id&status=eq.in_inspection&limit=1', 'GET');
-    const [thread] = await serviceRest<{ id: string }[]>('threads?select=id&limit=1', 'GET');
+    const [shop] = await serviceRest<{ id: string }[]>('shops?select=id&order=created_at&limit=1', 'GET');
+    const [thread] = await serviceRest<{ id: string }[]>(`threads?select=id&shop_id=eq.${shop!.id}&limit=1`, 'GET');
     await checkForm(
       page,
       {
