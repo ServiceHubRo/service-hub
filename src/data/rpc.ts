@@ -243,6 +243,14 @@ export const RPC_ERROR_CODES = [
   'hold_released',
   'secret_in_text',
   'account_not_found',
+  // A3c2b1 — retention
+  'preview_changed',
+  'job_disabled',
+  'text_review_not_found',
+  'text_review_done',
+  'text_review_expired',
+  'text_review_needs_edit',
+  'text_identifies',
 ] as const;
 
 export type RpcErrorCode = (typeof RPC_ERROR_CODES)[number] | 'network' | 'unknown';

@@ -7,6 +7,7 @@ import {
   Download,
   FileCheck,
   FileLock,
+  FileSearch,
   Handshake,
   Inbox,
   Landmark,
@@ -20,6 +21,7 @@ import {
   Settings,
   ShieldCheck,
   SlidersHorizontal,
+  Timer,
   Store,
   Truck,
   UserCog,
@@ -52,7 +54,9 @@ import {
   ADMIN_SUBSCRIPTIONS_PATH,
   ADMIN_REQUESTS_PATH,
   ADMIN_SUPPORT_PATH,
+  ADMIN_RETENTION_PATH,
   ADMIN_TEAM_PATH,
+  ADMIN_TEXT_REVIEWS_PATH,
   ADMIN_TEXTS_PATH,
   ADMIN_ZONES_PATH,
 } from '../screens/admin/paths';
@@ -137,6 +141,7 @@ export const ADMIN_ZONES: readonly AdminZone[] = [
     items: [
       { path: ADMIN_REQUESTS_PATH, labelKey: 'admin.requests.title', hintKey: 'admin.requests.tileHint', icon: Inbox },
       { path: ADMIN_HOLDS_PATH, labelKey: 'admin.holds.title', hintKey: 'admin.holds.tileHint', icon: FileLock },
+      { path: ADMIN_TEXT_REVIEWS_PATH, labelKey: 'support.textReview.title', hintKey: 'support.textReview.tileHint', icon: FileSearch },
     ],
   },
   {
@@ -155,6 +160,7 @@ export const ADMIN_ZONES: readonly AdminZone[] = [
       { path: ADMIN_AUDIT_PATH, labelKey: 'admin.audit.title', hintKey: 'admin.audit.tileHint', icon: ScrollText, group: 'control' },
       { path: ADMIN_FLEET_FAILED_PATH, labelKey: 'admin.fleetFailed.title', hintKey: 'admin.fleetFailed.tileHint', icon: BellOff, group: 'control' },
       { path: ADMIN_TEAM_PATH, labelKey: 'admin.team.title', hintKey: 'admin.team.tileHint', icon: UserCog, group: 'control' },
+      { path: ADMIN_RETENTION_PATH, labelKey: 'admin.retention.title', hintKey: 'admin.retention.tileHint', icon: Timer, group: 'control' },
     ],
   },
 ];

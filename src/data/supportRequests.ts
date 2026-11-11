@@ -243,6 +243,9 @@ export interface SupportCounts {
   over_48: number;
   /** A3c2a, admin only: legal holds past their review date. */
   holds_due?: number;
+  /** A3c2b1: suggestions whose text waits for a check, and those due within 7 days. */
+  reviews?: number;
+  reviews_soon?: number;
 }
 
 export interface SupportDashboard {

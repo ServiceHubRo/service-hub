@@ -430,3 +430,25 @@ input:focus-visible + .attachButton {
   color: var(--red-text);
   background: var(--red-soft);
 }
+
+/* A3c2b1: a suggestion's text under review, kept as written (line breaks included). */
+.reviewText {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  margin-top: 4px;
+}
+
+/* The suggestions waiting for their text check, under the counters. */
+.reviewsLine {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 12px;
+}
+
+.reviewsLink {
+  font-weight: 700;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+}

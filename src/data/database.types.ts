@@ -3043,6 +3043,72 @@ export type Database = {
         }
         Relationships: []
       }
+      retention_jobs: {
+        Row: {
+          batch_size: number
+          changed_at: string | null
+          changed_by: string | null
+          changed_by_display_id: string | null
+          enabled: boolean
+          enabled_counts: Json | null
+          key: string
+          last_run_at: string | null
+          reason: string | null
+        }
+        Insert: {
+          batch_size?: number
+          changed_at?: string | null
+          changed_by?: string | null
+          changed_by_display_id?: string | null
+          enabled?: boolean
+          enabled_counts?: Json | null
+          key: string
+          last_run_at?: string | null
+          reason?: string | null
+        }
+        Update: {
+          batch_size?: number
+          changed_at?: string | null
+          changed_by?: string | null
+          changed_by_display_id?: string | null
+          enabled?: boolean
+          enabled_counts?: Json | null
+          key?: string
+          last_run_at?: string | null
+          reason?: string | null
+        }
+        Relationships: []
+      }
+      retention_runs: {
+        Row: {
+          counts: Json
+          failed: number
+          finished_at: string
+          id: number
+          job: string
+          remaining: number
+          started_at: string
+        }
+        Insert: {
+          counts: Json
+          failed?: number
+          finished_at?: string
+          id?: number
+          job: string
+          remaining?: number
+          started_at: string
+        }
+        Update: {
+          counts?: Json
+          failed?: number
+          finished_at?: string
+          id?: number
+          job?: string
+          remaining?: number
+          started_at?: string
+        }
+        Relationships: []
+      }
       reviews: {
         Row: {
           booking_id: string
@@ -4411,6 +4477,7 @@ export type Database = {
           first_response_at: string | null
           former_author_id: string | null
           id: string
+          last_activity_at: string
           last_staff_message_at: string | null
           last_user_message_at: string | null
           resolved_at: string | null
@@ -4436,6 +4503,7 @@ export type Database = {
           first_response_at?: string | null
           former_author_id?: string | null
           id?: string
+          last_activity_at?: string
           last_staff_message_at?: string | null
           last_user_message_at?: string | null
           resolved_at?: string | null
@@ -4461,6 +4529,7 @@ export type Database = {
           first_response_at?: string | null
           former_author_id?: string | null
           id?: string
+          last_activity_at?: string
           last_staff_message_at?: string | null
           last_user_message_at?: string | null
           resolved_at?: string | null
@@ -4520,6 +4589,45 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      suggestions_anonymous: {
+        Row: {
+          author_role: string
+          created_month: string
+          final_status: string
+          findings: Json
+          id: string
+          pending_text: string | null
+          proposed_text: string | null
+          review_due_at: string | null
+          text: string | null
+          text_state: string
+        }
+        Insert: {
+          author_role: string
+          created_month: string
+          final_status: string
+          findings?: Json
+          id?: string
+          pending_text?: string | null
+          proposed_text?: string | null
+          review_due_at?: string | null
+          text?: string | null
+          text_state?: string
+        }
+        Update: {
+          author_role?: string
+          created_month?: string
+          final_status?: string
+          findings?: Json
+          id?: string
+          pending_text?: string | null
+          proposed_text?: string | null
+          review_due_at?: string | null
+          text?: string | null
+          text_state?: string
+        }
+        Relationships: []
       }
       support_categories: {
         Row: {
@@ -4597,6 +4705,45 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      support_stats_monthly: {
+        Row: {
+          author_role: string
+          category: string
+          escalated: number
+          first_response_count: number
+          first_response_minutes: number
+          month: string
+          requests: number
+          resolution_count: number
+          resolution_minutes: number
+          resolved: number
+        }
+        Insert: {
+          author_role: string
+          category: string
+          escalated?: number
+          first_response_count?: number
+          first_response_minutes?: number
+          month: string
+          requests?: number
+          resolution_count?: number
+          resolution_minutes?: number
+          resolved?: number
+        }
+        Update: {
+          author_role?: string
+          category?: string
+          escalated?: number
+          first_response_count?: number
+          first_response_minutes?: number
+          month?: string
+          requests?: number
+          resolution_count?: number
+          resolution_minutes?: number
+          resolved?: number
+        }
+        Relationships: []
       }
       threads: {
         Row: {
@@ -4985,6 +5132,7 @@ export type Database = {
       admin_list_legal_holds: { Args: { p_state?: string }; Returns: Json }
       admin_list_no_show_disputes: { Args: never; Returns: Json }
       admin_list_notices: { Args: never; Returns: Json }
+      admin_list_retention_jobs: { Args: never; Returns: Json }
       admin_list_reviews: { Args: { p_q?: string }; Returns: Json }
       admin_list_service_areas: { Args: never; Returns: Json }
       admin_list_shops: { Args: never; Returns: Json }
@@ -5026,6 +5174,7 @@ export type Database = {
         Args: { p_id: string; p_reason: string; p_request_id: string }
         Returns: Json
       }
+      admin_retention_preview: { Args: { p_job: string }; Returns: Json }
       admin_retry_fleet_event: {
         Args: { p_id: number; p_request_id: string }
         Returns: Json
@@ -5092,6 +5241,17 @@ export type Database = {
         }
         Returns: Json
       }
+      admin_set_retention_job: {
+        Args: {
+          p_batch_size: number
+          p_enabled: boolean
+          p_expected: Json
+          p_job: string
+          p_reason: string
+          p_request_id: string
+        }
+        Returns: Json
+      }
       admin_set_service_reminder: {
         Args: { p_id: string; p_months: number; p_request_id: string }
         Returns: Json
@@ -5118,6 +5278,7 @@ export type Database = {
         Returns: Json
       }
       admin_subscription_rows: { Args: never; Returns: Json }
+      admin_support_stats: { Args: { p_from: string; p_to: string }; Returns: Json }
       admin_update_category: {
         Args: {
           p_enabled: boolean
@@ -8902,6 +9063,7 @@ export type Database = {
       }
       support_list_requests: { Args: never; Returns: Json }
       support_list_staff: { Args: never; Returns: Json }
+      support_list_suggestion_reviews: { Args: { p_state?: string }; Returns: Json }
       support_list_suggestions: { Args: never; Returns: Json }
       support_reopen_until: {
         Args: { s: Database["public"]["Tables"]["suggestions"]["Row"] }
@@ -8935,6 +9097,10 @@ export type Database = {
         Returns: string
       }
       support_request_open: { Args: { p_status: string }; Returns: boolean }
+      support_review_suggestion_text: {
+        Args: { p_action: string; p_id: string; p_request_id: string; p_text: string }
+        Returns: Json
+      }
       support_search_accounts: { Args: { p_q: string }; Returns: Json }
       support_set_request_status: {
         Args: { p_id: string; p_request_id: string; p_status: string }

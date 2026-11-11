@@ -9,7 +9,7 @@ import styles from './requests.module.css';
 
 /** A counter: its number, its words and the one filter it opens the list with. */
 interface Tile {
-  count: Exclude<keyof SupportCounts, 'holds_due'>;
+  count: Exclude<keyof SupportCounts, 'holds_due' | 'reviews' | 'reviews_soon'>;
   label: MessageKey;
   filter: keyof RequestFilters;
   value: string;
@@ -57,11 +57,14 @@ export function SupportDashboardPanel({
   filters,
   listPath,
   detailPath,
+  reviewsPath,
 }: {
   dashboard: SupportDashboard;
   filters: RequestFilters;
   listPath: string;
   detailPath: (id: string) => string;
+  /** Sugestii de verificat (A3c2b1). */
+  reviewsPath: string;
 }) {
   const { t, lang } = useI18n();
   const { counts, oldest } = dashboard;
@@ -92,6 +95,16 @@ export function SupportDashboardPanel({
           );
         })}
       </ul>
+      {(counts.reviews ?? 0) > 0 && (
+        <div className={`${styles.oldest} ${styles.reviewsLine}`}>
+          <Link to={reviewsPath} className={styles.reviewsLink}>
+            {t('support.dash.reviews', { count: formatDecimal(lang, counts.reviews ?? 0) })}
+          </Link>
+          {(counts.reviews_soon ?? 0) > 0 && (
+            <span className={`${styles.pill} ${styles.amber}`}>{t('support.dash.reviewsSoon', { count: formatDecimal(lang, counts.reviews_soon ?? 0) })}</span>
+          )}
+        </div>
+      )}
       <div className={styles.oldest}>
         <span className={styles.oldestLabel}>{t('support.dash.oldest')}</span>
         {oldest && oldestHours !== null ? (
