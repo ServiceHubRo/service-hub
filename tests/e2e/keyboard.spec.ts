@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { appendFileSync, mkdirSync } from 'node:fs';
 import { expect, test, type Locator, type Page } from '@playwright/test';
+import { newPage } from './agent';
 import { fleetSetup } from './fleet-support';
 import { BACKEND, PASSWORD, SEED, SEED_PASSWORD, createUser, rpcAs, serviceRest, signIn } from './support';
 
@@ -26,6 +27,8 @@ type Size = (typeof SIZES)[number];
 type Mode = 'iphone' | 'android';
 
 const name = () => test.info().project.name;
+/** Pictures and the list of checks (outside test-results, which each run empties). */
+const OUT = process.env.KB_OUT ?? 'test-results/keyboard';
 const stamp = () => Math.random().toString(36).slice(2, 8);
 const h1 = (page: Page) => page.getByRole('heading', { level: 1 }).first();
 
@@ -109,14 +112,16 @@ async function band(page: Page) {
   });
 }
 
-/** The element on top at a point of `target` is the target itself (or inside it): nothing covers it. */
-async function notCovered(target: Locator): Promise<boolean> {
+/** What is on top at a point of `target`: '' when it is the target itself (or inside it), else what covers it. */
+async function coveredBy(target: Locator): Promise<string> {
   return target.evaluate((el) => {
     const r = el.getBoundingClientRect();
     const x = r.left + Math.min(r.width / 2, 24);
     const y = r.top + Math.min(r.height / 2, 18);
     const hit = document.elementFromPoint(x, y);
-    return !!hit && (hit === el || el.contains(hit) || hit.contains(el) || (el as HTMLInputElement).labels?.[0]?.contains(hit) === true);
+    if (!hit) return `nothing at ${Math.round(x)},${Math.round(y)} (outside the window ${window.innerWidth}×${window.innerHeight})`;
+    if (hit === el || el.contains(hit) || hit.contains(el) || (el as HTMLInputElement).labels?.[0]?.contains(hit) === true) return '';
+    return `${hit.tagName.toLowerCase()}.${String(hit.className).slice(0, 60)} «${(hit.textContent ?? '').trim().slice(0, 40)}»`;
   });
 }
 
@@ -200,7 +205,7 @@ async function checkForm(page: Page, form: Form, results: string[]) {
           results.push(`${what}: end of a short page, left to Safari`);
         } else {
           expect(below, `${what}: above the keyboard`).toBe(false);
-          expect(await notCovered(field), `${what}: nothing over it`).toBe(true);
+          expect(await coveredBy(field), `${what}: nothing over it`).toBe('');
         }
         expect(await stuckOver(page), `${what}: nothing held over the visible part`).toEqual([]);
         await closeKeyboard(page, s, mode);
@@ -217,11 +222,11 @@ async function checkForm(page: Page, form: Form, results: string[]) {
         // Without the keyboard: at the end of the page, seen whole and above the bar.
         await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
         await page.waitForTimeout(150);
-        await submit.scrollIntoViewIfNeeded();
+        await submit.scrollIntoViewIfNeeded({ timeout: 15_000 });
         const nb = await band(page);
         const sb = (await submit.boundingBox())!;
         expect(sb.y + sb.height, `${where}: the button above the bottom bar`).toBeLessThanOrEqual(nb.bottom + 1);
-        expect(await notCovered(submit), `${where}: nothing over the button`).toBe(true);
+        expect(await coveredBy(submit), `${where}: nothing over the button`).toBe('');
         // With the keyboard open on the last field: the button is reached by scrolling, nothing holds it.
         const last = fields[fields.length - 1]!;
         await last.focus();
@@ -232,7 +237,7 @@ async function checkForm(page: Page, form: Form, results: string[]) {
         const kbBox = (await submit.boundingBox())!;
         if (mode === 'android') {
           expect(kbBox.y + kbBox.height, `${where}: keyboard open, the button reached`).toBeLessThanOrEqual(kb.bottom + 1);
-          expect(await notCovered(submit), `${where}: keyboard open, nothing over the button`).toBe(true);
+          expect(await coveredBy(submit), `${where}: keyboard open, nothing over the button`).toBe('');
         } else {
           // Safari lets the visible part go down to the end of the page: the button is the page's own
           // (not held behind the keyboard by the bottom bar) and nothing of the app covers it.
@@ -240,7 +245,7 @@ async function checkForm(page: Page, form: Form, results: string[]) {
             await submit.evaluate((el) => getComputedStyle(el.closest('[data-fixed-bottom]') ?? el).position),
             `${where}: the button is in the page`,
           ).not.toBe('sticky');
-          expect(await notCovered(submit), `${where}: keyboard open, nothing over the button`).toBe(true);
+          expect(await coveredBy(submit), `${where}: keyboard open, nothing over the button`).toBe('');
         }
         await closeKeyboard(page, s, mode);
       }
@@ -263,14 +268,14 @@ async function checkForm(page: Page, form: Form, results: string[]) {
   }
 }
 
-/** Each checked form, size and keyboard, written down for the PR (test-results/keyboard-results.txt). */
+/** Each checked form, size and keyboard, written down for the PR (keyboard-results.txt). */
 function report(results: string[]) {
-  mkdirSync('test-results', { recursive: true });
-  appendFileSync('test-results/keyboard-results.txt', `${results.join('\n')}\n`);
+  mkdirSync(OUT, { recursive: true });
+  appendFileSync(`${OUT}/keyboard-results.txt`, `${results.join('\n')}\n`);
 }
 
 async function shot(page: Page, file: string) {
-  await page.screenshot({ path: `test-results/shots/${file}.png` });
+  await page.screenshot({ path: `${OUT}/${file}.png` });
 }
 
 /** Before/after pictures of „Solicitare nouă”: the description typed in with the keyboard open. */
@@ -409,7 +414,7 @@ test.describe('the phone keyboard over the forms', () => {
     const [shop] = await serviceRest<{ id: string }[]>('shops?select=id&order=created_at&limit=1', 'GET');
     const threads = await serviceRest<{ id: string }[]>(`threads?select=id&shop_id=eq.${shop!.id}&limit=1`, 'GET');
     // A new client (no car yet): the booking asks for the car in a form, its button held at the bottom.
-    const fresh = await browser.newPage({ viewport: { width: 390, height: 664 }, hasTouch: true, isMobile: true });
+    const fresh = await newPage(browser);
     await signIn(fresh, await createUser('client'), PASSWORD);
     await expect(fresh).toHaveURL(/\/c\//);
     await checkForm(
@@ -424,7 +429,7 @@ test.describe('the phone keyboard over the forms', () => {
       },
       results,
     );
-    await fresh.close();
+    await fresh.context().close();
     await signIn(page, SEED.client, SEED_PASSWORD);
     await expect(page).toHaveURL(/\/c\//);
     if (threads[0]) {
@@ -444,12 +449,10 @@ test.describe('the phone keyboard over the forms', () => {
     report(results);
   });
 
-  test('shop: settings, billing, a booking added by the shop, the quote editor, a conversation', async ({ page }) => {
+  test('shop: settings and billing', async ({ page }) => {
     const results: string[] = [];
     await signIn(page, SEED.shop, SEED_PASSWORD);
     await expect(page).toHaveURL(/\/s\//);
-    const [booking] = await serviceRest<{ id: string }[]>('bookings?select=id&status=eq.in_inspection&limit=1', 'GET');
-    const [thread] = await serviceRest<{ id: string }[]>('threads?select=id&limit=1', 'GET');
     await checkForm(
       page,
       {
@@ -458,7 +461,7 @@ test.describe('the phone keyboard over the forms', () => {
           await p.goto('/s/cont/setari/profil');
           await expect(p.locator('main input').first()).toBeVisible();
         },
-        submit: (p) => p.locator('main button[type="submit"]').last(),
+        submit: (p) => p.locator('main [data-fixed-bottom] button, main form button[type="submit"]').last(),
       },
       results,
     );
@@ -470,10 +473,19 @@ test.describe('the phone keyboard over the forms', () => {
           await p.goto('/s/cont/setari/facturare');
           await expect(p.locator('main input').first()).toBeVisible();
         },
-        submit: (p) => p.locator('main button[type="submit"]').last(),
+        submit: (p) => p.locator('main [data-fixed-bottom] button, main form button[type="submit"]').last(),
       },
       results,
     );
+    report(results);
+  });
+
+  test('shop: a booking added by the shop, the quote editor, a conversation', async ({ page }) => {
+    const results: string[] = [];
+    await signIn(page, SEED.shop, SEED_PASSWORD);
+    await expect(page).toHaveURL(/\/s\//);
+    const [booking] = await serviceRest<{ id: string }[]>('bookings?select=id&status=eq.in_inspection&limit=1', 'GET');
+    const [thread] = await serviceRest<{ id: string }[]>('threads?select=id&limit=1', 'GET');
     await checkForm(
       page,
       {
@@ -482,7 +494,7 @@ test.describe('the phone keyboard over the forms', () => {
           await p.goto('/s/programari/nou');
           await expect(p.locator('main input').first()).toBeVisible();
         },
-        submit: (p) => p.locator('main button[type="submit"]').last(),
+        submit: (p) => p.locator('main [data-fixed-bottom] button, main form button[type="submit"]').last(),
       },
       results,
     );
