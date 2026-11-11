@@ -1,6 +1,7 @@
 # A3c2b — Retention of support data and of the team's log: final specification
 
-Status: **specification only, waiting for Eduard's approval. Nothing here is implemented.** No file in
+Status: **specification approved by Eduard (11 Nov 2026, with the three confirmations in §7). Nothing here is
+implemented yet.** A3c2b1 starts only after #119 (A3c2a) is merged. No file in
 `supabase/migrations/` comes from this document, so "Deploy Supabase" cannot apply any of it. The
 privacy policy files are unchanged.
 
@@ -79,17 +80,18 @@ Internal notes do not count, so the team alone cannot keep a request alive indef
 must be kept for a legal reason gets a legal hold (A3c2a).
 
 **Implementation:**
-- New column `suggestions.last_activity_at timestamptz` (nullable, default `now()` for new rows).
-  **No backfill**: existing rows keep `null`, no existing value is written.
+- New column `suggestions.last_activity_at timestamptz not null` (default `now()` for new rows).
+  **Computed and saved at the migration** for every existing row (Eduard, 11 Nov, §7.2), with the formula
+  below; this fills only the new column, no existing value changes (checked by a full before/after
+  comparison of every other column).
 - Triggers move it to `clock_timestamp()` only when `auth.uid()` is not null (the same rule as the
   A3c1 signals): after insert on `suggestion_messages`; when a file of `suggestion_files` is attached to
   a sent message; before update of `status` on `suggestions`.
-- `support_activity_at(s suggestions) returns timestamptz` (stable): `last_activity_at` when set;
-  otherwise, for rows written before A3c2b1, the latest of `created_at`, `last_user_message_at`,
+- The value saved at the migration for rows written before A3c2b1 is the latest of `created_at`, `last_user_message_at`,
   `last_staff_message_at`, `resolved_at`, the latest sent file, and the latest `set_request_status` /
   `update_suggestion` / `reply_request` audit entry for that request made by a person. `closed_at` and
   `updated_at` are never used.
-- Eligible: `support_activity_at(s) + interval '12 months' <= p_now` (calendar months, Europe/Bucharest
+- Eligible: `last_activity_at + interval '12 months' <= p_now` (calendar months, Europe/Bucharest
   irrelevant because both sides are `timestamptz`; 29 Feb + 12 months = 28 Feb, tested).
 
 ### 3.2 Job switches, preview, runs (shared with A3c2b2)
@@ -213,7 +215,8 @@ A3c2a already does; the job acts once the admin enables it. The release result a
 SQL `tests/sql/156_support_retention.sql`:
 - every real activity in §3.1 moves `last_activity_at`; every "does not count" item does not, the
   14-day closing included;
-- legacy rows (null) are read through the fallback; `closed_at` / `updated_at` never decide;
+- the value saved at the migration for existing rows follows the formula (each source tested alone);
+  `closed_at` / `updated_at` never decide; no other column changes;
 - limits: 12 months minus 1 minute vs exactly 12 months; 29 Feb; 30-day review term at the minute;
 - jobs are disabled after the migration; a disabled run changes nothing (full digest of every table
   before and after) and writes no run row;
@@ -248,9 +251,9 @@ the test itself created in a local, throw-away database. On the PR's preview the
 
 - Migration `<timestamp>_support_retention.sql`, schema **115**, `EXPECTED_SCHEMA_VERSION = 115`. Adds
   one nullable column, the new tables, functions, triggers and two cron entries; replaces
-  `legal_hold_apply_rules`, `support_dashboard`, and the A3a functions that must leave the conversation's
-  triggers in place. **No existing row is written** (checked by a full before/after comparison, as in
-  A3c2a).
+  `legal_hold_apply_rules` and `support_dashboard`. **Only the new column `last_activity_at` is filled for
+  existing rows** (approved, §7.2); every other column of every table is identical before and after
+  (full comparison, as in A3c2a).
 - Rollback `supabase/rollback/<timestamp>_support_retention.sql`: **refuses to run** (and says how many)
   while any `retention_runs` row with an effect, `support_stats_monthly` row or `suggestions_anonymous`
   row exists — those cannot be put back and the statistics would be lost; otherwise drops everything new
@@ -401,11 +404,19 @@ A3c2b1 are approved, and the log paragraph after the legal validation of the 3 y
 > - **The log of administrative actions:** 3 years, except records needed for a legal obligation or an ongoing legal hold. *(The 3-year period awaits legal validation.)*
 > - **Your account ID after deletion:** after your account is deleted, your name, email and phone no longer appear in the logs. The account ID (for example, C-00012) may stay in the log for the periods above. It is not anonymous: combined with other information (for example, an email you received from us) it can lead to you, so we treat it as pseudonymised data, seen only by the administrator.
 
-## 7. Points to confirm before A3c2b1 starts
+## 7. Confirmed by Eduard (11 Nov 2026)
 
-1. **Real activity** as in §3.1 (internal notes, assignment and escalation do not count).
-2. **Requests that exist today** fall under the rule when they reach 12 months (first in November
-   2027), once the admin enables the job with the exact preview. Proposed: the admin's activation with the
-   confirmed numbers is the separate approval for those rows. The log is different: rows older than
-   A3c2b2 are never touched without A3c2b3.
-3. The **3 years** for the admin log stay "to validate"; the `admin_log` job stays off until then.
+1. **Real activity** exactly as in §3.1: the request created, messages, files sent, state changes made
+   by a person. Internal notes, assignment, escalation, openings, reads, the automatic closing and
+   technical operations do not count.
+2. **Existing requests** fall under the rules by the real-activity date **computed and saved at the
+   migration**. The admin's activation of the job (second sign-in step, preview confirmed) is the separate
+   approval for processing them. The preview shows the **eligible** rows and the **exempt** ones
+   separately, legal holds included (§3.3, §3.4). The log is different: rows older than A3c2b2 are never
+   touched without A3c2b3.
+3. The `admin_log` job (3 years) stays **off until the legal validation**; the rest of A3c2b2 is not
+   blocked by it.
+4. Merge of #119 only after its review, tests, migrations and the absence of conflicts are checked; no
+   deploy and no change of the production database after the merge without Eduard's separate approval.
+   Jobs stay disabled; no real data is processed before an admin enables a job with a confirmed preview.
+   Nothing outside this stage changes.
