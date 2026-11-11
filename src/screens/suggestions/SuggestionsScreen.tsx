@@ -39,7 +39,7 @@ export function SuggestionsScreen({ role }: { role: 'client' | 'shop' }) {
           value={text}
           rows={5}
           maxLength={SUGGESTION_MAX}
-          hint={t('sugg.count', { n: text.length })}
+          count={t('sugg.count', { n: text.length })}
           onChange={(e) => {
             setText(e.target.value);
             setSent(false);

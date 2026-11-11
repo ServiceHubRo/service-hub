@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { isTextField, keyboardOpen, resizeForKeyboard, watchKeyboard } from '../../src/lib/keyboard';
+import { isTextField, keyboardOpen, opensKeyboard, resizeForKeyboard, scrollToShow, visibleBand, watchKeyboard } from '../../src/lib/keyboard';
 
 describe('keyboard', () => {
   afterEach(() => {
@@ -38,6 +38,49 @@ describe('keyboard', () => {
     expect(document.documentElement.hasAttribute('data-keyboard')).toBe(true);
     stop();
     expect(document.documentElement.hasAttribute('data-keyboard')).toBe(false);
+  });
+
+  it('a drop-down list takes the keyboard\'s place too (the iPhone\'s wheel); a disabled one does not', () => {
+    const select = document.createElement('select');
+    expect(opensKeyboard(select)).toBe(true);
+    select.disabled = true;
+    expect(opensKeyboard(select)).toBe(false);
+    expect(opensKeyboard(document.createElement('textarea'))).toBe(true);
+    expect(opensKeyboard(document.createElement('button'))).toBe(false);
+  });
+
+  it('what is seen with the keyboard open: the visual viewport, below the header while it is on screen', () => {
+    // iPhone 390 × 664 (Safari with its bars), keyboard 300 px: 364 px seen, page not scrolled.
+    expect(visibleBand({ offsetTop: 0, height: 364 }, 664, 60)).toEqual({ top: 60, bottom: 364 });
+    // The browser panned the visible part down by 200 px: the header is above it, out of sight.
+    expect(visibleBand({ offsetTop: 200, height: 364 }, 664, 60)).toEqual({ top: 200, bottom: 564 });
+    // No visualViewport (an old browser): the window.
+    expect(visibleBand(null, 600, 0)).toEqual({ top: 0, bottom: 600 });
+  });
+
+  it('scrolls only as far as needed to see the field, never when it is already seen', () => {
+    const band = { top: 60, bottom: 364 };
+    expect(scrollToShow({ top: 120, bottom: 170 }, band)).toBe(0);
+    // Under the keyboard: up to a third of the way down what is seen.
+    const down = scrollToShow({ top: 500, bottom: 550 }, band);
+    expect(down).toBeGreaterThan(0);
+    expect(500 - down).toBe(60 + Math.round((304 - 50) / 3));
+    // Under the header: down to the same place.
+    expect(scrollToShow({ top: 20, bottom: 70 }, band)).toBe(20 - (60 + Math.round((304 - 50) / 3)));
+    // A text area taller than what is seen: its top under the header, with a margin.
+    expect(scrollToShow({ top: 400, bottom: 800 }, band)).toBe(400 - 60 - 16);
+  });
+
+  it('a drop-down list with the keyboard\'s height open hides the bottom bar too', () => {
+    const select = document.createElement('select');
+    document.body.appendChild(select);
+    const stop = watchKeyboard();
+    select.focus();
+    Object.defineProperty(window, 'innerHeight', { configurable: true, value: window.innerHeight - 260 });
+    window.dispatchEvent(new Event('resize'));
+    expect(document.documentElement.hasAttribute('data-keyboard')).toBe(true);
+    stop();
+    select.remove();
   });
 
   it('asks for a page made shorter by the keyboard in the Android app only, once', () => {
