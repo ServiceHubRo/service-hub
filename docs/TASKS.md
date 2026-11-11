@@ -1697,3 +1697,11 @@ Aprobate de Eduard pe 6 nov („aprob T71–T75”; T71 era deja folosit, așa c
 - Teste: `tests/sql/154_support_dashboard.sql` (roluri, izolare, 3.000 de solicitări, toate filtrele, fiecare rând o singură dată), `tests/e2e/support-dashboard.spec.ts` (390/820/1440, RO și EN; 1.100 de solicitări; ascultători Realtime pentru autor, alt client, service, agent fără al doilea pas, vizitator neautentificat, echipă, agent retras).
 
 - [x] Făcut
+
+### Tastatura telefonului peste formulare (Eduard, 11 nov 2026, bug critic) ✅ în simulare, de confirmat pe iPhone
+- Cauza: ascunderea barei de jos la deschiderea tastaturii era activă doar în aplicația Android. Pe iPhone (Safari) bara fixă rămânea peste formular, iar butoanele lipite jos (programare, setări, deviz, mesaje) stăteau în spatele tastaturii, pentru că pe iPhone pagina nu se scurtează.
+- Acum, pe orice telefon: bara de jos se ascunde cât e tastatura deschisă, ce era lipit jos revine la locul lui în pagină, iar câmpul în care scrii e adus între antet și tastatură, cu eticheta lui când încap amândouă. La închiderea tastaturii, bara revine și pagina rămâne neschimbată.
+- „‹ Înapoi” nu mai acoperă câmpul adus în vedere. Contorul de caractere stă pe rândul lui, în dreapta, nedespărțit.
+- Teste: `tests/unit/keyboard.test.ts`, `tests/e2e/keyboard.spec.ts` (simulare iPhone și Android, 320/375/390/430 px, toate tipurile de formulare); poze înainte/după în `docs/qa/keyboard/`.
+- Rămâne: confirmarea pe un iPhone real (Safari), de Eduard, pe linkul de previzualizare.
+
