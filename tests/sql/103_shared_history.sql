@@ -85,7 +85,9 @@ select test.eq(current_setting('test.file')::jsonb->'others'->0->'items', '["PlÄ
   'only the accepted lines');
 select test.ok(not (current_setting('test.file')::jsonb->'others'->0 ?| array['cost', 'shop_id', 'shop_name', 'shop_city', 'ref', 'client_name']),
   'no price, no shop, no booking code');
-select test.ok(position('520' in current_setting('test.file')::jsonb->>'others') = 0, 'the price appears nowhere');
+-- Dates and times left out: a moment like 10:27:25.207 would hold "520" by chance.
+select test.ok(position('520' in regexp_replace(current_setting('test.file')::jsonb->>'others',
+  '\d{4}-\d{2}-\d{2}([T ][0-9:.]+([+-][0-9:]+|Z)?)?', '', 'g')) = 0, 'the price appears nowhere');
 select test.ok(position('Atelier Doi' in current_setting('test.file')::jsonb->>'others') = 0, 'nor the other shop''s name');
 
 select test.login(test.id('owner2'));

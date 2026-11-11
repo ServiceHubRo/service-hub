@@ -10,6 +10,9 @@ export function visibleArea(): { top: number; bottom: number } {
     if (r.height > 0 && r.bottom > top) top = r.bottom;
   }
   for (const bar of document.querySelectorAll<HTMLElement>('[data-fixed-bottom]')) {
+    // While the keyboard is open the bars go back into the page (global.css): not over it then.
+    const position = getComputedStyle(bar).position;
+    if (position !== 'fixed' && position !== 'sticky') continue;
     const r = bar.getBoundingClientRect();
     if (r.height > 0 && r.top < bottom) bottom = r.top;
   }

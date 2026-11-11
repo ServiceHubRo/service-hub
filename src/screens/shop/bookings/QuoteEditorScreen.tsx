@@ -529,7 +529,7 @@ function Editor({
         </p>
       )}
       {/* Held at the bottom of the screen (T51): the total on the left, the send on the right. */}
-      <div className={styles.bar}>
+      <div className={styles.bar} data-fixed-bottom>
         <p className={styles.barTotal} aria-hidden="true">
           <span>{t('qe.totals.total')}</span>
           <span className="mono">{formatMoney(lang, totals.total / 100)}</span>

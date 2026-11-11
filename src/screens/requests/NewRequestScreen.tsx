@@ -83,7 +83,8 @@ export function NewRequestScreen({ role }: { role: 'client' | 'shop' }) {
               rows={6}
               maxLength={REQUEST_BODY_MAX}
               value={body}
-              hint={`${t('support.new.bodyHint')} ${t('support.new.count', { n: formatDecimal(lang, body.length) })}`}
+              hint={t('support.new.bodyHint')}
+              count={t('support.new.count', { n: formatDecimal(lang, body.length) })}
               error={missing.has('body') ? t('support.new.bodyRequired') : null}
               onChange={(e) => {
                 setBody(e.target.value);

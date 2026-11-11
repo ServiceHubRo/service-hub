@@ -33,7 +33,7 @@ export function SaveButton({
   useEffect(() => () => window.clearTimeout(timer.current), []);
 
   return (
-    <div className={footer ? styles.saveFooter : styles.saveBar} data-span="all">
+    <div className={footer ? styles.saveFooter : styles.saveBar} data-span="all" data-fixed-bottom={footer ? undefined : true}>
       {note && <div className={styles.saveNote}>{note}</div>}
       <div className={styles.saveAction}>
       <ActionButton
