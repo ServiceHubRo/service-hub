@@ -1697,3 +1697,51 @@ Aprobate de Eduard pe 6 nov („aprob T71–T75”; T71 era deja folosit, așa c
 - Teste: `tests/sql/154_support_dashboard.sql` (roluri, izolare, 3.000 de solicitări, toate filtrele, fiecare rând o singură dată), `tests/e2e/support-dashboard.spec.ts` (390/820/1440, RO și EN; 1.100 de solicitări; ascultători Realtime pentru autor, alt client, service, agent fără al doilea pas, vizitator neautentificat, echipă, agent retras).
 
 - [x] Făcut
+
+### A3c2 — Păstrarea legală și retenția: PROPUNERE (11 nov 2026), așteaptă aprobarea lui Eduard
+Nimic implementat. O sesiune nouă pornește de aici, după ce Eduard răspunde la cele patru decizii de la final.
+
+**Decizii deja luate de Eduard (8 nov):** solicitările închise se șterg la 12 luni de la închidere (conversație, note, atașamente, date identificabile; rămân doar statistici agregate și anonime). Sugestiile rămân după 12 luni doar anonimizate, inclusiv identificatorii din text, cu verificarea textului înainte. Păstrarea legală (legal hold) o pune și o ridică doar adminul, cu motiv, responsabil și date în jurnal; revizuire la 90 de zile; la termen depășit doar avertizări, niciodată ridicare automată. Cuvintele căutate de agenți se șterg din jurnal după 90 de zile, restul jurnalului echipei după 12 luni, fără parole, tokenuri sau alte secrete.
+
+**Audit (11 nov):**
+- La ștergerea unui cont, solicitările lui dispar pe loc (`suggestions.author_id` are `on delete cascade`), inclusiv cele deschise și cele care ar trebui păstrate.
+- La un service cu istoric (`prepare_account_deletion` → `anonymize`), profilul rămâne și solicitările proprietarului rămân cu tot textul.
+- Nu există termen pentru solicitări, mesaje, note sau jurnalul echipei. Fișierele au 90 de zile (A3b).
+- Niciun loc care scrie în `admin_audit_log` nu pune parole, tokenuri sau chei.
+- PR-urile ajung în proiectul de test Supabase (`TARGET: test` în „Deploy Supabase”), nu în cel real.
+
+**Împărțire propusă: două PR-uri.**
+
+*A3c2a — păstrarea legală și regulile la ștergerea contului*
+- Tabelă nouă `support_legal_holds`: solicitare, motiv (obligatoriu), cine a pus-o, când, data următoarei revizuiri (+90 de zile), ultima revizuire, ridicare (cine, când, motiv), copia datelor de identificare ale autorului (doar dacă își șterge contul; vizibilă doar adminului; ștearsă la ridicare). O singură păstrare activă pe solicitare.
+- Funcții doar pentru admin: pune, confirmă revizuirea (mută termenul cu 90 de zile), ridică, listează. Totul în jurnal. Agentul vede doar eticheta „Păstrare legală”.
+- Cât e activă: baza de date refuză ștergerea solicitării din orice cale; curățenia fișierelor (A3b, 90 de zile) o sare.
+- Revizuire: email către admin la termen, repetat săptămânal cât e depășit; avertizare în Panou și în Suport.
+- `suggestions.author_id`: din `on delete cascade` în `on delete set null`, coloana poate fi goală. Regulile se aplică explicit, printr-un trigger pe profil (la ștergere și la `deleted_at`), ca să acopere orice cale: închisă fără păstrare → ștearsă; deschisă fără păstrare → anonimizată și închisă (dispar autorul, service-ul, programarea, titlul, textul, mesajele, notele, fișierele; rămân categoria, starea, datele); cu păstrare → rămâne întreagă. La ridicare, regulile se aplică pe loc.
+- Niciun rând existent nu se modifică la instalare. Rollback-ul refuză dacă există o păstrare legală sau o solicitare anonimizată.
+
+*A3c2b — retenția în timp*
+- Job zilnic: solicitările închise de 12 luni fără păstrare → statistici lunare fără date personale (număr pe categorie și rol, timp până la primul răspuns, timp până la rezolvare, escaladate), apoi ștergere completă.
+- Sugestiile la 12 luni: fără autor și service; textul doar în forma verificată (vezi decizia 2).
+- Jurnal: `after.q` de la `support_search` șters după 90 de zile; rândurile acțiunilor de suport șterse după 12 luni, în afară de cele ale unei solicitări sub păstrare legală.
+- Protecție în baza de date: orice câmp numit ca o parolă, un token sau o cheie e eliminat din jurnal la scriere; test.
+- Politica de confidențialitate: termenele noi; textul complet aprobat de Eduard înainte de merge.
+- Primele ștergeri reale: cuvintele căutate în februarie 2027; solicitările și sugestiile în toamna lui 2027.
+
+**Teste planificate:** SQL — doar adminul pune/revizuiește/ridică, motiv obligatoriu, jurnal, ștergere refuzată cât păstrarea e activă, cele trei cazuri la ștergerea contului (și service-ul cu istoric), ridicarea aplică regulile pe loc, termenele la limită (11 vs 12 luni, 89 vs 90 de zile), statisticile fără date personale, rollback-ul refuză. Browser (390/820/1440, RO și EN) — ecranele păstrării, avertizarea de revizuire, lista de sugestii, cont șters cu solicitări deschise și închise.
+
+**Decizii care așteaptă răspunsul lui Eduard (cu recomandarea):**
+1. Împărțirea în A3c2a și A3c2b? Recomandat: da.
+2. Verificarea textului sugestiilor: automată (emailuri, telefoane, numere de înmatriculare, serii de șasiu, coduri de programare și de cont) plus confirmarea adminului, într-o listă deschisă cu 30 de zile înainte de termen; ce nu e confirmat până la termen rămâne fără text. Recomandat: da.
+3. Cele 12 luni la sugestii curg de la ultima activitate (trimitere, mesaj sau decizie), nu doar de la decizie. Recomandat: da.
+4. „Jurnalul echipei” = doar acțiunile de suport (căutări, deschideri de conturi, solicitări și fișiere, răspunsuri, note, escaladări); numirile și retragerile de agenți și celelalte acțiuni ale adminului rămân neschimbate. Recomandat: da.
+
+**Amânate din A3, după A3c2:** retrimiterea emailului de confirmare de către agent; butonul „Raportează o problemă” pe cardul programării (PR separat, cu aprobare, pentru că atinge ecranele clientului și ale service-ului).
+
+### Tastatura telefonului peste formulare (Eduard, 11 nov 2026, bug critic) ✅ în simulare, de confirmat pe iPhone
+- Cauza: ascunderea barei de jos la deschiderea tastaturii era activă doar în aplicația Android. Pe iPhone (Safari) bara fixă rămânea peste formular, iar butoanele lipite jos (programare, setări, deviz, mesaje) stăteau în spatele tastaturii, pentru că pe iPhone pagina nu se scurtează.
+- Acum, pe orice telefon: bara de jos se ascunde cât e tastatura deschisă, ce era lipit jos revine la locul lui în pagină, iar câmpul în care scrii e adus între antet și tastatură, cu eticheta lui când încap amândouă. La închiderea tastaturii, bara revine și pagina rămâne neschimbată.
+- „‹ Înapoi” nu mai acoperă câmpul adus în vedere. Contorul de caractere stă pe rândul lui, în dreapta, nedespărțit.
+- Teste: `tests/unit/keyboard.test.ts`, `tests/e2e/keyboard.spec.ts` (simulare iPhone și Android, 320/375/390/430 px, toate tipurile de formulare); poze înainte/după în `docs/qa/keyboard/`.
+- Rămâne: confirmarea pe un iPhone real (Safari), de Eduard, pe linkul de previzualizare.
+

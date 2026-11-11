@@ -336,7 +336,7 @@ export function ConversationScreen() {
 
       {messages &&
         (canWrite ? (
-          <div className={styles.composerWrap}>
+          <div className={styles.composerWrap} data-fixed-bottom>
             <form
               className={styles.composer}
               onSubmit={(e) => {

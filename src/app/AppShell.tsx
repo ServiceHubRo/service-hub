@@ -1,12 +1,11 @@
 import { CalendarDays, CarFront, LayoutDashboard, LogOut, ReceiptText, User, UserRound } from 'lucide-react';
-import { useCallback, useEffect, useLayoutEffect, useRef, useState, type MouseEvent } from 'react';
+import { useCallback, useLayoutEffect, useRef, useState, type MouseEvent } from 'react';
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { LogoTile } from '../components/LogoTile';
 import { Wordmark } from '../components/Wordmark';
 import { useI18n } from '../i18n/context';
 import { plural, type PluralUnit } from '../i18n/translate';
 import { quotesWaiting } from '../lib/clientBookings';
-import { IN_ANDROID_APP, watchKeyboard } from '../lib/keyboard';
 import { motionOn } from '../lib/motion';
 import { IS_NATIVE } from '../lib/native';
 import { useScreenSlide } from '../lib/screenSlide';
@@ -257,8 +256,6 @@ export function AppShell({ role }: { role: Role }) {
     };
   }, []);
 
-  // In the Android app the bottom bar steps aside while the keyboard is open (more room to type).
-  useEffect(() => (IN_ANDROID_APP ? watchKeyboard() : undefined), []);
 
   // Keyboard users jump past the navigation straight to the screen (T18).
   function skipToContent(event: MouseEvent<HTMLAnchorElement>) {
