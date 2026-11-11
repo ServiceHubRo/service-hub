@@ -15,6 +15,7 @@ import { TEAM_SIGNALS } from '../requests/useInbox';
 import {
   ADMIN_BOOKINGS_PATH,
   ADMIN_CLIENTS_PATH,
+  ADMIN_HOLDS_PATH,
   ADMIN_MODERATION_PATH,
   ADMIN_REQUESTS_PATH,
   ADMIN_SHOPS_PATH,
@@ -149,6 +150,9 @@ export function OverviewScreen() {
                         <Stat n={c.unassigned} label={t('support.dash.unassigned')} to={to('owner', 'none')} alert={c.unassigned > 0} />
                         <Stat n={c.escalated} label={t('support.dash.escalated')} to={to('owner', 'escalated')} alert={c.escalated > 0} />
                         <Stat n={c.over_48} label={t('support.dash.over48')} to={to('age', '48')} alert={c.over_48 > 0} />
+                        {c.holds_due !== undefined && c.holds_due > 0 && (
+                          <Stat n={c.holds_due} label={t('admin.holds.dash.due')} to={ADMIN_HOLDS_PATH} alert />
+                        )}
                       </ul>
                     </>
                   );

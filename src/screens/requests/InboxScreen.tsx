@@ -155,8 +155,9 @@ export function InboxScreen({ mode }: { mode: 'support' | 'admin' }) {
 function InboxRow({ r, now, to, categoryLabel }: { r: StaffRequestItem; now: Date; to: string; categoryLabel: string }) {
   const { t } = useI18n();
   const hours = waitingHours(r, now);
-  const who =
-    r.author.role === 'shop' && r.shop_name
+  const who = r.former_author
+    ? t('admin.holds.req.formerAuthor', { id: r.former_author })
+    : r.author.role === 'shop' && r.shop_name
       ? [r.author.display_id, r.shop_name].filter(Boolean).join(' · ')
       : [r.author.display_id, r.author.name].filter(Boolean).join(' · ');
   return (
@@ -166,6 +167,7 @@ function InboxRow({ r, now, to, categoryLabel }: { r: StaffRequestItem; now: Dat
           <span className={styles.rowTitle}>{r.title}</span>
           <RequestStatusPill status={r.status} staff />
           {r.escalated && <span className={`${styles.pill} ${styles.red}`}>{t('support.inbox.escalated')}</span>}
+          {r.held && <span className={`${styles.pill} ${styles.amber}`}>{t('admin.holds.pill')}</span>}
         </span>
         <span className={styles.meta}>
           <span>{categoryLabel}</span>

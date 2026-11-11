@@ -1977,6 +1977,131 @@ export type Database = {
           },
         ]
       }
+      legal_hold_reviews: {
+        Row: {
+          hold_id: string
+          id: string
+          next_due_at: string
+          note: string
+          reviewed_at: string
+          reviewed_by: string
+        }
+        Insert: {
+          hold_id: string
+          id?: string
+          next_due_at: string
+          note: string
+          reviewed_at?: string
+          reviewed_by: string
+        }
+        Update: {
+          hold_id?: string
+          id?: string
+          next_due_at?: string
+          note?: string
+          reviewed_at?: string
+          reviewed_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "legal_hold_reviews_hold_id_fkey"
+            columns: ["hold_id"]
+            isOneToOne: false
+            referencedRelation: "legal_holds"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      legal_hold_subjects: {
+        Row: {
+          account_deleted_at: string | null
+          captured_at: string
+          display_id: string
+          email: string | null
+          name: string | null
+          phone: string | null
+          role: string | null
+          user_id: string
+        }
+        Insert: {
+          account_deleted_at?: string | null
+          captured_at?: string
+          display_id: string
+          email?: string | null
+          name?: string | null
+          phone?: string | null
+          role?: string | null
+          user_id: string
+        }
+        Update: {
+          account_deleted_at?: string | null
+          captured_at?: string
+          display_id?: string
+          email?: string | null
+          name?: string | null
+          phone?: string | null
+          role?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      legal_holds: {
+        Row: {
+          basis: string
+          created_at: string
+          created_by: string
+          id: string
+          reason: string
+          reference: string
+          release_reason: string | null
+          released_at: string | null
+          released_by: string | null
+          responsible_id: string
+          review_due_at: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          subject_display_id: string
+          subject_id: string
+          suggestion_id: string | null
+        }
+        Insert: {
+          basis: string
+          created_at?: string
+          created_by: string
+          id?: string
+          reason: string
+          reference: string
+          release_reason?: string | null
+          released_at?: string | null
+          released_by?: string | null
+          responsible_id: string
+          review_due_at: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          subject_display_id: string
+          subject_id: string
+          suggestion_id?: string | null
+        }
+        Update: {
+          basis?: string
+          created_at?: string
+          created_by?: string
+          id?: string
+          reason?: string
+          reference?: string
+          release_reason?: string | null
+          released_at?: string | null
+          released_by?: string | null
+          responsible_id?: string
+          review_due_at?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          subject_display_id?: string
+          subject_id?: string
+          suggestion_id?: string | null
+        }
+        Relationships: []
+      }
       member_rights_versions: {
         Row: {
           changed_at: string
@@ -4272,7 +4397,7 @@ export type Database = {
         Row: {
           assigned_at: string | null
           assigned_to: string | null
-          author_id: string
+          author_id: string | null
           author_read_at: string | null
           author_role: string
           body: string
@@ -4284,6 +4409,7 @@ export type Database = {
           escalated_by: string | null
           escalation_reason: string | null
           first_response_at: string | null
+          former_author_id: string | null
           id: string
           last_staff_message_at: string | null
           last_user_message_at: string | null
@@ -4296,7 +4422,7 @@ export type Database = {
         Insert: {
           assigned_at?: string | null
           assigned_to?: string | null
-          author_id: string
+          author_id?: string | null
           author_read_at?: string | null
           author_role: string
           body: string
@@ -4308,6 +4434,7 @@ export type Database = {
           escalated_by?: string | null
           escalation_reason?: string | null
           first_response_at?: string | null
+          former_author_id?: string | null
           id?: string
           last_staff_message_at?: string | null
           last_user_message_at?: string | null
@@ -4320,7 +4447,7 @@ export type Database = {
         Update: {
           assigned_at?: string | null
           assigned_to?: string | null
-          author_id?: string
+          author_id?: string | null
           author_read_at?: string | null
           author_role?: string
           body?: string
@@ -4332,6 +4459,7 @@ export type Database = {
           escalated_by?: string | null
           escalation_reason?: string | null
           first_response_at?: string | null
+          former_author_id?: string | null
           id?: string
           last_staff_message_at?: string | null
           last_user_message_at?: string | null
@@ -4821,6 +4949,7 @@ export type Database = {
       }
       admin_get_booking: { Args: { p_booking_id: string }; Returns: Json }
       admin_get_client: { Args: { p_user_id: string }; Returns: Json }
+      admin_get_legal_hold: { Args: { p_id: string }; Returns: Json }
       admin_get_shop: { Args: { p_shop_id: string }; Returns: Json }
       admin_grant_report_credit: {
         Args: { p_request_id: string; p_user_id: string }
@@ -4830,6 +4959,7 @@ export type Database = {
         Args: { p_account: string; p_reason: string; p_request_id: string }
         Returns: Json
       }
+      admin_list_admins: { Args: never; Returns: Json }
       admin_list_audit: {
         Args: { p_before?: string; p_limit?: number }
         Returns: Json
@@ -4852,6 +4982,7 @@ export type Database = {
       admin_list_failed_fleet_events: { Args: never; Returns: Json }
       admin_list_fleet_companies: { Args: never; Returns: Json }
       admin_list_history_reports: { Args: never; Returns: Json }
+      admin_list_legal_holds: { Args: { p_state?: string }; Returns: Json }
       admin_list_no_show_disputes: { Args: never; Returns: Json }
       admin_list_notices: { Args: never; Returns: Json }
       admin_list_reviews: { Args: { p_q?: string }; Returns: Json }
@@ -4879,6 +5010,22 @@ export type Database = {
         Returns: Json
       }
       admin_overview: { Args: never; Returns: Json }
+      admin_place_legal_hold: {
+        Args: {
+          p_account: string
+          p_basis: string
+          p_reason: string
+          p_reference: string
+          p_request_id: string
+          p_responsible: string
+          p_suggestion: string
+        }
+        Returns: Json
+      }
+      admin_release_legal_hold: {
+        Args: { p_id: string; p_reason: string; p_request_id: string }
+        Returns: Json
+      }
       admin_retry_fleet_event: {
         Args: { p_id: number; p_request_id: string }
         Returns: Json
@@ -4889,6 +5036,15 @@ export type Database = {
       }
       admin_review_json: {
         Args: { p_review: Database["public"]["Tables"]["reviews"]["Row"] }
+        Returns: Json
+      }
+      admin_review_legal_hold: {
+        Args: {
+          p_id: string
+          p_note: string
+          p_request_id: string
+          p_responsible: string
+        }
         Returns: Json
       }
       admin_revoke_support: {
@@ -6633,6 +6789,36 @@ export type Database = {
         Args: { p_date: string; p_request_id: string; p_shop_id: string }
         Returns: Json
       }
+      legal_hold_apply_rules: {
+        Args: { p_now?: string; p_subject: string }
+        Returns: Json
+      }
+      legal_hold_capture_subject: {
+        Args: { p_user: string }
+        Returns: undefined
+      }
+      legal_hold_check_text: {
+        Args: { p_field: string; p_max: number; p_min: number; p_value: string }
+        Returns: string
+      }
+      legal_hold_covers: {
+        Args: { p_subject: string; p_suggestion: string }
+        Returns: boolean
+      }
+      legal_hold_covers_request: {
+        Args: { p_suggestion: string }
+        Returns: boolean
+      }
+      legal_hold_has_subject: { Args: { p_user: string }; Returns: boolean }
+      legal_hold_item: {
+        Args: { h: Database["public"]["Tables"]["legal_holds"]["Row"] }
+        Returns: Json
+      }
+      legal_hold_responsible: {
+        Args: { p_default: string; p_id: string }
+        Returns: string
+      }
+      legal_holds_for_request: { Args: { p_suggestion: string }; Returns: Json }
       limit_range: { Args: { p_key: string }; Returns: unknown }
       link_imported: {
         Args: { p_profile: string; p_shop: string }
@@ -8763,6 +8949,10 @@ export type Database = {
         Returns: undefined
       }
       support_signal_reader: { Args: never; Returns: boolean }
+      support_signal_team_visible: {
+        Args: { p_suggestion: string }
+        Returns: boolean
+      }
       support_staff_ref: { Args: { p_id: string }; Returns: Json }
       support_status_allowed: {
         Args: { p_category: string; p_status: string }
@@ -8780,6 +8970,7 @@ export type Database = {
         Args: { p_customer: string; p_shop_id: string; p_sub: Json }
         Returns: Json
       }
+      text_has_secret: { Args: { p_text: string }; Returns: boolean }
       tire_season: { Args: { p_today: string }; Returns: string }
       toggle_favorite: {
         Args: { p_request_id: string; p_shop_id: string }

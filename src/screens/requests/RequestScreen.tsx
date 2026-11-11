@@ -33,7 +33,10 @@ import type { MessageKey } from '../../i18n/ro';
 import { ro } from '../../i18n/ro';
 import { useLoad } from '../../lib/useLoad';
 import { ConfirmPanel } from '../admin/ActionPanels';
-import { ADMIN_REQUESTS_PATH, adminClientPath } from '../admin/paths';
+import { day } from '../admin/format';
+import { HoldForm } from '../admin/LegalHoldsScreen';
+import { basisLabel } from '../admin/legalHoldText';
+import { ADMIN_REQUESTS_PATH, adminClientPath, adminHoldPath } from '../admin/paths';
 import adminStyles from '../admin/admin.module.css';
 import { NotFound } from '../public/NotFound';
 import { SUPPORT_REQUESTS_PATH, supportAccountPath } from '../support/paths';
@@ -118,7 +121,12 @@ export function RequestScreen({ mode }: { mode: 'support' | 'admin' }) {
   const closed = r.status === 'closed';
   const escalated = r.escalated_at !== null;
   const editable = !closed && (mode === 'admin' || !escalated);
-  const authorName = r.author ? [r.author.display_id, r.author.name].filter(Boolean).join(' · ') : t('support.detail.deletedAuthor');
+  const authorName = r.author
+    ? [r.author.display_id, r.author.name].filter(Boolean).join(' · ')
+    : r.former_author
+      ? t('admin.holds.req.formerAuthor', { id: r.former_author.display_id })
+      : t('support.detail.deletedAuthor');
+  const held = (r.legal_holds?.length ?? 0) > 0;
   const items: ConversationItem[] = [
     { id: 'first', side: 'author', who: authorName, when: whenText(lang, r.created_at), body: r.body, files: r.files.filter((f) => !f.message_id) },
     ...r.messages.map((m) => ({
@@ -146,6 +154,7 @@ export function RequestScreen({ mode }: { mode: 'support' | 'admin' }) {
       <div className={styles.meta}>
         <RequestStatusPill status={r.status} staff />
         {escalated && <span className={`${styles.pill} ${styles.red}`}>{t('support.inbox.escalated')}</span>}
+        {held && <span className={`${styles.pill} ${styles.amber}`}>{t('admin.holds.pill')}</span>}
         <span>{categoryName(categories, r.category, lang)}</span>
       </div>
 
@@ -154,7 +163,7 @@ export function RequestScreen({ mode }: { mode: 'support' | 'admin' }) {
           <strong>{t('support.detail.escalatedBanner', { who: staffName(r.escalated_by) || '—', date: whenText(lang, r.escalated_at!) })}</strong>
           {r.escalation_reason && <span>{t('support.detail.escalatedReason', { reason: r.escalation_reason })}</span>}
           {mode === 'support' && <span className={styles.muted}>{t('support.detail.escalatedAgent')}</span>}
-          {mode === 'admin' && <ReturnAction request={r} onDone={refresh} />}
+          {mode === 'admin' && !held && <ReturnAction request={r} onDone={refresh} />}
         </div>
       )}
 
@@ -199,7 +208,64 @@ export function RequestScreen({ mode }: { mode: 'support' | 'admin' }) {
       <Notes request={r} canWrite={mode === 'admin' || !escalated} onDone={refresh} />
 
       {mode === 'support' && editable && <EscalateAction request={r} onDone={refresh} />}
+      {mode === 'admin' && <HoldSection request={r} onDone={refresh} />}
     </div>
+  );
+}
+
+/** A3c2a, admin only: the legal holds covering the request, or placing one on it. */
+function HoldSection({ request, onDone }: { request: StaffRequestDetail; onDone: () => Promise<void> }) {
+  const { t, lang } = useI18n();
+  const [open, setOpen] = useState(false);
+  const placeRef = useRef<HTMLButtonElement>(null);
+  const holds = request.legal_holds ?? [];
+  return (
+    <section className={styles.form} aria-labelledby="hold-title">
+      <h2 id="hold-title" className={adminStyles.sectionTitle}>
+        {t('admin.holds.title')}
+      </h2>
+      <Card>
+        {holds.length > 0 ? (
+          <>
+            <p className={styles.muted}>{t('admin.holds.req.desc')}</p>
+            <ul className={adminStyles.list}>
+              {holds.map((h) => (
+                <li key={h.id} className={adminStyles.rowMeta}>
+                  <span>{t(`admin.holds.scope.${h.scope}`)}</span>
+                  <span>{basisLabel(t, h.basis)}</span>
+                  <span>{t('admin.holds.reviewDue', { date: day(lang, h.review_due_at) })}</span>
+                  <Link className={adminStyles.link} to={adminHoldPath(h.id)}>
+                    {t('admin.holds.view')}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </>
+        ) : (
+          <p className={styles.muted}>{t('admin.holds.req.none')}</p>
+        )}
+        {holds.every((h) => h.scope !== 'request') &&
+          (open ? (
+            <HoldForm
+              request={request.id}
+              onPlaced={async () => {
+                setOpen(false);
+                await onDone();
+              }}
+              onCancel={() => {
+                setOpen(false);
+                requestAnimationFrame(() => placeRef.current?.focus());
+              }}
+            />
+          ) : (
+            <div className={styles.actions} style={{ marginTop: 12 }}>
+              <Button ref={placeRef} variant="secondary" onClick={() => setOpen(true)}>
+                {t('admin.holds.place')}
+              </Button>
+            </div>
+          ))}
+      </Card>
+    </section>
   );
 }
 
