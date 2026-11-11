@@ -173,6 +173,11 @@ export function HoldForm({
                 },
                 requestId,
               );
+              setAccount('');
+              setBasis('');
+              setReason('');
+              setReference('');
+              setResponsible('');
               onPlaced(res.id);
             } catch (e) {
               const err = holdError(lang, e);
@@ -208,7 +213,7 @@ function HoldRow({ hold }: { hold: LegalHold }) {
         {hold.account.deleted && <Pill tone="grey">{t('admin.holds.accountDeleted')}</Pill>}
       </span>
       <span className={styles.rowMeta}>
-        <span className={styles.id}>{hold.account.display_id}</span>
+        {hold.scope === 'request' && <span className={styles.id}>{hold.account.display_id}</span>}
         <span>{basisLabel(t, hold.basis)}</span>
         <span>{hold.reference}</span>
       </span>
@@ -369,8 +374,9 @@ export function LegalHoldScreen() {
           {active ? (
             <>
               <dt>{t('admin.holds.detail.review')}</dt>
-              <dd>
-                <ReviewLine hold={h} />
+              <dd className={reviewOverdue(h) ? styles.danger : undefined}>
+                {day(lang, h.review_due_at)}
+                {reviewOverdue(h) && ` · ${t('admin.holds.overdue')}`}
               </dd>
             </>
           ) : (

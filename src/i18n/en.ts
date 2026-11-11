@@ -4439,6 +4439,7 @@ export const en: Record<MessageKey, string> = {
   'admin.holds.basis.fraud_investigation': 'Fraud or abuse investigation',
   'admin.holds.reviewDue': 'Review by {date}',
   'admin.holds.reviewOverdue': 'Review overdue, due {date}',
+  'admin.holds.overdue': 'overdue',
   'admin.holds.releasedOn': 'Released on {date}',
   'admin.holds.accountDeleted': 'Account deleted',
   'admin.holds.requestsCount': 'Requests covered: {count}',

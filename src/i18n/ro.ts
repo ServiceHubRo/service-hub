@@ -4438,6 +4438,7 @@ export const ro = {
   'admin.holds.basis.fraud_investigation': 'Investigație de fraudă sau abuz',
   'admin.holds.reviewDue': 'Revizuire până la {date}',
   'admin.holds.reviewOverdue': 'Revizuire întârziată, termen {date}',
+  'admin.holds.overdue': 'întârziată',
   'admin.holds.releasedOn': 'Ridicată pe {date}',
   'admin.holds.accountDeleted': 'Cont șters',
   'admin.holds.requestsCount': 'Solicitări acoperite: {count}',
