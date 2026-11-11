@@ -171,6 +171,11 @@ export const AUDIT_ACTIONS = [
   'support_view_request',
   // A3b
   'open_request_file',
+  // A3c2a
+  'place_legal_hold',
+  'review_legal_hold',
+  'release_legal_hold',
+  'view_legal_hold',
 ] as const;
 
 export interface AuditChange {

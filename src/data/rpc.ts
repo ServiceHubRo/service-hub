@@ -236,6 +236,13 @@ export const RPC_ERROR_CODES = [
   'maintenance_invalid',
   'maintenance_not_found',
   'fleet_event_not_found',
+  // A3c2a — legal hold
+  'legal_hold',
+  'hold_exists',
+  'hold_not_found',
+  'hold_released',
+  'secret_in_text',
+  'account_not_found',
 ] as const;
 
 export type RpcErrorCode = (typeof RPC_ERROR_CODES)[number] | 'network' | 'unknown';

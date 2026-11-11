@@ -1,3 +1,4 @@
+import type { RequestHold } from './legalHolds';
 import { call } from './rpc';
 import type { RequestFile } from './supportFiles';
 
@@ -139,6 +140,9 @@ export interface StaffRequestItem {
   last_staff_message_at: string | null;
   /** The author waits for an answer since then. */
   waiting_since: string | null;
+  /** A3c2a, admin only: a legal hold covers it; the ID of its author once the account is gone. */
+  held?: boolean;
+  former_author?: string | null;
 }
 
 export interface StaffMessage extends RequestMessage {
@@ -183,6 +187,9 @@ export interface StaffRequestDetail {
   notes: StaffNote[];
   /** A3b: the files; for the admin with who opened each. */
   files: RequestFile[];
+  /** A3c2a, admin only: the active holds covering it, and its author once the account is gone. */
+  legal_holds?: RequestHold[];
+  former_author?: { display_id: string; role: 'client' | 'shop' | null } | null;
 }
 
 /** A3c1: where the next page starts (the last row of the previous one). */
@@ -234,6 +241,8 @@ export interface SupportCounts {
   mine: number;
   over_24: number;
   over_48: number;
+  /** A3c2a, admin only: legal holds past their review date. */
+  holds_due?: number;
 }
 
 export interface SupportDashboard {

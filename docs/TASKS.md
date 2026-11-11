@@ -1660,6 +1660,7 @@ Aprobate de Eduard pe 6 nov („aprob T71–T75”; T71 era deja folosit, așa c
 - **A3a** solicitări, conversație, note interne, escaladare — făcut (mai jos).
 - **A3b** atașamente — făcut (mai jos), textul din Politica de confidențialitate așteaptă aprobarea lui Eduard înainte de merge. Plan: atașamente (spațiu privat, verificarea conținutului pe server, linkuri de 60 s, jurnal la deschidere, ștergere la 90 de zile) și textul nou din Politica de confidențialitate (aprobat de Eduard înainte de merge).
 - **A3c** împărțit (aprobat de Eduard pe 8 nov): **A3c1** panoul de suport și timpul real — făcut (mai jos); **A3c2** păstrarea legală și retenția (12 luni după închidere; sugestiile anonimizate, inclusiv identificatorii din text; legal hold doar de admin, revizuire la 90 de zile, fără ridicare automată; cuvintele căutate șterse la 90 de zile, restul jurnalului echipei 12 luni). Planul inițial: panoul de suport (contoare, avertizări la 24 și 48 de ore), timp real, păstrare legală (motiv, responsabil, dată, revizuire periodică) și regulile la ștergerea contului; propunerea de retenție pe scop și categorie (decizia 6 a lui Eduard: fără termenul general de 2 ani).
+- **A3c2** împărțit (Eduard, 11 nov): **A3c2a** păstrarea legală și regulile la ștergerea contului — făcut (mai jos); **A3c2b** retenția la 12 luni după ultima activitate reală, anonimizarea sugestiilor cu confirmare umană obligatorie (textul original șters dacă nu e confirmat la termen, rămân doar date statistice neidentificabile), jurnalul echipei separat de cel administrativ, filtrarea generală a secretelor și retenția jurnalului — neînceput, așteaptă aprobarea.
 - Butonul „Raportează o problemă” pe cardul programării: amânat, PR separat (decizia 4).
 
 ### A3a — Solicitări: conversație, note interne, escaladare ✅
@@ -1684,6 +1685,19 @@ Aprobate de Eduard pe 6 nov („aprob T71–T75”; T71 era deja folosit, așa c
 - Politica de confidențialitate (RO și EN, versiunea 2026-11-08): §2.1, §3, §4.2, §5, §6 — textul complet în PR, pentru aprobare înainte de merge.
 - Migrarea `support_files` (schema 111). Rollback-ul refuză să ruleze cât există un fișier (rând, obiect în Storage sau ștergere în așteptare).
 - Teste: `tests/unit/supportFiles.test.ts`, `tests/sql/153_support_files.sql`, `tests/e2e/support-files.spec.ts` (390/820/1440, RO și EN; link expirat după 60 s; ștergerea automată).
+
+- [x] Făcut
+
+### A3c2a — Păstrarea legală și ștergerea contului ✅
+- Aprobat de Eduard pe 11 nov, cu condițiile lui (domeniu strict suport, acces doar admin, audit, fără cascade care ocolesc păstrarea, ridicare cu aplicarea imediată a regulilor, jurnal: doar câmpurile noi, politica de confidențialitate prezentată înainte); schimbarea legăturii solicitare ↔ autor aprobată separat în aceeași zi.
+- Doar adminul (cu al doilea pas) pune o păstrare pe o solicitare (din pagina ei) sau pe un cont întreg (Suport → Păstrare legală, după ID; acoperă și solicitările trimise ulterior): temei ales din lista închisă (litigiu, cerere a unei autorități, plângere oficială, investigație de fraudă), motiv concret de cel puțin 30 de caractere, referință (dosar, număr de cerere), responsabil. Revizuire la 90 de zile cu o notă scrisă, fără ridicare automată; ridicarea cu motiv. Fiecare pas în jurnal (fără textele); textele cu aspect de parolă, cheie sau număr de card sunt refuzate.
+- Ștergerea contului: pe orice cale (aplicație, admin, Auth, SQL direct) contul se șterge complet și imediat, ca înainte; solicitările fără păstrare se șterg cu mesajele, notele și fișierele; cele păstrate rămân, închise, fără legătură cu contul, cu codul fostului autor și datele lui de identificare (doar admin). Totul într-o singură operațiune.
+- Datele păstrate nu pot fi șterse sau modificate de nimeni (nici direct în baza de date, nici prin TRUNCATE); încercarea anulează toată operațiunea.
+- Agentul nu mai vede solicitările păstrate nicăieri (listă, contoare, pagină, acțiuni, fișiere, fișa contului, timp real); răspunsul e „nu există”, ca pentru o solicitare inexistentă. Autorul își vede în continuare solicitarea, fără nicio mențiune.
+- La ridicare: solicitările unui cont deja șters se șterg imediat, întregi (și obiectele din Storage, după confirmarea tranzacției); fișierele solicitărilor închise de peste 90 de zile se șterg imediat. Curățarea zilnică din A3b sare peste fișierele păstrate și le șterge pe celelalte.
+- Migrarea `legal_hold` (schema 114): niciun rând existent modificat (verificat prin comparație completă înainte/după). Rollback-ul refuză cât există orice păstrare (activă sau ridicată), revizuire, date de identificare sau solicitare păstrată.
+- Teste: `tests/sql/155_legal_hold.sql` (toate căile de ștergere, combinații păstrate/nepăstrate, conturi cu mai multe solicitări în stări diferite, TRUNCATE, privilegii, agent, ridicare), `tests/unit/legalHolds.test.ts` (nicio cheie privilegiată în aplicație, nicio citire directă a tabelelor), `tests/e2e/legal-hold.spec.ts` (390/820/1440, RO și EN).
+- **Rămas:** textul nou din Politica de confidențialitate și lista temeiurilor așteaptă validarea lui Eduard (textul complet în PR; fișierul politicii neschimbat). Riscul neacoperit de baza de date: ștergerea manuală a unui fișier din Storage (dashboard sau cheia de serviciu).
 
 - [x] Făcut
 

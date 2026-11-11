@@ -6,6 +6,7 @@ import {
   CreditCard,
   Download,
   FileCheck,
+  FileLock,
   Handshake,
   Inbox,
   Landmark,
@@ -39,6 +40,7 @@ import {
   ADMIN_EXPORT_PATH,
   ADMIN_FLEET_FAILED_PATH,
   ADMIN_FLEETS_PATH,
+  ADMIN_HOLDS_PATH,
   ADMIN_MODERATION_PATH,
   ADMIN_NOTICES_PATH,
   ADMIN_PANEL_PATH,
@@ -132,7 +134,10 @@ export const ADMIN_ZONES: readonly AdminZone[] = [
     titleKey: 'nav.admin.support',
     descKey: 'admin.zone.support.desc',
     icon: LifeBuoy,
-    items: [{ path: ADMIN_REQUESTS_PATH, labelKey: 'admin.requests.title', hintKey: 'admin.requests.tileHint', icon: Inbox }],
+    items: [
+      { path: ADMIN_REQUESTS_PATH, labelKey: 'admin.requests.title', hintKey: 'admin.requests.tileHint', icon: Inbox },
+      { path: ADMIN_HOLDS_PATH, labelKey: 'admin.holds.title', hintKey: 'admin.holds.tileHint', icon: FileLock },
+    ],
   },
   {
     path: ADMIN_PLATFORM_PATH,

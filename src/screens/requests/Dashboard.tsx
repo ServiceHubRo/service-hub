@@ -9,7 +9,7 @@ import styles from './requests.module.css';
 
 /** A counter: its number, its words and the one filter it opens the list with. */
 interface Tile {
-  count: keyof SupportCounts;
+  count: Exclude<keyof SupportCounts, 'holds_due'>;
   label: MessageKey;
   filter: keyof RequestFilters;
   value: string;

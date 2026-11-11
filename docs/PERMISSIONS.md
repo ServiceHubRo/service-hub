@@ -69,6 +69,9 @@ key) plus `actor_role` and `actor_display_id`, filled by a trigger at insert, so
 | **Support dashboard** (A3c1): counters, oldest request without answer, the list page by page | — | — | — | ✅ | ✅ (also in Panou) |
 | Live signals of a request (Realtime, `support_signals`: only "changed", no content) | own requests, never the team's internal work | own requests, the same | — | every request (aal2, live session) | every request |
 | A request's booking | own: code, day, shop, state | its shop's: the same | — | code, day, shop, state only | the same |
+| **Legal hold** (A3c2a): place, review, release; see the holds, their reasons and the author's identifiers | ❌ | ❌ | ❌ | ❌ (`not_allowed`) | ✅ (aal2; every step audited) |
+| A request under legal hold (also its messages, notes, files, signals, account card line) | ✅ own, while the account exists (no word about the hold) | ✅ own, the same | — | ❌ answers as if it did not exist (`request_not_found`, `file_not_found`); never in lists, counters or Realtime | ✅ marked „Păstrare legală” |
+| Delete or change the text of held support data (any path, direct SQL included; TRUNCATE) | ❌ | ❌ | ❌ | ❌ | ❌ (`legal_hold`; release first) |
 | **Account search** | — | — | — | ✅ masked: ID, name, role, state, `m***@…`, phone's last 3 digits, shop name and city, created, last active | ✅ full lists |
 | **Account card** | — | — | — | ✅ the same fields + its suggestions; never bookings, cars, companies, billing, messages, reviews | ✅ full card |
 | Find admin or agent accounts | — | — | — | ❌ (never in results) | ✅ |
@@ -125,12 +128,18 @@ key) plus `actor_role` and `actor_display_id`, filled by a trigger at insert, so
 | `support_file_begin`, `support_file_register`, `support_file_open`, `support_files_collect`, `support_file_deletions_next/done`, `support_files_stray` | `service_role` only (the function above) | — | — |
 | `support_dashboard()`, `support_inbox(owner, status, category, age, after…, limit)` (A3c1) | agent, admin (aal2) | counters + oldest; one page `{me, items, next}` | `request_invalid {field}` |
 
+| `admin_place_legal_hold(request, account, basis, reason, reference, responsible, request_id)` (A3c2a) | admin (aal2) | `{id, review_due_at}` | `field_invalid {field: target, basis, reason, reference, responsible}`, `secret_in_text {field}`, `request_not_found`, `account_not_found`, `hold_exists` |
+| `admin_review_legal_hold(id, note, responsible, request_id)` | admin | `{id, review_due_at}` (90 days later) | `field_invalid {field: note}`, `secret_in_text`, `hold_not_found`, `hold_released` |
+| `admin_release_legal_hold(id, reason, request_id)` | admin | `{id, released_at, deleted_requests, deleted_files}` | `field_invalid {field: reason}`, `secret_in_text`, `hold_not_found`, `hold_released` |
+| `admin_list_legal_holds(state)`, `admin_get_legal_hold(id)` (opening logged), `admin_list_admins()` | admin | the holds; one hold with reviews, covered requests and identifiers | `field_invalid`, `hold_not_found` |
+
 Every caller check also answers `not_signed_in`, `account_suspended`, `not_allowed`, `mfa_required`.
 
 ## 6. Migration and rollback
 
 | Migration | Schema | Rollback | Rollback test |
 |---|---|---|---|
+| `20261111142007_legal_hold.sql` (A3c2a) | 114 | `supabase/rollback/20261111142007_legal_hold.sql`: **refuses to run** (error listing how many) while any hold (active or released), review, kept identifiers or request kept after its account went exists — no held data is lost and no request is joined to an account by guess; otherwise the support functions, the foreign key (`ON DELETE CASCADE`, author required) and TRUNCATE for `service_role` return as before | `npm run test:rollback`: structure and data identical; the refusal checked by hand with an active and with a released hold (nothing changed) |
 | `20261108054527_support_signals_people_only.sql` (A3c1) | 113 | `supabase/rollback/20261108054527_support_signals_people_only.sql`: jobs signal again; nothing lost | `npm run test:rollback` |
 | `20261108045828_support_dashboard.sql` (A3c1) | 112 | `supabase/rollback/20261108045828_support_dashboard.sql`: drops the signals (made again by the next change), the dashboard and list functions, the index; nothing real is lost | `npm run test:rollback` |
 | `20261107220601_support_files.sql` (A3b) | 111 | `supabase/rollback/20261107220601_support_files.sql`: **refuses to run** (error listing how many) while a file row, an object in `support-files` or a path waiting for deletion exists; otherwise the A3a functions and export return and everything goes back to schema 110 | `npm run test:rollback`; the refusal checked by hand with one stored object (nothing changed) |

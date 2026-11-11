@@ -14,8 +14,8 @@ describe('admin zones (A1)', () => {
   it('every function of the inventory has exactly one place', () => {
     const paths = subSections.map((i) => i.path);
     expect(new Set(paths).size).toBe(paths.length);
-    // 19 at A1, plus Echipa de suport (A2).
-    expect(paths.length).toBe(20);
+    // 19 at A1, plus Echipa de suport (A2) and Păstrare legală (A3c2a).
+    expect(paths.length).toBe(21);
   });
 
   it('Platformă splits Configurare and Control; the other zones have no groups', () => {
