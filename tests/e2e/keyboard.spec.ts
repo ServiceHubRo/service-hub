@@ -3,7 +3,7 @@ import { appendFileSync, mkdirSync } from 'node:fs';
 import { expect, test, type Locator, type Page } from '@playwright/test';
 import { newPage } from './agent';
 import { fleetSetup } from './fleet-support';
-import { BACKEND, PASSWORD, SEED, SEED_PASSWORD, createUser, rpcAs, serviceRest, signIn } from './support';
+import { BACKEND, PASSWORD, SEED, SEED_PASSWORD, createBookableShop, createUser, rpcAs, serviceRest, signIn } from './support';
 
 // The phone's keyboard over the app's forms (Eduard, 11 Nov 2026: on the iPhone the bottom bar
 // covered „Solicitare nouă” and its button). A browser here has no real keyboard, so it is played
@@ -231,20 +231,19 @@ async function checkForm(page: Page, form: Form, results: string[]) {
         const last = fields[fields.length - 1]!;
         await last.focus();
         await openKeyboard(page, s, mode);
-        await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+        await submit.evaluate((el) => el.scrollIntoView({ block: 'start' }));
         await page.waitForTimeout(150);
         const kb = await band(page);
         const kbBox = (await submit.boundingBox())!;
-        if (mode === 'android') {
-          expect(kbBox.y + kbBox.height, `${where}: keyboard open, the button reached`).toBeLessThanOrEqual(kb.bottom + 1);
-          expect(await coveredBy(submit), `${where}: keyboard open, nothing over the button`).toBe('');
+        expect(
+          await submit.evaluate((el) => getComputedStyle(el.closest('[data-fixed-bottom]') ?? el).position),
+          `${where}: keyboard open, the button is in the page (not held behind the keyboard)`,
+        ).not.toBe('sticky');
+        if (kbBox.y + kbBox.height > kb.bottom + 1 && mode === 'iphone' && kb.atEnd) {
+          results.push(`${where}: button at the end of a short page, left to Safari`);
         } else {
-          // Safari lets the visible part go down to the end of the page: the button is the page's own
-          // (not held behind the keyboard by the bottom bar) and nothing of the app covers it.
-          expect(
-            await submit.evaluate((el) => getComputedStyle(el.closest('[data-fixed-bottom]') ?? el).position),
-            `${where}: the button is in the page`,
-          ).not.toBe('sticky');
+          expect(kbBox.y + kbBox.height, `${where}: keyboard open, the button reached`).toBeLessThanOrEqual(kb.bottom + 1);
+          expect(kbBox.y, `${where}: keyboard open, the button below the top bars`).toBeGreaterThanOrEqual(kb.top - 1);
           expect(await coveredBy(submit), `${where}: keyboard open, nothing over the button`).toBe('');
         }
         await closeKeyboard(page, s, mode);
@@ -412,6 +411,7 @@ test.describe('the phone keyboard over the forms', () => {
   test('client: booking a shop and a conversation', async ({ page, browser }) => {
     const results: string[] = [];
     const [shop] = await serviceRest<{ id: string }[]>('shops?select=id&order=created_at&limit=1', 'GET');
+    const { shopId } = await createBookableShop(`Atelier Tastatura ${stamp()}`, ['ulei']);
     const threads = await serviceRest<{ id: string }[]>(`threads?select=id&shop_id=eq.${shop!.id}&limit=1`, 'GET');
     // A new client (no car yet): the booking asks for the car in a form, its button held at the bottom.
     const fresh = await newPage(browser);
@@ -422,10 +422,19 @@ test.describe('the phone keyboard over the forms', () => {
       {
         label: 'Programare: mașina',
         open: async (p) => {
-          await p.goto(`/c/service/${shop!.id}/programare`);
-          await expect(p.locator('main input, main select').first()).toBeVisible();
+          // Service, day and time chosen: step 4, the car (a new client has none: the form).
+          await p.goto(`/c/service/${shopId}/programare?pas=2&serviciu=ulei`);
+          await p
+            .getByRole('button', { name: /: \d+ (loc|locuri)$/ })
+            .first()
+            .click();
+          await p
+            .getByRole('button', { name: /^\d{2}:\d{2}$/, disabled: false })
+            .first()
+            .click();
+          await expect(p.getByRole('heading', { level: 1, name: 'Mașina' })).toBeVisible();
         },
-        submit: (p) => p.locator('[data-fixed-bottom] button').last(),
+        submit: (p) => p.getByRole('button', { name: 'Trimite cererea' }),
       },
       results,
     );
@@ -494,7 +503,7 @@ test.describe('the phone keyboard over the forms', () => {
           await p.goto('/s/programari/nou');
           await expect(p.locator('main input').first()).toBeVisible();
         },
-        submit: (p) => p.locator('main [data-fixed-bottom] button, main form button[type="submit"]').last(),
+        submit: (p) => p.getByRole('button', { name: 'Adaugă programarea' }),
       },
       results,
     );
