@@ -381,6 +381,7 @@ Partea din cod e făcută (headerele de securitate, regulile din baza de date, l
 3. **Supabase, proiectul real → Authentication**:
    - **Sign In / Providers → Email**: **Secure email change** pornit (cere confirmare pe ambele adrese); **Secure password change** pornit (cine are doar o sesiune furată nu poate schimba parola fără un cod pe email); **Minimum password length** `8`; **Password requirements** „Letters and digits” → **Save**.
    - **Attack Protection**: CAPTCHA (pasul 4.3). Dacă apare **Prevent use of leaked passwords** (pe planul Pro), pornește-l: refuză parolele apărute în scurgeri de date cunoscute.
+   - **Sessions** (A6): lasă **Time-box user sessions** și **Inactivity timeout** oprite, dacă nu vrei ca și clienții și service-urile să fie deconectați. Pentru echipă (admini și agenți), sesiunea de 8 ore e deja impusă de baza de date. Dacă vrei totuși o limită de inactivitate pentru toți, alege cel puțin 24 h (o valoare mică, de exemplu 30 de minute, i-ar deconecta pe toți clienții care închid aplicația). **Refresh token rotation** pornit.
 4. **Proiectul de test** (Partea 2) și **copiile de siguranță** (4.1), dacă nu le-ai făcut încă.
 
 Nimic de aici nu cere cod nou și nu se vede în aplicație, în afară de cerințele pentru parolă (le arată Supabase la înregistrare).

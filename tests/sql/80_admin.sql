@@ -16,15 +16,15 @@ select test.fails($$select public.admin_get_booking(test.id('booking_b'))$$, 'no
 select test.fails($$select public.admin_get_thread(test.id('thread_b'))$$, 'does not exist', 'nor a conversation (P3: no such function)');
 select test.fails($$select public.admin_list_reviews()$$, 'not_allowed', 'nor the moderation queue');
 select test.fails($$select public.admin_list_audit()$$, 'not_allowed', 'nor the audit log');
-select test.fails($$select public.admin_verify_phone(test.id('owner2'), test.rid())$$, 'not_allowed', 'nor verify a phone');
+select test.fails($$select public.admin_verify_phone(test.id('owner2'), test.rid(), 'Test A6')$$, 'not_allowed', 'nor verify a phone');
 select test.fails($$select public.admin_set_shop_suspended(test.id('shop1'), true, 'x', test.rid())$$, 'not_allowed', 'nor suspend a shop');
 select test.fails($$select public.admin_set_account_suspended(test.id('client_b'), true, 'x', test.rid())$$, 'not_allowed', 'nor suspend an account');
-select test.fails($$select public.admin_update_shop(test.id('shop1'), '{"name":"X"}', null, test.rid())$$, 'not_allowed', 'nor edit a shop');
-select test.fails($$select public.admin_extend_trial(test.id('shop1'), 30, test.rid())$$, 'not_allowed', 'nor extend a trial');
+select test.fails($$select public.admin_update_shop(test.id('shop1'), '{"name":"X"}', null, test.rid(), 'Test A6')$$, 'not_allowed', 'nor edit a shop');
+select test.fails($$select public.admin_extend_trial(test.id('shop1'), 30, test.rid(), 'Test A6')$$, 'not_allowed', 'nor extend a trial');
 select test.fails($$select public.admin_set_subscription_status(test.id('shop1'), 'active', test.rid())$$, 'not_allowed', 'nor set a plan status');
 select test.fails($$select public.admin_decide_review(gen_random_uuid(), 'keep', null, test.rid())$$, 'not_allowed', 'nor moderate');
 select test.eq(test.count('select * from public.admin_audit_log'), 0::bigint, 'nor read the audit table');
-select test.fails($$select public.admin_account_deletion(test.id('client_a'), test.id('client_b'))$$, 'permission denied',
+select test.fails($$select public.admin_account_deletion(test.id('client_a'), test.id('client_b'), 'x', gen_random_uuid())$$, 'permission denied',
   'account deletion is not callable from the browser');
 
 select test.login(test.id('owner1'));
@@ -136,13 +136,14 @@ select test.eq(test.count('select 1 from public.notification_events'), 0::bigint
 
 -- ------------------------------------------------------------------ verify a phone
 select test.logout();
+select test.unlock_audit_log();
 delete from public.admin_audit_log;
 delete from public.notification_events;
 select test.login(test.id('admin'));
 select set_config('test.rid', gen_random_uuid()::text, true);
-select public.admin_verify_phone(test.id('owner2'), current_setting('test.rid')::uuid);
-select public.admin_verify_phone(test.id('owner2'), current_setting('test.rid')::uuid);
-select test.fails($$select public.admin_verify_phone(test.id('owner2'), test.rid())$$, 'phone_already_verified',
+select public.admin_verify_phone(test.id('owner2'), current_setting('test.rid')::uuid, 'Test A6');
+select public.admin_verify_phone(test.id('owner2'), current_setting('test.rid')::uuid, 'Test A6');
+select test.fails($$select public.admin_verify_phone(test.id('owner2'), test.rid(), 'Test A6')$$, 'phone_already_verified',
   'a verified phone is not verified twice');
 select test.logout();
 select test.eq(phone_verified_by_admin, true, 'the phone is verified') from public.profiles where id = test.id('owner2');
@@ -174,7 +175,7 @@ select test.fails(format($$select public.create_booking(%L, 'ulei', %L, '10:00',
   'nobody can book a suspended shop');
 
 select test.login(test.id('admin'));
-select public.admin_set_shop_suspended(test.id('shop1'), false, null, test.rid());
+select public.admin_set_shop_suspended(test.id('shop1'), false, 'Verificat', test.rid());
 select test.ok(public.is_shop_public(test.id('shop1')), 'reactivated: back in search');
 
 -- ------------------------------------------------------------------ suspend an account
@@ -185,7 +186,7 @@ select test.fails($$select public.toggle_favorite(test.id('shop1'), test.rid())$
 select test.login(test.id('admin'));
 select test.fails($$select public.admin_set_account_suspended(test.id('admin'), true, 'x', test.rid())$$, 'not_found',
   'an admin account is not suspended from here');
-select public.admin_set_account_suspended(test.id('client_a'), false, null, test.rid());
+select public.admin_set_account_suspended(test.id('client_a'), false, 'Verificat', test.rid());
 select test.login(test.id('client_a'));
 select test.ok(public.toggle_favorite(test.id('shop1'), test.rid()), 'reactivated: the client acts again');
 select test.logout();
@@ -194,15 +195,15 @@ from public.admin_audit_log where entity_id = test.id('client_a')::text and acti
 
 -- ------------------------------------------------------------------ edit a shop
 select test.login(test.id('admin'));
-select test.eq(test.error_of($$select public.admin_update_shop(test.id('shop1'), '{"owner_id":"x"}', null, test.rid())$$),
+select test.eq(test.error_of($$select public.admin_update_shop(test.id('shop1'), '{"owner_id":"x"}', null, test.rid(), 'Test A6')$$),
   'field_invalid', 'only the listed fields can be edited');
-select test.eq(test.error_params($$select public.admin_update_shop(test.id('shop1'), null, '{"iban":"RO00XXXX"}', test.rid())$$)->>'field',
+select test.eq(test.error_params($$select public.admin_update_shop(test.id('shop1'), null, '{"iban":"RO00XXXX"}', test.rid(), 'Test A6')$$)->>'field',
   'iban', 'an invalid IBAN names the field');
-select test.eq(test.error_params($$select public.admin_update_shop(test.id('shop1'), '{"daily_capacity":0}', null, test.rid())$$)->>'field',
+select test.eq(test.error_params($$select public.admin_update_shop(test.id('shop1'), '{"daily_capacity":0}', null, test.rid(), 'Test A6')$$)->>'field',
   'daily_capacity', 'a capacity out of range names the field');
-select test.eq(test.error_params($$select public.admin_update_shop(test.id('shop1'), '{"name":" "}', null, test.rid())$$)->>'field',
+select test.eq(test.error_params($$select public.admin_update_shop(test.id('shop1'), '{"name":" "}', null, test.rid(), 'Test A6')$$)->>'field',
   'name', 'the name cannot be emptied');
-select test.eq(test.error_of($$select public.admin_update_shop(test.id('shop1'), '{"daily_capacity":"abc"}', null, test.rid())$$),
+select test.eq(test.error_of($$select public.admin_update_shop(test.id('shop1'), '{"daily_capacity":"abc"}', null, test.rid(), 'Test A6')$$),
   'field_invalid', 'a number field refuses text');
 
 select test.eq((r->>'address_changed')::boolean, true, 'a new city is an address change'),
@@ -211,9 +212,9 @@ select test.eq((r->>'address_changed')::boolean, true, 'a new city is an address
        test.ok(r->'shop'->'website' = 'null'::jsonb, 'an emptied field becomes not set')
 from public.admin_update_shop(test.id('shop1'),
   '{"name":" Atelier Unu Plus ","city":"Codlea","daily_capacity":8,"website":""}',
-  '{"legal_rep":"Maria Popescu"}', test.rid()) r;
+  '{"legal_rep":"Maria Popescu"}', test.rid(), 'Test A6') r;
 select test.eq((r->>'address_changed')::boolean, false, 'no address change')
-from public.admin_update_shop(test.id('shop1'), '{"inspection_fee":50}', null, test.rid()) r;
+from public.admin_update_shop(test.id('shop1'), '{"inspection_fee":50}', null, test.rid(), 'Test A6') r;
 select test.logout();
 select test.eq(before, '{"city": "Brașov", "name": "Atelier Unu", "daily_capacity": 5, "billing": {"legal_rep": "Ion Popescu"}}'::jsonb,
                'only what changed, before'),
@@ -228,15 +229,15 @@ select test.ok(not public.is_shop_public(test.id('shop1')), 'an ended free perio
 delete from public.notification_events;
 
 select test.login(test.id('admin'));
-select test.fails($$select public.admin_extend_trial(test.id('shop1'), 0, test.rid())$$, 'days_invalid', 'at least one day');
-select test.fails($$select public.admin_extend_trial(test.id('shop1'), 400, test.rid())$$, 'days_invalid', 'at most a year');
+select test.fails($$select public.admin_extend_trial(test.id('shop1'), 0, test.rid(), 'Test A6')$$, 'days_invalid', 'at least one day');
+select test.fails($$select public.admin_extend_trial(test.id('shop1'), 400, test.rid(), 'Test A6')$$, 'days_invalid', 'at most a year');
 select test.eq(r->>'status', 'trial', 'extended: in the free period again'),
        test.ok((r->>'trial_ends_at')::timestamptz between now() + interval '29 days 23 hours' and now() + interval '30 days 1 hour',
                '30 days from today (the old end had passed)')
-from public.admin_extend_trial(test.id('shop1'), 30, test.rid()) r;
+from public.admin_extend_trial(test.id('shop1'), 30, test.rid(), 'Test A6') r;
 select test.ok(public.is_shop_public(test.id('shop1')), 'and back in search');
 select test.ok((r->>'trial_ends_at')::timestamptz > now() + interval '44 days', 'a second extension adds to the end')
-from public.admin_extend_trial(test.id('shop1'), 15, test.rid()) r;
+from public.admin_extend_trial(test.id('shop1'), 15, test.rid(), 'Test A6') r;
 
 select test.fails($$select public.admin_set_subscription_status(test.id('shop1'), 'trial', test.rid())$$, 'status_invalid',
   'the free period is set by extending it');
@@ -260,7 +261,7 @@ select test.eq((public.admin_overview()->'subscriptions'->>'mrr')::numeric, 100:
 select test.logout();
 update public.subscriptions set stripe_status = 'active', stripe_subscription_id = 'sub_1' where shop_id = test.id('shop1');
 select test.login(test.id('admin'));
-select test.fails($$select public.admin_extend_trial(test.id('shop1'), 10, test.rid())$$, 'subscription_in_stripe',
+select test.fails($$select public.admin_extend_trial(test.id('shop1'), 10, test.rid(), 'Test A6')$$, 'subscription_in_stripe',
   'a subscription running in Stripe is changed in Stripe');
 select test.logout();
 select test.eq(count(*), 4::bigint, 'every plan change is logged')
@@ -330,24 +331,31 @@ from public.admin_get_shop(test.id('shop1')) s;
 
 -- ------------------------------------------------------------------ deleting an account (service role)
 select test.logout();
-select test.fails($$select public.admin_account_deletion(test.id('client_a'), test.id('client_b'))$$, 'not_allowed',
+select test.fails($$select public.admin_account_deletion(test.id('client_a'), test.id('client_b'), 'Test A6', gen_random_uuid())$$, 'not_allowed',
   'only an admin may delete someone');
-select test.fails($$select public.admin_account_deletion(test.id('admin'), test.id('admin'))$$, 'not_allowed',
+select test.fails($$select public.admin_account_deletion(test.id('admin'), test.id('admin'), 'Test A6', test.admin_session(test.id('admin')))$$, 'not_allowed',
   'an admin account is not deleted here');
-select test.fails($$select public.admin_account_deletion(test.id('admin'), gen_random_uuid())$$, 'not_found', 'an unknown account');
+select test.fails($$select public.admin_account_deletion(test.id('admin'), gen_random_uuid(), 'Test A6', test.admin_session(test.id('admin')))$$, 'not_found', 'an unknown account');
+-- A6: the admin's session must exist (not a made-up or ended one) and a reason is required.
+select test.fails($$select public.admin_account_deletion(test.id('admin'), test.id('client_a'), 'Test A6', gen_random_uuid())$$, 'not_signed_in',
+  'a session that does not exist is refused');
+select test.fails($$select public.admin_account_deletion(test.id('admin'), test.id('client_a'), 'Test A6', null)$$, 'not_signed_in',
+  'no session is refused');
+select test.fails($$select public.admin_account_deletion(test.id('admin'), test.id('client_a'), '  ', test.admin_session(test.id('admin')))$$, 'reason_required',
+  'a reason is required');
 insert into public.bookings (shop_id, client_id, service_id, client_name, car_snapshot, date, slot, status)
 values (test.id('shop2'), test.id('client_b'), 'ulei', 'Bogdan Pop', '{}', current_date + 5, '09:00', 'confirmed');
-select test.fails($$select public.admin_account_deletion(test.id('admin'), test.id('client_b'))$$, 'account_has_active_bookings',
+select test.fails($$select public.admin_account_deletion(test.id('admin'), test.id('client_b'), 'Test A6', test.admin_session(test.id('admin')))$$, 'account_has_active_bookings',
   'an account with active bookings is refused');
-select test.fails($$select public.admin_account_deletion(test.id('admin'), test.id('owner2'))$$, 'shop_has_active_bookings',
+select test.fails($$select public.admin_account_deletion(test.id('admin'), test.id('owner2'), 'Test A6', test.admin_session(test.id('admin')))$$, 'shop_has_active_bookings',
   'a shop with active bookings too');
-select test.eq(public.admin_account_deletion(test.id('admin'), test.id('client_a')), 'delete', 'a client is deleted');
+select test.eq(public.admin_account_deletion(test.id('admin'), test.id('client_a'), 'Test A6', test.admin_session(test.id('admin'))), 'delete', 'a client is deleted');
 -- A3c2b2: the log keeps the account's code and role, never its name or email.
 select test.ok(before ? 'display_id' and before ? 'role' and not before ? 'email' and not before ? 'name', 'who it was, in the log: its code, no name or email'),
        test.eq(after->>'mode', 'delete', 'and how'),
        test.eq(admin_id, test.id('admin'), 'by whom')
 from public.admin_audit_log where action = 'delete_account' and entity_id = test.id('client_a')::text;
-select test.eq(public.admin_account_deletion(test.id('admin'), test.id('owner1')), 'anonymize',
+select test.eq(public.admin_account_deletion(test.id('admin'), test.id('owner1'), 'Test A6', test.admin_session(test.id('admin'))), 'anonymize',
   'a shop with records is anonymized');
 select test.eq(entity_type, 'shop', 'logged on the shop') from public.admin_audit_log
 where action = 'delete_account' and entity_id = test.id('shop1')::text;

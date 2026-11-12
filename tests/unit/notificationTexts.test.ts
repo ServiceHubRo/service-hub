@@ -70,6 +70,7 @@ const SAMPLE: Record<string, Record<string, unknown>> = {
   welcome: { day: 3, has_car: false },
   area_launched: { area: 'CJ', area_ro: 'Cluj', area_en: 'Cluj', shops: 3 },
   report_credit: {},
+  billing_changed: { fields: ['iban'], iban_end: '7890' },
   slot_freed: { shop_id: 's-1', shop_name: 'Atelier Unu', date: '2026-10-23' },
   favorite_offer: { percent: 15 },
   booking_request_waiting: {},

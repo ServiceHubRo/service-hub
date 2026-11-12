@@ -106,7 +106,7 @@ select test.eq(test.count(format($$select 1 from public.bookings where id = %L$$
 select test.login(test.id('client_a'));
 select public.set_company_member_rights(test.id('m_drv'), array['costs.view'], null, gen_random_uuid());
 select test.login(test.id('admin'));
-select public.admin_set_company_plan(test.id('co'), 'fleet_start', gen_random_uuid());
+select public.admin_set_company_plan(test.id('co'), 'fleet_start', gen_random_uuid(), 'Test A6');
 select test.login(test.id('client_b'));
 select test.eq(test.count(format($$select 1 from public.bookings where id = %L$$, current_setting('test.cb'))), 0::bigint,
   'a plan without extra rights: the amounts are hidden again');

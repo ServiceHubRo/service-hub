@@ -1,4 +1,5 @@
-import { call, failure, RpcError, type Booking } from './rpc';
+import { FunctionsFetchError, FunctionsHttpError } from '@supabase/supabase-js';
+import { call, failure, FILE_ERRORS, FileError, RpcError, type Booking, type FileErrorCode } from './rpc';
 import { supabase } from './supabase';
 import type { ExpenseFields, FleetExpense, FleetIssue, FleetMaintenanceItem, MaintenanceFields, FleetReading, FuelStats, FleetIssueDetail, FleetOverview, IssueFields, IssueUpdate, FleetPlanRow, FleetPlanSummary, FleetReport, FleetSubscriptionView, FleetVehicle, ReportFilters } from '../lib/fleet';
 
@@ -160,12 +161,12 @@ export async function adminFleetPlans(): Promise<(FleetPlanRow & { position: num
   return data as unknown as (FleetPlanRow & { position: number; public: boolean; active: boolean })[];
 }
 
-export async function adminSetCompanyPlan(company: string, planKey: string, requestId: string): Promise<void> {
-  await call('admin_set_company_plan', { p_company: company, p_plan_key: planKey, p_request_id: requestId });
+export async function adminSetCompanyPlan(company: string, planKey: string, reason: string, requestId: string): Promise<void> {
+  await call('admin_set_company_plan', { p_company: company, p_plan_key: planKey, p_request_id: requestId, p_reason: reason });
 }
 
-export async function adminExtendCompanyTrial(company: string, days: number, requestId: string): Promise<void> {
-  await call('admin_extend_company_trial', { p_company: company, p_days: days, p_request_id: requestId });
+export async function adminExtendCompanyTrial(company: string, days: number, reason: string, requestId: string): Promise<void> {
+  await call('admin_extend_company_trial', { p_company: company, p_days: days, p_request_id: requestId, p_reason: reason });
 }
 
 export async function adminUpdateFleetPlan(
@@ -210,16 +211,40 @@ export const RECEIPT_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'applicat
 export const RECEIPT_MAX_BYTES = 5 * 1024 * 1024;
 
 /**
- * The photo or PDF of a receipt, uploaded before the expense is saved: `<company>/<vehicle>/<random>.<ext>`
- * in the private bucket (the storage policies let only costs.manage, or the vehicle's driver, write there).
+ * A6 (M4): every company file goes through the Edge Function fleet-files, which checks its real type
+ * from the bytes, refuses active or encrypted PDFs, removes the metadata of photos (GPS included) and
+ * applies the limits; the bucket takes nothing else. Answers the stored path.
  */
-export async function uploadReceipt(company: string, vehicle: string, file: File): Promise<string> {
+async function uploadFleetFile(company: string, vehicle: string, issue: string | null, file: File): Promise<string> {
   if (!supabase) throw new RpcError('network');
-  const ext = file.type === 'application/pdf' ? 'pdf' : file.type === 'image/png' ? 'png' : file.type === 'image/webp' ? 'webp' : 'jpg';
-  const path = `${company}/${vehicle}/${crypto.randomUUID()}.${ext}`;
-  const { error } = await supabase.storage.from(FLEET_FILES_BUCKET).upload(path, file, { contentType: file.type, upsert: false });
-  if (error) throw new RpcError('unknown');
-  return path;
+  const form = new FormData();
+  form.append('file', file, file.name);
+  form.append('company', company);
+  form.append('vehicle', vehicle);
+  if (issue) form.append('issue', issue);
+  const { data, error } = await supabase.functions.invoke('fleet-files', { method: 'POST', body: form });
+  if (!error) {
+    const path = (data as { path?: unknown } | null)?.path;
+    if (typeof path !== 'string') throw new RpcError('unknown');
+    return path;
+  }
+  if (error instanceof FunctionsFetchError) throw new RpcError('network');
+  if (error instanceof FunctionsHttpError) {
+    let code: unknown;
+    try {
+      code = ((await (error.context as Response).json()) as { error?: unknown }).error;
+    } catch {
+      code = null;
+    }
+    if ((FILE_ERRORS as readonly unknown[]).includes(code)) throw new FileError(code as FileErrorCode);
+    throw failure({ message: code }, 'fleet-files');
+  }
+  throw new RpcError('unknown');
+}
+
+/** The photo or PDF of a receipt, uploaded before the expense is saved (`<company>/<vehicle>/<random>.<ext>`). */
+export function uploadReceipt(company: string, vehicle: string, file: File): Promise<string> {
+  return uploadFleetFile(company, vehicle, null, file);
 }
 
 /** A link to look at a receipt (60 seconds, as every company file). */
@@ -241,14 +266,9 @@ export async function fleetFileUrl(path: string): Promise<string> {
 export const ISSUE_PHOTO_TYPES = ['image/jpeg', 'image/png', 'image/webp'] as const;
 export const ISSUE_PHOTO_MAX = 6;
 
-/** A photo of a report, uploaded before the report is sent: `<company>/<vehicle>/issues/<issue>/<random>.<ext>`. */
-export async function uploadIssuePhoto(company: string, vehicle: string, issue: string, file: File): Promise<string> {
-  if (!supabase) throw new RpcError('network');
-  const ext = file.type === 'image/png' ? 'png' : file.type === 'image/webp' ? 'webp' : 'jpg';
-  const path = `${company}/${vehicle}/issues/${issue}/${crypto.randomUUID()}.${ext}`;
-  const { error } = await supabase.storage.from(FLEET_FILES_BUCKET).upload(path, file, { contentType: file.type, upsert: false });
-  if (error) throw new RpcError('unknown');
-  return path;
+/** A photo of a report, uploaded before the report is sent (`<company>/<vehicle>/issues/<issue>/<random>.<ext>`). */
+export function uploadIssuePhoto(company: string, vehicle: string, issue: string, file: File): Promise<string> {
+  return uploadFleetFile(company, vehicle, issue, file);
 }
 
 export async function reportIssue(company: string, issue: string, fields: IssueFields, requestId: string): Promise<FleetIssue> {

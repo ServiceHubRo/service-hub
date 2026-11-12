@@ -179,7 +179,7 @@ export function AnafScreen() {
               onClearAll={() => setParam({ categorie: null })}
             />
             <div>
-              <ExportButton<CompanyCheckRow> kind="company_checks" narrow={(rows) => filterCompanyChecks(rows, query, filter)} />
+              <ExportButton<CompanyCheckRow> kind="company_checks" narrow={(rows) => filterCompanyChecks(rows, query, filter)} ids={shown.map((r) => r.shop_id)} />
             </div>
           </div>
           {notice && (

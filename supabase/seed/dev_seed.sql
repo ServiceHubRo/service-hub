@@ -401,12 +401,16 @@ begin
      and not exists (select 1 from auth.users where email = 'suport@service-hub.test') then
     perform pg_temp.seed_user('30000000-0000-4000-8000-000000000003', 'suport@service-hub.test',
       '{"role":"client","name":"Ioana Suport","lang":"ro","terms_version":"2026-09"}');
+    -- A6: an admin acts only with a live session; this one exists for the call and goes after it.
+    insert into auth.sessions (id, user_id) values ('30000000-0000-4000-8000-0000000000e1', '30000000-0000-4000-8000-000000000001')
+    on conflict (id) do nothing;
     perform set_config('request.jwt.claim.sub', '30000000-0000-4000-8000-000000000001', true);
     perform set_config('request.jwt.claims',
-      '{"sub":"30000000-0000-4000-8000-000000000001","role":"authenticated","aal":"aal2"}', true);
+      '{"sub":"30000000-0000-4000-8000-000000000001","role":"authenticated","aal":"aal2","session_id":"30000000-0000-4000-8000-0000000000e1"}', true);
     perform public.admin_grant_support('suport@service-hub.test', 'Cont demo', '30000000-0000-4000-8000-0000000000a2');
     perform set_config('request.jwt.claim.sub', '', true);
     perform set_config('request.jwt.claims', '', true);
+    delete from auth.sessions where id = '30000000-0000-4000-8000-0000000000e1';
     update public.profiles set tour_seen_at = now(), guide_hidden_at = now()
     where id = '30000000-0000-4000-8000-000000000003';
   end if;

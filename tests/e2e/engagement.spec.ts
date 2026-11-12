@@ -142,6 +142,7 @@ test.describe('T24 notifications', () => {
 
     // An hour that does not exist is refused by the database, and named.
     await section.getByLabel('Ore de liniște: de la ora').fill('25');
+    await page.getByLabel('Motiv').fill('Test e2e');
     await page.getByRole('button', { name: 'Salvează setările' }).click();
     await expect(page.getByRole('alert').filter({ visible: true }).first()).toBeVisible();
     await shot(page, 't24-admin-settings-error', name());

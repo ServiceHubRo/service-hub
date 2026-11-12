@@ -73,9 +73,9 @@ select test.logout();
 
 -- ------------------------------------------------------------------ the price per colleague
 select test.login(test.id('admin'));
-select test.eq(test.error_params($$select public.admin_update_settings('{"staff_seat_price_ron":-1}', test.rid())$$)->>'field',
+select test.eq(test.error_params($$select public.admin_update_settings('{"staff_seat_price_ron":-1}', test.rid(), 'Test A6')$$)->>'field',
                'staff_seat_price_ron', 'a negative price is refused');
-select public.admin_update_settings('{"staff_seat_price_ron":25}', test.rid());
+select public.admin_update_settings('{"staff_seat_price_ron":25}', test.rid(), 'Test A6');
 select test.eq(staff_seat_price_ron, 25.00::numeric(10,2), 'changed in the settings') from public.platform_settings;
 select test.eq(count(*), 1::bigint, 'and logged')
 from public.admin_audit_log where action = 'update_settings' and after->>'staff_seat_price_ron' = '25.00';
@@ -85,13 +85,13 @@ select test.logout();
 
 -- The included colleagues are a setting too (whole number, 0–10), for shops signing up afterwards.
 select test.login(test.id('admin'));
-select test.eq(test.error_params($$select public.admin_update_settings('{"staff_free_seats":1.5}', test.rid())$$)->>'field',
+select test.eq(test.error_params($$select public.admin_update_settings('{"staff_free_seats":1.5}', test.rid(), 'Test A6')$$)->>'field',
                'staff_free_seats', 'a fraction is refused');
-select test.eq(test.error_params($$select public.admin_update_settings('{"staff_free_seats":11}', test.rid())$$)->>'field',
+select test.eq(test.error_params($$select public.admin_update_settings('{"staff_free_seats":11}', test.rid(), 'Test A6')$$)->>'field',
                'staff_free_seats', 'more than 10 is refused');
-select public.admin_update_settings('{"staff_free_seats":2}', test.rid());
+select public.admin_update_settings('{"staff_free_seats":2}', test.rid(), 'Test A6');
 select test.eq((public.public_pricing()->>'free_seats')::int, 2, 'the landing page shows the included colleagues');
-select public.admin_update_settings('{"staff_free_seats":1}', test.rid());
+select public.admin_update_settings('{"staff_free_seats":1}', test.rid(), 'Test A6');
 select test.logout();
 
 -- A shop signing up now pays 25 lei per colleague; the ones before keep 20.

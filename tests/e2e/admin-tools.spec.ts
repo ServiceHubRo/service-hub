@@ -77,8 +77,15 @@ async function freeSlot(client: string, shopId: string): Promise<{ date: string;
   throw new Error('no free slot');
 }
 
+/**
+ * A6: an export asks for a reason first (the panel's confirm button is „Descarcă Excel”). The shared
+ * test admin's hourly export limit (5) is reset first: every project and test signs in as it.
+ */
 async function downloadCsv(page: Page, button: ReturnType<Page['getByRole']>): Promise<{ file: string; text: string }> {
-  const [download] = await Promise.all([page.waitForEvent('download'), button.click()]);
+  await serviceRest('rate_events?kind=eq.admin_export', 'DELETE');
+  await button.click();
+  await page.getByLabel('Motiv').fill('Verificare e2e');
+  const [download] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: 'Descarcă Excel' }).click()]);
   const chunks = await (await download.createReadStream()).toArray();
   return { file: download.suggestedFilename(), text: xlsxText(new Uint8Array(Buffer.concat(chunks))) };
 }
@@ -263,6 +270,8 @@ test.describe('admin tools', () => {
     await page.getByLabel('Zile gratuite').fill('90');
 
     if (name() === 'desktop-1440') {
+      // A6: a reason for every change of the settings.
+      await page.getByLabel('Motiv').fill('Test e2e');
       // Only one project changes a real value (the VAT rate is not used before T14b), then puts it back.
       await page.getByLabel('Cota TVA (%)').fill('19');
       await page.getByRole('button', { name: 'Salvează setările' }).click();
@@ -341,6 +350,7 @@ test.describe('admin tools', () => {
     await expect(page.getByRole('heading', { level: 1, name: shopName })).toBeVisible();
     await page.getByRole('button', { name: 'Schimbă prețul' }).click();
     await page.getByLabel('Preț pe lună (lei)').fill('79,50');
+    await page.getByLabel('Motiv').fill('Preț de fondator');
     await page.getByRole('button', { name: 'Salvează' }).click();
     await expect(page.getByText('Prețul abonamentului este schimbat.')).toBeVisible();
     await expect(page.getByText('79,50 lei').first()).toBeVisible();

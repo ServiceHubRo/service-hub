@@ -82,6 +82,7 @@ export function ClientsScreen() {
                   <ExportButton<AdminClientRow>
                     kind="clients"
                     filters={{ q: query || undefined, filter: filter === 'all' ? undefined : filter }}
+                    ids={shown.map((r) => r.id)}
                     narrow={(rows) => filterClients(rows, query, filter)}
                   />
                 </div>

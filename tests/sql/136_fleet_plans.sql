@@ -36,7 +36,7 @@ select test.fails(format($$select public.fleet_subscription(%L)$$, current_setti
 
 -- ------------------------------------------------------------------ vehicle limit (Fleet Start: 5)
 select test.login(test.id('admin'));
-select public.admin_set_company_plan(current_setting('test.co')::uuid, 'fleet_start', gen_random_uuid());
+select public.admin_set_company_plan(current_setting('test.co')::uuid, 'fleet_start', gen_random_uuid(), 'Test A6');
 select test.login(test.id('client_a'));
 select test.eq(public.fleet_plan_summary(current_setting('test.co')::uuid)->>'vehicle_limit', '5', 'Fleet Start: 5 vehicles');
 do $$
@@ -74,13 +74,13 @@ select test.fails(format($$select public.set_company_rules(%L, null, 4000, null,
 
 -- A downgrade over the limit deletes nothing.
 select test.login(test.id('admin'));
-select public.admin_set_company_plan(current_setting('test.co')::uuid, 'fleet_business', gen_random_uuid());
+select public.admin_set_company_plan(current_setting('test.co')::uuid, 'fleet_business', gen_random_uuid(), 'Test A6');
 select test.login(test.id('client_a'));
 select public.fleet_archive_vehicle(current_setting('test.v1')::uuid, false, gen_random_uuid());
 select test.eq((select count(*) from public.company_vehicles where company_id = current_setting('test.co')::uuid and archived_at is null), 6::bigint,
   'on Fleet Business the sixth vehicle comes back');
 select test.login(test.id('admin'));
-select public.admin_set_company_plan(current_setting('test.co')::uuid, 'fleet_start', gen_random_uuid());
+select public.admin_set_company_plan(current_setting('test.co')::uuid, 'fleet_start', gen_random_uuid(), 'Test A6');
 select test.eq((select count(*) from public.company_vehicles where company_id = current_setting('test.co')::uuid and archived_at is null), 6::bigint,
   'back on Fleet Start: all six stay, nothing deleted');
 
@@ -88,7 +88,7 @@ select test.eq((select count(*) from public.company_vehicles where company_id = 
 select test.login(test.id('client_a'));
 select public.set_company_rules(current_setting('test.co')::uuid, null, null, null, gen_random_uuid());
 select test.login(test.id('admin'));
-select public.admin_set_company_plan(current_setting('test.co')::uuid, 'fleet_business', gen_random_uuid());
+select public.admin_set_company_plan(current_setting('test.co')::uuid, 'fleet_business', gen_random_uuid(), 'Test A6');
 select test.login(test.id('client_a'));
 select public.invite_company_member(current_setting('test.co')::uuid, 'bogdan@test.local', 'driver', repeat('b2', 32), gen_random_uuid());
 select test.login(test.id('client_b'));
@@ -112,10 +112,10 @@ select test.ok(true, 'read-only: an existing vehicle can still be corrected');
 
 -- ------------------------------------------------------------------ the platform admin
 select test.login(test.id('admin'));
-select public.admin_extend_company_trial(current_setting('test.co')::uuid, 14, gen_random_uuid());
+select public.admin_extend_company_trial(current_setting('test.co')::uuid, 14, gen_random_uuid(), 'Test A6');
 select test.login(test.id('client_a'));
 select test.ok(not (public.fleet_plan_summary(current_setting('test.co')::uuid)->>'read_only')::boolean, 'a trial extended by the admin: working again');
-select test.fails(format($$select public.admin_set_company_plan(%L, 'fleet_pro', gen_random_uuid())$$, current_setting('test.co')),
+select test.fails(format($$select public.admin_set_company_plan(%L, 'fleet_pro', gen_random_uuid(), 'Test A6')$$, current_setting('test.co')),
   'not_allowed', 'a member cannot change the plan through the admin function');
 select test.login(test.id('admin'));
 select public.admin_update_fleet_plan('fleet_start', 35, 6, 1, 19, gen_random_uuid());

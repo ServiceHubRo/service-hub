@@ -92,9 +92,9 @@ select test.ok(public.is_dispatch_token((select dispatch_token from public.push_
 select test.ok(not public.is_dispatch_token('x'), 'nothing else');
 
 select test.login(test.id('admin'));
-select test.fails($$select public.admin_update_settings('{"limits":{"company_fix_days":0}}', gen_random_uuid())$$, 'field_invalid',
+select test.fails($$select public.admin_update_settings('{"limits":{"company_fix_days":0}}', gen_random_uuid(), 'Test A6')$$, 'field_invalid',
   'at least one day');
-select public.admin_update_settings('{"limits":{"company_fix_days":21}}', gen_random_uuid());
+select public.admin_update_settings('{"limits":{"company_fix_days":21}}', gen_random_uuid(), 'Test A6');
 select test.logout();
 select test.eq(public.company_fix_deadline(timestamptz '2026-10-01 10:00+00'), date '2026-10-22', 'the deadline follows the setting');
 

@@ -108,3 +108,45 @@ export function adminApi() {
       request('PUT', `/auth/v1/admin/users/${id}`, attributes),
   };
 }
+
+/**
+ * A6 (M4): the same project, acting as the person whose token this is (the anon key and their own
+ * access token). Their database rules apply, as when the app calls; used where a write must be theirs
+ * (a fleet file's owner) after the function has checked the content.
+ */
+export function userApi(token: string) {
+  const url = env('SUPABASE_URL');
+  const anon = env('SUPABASE_ANON_KEY');
+  const headers = { apikey: anon, Authorization: `Bearer ${token}` };
+  return {
+    /** Calls a database function as the person. Business errors keep their code as the message. */
+    async rpc(fn: string, args: Record<string, unknown>): Promise<unknown> {
+      const res = await fetch(`${url}/rest/v1/rpc/${fn}`, {
+        method: 'POST',
+        headers: { ...headers, 'Content-Type': 'application/json' },
+        body: JSON.stringify(args),
+      });
+      const text = await res.text();
+      let data: unknown = null;
+      try {
+        data = text ? JSON.parse(text) : null;
+      } catch {
+        data = text;
+      }
+      if (!res.ok) {
+        const message = data && typeof data === 'object' && 'message' in data ? String((data as { message: unknown }).message) : text;
+        throw new AdminError(res.status, message);
+      }
+      return data;
+    },
+    /** Stores a new file as the person (never replacing one): the Storage rules decide. */
+    async upload(bucket: string, path: string, bytes: Uint8Array, contentType: string): Promise<void> {
+      const res = await fetch(`${url}/storage/v1/object/${bucket}/${path}`, {
+        method: 'POST',
+        headers: { ...headers, 'Content-Type': contentType, 'x-upsert': 'false' },
+        body: bytes,
+      });
+      if (!res.ok) throw new AdminError(res.status, `storage upload: ${(await res.text()).slice(0, 200)}`);
+    },
+  };
+}

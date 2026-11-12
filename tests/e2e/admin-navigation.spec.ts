@@ -129,6 +129,9 @@ const FUNCTIONS = (page: Page): Fn[] => [
   { zone: 'Platformă', item: 'Notificări flotă eșuate', path: '/admin/platforma/notificari-flota', title: 'Notificări flotă eșuate' },
   // A2
   { zone: 'Platformă', item: 'Echipa de suport', path: '/admin/platforma/echipa', title: 'Echipa de suport', shows: label(page, 'ID cont sau email') },
+  // A6
+  { zone: 'Platformă', item: 'Securitate', path: '/admin/platforma/securitate', title: 'Securitate' },
+  { zone: 'Platformă', item: 'Administratori', path: '/admin/platforma/administratori', title: 'Administratori' },
   // A3c2b1
   { zone: 'Suport', item: 'Sugestii de verificat', path: '/admin/suport/sugestii-de-verificat', title: 'Sugestii de verificat', shows: label(page, 'Afișează') },
   // A4
@@ -235,8 +238,10 @@ test.describe('A1 — admin navigation', () => {
         'Zone',
         'Catalog de servicii',
         'Jurnal de audit',
+        'Securitate',
         'Notificări flotă eșuate',
         'Echipa de suport',
+        'Administratori',
         'Retenția datelor',
       ]);
       await sub.getByRole('link', { name: 'Anunțuri' }).click();

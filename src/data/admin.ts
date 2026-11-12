@@ -520,8 +520,8 @@ export async function fetchAudit(before?: string): Promise<AuditEntry[]> {
 
 // ------------------------------------------------------------------------------------ actions
 
-export function verifyPhone(userId: string, requestId: string): Promise<Json> {
-  return call('admin_verify_phone', { p_user_id: userId, p_request_id: requestId });
+export function verifyPhone(userId: string, reason: string, requestId: string): Promise<Json> {
+  return call('admin_verify_phone', { p_user_id: userId, p_request_id: requestId, p_reason: reason });
 }
 
 export function setShopSuspended(shopId: string, suspended: boolean, reason: string, requestId: string): Promise<Json> {
@@ -543,8 +543,8 @@ export function setAccountSuspended(userId: string, suspended: boolean, reason: 
 }
 
 /** One free history report for a client (report_credits), told by push and email. */
-export function grantReportCredit(userId: string, requestId: string): Promise<Json> {
-  return call('admin_grant_report_credit', { p_user_id: userId, p_request_id: requestId });
+export function grantReportCredit(userId: string, reason: string, requestId: string): Promise<Json> {
+  return call('admin_grant_report_credit', { p_user_id: userId, p_request_id: requestId, p_reason: reason });
 }
 
 export type ShopEdit = Partial<Record<keyof AdminShop, string | number | null>>;
@@ -556,17 +556,19 @@ export interface ShopEditResult {
   address_changed: boolean;
 }
 
-export async function updateShop(shopId: string, shop: ShopEdit, billing: BillingEdit, requestId: string): Promise<ShopEditResult> {
+/** A6: a reason is required; when the IBAN or the billing email changes, the owner is told. */
+export async function updateShop(shopId: string, shop: ShopEdit, billing: BillingEdit, reason: string, requestId: string): Promise<ShopEditResult> {
   return (await call('admin_update_shop', {
     p_shop_id: shopId,
     p_shop: shop as Json,
     p_billing: billing as Json,
     p_request_id: requestId,
+    p_reason: reason,
   })) as unknown as ShopEditResult;
 }
 
-export async function extendTrial(shopId: string, days: number, requestId: string): Promise<AdminSubscription> {
-  return (await call('admin_extend_trial', { p_shop_id: shopId, p_days: days, p_request_id: requestId })) as unknown as AdminSubscription;
+export async function extendTrial(shopId: string, days: number, reason: string, requestId: string): Promise<AdminSubscription> {
+  return (await call('admin_extend_trial', { p_shop_id: shopId, p_days: days, p_request_id: requestId, p_reason: reason })) as unknown as AdminSubscription;
 }
 
 export type ManualStatus = Exclude<SubscriptionStatus, 'trial'>;
@@ -596,9 +598,9 @@ export async function decideReview(reviewId: string, decision: ReviewDecision, n
  * `admin-delete-account`. A shop with records is anonymized instead (kept by law). Refusals
  * (active bookings) arrive as RpcError codes.
  */
-export async function deleteAccount(userId: string): Promise<'delete' | 'anonymize'> {
+export async function deleteAccount(userId: string, reason: string): Promise<'delete' | 'anonymize'> {
   if (!supabase) throw new RpcError('network');
-  const { data, error } = await supabase.functions.invoke('admin-delete-account', { method: 'POST', body: { user_id: userId } });
+  const { data, error } = await supabase.functions.invoke('admin-delete-account', { method: 'POST', body: { user_id: userId, reason } });
   if (!error) return (data as { mode?: string }).mode === 'anonymize' ? 'anonymize' : 'delete';
   if (error instanceof FunctionsFetchError) throw new RpcError('network');
   if (error instanceof FunctionsHttpError) {

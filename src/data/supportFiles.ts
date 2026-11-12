@@ -1,5 +1,5 @@
 import { FunctionsFetchError, FunctionsHttpError } from '@supabase/supabase-js';
-import { failure, RpcError } from './rpc';
+import { failure, FILE_ERRORS, FileError, RpcError, type FileErrorCode } from './rpc';
 import { supabase, supabaseConfig } from './supabase';
 
 /**
@@ -30,15 +30,8 @@ export interface RequestFile extends UploadedFile {
   opens?: { at: string; by: string | null; name: string | null; role: string | null }[];
 }
 
-/** Why the Edge Function refused a file (the database's refusals come as RpcError). */
-export const FILE_ERRORS = ['file_type', 'file_corrupt', 'file_pdf_active', 'file_pdf_encrypted', 'file_too_large'] as const;
-export type FileErrorCode = (typeof FILE_ERRORS)[number];
-
-export class FileError extends Error {
-  constructor(readonly code: FileErrorCode) {
-    super(code);
-  }
-}
+/** Why the Edge Function refused a file (the database's refusals come as RpcError); shared with the fleet files (A6). */
+export { FILE_ERRORS, FileError, type FileErrorCode } from './rpc';
 
 async function call(body: FormData | Record<string, unknown>): Promise<unknown> {
   if (!supabase) throw new RpcError('network');

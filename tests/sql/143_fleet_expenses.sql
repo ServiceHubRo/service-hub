@@ -25,7 +25,7 @@ select public.accept_company_invite(repeat('e2', 32), gen_random_uuid());
 select test.login(test.id('client_a'));
 select public.fleet_assign_driver(current_setting('test.v1')::uuid, current_setting('test.m_b')::uuid, gen_random_uuid());
 select test.login(test.id('admin'));
-select public.admin_set_company_plan(current_setting('test.co')::uuid, 'fleet_business', gen_random_uuid());
+select public.admin_set_company_plan(current_setting('test.co')::uuid, 'fleet_business', gen_random_uuid(), 'Test A6');
 
 select test.logout();
 create function pg_temp.save(p_fields jsonb, p_expense uuid default null) returns jsonb

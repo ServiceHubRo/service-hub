@@ -64,7 +64,7 @@ create function pg_temp.set_plan(p_plan text) returns void
 language plpgsql as $$
 begin
   perform test.login(test.id('admin'));
-  perform public.admin_set_company_plan(current_setting('test.co')::uuid, p_plan, gen_random_uuid());
+  perform public.admin_set_company_plan(current_setting('test.co')::uuid, p_plan, gen_random_uuid(), 'Test A6');
   perform test.login(test.id('client_a'));
 end
 $$;

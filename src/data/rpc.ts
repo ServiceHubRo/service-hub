@@ -263,6 +263,14 @@ export const RPC_ERROR_CODES = [
   'version_locked',
   'version_open',
   'ack_not_required',
+  // A6 — security and control of the team
+  'cannot_target_self',
+  'last_platform_admin',
+  'limit_documents',
+  'limit_exports',
+  'limit_fleet_storage',
+  'limit_fleet_uploads',
+  'sessions_not_ended',
 ] as const;
 
 export type RpcErrorCode = (typeof RPC_ERROR_CODES)[number] | 'network' | 'unknown';
@@ -335,8 +343,22 @@ function num(value: unknown): number | null {
   return Number.isFinite(n) ? n : null;
 }
 
+/**
+ * Why an Edge Function refused a file from its bytes (support files A3b, fleet files A6): not a
+ * database code, translated by rpcErrorMessage like one.
+ */
+export const FILE_ERRORS = ['file_type', 'file_corrupt', 'file_pdf_active', 'file_pdf_encrypted', 'file_too_large'] as const;
+export type FileErrorCode = (typeof FILE_ERRORS)[number];
+
+export class FileError extends Error {
+  constructor(readonly code: FileErrorCode) {
+    super(code);
+  }
+}
+
 /** Translated, user-facing text for any error thrown by the calls below. */
 export function rpcErrorMessage(lang: Lang, error: unknown): string {
+  if (error instanceof FileError) return translate(lang, `support.files.err.${error.code}` as MessageKey);
   const { code, params } = toRpcError(error);
   const p = params;
   switch (code) {

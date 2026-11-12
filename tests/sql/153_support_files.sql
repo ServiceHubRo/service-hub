@@ -182,8 +182,11 @@ select test.fails(format($$select public.support_file_open(%L, 'aal1', null, %L)
   'mfa_required', 'the agent needs the second step');
 select test.ok(public.support_file_open(current_setting('test.ag')::uuid, 'aal2', current_setting('test.sid')::uuid,
   current_setting('test.fs')::uuid)->>'path' is not null, 'the agent opens one (escalated requests stay readable)');
-select test.ok(public.support_file_open(test.id('admin'), 'aal2', null, current_setting('test.f1')::uuid)->>'path' is not null,
+select test.ok(public.support_file_open(test.id('admin'), 'aal2', test.admin_session(test.id('admin')), current_setting('test.f1')::uuid)->>'path' is not null,
   'the admin opens one');
+-- A6: an admin's file opening needs its session too (as an agent's since A3b).
+select test.fails(format($$select public.support_file_open(%L, 'aal2', null, %L)$$, test.id('admin'), current_setting('test.f1')), 'not_signed_in',
+  'an admin without a live session cannot open it');
 select test.eq(count(*), 3::bigint, 'every opening is in the audit log'),
        test.eq(string_agg(coalesce(actor_role, '?'), ',' order by created_at), 'client,support,admin', 'with who opened it'),
        test.ok(bool_and(after->>'file_id' is not null and entity_id = current_setting('test.req')), 'and which file of which request')

@@ -35,6 +35,19 @@ Deno.serve(async (req) => {
     const lang = body.lang === 'en' ? 'en' : 'ro';
     if (!id || !kind) return json({ error: 'not_found' }, 404);
 
+    // A6 (L2): at most so many PDFs an hour per person (document_limit, in the database).
+    try {
+      await api.rpc('document_limit', { p_user: user.id, p_kind: 'job_document' });
+    } catch (e) {
+      if (e instanceof AdminError && e.message === 'limit_documents') {
+        await api
+          .rpc('security_report', { p_user: user.id, p_kind: 'limit_documents', p_severity: 'info', p_detail: { kind: 'job_document' } })
+          .catch(() => undefined);
+        return json({ error: 'limit_documents' }, 429);
+      }
+      throw e;
+    }
+
     let data: JobDocData;
     try {
       data = (await api.rpc('job_document_data', {

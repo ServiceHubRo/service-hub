@@ -56,7 +56,7 @@ from public.run_support_retention() r;
 update public.retention_jobs set enabled = false where key = 'support_requests';
 delete from public.retention_runs where job = 'support_requests';
 update public.retention_jobs set last_run_at = null where key = 'support_requests';
-delete from public.admin_audit_log where action = 'retention_run';
+do $$ begin perform test.unlock_audit_log(); delete from public.admin_audit_log where action = 'retention_run'; delete from public.audit_log_unlocks where txid = txid_current(); end $$;
 delete from public.request_log where user_id = test.id('r157_client');
 delete from public.notification_events where params->>'request_id' = test.id('r157_req')::text;
 delete from public.suggestions where id = test.id('r157_req');

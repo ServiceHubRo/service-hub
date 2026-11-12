@@ -25,6 +25,19 @@ Deno.serve(async (req) => {
     const id = typeof body.report_id === 'string' && UUID.test(body.report_id) ? body.report_id : null;
     if (!id) return json({ error: 'not_found' }, 404);
 
+    // A6 (L2): at most so many PDFs an hour per person (document_limit, in the database).
+    try {
+      await api.rpc('document_limit', { p_user: user.id, p_kind: 'report_generate' });
+    } catch (e) {
+      if (e instanceof AdminError && e.message === 'limit_documents') {
+        await api
+          .rpc('security_report', { p_user: user.id, p_kind: 'limit_documents', p_severity: 'info', p_detail: { kind: 'report_generate' } })
+          .catch(() => undefined);
+        return json({ error: 'limit_documents' }, 429);
+      }
+      throw e;
+    }
+
     try {
       await api.rpc('history_report_for', { p_user_id: user.id, p_report_id: id, p_aal: tokenAal(token) });
     } catch (e) {

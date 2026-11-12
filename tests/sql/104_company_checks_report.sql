@@ -49,7 +49,7 @@ select test.eq((select r->>'category' from jsonb_array_elements(public.admin_lis
   where r->>'shop_id' = test.id('shop2')::text), 'no_cui', 'no CUI, no answer kept');
 
 -- The Excel export: same rows, written to the audit log.
-select test.eq(jsonb_array_length(public.admin_export('company_checks')), jsonb_array_length(public.admin_list_company_checks()),
+select test.eq(jsonb_array_length(public.admin_export('company_checks', '{}', 'Test A6')), jsonb_array_length(public.admin_list_company_checks()),
   'the export has every shop');
 select test.logout();
 select test.ok(exists (select 1 from public.admin_audit_log where action = 'export' and after->>'kind' = 'company_checks'),

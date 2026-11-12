@@ -4,6 +4,7 @@ import { VehicleDuplicatesScreen } from '../../screens/admin/VehicleDuplicatesSc
 import { FleetFailedEventsScreen } from '../../screens/admin/FleetFailedEventsScreen';
 import { AdminProvider } from '../../screens/admin/AdminProvider';
 import { AnafScreen } from '../../screens/admin/AnafScreen';
+import { AdminsScreen } from '../../screens/admin/AdminsScreen';
 import { AuditScreen } from '../../screens/admin/AuditScreen';
 import { BookingDetailScreen } from '../../screens/admin/BookingDetailScreen';
 import { BookingsScreen } from '../../screens/admin/BookingsScreen';
@@ -52,6 +53,8 @@ import {
   ADMIN_HOLDS_PATH,
   ADMIN_SUPPORT_PATH,
   ADMIN_TEAM_PATH,
+  ADMIN_SECURITY_PATH,
+  ADMIN_ADMINS_PATH,
   ADMIN_RETENTION_PATH,
   ADMIN_TEXT_REVIEWS_PATH,
   ADMIN_TEXTS_PATH,
@@ -62,6 +65,7 @@ import { SettingsScreen } from '../../screens/admin/SettingsScreen';
 import { ShopDetailScreen } from '../../screens/admin/ShopDetailScreen';
 import { ShopsScreen } from '../../screens/admin/ShopsScreen';
 import { SubscriptionsScreen } from '../../screens/admin/SubscriptionsScreen';
+import { SecurityScreen } from '../../screens/admin/SecurityScreen';
 import { TeamScreen } from '../../screens/admin/TeamScreen';
 import { RetentionScreen } from '../../screens/admin/RetentionScreen';
 import { TextReviewsScreen } from '../../screens/requests/TextReviewsScreen';
@@ -140,6 +144,8 @@ export default function AdminApp() {
         <Route path={at(ADMIN_AUDIT_PATH)} element={<AuditScreen />} />
         <Route path={at(ADMIN_FLEET_FAILED_PATH)} element={<FleetFailedEventsScreen />} />
         <Route path={at(ADMIN_TEAM_PATH)} element={<TeamScreen />} />
+        <Route path={at(ADMIN_SECURITY_PATH)} element={<SecurityScreen />} />
+        <Route path={at(ADMIN_ADMINS_PATH)} element={<AdminsScreen />} />
         <Route path={at(ADMIN_RETENTION_PATH)} element={<RetentionScreen />} />
         {/* The addresses from before A1 (kept at least until A8). */}
         {ADMIN_LEGACY_ROUTES.map(([old]) => (

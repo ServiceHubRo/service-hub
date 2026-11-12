@@ -68,3 +68,45 @@ Unde merită să se uite întâi:
 3. **Plățile:** `supabase/functions/stripe-webhook`, `stripe-checkout`, `report-checkout`.
 4. **Ștergerea conturilor și datele personale:** `supabase/functions/delete-account`, `admin-delete-account`.
 5. **Un test de penetrare pe site-ul publicat**, după lansare, cu un cont de client și unul de service.
+
+---
+
+## A6 — Securitatea și controlul echipei (12 noiembrie 2026)
+
+**Pornire:** auditul A6 pe `main` la `d7cd6c0` (schema 118), verdict „READY WITH CONDITIONS”. Toate problemele confirmate sunt reparate în PR-ul A6 (migrarea `a6_security`, schema 119). Detaliile tehnice: `docs/ARCHITECTURE.md` (paragraful A6) și `docs/PERMISSIONS.md` (§4, §5b).
+
+| Problemă | Ce s-a făcut |
+|---|---|
+| H1 — tokenul adminului mergea până la o oră după delogare | Orice funcție de admin (și regulile de acces, și fișierele din suport) verifică acum că sesiunea există, nu a expirat și are sub 8 ore. Testat pe toate funcțiile `admin_*`. |
+| H2 — ce deschide adminul nu apărea în jurnal | Fișele (client, service, programare), listele cu date personale și căutările sunt în Jurnalul de audit, o dată la 10 minute pentru același lucru, fără cuvintele căutate. |
+| M1 — conturile suspendate scriau direct în tabele | Toate regulile de scriere și cele din Storage cer un cont nesuspendat (și un service nesuspendat). Profilul: doar limba. |
+| M2 — cheia de server putea modifica jurnalul | Jurnalul nu mai poate fi modificat, șters sau golit de nimeni prin API. Doar retenția și ștergerea GDPR, prin funcțiile lor, cu o „deblocare” pe care nimeni altcineva nu o poate scrie (nu o setare de sesiune). |
+| M3 — refuzurile nu lăsau urme | Refuzurile importante ajung în jurnalul serverului (`sh_security`), care rămâne și când operația e anulată; evenimentele din operațiile reușite apar în Platformă → Securitate. Fiecare rând de audit are sesiunea. |
+| M4 — fișierele din flote | Doar prin funcția `fleet-files`: tipul real, PDF-uri active refuzate, fotografii fără GPS, limite pe oră și pe firmă. |
+| M5 — operațiuni sensibile fără motiv | Motiv obligatoriu în baza de date; exporturi de cel mult 100 de rânduri, 5 pe oră, fără telefoane și serii de șasiu; proprietarul e anunțat la schimbarea IBAN-ului sau a emailului de facturare. |
+| M6 — adminii nu puteau fi opriți din aplicație | Platformă → Administratori: închiderea sesiunilor, suspendarea și reactivarea altui admin (niciodată pe sine, niciodată ultimul admin activ). |
+| L1, L2, L3 | Admin șters refuzat; PDF-uri limitate pe oră; o curățare de sesiuni eșuată devine eveniment de securitate. |
+| Găsit în timpul lucrului | Funcția fișierelor din suport verifica sesiunea doar pentru agenți, nu și pentru admini: reparat la fel ca H1. |
+
+### Ce rămâne și de ce
+
+- **Citirile directe ale adminului prin regulile de acces** nu sunt în jurnal: numărul de recenzii raportate, setările platformei, planurile și semnalele „s-a schimbat ceva” ale ecranelor live. Fișele și listele cu date personale trec toate prin funcțiile înregistrate.
+- **Refuzurile din interiorul bazei de date** se văd în Supabase → **Logs** (Postgres), căutând `sh_security`, nu în aplicație: o tranzacție refuzată se anulează cu tot ce a scris. Aplicația arată evenimentele operațiilor reușite și refuzurile raportate de funcțiile de pe server.
+- **Proprietarul bazei de date (SQL Editor)** poate face orice; nicio regulă dintr-un tabel nu-l oprește. Scriptul de resetare de la lansare deblochează jurnalul în scris, doar pentru tranzacția lui.
+- **Limita de inactivitate de 30 de minute pentru echipă** nu se poate aplica sigur din baza de date (reîmprospătarea tokenului nu înseamnă activitate). Setarea din Supabase s-ar aplica tuturor utilizatorilor — e decizia ta (mai jos).
+
+### Setările din Supabase Dashboard (L4) — de verificat de tine
+
+Nu le pot vedea și nu le pot schimba de aici: proiectul real nu e accesibil din sesiunea de lucru. Valorile „din cod” sunt cele din `supabase/config.toml` (proiectul local); cele reale sunt în Dashboard.
+
+| Setare | Unde (Supabase → proiectul real) | Din cod (local) | Recomandat | Stare |
+|---|---|---|---|---|
+| Durata maximă a sesiunii, echipa | — (în baza de date, A6) | 8 ore pentru admini și agenți | 8 ore | ✅ făcut în cod |
+| Time-box user sessions (toți utilizatorii) | Authentication → Sessions | oprit | oprit (ar deconecta și clienții) | de verificat |
+| Inactivity timeout (toți utilizatorii) | Authentication → Sessions | oprit | oprit sau peste 24 h; 30 min doar dacă accepți ca și clienții să se reconecteze | **decizia ta** |
+| Secure password change | Authentication → Sign In / Providers → Email | oprit | **pornit** | de făcut (LANSARE 4.6c) |
+| Secure email change | același loc | pornit | pornit | de verificat |
+| CAPTCHA (Turnstile) | Authentication → Attack Protection | oprit | **pornit** la lansare | de făcut (LANSARE 4.3) |
+| 2FA (TOTP) | Authentication → Multi-Factor | pornit | pornit (obligatoriu pentru admini și agenți, verificat în baza de date) | ✅ |
+| Durata tokenului (JWT expiry) | Project Settings → JWT Keys | 3600 s | 3600 s | de verificat |
+| Refresh token rotation | Authentication → Sessions | pornit | pornit | de verificat |

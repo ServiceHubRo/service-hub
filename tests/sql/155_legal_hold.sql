@@ -273,7 +273,7 @@ select test.eq(jsonb_array_length(public.support_get_request(current_setting('te
 select test.eq(test.count(format('select 1 from public.support_signals where suggestion_id = %L and audience = ''team''', current_setting('test.r_held'))), 1::bigint,
   'and hears its signals');
 select test.logout();
-select test.ok(public.support_file_open(test.id('admin'), 'aal2', null,
+select test.ok(public.support_file_open(test.id('admin'), 'aal2', test.admin_session(test.id('admin')),
   current_setting('test.held_file_id')::uuid) ? 'path', 'and opens its files');
 -- An escalated held request is not given back to an agent.
 select test.logout();

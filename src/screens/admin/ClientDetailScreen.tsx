@@ -1,6 +1,5 @@
 import { useCallback, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { ActionButton } from '../../components/ActionButton';
 import { BackLink } from '../../components/BackLink';
 import { Button } from '../../components/Button';
 import { Card } from '../../components/Card';
@@ -9,7 +8,7 @@ import { SkeletonList } from '../../components/Skeleton';
 import { Stars } from '../../components/Stars';
 import { StatusBadge } from '../../components/StatusBadge';
 import { deleteAccount, fetchClient, grantReportCredit, setAccountSuspended } from '../../data/admin';
-import { canRetryRpc, rpcErrorMessage, toRpcError } from '../../data/rpc';
+import { toRpcError } from '../../data/rpc';
 import { useI18n } from '../../i18n/context';
 import { NO_SHOW_FLAG } from '../../lib/admin';
 import { formatPhone } from '../../lib/validators';
@@ -20,7 +19,7 @@ import { useLiveData } from './useLiveData';
 import { carText, dateTime, day } from './format';
 import styles from './admin.module.css';
 
-type Panel = 'suspend' | 'delete' | 'report' | null;
+type Panel = 'suspend' | 'unsuspend' | 'delete' | 'report' | null;
 
 /**
  * One client for the admin (FR §5.3, P20): profile, cars, bookings, reviews and conversations
@@ -106,17 +105,9 @@ export function ClientDetailScreen() {
         {panel === null && (
           <div className={styles.actionGrid}>
             {p.suspended ? (
-              <ActionButton
-                variant="secondary"
-                onAction={async (requestId) => {
-                  await setAccountSuspended(p.id, false, '', requestId);
-                  done(t('admin.done.unsuspendedAccount'));
-                }}
-                errorMessage={(e) => rpcErrorMessage(lang, e)}
-                canRetry={canRetryRpc}
-              >
+              <Button variant="secondary" onClick={() => setPanel('unsuspend')}>
                 {t('admin.client.unsuspend')}
-              </ActionButton>
+              </Button>
             ) : (
               <Button onClick={() => setPanel('suspend')}>{t('admin.client.suspend')}</Button>
             )}
@@ -146,13 +137,30 @@ export function ClientDetailScreen() {
             onCancel={() => setPanel(null)}
           />
         )}
+        {panel === 'unsuspend' && (
+          <ConfirmPanel
+            title={t('admin.client.unsuspend')}
+            textLabel={t('admin.reason')}
+            textHint={t('admin.reasonHint')}
+            textRequired
+            confirmLabel={t('admin.client.unsuspend')}
+            onConfirm={async (reason, requestId) => {
+              await setAccountSuspended(p.id, false, reason, requestId);
+              done(t('admin.done.unsuspendedAccount'));
+            }}
+            onCancel={() => setPanel(null)}
+          />
+        )}
         {panel === 'report' && (
           <ConfirmPanel
             title={t('admin.client.giveReport')}
             body={t('admin.client.giveReportBody')}
+            textLabel={t('admin.reason')}
+            textHint={t('admin.reasonHint')}
+            textRequired
             confirmLabel={t('admin.client.giveReportConfirm')}
-            onConfirm={async (_text, requestId) => {
-              await grantReportCredit(p.id, requestId);
+            onConfirm={async (reason, requestId) => {
+              await grantReportCredit(p.id, reason, requestId);
               done(t('admin.done.reportCredit'));
             }}
             onCancel={() => setPanel(null)}
@@ -162,10 +170,13 @@ export function ClientDetailScreen() {
           <ConfirmPanel
             title={t('admin.client.delete')}
             body={t('admin.client.deleteBody')}
+            textLabel={t('admin.reason')}
+            textHint={t('admin.reasonHint')}
+            textRequired
             confirmLabel={t('admin.client.deleteConfirm')}
             danger
-            onConfirm={async () => {
-              await deleteAccount(p.id);
+            onConfirm={async (reason) => {
+              await deleteAccount(p.id, reason);
               navigate(ADMIN_CLIENTS_PATH, { replace: true });
             }}
             onCancel={() => setPanel(null)}

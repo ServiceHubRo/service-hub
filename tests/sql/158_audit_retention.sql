@@ -164,6 +164,7 @@ begin
     current_setting('test.cut'));
 end
 $$;
+select test.unlock_audit_log();
 delete from public.admin_audit_log;
 -- support
 select set_config('test.s_old', test.raw_log('support_view_request', 'suggestion', gen_random_uuid()::text, null, now() - interval '12 months 1 minute')::text, true);
@@ -184,6 +185,7 @@ select set_config('test.hold', (public.admin_place_legal_hold(current_setting('t
   'Litigiu cu autorul solicitării, notificare primită de la avocat', 'Dosar nr. 1234/180/2026', null, test.rid()))->>'id', true);
 select test.logout();
 select set_config('test.l_active', test.raw_log('view_legal_hold', 'legal_hold', current_setting('test.hold'), null, now() - interval '4 years')::text, true);
+select test.unlock_audit_log();
 delete from public.admin_audit_log where action = 'place_legal_hold';
 
 select test.login(test.id('admin'));

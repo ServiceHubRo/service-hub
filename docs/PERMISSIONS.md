@@ -33,7 +33,7 @@ to end.
 | Works | Solicitări, Căutare, its account card, its own Cont | `require_staff()` in every `support_*` function | every search, opened card and change |
 | Suspended | `admin_set_account_suspended`: its sessions are deleted at once | trigger `profiles_end_staff_sessions`; `require_caller()` → `account_suspended` | `suspend_account` |
 | Role withdrawn | `admin_revoke_support(user, reason, request)`: back to a client account (its `E-` ID stays), sessions deleted at once | `require_admin()`, reason required; trigger `profiles_end_staff_sessions` | `revoke_support`, reason |
-| An old token | Refused by every `support_*` function: the role is read from the database at every call, and an agent's session must still exist | `require_staff()` → `not_allowed`, `caller_session_alive()` → `not_signed_in` | — |
+| An old token | Refused by every `support_*` function: the role is read from the database at every call, and an agent's session must still exist and be younger than 8 hours (A6) | `require_staff()` → `not_allowed`, `caller_session_alive()` → `not_signed_in` | — |
 | Appointed again | Possible while the account is still clean; same `E-` ID | as "Appointed" | `grant_support` |
 | Deleted | Only after the role is withdrawn (`prepare_account_deletion` refuses an agent, like an admin) | `prepare_account_deletion` | `delete_account` |
 
@@ -80,7 +80,12 @@ key) plus `actor_role` and `actor_display_id`, filled by a trigger at insert, so
 | **Account search** | — | — | — | ✅ masked: ID, name, role, state, `m***@…`, phone's last 3 digits, shop name and city, created, last active | ✅ full lists |
 | **Account card** | — | — | — | ✅ the same fields + its suggestions; never bookings, cars, companies, billing, messages, reviews | ✅ full card |
 | Find admin or agent accounts | — | — | — | ❌ (never in results) | ✅ |
-| Suspend, delete accounts | ❌ | ❌ | ❌ | ❌ | ✅ (reason required to suspend) |
+| Suspend, reactivate, delete accounts | ❌ | ❌ | ❌ | ❌ | ✅ (reason required for each, A6) |
+| Sensitive admin changes (A6): a shop's data and billing, a price, a free period, a report credit, a phone confirmed by hand, a company plan, the platform settings | ❌ | ❌ | ❌ | ❌ | ✅ reason required (1–500 characters, in the audit log); the owner is told when the IBAN or the billing email changes |
+| **Exports** (A6) | ❌ | ❌ | ❌ | ❌ | ✅ reason required, at most 100 rows and 5 exports an hour per admin, without phone numbers or VINs |
+| **Admin accounts** (A6, Platformă → Administratori): see the admins, end another admin's sessions, suspend or reactivate it, end one's own other sessions | ❌ | ❌ | ❌ | ❌ | ✅ reason required; never oneself, never the last active admin |
+| **Security log** (A6, Platformă → Securitate) | ❌ | ❌ | ❌ | ❌ | ✅ read only |
+| Write one's own data directly (profile, cars, shop, billing, hours, closures, photos, files) while **suspended** | ❌ (A6: only the language and the hints it reads) | ❌ (A6; a suspended shop too) | ❌ | — | — |
 | Appoint or withdraw agents | ❌ | ❌ | ❌ | ❌ | ✅ (reason required) |
 | Promote to admin | ❌ | ❌ | ❌ | ❌ | ❌ (SQL Editor only) |
 | **Platform settings**, texts, notices, catalog, zones | ❌ | ❌ | ❌ | ❌ | ✅ |
@@ -132,9 +137,23 @@ key) plus `actor_role` and `actor_display_id`, filled by a trigger at insert, so
 ## 4. How it is enforced
 
 - **Roles are read from the database at every call**, never from the browser or the token:
-  `require_caller()` (signed in, not suspended), `require_admin()` (role `admin`, aal2),
-  `require_staff()` (role `support` or `admin`, not deleted, aal2; for an agent, the session id of the
-  token must still exist in `auth.sessions`).
+  `require_caller()` (signed in, not suspended), `require_admin()` (role `admin`, not deleted, aal2,
+  and since A6 the session id of the token must still exist in `auth.sessions`, not past its end and
+  younger than 8 hours), `require_staff()` (role `support` or `admin`, not deleted, aal2, the same
+  session check). `is_admin()` (the access rules) and `support_file_caller()` (the support files'
+  Edge Function) apply the same session check since A6: an admin who signed out, whose sessions
+  another admin ended, or who signed in more than 8 hours ago, is refused at once (`not_signed_in`).
+- **A suspended account cannot write directly** (A6): every write rule on its own rows asks
+  `caller_can_write()` (signed in, not suspended, not deleted), every write rule on a shop's rows and
+  files `shop_writable(shop)` (also the shop not suspended and its owner not suspended); the trigger
+  `profiles_suspended_guard` lets a suspended person change only its language and the hints it reads.
+  Fleet files are written only through the Edge Function `fleet-files` (a ticket per file).
+- **Refusals that matter** (an admin function called without the right, a missing second step, a
+  dead session, a suspended account trying to act, a change attempted on the audit log) are written to
+  the Postgres log as `sh_security {json}` (codes and ids, never a name or what was typed), which a
+  rolled-back transaction keeps; events of committed work (an admin's sessions ended, a file refused,
+  a limit reached, a failed session cleanup) are kept in `security_events` and shown in Platformă →
+  Securitate.
 - **Every `admin_*` function calls `require_admin()`**, which refuses an agent with `not_allowed`.
   `tests/sql/151_support_role.sql` calls every `admin_*` function the API exposes as an agent and fails
   if one answers anything else, including functions added later.
@@ -206,10 +225,27 @@ key) plus `actor_role` and `actor_display_id`, filled by a trigger at insert, so
 
 Every caller check also answers `not_signed_in`, `account_suspended`, `not_allowed`, `mfa_required`.
 
+## 5b. Function reference (A6)
+
+| Function | Caller | Answers | Refusals |
+|---|---|---|---|
+| `admin_team_admins()` | admin | `[{id, display_id, name, suspended, me, mfa_ready, sessions, last_sign_in_at}]` (never a deleted one) | — |
+| `admin_set_admin_suspended(user, suspended, reason, request_id)` | admin | `{id, suspended}`; suspending ends its sessions | `reason_required`, `reason_too_long`, `cannot_target_self`, `not_found` (not an admin), `wrong_status`, `last_platform_admin` |
+| `admin_end_admin_sessions(user, reason, request_id)` | admin | `{id, sessions_ended}` | `reason_required`, `cannot_target_self`, `not_found`, `sessions_not_ended` |
+| `admin_end_my_other_sessions(reason, request_id)` | admin | `{sessions_ended}` (the session in use stays) | `reason_required`, `sessions_not_ended` |
+| `admin_security_events(severity, before, limit)` | admin | grouped events, newest first (≤ 200) | `field_invalid {field: severity}` |
+| `admin_export(kind, filters, reason)` | admin | ≤ 100 rows, no phone numbers or VINs; `filters.ids` = the rows a screen shows | `reason_required`, `limit_exports` (5 an hour), `kind_invalid` |
+| `admin_verify_phone`, `admin_grant_report_credit`, `admin_set_subscription_price`, `admin_extend_trial`, `admin_extend_company_trial`, `admin_set_company_plan`, `admin_update_settings`, `admin_update_shop` | admin | as before; `p_reason` added (last argument) | `reason_required`, `reason_too_long` |
+| `admin_set_account_suspended`, `admin_set_shop_suspended` | admin | as before; a reason now also to reactivate | `reason_required` |
+| Edge Function `admin-delete-account` `{user_id, reason}` | admin (aal2, live session) | `{ok, mode}` | `not_signed_in`, `not_allowed`, `reason_required`, as before |
+| Edge Function `fleet-files` (multipart `file`, `company`, `vehicle`, `issue?`) | company member with the right for that vehicle or report | `{path, mime, size}` | `file_type`, `file_corrupt`, `file_pdf_active`, `file_pdf_encrypted`, `file_too_large`, `not_allowed`, `account_suspended`, `too_many_photos` (6 a report), `limit_fleet_uploads` (60 an hour), `limit_fleet_storage` (500 MB a company) |
+| `document_limit(user, kind)` (service role, from `job-document` and `generate-report`) | — | nothing | `limit_documents` (job documents 30 an hour, reports made again 10 an hour, per person) |
+
 ## 6. Migration and rollback
 
 | Migration | Schema | Rollback | Rollback test |
 |---|---|---|---|
+| `20261112150000_a6_security.sql` (A6) | 119 | `supabase/rollback/20261112150000_a6_security.sql` (generated from schema 118): **refuses to run** (error listing how many) once a security event, an audit entry written by A6 (views, admin suspensions, sessions ended, or any entry with a session id) or a pending fleet file ticket exists; otherwise every function, rule and grant returns to schema 118. The app must go back with it (git revert of the A6 pull request) | `npm run test:rollback`: structure and data identical, applies again; the refusal checked by hand with one security event |
 | `20261112120000_procedures.sql` (A5) | 118 | `supabase/rollback/20261112120000_procedures.sql`: **refuses to run** (error listing how many) once a version written by a person, a changed procedure or version (sent, approved, published, archived, saved), a confirmation, a responsible or a procedure entry in the audit log exists; otherwise the tables, functions and audit classes go (the 16 untouched first drafts with them) | `npm run test:rollback`: structure and data identical, applies again; the refusal in `tests/sql/160_procedures.sql` |
 | `20261112060000_help_center.sql` (A4) | 117 | `supabase/rollback/20261112060000_help_center.sql`: **refuses to run** (error listing how many) once a vote, a saved version, a changed, moved or added article or category, or a Help Center entry in the audit log exists; otherwise the tables, functions and audit classes go and the data export is the one before A4 | `npm run test:rollback`: structure and data identical; the refusal checked by hand with one changed article |
 | `20261111204858_audit_log_retention.sql` (A3c2b2) | 116 | `supabase/rollback/20261111204858_audit_log_retention.sql`: **refuses to run** while a log job is on, a log run exists or a log row has removed values (`redacted`); otherwise the A3c2b1 functions return and the classes, triggers and the cutoff go | `npm run test:rollback`: structure and data identical |

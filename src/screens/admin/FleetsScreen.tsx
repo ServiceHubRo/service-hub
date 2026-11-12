@@ -27,6 +27,7 @@ import { plural } from '../../i18n/translate';
 import { planState, trialDaysLeft, type FleetPlanRow, type PlanState } from '../../lib/fleet';
 import { useLoad } from '../../lib/useLoad';
 import pill from '../../components/StatusBadge.module.css';
+import { useReason } from './ActionPanels';
 import { ADMIN_FLEETS_PATH } from './paths';
 import styles from './admin.module.css';
 import own from './fleets.module.css';
@@ -127,6 +128,8 @@ function CompanyRow({ c, plans, onChanged }: { c: AdminFleetCompany; plans: Plan
   const [mode, setMode] = useState<'view' | 'plan' | 'trial'>('view');
   const [planKey, setPlanKey] = useState(c.plan.plan_key);
   const [days, setDays] = useState('30');
+  const planReason = useReason();
+  const trialReason = useReason();
   const st = planState(c.plan);
   const left = trialDaysLeft(c.plan.trial_ends_at);
   const err = (e: unknown) => rpcErrorMessage(lang, e);
@@ -186,6 +189,7 @@ function CompanyRow({ c, plans, onChanged }: { c: AdminFleetCompany; plans: Plan
               onChange={(e) => setPlanKey(e.target.value)}
               options={plans.filter((p) => p.active).map((p) => ({ value: p.key, label: lang === 'ro' ? p.name_ro : p.name_en }))}
             />
+            {planReason.field}
             <div className={own.panelButtons}>
               <ActionButton
                 block={false}
@@ -193,7 +197,9 @@ function CompanyRow({ c, plans, onChanged }: { c: AdminFleetCompany; plans: Plan
                 errorMessage={err}
                 canRetry={canRetryRpc}
                 onAction={async (requestId) => {
-                  await adminSetCompanyPlan(c.id, planKey, requestId);
+                  const why = planReason.take();
+                  if (!why) return;
+                  await adminSetCompanyPlan(c.id, planKey, why, requestId);
                   await onChanged();
                   setMode('view');
                 }}
@@ -212,13 +218,16 @@ function CompanyRow({ c, plans, onChanged }: { c: AdminFleetCompany; plans: Plan
               onChange={(e) => setDays(e.target.value)}
               options={['7', '14', '30', '60', '90'].map((d) => ({ value: d, label: plural(lang, 'unit.days', Number(d)) }))}
             />
+            {trialReason.field}
             <div className={own.panelButtons}>
               <ActionButton
                 block={false}
                 errorMessage={err}
                 canRetry={canRetryRpc}
                 onAction={async (requestId) => {
-                  await adminExtendCompanyTrial(c.id, Number(days), requestId);
+                  const why = trialReason.take();
+                  if (!why) return;
+                  await adminExtendCompanyTrial(c.id, Number(days), why, requestId);
                   await onChanged();
                   setMode('view');
                 }}

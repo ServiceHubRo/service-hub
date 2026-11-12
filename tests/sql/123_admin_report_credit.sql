@@ -11,10 +11,10 @@ language sql as $$ select count(*)::int from public.report_credits where client_
 
 -- ------------------------------------------------------------------ only the admin
 select test.login(test.id('client_a'));
-select test.fails($$select public.admin_grant_report_credit(test.id('client_a'), test.rid())$$, 'not_allowed',
+select test.fails($$select public.admin_grant_report_credit(test.id('client_a'), test.rid(), 'Test A6')$$, 'not_allowed',
   'a client cannot give themselves a free report');
 select test.login(test.id('owner1'));
-select test.fails($$select public.admin_grant_report_credit(test.id('client_a'), test.rid())$$, 'not_allowed',
+select test.fails($$select public.admin_grant_report_credit(test.id('client_a'), test.rid(), 'Test A6')$$, 'not_allowed',
   'nor a shop');
 select test.logout();
 select test.eq(pg_temp.available(test.id('client_a')), 0, 'nothing given');
@@ -22,12 +22,12 @@ select test.eq(pg_temp.available(test.id('client_a')), 0, 'nothing given');
 -- ------------------------------------------------------------------ given
 delete from public.notification_events;
 select test.login(test.id('admin'));
-select test.eq((public.admin_grant_report_credit(test.id('client_a'), '00000000-0000-4000-8000-000000000123')->>'credits_available')::int,
+select test.eq((public.admin_grant_report_credit(test.id('client_a'), '00000000-0000-4000-8000-000000000123', 'Test A6')->>'credits_available')::int,
   1, 'the admin gives one');
-select test.eq((public.admin_grant_report_credit(test.id('client_a'), '00000000-0000-4000-8000-000000000123')->>'credits_available')::int,
+select test.eq((public.admin_grant_report_credit(test.id('client_a'), '00000000-0000-4000-8000-000000000123', 'Test A6')->>'credits_available')::int,
   1, 'the same request twice gives it once');
-select test.fails($$select public.admin_grant_report_credit(test.id('owner1'), test.rid())$$, 'not_found', 'only to a client');
-select test.fails($$select public.admin_grant_report_credit(test.id('admin'), test.rid())$$, 'not_found', 'not to an admin');
+select test.fails($$select public.admin_grant_report_credit(test.id('owner1'), test.rid(), 'Test A6')$$, 'not_found', 'only to a client');
+select test.fails($$select public.admin_grant_report_credit(test.id('admin'), test.rid(), 'Test A6')$$, 'not_found', 'not to an admin');
 select test.eq(((public.admin_get_client(test.id('client_a'))->'report_credits')->>'available')::int, 1,
   'the client page shows it');
 select test.logout();
