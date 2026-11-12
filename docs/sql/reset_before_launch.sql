@@ -4,8 +4,9 @@
 -- Kept: admin accounts (with their number), the platform settings, the service catalog, the push
 -- keys. The free-period and suspension fingerprints go too, so nobody is blocked by a test account.
 --
--- Run by Eduard in the Supabase SQL Editor, after emptying the `logos` and `reports` buckets
--- (Storage → bucket → Empty bucket). It is one transaction: it either does everything or nothing.
+-- Run by Eduard in the Supabase SQL Editor, after emptying the `logos`, `reports`, `shop-photos`,
+-- `intake-photos`, `fleet-files` and `support-files` buckets (Storage → bucket → Empty bucket; every
+-- bucket the migrations create, A8). It is one transaction: it either does everything or nothing.
 -- It refuses on a database with more than 300 client and shop accounts, so it cannot wipe a
 -- platform already in use by mistake. Never part of the migrations.
 
@@ -18,6 +19,11 @@ begin
   if v_accounts > 300 then
     raise exception 'Refused: % client and shop accounts. This script is only for test data before the launch.', v_accounts;
   end if;
+  -- A8: a legal hold keeps its support data through every deletion (A3c2a); release it first in
+  -- Suport → the request → Păstrare legală, then run this again.
+  if exists (select 1 from public.legal_holds where released_at is null) then
+    raise exception 'Refused: an active legal hold. Release it in the admin (Suport), then run this again.';
+  end if;
 
   -- A6: the audit log is append-only; this one-off reset unlocks it for its own transaction only.
   insert into public.audit_log_unlocks (txid, purpose) values (txid_current(), 'launch_reset') on conflict (txid) do nothing;
@@ -29,7 +35,11 @@ begin
     public.shop_billing, public.shop_hours, public.shop_closures, public.shop_services,
     public.shop_staff, public.subscriptions, public.notices, public.notice_reads,
     public.admin_audit_log, public.request_log, public.stripe_events, public.shop_referrals,
-    public.security_events
+    public.security_events,
+    -- A8: the companies (members, vehicles, plans, expenses, issues… go with them) and the support
+    -- requests. Without them, deleting every account at once failed on a company whose vehicle has a
+    -- driver (two cascades reach the same vehicle row in one statement: company_vehicles_driver_member_id_fkey).
+    public.companies, public.suggestions
     restart identity cascade;
   delete from public.audit_log_unlocks where txid = txid_current();
 

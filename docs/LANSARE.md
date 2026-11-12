@@ -414,13 +414,15 @@ După fiecare Merge, acțiunea „Deploy Supabase” aplică modificările în b
 
 Chiar înainte de lansare: se șterg toate conturile de client și de service din **proiectul real**, cu tot ce au făcut (mașini, programări, devize, mesaje, recenzii, abonamente, rapoarte), iar numerele încep din nou: primul client va fi **C-00001**, primul service **S-00001**, prima programare **P-000001**.
 
-**Rămân:** conturile de admin (cu numărul lor), setările platformei (prețuri, reduceri, perioada gratuită), lista celor 151 de servicii. Se șterg și amprentele de cont (perioada gratuită folosită, suspendările), ca nimeni să nu fie blocat din cauza unui cont de test.
+**Rămân:** conturile de admin (cu numărul lor), setările platformei (prețuri, reduceri, perioada gratuită), lista celor 151 de servicii, articolele din Centrul de ajutor și procedurile interne. Se șterg și firmele (flotele) și solicitările de suport de test. Se șterg și amprentele de cont (perioada gratuită folosită, suspendările), ca nimeni să nu fie blocat din cauza unui cont de test.
 
 Nu se poate anula. Scriptul refuză să ruleze dacă găsește peste 300 de conturi de client și service, ca să nu poată șterge din greșeală o platformă deja folosită.
 
 ### 1. Pozele și rapoartele
 
-În **Supabase** → proiectul real → **Storage**. Pentru fiecare dintre folderele `logos` și `reports`: apasă cele trei puncte de lângă nume → **Empty bucket** → confirmă. (Fișierele nu se pot șterge din SQL; de aceea începi cu ele.)
+În **Supabase** → proiectul real → **Storage**. Pentru fiecare dintre cele șase foldere — `logos`, `reports`, `shop-photos`, `intake-photos`, `fleet-files` și `support-files` — apasă cele trei puncte de lângă nume → **Empty bucket** → confirmă. (Fișierele nu se pot șterge din SQL; de aceea începi cu ele.)
+
+Dacă ai pus o **păstrare legală** pe o solicitare de test, elibereaz-o întâi (admin → **Suport** → solicitarea → **Păstrare legală**): scriptul refuză cât timp există una activă.
 
 ### 2. Conturile
 
