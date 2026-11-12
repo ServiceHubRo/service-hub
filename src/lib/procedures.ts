@@ -41,14 +41,13 @@ export const MAX_STEPS = 30;
 export type ContentProblem = HelpTextProblem | 'required' | 'steps' | 'secret';
 
 /**
- * Text that looks like a password, a key, a token or a card number (the database's text_has_secret,
- * its main patterns): refused before saving, so the field says why.
+ * Text that looks like a password, a key, a token or a card number (most of the database's
+ * text_has_secret patterns): shown under the field before saving. The database checks every pattern
+ * (`secret_in_text`); the names of privileged keys stay out of the app's code (tests/unit/legalHolds).
  */
 export function looksSecret(text: string): boolean {
   if (
     /\b(sk|rk)_(live|test)_[0-9a-z]{8,}/i.test(text) ||
-    /whsec_[0-9A-Za-z]{8,}/.test(text) ||
-    /sb_secret_[0-9A-Za-z_-]{8,}/.test(text) ||
     /\bgh[pousr]_[0-9A-Za-z]{20,}/.test(text) ||
     /\bAKIA[0-9A-Z]{16}\b/.test(text) ||
     /eyJ[0-9A-Za-z_-]{8,}\.[0-9A-Za-z_-]{8,}\.[0-9A-Za-z_-]{8,}/.test(text) ||

@@ -37,7 +37,8 @@ import { contentIn, procedureTitle } from '../../lib/procedures';
 import { useLoad } from '../../lib/useLoad';
 import { day } from '../admin/format';
 import { NotFound } from '../public/NotFound';
-import { ProcedureTags, ProcedureText, Tag, VersionTag, versionLine } from './parts';
+import { versionLine } from './format';
+import { ProcedureTags, ProcedureText, Tag, VersionTag } from './parts';
 import { procedureEditPath, proceduresHome, type ProcedureMode } from './paths';
 import styles from './procedures.module.css';
 

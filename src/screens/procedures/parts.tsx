@@ -1,11 +1,9 @@
 import { AlertTriangle, ArrowUpRight, Ban, ChevronRight, ShieldAlert } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
-import type { Procedure, ProcedureContent, ProcedureVersion, VersionStatus } from '../../data/procedures';
+import type { Procedure, ProcedureContent, VersionStatus } from '../../data/procedures';
 import { useI18n } from '../../i18n/context';
-import type { MessageKey } from '../../i18n/ro';
 import { procedureTitle } from '../../lib/procedures';
-import { day } from '../admin/format';
 import { ArticleBody } from '../help/parts';
 import styles from './procedures.module.css';
 
@@ -136,12 +134,4 @@ export function ProcedureText({ content }: { content: ProcedureContent }) {
       )}
     </div>
   );
-}
-
-/** Who wrote, approved and published a version, as one line. */
-export function versionLine(t: (key: MessageKey, params?: Record<string, string | number>) => string, lang: 'ro' | 'en', v: ProcedureVersion): string {
-  const parts = [v.seeded ? t('proc.history.seeded') : v.author ? t('proc.history.author', { who: v.author }) : null];
-  if (v.approved_at) parts.push(t('proc.history.approved', { who: v.approved_by ?? '—', date: day(lang, v.approved_at) }));
-  if (v.published_at) parts.push(t('proc.history.published', { date: day(lang, v.published_at) }));
-  return parts.filter(Boolean).join(' · ');
 }

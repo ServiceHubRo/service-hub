@@ -92,7 +92,42 @@ key) plus `actor_role` and `actor_display_id`, filled by a trigger at insert, so
 | Help Center: vote „Ți-a fost util acest articol?” (own vote, changeable; in the own data export) | ✅ on an article it may read | ✅ | ✅ | ✅ (the app does not ask) | ✅ |
 | Help Center: write, publish, withdraw, delete, order, categories, see vote totals and history | ❌ | ❌ | ❌ | ❌ (`not_allowed`) | ✅ (aal2; every write audited) |
 | Who voted on an article | ❌ | ❌ | ❌ | ❌ | ❌ (only totals; no grant on `help_feedback`) |
-| Internal procedures | — | — | — | A5 | A5 |
+| **Internal procedures** (A5): read the published procedures | ❌ (`not_allowed`; never in `help_center` or any public function) | ❌ | ❌ | ✅ those for agents (aal2, live session) | ✅ all, every status |
+| Procedures: create a draft, propose one | ❌ | ❌ | ❌ | ✅ for agents, not critical | ✅ |
+| Procedures: edit a draft | ❌ | ❌ | ❌ | ✅ its own, and those of a category it is responsible for | ✅ any |
+| Procedures: send for approval, back to draft, discard a draft | ❌ | ❌ | ❌ | ✅ on a draft it may edit | ✅ |
+| Procedures: approve, publish, archive, restore; who reads it; critical | ❌ | ❌ | ❌ | ❌ (`not_allowed`) | ✅ any admin, its own draft included |
+| Procedures: change an approved version | ❌ | ❌ | ❌ | ❌ (`version_locked`) | ❌ (`version_locked`, by any path; a new version instead) |
+| Procedures: „Am citit” on a critical one | ❌ | ❌ | ❌ | ✅ own, the version shown | ✅ own, the version shown |
+| Procedures: see who confirmed | ❌ | ❌ | ❌ | ❌ | ✅ |
+| Procedures: name or remove a category's responsible | ❌ | ❌ | ❌ | ❌ (reads who it is) | ✅ |
+| Procedures next to a support request | ❌ | ❌ | ❌ | ✅ published, for agents (not on a request under legal hold) | ✅ |
+
+## 3b. Internal procedures (A5)
+
+- **Who reads:** an admin reads every procedure in every state. An agent reads only the published
+  procedures meant for agents (`visibility = 'support'`), never one for admins only, a draft of someone
+  else or an archived one. Clients, shops, company members and signed-out visitors reach nothing: the
+  tables have no grant and every function refuses them (`not_allowed`, `permission denied`).
+- **Who writes:** an agent creates drafts (always for agents and not critical), edits its own drafts and
+  the drafts of the categories it is responsible for, sends them for approval and proposes a new version
+  of a published procedure it reads. An admin does all of that on any procedure and decides who reads it
+  and whether it is critical.
+- **Who approves and publishes:** any admin, its own draft included; one admin is enough. An approved
+  version is fixed for ever (`version_locked` on every path, direct SQL included); every change is a new
+  version, and readers keep seeing the published one until an admin approves and publishes the new one.
+  An older approved version can be published again.
+- **„Am citit”:** required on exceptional procedures marked critical. It belongs to one version: a new
+  version published asks everyone again, the earlier confirmations stay in the history. Only the caller's
+  own explicit call writes it (opening the page writes nothing; nobody confirms for someone else; a repeat
+  changes nothing). The admin sees who confirmed the version shown and who did not.
+- **Responsibles:** one per category, named by an admin among the active agents and admins. A responsible
+  who leaves the team, is suspended or deleted is marked „Necesită reatribuire”; nobody is named in its
+  place automatically.
+- **History:** every version is kept with its author, approver, approval and publication dates; the admin
+  sees them all, an agent the published ones and the version it edits. Every write is in the audit log.
+- **Escalation:** unchanged from A3 (agent → admin, `support_escalate_request` / `admin_return_request`).
+  A procedure only describes it; no new level, no automatic deadline.
 
 ## 4. How it is enforced
 
@@ -156,12 +191,26 @@ key) plus `actor_role` and `actor_display_id`, filled by a trigger at insert, so
 | `admin_help_save_article(id, article, request_id)`, `admin_help_set_article_status(id, status, request_id)`, `admin_help_delete_article(id, request_id)` | admin | the article; `{id, deleted}` | `field_invalid {field: help_title_ro, help_body_en, help_slug, help_audience, help_company_roles, …}`, `slug_taken`, `category_not_found`, `article_not_found`, `wrong_status`, `article_published` (withdraw before deleting) |
 | `admin_help_save_category(id, category, request_id)`, `admin_help_delete_category(id, request_id)`, `admin_help_move(kind, id, direction, request_id)` | admin | the category; `{id, deleted}`; the new position | `field_invalid {field: help_name_ro, help_icon, …}`, `slug_taken`, `category_not_found`, `category_not_empty`, `cannot_move` |
 
+| `staff_procedures()` (A5) | agent, admin (aal2; agent: live session) | `{me, categories (with responsible), procedures (published text; version in work when editable), support_categories, team (admin only)}` | — |
+| `staff_procedure_get(id)` | agent, admin | the procedure with the versions the caller may see | `procedure_not_found` (not readable or editable by the caller) |
+| `support_procedures_for_request(request)` | agent, admin | published procedures of the request's category the caller reads | `request_not_found` (also a request under legal hold, for an agent) |
+| `staff_procedure_create(settings, content_ro, content_en, request_id)` | agent, admin | `{id, version_id, version}` | `field_invalid {field: proc_category, proc_kind, proc_support_categories, proc_title_ro, proc_steps_en, …}`, `secret_in_text {field}`, `not_allowed` (an agent setting who reads it or critical) |
+| `staff_procedure_save(version, content_ro, content_en, settings, request_id)` | agent (its drafts, its categories' drafts), admin | `{id, version_id, version, changed}` | as above, `procedure_not_found`, `version_locked`, `wrong_status` (not a draft; settings of a published procedure) |
+| `staff_procedure_new_version(procedure, request_id)` | agent (a published procedure for agents), admin | `{id, version_id, version}` | `procedure_not_found`, `version_open`, `wrong_status` |
+| `staff_procedure_step(version, submit \| to_draft \| discard, request_id)` | the version's editors, admin | `{…, status}` or `{discarded, procedure_deleted}` | `procedure_not_found`, `version_locked`, `wrong_status`, `field_invalid {field: proc_step}` |
+| `staff_procedure_acknowledge(version, request_id)` | agent, admin (own confirmation only) | `{version, acknowledged_at}` (the first one on a repeat) | `procedure_not_found`, `wrong_status` (not the version shown), `ack_not_required` |
+| `admin_procedure_approve(version, publish, request_id)`, `admin_procedure_publish(version, request_id)` | admin (any, its own draft included) | `{id, version_id, version, …}` | `procedure_not_found`, `version_locked`, `wrong_status` |
+| `admin_procedure_set_settings(id, settings, request_id)`, `admin_procedure_archive(id, archived, request_id)` | admin | the settings; `{id, status}` | `field_invalid {field: proc_critical, proc_visibility, …}`, `procedure_not_found`, `wrong_status` |
+| `admin_procedure_acknowledgements(id)` | admin | `{version, people: [{display_id, name, role, acknowledged_at}]}` | `procedure_not_found` |
+| `admin_procedure_set_responsible(category, user \| null, request_id)` | admin | `{category, responsible}` | `field_invalid {field: proc_category}`, `assignee_invalid` (not an active agent or admin), `wrong_status` (nothing to remove) |
+
 Every caller check also answers `not_signed_in`, `account_suspended`, `not_allowed`, `mfa_required`.
 
 ## 6. Migration and rollback
 
 | Migration | Schema | Rollback | Rollback test |
 |---|---|---|---|
+| `20261112120000_procedures.sql` (A5) | 118 | `supabase/rollback/20261112120000_procedures.sql`: **refuses to run** (error listing how many) once a version written by a person, a changed procedure or version (sent, approved, published, archived, saved), a confirmation, a responsible or a procedure entry in the audit log exists; otherwise the tables, functions and audit classes go (the 16 untouched first drafts with them) | `npm run test:rollback`: structure and data identical, applies again; the refusal in `tests/sql/160_procedures.sql` |
 | `20261112060000_help_center.sql` (A4) | 117 | `supabase/rollback/20261112060000_help_center.sql`: **refuses to run** (error listing how many) once a vote, a saved version, a changed, moved or added article or category, or a Help Center entry in the audit log exists; otherwise the tables, functions and audit classes go and the data export is the one before A4 | `npm run test:rollback`: structure and data identical; the refusal checked by hand with one changed article |
 | `20261111204858_audit_log_retention.sql` (A3c2b2) | 116 | `supabase/rollback/20261111204858_audit_log_retention.sql`: **refuses to run** while a log job is on, a log run exists or a log row has removed values (`redacted`); otherwise the A3c2b1 functions return and the classes, triggers and the cutoff go | `npm run test:rollback`: structure and data identical |
 | `20261111194435_support_retention.sql` (A3c2b1) | 115 | `supabase/rollback/20261111194435_support_retention.sql`: **refuses to run** (error listing how many) while a job is on or any run, statistics row or anonymised suggestion exists — what a job did cannot be undone; otherwise the A3c2a functions return and the activity column (derived data) goes | `npm run test:rollback`: structure and data identical |

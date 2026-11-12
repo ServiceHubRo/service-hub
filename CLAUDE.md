@@ -13,7 +13,7 @@ Three roles, three completely separate interfaces:
 | **Client** | Caută · Garaj · Programări · Mesaje · Cont | Garage exists only here |
 | **Shop** | Panou · Programări · Istoric · Mesaje · Cont | Setări, Abonament, Recenzii, Rapoarte are tiles inside Cont |
 | **Admin** | Panou · Parteneri · Activitate · Suport · Platformă | Five zones (Eduard, 7 Nov 2026, A1), each with one level of sub-sections (`src/app/adminZones.ts`); Cont is the admin's own account. Admin accounts are created only in the database |
-| **Support agent** (A2) | Solicitări · Căutare · Centrul de ajutor · Cont | The Service-Hub team, not a customer. Appointed and withdrawn only by an admin in the app (reason required, audited), only on a clean client account; second step of sign-in required; no admin function, no private data. Help Center since A4; Proceduri joins in A5. Matrix: `docs/PERMISSIONS.md` |
+| **Support agent** (A2) | Solicitări · Căutare · Centrul de ajutor · Proceduri · Cont | The Service-Hub team, not a customer. Appointed and withdrawn only by an admin in the app (reason required, audited), only on a clean client account; second step of sign-in required; no admin function, no private data. Help Center since A4, Proceduri interne since A5. Matrix: `docs/PERMISSIONS.md` |
 
 A user has exactly one role, fixed at sign-up (client or shop); only an admin changes a clean client account into a support agent and back. The role decides the whole navigation and every reachable route. A client can never reach a shop screen and vice versa; this is enforced in routing **and** in the database.
 
