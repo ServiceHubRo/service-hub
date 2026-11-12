@@ -121,7 +121,7 @@ describe('fleet file body', () => {
     const req = new Request('http://local/fleet-files', { method: 'POST', body: form });
     const body = await readCapped(req, LIMIT);
     expect(body).not.toBeNull();
-    const again = await new Response(body, { headers: { 'content-type': req.headers.get('content-type') ?? '' } }).formData();
+    const again = await new Response(body as unknown as BodyInit, { headers: { 'content-type': req.headers.get('content-type') ?? '' } }).formData();
     expect((again.get('file') as File).size).toBe(1000);
     expect(again.get('company')).toBe(C);
   });
