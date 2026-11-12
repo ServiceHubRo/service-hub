@@ -3692,6 +3692,7 @@ export const en: Record<MessageKey, string> = {
   'rpcError.invite_other_email': 'The invitation is for another email address. Sign in with the invited address.',
   'rpcError.member_not_found': 'The member no longer exists.',
   'rpcError.last_admin': 'The company needs an administrator. Hand the administration to another member first.',
+  'rpcError.company_last_admin': 'This account is the only administrator of a company with other members. The administration of the company must first go to another member.',
   'rpcError.transfer_invalid': 'The administration can only go to another member who has accepted the invitation.',
 
   // T63a — fleet account (design preview; docs/FLEET_PLAN.md)

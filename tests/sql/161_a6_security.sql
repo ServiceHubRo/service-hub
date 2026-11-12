@@ -535,5 +535,5 @@ select test.eq(test.count($$select 1 from public.rate_events where kind = 'job_d
                'another person keeps its own limit');
 
 -- ================================================================================ the rest is unchanged
-select test.eq((select version from public.schema_version), 119, 'schema 119');
+select test.ok((select version from public.schema_version) >= 119, 'schema 119 or later (A7 adds 120)');
 rollback;

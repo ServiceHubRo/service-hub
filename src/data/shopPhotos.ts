@@ -1,4 +1,5 @@
 import { shrinkImage } from '../lib/image';
+import { ensureChanged } from './directWrite';
 import { failure, RpcError } from './rpc';
 import { supabase } from './supabase';
 
@@ -60,8 +61,10 @@ export async function addShopPhoto(shopId: string, file: File, position: number)
 }
 
 export async function removeShopPhoto(photo: ShopPhoto): Promise<void> {
-  const { error } = await db().from('shop_photos').delete().eq('id', photo.id);
-  if (error) throw failure(error);
+  // A refused deletion (a suspended shop) is an error, and the file stays with its row (A7).
+  await ensureChanged(await db().from('shop_photos').delete().eq('id', photo.id).select('id'), () =>
+    db().from('shop_photos').select('id').eq('id', photo.id),
+  );
   // Best effort: an orphaned file costs nothing visible.
   await db().storage.from('shop-photos').remove([photo.path]).then(
     () => undefined,
@@ -74,8 +77,9 @@ export async function saveShopPhotoOrder(photos: ShopPhoto[]): Promise<ShopPhoto
   const next = photos.map((p, i) => ({ ...p, position: i }));
   for (const p of next) {
     if (photos.find((x) => x.id === p.id)?.position === p.position) continue;
-    const { error } = await db().from('shop_photos').update({ position: p.position }).eq('id', p.id);
-    if (error) throw failure(error);
+    await ensureChanged(await db().from('shop_photos').update({ position: p.position }).eq('id', p.id).select('id'), () =>
+      db().from('shop_photos').select('id').eq('id', p.id),
+    );
   }
   return next;
 }

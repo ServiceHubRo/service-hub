@@ -1,6 +1,7 @@
 import { FunctionsFetchError, FunctionsHttpError } from '@supabase/supabase-js';
 import { webOrigin } from '../lib/native';
 import type { Database } from './database.types';
+import { ensureChanged } from './directWrite';
 import { call, failure, RpcError } from './rpc';
 import { supabase } from './supabase';
 
@@ -211,9 +212,11 @@ export async function updateClosure(id: string, input: ClosureInput): Promise<Sh
   return data;
 }
 
+/** A deletion the database refuses (a suspended shop) is an error, never a silent success (A7). */
 export async function deleteClosure(id: string): Promise<void> {
-  const { error } = await db().from('shop_closures').delete().eq('id', id);
-  if (error) throw failure(error);
+  await ensureChanged(await db().from('shop_closures').delete().eq('id', id).select('id'), () =>
+    db().from('shop_closures').select('id').eq('id', id),
+  );
 }
 
 // ------------------------------------------------------------------------------------ services
@@ -385,9 +388,14 @@ export async function emailInvite(token: string, lang: 'ro' | 'en'): Promise<Inv
   }
 }
 
+/**
+ * A colleague the database refuses to remove (a suspended shop) stays, and the owner is told so:
+ * never "removed" while the colleague keeps access (A7).
+ */
 export async function removeStaff(id: string): Promise<void> {
-  const { error } = await db().from('shop_staff').delete().eq('id', id);
-  if (error) throw failure(error);
+  await ensureChanged(await db().from('shop_staff').delete().eq('id', id).select('id'), () =>
+    db().from('shop_staff').select('id').eq('id', id),
+  );
 }
 
 export interface StaffInvite {

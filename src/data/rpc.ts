@@ -202,6 +202,7 @@ export const RPC_ERROR_CODES = [
   'invite_other_email',
   'member_not_found',
   'last_admin',
+  'company_last_admin',
   'transfer_invalid',
   'vehicle_invalid',
   'limit_vehicles',
