@@ -180,6 +180,16 @@ export const AUDIT_ACTIONS = [
   'set_retention_job',
   'retention_run',
   'review_suggestion_text',
+  // A4
+  'create_help_article',
+  'update_help_article',
+  'publish_help_article',
+  'unpublish_help_article',
+  'delete_help_article',
+  'create_help_category',
+  'update_help_category',
+  'delete_help_category',
+  'move_help_item',
 ] as const;
 
 export interface AuditChange {
@@ -190,7 +200,7 @@ export interface AuditChange {
 }
 
 /** Keys that describe the action rather than a changed value: shown on their own line. */
-const DETAIL_KEYS = new Set(['reason', 'note', 'days', 'mode', 'services_off', 'kind', 'filters', 'rows', 'recipients', 'push_recipients', 'q', 'results', 'message_id', 'note_id', 'file_id', 'file_name']);
+const DETAIL_KEYS = new Set(['reason', 'note', 'days', 'mode', 'services_off', 'kind', 'filters', 'rows', 'recipients', 'push_recipients', 'q', 'results', 'message_id', 'note_id', 'file_id', 'file_name', 'changed']);
 
 /** Values kept whole (an export's filters): shown as one line, not split into their keys. */
 const WHOLE_KEYS = new Set(['filters']);

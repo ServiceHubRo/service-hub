@@ -14,11 +14,12 @@ describe('navigation per role (CLAUDE.md §1)', () => {
   it('admin has exactly its five zones (A1), each but Panou with its sub-sections', () => {
     expect(labels('admin')).toEqual(['Panou', 'Parteneri', 'Activitate', 'Suport', 'Platformă']);
     // Platformă: 7 at A1, plus Echipa de suport (A2) and Retenția datelor (A3c2b1); Suport: Solicitări,
-    // Păstrare legală (A3c2a) and Sugestii de verificat (A3c2b1).
-    expect(NAV.admin.main.map((z) => z.children?.length ?? 0)).toEqual([0, 5, 6, 3, 9]);
+    // Păstrare legală (A3c2a), Sugestii de verificat (A3c2b1) and Centrul de ajutor (A4).
+    expect(NAV.admin.main.map((z) => z.children?.length ?? 0)).toEqual([0, 5, 6, 4, 9]);
   });
-  it('support agent (A2): its requests, the search and its own Cont; Help Center and Proceduri come later', () => {
-    expect(labels('support')).toEqual(['Solicitări', 'Căutare', 'Cont']);
+  it('support agent (A2): its requests, the search, the Help Center (A4) and its own Cont; Proceduri comes later', () => {
+    expect(labels('support')).toEqual(['Solicitări', 'Căutare', 'Ajutor', 'Cont']);
+    expect(NAV.support.main.map((i) => translate('ro', i.labelKey))).toEqual(['Solicitări', 'Căutare', 'Centrul de ajutor']);
     expect(NAV.support.base).toBe('/suport');
   });
   it('the team (admin and agents) never gets a client\'s or a shop\'s screens', () => {

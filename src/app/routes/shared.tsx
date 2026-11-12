@@ -3,6 +3,8 @@ import { Navigate, Route } from 'react-router-dom';
 import { AccountScreen } from '../../screens/account/AccountScreen';
 import { HelpScreen } from '../../screens/account/HelpScreen';
 import { helpPath, newRequestPath, requestsPath, suggestionsPath } from '../../screens/account/paths';
+import { HelpArticleScreen } from '../../screens/help/HelpArticleScreen';
+import { HelpCategoryScreen } from '../../screens/help/HelpCategoryScreen';
 import { MyRequestScreen } from '../../screens/requests/MyRequestScreen';
 import { MyRequestsScreen } from '../../screens/requests/MyRequestsScreen';
 import { NewRequestScreen } from '../../screens/requests/NewRequestScreen';
@@ -41,6 +43,9 @@ export function commonRoutes(role: Role, screens: Record<string, ReactElement>) 
       <Route path={`${rel(role, nav.account.path)}/legal/:doc`} element={<AccountLegal role={role} />} />
       {!isStaff(role) && <Route path={rel(role, helpPath(role))} element={<HelpScreen role={role} />} />}
       {!isStaff(role) && <Route path={rel(role, suggestionsPath(role))} element={<SuggestionsScreen role={role} />} />}
+      {/* A4: the Help Center's categories and articles, under Ajutor și contact (the agent's are in SupportApp). */}
+      {!isStaff(role) && <Route path={`${rel(role, helpPath(role))}/categorie/:slug`} element={<HelpCategoryScreen role={role} />} />}
+      {!isStaff(role) && <Route path={`${rel(role, helpPath(role))}/articol/:slug`} element={<HelpArticleScreen role={role} />} />}
       {/* A3a: Cont → Ajutor și contact → Solicitările mele. */}
       {!isStaff(role) && <Route path={rel(role, requestsPath(role))} element={<MyRequestsScreen role={role} />} />}
       {!isStaff(role) && <Route path={rel(role, newRequestPath(role))} element={<NewRequestScreen role={role} />} />}

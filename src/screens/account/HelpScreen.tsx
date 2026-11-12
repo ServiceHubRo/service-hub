@@ -8,12 +8,14 @@ import { Tile } from '../../components/Tile';
 import { useI18n } from '../../i18n/context';
 import { CONTACT, whatsappLink } from '../../lib/contact';
 import { formatPhone } from '../../lib/validators';
+import { HelpCenterHome } from '../help/HelpCenterHome';
 import { requestsPath } from './paths';
 import styles from './account.module.css';
 
 /**
- * How to reach the Service-Hub team (clients and shops): email and WhatsApp, each opening with the
- * account's ID already written, so the team finds the account at once. Below, the app tour again (T39).
+ * Ajutor și contact (clients and shops): the Help Center first (A4: search, categories, recommended
+ * articles, frequent questions), then the way to the Service-Hub team — the support requests (A3),
+ * email and WhatsApp, each opening with the account's ID already written. Below, the app tour (T39).
  */
 export function HelpScreen({ role }: { role: 'client' | 'shop' }) {
   const { t } = useI18n();
@@ -24,8 +26,11 @@ export function HelpScreen({ role }: { role: 'client' | 'shop' }) {
 
   return (
     <div className={styles.page}>
-      <PageHeader back={{ to: NAV[role].account.path, label: t('nav.account') }} title={t('help.title')} />
+      <PageHeader back={{ to: NAV[role].account.path, label: t('nav.account') }} title={t('help.title')} subtitle={t('help.subtitle')} />
 
+      <HelpCenterHome role={role} />
+
+      <h2 className={styles.section}>{t('help.contact.title')}</h2>
       {/* A3a: requests written in the app, answered by the Service-Hub team. */}
       <div className={styles.tiles} data-layout="tiles">
         <Tile to={requestsPath(role)} icon={Inbox} label={t('support.my.title')} hint={t('support.my.hint')} />

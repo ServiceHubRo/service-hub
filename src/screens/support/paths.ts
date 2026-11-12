@@ -1,9 +1,11 @@
 /**
- * The support agent's routes (A2). Solicitări and Căutare now; Help Center (A4) and Proceduri (A5)
- * join when they exist. Cont is the agent's own account.
+ * The support agent's routes (A2). Solicitări, Căutare and the Help Center (A4); Proceduri (A5)
+ * joins when it exists. Cont is the agent's own account.
  */
 export const SUPPORT_REQUESTS_PATH = '/suport/solicitari';
 export const SUPPORT_SEARCH_PATH = '/suport/cautare';
+/** Centrul de ajutor (A4): every published article, with the audience filter. */
+export const SUPPORT_HELP_PATH = '/suport/ajutor';
 /** Sugestii de verificat (A3c2b1), reached from Solicitări. */
 export const SUPPORT_TEXT_REVIEWS_PATH = '/suport/sugestii-de-verificat';
 

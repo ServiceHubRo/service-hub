@@ -1,6 +1,6 @@
 # Politica de confidențialitate — Service-Hub
 
-**Ultima actualizare:** 8 noiembrie 2026
+**Ultima actualizare:** 12 noiembrie 2026
 
 Aici afli ce date personale folosește Service-Hub, de ce, cine le mai vede, cât timp le păstrăm și ce drepturi ai, conform Regulamentului (UE) 2016/679 („GDPR”) și legii române.
 
@@ -29,6 +29,7 @@ Aici afli ce date personale folosește Service-Hub, de ce, cine le mai vede, câ
 - dacă intri cu Google sau Apple: numele, adresa de email și (la Google) poza de profil pe care ni le trimit; la Apple poți alege să primim o adresă ascunsă, care îți trimite mai departe emailurile; parola contului tău Google sau Apple nu ajunge la noi;
 - alegerile tale din aplicație (de exemplu, dacă ai amânat mesajul despre notificări);
 - solicitările pe care le trimiți echipei Service-Hub (Cont → Ajutor și contact → Solicitările mele): categoria, titlul, descrierea, mesajele, codul programării, dacă îl adaugi, și fișierele atașate (imagini PNG, JPEG sau WebP și documente PDF, cel mult 5 MB fiecare). Din fotografii eliminăm la încărcare locația, datele aparatului, data și celelalte informații ascunse în fișier; păstrăm doar orientarea imaginii.
+- răspunsurile tale la „Ți-a fost util acest articol?” din Centrul de ajutor (Da sau Nu), legate de contul tău, ca să poți schimba răspunsul și ca un cont să conteze o singură dată. Echipa Service-Hub vede doar totalurile pe articol, nu cine a răspuns. Răspunsurile se șterg odată cu contul și apar în copia datelor tale (Cont → Datele mele).
 
 ### 2.2 Dacă ești Client
 

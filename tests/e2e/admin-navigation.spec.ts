@@ -131,6 +131,8 @@ const FUNCTIONS = (page: Page): Fn[] => [
   { zone: 'Platformă', item: 'Echipa de suport', path: '/admin/platforma/echipa', title: 'Echipa de suport', shows: label(page, 'ID cont sau email') },
   // A3c2b1
   { zone: 'Suport', item: 'Sugestii de verificat', path: '/admin/suport/sugestii-de-verificat', title: 'Sugestii de verificat', shows: label(page, 'Afișează') },
+  // A4
+  { zone: 'Suport', item: 'Centrul de ajutor', path: '/admin/suport/centrul-de-ajutor', title: 'Centrul de ajutor', shows: label(page, 'Caută articol') },
   {
     zone: 'Platformă',
     item: 'Retenția datelor',

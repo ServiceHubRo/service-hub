@@ -65,7 +65,8 @@ export type PluralUnit =
   | 'unit.subscriptions'
   | 'unit.reports'
   | 'unit.people'
-  | 'unit.colleagues';
+  | 'unit.colleagues'
+  | 'unit.articles';
 const pluralRules: Record<Lang, Intl.PluralRules> = {
   ro: new Intl.PluralRules('ro-RO'),
   en: new Intl.PluralRules('en-US'),

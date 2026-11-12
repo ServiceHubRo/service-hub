@@ -21,6 +21,7 @@ import { formatDecimal } from '../../i18n/format';
 import { useLoad } from '../../lib/useLoad';
 import accountStyles from '../account/account.module.css';
 import { requestPath, requestsPath } from '../account/paths';
+import { HelpSuggestions } from '../help/HelpSuggestions';
 import { AttachmentPicker } from './Attachments';
 import styles from './requests.module.css';
 
@@ -78,6 +79,8 @@ export function NewRequestScreen({ role }: { role: 'client' | 'shop' }) {
                 clear('title');
               }}
             />
+            {/* A4: matching Help Center articles, opened in place; sending is never blocked. */}
+            <HelpSuggestions text={title} />
             <TextArea
               label={t('support.new.body')}
               rows={6}

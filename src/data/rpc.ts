@@ -253,6 +253,11 @@ export const RPC_ERROR_CODES = [
   'text_identifies',
   // A3c2b2
   'job_locked',
+  // A4 — Help Center
+  'article_not_found',
+  'article_published',
+  'category_not_empty',
+  'slug_taken',
 ] as const;
 
 export type RpcErrorCode = (typeof RPC_ERROR_CODES)[number] | 'network' | 'unknown';

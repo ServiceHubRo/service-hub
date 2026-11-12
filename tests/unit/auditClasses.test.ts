@@ -10,8 +10,15 @@ import { AUDIT_ACTIONS } from '../../src/lib/admin';
 const migrations = import.meta.glob('../../supabase/migrations/*.sql', { query: '?raw', import: 'default', eager: true }) as Record<string, string>;
 const classesSql = Object.entries(migrations).find(([path]) => path.endsWith('_audit_log_retention.sql'))![1];
 
+// The classes are set where the table was created (A3c2b2) and by every later migration that adds actions
+// to it (A4 onwards): each `insert into public.audit_action_classes` block counts.
+const classInserts = Object.values(migrations).flatMap((sql) =>
+  [...sql.matchAll(/insert into public\.audit_action_classes \(action, class, strip_keys\) values([\s\S]*?);/g)].map((m) => m[1]!),
+);
 const classified = new Map(
-  [...classesSql.matchAll(/\('([a-z_]+)', '(support|admin|security|legal)', '\{[a-z_,]*\}'\)/g)].map((m) => [m[1]!, m[2]!]),
+  classInserts.flatMap((block) =>
+    [...block.matchAll(/\('([a-z_]+)', '(support|admin|security|legal)', '\{[a-z_,]*\}'\)/g)].map((m) => [m[1]!, m[2]!] as const),
+  ),
 );
 
 /** Every action a migration writes: the audit helpers' literals, the direct inserts, the CASE choices. */
@@ -44,6 +51,9 @@ describe('audit log classes (A3c2b2)', () => {
     expect(classified.get('place_legal_hold')).toBe('legal');
     expect(classified.get('delete_account')).toBe('security');
     expect(classified.get('grant_support')).toBe('security');
+    // A4: the Help Center's administration is administrative.
+    expect(classified.get('publish_help_article')).toBe('admin');
+    expect(classified.get('move_help_item')).toBe('admin');
   });
 
   it('every class and every report kind has words in both languages', () => {
