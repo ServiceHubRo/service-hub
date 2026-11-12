@@ -139,13 +139,14 @@ test.describe('Internal procedures (A5)', () => {
     await expect(page.getByRole('button', { name: 'Am citit' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Termene' })).toBeVisible();
     await page.getByText('Istoricul versiunilor').scrollIntoViewIfNeeded();
-    await page.getByText(/^Versiunea 1/).last().click();
-    await expect(page.getByText('Aprobată de').first()).toBeVisible();
+    const v1 = page.locator('details').filter({ hasText: /^\s*Versiunea 1\b/ }).last();
+    await v1.locator('summary').click();
+    await expect(v1.getByText('Aprobată de')).toBeVisible();
 
     // English: the interface in English, the text in Romanian with a note (none written).
     await switchLanguage(page, 'en');
     await expect(page.getByText('This procedure has no English text. The Romanian text is shown.')).toBeVisible();
-    await expect(page.getByRole('heading', { name: 'Steps to follow' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Steps to follow' }).first()).toBeVisible();
     await shot(page, 'a5-admin-procedure-en', name());
     await switchLanguage(page, 'ro');
   });
@@ -184,7 +185,9 @@ test.describe('Internal procedures (A5)', () => {
 
     // Search as one types (diacritics ignored).
     await page.getByLabel('Caută în proceduri').fill('procedura critica');
-    await expect(page.getByRole('link', { name: new RegExp(`^${critical}`) })).toBeVisible();
+    // The results replace the sections.
+    await expect(page.getByRole('heading', { name: 'De confirmat' })).toHaveCount(0);
+    await expect(page.getByRole('link', { name: new RegExp(`^${critical}`) })).toHaveCount(1);
     await page.getByLabel('Caută în proceduri').fill('zzzqqq');
     await expect(page.getByText('Nu există rezultate pentru „zzzqqq”.')).toBeVisible();
     await page.getByRole('button', { name: 'Șterge căutarea' }).click();
@@ -226,13 +229,14 @@ test.describe('Internal procedures (A5)', () => {
     // The request: its category's procedures, opened in place.
     await page.goto(`/suport/solicitari/${request.id}`);
     await expect(page.getByRole('heading', { name: 'Proceduri relevante' })).toBeVisible();
-    await page.getByText(forRequests).click();
-    await expect(page.getByText('Notează faptele în nota internă.').first()).toBeVisible();
+    const fits = page.locator('details').filter({ hasText: forRequests });
+    await fits.locator('summary').click();
+    await expect(fits.getByText('Notează faptele în nota internă.')).toBeVisible();
     await expect(page.getByText(critical)).toHaveCount(0);
     await expectNoHorizontalScroll(page);
     await expectAccessible(page, 'request with procedures');
     await shot(page, 'a5-request-procedures', name());
-    await page.getByRole('link', { name: 'Deschide procedura' }).first().click();
+    await fits.getByRole('link', { name: 'Deschide procedura' }).click();
     await expect(h1(page)).toHaveText(forRequests);
   });
 
