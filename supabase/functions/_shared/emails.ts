@@ -607,6 +607,8 @@ export function emailForEvent(e: EmailEvent, app: string): EmailContent | null {
       return areaLaunchedEmail(p, lang, app);
     case 'report_credit':
       return reportCreditEmail(p, lang, app);
+    case 'billing_changed':
+      return billingChangedEmail(p, lang, app);
     case 'support_reply':
     case 'support_resolved':
       return supportRequestEmail(e, lang, app);
@@ -686,6 +688,48 @@ function reportCreditEmail(p: Record<string, unknown>, lang: Lang, app: string):
       : en
         ? 'You are receiving this email because a friend signed up with your invitation code.'
         : 'Primești acest email pentru că un prieten și-a făcut cont cu codul tău de invitare.',
+  });
+}
+
+/**
+ * A6: the team changed the shop's IBAN or billing email (admin_update_shop). Only which fields
+ * changed and the last 4 characters of a new IBAN: never the whole IBAN, never the old values.
+ */
+function billingChangedEmail(p: Record<string, unknown>, lang: Lang, app: string): EmailContent {
+  const en = lang === 'en';
+  const fields = Array.isArray(p.fields) ? p.fields.map(String) : [];
+  const ibanEnd = str(p.iban_end).replace(/[^0-9A-Za-z]/g, '').slice(-4).toUpperCase();
+  const shop = str(p.shop_name) || 'Service-Hub';
+  const lines: Block[] = [];
+  if (fields.includes('iban')) {
+    lines.push({
+      p: ibanEnd
+        ? en
+          ? `IBAN: changed. The new one ends in ${ibanEnd}.`
+          : `IBAN: schimbat. Noul IBAN se termină cu ${ibanEnd}.`
+        : en
+          ? 'IBAN: removed.'
+          : 'IBAN: șters.',
+    });
+  }
+  if (fields.includes('billing_email')) lines.push({ p: en ? 'Billing email: changed.' : 'Emailul de facturare: schimbat.' });
+  return email(en ? 'Your billing details changed' : 'Datele de facturare s-au schimbat', {
+    lang,
+    preheader: en ? `The Service-Hub team changed the billing details for ${shop}.` : `Echipa Service-Hub a schimbat datele de facturare pentru ${shop}.`,
+    title: en ? 'Billing details changed' : 'Date de facturare schimbate',
+    blocks: [
+      { p: en ? `The Service-Hub team changed the billing details for ${shop}:` : `Echipa Service-Hub a schimbat datele de facturare pentru ${shop}:` },
+      ...lines,
+      {
+        p: en
+          ? 'If you did not ask for this change, write to the Service-Hub team from Help and contact.'
+          : 'Dacă nu ai cerut această schimbare, scrie echipei Service-Hub din Ajutor și contact.',
+      },
+    ],
+    button: { label: en ? 'Open Billing details' : 'Deschide Date de facturare', url: `${app}${BILLING_PATH}` },
+    footer: en
+      ? `You are receiving this email as the owner of ${shop} on Service-Hub.`
+      : `Primești acest email ca proprietar al service-ului ${shop} pe Service-Hub.`,
   });
 }
 

@@ -81,8 +81,8 @@ export async function fetchSubscriptions(): Promise<AdminSubscriptions> {
   return (await call('admin_list_subscriptions', {} as never)) as unknown as AdminSubscriptions;
 }
 
-export function setSubscriptionPrice(shopId: string, price: number, requestId: string): Promise<Json> {
-  return call('admin_set_subscription_price', { p_shop_id: shopId, p_price: price, p_request_id: requestId });
+export function setSubscriptionPrice(shopId: string, price: number, reason: string, requestId: string): Promise<Json> {
+  return call('admin_set_subscription_price', { p_shop_id: shopId, p_price: price, p_request_id: requestId, p_reason: reason });
 }
 
 // ------------------------------------------------------------------------------------ history reports
@@ -271,8 +271,8 @@ export async function fetchSettings(): Promise<PlatformSettings> {
 
 export type SettingsChange = Partial<Record<SettingKey, number>> & { limits?: Partial<Record<LimitKey, number>> };
 
-export async function updateSettings(change: SettingsChange, requestId: string): Promise<PlatformSettings> {
-  return (await call('admin_update_settings', { p_settings: change as Json, p_request_id: requestId })) as unknown as PlatformSettings;
+export async function updateSettings(change: SettingsChange, reason: string, requestId: string): Promise<PlatformSettings> {
+  return (await call('admin_update_settings', { p_settings: change as Json, p_request_id: requestId, p_reason: reason })) as unknown as PlatformSettings;
 }
 
 export interface TextInput {
@@ -448,6 +448,6 @@ export interface ExportReviewRow {
  * and subscriptions come whole — the screen applies its filters; bookings and reviews are filtered
  * in the database.
  */
-export async function fetchExport(kind: ExportKind, filters: Record<string, unknown> = {}): Promise<Record<string, unknown>[]> {
-  return (await call('admin_export', { p_kind: kind, p_filters: filters as Json })) as unknown as Record<string, unknown>[];
+export async function fetchExport(kind: ExportKind, reason: string, filters: Record<string, unknown> = {}): Promise<Record<string, unknown>[]> {
+  return (await call('admin_export', { p_kind: kind, p_filters: filters as Json, p_reason: reason })) as unknown as Record<string, unknown>[];
 }

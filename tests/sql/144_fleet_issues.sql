@@ -4,9 +4,12 @@
 begin;
 select test.make_fleet();
 
--- The photo as the browser uploads it (storage policies apply), and its age changed by the server.
+-- The photo as the fleet-files Edge Function stores it with the person's token (storage policies
+-- apply; A6: after it checked the file and asked for a ticket), and its age changed by the server.
+create function pg_temp.ticket(p_name text) returns void
+language sql security definer as $$ select public.fleet_file_ticket(auth.uid(), p_name) $$;
 create function pg_temp.upload(p_name text) returns void
-language sql as $$ insert into storage.objects (bucket_id, name, owner) values ('fleet-files', p_name, auth.uid()) $$;
+language sql as $$ select pg_temp.ticket(p_name); insert into storage.objects (bucket_id, name, owner) values ('fleet-files', p_name, auth.uid()) $$;
 create function pg_temp.age(p_name text, p_age interval) returns void
 language sql security definer as $$ update storage.objects set created_at = now() - p_age where name = p_name $$;
 create function pg_temp.exists(p_name text) returns boolean

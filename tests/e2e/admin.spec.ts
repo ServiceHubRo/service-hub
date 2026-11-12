@@ -143,11 +143,14 @@ test.describe('admin', () => {
     expect(await inSearch(client, shopName)).toBe(false);
 
     await page.getByRole('button', { name: 'Reactivează service-ul' }).click();
+    await page.getByLabel('Motiv').fill('Verificat');
+    await page.getByRole('button', { name: 'Reactivează service-ul' }).click();
     await expect(page.getByRole('status').filter({ hasText: 'Service-ul este reactivat.' })).toBeVisible();
     expect(await inSearch(client, shopName)).toBe(true);
 
     // Extend the free period by 30 days.
     await page.getByRole('button', { name: 'Prelungește perioada gratuită' }).click();
+    await page.getByLabel('Motiv').fill('Lansare în oraș');
     await page.getByRole('button', { name: 'Prelungește cu 30 de zile' }).click();
     await expect(page.getByRole('status').filter({ hasText: 'Perioada gratuită este prelungită.' })).toBeVisible();
 
@@ -165,6 +168,7 @@ test.describe('admin', () => {
 
     // Edit: an invalid IBAN is named; a valid change is saved.
     await page.getByRole('button', { name: 'Editează datele' }).click();
+    await page.getByLabel('Motiv').fill('Cerere scrisă');
     await page.getByLabel('IBAN').fill('RO00 XXXX');
     await page.getByRole('button', { name: 'Salvează' }).click();
     await expect(page.getByText('Verifică câmpul „IBAN”: valoarea nu este validă.')).toBeVisible();
@@ -317,9 +321,12 @@ test.describe('admin', () => {
     await expectNoHorizontalScroll(page);
     await shot(page, 't16a-client', name());
     await page.getByRole('button', { name: 'Reactivează contul' }).click();
+    await page.getByLabel('Motiv').fill('Verificat');
+    await page.getByRole('button', { name: 'Reactivează contul' }).click();
     await expect(page.getByRole('status').filter({ hasText: 'Contul este reactivat.' })).toBeVisible();
 
     await page.getByRole('button', { name: 'Șterge contul' }).click();
+    await page.getByLabel('Motiv').fill('Cerere de ștergere');
     await page.getByRole('button', { name: 'Șterge definitiv' }).click();
     await expect(page.getByRole('heading', { level: 1, name: 'Clienți' })).toBeVisible();
     const gone = await fetch(`${process.env.VITE_SUPABASE_URL ?? 'http://127.0.0.1:54321'}/auth/v1/token?grant_type=password`, {
@@ -329,7 +336,9 @@ test.describe('admin', () => {
     });
     expect(gone.ok).toBe(false);
     const log = await serviceRest<{ action: string }[]>(`admin_audit_log?entity_id=eq.${clientId}&select=action`, 'GET');
-    expect(log.map((l) => l.action).sort()).toEqual(['delete_account', 'suspend_account', 'unsuspend_account']);
+    // A6: opening the card is in the log too (view_client, once per 10 minutes).
+    expect(log.map((l) => l.action).filter((a) => !a.startsWith('view_')).sort()).toEqual(['delete_account', 'suspend_account', 'unsuspend_account']);
+    expect(log.some((l) => l.action === 'view_client')).toBe(true);
   });
 
   test('a client: a free history report, told by push and email, in the log; the client sees it', async ({ page, browser }) => {
@@ -348,6 +357,7 @@ test.describe('admin', () => {
     await shot(page, 'admin-free-report', name());
     await page.getByRole('button', { name: 'Renunță' }).click();
     await page.getByRole('button', { name: 'Dă un raport gratuit' }).click();
+    await page.getByLabel('Motiv').fill('Compensare');
     await page.getByRole('button', { name: 'Dă raportul' }).click();
     await expect(page.getByRole('status').filter({ hasText: 'Raportul gratuit este dat. Clientul este anunțat.' })).toBeVisible();
     await expect(page.getByText('disponibile: 1 · folosite: 0')).toBeVisible();

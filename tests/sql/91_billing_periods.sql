@@ -89,9 +89,9 @@ select test.logout();
 select test.sign_up('admin-perioade@test.local', '{"role":"client","name":"Admin Perioade"}');
 update public.profiles set role = 'admin' where name = 'Admin Perioade';
 select test.login((select id from public.profiles where name = 'Admin Perioade'));
-select test.eq(test.error_params($$select public.admin_update_settings('{"period_discount_6":60}', test.rid())$$)->>'field',
+select test.eq(test.error_params($$select public.admin_update_settings('{"period_discount_6":60}', test.rid(), 'Test A6')$$)->>'field',
   'period_discount_6', 'a discount over 50% is refused');
-select test.eq((public.admin_update_settings('{"period_discount_3":7.5}', test.rid())->>'period_discount_3')::numeric, 7.5,
+select test.eq((public.admin_update_settings('{"period_discount_3":7.5}', test.rid(), 'Test A6')->>'period_discount_3')::numeric, 7.5,
   'the admin changes a discount');
 select test.logout();
 

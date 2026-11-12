@@ -74,15 +74,40 @@ begin
 end
 $$;
 
+-- A6: an admin's sign-in has a session in auth.sessions, as in the app (its token is refused once
+-- the session is gone). The admin's first live session is reused; a new one is made after the
+-- last was ended. Other roles get none here (an agent's tests make theirs: test.login_session).
+create function test.admin_session(uid uuid) returns uuid
+language plpgsql
+security definer
+as $$
+declare
+  sid uuid;
+begin
+  if not exists (select 1 from public.profiles p where p.id = uid and p.role = 'admin')
+     or not exists (select 1 from auth.users u where u.id = uid) then
+    return null;
+  end if;
+  select s.id into sid from auth.sessions s where s.user_id = uid order by s.created_at, s.id limit 1;
+  if sid is null then
+    insert into auth.sessions (user_id) values (uid) returning id into sid;
+  end if;
+  return sid;
+end
+$$;
+grant execute on function test.admin_session(uuid) to public;
+
 -- Signed in as after the second step (aal2, T25): what an admin needs; clients and shops do not care.
 create function test.login(uid uuid, aal text default 'aal2') returns void
 language plpgsql
 as $$
+declare
+  sid uuid := test.admin_session(uid);
 begin
   perform set_config('request.jwt.claim.sub', uid::text, true);
   perform set_config('request.jwt.claim.role', 'authenticated', true);
   perform set_config('request.jwt.claims',
-    jsonb_build_object('sub', uid, 'role', 'authenticated', 'aal', aal)::text, true);
+    jsonb_strip_nulls(jsonb_build_object('sub', uid, 'role', 'authenticated', 'aal', aal, 'session_id', sid))::text, true);
   perform set_config('role', 'authenticated', true);
 end
 $$;
@@ -110,3 +135,18 @@ end
 $$;
 
 grant execute on all functions in schema test to public;
+
+-- A6: the audit log is append-only. Test setups that clear or reshape it on purpose unlock it for
+-- their own transaction, the way only the retention job and the erasure do (superuser only).
+create function test.unlock_audit_log() returns void
+language plpgsql
+security definer
+as $$ begin insert into public.audit_log_unlocks (txid, purpose) values (txid_current(), 'launch_reset') on conflict (txid) do nothing; end $$;
+grant execute on function test.unlock_audit_log() to public;
+
+-- A6: forgets a rate limit's past uses (a test that needs more calls than the hourly limit).
+create function test.forget_rate(p_kind text) returns void
+language plpgsql
+security definer
+as $$ begin delete from public.rate_events where kind = p_kind; end $$;
+grant execute on function test.forget_rate(text) to public;

@@ -15,13 +15,13 @@ describe('admin zones (A1)', () => {
     const paths = subSections.map((i) => i.path);
     expect(new Set(paths).size).toBe(paths.length);
     // 19 at A1, plus Echipa de suport (A2), Păstrare legală (A3c2a), Sugestii de verificat and Retenția datelor
-    // (A3c2b1), Centrul de ajutor (A4), Proceduri interne (A5).
-    expect(paths.length).toBe(25);
+    // (A3c2b1), Centrul de ajutor (A4), Proceduri interne (A5), Securitate and Administratori (A6).
+    expect(paths.length).toBe(27);
   });
 
   it('Platformă splits Configurare and Control; the other zones have no groups', () => {
     const platform = ADMIN_ZONES.find((z) => z.path === '/admin/platforma')!;
-    expect(platform.items.map((i) => i.group)).toEqual(['config', 'config', 'config', 'config', 'config', 'control', 'control', 'control', 'control']);
+    expect(platform.items.map((i) => i.group)).toEqual(['config', 'config', 'config', 'config', 'config', 'control', 'control', 'control', 'control', 'control', 'control']);
     for (const zone of ADMIN_ZONES.filter((z) => z !== platform)) expect(zone.items.every((i) => !i.group)).toBe(true);
   });
 

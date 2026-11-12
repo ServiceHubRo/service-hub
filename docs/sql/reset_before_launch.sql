@@ -19,14 +19,19 @@ begin
     raise exception 'Refused: % client and shop accounts. This script is only for test data before the launch.', v_accounts;
   end if;
 
+  -- A6: the audit log is append-only; this one-off reset unlocks it for its own transaction only.
+  insert into public.audit_log_unlocks (txid, purpose) values (txid_current(), 'launch_reset') on conflict (txid) do nothing;
+
   -- Everything accounts made (no row triggers run, and bookings no longer hold shops back).
   truncate public.bookings, public.quotes, public.quote_items, public.reviews, public.messages,
     public.threads, public.notification_events, public.notifications_log, public.client_reminders,
     public.history_reports, public.invoices, public.cars, public.favorites, public.shops,
     public.shop_billing, public.shop_hours, public.shop_closures, public.shop_services,
     public.shop_staff, public.subscriptions, public.notices, public.notice_reads,
-    public.admin_audit_log, public.request_log, public.stripe_events, public.shop_referrals
+    public.admin_audit_log, public.request_log, public.stripe_events, public.shop_referrals,
+    public.security_events
     restart identity cascade;
+  delete from public.audit_log_unlocks where txid = txid_current();
 
   -- The accounts themselves (their profiles, push subscriptions, phone codes and sign-ins go with them).
   delete from auth.users u

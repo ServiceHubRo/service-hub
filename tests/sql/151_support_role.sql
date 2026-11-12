@@ -114,7 +114,7 @@ end
 $$;
 select test.eq(public.is_admin(), false, 'an agent is not an admin for any policy');
 select test.fails($$select public.promote_to_admin('agent@test.local')$$, 'permission denied', 'nor can it promote anyone');
-select test.fails($$select public.admin_account_deletion(test.id('admin'), test.id('client_b'))$$, 'permission denied', 'nor delete an account');
+select test.fails($$select public.admin_account_deletion(test.id('admin'), test.id('client_b'), 'x', gen_random_uuid())$$, 'permission denied', 'nor delete an account');
 
 -- Its own role, suspension and the audit log are out of reach.
 select test.fails(format($$update public.profiles set role = 'admin' where id = %L$$, current_setting('test.agent')),
@@ -291,7 +291,7 @@ select test.eq((select count(*) from auth.refresh_tokens where user_id = current
 select test.login_session(current_setting('test.agent')::uuid, '51000000-0000-4000-8000-000000000001');
 select test.fails($$select public.support_list_suggestions()$$, 'account_suspended', 'a suspended agent is refused');
 select test.login(test.id('admin'));
-select public.admin_set_account_suspended(current_setting('test.agent')::uuid, false, null, test.rid());
+select public.admin_set_account_suspended(current_setting('test.agent')::uuid, false, 'Verificat', test.rid());
 select test.login_session(current_setting('test.agent')::uuid, '51000000-0000-4000-8000-000000000001');
 select test.fails($$select public.support_list_suggestions()$$, 'not_signed_in', 'reactivated, the old session still does not work');
 select test.logout();

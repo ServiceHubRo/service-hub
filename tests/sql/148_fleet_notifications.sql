@@ -115,7 +115,7 @@ select test.login(test.id('client_a'));
 select public.remove_company_member(test.id('m_mgr'), gen_random_uuid());
 select test.logout();
 select test.login(test.id('admin'));
-select public.admin_set_company_plan(test.id('co'), 'fleet_start', gen_random_uuid());
+select public.admin_set_company_plan(test.id('co'), 'fleet_start', gen_random_uuid(), 'Test A6');
 select test.logout();
 select test.raw_quote(current_setting('test.b4')::uuid);
 select pg_temp.run();
@@ -124,7 +124,7 @@ select test.eq(pg_temp.got(test.id('appr'), 'fleet_quote_waiting'), 1::bigint, '
 select test.eq(pg_temp.got(test.id('client_a'), 'fleet_quote_waiting'), 2::bigint, 'the admin still is');
 select test.logout();
 select test.login(test.id('admin'));
-select public.admin_set_company_plan(test.id('co'), 'fleet_business', gen_random_uuid());
+select public.admin_set_company_plan(test.id('co'), 'fleet_business', gen_random_uuid(), 'Test A6');
 select test.logout();
 
 -- ------------------------------------------------------------------ the daily part, twice
@@ -208,14 +208,14 @@ select test.logout();
 grant execute on function public.fleet_user_can(uuid, uuid, text) to authenticated;
 select test.eq(pg_temp.mismatches(), 0::bigint, 'Business plan: fleet_can equals fleet_user_can for every member and right');
 select test.login(test.id('admin'));
-select public.admin_set_company_plan(test.id('co'), 'fleet_start', gen_random_uuid());
+select public.admin_set_company_plan(test.id('co'), 'fleet_start', gen_random_uuid(), 'Test A6');
 select test.logout();
 select test.eq(pg_temp.mismatches(), 0::bigint, 'Start plan (no extra rights): the same');
 revoke execute on function public.fleet_user_can(uuid, uuid, text) from authenticated;
 
 -- ------------------------------------------------------------------ rights versions
 select test.login(test.id('admin'));
-select public.admin_set_company_plan(test.id('co'), 'fleet_business', gen_random_uuid());
+select public.admin_set_company_plan(test.id('co'), 'fleet_business', gen_random_uuid(), 'Test A6');
 select test.logout();
 select set_config('test.v_before', (select version::text from public.member_rights_versions where user_id = test.id('acc') and company_id = test.id('co')), true);
 select test.login(test.id('client_a'));
@@ -225,7 +225,7 @@ select test.ok((select version from public.member_rights_versions where company_
   'a right changed: the member''s version goes up, readable by them');
 select test.eq(test.count('select 1 from public.member_rights_versions'), 1::bigint, 'only their own row');
 select test.login(test.id('admin'));
-select public.admin_set_company_plan(test.id('co'), 'fleet_start', gen_random_uuid());
+select public.admin_set_company_plan(test.id('co'), 'fleet_start', gen_random_uuid(), 'Test A6');
 select test.login(test.id('client_b'));
 select test.ok((select version from public.member_rights_versions where company_id = test.id('co')) > 1, 'a plan change bumps every member');
 

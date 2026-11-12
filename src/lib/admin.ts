@@ -204,6 +204,20 @@ export const AUDIT_ACTIONS = [
   'restore_procedure',
   'acknowledge_procedure',
   'set_procedure_responsible',
+  // A6 — what an admin opens (H2) and the control of the admin accounts (M6)
+  'view_client',
+  'view_shop',
+  'view_booking',
+  'view_client_list',
+  'view_shop_list',
+  'search_bookings',
+  'search_reviews',
+  'view_company_list',
+  'view_vehicle_duplicates',
+  'suspend_admin',
+  'unsuspend_admin',
+  'end_admin_sessions',
+  'end_own_sessions',
 ] as const;
 
 export interface AuditChange {

@@ -354,6 +354,15 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
       title: 'Service reactivat',
       body: '{shop} este din nou activ: apare în căutări și poate primi programări.',
     },
+    // ------------------------------------------------------------------ billing details changed by the team (A6)
+    'shop.billing_changed': {
+      title: 'Datele de facturare s-au schimbat',
+      body: 'Echipa Service-Hub a schimbat datele de facturare pentru {shop}. Verifică Date de facturare.',
+    },
+    'shop.billing_changed_iban': {
+      title: 'IBAN-ul s-a schimbat',
+      body: 'Echipa Service-Hub a schimbat IBAN-ul pentru {shop}. Noul IBAN se termină cu {iban_end}. Verifică Date de facturare.',
+    },
     // ------------------------------------------------------------------ shop referrals
     'shop.referral_reward': {
       title: 'Ai primit o lună gratuită',
@@ -690,6 +699,14 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
       body: '{shop} is active again: it appears in search and can take bookings.',
     },
     // ------------------------------------------------------------------ shop referrals
+    'shop.billing_changed': {
+      title: 'Your billing details changed',
+      body: 'The Service-Hub team changed the billing details for {shop}. Check Billing details.',
+    },
+    'shop.billing_changed_iban': {
+      title: 'Your IBAN changed',
+      body: 'The Service-Hub team changed the IBAN for {shop}. The new IBAN ends in {iban_end}. Check Billing details.',
+    },
     'shop.referral_reward': {
       title: 'You got a free month',
       body: '{referred}, the shop you referred, paid its subscription. Your free period is {days} longer, until {expiry}.',
@@ -834,7 +851,7 @@ export const EVENTS: Record<Side, readonly string[]> = {
     'daily_digest', 'trial_ending', 'payment_failed', 'shop_inactive', 'review_report_decided', 'account_suspended',
     'account_reactivated', 'referral_reward', 'referral_revoked', 'booking_request_waiting', 'booking_request_last_call', 'monthly_report',
     'company_problem', 'company_name_mismatch', 'company_hidden', 'company_ok', 'request_expired', 'booking_followup',
-    'booking_auto_closed', 'support_reply', 'support_resolved',
+    'booking_auto_closed', 'support_reply', 'support_resolved', 'billing_changed',
   ],
 };
 
@@ -972,6 +989,8 @@ function vars(e: NotificationEvent, lang: Lang, side: Side, now: Date): Record<s
     // A3a: a support request's title (the author's own words), short enough for a notification.
     request: clip(str(p.title), 60),
     amount: money(p.amount),
+    // A6: only the last 4 characters of a new IBAN, never the whole of it.
+    iban_end: str(p.iban_end).replace(/[^0-9A-Za-z]/g, '').slice(-4).toUpperCase(),
     maint: str(p.kind) === 'custom' ? str(p.label) : (WORDS[lang][`maint.${str(p.kind)}`] ?? str(p.label)),
   };
 }
@@ -1043,6 +1062,9 @@ export function templateKey(side: Side, e: NotificationEvent, now: Date = new Da
       return p.final === true || !str(p.expiry) ? `${base}_final` : base;
     case 'referral_reward':
       return p.kind === 'stripe_credit' ? `${base}_credit` : base;
+    // A6: a new IBAN (with its last 4 characters), or another billing change (the email, an IBAN removed).
+    case 'billing_changed':
+      return str(p.iban_end) ? `${base}_iban` : base;
     // Given by the admin rather than earned by inviting friends.
     case 'report_credit':
       return p.source === 'admin' ? `${base}_admin` : base;
@@ -1149,6 +1171,8 @@ export function urlFor(side: Side, e: NotificationEvent): string {
     case 'account_suspended':
     case 'account_reactivated':
       return '/s/panou';
+    case 'billing_changed':
+      return BILLING_PATH;
     case 'trial_ending':
     case 'payment_failed':
     case 'shop_inactive':
@@ -1223,6 +1247,8 @@ function tagFor(e: NotificationEvent): string {
     case 'referral_reward':
     case 'referral_revoked':
       return `referral-${str(p.referral_shop_id)}`;
+    case 'billing_changed':
+      return 'billing';
     case 'trial_ending':
     case 'payment_failed':
     case 'shop_inactive':

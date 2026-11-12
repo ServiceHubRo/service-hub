@@ -18,6 +18,7 @@ import type { Msg } from '../../i18n/translate';
 import type { MessageKey } from '../../i18n/ro';
 import { DECIMAL_SETTINGS, SETTING_SECTIONS, settingsChange, type SettingsDraft } from '../../lib/adminTools';
 import { useLoad } from '../../lib/useLoad';
+import { useReason } from './ActionPanels';
 import { SectionTitle } from './parts';
 import { ADMIN_SETTINGS_PATH } from './paths';
 import { dateTime } from './format';
@@ -44,6 +45,7 @@ function SettingsForm({ settings, onSaved }: { settings: PlatformSettings; onSav
   const [draft, setDraft] = useState<SettingsDraft>(() => draftOf(settings, lang));
   const [invalid, setInvalid] = useState<string[]>([]);
   const [message, setMessage] = useState<Msg | null>(null);
+  const reason = useReason();
 
   const field = (key: SettingKey | LimitKey) => (
     <Field
@@ -92,6 +94,7 @@ function SettingsForm({ settings, onSaved }: { settings: PlatformSettings; onSav
         </Card>
       </section>
       <p className={styles.muted}>{t('admin.settings.onlyFuture')}</p>
+      {reason.field}
       <ActionButton
         submit
         onAction={async (requestId) => {
@@ -105,7 +108,9 @@ function SettingsForm({ settings, onSaved }: { settings: PlatformSettings; onSav
             setMessage({ key: 'admin.settings.nothing' });
             return;
           }
-          const saved = await updateSettings(change, requestId);
+          const why = reason.take();
+          if (!why) return;
+          const saved = await updateSettings(change, why, requestId);
           onSaved(saved);
           setDraft(draftOf(saved, lang));
           setMessage({ key: 'admin.settings.saved' });

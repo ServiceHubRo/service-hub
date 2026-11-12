@@ -73,7 +73,7 @@ select test.ok(b->>'service_ro' like '%, %, %, %, %', 'the admin list shows all 
 from jsonb_array_elements(public.admin_list_bookings()->'bookings') b where b->>'id' = current_setting('test.b');
 select test.eq(jsonb_array_length(public.admin_get_booking(current_setting('test.b')::uuid)->'extra_services'), 4, 'and the booking page');
 select test.ok(r->>'service_ro' like '%, %', 'the Excel export too')
-from jsonb_array_elements(public.admin_export('bookings', '{}')) r where r->>'ref' = (select ref from public.bookings where id = current_setting('test.b')::uuid);
+from jsonb_array_elements(public.admin_export('bookings', '{}', 'Test A6')) r where r->>'ref' = (select ref from public.bookings where id = current_setting('test.b')::uuid);
 select test.logout();
 
 -- ------------------------------------------------------------------ reminders for each service

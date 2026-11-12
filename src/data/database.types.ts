@@ -71,6 +71,7 @@ export type Database = {
           id: string
           reason: string | null
           redacted: string[] | null
+          session_id: string | null
         }
         Insert: {
           action: string
@@ -85,6 +86,7 @@ export type Database = {
           id?: string
           reason?: string | null
           redacted?: string[] | null
+          session_id?: string | null
         }
         Update: {
           action?: string
@@ -99,6 +101,7 @@ export type Database = {
           id?: string
           reason?: string | null
           redacted?: string[] | null
+          session_id?: string | null
         }
         Relationships: []
       }
@@ -4954,7 +4957,12 @@ export type Database = {
         Returns: string
       }
       admin_account_deletion: {
-        Args: { p_admin_id: string; p_user_id: string }
+        Args: {
+          p_admin_id: string
+          p_reason: string
+          p_session: string
+          p_user_id: string
+        }
         Returns: string
       }
       admin_audit: {
@@ -5026,16 +5034,24 @@ export type Database = {
         Returns: Json
       }
       admin_digest_counts: { Args: { p_now?: string }; Returns: Json }
+      admin_end_admin_sessions: {
+        Args: { p_reason: string; p_request_id: string; p_user_id: string }
+        Returns: Json
+      }
+      admin_end_my_other_sessions: {
+        Args: { p_reason: string; p_request_id: string }
+        Returns: Json
+      }
       admin_export: {
-        Args: { p_filters?: Json; p_kind: string }
+        Args: { p_filters?: Json; p_kind: string; p_reason?: string }
         Returns: Json
       }
       admin_extend_company_trial: {
-        Args: { p_company: string; p_days: number; p_request_id: string }
+        Args: { p_company: string; p_days: number; p_reason?: string; p_request_id: string }
         Returns: Json
       }
       admin_extend_trial: {
-        Args: { p_days: number; p_request_id: string; p_shop_id: string }
+        Args: { p_days: number; p_reason?: string; p_request_id: string; p_shop_id: string }
         Returns: Json
       }
       admin_force_cancel: {
@@ -5106,7 +5122,7 @@ export type Database = {
       admin_get_legal_hold: { Args: { p_id: string }; Returns: Json }
       admin_get_shop: { Args: { p_shop_id: string }; Returns: Json }
       admin_grant_report_credit: {
-        Args: { p_request_id: string; p_user_id: string }
+        Args: { p_reason?: string; p_request_id: string; p_user_id: string }
         Returns: Json
       }
       admin_grant_support: {
@@ -5259,6 +5275,10 @@ export type Database = {
         Args: { p_reason: string; p_request_id: string; p_user_id: string }
         Returns: Json
       }
+      admin_security_events: {
+        Args: { p_before?: string; p_limit?: number; p_severity?: string }
+        Returns: Json
+      }
       admin_send_notice: {
         Args: {
           p_audience: string
@@ -5281,12 +5301,21 @@ export type Database = {
         }
         Returns: Json
       }
+      admin_set_admin_suspended: {
+        Args: {
+          p_reason: string
+          p_request_id: string
+          p_suspended: boolean
+          p_user_id: string
+        }
+        Returns: Json
+      }
       admin_set_area_mode: {
         Args: { p_code: string; p_mode: string; p_request_id: string }
         Returns: Json
       }
       admin_set_company_plan: {
-        Args: { p_company: string; p_plan_key: string; p_request_id: string }
+        Args: { p_company: string; p_plan_key: string; p_reason?: string; p_request_id: string }
         Returns: Json
       }
       admin_set_notification_text: {
@@ -5325,7 +5354,7 @@ export type Database = {
         Returns: Json
       }
       admin_set_subscription_price: {
-        Args: { p_price: number; p_request_id: string; p_shop_id: string }
+        Args: { p_price: number; p_reason?: string; p_request_id: string; p_shop_id: string }
         Returns: Json
       }
       admin_set_subscription_status: {
@@ -5338,6 +5367,7 @@ export type Database = {
       }
       admin_subscription_rows: { Args: never; Returns: Json }
       admin_support_stats: { Args: { p_from: string; p_to: string }; Returns: Json }
+      admin_team_admins: { Args: never; Returns: Json }
       admin_update_category: {
         Args: {
           p_enabled: boolean
@@ -5372,12 +5402,13 @@ export type Database = {
         Returns: Json
       }
       admin_update_settings: {
-        Args: { p_request_id: string; p_settings: Json }
+        Args: { p_reason?: string; p_request_id: string; p_settings: Json }
         Returns: Json
       }
       admin_update_shop: {
         Args: {
           p_billing: Json
+          p_reason?: string
           p_request_id: string
           p_shop: Json
           p_shop_id: string
@@ -5386,7 +5417,7 @@ export type Database = {
       }
       admin_vehicle_duplicates: { Args: never; Returns: Json }
       admin_verify_phone: {
-        Args: { p_request_id: string; p_user_id: string }
+        Args: { p_reason?: string; p_request_id: string; p_user_id: string }
         Returns: Json
       }
       admin_void_history_report: {
@@ -5523,6 +5554,7 @@ export type Database = {
         Returns: undefined
       }
       caller_aal: { Args: never; Returns: string }
+      caller_can_write: { Args: never; Returns: boolean }
       caller_session_alive: { Args: never; Returns: boolean }
       can_read_booking: { Args: { p_booking_id: string }; Returns: boolean }
       can_read_booking_money: {
@@ -6515,10 +6547,26 @@ export type Database = {
         Args: { e: Database["public"]["Tables"]["fleet_expenses"]["Row"] }
         Returns: Json
       }
+      fleet_file_begin: {
+        Args: {
+          p_company: string
+          p_issue: string
+          p_mime: string
+          p_size: number
+          p_vehicle: string
+        }
+        Returns: Json
+      }
       fleet_file_can_write: {
         Args: { p_company: string; p_vehicle: string }
         Returns: boolean
       }
+      fleet_file_ticket: {
+        Args: { p_path: string; p_user: string }
+        Returns: undefined
+      }
+      fleet_file_ticket_done: { Args: { p_path: string }; Returns: undefined }
+      fleet_file_ticket_ok: { Args: { p_name: string }; Returns: boolean }
       fleet_fuel_stats: {
         Args: {
           p_company: string
@@ -6849,6 +6897,16 @@ export type Database = {
       }
       grant_referral_reward: { Args: { p_shop_id: string }; Returns: undefined }
       help_center: { Args: { p_lang: string }; Returns: Json }
+      security_report: {
+        Args: {
+          p_detail?: Json
+          p_kind: string
+          p_severity: string
+          p_user: string
+        }
+        Returns: undefined
+      }
+      shop_writable: { Args: { p_shop_id: string }; Returns: boolean }
       staff_procedure_acknowledge: {
         Args: { p_request_id: string; p_version_id: string }
         Returns: Json

@@ -42,7 +42,7 @@ begin
   perform public.invite_company_member(v_co, 'radu@test.local', 'driver', repeat('f4', 32), gen_random_uuid());
   perform public.invite_company_member(v_co, 'ioana@test.local', 'driver', repeat('f5', 32), gen_random_uuid());
   perform test.login(test.id('admin'));
-  perform public.admin_set_company_plan(v_co, 'fleet_business', gen_random_uuid());
+  perform public.admin_set_company_plan(v_co, 'fleet_business', gen_random_uuid(), 'Test A6');
 
   perform test.login(v_mgr);
   perform public.accept_company_invite(repeat('f1', 32), gen_random_uuid());

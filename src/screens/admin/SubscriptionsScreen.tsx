@@ -174,7 +174,8 @@ export function SubscriptionsScreen() {
                       <ExportButton<AdminSubscriptionRow>
                         kind="subscriptions"
                         filters={{ q: query || undefined, status: filter === 'all' ? undefined : filter }}
-                        narrow={(rows) => filterSubscriptions(rows, query, filter)}
+                        ids={shown.map((r) => r.shop_id)}
+                    narrow={(rows) => filterSubscriptions(rows, query, filter)}
                       />
                     </div>
                   }

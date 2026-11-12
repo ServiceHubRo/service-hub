@@ -57,6 +57,10 @@ export const ADMIN_FLEET_FAILED_PATH = `${ADMIN_PLATFORM_PATH}/notificari-flota`
 export const ADMIN_TEAM_PATH = `${ADMIN_PLATFORM_PATH}/echipa`;
 /** Retenția datelor (A3c2b1): the retention jobs, their preview and their switch. */
 export const ADMIN_RETENTION_PATH = `${ADMIN_PLATFORM_PATH}/retentie`;
+/** Securitate (A6): the security events (refusals, files refused, admin accounts acted on). */
+export const ADMIN_SECURITY_PATH = `${ADMIN_PLATFORM_PATH}/securitate`;
+/** Administratori (A6): the admins; ending sessions, suspending and reactivating another admin. */
+export const ADMIN_ADMINS_PATH = `${ADMIN_PLATFORM_PATH}/administratori`;
 
 export const adminShopPath = (id: string) => `${ADMIN_SHOPS_PATH}/${id}`;
 export const adminClientPath = (id: string) => `${ADMIN_CLIENTS_PATH}/${id}`;

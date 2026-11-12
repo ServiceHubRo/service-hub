@@ -1,6 +1,5 @@
 import { useCallback, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { ActionButton } from '../../components/ActionButton';
 import { BackLink } from '../../components/BackLink';
 import { Button } from '../../components/Button';
 import { Card } from '../../components/Card';
@@ -9,7 +8,7 @@ import { SkeletonList } from '../../components/Skeleton';
 import { StatusBadge } from '../../components/StatusBadge';
 import { Stars } from '../../components/Stars';
 import { deleteAccount, fetchShop, setShopSuspended, verifyPhone, type AdminShopDetail } from '../../data/admin';
-import { canRetryRpc, rpcErrorMessage, toRpcError } from '../../data/rpc';
+import { toRpcError } from '../../data/rpc';
 import { verifyCompany } from '../../data/shop';
 import { useI18n } from '../../i18n/context';
 import { formatMoney, formatRating } from '../../i18n/format';
@@ -26,7 +25,7 @@ import { useLiveData } from './useLiveData';
 import { carText, dateTime, day, stripeRuns } from './format';
 import styles from './admin.module.css';
 
-type Panel = 'suspend' | 'trial' | 'status' | 'price' | 'edit' | 'delete' | null;
+type Panel = 'suspend' | 'unsuspend' | 'phone' | 'trial' | 'status' | 'price' | 'edit' | 'delete' | null;
 
 /**
  * One shop for the admin (FR §5.2, P20): state and why it is hidden, the actions (verify the phone,
@@ -119,30 +118,14 @@ export function ShopDetailScreen() {
           {panel === null && (
             <div className={styles.actionGrid}>
               {!phoneVerified && o.phone && (
-                <ActionButton
-                  variant="secondary"
-                  onAction={async (requestId) => {
-                    await verifyPhone(o.id, requestId);
-                    done(t('admin.done.phone'));
-                  }}
-                  errorMessage={(e) => rpcErrorMessage(lang, e)}
-                  canRetry={canRetryRpc}
-                >
+                <Button variant="secondary" onClick={() => setPanel('phone')}>
                   {t('admin.shop.verifyPhone')}
-                </ActionButton>
+                </Button>
               )}
               {s.suspended ? (
-                <ActionButton
-                  variant="secondary"
-                  onAction={async (requestId) => {
-                    await setShopSuspended(s.id, false, '', requestId);
-                    done(t('admin.done.unsuspended'));
-                  }}
-                  errorMessage={(e) => rpcErrorMessage(lang, e)}
-                  canRetry={canRetryRpc}
-                >
+                <Button variant="secondary" onClick={() => setPanel('unsuspend')}>
                   {t('admin.shop.unsuspend')}
-                </ActionButton>
+                </Button>
               ) : (
                 <Button onClick={() => setPanel('suspend')}>{t('admin.shop.suspend')}</Button>
               )}
@@ -171,6 +154,34 @@ export function ShopDetailScreen() {
               onCancel={() => setPanel(null)}
             />
           )}
+          {panel === 'unsuspend' && (
+            <ConfirmPanel
+              title={t('admin.shop.unsuspend')}
+              textLabel={t('admin.reason')}
+              textHint={t('admin.reasonHint')}
+              textRequired
+              confirmLabel={t('admin.shop.unsuspend')}
+              onConfirm={async (reason, requestId) => {
+                await setShopSuspended(s.id, false, reason, requestId);
+                done(t('admin.done.unsuspended'));
+              }}
+              onCancel={() => setPanel(null)}
+            />
+          )}
+          {panel === 'phone' && (
+            <ConfirmPanel
+              title={t('admin.shop.verifyPhone')}
+              textLabel={t('admin.reason')}
+              textHint={t('admin.reasonHint')}
+              textRequired
+              confirmLabel={t('admin.shop.verifyPhone')}
+              onConfirm={async (reason, requestId) => {
+                await verifyPhone(o.id, reason, requestId);
+                done(t('admin.done.phone'));
+              }}
+              onCancel={() => setPanel(null)}
+            />
+          )}
           {panel === 'trial' && <TrialPanel shopId={s.id} onDone={() => done(t('admin.done.trial'))} onCancel={() => setPanel(null)} />}
           {panel === 'status' && <StatusPanel detail={d} onDone={() => done(t('admin.done.status'))} onCancel={() => setPanel(null)} />}
           {panel === 'price' && sub && (
@@ -181,10 +192,13 @@ export function ShopDetailScreen() {
             <ConfirmPanel
               title={t('admin.shop.delete')}
               body={t('admin.shop.deleteBody')}
+              textLabel={t('admin.reason')}
+              textHint={t('admin.reasonHint')}
+              textRequired
               confirmLabel={t('admin.shop.deleteConfirm')}
               danger
-              onConfirm={async () => {
-                const mode = await deleteAccount(o.id);
+              onConfirm={async (reason) => {
+                const mode = await deleteAccount(o.id, reason);
                 if (mode === 'delete') navigate(ADMIN_SHOPS_PATH, { replace: true });
                 else done(t('admin.done.anonymized'));
               }}

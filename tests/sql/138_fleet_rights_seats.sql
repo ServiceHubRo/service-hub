@@ -55,7 +55,7 @@ select test.login(test.id('client_a'));
 select test.eq(public.fleet_subscription(current_setting('test.co')::uuid)->'plan'->>'monthly_total', '137.00',
   'two included now; the running subscription keeps 19 lei: 99 + 2 × 19');
 select test.login(test.id('admin'));
-select public.admin_set_company_plan(current_setting('test.co')::uuid, 'fleet_business', gen_random_uuid());
+select public.admin_set_company_plan(current_setting('test.co')::uuid, 'fleet_business', gen_random_uuid(), 'Test A6');
 select test.login(test.id('client_a'));
 select test.eq(public.fleet_subscription(current_setting('test.co')::uuid)->'plan'->>'monthly_total', '149.00',
   'after a plan change the new colleague''s price: 99 + 2 × 25');
@@ -65,7 +65,7 @@ select test.fails($$select public.admin_update_fleet_plan('fleet_business', 99, 
 -- ------------------------------------------------------------------ only the admin gives rights
 -- A member's own limit is a Fleet Pro feature since T65 (139_fleet_plan_features.sql tests the plans).
 select test.login(test.id('admin'));
-select public.admin_set_company_plan(current_setting('test.co')::uuid, 'fleet_pro', gen_random_uuid());
+select public.admin_set_company_plan(current_setting('test.co')::uuid, 'fleet_pro', gen_random_uuid(), 'Test A6');
 select test.login(current_setting('test.mgr')::uuid);
 select test.fails(format($$select public.set_company_member_rights(%L, '{quotes.approve}', null, gen_random_uuid())$$,
   current_setting('test.m_acc')), 'not_allowed', 'a manager cannot give rights');

@@ -495,6 +495,6 @@ select test.ok(exists (select 1 from public.audit_action_classes where action = 
 -- ------------------------------------------------------------------ the rollback refuses once real data exists
 \set rb `cat supabase/rollback/20261112120000_procedures.sql`
 select test.fails(:'rb', 'Refused', 'the rollback refuses to delete what people wrote');
-select test.ok(to_regclass('public.procedures') is not null and (select version from public.schema_version) = 118, 'and changes nothing');
+select test.ok(to_regclass('public.procedures') is not null and (select version from public.schema_version) >= 118, 'and changes nothing');
 
 rollback;

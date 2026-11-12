@@ -6,7 +6,7 @@ select test.make_world();
 -- ------------------------------------------------------------------ only an admin
 select test.login(test.id('client_a'));
 select test.fails($$select public.admin_list_subscriptions()$$, 'not_allowed', 'a client cannot list subscriptions');
-select test.fails($$select public.admin_set_subscription_price(test.id('shop1'), 50, test.rid())$$, 'not_allowed', 'nor set a price');
+select test.fails($$select public.admin_set_subscription_price(test.id('shop1'), 50, test.rid(), 'Test A6')$$, 'not_allowed', 'nor set a price');
 select test.fails($$select public.admin_list_history_reports()$$, 'not_allowed', 'nor list reports');
 select test.fails($$select public.admin_void_history_report(gen_random_uuid(), 'x', test.rid())$$, 'not_allowed', 'nor void one');
 select test.fails($$select public.admin_list_catalog()$$, 'not_allowed', 'nor read the catalog tool');
@@ -15,20 +15,20 @@ select test.fails($$select public.admin_update_category('cat_rev', 'X', 'X', fal
 select test.fails($$select public.admin_create_service('x_new', 'cat_rev', null, 'X', 'X', test.rid())$$, 'not_allowed', 'nor add a service');
 select test.fails($$select public.admin_update_service('ulei', 'cat_rev', null, 'X', 'X', false, test.rid())$$, 'not_allowed', 'nor change one');
 select test.fails($$select public.admin_move_catalog_item('category', 'cat_rev', 1, test.rid())$$, 'not_allowed', 'nor reorder');
-select test.fails($$select public.admin_update_settings('{"trial_days":1}', test.rid())$$, 'not_allowed', 'nor change settings');
+select test.fails($$select public.admin_update_settings('{"trial_days":1}', test.rid(), 'Test A6')$$, 'not_allowed', 'nor change settings');
 select test.fails($$select public.admin_set_notification_text('client.quote_sent', 'X', null, null, null, test.rid())$$,
   'not_allowed', 'nor a notification text');
 select test.fails($$select public.admin_notice_preview('all', null)$$, 'not_allowed', 'nor preview a notice');
 select test.fails($$select public.admin_send_notice('all', null, 'X', 'Y', null, null, false, test.rid())$$, 'not_allowed', 'nor send one');
 select test.fails($$select public.admin_list_notices()$$, 'not_allowed', 'nor list them');
 select test.fails($$select public.admin_withdraw_notice(gen_random_uuid(), test.rid())$$, 'not_allowed', 'nor withdraw one');
-select test.fails($$select public.admin_export('clients')$$, 'not_allowed', 'nor export');
+select test.fails($$select public.admin_export('clients', '{}', 'Test A6')$$, 'not_allowed', 'nor export');
 select test.fails($$update public.platform_settings set trial_days = 1$$, 'permission denied', 'settings are not writable directly');
 select test.fails($$update public.services set enabled = false where id = 'ulei'$$, 'permission denied', 'nor the catalog');
 
 select test.login(test.id('owner1'));
-select test.fails($$select public.admin_export('shops')$$, 'not_allowed', 'a shop cannot export');
-select test.fails($$select public.admin_update_settings('{"trial_days":1}', test.rid())$$, 'not_allowed', 'nor change settings');
+select test.fails($$select public.admin_export('shops', '{}', 'Test A6')$$, 'not_allowed', 'a shop cannot export');
+select test.fails($$select public.admin_update_settings('{"trial_days":1}', test.rid(), 'Test A6')$$, 'not_allowed', 'nor change settings');
 
 select test.login_anon();
 select test.fails($$select public.admin_list_catalog()$$, 'permission denied', 'signed out: not callable');
@@ -45,20 +45,20 @@ select test.eq(jsonb_array_length(l->'subscriptions'), 2, 'every subscription li
 from public.admin_list_subscriptions() l;
 
 select set_config('test.rid_price', test.rid()::text, true);
-select test.eq((public.admin_set_subscription_price(test.id('shop1'), 79.5, current_setting('test.rid_price')::uuid))->>'price_ron',
+select test.eq((public.admin_set_subscription_price(test.id('shop1'), 79.5, current_setting('test.rid_price')::uuid, 'Test A6'))->>'price_ron',
                '79.50', 'a founder''s price set by hand');
-select test.eq((public.admin_set_subscription_price(test.id('shop1'), 60, current_setting('test.rid_price')::uuid))->>'price_ron',
+select test.eq((public.admin_set_subscription_price(test.id('shop1'), 60, current_setting('test.rid_price')::uuid, 'Test A6'))->>'price_ron',
                '79.50', 'the same tap again changes nothing');
 select test.eq(price_ron, 79.50::numeric(10,2), 'stored') from public.subscriptions where shop_id = test.id('shop1');
 select test.eq(count(*), 1::bigint, 'logged once with before and after')
 from public.admin_audit_log where action = 'set_subscription_price' and entity_id = test.id('shop1')::text
   and before->>'price_ron' = '100.00' and after->>'price_ron' = '79.50';
-select test.eq(test.error_params($$select public.admin_set_subscription_price(test.id('shop1'), 0, test.rid())$$)->>'field',
+select test.eq(test.error_params($$select public.admin_set_subscription_price(test.id('shop1'), 0, test.rid(), 'Test A6')$$)->>'field',
                'price_ron', 'a price under 1 leu is refused');
 select test.logout();
 update public.subscriptions set stripe_status = 'trialing' where shop_id = test.id('shop2');
 select test.login(test.id('admin'));
-select test.fails($$select public.admin_set_subscription_price(test.id('shop2'), 50, test.rid())$$, 'subscription_in_stripe',
+select test.fails($$select public.admin_set_subscription_price(test.id('shop2'), 50, test.rid(), 'Test A6')$$, 'subscription_in_stripe',
   'refused while Stripe runs the subscription');
 
 -- ------------------------------------------------------------------ history reports
@@ -158,22 +158,22 @@ select set_config('test.old_expiry', (select expires_at::text from public.quotes
 select set_config('test.new_booking', test.raw_booking(test.id('shop1'), test.id('client_a'), 'in_inspection', test.workday(3), '11:00')::text, true);
 select test.login(test.id('admin'));
 
-select test.eq(test.error_params($$select public.admin_update_settings('{"trial_days":999}', test.rid())$$)->>'field',
+select test.eq(test.error_params($$select public.admin_update_settings('{"trial_days":999}', test.rid(), 'Test A6')$$)->>'field',
                'trial_days', 'a value out of range names its field');
-select test.eq(test.error_params($$select public.admin_update_settings('{"quote_expiry_days":2.5}', test.rid())$$)->>'field',
+select test.eq(test.error_params($$select public.admin_update_settings('{"quote_expiry_days":2.5}', test.rid(), 'Test A6')$$)->>'field',
                'quote_expiry_days', 'days are whole');
-select test.eq(test.error_params($$select public.admin_update_settings('{"owner_id":"x"}', test.rid())$$)->>'field',
+select test.eq(test.error_params($$select public.admin_update_settings('{"owner_id":"x"}', test.rid(), 'Test A6')$$)->>'field',
                'owner_id', 'unknown settings are refused');
-select test.eq(test.error_params($$select public.admin_update_settings('{"limits":{"review_window_days":0}}', test.rid())$$)->>'field',
+select test.eq(test.error_params($$select public.admin_update_settings('{"limits":{"review_window_days":0}}', test.rid(), 'Test A6')$$)->>'field',
                'review_window_days', 'limits have ranges');
-select test.eq(test.error_params($$select public.admin_update_settings('{"limits":{"anything":3}}', test.rid())$$)->>'field',
+select test.eq(test.error_params($$select public.admin_update_settings('{"limits":{"anything":3}}', test.rid(), 'Test A6')$$)->>'field',
                'anything', 'unknown limits are refused');
-select test.eq(test.error_params($$select public.admin_update_settings('{"subscription_price_ron":0}', test.rid())$$)->>'field',
+select test.eq(test.error_params($$select public.admin_update_settings('{"subscription_price_ron":0}', test.rid(), 'Test A6')$$)->>'field',
                'subscription_price_ron', 'a price of 0 is refused');
 
 select public.admin_update_settings(
   '{"quote_expiry_days":7,"trial_days":30,"subscription_price_ron":120,"limits":{"review_window_days":30},"ranking_prior_avg":4.3}',
-  test.rid());
+  test.rid(), 'Test A6');
 select test.eq(quote_expiry_days, 7, 'quote expiry changed'),
        test.eq(trial_days, 30, 'free period changed'),
        test.eq((limits->>'review_window_days')::int, 30, 'one limit changed'),
@@ -278,17 +278,19 @@ select test.eq(test.count($$select 1 from public.notices where audience = 'city'
 select test.login(test.id('admin'));
 
 -- ------------------------------------------------------------------ export
-select test.eq(jsonb_array_length(public.admin_export('shops')), 3, 'shops export: every shop'),
-       test.eq(jsonb_array_length(public.admin_export('clients')), 2, 'clients export'),
-       test.eq(jsonb_array_length(public.admin_export('subscriptions')), 3, 'subscriptions export'),
-       test.eq(jsonb_array_length(public.admin_export('reviews')), 2, 'reviews export: every review'),
-       test.eq(jsonb_array_length(public.admin_export('reviews', '{"q":"prompt"}')), 1, 'or those matching the text'),
-       test.eq(jsonb_array_length(public.admin_export('bookings', '{"statuses":["done"]}')), 2, 'bookings export with the status filter'),
-       test.eq(jsonb_array_length(public.admin_export('bookings', format('{"shop_id":"%s"}', test.id('shop2'))::jsonb)), 1,
+select test.forget_rate('admin_export');
+select test.eq(jsonb_array_length(public.admin_export('shops', '{}', 'Test A6')), 3, 'shops export: every shop'),
+       test.eq(jsonb_array_length(public.admin_export('clients', '{}', 'Test A6')), 2, 'clients export'),
+       test.eq(jsonb_array_length(public.admin_export('subscriptions', '{}', 'Test A6')), 3, 'subscriptions export'),
+       test.eq(jsonb_array_length(public.admin_export('reviews', '{}', 'Test A6')), 2, 'reviews export: every review'),
+       test.eq(jsonb_array_length(public.admin_export('reviews', '{"q":"prompt"}', 'Test A6')), 1, 'or those matching the text');
+select test.forget_rate('admin_export');
+select        test.eq(jsonb_array_length(public.admin_export('bookings', '{"statuses":["done"]}', 'Test A6')), 2, 'bookings export with the status filter'),
+       test.eq(jsonb_array_length(public.admin_export('bookings', format('{"shop_id":"%s"}', test.id('shop2'))::jsonb, 'Test A6')), 1,
                'and the shop filter');
-select test.eq((select x->>'plate' from jsonb_array_elements(public.admin_export('bookings', '{"q":"bv12abc"}')) x), 'BV 12 ABC',
+select test.eq((select x->>'plate' from jsonb_array_elements(public.admin_export('bookings', '{"q":"bv12abc"}', 'Test A6')) x), 'BV 12 ABC',
                'bookings export finds a plate');
-select test.fails($$select public.admin_export('passwords')$$, 'kind_invalid', 'only the five lists');
+select test.fails($$select public.admin_export('passwords', '{}', 'Test A6')$$, 'kind_invalid', 'only the five lists');
 select test.eq(count(*), 8::bigint, 'every export is logged')
 from public.admin_audit_log where action = 'export';
 select test.eq(after->'filters', '{"statuses": ["done"]}'::jsonb, 'with its filters')

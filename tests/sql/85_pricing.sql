@@ -26,15 +26,15 @@ select test.logout();
 select test.sign_up('admin-pret@test.local', '{"role":"client","name":"Admin Preț"}');
 update public.profiles set role = 'admin' where name = 'Admin Preț';
 select test.login((select id from public.profiles where name = 'Admin Preț'));
-select test.eq(test.error_params($$select public.admin_update_settings('{"launch_price_ron":0.5}', test.rid())$$)->>'field',
+select test.eq(test.error_params($$select public.admin_update_settings('{"launch_price_ron":0.5}', test.rid(), 'Test A6')$$)->>'field',
                'launch_price_ron', 'a launch price under 1 leu is refused');
-select test.eq(test.error_params($$select public.admin_update_settings('{"launch_slots_per_city":2.5}', test.rid())$$)->>'field',
+select test.eq(test.error_params($$select public.admin_update_settings('{"launch_slots_per_city":2.5}', test.rid(), 'Test A6')$$)->>'field',
                'launch_slots_per_city', 'places must be a whole number');
-select test.eq(test.error_params($$select public.admin_update_settings('{"launch_shops":50}', test.rid())$$)->>'field',
+select test.eq(test.error_params($$select public.admin_update_settings('{"launch_shops":50}', test.rid(), 'Test A6')$$)->>'field',
                'launch_shops', 'the country-wide places are no longer a setting');
-select test.eq((public.admin_update_settings('{"launch_slots_per_city":12}', test.rid())->>'launch_slots_per_city')::int, 12,
+select test.eq((public.admin_update_settings('{"launch_slots_per_city":12}', test.rid(), 'Test A6')->>'launch_slots_per_city')::int, 12,
                'the admin sets the places per city');
-select public.admin_update_settings('{"launch_price_ron":0}', test.rid());
+select public.admin_update_settings('{"launch_price_ron":0}', test.rid(), 'Test A6');
 select test.logout();
 select test.login_anon();
 select test.ok(public.public_pricing()->'launch_price_ron' = 'null'::jsonb, 'launch price 0: no launch offer');

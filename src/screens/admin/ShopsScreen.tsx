@@ -82,6 +82,7 @@ export function ShopsScreen() {
                   <ExportButton<AdminShopRow>
                     kind="shops"
                     filters={{ q: query || undefined, state: filter === 'all' ? undefined : filter }}
+                    ids={shown.map((r) => r.id)}
                     narrow={(rows) => filterShops(rows, query, filter)}
                   />
                 </div>

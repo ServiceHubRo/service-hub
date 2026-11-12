@@ -1831,3 +1831,22 @@ Nimic implementat. O sesiune nouă pornește de aici, după ce Eduard răspunde 
 - **Rămas:** aprobarea conținutului inițial de către Eduard (fiecare procedură se citește, se completează unde scrie „se confirmă cu administratorul” și se aprobă).
 
 - [x] Făcut
+
+### A6 — Securitate și controlul echipei ✅ (Eduard, 12 nov 2026: o singură etapă, după auditul A6 pe d7cd6c0)
+- **Sesiunea adminului (H1, L1):** tokenul unui admin funcționează doar cât sesiunea lui există. După delogare, după ce alt admin i-a închis sesiunile sau după expirare, orice funcție de admin răspunde `not_signed_in` (toate cele peste 85 de funcții `admin_*`, plus regulile de acces și fișierele din suport). Un admin șters sau suspendat este refuzat peste tot.
+- **Sesiunile echipei (L4):** un admin sau un agent se autentifică din nou, cu codul din aplicație, la cel mult 8 ore. Regula e în baza de date, doar pentru echipă (setarea din Supabase s-ar aplica tuturor clienților).
+- **Ce deschide adminul (H2):** fișa unui client, a unui service, a unei programări, listele cu date personale și căutările apar în Jurnalul de audit, o singură dată la 10 minute pentru același lucru, fără cuvintele căutate.
+- **Conturi suspendate (M1):** nu mai pot scrie direct în baza de date (profil, mașini, date service, IBAN, program, închideri, fotografii, fișiere). Un service suspendat, la fel. Suspendatul își poate schimba doar limba.
+- **Jurnalul de audit (M2):** nimeni nu mai poate modifica, șterge sau goli jurnalul prin API, nici cheia de server. Doar retenția și ștergerea datelor unui cont (GDPR) pot, prin funcțiile lor; Legal Hold neschimbat.
+- **Securitate (M3):** Platformă → **Securitate** (doar admini): acces refuzat, sesiuni închise, fișiere respinse, limite atinse, cu gravitate, grupate pe oră și marcate „Activitate repetată” de la 5 pe oră. Refuzurile din interiorul bazei de date ajung în jurnalul serverului (Supabase → Logs, `sh_security`). Fiecare rând din jurnalul de audit are acum și sesiunea.
+- **Fișierele din flote (M4):** se încarcă doar prin funcția `fleet-files`: tipul real din conținut, PDF-uri cu JavaScript sau parolă refuzate, fotografiile fără GPS și alte metadate, 5 MB, 6 fotografii pe raport, 60 de fișiere pe oră, 500 MB pe firmă.
+- **Motiv obligatoriu (M5):** la ștergerea unui cont, la datele și IBAN-ul unui service, preț, perioadă gratuită, raport gratuit, telefon confirmat manual, planul unei firme, setările platformei, export și reactivare. Exporturi: cel mult 100 de rânduri, 5 pe oră, fără telefoane și serii de șasiu. Proprietarul primește notificare și email când adminul îi schimbă IBAN-ul sau emailul de facturare (doar ultimele 4 caractere ale IBAN-ului).
+- **Administratori (M6):** Platformă → **Administratori**: lista adminilor, închiderea sesiunilor altui admin, suspendare și reactivare (cu motiv; niciodată pe sine, niciodată ultimul admin activ), închiderea propriilor sesiuni de pe alte dispozitive.
+- **PDF-uri (L2):** documentele lucrării, cel mult 30 pe oră de persoană; un raport refăcut, cel mult 10 pe oră.
+- **Sesiunile la retragerea rolului (L3):** dacă sesiunile nu pot fi șterse, apare un eveniment de securitate „ridicat” (nu se mai trece sub tăcere), iar accesul e refuzat oricum.
+- Migrarea `a6_security` (schema 119), cu rollback generat din schema 118 și testat (structură și date identice; refuză dacă există date scrise de A6). Niciun rând existent modificat sau șters.
+- Teste: `tests/sql/161_a6_security.sql`, `tests/sql/162_a6_concurrency.sql` (doi admini care se suspendă reciproc în același moment; aceeași fișă deschisă de două ori deodată), `tests/unit/fleetFiles.test.ts`, `tests/e2e/fleet-files.spec.ts`; actualizate `50_platform`, `80_admin`, `153_support_files`, `155_legal_hold`, testele care cer acum un motiv sau o sesiune, `adminZones`, `notificationTexts`, `admin`, `admin-tools`, `admin-navigation`, `engagement`, `fleet-space`.
+- **Decizii:** Securitate și Administratori stau în Platformă → Control (lângă Jurnal de audit și Echipa de suport); exportul dintr-o listă filtrată trimite rândurile afișate (altfel limita de 100 ar fi tăiat lista înainte de filtrare); motivul poate fi orice text de 1–500 de caractere; adminii se creează în continuare doar din SQL Editor, care rămâne și calea de recuperare.
+- **Rămas / Pașii lui Eduard:** setările din Supabase care nu țin de cod (LANSARE 4.6c): Secure password change, CAPTCHA, eventual limita de inactivitate (se aplică tuturor utilizatorilor).
+
+- [x] Făcut

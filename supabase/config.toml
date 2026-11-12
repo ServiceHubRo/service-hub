@@ -521,6 +521,10 @@ verify_jwt = false
 [functions.support-files]
 verify_jwt = false
 
+# A6 (M4): fleet files, checked and cleaned before they are stored; the token is checked inside.
+[functions.fleet-files]
+verify_jwt = false
+
 # The wordmark image in emails: fetched by email programs, no sign-in.
 [functions.email-logo]
 verify_jwt = false

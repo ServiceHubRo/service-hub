@@ -25,6 +25,7 @@ import { parseNumber } from '../../lib/adminTools';
 import { useI18n } from '../../i18n/context';
 import type { MessageKey } from '../../i18n/ro';
 import { plural } from '../../i18n/translate';
+import { useReason } from './ActionPanels';
 import { stripeRuns } from './format';
 import styles from './admin.module.css';
 
@@ -33,6 +34,7 @@ import styles from './admin.module.css';
 export function TrialPanel({ shopId, onDone, onCancel }: { shopId: string; onDone: () => void; onCancel: () => void }) {
   const { t, lang } = useI18n();
   const [days, setDays] = useState(30);
+  const reason = useReason();
   return (
     <InlinePanel title={t('admin.trial.title')}>
       <p className={styles.muted}>{t('admin.trial.body')}</p>
@@ -45,10 +47,13 @@ export function TrialPanel({ shopId, onDone, onCancel }: { shopId: string; onDon
         decreaseLabel={t('common.decrease')}
         increaseLabel={t('common.increase')}
       />
+      {reason.field}
       <div className={styles.panelButtons}>
         <ActionButton
           onAction={async (requestId) => {
-            await extendTrial(shopId, days, requestId);
+            const why = reason.take();
+            if (!why) return;
+            await extendTrial(shopId, days, why, requestId);
             onDone();
           }}
           errorMessage={(e) => rpcErrorMessage(lang, e)}
@@ -118,6 +123,7 @@ export function PricePanel({
   const [text, setText] = useState(String(Number(subscription.price_ron)).replace('.', lang === 'ro' ? ',' : '.'));
   const price = parseNumber(text);
   const valid = price !== null && price >= 1 && price <= 10000;
+  const reason = useReason();
   return (
     <InlinePanel title={t('admin.price.title')}>
       <p className={styles.muted}>{t('admin.price.body')}</p>
@@ -130,11 +136,14 @@ export function PricePanel({
         error={text.trim() && !valid ? t('admin.price.invalid') : null}
         onChange={(e) => setText(e.target.value)}
       />
+      {reason.field}
       <div className={styles.panelButtons}>
         <ActionButton
           disabled={!valid || stripeRuns(subscription.stripe_status)}
           onAction={async (requestId) => {
-            await setSubscriptionPrice(shopId, price!, requestId);
+            const why = reason.take();
+            if (!why) return;
+            await setSubscriptionPrice(shopId, price!, why, requestId);
             onDone();
           }}
           errorMessage={(e) => rpcErrorMessage(lang, e)}
@@ -187,6 +196,7 @@ export function EditPanel({ detail, onDone, onCancel }: { detail: AdminShopDetai
   const [values, setValues] = useState(start);
   const [vatPayer, setVatPayer] = useState(detail.billing?.vat_payer ?? false);
   const set = (k: string, v: string) => setValues((prev) => ({ ...prev, [k]: v }));
+  const reason = useReason();
 
   function changes(): { shop: ShopEdit; billing: BillingEdit } | 'invalid' {
     const shop: Record<string, string | number | null> = {};
@@ -273,12 +283,16 @@ export function EditPanel({ detail, onDone, onCancel }: { detail: AdminShopDetai
           </>
         )}
       </div>
+      {detail.billing && <p className={styles.muted}>{t('admin.edit.billingNotice')}</p>}
+      {reason.field}
       <div className={styles.panelButtons}>
         <ActionButton
           onAction={async (requestId) => {
             const c = changes();
             if (c === 'invalid') throw new Error('invalid_number');
-            const result = await updateShop(detail.shop.id, c.shop, c.billing, requestId);
+            const why = reason.take();
+            if (!why) return;
+            const result = await updateShop(detail.shop.id, c.shop, c.billing, why, requestId);
             if (result.address_changed) void geocodeShopAsAdmin(detail.shop.id);
             onDone();
           }}
