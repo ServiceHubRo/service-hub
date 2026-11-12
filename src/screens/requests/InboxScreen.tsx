@@ -14,9 +14,9 @@ import { fetchSupportCategories, listStaff, REQUEST_STATUSES, type StaffRequestI
 import { useI18n } from '../../i18n/context';
 import { DEFAULT_FILTERS, FILTER_PARAMS, filtersFrom, inboxArgs, waitingHours, type RequestFilters } from '../../lib/supportRequests';
 import { useLoad } from '../../lib/useLoad';
-import { ADMIN_REQUESTS_PATH, adminRequestPath } from '../admin/paths';
+import { ADMIN_REQUESTS_PATH, ADMIN_TEXT_REVIEWS_PATH, adminRequestPath } from '../admin/paths';
 import adminStyles from '../admin/admin.module.css';
-import { SUPPORT_REQUESTS_PATH, supportRequestPath } from '../support/paths';
+import { SUPPORT_REQUESTS_PATH, SUPPORT_TEXT_REVIEWS_PATH, supportRequestPath } from '../support/paths';
 import { categoryName } from './format';
 import { SupportDashboardPanel, WaitingPill } from './Dashboard';
 import { RequestStatusPill } from './parts';
@@ -76,7 +76,13 @@ export function InboxScreen({ mode }: { mode: 'support' | 'admin' }) {
           const current = data.key === inbox.key;
           return (
             <>
-              <SupportDashboardPanel dashboard={data.dashboard} filters={filters} listPath={listPath} detailPath={detailPath} />
+              <SupportDashboardPanel
+                dashboard={data.dashboard}
+                filters={filters}
+                listPath={listPath}
+                detailPath={detailPath}
+                reviewsPath={mode === 'admin' ? ADMIN_TEXT_REVIEWS_PATH : SUPPORT_TEXT_REVIEWS_PATH}
+              />
               <div className={styles.filters}>
                 <SelectField
                   label={t('support.filter.owner')}

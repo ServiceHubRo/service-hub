@@ -189,8 +189,9 @@ select test.ok(not exists (select 1 from public.notification_events where params
 select test.ok(not exists (select 1 from pg_publication_tables where tablename = 'suggestion_notes'), 'the notes are not in Realtime');
 select test.ok(not exists (select 1 from pg_policies where tablename = 'suggestion_notes'), 'and have no policy at all');
 -- A3b wraps support_get_request (support_get_request_a3a inside, not callable through the API).
-select test.eq(string_agg(p.proname, ', ' order by p.proname), 'support_add_note, support_get_request_a3a',
-  'only two functions in the database touch the notes, both for the team'),
+-- A3c2b1: the retention preview counts them (a number, never a text; behind admin_retention_preview).
+select test.eq(string_agg(p.proname, ', ' order by p.proname), 'retention_preview_counts, support_add_note, support_get_request_a3a',
+  'only the team''s two functions and the retention preview''s count touch the notes'),
        test.eq(bool_or(has_function_privilege('authenticated', p.oid, 'execute') and p.proname <> 'support_add_note'), false,
   'and the one that reads them is not callable through the API')
 from pg_proc p

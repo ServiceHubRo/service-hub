@@ -13,7 +13,7 @@ import { useI18n } from '../../i18n/context';
 import type { MessageKey } from '../../i18n/ro';
 import { useLoad } from '../../lib/useLoad';
 import { AuditList } from './parts';
-import { ADMIN_AUDIT_PATH, ADMIN_TEAM_PATH, ADMIN_CATALOG_PATH, ADMIN_MODERATION_PATH, ADMIN_NOTICES_PATH, ADMIN_REPORTS_PATH, adminHoldPath, adminRequestPath, ADMIN_TEXTS_PATH, adminBookingPath, adminClientPath, adminShopPath } from './paths';
+import { ADMIN_AUDIT_PATH, ADMIN_TEAM_PATH, ADMIN_CATALOG_PATH, ADMIN_MODERATION_PATH, ADMIN_NOTICES_PATH, ADMIN_REPORTS_PATH, adminHoldPath, adminRequestPath, ADMIN_RETENTION_PATH, ADMIN_TEXT_REVIEWS_PATH, ADMIN_TEXTS_PATH, adminBookingPath, adminClientPath, adminShopPath } from './paths';
 import styles from './admin.module.css';
 
 /** „‹ Înapoi” goes to the screen's zone (A1). */
@@ -78,6 +78,10 @@ function entityLink(e: AuditEntry, t: (key: MessageKey) => string) {
       return e.entity_id ? toolLink(adminRequestPath(e.entity_id), t('admin.requests.auditLabel')) : null;
     case 'legal_hold':
       return toolLink(adminHoldPath(e.entity_id), t('admin.holds.title'));
+    case 'retention_job':
+      return toolLink(ADMIN_RETENTION_PATH, t('admin.retention.title'));
+    case 'suggestion_review':
+      return toolLink(ADMIN_TEXT_REVIEWS_PATH, t('support.textReview.title'));
     case 'export':
     case 'search':
       return null;

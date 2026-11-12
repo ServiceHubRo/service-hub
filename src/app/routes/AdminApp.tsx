@@ -44,6 +44,8 @@ import {
   ADMIN_HOLDS_PATH,
   ADMIN_SUPPORT_PATH,
   ADMIN_TEAM_PATH,
+  ADMIN_RETENTION_PATH,
+  ADMIN_TEXT_REVIEWS_PATH,
   ADMIN_TEXTS_PATH,
   ADMIN_ZONES_PATH,
 } from '../../screens/admin/paths';
@@ -53,6 +55,8 @@ import { ShopDetailScreen } from '../../screens/admin/ShopDetailScreen';
 import { ShopsScreen } from '../../screens/admin/ShopsScreen';
 import { SubscriptionsScreen } from '../../screens/admin/SubscriptionsScreen';
 import { TeamScreen } from '../../screens/admin/TeamScreen';
+import { RetentionScreen } from '../../screens/admin/RetentionScreen';
+import { TextReviewsScreen } from '../../screens/requests/TextReviewsScreen';
 import { InboxScreen } from '../../screens/requests/InboxScreen';
 import { RequestScreen } from '../../screens/requests/RequestScreen';
 import { TextsScreen } from '../../screens/admin/TextsScreen';
@@ -111,6 +115,7 @@ export default function AdminApp() {
         <Route path={`${at(ADMIN_REQUESTS_PATH)}/:requestId`} element={<RequestScreen mode="admin" />} />
         <Route path={at(ADMIN_HOLDS_PATH)} element={<LegalHoldsScreen />} />
         <Route path={`${at(ADMIN_HOLDS_PATH)}/:holdId`} element={<LegalHoldScreen />} />
+        <Route path={at(ADMIN_TEXT_REVIEWS_PATH)} element={<TextReviewsScreen mode="admin" />} />
         {/* Platformă */}
         <Route path={at(ADMIN_SETTINGS_PATH)} element={<SettingsScreen />} />
         <Route path={at(ADMIN_TEXTS_PATH)} element={<TextsScreen />} />
@@ -120,6 +125,7 @@ export default function AdminApp() {
         <Route path={at(ADMIN_AUDIT_PATH)} element={<AuditScreen />} />
         <Route path={at(ADMIN_FLEET_FAILED_PATH)} element={<FleetFailedEventsScreen />} />
         <Route path={at(ADMIN_TEAM_PATH)} element={<TeamScreen />} />
+        <Route path={at(ADMIN_RETENTION_PATH)} element={<RetentionScreen />} />
         {/* The addresses from before A1 (kept at least until A8). */}
         {ADMIN_LEGACY_ROUTES.map(([old]) => (
           <Route key={old} path={`${at(old)}/*`} element={<LegacyRedirect />} />

@@ -4,6 +4,8 @@
  */
 export const SUPPORT_REQUESTS_PATH = '/suport/solicitari';
 export const SUPPORT_SEARCH_PATH = '/suport/cautare';
+/** Sugestii de verificat (A3c2b1), reached from Solicitări. */
+export const SUPPORT_TEXT_REVIEWS_PATH = '/suport/sugestii-de-verificat';
 
 /** One request (A3a). */
 export const supportRequestPath = (id: string) => `${SUPPORT_REQUESTS_PATH}/${id}`;

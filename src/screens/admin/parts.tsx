@@ -94,7 +94,7 @@ function fieldLabel(t: (key: MessageKey) => string, key: string): string {
   return own in ro ? t(own as MessageKey) : key;
 }
 
-function valueText(t: (key: MessageKey) => string, lang: Lang, key: string, value: unknown): string {
+function valueText(t: (key: MessageKey, params?: Record<string, string | number>) => string, lang: Lang, key: string, value: unknown): string {
   if (value === null || value === undefined || value === '') return '—';
   if (typeof value === 'boolean') return t(value ? 'admin.yes' : 'admin.no');
   if (key === 'status') {
@@ -110,6 +110,12 @@ function valueText(t: (key: MessageKey) => string, lang: Lang, key: string, valu
   if (key === 'mode' && `admin.deleteMode.${String(value)}` in ro) return t(`admin.deleteMode.${String(value)}` as MessageKey);
   if (key === 'kind' && `admin.export.kind.${String(value)}` in ro) return t(`admin.export.kind.${String(value)}` as MessageKey);
   if (key === 'matched' && Array.isArray(value)) return value.map((v) => t(`admin.matched.${String(v)}` as MessageKey)).join(', ');
+  if (key === 'counts' && value && typeof value === 'object') {
+    // A3c2b1: the preview's numbers confirmed when a retention job was switched on.
+    const c = value as { eligible?: { total?: number }; exempt?: { legal_hold?: number } };
+    return t('admin.retention.audit.counts', { eligible: c.eligible?.total ?? 0, exempt: c.exempt?.legal_hold ?? 0 });
+  }
+  if (key === 'action' && `support.textReview.action.${String(value)}` in ro) return t(`support.textReview.action.${String(value)}` as MessageKey);
   if (key === 'basis' && `admin.holds.basis.${String(value)}` in ro) return t(`admin.holds.basis.${String(value)}` as MessageKey);
   if (key === 'scope' && `admin.holds.scope.${String(value)}` in ro) return t(`admin.holds.scope.${String(value)}` as MessageKey);
   if (key === 'audience' && `admin.notices.audience.${String(value)}` in ro) return t(`admin.notices.audience.${String(value)}` as MessageKey);

@@ -36,6 +36,8 @@ export const adminRequestPath = (id: string) => `${ADMIN_REQUESTS_PATH}/${id}`;
 /** Păstrare legală (A3c2a): the support data kept for a dispute or an authority, admin only. */
 export const ADMIN_HOLDS_PATH = `${ADMIN_SUPPORT_PATH}/pastrare-legala`;
 export const adminHoldPath = (id: string) => `${ADMIN_HOLDS_PATH}/${id}`;
+/** Sugestii de verificat (A3c2b1): suggestions past 12 months whose text waits for a check. */
+export const ADMIN_TEXT_REVIEWS_PATH = `${ADMIN_SUPPORT_PATH}/sugestii-de-verificat`;
 
 // Platformă
 export const ADMIN_SETTINGS_PATH = `${ADMIN_PLATFORM_PATH}/setari`;
@@ -48,6 +50,8 @@ export const ADMIN_AUDIT_PATH = `${ADMIN_PLATFORM_PATH}/jurnal`;
 export const ADMIN_FLEET_FAILED_PATH = `${ADMIN_PLATFORM_PATH}/notificari-flota`;
 /** Echipa de suport (A2): the support agents, appointing and withdrawing the role. */
 export const ADMIN_TEAM_PATH = `${ADMIN_PLATFORM_PATH}/echipa`;
+/** Retenția datelor (A3c2b1): the retention jobs, their preview and their switch. */
+export const ADMIN_RETENTION_PATH = `${ADMIN_PLATFORM_PATH}/retentie`;
 
 export const adminShopPath = (id: string) => `${ADMIN_SHOPS_PATH}/${id}`;
 export const adminClientPath = (id: string) => `${ADMIN_CLIENTS_PATH}/${id}`;

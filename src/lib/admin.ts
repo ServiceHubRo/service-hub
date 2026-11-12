@@ -176,6 +176,10 @@ export const AUDIT_ACTIONS = [
   'review_legal_hold',
   'release_legal_hold',
   'view_legal_hold',
+  // A3c2b1
+  'set_retention_job',
+  'retention_run',
+  'review_suggestion_text',
 ] as const;
 
 export interface AuditChange {
