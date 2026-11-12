@@ -82,7 +82,7 @@ test.describe('fleet files (A6)', () => {
   test.skip(!BACKEND, 'needs the local Supabase stack');
 
   test('checked, cleaned and limited on the server; nothing else reaches the bucket', async () => {
-    test.skip(test.info().project.name !== 'mobile-ro', 'API only: once');
+    test.skip(test.info().project.name !== 'desktop-1440', 'API only: once');
     const admin = await createFleetUser();
     const other = await createFleetUser();
     const mine = await company(admin);
