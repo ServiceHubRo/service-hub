@@ -1,0 +1,305 @@
+/* Help Center (A4): the same cards, tiles and rows as the rest of the app; reading width for articles. */
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.home {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.searchRow {
+  display: grid;
+  gap: var(--space-3);
+}
+
+@media (min-width: 768px) {
+  .searchRow:has(> :nth-child(2)) {
+    grid-template-columns: minmax(0, 1fr) 240px;
+    align-items: end;
+  }
+}
+
+.block {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.blockTitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted-strong);
+  letter-spacing: 0.01em;
+}
+
+.note {
+  color: var(--text-2);
+  font-size: 14px;
+}
+
+/* Rows: a list of articles inside one card, hairlines between them. */
+.links {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+}
+
+.links > li + li {
+  border-top: 1px solid var(--border);
+}
+
+.link {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 56px;
+  padding: var(--space-3) var(--card-pad);
+  color: var(--text);
+  text-decoration: none;
+  transition: background-color var(--motion-quick) var(--ease);
+}
+
+.link:hover {
+  background: var(--surface-hover);
+}
+
+.linkText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.linkTitle {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.linkMeta {
+  font-size: 13px;
+  color: var(--muted-strong);
+}
+
+.linkSummary {
+  font-size: 14px;
+  color: var(--text-2);
+  overflow-wrap: anywhere;
+}
+
+.chevron {
+  flex-shrink: 0;
+  color: var(--muted);
+}
+
+/* Categories: tiles, two or three per row on wider screens, the same height on a row. */
+.categories {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-3);
+}
+
+@media (min-width: 768px) {
+  .categories {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1280px) {
+  .categories {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.categories > li {
+  display: flex;
+}
+
+.category {
+  flex: 1;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--card-pad);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  color: var(--text);
+  text-decoration: none;
+  transition:
+    border-color var(--motion-quick) var(--ease),
+    background-color var(--motion-quick) var(--ease);
+}
+
+.category:hover {
+  border-color: var(--border-lit);
+  background: var(--surface-hover);
+}
+
+.categoryIcon {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-button);
+  background: var(--amber-tint);
+  border: 1px solid rgba(245, 165, 36, 0.18);
+  color: var(--amber);
+}
+
+/* An article's text: a comfortable reading width, the app's type. */
+.articleCard {
+  max-width: 760px;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  line-height: 1.6;
+  color: var(--text);
+  overflow-wrap: anywhere;
+}
+
+.body h2 {
+  font-size: 17px;
+  margin-top: var(--space-2);
+}
+
+.body h3 {
+  font-size: 15px;
+  margin-top: var(--space-1);
+}
+
+.body ul,
+.body ol {
+  margin: 0;
+  padding-left: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.body blockquote {
+  margin: 0;
+  padding-left: var(--space-3);
+  border-left: 2px solid var(--border-lit);
+  color: var(--text-2);
+}
+
+.body a {
+  color: var(--amber);
+}
+
+.body hr {
+  border: 0;
+  border-top: 1px solid var(--border);
+  width: 100%;
+}
+
+.tableWrap {
+  overflow-x: auto;
+}
+
+.tableWrap table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 14px;
+}
+
+.tableWrap th,
+.tableWrap td {
+  border: 1px solid var(--border);
+  padding: var(--space-2);
+  text-align: left;
+}
+
+.updated {
+  margin-top: var(--space-4);
+  font-size: 13px;
+  color: var(--muted-strong);
+}
+
+/* „Ți-a fost util acest articol?” */
+.feedback {
+  max-width: 760px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--card-pad);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+}
+
+.feedbackQuestion {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.feedbackButtons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.feedbackButtons > * {
+  min-width: 96px;
+}
+
+.feedbackDone {
+  color: var(--text-2);
+}
+
+.feedbackMine {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 14px;
+  color: var(--muted-strong);
+}
+
+.contact {
+  max-width: 760px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-3);
+}
+
+@media (min-width: 768px) {
+  .contact {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+/* Suggestions while writing a support request. */
+.suggest {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.suggestTitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted-strong);
+}

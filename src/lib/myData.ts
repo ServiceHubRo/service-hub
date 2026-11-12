@@ -89,6 +89,13 @@ export function myDataSheets(data: unknown, lang: Lang, services: ServiceNames =
     rows: [[t('mydata.col.field'), t('mydata.col.value')], ...facts.filter(([, v]) => v !== '').map(([k, v]) => [t(k), v])],
   });
 
+  // A4: the account's answers to „Ți-a fost util acest articol?” (every role reads the Help Center).
+  add(
+    'mydata.sheet.helpFeedback',
+    ['mydata.hf.article', 'mydata.hf.helpful', 'mydata.hf.date'],
+    list(d.help_feedback).map((f) => [text(f.article), yesNo(lang, f.helpful), when(lang, f.updated_at)]),
+  );
+
   // ---------------------------------------------------------------- the client's side
   add(
     'mydata.sheet.cars',

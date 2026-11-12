@@ -87,7 +87,12 @@ key) plus `actor_role` and `actor_display_id`, filled by a trigger at insert, so
 | **Audit log** | ❌ | ❌ | company log per right | ❌ | ✅ |
 | Secrets, keys, configuration | ❌ | ❌ | ❌ | ❌ | ❌ (never in the database API) |
 | Resend the confirmation email for someone | — | — | — | after A3 | after A3 |
-| Help Center, internal procedures | — | — | — | A4, A5 | A4, A5 |
+| **Help Center** (A4): read published articles meant for it, search, frequent questions | ✅ client and general articles (company articles when fleets are on) | ✅ shop and general articles | ✅ + fleet articles for its company role | ✅ every audience (aal2, live session) | ✅ every audience |
+| Help Center: drafts, withdrawn articles, the team-only articles | ❌ (never returned) | ❌ | ❌ | ✅ team-only articles once published; ❌ drafts | ✅ in the administration |
+| Help Center: vote „Ți-a fost util acest articol?” (own vote, changeable; in the own data export) | ✅ on an article it may read | ✅ | ✅ | ✅ (the app does not ask) | ✅ |
+| Help Center: write, publish, withdraw, delete, order, categories, see vote totals and history | ❌ | ❌ | ❌ | ❌ (`not_allowed`) | ✅ (aal2; every write audited) |
+| Who voted on an article | ❌ | ❌ | ❌ | ❌ | ❌ (only totals; no grant on `help_feedback`) |
+| Internal procedures | — | — | — | A5 | A5 |
 
 ## 4. How it is enforced
 
@@ -145,12 +150,19 @@ key) plus `actor_role` and `actor_display_id`, filled by a trigger at insert, so
 | `run_audit_retention(job, now)` | `pg_cron`; nothing while off or locked; only rows written after the cutoff | the run's numbers | — |
 | `run_support_retention(now)`, `run_suggestion_anonymization(now)` | `pg_cron` (and `service_role`); nothing while the job is off; `now` never later than the clock | the run's numbers | — |
 
+| `help_center(lang)` (A4) | any signed-in account (an agent at aal2 with a live session) | `{lang, me: {staff, types, company_roles}, categories, articles (with text), untranslated, votes}` | `field_invalid {field: lang}` |
+| `help_send_feedback(article, helpful, request_id)` | the same readers | `{article_id, helpful}` | `article_not_found` (draft, withdrawn, hidden category or not meant for the caller), `field_invalid {field: helpful}` |
+| `admin_help_list()`, `admin_help_get_article(id)` | admin (aal2) | categories and articles (every status) with vote totals; one article with its last 50 versions | `article_not_found` |
+| `admin_help_save_article(id, article, request_id)`, `admin_help_set_article_status(id, status, request_id)`, `admin_help_delete_article(id, request_id)` | admin | the article; `{id, deleted}` | `field_invalid {field: help_title_ro, help_body_en, help_slug, help_audience, help_company_roles, …}`, `slug_taken`, `category_not_found`, `article_not_found`, `wrong_status`, `article_published` (withdraw before deleting) |
+| `admin_help_save_category(id, category, request_id)`, `admin_help_delete_category(id, request_id)`, `admin_help_move(kind, id, direction, request_id)` | admin | the category; `{id, deleted}`; the new position | `field_invalid {field: help_name_ro, help_icon, …}`, `slug_taken`, `category_not_found`, `category_not_empty`, `cannot_move` |
+
 Every caller check also answers `not_signed_in`, `account_suspended`, `not_allowed`, `mfa_required`.
 
 ## 6. Migration and rollback
 
 | Migration | Schema | Rollback | Rollback test |
 |---|---|---|---|
+| `20261112060000_help_center.sql` (A4) | 117 | `supabase/rollback/20261112060000_help_center.sql`: **refuses to run** (error listing how many) once a vote, a saved version, a changed, moved or added article or category, or a Help Center entry in the audit log exists; otherwise the tables, functions and audit classes go and the data export is the one before A4 | `npm run test:rollback`: structure and data identical; the refusal checked by hand with one changed article |
 | `20261111204858_audit_log_retention.sql` (A3c2b2) | 116 | `supabase/rollback/20261111204858_audit_log_retention.sql`: **refuses to run** while a log job is on, a log run exists or a log row has removed values (`redacted`); otherwise the A3c2b1 functions return and the classes, triggers and the cutoff go | `npm run test:rollback`: structure and data identical |
 | `20261111194435_support_retention.sql` (A3c2b1) | 115 | `supabase/rollback/20261111194435_support_retention.sql`: **refuses to run** (error listing how many) while a job is on or any run, statistics row or anonymised suggestion exists — what a job did cannot be undone; otherwise the A3c2a functions return and the activity column (derived data) goes | `npm run test:rollback`: structure and data identical |
 | `20261111142007_legal_hold.sql` (A3c2a) | 114 | `supabase/rollback/20261111142007_legal_hold.sql`: **refuses to run** (error listing how many) while any hold (active or released), review, kept identifiers or request kept after its account went exists — no held data is lost and no request is joined to an account by guess; otherwise the support functions, the foreign key (`ON DELETE CASCADE`, author required) and TRUNCATE for `service_role` return as before | `npm run test:rollback`: structure and data identical; the refusal checked by hand with an active and with a released hold (nothing changed) |

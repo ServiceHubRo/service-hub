@@ -121,7 +121,7 @@ select test.eq(
       and not has_function_privilege('anon', p.oid, 'execute')),
   'accept_company_invite, acknowledge_no_show_notice, admin_audit_privacy_report, admin_create_category, admin_create_service, admin_decide_no_show_dispute, '
   || 'admin_decide_review, admin_decide_suspect_review, admin_export, admin_extend_company_trial, admin_extend_trial, admin_force_cancel, '
-  || 'admin_get_booking, admin_get_client, admin_get_legal_hold, admin_get_shop, admin_grant_report_credit, admin_grant_support, admin_list_admins, admin_list_audit, admin_list_bookings, '
+  || 'admin_get_booking, admin_get_client, admin_get_legal_hold, admin_get_shop, admin_grant_report_credit, admin_grant_support, admin_help_delete_article, admin_help_delete_category, admin_help_get_article, admin_help_list, admin_help_move, admin_help_save_article, admin_help_save_category, admin_help_set_article_status, admin_list_admins, admin_list_audit, admin_list_bookings, '
   || 'admin_list_catalog, admin_list_clients, admin_list_company_checks, admin_list_failed_fleet_events, admin_list_fleet_companies, admin_list_history_reports, '
   || 'admin_list_legal_holds, admin_list_no_show_disputes, admin_list_notices, admin_list_retention_jobs, admin_list_reviews, admin_list_service_areas, admin_list_shops, admin_list_subscriptions, '
   || 'admin_list_suggestions, admin_list_support_agents, admin_list_suspect_reviews, admin_move_catalog_item, admin_notice_preview, admin_overview, admin_place_legal_hold, admin_release_legal_hold, admin_retention_preview, admin_retry_fleet_event, admin_return_request, admin_review_legal_hold, admin_revoke_support, admin_send_notice, '
@@ -136,7 +136,7 @@ select test.eq(
   || 'fleet_issue_photo_can_delete, fleet_issue_photo_can_read, fleet_issue_photo_can_upload, '
   || 'fleet_log_export, fleet_mark_expense, fleet_mark_maintenance_done, fleet_overview, fleet_plan_summary, fleet_report, fleet_report_issue, fleet_request_quote_changes, '
   || 'fleet_role_can, fleet_save_expense, fleet_save_maintenance, fleet_save_vehicle, '
-  || 'fleet_set_unavailable, fleet_subscription, fleet_update_issue, get_availability, get_my_support_request, get_shop_page, get_shop_setup, history_report_preview, invite_company_member, '
+  || 'fleet_set_unavailable, fleet_subscription, fleet_update_issue, get_availability, get_my_support_request, get_shop_page, get_shop_setup, help_center, help_send_feedback, history_report_preview, invite_company_member, '
   || 'invite_staff, is_admin, is_booking_shop_member, is_shop_member, is_shop_owner, is_shop_public, is_support_request_author, join_area_waitlist, join_slot_waitlist, '
   || 'last_odometer_for_booking, leave_area_waitlist, leave_slot_waitlist, list_company_members, list_imported_jobs, list_service_areas, '
   || 'list_shop_bookings, list_shop_history, list_shop_staff, list_threads, mark_no_show, mark_thread_read, merge_cars, my_client_referrals, my_companies, my_company_bookings, '

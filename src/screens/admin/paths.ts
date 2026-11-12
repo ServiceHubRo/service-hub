@@ -38,6 +38,9 @@ export const ADMIN_HOLDS_PATH = `${ADMIN_SUPPORT_PATH}/pastrare-legala`;
 export const adminHoldPath = (id: string) => `${ADMIN_HOLDS_PATH}/${id}`;
 /** Sugestii de verificat (A3c2b1): suggestions past 12 months whose text waits for a check. */
 export const ADMIN_TEXT_REVIEWS_PATH = `${ADMIN_SUPPORT_PATH}/sugestii-de-verificat`;
+/** Centrul de ajutor (A4): articles and categories; one article's editor (`nou` for a new one). */
+export const ADMIN_HELP_PATH = `${ADMIN_SUPPORT_PATH}/centrul-de-ajutor`;
+export const adminHelpArticlePath = (id: string) => `${ADMIN_HELP_PATH}/articol/${id}`;
 
 // Platformă
 export const ADMIN_SETTINGS_PATH = `${ADMIN_PLATFORM_PATH}/setari`;

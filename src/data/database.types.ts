@@ -5113,6 +5113,37 @@ export type Database = {
         Args: { p_account: string; p_reason: string; p_request_id: string }
         Returns: Json
       }
+      admin_help_delete_article: {
+        Args: { p_id: string; p_request_id: string }
+        Returns: Json
+      }
+      admin_help_delete_category: {
+        Args: { p_id: string; p_request_id: string }
+        Returns: Json
+      }
+      admin_help_get_article: { Args: { p_id: string }; Returns: Json }
+      admin_help_list: { Args: never; Returns: Json }
+      admin_help_move: {
+        Args: {
+          p_direction: number
+          p_id: string
+          p_kind: string
+          p_request_id: string
+        }
+        Returns: Json
+      }
+      admin_help_save_article: {
+        Args: { p_article: Json; p_id: string | null; p_request_id: string }
+        Returns: Json
+      }
+      admin_help_save_category: {
+        Args: { p_category: Json; p_id: string | null; p_request_id: string }
+        Returns: Json
+      }
+      admin_help_set_article_status: {
+        Args: { p_id: string; p_request_id: string; p_status: string }
+        Returns: Json
+      }
       admin_list_admins: { Args: never; Returns: Json }
       admin_list_audit: {
         Args: { p_before?: string; p_limit?: number }
@@ -6796,6 +6827,11 @@ export type Database = {
         Returns: string
       }
       grant_referral_reward: { Args: { p_shop_id: string }; Returns: undefined }
+      help_center: { Args: { p_lang: string }; Returns: Json }
+      help_send_feedback: {
+        Args: { p_article: string; p_helpful: boolean; p_request_id: string }
+        Returns: Json
+      }
       history_report_for: {
         Args: { p_aal?: string; p_report_id: string; p_user_id: string }
         Returns: Json

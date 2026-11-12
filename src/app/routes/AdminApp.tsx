@@ -10,6 +10,8 @@ import { BookingsScreen } from '../../screens/admin/BookingsScreen';
 import { CatalogScreen } from '../../screens/admin/CatalogScreen';
 import { ClientDetailScreen } from '../../screens/admin/ClientDetailScreen';
 import { ClientsScreen } from '../../screens/admin/ClientsScreen';
+import { HelpAdminScreen } from '../../screens/admin/HelpAdminScreen';
+import { HelpArticleEditScreen } from '../../screens/admin/HelpArticleEditScreen';
 import { LegalHoldScreen, LegalHoldsScreen } from '../../screens/admin/LegalHoldsScreen';
 import { ExportScreen } from '../../screens/admin/ExportScreen';
 import { LegacyRedirect } from '../../screens/admin/LegacyRedirect';
@@ -41,6 +43,7 @@ import {
   ADMIN_SHOPS_PATH,
   ADMIN_SUBSCRIPTIONS_PATH,
   ADMIN_REQUESTS_PATH,
+  ADMIN_HELP_PATH,
   ADMIN_HOLDS_PATH,
   ADMIN_SUPPORT_PATH,
   ADMIN_TEAM_PATH,
@@ -115,6 +118,8 @@ export default function AdminApp() {
         <Route path={`${at(ADMIN_REQUESTS_PATH)}/:requestId`} element={<RequestScreen mode="admin" />} />
         <Route path={at(ADMIN_HOLDS_PATH)} element={<LegalHoldsScreen />} />
         <Route path={`${at(ADMIN_HOLDS_PATH)}/:holdId`} element={<LegalHoldScreen />} />
+        <Route path={at(ADMIN_HELP_PATH)} element={<HelpAdminScreen />} />
+        <Route path={`${at(ADMIN_HELP_PATH)}/articol/:articleId`} element={<HelpArticleEditScreen />} />
         <Route path={at(ADMIN_TEXT_REVIEWS_PATH)} element={<TextReviewsScreen mode="admin" />} />
         {/* Platformă */}
         <Route path={at(ADMIN_SETTINGS_PATH)} element={<SettingsScreen />} />

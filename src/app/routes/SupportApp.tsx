@@ -4,7 +4,10 @@ import { AccountScreen as SupportAccountScreen } from '../../screens/support/Acc
 import { InboxScreen } from '../../screens/requests/InboxScreen';
 import { RequestScreen } from '../../screens/requests/RequestScreen';
 import { TextReviewsScreen } from '../../screens/requests/TextReviewsScreen';
-import { SUPPORT_REQUESTS_PATH, SUPPORT_SEARCH_PATH, SUPPORT_TEXT_REVIEWS_PATH } from '../../screens/support/paths';
+import { HelpArticleScreen } from '../../screens/help/HelpArticleScreen';
+import { HelpCategoryScreen } from '../../screens/help/HelpCategoryScreen';
+import { SupportHelpScreen } from '../../screens/help/SupportHelpScreen';
+import { SUPPORT_HELP_PATH, SUPPORT_REQUESTS_PATH, SUPPORT_SEARCH_PATH, SUPPORT_TEXT_REVIEWS_PATH } from '../../screens/support/paths';
 import { SearchScreen } from '../../screens/support/SearchScreen';
 import { AppShell } from '../AppShell';
 import { commonRoutes, rel } from './shared';
@@ -12,7 +15,7 @@ import { commonRoutes, rel } from './shared';
 /**
  * Everything under /suport, loaded only by support agents (A2): after the second step of sign-in
  * (the database refuses every support_* function without it), Solicitări, Căutare with an account's
- * card, and the agent's own Cont. Help Center (A4) and Proceduri (A5) join when they exist.
+ * card, the Help Center (A4) and the agent's own Cont. Proceduri (A5) joins when it exists.
  */
 export default function SupportApp() {
   return (
@@ -27,7 +30,10 @@ export default function SupportApp() {
         {commonRoutes('support', {
           [SUPPORT_REQUESTS_PATH]: <InboxScreen mode="support" />,
           [SUPPORT_SEARCH_PATH]: <SearchScreen />,
+          [SUPPORT_HELP_PATH]: <SupportHelpScreen />,
         })}
+        <Route path={`${rel('support', SUPPORT_HELP_PATH)}/categorie/:slug`} element={<HelpCategoryScreen role="support" />} />
+        <Route path={`${rel('support', SUPPORT_HELP_PATH)}/articol/:slug`} element={<HelpArticleScreen role="support" />} />
         <Route path={`${rel('support', SUPPORT_REQUESTS_PATH)}/:requestId`} element={<RequestScreen mode="support" />} />
         <Route path={`${rel('support', SUPPORT_SEARCH_PATH)}/:accountId`} element={<SupportAccountScreen />} />
         <Route path={rel('support', SUPPORT_TEXT_REVIEWS_PATH)} element={<TextReviewsScreen mode="support" />} />
