@@ -1,6 +1,6 @@
-import { BookOpen, CalendarDays, Car, History, Inbox, LayoutDashboard, MessageSquare, Search, User, UserSearch, type LucideIcon } from 'lucide-react';
+import { BookOpen, CalendarDays, Car, ClipboardList, History, Inbox, LayoutDashboard, MessageSquare, Search, User, UserSearch, type LucideIcon } from 'lucide-react';
 import type { MessageKey } from '../i18n/ro';
-import { SUPPORT_HELP_PATH, SUPPORT_REQUESTS_PATH, SUPPORT_SEARCH_PATH } from '../screens/support/paths';
+import { SUPPORT_HELP_PATH, SUPPORT_PROCEDURES_PATH, SUPPORT_REQUESTS_PATH, SUPPORT_SEARCH_PATH } from '../screens/support/paths';
 import { ADMIN_ZONES } from './adminZones';
 
 export type Role = 'client' | 'shop' | 'admin' | 'support';
@@ -60,11 +60,12 @@ const adminMain: NavItem[] = ADMIN_ZONES.map((zone) => ({
   children: zone.items.map((item) => ({ path: item.path, labelKey: item.labelKey, icon: item.icon })),
 }));
 
-// Support agent (A2): its requests, the account search and the Help Center (A4); Proceduri joins in A5.
+// Support agent (A2): its requests, the account search, the Help Center (A4) and the procedures (A5).
 const supportMain: NavItem[] = [
   { path: SUPPORT_REQUESTS_PATH, labelKey: 'nav.support.requests', icon: Inbox },
   { path: SUPPORT_SEARCH_PATH, labelKey: 'nav.support.search', icon: UserSearch },
   { path: SUPPORT_HELP_PATH, labelKey: 'help.center.title', shortLabelKey: 'nav.support.helpShort', icon: BookOpen },
+  { path: SUPPORT_PROCEDURES_PATH, labelKey: 'proc.title', shortLabelKey: 'nav.support.procedures', icon: ClipboardList },
 ];
 
 export const NAV: Record<Role, RoleNav> = {

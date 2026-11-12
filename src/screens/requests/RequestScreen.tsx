@@ -39,6 +39,7 @@ import { basisLabel } from '../admin/legalHoldText';
 import { ADMIN_REQUESTS_PATH, adminClientPath, adminHoldPath } from '../admin/paths';
 import adminStyles from '../admin/admin.module.css';
 import { NotFound } from '../public/NotFound';
+import { RelevantProcedures } from '../procedures/RelevantProcedures';
 import { SUPPORT_REQUESTS_PATH, supportAccountPath } from '../support/paths';
 import { categoryName, dayText, whenText } from './format';
 import { AttachmentPicker } from './Attachments';
@@ -54,7 +55,8 @@ const staffName = (s: Partial<StaffRef> | null | undefined) => [s?.display_id, s
  * minimal reference, the conversation with which member answered, the internal notes (never the
  * author's), and the work: take, assign, answer, change the state, note, escalate (agent) or give back
  * (admin). An escalated request is read-only for an agent; a closed one for everybody. Every opening
- * and every action is in the audit log (the database writes it). Live since A3c1.
+ * and every action is in the audit log (the database writes it). Live since A3c1. The procedures that
+ * fit its category are shown under the facts (A5), read only.
  */
 export function RequestScreen({ mode }: { mode: 'support' | 'admin' }) {
   const { t, lang } = useI18n();
@@ -195,6 +197,9 @@ export function RequestScreen({ mode }: { mode: 'support' | 'admin' }) {
         </dl>
         {editable && <Responsible request={r} me={me} staff={staff} onDone={refresh} />}
       </Card>
+
+      {/* A5: the team's procedures for this kind of request, read in place. */}
+      <RelevantProcedures requestId={r.id} mode={mode} />
 
       <section className={styles.form} aria-label={t('support.req.conversation')}>
         <h2 className={adminStyles.sectionTitle}>{t('support.req.conversation')}</h2>

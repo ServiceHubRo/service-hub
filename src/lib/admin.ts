@@ -190,6 +190,20 @@ export const AUDIT_ACTIONS = [
   'update_help_category',
   'delete_help_category',
   'move_help_item',
+  // A5
+  'create_procedure',
+  'save_procedure_draft',
+  'new_procedure_version',
+  'submit_procedure',
+  'return_procedure_draft',
+  'discard_procedure_draft',
+  'approve_procedure',
+  'publish_procedure',
+  'update_procedure_settings',
+  'archive_procedure',
+  'restore_procedure',
+  'acknowledge_procedure',
+  'set_procedure_responsible',
 ] as const;
 
 export interface AuditChange {

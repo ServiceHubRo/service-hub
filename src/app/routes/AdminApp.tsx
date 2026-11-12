@@ -20,6 +20,10 @@ import { ModerationScreen } from '../../screens/admin/ModerationScreen';
 import { NoShowDisputesScreen } from '../../screens/admin/NoShowDisputesScreen';
 import { NoticesScreen } from '../../screens/admin/NoticesScreen';
 import { OverviewScreen } from '../../screens/admin/OverviewScreen';
+import { ProcedureEditScreen } from '../../screens/procedures/ProcedureEditScreen';
+import { ProcedureScreen } from '../../screens/procedures/ProcedureScreen';
+import { ProceduresScreen } from '../../screens/procedures/ProceduresScreen';
+import { ResponsiblesScreen } from '../../screens/procedures/ResponsiblesScreen';
 import {
   ADMIN_ACTIVITY_PATH,
   ADMIN_ANAF_PATH,
@@ -38,6 +42,7 @@ import {
   ADMIN_PANEL_PATH,
   ADMIN_PARTNERS_PATH,
   ADMIN_PLATFORM_PATH,
+  ADMIN_PROCEDURES_PATH,
   ADMIN_REPORTS_PATH,
   ADMIN_SETTINGS_PATH,
   ADMIN_SHOPS_PATH,
@@ -120,6 +125,11 @@ export default function AdminApp() {
         <Route path={`${at(ADMIN_HOLDS_PATH)}/:holdId`} element={<LegalHoldScreen />} />
         <Route path={at(ADMIN_HELP_PATH)} element={<HelpAdminScreen />} />
         <Route path={`${at(ADMIN_HELP_PATH)}/articol/:articleId`} element={<HelpArticleEditScreen />} />
+        <Route path={at(ADMIN_PROCEDURES_PATH)} element={<ProceduresScreen mode="admin" />} />
+        <Route path={`${at(ADMIN_PROCEDURES_PATH)}/nou`} element={<ProcedureEditScreen mode="admin" />} />
+        <Route path={`${at(ADMIN_PROCEDURES_PATH)}/responsabili`} element={<ResponsiblesScreen mode="admin" />} />
+        <Route path={`${at(ADMIN_PROCEDURES_PATH)}/:procedureId`} element={<ProcedureScreen mode="admin" />} />
+        <Route path={`${at(ADMIN_PROCEDURES_PATH)}/:procedureId/editare`} element={<ProcedureEditScreen mode="admin" />} />
         <Route path={at(ADMIN_TEXT_REVIEWS_PATH)} element={<TextReviewsScreen mode="admin" />} />
         {/* Platformă */}
         <Route path={at(ADMIN_SETTINGS_PATH)} element={<SettingsScreen />} />

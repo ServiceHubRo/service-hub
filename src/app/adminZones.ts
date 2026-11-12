@@ -2,6 +2,7 @@ import {
   Activity,
   BellOff,
   BookOpen,
+  ClipboardCheck,
   ClipboardList,
   Copy,
   CreditCard,
@@ -50,6 +51,7 @@ import {
   ADMIN_PANEL_PATH,
   ADMIN_PARTNERS_PATH,
   ADMIN_PLATFORM_PATH,
+  ADMIN_PROCEDURES_PATH,
   ADMIN_REPORTS_PATH,
   ADMIN_SETTINGS_PATH,
   ADMIN_SHOPS_PATH,
@@ -145,6 +147,7 @@ export const ADMIN_ZONES: readonly AdminZone[] = [
       { path: ADMIN_HOLDS_PATH, labelKey: 'admin.holds.title', hintKey: 'admin.holds.tileHint', icon: FileLock },
       { path: ADMIN_TEXT_REVIEWS_PATH, labelKey: 'support.textReview.title', hintKey: 'support.textReview.tileHint', icon: FileSearch },
       { path: ADMIN_HELP_PATH, labelKey: 'admin.help.title', hintKey: 'admin.help.tileHint', icon: BookOpen },
+      { path: ADMIN_PROCEDURES_PATH, labelKey: 'proc.title', hintKey: 'proc.tileHint', icon: ClipboardCheck },
     ],
   },
   {

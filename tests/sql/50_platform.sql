@@ -124,7 +124,7 @@ select test.eq(
   || 'admin_get_booking, admin_get_client, admin_get_legal_hold, admin_get_shop, admin_grant_report_credit, admin_grant_support, admin_help_delete_article, admin_help_delete_category, admin_help_get_article, admin_help_list, admin_help_move, admin_help_save_article, admin_help_save_category, admin_help_set_article_status, admin_list_admins, admin_list_audit, admin_list_bookings, '
   || 'admin_list_catalog, admin_list_clients, admin_list_company_checks, admin_list_failed_fleet_events, admin_list_fleet_companies, admin_list_history_reports, '
   || 'admin_list_legal_holds, admin_list_no_show_disputes, admin_list_notices, admin_list_retention_jobs, admin_list_reviews, admin_list_service_areas, admin_list_shops, admin_list_subscriptions, '
-  || 'admin_list_suggestions, admin_list_support_agents, admin_list_suspect_reviews, admin_move_catalog_item, admin_notice_preview, admin_overview, admin_place_legal_hold, admin_release_legal_hold, admin_retention_preview, admin_retry_fleet_event, admin_return_request, admin_review_legal_hold, admin_revoke_support, admin_send_notice, '
+  || 'admin_list_suggestions, admin_list_support_agents, admin_list_suspect_reviews, admin_move_catalog_item, admin_notice_preview, admin_overview, admin_place_legal_hold, admin_procedure_acknowledgements, admin_procedure_approve, admin_procedure_archive, admin_procedure_publish, admin_procedure_set_responsible, admin_procedure_set_settings, admin_release_legal_hold, admin_retention_preview, admin_retry_fleet_event, admin_return_request, admin_review_legal_hold, admin_revoke_support, admin_send_notice, '
   || 'admin_set_account_suspended, admin_set_area_mode, admin_set_company_plan, admin_set_notification_text, admin_set_retention_job, admin_set_service_reminder, '
   || 'admin_set_shop_suspended, admin_set_subscription_price, admin_set_subscription_status, admin_set_suggestion_status, admin_support_stats, admin_update_category, '
   || 'admin_update_fleet_plan, admin_update_service, admin_update_settings, admin_update_shop, admin_vehicle_duplicates, admin_verify_phone, admin_void_history_report, '
@@ -145,9 +145,9 @@ select test.eq(
   || 'reschedule_booking, save_native_push_token, save_push_subscription, save_shop_hours, save_vehicle_intake, search_card_extras, '
   || 'search_cities, search_shops, send_message, send_quote, set_booking_history_share, set_company_member_rights, set_company_member_role, set_company_rules, '
   || 'set_quote_next_number, set_shop_services, shop_cancel_booking, shop_create_booking, shop_decide_quote, shop_import_add, shop_import_begin, '
-  || 'shop_import_undo, shop_offers, shop_reports, shop_vehicle_file, start_inspection, start_work, submit_review, submit_suggestion, '
+  || 'shop_import_undo, shop_offers, shop_reports, shop_vehicle_file, staff_procedure_acknowledge, staff_procedure_create, staff_procedure_get, staff_procedure_new_version, staff_procedure_save, staff_procedure_step, staff_procedures, start_inspection, start_work, submit_review, submit_suggestion, '
   || 'support_add_note, support_assign_request, support_categories_for_me, support_dashboard, support_escalate_request, support_get_account, support_get_request, support_inbox, '
-  || 'support_list_requests, support_list_staff, support_list_suggestion_reviews, support_list_suggestions, support_reply_request, support_review_suggestion_text, support_search_accounts, support_set_request_status, '
+  || 'support_list_requests, support_list_staff, support_list_suggestion_reviews, support_list_suggestions, support_procedures_for_request, support_reply_request, support_review_suggestion_text, support_search_accounts, support_set_request_status, '
   || 'support_set_suggestion_status, support_signal_reader, support_signal_team_visible, support_take_request, '
   || 'toggle_favorite, touch_last_active, transfer_company_admin, update_company, withdraw_quote',
   'functions callable only when signed in')
