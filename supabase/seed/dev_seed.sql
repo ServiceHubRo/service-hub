@@ -402,7 +402,8 @@ begin
     perform pg_temp.seed_user('30000000-0000-4000-8000-000000000003', 'suport@service-hub.test',
       '{"role":"client","name":"Ioana Suport","lang":"ro","terms_version":"2026-09"}');
     -- A6: an admin acts only with a live session; this one exists for the call and goes after it.
-    insert into auth.sessions (id, user_id) values ('30000000-0000-4000-8000-0000000000e1', '30000000-0000-4000-8000-000000000001')
+    -- created_at as Supabase Auth writes it (no default on the real table; the team's 8 hours count from it).
+    insert into auth.sessions (id, user_id, created_at) values ('30000000-0000-4000-8000-0000000000e1', '30000000-0000-4000-8000-000000000001', now())
     on conflict (id) do nothing;
     perform set_config('request.jwt.claim.sub', '30000000-0000-4000-8000-000000000001', true);
     perform set_config('request.jwt.claims',
