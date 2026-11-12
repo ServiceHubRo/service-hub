@@ -80,7 +80,7 @@ key) plus `actor_role` and `actor_display_id`, filled by a trigger at insert, so
 | **Account search** | — | — | — | ✅ masked: ID, name, role, state, `m***@…`, phone's last 3 digits, shop name and city, created, last active | ✅ full lists |
 | **Account card** | — | — | — | ✅ the same fields + its suggestions; never bookings, cars, companies, billing, messages, reviews | ✅ full card |
 | Find admin or agent accounts | — | — | — | ❌ (never in results) | ✅ |
-| Suspend, reactivate, delete accounts | ❌ | ❌ | ❌ | ❌ | ✅ (reason required for each, A6) |
+| Suspend, reactivate, delete accounts | ❌ | ❌ | ❌ | ❌ | ✅ (reason required for each, A6; never the only administrator of a company with other members — `company_last_admin`, A7, the same rule as the account's own deletion) |
 | Sensitive admin changes (A6): a shop's data and billing, a price, a free period, a report credit, a phone confirmed by hand, a company plan, the platform settings | ❌ | ❌ | ❌ | ❌ | ✅ reason required (1–500 characters, in the audit log); the owner is told when the IBAN or the billing email changes |
 | **Exports** (A6) | ❌ | ❌ | ❌ | ❌ | ✅ reason required, at most 100 rows and 5 exports an hour per admin, without phone numbers or VINs |
 | **Admin accounts** (A6, Platformă → Administratori): see the admins, end another admin's sessions, suspend or reactivate it, end one's own other sessions | ❌ | ❌ | ❌ | ❌ | ✅ reason required; never oneself, never the last active admin |
