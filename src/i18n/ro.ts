@@ -3691,6 +3691,7 @@ export const ro = {
   'rpcError.invite_other_email': 'Invitația este pentru altă adresă de email. Intră cu contul care are adresa invitată.',
   'rpcError.member_not_found': 'Membrul nu mai există.',
   'rpcError.last_admin': 'Firma trebuie să aibă un administrator. Predă mai întâi administrarea altui membru.',
+  'rpcError.company_last_admin': 'Contul este singurul administrator al unei firme cu alți membri. Administrarea firmei trebuie predată mai întâi altui membru.',
   'rpcError.transfer_invalid': 'Administrarea se poate preda doar unui alt membru care și-a acceptat invitația.',
 
   // T63a — fleet account (design preview; docs/FLEET_PLAN.md)

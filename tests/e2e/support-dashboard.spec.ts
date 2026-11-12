@@ -59,6 +59,7 @@ interface Heard {
   suggestion_id?: string;
   audience?: string;
   author_id?: string | null;
+  changed_at?: string;
   errors?: unknown;
 }
 
@@ -455,9 +456,15 @@ test.describe('support dashboard (A3c1)', () => {
         })
       ).ok,
     ).toBe(true);
+    // A change committed before the withdrawal answered (another test's request, in parallel) may
+    // still reach the agent; nothing that changed afterwards may (A7: flaky on such a change).
+    const withdrawnAt = Date.now();
     await request(clientA, `După retragere ${s}`);
     await page.waitForTimeout(4_000);
-    expect(hearOld.heard, 'a withdrawn agent hears nothing more').toEqual([]);
+    expect(
+      hearOld.heard.filter((h) => !h.changed_at || Date.parse(h.changed_at) >= withdrawnAt),
+      'a withdrawn agent hears nothing more',
+    ).toEqual([]);
     await hearOld.close();
     agent = await createAgent();
   });

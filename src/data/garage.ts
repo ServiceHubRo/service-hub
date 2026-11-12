@@ -1,4 +1,5 @@
 import type { Database } from './database.types';
+import { ensureChanged } from './directWrite';
 import { call, failure, RpcError } from './rpc';
 import { supabase } from './supabase';
 
@@ -76,10 +77,14 @@ export async function fetchOilStandard(): Promise<{ enabled: boolean; months: nu
   return { enabled: data?.enabled ?? false, months: data?.reminder_months ?? null };
 }
 
-/** Deleting twice is harmless: the second time there is simply nothing left to delete. */
+/**
+ * Deleting twice is harmless: the second time there is simply nothing left to delete. A deletion the
+ * database refuses (a suspended account) is an error, never a silent success (A7).
+ */
 export async function deleteCar(id: string): Promise<void> {
-  const { error } = await db().from('cars').delete().eq('id', id);
-  if (error) throw failure(error);
+  await ensureChanged(await db().from('cars').delete().eq('id', id).select('id'), () =>
+    db().from('cars').select('id').eq('id', id),
+  );
 }
 
 /** The owner keeps one of two copies of the same car (T66): bookings and reports move to it; logged. */
