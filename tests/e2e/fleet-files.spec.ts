@@ -114,13 +114,6 @@ test.describe('fleet files (A6)', () => {
       await refused({ name: 'stricata.png', type: 'image/png', bytes: Buffer.from(PNG, 'base64').subarray(0, 60) }, 'file_corrupt');
       await refused({ name: 'factura.pdf', type: 'application/pdf', bytes: ACTIVE_PDF }, 'file_pdf_active');
       await refused({ name: 'raport.pdf', type: 'application/pdf', bytes: PDF }, 'file_type', crypto.randomUUID());
-      // Over 5 MB: refused and not stored. The function answers `file_too_large`; a body over the
-      // platform's own limit is refused before it runs, with a 413 the app reads the same way.
-      const big = await upload(token, mine, { name: 'mare.png', type: 'image/png', bytes: Buffer.concat([Buffer.from(PNG, 'base64'), Buffer.alloc(6 * 1024 * 1024)]) });
-      console.warn(`fleet-files over 5 MB: ${big.status} ${JSON.stringify(big.body)}`);
-      expect(big.status, JSON.stringify(big.body)).toBeGreaterThanOrEqual(400);
-      expect(big.body.path).toBeUndefined();
-      if (big.body.error !== undefined) expect(big.body.error).toBe('file_too_large');
     });
     await test.step('a phone photo loses its GPS block', async () => {
       const photo = await upload(token, mine, { name: 'IMG_2026.jpg', type: 'image/jpeg', bytes: phoneJpeg() });
@@ -152,5 +145,21 @@ test.describe('fleet files (A6)', () => {
       expect(r.body.error).toBe('account_suspended');
       await serviceRest(`profiles?id=eq.${me}`, 'PATCH', { suspended: false });
     });
+  });
+
+  test('a body over 5 MB is cut and refused at once, and nothing is stored', async () => {
+    test.skip(test.info().project.name !== 'desktop-1440', 'API only: once');
+    test.setTimeout(60_000);
+    const admin = await createFleetUser();
+    const mine = await company(admin);
+    const token = await tokenOf(admin);
+    const big = await upload(token, mine, {
+      name: 'mare.png',
+      type: 'image/png',
+      bytes: Buffer.concat([Buffer.from(PNG, 'base64'), Buffer.alloc(6 * 1024 * 1024)]),
+    });
+    expect(big.status, JSON.stringify(big.body)).toBe(413);
+    expect(big.body.error).toBe('file_too_large');
+    expect(big.body.path).toBeUndefined();
   });
 });
