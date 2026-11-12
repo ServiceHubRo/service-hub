@@ -1,7 +1,7 @@
 # A3c2b3 — Audit of the historical logs (read-only) and cleanup proposal
 
-Status: **audit done 12 Nov 2026, nothing changed. The cleanup below is a PROPOSAL waiting for Eduard's
-explicit approval.** No migration, no data change, no permission change in this stage.
+Status: **audit done 12 Nov 2026, nothing changed. Eduard's decision (12 Nov): no A3c2b3 migration; the 7
+legacy rows go with the launch reset (`docs/sql/reset_before_launch.sql`). §8 stays as the fallback, not approved.** No migration, no data change, no permission change in this stage.
 
 ## 0. What was checked, and how
 
