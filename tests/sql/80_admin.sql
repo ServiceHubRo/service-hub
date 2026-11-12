@@ -342,7 +342,8 @@ select test.fails($$select public.admin_account_deletion(test.id('admin'), test.
 select test.fails($$select public.admin_account_deletion(test.id('admin'), test.id('owner2'))$$, 'shop_has_active_bookings',
   'a shop with active bookings too');
 select test.eq(public.admin_account_deletion(test.id('admin'), test.id('client_a')), 'delete', 'a client is deleted');
-select test.eq(before->>'email', 'ana@test.local', 'who it was, in the log'),
+-- A3c2b2: the log keeps the account's code and role, never its name or email.
+select test.ok(before ? 'display_id' and before ? 'role' and not before ? 'email' and not before ? 'name', 'who it was, in the log: its code, no name or email'),
        test.eq(after->>'mode', 'delete', 'and how'),
        test.eq(admin_id, test.id('admin'), 'by whom')
 from public.admin_audit_log where action = 'delete_account' and entity_id = test.id('client_a')::text;

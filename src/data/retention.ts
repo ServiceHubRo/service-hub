@@ -8,8 +8,14 @@ import type { StaffRef } from './supportRequests';
  * function; none of these tables has a grant.
  */
 
-export const RETENTION_JOBS = ['support_requests', 'suggestions'] as const;
+export const RETENTION_JOBS = ['support_requests', 'suggestions', 'support_log', 'admin_log'] as const;
 export type RetentionJob = (typeof RETENTION_JOBS)[number];
+/** A3c2b2: the jobs of the audit log. */
+export const LOG_JOBS: readonly RetentionJob[] = ['support_log', 'admin_log'];
+export const isLogJob = (job: RetentionJob) => LOG_JOBS.includes(job);
+/** The classes of the audit log (audit_action_classes). */
+export const AUDIT_CLASSES = ['support', 'admin', 'security', 'legal'] as const;
+export type AuditClass = (typeof AUDIT_CLASSES)[number];
 
 /** The database's limits (retention_jobs checks, admin_set_retention_job). */
 export const RETENTION_REASON_MIN = 10;
@@ -58,12 +64,19 @@ export interface RetentionCounts {
   reviews?: { pending: number; expiring: number; due_7_days: number };
 }
 
+/** The numbers of a log job (A3c2b2): rows written after the cutoff only. */
+export interface LogCounts {
+  eligible: { total: number; search_terms: number; by_class: Partial<Record<AuditClass, number>> };
+  exempt: { legal_hold: number; before_cutoff: number; legal_active: number };
+  next_due_at: string | null;
+}
+
 export interface RetentionPreview {
   job: RetentionJob;
   now: string;
   enabled: boolean;
   /** Sent back unchanged to switch the job on: the database refuses other numbers. */
-  counts: RetentionCounts;
+  counts: RetentionCounts | LogCounts;
 }
 
 export interface RetentionRun {
@@ -81,13 +94,15 @@ export interface RetentionJobState {
   changed_at: string | null;
   reason: string | null;
   changed_by: StaffRef | null;
-  enabled_counts: RetentionCounts | null;
+  enabled_counts: RetentionCounts | LogCounts | null;
+  /** A job nobody can switch on yet (admin_log: 'legal_validation'). */
+  locked_reason: string | null;
   /** The last ten runs, newest first. */
   runs: RetentionRun[];
 }
 
-export async function listRetentionJobs(): Promise<{ now: string; items: RetentionJobState[] }> {
-  return (await call('admin_list_retention_jobs', {} as never)) as unknown as { now: string; items: RetentionJobState[] };
+export async function listRetentionJobs(): Promise<{ now: string; cutoff: string; items: RetentionJobState[] }> {
+  return (await call('admin_list_retention_jobs', {} as never)) as unknown as { now: string; cutoff: string; items: RetentionJobState[] };
 }
 
 export async function retentionPreview(job: RetentionJob): Promise<RetentionPreview> {
@@ -95,7 +110,7 @@ export async function retentionPreview(job: RetentionJob): Promise<RetentionPrev
 }
 
 export async function setRetentionJob(
-  p: { job: RetentionJob; enabled: boolean; reason: string; batchSize: number | null; expected: RetentionCounts | null },
+  p: { job: RetentionJob; enabled: boolean; reason: string; batchSize: number | null; expected: RetentionCounts | LogCounts | null },
   requestId: string,
 ): Promise<{ enabled: boolean; batch_size: number }> {
   return (await call('admin_set_retention_job', {
@@ -160,4 +175,25 @@ export function reviewUrgent(dueAt: string, now: Date): boolean {
 /** The findings that are there, in a fixed order. */
 export function findingList(f: Findings): { kind: FindingKind; n: number }[] {
   return FINDING_KINDS.filter((k) => (f[k] ?? 0) > 0).map((k) => ({ kind: k, n: f[k] ?? 0 }));
+}
+
+// ------------------------------------------------------------------ the log's privacy report (A3c2b2)
+
+export const REPORT_KINDS = ['names', 'emails', 'phones', 'search_terms', 'file_names', 'secrets', 'deleted_accounts'] as const;
+export type ReportKind = (typeof REPORT_KINDS)[number];
+
+/** What the log holds that may be personal data or a secret: numbers only, never a value. */
+export interface AuditPrivacyReport {
+  generated_at: string;
+  cutoff: string;
+  rows: number;
+  legacy_rows: number;
+  oldest: string | null;
+  newest: string | null;
+  totals: Record<ReportKind, number>;
+  by_action: ({ action: string; class: AuditClass; rows: number; legacy_rows: number } & Record<ReportKind, number>)[];
+}
+
+export async function auditPrivacyReport(): Promise<AuditPrivacyReport> {
+  return (await call('admin_audit_privacy_report', {} as never)) as unknown as AuditPrivacyReport;
 }

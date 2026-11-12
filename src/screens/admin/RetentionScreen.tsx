@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { Fragment, useCallback, useState } from 'react';
 import { ActionButton } from '../../components/ActionButton';
 import { BackLink } from '../../components/BackLink';
 import { Button } from '../../components/Button';
@@ -11,10 +11,17 @@ import { Spinner } from '../../components/Spinner';
 import { TextArea } from '../../components/TextArea';
 import { adminZoneBack } from '../../app/adminZones';
 import {
+  AUDIT_CLASSES,
+  auditPrivacyReport,
   BATCH_SIZES,
   DEFAULT_BATCH,
   findingList,
+  isLogJob,
   listRetentionJobs,
+  REPORT_KINDS,
+  type AuditPrivacyReport,
+  type LogCounts,
+  type RetentionCounts,
   RETENTION_REASON_MAX,
   RETENTION_REASON_MIN,
   retentionPreview,
@@ -29,7 +36,7 @@ import { formatDecimal, formatTime } from '../../i18n/format';
 import type { MessageKey } from '../../i18n/ro';
 import { ro } from '../../i18n/ro';
 import { useLoad } from '../../lib/useLoad';
-import { dateTime } from './format';
+import { actionLabel, dateTime } from './format';
 import { Pill, SectionTitle } from './parts';
 import { ADMIN_RETENTION_PATH } from './paths';
 import styles from './admin.module.css';
@@ -64,9 +71,9 @@ function runSummary(t: T, lang: 'ro' | 'en', run: RetentionRun): string {
  * The preview of a job: exactly what the next run would process, the exceptions apart. It is read with
  * a database function that cannot write, so opening it changes nothing.
  */
-function PreviewFacts({ preview }: { preview: RetentionPreview }) {
+function RequestPreviewFacts({ preview }: { preview: RetentionPreview }) {
   const { t, lang } = useI18n();
-  const c = preview.counts;
+  const c = preview.counts as RetentionCounts;
   const n = (v: number | undefined) => formatDecimal(lang, v ?? 0);
   const statuses = Object.entries(c.eligible.by_status);
   const found = findingList(c.findings ?? {});
@@ -134,6 +141,54 @@ function PreviewFacts({ preview }: { preview: RetentionPreview }) {
       </p>
     </div>
   );
+}
+
+/** The preview of a log job (A3c2b2): rows written after the cutoff only. */
+function LogPreviewFacts({ preview }: { preview: RetentionPreview }) {
+  const { t, lang } = useI18n();
+  const c = preview.counts as LogCounts;
+  const n = (v: number | undefined) => formatDecimal(lang, v ?? 0);
+  const classes = AUDIT_CLASSES.filter((k) => (c.eligible.by_class[k] ?? 0) > 0);
+  return (
+    <div className={supportStyles.form}>
+      <p className={styles.muted}>{t('admin.retention.previewAt', { time: formatTime(lang, new Date(preview.now)) })}</p>
+      <h3 className={styles.rowTitle}>{t('admin.retention.eligible')}</h3>
+      <dl className={styles.facts}>
+        <dt>{t('admin.retention.log.rows')}</dt>
+        <dd>
+          {n(c.eligible.total)}
+          {classes.length > 0 && (
+            <span className={styles.muted}>
+              {' · '}
+              {classes.map((k) => `${t(`admin.retention.class.${k}`)}: ${n(c.eligible.by_class[k])}`).join(' · ')}
+            </span>
+          )}
+        </dd>
+        {preview.job === 'support_log' && (
+          <>
+            <dt>{t('admin.retention.log.searchTerms')}</dt>
+            <dd>{n(c.eligible.search_terms)}</dd>
+          </>
+        )}
+      </dl>
+      <h3 className={styles.rowTitle}>{t('admin.retention.exempt')}</h3>
+      <dl className={styles.facts}>
+        <dt>{t('admin.retention.exempt.legalHold')}</dt>
+        <dd>{n(c.exempt.legal_hold)}</dd>
+        <dt>{t('admin.retention.log.legalActive')}</dt>
+        <dd>{n(c.exempt.legal_active)}</dd>
+        <dt>{t('admin.retention.log.beforeCutoff')}</dt>
+        <dd>{n(c.exempt.before_cutoff)}</dd>
+      </dl>
+      <p className={styles.muted}>
+        {c.next_due_at ? t('admin.retention.nextDue', { date: dateTime(lang, c.next_due_at) }) : t('admin.retention.nextNone')}
+      </p>
+    </div>
+  );
+}
+
+function PreviewFacts({ preview }: { preview: RetentionPreview }) {
+  return isLogJob(preview.job) ? <LogPreviewFacts preview={preview} /> : <RequestPreviewFacts preview={preview} />;
 }
 
 /** Switching a job on: the numbers just previewed, the daily batch, a reason. */
@@ -251,7 +306,7 @@ function DisablePanel({ job, onDone, onCancel }: { job: RetentionJobState; onDon
 
 type PreviewState = { status: 'idle' } | { status: 'loading' } | { status: 'error' } | { status: 'ready'; data: RetentionPreview };
 
-function JobCard({ job, onChanged }: { job: RetentionJobState; onChanged: () => Promise<void> }) {
+function JobCard({ job, cutoff, onChanged }: { job: RetentionJobState; cutoff: string; onChanged: () => Promise<void> }) {
   const { t, lang } = useI18n();
   const [preview, setPreview] = useState<PreviewState>({ status: 'idle' });
   const [panel, setPanel] = useState<'enable' | 'disable' | null>(null);
@@ -274,9 +329,12 @@ function JobCard({ job, onChanged }: { job: RetentionJobState; onChanged: () => 
           <h2 id={`job-${job.key}`} className={styles.cardTitle}>
             {t(`admin.retention.job.${job.key}`)}
           </h2>
-          <Pill tone={job.enabled ? 'amber' : 'grey'}>{t(job.enabled ? 'admin.retention.on' : 'admin.retention.off')}</Pill>
+          <Pill tone={job.enabled ? 'amber' : 'grey'}>
+            {t(job.locked_reason ? 'admin.retention.locked' : job.enabled ? 'admin.retention.on' : 'admin.retention.off')}
+          </Pill>
         </div>
-        <p className={styles.muted}>{t(`admin.retention.rule.${job.key}`)}</p>
+        <p className={styles.muted}>{t(`admin.retention.rule.${job.key}`, { cutoff: dateTime(lang, cutoff) })}</p>
+        {job.locked_reason && <p className={styles.warning}>{t('admin.retention.lockedBody')}</p>}
         <p>
           {job.changed_at
             ? t(job.enabled ? 'admin.retention.enabledBy' : 'admin.retention.disabledBy', {
@@ -321,7 +379,7 @@ function JobCard({ job, onChanged }: { job: RetentionJobState; onChanged: () => 
             {preview.status === 'ready' && (
               <>
                 <PreviewFacts preview={preview.data} />
-                {!job.enabled && panel === null && (
+                {!job.enabled && !job.locked_reason && panel === null && (
                   <div className={styles.panelButtons}>
                     <Button onClick={() => setPanel('enable')}>{t('admin.retention.enable')}</Button>
                   </div>
@@ -365,6 +423,78 @@ function JobCard({ job, onChanged }: { job: RetentionJobState; onChanged: () => 
 }
 
 /**
+ * What the audit log holds that may be personal data or a secret (A3c2b2), counted per action, for
+ * every row (the older ones included). Numbers only: no value ever leaves the database.
+ */
+function PrivacyReport() {
+  const { t, lang } = useI18n();
+  const [state, setState] = useState<{ status: 'idle' } | { status: 'loading' } | { status: 'error' } | { status: 'ready'; data: AuditPrivacyReport }>({
+    status: 'idle',
+  });
+  const n = (v: number | undefined) => formatDecimal(lang, v ?? 0);
+  const load = async () => {
+    setState({ status: 'loading' });
+    try {
+      setState({ status: 'ready', data: await auditPrivacyReport() });
+    } catch {
+      setState({ status: 'error' });
+    }
+  };
+  return (
+    <Card>
+      <div className={styles.stack}>
+        <h2 className={styles.cardTitle}>{t('admin.retention.report.title')}</h2>
+        <p className={styles.muted}>{t('admin.retention.report.desc')}</p>
+        <div className={styles.panelButtons}>
+          <Button variant="secondary" onClick={() => void load()}>
+            {t('admin.retention.report.run')}
+          </Button>
+        </div>
+        {state.status === 'loading' && <Spinner />}
+        {state.status === 'error' && <LoadError message={t('admin.retention.reportLoadError')} onRetry={() => void load()} />}
+        {state.status === 'ready' && (
+          <>
+            <p className={styles.muted}>
+              {t('admin.retention.report.summary', {
+                rows: n(state.data.rows),
+                legacy: n(state.data.legacy_rows),
+                cutoff: dateTime(lang, state.data.cutoff),
+              })}
+            </p>
+            <dl className={styles.facts}>
+              {REPORT_KINDS.map((k) => (
+                <Fragment key={k}>
+                  <dt>{t(`admin.retention.report.kind.${k}`)}</dt>
+                  <dd>{n(state.data.totals[k])}</dd>
+                </Fragment>
+              ))}
+            </dl>
+            {state.data.by_action.length > 0 && (
+              <ul className={styles.list} aria-label={t('admin.retention.report.byAction')}>
+                {state.data.by_action.map((a) => (
+                  <li key={a.action}>
+                    <span className={styles.rowTop}>
+                      <span className={styles.rowTitle}>{actionLabel(t, a.action)}</span>
+                      <Pill tone="grey">{t(`admin.retention.class.${a.class}`)}</Pill>
+                    </span>
+                    <span className={styles.rowMeta}>
+                      <span>{t('admin.retention.report.rows', { rows: n(a.rows), legacy: n(a.legacy_rows) })}</span>
+                      {REPORT_KINDS.filter((k) => a[k] > 0).map((k) => (
+                        <span key={k}>{`${t(`admin.retention.report.kind.${k}`)}: ${n(a[k])}`}</span>
+                      ))}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </>
+        )}
+      </div>
+    </Card>
+  );
+}
+
+/**
  * Platformă → Retenția datelor (A3c2b1): the two jobs, off until an admin switches one on with the
  * numbers of its preview; what each run did. Admin only (the database refuses everyone else).
  */
@@ -389,11 +519,12 @@ export function RetentionScreen() {
         <ul className={styles.list}>
           {state.data.items.map((j) => (
             <li key={j.key}>
-              <JobCard job={j} onChanged={refresh} />
+              <JobCard job={j} cutoff={state.data.cutoff} onChanged={refresh} />
             </li>
           ))}
         </ul>
       )}
+      {state.status === 'ready' && <PrivacyReport />}
     </div>
   );
 }

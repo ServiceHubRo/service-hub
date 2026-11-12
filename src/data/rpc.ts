@@ -251,6 +251,8 @@ export const RPC_ERROR_CODES = [
   'text_review_expired',
   'text_review_needs_edit',
   'text_identifies',
+  // A3c2b2
+  'job_locked',
 ] as const;
 
 export type RpcErrorCode = (typeof RPC_ERROR_CODES)[number] | 'network' | 'unknown';

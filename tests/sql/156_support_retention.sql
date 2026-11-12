@@ -120,8 +120,8 @@ $$;
 grant execute on function test.switch(text, boolean, int) to public;
 
 -- ------------------------------------------------------------------ the migration
-select test.eq((select count(*) from public.retention_jobs), 2::bigint, 'two jobs');
-select test.eq((select count(*) from public.retention_jobs where enabled), 0::bigint, 'both jobs start disabled');
+select test.eq((select count(*) from public.retention_jobs where key in ('support_requests', 'suggestions')), 2::bigint, 'two jobs');
+select test.eq((select count(*) from public.retention_jobs where enabled), 0::bigint, 'every job starts disabled');
 select test.ok((select attnotnull from pg_attribute where attrelid = 'public.suggestions'::regclass and attname = 'last_activity_at'),
   'every request has its real activity date');
 select test.ok(not has_table_privilege(r, 'public.' || t, 'select') and not has_table_privilege(r, 'public.' || t, 'update'),

@@ -75,6 +75,8 @@ key) plus `actor_role` and `actor_display_id`, filled by a trigger at insert, so
 | **Retention jobs** (A3c2b1): preview, switch on (exact preview numbers, reason) or off, runs, statistics | ❌ | ❌ | ❌ | ❌ (`not_allowed`) | ✅ (aal2; every switch audited) |
 | **Suggestions to check** (A3c2b1): the original and proposed text of a suggestion past 12 months; confirm, edit, delete the text | ❌ | ❌ | ❌ | ✅ (aal2, live session; audited) | ✅ (audited) |
 | Move a request's real activity date by hand (any path, direct SQL included) | ❌ | ❌ | ❌ | ❌ | ❌ (only a person's message or state change) |
+| **Audit log retention** (A3c2b2): support_log job, admin_log job (locked until the legal validation), the privacy report (numbers only) | ❌ | ❌ | ❌ | ❌ | ✅ (aal2; admin_log cannot be switched on) |
+| A secret, or a key an action must not keep, in a new log row | ❌ removed at insert (never refused), the paths in `redacted` | | | | |
 | **Account search** | — | — | — | ✅ masked: ID, name, role, state, `m***@…`, phone's last 3 digits, shop name and city, created, last active | ✅ full lists |
 | **Account card** | — | — | — | ✅ the same fields + its suggestions; never bookings, cars, companies, billing, messages, reviews | ✅ full card |
 | Find admin or agent accounts | — | — | — | ❌ (never in results) | ✅ |
@@ -138,6 +140,9 @@ key) plus `actor_role` and `actor_display_id`, filled by a trigger at insert, so
 | `admin_list_retention_jobs()`, `admin_retention_preview(job)` (stable: cannot write), `admin_support_stats(from, to)` (A3c2b1) | admin | the jobs with their last runs; the exact numbers and exceptions; the anonymous statistics | `field_invalid {field: job}` |
 | `admin_set_retention_job(job, enabled, reason, batch_size, expected, request_id)` | admin | `{job, enabled, batch_size}` | `field_invalid {field: job, enabled, reason, batch_size}`, `secret_in_text`, `preview_changed {counts}`, `job_disabled` |
 | `support_list_suggestion_reviews(state)`, `support_review_suggestion_text(id, action, text, request_id)` | agent, admin (aal2) | the texts to check or kept; `{state}` | `field_invalid`, `text_review_not_found`, `text_review_done`, `text_review_expired`, `text_review_needs_edit`, `text_identifies {kinds}` |
+| `admin_audit_privacy_report()` (A3c2b2; stable) | admin (aal2) | `{rows, legacy_rows, cutoff, totals, by_action}` — numbers only | — |
+| `admin_set_retention_job('support_log' \| 'admin_log', …)` | admin | as above | `job_locked {reason}` for admin_log |
+| `run_audit_retention(job, now)` | `pg_cron`; nothing while off or locked; only rows written after the cutoff | the run's numbers | — |
 | `run_support_retention(now)`, `run_suggestion_anonymization(now)` | `pg_cron` (and `service_role`); nothing while the job is off; `now` never later than the clock | the run's numbers | — |
 
 Every caller check also answers `not_signed_in`, `account_suspended`, `not_allowed`, `mfa_required`.
@@ -146,6 +151,7 @@ Every caller check also answers `not_signed_in`, `account_suspended`, `not_allow
 
 | Migration | Schema | Rollback | Rollback test |
 |---|---|---|---|
+| `20261111204858_audit_log_retention.sql` (A3c2b2) | 116 | `supabase/rollback/20261111204858_audit_log_retention.sql`: **refuses to run** while a log job is on, a log run exists or a log row has removed values (`redacted`); otherwise the A3c2b1 functions return and the classes, triggers and the cutoff go | `npm run test:rollback`: structure and data identical |
 | `20261111194435_support_retention.sql` (A3c2b1) | 115 | `supabase/rollback/20261111194435_support_retention.sql`: **refuses to run** (error listing how many) while a job is on or any run, statistics row or anonymised suggestion exists — what a job did cannot be undone; otherwise the A3c2a functions return and the activity column (derived data) goes | `npm run test:rollback`: structure and data identical |
 | `20261111142007_legal_hold.sql` (A3c2a) | 114 | `supabase/rollback/20261111142007_legal_hold.sql`: **refuses to run** (error listing how many) while any hold (active or released), review, kept identifiers or request kept after its account went exists — no held data is lost and no request is joined to an account by guess; otherwise the support functions, the foreign key (`ON DELETE CASCADE`, author required) and TRUNCATE for `service_role` return as before | `npm run test:rollback`: structure and data identical; the refusal checked by hand with an active and with a released hold (nothing changed) |
 | `20261108054527_support_signals_people_only.sql` (A3c1) | 113 | `supabase/rollback/20261108054527_support_signals_people_only.sql`: jobs signal again; nothing lost | `npm run test:rollback` |

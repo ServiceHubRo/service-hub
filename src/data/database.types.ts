@@ -70,6 +70,7 @@ export type Database = {
           entity_type: string
           id: string
           reason: string | null
+          redacted: string[] | null
         }
         Insert: {
           action: string
@@ -83,6 +84,7 @@ export type Database = {
           entity_type: string
           id?: string
           reason?: string | null
+          redacted?: string[] | null
         }
         Update: {
           action?: string
@@ -96,6 +98,7 @@ export type Database = {
           entity_type?: string
           id?: string
           reason?: string | null
+          redacted?: string[] | null
         }
         Relationships: []
       }
@@ -3053,6 +3056,7 @@ export type Database = {
           enabled_counts: Json | null
           key: string
           last_run_at: string | null
+          locked_reason: string | null
           reason: string | null
         }
         Insert: {
@@ -3064,6 +3068,7 @@ export type Database = {
           enabled_counts?: Json | null
           key: string
           last_run_at?: string | null
+          locked_reason?: string | null
           reason?: string | null
         }
         Update: {
@@ -3075,6 +3080,7 @@ export type Database = {
           enabled_counts?: Json | null
           key?: string
           last_run_at?: string | null
+          locked_reason?: string | null
           reason?: string | null
         }
         Relationships: []
@@ -4971,6 +4977,7 @@ export type Database = {
         }
         Returns: undefined
       }
+      admin_audit_privacy_report: { Args: never; Returns: Json }
       admin_create_category: {
         Args: {
           p_key: string
