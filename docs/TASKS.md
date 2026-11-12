@@ -1808,6 +1808,7 @@ Nimic implementat. O sesiune nouă pornește de aici, după ce Eduard răspunde 
 - Migrarea `help_center` (schema 117), cu rollback testat (refuză după orice vot sau modificare făcută de o persoană). Niciun rând existent modificat.
 - Teste: `tests/sql/159_help_center.sql`, `tests/unit/helpCenter.test.ts` (căutarea, ordinea, regulile de conținut, standardul editorial pe tot conținutul inițial, exportul), `tests/e2e/help-center.spec.ts` (390/820/1440, RO și EN; client, service, admin, agent); actualizate `50_platform.sql`, `roles`, `adminZones`, `auditClasses`, `support-agent`, `admin-navigation`.
 - **Decizii:** Help Center-ul e integrat în „Ajutor și contact” (nu o pagină nouă); agentul nu votează (nu i se cere); un articol publicat se retrage înainte de ștergere; editările unui articol publicat se văd imediat (fiecare salvare e o versiune nouă în istoric); articolele sunt doar pentru conturi autentificate.
-- **Rămas:** o propoziție în Politica de confidențialitate despre vot (propusă în PR, neaplicată); articolele pentru vizitatori fără cont (dacă le vrei public); A5 Proceduri.
+- **Politica de confidențialitate** (aprobat de Eduard, 12 nov): §2.1 spune că votul „Ți-a fost util acest articol?” se păstrează cu contul, adminul vede doar totaluri, se șterge cu contul și apare în „Datele mele” (RO + EN); data actualizării și `TERMS_VERSION` → 2026-11-12.
+- **Rămas:** articolele pentru vizitatori fără cont (dacă le vrei public); A5 Proceduri.
 
 - [x] Făcut

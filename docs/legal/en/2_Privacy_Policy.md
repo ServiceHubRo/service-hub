@@ -1,6 +1,6 @@
 # Privacy Policy — Service-Hub
 
-**Last updated:** November 8, 2026
+**Last updated:** November 12, 2026
 
 This policy explains what personal data Service-Hub uses, why, who else sees it, how long we keep it and what rights you have, under Regulation (EU) 2016/679 (the “GDPR”) and Romanian law.
 
@@ -29,6 +29,7 @@ This policy explains what personal data Service-Hub uses, why, who else sees it,
 - if you sign in with Google or Apple: the name, email address and (from Google) profile picture they send us; with Apple you may choose to give us a hidden address that forwards our emails to you; your Google or Apple password never reaches us;
 - your choices in the app (for example, if you postponed the message about notifications);
 - the requests you send to the Service-Hub team (Account → Help and contact → My requests): the category, title, description, messages, the booking code if you add it, and the attached files (PNG, JPEG or WebP images and PDF documents, at most 5 MB each). When a photo is uploaded we remove its location, device details, date and the other information hidden in the file; we keep only the image's orientation.
+- your answers to “Was this article helpful?” in the Help Center (Yes or No), kept with your account so you can change your answer and each account counts once. The Service-Hub team sees only the totals per article, never who answered. Your answers are deleted with your account and appear in the copy of your data (Account → My data).
 
 ### 2.2 If you are a Customer
 
