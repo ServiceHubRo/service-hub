@@ -1,7 +1,7 @@
 import { canonicalPlate } from './plate';
 import { ymdInBucharest } from '../i18n/format';
 import { matchesWords, searchWords } from './text';
-import type { BookingStatus } from './status';
+import { isActiveStatus, type BookingStatus } from './status';
 
 /**
  * Repair history (FR §3.6, §4.3, P16b, P16c): pure logic for the shop's Istoric (search, status and
@@ -249,4 +249,17 @@ export function csvField(value: string, separator: string): string {
 /** Rows to a CSV file body (with a byte-order mark, so Excel reads the diacritics). */
 export function toCsv(rows: readonly (readonly string[])[], separator: string): string {
   return '﻿' + rows.map((r) => r.map((f) => csvField(f, separator)).join(separator)).join('\r\n') + '\r\n';
+}
+
+/**
+ * Whether a live change of one of the shop's bookings can change Istoric (A8). The history holds only
+ * bookings that ended, so a booking that is (still) in progress — a new request, a confirmation, a quote
+ * sent — cannot: reading the whole history again for each of them (several MB for a shop with a year of
+ * work) only cost data and time. Anything else reads it again: a booking that ended or changed after
+ * it ended, a deletion, or a change whose new status is not known.
+ */
+export function changesShopHistory(change: { eventType?: string; new?: unknown }): boolean {
+  if (change.eventType !== 'INSERT' && change.eventType !== 'UPDATE') return true;
+  const status = (change.new as { status?: unknown } | null | undefined)?.status;
+  return typeof status !== 'string' || !isActiveStatus(status as BookingStatus);
 }

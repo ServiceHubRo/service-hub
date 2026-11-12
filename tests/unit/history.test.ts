@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  changesShopHistory,
   csvAmount,
   csvField,
   filterHistory,
@@ -173,5 +174,30 @@ describe('CSV export', () => {
 
   it('starts with a byte-order mark and ends every row with CRLF', () => {
     expect(toCsv([['Data', 'Număr'], ['2026-09-24', 'BV 12 ABC']], ';')).toBe('﻿Data;Număr\r\n2026-09-24;BV 12 ABC\r\n');
+  });
+});
+
+describe('live changes that read Istoric again (A8)', () => {
+  it('a booking still in progress does not: the history holds only ended ones', () => {
+    for (const status of ['pending', 'confirmed', 'in_inspection', 'quote_sent', 'approved', 'in_progress']) {
+      expect(changesShopHistory({ eventType: 'UPDATE', new: { id: 'b', status } }), status).toBe(false);
+      expect(changesShopHistory({ eventType: 'INSERT', new: { id: 'b', status } }), status).toBe(false);
+    }
+  });
+
+  it('a booking that ended, or changed after it ended, does', () => {
+    for (const status of ['done', 'quote_refused', 'expired', 'cancelled', 'no_show', 'declined']) {
+      expect(changesShopHistory({ eventType: 'UPDATE', new: { id: 'b', status } }), status).toBe(true);
+    }
+    // A row that arrives already ended counts as well.
+    expect(changesShopHistory({ eventType: 'INSERT', new: { id: 'b', status: 'done' } })).toBe(true);
+  });
+
+  it('when it cannot tell, it reads again: a deletion, a row without its status, an unknown status', () => {
+    expect(changesShopHistory({ eventType: 'DELETE', new: {} })).toBe(true);
+    expect(changesShopHistory({ eventType: 'UPDATE', new: { id: 'b' } })).toBe(true);
+    expect(changesShopHistory({ eventType: 'UPDATE', new: { id: 'b', status: 'archived' } })).toBe(true);
+    expect(changesShopHistory({ eventType: 'UPDATE' })).toBe(true);
+    expect(changesShopHistory({})).toBe(true);
   });
 });
