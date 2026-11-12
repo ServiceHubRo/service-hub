@@ -363,7 +363,9 @@ test.describe('107 — amounts hidden from a driver without costs.view', () => {
     const driver = await openAs(browser, f.driver, 'ro', '/c/programari');
     const card = driver.locator('article, div').filter({ hasText: b.ref }).filter({ hasText: 'Plăcuțe' }).last();
     await expect(card).toContainText('Devizul a fost aprobat de firmă.');
-    await expect(card).not.toContainText('600');
+    // The total as a number of its own: the shop's name (a timestamp) or the booking code may contain
+    // the digits 600 (A7: the test failed on „Atelier Sume 1794497150600”).
+    await expect(card).not.toContainText(/(?<!\d)600(?!\d)/);
     await expect(card).not.toContainText(/\d\s?lei/);
     await expect(card.getByRole('button', { name: 'Deviz (PDF)' })).toHaveCount(0);
     await expectNoHorizontalScroll(driver);
@@ -374,7 +376,7 @@ test.describe('107 — amounts hidden from a driver without costs.view', () => {
     await driver.context().close();
 
     const manager = await openAs(browser, f.manager, 'ro', `/c/firme/${f.company}?sectiune=programari`);
-    await expect(manager.locator('div').filter({ hasText: b.ref }).last()).toContainText('600');
+    await expect(manager.locator('div').filter({ hasText: b.ref }).last()).toContainText(/(?<!\d)600(?!\d)/);
     await manager.context().close();
   });
 });

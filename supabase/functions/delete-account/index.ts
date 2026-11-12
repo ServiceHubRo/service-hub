@@ -35,6 +35,9 @@ Deno.serve(async (req) => {
     try {
       mode = await api.rpc('prepare_account_deletion', { p_user_id: user.id });
     } catch (e) {
+      // A7: the same rule checked again by the database, under the account's lock (a change of
+      // administrators between the two checks); the app already knows it as last_admin.
+      if (e instanceof AdminError && e.message === 'company_last_admin') return json({ error: 'last_admin' }, 409);
       if (e instanceof AdminError && KNOWN_CODES.has(e.message)) return json({ error: e.message }, 409);
       throw e;
     }

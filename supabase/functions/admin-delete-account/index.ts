@@ -16,7 +16,9 @@ import { bearerToken, corsHeaders, json } from '../_shared/http.ts';
 import { reportError } from '../_shared/monitor.ts';
 
 /** Refusals the app translates (src/data/admin.ts). */
-const KNOWN_CODES = new Set(['not_allowed', 'account_has_active_bookings', 'shop_has_active_bookings', 'reason_required', 'reason_too_long']);
+// company_last_admin (A7): the only administrator of a company with other members stays until the
+// administration goes to another member (FLEET_PLAN R7, now checked in prepare_account_deletion).
+const KNOWN_CODES = new Set(['not_allowed', 'account_has_active_bookings', 'shop_has_active_bookings', 'reason_required', 'reason_too_long', 'company_last_admin']);
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
