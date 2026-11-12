@@ -1,0 +1,10 @@
+/* Centrul de ajutor (A4), admin: an article row — the link takes the width, the tools wrap under it on a phone. */
+.articleRow > a {
+  flex: 1 1 240px;
+  min-width: 0;
+  min-height: var(--tap);
+}
+
+.articleRow > span:last-child {
+  margin-left: auto;
+}

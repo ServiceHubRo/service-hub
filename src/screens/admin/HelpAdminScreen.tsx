@@ -42,6 +42,7 @@ import { ADMIN_HELP_PATH, adminHelpArticlePath } from './paths';
 import { useUrlParams } from './useUrlParams';
 import styles from './admin.module.css';
 import tools from './tools.module.css';
+import rowStyles from './helpAdmin.module.css';
 
 const ZONE_BACK = adminZoneBack(ADMIN_HELP_PATH);
 const STATUS_TONE: Record<HelpStatus, 'green' | 'amber' | 'grey'> = { published: 'green', draft: 'amber', archived: 'grey' };
@@ -194,7 +195,7 @@ function ArticleRow({ a, first, last, canMove, onMoved }: { a: AdminHelpArticleR
   const { t } = useI18n();
   const votes = a.helpful + a.not_helpful;
   return (
-    <div className={tools.serviceRow}>
+    <div className={`${tools.serviceRow} ${rowStyles.articleRow}`}>
       <Link to={adminHelpArticlePath(a.id)} className={styles.rowMain} aria-label={`${t('admin.help.edit')}: ${a.title_ro}`}>
         <span className={styles.rowTop}>
           <span className={styles.rowTitle}>{a.title_ro}</span>
