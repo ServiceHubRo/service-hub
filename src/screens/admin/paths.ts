@@ -41,6 +41,8 @@ export const ADMIN_TEXT_REVIEWS_PATH = `${ADMIN_SUPPORT_PATH}/sugestii-de-verifi
 /** Centrul de ajutor (A4): articles and categories; one article's editor (`nou` for a new one). */
 export const ADMIN_HELP_PATH = `${ADMIN_SUPPORT_PATH}/centrul-de-ajutor`;
 export const adminHelpArticlePath = (id: string) => `${ADMIN_HELP_PATH}/articol/${id}`;
+/** Proceduri interne (A5): the team's procedures, their editor and the category responsibles. */
+export const ADMIN_PROCEDURES_PATH = `${ADMIN_SUPPORT_PATH}/proceduri`;
 
 // Platformă
 export const ADMIN_SETTINGS_PATH = `${ADMIN_PLATFORM_PATH}/setari`;

@@ -56,9 +56,11 @@ test.describe('support agent (A2)', () => {
     await expect(h1(page)).toHaveText('Solicitări');
 
     // Exactly its sections: Solicitări, Căutare and Cont (the sidebar keeps Cont at its bottom).
-    // A4: the Help Center joins Solicitări and Căutare („Ajutor” in the phone's bottom bar).
+    // A4: the Help Center joins Solicitări and Căutare („Ajutor” in the phone's bottom bar); A5: Proceduri.
     await expect(nav(page).getByRole('link')).toHaveText(
-      isDesktop(page) ? ['Solicitări', 'Căutare', 'Centrul de ajutor'] : ['Solicitări', 'Căutare', 'Ajutor', 'Cont'],
+      isDesktop(page)
+        ? ['Solicitări', 'Căutare', 'Centrul de ajutor', 'Proceduri interne']
+        : ['Solicitări', 'Căutare', 'Ajutor', 'Proceduri', 'Cont'],
     );
     await expectNoHorizontalScroll(page);
     await expectAccessible(page, 'Solicitări');

@@ -258,6 +258,11 @@ export const RPC_ERROR_CODES = [
   'article_published',
   'category_not_empty',
   'slug_taken',
+  // A5 — Internal procedures
+  'procedure_not_found',
+  'version_locked',
+  'version_open',
+  'ack_not_required',
 ] as const;
 
 export type RpcErrorCode = (typeof RPC_ERROR_CODES)[number] | 'network' | 'unknown';

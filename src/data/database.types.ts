@@ -5123,6 +5123,27 @@ export type Database = {
       }
       admin_help_get_article: { Args: { p_id: string }; Returns: Json }
       admin_help_list: { Args: never; Returns: Json }
+      admin_procedure_acknowledgements: { Args: { p_id: string }; Returns: Json }
+      admin_procedure_approve: {
+        Args: { p_publish: boolean; p_request_id: string; p_version_id: string }
+        Returns: Json
+      }
+      admin_procedure_archive: {
+        Args: { p_archived: boolean; p_id: string; p_request_id: string }
+        Returns: Json
+      }
+      admin_procedure_publish: {
+        Args: { p_request_id: string; p_version_id: string }
+        Returns: Json
+      }
+      admin_procedure_set_responsible: {
+        Args: { p_category: string; p_request_id: string; p_user: string | null }
+        Returns: Json
+      }
+      admin_procedure_set_settings: {
+        Args: { p_id: string; p_procedure: Json; p_request_id: string }
+        Returns: Json
+      }
       admin_help_move: {
         Args: {
           p_direction: number
@@ -6828,6 +6849,43 @@ export type Database = {
       }
       grant_referral_reward: { Args: { p_shop_id: string }; Returns: undefined }
       help_center: { Args: { p_lang: string }; Returns: Json }
+      staff_procedure_acknowledge: {
+        Args: { p_request_id: string; p_version_id: string }
+        Returns: Json
+      }
+      staff_procedure_create: {
+        Args: {
+          p_content_en: Json
+          p_content_ro: Json
+          p_procedure: Json
+          p_request_id: string
+        }
+        Returns: Json
+      }
+      staff_procedure_get: { Args: { p_id: string }; Returns: Json }
+      staff_procedure_new_version: {
+        Args: { p_procedure_id: string; p_request_id: string }
+        Returns: Json
+      }
+      staff_procedure_save: {
+        Args: {
+          p_content_en: Json
+          p_content_ro: Json
+          p_procedure: Json
+          p_request_id: string
+          p_version_id: string
+        }
+        Returns: Json
+      }
+      staff_procedure_step: {
+        Args: { p_request_id: string; p_step: string; p_version_id: string }
+        Returns: Json
+      }
+      staff_procedures: { Args: never; Returns: Json }
+      support_procedures_for_request: {
+        Args: { p_request: string }
+        Returns: Json
+      }
       help_send_feedback: {
         Args: { p_article: string; p_helpful: boolean; p_request_id: string }
         Returns: Json
