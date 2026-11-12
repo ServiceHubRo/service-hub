@@ -16,7 +16,7 @@
 // A refusal worth knowing (a dangerous file, a vehicle of another company, a limit) is recorded in the
 // security log, with codes and ids only. Errors answer { error: code } with the code the app translates.
 import { AdminError, adminApi, userApi } from '../_shared/admin.ts';
-import { FLEET_KNOWN, kindAllowed, parseTarget, refusalStatus, rejectionCode, securityKind } from '../_shared/fleetFiles.ts';
+import { FLEET_KNOWN, kindAllowed, parseTarget, readCapped, refusalStatus, rejectionCode, securityKind } from '../_shared/fleetFiles.ts';
 import { bearerToken, corsHeaders, json } from '../_shared/http.ts';
 import { reportError } from '../_shared/monitor.ts';
 import { checkFile, MAX_FILE_BYTES } from '../_shared/supportFiles.ts';
@@ -28,30 +28,6 @@ type Api = ReturnType<typeof adminApi>;
 /** A single file of at most 5 MB, with room for the form's own bytes. */
 const BODY_LIMIT = MAX_FILE_BYTES + 64 * 1024;
 
-/** The request body, or null (and the transfer cut) as soon as it passes `limit` bytes. */
-async function readCapped(req: Request, limit: number): Promise<Uint8Array | null> {
-  if (!req.body) return new Uint8Array(0);
-  const reader = req.body.getReader();
-  const chunks: Uint8Array[] = [];
-  let size = 0;
-  for (;;) {
-    const { done, value } = await reader.read();
-    if (done) break;
-    size += value.byteLength;
-    if (size > limit) {
-      await reader.cancel().catch(() => undefined);
-      return null;
-    }
-    chunks.push(value);
-  }
-  const out = new Uint8Array(size);
-  let at = 0;
-  for (const c of chunks) {
-    out.set(c, at);
-    at += c.byteLength;
-  }
-  return out;
-}
 
 /** Records the refusal in the security log when it matters; never fails the answer. */
 async function note(api: Api, user: string, code: string, detail: Record<string, unknown>): Promise<void> {

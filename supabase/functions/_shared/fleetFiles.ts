@@ -65,3 +65,28 @@ export function securityKind(code: string): { kind: string; severity: 'info' | '
   if (code === 'limit_fleet_uploads' || code === 'limit_fleet_storage') return { kind: 'limit_fleet_uploads', severity: 'info' };
   return null;
 }
+
+/** The request body, or null (and the transfer cut) as soon as it passes `limit` bytes. */
+export async function readCapped(req: Request, limit: number): Promise<Uint8Array | null> {
+  if (!req.body) return new Uint8Array(0);
+  const reader = req.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let size = 0;
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    size += value.byteLength;
+    if (size > limit) {
+      await reader.cancel().catch(() => undefined);
+      return null;
+    }
+    chunks.push(value);
+  }
+  const out = new Uint8Array(size);
+  let at = 0;
+  for (const c of chunks) {
+    out.set(c, at);
+    at += c.byteLength;
+  }
+  return out;
+}
