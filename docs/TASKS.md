@@ -1705,7 +1705,8 @@ Aprobate de Eduard pe 6 nov („aprob T71–T75”; T71 era deja folosit, așa c
 - Raportul și propunerea: `docs/A3C2B3_AUDIT.md`. Interogarea doar-citire pentru proiectul real (doar numere): `docs/sql/a3c2b3_audit_readonly.sql`.
 - Nimic modificat: nicio migrare, niciun rând, nicio permisiune, niciun job pornit.
 - Termen: cuvintele căutate scrise înainte de A3c2b2 depășesc 90 de zile de la ~5 feb 2027, dacă A3c2b3 nu e aprobat până atunci.
-- [ ] Corectarea (A3c2b3) — după numerele de pe proiectul real și aprobarea lui Eduard.
+- Rezultatul pe proiectul real (Eduard, 12 nov): doar date de test; 7 înregistrări vechi cu datele unor conturi de test șterse (5 nume și email, 2 telefoane); nimic peste termen, nimic sub păstrare legală, 0 contradicții după A3c2b2. Recomandare: fără migrare; ștergerea conturilor de test de la lansare (`reset_before_launch.sql`) golește jurnalul.
+- [ ] Decizia lui Eduard: fără migrare (recomandat) sau migrare mică pentru cele 7 înregistrări.
 
 ### A3c2b2 — Jurnalul: clase, retenție, secrete, ștergerea contului ✅ (construit peste #120, fără Merge)
 - Fiecare acțiune scrisă în jurnal are o clasă: **suport** (12 luni; cuvintele căutate de agenți 90 de zile), **administrativ** și **securitate** (3 ani, de validat juridic), **păstrare legală** (cât e activă, apoi 3 ani după ridicare). O acțiune nouă fără clasă primește termenul mai lung, iar un test unitar eșuează până e clasificată.

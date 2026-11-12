@@ -212,3 +212,37 @@ anonymised; the Supabase Auth audit log setting; IBAN in the log.
 - The report contains no personal value: only counts, action names and months.
 - Not verified by Claude: the real-project numbers (Eduard's query), external providers' logs, the Supabase
   Auth log setting, and whether production rows have backdated timestamps (the query's `oldest_month` says).
+
+## 10. Results on the real project (run by Eduard, 12 Nov 2026)
+
+Schema 116, cutoff Nov 2026. The database holds only pre-launch test data (the PR previews and `main`
+still share it, `docs/LANSARE.md`).
+
+| Area | Result |
+|---|---|
+| A. support (requests, messages, notes, files, Storage, notifications) | 0 rows |
+| C. search words | 0 rows |
+| D. legal hold (holds, reviews, subjects, held rows) | 0 rows |
+| B. admin log | 16 rows, all from Sep 2026, all before the cutoff (13 security, 3 admin) |
+| B. rows with identifiers of deleted accounts | **7**: 5 `delete_account` (name + email), 2 `verify_phone` (phone) |
+| B. rows about deleted accounts without identifiers | 3 (`promote_to_admin` 1, `extend_trial` 1, `set_subscription_price` 1) |
+| B. possible secrets, IBAN / fiscal, file names, CNP, plates | 0 |
+| B. unclassified actions; contradictions after the cutoff | 0; 0 (A3c2b2 works as intended) |
+| Past any retention period | 0 everywhere |
+| E. other sources | `company_audit_log` 1 row (no email/plate), notification events 2 + log 2 (no personal data), everything else 0 |
+| Anonymised accounts (`signup_completions`, `auth.identities`) | 0 (the code gap of §4.4 has no data today) |
+| Supabase Auth table `auth.audit_log_entries` | 0 rows (the Auth events are in Supabase's platform logs, outside the database) |
+| Retention jobs | all off, `admin_log` locked, 0 runs; the pg_cron entries are active, as designed (a run returns at once while its switch is off) |
+
+**Consequence for A3c2b3.** The only data to correct are 7 legacy rows of test accounts deleted in
+September. `docs/sql/reset_before_launch.sql` (LANSARE, Part 5, run by Eduard right before the launch)
+already empties `admin_audit_log`, the notifications and every test account; the SQL test
+`93_reset_before_launch.sql` passes on schema 116. Recommendation: **no A3c2b3 migration**; the launch
+reset removes the 7 rows together with all other test data, and every row written after the launch is
+covered by the A3c2b2 jobs (it is after the cutoff). Fallback if the launch reset is not run: a small
+migration that removes `name`/`email` from the 5 rows and `phone` from the 2 rows, with the preview and
+activation pattern of §8.
+
+Still open, unrelated to historical data (separate decisions, none urgent): retention of
+`notification_events`/`notifications_log`, `company_audit_log`, `stripe_events`; clearing
+`auth.identities`/`signup_completions` when a shop is anonymised; the IBAN key in the log (§4.2).
