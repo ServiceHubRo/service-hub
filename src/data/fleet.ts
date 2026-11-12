@@ -237,6 +237,8 @@ async function uploadFleetFile(company: string, vehicle: string, issue: string |
       code = null;
     }
     if ((FILE_ERRORS as readonly unknown[]).includes(code)) throw new FileError(code as FileErrorCode);
+    // A body over the platform's size limit is refused before the function runs, with its own answer.
+    if ((error.context as Response).status === 413) throw new FileError('file_too_large');
     throw failure({ message: code }, 'fleet-files');
   }
   throw new RpcError('unknown');

@@ -455,9 +455,14 @@ test.describe('support dashboard (A3c1)', () => {
         })
       ).ok,
     ).toBe(true);
-    await request(clientA, `După retragere ${s}`);
+    const after = await request(clientA, `După retragere ${s}`);
     await page.waitForTimeout(4_000);
-    expect(hearOld.heard, 'a withdrawn agent hears nothing more').toEqual([]);
+    // Only what happens after the withdrawal counts: a change made before it may still arrive late
+    // on a busy test database (A6: seen with the fleet-files test running alongside).
+    expect(
+      hearOld.heard.filter((h) => h.suggestion_id === after),
+      'a withdrawn agent hears nothing more',
+    ).toEqual([]);
     await hearOld.close();
     agent = await createAgent();
   });
