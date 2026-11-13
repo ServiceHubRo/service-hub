@@ -84,8 +84,10 @@ export function showKeyboardReadout(): () => void {
   window.addEventListener('touchmove', onTouch, { passive: true });
   window.addEventListener('resize', onWinResize);
 
-  // What is painted just above the keyboard (Eduard, 13 Nov 2026: a white strip there): the page's
-  // own things at that point, and anything fixed or sticky that reaches it. Read once a second.
+  // What is painted just above the keyboard: the page's own things at that point, and anything fixed
+  // or sticky that reaches it, read once a second. (Eduard, 13 Nov 2026: a white strip there was
+  // `iframe#nl-hud-frame`, the toolbar Netlify adds to deploy previews — not the app's, not on the
+  // published site.)
   let under = '';
   let underAt = 0;
   const brief = (el: Element) => {
