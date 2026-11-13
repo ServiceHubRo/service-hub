@@ -29,14 +29,14 @@ jobs:
             echo "VITE_SUPABASE_ANON_KEY=$ANON_KEY"
             echo "E2E_SERVICE_ROLE_KEY=$SERVICE_ROLE_KEY"
           } >> "$GITHUB_ENV"
-      - run: npx playwright test -c playwright.visual.config.ts tests/visual/reload-variants.spec.ts
+      - run: npx playwright test -c playwright.visual.config.ts tests/visual/scroll-trace.spec.ts
         continue-on-error: true
       - name: The regression test, phone / tablet / computer
         env:
           PLAYWRIGHT_JSON_OUTPUT_NAME: visual-audit/logout/e2e-result.json
         run: |
           mkdir -p visual-audit/logout
-          echo skipped
+          npx playwright test tests/e2e/logout-scroll.spec.ts tests/e2e/scroll-reload.spec.ts --reporter=list,json
         continue-on-error: true
       - if: always()
         env:

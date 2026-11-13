@@ -30,10 +30,12 @@ function isReload(): boolean {
 
 /**
  * A reload (F5, the browser's reload, pull to refresh) opens the page at its top, on every page
- * (Eduard, 13 Nov 2026): on the public pages the browser put it back where it was left (its own
- * restoring, 'auto' there); in the signed-in app it already opened at the top ('manual'). index.html
- * turns the browser's restoring off for a reload before anything is drawn; here the page is put at
- * the top, and once it has loaded the restoring is what it was, so Back and Forward are unchanged.
+ * (Eduard, 13 Nov 2026). Measured cause: on the public pages the browser put the page back where it
+ * was left (its own restoring, 'auto' there); in the signed-in app it already opened at the top
+ * ('manual', below). index.html turns the browser's restoring off for a reload before anything is
+ * drawn; here the page is put at the top, and the restoring stays off for the reloaded page — turned
+ * back on at load, the browser could still put it back afterwards — until the person moves on from
+ * it: just before the first change of address, so Back and Forward keep their places as before.
  * Only a reload: no other way into a page and no move between screens is touched. Called once, at
  * start (main.tsx).
  */
@@ -42,39 +44,25 @@ export function openReloadAtTop(): void {
   reloading = true;
   applyRestoration();
   window.scrollTo(0, 0);
-  const release = () =>
-    requestAnimationFrame(() => {
-      reloading = false;
-      applyRestoration();
-    });
-  let variant = '0';
-  try {
-    variant = localStorage.getItem('sh_reload_variant') ?? '0';
-  } catch {
-    // investigation only
+  const push = history.pushState;
+  const replace = history.replaceState;
+  const onPush: History['pushState'] = function (this: History, ...args) {
+    release();
+    return push.apply(this, args);
+  };
+  const onReplace: History['replaceState'] = function (this: History, ...args) {
+    release();
+    return replace.apply(this, args);
+  };
+  function release() {
+    // Only our own wrappers come off (another one added later stays).
+    if (history.pushState === onPush) history.pushState = push;
+    if (history.replaceState === onReplace) history.replaceState = replace;
+    reloading = false;
+    applyRestoration();
   }
-  if (variant === '2') {
-    // Back on just before the first move away from the reloaded page.
-    const push = history.pushState;
-    const replace = history.replaceState;
-    const before = () => {
-      history.pushState = push;
-      history.replaceState = replace;
-      reloading = false;
-      applyRestoration();
-    };
-    history.pushState = function (...args: Parameters<History['pushState']>) {
-      before();
-      return push.apply(this, args);
-    };
-    history.replaceState = function (...args: Parameters<History['replaceState']>) {
-      before();
-      return replace.apply(this, args);
-    };
-    return;
-  }
-  if (document.readyState === 'complete') release();
-  else window.addEventListener('load', release, { once: true });
+  history.pushState = onPush;
+  history.replaceState = onReplace;
 }
 
 /**

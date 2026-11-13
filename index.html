@@ -37,19 +37,14 @@
     <link rel="manifest" href="/manifest.webmanifest" />
     <title>Service-Hub — programări online la service auto</title>
     <!-- A reload opens the page at its top (Eduard, 13 Nov 2026): the browser's own restoring is off
-         for this load, before anything is drawn; the app turns it back on once the page has loaded
+         for the reloaded page, before anything is drawn, and back on as the person moves on from it
          (src/lib/scrollMemory.ts, openReloadAtTop). Any other way in keeps the browser's behavior. -->
     <script>
       (function () {
         try {
           var nav = performance.getEntriesByType ? performance.getEntriesByType('navigation')[0] : null;
           var reload = nav ? nav.type === 'reload' : !!(performance.navigation && performance.navigation.type === 1);
-          var variant = '0';
-          try { variant = localStorage.getItem('sh_reload_variant') || '0'; } catch (e2) {}
-          if (reload && 'scrollRestoration' in history) {
-            history.scrollRestoration = 'manual';
-            if (variant === '1') history.replaceState(history.state, '');
-          }
+          if (reload && 'scrollRestoration' in history) history.scrollRestoration = 'manual';
         } catch (e) {
           // No timing API: the browser's behavior, as before.
         }
