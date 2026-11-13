@@ -15,7 +15,9 @@ import { BACKEND, PASSWORD, SEED, SEED_PASSWORD, createBookableShop, createUser,
 // focus with the keyboard open — the bottom bar steps aside, the field is seen, nothing sticks over
 // it; the keyboard closes — the bar is back and the page has no gap; the main button is reached and
 // nothing covers it, with and without the keyboard; a form with errors keeps its fields seen.
-// This does not replace a real iPhone: Safari's own scrolling with the keyboard is not played here.
+// Safari also moves what is seen down the page by itself (visualViewport.offsetTop): played with
+// __setPan (Eduard, 13 Nov 2026: the header slid away and the field stayed under the keyboard).
+// This does not replace a real iPhone.
 
 const SIZES = [
   { width: 320, height: 454, keyboard: 260 },
@@ -40,13 +42,23 @@ async function installKeyboard(context: BrowserContext) {
       localStorage.setItem('sh_lang', 'ro');
     }
     // The iPhone's keyboard: the visible part shrinks, the page does not; a grey block where it covers.
-    const w = window as unknown as { __kb: number; __setKeyboard: (h: number) => void };
+    const w = window as unknown as { __kb: number; __pan: number; __setKeyboard: (h: number) => void; __setPan: (p: number) => void };
     w.__kb = 0;
+    w.__pan = 0;
     const vv = window.visualViewport;
     if (vv) {
       const height = Object.getOwnPropertyDescriptor(VisualViewport.prototype, 'height')!.get!;
+      const offsetTop = Object.getOwnPropertyDescriptor(VisualViewport.prototype, 'offsetTop')!.get!;
       Object.defineProperty(vv, 'height', { configurable: true, get: () => height.call(vv) - w.__kb });
+      Object.defineProperty(vv, 'offsetTop', { configurable: true, get: () => offsetTop.call(vv) + w.__pan });
     }
+    // Safari moving what is seen down the page by `p` px (only while the keyboard is open).
+    w.__setPan = (p: number) => {
+      w.__pan = p;
+      const el = document.getElementById('__keyboard');
+      if (el) el.style.bottom = `${-p}px`;
+      vv?.dispatchEvent(new Event('scroll'));
+    };
     w.__setKeyboard = (h: number) => {
       w.__kb = h;
       let el = document.getElementById('__keyboard');
@@ -72,6 +84,7 @@ async function installKeyboard(context: BrowserContext) {
       }
       el.style.height = `${h}px`;
       el.style.visibility = h ? 'visible' : 'hidden';
+      if (!h) w.__pan = 0;
       vv?.dispatchEvent(new Event('resize'));
     };
   });
@@ -205,13 +218,10 @@ async function checkForm(page: Page, form: Form, results: string[]) {
         expect(box.y, `${what}: below the top`).toBeGreaterThanOrEqual(b.top - 1);
         // A text area taller than what is seen shows its top; anything else is seen whole.
         const below = box.height < b.bottom - b.top - 32 ? box.y + box.height > b.bottom + 1 : box.y > b.bottom - 40;
-        if (below && mode === 'iphone' && b.atEnd) {
-          // The page ends there: the app cannot scroll it further; Safari moves what is seen itself.
-          results.push(`${what}: end of a short page, left to Safari`);
-        } else {
-          expect(below, `${what}: above the keyboard`).toBe(false);
-          expect(await coveredBy(field), `${what}: nothing over it`).toBe('');
-        }
+        // Also at the end of a short page (Eduard, 13 Nov 2026: this was left to Safari, which moved
+        // the header away and left the field under the keyboard): the page keeps room to scroll.
+        expect(below, `${what}: above the keyboard${b.atEnd ? ' (end of the page)' : ''}`).toBe(false);
+        expect(await coveredBy(field), `${what}: nothing over it`).toBe('');
         expect(await stuckOver(page), `${what}: nothing held over the visible part`).toEqual([]);
         await closeKeyboard(page, s, mode);
       }
@@ -244,13 +254,9 @@ async function checkForm(page: Page, form: Form, results: string[]) {
           await submit.evaluate((el) => getComputedStyle(el.closest('[data-fixed-bottom]') ?? el).position),
           `${where}: keyboard open, the button is in the page (not held behind the keyboard)`,
         ).not.toBe('sticky');
-        if (kbBox.y + kbBox.height > kb.bottom + 1 && mode === 'iphone' && kb.atEnd) {
-          results.push(`${where}: button at the end of a short page, left to Safari`);
-        } else {
-          expect(kbBox.y + kbBox.height, `${where}: keyboard open, the button reached`).toBeLessThanOrEqual(kb.bottom + 1);
-          expect(kbBox.y, `${where}: keyboard open, the button below the top bars`).toBeGreaterThanOrEqual(kb.top - 1);
-          expect(await coveredBy(submit), `${where}: keyboard open, nothing over the button`).toBe('');
-        }
+        expect(kbBox.y + kbBox.height, `${where}: keyboard open, the button reached`).toBeLessThanOrEqual(kb.bottom + 1);
+        expect(kbBox.y, `${where}: keyboard open, the button below the top bars`).toBeGreaterThanOrEqual(kb.top - 1);
+        expect(await coveredBy(submit), `${where}: keyboard open, nothing over the button`).toBe('');
         await closeKeyboard(page, s, mode);
       }
       results.push(`${where}: ok (${fields.length} fields)`);
@@ -568,5 +574,70 @@ test.describe('the phone keyboard over the forms', () => {
       results,
     );
     report(results);
+  });
+  // Eduard's iPhone, 13 Nov 2026 (Costuri, a company without expenses): the form ends the page. The
+  // keyboard opened, the bottom bar stepped aside and the page got shorter by its height, so the
+  // page dropped and „Service sau furnizor” stayed under the keyboard; Safari moved what is seen and
+  // the header slid up under the status bar. Played at the end of the page, then with Safari's move.
+  test('iPhone: the expense form at the end of a short page (the reported screen)', async ({ page }) => {
+    const { admin, company } = await fleetSetup();
+    await signIn(page, admin, PASSWORD);
+    await expect(page).toHaveURL(/\/c\//);
+    const prefix = process.env.KB_SHOTS ?? 'kb-after';
+    for (const s of SIZES) {
+      const where = `Costuri @${s.width}`;
+      await setSize(page, s);
+      await page.goto(`/c/firme/${company}?sectiune=costuri`);
+      await page.getByRole('button', { name: 'Adaugă cheltuială' }).click();
+      const field = page.getByLabel('Service sau furnizor');
+      await expect(field).toBeVisible();
+      await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+      await page.waitForTimeout(200);
+      const pageHeight = await page.evaluate(() => document.documentElement.scrollHeight);
+      // Safari first moves what is seen 43 px down the page (measured on the screenshot), then the
+      // keyboard settles and the app places the field.
+      await field.focus();
+      await page.evaluate(() => (window as unknown as { __setPan: (p: number) => void }).__setPan(43));
+      await openKeyboard(page, s, 'iphone');
+      await shot(page, `${prefix}-costuri-keyboard-${s.width}`);
+      // What the person sees on the iPhone: from where Safari moved the view down to the keyboard.
+      const seen = await page.evaluate(() => ({ y: window.visualViewport!.offsetTop, h: window.visualViewport!.height }));
+      await page.screenshot({ path: `${OUT}/${prefix}-costuri-seen-${s.width}.png`, clip: { x: 0, y: seen.y, width: s.width, height: seen.h } });
+      expect.soft(await page.evaluate(() => document.documentElement.scrollHeight), `${where}: the page does not get shorter`).toBeGreaterThanOrEqual(pageHeight);
+      const header = await page.locator('header').first().boundingBox();
+      expect.soft(Math.round(header!.y), `${where}: the header stays at the top of what is seen`).toBe(43);
+      let b = await band(page);
+      const box = (await field.boundingBox())!;
+      expect.soft(box.y, `${where}: the field below the header`).toBeGreaterThanOrEqual(b.top - 1);
+      expect.soft(box.y + box.height, `${where}: the field above the keyboard`).toBeLessThanOrEqual(b.bottom + 1);
+      expect.soft(await coveredBy(field), `${where}: nothing over the field`).toBe('');
+      // Its label is seen too (the label „Vehicul” was cut on the iPhone), where both fit between the
+      // header and the keyboard (not on a 320 px iPhone: the field alone is shown there).
+      const label = (await page.locator('label', { hasText: /^Service sau furnizor$/ }).first().boundingBox())!;
+      if (box.y + box.height - label.y + 32 <= b.bottom - b.top) {
+        expect.soft(label.y, `${where}: the label below the header`).toBeGreaterThanOrEqual(b.top - 1);
+      }
+
+      // The last button is reached above the keyboard: the person scrolls until it is just above it.
+      const save = page.getByRole('button', { name: 'Salvează cheltuiala' });
+      await page.getByLabel('Descriere').focus();
+      await page.waitForTimeout(300);
+      b = await band(page);
+      const before = (await save.boundingBox())!;
+      await page.evaluate((dy) => window.scrollBy(0, dy), before.y + before.height - (b.bottom - 16));
+      await page.waitForTimeout(150);
+      b = await band(page);
+      const sb = (await save.boundingBox())!;
+      expect.soft(sb.y + sb.height, `${where}: the save button above the keyboard`).toBeLessThanOrEqual(b.bottom + 1);
+      expect.soft(sb.y, `${where}: the save button below the header`).toBeGreaterThanOrEqual(b.top - 1);
+      expect.soft(await coveredBy(save), `${where}: nothing over the save button`).toBe('');
+      await shot(page, `${prefix}-costuri-save-${s.width}`);
+
+      // Keyboard closed: the header back at the top, the bar back, the page as long as before.
+      await closeKeyboard(page, s, 'iphone');
+      expect.soft(Math.round((await page.locator('header').first().boundingBox())!.y), `${where}: header back`).toBe(0);
+      expect.soft(await page.evaluate(() => document.documentElement.scrollHeight), `${where}: no gap left`).toBe(pageHeight);
+      await shot(page, `${prefix}-costuri-closed-${s.width}`);
+    }
   });
 });

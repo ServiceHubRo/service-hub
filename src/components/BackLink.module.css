@@ -7,7 +7,7 @@
 :global(#continut) .bar {
   position: sticky;
   /* Under the app's header (the page scrolls; 0 on a laptop). */
-  top: var(--nav-top, 0px);
+  top: calc(var(--nav-top, 0px) + var(--vv-top, 0px));
   z-index: 5;
   background: var(--bg);
   /* The side margins too, without widening the screen. */

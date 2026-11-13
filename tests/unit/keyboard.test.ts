@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { fieldArea, isTextField, keyboardOpen, opensKeyboard, resizeForKeyboard, scrollToShow, visibleBand, watchKeyboard } from '../../src/lib/keyboard';
+import { KEYBOARD_GAP, fieldArea, isTextField, keyboardOpen, keyboardRoom, opensKeyboard, placeField, resizeForKeyboard, scrollToShow, visibleBand, watchKeyboard } from '../../src/lib/keyboard';
 
 describe('keyboard', () => {
   afterEach(() => {
@@ -52,8 +52,8 @@ describe('keyboard', () => {
   it('what is seen with the keyboard open: the visual viewport, below the header while it is on screen', () => {
     // iPhone 390 × 664 (Safari with its bars), keyboard 300 px: 364 px seen, page not scrolled.
     expect(visibleBand({ offsetTop: 0, height: 364 }, 664, 60)).toEqual({ top: 60, bottom: 364 });
-    // The browser panned the visible part down by 200 px: the header is above it, out of sight.
-    expect(visibleBand({ offsetTop: 200, height: 364 }, 664, 60)).toEqual({ top: 200, bottom: 564 });
+    // Safari moved the visible part down by 200 px: the header follows it (--vv-top) and covers its top.
+    expect(visibleBand({ offsetTop: 200, height: 364 }, 664, 60)).toEqual({ top: 260, bottom: 564 });
     // No visualViewport (an old browser): the window.
     expect(visibleBand(null, 600, 0)).toEqual({ top: 0, bottom: 600 });
   });
@@ -106,5 +106,50 @@ describe('keyboard', () => {
     resizeForKeyboard(true, document);
     expect(meta.content).toBe('width=device-width, initial-scale=1, interactive-widget=resizes-content');
     document.head.innerHTML = '';
+  });
+  it('keeps room at the end of the page while the keyboard is open (Eduard, 13 Nov 2026)', () => {
+    // iPhone: the keyboard covers 336 px of a 664 px page: the keyboard and the gap.
+    expect(keyboardRoom(664, 328)).toBe(336 + KEYBOARD_GAP);
+    // Android (the page itself got shorter): the gap only.
+    expect(keyboardRoom(328, 328)).toBe(KEYBOARD_GAP);
+  });
+
+  it('a field above the keyboard with a gap; the label kept first on a small phone', () => {
+    const band = { top: 100, bottom: 400 };
+    // Plenty of room: the field and its label above the gap.
+    expect(placeField({ top: 470, bottom: 540 }, { top: 490, bottom: 540 }, band)).toBe(scrollToShow({ top: 470, bottom: 540 }, band, 16, KEYBOARD_GAP));
+    // 130 px seen: the label and the field fit with a small gap, not with the full one.
+    const small = { top: 100, bottom: 230 };
+    const delta = placeField({ top: 300, bottom: 376 }, { top: 328, bottom: 376 }, small);
+    expect(300 - delta).toBeGreaterThanOrEqual(116);
+    expect(376 - delta).toBeLessThanOrEqual(230 - 16);
+    // 90 px seen: the field alone.
+    const tiny = { top: 100, bottom: 190 };
+    const d = placeField({ top: 300, bottom: 376 }, { top: 328, bottom: 376 }, tiny);
+    expect(328 - d).toBeGreaterThanOrEqual(116);
+  });
+
+  it('while the keyboard is open, the header follows what Safari shows and the page keeps room', () => {
+    const area = document.createElement('textarea');
+    document.body.appendChild(area);
+    const raf = window.requestAnimationFrame;
+    window.requestAnimationFrame = (cb) => {
+      cb(0);
+      return 0;
+    };
+    const stop = watchKeyboard();
+    area.focus();
+    const tall = window.innerHeight;
+    Object.defineProperty(window, 'innerHeight', { configurable: true, value: tall - 300 });
+    window.dispatchEvent(new Event('resize'));
+    const root = document.documentElement;
+    expect(root.hasAttribute('data-keyboard')).toBe(true);
+    expect(parseFloat(root.style.getPropertyValue('--kb-room'))).toBe(KEYBOARD_GAP); // no visualViewport here: the page itself got shorter
+    expect(root.style.getPropertyValue('--vv-top')).toBe('0px');
+    stop();
+    expect(root.style.getPropertyValue('--kb-room')).toBe('');
+    expect(root.style.getPropertyValue('--vv-top')).toBe('');
+    Object.defineProperty(window, 'innerHeight', { configurable: true, value: tall });
+    window.requestAnimationFrame = raf;
   });
 });

@@ -243,7 +243,11 @@ export function AppShell({ role }: { role: Role }) {
     const root = document.documentElement;
     const measure = () => {
       root.style.setProperty('--nav-top', `${headerRef.current?.offsetHeight ?? 0}px`);
-      root.style.setProperty('--nav-bottom', `${tabBarRef.current?.offsetHeight ?? 0}px`);
+      // The bar stepped aside for the phone's keyboard (src/lib/keyboard.ts): its height is kept, so
+      // the page does not get shorter under the field, nor longer again when the keyboard closes.
+      const bar = tabBarRef.current?.offsetHeight ?? 0;
+      if (bar === 0 && root.hasAttribute('data-keyboard') && root.style.getPropertyValue('--nav-bottom')) return;
+      root.style.setProperty('--nav-bottom', `${bar}px`);
     };
     measure();
     const observer = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(measure);

@@ -12,7 +12,7 @@ html {
   -webkit-text-size-adjust: 100%;
   /* The page scrolls (not an area inside it): what is scrolled into view is never hidden under the
      app's bars (their heights come from AppShell; 0 outside it). A pull at the top never reloads. */
-  scroll-padding-top: calc(var(--nav-top, 0px) + var(--back-bar, 0px));
+  scroll-padding-top: calc(var(--nav-top, 0px) + var(--back-bar, 0px) + var(--vv-top, 0px));
   scroll-padding-bottom: var(--nav-bottom, 0px);
   overscroll-behavior-y: contain;
 }
@@ -21,9 +21,17 @@ html {
    of the screen — the main button of a form, the save bar, the quote's send bar, the box to write a
    message — goes back to its place at the end of the page instead of staying behind the keyboard
    (on the iPhone the page keeps its height under the keyboard). The tab bar is hidden then
-   (AppShell), so --nav-bottom is 0 and nothing waits for it. */
+   (AppShell); --nav-bottom keeps its height, so the page does not get shorter (AppShell .main). */
 html[data-keyboard] [data-fixed-bottom] {
   position: static;
+}
+
+/* The room the keyboard covers, at the end of every page while it is open (--kb-room,
+   src/lib/keyboard.ts): on the iPhone the page keeps its height under the keyboard, so without it
+   the last field and the last button of a page could not be scrolled above the keyboard (Eduard,
+   13 Nov 2026). Gone when the keyboard closes. */
+html[data-keyboard] body {
+  padding-bottom: var(--kb-room, 0px);
 }
 
 body {

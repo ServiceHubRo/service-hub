@@ -11,7 +11,9 @@
 
 .header {
   position: sticky;
-  top: 0;
+  /* With the keyboard open, Safari moves what is seen down the page by itself: the header follows it
+     (--vv-top, src/lib/keyboard.ts) instead of sliding away under the status bar. 0 otherwise. */
+  top: var(--vv-top, 0px);
   z-index: 30;
   flex-shrink: 0;
   display: flex;
@@ -70,6 +72,7 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
+  /* --nav-bottom keeps the bar's height while the keyboard hides it: the page never gets shorter. */
   padding-bottom: var(--nav-bottom, 0px);
 }
 
@@ -125,7 +128,7 @@
   padding-bottom: var(--safe-bottom);
 }
 
-/* The Android app's keyboard is open (src/lib/keyboard.ts). */
+/* The phone's keyboard is open (src/lib/keyboard.ts, every platform). */
 :global(html[data-keyboard]) .bottomBar {
   display: none;
 }

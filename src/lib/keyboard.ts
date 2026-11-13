@@ -55,25 +55,57 @@ export interface Band {
 
 /**
  * What is visible while the keyboard is open. On the iPhone the page keeps its height and the
- * keyboard covers its bottom: only the visual viewport (offsetTop, height) is seen, and the header
- * with „‹ Înapoi” under it (navTop) covers its top while it is on screen. The bottom bar is hidden then (data-keyboard).
+ * keyboard covers its bottom: only the visual viewport (offsetTop, height) is seen. Safari also
+ * moves that visible part down the page by itself (offsetTop); the header and „‹ Înapoi” follow it
+ * (--vv-top, watchKeyboard), so they cover its top (navTop) wherever it is. The bottom bar is
+ * hidden then (data-keyboard).
  */
 export function visibleBand(viewport: { offsetTop: number; height: number } | null, innerHeight: number, navTop: number): Band {
   const top = viewport?.offsetTop ?? 0;
-  return { top: Math.max(top, navTop), bottom: top + (viewport?.height ?? innerHeight) };
+  return { top: top + navTop, bottom: top + (viewport?.height ?? innerHeight) };
 }
 
 /**
- * How far to scroll the page so the field is seen comfortably: 0 when it already is (with a
- * margin); otherwise it goes a third of the way down what is visible, or, taller than that, its top
- * to the top (the caret of a long text stays where the browser keeps it).
+ * Kept free above the keyboard (Eduard, 13 Nov 2026, iPhone): Safari 26 shows its address bar just
+ * above the keyboard, over the page (about 40 px on his screenshot), and a field needs a little air.
  */
-export function scrollToShow(field: Band, band: Band, margin = 16): number {
+export const KEYBOARD_GAP = 56;
+
+/**
+ * How far to scroll the page so the field is seen comfortably: 0 when it already is (`margin` below
+ * the top, `bottomMargin` above the bottom); otherwise it goes a third of the way down what is
+ * visible, or, taller than that, its top to the top (the caret of a long text stays where the
+ * browser keeps it).
+ */
+export function scrollToShow(field: Band, band: Band, margin = 16, bottomMargin = margin): number {
   const room = band.bottom - band.top;
   const height = field.bottom - field.top;
-  if (field.top >= band.top + margin && field.bottom <= band.bottom - margin) return 0;
-  if (height + 2 * margin >= room) return Math.round(field.top - band.top - margin);
-  return Math.round(field.top - (band.top + Math.max(margin, (room - height) / 3)));
+  if (field.top >= band.top + margin && field.bottom <= band.bottom - bottomMargin) return 0;
+  if (height + margin + bottomMargin >= room) return Math.round(field.top - band.top - margin);
+  return Math.round(field.top - (band.top + Math.max(margin, Math.min((room - height) / 3, room - bottomMargin - height))));
+}
+
+/**
+ * The room kept at the end of the page while the keyboard is open (--kb-room, global.css): on the
+ * iPhone, where the keyboard covers the page instead of shortening it, enough for the last field
+ * and the last button to be scrolled above the keyboard. Without it, at the end of a page the app
+ * cannot scroll further: Safari then moves what is seen itself and the header slides away
+ * (Eduard, 13 Nov 2026). Where the page itself got shorter (Android), the gap only.
+ */
+export function keyboardRoom(innerHeight: number, viewportHeight: number): number {
+  return Math.max(0, Math.round(innerHeight - viewportHeight)) + KEYBOARD_GAP;
+}
+
+/**
+ * Where the field goes with the keyboard open: with its label and the gap above the keyboard when
+ * all fit; on a small phone the label first (a smaller gap), then the field alone.
+ */
+export function placeField(withLabel: Band, field: Band, band: Band): number {
+  const room = band.bottom - band.top;
+  const fits = (b: Band, gap: number) => b.bottom - b.top + 16 + gap <= room;
+  if (fits(withLabel, KEYBOARD_GAP)) return scrollToShow(withLabel, band, 16, KEYBOARD_GAP);
+  if (fits(withLabel, 16)) return scrollToShow(withLabel, band, 16, 16);
+  return scrollToShow(field, band, 16, fits(field, KEYBOARD_GAP) ? KEYBOARD_GAP : 16);
 }
 
 /** The field with its label when the label is just above it (so the person sees what is asked). */
@@ -112,12 +144,20 @@ export function watchKeyboard(): () => void {
       if (!open || !(field instanceof HTMLElement) || !opensKeyboard(field)) return;
       const band = visibleBand(viewport, window.innerHeight, navTopPx());
       // With its label when both fit; the field alone (seen whole) when only it does.
-      const withLabel = fieldArea(field);
-      const rect = field.getBoundingClientRect();
-      const fits = withLabel.bottom - withLabel.top + 32 <= band.bottom - band.top;
-      const delta = scrollToShow(fits ? withLabel : { top: rect.top, bottom: rect.bottom }, band);
+      const delta = placeField(fieldArea(field), field.getBoundingClientRect(), band);
       if (delta !== 0) window.scrollBy({ top: delta, behavior: 'auto' });
     }, 120);
+  };
+
+  // Where Safari has moved what is seen (the header and „‹ Înapoi” follow it), and the room at the
+  // end of the page, while the keyboard is open; nothing otherwise.
+  let frame = 0;
+  const place = () => {
+    window.cancelAnimationFrame(frame);
+    frame = window.requestAnimationFrame(() => {
+      if (!open) return;
+      root.style.setProperty('--vv-top', `${Math.max(0, Math.round(viewport?.offsetTop ?? 0))}px`);
+    });
   };
 
   const update = () => {
@@ -126,15 +166,25 @@ export function watchKeyboard(): () => void {
     const before = tallest.get(width) ?? 0;
     if (height > before) tallest.set(width, height);
     const now = keyboardOpen(height, Math.max(before, height), opensKeyboard(document.activeElement));
+    if (now) root.style.setProperty('--kb-room', `${keyboardRoom(window.innerHeight, height)}px`);
     if (now !== open) {
       open = now;
       root.toggleAttribute('data-keyboard', open);
+      if (!open) {
+        window.cancelAnimationFrame(frame);
+        root.style.removeProperty('--vv-top');
+        root.style.removeProperty('--kb-room');
+      }
     }
-    if (open) show();
+    if (open) {
+      place();
+      show();
+    }
   };
   update();
   const target = viewport ?? window;
   target.addEventListener('resize', update);
+  viewport?.addEventListener('scroll', place);
   // The keyboard can stay while the focus moves (or go while it stays): checked again then.
   // After a focusout the next field may take the focus at once: no flash of the bar in between.
   let timer = 0;
@@ -147,9 +197,13 @@ export function watchKeyboard(): () => void {
   return () => {
     window.clearTimeout(timer);
     window.clearTimeout(showTimer);
+    window.cancelAnimationFrame(frame);
     target.removeEventListener('resize', update);
+    viewport?.removeEventListener('scroll', place);
     document.removeEventListener('focusin', update);
     document.removeEventListener('focusout', later);
     root.removeAttribute('data-keyboard');
+    root.style.removeProperty('--vv-top');
+    root.style.removeProperty('--kb-room');
   };
 }
