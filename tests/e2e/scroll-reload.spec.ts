@@ -1,3 +1,4 @@
+import { appendFileSync, mkdirSync } from 'node:fs';
 import { expect, test, type Page } from '@playwright/test';
 import { BACKEND, PASSWORD, createUser, scrollTopOf, signIn } from './support';
 
@@ -24,7 +25,23 @@ async function scrollToShare(page: Page, share: number) {
 
 /** Reloads and checks the page is at the top, and stays there once loaded. */
 async function reloadExpectTop(page: Page, heading: RegExp | string) {
+  // Investigation: the offset every 100 ms after the reload, the navigation type, the restoring.
   await page.reload();
+  const seen: unknown[] = [];
+  for (let i = 0; i < 30; i++) {
+    seen.push(
+      await page.evaluate(() => {
+        const h = document.querySelector('h1');
+        const r = h?.getBoundingClientRect();
+        const nav = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming | undefined;
+        return { y: Math.round(document.documentElement.scrollTop), h1: r ? `${Math.round(r.top)}..${Math.round(r.bottom)} vis=${getComputedStyle(h!).visibility} op=${getComputedStyle(h!).opacity}` : 'none', nav: nav?.type, mode: history.scrollRestoration, ready: document.readyState, vh: innerHeight, path: location.pathname, shell: document.documentElement.hasAttribute('data-shell'), pre: document.getElementById('root')?.getAttribute('data-prerendered') };
+      }),
+    );
+    await page.waitForTimeout(100);
+  }
+  mkdirSync('visual-audit/logout', { recursive: true });
+  appendFileSync('visual-audit/logout/reload-debug.jsonl', `${JSON.stringify({ project: test.info().project.name, title: test.info().title, seen })}\n`);
+  await page.screenshot({ path: `visual-audit/logout/reload-${test.info().project.name}-${Date.now()}.jpg`, type: 'jpeg', quality: 50 });
   await expect(page.getByRole('heading', { level: 1, name: heading }).first()).toBeInViewport();
   expect(await scrollTopOf(page)).toBe(0);
   await page.waitForTimeout(1200);
