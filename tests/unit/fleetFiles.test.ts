@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { kindAllowed, parseTarget, refusalStatus, rejectionCode, securityKind } from '../../supabase/functions/_shared/fleetFiles.ts';
+import { kindAllowed, parseTarget, readCapped, refusalStatus, rejectionCode, securityKind } from '../../supabase/functions/_shared/fleetFiles.ts';
 import { checkFile } from '../../supabase/functions/_shared/supportFiles.ts';
 import { JPEG, PNG } from './fixtures/support-files/images';
 
@@ -108,5 +108,27 @@ describe('fleet file refusals', () => {
     expect(securityKind('limit_fleet_uploads')?.kind).toBe('limit_fleet_uploads');
     expect(securityKind('file_too_large')).toBeNull();
     expect(securityKind('too_many_photos')).toBeNull();
+  });
+});
+
+describe('fleet file body', () => {
+  const LIMIT = 5 * 1024 * 1024 + 64 * 1024;
+
+  it('a normal form is read whole and parses again', async () => {
+    const form = new FormData();
+    form.append('file', new Blob([new Uint8Array(1000)], { type: 'image/png' }), 'bon.png');
+    form.append('company', C);
+    const req = new Request('http://local/fleet-files', { method: 'POST', body: form });
+    const body = await readCapped(req, LIMIT);
+    expect(body).not.toBeNull();
+    const again = await new Response(body as unknown as BodyInit, { headers: { 'content-type': req.headers.get('content-type') ?? '' } }).formData();
+    expect((again.get('file') as File).size).toBe(1000);
+    expect(again.get('company')).toBe(C);
+  });
+
+  it('a body over 5 MB is cut, whatever the request declares', async () => {
+    const form = new FormData();
+    form.append('file', new Blob([new Uint8Array(6 * 1024 * 1024)], { type: 'image/png' }), 'mare.png');
+    expect(await readCapped(new Request('http://local/fleet-files', { method: 'POST', body: form }), LIMIT)).toBeNull();
   });
 });

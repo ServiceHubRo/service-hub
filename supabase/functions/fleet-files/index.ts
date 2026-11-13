@@ -16,7 +16,7 @@
 // A refusal worth knowing (a dangerous file, a vehicle of another company, a limit) is recorded in the
 // security log, with codes and ids only. Errors answer { error: code } with the code the app translates.
 import { AdminError, adminApi, userApi } from '../_shared/admin.ts';
-import { FLEET_KNOWN, kindAllowed, parseTarget, refusalStatus, rejectionCode, securityKind } from '../_shared/fleetFiles.ts';
+import { FLEET_KNOWN, kindAllowed, parseTarget, readCapped, refusalStatus, rejectionCode, securityKind } from '../_shared/fleetFiles.ts';
 import { bearerToken, corsHeaders, json } from '../_shared/http.ts';
 import { reportError } from '../_shared/monitor.ts';
 import { checkFile, MAX_FILE_BYTES } from '../_shared/supportFiles.ts';
@@ -24,6 +24,10 @@ import { checkFile, MAX_FILE_BYTES } from '../_shared/supportFiles.ts';
 const BUCKET = 'fleet-files';
 
 type Api = ReturnType<typeof adminApi>;
+
+/** A single file of at most 5 MB, with room for the form's own bytes. */
+const BODY_LIMIT = MAX_FILE_BYTES + 64 * 1024;
+
 
 /** Records the refusal in the security log when it matters; never fails the answer. */
 async function note(api: Api, user: string, code: string, detail: Record<string, unknown>): Promise<void> {
@@ -49,12 +53,19 @@ Deno.serve(async (req) => {
     if (!caller || !token) return json({ error: 'not_signed_in' }, 401);
     if (!(req.headers.get('content-type') ?? '').startsWith('multipart/form-data')) return json({ error: 'bad_request' }, 400);
 
-    // The body is read only when it can be a single file of at most 5 MB (with the form's own bytes).
+    // The body is read only up to a single file of 5 MB plus the form's own bytes, whatever the
+    // request declares: past that the transfer is cut and the answer is 413 at once.
+    const contentType = req.headers.get('content-type') ?? '';
     const declared = Number(req.headers.get('content-length') ?? '0');
-    if (declared > MAX_FILE_BYTES + 64 * 1024) return await refuse(api, caller.id, 'file_too_large');
+    if (declared > BODY_LIMIT) {
+      await req.body?.cancel().catch(() => undefined);
+      return await refuse(api, caller.id, 'file_too_large');
+    }
+    const body = await readCapped(req, BODY_LIMIT);
+    if (!body) return await refuse(api, caller.id, 'file_too_large');
     let form: FormData;
     try {
-      form = await req.formData();
+      form = await new Response(body, { headers: { 'content-type': contentType } }).formData();
     } catch {
       return json({ error: 'bad_request' }, 400);
     }

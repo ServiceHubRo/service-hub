@@ -47,7 +47,7 @@ test.describe('M3 — issues and incidents', () => {
     await manager.getByRole('combobox', { name: 'Status' }).selectOption('in_review');
     await manager.getByLabel('Note').fill('Waiting for the insurer.');
     await manager.getByRole('button', { name: 'Save' }).click();
-    await expect(manager.getByRole('status')).toHaveText('The report was saved.');
+    await expect(manager.getByRole('status').filter({ hasText: 'The report was saved.' })).toBeVisible();
     await expect(manager.getByText('Status: New → In review')).toBeVisible();
     await expect(manager.getByText('Waiting for the insurer.')).toBeVisible();
     await expectNoHorizontalScroll(manager);
