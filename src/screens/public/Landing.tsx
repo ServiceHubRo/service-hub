@@ -45,6 +45,7 @@ import styles from './Landing.module.css';
 import { MockNav, ShopMockup, ViewLabel } from './LandingMockups';
 import mockups from './LandingMockups.module.css';
 import { LANDING_MOTION, startLandingMotion } from './landingMotion';
+import { takeOpenAtTop } from '../../lib/afterSignOut';
 
 interface Feature {
   icon: LucideIcon;
@@ -92,6 +93,11 @@ export function Landing() {
   const [pageEl, setPageEl] = useState<HTMLDivElement | null>(null);
   const sessionChecked = session.status !== 'loading';
   useLayoutEffect(() => (pageEl && sessionChecked ? startLandingMotion(pageEl) : undefined), [pageEl, sessionChecked]);
+  // Just signed out: the page opens at its very top, header and hero in view (src/lib/afterSignOut.ts).
+  // Before paint, once; a reload keeps the browser's place.
+  useLayoutEffect(() => {
+    if (takeOpenAtTop()) window.scrollTo(0, 0);
+  }, []);
 
   // Arrived drawn at build time (T46): the page stays while the session is checked.
   if (session.status === 'loading' && !fromPrerenderedPage()) return <LoadingScreen />;
