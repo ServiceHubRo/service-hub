@@ -1,0 +1,3264 @@
+{
+  "config": {
+    "configFile": "/home/runner/work/service-hub/service-hub/playwright.config.ts",
+    "rootDir": "/home/runner/work/service-hub/service-hub/tests/e2e",
+    "forbidOnly": true,
+    "fullyParallel": true,
+    "globalSetup": "/home/runner/work/service-hub/service-hub/tests/e2e/global-setup.ts",
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "ci": {
+        "commitHref": "https://github.com/ServiceHubRo/service-hub/commit/7069cca238a4f740a2237547c16e128057fe6152",
+        "commitHash": "7069cca238a4f740a2237547c16e128057fe6152",
+        "buildHref": "https://github.com/ServiceHubRo/service-hub/actions/runs/43388465186"
+      },
+      "gitCommit": {
+        "shortHash": "7069cca",
+        "hash": "7069cca238a4f740a2237547c16e128057fe6152",
+        "subject": "Investigation: the reload tests six times each, four at a time",
+        "body": "Investigation: the reload tests six times each, four at a time\n",
+        "author": {
+          "name": "Claude",
+          "email": "noreply@anthropic.com",
+          "time": 1794556140000
+        },
+        "committer": {
+          "name": "Claude",
+          "email": "noreply@anthropic.com",
+          "time": 1794556140000
+        },
+        "branch": "a9-scroll-trace"
+      },
+      "actualWorkers": 4
+    },
+    "preserveOutput": "always",
+    "reporter": [
+      [
+        "list"
+      ],
+      [
+        "json"
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "quiet": false,
+    "projects": [
+      {
+        "outputDir": "/home/runner/work/service-hub/service-hub/test-results",
+        "repeatEach": 6,
+        "retries": 0,
+        "metadata": {
+          "ci": {
+            "commitHref": "https://github.com/ServiceHubRo/service-hub/commit/7069cca238a4f740a2237547c16e128057fe6152",
+            "commitHash": "7069cca238a4f740a2237547c16e128057fe6152",
+            "buildHref": "https://github.com/ServiceHubRo/service-hub/actions/runs/43388465186"
+          },
+          "gitCommit": {
+            "shortHash": "7069cca",
+            "hash": "7069cca238a4f740a2237547c16e128057fe6152",
+            "subject": "Investigation: the reload tests six times each, four at a time",
+            "body": "Investigation: the reload tests six times each, four at a time\n",
+            "author": {
+              "name": "Claude",
+              "email": "noreply@anthropic.com",
+              "time": 1794556140000
+            },
+            "committer": {
+              "name": "Claude",
+              "email": "noreply@anthropic.com",
+              "time": 1794556140000
+            },
+            "branch": "a9-scroll-trace"
+          },
+          "actualWorkers": 4
+        },
+        "id": "mobile-390",
+        "name": "mobile-390",
+        "testDir": "/home/runner/work/service-hub/service-hub/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/home/runner/work/service-hub/service-hub/test-results",
+        "repeatEach": 6,
+        "retries": 0,
+        "metadata": {
+          "ci": {
+            "commitHref": "https://github.com/ServiceHubRo/service-hub/commit/7069cca238a4f740a2237547c16e128057fe6152",
+            "commitHash": "7069cca238a4f740a2237547c16e128057fe6152",
+            "buildHref": "https://github.com/ServiceHubRo/service-hub/actions/runs/43388465186"
+          },
+          "gitCommit": {
+            "shortHash": "7069cca",
+            "hash": "7069cca238a4f740a2237547c16e128057fe6152",
+            "subject": "Investigation: the reload tests six times each, four at a time",
+            "body": "Investigation: the reload tests six times each, four at a time\n",
+            "author": {
+              "name": "Claude",
+              "email": "noreply@anthropic.com",
+              "time": 1794556140000
+            },
+            "committer": {
+              "name": "Claude",
+              "email": "noreply@anthropic.com",
+              "time": 1794556140000
+            },
+            "branch": "a9-scroll-trace"
+          },
+          "actualWorkers": 4
+        },
+        "id": "tablet-820",
+        "name": "tablet-820",
+        "testDir": "/home/runner/work/service-hub/service-hub/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/home/runner/work/service-hub/service-hub/test-results",
+        "repeatEach": 6,
+        "retries": 0,
+        "metadata": {
+          "ci": {
+            "commitHref": "https://github.com/ServiceHubRo/service-hub/commit/7069cca238a4f740a2237547c16e128057fe6152",
+            "commitHash": "7069cca238a4f740a2237547c16e128057fe6152",
+            "buildHref": "https://github.com/ServiceHubRo/service-hub/actions/runs/43388465186"
+          },
+          "gitCommit": {
+            "shortHash": "7069cca",
+            "hash": "7069cca238a4f740a2237547c16e128057fe6152",
+            "subject": "Investigation: the reload tests six times each, four at a time",
+            "body": "Investigation: the reload tests six times each, four at a time\n",
+            "author": {
+              "name": "Claude",
+              "email": "noreply@anthropic.com",
+              "time": 1794556140000
+            },
+            "committer": {
+              "name": "Claude",
+              "email": "noreply@anthropic.com",
+              "time": 1794556140000
+            },
+            "branch": "a9-scroll-trace"
+          },
+          "actualWorkers": 4
+        },
+        "id": "desktop-1440",
+        "name": "desktop-1440",
+        "testDir": "/home/runner/work/service-hub/service-hub/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "shard": null,
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.56.1",
+    "workers": 4,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "scroll-reload.spec.ts",
+      "file": "scroll-reload.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "a reload from the middle or the end of the public page opens it at the top",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-390",
+              "projectName": "mobile-390",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4486,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-13T07:51:45.920Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "743f27f1dcbb1297dd7b-89d16a07d10f8983f739",
+          "file": "scroll-reload.spec.ts",
+          "line": 34,
+          "column": 1
+        },
+        {
+          "title": "the browser’s Back and Forward on the public pages keep their places",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-390",
+              "projectName": "mobile-390",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 1206,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-13T07:51:45.969Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "743f27f1dcbb1297dd7b-76a85bdc729a60b9ad5d",
+          "file": "scroll-reload.spec.ts",
+          "line": 44,
+          "column": 1
+        },
+        {
+          "title": "a reload from the middle or the end of the public page opens it at the top",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-390",
+              "projectName": "mobile-390",
+              "results": [
+                {
+                  "workerIndex": 4,
+                  "parallelIndex": 3,
+                  "status": "passed",
+                  "duration": 3757,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-13T07:51:49.350Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "743f27f1dcbb1297dd7b-7280a0294fc310d58ffd",
+          "file": "scroll-reload.spec.ts",
+          "line": 34,
+          "column": 1
+        },
+        {
+          "title": "the browser’s Back and Forward on the public pages keep their places",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-390",
+              "projectName": "mobile-390",
+              "results": [
+                {
+                  "workerIndex": 5,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 766,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-13T07:51:50.937Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "743f27f1dcbb1297dd7b-52061c58e97c3189590c",
+          "file": "scroll-reload.spec.ts",
+          "line": 44,
+          "column": 1
+        },
+        {
+          "title": "a reload from the middle or the end of the public page opens it at the top",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-390",
+              "projectName": "mobile-390",
+              "results": [
+                {
+                  "workerIndex": 8,
+                  "parallelIndex": 3,
+                  "status": "passed",
+                  "duration": 4001,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-13T07:51:54.152Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "743f27f1dcbb1297dd7b-b3463653225d85193330",
+          "file": "scroll-reload.spec.ts",
+          "line": 34,
+          "column": 1
+        },
+        {
+          "title": "the browser’s Back and Forward on the public pages keep their places",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-390",
+              "projectName": "mobile-390",
+              "results": [
+                {
+                  "workerIndex": 9,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 549,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-13T07:51:54.738Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "743f27f1dcbb1297dd7b-ed79b5c7d6930d0d1846",
+          "file": "scroll-reload.spec.ts",
+          "line": 44,
+          "column": 1
+        },
+        {
+          "title": "a reload from the middle or the end of the public page opens it at the top",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-390",
+              "projectName": "mobile-390",
+              "results": [
+                {
+                  "workerIndex": 12,
+                  "parallelIndex": 3,
+                  "status": "passed",
+                  "duration": 4171,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-13T07:51:59.024Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "743f27f1dcbb1297dd7b-9840c7bd7d6ba243bbb6",
+          "file": "scroll-reload.spec.ts",
+          "line": 34,
+          "column": 1
+        },
+        {
+          "title": "the browser’s Back and Forward on the public pages keep their places",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-390",
+              "projectName": "mobile-390",
+              "results": [
+                {
+                  "workerIndex": 13,
+                  "parallelIndex": 2,
+                  "status": "passed",
+                  "duration": 699,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-13T07:51:59.289Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "743f27f1dcbb1297dd7b-b2a1f2fb5bce29b0bc41",
+          "file": "scroll-reload.spec.ts",
+          "line": 44,
+          "column": 1
+        },
+        {
+          "title": "a reload from the middle or the end of the public page opens it at the top",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-390",
+              "projectName": "mobile-390",
+              "results": [
+                {
+                  "workerIndex": 16,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 4027,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-13T07:52:03.709Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "743f27f1dcbb1297dd7b-a2619c468dccce5e6183",
+          "file": "scroll-reload.spec.ts",
+          "line": 34,
+          "column": 1
+        },
+        {
+          "title": "the browser’s Back and Forward on the public pages keep their places",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-390",
+              "projectName": "mobile-390",
+              "results": [
+                {
+                  "workerIndex": 17,
+                  "parallelIndex": 3,
+                  "status": "passed",
+                  "duration": 653,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-13T07:52:04.055Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "743f27f1dcbb1297dd7b-ccb7e420ae9c076c78b5",
+          "file": "scroll-reload.spec.ts",
+          "line": 44,
+          "column": 1
+        },
+        {
+          "title": "a reload from the middle or the end of the public page opens it at the top",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-390",
+              "projectName": "mobile-390",
+              "results": [
+                {
+                  "workerIndex": 20,
+                  "parallelIndex": 3,
+                  "status": "passed",
+                  "duration": 3890,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-13T07:52:07.427Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "743f27f1dcbb1297dd7b-7f4254355164da9016c8",
+          "file": "scroll-reload.spec.ts",
+          "line": 34,
+          "column": 1
+        },
+        {
+          "title": "the browser’s Back and Forward on the public pages keep their places",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-390",
+              "projectName": "mobile-390",
+              "results": [
+                {
+                  "workerIndex": 21,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 439,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-13T07:52:08.483Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "743f27f1dcbb1297dd7b-1eef621c1124cfdbd3c7",
+          "file": "scroll-reload.spec.ts",
+          "line": 44,
+          "column": 1
+        },
+        {
+          "title": "a reload from the middle or the end of the public page opens it at the top",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "tablet-820",
+              "projectName": "tablet-820",
+              "results": [
+                {
+                  "workerIndex": 24,
+                  "parallelIndex": 3,
+                  "status": "passed",
+                  "duration": 4166,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-13T07:52:12.154Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "743f27f1dcbb1297dd7b-86ba5f2db38729543837",
+          "file": "scroll-reload.spec.ts",
+          "line": 34,
+          "column": 1
+        },
+        {
+          "title": "the browser’s Back and Forward on the public pages keep their places",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "tablet-820",
+              "projectName": "tablet-820",
+              "results": [
+                {
+                  "workerIndex": 25,
+                  "parallelIndex": 2,
+                  "status": "passed",
+                  "duration": 737,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-13T07:52:12.609Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "743f27f1dcbb1297dd7b-6df3834b6e961787ffa3",
+          "file": "scroll-reload.spec.ts",
+          "line": 44,
+          "column": 1
+        },
+        {
+          "title": "a reload from the middle or the end of the public page opens it at the top",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "tablet-820",
+              "projectName": "tablet-820",
+              "results": [
+                {
+                  "workerIndex": 28,
+                  "parallelIndex": 3,
+                  "status": "passed",
+                  "duration": 3962,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-13T07:52:17.039Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "743f27f1dcbb1297dd7b-834f9115aeef948f3d6e",
+          "file": "scroll-reload.spec.ts",
+          "line": 34,
+          "column": 1
+        },
+        {
+          "title": "the browser’s Back and Forward on the public pages keep their places",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "tablet-820",
+              "projectName": "tablet-820",
+              "results": [
+                {
+                  "workerIndex": 29,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 492,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-13T07:52:17.653Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "743f27f1dcbb1297dd7b-d2d5f0f7e89c920c0ba6",
+          "file": "scroll-reload.spec.ts",
+          "line": 44,
+          "column": 1
+        },
+        {
+          "title": "a reload from the middle or the end of the public page opens it at the top",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "tablet-820",
+              "projectName": "tablet-820",
+              "results": [
+                {
+                  "workerIndex": 32,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4168,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-13T07:52:21.625Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "743f27f1dcbb1297dd7b-9e153cc86d7c66019e4e",
+          "file": "scroll-reload.spec.ts",
+          "line": 34,
+          "column": 1
+        },
+        {
+          "title": "the browser’s Back and Forward on the public pages keep their places",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "tablet-820",
+              "projectName": "tablet-820",
+              "results": [
+                {
+                  "workerIndex": 33,
+                  "parallelIndex": 3,
+                  "status": "passed",
+                  "duration": 792,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-13T07:52:21.833Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "743f27f1dcbb1297dd7b-0058d8c91f277d41cb80",
+          "file": "scroll-reload.spec.ts",
+          "line": 44,
+          "column": 1
+        },
+        {
+          "title": "a reload from the middle or the end of the public page opens it at the top",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "tablet-820",
+              "projectName": "tablet-820",
+              "results": [
+                {
+                  "workerIndex": 36,
+                  "parallelIndex": 3,
+                  "status": "passed",
+                  "duration": 3897,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-13T07:52:25.375Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "743f27f1dcbb1297dd7b-d4671ebae8e83be123ef",
+          "file": "scroll-reload.spec.ts",
+          "line": 34,
+          "column": 1
+        },
+        {
+          "title": "the browser’s Back and Forward on the public pages keep their places",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "tablet-820",
+              "projectName": "tablet-820",
+              "results": [
+                {
+                  "workerIndex": 37,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 469,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-13T07:52:26.503Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "743f27f1dcbb1297dd7b-750e051e85110a0732a8",
+          "file": "scroll-reload.spec.ts",
+          "line": 44,
+          "column": 1
+        },
+        {
+          "title": "a reload from the middle or the end of the public page opens it at the top",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "tablet-820",
+              "projectName": "tablet-820",
+              "results": [
+                {
+                  "workerIndex": 40,
+                  "parallelIndex": 3,
+                  "status": "passed",
+                  "duration": 4267,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-13T07:52:30.242Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "743f27f1dcbb1297dd7b-c4dc397bc55f07094cb0",
+          "file": "scroll-reload.spec.ts",
+          "line": 34,
+          "column": 1
+        },
+        {
+          "title": "the browser’s Back and Forward on the public pages keep their places",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "tablet-820",
+              "projectName": "tablet-820",
+              "results": [
+                {
+                  "workerIndex": 41,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 964,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-13T07:52:30.531Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "743f27f1dcbb1297dd7b-17e1228cd622d19307ca",
+          "file": "scroll-reload.spec.ts",
+          "line": 44,
+          "column": 1
+        },
+        {
+          "title": "a reload from the middle or the end of the public page opens it at the top",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "tablet-820",
+              "projectName": "tablet-820",
+              "results": [
+                {
+                  "workerIndex": 44,
+                  "parallelIndex": 3,
+                  "status": "passed",
+                  "duration": 3994,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-13T07:52:35.212Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "743f27f1dcbb1297dd7b-9d37c1673f06760e99db",
+          "file": "scroll-reload.spec.ts",
+          "line": 34,
+          "column": 1
+        },
+        {
+          "title": "the browser’s Back and Forward on the public pages keep their places",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "tablet-820",
+              "projectName": "tablet-820",
+              "results": [
+                {
+                  "workerIndex": 45,
+                  "parallelIndex": 2,
+                  "status": "passed",
+                  "duration": 564,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-13T07:52:36.002Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "743f27f1dcbb1297dd7b-7f8c89fdd1d4855ac575",
+          "file": "scroll-reload.spec.ts",
+          "line": 44,
+          "column": 1
+        },
+        {
+          "title": "a reload from the middle or the end of the public page opens it at the top",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop-1440",
+              "projectName": "desktop-1440",
+              "results": [
+                {
+                  "workerIndex": 48,
+                  "parallelIndex": 2,
+                  "status": "passed",
+                  "duration": 3974,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-13T07:52:39.208Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "743f27f1dcbb1297dd7b-e77719bf7dffb114958d",
+          "file": "scroll-reload.spec.ts",
+          "line": 34,
+          "column": 1
+        },
+        {
+          "title": "the browser’s Back and Forward on the public pages keep their places",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop-1440",
+              "projectName": "desktop-1440",
+              "results": [
+                {
+                  "workerIndex": 49,
+                  "parallelIndex": 3,
+                  "status": "passed",
+                  "duration": 531,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-13T07:52:40.056Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "743f27f1dcbb1297dd7b-2287872f388b96db1dc5",
+          "file": "scroll-reload.spec.ts",
+          "line": 44,
+          "column": 1
+        },
+        {
+          "title": "a reload from the middle or the end of the public page opens it at the top",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop-1440",
+              "projectName": "desktop-1440",
+              "results": [
+                {
+                  "workerIndex": 51,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 3927,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-13T07:52:43.507Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "743f27f1dcbb1297dd7b-866e503c4d41996b43e0",
+          "file": "scroll-reload.spec.ts",
+          "line": 34,
+          "column": 1
+        },
+        {
+          "title": "the browser’s Back and Forward on the public pages keep their places",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop-1440",
+              "projectName": "desktop-1440",
+              "results": [
+                {
+                  "workerIndex": 52,
+                  "parallelIndex": 2,
+                  "status": "passed",
+                  "duration": 488,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-13T07:52:44.188Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "743f27f1dcbb1297dd7b-58c875e39431127bc41d",
+          "file": "scroll-reload.spec.ts",
+          "line": 44,
+          "column": 1
+        },
+        {
+          "title": "a reload from the middle or the end of the public page opens it at the top",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop-1440",
+              "projectName": "desktop-1440",
+              "results": [
+                {
+                  "workerIndex": 55,
+                  "parallelIndex": 3,
+                  "status": "passed",
+                  "duration": 4217,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-13T07:52:48.259Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "743f27f1dcbb1297dd7b-fe3dd0957cd0412616a3",
+          "file": "scroll-reload.spec.ts",
+          "line": 34,
+          "column": 1
+        },
+        {
+          "title": "the browser’s Back and Forward on the public pages keep their places",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop-1440",
+              "projectName": "desktop-1440",
+              "results": [
+                {
+                  "workerIndex": 56,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 823,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-13T07:52:48.447Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "743f27f1dcbb1297dd7b-197f13ec2fef46e515ba",
+          "file": "scroll-reload.spec.ts",
+          "line": 44,
+          "column": 1
+        },
+        {
+          "title": "a reload from the middle or the end of the public page opens it at the top",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop-1440",
+              "projectName": "desktop-1440",
+              "results": [
+                {
+                  "workerIndex": 59,
+                  "parallelIndex": 3,
+                  "status": "passed",
+                  "duration": 4044,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-13T07:52:53.312Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "743f27f1dcbb1297dd7b-9e997e6bb4eccbcc0056",
+          "file": "scroll-reload.spec.ts",
+          "line": 34,
+          "column": 1
+        },
+        {
+          "title": "the browser’s Back and Forward on the public pages keep their places",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop-1440",
+              "projectName": "desktop-1440",
+              "results": [
+                {
+                  "workerIndex": 60,
+                  "parallelIndex": 2,
+                  "status": "passed",
+                  "duration": 672,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-13T07:52:53.584Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "743f27f1dcbb1297dd7b-98291a3aaf9c31b4c2c7",
+          "file": "scroll-reload.spec.ts",
+          "line": 44,
+          "column": 1
+        },
+        {
+          "title": "a reload from the middle or the end of the public page opens it at the top",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop-1440",
+              "projectName": "desktop-1440",
+              "results": [
+                {
+                  "workerIndex": 63,
+                  "parallelIndex": 2,
+                  "status": "passed",
+                  "duration": 3918,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-13T07:52:57.083Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "743f27f1dcbb1297dd7b-29057c0b9ef074e74423",
+          "file": "scroll-reload.spec.ts",
+          "line": 34,
+          "column": 1
+        },
+        {
+          "title": "the browser’s Back and Forward on the public pages keep their places",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop-1440",
+              "projectName": "desktop-1440",
+              "results": [
+                {
+                  "workerIndex": 64,
+                  "parallelIndex": 3,
+                  "status": "passed",
+                  "duration": 571,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-13T07:52:58.131Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "743f27f1dcbb1297dd7b-c42df646a67c68c4e41b",
+          "file": "scroll-reload.spec.ts",
+          "line": 44,
+          "column": 1
+        },
+        {
+          "title": "a reload from the middle or the end of the public page opens it at the top",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop-1440",
+              "projectName": "desktop-1440",
+              "results": [
+                {
+                  "workerIndex": 66,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 4042,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-13T07:53:01.750Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "743f27f1dcbb1297dd7b-d8d7d21d52f6caaf865b",
+          "file": "scroll-reload.spec.ts",
+          "line": 34,
+          "column": 1
+        },
+        {
+          "title": "the browser’s Back and Forward on the public pages keep their places",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop-1440",
+              "projectName": "desktop-1440",
+              "results": [
+                {
+                  "workerIndex": 67,
+                  "parallelIndex": 2,
+                  "status": "passed",
+                  "duration": 754,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-13T07:53:01.943Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "743f27f1dcbb1297dd7b-ba14be3c9d91c270d632",
+          "file": "scroll-reload.spec.ts",
+          "line": 44,
+          "column": 1
+        }
+      ],
+      "suites": [
+        {
+          "title": "in the app",
+          "file": "scroll-reload.spec.ts",
+          "line": 59,
+          "column": 6,
+          "specs": [
+            {
+              "title": "a reload from the middle or the end of a page opens it at the top",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "mobile-390",
+                  "projectName": "mobile-390",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 6114,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-13T07:51:45.970Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "743f27f1dcbb1297dd7b-9d604149991e1262a0ef",
+              "file": "scroll-reload.spec.ts",
+              "line": 62,
+              "column": 3
+            },
+            {
+              "title": "moving between screens, „‹ Înapoi”, Back and Forward keep their places",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "mobile-390",
+                  "projectName": "mobile-390",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 3,
+                      "status": "passed",
+                      "duration": 2570,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-13T07:51:45.916Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "743f27f1dcbb1297dd7b-5919b7074a19f931ae74",
+              "file": "scroll-reload.spec.ts",
+              "line": 73,
+              "column": 3
+            },
+            {
+              "title": "signing out from the middle of a page opens the public page at the top",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "mobile-390",
+                  "projectName": "mobile-390",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 2967,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-13T07:51:47.444Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "743f27f1dcbb1297dd7b-911b3b1bd281b90c7e32",
+              "file": "scroll-reload.spec.ts",
+              "line": 98,
+              "column": 3
+            },
+            {
+              "title": "a reload from the middle or the end of a page opens it at the top",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "mobile-390",
+                  "projectName": "mobile-390",
+                  "results": [
+                    {
+                      "workerIndex": 6,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 5779,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-13T07:51:51.439Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "743f27f1dcbb1297dd7b-61dcf18cd142392ad1fd",
+              "file": "scroll-reload.spec.ts",
+              "line": 62,
+              "column": 3
+            },
+            {
+              "title": "moving between screens, „‹ Înapoi”, Back and Forward keep their places",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "mobile-390",
+                  "projectName": "mobile-390",
+                  "results": [
+                    {
+                      "workerIndex": 5,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 1963,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-13T07:51:51.898Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "743f27f1dcbb1297dd7b-e381f377d9d2e84ca177",
+              "file": "scroll-reload.spec.ts",
+              "line": 73,
+              "column": 3
+            },
+            {
+              "title": "signing out from the middle of a page opens the public page at the top",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "mobile-390",
+                  "projectName": "mobile-390",
+                  "results": [
+                    {
+                      "workerIndex": 7,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 3088,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-13T07:51:53.000Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "743f27f1dcbb1297dd7b-0305ecc5d452e45e4c03",
+              "file": "scroll-reload.spec.ts",
+              "line": 98,
+              "column": 3
+            },
+            {
+              "title": "a reload from the middle or the end of a page opens it at the top",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "mobile-390",
+                  "projectName": "mobile-390",
+                  "results": [
+                    {
+                      "workerIndex": 9,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 5050,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-13T07:51:55.440Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "743f27f1dcbb1297dd7b-920d9a118fde5d4773e1",
+              "file": "scroll-reload.spec.ts",
+              "line": 62,
+              "column": 3
+            },
+            {
+              "title": "moving between screens, „‹ Înapoi”, Back and Forward keep their places",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "mobile-390",
+                  "projectName": "mobile-390",
+                  "results": [
+                    {
+                      "workerIndex": 10,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 1736,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-13T07:51:56.701Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "743f27f1dcbb1297dd7b-0967b15b36a5e820e8a1",
+              "file": "scroll-reload.spec.ts",
+              "line": 73,
+              "column": 3
+            },
+            {
+              "title": "signing out from the middle of a page opens the public page at the top",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "mobile-390",
+                  "projectName": "mobile-390",
+                  "results": [
+                    {
+                      "workerIndex": 11,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2951,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-13T07:51:57.872Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "743f27f1dcbb1297dd7b-aa5767c10743542e73fc",
+              "file": "scroll-reload.spec.ts",
+              "line": 98,
+              "column": 3
+            },
+            {
+              "title": "a reload from the middle or the end of a page opens it at the top",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "mobile-390",
+                  "projectName": "mobile-390",
+                  "results": [
+                    {
+                      "workerIndex": 13,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 5481,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-13T07:52:00.111Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "743f27f1dcbb1297dd7b-aa6c5971c15fa26f9d13",
+              "file": "scroll-reload.spec.ts",
+              "line": 62,
+              "column": 3
+            },
+            {
+              "title": "moving between screens, „‹ Înapoi”, Back and Forward keep their places",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "mobile-390",
+                  "projectName": "mobile-390",
+                  "results": [
+                    {
+                      "workerIndex": 14,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 1878,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-13T07:52:01.122Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "743f27f1dcbb1297dd7b-565b823abc396806171d",
+              "file": "scroll-reload.spec.ts",
+              "line": 73,
+              "column": 3
+            },
+            {
+              "title": "signing out from the middle of a page opens the public page at the top",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "mobile-390",
+                  "projectName": "mobile-390",
+                  "results": [
+                    {
+                      "workerIndex": 15,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2593,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-13T07:52:01.771Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "743f27f1dcbb1297dd7b-bdec87afb78313cac1e6",
+              "file": "scroll-reload.spec.ts",
+              "line": 98,
+              "column": 3
+            },
+            {
+              "title": "a reload from the middle or the end of a page opens it at the top",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "mobile-390",
+                  "projectName": "mobile-390",
+                  "results": [
+                    {
+                      "workerIndex": 18,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 5639,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-13T07:52:05.213Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "743f27f1dcbb1297dd7b-20a55a055e3f7d3a08e8",
+              "file": "scroll-reload.spec.ts",
+              "line": 62,
+              "column": 3
+            },
+            {
+              "title": "moving between screens, „‹ Înapoi”, Back and Forward keep their places",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "mobile-390",
+                  "projectName": "mobile-390",
+                  "results": [
+                    {
+                      "workerIndex": 17,
+                      "parallelIndex": 3,
+                      "status": "passed",
+                      "duration": 1907,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-13T07:52:04.825Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "743f27f1dcbb1297dd7b-4c689691b88a3be67e5a",
+              "file": "scroll-reload.spec.ts",
+              "line": 73,
+              "column": 3
+            },
+            {
+              "title": "signing out from the middle of a page opens the public page at the top",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "mobile-390",
+                  "projectName": "mobile-390",
+                  "results": [
+                    {
+                      "workerIndex": 19,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 2856,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-13T07:52:06.307Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "743f27f1dcbb1297dd7b-a373d987476b01054c7f",
+              "file": "scroll-reload.spec.ts",
+              "line": 98,
+              "column": 3
+            },
+            {
+              "title": "a reload from the middle or the end of a page opens it at the top",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "mobile-390",
+                  "projectName": "mobile-390",
+                  "results": [
+                    {
+                      "workerIndex": 21,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 5208,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-13T07:52:09.012Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "743f27f1dcbb1297dd7b-ec7817184fd48ac06b23",
+              "file": "scroll-reload.spec.ts",
+              "line": 62,
+              "column": 3
+            },
+            {
+              "title": "moving between screens, „‹ Înapoi”, Back and Forward keep their places",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "mobile-390",
+                  "projectName": "mobile-390",
+                  "results": [
+                    {
+                      "workerIndex": 22,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 1708,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-13T07:52:09.915Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "743f27f1dcbb1297dd7b-4ef611b2b291dfe8119c",
+              "file": "scroll-reload.spec.ts",
+              "line": 73,
+              "column": 3
+            },
+            {
+              "title": "signing out from the middle of a page opens the public page at the top",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "mobile-390",
+                  "projectName": "mobile-390",
+                  "results": [
+                    {
+                      "workerIndex": 23,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3008,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-13T07:52:11.469Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "743f27f1dcbb1297dd7b-3296b9060c819ccc5bef",
+              "file": "scroll-reload.spec.ts",
+              "line": 98,
+              "column": 3
+            },
+            {
+              "title": "a reload from the middle or the end of a page opens it at the top",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "tablet-820",
+                  "projectName": "tablet-820",
+                  "results": [
+                    {
+                      "workerIndex": 25,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 5181,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-13T07:52:13.520Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "743f27f1dcbb1297dd7b-eb079961203df1ffbe00",
+              "file": "scroll-reload.spec.ts",
+              "line": 62,
+              "column": 3
+            },
+            {
+              "title": "moving between screens, „‹ Înapoi”, Back and Forward keep their places",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "tablet-820",
+                  "projectName": "tablet-820",
+                  "results": [
+                    {
+                      "workerIndex": 26,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 1950,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-13T07:52:14.721Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "743f27f1dcbb1297dd7b-09af9d351b336862b74c",
+              "file": "scroll-reload.spec.ts",
+              "line": 73,
+              "column": 3
+            },
+            {
+              "title": "signing out from the middle of a page opens the public page at the top",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "tablet-820",
+                  "projectName": "tablet-820",
+                  "results": [
+                    {
+                      "workerIndex": 27,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2744,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-13T07:52:15.394Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "743f27f1dcbb1297dd7b-925725e945b10fdb1b28",
+              "file": "scroll-reload.spec.ts",
+              "line": 98,
+              "column": 3
+            },
+            {
+              "title": "a reload from the middle or the end of a page opens it at the top",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "tablet-820",
+                  "projectName": "tablet-820",
+                  "results": [
+                    {
+                      "workerIndex": 29,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 5662,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-13T07:52:18.250Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "743f27f1dcbb1297dd7b-0e055ef3ceaaa8b1205d",
+              "file": "scroll-reload.spec.ts",
+              "line": 62,
+              "column": 3
+            },
+            {
+              "title": "moving between screens, „‹ Înapoi”, Back and Forward keep their places",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "tablet-820",
+                  "projectName": "tablet-820",
+                  "results": [
+                    {
+                      "workerIndex": 30,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2037,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-13T07:52:18.856Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "743f27f1dcbb1297dd7b-0fbb78a219a80a7b0065",
+              "file": "scroll-reload.spec.ts",
+              "line": 73,
+              "column": 3
+            },
+            {
+              "title": "signing out from the middle of a page opens the public page at the top",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "tablet-820",
+                  "projectName": "tablet-820",
+                  "results": [
+                    {
+                      "workerIndex": 31,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 2800,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-13T07:52:19.479Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "743f27f1dcbb1297dd7b-5283661bd19892921544",
+              "file": "scroll-reload.spec.ts",
+              "line": 98,
+              "column": 3
+            },
+            {
+              "title": "a reload from the middle or the end of a page opens it at the top",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "tablet-820",
+                  "projectName": "tablet-820",
+                  "results": [
+                    {
+                      "workerIndex": 34,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 5554,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-13T07:52:23.095Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "743f27f1dcbb1297dd7b-2478a01dc8a87a492992",
+              "file": "scroll-reload.spec.ts",
+              "line": 62,
+              "column": 3
+            },
+            {
+              "title": "moving between screens, „‹ Înapoi”, Back and Forward keep their places",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "tablet-820",
+                  "projectName": "tablet-820",
+                  "results": [
+                    {
+                      "workerIndex": 33,
+                      "parallelIndex": 3,
+                      "status": "passed",
+                      "duration": 1939,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-13T07:52:22.739Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "743f27f1dcbb1297dd7b-846f2dcdc105448b9ff9",
+              "file": "scroll-reload.spec.ts",
+              "line": 73,
+              "column": 3
+            },
+            {
+              "title": "signing out from the middle of a page opens the public page at the top",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "tablet-820",
+                  "projectName": "tablet-820",
+                  "results": [
+                    {
+                      "workerIndex": 35,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 2566,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-13T07:52:24.452Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "743f27f1dcbb1297dd7b-2f56b287639fb5232b57",
+              "file": "scroll-reload.spec.ts",
+              "line": 98,
+              "column": 3
+            },
+            {
+              "title": "a reload from the middle or the end of a page opens it at the top",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "tablet-820",
+                  "projectName": "tablet-820",
+                  "results": [
+                    {
+                      "workerIndex": 37,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 5591,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-13T07:52:27.056Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "743f27f1dcbb1297dd7b-fa2aed43e70174d4e65c",
+              "file": "scroll-reload.spec.ts",
+              "line": 62,
+              "column": 3
+            },
+            {
+              "title": "moving between screens, „‹ Înapoi”, Back and Forward keep their places",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "tablet-820",
+                  "projectName": "tablet-820",
+                  "results": [
+                    {
+                      "workerIndex": 38,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 1779,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-13T07:52:27.860Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "743f27f1dcbb1297dd7b-382ffb05c94097080cb3",
+              "file": "scroll-reload.spec.ts",
+              "line": 73,
+              "column": 3
+            },
+            {
+              "title": "signing out from the middle of a page opens the public page at the top",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "tablet-820",
+                  "projectName": "tablet-820",
+                  "results": [
+                    {
+                      "workerIndex": 39,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 3045,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-13T07:52:29.368Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "743f27f1dcbb1297dd7b-199dfb0e70868443f057",
+              "file": "scroll-reload.spec.ts",
+              "line": 98,
+              "column": 3
+            },
+            {
+              "title": "a reload from the middle or the end of a page opens it at the top",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "tablet-820",
+                  "projectName": "tablet-820",
+                  "results": [
+                    {
+                      "workerIndex": 41,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 5171,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-13T07:52:31.672Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "743f27f1dcbb1297dd7b-a5657c1c971bacc8ee3c",
+              "file": "scroll-reload.spec.ts",
+              "line": 62,
+              "column": 3
+            },
+            {
+              "title": "moving between screens, „‹ Înapoi”, Back and Forward keep their places",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "tablet-820",
+                  "projectName": "tablet-820",
+                  "results": [
+                    {
+                      "workerIndex": 42,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 2045,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-13T07:52:33.129Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "743f27f1dcbb1297dd7b-764d12f2e5a5c3aba4f4",
+              "file": "scroll-reload.spec.ts",
+              "line": 73,
+              "column": 3
+            },
+            {
+              "title": "signing out from the middle of a page opens the public page at the top",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "tablet-820",
+                  "projectName": "tablet-820",
+                  "results": [
+                    {
+                      "workerIndex": 43,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2775,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-13T07:52:33.368Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "743f27f1dcbb1297dd7b-3518aa19881a3c414a17",
+              "file": "scroll-reload.spec.ts",
+              "line": 98,
+              "column": 3
+            },
+            {
+              "title": "a reload from the middle or the end of a page opens it at the top",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "tablet-820",
+                  "projectName": "tablet-820",
+                  "results": [
+                    {
+                      "workerIndex": 46,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 5805,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-13T07:52:36.889Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "743f27f1dcbb1297dd7b-0ff46061441f2121c61e",
+              "file": "scroll-reload.spec.ts",
+              "line": 62,
+              "column": 3
+            },
+            {
+              "title": "moving between screens, „‹ Înapoi”, Back and Forward keep their places",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "tablet-820",
+                  "projectName": "tablet-820",
+                  "results": [
+                    {
+                      "workerIndex": 45,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 2049,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-13T07:52:36.642Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "743f27f1dcbb1297dd7b-33d1deb759eab1be46d7",
+              "file": "scroll-reload.spec.ts",
+              "line": 73,
+              "column": 3
+            },
+            {
+              "title": "signing out from the middle of a page opens the public page at the top",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "tablet-820",
+                  "projectName": "tablet-820",
+                  "results": [
+                    {
+                      "workerIndex": 47,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 2881,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-13T07:52:37.642Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "743f27f1dcbb1297dd7b-2299f4459fb01ce2e1fd",
+              "file": "scroll-reload.spec.ts",
+              "line": 98,
+              "column": 3
+            },
+            {
+              "title": "a reload from the middle or the end of a page opens it at the top",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "desktop-1440",
+                  "projectName": "desktop-1440",
+                  "results": [
+                    {
+                      "workerIndex": 50,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 5314,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-13T07:52:41.413Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "743f27f1dcbb1297dd7b-ca68e1843b7ec2525189",
+              "file": "scroll-reload.spec.ts",
+              "line": 62,
+              "column": 3
+            },
+            {
+              "title": "moving between screens, „‹ Înapoi”, Back and Forward keep their places",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "desktop-1440",
+                  "projectName": "desktop-1440",
+                  "results": [
+                    {
+                      "workerIndex": 49,
+                      "parallelIndex": 3,
+                      "status": "passed",
+                      "duration": 1857,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-13T07:52:40.663Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "743f27f1dcbb1297dd7b-e15d7520f941adb8266a",
+              "file": "scroll-reload.spec.ts",
+              "line": 73,
+              "column": 3
+            },
+            {
+              "title": "signing out from the middle of a page opens the public page at the top",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "desktop-1440",
+                  "projectName": "desktop-1440",
+                  "results": [
+                    {
+                      "workerIndex": 49,
+                      "parallelIndex": 3,
+                      "status": "passed",
+                      "duration": 2508,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-13T07:52:42.533Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "743f27f1dcbb1297dd7b-1f069a0647e6c36e2772",
+              "file": "scroll-reload.spec.ts",
+              "line": 98,
+              "column": 3
+            },
+            {
+              "title": "a reload from the middle or the end of a page opens it at the top",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "desktop-1440",
+                  "projectName": "desktop-1440",
+                  "results": [
+                    {
+                      "workerIndex": 52,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 5399,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-13T07:52:44.798Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "743f27f1dcbb1297dd7b-7acfee9976bac0d91b3c",
+              "file": "scroll-reload.spec.ts",
+              "line": 62,
+              "column": 3
+            },
+            {
+              "title": "moving between screens, „‹ Înapoi”, Back and Forward keep their places",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "desktop-1440",
+                  "projectName": "desktop-1440",
+                  "results": [
+                    {
+                      "workerIndex": 53,
+                      "parallelIndex": 3,
+                      "status": "passed",
+                      "duration": 1743,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-13T07:52:45.656Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "743f27f1dcbb1297dd7b-5fe9de38249321b2e450",
+              "file": "scroll-reload.spec.ts",
+              "line": 73,
+              "column": 3
+            },
+            {
+              "title": "signing out from the middle of a page opens the public page at the top",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "desktop-1440",
+                  "projectName": "desktop-1440",
+                  "results": [
+                    {
+                      "workerIndex": 54,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 3096,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-13T07:52:47.354Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "743f27f1dcbb1297dd7b-d36d3d7554ca0fae2c1c",
+              "file": "scroll-reload.spec.ts",
+              "line": 98,
+              "column": 3
+            },
+            {
+              "title": "a reload from the middle or the end of a page opens it at the top",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "desktop-1440",
+                  "projectName": "desktop-1440",
+                  "results": [
+                    {
+                      "workerIndex": 56,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 5237,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-13T07:52:49.495Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "743f27f1dcbb1297dd7b-e752d0328e955126bebd",
+              "file": "scroll-reload.spec.ts",
+              "line": 62,
+              "column": 3
+            },
+            {
+              "title": "moving between screens, „‹ Înapoi”, Back and Forward keep their places",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "desktop-1440",
+                  "projectName": "desktop-1440",
+                  "results": [
+                    {
+                      "workerIndex": 57,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 1969,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-13T07:52:50.721Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "743f27f1dcbb1297dd7b-570d752bda9284a24e5c",
+              "file": "scroll-reload.spec.ts",
+              "line": 73,
+              "column": 3
+            },
+            {
+              "title": "signing out from the middle of a page opens the public page at the top",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "desktop-1440",
+                  "projectName": "desktop-1440",
+                  "results": [
+                    {
+                      "workerIndex": 58,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 2701,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-13T07:52:51.360Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "743f27f1dcbb1297dd7b-dd0be256445496bab71e",
+              "file": "scroll-reload.spec.ts",
+              "line": 98,
+              "column": 3
+            },
+            {
+              "title": "a reload from the middle or the end of a page opens it at the top",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "desktop-1440",
+                  "projectName": "desktop-1440",
+                  "results": [
+                    {
+                      "workerIndex": 61,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 5877,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-13T07:52:54.937Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "743f27f1dcbb1297dd7b-89ffb5bb2284a9b0ebed",
+              "file": "scroll-reload.spec.ts",
+              "line": 62,
+              "column": 3
+            },
+            {
+              "title": "moving between screens, „‹ Înapoi”, Back and Forward keep their places",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "desktop-1440",
+                  "projectName": "desktop-1440",
+                  "results": [
+                    {
+                      "workerIndex": 60,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 2032,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-13T07:52:54.374Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "743f27f1dcbb1297dd7b-81253bd4b823f3cdb8be",
+              "file": "scroll-reload.spec.ts",
+              "line": 73,
+              "column": 3
+            },
+            {
+              "title": "signing out from the middle of a page opens the public page at the top",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "desktop-1440",
+                  "projectName": "desktop-1440",
+                  "results": [
+                    {
+                      "workerIndex": 62,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2807,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-13T07:52:55.636Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "743f27f1dcbb1297dd7b-2027e717a092b5198b74",
+              "file": "scroll-reload.spec.ts",
+              "line": 98,
+              "column": 3
+            },
+            {
+              "title": "a reload from the middle or the end of a page opens it at the top",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "desktop-1440",
+                  "projectName": "desktop-1440",
+                  "results": [
+                    {
+                      "workerIndex": 65,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 5338,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-13T07:52:59.181Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "743f27f1dcbb1297dd7b-0582511076df89ea7867",
+              "file": "scroll-reload.spec.ts",
+              "line": 62,
+              "column": 3
+            },
+            {
+              "title": "moving between screens, „‹ Înapoi”, Back and Forward keep their places",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "desktop-1440",
+                  "projectName": "desktop-1440",
+                  "results": [
+                    {
+                      "workerIndex": 64,
+                      "parallelIndex": 3,
+                      "status": "passed",
+                      "duration": 1883,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-13T07:52:58.800Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "743f27f1dcbb1297dd7b-7107cb29f37763f45b2a",
+              "file": "scroll-reload.spec.ts",
+              "line": 73,
+              "column": 3
+            },
+            {
+              "title": "signing out from the middle of a page opens the public page at the top",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "desktop-1440",
+                  "projectName": "desktop-1440",
+                  "results": [
+                    {
+                      "workerIndex": 64,
+                      "parallelIndex": 3,
+                      "status": "passed",
+                      "duration": 2775,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-13T07:53:00.692Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "743f27f1dcbb1297dd7b-72d5c251bbf25b2a4faa",
+              "file": "scroll-reload.spec.ts",
+              "line": 98,
+              "column": 3
+            },
+            {
+              "title": "a reload from the middle or the end of a page opens it at the top",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "desktop-1440",
+                  "projectName": "desktop-1440",
+                  "results": [
+                    {
+                      "workerIndex": 67,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 5229,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-13T07:53:02.863Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "743f27f1dcbb1297dd7b-72d1108c9e1ee3b8d5c9",
+              "file": "scroll-reload.spec.ts",
+              "line": 62,
+              "column": 3
+            },
+            {
+              "title": "moving between screens, „‹ Înapoi”, Back and Forward keep their places",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "desktop-1440",
+                  "projectName": "desktop-1440",
+                  "results": [
+                    {
+                      "workerIndex": 68,
+                      "parallelIndex": 3,
+                      "status": "passed",
+                      "duration": 1761,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-13T07:53:03.969Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "743f27f1dcbb1297dd7b-1a1b608abdeea01d4a02",
+              "file": "scroll-reload.spec.ts",
+              "line": 73,
+              "column": 3
+            },
+            {
+              "title": "signing out from the middle of a page opens the public page at the top",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "desktop-1440",
+                  "projectName": "desktop-1440",
+                  "results": [
+                    {
+                      "workerIndex": 69,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2380,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-13T07:53:05.268Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "743f27f1dcbb1297dd7b-6b1cf286821e6017227f",
+              "file": "scroll-reload.spec.ts",
+              "line": 98,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-11-13T07:51:25.066Z",
+    "duration": 103105.62000000001,
+    "expected": 90,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}
