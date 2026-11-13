@@ -34,6 +34,7 @@ import { useOptionalWorkspace } from './workspace/workspaceContext';
 import { WorkspaceSwitcher } from './workspace/WorkspaceSwitcher';
 import { fleetSpacePath } from '../screens/client/companies/paths';
 import styles from './AppShell.module.css';
+import { markSigningOut } from '../lib/afterSignOut';
 
 /**
  * The item's icon with its count bubble (the count is read out after the label). The bubble jumps
@@ -273,6 +274,7 @@ export function AppShell({ role }: { role: Role }) {
 
   // Leave first, then end the session: otherwise the role guard would send us to sign-in.
   async function logOut() {
+    markSigningOut();
     navigate('/', { replace: true, state: { leaving: true } });
     await signOut();
   }

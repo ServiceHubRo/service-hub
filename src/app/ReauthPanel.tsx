@@ -10,6 +10,7 @@ import { useI18n } from '../i18n/context';
 import { rememberMe } from '../lib/remember';
 import styles from './ReauthPanel.module.css';
 import { useSession } from './sessionContext';
+import { markSigningOut } from '../lib/afterSignOut';
 
 /**
  * The session ended while the app was open (FR §10): a sign-in panel covers the screen, which stays
@@ -41,6 +42,7 @@ export function ReauthPanel() {
   }
 
   async function leave() {
+    markSigningOut();
     navigate('/', { replace: true, state: { leaving: true } });
     await session.signOut();
   }
