@@ -1157,11 +1157,10 @@ button.kpi:hover {
   margin-top: 3px;
 }
 
+/* The custom plan's only action: a button at the foot of its card, like the other actions (A9; it
+   was a 22 px text link). */
 .planContact {
   margin-top: auto;
-  color: var(--amber);
-  font-weight: 600;
-  font-size: 14px;
 }
 
 /* Programări (T63d): one card per booking; a quote waiting for the company opens inside it. */

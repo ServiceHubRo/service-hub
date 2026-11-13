@@ -377,13 +377,14 @@ function PriceBlock() {
                   <span className="visually-hidden"> · {t('landing.launchSaveLabel', { n: launch.off })}</span>
                 </>
               )}
+              {/* The dot stays at the end of a line, never at the start of the next one (A9). */}
               {state.pricing.trialDays > 0 && (
                 <>
-                  <span aria-hidden="true"> · </span>
+                  <span aria-hidden="true">{'\u00a0· '}</span>
                   <span>{t('landing.priceTrial', { days: plural('unit.days', state.pricing.trialDays) })}</span>
                 </>
               )}
-              <span aria-hidden="true"> · </span>
+              <span aria-hidden="true">{'\u00a0· '}</span>
               <span>{t('landing.priceNoContract')}</span>
             </p>
             {state.pricing.launchRon !== null && (

@@ -1,10 +1,11 @@
-import { Plus, Trash2 } from 'lucide-react';
+import { FileLock, Plus, Trash2 } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ActionButton } from '../../../components/ActionButton';
 import { BackLink } from '../../../components/BackLink';
 import { Button } from '../../../components/Button';
 import { Card } from '../../../components/Card';
+import { EmptyState } from '../../../components/EmptyState';
 import { Field } from '../../../components/Field';
 import { LoadError } from '../../../components/LoadError';
 import { OfferNote } from '../../../components/OfferNote';
@@ -123,8 +124,9 @@ export function QuoteEditorScreen() {
   else if (state.status === 'error') body = <LoadError message={t('sb.loadError')} onRetry={reload} />;
   else {
     const booking = state.data.bookings.find((b) => b.id === bookingId);
+    // An old link to a booking that can no longer get a quote: a state of its own (A9), not a bare line.
     if (!booking || (booking.status !== 'in_inspection' && booking.status !== 'quote_sent'))
-      body = <p className={styles.muted}>{t('qe.unavailable')}</p>;
+      body = <EmptyState icon={FileLock} title={t('qe.unavailable')} />;
     else
       body = (
         <Editor

@@ -1,5 +1,6 @@
 import { Check, CreditCard, Lock, Plus } from 'lucide-react';
 import { useCallback } from 'react';
+import { buttonClass } from '../../components/buttonClass';
 import { Card } from '../../components/Card';
 import { EmptyState } from '../../components/EmptyState';
 import { LoadError } from '../../components/LoadError';
@@ -204,7 +205,7 @@ function PlanCard({ p, current, have, largest }: { p: FleetPlanRow; current: boo
         })}
       </ul>
       {p.price_ron === null && (
-        <a className={styles.planContact} href="mailto:contact@service-hub.ro">
+        <a className={buttonClass('secondary', true, styles.planContact)} href="mailto:contact@service-hub.ro">
           {t('fleet.sub.contact')}
         </a>
       )}

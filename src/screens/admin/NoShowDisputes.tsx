@@ -1,7 +1,9 @@
+import { UserX } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '../../components/Button';
 import { Card } from '../../components/Card';
+import { EmptyState } from '../../components/EmptyState';
 import {
   decideNoShowDispute,
   type AdminNoShowDispute,
@@ -105,7 +107,7 @@ export function NoShowDisputesSection({ data, onDecided }: { data: AdminNoShowDi
     <>
       <SectionTitle>{t('admin.noShowDispute.title', { n: data.pending.length })}</SectionTitle>
       {data.pending.length === 0 ? (
-        <p className={styles.muted}>{t('admin.noShowDispute.empty')}</p>
+        <EmptyState icon={UserX} title={t('admin.noShowDispute.empty')} />
       ) : (
         <ul className={styles.list}>
           {data.pending.map((d) => (

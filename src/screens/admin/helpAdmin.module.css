@@ -8,3 +8,30 @@
 .articleRow > span:last-child {
   margin-left: auto;
 }
+
+/* The status filter and the two „new” buttons (A9): one under the other on a phone, as before; from
+   768 px one row, the filter as wide as its choices and the buttons as wide as their labels, on the
+   right like a page's actions (they were each half of the page on a computer). */
+.toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+@media (min-width: 768px) {
+  .toolbar {
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--space-4);
+  }
+
+  .toolbar > :first-child {
+    flex: 0 1 280px;
+    min-width: 0;
+  }
+
+  .toolbar .toolbarButtons > * {
+    flex: 0 0 auto;
+  }
+}

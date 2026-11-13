@@ -372,7 +372,7 @@ export function CatalogScreen() {
               clearLabel={t('admin.search.clear')}
             />
             {panel?.kind !== 'new-category' && (
-              <Button onClick={() => setPanel({ kind: 'new-category' })}>
+              <Button className={styles.loneAction} onClick={() => setPanel({ kind: 'new-category' })}>
                 <Plus size={18} aria-hidden="true" /> {t('admin.catalog.newCategory')}
               </Button>
             )}
