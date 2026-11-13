@@ -76,7 +76,7 @@ select test.login(test.id('admin'));
 select test.eq(test.error_params($$select public.admin_update_settings('{"staff_seat_price_ron":-1}', test.rid(), 'Test A6')$$)->>'field',
                'staff_seat_price_ron', 'a negative price is refused');
 select public.admin_update_settings('{"staff_seat_price_ron":25}', test.rid(), 'Test A6');
-select test.eq(staff_seat_price_ron, 25.00::numeric(10,2), 'changed in the settings') from public.platform_settings;
+select test.eq(staff_seat_price_ron, 25.00::numeric(10,2), 'changed in the settings') from jsonb_populate_record(null::public.platform_settings, public.admin_get_settings());
 select test.eq(count(*), 1::bigint, 'and logged')
 from public.admin_audit_log where action = 'update_settings' and after->>'staff_seat_price_ron' = '25.00';
 select test.eq((select (x->>'monthly_ron')::numeric from jsonb_array_elements(public.admin_list_subscriptions()->'subscriptions') x
