@@ -578,8 +578,9 @@ test.describe('A9 visual audit', () => {
       { name: 'programari-mai-multe', path: '/s/programari', roOnly: true, prep: async (p) => clickButton(p, /^Mai multe/) },
       { name: 'programare-noua', path: '/s/programari/nou' },
       { name: 'import', path: '/s/programari/import' },
-      { name: 'deviz-editor', path: `/s/programari/deviz/${by('inspecting', 'confirmed')}` },
-      { name: 'preluare', path: `/s/programari/preluare/${by('confirmed', 'inspecting')}` },
+      { name: 'deviz-editor', path: `/s/programari/deviz/${by('in_inspection')}` },
+      { name: 'deviz-indisponibil', path: `/s/programari/deviz/${by('confirmed')}`, roOnly: true },
+      { name: 'preluare', path: `/s/programari/preluare/${by('confirmed', 'in_inspection')}` },
       { name: 'fisa-vehicul', path: `/s/istoric/fisa/${by('completed')}` },
       { name: 'istoric', path: '/s/istoric' },
       { name: 'istoric-deschis', path: '/s/istoric', roOnly: true, prep: async (p) => {
@@ -627,6 +628,14 @@ test.describe('A9 visual audit', () => {
       { name: 'setari-facturare', path: '/s/cont/setari/facturare' },
       { name: 'abonament', path: '/s/cont/abonament' },
     ], 'ro');
+  });
+
+  test('shop quote editor (a booking in inspection)', async ({ page }) => {
+    const atelier = await ids.shop('10000000-0000-4000-8000-000000000001');
+    const open = await serviceRest<{ id: string }[]>(`bookings?shop_id=eq.${atelier}&status=eq.in_inspection&select=id&limit=1`, 'GET');
+    await signIn(page, SEED.shop, SEED_PASSWORD);
+    await expect(page).toHaveURL(/\/s\/panou/, { timeout: 20_000 });
+    await runRole(page, 'service', [{ name: 'deviz-editor', path: `/s/programari/deviz/${open[0]?.id ?? 'x'}` }]);
   });
 
   test('client logout confirmation', async ({ page }) => {
