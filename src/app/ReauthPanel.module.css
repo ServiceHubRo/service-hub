@@ -3,7 +3,9 @@
   inset: 0;
   z-index: 50;
   display: flex;
-  align-items: center;
+  /* Centered by the panel's own margins: taller than what is seen (a small phone with the keyboard
+     open), it starts at the top and scrolls, its title never out of reach. */
+  align-items: flex-start;
   justify-content: center;
   padding: var(--page-pad);
   background: rgba(10, 11, 13, 0.82);
@@ -11,6 +13,7 @@
 }
 
 .panel {
+  margin: auto;
   width: 100%;
   max-width: 420px;
   background: var(--surface);

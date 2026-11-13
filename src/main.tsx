@@ -2,7 +2,8 @@ import { StrictMode, type ErrorInfo } from 'react';
 import { createRoot, hydrateRoot } from 'react-dom/client';
 import { App } from './app/App';
 import { ChunkLoadError } from './app/routes/lazyChunk';
-import { resizeForKeyboard, watchKeyboard } from './lib/keyboard';
+import { IS_TEST_BUILD } from './lib/env';
+import { keyboardReadoutAsked, resizeForKeyboard, watchKeyboard } from './lib/keyboard';
 import { captureError, installGlobalHandlers } from './lib/monitoring';
 import { markHydrating, PRERENDERED_ATTR } from './lib/prerender';
 import { openReloadAtTop } from './lib/scrollMemory';
@@ -16,6 +17,17 @@ openReloadAtTop();
 resizeForKeyboard();
 // The phone's keyboard, on every screen and platform (the bottom bar steps aside, the field stays seen).
 watchKeyboard();
+// Its measurements on screen, for a screenshot from a real phone: test builds only, asked with ?kb=1.
+const visitStorage = () => {
+  try {
+    return window.sessionStorage;
+  } catch {
+    return null;
+  }
+};
+if (IS_TEST_BUILD && keyboardReadoutAsked(window.location.search, visitStorage())) {
+  void import('./lib/keyboardReadout').then((m) => m.showKeyboardReadout());
+}
 
 // Error reports (T19): nothing is sent unless the build has VITE_SENTRY_DSN.
 installGlobalHandlers();

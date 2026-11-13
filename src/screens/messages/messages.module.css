@@ -127,6 +127,12 @@
     var(--page-pad) 0 0 var(--bg);
 }
 
+/* While the phone's keyboard is open the conversation's top scrolls with it, like the box to write
+   in (global.css): on a small phone it would cover that box (src/lib/keyboard.ts). */
+:global(html[data-keyboard] #continut) .top {
+  position: static;
+}
+
 .header {
   display: flex;
   align-items: center;

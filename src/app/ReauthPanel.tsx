@@ -48,7 +48,7 @@ export function ReauthPanel() {
   }
 
   return (
-    <div className={styles.backdrop}>
+    <div className={styles.backdrop} data-keyboard-fit>
       <div className={styles.panel} role="dialog" aria-modal="true" aria-labelledby="reauth-title">
         <h2 id="reauth-title" className={styles.title}>
           {t('session.expired.title')}
