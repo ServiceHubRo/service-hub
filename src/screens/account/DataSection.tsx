@@ -15,6 +15,7 @@ import { myDataSheets } from '../../lib/myData';
 import { saveFile } from '../../lib/saveFile';
 import { toXlsxBook } from '../../lib/xlsx';
 import styles from './account.module.css';
+import { markSigningOut } from '../../lib/afterSignOut';
 
 /** "Datele mele" (P13): an Excel file with one sheet per kind of data; deleting the account asks first. */
 export function DataSection() {
@@ -34,6 +35,7 @@ export function DataSection() {
 
   async function remove() {
     await deleteAccount();
+    markSigningOut();
     navigate('/', { replace: true, state: { leaving: true, accountDeleted: true } });
     await session.signOut();
   }
