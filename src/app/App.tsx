@@ -23,7 +23,6 @@ import { ScreenErrorBoundary } from './ScreenErrorBoundary';
 import { SessionProvider } from './SessionProvider';
 import { useSession } from './sessionContext';
 import styles from './App.module.css';
-import { useScrollMemory } from '../lib/scrollMemory';
 
 // Each role's screens are a file of their own, loaded after sign-in (T18): a client never
 // downloads the shop's or the admin's code, and the public page stays small.
@@ -62,27 +61,8 @@ function roleRoutes(role: Role) {
   );
 }
 
-/**
- * Where every screen opens (src/lib/scrollMemory.ts), for the whole app: a new screen at the top,
- * going back where it was left. Here and not in the signed-in shell (Eduard, 13 Nov 2026): signing
- * out replaced the address with the public page while the shell, and with it this rule, went away,
- * so the landing page opened at the offset of Cont (at „Pentru șoferi” on a phone); a public page
- * opened from the middle of another did the same.
- */
-function ScrollMemory() {
-  useScrollMemory();
-  return null;
-}
-
 function Router({ location, children }: { location?: string; children: ReactNode }) {
-  return location === undefined ? (
-    <BrowserRouter>
-      <ScrollMemory />
-      {children}
-    </BrowserRouter>
-  ) : (
-    <StaticRouter location={location}>{children}</StaticRouter>
-  );
+  return location === undefined ? <BrowserRouter>{children}</BrowserRouter> : <StaticRouter location={location}>{children}</StaticRouter>;
 }
 
 /**

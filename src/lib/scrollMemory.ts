@@ -17,9 +17,6 @@ function pageScroller(): HTMLElement {
  *
  * Since 6 Nov 2026 the document scrolls, not the app's content area: Safari on the iPhone kept the
  * page's place at a screenshot but threw an inner scrolling area back to the top.
- *
- * Used once, for every screen (App, ScrollMemory), since 13 Nov 2026: in the signed-in shell alone
- * it went away with the shell, and signing out opened the public page at the offset of Cont.
  */
 export function useScrollMemory(): void {
   const { pathname } = useLocation();

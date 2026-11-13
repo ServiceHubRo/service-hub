@@ -9,6 +9,7 @@ import { quotesWaiting } from '../lib/clientBookings';
 import { motionOn } from '../lib/motion';
 import { IS_NATIVE } from '../lib/native';
 import { useScreenSlide } from '../lib/screenSlide';
+import { useScrollMemory } from '../lib/scrollMemory';
 import { useBumps } from '../lib/useBumps';
 import { useOptionalAdminCounts } from '../screens/admin/adminContext';
 import { ADMIN_ACTIVITY_PATH, ADMIN_MODERATION_PATH } from '../screens/admin/paths';
@@ -33,6 +34,7 @@ import { useOptionalWorkspace } from './workspace/workspaceContext';
 import { WorkspaceSwitcher } from './workspace/WorkspaceSwitcher';
 import { fleetSpacePath } from '../screens/client/companies/paths';
 import styles from './AppShell.module.css';
+import { markSigningOut } from '../lib/afterSignOut';
 
 /**
  * The item's icon with its count bubble (the count is read out after the label). The bubble jumps
@@ -230,8 +232,8 @@ export function AppShell({ role }: { role: Role }) {
   const current = nav.main.flatMap((item) => item.children ?? []).find(under) ?? [...nav.main, nav.account].find(under);
   useDocumentTitle(current ? t(current.labelKey) : null);
 
-  // Where a screen opens (a new one at the top, going back where it was left): for every screen,
-  // signed in or not, in App (ScrollMemory), so leaving the shell follows the same rule.
+  // The page scrolls: a new screen starts at the top, going back finds it where it was.
+  useScrollMemory();
 
   // The header (top) and the tab bar (bottom) stay over the scrolling page: their heights, for what
   // sticks under them and for what is scrolled into view (0 where they are hidden, e.g. a laptop).
@@ -272,6 +274,7 @@ export function AppShell({ role }: { role: Role }) {
 
   // Leave first, then end the session: otherwise the role guard would send us to sign-in.
   async function logOut() {
+    markSigningOut();
     navigate('/', { replace: true, state: { leaving: true } });
     await signOut();
   }
