@@ -1,0 +1,59 @@
+name: Visual audit
+
+# A9: every screen of every role at 390, 430, 768, 820, 1024, 1280 and 1440 px against a throwaway
+# Supabase on the runner (the same as the browser tests; never the real project). The screenshots
+# and visual-audit/report.json are kept on the branch `visual-audit-shots` (one commit, replaced on
+# every run) so they can be read without downloading an artifact.
+
+on:
+  push:
+    branches: [a9-visual-polish]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: visual-audit-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  audit:
+    name: Screenshots and measurements, every role
+    runs-on: ubuntu-24.04
+    timeout-minutes: 80
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium || npx playwright install chromium
+      - name: Start the local Supabase stack
+        run: npx supabase start -x studio,imgproxy,vector,logflare,supavisor
+      - name: Point the audit at it
+        run: |
+          eval "$(npx supabase status -o env)"
+          {
+            echo "E2E_BACKEND=1"
+            echo "VITE_SUPABASE_URL=$API_URL"
+            echo "VITE_SUPABASE_ANON_KEY=$ANON_KEY"
+            echo "E2E_SERVICE_ROLE_KEY=$SERVICE_ROLE_KEY"
+          } >> "$GITHUB_ENV"
+      - name: Audit
+        run: npm run test:visual
+        continue-on-error: true
+      - name: Keep the screenshots on the visual-audit-shots branch
+        env:
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mkdir -p visual-audit
+          echo "${GITHUB_SHA}" > visual-audit/COMMIT
+          cd visual-audit
+          git init -q -b shots
+          git config user.name "github-actions[bot]"
+          git config user.email "41898237+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -qm "Visual audit of ${GITHUB_SHA::7}"
+          git push -qf "https://x-access-token:${TOKEN}@github.com/${GITHUB_REPOSITORY}.git" shots:refs/heads/visual-audit-shots
