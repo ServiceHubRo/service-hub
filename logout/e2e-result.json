@@ -1,0 +1,714 @@
+{
+  "config": {
+    "configFile": "/home/runner/work/service-hub/service-hub/playwright.config.ts",
+    "rootDir": "/home/runner/work/service-hub/service-hub/tests/e2e",
+    "forbidOnly": true,
+    "fullyParallel": true,
+    "globalSetup": "/home/runner/work/service-hub/service-hub/tests/e2e/global-setup.ts",
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "ci": {
+        "commitHref": "https://github.com/ServiceHubRo/service-hub/commit/b857fdcbecc392f8266288a4f3313f68a3af913b",
+        "commitHash": "b857fdcbecc392f8266288a4f3313f68a3af913b",
+        "buildHref": "https://github.com/ServiceHubRo/service-hub/actions/runs/43387819526"
+      },
+      "gitCommit": {
+        "shortHash": "b857fdc",
+        "hash": "b857fdcbecc392f8266288a4f3313f68a3af913b",
+        "subject": "Investigation: only the reload tests",
+        "body": "Investigation: only the reload tests\n",
+        "author": {
+          "name": "Claude",
+          "email": "noreply@anthropic.com",
+          "time": 1794555822000
+        },
+        "committer": {
+          "name": "Claude",
+          "email": "noreply@anthropic.com",
+          "time": 1794555822000
+        },
+        "branch": "a9-scroll-trace"
+      },
+      "actualWorkers": 2
+    },
+    "preserveOutput": "always",
+    "reporter": [
+      [
+        "list"
+      ],
+      [
+        "json"
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "quiet": false,
+    "projects": [
+      {
+        "outputDir": "/home/runner/work/service-hub/service-hub/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "ci": {
+            "commitHref": "https://github.com/ServiceHubRo/service-hub/commit/b857fdcbecc392f8266288a4f3313f68a3af913b",
+            "commitHash": "b857fdcbecc392f8266288a4f3313f68a3af913b",
+            "buildHref": "https://github.com/ServiceHubRo/service-hub/actions/runs/43387819526"
+          },
+          "gitCommit": {
+            "shortHash": "b857fdc",
+            "hash": "b857fdcbecc392f8266288a4f3313f68a3af913b",
+            "subject": "Investigation: only the reload tests",
+            "body": "Investigation: only the reload tests\n",
+            "author": {
+              "name": "Claude",
+              "email": "noreply@anthropic.com",
+              "time": 1794555822000
+            },
+            "committer": {
+              "name": "Claude",
+              "email": "noreply@anthropic.com",
+              "time": 1794555822000
+            },
+            "branch": "a9-scroll-trace"
+          },
+          "actualWorkers": 2
+        },
+        "id": "mobile-390",
+        "name": "mobile-390",
+        "testDir": "/home/runner/work/service-hub/service-hub/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/home/runner/work/service-hub/service-hub/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "ci": {
+            "commitHref": "https://github.com/ServiceHubRo/service-hub/commit/b857fdcbecc392f8266288a4f3313f68a3af913b",
+            "commitHash": "b857fdcbecc392f8266288a4f3313f68a3af913b",
+            "buildHref": "https://github.com/ServiceHubRo/service-hub/actions/runs/43387819526"
+          },
+          "gitCommit": {
+            "shortHash": "b857fdc",
+            "hash": "b857fdcbecc392f8266288a4f3313f68a3af913b",
+            "subject": "Investigation: only the reload tests",
+            "body": "Investigation: only the reload tests\n",
+            "author": {
+              "name": "Claude",
+              "email": "noreply@anthropic.com",
+              "time": 1794555822000
+            },
+            "committer": {
+              "name": "Claude",
+              "email": "noreply@anthropic.com",
+              "time": 1794555822000
+            },
+            "branch": "a9-scroll-trace"
+          },
+          "actualWorkers": 2
+        },
+        "id": "tablet-820",
+        "name": "tablet-820",
+        "testDir": "/home/runner/work/service-hub/service-hub/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/home/runner/work/service-hub/service-hub/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "ci": {
+            "commitHref": "https://github.com/ServiceHubRo/service-hub/commit/b857fdcbecc392f8266288a4f3313f68a3af913b",
+            "commitHash": "b857fdcbecc392f8266288a4f3313f68a3af913b",
+            "buildHref": "https://github.com/ServiceHubRo/service-hub/actions/runs/43387819526"
+          },
+          "gitCommit": {
+            "shortHash": "b857fdc",
+            "hash": "b857fdcbecc392f8266288a4f3313f68a3af913b",
+            "subject": "Investigation: only the reload tests",
+            "body": "Investigation: only the reload tests\n",
+            "author": {
+              "name": "Claude",
+              "email": "noreply@anthropic.com",
+              "time": 1794555822000
+            },
+            "committer": {
+              "name": "Claude",
+              "email": "noreply@anthropic.com",
+              "time": 1794555822000
+            },
+            "branch": "a9-scroll-trace"
+          },
+          "actualWorkers": 2
+        },
+        "id": "desktop-1440",
+        "name": "desktop-1440",
+        "testDir": "/home/runner/work/service-hub/service-hub/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "shard": null,
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.56.1",
+    "workers": 2,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "scroll-reload.spec.ts",
+      "file": "scroll-reload.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "a reload from the middle or the end of the public page opens it at the top",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-390",
+              "projectName": "mobile-390",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 10116,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-13T07:46:51.203Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "743f27f1dcbb1297dd7b-89d16a07d10f8983f739",
+          "file": "scroll-reload.spec.ts",
+          "line": 51,
+          "column": 1
+        },
+        {
+          "title": "the browser’s Back and Forward on the public pages keep their places",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "mobile-390",
+              "projectName": "mobile-390",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 763,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-13T07:46:51.231Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "743f27f1dcbb1297dd7b-76a85bdc729a60b9ad5d",
+          "file": "scroll-reload.spec.ts",
+          "line": 61,
+          "column": 1
+        },
+        {
+          "title": "a reload from the middle or the end of the public page opens it at the top",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "tablet-820",
+              "projectName": "tablet-820",
+              "results": [
+                {
+                  "workerIndex": 2,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 9994,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-13T07:47:05.616Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "743f27f1dcbb1297dd7b-86ba5f2db38729543837",
+          "file": "scroll-reload.spec.ts",
+          "line": 51,
+          "column": 1
+        },
+        {
+          "title": "the browser’s Back and Forward on the public pages keep their places",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "tablet-820",
+              "projectName": "tablet-820",
+              "results": [
+                {
+                  "workerIndex": 3,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 542,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-13T07:47:07.525Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "743f27f1dcbb1297dd7b-6df3834b6e961787ffa3",
+          "file": "scroll-reload.spec.ts",
+          "line": 61,
+          "column": 1
+        },
+        {
+          "title": "a reload from the middle or the end of the public page opens it at the top",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop-1440",
+              "projectName": "desktop-1440",
+              "results": [
+                {
+                  "workerIndex": 4,
+                  "parallelIndex": 1,
+                  "status": "passed",
+                  "duration": 10322,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-13T07:47:19.558Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "743f27f1dcbb1297dd7b-e77719bf7dffb114958d",
+          "file": "scroll-reload.spec.ts",
+          "line": 51,
+          "column": 1
+        },
+        {
+          "title": "the browser’s Back and Forward on the public pages keep their places",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 30000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "desktop-1440",
+              "projectName": "desktop-1440",
+              "results": [
+                {
+                  "workerIndex": 5,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 694,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-11-13T07:47:20.525Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "743f27f1dcbb1297dd7b-2287872f388b96db1dc5",
+          "file": "scroll-reload.spec.ts",
+          "line": 61,
+          "column": 1
+        }
+      ],
+      "suites": [
+        {
+          "title": "in the app",
+          "file": "scroll-reload.spec.ts",
+          "line": 76,
+          "column": 6,
+          "specs": [
+            {
+              "title": "a reload from the middle or the end of a page opens it at the top",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "mobile-390",
+                  "projectName": "mobile-390",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 10661,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-13T07:46:53.694Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "743f27f1dcbb1297dd7b-9d604149991e1262a0ef",
+              "file": "scroll-reload.spec.ts",
+              "line": 79,
+              "column": 3
+            },
+            {
+              "title": "moving between screens, „‹ Înapoi”, Back and Forward keep their places",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "mobile-390",
+                  "projectName": "mobile-390",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1899,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-13T07:47:03.064Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "743f27f1dcbb1297dd7b-5919b7074a19f931ae74",
+              "file": "scroll-reload.spec.ts",
+              "line": 90,
+              "column": 3
+            },
+            {
+              "title": "signing out from the middle of a page opens the public page at the top",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "mobile-390",
+                  "projectName": "mobile-390",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 2586,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-13T07:47:04.365Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "743f27f1dcbb1297dd7b-911b3b1bd281b90c7e32",
+              "file": "scroll-reload.spec.ts",
+              "line": 115,
+              "column": 3
+            },
+            {
+              "title": "a reload from the middle or the end of a page opens it at the top",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "tablet-820",
+                  "projectName": "tablet-820",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 10820,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-13T07:47:08.162Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "743f27f1dcbb1297dd7b-eb079961203df1ffbe00",
+              "file": "scroll-reload.spec.ts",
+              "line": 79,
+              "column": 3
+            },
+            {
+              "title": "moving between screens, „‹ Înapoi”, Back and Forward keep their places",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "tablet-820",
+                  "projectName": "tablet-820",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1541,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-13T07:47:15.731Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "743f27f1dcbb1297dd7b-09af9d351b336862b74c",
+              "file": "scroll-reload.spec.ts",
+              "line": 90,
+              "column": 3
+            },
+            {
+              "title": "signing out from the middle of a page opens the public page at the top",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "tablet-820",
+                  "projectName": "tablet-820",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2505,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-13T07:47:17.283Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "743f27f1dcbb1297dd7b-925725e945b10fdb1b28",
+              "file": "scroll-reload.spec.ts",
+              "line": 115,
+              "column": 3
+            },
+            {
+              "title": "a reload from the middle or the end of a page opens it at the top",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "desktop-1440",
+                  "projectName": "desktop-1440",
+                  "results": [
+                    {
+                      "workerIndex": 5,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 10737,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-13T07:47:21.316Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "743f27f1dcbb1297dd7b-ca68e1843b7ec2525189",
+              "file": "scroll-reload.spec.ts",
+              "line": 79,
+              "column": 3
+            },
+            {
+              "title": "moving between screens, „‹ Înapoi”, Back and Forward keep their places",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "desktop-1440",
+                  "projectName": "desktop-1440",
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 1736,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-13T07:47:29.963Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "743f27f1dcbb1297dd7b-e15d7520f941adb8266a",
+              "file": "scroll-reload.spec.ts",
+              "line": 90,
+              "column": 3
+            },
+            {
+              "title": "signing out from the middle of a page opens the public page at the top",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "desktop-1440",
+                  "projectName": "desktop-1440",
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 2552,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-13T07:47:31.713Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "743f27f1dcbb1297dd7b-1f069a0647e6c36e2772",
+              "file": "scroll-reload.spec.ts",
+              "line": 115,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-11-13T07:46:24.243Z",
+    "duration": 70098.517,
+    "expected": 15,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}
