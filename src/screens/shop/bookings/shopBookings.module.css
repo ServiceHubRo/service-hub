@@ -542,9 +542,11 @@
   font-weight: 600;
 }
 
-.tile:hover:not(:disabled),
-.time:hover:not(:disabled) {
-  border-color: var(--border-lit);
+@media (hover: hover) {
+  .tile:hover:not(:disabled),
+  .time:hover:not(:disabled) {
+    border-color: var(--border-lit);
+  }
 }
 
 .tile:disabled,
@@ -553,10 +555,16 @@
   cursor: not-allowed;
 }
 
-.tileOn,
-.tileOn:hover:not(:disabled) {
+.tileOn {
   border-color: var(--amber);
   background: var(--amber-tint);
+}
+
+@media (hover: hover) {
+  .tileOn:hover:not(:disabled) {
+    border-color: var(--amber);
+    background: var(--amber-tint);
+  }
 }
 
 .taken .mono {
@@ -582,12 +590,12 @@
 }
 
 .places {
-  font-size: 11.5px;
+  font-size: var(--text-xs);
   color: var(--green);
 }
 
 .full {
-  font-size: 11.5px;
+  font-size: var(--text-xs);
   color: var(--muted);
 }
 
@@ -648,8 +656,10 @@
   text-decoration: none;
 }
 
-.inlineLink:hover {
-  text-decoration: underline;
+@media (hover: hover) {
+  .inlineLink:hover {
+    text-decoration: underline;
+  }
 }
 
 .intakeLine {

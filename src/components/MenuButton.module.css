@@ -54,10 +54,16 @@
   cursor: pointer;
 }
 
-.item:hover,
 .item:focus-visible {
   background: var(--amber-tint);
   outline: none;
+}
+
+@media (hover: hover) {
+  .item:hover {
+    background: var(--amber-tint);
+    outline: none;
+  }
 }
 
 .item svg {

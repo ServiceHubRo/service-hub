@@ -18,7 +18,7 @@ import type { Msg } from '../../i18n/translate';
 import type { MessageKey } from '../../i18n/ro';
 import { DECIMAL_SETTINGS, SETTING_SECTIONS, settingsChange, type SettingsDraft } from '../../lib/adminTools';
 import { useLoad } from '../../lib/useLoad';
-import { useReason } from './ActionPanels';
+import { useReason } from './useReason';
 import { SectionTitle } from './parts';
 import { ADMIN_SETTINGS_PATH } from './paths';
 import { dateTime } from './format';

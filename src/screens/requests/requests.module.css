@@ -210,6 +210,7 @@
 }
 
 .warning {
+  max-width: var(--measure);
   color: var(--text-2);
   font-size: 13.5px;
   margin: 0;
@@ -223,8 +224,10 @@
   border-radius: var(--radius-card);
 }
 
-.cardLink:hover > * {
-  border-color: var(--border-lit);
+@media (hover: hover) {
+  .cardLink:hover > * {
+    border-color: var(--border-lit);
+  }
 }
 
 /* A link standing on its own in a fact (the author): a full tap target. */
@@ -255,8 +258,10 @@
   transition: background var(--motion-quick) var(--ease);
 }
 
-.attachButton:hover {
-  background: var(--surface3);
+@media (hover: hover) {
+  .attachButton:hover {
+    background: var(--surface3);
+  }
 }
 
 input:focus-visible + .attachButton {
@@ -333,9 +338,11 @@ input:focus-visible + .attachButton {
   cursor: pointer;
 }
 
-.iconButton:hover {
-  color: var(--text);
-  background: var(--surface3);
+@media (hover: hover) {
+  .iconButton:hover {
+    color: var(--text);
+    background: var(--surface3);
+  }
 }
 
 .spin {

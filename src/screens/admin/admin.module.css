@@ -7,11 +7,13 @@
 }
 
 .sub {
+  max-width: var(--measure);
   color: var(--muted);
   font-size: 13.5px;
 }
 
 .muted {
+  max-width: var(--measure);
   color: var(--muted);
   font-size: 13.5px;
   overflow-wrap: anywhere;
@@ -57,8 +59,10 @@
   text-decoration: none;
 }
 
-.row:hover {
-  border-color: var(--border-lit);
+@media (hover: hover) {
+  .row:hover {
+    border-color: var(--border-lit);
+  }
 }
 
 .rowMain {
@@ -194,8 +198,10 @@
   text-decoration: none;
 }
 
-a.stat:hover {
-  border-color: var(--border-lit);
+@media (hover: hover) {
+  a.stat:hover {
+    border-color: var(--border-lit);
+  }
 }
 
 .statNumber {

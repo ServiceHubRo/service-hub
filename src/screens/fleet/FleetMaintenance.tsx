@@ -159,7 +159,7 @@ function MaintenanceForm({ vehicle, item, onDone }: { vehicle: FleetVehicle; ite
   }
 
   return (
-    <div className={styles.inlineForm}>
+    <form className={styles.inlineForm} onSubmit={(e) => e.preventDefault()} noValidate>
       <div className={styles.formGrid}>
         <SelectField
           label={t('fleet.maint.kind')}
@@ -174,12 +174,12 @@ function MaintenanceForm({ vehicle, item, onDone }: { vehicle: FleetVehicle; ite
         <Field label={t('fleet.maint.lastKm')} inputMode="numeric" mono value={lastKm} error={errors.lastKm} onChange={(e) => setLastKm(e.target.value)} />
       </div>
       <div className={styles.actions}>
-        <ActionButton variant="primary" onAction={save} errorMessage={(e) => rpcErrorMessage(lang, e)} canRetry={canRetryRpc}>
+        <ActionButton submit variant="primary" onAction={save} errorMessage={(e) => rpcErrorMessage(lang, e)} canRetry={canRetryRpc}>
           {t('fleet.maint.save')}
         </ActionButton>
         <Button onClick={onDone}>{t('fleet.form.cancel')}</Button>
       </div>
-    </div>
+    </form>
   );
 }
 
@@ -210,7 +210,7 @@ function DoneForm({ item, onDone }: { item: FleetMaintenanceItem; onDone: () => 
   }
 
   return (
-    <div className={styles.inlineForm}>
+    <form className={styles.inlineForm} onSubmit={(e) => e.preventDefault()} noValidate>
       {jobs.length > 0 && (
         <SelectField
           label={t('fleet.maint.fromJob')}
@@ -232,11 +232,11 @@ function DoneForm({ item, onDone }: { item: FleetMaintenanceItem; onDone: () => 
         </div>
       )}
       <div className={styles.actions}>
-        <ActionButton variant="primary" onAction={save} errorMessage={(e) => rpcErrorMessage(lang, e)} canRetry={canRetryRpc}>
+        <ActionButton submit variant="primary" onAction={save} errorMessage={(e) => rpcErrorMessage(lang, e)} canRetry={canRetryRpc}>
           {t('fleet.maint.markDone')}
         </ActionButton>
         <Button onClick={onDone}>{t('fleet.form.cancel')}</Button>
       </div>
-    </div>
+    </form>
   );
 }

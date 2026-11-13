@@ -4,6 +4,11 @@
   gap: 12px;
 }
 
+/* DESK-05: the card's sentences keep a reading width on a wide screen. */
+.card > p {
+  max-width: var(--measure);
+}
+
 .title {
   display: flex;
   align-items: center;
@@ -109,8 +114,10 @@
   text-decoration: none;
 }
 
-.textLink:hover {
-  text-decoration: underline;
+@media (hover: hover) {
+  .textLink:hover {
+    text-decoration: underline;
+  }
 }
 
 /* The status line of "Copiat" takes no room while empty. */

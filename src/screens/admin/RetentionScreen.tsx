@@ -208,7 +208,7 @@ function EnablePanel({
   const [reason, setReason] = useState('');
   const [short, setShort] = useState(false);
   return (
-    <InlinePanel title={t('admin.retention.enable.title')}>
+    <InlinePanel title={t('admin.retention.enable.title')} onClose={onCancel}>
       <p className={styles.warning}>{t('admin.retention.enable.body')}</p>
       <SelectField
         label={t('admin.retention.enable.batch')}
@@ -270,7 +270,7 @@ function DisablePanel({ job, onDone, onCancel }: { job: RetentionJobState; onDon
   const [reason, setReason] = useState('');
   const [short, setShort] = useState(false);
   return (
-    <InlinePanel title={t('admin.retention.disable.title')}>
+    <InlinePanel title={t('admin.retention.disable.title')} onClose={onCancel}>
       <p className={styles.muted}>{t('admin.retention.disable.body')}</p>
       <TextArea
         label={t('admin.retention.disable.reason')}

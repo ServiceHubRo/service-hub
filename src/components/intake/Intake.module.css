@@ -158,9 +158,11 @@
   transition: color var(--motion-quick) var(--ease), border-color var(--motion-quick) var(--ease);
 }
 
-.remove:hover {
-  color: var(--red-text);
-  border-color: var(--red-line);
+@media (hover: hover) {
+  .remove:hover {
+    color: var(--red-text);
+    border-color: var(--red-line);
+  }
 }
 
 .photos {

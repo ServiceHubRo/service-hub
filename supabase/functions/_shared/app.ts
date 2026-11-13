@@ -7,7 +7,7 @@
 
 export const DEFAULT_APP_URL = 'https://service-hubapp.netlify.app';
 
-const OWN_ORIGINS = [
+export const OWN_ORIGINS = [
   /^https:\/\/(www\.)?service-hub\.ro$/,
   // The Netlify site and its deploy previews (deploy-preview-12--service-hubapp.netlify.app). The
   // site is named `service-hubapp`; `service-hub-app`, the name first planned, is accepted too.

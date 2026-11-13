@@ -208,142 +208,145 @@ function Editor({
         </div>
       )}
 
-      <Section title={t('admin.help.editor.settings')} description={t('admin.help.editor.settingsDesc')}>
-        <Card className={styles.stack}>
-          <div className={styles.fields}>
-            <SelectField
-              label={t('admin.help.editor.category')}
-              value={draft.category_id}
-              options={categories.map((c) => ({ value: c.id, label: lang === 'en' ? c.name_en : c.name_ro }))}
-              onChange={(e) => set('category_id', e.target.value)}
-            />
-            <SelectField
-              label={t('admin.help.editor.kind')}
-              value={draft.kind}
-              options={(['article', 'faq'] as const).map((k) => ({ value: k, label: t(`admin.help.kind.${k}`) }))}
-              onChange={(e) => set('kind', e.target.value as HelpKind)}
-            />
-            <Field
-              className={styles.full}
-              label={t('admin.help.slug')}
-              hint={t('admin.help.slugHint')}
-              error={input.slug ? (problems.slug ?? null) : null}
-              value={input.slug}
-              mono
-              maxLength={80}
-              onChange={(e) => setDraft((d) => ({ ...d, slug: e.target.value.toLowerCase(), slugTouched: true }))}
-            />
-            <div className={styles.full}>
-              <CheckMenu
-                label={t('admin.help.audience')}
-                summary={audienceLabel(t, draft.audience)}
-                options={HELP_AUDIENCES.map((a) => ({ value: a, label: t(`help.audience.${a}` as MessageKey) }))}
-                selected={draft.audience}
-                onToggle={(v) => set('audience', toggle(draft.audience, v as HelpAudience))}
-                all={{ label: t('admin.help.audienceAll'), selected: draft.audience.length === 0, onSelect: () => set('audience', []) }}
+      <form className="form-contents" onSubmit={(e) => e.preventDefault()} noValidate>
+        <Section title={t('admin.help.editor.settings')} description={t('admin.help.editor.settingsDesc')}>
+          <Card className={styles.stack}>
+            <div className={styles.fields}>
+              <SelectField
+                label={t('admin.help.editor.category')}
+                value={draft.category_id}
+                options={categories.map((c) => ({ value: c.id, label: lang === 'en' ? c.name_en : c.name_ro }))}
+                onChange={(e) => set('category_id', e.target.value)}
               />
-              <p className={styles.muted}>{t('admin.help.audienceHint')}</p>
-            </div>
-            {draft.audience.includes('fleet') && (
+              <SelectField
+                label={t('admin.help.editor.kind')}
+                value={draft.kind}
+                options={(['article', 'faq'] as const).map((k) => ({ value: k, label: t(`admin.help.kind.${k}`) }))}
+                onChange={(e) => set('kind', e.target.value as HelpKind)}
+              />
+              <Field
+                className={styles.full}
+                label={t('admin.help.slug')}
+                hint={t('admin.help.slugHint')}
+                error={input.slug ? (problems.slug ?? null) : null}
+                value={input.slug}
+                mono
+                maxLength={80}
+                onChange={(e) => setDraft((d) => ({ ...d, slug: e.target.value.toLowerCase(), slugTouched: true }))}
+              />
               <div className={styles.full}>
                 <CheckMenu
-                  label={t('admin.help.companyRoles')}
-                  summary={
-                    draft.company_roles.length === 0
-                      ? t('admin.help.companyRolesAll')
-                      : draft.company_roles.map((r) => t(`fleet.role.${r}` as MessageKey)).join(', ')
-                  }
-                  options={HELP_COMPANY_ROLES.map((r) => ({ value: r, label: t(`fleet.role.${r}` as MessageKey) }))}
-                  selected={draft.company_roles}
-                  onToggle={(v) => set('company_roles', toggle(draft.company_roles, v as HelpCompanyRole))}
-                  all={{ label: t('admin.help.companyRolesAll'), selected: draft.company_roles.length === 0, onSelect: () => set('company_roles', []) }}
+                  label={t('admin.help.audience')}
+                  summary={audienceLabel(t, draft.audience)}
+                  options={HELP_AUDIENCES.map((a) => ({ value: a, label: t(`help.audience.${a}` as MessageKey) }))}
+                  selected={draft.audience}
+                  onToggle={(v) => set('audience', toggle(draft.audience, v as HelpAudience))}
+                  all={{ label: t('admin.help.audienceAll'), selected: draft.audience.length === 0, onSelect: () => set('audience', []) }}
                 />
+                <p className={styles.muted}>{t('admin.help.audienceHint')}</p>
               </div>
-            )}
-          </div>
-          <Switch checked={draft.featured} onChange={(e) => set('featured', e.target.checked)}>
-            {t('admin.help.editor.featured')}
-          </Switch>
-        </Card>
-      </Section>
-
-      {(['ro', 'en'] as const).map((l) => (
-        <Section key={l} title={t(l === 'ro' ? 'admin.help.editor.ro' : 'admin.help.editor.en')} description={t(l === 'ro' ? 'admin.help.editor.roDesc' : 'admin.help.editor.enDesc')}>
-          <Card className={styles.stack}>
-            <Field
-              label={t('admin.help.editor.title')}
-              value={draft[`title_${l}`]}
-              maxLength={HELP_LIMITS.title[1]}
-              error={shown(`title_${l}`)}
-              onChange={(e) =>
-                setDraft((d) => ({
-                  ...d,
-                  [`title_${l}`]: e.target.value,
-                  ...(l === 'ro' && !d.slugTouched ? { slug: slugify(e.target.value) } : {}),
-                }))
-              }
-            />
-            <Field
-              label={t('admin.help.editor.summary')}
-              value={draft[`summary_${l}`]}
-              maxLength={HELP_LIMITS.summary[1]}
-              error={shown(`summary_${l}`)}
-              onChange={(e) => set(`summary_${l}`, e.target.value)}
-            />
-            <TextArea
-              label={t('admin.help.editor.body')}
-              hint={t('admin.help.editor.bodyHint')}
-              rows={14}
-              maxLength={HELP_LIMITS.body[1]}
-              value={draft[`body_${l}`]}
-              error={shown(`body_${l}`)}
-              onChange={(e) => set(`body_${l}`, e.target.value)}
-            />
-            <Field
-              label={t('admin.help.editor.keywords')}
-              hint={t('admin.help.editor.keywordsHint')}
-              value={draft[`keywords_${l}`]}
-              error={shown(`keywords_${l}`)}
-              onChange={(e) => set(`keywords_${l}`, e.target.value)}
-            />
+              {draft.audience.includes('fleet') && (
+                <div className={styles.full}>
+                  <CheckMenu
+                    label={t('admin.help.companyRoles')}
+                    summary={
+                      draft.company_roles.length === 0
+                        ? t('admin.help.companyRolesAll')
+                        : draft.company_roles.map((r) => t(`fleet.role.${r}` as MessageKey)).join(', ')
+                    }
+                    options={HELP_COMPANY_ROLES.map((r) => ({ value: r, label: t(`fleet.role.${r}` as MessageKey) }))}
+                    selected={draft.company_roles}
+                    onToggle={(v) => set('company_roles', toggle(draft.company_roles, v as HelpCompanyRole))}
+                    all={{ label: t('admin.help.companyRolesAll'), selected: draft.company_roles.length === 0, onSelect: () => set('company_roles', []) }}
+                  />
+                </div>
+              )}
+            </div>
+            <Switch checked={draft.featured} onChange={(e) => set('featured', e.target.checked)}>
+              {t('admin.help.editor.featured')}
+            </Switch>
           </Card>
         </Section>
-      ))}
 
-      <Section title={t('admin.help.editor.preview')}>
-        <Card className={styles.stack}>
-          <SelectField
-            label={t('admin.help.editor.previewLang')}
-            value={previewLang}
-            options={[
-              { value: 'ro', label: t('admin.help.editor.ro') },
-              { value: 'en', label: t('admin.help.editor.en') },
-            ]}
-            onChange={(e) => setPreviewLang(e.target.value as 'ro' | 'en')}
-          />
-          {previewBody.trim() ? <ArticleBody body={previewBody} /> : <p className={styles.muted}>{t('admin.help.editor.previewEmpty')}</p>}
-        </Card>
-      </Section>
+        {(['ro', 'en'] as const).map((l) => (
+          <Section key={l} title={t(l === 'ro' ? 'admin.help.editor.ro' : 'admin.help.editor.en')} description={t(l === 'ro' ? 'admin.help.editor.roDesc' : 'admin.help.editor.enDesc')}>
+            <Card className={styles.stack}>
+              <Field
+                label={t('admin.help.editor.title')}
+                value={draft[`title_${l}`]}
+                maxLength={HELP_LIMITS.title[1]}
+                error={shown(`title_${l}`)}
+                onChange={(e) =>
+                  setDraft((d) => ({
+                    ...d,
+                    [`title_${l}`]: e.target.value,
+                    ...(l === 'ro' && !d.slugTouched ? { slug: slugify(e.target.value) } : {}),
+                  }))
+                }
+              />
+              <Field
+                label={t('admin.help.editor.summary')}
+                value={draft[`summary_${l}`]}
+                maxLength={HELP_LIMITS.summary[1]}
+                error={shown(`summary_${l}`)}
+                onChange={(e) => set(`summary_${l}`, e.target.value)}
+              />
+              <TextArea
+                label={t('admin.help.editor.body')}
+                hint={t('admin.help.editor.bodyHint')}
+                rows={14}
+                maxLength={HELP_LIMITS.body[1]}
+                value={draft[`body_${l}`]}
+                error={shown(`body_${l}`)}
+                onChange={(e) => set(`body_${l}`, e.target.value)}
+              />
+              <Field
+                label={t('admin.help.editor.keywords')}
+                hint={t('admin.help.editor.keywordsHint')}
+                value={draft[`keywords_${l}`]}
+                error={shown(`keywords_${l}`)}
+                onChange={(e) => set(`keywords_${l}`, e.target.value)}
+              />
+            </Card>
+          </Section>
+        ))}
 
-      <div className={styles.panelButtons}>
-        <ActionButton
-          disabled={!valid || (!dirty && !!article)}
-          onAction={async (requestId) => {
-            const { id } = await saveHelpArticle(article?.id ?? null, input, requestId);
-            if (!article) {
-              setNotice(t('admin.help.editor.created'));
-              navigate(adminHelpArticlePath(id), { replace: true });
-              return;
-            }
-            setNotice(t('admin.help.editor.saved'));
-            onSaved(await fetchAdminHelpArticle(id));
-          }}
-          errorMessage={(e) => rpcErrorMessage(lang, e)}
-          canRetry={canRetryRpc}
-        >
-          {t('admin.help.editor.save')}
-        </ActionButton>
-      </div>
+        <Section title={t('admin.help.editor.preview')}>
+          <Card className={styles.stack}>
+            <SelectField
+              label={t('admin.help.editor.previewLang')}
+              value={previewLang}
+              options={[
+                { value: 'ro', label: t('admin.help.editor.ro') },
+                { value: 'en', label: t('admin.help.editor.en') },
+              ]}
+              onChange={(e) => setPreviewLang(e.target.value as 'ro' | 'en')}
+            />
+            {previewBody.trim() ? <ArticleBody body={previewBody} /> : <p className={styles.muted}>{t('admin.help.editor.previewEmpty')}</p>}
+          </Card>
+        </Section>
+
+        <div className={styles.panelButtons}>
+          <ActionButton
+            submit
+            disabled={!valid || (!dirty && !!article)}
+            onAction={async (requestId) => {
+              const { id } = await saveHelpArticle(article?.id ?? null, input, requestId);
+              if (!article) {
+                setNotice(t('admin.help.editor.created'));
+                navigate(adminHelpArticlePath(id), { replace: true });
+                return;
+              }
+              setNotice(t('admin.help.editor.saved'));
+              onSaved(await fetchAdminHelpArticle(id));
+            }}
+            errorMessage={(e) => rpcErrorMessage(lang, e)}
+            canRetry={canRetryRpc}
+          >
+            {t('admin.help.editor.save')}
+          </ActionButton>
+        </div>
+      </form>
       {notice && (
         <p className={styles.muted} role="status">
           {notice}
@@ -388,7 +391,7 @@ function Editor({
                   {t('admin.help.delete')}
                 </Button>
               ) : (
-                <InlinePanel title={t('admin.help.deleteConfirm')}>
+                <InlinePanel title={t('admin.help.deleteConfirm')} onClose={() => setConfirmDelete(false)}>
                   <p>{t('admin.help.deleteBody')}</p>
                   <div className={styles.panelButtons}>
                     <ActionButton

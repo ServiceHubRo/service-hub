@@ -117,6 +117,12 @@ textarea {
   white-space: nowrap;
 }
 
+/* A <form> around fields that already sit in a card's layout (FUN-01, audit 13 Nov 2026): Enter in a
+   field submits it, the layout stays the card's own. */
+.form-contents {
+  display: contents;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

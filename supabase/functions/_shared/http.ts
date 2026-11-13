@@ -1,10 +1,16 @@
 // Shared HTTP helpers for the Edge Functions: CORS for the browser app and JSON responses.
 
-export const corsHeaders: Record<string, string> = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-};
+import { allowedOrigin, corsHeaders, withCors } from './cors.ts';
+
+export { corsHeaders };
+
+/** `Deno.serve` for the functions the app calls: every answer gets the CORS origin of `allowedOrigin`. */
+export function serve(handler: (req: Request) => Response | Promise<Response>): void {
+  Deno.serve(async (req) => {
+    const origin = allowedOrigin(req.headers.get('Origin'), Deno.env.get('APP_URL'));
+    return withCors(await handler(req), origin);
+  });
+}
 
 export function json(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {

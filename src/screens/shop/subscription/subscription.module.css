@@ -139,6 +139,7 @@
 
 /* The price per colleague under the total (paid staff seats). */
 .seats {
+  max-width: var(--measure);
   color: var(--muted);
   font-size: 13.5px;
   margin-top: -4px;

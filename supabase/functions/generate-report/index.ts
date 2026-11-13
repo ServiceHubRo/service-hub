@@ -6,13 +6,13 @@
 // Answers { status } or { error: code }.
 import { AdminError, adminApi, tokenAal } from '../_shared/admin.ts';
 import { appUrlFromEnv } from '../_shared/env.ts';
-import { bearerToken, corsHeaders, json } from '../_shared/http.ts';
+import { bearerToken, corsHeaders, json, serve } from '../_shared/http.ts';
 import { generateReport, reportRow } from '../_shared/reportGenerate.ts';
 import { reportError } from '../_shared/monitor.ts';
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-Deno.serve(async (req) => {
+serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
   if (req.method !== 'POST') return json({ error: 'method_not_allowed' }, 405);
 

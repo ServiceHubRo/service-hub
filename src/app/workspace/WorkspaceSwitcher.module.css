@@ -36,8 +36,10 @@
     background var(--motion-quick) var(--ease);
 }
 
-.button:hover {
-  border-color: var(--amber);
+@media (hover: hover) {
+  .button:hover {
+    border-color: var(--amber);
+  }
 }
 
 .button[aria-expanded='true'] {
@@ -128,12 +130,18 @@
   cursor: pointer;
 }
 
-.item:hover,
 .item:focus-visible,
-.manage:hover,
 .manage:focus-visible {
   background: var(--amber-tint);
   outline: none;
+}
+
+@media (hover: hover) {
+  .item:hover,
+  .manage:hover {
+    background: var(--amber-tint);
+    outline: none;
+  }
 }
 
 .itemOn {

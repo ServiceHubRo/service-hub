@@ -416,7 +416,7 @@ function Editor({
               </Button>
             </div>
           ) : (
-            <InlinePanel title={t('proc.editor.discardConfirm')}>
+            <InlinePanel title={t('proc.editor.discardConfirm')} onClose={() => setConfirmDiscard(false)}>
               <p className={styles.muted}>{t('proc.editor.discardBody')}</p>
               <div className={styles.buttons}>
                 <ActionButton

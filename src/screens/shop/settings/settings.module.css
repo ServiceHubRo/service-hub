@@ -106,8 +106,10 @@
   text-decoration: none;
 }
 
-.inlineLink:hover {
-  text-decoration: underline;
+@media (hover: hover) {
+  .inlineLink:hover {
+    text-decoration: underline;
+  }
 }
 
 /* The save bar (T51): held at the bottom of the screen across the whole content width, glass over

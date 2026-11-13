@@ -175,7 +175,7 @@ export function FleetVehicles({ initialStatus }: { initialStatus?: string }) {
             }}
           />
         ) : (
-          <InlinePanel title={t('fleet.vehicles.addTitle')}>
+          <InlinePanel title={t('fleet.vehicles.addTitle')} onClose={() => setAdding(false)}>
             <p className={styles.note}>{t('fleet.vehicles.addPreview')}</p>
             <div>
               <Button onClick={() => setAdding(false)}>{t('fleet.close')}</Button>

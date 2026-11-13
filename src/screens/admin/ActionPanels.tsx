@@ -1,4 +1,4 @@
-import { useState, type ReactElement } from 'react';
+import { useState } from 'react';
 import { ActionButton } from '../../components/ActionButton';
 import { Button } from '../../components/Button';
 import { InlinePanel } from '../../components/InlinePanel';
@@ -39,7 +39,7 @@ export function ConfirmPanel({
   const [text, setText] = useState('');
   const [missing, setMissing] = useState(false);
   return (
-    <InlinePanel title={title}>
+    <InlinePanel title={title} onClose={onCancel}>
       {body && <p className={danger ? styles.warning : styles.muted}>{body}</p>}
       {textLabel && (
         <TextArea
@@ -74,39 +74,4 @@ export function ConfirmPanel({
       </div>
     </InlinePanel>
   );
-}
-
-/**
- * A6 (M5): the reason a sensitive admin action asks for, inside a panel that has its own form (a
- * free period, a price, a shop's data, the platform settings, an export). The database refuses the
- * action without one (`reason_required`); this only says so before sending. `take()` answers the
- * trimmed reason, or null after marking the field.
- */
-export function useReason(): { field: ReactElement; take: () => string | null } {
-  const { t } = useI18n();
-  const [text, setText] = useState('');
-  const [missing, setMissing] = useState(false);
-  const field = (
-    <TextArea
-      label={t('admin.reason')}
-      hint={t('admin.reasonHint')}
-      value={text}
-      maxLength={500}
-      rows={2}
-      error={missing ? t('admin.reasonRequired') : null}
-      onChange={(e) => {
-        setText(e.target.value);
-        if (missing) setMissing(false);
-      }}
-    />
-  );
-  const take = () => {
-    const value = text.trim();
-    if (!value) {
-      setMissing(true);
-      return null;
-    }
-    return value;
-  };
-  return { field, take };
 }

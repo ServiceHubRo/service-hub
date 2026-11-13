@@ -124,7 +124,7 @@ export function QuoteDecision({
       {fee > 0 && <p className={styles.muted}>{t('cb.quote.fee', { fee: formatMoney(lang, fee) })}</p>}
 
       {refusing ? (
-        <InlinePanel title={t('cb.refuse.title')}>
+        <InlinePanel title={t('cb.refuse.title')} onClose={() => setRefusing(false)}>
           {fee > 0 && <p className={styles.panelBody}>{t('cb.refuse.fee', { fee: formatMoney(lang, fee) })}</p>}
           <div className={styles.buttons}>
             <ActionButton

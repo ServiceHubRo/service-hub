@@ -71,7 +71,7 @@ export function IntakeView({ intake }: { intake: VehicleIntake }) {
                 photos.data[p] ? (
                   <li key={p}>
                     <a href={photos.data[p]} target="_blank" rel="noopener noreferrer" aria-label={t('in.photoOpen', { n: i + 1 })}>
-                      <img src={photos.data[p]} alt="" loading="lazy" />
+                      <img src={photos.data[p]} alt="" loading="lazy" decoding="async" />
                     </a>
                   </li>
                 ) : null,

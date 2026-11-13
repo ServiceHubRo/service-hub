@@ -14,8 +14,10 @@
 }
 
 /* Like the other cards (T52): a lighter edge under the pointer, a lighter card under the finger. */
-.card:hover {
-  border-color: var(--border-lit);
+@media (hover: hover) {
+  .card:hover {
+    border-color: var(--border-lit);
+  }
 }
 
 .card:has(.link:active) {
@@ -41,8 +43,10 @@
   text-decoration: none;
 }
 
-.link:hover .name {
-  color: var(--amber);
+@media (hover: hover) {
+  .link:hover .name {
+    color: var(--amber);
+  }
 }
 
 .body {

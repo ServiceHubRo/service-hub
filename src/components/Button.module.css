@@ -41,8 +41,10 @@
   color: var(--ink);
 }
 
-.primary:hover:not(:disabled) {
-  filter: brightness(1.06);
+@media (hover: hover) {
+  .primary:hover:not(:disabled) {
+    filter: brightness(1.06);
+  }
 }
 
 .primary:active:not(:disabled) {
@@ -55,9 +57,11 @@
   color: var(--text);
 }
 
-.secondary:hover:not(:disabled) {
-  background: var(--surface2);
-  border-color: #46505c;
+@media (hover: hover) {
+  .secondary:hover:not(:disabled) {
+    background: var(--surface2);
+    border-color: #46505c;
+  }
 }
 
 .success {
@@ -65,8 +69,10 @@
   color: #0a1a0e;
 }
 
-.success:hover:not(:disabled) {
-  filter: brightness(1.06);
+@media (hover: hover) {
+  .success:hover:not(:disabled) {
+    filter: brightness(1.06);
+  }
 }
 
 /* --red-text: plain red falls under 4.5:1 on a raised card. */
@@ -75,8 +81,10 @@
   color: var(--red-text);
 }
 
-.danger:hover:not(:disabled) {
-  background: var(--red-soft);
+@media (hover: hover) {
+  .danger:hover:not(:disabled) {
+    background: var(--red-soft);
+  }
 }
 
 .ghost {
@@ -84,9 +92,11 @@
   font-weight: 600;
 }
 
-.ghost:hover:not(:disabled) {
-  color: var(--text);
-  background: var(--surface2);
+@media (hover: hover) {
+  .ghost:hover:not(:disabled) {
+    color: var(--text);
+    background: var(--surface2);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

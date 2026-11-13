@@ -281,41 +281,43 @@ export function CarStep({
       {cars.length === 0 && companies.length > 0 && <ul className={styles.options}>{otherOption()}</ul>}
 
       {manual && (
-        <Card className={styles.form}>
-          <div className={styles.pair}>
-            <Field label={t('car.make')} placeholder={t('car.makePlaceholder')} value={draft.make} maxLength={60} autoComplete="off" onChange={(e) => set({ make: e.target.value })} />
-            <Field label={t('car.model')} placeholder={t('car.modelPlaceholder')} value={draft.model} maxLength={60} autoComplete="off" onChange={(e) => set({ model: e.target.value })} />
-          </div>
-          <div className={styles.pair}>
-            <Field
-              label={t('car.year')}
-              value={draft.year}
-              inputMode="numeric"
-              maxLength={4}
-              mono
-              autoComplete="off"
-              error={yearTouched ? yearProblem : null}
-              onBlur={() => setYearTouched(true)}
-              onChange={(e) => set({ year: e.target.value.replace(/\D/g, '') })}
-            />
-            <Field
-              label={t('car.plate')}
-              placeholder={t('car.platePlaceholder')}
-              value={draft.plate}
-              maxLength={20}
-              mono
-              upper
-              autoCapitalize="characters"
-              autoComplete="off"
-              error={plateTouched ? plateProblem : null}
-              onBlur={() => setPlateTouched(true)}
-              onChange={(e) => set({ plate: e.target.value })}
-            />
-          </div>
-          <Switch checked={draft.save} onChange={(e) => set({ save: e.target.checked })}>
-            {t('booking.car.save')}
-          </Switch>
-        </Card>
+        <form id={CAR_FORM_ID} className="form-contents" onSubmit={(e) => e.preventDefault()} noValidate>
+          <Card className={styles.form}>
+            <div className={styles.pair}>
+              <Field label={t('car.make')} placeholder={t('car.makePlaceholder')} value={draft.make} maxLength={60} autoComplete="off" onChange={(e) => set({ make: e.target.value })} />
+              <Field label={t('car.model')} placeholder={t('car.modelPlaceholder')} value={draft.model} maxLength={60} autoComplete="off" onChange={(e) => set({ model: e.target.value })} />
+            </div>
+            <div className={styles.pair}>
+              <Field
+                label={t('car.year')}
+                value={draft.year}
+                inputMode="numeric"
+                maxLength={4}
+                mono
+                autoComplete="off"
+                error={yearTouched ? yearProblem : null}
+                onBlur={() => setYearTouched(true)}
+                onChange={(e) => set({ year: e.target.value.replace(/\D/g, '') })}
+              />
+              <Field
+                label={t('car.plate')}
+                placeholder={t('car.platePlaceholder')}
+                value={draft.plate}
+                maxLength={20}
+                mono
+                upper
+                autoCapitalize="characters"
+                autoComplete="off"
+                error={plateTouched ? plateProblem : null}
+                onBlur={() => setPlateTouched(true)}
+                onChange={(e) => set({ plate: e.target.value })}
+              />
+            </div>
+            <Switch checked={draft.save} onChange={(e) => set({ save: e.target.checked })}>
+              {t('booking.car.save')}
+            </Switch>
+          </Card>
+        </form>
       )}
 
       <TextArea
@@ -392,7 +394,7 @@ export function CarStep({
           {!described && <p className={styles.muted}>{t('booking.unsure.required')}</p>}
           {ackNeeded !== null && !acked && <p className={styles.muted}>{t('booking.ack.required')}</p>}
           {shop.auto_confirm && <p className={styles.muted}>{t('booking.instantNote')}</p>}
-          <ActionButton onAction={send} disabled={!ready} errorMessage={(e) => rpcErrorMessage(lang, e)} canRetry={canRetryRpc}>
+          <ActionButton submit form={CAR_FORM_ID} onAction={send} disabled={!ready} errorMessage={(e) => rpcErrorMessage(lang, e)} canRetry={canRetryRpc}>
             {t(shop.auto_confirm ? 'booking.submitInstant' : 'booking.submit')}
           </ActionButton>
         </BottomBar>
@@ -407,6 +409,9 @@ export function CarStep({
     </>
   );
 }
+
+/** The typed car's fields: Enter in one sends the booking with the button in the bottom bar (FUN-01). */
+const CAR_FORM_ID = 'booking-car';
 
 /** "Zgomote neobișnuite" → "zgomote neobișnuite" inside the sentence. */
 function lowerFirst(s: string): string {

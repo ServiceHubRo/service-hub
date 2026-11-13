@@ -17,9 +17,11 @@
     background-color var(--motion-quick) var(--ease);
 }
 
-.tile:hover {
-  border-color: var(--border-lit);
-  background: var(--surface-hover);
+@media (hover: hover) {
+  .tile:hover {
+    border-color: var(--border-lit);
+    background: var(--surface-hover);
+  }
 }
 
 .iconBox {
@@ -50,8 +52,10 @@
   transition: transform var(--motion-quick) var(--ease);
 }
 
-.tile:hover .chevron {
-  transform: translateX(2px);
+@media (hover: hover) {
+  .tile:hover .chevron {
+    transform: translateX(2px);
+  }
 }
 
 .hint {

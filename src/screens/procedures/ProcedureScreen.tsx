@@ -418,7 +418,7 @@ function Archive({ p, onDone }: { p: ProcedureDetail; onDone: () => Promise<void
           </Button>
         </div>
       ) : (
-        <InlinePanel title={t('proc.archiveConfirm')}>
+        <InlinePanel title={t('proc.archiveConfirm')} onClose={() => setConfirm(false)}>
           <p className={styles.muted}>{t('proc.archiveBody')}</p>
           <div className={styles.buttons}>
             <ActionButton

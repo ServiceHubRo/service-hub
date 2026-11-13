@@ -98,6 +98,14 @@
   --content-max: 560px;
   --heading-size: 26px;
   --body-size: 14px;
+  /* The smallest text (MOB-02, audit 13 Nov 2026): badges, times, small labels. Only the labels of the
+     phone's bottom bar are smaller (11 px, AppShell). */
+  --text-xs: 12px;
+  /* Reading width (DESK-05, audit 13 Nov 2026): a paragraph or a note never runs wider than this, and
+     a one-line field (a name, a list to choose from) never wider than --field-max. A grid that sizes
+     its own columns (the quote lines) sets --field-max: none. */
+  --measure: 72ch;
+  --field-max: 560px;
 
   /* Pop-up lists and menus: frosted glass over the page (Eduard, 10 Oct). Where blur is missing
      the glass is opaque (--surface2). */

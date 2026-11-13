@@ -112,9 +112,10 @@ export default defineConfig(({ command, mode }) => {
       // The start file holds React, the router, the Supabase client and both dictionaries (RO + EN);
       // each role's screens are loaded on their own after sign-in (src/app/App.tsx).
       chunkSizeWarningLimit: 800,
-      // Published next to each file, so Sentry turns a minified stack into file, line and function
-      // (T19). Browsers fetch them only when the developer tools are open.
-      sourcemap: true,
+      // Written without the `sourceMappingURL` line and never published (SEC-03, audit 13 Nov 2026):
+      // scripts/sourcemaps.mjs uploads them to Sentry when the build has its token (so Sentry still
+      // turns a minified stack into file, line and function, T19), then deletes them from dist.
+      sourcemap: 'hidden',
     },
     define: {
       __APP_CONTEXT__: JSON.stringify(context),

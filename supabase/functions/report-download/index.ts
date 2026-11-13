@@ -6,14 +6,14 @@
 // reads the file with the service role and hands it back as the answer — no link that could be
 // passed on. Answers the PDF, or { error: code }.
 import { AdminError, adminApi, tokenAal } from '../_shared/admin.ts';
-import { bearerToken, corsHeaders, json } from '../_shared/http.ts';
+import { bearerToken, corsHeaders, json, serve } from '../_shared/http.ts';
 import { reportFileName } from '../_shared/report.ts';
 import { REPORTS_BUCKET } from '../_shared/reportGenerate.ts';
 import { reportError } from '../_shared/monitor.ts';
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-Deno.serve(async (req) => {
+serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
   if (req.method !== 'POST') return json({ error: 'method_not_allowed' }, 405);
 

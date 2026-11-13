@@ -35,7 +35,7 @@ export function PhotoGallery({ photos: all, shopName }: { photos: { id: string; 
         {photos.map((p, i) => (
           <li key={p.id}>
             <button type="button" className={styles.thumb} onClick={() => setOpen(i)} aria-label={t('gallery.open', { n: i + 1, total: n })}>
-              <img src={p.url} alt="" loading={i < 2 ? 'eager' : 'lazy'} />
+              <img src={p.url} alt="" loading={i < 2 ? 'eager' : 'lazy'} decoding="async" />
             </button>
           </li>
         ))}

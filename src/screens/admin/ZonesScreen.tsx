@@ -209,7 +209,13 @@ function ZoneCard({
             </ActionButton>
           ))
         ) : (
-          <InlinePanel title={t('admin.areas.confirm.title', { area: title })}>
+          <InlinePanel
+            title={t('admin.areas.confirm.title', { area: title })}
+            onClose={() => {
+              setConfirm(null);
+              setChosen(a.mode);
+            }}
+          >
             <p className={styles.muted}>{t('admin.areas.confirm.body', { n: a.waiting })}</p>
             <div className={styles.panelButtons}>
               <ActionButton

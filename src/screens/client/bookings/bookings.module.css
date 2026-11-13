@@ -488,8 +488,10 @@
   transition: border-color var(--motion-quick) var(--ease);
 }
 
-.intakePrompt:hover {
-  border-color: var(--amber);
+@media (hover: hover) {
+  .intakePrompt:hover {
+    border-color: var(--amber);
+  }
 }
 
 .intakePrompt svg {

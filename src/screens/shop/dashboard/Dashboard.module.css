@@ -118,9 +118,11 @@
   transition: border-color var(--motion-quick) var(--ease), background-color var(--motion-quick) var(--ease);
 }
 
-a.stat:hover {
-  border-color: var(--border-lit);
-  background: var(--surface-hover);
+@media (hover: hover) {
+  a.stat:hover {
+    border-color: var(--border-lit);
+    background: var(--surface-hover);
+  }
 }
 
 a.stat:active {
@@ -226,8 +228,10 @@ a.stat:active {
   text-decoration: none;
 }
 
-.todayRow:hover {
-  background: var(--surface-hover);
+@media (hover: hover) {
+  .todayRow:hover {
+    background: var(--surface-hover);
+  }
 }
 
 .todayTime {

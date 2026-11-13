@@ -189,7 +189,7 @@ function Editor({
   const [note, setNote] = useState(() => (mode === 'replace' ? (b.quote?.note ?? '') : ''));
   const [errors, setErrors] = useState<Record<string, QuoteRowError>>({});
   const [formError, setFormError] = useState<Msg | null>(null);
-  const container = useRef<HTMLDivElement>(null);
+  const container = useRef<HTMLFormElement>(null);
   const focusRow = useRef<{ key: string; field: RowField } | null>(null);
 
   // Focus the row just added, or the first row with an error (never the top of the page).
@@ -235,6 +235,22 @@ function Editor({
       const last = prev.map((r) => r.kind).lastIndexOf(kind);
       return last < 0 ? [...prev, row] : [...prev.slice(0, last + 1), row, ...prev.slice(last + 1)];
     });
+  }
+
+  /**
+   * FUN-01 (audit 13 Nov 2026): Enter in a line of the quote goes to the next line of its kind (a new
+   * one after the last), never sends the quote. The send stays a deliberate tap or click.
+   */
+  function nextRow(key: string) {
+    const row = rows.find((r) => r.key === key);
+    if (!row) return;
+    const same = rows.filter((r) => r.kind === row.kind);
+    const next = same[same.findIndex((r) => r.key === key) + 1];
+    if (next) {
+      container.current?.querySelector<HTMLInputElement>(`[data-row="${next.key}"][data-field="name"]`)?.focus();
+    } else if (rows.length < QUOTE_ROWS_MAX) {
+      addRow(row.kind);
+    }
   }
 
   function removeRow(key: string) {
@@ -431,7 +447,19 @@ function Editor({
   };
 
   return (
-    <div ref={container} className={styles.editor}>
+    <form
+      ref={container}
+      className={styles.editor}
+      noValidate
+      onSubmit={(e) => e.preventDefault()}
+      onKeyDown={(e) => {
+        if (e.key !== 'Enter' || e.nativeEvent.isComposing) return;
+        const key = (e.target as HTMLElement).dataset?.row;
+        if (!key || !(e.target instanceof HTMLInputElement)) return;
+        e.preventDefault();
+        nextRow(key);
+      }}
+    >
       <h1>{mode === 'send' ? t('qe.title.send') : t('qe.title.replace')}</h1>
       {mode === 'replace' && <p className={styles.muted}>{t('sb.quote.editBody')}</p>}
 
@@ -538,6 +566,7 @@ function Editor({
         </p>
         <div className={styles.buttons}>
           <ActionButton
+            submit
             block={false}
             disabled={totals.total <= 0}
             onAction={submit}
@@ -551,6 +580,6 @@ function Editor({
           </Button>
         </div>
       </div>
-    </div>
+    </form>
   );
 }

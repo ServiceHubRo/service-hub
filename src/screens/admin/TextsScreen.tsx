@@ -54,7 +54,7 @@ function TextPanel({ textKey, texts, onDone, onCancel }: { textKey: string; text
   const overridden = Boolean(texts[textKey]);
 
   return (
-    <InlinePanel title={t('admin.texts.edit')}>
+    <InlinePanel title={t('admin.texts.edit')} onClose={onCancel}>
       <p className={styles.muted}>{t('admin.texts.editHint')}</p>
       {allowed.length > 0 && (
         <div className={tools.textRow}>

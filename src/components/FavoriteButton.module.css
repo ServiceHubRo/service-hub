@@ -14,8 +14,10 @@
   color: var(--muted);
 }
 
-.heart:hover {
-  color: var(--text);
+@media (hover: hover) {
+  .heart:hover {
+    color: var(--text);
+  }
 }
 
 .heart:disabled {
@@ -23,9 +25,14 @@
   opacity: 0.6;
 }
 
-.on,
-.on:hover {
+.on {
   color: var(--amber);
+}
+
+@media (hover: hover) {
+  .on:hover {
+    color: var(--amber);
+  }
 }
 
 .on svg {
@@ -85,7 +92,8 @@
   border: 1px solid var(--red-line);
   border-radius: var(--radius-input);
   background: var(--surface2);
-  color: var(--red);
+  /* A11Y-01: --red is 4.46:1 on --surface2; --red-text keeps the error readable. */
+  color: var(--red-text);
   font-size: 13px;
 }
 

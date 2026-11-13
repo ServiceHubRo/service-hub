@@ -117,8 +117,10 @@
   color: var(--muted);
 }
 
-.hide:hover {
-  color: var(--text);
+@media (hover: hover) {
+  .hide:hover {
+    color: var(--text);
+  }
 }
 
 button.step {

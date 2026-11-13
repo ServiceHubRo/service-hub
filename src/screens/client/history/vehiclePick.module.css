@@ -44,8 +44,10 @@
   text-decoration: none;
 }
 
-.row:hover {
-  border-color: var(--border-lit);
+@media (hover: hover) {
+  .row:hover {
+    border-color: var(--border-lit);
+  }
 }
 
 .carTile {

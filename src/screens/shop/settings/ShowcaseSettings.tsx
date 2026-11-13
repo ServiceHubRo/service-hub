@@ -114,7 +114,7 @@ function PhotosCard() {
             <ul className={own.grid}>
               {photos.map((p, i) => (
                 <li key={p.id} className={own.item}>
-                  <img src={p.url} alt={t('showcase.photos.alt', { n: i + 1 })} className={own.photo} loading="lazy" />
+                  <img src={p.url} alt={t('showcase.photos.alt', { n: i + 1 })} className={own.photo} loading="lazy" decoding="async" />
                   {confirmId === p.id ? (
                     <div className={own.confirm}>
                       <p>{t('showcase.photos.removeAsk')}</p>

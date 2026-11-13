@@ -100,52 +100,55 @@ function CategoryPanel({ category, onDone, onCancel }: { category?: CatalogCateg
   const shownKey = keyTouched ? key : suggestCategoryKey(ro);
   const keyOk = CATEGORY_KEY_PATTERN.test(shownKey);
   return (
-    <InlinePanel title={category ? t('admin.catalog.editCategory') : t('admin.catalog.newCategory')}>
-      <div className={styles.fields}>
-        <NameFields ro={ro} en={en} onRo={setRo} onEn={setEn} />
-        {!category && (
-          <Field
-            className={styles.full}
-            label={t('admin.catalog.categoryKey')}
-            hint={t('admin.catalog.keyHint')}
-            error={shownKey && !keyOk ? t('admin.catalog.categoryKeyInvalid') : null}
-            value={shownKey}
-            mono
-            maxLength={34}
-            onChange={(e) => {
-              setKeyTouched(true);
-              setKey(e.target.value.toLowerCase());
-            }}
-          />
+    <InlinePanel title={category ? t('admin.catalog.editCategory') : t('admin.catalog.newCategory')} onClose={onCancel}>
+      <form className="form-contents" onSubmit={(e) => e.preventDefault()} noValidate>
+        <div className={styles.fields}>
+          <NameFields ro={ro} en={en} onRo={setRo} onEn={setEn} />
+          {!category && (
+            <Field
+              className={styles.full}
+              label={t('admin.catalog.categoryKey')}
+              hint={t('admin.catalog.keyHint')}
+              error={shownKey && !keyOk ? t('admin.catalog.categoryKeyInvalid') : null}
+              value={shownKey}
+              mono
+              maxLength={34}
+              onChange={(e) => {
+                setKeyTouched(true);
+                setKey(e.target.value.toLowerCase());
+              }}
+            />
+          )}
+        </div>
+        {category && (
+          <>
+            <Switch checked={enabled} onChange={(e) => setEnabled(e.target.checked)}>
+              {t('admin.catalog.categoryOn')}
+            </Switch>
+            {category.enabled && !enabled && <p className={styles.warning}>{t('admin.catalog.categoryOffWarning')}</p>}
+          </>
         )}
-      </div>
-      {category && (
-        <>
-          <Switch checked={enabled} onChange={(e) => setEnabled(e.target.checked)}>
-            {t('admin.catalog.categoryOn')}
-          </Switch>
-          {category.enabled && !enabled && <p className={styles.warning}>{t('admin.catalog.categoryOffWarning')}</p>}
-        </>
-      )}
-      <div className={styles.panelButtons}>
-        <ActionButton
-          disabled={!ro.trim() || !en.trim() || (!category && !keyOk)}
-          onAction={async (requestId) => {
-            if (category) {
-              await updateCategory(category.key, ro, en, enabled, requestId);
-              onDone(t('admin.catalog.saved'));
-            } else {
-              await createCategory(shownKey, ro, en, requestId);
-              onDone(t('admin.catalog.categoryAdded'));
-            }
-          }}
-          errorMessage={(e) => rpcErrorMessage(lang, e)}
-          canRetry={canRetryRpc}
-        >
-          {category ? t('admin.save') : t('admin.catalog.addCategory')}
-        </ActionButton>
-        <Button onClick={onCancel}>{t('common.cancel')}</Button>
-      </div>
+        <div className={styles.panelButtons}>
+          <ActionButton
+            submit
+            disabled={!ro.trim() || !en.trim() || (!category && !keyOk)}
+            onAction={async (requestId) => {
+              if (category) {
+                await updateCategory(category.key, ro, en, enabled, requestId);
+                onDone(t('admin.catalog.saved'));
+              } else {
+                await createCategory(shownKey, ro, en, requestId);
+                onDone(t('admin.catalog.categoryAdded'));
+              }
+            }}
+            errorMessage={(e) => rpcErrorMessage(lang, e)}
+            canRetry={canRetryRpc}
+          >
+            {category ? t('admin.save') : t('admin.catalog.addCategory')}
+          </ActionButton>
+          <Button onClick={onCancel}>{t('common.cancel')}</Button>
+        </div>
+      </form>
     </InlinePanel>
   );
 }
@@ -183,93 +186,96 @@ function ServicePanel({
     iconOptions.unshift({ value: service.icon, label: service.icon });
   }
   return (
-    <InlinePanel title={service ? t('admin.catalog.editService') : t('admin.catalog.newService')}>
-      <div className={styles.fields}>
-        <NameFields ro={ro} en={en} onRo={setRo} onEn={setEn} />
-        {service ? (
-          <p className={`${styles.muted} ${styles.full}`}>
-            {t('admin.catalog.serviceId')}: <span className="mono">{service.id}</span> · {t('admin.catalog.idFixed')}
-          </p>
-        ) : (
+    <InlinePanel title={service ? t('admin.catalog.editService') : t('admin.catalog.newService')} onClose={onCancel}>
+      <form className="form-contents" onSubmit={(e) => e.preventDefault()} noValidate>
+        <div className={styles.fields}>
+          <NameFields ro={ro} en={en} onRo={setRo} onEn={setEn} />
+          {service ? (
+            <p className={`${styles.muted} ${styles.full}`}>
+              {t('admin.catalog.serviceId')}: <span className="mono">{service.id}</span> · {t('admin.catalog.idFixed')}
+            </p>
+          ) : (
+            <Field
+              className={styles.full}
+              label={t('admin.catalog.serviceId')}
+              hint={t('admin.catalog.idHint')}
+              error={shownId && !idOk ? t('admin.catalog.serviceIdInvalid') : null}
+              value={shownId}
+              mono
+              maxLength={40}
+              onChange={(e) => {
+                setIdTouched(true);
+                setId(e.target.value.toLowerCase());
+              }}
+            />
+          )}
+          <div className={tools.iconField}>
+            <SelectField label={t('admin.catalog.icon')} value={icon} options={iconOptions} onChange={(e) => setIcon(e.target.value)} />
+            <span className={tools.iconPreview} aria-hidden="true">
+              <ServiceIcon name={icon} size={22} />
+            </span>
+          </div>
+          {service && (
+            <SelectField
+              label={t('admin.catalog.category')}
+              value={category}
+              options={categories.map((c) => ({
+                value: c.key,
+                label: c.enabled ? (lang === 'en' ? c.name_en : c.name_ro) : `${lang === 'en' ? c.name_en : c.name_ro} (${t('admin.catalog.off')})`,
+              }))}
+              onChange={(e) => setCategory(e.target.value)}
+            />
+          )}
           <Field
             className={styles.full}
-            label={t('admin.catalog.serviceId')}
-            hint={t('admin.catalog.idHint')}
-            error={shownId && !idOk ? t('admin.catalog.serviceIdInvalid') : null}
-            value={shownId}
-            mono
-            maxLength={40}
-            onChange={(e) => {
-              setIdTouched(true);
-              setId(e.target.value.toLowerCase());
-            }}
+            label={t('admin.catalog.reminder')}
+            hint={t('admin.catalog.reminderHint')}
+            error={reminderMonths === 'invalid' ? t('admin.catalog.reminderInvalid') : null}
+            value={reminder}
+            inputMode="numeric"
+            maxLength={3}
+            onChange={(e) => setReminder(e.target.value)}
           />
-        )}
-        <div className={tools.iconField}>
-          <SelectField label={t('admin.catalog.icon')} value={icon} options={iconOptions} onChange={(e) => setIcon(e.target.value)} />
-          <span className={tools.iconPreview} aria-hidden="true">
-            <ServiceIcon name={icon} size={22} />
-          </span>
         </div>
         {service && (
-          <SelectField
-            label={t('admin.catalog.category')}
-            value={category}
-            options={categories.map((c) => ({
-              value: c.key,
-              label: c.enabled ? (lang === 'en' ? c.name_en : c.name_ro) : `${lang === 'en' ? c.name_en : c.name_ro} (${t('admin.catalog.off')})`,
-            }))}
-            onChange={(e) => setCategory(e.target.value)}
-          />
+          <>
+            <Switch checked={enabled} onChange={(e) => setEnabled(e.target.checked)}>
+              {t('admin.catalog.serviceOn')}
+            </Switch>
+            {enabled && !categoryOn && <p className={styles.warning}>{t('admin.catalog.categoryIsOff')}</p>}
+            {service.enabled && !enabled && <p className={styles.muted}>{t('admin.catalog.serviceOffNote')}</p>}
+          </>
         )}
-        <Field
-          className={styles.full}
-          label={t('admin.catalog.reminder')}
-          hint={t('admin.catalog.reminderHint')}
-          error={reminderMonths === 'invalid' ? t('admin.catalog.reminderInvalid') : null}
-          value={reminder}
-          inputMode="numeric"
-          maxLength={3}
-          onChange={(e) => setReminder(e.target.value)}
-        />
-      </div>
-      {service && (
-        <>
-          <Switch checked={enabled} onChange={(e) => setEnabled(e.target.checked)}>
-            {t('admin.catalog.serviceOn')}
-          </Switch>
-          {enabled && !categoryOn && <p className={styles.warning}>{t('admin.catalog.categoryIsOff')}</p>}
-          {service.enabled && !enabled && <p className={styles.muted}>{t('admin.catalog.serviceOffNote')}</p>}
-        </>
-      )}
-      <div className={styles.panelButtons}>
-        <ActionButton
-          disabled={
-            !ro.trim() ||
-            !en.trim() ||
-            (!service && !idOk) ||
-            (Boolean(service) && enabled && !categoryOn) ||
-            reminderMonths === 'invalid'
-          }
-          onAction={async (requestId) => {
-            const months = reminderMonths === 'invalid' ? null : reminderMonths;
-            if (service) {
-              await updateService(service.id, { category_key: category, icon, name_ro: ro, name_en: en, enabled }, requestId);
-              if (months !== service.reminder_months) await setServiceReminder(service.id, months, reminderRequest.current);
-              onDone(t('admin.catalog.saved'));
-            } else {
-              await createService(shownId, { category_key: categoryKey, icon, name_ro: ro, name_en: en }, requestId);
-              if (months !== null) await setServiceReminder(shownId, months, reminderRequest.current);
-              onDone(t('admin.catalog.serviceAdded'));
+        <div className={styles.panelButtons}>
+          <ActionButton
+            submit
+            disabled={
+              !ro.trim() ||
+              !en.trim() ||
+              (!service && !idOk) ||
+              (Boolean(service) && enabled && !categoryOn) ||
+              reminderMonths === 'invalid'
             }
-          }}
-          errorMessage={(e) => rpcErrorMessage(lang, e)}
-          canRetry={canRetryRpc}
-        >
-          {service ? t('admin.save') : t('admin.catalog.addService')}
-        </ActionButton>
-        <Button onClick={onCancel}>{t('common.cancel')}</Button>
-      </div>
+            onAction={async (requestId) => {
+              const months = reminderMonths === 'invalid' ? null : reminderMonths;
+              if (service) {
+                await updateService(service.id, { category_key: category, icon, name_ro: ro, name_en: en, enabled }, requestId);
+                if (months !== service.reminder_months) await setServiceReminder(service.id, months, reminderRequest.current);
+                onDone(t('admin.catalog.saved'));
+              } else {
+                await createService(shownId, { category_key: categoryKey, icon, name_ro: ro, name_en: en }, requestId);
+                if (months !== null) await setServiceReminder(shownId, months, reminderRequest.current);
+                onDone(t('admin.catalog.serviceAdded'));
+              }
+            }}
+            errorMessage={(e) => rpcErrorMessage(lang, e)}
+            canRetry={canRetryRpc}
+          >
+            {service ? t('admin.save') : t('admin.catalog.addService')}
+          </ActionButton>
+          <Button onClick={onCancel}>{t('common.cancel')}</Button>
+        </div>
+      </form>
     </InlinePanel>
   );
 }

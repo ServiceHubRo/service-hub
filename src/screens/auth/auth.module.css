@@ -177,6 +177,8 @@
   text-decoration: none;
 }
 
-.switchLink:hover {
-  text-decoration: underline;
+@media (hover: hover) {
+  .switchLink:hover {
+    text-decoration: underline;
+  }
 }

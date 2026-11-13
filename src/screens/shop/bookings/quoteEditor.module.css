@@ -11,6 +11,7 @@
 }
 
 .muted {
+  max-width: var(--measure);
   color: var(--muted);
   font-size: 14px;
 }
@@ -97,6 +98,8 @@
   display: grid;
   gap: 10px;
   align-items: end;
+  /* The columns size the fields (DESK-05). */
+  --field-max: none;
 }
 
 .laborGrid {
@@ -170,9 +173,11 @@
   transition: color var(--motion-quick) var(--ease), border-color var(--motion-quick) var(--ease);
 }
 
-.remove:hover {
-  color: var(--red-text);
-  border-color: var(--red-line);
+@media (hover: hover) {
+  .remove:hover {
+    color: var(--red-text);
+    border-color: var(--red-line);
+  }
 }
 
 .partKind {

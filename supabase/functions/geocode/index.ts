@@ -15,7 +15,7 @@
 // refuses more than 10 an hour per shop (429, the old coordinates stay). The admin's path needs
 // the second step of sign-in (aal2).
 import { adminApi } from '../_shared/admin.ts';
-import { bearerToken, corsHeaders, json } from '../_shared/http.ts';
+import { bearerToken, corsHeaders, json, serve } from '../_shared/http.ts';
 import { tokenAal } from '../_shared/jwt.ts';
 import { reportError } from '../_shared/monitor.ts';
 
@@ -72,7 +72,7 @@ async function locate(a: Address): Promise<{ lat: number; lng: number; precision
   return null;
 }
 
-Deno.serve(async (req) => {
+serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
   if (req.method !== 'POST') return json({ error: 'method_not_allowed' }, 405);
 

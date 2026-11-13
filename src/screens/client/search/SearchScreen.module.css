@@ -61,8 +61,10 @@
   text-decoration-color: var(--border-lit);
 }
 
-.textButton:hover {
-  text-decoration-color: var(--amber);
+@media (hover: hover) {
+  .textButton:hover {
+    text-decoration-color: var(--amber);
+  }
 }
 
 .chevron,

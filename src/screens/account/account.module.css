@@ -168,6 +168,7 @@
 }
 
 .helpNote {
+  max-width: var(--measure);
   color: var(--muted);
   font-size: 14px;
 }

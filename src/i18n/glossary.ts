@@ -48,6 +48,7 @@ export const TERMS: readonly GlossaryTerm[] = [
   { concept: 'a repair shop', ro: 'service', en: 'shop', note: 'Never „atelier” / "workshop", "garage".' },
   { concept: 'an item of the catalog', ro: 'serviciu', en: 'service', note: 'Never „intervenție”.' },
   { concept: 'the quote', ro: 'deviz', en: 'quote' },
+  { concept: 'the state of a booking, a request, a subscription', ro: 'stare', en: 'status', note: 'Never „status” in Romanian (TXT-01).' },
   { concept: 'a job done by a shop', ro: 'lucrare', en: 'job' },
   { concept: "a client's car", ro: 'mașină', en: 'car', note: 'Client screens and the Garage.' },
   { concept: "a company's vehicle", ro: 'vehicul', en: 'vehicle', note: 'Fleet screens.' },
