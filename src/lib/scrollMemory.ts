@@ -10,6 +10,47 @@ function pageScroller(): HTMLElement {
   return (document.scrollingElement as HTMLElement | null) ?? document.documentElement;
 }
 
+/** Signed-in shells on screen (useScrollMemory): while one is, the app decides where a screen opens. */
+let shells = 0;
+/** A reload being opened at its top: the browser must not put the page back where it was. */
+let reloading = false;
+
+/** The browser's own restoring: off in the signed-in app and during a reload, on everywhere else. */
+function applyRestoration(): void {
+  if (!('scrollRestoration' in history)) return;
+  history.scrollRestoration = shells > 0 || reloading ? 'manual' : 'auto';
+}
+
+function isReload(): boolean {
+  const nav = performance.getEntriesByType?.('navigation')[0] as PerformanceNavigationTiming | undefined;
+  if (nav) return nav.type === 'reload';
+  // Older Safari has only the first version of the API (1 = a reload).
+  return performance.navigation?.type === 1;
+}
+
+/**
+ * A reload (F5, the browser's reload, pull to refresh) opens the page at its top, on every page
+ * (Eduard, 13 Nov 2026): on the public pages the browser put it back where it was left (its own
+ * restoring, 'auto' there); in the signed-in app it already opened at the top ('manual'). index.html
+ * turns the browser's restoring off for a reload before anything is drawn; here the page is put at
+ * the top, and once it has loaded the restoring is what it was, so Back and Forward are unchanged.
+ * Only a reload: no other way into a page and no move between screens is touched. Called once, at
+ * start (main.tsx).
+ */
+export function openReloadAtTop(): void {
+  if (!isReload()) return;
+  reloading = true;
+  applyRestoration();
+  window.scrollTo(0, 0);
+  const release = () =>
+    requestAnimationFrame(() => {
+      reloading = false;
+      applyRestoration();
+    });
+  if (document.readyState === 'complete') release();
+  else window.addEventListener('load', release, { once: true });
+}
+
 /**
  * The page's scroll (Eduard, 19 Oct): a new screen starts at the top; going back (the phone's or
  * browser's back, or "‹ Cont" up to the screen before) finds the screen where it was left. A screen
@@ -23,13 +64,14 @@ export function useScrollMemory(): void {
   const navigationType = useNavigationType();
   const current = useRef(pathname);
 
-  // The app decides where a screen opens; the browser's own restoring would fight it.
+  // The app decides where a screen opens; the browser's own restoring would fight it. Back to the
+  // browser's when the shell goes (signing out), whatever a reload had set meanwhile.
   useEffect(() => {
-    if (!('scrollRestoration' in history)) return;
-    const before = history.scrollRestoration;
-    history.scrollRestoration = 'manual';
+    shells += 1;
+    applyRestoration();
     return () => {
-      history.scrollRestoration = before;
+      shells -= 1;
+      applyRestoration();
     };
   }, []);
 

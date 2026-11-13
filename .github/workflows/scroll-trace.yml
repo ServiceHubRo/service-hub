@@ -36,7 +36,7 @@ jobs:
           PLAYWRIGHT_JSON_OUTPUT_NAME: visual-audit/logout/e2e-result.json
         run: |
           mkdir -p visual-audit/logout
-          npx playwright test tests/e2e/logout-scroll.spec.ts --reporter=list,json
+          npx playwright test tests/e2e/logout-scroll.spec.ts tests/e2e/scroll-reload.spec.ts --reporter=list,json
         continue-on-error: true
       - if: always()
         env:

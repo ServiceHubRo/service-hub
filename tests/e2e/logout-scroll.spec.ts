@@ -6,8 +6,8 @@ import { BACKEND, PASSWORD, SEED, SEED_PASSWORD, createFleetUser, createUser, rp
 // After signing out, the public page at its very top (Eduard, 13 Nov 2026: it opened at „Pentru
 // șoferi”). Cause: the address is replaced with `/` (no hash, no query, no other redirect) while the
 // page is still scrolled where „Deconectare” was — the end of Cont on a phone or a tablet — and the
-// public page sets no place of its own, so it kept that offset. Fix: src/lib/afterSignOut.ts. A
-// reload keeps the browser's own place, as before.
+// public page sets no place of its own, so it kept that offset. Fix: src/lib/afterSignOut.ts. The
+// reload: tests/e2e/scroll-reload.spec.ts.
 
 test.beforeEach(async ({ context }) => {
   await context.addInitScript(() => {
@@ -47,20 +47,11 @@ test.describe('signing out opens the public page at its top', () => {
   test.skip(!BACKEND, 'needs the local Supabase stack');
   test.setTimeout(120_000);
 
-  test('client, then a reload keeps the place on the public page', async ({ page }) => {
+  test('client', async ({ page }) => {
     await signIn(page, await createUser('client'), PASSWORD);
     await expect(page).toHaveURL(/\/c\/cauta/);
     await signOutFromTheEnd(page, '/c/cont', '/c/cont');
     await expectPublicPageAtTop(page);
-
-    // Refresh as before: the browser keeps where the person was on the public page.
-    await page.evaluate(() => window.scrollTo(0, 1200));
-    await expect.poll(() => scrollTopOf(page)).toBeGreaterThan(1000);
-    await page.waitForTimeout(300);
-    const before = await scrollTopOf(page);
-    await page.reload();
-    await expect(page.getByRole('heading', { level: 1, name: /^Programarea la service/ })).toBeAttached();
-    await expect.poll(() => scrollTopOf(page)).toBeGreaterThan(before - 10);
   });
 
   test('company member, from the company space', async ({ page }) => {

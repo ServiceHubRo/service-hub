@@ -36,6 +36,20 @@
     <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
     <link rel="manifest" href="/manifest.webmanifest" />
     <title>Service-Hub — programări online la service auto</title>
+    <!-- A reload opens the page at its top (Eduard, 13 Nov 2026): the browser's own restoring is off
+         for this load, before anything is drawn; the app turns it back on once the page has loaded
+         (src/lib/scrollMemory.ts, openReloadAtTop). Any other way in keeps the browser's behavior. -->
+    <script>
+      (function () {
+        try {
+          var nav = performance.getEntriesByType ? performance.getEntriesByType('navigation')[0] : null;
+          var reload = nav ? nav.type === 'reload' : !!(performance.navigation && performance.navigation.type === 1);
+          if (reload && 'scrollRestoration' in history) history.scrollRestoration = 'manual';
+        } catch (e) {
+          // No timing API: the browser's behavior, as before.
+        }
+      })();
+    </script>
   </head>
   <body>
     <!-- The page drawn at build time (T46, scripts/prerender.mjs), plain old JavaScript like the

@@ -33,6 +33,15 @@ function tracer() {
       return orig.apply(this, args);
     };
   }
+  // Every frame's offset from the start of the document: a place shown even for a frame shows here.
+  const frames: number[] = [];
+  (window as unknown as { __frames: number[] }).__frames = frames;
+  const t0 = performance.now();
+  const sample = () => {
+    frames.push(y());
+    if (performance.now() - t0 < 3000) requestAnimationFrame(sample);
+  };
+  requestAnimationFrame(sample);
   sessionStorage.setItem('sh_test_init', '1');
   localStorage.setItem('sh_lang', 'ro');
   localStorage.setItem('sh_onboarding_off', '1');
@@ -56,6 +65,9 @@ const info = (page: Page) =>
       navType: nav?.type,
       scrollers,
       calls: (window as unknown as { __calls?: string[] }).__calls ?? [],
+      framesSeen: ((window as unknown as { __frames?: number[] }).__frames ?? []).length,
+      framesAboveTop: ((window as unknown as { __frames?: number[] }).__frames ?? []).filter((v) => v > 0).length,
+      framesMax: Math.max(0, ...((window as unknown as { __frames?: number[] }).__frames ?? [])),
     };
   });
 
