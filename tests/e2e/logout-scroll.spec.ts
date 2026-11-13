@@ -25,7 +25,8 @@ async function signOutFromTheEnd(page: Page, start: string, account: string) {
     await page.goto(path);
     await expect(page.getByRole('heading', { level: 1 }).first()).toBeVisible();
     await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
-    if ((await logout.count()) > 0) break;
+    // A page that fits the screen proves nothing here: Cont is longer than the screen everywhere.
+    if ((await logout.count()) > 0 && (await scrollTopOf(page)) > 0) break;
   }
   expect(await scrollTopOf(page), 'the page is scrolled before signing out').toBeGreaterThan(0);
   await logout.first().click();
