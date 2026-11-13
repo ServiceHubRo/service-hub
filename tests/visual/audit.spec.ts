@@ -470,7 +470,8 @@ test.describe('A9 visual audit', () => {
       { name: 'mesaje-echipa', path: '/c/mesaje/echipa' },
       { name: 'cont', path: '/c/cont' },
       { name: 'cont-deconectare', path: '/c/cont', roOnly: true, prep: async (p) => {
-          await p.locator('main').getByRole('button', { name: /^Deconectare$/ }).click();
+          // In Cont on a phone or tablet, in the sidebar from 1024 px.
+          await p.getByRole('button', { name: /^Deconectare$/ }).filter({ visible: true }).first().click();
         } },
       { name: 'favorite', path: '/c/cont/favorite' },
       { name: 'istoric-alege', path: '/c/cont/istoric' },
@@ -633,7 +634,8 @@ test.describe('A9 visual audit', () => {
     await expect(page).toHaveURL(/\/c\/cauta/, { timeout: 20_000 });
     await audit(page, 'client', [
       { name: 'cont-deconectare', path: '/c/cont', prep: async (p) => {
-          await p.locator('main').getByRole('button', { name: /^Deconectare$/ }).click();
+          // In Cont on a phone or tablet, in the sidebar from 1024 px.
+          await p.getByRole('button', { name: /^Deconectare$/ }).filter({ visible: true }).first().click();
         } },
     ], 'ro');
   });
