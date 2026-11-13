@@ -2309,7 +2309,7 @@ export const en: Record<MessageKey, string> = {
   'admin.clients.noShowsLabel': 'No-shows (90 days)',
   'admin.client.notFound': "This client doesn't exist.",
   'admin.client.suspend': 'Suspend account',
-  'admin.client.suspendBody': "The client can sign in and read, but can't book, send messages or write reviews. They get an email.",
+  'admin.client.suspendBody': "The client can sign in and read, but can't book, send messages or write reviews. Requests and confirmed bookings that have not started are canceled and the shops are told. Jobs already started go on. They get an email.",
   'admin.client.unsuspend': 'Reactivate account',
   'admin.client.delete': 'Delete account',
   'admin.client.deleteBody': "The account, cars and favorites are deleted. Bookings stay with the shops without the client's name and phone. Not possible while there are active bookings.",

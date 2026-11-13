@@ -5234,6 +5234,7 @@ export type Database = {
         Returns: Json
       }
       admin_overview: { Args: never; Returns: Json }
+      admin_pending_reports: { Args: never; Returns: number }
       admin_place_legal_hold: {
         Args: {
           p_account: string
@@ -7156,6 +7157,7 @@ export type Database = {
         }
         Returns: Json
       }
+      list_my_shop_reviews: { Args: never; Returns: Json }
       list_service_areas: { Args: never; Returns: Json }
       list_shop_bookings: { Args: never; Returns: Json }
       list_shop_history: { Args: never; Returns: Json }

@@ -1923,3 +1923,17 @@ Nimic implementat. O sesiune nouă pornește de aici, după ce Eduard răspunde 
 - **Neexecutat în acest mediu:** typecheck, lint, testele unitare, build-ul și testele în browser rulează doar pe CI; Setări platformă, Programări (client) și fereastra de suspendare nu au fost deschise într-un browser aici.
 
 - [x] Făcut
+
+### A12 — Programările unui cont suspendat, raportarea recenziilor ✅ (Eduard, 13 nov 2026: „repară tot ce a mai rămas”; construit peste A11, schema 122 → 123)
+- **Cont de client suspendat.** Cererile și programările confirmate ale clientului care nu au început sunt anulate de platformă în aceeași operație, iar fiecare service este anunțat (notificare și mesaj automat în conversație), cu motivul platformei în limba service-ului: „Contul clientului nu mai este disponibil pe Service-Hub.” Lucrările începute merg până la capăt. Programările făcute pentru o firmă rămân: sunt ale firmei.
+- **Contul proprietarului unui service suspendat.** Service-ul dispare din căutări la fel ca la suspendarea service-ului, deci se aplică aceeași regulă din A11: programările neîncepute se anulează, clienții sunt anunțați. Suspendarea unui coleg sau a unui agent nu anulează nimic.
+- **Raportarea unei recenzii (restul din P2-1).** Un utilizator autentificat nu mai poate afla din baza de date dacă o recenzie publică a fost raportată, de ce și când. Ecranul Recenzii al service-ului și contorul din Moderare citesc prin funcții. Răspunsul primit de client sau de service la propria acțiune (recenzie, răspuns, raportare) nu mai conține nota adminului.
+- Textul din fereastra de suspendare a unui client spune acum ce se întâmplă cu programările.
+- Migrarea `a12_account_suspension_review_reports` (schema 123): funcțiile vechi păstrate și învelite (`*_a11`), niciun rând existent modificat; rollback testat.
+- Teste: `tests/sql/173_a12_account_suspension_review_reports.sql` (pică pe schema 122); `171` citește recenziile service-ului și contorul prin funcțiile noi; `50_platform.sql` le cunoaște. SQL: 114 fișiere trecute local; rollback-uri: 22.
+- **Decizii:** clientul suspendat nu primește câte o notificare pentru fiecare programare anulată (primește emailul de suspendare); ecranul Recenzii recitește lista la orice schimbare în timp real, în loc să folosească rândul primit (rândul nu mai are starea raportării).
+- **Lăsat intenționat, cu motiv:** ordinea din ștergerea contului unui proprietar de service (datele se curăță înainte de anularea abonamentului Stripe; dacă Stripe nu răspunde, operația se reia fără pierderi) — schimbarea ei cere o verificare „pe uscat” nouă și nu se poate testa aici; cele patru funcții nefolosite de nicio pagină (inofensive); coloanele unui service public citibile de orice utilizator (acceptat în `docs/SECURITATE.md`); indexurile pe chei străine (A8: niciunul fără un plan de execuție care să-l ceară).
+- **Rămas din audit:** datele firmei în `docs/legal/company.json` (când se deschide firma); după lansare: facturile fiscale, pornirea retenției după validarea juridică, paginarea istoricului.
+- **Neexecutat în acest mediu:** typecheck, lint, testele unitare, build-ul și testele în browser rulează doar pe CI; Recenzii (service), Moderare (admin) și fereastra de suspendare a unui client nu au fost deschise într-un browser aici.
+
+- [x] Făcut

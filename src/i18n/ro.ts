@@ -2307,7 +2307,7 @@ export const ro = {
   'admin.clients.noShowsLabel': 'Neprezentări (90 de zile)',
   'admin.client.notFound': 'Clientul nu există.',
   'admin.client.suspend': 'Suspendă contul',
-  'admin.client.suspendBody': 'Clientul poate intra în cont și citi, dar nu mai poate face programări, trimite mesaje sau recenzii. Primește un email.',
+  'admin.client.suspendBody': 'Clientul poate intra în cont și citi, dar nu mai poate face programări, trimite mesaje sau recenzii. Cererile și programările confirmate care nu au început sunt anulate, iar service-urile sunt anunțate. Lucrările începute continuă. Primește un email.',
   'admin.client.unsuspend': 'Reactivează contul',
   'admin.client.delete': 'Șterge contul',
   'admin.client.deleteBody': 'Contul, mașinile și favoritele se șterg. Programările rămân la service-uri fără numele și telefonul clientului. Nu este posibil cât timp are programări active.',

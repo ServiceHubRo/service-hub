@@ -121,18 +121,17 @@ select test.eq(test.count(format($$select id from public.reviews where booking_i
   'another client does not');
 select test.logout();
 
--- The shop's Recenzii screen: exactly the columns it asks for (src/data/reviews.ts).
+-- The shop's Recenzii screen and the admin's badge read through functions since A12
+-- (173_a12_account_suspension_review_reports.sql); the note stays out of the shop's reach.
 select test.login(test.id('owner1'));
-select test.eq(test.count(format($$select id, booking_id, shop_id, client_display_name, rating, text, reply, reply_at,
-  report_reason, reported_at, report_status, removed_at, created_at from public.reviews where shop_id = %L$$, test.id('shop1'))), 2::bigint,
-  'the shop reads its reviews with the report state');
+select test.eq(jsonb_array_length(public.list_my_shop_reviews()->'reviews'), 2, 'the shop reads its reviews');
 select test.fails($$select report_note from public.reviews$$, 'permission denied', 'the shop does not read the admin''s note either');
 select test.logout();
 
--- The admin: the badge counts through the table; the note comes through the admin's functions.
+-- The admin: the badge counts; the note comes through the admin's functions.
 update public.reviews set report_status = 'pending', report_decided_at = null where booking_id = test.id('booking_a');
 select test.login(test.id('admin'));
-select test.eq(test.count($$select id from public.reviews where report_status = 'pending'$$), 1::bigint, 'the admin counts the reports waiting');
+select test.eq(public.admin_pending_reports(), 1, 'the admin counts the reports waiting');
 select test.ok((select r->>'report_note' = 'Notă internă' from jsonb_array_elements(public.admin_list_reviews(null)->'queue') r
                 where r->>'booking_id' = test.id('booking_a')::text),
   'admin_list_reviews still answers the note');
