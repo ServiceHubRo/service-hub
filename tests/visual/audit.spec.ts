@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { appendFileSync, mkdirSync } from 'node:fs';
 import { dirname } from 'node:path';
 import { expect, test, type Page } from '@playwright/test';
 import { fleetSetup } from '../e2e/fleet-support';
@@ -69,7 +69,14 @@ interface Row extends Partial<Measured> {
   console: string[];
 }
 
-const rows: Row[] = [];
+/** Each measured screen, written as soon as it is measured (a run stopped halfway keeps its rows). */
+function keepRow(row: Row) {
+  mkdirSync(OUT, { recursive: true });
+  appendFileSync(`${OUT}/rows-${test.info().workerIndex}.jsonl`, `${JSON.stringify(row)}\n`);
+}
+
+/** Every test stops measuring a little before its time limit, so the rest of the run still finishes. */
+const BUDGET_MS = 30 * 60_000;
 
 const slug = (s: string) =>
   s
@@ -232,19 +239,49 @@ function measure(): Measured {
 }
 
 async function settle(page: Page) {
-  await page.waitForLoadState('networkidle', { timeout: 8_000 }).catch(() => undefined);
-  await page.waitForFunction(() => !document.querySelector('[aria-busy="true"]'), null, { timeout: 8_000 }).catch(() => undefined);
+  await page
+    .waitForFunction(() => document.readyState === 'complete' && !document.querySelector('[aria-busy="true"]'), null, { timeout: 6_000 })
+    .catch(() => undefined);
+  await page.waitForLoadState('networkidle', { timeout: 2_500 }).catch(() => undefined);
   await page.evaluate(async () => {
     for (const el of Array.from(document.querySelectorAll<HTMLElement>('[data-reveal]'))) el.dataset.shown = '';
     await document.fonts.ready;
   });
-  await page.waitForTimeout(250);
+  await page.waitForTimeout(150);
 }
 
 const flagged = (m: Measured) =>
   m.overflowX > 0 || m.offscreen.length > 0 || m.textOverflow.length > 0 || m.clipped.length > 0 || m.overlaps.length > 0 || m.brokenImages.length > 0;
 
-async function audit(page: Page, role: string, screens: Screen[], lang: 'ro' | 'en') {
+/**
+ * English without touching the account: the profile the app reads says `en` (the saved language wins
+ * after sign-in), so tests sharing a demo account at the same time keep their own language.
+ */
+async function english(page: Page) {
+  await page.route(
+    (url) => url.pathname.endsWith('/rest/v1/profiles'),
+    async (route) => {
+      if (route.request().method() !== 'GET') return route.continue();
+      const response = await route.fetch();
+      let body = await response.text();
+      try {
+        const json = JSON.parse(body) as unknown;
+        const fix = (o: unknown) => {
+          if (o && typeof o === 'object' && 'lang' in o) (o as { lang: string }).lang = 'en';
+        };
+        if (Array.isArray(json)) json.forEach(fix);
+        else fix(json);
+        body = JSON.stringify(json);
+      } catch {
+        // Not JSON: as it came.
+      }
+      await route.fulfill({ response, body });
+    },
+  );
+  await page.evaluate(() => localStorage.setItem('sh_lang', 'en'));
+}
+
+async function audit(page: Page, role: string, screens: Screen[], lang: 'ro' | 'en', started = Date.now()) {
   const consoleLines: string[] = [];
   page.on('console', (msg) => {
     if (msg.type() === 'error') consoleLines.push(msg.text().slice(0, 200));
@@ -257,6 +294,11 @@ async function audit(page: Page, role: string, screens: Screen[], lang: 'ro' | '
       if (screen.widths && !screen.widths.includes(width)) continue;
       consoleLines.length = 0;
       const row: Row = { role, lang, screen: screen.name, path: screen.path, url: '', width, errors: [], console: [] };
+      if (Date.now() - started > BUDGET_MS) {
+        row.errors.push('not measured: the test ran out of time');
+        keepRow(row);
+        continue;
+      }
       try {
         await page.setViewportSize({ width, height: HEIGHT[width] ?? 900 });
         if (screen.before) await screen.before(page);
@@ -282,7 +324,7 @@ async function audit(page: Page, role: string, screens: Screen[], lang: 'ro' | '
       }
       row.url = new URL(page.url()).pathname + new URL(page.url()).search;
       row.console = [...new Set(consoleLines)].slice(0, 8);
-      rows.push(row);
+      keepRow(row);
     }
   }
 }
@@ -295,11 +337,6 @@ async function clickFirst(page: Page, selector: string) {
 
 async function clickButton(page: Page, name: RegExp) {
   await page.getByRole('button', { name }).filter({ visible: true }).first().click({ timeout: 8_000 });
-}
-
-async function setLang(email: string, lang: 'ro' | 'en', page: Page) {
-  if (email) await serviceRest(`profiles?id=eq.${await userIdOf(email, email.endsWith('@service-hub.test') ? SEED_PASSWORD : PASSWORD)}`, 'PATCH', { lang });
-  await page.evaluate((l) => localStorage.setItem('sh_lang', l), lang);
 }
 
 async function signInWithCode(page: Page, email: string, password: string, secret: string) {
@@ -320,11 +357,13 @@ async function signInWithCode(page: Page, email: string, password: string, secre
   }
 }
 
-async function runRole(page: Page, role: string, email: string, screens: Screen[]) {
-  await audit(page, role, screens, 'ro');
-  await setLang(email, 'en', page);
-  await audit(page, role, screens, 'en');
-  await setLang(email, 'ro', page);
+async function runRole(page: Page, role: string, screens: Screen[]) {
+  const started = Date.now();
+  await audit(page, role, screens, 'ro', started);
+  await english(page);
+  await audit(page, role, screens, 'en', started);
+  await page.unrouteAll({ behavior: 'ignoreErrors' });
+  await page.evaluate(() => localStorage.setItem('sh_lang', 'ro'));
 }
 
 const ids = {
@@ -343,12 +382,6 @@ test.beforeEach(async ({ context }) => {
       if (!localStorage.getItem('sh_lang')) localStorage.setItem('sh_lang', 'ro');
     }
   });
-});
-
-test.afterAll(async () => {
-  mkdirSync(OUT, { recursive: true });
-  const part = test.info().workerIndex;
-  writeFileSync(`${OUT}/report-${part}-${randomUUID().slice(0, 6)}.json`, JSON.stringify(rows, null, 1));
 });
 
 test.describe('A9 visual audit', () => {
@@ -381,12 +414,10 @@ test.describe('A9 visual audit', () => {
       { name: 'galerie-componente', path: '/dev/componente' },
       { name: 'flota-previzualizare', path: '/dev/flota' },
     ];
-    await audit(page, 'visitor', screens, 'ro');
-    await setLang('', 'en', page);
-    await audit(page, 'visitor', screens, 'en');
+    await runRole(page, 'visitor', screens);
   });
 
-  test('client: Andrei (seed), every screen', async ({ page }) => {
+  for (const half of [0, 1] as const) test(`client: Andrei (seed), part ${half + 1}`, async ({ page }) => {
     const clientId = '20000000-0000-4000-8000-000000000001';
     const atelier = await ids.shop('10000000-0000-4000-8000-000000000001');
     const cars = await serviceRest<{ id: string }[]>(`cars?owner_id=eq.${clientId}&select=id&order=created_at`, 'GET');
@@ -394,7 +425,7 @@ test.describe('A9 visual audit', () => {
     const threads = await serviceRest<{ id: string }[]>(`threads?client_id=eq.${clientId}&select=id&limit=1`, 'GET');
     const articles = await serviceRest<{ slug: string }[]>('help_articles?status=eq.published&audience=cs.{client}&select=slug&limit=1', 'GET').catch(() => []);
     const categories = await serviceRest<{ slug: string }[]>('help_categories?active=eq.true&audience=cs.{client}&select=slug&limit=1', 'GET').catch(() => []);
-    await rpcAs(SEED.client, 'create_support_request', {
+    if (half === 1) await rpcAs(SEED.client, 'create_support_request', {
       p_category: 'account',
       p_title: 'Nu pot schimba numărul de telefon',
       p_body: 'După schimbarea telefonului nu primesc codul prin SMS.',
@@ -442,7 +473,8 @@ test.describe('A9 visual audit', () => {
       { name: 'cont-legal', path: '/c/cont/legal/termeni', roOnly: true },
       { name: 'necunoscut', path: '/c/nu-exista', roOnly: true },
     ];
-    await runRole(page, 'client', SEED.client, screens);
+    const cut = screens.findIndex((x) => x.name === 'mesaje');
+    await runRole(page, 'client', half === 0 ? screens.slice(0, cut) : screens.slice(cut));
   });
 
   test('new client and new shop: empty states, first steps', async ({ page, browser }) => {
@@ -497,7 +529,7 @@ test.describe('A9 visual audit', () => {
       { name: 'abonament', path: s('abonament') },
       { name: 'cont-firma', path: s('cont') },
     ];
-    await runRole(page, 'firma-admin', f.admin, adminScreens);
+    await runRole(page, 'firma-admin', adminScreens);
 
     for (const [who, email, sections] of [
       ['firma-manager', f.manager, ['panou', 'vehicule', 'membri']],
@@ -514,7 +546,7 @@ test.describe('A9 visual audit', () => {
     }
   });
 
-  test('shop: Atelier Demo (seed) and a colleague', async ({ page, browser }) => {
+  for (const half of [0, 1] as const) test(`shop: Atelier Demo (seed), part ${half + 1}`, async ({ page, browser }) => {
     const ownerId = '10000000-0000-4000-8000-000000000001';
     const atelier = await ids.shop(ownerId);
     const bookings = await serviceRest<{ id: string; status: string }[]>(`bookings?shop_id=eq.${atelier}&select=id,status&order=created_at.desc`, 'GET');
@@ -560,7 +592,9 @@ test.describe('A9 visual audit', () => {
       { name: 'solicitare-noua', path: '/s/cont/ajutor/solicitari/noua' },
       { name: 'sugestii', path: '/s/cont/sugestii' },
     ];
-    await runRole(page, 'service', SEED.shop, screens);
+    const cut = screens.findIndex((x) => x.name === 'cont');
+    await runRole(page, 'service', half === 0 ? screens.slice(0, cut) : screens.slice(cut));
+    if (half === 0) return;
 
     // A colleague of the shop (staff): what the owner-only pages look like to them.
     const colleague = await createUser('client', { name: 'Coleg Atelier' });
@@ -614,10 +648,10 @@ test.describe('A9 visual audit', () => {
       { name: 'sugestii-de-verificat', path: '/suport/sugestii-de-verificat' },
       { name: 'cont', path: '/suport/cont' },
     ];
-    await runRole(page, 'suport', SEED_SUPPORT.email, screens);
+    await runRole(page, 'suport', screens);
   });
 
-  test('platform admin (seed)', async ({ page }) => {
+  for (const part of [0, 1, 2] as const) test(`platform admin (seed), part ${part + 1}`, async ({ page }) => {
     const procs = await serviceRest<{ id: string }[]>('procedures?select=id&limit=1', 'GET').catch(() => []);
     await signIn(page, SEED.admin, SEED_PASSWORD);
     await expect(page).toHaveURL(/\/admin\//, { timeout: 30_000 });
@@ -665,6 +699,8 @@ test.describe('A9 visual audit', () => {
       { name: 'administratori', path: `${a}/platforma/administratori` },
       { name: 'cont', path: `${a}/cont` },
     ];
-    await runRole(page, 'admin', SEED.admin, screens);
+    const a1 = screens.findIndex((x) => x.name === 'programari');
+    const a2 = screens.findIndex((x) => x.name === 'proceduri');
+    await runRole(page, 'admin', [screens.slice(0, a1), screens.slice(a1, a2), screens.slice(a2)][part]!);
   });
 });

@@ -9,9 +9,9 @@ export default defineConfig({
   testDir: 'tests/visual',
   globalSetup: './tests/e2e/global-setup.ts',
   fullyParallel: true,
-  workers: process.env.CI ? 3 : undefined,
+  workers: process.env.CI ? 4 : undefined,
   retries: 0,
-  timeout: 55 * 60_000,
+  timeout: 45 * 60_000,
   reporter: 'list',
   use: {
     baseURL: `http://localhost:${PORT}`,

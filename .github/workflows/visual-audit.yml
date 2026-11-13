@@ -21,7 +21,7 @@ jobs:
   audit:
     name: Screenshots and measurements, every role
     runs-on: ubuntu-24.04
-    timeout-minutes: 80
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -45,6 +45,7 @@ jobs:
         run: npm run test:visual
         continue-on-error: true
       - name: Keep the screenshots on the visual-audit-shots branch
+        if: always()
         env:
           TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
