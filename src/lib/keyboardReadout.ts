@@ -1,5 +1,5 @@
 import { APP_RELEASE } from './env';
-import { fieldArea, navTopPx, opensKeyboard, placeField, scrollHost, visibleBand } from './keyboard';
+import { fieldArea, navTopPx, opensKeyboard, placeField, scrollHost, seenTop, visibleBand } from './keyboard';
 
 /**
  * The keyboard's measurements, on screen (test builds only, opened with `?kb=1`; main.tsx).
@@ -84,8 +84,38 @@ export function showKeyboardReadout(): () => void {
   window.addEventListener('touchmove', onTouch, { passive: true });
   window.addEventListener('resize', onWinResize);
 
+  // What is painted just above the keyboard (Eduard, 13 Nov 2026: a white strip there): the page's
+  // own things at that point, and anything fixed or sticky that reaches it. Read once a second.
+  let under = '';
+  let underAt = 0;
+  const brief = (el: Element) => {
+    const css = getComputedStyle(el);
+    const box = el.getBoundingClientRect();
+    return `${el.tagName.toLowerCase()}${el.id ? `#${el.id}` : ''}.${String(el.className).slice(0, 14)} ${css.position.slice(0, 3)} ${css.backgroundColor.replace(/\s/g, '')} ${r(box.top)}>${r(box.bottom)}`;
+  };
+  const lookUnder = () => {
+    const top = seenTop(vv ?? null, window.scrollY);
+    const y = top + (vv?.height ?? window.innerHeight) - 20;
+    const hit = (document.elementsFromPoint?.(window.innerWidth / 2, y) ?? []).filter((el) => el !== strip).slice(0, 3);
+    const pinned = Array.from(document.querySelectorAll<HTMLElement>('body *')).filter((el) => {
+      if (el === strip || el === safe) return false;
+      const position = getComputedStyle(el).position;
+      if (position !== 'fixed' && position !== 'sticky') return false;
+      const box = el.getBoundingClientRect();
+      return box.height > 0 && box.width > 0 && box.top < y + 20 && box.bottom > y - 40;
+    });
+    under =
+      `at ${r(y)}: ${hit.map(brief).join(' < ') || '-'}\npinned ${pinned.length}: ${pinned.slice(0, 3).map(brief).join(' ; ') || '-'} ` +
+      `root ${getComputedStyle(root).backgroundColor.replace(/\s/g, '')} body ${getComputedStyle(document.body).backgroundColor.replace(/\s/g, '')} ` +
+      `frames ${document.querySelectorAll('iframe').length} kids ${document.body.children.length}`;
+  };
+
   let frame = 0;
   const draw = () => {
+    if (performance.now() - underAt > 1000) {
+      underAt = performance.now();
+      lookUnder();
+    }
     const css = getComputedStyle(root);
     const off = r(vv?.offsetTop ?? 0);
     const field = document.activeElement;
@@ -108,7 +138,7 @@ export function showKeyboardReadout(): () => void {
       `y ${r(window.scrollY)}/${scroller.scrollHeight - window.innerHeight} room ${css.getPropertyValue('--kb-room').trim() || '-'} ` +
       `vvtop ${css.getPropertyValue('--vv-top').trim() || '-'} nav ${css.getPropertyValue('--nav-top').trim() || '-'}+${css.getPropertyValue('--back-bar').trim() || '0'} ` +
       `bar ${css.getPropertyValue('--nav-bottom').trim() || '-'} safe ${parseFloat(getComputedStyle(safe).borderTopWidth) || 0}/${parseFloat(getComputedStyle(safe).borderBottomWidth) || 0}\n` +
-      `${about} hdr ${r(document.querySelector('header')?.getBoundingClientRect().top ?? -1)}\n${first.join(' | ')}${events.length ? ' ... ' : ''}${events.join(' | ')}\n${APP_RELEASE.slice(0, 7)} ${navigator.userAgent.match(/OS [\d_]+|Android [\d.]+|Chrome\/[\d]+/)?.[0] ?? ''}`;
+      `${about} hdr ${r(document.querySelector('header')?.getBoundingClientRect().top ?? -1)}\n${first.join(' | ')}${events.length ? ' ... ' : ''}${events.join(' | ')}\n${under}\n${APP_RELEASE.slice(0, 7)} ${navigator.userAgent.match(/OS [\d_]+|Android [\d.]+|Chrome\/[\d]+/)?.[0] ?? ''}`;
     frame = window.requestAnimationFrame(draw);
   };
   draw();

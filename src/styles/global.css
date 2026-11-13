@@ -9,6 +9,10 @@
 
 html {
   color-scheme: dark;
+  /* The page's color on the root too, not only on body: Safari on the iPhone paints the parts it
+     covers with its own bars (the strip above the keyboard) from the root (Eduard, 13 Nov 2026: a
+     white strip above the keyboard). */
+  background: var(--bg);
   -webkit-text-size-adjust: 100%;
   /* The page scrolls (not an area inside it): what is scrolled into view is never hidden under the
      app's bars (their heights come from AppShell; 0 outside it). A pull at the top never reloads. */
@@ -129,6 +133,7 @@ textarea {
 }
 
 @media print {
+  html,
   body {
     background: #fff;
     color: #000;
