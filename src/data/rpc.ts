@@ -192,6 +192,7 @@ export const RPC_ERROR_CODES = [
   'company_not_found',
   'company_name_invalid',
   'company_vat_invalid',
+  'company_vat_taken',
   'company_regcom_invalid',
   'company_address_invalid',
   'limit_companies',

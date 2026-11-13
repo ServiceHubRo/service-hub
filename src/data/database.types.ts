@@ -5120,6 +5120,7 @@ export type Database = {
       admin_get_booking: { Args: { p_booking_id: string }; Returns: Json }
       admin_get_client: { Args: { p_user_id: string }; Returns: Json }
       admin_get_legal_hold: { Args: { p_id: string }; Returns: Json }
+      admin_get_settings: { Args: never; Returns: Json }
       admin_get_shop: { Args: { p_shop_id: string }; Returns: Json }
       admin_grant_report_credit: {
         Args: { p_reason?: string; p_request_id: string; p_user_id: string }
@@ -8174,6 +8175,7 @@ export type Database = {
         Args: { p_review: Database["public"]["Tables"]["reviews"]["Row"] }
         Returns: string[]
       }
+      review_window_days: { Args: never; Returns: number }
       revoke_referral_reward: {
         Args: { p_reason: string; p_shop_id: string }
         Returns: undefined

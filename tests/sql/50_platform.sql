@@ -121,7 +121,7 @@ select test.eq(
       and not has_function_privilege('anon', p.oid, 'execute')),
   'accept_company_invite, acknowledge_no_show_notice, admin_audit_privacy_report, admin_create_category, admin_create_service, '
   || 'admin_decide_no_show_dispute, admin_decide_review, admin_decide_suspect_review, admin_end_admin_sessions, admin_end_my_other_sessions, admin_export, '
-  || 'admin_extend_company_trial, admin_extend_trial, admin_force_cancel, admin_get_booking, admin_get_client, admin_get_legal_hold, admin_get_shop, '
+  || 'admin_extend_company_trial, admin_extend_trial, admin_force_cancel, admin_get_booking, admin_get_client, admin_get_legal_hold, admin_get_settings, admin_get_shop, '
   || 'admin_grant_report_credit, admin_grant_support, admin_help_delete_article, admin_help_delete_category, admin_help_get_article, admin_help_list, '
   || 'admin_help_move, admin_help_save_article, admin_help_save_category, admin_help_set_article_status, admin_list_admins, admin_list_audit, '
   || 'admin_list_bookings, admin_list_catalog, admin_list_clients, admin_list_company_checks, admin_list_failed_fleet_events, admin_list_fleet_companies, '
@@ -149,7 +149,7 @@ select test.eq(
   || 'list_shop_staff, list_threads, mark_no_show, mark_thread_read, merge_cars, my_client_referrals, my_companies, my_company_bookings, my_fleet_access, '
   || 'my_imported_jobs, my_member_id, my_no_show_summary, my_phone_verification, my_quote_numbering, my_referrals, my_shop_id, my_subscription_offers, '
   || 'my_support_requests, new_client_offers, phone_digits, plate_norm, plate_valid, remove_company_member, replace_quote, reply_my_support_request, '
-  || 'reply_review, report_review, reschedule_booking, save_native_push_token, save_push_subscription, save_shop_hours, save_vehicle_intake, '
+  || 'reply_review, report_review, reschedule_booking, review_window_days, save_native_push_token, save_push_subscription, save_shop_hours, save_vehicle_intake, '
   || 'search_card_extras, search_cities, search_shops, send_message, send_quote, set_booking_history_share, set_company_member_rights, '
   || 'set_company_member_role, set_company_rules, set_quote_next_number, set_shop_services, shop_cancel_booking, shop_create_booking, shop_decide_quote, '
   || 'shop_import_add, shop_import_begin, shop_import_undo, shop_offers, shop_reports, shop_vehicle_file, shop_writable, staff_procedure_acknowledge, '

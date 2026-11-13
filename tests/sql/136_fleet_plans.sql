@@ -18,9 +18,18 @@ select test.eq(jsonb_array_length(public.fleet_subscription(current_setting('tes
 -- A second company of the same account: no second trial.
 select set_config('test.co2', (public.create_company('A doua firmă', null, null, null, gen_random_uuid())->>'id'), true);
 select test.eq(public.fleet_subscription(current_setting('test.co2')::uuid)->'plan'->>'status', 'inactive', 'a second company of the same account: no trial');
--- Another account with the same CUI: no trial either.
+-- Another account with the same CUI: refused while the first company exists (A11) …
+select test.login(test.id('client_b'));
+select test.fails($$select public.create_company('Aceeași firmă', 'RO18547290', null, null, gen_random_uuid())$$, 'company_vat_taken',
+  'the same CUI from another account is refused');
+select test.logout();
+-- … and once the first one is archived, the CUI is free again but its trial is not.
+update public.companies set archived_at = now() where id = current_setting('test.co')::uuid;
 select test.login(test.id('client_b'));
 select set_config('test.co3', (public.create_company('Aceeași firmă', 'RO18547290', null, null, gen_random_uuid())->>'id'), true);
+select test.logout();
+update public.companies set archived_at = null where id = current_setting('test.co')::uuid;
+select test.login(test.id('client_b'));
 select test.eq(public.fleet_subscription(current_setting('test.co3')::uuid)->'plan'->>'ended_reason', 'trial_used', 'the same CUI from another account: no trial');
 -- With billing off, none of them is blocked.
 select test.ok(not (public.fleet_plan_summary(current_setting('test.co3')::uuid)->>'read_only')::boolean, 'billing off: never read-only');

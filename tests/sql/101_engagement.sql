@@ -228,7 +228,7 @@ select test.login(test.id('admin'));
 select test.eq(test.error_params($$select public.admin_update_settings('{"limits":{"quiet_hours_start":24}}', gen_random_uuid(), 'Test A6')$$)->>'field',
   'quiet_hours_start', 'an hour is 0–23');
 select public.admin_update_settings('{"limits":{"quiet_hours_start":22,"promo_per_week":1}}', gen_random_uuid(), 'Test A6');
-select test.eq((select (limits->>'quiet_hours_start')::int from public.platform_settings), 22, 'the admin moves the quiet hours');
+select test.eq((select (limits->>'quiet_hours_start')::int from jsonb_populate_record(null::public.platform_settings, public.admin_get_settings())), 22, 'the admin moves the quiet hours');
 select test.logout();
 
 rollback;
