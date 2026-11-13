@@ -5,9 +5,13 @@ import { ChunkLoadError } from './app/routes/lazyChunk';
 import { resizeForKeyboard, watchKeyboard } from './lib/keyboard';
 import { captureError, installGlobalHandlers } from './lib/monitoring';
 import { markHydrating, PRERENDERED_ATTR } from './lib/prerender';
+import { openReloadAtTop } from './lib/scrollMemory';
 import '@fontsource-variable/inter/wght.css';
 import './styles/tokens.css';
 import './styles/global.css';
+
+// A reload opens the page at its top (src/lib/scrollMemory.ts); nothing else is touched.
+openReloadAtTop();
 
 resizeForKeyboard();
 // The phone's keyboard, on every screen and platform (the bottom bar steps aside, the field stays seen).
