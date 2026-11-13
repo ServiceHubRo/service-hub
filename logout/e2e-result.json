@@ -1,0 +1,845 @@
+{
+  "config": {
+    "configFile": "/home/runner/work/service-hub/service-hub/playwright.config.ts",
+    "rootDir": "/home/runner/work/service-hub/service-hub/tests/e2e",
+    "forbidOnly": true,
+    "fullyParallel": true,
+    "globalSetup": "/home/runner/work/service-hub/service-hub/tests/e2e/global-setup.ts",
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "ci": {
+        "commitHref": "https://github.com/ServiceHubRo/service-hub/commit/ff25fe96d5c5bfa8ee8e6d1327a7c70740882fc7",
+        "commitHash": "ff25fe96d5c5bfa8ee8e6d1327a7c70740882fc7",
+        "buildHref": "https://github.com/ServiceHubRo/service-hub/actions/runs/43375560429"
+      },
+      "gitCommit": {
+        "shortHash": "ff25fe9",
+        "hash": "ff25fe96d5c5bfa8ee8e6d1327a7c70740882fc7",
+        "subject": "Investigation: fix only the sign-out flow (the public page opens at its top once), regression test for every account type",
+        "body": "Investigation: fix only the sign-out flow (the public page opens at its top once), regression test for every account type\n\nReverts the scroll rule moved into the router: a reload, back and forward keep their behavior.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01Jkyhh8hksgqvvBgsvSC5Xb\n",
+        "author": {
+          "name": "Claude",
+          "email": "noreply@anthropic.com",
+          "time": 1794549549000
+        },
+        "committer": {
+          "name": "Claude",
+          "email": "noreply@anthropic.com",
+          "time": 1794549549000
+        },
+        "branch": "a9-logout-trace"
+      },
+      "actualWorkers": 2
+    },
+    "preserveOutput": "always",
+    "reporter": [
+      [
+        "list"
+      ],
+      [
+        "json"
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "quiet": false,
+    "projects": [
+      {
+        "outputDir": "/home/runner/work/service-hub/service-hub/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "ci": {
+            "commitHref": "https://github.com/ServiceHubRo/service-hub/commit/ff25fe96d5c5bfa8ee8e6d1327a7c70740882fc7",
+            "commitHash": "ff25fe96d5c5bfa8ee8e6d1327a7c70740882fc7",
+            "buildHref": "https://github.com/ServiceHubRo/service-hub/actions/runs/43375560429"
+          },
+          "gitCommit": {
+            "shortHash": "ff25fe9",
+            "hash": "ff25fe96d5c5bfa8ee8e6d1327a7c70740882fc7",
+            "subject": "Investigation: fix only the sign-out flow (the public page opens at its top once), regression test for every account type",
+            "body": "Investigation: fix only the sign-out flow (the public page opens at its top once), regression test for every account type\n\nReverts the scroll rule moved into the router: a reload, back and forward keep their behavior.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01Jkyhh8hksgqvvBgsvSC5Xb\n",
+            "author": {
+              "name": "Claude",
+              "email": "noreply@anthropic.com",
+              "time": 1794549549000
+            },
+            "committer": {
+              "name": "Claude",
+              "email": "noreply@anthropic.com",
+              "time": 1794549549000
+            },
+            "branch": "a9-logout-trace"
+          },
+          "actualWorkers": 2
+        },
+        "id": "mobile-390",
+        "name": "mobile-390",
+        "testDir": "/home/runner/work/service-hub/service-hub/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/home/runner/work/service-hub/service-hub/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "ci": {
+            "commitHref": "https://github.com/ServiceHubRo/service-hub/commit/ff25fe96d5c5bfa8ee8e6d1327a7c70740882fc7",
+            "commitHash": "ff25fe96d5c5bfa8ee8e6d1327a7c70740882fc7",
+            "buildHref": "https://github.com/ServiceHubRo/service-hub/actions/runs/43375560429"
+          },
+          "gitCommit": {
+            "shortHash": "ff25fe9",
+            "hash": "ff25fe96d5c5bfa8ee8e6d1327a7c70740882fc7",
+            "subject": "Investigation: fix only the sign-out flow (the public page opens at its top once), regression test for every account type",
+            "body": "Investigation: fix only the sign-out flow (the public page opens at its top once), regression test for every account type\n\nReverts the scroll rule moved into the router: a reload, back and forward keep their behavior.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01Jkyhh8hksgqvvBgsvSC5Xb\n",
+            "author": {
+              "name": "Claude",
+              "email": "noreply@anthropic.com",
+              "time": 1794549549000
+            },
+            "committer": {
+              "name": "Claude",
+              "email": "noreply@anthropic.com",
+              "time": 1794549549000
+            },
+            "branch": "a9-logout-trace"
+          },
+          "actualWorkers": 2
+        },
+        "id": "tablet-820",
+        "name": "tablet-820",
+        "testDir": "/home/runner/work/service-hub/service-hub/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/home/runner/work/service-hub/service-hub/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "ci": {
+            "commitHref": "https://github.com/ServiceHubRo/service-hub/commit/ff25fe96d5c5bfa8ee8e6d1327a7c70740882fc7",
+            "commitHash": "ff25fe96d5c5bfa8ee8e6d1327a7c70740882fc7",
+            "buildHref": "https://github.com/ServiceHubRo/service-hub/actions/runs/43375560429"
+          },
+          "gitCommit": {
+            "shortHash": "ff25fe9",
+            "hash": "ff25fe96d5c5bfa8ee8e6d1327a7c70740882fc7",
+            "subject": "Investigation: fix only the sign-out flow (the public page opens at its top once), regression test for every account type",
+            "body": "Investigation: fix only the sign-out flow (the public page opens at its top once), regression test for every account type\n\nReverts the scroll rule moved into the router: a reload, back and forward keep their behavior.\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01Jkyhh8hksgqvvBgsvSC5Xb\n",
+            "author": {
+              "name": "Claude",
+              "email": "noreply@anthropic.com",
+              "time": 1794549549000
+            },
+            "committer": {
+              "name": "Claude",
+              "email": "noreply@anthropic.com",
+              "time": 1794549549000
+            },
+            "branch": "a9-logout-trace"
+          },
+          "actualWorkers": 2
+        },
+        "id": "desktop-1440",
+        "name": "desktop-1440",
+        "testDir": "/home/runner/work/service-hub/service-hub/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "shard": null,
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.56.1",
+    "workers": 2,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "logout-scroll.spec.ts",
+      "file": "logout-scroll.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "signing out opens the public page at its top",
+          "file": "logout-scroll.spec.ts",
+          "line": 45,
+          "column": 6,
+          "specs": [
+            {
+              "title": "client, then a reload keeps the place on the public page",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "mobile-390",
+                  "projectName": "mobile-390",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3149,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-13T06:02:48.847Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "fff48aad65c1ab29208d-d4c668cf385e66236ee1",
+              "file": "logout-scroll.spec.ts",
+              "line": 49,
+              "column": 3
+            },
+            {
+              "title": "company member, from the company space",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "mobile-390",
+                  "projectName": "mobile-390",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 3618,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-13T06:02:48.827Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "fff48aad65c1ab29208d-3f296f9527d41a94cb83",
+              "file": "logout-scroll.spec.ts",
+              "line": 65,
+              "column": 3
+            },
+            {
+              "title": "shop owner",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "mobile-390",
+                  "projectName": "mobile-390",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2307,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-13T06:02:52.136Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "fff48aad65c1ab29208d-b3856701aeb1dddc077c",
+              "file": "logout-scroll.spec.ts",
+              "line": 80,
+              "column": 3
+            },
+            {
+              "title": "shop colleague",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "mobile-390",
+                  "projectName": "mobile-390",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 2637,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-13T06:02:52.605Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "fff48aad65c1ab29208d-09f6aba8d466cd2238a3",
+              "file": "logout-scroll.spec.ts",
+              "line": 87,
+              "column": 3
+            },
+            {
+              "title": "support agent",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "mobile-390",
+                  "projectName": "mobile-390",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3549,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-13T06:02:54.455Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "fff48aad65c1ab29208d-808be399a3630fd42099",
+              "file": "logout-scroll.spec.ts",
+              "line": 100,
+              "column": 3
+            },
+            {
+              "title": "platform admin",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "mobile-390",
+                  "projectName": "mobile-390",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 3099,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-13T06:02:55.255Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "fff48aad65c1ab29208d-dec17efabffa0a754676",
+              "file": "logout-scroll.spec.ts",
+              "line": 107,
+              "column": 3
+            },
+            {
+              "title": "client, then a reload keeps the place on the public page",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "tablet-820",
+                  "projectName": "tablet-820",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3100,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-13T06:02:58.639Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "fff48aad65c1ab29208d-a3cfaf74aee141519c3d",
+              "file": "logout-scroll.spec.ts",
+              "line": 49,
+              "column": 3
+            },
+            {
+              "title": "company member, from the company space",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "tablet-820",
+                  "projectName": "tablet-820",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 3179,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-13T06:02:59.166Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "fff48aad65c1ab29208d-79e41c331fc6fd21d3c7",
+              "file": "logout-scroll.spec.ts",
+              "line": 65,
+              "column": 3
+            },
+            {
+              "title": "shop owner",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "tablet-820",
+                  "projectName": "tablet-820",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2358,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-13T06:03:01.839Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "fff48aad65c1ab29208d-34a0ae94ee7ce9007d3c",
+              "file": "logout-scroll.spec.ts",
+              "line": 80,
+              "column": 3
+            },
+            {
+              "title": "shop colleague",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "tablet-820",
+                  "projectName": "tablet-820",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 2752,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-13T06:03:02.512Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "fff48aad65c1ab29208d-13541e4a5a61a8cb9b75",
+              "file": "logout-scroll.spec.ts",
+              "line": 87,
+              "column": 3
+            },
+            {
+              "title": "support agent",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "tablet-820",
+                  "projectName": "tablet-820",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3584,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-13T06:03:04.209Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "fff48aad65c1ab29208d-d7837f81254ec6a3183b",
+              "file": "logout-scroll.spec.ts",
+              "line": 100,
+              "column": 3
+            },
+            {
+              "title": "platform admin",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "tablet-820",
+                  "projectName": "tablet-820",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 3078,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-13T06:03:05.276Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "fff48aad65c1ab29208d-e3bf5759ab4513661774",
+              "file": "logout-scroll.spec.ts",
+              "line": 107,
+              "column": 3
+            },
+            {
+              "title": "client, then a reload keeps the place on the public page",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "desktop-1440",
+                  "projectName": "desktop-1440",
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3115,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-13T06:03:08.339Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "fff48aad65c1ab29208d-5ddbd6fcf616d7d7a323",
+              "file": "logout-scroll.spec.ts",
+              "line": 49,
+              "column": 3
+            },
+            {
+              "title": "company member, from the company space",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "desktop-1440",
+                  "projectName": "desktop-1440",
+                  "results": [
+                    {
+                      "workerIndex": 5,
+                      "parallelIndex": 1,
+                      "status": "failed",
+                      "duration": 1681,
+                      "error": {
+                        "message": "Error: the page is scrolled before signing out\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: > \u001b[32m0\u001b[39m\nReceived:   \u001b[31m0\u001b[39m",
+                        "stack": "Error: the page is scrolled before signing out\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: > \u001b[32m0\u001b[39m\nReceived:   \u001b[31m0\u001b[39m\n    at signOutFromTheEnd (/home/runner/work/service-hub/service-hub/tests/e2e/logout-scroll.spec.ts:30:78)\n    at /home/runner/work/service-hub/service-hub/tests/e2e/logout-scroll.spec.ts:76:5",
+                        "location": {
+                          "file": "/home/runner/work/service-hub/service-hub/tests/e2e/logout-scroll.spec.ts",
+                          "column": 78,
+                          "line": 30
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 28 |\u001b[39m     \u001b[36mif\u001b[39m ((\u001b[36mawait\u001b[39m logout\u001b[33m.\u001b[39mcount()) \u001b[33m>\u001b[39m \u001b[35m0\u001b[39m) \u001b[36mbreak\u001b[39m\u001b[33m;\u001b[39m\n \u001b[90m 29 |\u001b[39m   }\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 30 |\u001b[39m   expect(\u001b[36mawait\u001b[39m scrollTopOf(page)\u001b[33m,\u001b[39m \u001b[32m'the page is scrolled before signing out'\u001b[39m)\u001b[33m.\u001b[39mtoBeGreaterThan(\u001b[35m0\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                                                              \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 31 |\u001b[39m   \u001b[36mawait\u001b[39m logout\u001b[33m.\u001b[39mfirst()\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m 32 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgetByRole(\u001b[32m'button'\u001b[39m\u001b[33m,\u001b[39m { name\u001b[33m:\u001b[39m \u001b[32m'Deconectează-mă'\u001b[39m })\u001b[33m.\u001b[39mclick()\u001b[33m;\u001b[39m\n \u001b[90m 33 |\u001b[39m }\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/home/runner/work/service-hub/service-hub/tests/e2e/logout-scroll.spec.ts",
+                            "column": 78,
+                            "line": 30
+                          },
+                          "message": "Error: the page is scrolled before signing out\n\n\u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBeGreaterThan\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m)\u001b[22m\n\nExpected: > \u001b[32m0\u001b[39m\nReceived:   \u001b[31m0\u001b[39m\n\n  28 |     if ((await logout.count()) > 0) break;\n  29 |   }\n> 30 |   expect(await scrollTopOf(page), 'the page is scrolled before signing out').toBeGreaterThan(0);\n     |                                                                              ^\n  31 |   await logout.first().click();\n  32 |   await page.getByRole('button', { name: 'Deconectează-mă' }).click();\n  33 | }\n    at signOutFromTheEnd (/home/runner/work/service-hub/service-hub/tests/e2e/logout-scroll.spec.ts:30:78)\n    at /home/runner/work/service-hub/service-hub/tests/e2e/logout-scroll.spec.ts:76:5"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-13T06:03:09.178Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/home/runner/work/service-hub/service-hub/test-results/logout-scroll-signing-out--66346-mber-from-the-company-space-desktop-1440/error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/home/runner/work/service-hub/service-hub/tests/e2e/logout-scroll.spec.ts",
+                        "column": 78,
+                        "line": 30
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "fff48aad65c1ab29208d-bd4ce486fdb048ba64ee",
+              "file": "logout-scroll.spec.ts",
+              "line": 65,
+              "column": 3
+            },
+            {
+              "title": "shop owner",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "desktop-1440",
+                  "projectName": "desktop-1440",
+                  "results": [
+                    {
+                      "workerIndex": 6,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 2483,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-13T06:03:11.602Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "fff48aad65c1ab29208d-2472cee1dd13b9c2f565",
+              "file": "logout-scroll.spec.ts",
+              "line": 80,
+              "column": 3
+            },
+            {
+              "title": "shop colleague",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "desktop-1440",
+                  "projectName": "desktop-1440",
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2842,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-13T06:03:11.568Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "fff48aad65c1ab29208d-6fe36bdf2b7898519804",
+              "file": "logout-scroll.spec.ts",
+              "line": 87,
+              "column": 3
+            },
+            {
+              "title": "support agent",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "desktop-1440",
+                  "projectName": "desktop-1440",
+                  "results": [
+                    {
+                      "workerIndex": 6,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 3660,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-13T06:03:14.212Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "fff48aad65c1ab29208d-415d7ece4e7c269d64ae",
+              "file": "logout-scroll.spec.ts",
+              "line": 100,
+              "column": 3
+            },
+            {
+              "title": "platform admin",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "desktop-1440",
+                  "projectName": "desktop-1440",
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3145,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-13T06:03:14.424Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "fff48aad65c1ab29208d-29898f66337e7354e36a",
+              "file": "logout-scroll.spec.ts",
+              "line": 107,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-11-13T06:02:23.239Z",
+    "duration": 54708.624,
+    "expected": 17,
+    "skipped": 0,
+    "unexpected": 1,
+    "flaky": 0
+  }
+}
