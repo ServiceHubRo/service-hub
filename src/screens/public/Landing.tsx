@@ -368,23 +368,29 @@ function PriceBlock() {
               <span className={styles.priceFigure}>
                 {t('landing.priceMain', { price: money(state.pricing.launchRon ?? state.pricing.subscriptionRon) })}
               </span>
-              {launch && launch.off > 0 && (
+              {/* Each dot belongs to the item before it, so a line never starts with one (A9). The
+                  −33% pill and its dot stay together: a line may break after the pill itself. */}
+              {launch && launch.off > 0 ? (
                 <>
                   {' '}
-                  <span className={styles.priceSave} aria-hidden="true">
-                    {t('landing.launchSave', { n: launch.off })}
+                  <span className={styles.keep}>
+                    <span className={styles.priceSave} aria-hidden="true">
+                      {t('landing.launchSave', { n: launch.off })}
+                    </span>
+                    <span aria-hidden="true">{'\u00a0·'}</span>
                   </span>
                   <span className="visually-hidden"> · {t('landing.launchSaveLabel', { n: launch.off })}</span>
                 </>
+              ) : (
+                <span aria-hidden="true">{'\u00a0·'}</span>
               )}
-              {/* The dot stays at the end of a line, never at the start of the next one (A9). */}
               {state.pricing.trialDays > 0 && (
                 <>
-                  <span aria-hidden="true">{'\u00a0· '}</span>
+                  {' '}
                   <span>{t('landing.priceTrial', { days: plural('unit.days', state.pricing.trialDays) })}</span>
+                  <span aria-hidden="true">{'\u00a0·'}</span>
                 </>
-              )}
-              <span aria-hidden="true">{'\u00a0· '}</span>
+              )}{' '}
               <span>{t('landing.priceNoContract')}</span>
             </p>
             {state.pricing.launchRon !== null && (

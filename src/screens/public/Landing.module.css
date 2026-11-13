@@ -494,6 +494,11 @@
   font-weight: 600;
 }
 
+/* The −33% pill and the dot after it, never on two lines (A9). */
+.keep {
+  white-space: nowrap;
+}
+
 .priceFigure {
   color: var(--amber);
   font-family: var(--font-display);
