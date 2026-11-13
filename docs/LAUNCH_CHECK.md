@@ -10,6 +10,8 @@ Lista „Final check” din `docs/lovable-prompts.md` și cerințele din `docs/F
 
 **Ultima rulare completă:** 17 oct 2026, pe codul de după T37c (stack-ul Supabase local, ca în CI; testele în browser și pe GitHub, pe `main`).
 
+**După 17 oct (flote, suport, Centrul de ajutor, A6–A10)** lista de mai jos nu a mai fost parcursă integral într-o singură rulare; testele ei rulează în CI la fiecare pull request. Ultima rulare parțială: 13 nov 2026 (auditul master și A10), baza de date — 112 fișiere SQL și 20 de rollback-uri trecute local; testele unitare și cele în browser, pe CI. Partea C (verificările tale pe site-ul real) rămâne de făcut înainte de lansare.
+
 | Teste | Rezultat |
 |---|---|
 | Unitare (Vitest), 59 de fișiere | 525 trec, și cu ora din Los Angeles și din Tokyo |

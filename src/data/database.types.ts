@@ -6884,6 +6884,7 @@ export type Database = {
         }
         Returns: Json
       }
+      get_company: { Args: { p_company: string }; Returns: Json }
       get_company_invite: { Args: { p_token: string }; Returns: Json }
       get_my_support_request: { Args: { p_id: string }; Returns: Json }
       get_my_support_request_a3a: { Args: { p_id: string }; Returns: Json }
