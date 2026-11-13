@@ -64,11 +64,12 @@ export async function fetchMyCompanies(): Promise<MyCompany[]> {
   return (await call('my_companies', {} as never)) as unknown as MyCompany[];
 }
 
-/** One company the caller belongs to (RLS), or null. */
+/**
+ * One company the caller belongs to, or null (`get_company`, A10). The budgets and the managers'
+ * approval limit are null for a member who neither sees the costs nor manages the budget.
+ */
 export async function fetchCompany(id: string): Promise<Company | null> {
-  const { data, error } = await db().from('companies').select('*').eq('id', id).maybeSingle();
-  if (error) throw failure(error);
-  return data;
+  return (await call('get_company', { p_company: id })) as unknown as Company | null;
 }
 
 export async function createCompany(d: CompanyDetails, requestId: string): Promise<Company> {

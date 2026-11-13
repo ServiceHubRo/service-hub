@@ -109,7 +109,7 @@ select test.fails(format($$select public.set_company_member_role(%L, 'manager', 
 select test.fails(format($$select public.remove_company_member(%L, gen_random_uuid())$$, current_setting('test.m_a')),
   'last_admin', 'the last admin cannot leave');
 select public.set_company_rules(current_setting('test.co_a')::uuid, 2500, 4000, null, gen_random_uuid());
-select test.eq((select manager_approval_limit from public.companies where id = current_setting('test.co_a')::uuid), 2500.00::numeric(12,2),
+select test.eq((public.get_company(current_setting('test.co_a')::uuid)->>'manager_approval_limit')::numeric(12,2), 2500.00::numeric(12,2),
   'the admin sets the managers'' limit');
 
 select public.transfer_company_admin(current_setting('test.m_b')::uuid, gen_random_uuid());

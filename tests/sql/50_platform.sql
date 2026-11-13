@@ -142,7 +142,7 @@ select test.eq(
   || 'fleet_ignore_job_odometer, fleet_issue_can_read, fleet_issue_can_report, fleet_issue_detail, fleet_issue_path, fleet_issue_photo_can_delete, '
   || 'fleet_issue_photo_can_read, fleet_issue_photo_can_upload, fleet_log_export, fleet_mark_expense, fleet_mark_maintenance_done, fleet_overview, '
   || 'fleet_plan_summary, fleet_report, fleet_report_issue, fleet_request_quote_changes, fleet_role_can, fleet_save_expense, fleet_save_maintenance, '
-  || 'fleet_save_vehicle, fleet_set_unavailable, fleet_subscription, fleet_update_issue, get_availability, get_my_support_request, get_shop_page, '
+  || 'fleet_save_vehicle, fleet_set_unavailable, fleet_subscription, fleet_update_issue, get_availability, get_company, get_my_support_request, get_shop_page, '
   || 'get_shop_setup, help_center, help_send_feedback, history_report_preview, invite_company_member, invite_staff, is_admin, is_booking_shop_member, '
   || 'is_shop_member, is_shop_owner, is_shop_public, is_support_request_author, join_area_waitlist, join_slot_waitlist, last_odometer_for_booking, '
   || 'leave_area_waitlist, leave_slot_waitlist, list_company_members, list_imported_jobs, list_service_areas, list_shop_bookings, list_shop_history, '
