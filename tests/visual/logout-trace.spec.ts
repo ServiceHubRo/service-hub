@@ -1,4 +1,4 @@
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { appendFileSync, mkdirSync } from 'node:fs';
 import { expect, test, type Page } from '@playwright/test';
 import { BACKEND, SEED, SEED_PASSWORD, signIn } from '../e2e/support';
 
@@ -99,7 +99,10 @@ interface Result {
   end: unknown;
   trace: unknown[];
 }
-const results: Result[] = [];
+function keep(r: Partial<Result> & { scenario: string; error?: string }) {
+  mkdirSync(`${OUT}/logout`, { recursive: true });
+  appendFileSync(`${OUT}/logout/trace.jsonl`, `${JSON.stringify(r)}\n`);
+}
 
 async function run(page: Page, scenario: string, width: number, height: number, start: string, scrollTo: 'top' | 'bottom', where: 'main' | 'sidebar') {
   await page.setViewportSize({ width, height });
@@ -124,51 +127,68 @@ async function run(page: Page, scenario: string, width: number, height: number, 
   const end = await inView(page);
   await page.screenshot({ path: `${OUT}/logout/${scenario}-2-after.jpg`, type: 'jpeg', quality: 60 });
   const trace = await page.evaluate(() => (window as unknown as { __trace: unknown[] }).__trace);
-  results.push({ scenario, before, afterConfirmOpen, end, trace });
+  keep({ scenario, before, afterConfirmOpen, end, trace });
 }
+
+async function guarded(page: Page, scenario: string, body: () => Promise<void>) {
+  const errors: string[] = [];
+  page.on('pageerror', (e) => errors.push(e.message));
+  try {
+    await body();
+  } catch (e) {
+    const trace = await page.evaluate(() => (window as unknown as { __trace?: unknown[] }).__trace ?? []).catch(() => []);
+    await page.screenshot({ path: `${OUT}/logout/${scenario}-error.jpg`, type: 'jpeg', quality: 60 }).catch(() => undefined);
+    keep({ scenario, error: `${String(e).slice(0, 1500)} | page errors: ${errors.join(' / ')} | url: ${page.url()}`, trace });
+  }
+}
+
+test.beforeEach(async ({ context }) => {
+  // The sign-in page in Romanian, as the test helpers expect.
+  await context.addInitScript(() => {
+    if (!sessionStorage.getItem('sh_test_init')) {
+      sessionStorage.setItem('sh_test_init', '1');
+      localStorage.setItem('sh_lang', 'ro');
+    }
+  });
+});
 
 test.describe('logout scroll trace', () => {
   test.skip(!BACKEND, 'needs the local Supabase stack');
-  test.describe.configure({ mode: 'serial' });
-
-  test.afterAll(() => {
-    mkdirSync(`${OUT}/logout`, { recursive: true });
-    writeFileSync(`${OUT}/logout/trace.json`, JSON.stringify(results, null, 1));
-  });
-
   test('phone 390: Cont, button at the end of the page', async ({ page }) => {
     mkdirSync(`${OUT}/logout`, { recursive: true });
-    await run(page, 'phone-390-cont', 390, 844, '/c/cont', 'top', 'main');
+    await guarded(page, 'phone-390-cont', () => run(page, 'phone-390-cont', 390, 844, '/c/cont', 'top', 'main'));
   });
 
   test('tablet 820: Cont, button at the end of the page', async ({ page }) => {
-    await run(page, 'tablet-820-cont', 820, 1180, '/c/cont', 'top', 'main');
+    await guarded(page, 'tablet-820-cont', () => run(page, 'tablet-820-cont', 820, 1180, '/c/cont', 'top', 'main'));
   });
 
   test('desktop 1440: sidebar, page at the top', async ({ page }) => {
-    await run(page, 'desktop-1440-top', 1440, 900, '/c/programari', 'top', 'sidebar');
+    await guarded(page, 'desktop-1440-top', () => run(page, 'desktop-1440-top', 1440, 900, '/c/programari', 'top', 'sidebar'));
   });
 
   test('desktop 1440: sidebar, page scrolled to the end', async ({ page }) => {
-    await run(page, 'desktop-1440-scrolled', 1440, 900, '/c/cont', 'bottom', 'sidebar');
+    await guarded(page, 'desktop-1440-scrolled', () => run(page, 'desktop-1440-scrolled', 1440, 900, '/c/cont', 'bottom', 'sidebar'));
   });
 
   test('phone 390: landing scrolled to the price, then „Profită acum” (a public page to another)', async ({ page }) => {
-    await page.setViewportSize({ width: 390, height: 844 });
-    await page.addInitScript(tracer);
-    await page.goto('/');
-    await page.waitForLoadState('networkidle', { timeout: 8_000 }).catch(() => undefined);
-    const cta = page.getByRole('link', { name: /Profită acum|Creează cont/ }).last();
-    await cta.scrollIntoViewIfNeeded();
-    await page.waitForTimeout(300);
-    await page.evaluate(() => (window as unknown as { __trace: unknown[] }).__trace.splice(0));
-    const before = await inView(page);
-    await cta.click();
-    await page.waitForURL(/\/cont-nou/);
-    await page.waitForTimeout(1500);
-    const end = await inView(page);
-    await page.screenshot({ path: `${OUT}/logout/public-390-cta-after.jpg`, type: 'jpeg', quality: 60 });
-    const trace = await page.evaluate(() => (window as unknown as { __trace: unknown[] }).__trace);
-    results.push({ scenario: 'public-390-landing-to-signup', before, afterConfirmOpen: null, end, trace });
+    await guarded(page, 'public-390-landing-to-signup', async () => {
+      await page.setViewportSize({ width: 390, height: 844 });
+      await page.addInitScript(tracer);
+      await page.goto('/');
+      await page.waitForLoadState('networkidle', { timeout: 8_000 }).catch(() => undefined);
+      const cta = page.getByRole('link', { name: /Profită acum/ }).first();
+      await cta.scrollIntoViewIfNeeded();
+      await page.waitForTimeout(300);
+      await page.evaluate(() => (window as unknown as { __trace: unknown[] }).__trace.splice(0));
+      const before = await inView(page);
+      await cta.click();
+      await page.waitForURL(/\/cont-nou/);
+      await page.waitForTimeout(1500);
+      const end = await inView(page);
+      await page.screenshot({ path: `${OUT}/logout/public-390-cta-after.jpg`, type: 'jpeg', quality: 60 });
+      const trace = await page.evaluate(() => (window as unknown as { __trace: unknown[] }).__trace);
+      keep({ scenario: 'public-390-landing-to-signup', before, afterConfirmOpen: null, end, trace });
+    });
   });
 });
