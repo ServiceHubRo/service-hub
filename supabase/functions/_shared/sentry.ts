@@ -3,7 +3,8 @@
 // Pure: no Deno and no DOM, so the browser, the functions and the unit tests share it.
 //
 // Nothing personal leaves: the user is only their id and role, addresses lose their tokens
-// (email links carry the session in `#access_token=…`, invitations in `/invitatie/<token>`), and
+// (email links carry the session in `#access_token=…`, invitations in `/invitatie/<token>`, a
+// booking a shop added in `/p/<token>` and `/c/preia/<token>`), and
 // emails, phone numbers and access tokens in messages are replaced before sending.
 
 export interface SentryDsn {
@@ -65,7 +66,12 @@ export function scrubUrl(value: string): string {
   url.hash = '';
   url.username = '';
   url.password = '';
-  url.pathname = url.pathname.replace(/\/invitatie\/[^/]+/, '/invitatie/[token]');
+  // Invitations (`/invitatie/…`, `/c/firme/invitatie/…`) and, since A8, a booking a shop added
+  // (the SMS link `/p/…` and its claim screen `/c/preia/…`): the token opens that booking's preview.
+  url.pathname = url.pathname
+    .replace(/\/invitatie\/[^/]+/, '/invitatie/[token]')
+    .replace(/^\/p\/[^/]+/, '/p/[token]')
+    .replace(/\/preia\/[^/]+/, '/preia/[token]');
   for (const key of [...url.searchParams.keys()]) {
     if (SECRET_PARAMS.test(key)) url.searchParams.set(key, '[filtered]');
   }

@@ -170,6 +170,11 @@ Pe planul gratuit Supabase **nu face copii de siguranță**: dacă se șterge ce
 
 **Verifici:** în proiectul real → **Database → Backups** apare prima copie a doua zi.
 
+**Ce acoperă copiile și cum se refac (A8):**
+- Copia zilnică are **baza de date** (conturi, programări, devize, mesaje, setări). **Nu are fișierele** din Storage (logo-uri, poze, rapoarte PDF, bonuri, atașamente): baza păstrează doar numele lor. Un fișier șters din Storage nu revine dintr-o copie. Codul funcțiilor de pe server e în GitHub („Deploy Supabase” îl publică din nou); cheile lor (Stripe, Resend, SMSO) stau doar în Supabase, deci păstrează-le și în managerul de parole.
+- Refacerea: proiectul real → **Database → Backups** → copia dorită → **Restore**. Toată baza revine la momentul copiei: tot ce s-a făcut după (programări, conturi noi, plăți înregistrate) se pierde, iar site-ul nu merge câteva minute. Se face doar pentru o greșeală gravă, nu pentru o singură înregistrare.
+- Nu încerca o refacere pe proiectul real „de probă”. Proiectul de test, ținut pe planul gratuit (pasul 2 de mai sus), nu are copii, deci nici acolo nu se poate exersa; o refacere se încearcă prima dată doar când chiar e nevoie, cu pașii de aici.
+
 ### 4.2 Plățile reale (Stripe)
 
 Până acum Stripe a mers în **modul de test** (carduri de probă). Acum proiectul real primește cheile reale; proiectul de test rămâne pe cheile de test.
@@ -414,13 +419,15 @@ După fiecare Merge, acțiunea „Deploy Supabase” aplică modificările în b
 
 Chiar înainte de lansare: se șterg toate conturile de client și de service din **proiectul real**, cu tot ce au făcut (mașini, programări, devize, mesaje, recenzii, abonamente, rapoarte), iar numerele încep din nou: primul client va fi **C-00001**, primul service **S-00001**, prima programare **P-000001**.
 
-**Rămân:** conturile de admin (cu numărul lor), setările platformei (prețuri, reduceri, perioada gratuită), lista celor 151 de servicii. Se șterg și amprentele de cont (perioada gratuită folosită, suspendările), ca nimeni să nu fie blocat din cauza unui cont de test.
+**Rămân:** conturile de admin (cu numărul lor), setările platformei (prețuri, reduceri, perioada gratuită), lista celor 151 de servicii, articolele din Centrul de ajutor și procedurile interne. Se șterg și firmele (flotele) și solicitările de suport de test. Se șterg și amprentele de cont (perioada gratuită folosită, suspendările), ca nimeni să nu fie blocat din cauza unui cont de test.
 
 Nu se poate anula. Scriptul refuză să ruleze dacă găsește peste 300 de conturi de client și service, ca să nu poată șterge din greșeală o platformă deja folosită.
 
 ### 1. Pozele și rapoartele
 
-În **Supabase** → proiectul real → **Storage**. Pentru fiecare dintre folderele `logos` și `reports`: apasă cele trei puncte de lângă nume → **Empty bucket** → confirmă. (Fișierele nu se pot șterge din SQL; de aceea începi cu ele.)
+În **Supabase** → proiectul real → **Storage**. Pentru fiecare dintre cele șase foldere — `logos`, `reports`, `shop-photos`, `intake-photos`, `fleet-files` și `support-files` — apasă cele trei puncte de lângă nume → **Empty bucket** → confirmă. (Fișierele nu se pot șterge din SQL; de aceea începi cu ele.)
+
+Dacă ai pus o **păstrare legală** pe o solicitare de test, elibereaz-o întâi (admin → **Suport** → solicitarea → **Păstrare legală**): scriptul refuză cât timp există una activă.
 
 ### 2. Conturile
 

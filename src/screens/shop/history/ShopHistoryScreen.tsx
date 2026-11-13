@@ -18,6 +18,7 @@ import { useI18n, type I18nValue } from '../../../i18n/context';
 import { formatDayMonth, formatKm, formatMoney, ymdInBucharest } from '../../../i18n/format';
 import { plural, type Lang } from '../../../i18n/translate';
 import {
+  changesShopHistory,
   csvAmount,
   csvFormat,
   endedDay,
@@ -123,7 +124,10 @@ export function ShopHistoryScreen() {
       channel: `shop-history:${shopId}`,
       table: 'bookings',
       filter: `shop_id=eq.${shopId}`,
-      onChange: refresh,
+      // A8: a booking still in progress is not in Istoric; only an ended one reads it again.
+      onChange: (change) => {
+        if (changesShopHistory(change)) refresh();
+      },
       onResync: refresh,
     });
     return () => {

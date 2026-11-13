@@ -49,6 +49,15 @@ describe('scrubbing', () => {
     expect(scrubUrl('https://x.test/s/programari?p=1b2c')).toBe('https://x.test/s/programari?p=1b2c');
   });
 
+  it('hides the token of a booking a shop added: the SMS link and its claim screen (A8)', () => {
+    expect(scrubUrl('https://service-hub.ro/p/abcdef0123456789')).toBe('https://service-hub.ro/p/[token]');
+    expect(scrubUrl('https://service-hub.ro/c/preia/abcdef0123456789?x=1')).toBe('https://service-hub.ro/c/preia/[token]?x=1');
+    expect(scrubUrl('https://service-hub.ro/c/firme/invitatie/abcdef0123456789')).toBe('https://service-hub.ro/c/firme/invitatie/[token]');
+    // Other addresses that start alike stay as they are.
+    expect(scrubUrl('https://service-hub.ro/s/programari/p/x')).toBe('https://service-hub.ro/s/programari/p/x');
+    expect(scrubUrl('https://service-hub.ro/parola-noua')).toBe('https://service-hub.ro/parola-noua');
+  });
+
   it('replaces emails, Romanian phone numbers and access tokens in text', () => {
     expect(scrubText('duplicate key (email)=(ana.pop+1@gmail.com)')).toBe('duplicate key (email)=([email])');
     expect(scrubText('call 0723 375 248 or +40723375248 or 0723.375.248')).toBe('call [phone] or [phone] or [phone]');

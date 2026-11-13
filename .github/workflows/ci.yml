@@ -20,6 +20,12 @@ jobs:
           node-version-file: .nvmrc
           cache: npm
       - run: npm ci
+      # A8: known vulnerabilities in the packages the app ships (a warning on the run) and in the build
+      # tools (the log only). Report only: an advisory published upstream must not block every pull request.
+      - name: Dependency audit (report only)
+        run: |
+          npm audit --omit=dev || echo "::warning title=npm audit::A package the app ships has a known vulnerability (see this step's log)."
+          npm audit || true
       - run: npm run typecheck
       - run: npm run lint
       - run: npm test

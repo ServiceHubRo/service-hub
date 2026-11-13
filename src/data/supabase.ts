@@ -1,4 +1,5 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
+import { fetchWithTimeout } from '../lib/fetchTimeout';
 import { sessionStorageForAuth } from '../lib/remember';
 import { checkSupabaseConfig } from '../lib/supabaseConfig';
 import type { Database } from './database.types';
@@ -47,6 +48,9 @@ export const supabase: SupabaseClient<Database> | null =
           autoRefreshToken: true,
           detectSessionInUrl: true,
         },
+        // A8: a database or sign-in request with no answer fails after 30 s like a lost connection,
+        // instead of leaving a screen loading or a button spinning (src/lib/fetchTimeout.ts).
+        global: { fetch: fetchWithTimeout() },
       })
     : null;
 
