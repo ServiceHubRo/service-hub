@@ -1,0 +1,407 @@
+{
+  "config": {
+    "configFile": "/home/runner/work/service-hub/service-hub/playwright.config.ts",
+    "rootDir": "/home/runner/work/service-hub/service-hub/tests/e2e",
+    "forbidOnly": true,
+    "fullyParallel": true,
+    "globalSetup": "/home/runner/work/service-hub/service-hub/tests/e2e/global-setup.ts",
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "ci": {
+        "commitHref": "https://github.com/ServiceHubRo/service-hub/commit/72a23d8555af76b6679f99c7bd17742500447772",
+        "commitHash": "72a23d8555af76b6679f99c7bd17742500447772",
+        "buildHref": "https://github.com/ServiceHubRo/service-hub/actions/runs/43374866735"
+      },
+      "gitCommit": {
+        "shortHash": "72a23d8",
+        "hash": "72a23d8555af76b6679f99c7bd17742500447772",
+        "subject": "Investigation: the fix (scroll rule for every screen) and its regression test",
+        "body": "Investigation: the fix (scroll rule for every screen) and its regression test\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01Jkyhh8hksgqvvBgsvSC5Xb\n",
+        "author": {
+          "name": "Claude",
+          "email": "noreply@anthropic.com",
+          "time": 1794549154000
+        },
+        "committer": {
+          "name": "Claude",
+          "email": "noreply@anthropic.com",
+          "time": 1794549154000
+        },
+        "branch": "a9-logout-trace"
+      },
+      "actualWorkers": 2
+    },
+    "preserveOutput": "always",
+    "reporter": [
+      [
+        "list"
+      ],
+      [
+        "json"
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "quiet": false,
+    "projects": [
+      {
+        "outputDir": "/home/runner/work/service-hub/service-hub/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "ci": {
+            "commitHref": "https://github.com/ServiceHubRo/service-hub/commit/72a23d8555af76b6679f99c7bd17742500447772",
+            "commitHash": "72a23d8555af76b6679f99c7bd17742500447772",
+            "buildHref": "https://github.com/ServiceHubRo/service-hub/actions/runs/43374866735"
+          },
+          "gitCommit": {
+            "shortHash": "72a23d8",
+            "hash": "72a23d8555af76b6679f99c7bd17742500447772",
+            "subject": "Investigation: the fix (scroll rule for every screen) and its regression test",
+            "body": "Investigation: the fix (scroll rule for every screen) and its regression test\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01Jkyhh8hksgqvvBgsvSC5Xb\n",
+            "author": {
+              "name": "Claude",
+              "email": "noreply@anthropic.com",
+              "time": 1794549154000
+            },
+            "committer": {
+              "name": "Claude",
+              "email": "noreply@anthropic.com",
+              "time": 1794549154000
+            },
+            "branch": "a9-logout-trace"
+          },
+          "actualWorkers": 2
+        },
+        "id": "mobile-390",
+        "name": "mobile-390",
+        "testDir": "/home/runner/work/service-hub/service-hub/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/home/runner/work/service-hub/service-hub/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "ci": {
+            "commitHref": "https://github.com/ServiceHubRo/service-hub/commit/72a23d8555af76b6679f99c7bd17742500447772",
+            "commitHash": "72a23d8555af76b6679f99c7bd17742500447772",
+            "buildHref": "https://github.com/ServiceHubRo/service-hub/actions/runs/43374866735"
+          },
+          "gitCommit": {
+            "shortHash": "72a23d8",
+            "hash": "72a23d8555af76b6679f99c7bd17742500447772",
+            "subject": "Investigation: the fix (scroll rule for every screen) and its regression test",
+            "body": "Investigation: the fix (scroll rule for every screen) and its regression test\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01Jkyhh8hksgqvvBgsvSC5Xb\n",
+            "author": {
+              "name": "Claude",
+              "email": "noreply@anthropic.com",
+              "time": 1794549154000
+            },
+            "committer": {
+              "name": "Claude",
+              "email": "noreply@anthropic.com",
+              "time": 1794549154000
+            },
+            "branch": "a9-logout-trace"
+          },
+          "actualWorkers": 2
+        },
+        "id": "tablet-820",
+        "name": "tablet-820",
+        "testDir": "/home/runner/work/service-hub/service-hub/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "/home/runner/work/service-hub/service-hub/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "ci": {
+            "commitHref": "https://github.com/ServiceHubRo/service-hub/commit/72a23d8555af76b6679f99c7bd17742500447772",
+            "commitHash": "72a23d8555af76b6679f99c7bd17742500447772",
+            "buildHref": "https://github.com/ServiceHubRo/service-hub/actions/runs/43374866735"
+          },
+          "gitCommit": {
+            "shortHash": "72a23d8",
+            "hash": "72a23d8555af76b6679f99c7bd17742500447772",
+            "subject": "Investigation: the fix (scroll rule for every screen) and its regression test",
+            "body": "Investigation: the fix (scroll rule for every screen) and its regression test\n\nCo-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>\nClaude-Session: https://claude.ai/code/session_01Jkyhh8hksgqvvBgsvSC5Xb\n",
+            "author": {
+              "name": "Claude",
+              "email": "noreply@anthropic.com",
+              "time": 1794549154000
+            },
+            "committer": {
+              "name": "Claude",
+              "email": "noreply@anthropic.com",
+              "time": 1794549154000
+            },
+            "branch": "a9-logout-trace"
+          },
+          "actualWorkers": 2
+        },
+        "id": "desktop-1440",
+        "name": "desktop-1440",
+        "testDir": "/home/runner/work/service-hub/service-hub/tests/e2e",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "shard": null,
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.56.1",
+    "workers": 2,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "logout-scroll.spec.ts",
+      "file": "logout-scroll.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "where the public pages open",
+          "file": "logout-scroll.spec.ts",
+          "line": 19,
+          "column": 6,
+          "specs": [
+            {
+              "title": "signing out from the end of Cont opens the public page at its very top",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "mobile-390",
+                  "projectName": "mobile-390",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3070,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-13T05:56:40.585Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "fff48aad65c1ab29208d-204a4815c216fa517deb",
+              "file": "logout-scroll.spec.ts",
+              "line": 20,
+              "column": 3
+            },
+            {
+              "title": "a public page opened from the middle of another starts at its top; back finds the first where it was",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "mobile-390",
+                  "projectName": "mobile-390",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 1048,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-13T05:56:40.577Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "fff48aad65c1ab29208d-059d8f00825988f67323",
+              "file": "logout-scroll.spec.ts",
+              "line": 41,
+              "column": 3
+            },
+            {
+              "title": "signing out from the end of Cont opens the public page at its very top",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "tablet-820",
+                  "projectName": "tablet-820",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 2616,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-13T05:56:42.749Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "fff48aad65c1ab29208d-3cbfd4407d781532b959",
+              "file": "logout-scroll.spec.ts",
+              "line": 20,
+              "column": 3
+            },
+            {
+              "title": "a public page opened from the middle of another starts at its top; back finds the first where it was",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "tablet-820",
+                  "projectName": "tablet-820",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 743,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-13T05:56:44.696Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "fff48aad65c1ab29208d-870c00ddf2bb384c30ba",
+              "file": "logout-scroll.spec.ts",
+              "line": 41,
+              "column": 3
+            },
+            {
+              "title": "signing out from the end of Cont opens the public page at its very top",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "desktop-1440",
+                  "projectName": "desktop-1440",
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 2801,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-13T05:56:46.335Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "fff48aad65c1ab29208d-99aab9251946b016ecda",
+              "file": "logout-scroll.spec.ts",
+              "line": 20,
+              "column": 3
+            },
+            {
+              "title": "a public page opened from the middle of another starts at its top; back finds the first where it was",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "desktop-1440",
+                  "projectName": "desktop-1440",
+                  "results": [
+                    {
+                      "workerIndex": 5,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 1076,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-11-13T05:56:46.343Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "fff48aad65c1ab29208d-42699b16d02a54d4254c",
+              "file": "logout-scroll.spec.ts",
+              "line": 41,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-11-13T05:56:07.850Z",
+    "duration": 41491.708999999995,
+    "expected": 6,
+    "skipped": 0,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}
