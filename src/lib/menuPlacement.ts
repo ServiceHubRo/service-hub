@@ -1,10 +1,13 @@
+import { seenTop } from './keyboard';
+
 /** Where a pop-up menu opens (MenuButton). */
 
 /** What can be seen: the window, less the bars fixed at its top (header) and bottom (tab bar). */
 export function visibleArea(): { top: number; bottom: number } {
   const vv = window.visualViewport;
-  let top = vv ? vv.offsetTop : 0;
-  let bottom = vv ? vv.offsetTop + vv.height : window.innerHeight;
+  // In the coordinates getBoundingClientRect answers in (src/lib/keyboard.ts, seenTop).
+  let top = seenTop(vv ?? null, window.scrollY);
+  let bottom = vv ? top + vv.height : window.innerHeight;
   for (const bar of document.querySelectorAll<HTMLElement>('[data-fixed-top]')) {
     const r = bar.getBoundingClientRect();
     if (r.height > 0 && r.bottom > top) top = r.bottom;

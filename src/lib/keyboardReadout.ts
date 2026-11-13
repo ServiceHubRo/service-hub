@@ -1,5 +1,5 @@
 import { APP_RELEASE } from './env';
-import { fieldArea, isIPhone, navTopPx, opensKeyboard, placeField, scrollHost, visibleBand } from './keyboard';
+import { fieldArea, navTopPx, opensKeyboard, placeField, scrollHost, visibleBand } from './keyboard';
 
 /**
  * The keyboard's measurements, on screen (test builds only, opened with `?kb=1`; main.tsx).
@@ -40,14 +40,19 @@ export function showKeyboardReadout(): () => void {
   // What happened, in order, since the last field took the focus (ms after it).
   let start = performance.now();
   let events: string[] = [];
+  let first: string[] = [];
   const note = (text: string) => {
-    events.push(`+${Math.round(performance.now() - start)} ${text}`);
-    if (events.length > 14) events = events.slice(-14);
+    const line = `+${Math.round(performance.now() - start)} ${text}`;
+    // The first ones (how the keyboard came) and the last ones (where things ended).
+    if (first.length < 12) first.push(line);
+    else events.push(line);
+    if (events.length > 12) events = events.slice(-12);
   };
   const r = Math.round;
 
   const onFocus = (event: Event) => {
     start = performance.now();
+    first = [];
     events = [];
     note(`focus ${(event.target as Element | null)?.tagName ?? '?'}`);
   };
@@ -87,7 +92,7 @@ export function showKeyboardReadout(): () => void {
     let about = 'field -';
     if (field instanceof HTMLElement && opensKeyboard(field)) {
       const host = scrollHost(field);
-      const band = visibleBand(vv, window.innerHeight, host ? 0 : navTopPx());
+      const band = visibleBand(vv, window.innerHeight, host ? 0 : navTopPx(), window.scrollY);
       const rect = field.getBoundingClientRect();
       const area = fieldArea(field);
       about =
@@ -97,13 +102,13 @@ export function showKeyboardReadout(): () => void {
     const scroller = document.scrollingElement ?? root;
     strip.style.top = `${off}px`;
     strip.textContent =
-      `kb ${root.hasAttribute('data-keyboard') ? 1 : 0} ip ${isIPhone() ? 1 : 0} inner ${r(window.innerHeight)}x${r(window.innerWidth)} ` +
+      `kb ${root.hasAttribute('data-keyboard') ? 1 : 0} inner ${r(window.innerHeight)}x${r(window.innerWidth)} ` +
       `vv ${r(vv?.height ?? -1)} off ${off} page ${r(vv?.pageTop ?? -1)} sc ${vv ? vv.scale.toFixed(2) : '-'} ` +
       `client ${root.clientHeight} screen ${screen.height}\n` +
       `y ${r(window.scrollY)}/${scroller.scrollHeight - window.innerHeight} room ${css.getPropertyValue('--kb-room').trim() || '-'} ` +
       `vvtop ${css.getPropertyValue('--vv-top').trim() || '-'} nav ${css.getPropertyValue('--nav-top').trim() || '-'}+${css.getPropertyValue('--back-bar').trim() || '0'} ` +
       `bar ${css.getPropertyValue('--nav-bottom').trim() || '-'} safe ${parseFloat(getComputedStyle(safe).borderTopWidth) || 0}/${parseFloat(getComputedStyle(safe).borderBottomWidth) || 0}\n` +
-      `${about}\n${events.join(' | ')}\n${APP_RELEASE.slice(0, 7)} ${navigator.userAgent.match(/OS [\d_]+|Android [\d.]+|Chrome\/[\d]+/)?.[0] ?? ''}`;
+      `${about} hdr ${r(document.querySelector('header')?.getBoundingClientRect().top ?? -1)}\n${first.join(' | ')}${events.length ? ' ... ' : ''}${events.join(' | ')}\n${APP_RELEASE.slice(0, 7)} ${navigator.userAgent.match(/OS [\d_]+|Android [\d.]+|Chrome\/[\d]+/)?.[0] ?? ''}`;
     frame = window.requestAnimationFrame(draw);
   };
   draw();

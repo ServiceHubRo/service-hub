@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { KEYBOARD_GAP, KEYBOARD_MAX_PLACEMENTS, KEYBOARD_REGROW_PX, KEYBOARD_SETTLE_MS, KEYBOARD_ASSUMED_SEEN, KEYBOARD_WAIT_MS, fieldArea, freeAboveKeyboard, isIPhone, keyboardReadoutAsked, touchScreen, typedWithKeys, isTextField, keyboardOpen, keyboardRoom, opensKeyboard, placeField, resizeForKeyboard, scrollHost, scrollToShow, visibleBand, watchKeyboard } from '../../src/lib/keyboard';
+import { KEYBOARD_GAP, KEYBOARD_REGROW_PX, fieldArea, isTextField, keyboardOpen, keyboardRoom, opensKeyboard, placeField, keyboardReadoutAsked, resizeForKeyboard, scrollHost, scrollToShow, seenTop, touchScreen, visibleBand, watchKeyboard } from '../../src/lib/keyboard';
 
 describe('keyboard', () => {
   // A phone: its screen is touched (a computer never gets an on-screen keyboard, see the last test).
@@ -43,6 +43,7 @@ describe('keyboard', () => {
     stop();
     expect(document.documentElement.hasAttribute('data-keyboard')).toBe(false);
     Object.defineProperty(window, 'innerHeight', { configurable: true, value: window.innerHeight + 300 });
+    Object.defineProperty(window, 'innerHeight', { configurable: true, value: window.innerHeight + 300 });
   });
 
   it('a drop-down list takes the keyboard\'s place too (the iPhone\'s wheel); a disabled one does not', () => {
@@ -54,13 +55,35 @@ describe('keyboard', () => {
     expect(opensKeyboard(document.createElement('button'))).toBe(false);
   });
 
-  it('what is seen with the keyboard open: the visual viewport, below the header while it is on screen', () => {
+  it('what is seen with the keyboard open: the visual viewport, below the header', () => {
     // iPhone 390 × 664 (Safari with its bars), keyboard 300 px: 364 px seen, page not scrolled.
-    expect(visibleBand({ offsetTop: 0, height: 364 }, 664, 60)).toEqual({ top: 60, bottom: 364 });
-    // Safari moved the visible part down by 200 px: the header follows it (--vv-top) and covers its top.
-    expect(visibleBand({ offsetTop: 200, height: 364 }, 664, 60)).toEqual({ top: 260, bottom: 564 });
-    // No visualViewport (an old browser): the window.
+    expect(visibleBand({ offsetTop: 0, height: 364, pageTop: 0 }, 664, 60, 0)).toEqual({ top: 60, bottom: 364 });
+    // Chrome answers positions from the page's own top: what is seen starts offsetTop lower
+    // (pageTop = scrollY + offsetTop), the header following it (--vv-top).
+    expect(visibleBand({ offsetTop: 200, height: 364, pageTop: 1200 }, 664, 60, 1000)).toEqual({ top: 260, bottom: 564 });
+    // Safari answers them from the top of what is seen (scrollY is pageTop): nothing to add.
+    expect(seenTop({ offsetTop: 32, height: 447, pageTop: 403 }, 403)).toBe(0);
+    expect(visibleBand({ offsetTop: 32, height: 447, pageTop: 403 }, 796, 61, 403)).toEqual({ top: 61, bottom: 447 });
+    // An old browser without pageTop: offsetTop; none at all: the window.
+    expect(seenTop({ offsetTop: 40, height: 300 }, 0)).toBe(40);
     expect(visibleBand(null, 600, 0)).toEqual({ top: 0, bottom: 600 });
+  });
+
+  it('Eduard\'s iPhone, 13 Nov 2026: the field goes up once and stays (it went up and came back)', () => {
+    // The strip on his screenshot: inner 796, seen 447, moved 32 px down, header 61; the field at
+    // 436-480 under its label at 408, positions answered from the top of what is seen.
+    const before = { offsetTop: 32, height: 447, pageTop: 403 };
+    const band = visibleBand(before, 796, 61, 403);
+    const delta = placeField({ top: 408, bottom: 480 }, { top: 436, bottom: 480 }, band);
+    expect(delta).toBeGreaterThan(0);
+    // Above the keyboard with the gap, below the header.
+    expect(480 - delta).toBeLessThanOrEqual(447 - KEYBOARD_GAP);
+    expect(408 - delta).toBeGreaterThanOrEqual(61 + 16);
+    // Safari scrolls by moving what is seen further down the page: offsetTop and pageTop grow with
+    // scrollY. The field is seen now: nothing more to do (the old sum asked for the way back).
+    const after = { offsetTop: 32 + delta, height: 447, pageTop: 403 + delta };
+    const moved = { label: 408 - delta, top: 436 - delta, bottom: 480 - delta };
+    expect(placeField({ top: moved.label, bottom: moved.bottom }, { top: moved.top, bottom: moved.bottom }, visibleBand(after, 796, 61, 403 + delta))).toBe(0);
   });
 
   it('scrolls only as far as needed to see the field, never when it is already seen', () => {
@@ -72,7 +95,7 @@ describe('keyboard', () => {
     expect(500 - down).toBe(60 + Math.round((304 - 16 - 50) / 2));
     // Under the header: down to the same place.
     expect(scrollToShow({ top: 20, bottom: 70 }, band)).toBe(20 - (60 + Math.round((304 - 16 - 50) / 2)));
-    // A part kept free above the keyboard: the middle of the rest.
+    // A gap kept above the keyboard: the middle of the rest.
     expect(500 - scrollToShow({ top: 500, bottom: 550 }, band, 16, 120)).toBe(60 + Math.round((304 - 120 - 50) / 2));
     // A text area taller than what is seen: its top under the header, with a margin.
     expect(scrollToShow({ top: 400, bottom: 800 }, band)).toBe(400 - 60 - 16);
@@ -115,19 +138,16 @@ describe('keyboard', () => {
     document.head.innerHTML = '';
   });
   it('keeps room at the end of the page while the keyboard is open (Eduard, 13 Nov 2026)', () => {
-    // iPhone: the keyboard covers 336 px of a 664 px page; 268 px are seen under a 60 px header:
-    // the keyboard and the part kept free above it.
-    expect(keyboardRoom(664, 328, 60)).toBe(336 + freeAboveKeyboard(268));
-    // Android (the page itself got shorter): the free part only.
-    expect(keyboardRoom(328, 328, 60)).toBe(freeAboveKeyboard(268));
-    // A very small room: never less than the gap.
-    expect(freeAboveKeyboard(100)).toBe(KEYBOARD_GAP);
+    // iPhone: the keyboard covers 336 px of a 664 px page: the keyboard and the gap.
+    expect(keyboardRoom(664, 328)).toBe(336 + KEYBOARD_GAP);
+    // Android (the page itself got shorter): the gap only.
+    expect(keyboardRoom(328, 328)).toBe(KEYBOARD_GAP);
   });
 
   it('a field above the keyboard with a gap; the label kept first on a small phone', () => {
     const band = { top: 100, bottom: 400 };
     // Plenty of room: the field and its label above the gap.
-    expect(placeField({ top: 470, bottom: 540 }, { top: 490, bottom: 540 }, band)).toBe(scrollToShow({ top: 470, bottom: 540 }, band, 16, freeAboveKeyboard(300)));
+    expect(placeField({ top: 470, bottom: 540 }, { top: 490, bottom: 540 }, band)).toBe(scrollToShow({ top: 470, bottom: 540 }, band, 16, KEYBOARD_GAP));
     // 130 px seen: the label and the field fit with a small gap, not with the full one.
     const small = { top: 100, bottom: 230 };
     const delta = placeField({ top: 300, bottom: 376 }, { top: 328, bottom: 376 }, small);
@@ -154,7 +174,7 @@ describe('keyboard', () => {
     window.dispatchEvent(new Event('resize'));
     const root = document.documentElement;
     expect(root.hasAttribute('data-keyboard')).toBe(true);
-    expect(parseFloat(root.style.getPropertyValue('--kb-room'))).toBe(freeAboveKeyboard(tall - 300)); // no visualViewport here: the page itself got shorter
+    expect(parseFloat(root.style.getPropertyValue('--kb-room'))).toBe(KEYBOARD_GAP); // no visualViewport here: the page itself got shorter
     expect(root.style.getPropertyValue('--vv-top')).toBe('0px');
     stop();
     expect(root.style.getPropertyValue('--kb-room')).toBe('');
@@ -168,13 +188,11 @@ describe('keyboard', () => {
     let stop = () => {};
     let scrollBy: ReturnType<typeof vi.fn>;
 
-    /** How far the page was moved (the fields follow it, as on a real page). */
-    let scrolled = 0;
     /** A field far below what is seen, with the keyboard open on it. */
     function openOn(id: string): HTMLElement {
       const field = document.createElement('input');
       field.id = id;
-      field.getBoundingClientRect = () => box(900 - scrolled, 950 - scrolled);
+      field.getBoundingClientRect = () => box(900, 950);
       document.body.appendChild(field);
       field.focus();
       resize(tall - 300);
@@ -188,10 +206,7 @@ describe('keyboard', () => {
     function start() {
       vi.useFakeTimers();
       tall = window.innerHeight;
-      scrolled = 0;
-      scrollBy = vi.fn((how: ScrollToOptions) => {
-        scrolled += how.top ?? 0;
-      });
+      scrollBy = vi.fn();
       window.scrollBy = scrollBy as unknown as typeof window.scrollBy;
       stop = watchKeyboard();
     }
@@ -252,7 +267,7 @@ describe('keyboard', () => {
       vi.advanceTimersByTime(200);
       window.dispatchEvent(new Event('touchmove'));
       const next = document.createElement('textarea');
-      next.getBoundingClientRect = () => box(1200 - scrolled, 1300 - scrolled);
+      next.getBoundingClientRect = () => box(1200, 1300);
       document.body.appendChild(next);
       next.focus();
       vi.advanceTimersByTime(200);
@@ -263,43 +278,16 @@ describe('keyboard', () => {
       expect(scrollBy).toHaveBeenCalledTimes(2);
     });
 
-    it('places the field again when the keyboard itself grows later, the page untouched', () => {
+    it('places the field again when the keyboard itself grows, the page untouched', () => {
       start();
-      const field = openOn('a');
-      vi.advanceTimersByTime(KEYBOARD_SETTLE_MS + 500);
-      expect(scrollBy).toHaveBeenCalledTimes(1);
-      // The keyboard grows over the field (its row of suggestions comes).
-      field.getBoundingClientRect = () => box(tall - 300 - 70, tall - 300 - 30);
+      openOn('a');
+      vi.advanceTimersByTime(200);
       resize(tall - 300 - KEYBOARD_REGROW_PX + 4); // a few pixels: not the keyboard
       vi.advanceTimersByTime(200);
       expect(scrollBy).toHaveBeenCalledTimes(1);
       resize(tall - 300 - 2 * KEYBOARD_REGROW_PX);
       vi.advanceTimersByTime(200);
       expect(scrollBy).toHaveBeenCalledTimes(2);
-    });
-
-    it('puts the field back when the browser moves the page itself while the keyboard settles, a few times at most', () => {
-      start();
-      openOn('a');
-      vi.advanceTimersByTime(200);
-      expect(scrollBy).toHaveBeenCalledTimes(1);
-      // Safari brings the field back just above the keys, again and again.
-      for (let i = 0; i < 6; i++) {
-        scrolled = 0;
-        window.dispatchEvent(new Event('scroll'));
-        vi.advanceTimersByTime(200);
-      }
-      expect(scrollBy).toHaveBeenCalledTimes(KEYBOARD_MAX_PLACEMENTS);
-    });
-
-    it('after the keyboard has settled, a move of the page is left alone', () => {
-      start();
-      openOn('a');
-      vi.advanceTimersByTime(KEYBOARD_SETTLE_MS + 500);
-      scrolled = 0;
-      window.dispatchEvent(new Event('scroll'));
-      vi.advanceTimersByTime(500);
-      expect(scrollBy).toHaveBeenCalledTimes(1);
     });
 
     it('a field already seen is left where it is', () => {
@@ -365,18 +353,34 @@ describe('keyboard', () => {
     Object.defineProperty(window, 'innerHeight', { configurable: true, value: inner });
     Object.defineProperty(window, 'innerWidth', { configurable: true, value: width });
   });
-  it('a field right above the keys is not taken for seen (Eduard\'s iPhone, 13 Nov 2026)', () => {
-    // 393 x 791 seen by the page; Safari reports 527 px as seen; the header ends at 47. The field sat at
-    // 473-510, where Safari had put it, under the bars it floats over the page (they start at 392).
-    const band = { top: 47, bottom: 527 };
-    const delta = placeField({ top: 445, bottom: 510 }, { top: 473, bottom: 510 }, band);
-    expect(delta).toBeGreaterThan(0);
-    expect(510 - delta).toBeLessThanOrEqual(392);
-    // Even if Safari reported only the keys' own top bar less (482): still above the floating bars.
-    const less = placeField({ top: 445, bottom: 510 }, { top: 473, bottom: 510 }, { top: 47, bottom: 482 });
-    expect(510 - less).toBeLessThanOrEqual(392);
-    // A field in the upper part of what is seen is left where it is.
-    expect(placeField({ top: 150, bottom: 215 }, { top: 178, bottom: 215 }, band)).toBe(0);
+  it('the page moving by itself is not answered: no scroll of ours follows a scroll', () => {
+    vi.useFakeTimers();
+    const tall = window.innerHeight;
+    let scrolled = 0;
+    const scrollBy = vi.fn((how: ScrollToOptions) => {
+      scrolled += how.top ?? 0;
+    });
+    window.scrollBy = scrollBy as unknown as typeof window.scrollBy;
+    const field = document.createElement('input');
+    field.getBoundingClientRect = () => ({ top: 900 - scrolled, bottom: 950 - scrolled, left: 0, right: 100, width: 100, height: 50, x: 0, y: 900 - scrolled, toJSON: () => ({}) }) as DOMRect;
+    document.body.appendChild(field);
+    const stop = watchKeyboard();
+    field.focus();
+    Object.defineProperty(window, 'innerHeight', { configurable: true, value: tall - 300 });
+    window.dispatchEvent(new Event('resize'));
+    vi.advanceTimersByTime(200);
+    expect(scrollBy).toHaveBeenCalledTimes(1);
+    // The browser brings the page back (or anything else scrolls it): the app does not fight it.
+    scrolled = 0;
+    for (let i = 0; i < 5; i++) {
+      window.dispatchEvent(new Event('scroll'));
+      window.dispatchEvent(new Event('resize'));
+      vi.advanceTimersByTime(300);
+    }
+    expect(scrollBy).toHaveBeenCalledTimes(1);
+    stop();
+    Object.defineProperty(window, 'innerHeight', { configurable: true, value: tall });
+    vi.useRealTimers();
   });
 
   it('the measurements on screen are asked with ?kb=1 and kept for the visit', () => {
@@ -388,103 +392,7 @@ describe('keyboard', () => {
     expect(keyboardReadoutAsked('?kb=0', storage)).toBe(false);
     expect(keyboardReadoutAsked('?kb=1', null)).toBe(true);
   });
-  describe('when the browser reports nothing about the keyboard (a real iPhone may not)', () => {
-    const box = (top: number, bottom: number) => ({ top, bottom, left: 0, right: 100, width: 100, height: bottom - top, x: 0, y: top, toJSON: () => ({}) }) as DOMRect;
-    const agent = navigator.userAgent;
-    const IPHONE = 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0 Mobile/15E148 Safari/604.1';
-    const size = { w: window.innerWidth, h: window.innerHeight };
-    let stop = () => {};
-    let scrollBy: ReturnType<typeof vi.fn>;
-    function phone(iphone: boolean) {
-      Object.defineProperty(navigator, 'userAgent', { configurable: true, value: iphone ? IPHONE : agent });
-      Object.defineProperty(window, 'innerWidth', { configurable: true, value: 393 });
-      Object.defineProperty(window, 'innerHeight', { configurable: true, value: 791 });
-      vi.useFakeTimers();
-      scrollBy = vi.fn();
-      window.scrollBy = scrollBy as unknown as typeof window.scrollBy;
-      stop = watchKeyboard();
-    }
-    afterEach(() => {
-      stop();
-      Object.defineProperty(navigator, 'userAgent', { configurable: true, value: agent });
-      Object.defineProperty(window, 'innerWidth', { configurable: true, value: size.w });
-      Object.defineProperty(window, 'innerHeight', { configurable: true, value: size.h });
-      vi.useRealTimers();
-    });
 
-    it('on an iPhone, a field in the lower half is brought into the upper part after the keyboard\'s time', () => {
-      phone(true);
-      const field = document.createElement('input');
-      field.getBoundingClientRect = () => box(473, 510); // where Safari left it on Eduard's iPhone
-      document.body.appendChild(field);
-      field.focus();
-      vi.advanceTimersByTime(KEYBOARD_WAIT_MS - 50);
-      expect(document.documentElement.hasAttribute('data-keyboard')).toBe(false);
-      vi.advanceTimersByTime(300);
-      const root = document.documentElement;
-      expect(root.hasAttribute('data-keyboard')).toBe(true);
-      // Room for the last field of a page: the half taken to be covered and the part kept free.
-      expect(parseFloat(root.style.getPropertyValue('--kb-room'))).toBeGreaterThan(791 * (1 - KEYBOARD_ASSUMED_SEEN));
-      expect(scrollBy).toHaveBeenCalledTimes(1);
-      const delta = (scrollBy.mock.calls[0]![0] as ScrollToOptions).top!;
-      // Above the bars Safari floats over the page (they start 392 px down).
-      expect(510 - delta).toBeLessThan(392);
-      expect(473 - delta).toBeGreaterThan(0);
-      // The field loses the focus: nothing is assumed any more.
-      field.blur();
-      vi.advanceTimersByTime(50);
-      expect(root.hasAttribute('data-keyboard')).toBe(false);
-      expect(root.style.getPropertyValue('--kb-room')).toBe('');
-    });
-
-    it('a field already in the upper part is left where it is', () => {
-      phone(true);
-      const field = document.createElement('input');
-      field.getBoundingClientRect = () => box(120, 160);
-      document.body.appendChild(field);
-      field.focus();
-      vi.advanceTimersByTime(KEYBOARD_WAIT_MS + 300);
-      expect(scrollBy).not.toHaveBeenCalled();
-    });
-
-    it('not on another device, not for a date or a list, not after the person scrolled', () => {
-      phone(false);
-      const field = document.createElement('input');
-      field.getBoundingClientRect = () => box(473, 510);
-      document.body.appendChild(field);
-      field.focus();
-      vi.advanceTimersByTime(KEYBOARD_WAIT_MS + 300);
-      expect(document.documentElement.hasAttribute('data-keyboard')).toBe(false);
-      stop();
-      vi.useRealTimers();
-
-      phone(true);
-      const date = document.createElement('input');
-      date.type = 'date';
-      const list = document.createElement('select');
-      document.body.append(date, list);
-      for (const el of [date, list]) {
-        el.focus();
-        vi.advanceTimersByTime(KEYBOARD_WAIT_MS + 300);
-        expect(document.documentElement.hasAttribute('data-keyboard'), el.tagName).toBe(false);
-      }
-      expect(typedWithKeys(date)).toBe(false);
-      expect(typedWithKeys(field)).toBe(true);
-      // The person scrolls while the keyboard comes: the page is theirs.
-      field.focus();
-      vi.advanceTimersByTime(100);
-      window.dispatchEvent(new Event('touchmove'));
-      vi.advanceTimersByTime(KEYBOARD_WAIT_MS + 300);
-      expect(scrollBy).not.toHaveBeenCalled();
-    });
-
-    it('knows an iPhone by its browser, whatever the app', () => {
-      expect(isIPhone({ userAgent: IPHONE })).toBe(true);
-      expect(isIPhone({ userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 18_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) CriOS/142.0 Mobile/15E148 Safari/604.1' })).toBe(true);
-      expect(isIPhone({ userAgent: 'Mozilla/5.0 (Linux; Android 16; Pixel 9) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0 Mobile Safari/537.36' })).toBe(false);
-      expect(isIPhone({ userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.0 Safari/605.1.15' })).toBe(false);
-    });
-  });
   it('on a computer a window made shorter is never a keyboard', () => {
     Object.defineProperty(navigator, 'maxTouchPoints', { configurable: true, value: 0 });
     expect(touchScreen()).toBe(false);
