@@ -1,11 +1,10 @@
 import type { ReportReason } from './rpc';
-import { call, failure, RpcError } from './rpc';
-import { supabase } from './supabase';
+import { call } from './rpc';
 
 /**
- * The shop's reviews (FR §4.5, P10; T11), read straight from the table: RLS lets a shop's members
- * read all of their shop's reviews, removed ones included. The booking's reference and service
- * come along. Replies and reports go through `reply_review` / `report_review` (src/data/rpc.ts).
+ * The shop's reviews (FR §4.5, P10; T11), removed ones included, each with its booking's reference
+ * and service. Read through a database function since A12: the report's reason and state are not
+ * readable from the table. Replies and reports go through `reply_review` / `report_review` (src/data/rpc.ts).
  */
 
 export interface ShopReview {
@@ -31,28 +30,10 @@ export interface ShopReviewsData {
   reviews: ShopReview[];
 }
 
-const COLUMNS = [
-  'id, booking_id, shop_id, client_display_name, rating, text, reply, reply_at',
-  'report_reason, reported_at, report_status, removed_at, created_at',
-  'booking:bookings(ref, service:services(name_ro, name_en))',
-].join(', ');
-
-function db() {
-  if (!supabase) throw new RpcError('network');
-  return supabase;
-}
-
-/** The caller's shop's reviews, newest first. */
+/** The caller's shop's reviews, newest first (`list_my_shop_reviews`, A12). */
 export async function fetchShopReviews(): Promise<ShopReviewsData> {
-  const shopId = (await call('my_shop_id', {} as never)) as string | null;
-  if (!shopId) throw new RpcError('not_allowed');
-  const { data, error } = await db()
-    .from('reviews')
-    .select(COLUMNS)
-    .eq('shop_id', shopId)
-    .order('created_at', { ascending: false });
-  if (error) throw failure(error);
-  return { shopId, reviews: data as unknown as ShopReview[] };
+  const data = (await call('list_my_shop_reviews', {} as never)) as unknown as { shop_id: string; reviews: ShopReview[] };
+  return { shopId: data.shop_id, reviews: data.reviews };
 }
 
 /** Average and count of the reviews that count (removed ones do not, as in `shop_ratings`). */

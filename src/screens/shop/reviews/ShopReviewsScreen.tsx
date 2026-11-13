@@ -60,11 +60,8 @@ export function ShopReviewsScreen() {
       channel: `shop-reviews:${shopId}`,
       table: 'reviews',
       filter: `shop_id=eq.${shopId}`,
-      onChange: (payload) => {
-        const row = payload.new as Partial<ShopReview>;
-        if (payload.eventType === 'UPDATE' && row.id) replace(row as Partial<ShopReview> & { id: string });
-        else refresh(); // a new review: its booking comes with a read
-      },
+      // The live row has no report state (A12: not readable from the table) and no booking: read again.
+      onChange: refresh,
       onResync: refresh,
     });
   }, [shopId, replace, refresh]);

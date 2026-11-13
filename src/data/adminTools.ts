@@ -2,8 +2,7 @@ import type { BookingStatus } from '../lib/status';
 import type { Json } from './database.types';
 import type { ReportStatus } from './reports';
 import type { ReportReason } from './rpc';
-import { call, failure, RpcError } from './rpc';
-import { supabase } from './supabase';
+import { call } from './rpc';
 import type { CarSnapshot, ShopState, SubscriptionStatus } from './admin';
 
 /**
@@ -263,10 +262,7 @@ export interface PlatformSettings {
 export type SettingKey = Exclude<keyof PlatformSettings, 'limits' | 'notification_texts' | 'updated_at'>;
 
 export async function fetchSettings(): Promise<PlatformSettings> {
-  if (!supabase) throw new RpcError('network');
-  const { data, error } = await supabase.from('platform_settings').select('*').eq('id', 1).single();
-  if (error) throw failure(error);
-  return data as unknown as PlatformSettings;
+  return (await call('admin_get_settings', {} as never)) as unknown as PlatformSettings;
 }
 
 export type SettingsChange = Partial<Record<SettingKey, number>> & { limits?: Partial<Record<LimitKey, number>> };

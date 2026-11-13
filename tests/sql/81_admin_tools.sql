@@ -179,7 +179,7 @@ select test.eq(quote_expiry_days, 7, 'quote expiry changed'),
        test.eq((limits->>'review_window_days')::int, 30, 'one limit changed'),
        test.eq((limits->>'active_bookings_per_shop')::int, 3, 'the other limits stay'),
        test.eq(updated_by, test.id('admin'), 'who changed them')
-from public.platform_settings;
+from jsonb_populate_record(null::public.platform_settings, public.admin_get_settings());
 select test.eq(before, '{"trial_days": 90, "limits": {"review_window_days": 60}, "quote_expiry_days": 3, "subscription_price_ron": 100.00}'::jsonb,
                'the log keeps only what changed (before)'),
        test.eq(after, '{"trial_days": 30, "limits": {"review_window_days": 30}, "quote_expiry_days": 7, "subscription_price_ron": 120.00}'::jsonb,
@@ -213,9 +213,9 @@ select test.eq(test.error_params($$select public.admin_set_notification_text('ad
 select public.admin_set_notification_text('client.quote_sent', ' Deviz nou ', 'Total {total}', null, '', test.rid());
 select test.eq(notification_texts->'client.quote_sent', '{"ro": {"body": "Total {total}", "title": "Deviz nou"}}'::jsonb,
                'a text overridden in Romanian only (empty fields keep the built-in text)')
-from public.platform_settings;
+from jsonb_populate_record(null::public.platform_settings, public.admin_get_settings());
 select public.admin_set_notification_text('client.quote_sent', '', '', '', '', test.rid());
-select test.eq(notification_texts ? 'client.quote_sent', false, 'all empty: back to the built-in text') from public.platform_settings;
+select test.eq(notification_texts ? 'client.quote_sent', false, 'all empty: back to the built-in text') from jsonb_populate_record(null::public.platform_settings, public.admin_get_settings());
 select test.eq(count(*), 2::bigint, 'both changes logged') from public.admin_audit_log where action = 'set_notification_text';
 
 -- ------------------------------------------------------------------ notices

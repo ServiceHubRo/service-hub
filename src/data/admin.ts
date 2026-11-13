@@ -498,15 +498,9 @@ export async function decideSuspectReview(reviewId: string, decision: SuspectDec
   })) as unknown as AdminReview;
 }
 
-/** Reported reviews waiting for a decision: the badge on Moderare (RLS lets the admin count them). */
+/** Reported reviews waiting for a decision: the badge on Moderare (`admin_pending_reports`, A12). */
 export async function countPendingReports(): Promise<number> {
-  if (!supabase) throw new RpcError('network');
-  const { count, error } = await supabase
-    .from('reviews')
-    .select('id', { count: 'exact', head: true })
-    .eq('report_status', 'pending');
-  if (error) throw failure(error);
-  return count ?? 0;
+  return (await call('admin_pending_reports', {} as never)) as unknown as number;
 }
 
 // ------------------------------------------------------------------------------------ audit log

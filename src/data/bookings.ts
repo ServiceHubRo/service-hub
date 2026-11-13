@@ -1,4 +1,4 @@
-import { failure, RpcError } from './rpc';
+import { call, failure, RpcError } from './rpc';
 import { supabase } from './supabase';
 import { currentQuote, type Quote } from '../lib/clientBookings';
 import { isActiveStatus, type BookingStatus } from '../lib/status';
@@ -161,9 +161,7 @@ export async function fetchClientBookings(clientId: string): Promise<ClientBooki
 }
 
 async function fetchReviewWindowDays(): Promise<number> {
-  const { data, error } = await db().from('platform_settings').select('limits').eq('id', 1).maybeSingle();
-  if (error) throw failure(error);
-  const days = Number((data?.limits as Record<string, unknown> | undefined)?.review_window_days);
+  const days = Number(await call('review_window_days', {} as never));
   return Number.isFinite(days) && days > 0 ? days : REVIEW_WINDOW_DEFAULT;
 }
 
