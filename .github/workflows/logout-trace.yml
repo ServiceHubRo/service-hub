@@ -1,0 +1,42 @@
+name: Logout scroll trace
+
+# Investigation only (branch a9-logout-trace): where the landing page opens after signing out.
+on:
+  push:
+    branches: [a9-logout-trace]
+
+permissions:
+  contents: write
+
+jobs:
+  trace:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium || npx playwright install chromium
+      - run: npx supabase start -x studio,imgproxy,vector,logflare,supavisor
+      - run: |
+          eval "$(npx supabase status -o env)"
+          {
+            echo "E2E_BACKEND=1"
+            echo "VITE_SUPABASE_URL=$API_URL"
+            echo "VITE_SUPABASE_ANON_KEY=$ANON_KEY"
+            echo "E2E_SERVICE_ROLE_KEY=$SERVICE_ROLE_KEY"
+          } >> "$GITHUB_ENV"
+      - run: npx playwright test -c playwright.visual.config.ts tests/visual/logout-trace.spec.ts ${{ contains(github.event.head_commit.message, '[e2e]') && 'tests/e2e/logout-scroll.spec.ts' || '' }}
+        continue-on-error: true
+      - if: always()
+        env:
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mkdir -p visual-audit && echo "${GITHUB_SHA}" > visual-audit/COMMIT
+          cd visual-audit
+          git init -q -b r && git config user.name "github-actions[bot]" && git config user.email "41898237+github-actions[bot]@users.noreply.github.com"
+          git add -A && git commit -qm "Logout trace ${GITHUB_SHA::7}"
+          git push -qf "https://x-access-token:${TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "r:refs/heads/logout-trace-${GITHUB_SHA::7}"
