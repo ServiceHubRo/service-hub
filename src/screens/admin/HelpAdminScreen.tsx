@@ -276,24 +276,26 @@ export function HelpAdminScreen() {
               }}
               clearLabel={t('admin.search.clear')}
             />
-            <SelectField
-              label={t('admin.help.statusFilter')}
-              value={status}
-              options={[
-                { value: '', label: t('admin.help.statusAll') },
-                ...(['published', 'draft', 'archived'] as const).map((s) => ({ value: s, label: t(`admin.help.status.${s}`) })),
-              ]}
-              onChange={(e) => setParam({ stare: e.target.value || null })}
-            />
-            <div className={styles.panelButtons}>
-              <Link to={adminHelpArticlePath('nou')} className={buttonClass('primary')}>
-                <Plus size={18} aria-hidden="true" /> {t('admin.help.newArticle')}
-              </Link>
-              {panel?.kind !== 'new-category' && (
-                <Button onClick={() => setPanel({ kind: 'new-category' })}>
-                  <Plus size={18} aria-hidden="true" /> {t('admin.help.newCategory')}
-                </Button>
-              )}
+            <div className={rowStyles.toolbar}>
+              <SelectField
+                label={t('admin.help.statusFilter')}
+                value={status}
+                options={[
+                  { value: '', label: t('admin.help.statusAll') },
+                  ...(['published', 'draft', 'archived'] as const).map((s) => ({ value: s, label: t(`admin.help.status.${s}`) })),
+                ]}
+                onChange={(e) => setParam({ stare: e.target.value || null })}
+              />
+              <div className={`${styles.panelButtons} ${rowStyles.toolbarButtons}`}>
+                <Link to={adminHelpArticlePath('nou')} className={buttonClass('primary')}>
+                  <Plus size={18} aria-hidden="true" /> {t('admin.help.newArticle')}
+                </Link>
+                {panel?.kind !== 'new-category' && (
+                  <Button onClick={() => setPanel({ kind: 'new-category' })}>
+                    <Plus size={18} aria-hidden="true" /> {t('admin.help.newCategory')}
+                  </Button>
+                )}
+              </div>
             </div>
           </div>
           {panel?.kind === 'new-category' && <CategoryPanel onDone={done} onCancel={() => setPanel(null)} />}

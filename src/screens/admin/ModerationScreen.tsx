@@ -1,4 +1,4 @@
-import { ShieldCheck, Star, UserX } from 'lucide-react';
+import { ShieldAlert, ShieldCheck, Star, UserX } from 'lucide-react';
 import { useCallback, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { adminZoneBack } from '../../app/adminZones';
@@ -222,7 +222,7 @@ export function ModerationScreen() {
 
           <SectionTitle>{t('admin.suspect.title', { n: state.data.suspects.length })}</SectionTitle>
           {state.data.suspects.length === 0 ? (
-            <p className={styles.muted}>{t('admin.suspect.empty')}</p>
+            <EmptyState icon={ShieldAlert} title={t('admin.suspect.empty')} />
           ) : (
             <>
               <p className={styles.muted}>{t('admin.suspect.intro')}</p>

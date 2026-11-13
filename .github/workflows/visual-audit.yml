@@ -1,0 +1,59 @@
+name: Visual audit
+
+# A9: every screen of every role at 390, 430, 768, 820, 1024, 1280 and 1440 px against a throwaway
+# Supabase on the runner (the same as the browser tests; never the real project). Run by hand
+# (Actions → Visual audit → Run workflow), for example after a change to the shared components:
+# the screenshots and the measurements (visual-audit/rows-*.jsonl) are under the run's Artifacts.
+# `only` measures just the tests whose title matches (for example: visitor|new shop).
+
+on:
+  workflow_dispatch:
+    inputs:
+      only:
+        description: 'Only the tests whose title matches (empty = all)'
+        type: string
+        default: ''
+
+permissions:
+  contents: read
+
+concurrency:
+  group: visual-audit-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  audit:
+    name: Screenshots and measurements, every role
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium || npx playwright install chromium
+      - name: Start the local Supabase stack
+        run: npx supabase start -x studio,imgproxy,vector,logflare,supavisor
+      - name: Point the audit at it
+        run: |
+          eval "$(npx supabase status -o env)"
+          {
+            echo "E2E_BACKEND=1"
+            echo "VITE_SUPABASE_URL=$API_URL"
+            echo "VITE_SUPABASE_ANON_KEY=$ANON_KEY"
+            echo "E2E_SERVICE_ROLE_KEY=$SERVICE_ROLE_KEY"
+          } >> "$GITHUB_ENV"
+      - name: Audit
+        env:
+          ONLY: ${{ inputs.only }}
+        run: |
+          if [ -n "$ONLY" ]; then npm run test:visual -- --grep "$ONLY"; else npm run test:visual; fi
+        continue-on-error: true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: visual-audit
+          path: visual-audit
+          retention-days: 14

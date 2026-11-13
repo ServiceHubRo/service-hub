@@ -247,7 +247,7 @@ export function LegalHoldsScreen() {
 
       <section className={styles.section}>
         <SectionTitle>{t('admin.holds.new.title')}</SectionTitle>
-        <Card>
+        <Card className={styles.stack}>
           <p className={styles.muted}>{t('admin.holds.new.desc')}</p>
           <HoldForm
             onPlaced={() => {

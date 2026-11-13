@@ -204,7 +204,7 @@ export function TextsScreen() {
                               onCancel={() => setOpen(null)}
                             />
                           ) : (
-                            <Button onClick={() => setOpen(k)} aria-label={`${t('admin.texts.edit')}: ${k}`}>
+                            <Button className={styles.loneAction} onClick={() => setOpen(k)} aria-label={`${t('admin.texts.edit')}: ${k}`}>
                               {t('admin.texts.edit')}
                             </Button>
                           )}

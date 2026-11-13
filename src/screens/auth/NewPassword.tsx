@@ -57,9 +57,9 @@ export function NewPassword() {
           <div className={styles.stack}>
             <h1 className={styles.title}>{t('auth.reset.expiredTitle')}</h1>
             <p>{t('auth.reset.expiredBody')}</p>
-            <Link to="/parola-uitata" className={styles.center}>
-              {t('auth.reset.askAgain')}
-            </Link>
+            <div className={styles.links}>
+              <Link to="/parola-uitata">{t('auth.reset.askAgain')}</Link>
+            </div>
           </div>
         </Card>
       </AuthLayout>

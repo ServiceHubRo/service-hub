@@ -386,8 +386,11 @@
   }
 }
 
+/* One column on a phone that never grows past the card: a long choice in a select or in the
+   categories menu shortens with "…" instead of widening the page (A9). */
 .fields {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--space-3);
 }
 

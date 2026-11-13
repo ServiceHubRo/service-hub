@@ -14,7 +14,11 @@
   margin: 4px 0 0 18px;
 }
 
+/* Each reason is a link to the place that fixes it: a whole 44 px row to tap (A9: 16 px). */
 .reasons a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap);
   color: var(--amber);
 }
 

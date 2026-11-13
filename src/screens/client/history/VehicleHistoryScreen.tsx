@@ -190,7 +190,7 @@ export function VehicleHistoryScreen() {
             <Link
               to={carId ? carReportPath(carId) : bookingReportPath(bookingId ?? '')}
               state={FROM_HISTORY}
-              className={buttonClass('secondary', true)}
+              className={buttonClass('secondary', true, styles.reportButton)}
             >
               <FileCheck size={18} aria-hidden="true" />
               {priceState.status === 'ready' && priceState.data !== null

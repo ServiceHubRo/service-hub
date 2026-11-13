@@ -16,6 +16,7 @@
     "test:watch": "vitest",
     "test:sql": "bash scripts/test-sql.sh",
     "test:e2e": "playwright test",
+    "test:visual": "playwright test -c playwright.visual.config.ts",
     "icons": "node scripts/gen-icons.mjs",
     "db:types": "bash scripts/db-types.sh",
     "android:sync": "APP_PLATFORM=android npm run build && cap sync android",

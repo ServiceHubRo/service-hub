@@ -1,7 +1,10 @@
+/* Inside the app: the same reading width as a Help Center article (A9: at 1440 px a line of the
+   terms ran to ~170 characters). The public page is already 820 px wide. */
 .inApp {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  max-width: 760px;
 }
 
 .page {

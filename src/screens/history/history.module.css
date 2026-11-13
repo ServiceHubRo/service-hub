@@ -574,3 +574,11 @@
     gap: 10px;
   }
 }
+
+/* A computer (A9): the paid report's button as wide as a form column, like „Adaugă mașină” in Garaj
+   (it ran across the whole page under the jobs). */
+@media (min-width: 1024px) {
+  a.reportButton {
+    width: min(100%, 420px);
+  }
+}

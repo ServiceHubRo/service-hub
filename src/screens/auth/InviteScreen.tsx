@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
 import { Link, Navigate, useParams } from 'react-router-dom';
+import { buttonClass } from '../../components/buttonClass';
 import { useSession } from '../../app/sessionContext';
 import { Banner } from '../../components/Banner';
 import { Button } from '../../components/Button';
@@ -34,7 +35,7 @@ export function InviteScreen() {
     body = (
       <>
         <Banner tone="warning">{t('invite.invalid')}</Banner>
-        <Link to="/" className={styles.linkButton}>
+        <Link to="/" className={buttonClass('secondary', true)}>
           {t('app.title')}
         </Link>
       </>
