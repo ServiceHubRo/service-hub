@@ -47,6 +47,32 @@ export function openReloadAtTop(): void {
       reloading = false;
       applyRestoration();
     });
+  let variant = '0';
+  try {
+    variant = localStorage.getItem('sh_reload_variant') ?? '0';
+  } catch {
+    // investigation only
+  }
+  if (variant === '2') {
+    // Back on just before the first move away from the reloaded page.
+    const push = history.pushState;
+    const replace = history.replaceState;
+    const before = () => {
+      history.pushState = push;
+      history.replaceState = replace;
+      reloading = false;
+      applyRestoration();
+    };
+    history.pushState = function (...args: Parameters<History['pushState']>) {
+      before();
+      return push.apply(this, args);
+    };
+    history.replaceState = function (...args: Parameters<History['replaceState']>) {
+      before();
+      return replace.apply(this, args);
+    };
+    return;
+  }
   if (document.readyState === 'complete') release();
   else window.addEventListener('load', release, { once: true });
 }

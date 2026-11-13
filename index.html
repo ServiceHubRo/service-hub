@@ -44,7 +44,12 @@
         try {
           var nav = performance.getEntriesByType ? performance.getEntriesByType('navigation')[0] : null;
           var reload = nav ? nav.type === 'reload' : !!(performance.navigation && performance.navigation.type === 1);
-          if (reload && 'scrollRestoration' in history) history.scrollRestoration = 'manual';
+          var variant = '0';
+          try { variant = localStorage.getItem('sh_reload_variant') || '0'; } catch (e2) {}
+          if (reload && 'scrollRestoration' in history) {
+            history.scrollRestoration = 'manual';
+            if (variant === '1') history.replaceState(history.state, '');
+          }
         } catch (e) {
           // No timing API: the browser's behavior, as before.
         }
