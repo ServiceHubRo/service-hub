@@ -17,6 +17,9 @@ test.beforeEach(async ({ context }) => {
 });
 
 async function scrollToShare(page: Page, share: number) {
+  // As a person does: the wheel first (a page just reloaded waits for the person's first move).
+  await page.mouse.move(Math.round((page.viewportSize()?.width ?? 400) / 2), 300);
+  await page.mouse.wheel(0, 40);
   await page.evaluate((s) => window.scrollTo(0, Math.round((document.documentElement.scrollHeight - innerHeight) * s)), share);
   await expect.poll(() => scrollTopOf(page)).toBeGreaterThan(200);
   await page.waitForTimeout(300);
