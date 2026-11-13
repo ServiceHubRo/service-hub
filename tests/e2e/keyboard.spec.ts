@@ -3,7 +3,7 @@ import { appendFileSync, mkdirSync } from 'node:fs';
 import { expect, test, type BrowserContext, type Locator, type Page } from '@playwright/test';
 import { newPage } from './agent';
 import { fleetSetup } from './fleet-support';
-import { BACKEND, PASSWORD, SEED, SEED_PASSWORD, createBookableShop, createUser, rpcAs, serviceRest, signIn } from './support';
+import { BACKEND, PASSWORD, SEED, SEED_PASSWORD, createBookableShop, createUser, revokeSessions, rpcAs, serviceRest, signIn } from './support';
 
 // The phone's keyboard over the app's forms (Eduard, 11 Nov 2026: on the iPhone the bottom bar
 // covered „Solicitare nouă” and its button). A browser here has no real keyboard, so it is played
@@ -639,5 +639,200 @@ test.describe('the phone keyboard over the forms', () => {
       expect.soft(await page.evaluate(() => document.documentElement.scrollHeight), `${where}: no gap left`).toBe(pageHeight);
       await shot(page, `${prefix}-costuri-closed-${s.width}`);
     }
+  });
+  // Eduard, 13 Nov 2026 (iPhone): with the keyboard open the page jumped back when he scrolled by
+  // hand. Safari reports a change of what is seen while the page is scrolled (its bars move), and
+  // every report placed the field again. The scenarios he listed, on the expense form: fields at
+  // the top, in the middle, near the end and on the last row, a text area, „Next”, a scroll by hand
+  // up and down, closing and reopening the keyboard, a list next to it, the phone turned, saving.
+  test('iPhone: every field is brought above the keyboard once, and the scroll stays the person’s', async ({ page }) => {
+    const { admin, company, vehicle } = await fleetSetup();
+    page.setDefaultTimeout(20_000);
+    await signIn(page, admin, PASSWORD);
+    await expect(page).toHaveURL(/\/c\//);
+    const scrollY = () => page.evaluate(() => Math.round(window.scrollY));
+    /** What Safari does while the page is scrolled with the keyboard open: it reports what is seen again. */
+    const safariReports = async () => {
+      for (let i = 0; i < 4; i++) {
+        await page.evaluate(() => {
+          window.visualViewport!.dispatchEvent(new Event('resize'));
+          window.visualViewport!.dispatchEvent(new Event('scroll'));
+        });
+        await page.waitForTimeout(60);
+      }
+      await page.waitForTimeout(300);
+    };
+    const seen = async (field: Locator, what: string) => {
+      const b = await band(page);
+      const box = (await field.boundingBox())!;
+      expect.soft(box.y, `${what}: below the header`).toBeGreaterThanOrEqual(b.top - 1);
+      expect.soft(box.y + Math.min(box.height, 60), `${what}: above the keyboard`).toBeLessThanOrEqual(b.bottom + 1);
+      expect.soft(await coveredBy(field), `${what}: nothing over it`).toBe('');
+    };
+
+    for (const s of [SIZES[0], SIZES[2]]) {
+      const at = `@${s.width}`;
+      await setSize(page, s);
+      await page.goto(`/c/firme/${company}?sectiune=costuri`);
+      await page.getByRole('button', { name: 'Adaugă cheltuială' }).click();
+      const amount = page.getByLabel('Suma');
+      const liters = page.getByLabel('Litri');
+      const fuel = page.getByLabel('Tip combustibil');
+      const vendor = page.getByLabel('Service sau furnizor');
+      const km = page.getByLabel('Kilometraj');
+      const description = page.getByLabel('Descriere');
+      await expect(vendor).toBeVisible();
+
+      // 1. A field at the top, already seen above where the keyboard comes: nothing moves.
+      await amount.evaluate((el) => {
+        const header = document.querySelector('header')!.getBoundingClientRect().bottom;
+        const label = (el as HTMLInputElement).labels![0]!.getBoundingClientRect().top;
+        window.scrollBy(0, label - (header + 20));
+      });
+      await page.waitForTimeout(150);
+      const before = await scrollY();
+      await amount.focus();
+      await openKeyboard(page, s, 'iphone');
+      await seen(amount, `${at} top field`);
+      expect.soft(await scrollY(), `${at} top field: already seen, the page does not move`).toBe(before);
+
+      // 6. „Next”: the focus moves with the keyboard open — the middle, near the end, the last row (a text area).
+      for (const [field, what] of [
+        [liters, 'middle field'],
+        [km, 'field near the end'],
+        [description, 'text area on the last row'],
+      ] as const) {
+        await field.focus();
+        await page.waitForTimeout(350);
+        await expect(page.locator('html')).toHaveAttribute('data-keyboard', '');
+        await seen(field, `${at} ${what} (Next)`);
+      }
+
+      // Typing moves nothing and keeps the focus and the text.
+      const typed = await scrollY();
+      await description.pressSequentially('Plin la pompa 4', { delay: 15 });
+      await safariReports();
+      expect.soft(await scrollY(), `${at}: typing does not move the page`).toBe(typed);
+      await expect(description).toBeFocused();
+      await expect(description).toHaveValue('Plin la pompa 4');
+
+      // 7. A scroll up by hand with the keyboard open (the wheel, then Safari's reports): it stays.
+      await page.mouse.move(s.width / 2, 150);
+      await page.mouse.wheel(0, -260);
+      await page.waitForTimeout(250);
+      const up = await scrollY();
+      expect.soft(up, `${at}: the page scrolled up by hand`).toBeLessThan(typed - 100);
+      await safariReports();
+      expect.soft(await scrollY(), `${at}: the scroll up is not undone`).toBe(up);
+      await expect(description).toBeFocused();
+      await expect(page.locator('html')).toHaveAttribute('data-keyboard', '');
+
+      // 8. A scroll down by hand (a finger: touchmove, the page follows), to the very end: it stays.
+      await page.evaluate(() => {
+        window.dispatchEvent(new Event('touchmove'));
+        window.scrollTo(0, document.documentElement.scrollHeight);
+      });
+      await page.waitForTimeout(250);
+      const down = await scrollY();
+      expect.soft(down, `${at}: the page scrolled down by hand`).toBeGreaterThan(up + 100);
+      await safariReports();
+      expect.soft(await scrollY(), `${at}: the scroll down is not undone`).toBe(down);
+      // The end of the page: the save button is above the keyboard, nothing over it.
+      const save = page.getByRole('button', { name: 'Salvează cheltuiala' });
+      const b = await band(page);
+      const sb = (await save.boundingBox())!;
+      expect.soft(sb.y + sb.height, `${at}: the save button above the keyboard at the end of the page`).toBeLessThanOrEqual(b.bottom + 1);
+      // The room under it is the part the keyboard covers and a gap, not more.
+      const room = await page.evaluate(() => parseFloat(getComputedStyle(document.body).paddingBottom));
+      expect.soft(room, `${at}: no more room than the keyboard and a gap`).toBeLessThanOrEqual(s.keyboard + 60);
+
+      // 11. A list next to the keyboard (the iPhone's wheel takes the keyboard's place).
+      await fuel.focus();
+      await page.waitForTimeout(350);
+      await seen(fuel, `${at} list (Tip combustibil)`);
+
+      // 9. The keyboard closes: the bar is back, the room is gone, the page is at a place that exists.
+      await closeKeyboard(page, s, 'iphone');
+      await expect(page.locator('html')).not.toHaveAttribute('data-keyboard', '');
+      expect.soft(await page.evaluate(() => parseFloat(getComputedStyle(document.body).paddingBottom)), `${at}: no room left`).toBe(0);
+      expect.soft(await page.evaluate(() => window.scrollY <= document.documentElement.scrollHeight - window.innerHeight + 1), `${at}: no gap under the page`).toBe(true);
+
+      // 10. Opened again on another field: placed again.
+      await vendor.focus();
+      await openKeyboard(page, s, 'iphone');
+      await seen(vendor, `${at} reopened on Service sau furnizor`);
+      await closeKeyboard(page, s, 'iphone');
+    }
+
+    // 13. The phone is turned with the keyboard open: still known as open, the field still seen.
+    const tall = SIZES[2];
+    await setSize(page, tall);
+    const vendor = page.getByLabel('Service sau furnizor');
+    await vendor.focus();
+    await openKeyboard(page, tall, 'iphone');
+    await page.setViewportSize({ width: 740, height: 340 });
+    await page.evaluate(() => (window as unknown as { __setKeyboard: (h: number) => void }).__setKeyboard(180));
+    await page.waitForTimeout(400);
+    await expect(page.locator('html'), 'turned: the keyboard is still known').toHaveAttribute('data-keyboard', '');
+    const turned = await band(page);
+    const box = (await vendor.boundingBox())!;
+    expect.soft(box.y + box.height, 'turned: the field above the keyboard').toBeLessThanOrEqual(turned.bottom + 1);
+    await closeKeyboard(page, tall, 'iphone');
+    await setSize(page, tall);
+
+    // 14. The form is saved with what was typed.
+    await page.locator('#continut').getByLabel('Vehicul', { exact: true }).filter({ visible: true }).last().selectOption(vehicle);
+    const amount = page.getByLabel('Suma');
+    await amount.focus();
+    await openKeyboard(page, tall, 'iphone');
+    await amount.fill('123');
+    await vendor.focus();
+    await page.waitForTimeout(350);
+    await vendor.fill('Stația de test');
+    await expect(amount).toHaveValue('123');
+    await closeKeyboard(page, tall, 'iphone');
+    await page.getByRole('button', { name: 'Salvează cheltuiala' }).click();
+    await expect(page.getByText('Stația de test').first()).toBeVisible({ timeout: 15_000 });
+  });
+
+  // 12. A form in a window over the page („Sesiunea a expirat”): centered above the keyboard, and the
+  // page behind it does not move.
+  test('iPhone: the form in the session-expired window stays above the keyboard', async ({ page }) => {
+    const email = await createUser('client');
+    await signIn(page, email, PASSWORD);
+    await expect(page).toHaveURL(/\/c\//);
+    const s = SIZES[2];
+    await setSize(page, s);
+    const key = await page.evaluate(() => Object.keys(localStorage).find((k) => k.startsWith('sb-') && k.endsWith('-auth-token')));
+    const stored = await page.evaluate((k) => JSON.parse(localStorage.getItem(k!)!), key);
+    await revokeSessions(stored.access_token);
+    await page.evaluate(([k, value]) => localStorage.setItem(k!, value!), [key, JSON.stringify({ ...stored, expires_at: Math.floor(Date.now() / 1000) - 10 })]);
+    await page.evaluate(() => window.dispatchEvent(new Event('visibilitychange')));
+    const panel = page.getByRole('dialog', { name: 'Sesiunea a expirat' });
+    await expect(panel).toBeVisible({ timeout: 40_000 });
+    const password = panel.getByLabel('Parolă', { exact: true });
+    const behind = await page.evaluate(() => window.scrollY);
+    await password.focus();
+    await page.evaluate(() => (window as unknown as { __setPan: (p: number) => void }).__setPan(60));
+    await openKeyboard(page, s, 'iphone');
+    const view = await page.evaluate(() => ({ top: window.visualViewport!.offsetTop, bottom: window.visualViewport!.offsetTop + window.visualViewport!.height }));
+    const submit = panel.getByRole('button', { name: 'Intră în cont' });
+    const inView = async (el: Locator, what: string) => {
+      const box = (await el.boundingBox())!;
+      expect.soft(box.y, `${what}: inside what is seen`).toBeGreaterThanOrEqual(view.top);
+      expect.soft(box.y + box.height, `${what}: above the keyboard`).toBeLessThanOrEqual(view.bottom + 1);
+    };
+    // The field typed in is seen at once; the title and the button are reached by scrolling the window.
+    await inView(password, 'the password');
+    await submit.evaluate((el) => el.scrollIntoView({ block: 'nearest' }));
+    await inView(submit, 'the button');
+    await panel.getByRole('heading').evaluate((el) => el.scrollIntoView({ block: 'nearest' }));
+    await inView(panel.getByRole('heading'), 'the title');
+    expect.soft(await page.evaluate(() => window.scrollY), 'the page behind does not move').toBe(behind);
+    await shot(page, `${process.env.KB_SHOTS ?? 'kb-after'}-sesiune-expirata-${s.width}`);
+    await closeKeyboard(page, s, 'iphone');
+    await password.fill(PASSWORD);
+    await submit.click();
+    await expect(panel).toHaveCount(0);
   });
 });

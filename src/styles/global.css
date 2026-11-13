@@ -34,6 +34,21 @@ html[data-keyboard] body {
   padding-bottom: var(--kb-room, 0px);
 }
 
+/* What is scrolled into view meanwhile (an error under a button, the browser's own move to a field)
+   stops above the keyboard, not at the bottom of the page behind it. */
+html[data-keyboard] {
+  scroll-padding-bottom: var(--kb-room, 0px);
+}
+
+/* A window over the whole page with a form in it (data-keyboard-fit: „Sesiunea a expirat”): while
+   the keyboard is open it takes exactly what is seen — from where Safari moved the view down to the
+   keyboard — so its form stays centered above the keyboard, not behind it. */
+html[data-keyboard] [data-keyboard-fit] {
+  top: var(--vv-top, 0px);
+  padding-bottom: max(var(--page-pad), calc(var(--kb-room, 0px) - var(--vv-top, 0px)));
+  scroll-padding-bottom: max(var(--page-pad), calc(var(--kb-room, 0px) - var(--vv-top, 0px)));
+}
+
 body {
   background: var(--bg);
   color: var(--text);

@@ -1,5 +1,5 @@
-import { afterEach, describe, expect, it } from 'vitest';
-import { KEYBOARD_GAP, fieldArea, isTextField, keyboardOpen, keyboardRoom, opensKeyboard, placeField, resizeForKeyboard, scrollToShow, visibleBand, watchKeyboard } from '../../src/lib/keyboard';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import { KEYBOARD_GAP, KEYBOARD_REGROW_PX, fieldArea, isTextField, keyboardOpen, keyboardRoom, opensKeyboard, placeField, resizeForKeyboard, scrollHost, scrollToShow, visibleBand, watchKeyboard } from '../../src/lib/keyboard';
 
 describe('keyboard', () => {
   afterEach(() => {
@@ -38,6 +38,7 @@ describe('keyboard', () => {
     expect(document.documentElement.hasAttribute('data-keyboard')).toBe(true);
     stop();
     expect(document.documentElement.hasAttribute('data-keyboard')).toBe(false);
+    Object.defineProperty(window, 'innerHeight', { configurable: true, value: window.innerHeight + 300 });
   });
 
   it('a drop-down list takes the keyboard\'s place too (the iPhone\'s wheel); a disabled one does not', () => {
@@ -151,5 +152,176 @@ describe('keyboard', () => {
     expect(root.style.getPropertyValue('--vv-top')).toBe('');
     Object.defineProperty(window, 'innerHeight', { configurable: true, value: tall });
     window.requestAnimationFrame = raf;
+  });
+  describe('the page stays where the person put it (Eduard, 13 Nov 2026)', () => {
+    const box = (top: number, bottom: number) => ({ top, bottom, left: 0, right: 100, width: 100, height: bottom - top, x: 0, y: top, toJSON: () => ({}) }) as DOMRect;
+    let tall = 0;
+    let stop = () => {};
+    let scrollBy: ReturnType<typeof vi.fn>;
+
+    /** A field far below what is seen, with the keyboard open on it. */
+    function openOn(id: string): HTMLElement {
+      const field = document.createElement('input');
+      field.id = id;
+      field.getBoundingClientRect = () => box(900, 950);
+      document.body.appendChild(field);
+      field.focus();
+      resize(tall - 300);
+      return field;
+    }
+    function resize(height: number) {
+      Object.defineProperty(window, 'innerHeight', { configurable: true, value: height });
+      window.dispatchEvent(new Event('resize'));
+    }
+
+    function start() {
+      vi.useFakeTimers();
+      tall = window.innerHeight;
+      scrollBy = vi.fn();
+      window.scrollBy = scrollBy as unknown as typeof window.scrollBy;
+      stop = watchKeyboard();
+    }
+    afterEach(() => {
+      stop();
+      Object.defineProperty(window, 'innerHeight', { configurable: true, value: tall });
+      vi.useRealTimers();
+    });
+
+    it('places the field once when the keyboard opens, not at every report of what is seen', () => {
+      start();
+      openOn('a');
+      vi.advanceTimersByTime(200);
+      expect(scrollBy).toHaveBeenCalledTimes(1);
+      // Safari reports again (its bars move while the page is scrolled): nothing more.
+      for (let i = 0; i < 5; i++) window.dispatchEvent(new Event('resize'));
+      vi.advanceTimersByTime(500);
+      expect(scrollBy).toHaveBeenCalledTimes(1);
+    });
+
+    it('never moves the page after the person scrolled, by touch or by wheel', () => {
+      for (const gesture of ['touchmove', 'wheel']) {
+        start();
+        openOn(gesture);
+        // Before the field was placed: the person is already scrolling.
+        window.dispatchEvent(new Event(gesture));
+        vi.advanceTimersByTime(500);
+        expect(scrollBy, gesture).not.toHaveBeenCalled();
+        // The keyboard grows afterwards: still theirs.
+        resize(tall - 300 - 2 * KEYBOARD_REGROW_PX);
+        vi.advanceTimersByTime(500);
+        expect(scrollBy, gesture).not.toHaveBeenCalled();
+        stop();
+        document.body.innerHTML = '';
+        Object.defineProperty(window, 'innerHeight', { configurable: true, value: tall });
+        vi.useRealTimers();
+      }
+    });
+
+    it('leaves the page alone when the person scrolls while the keyboard is still coming', () => {
+      start();
+      const field = document.createElement('input');
+      field.getBoundingClientRect = () => box(900, 950);
+      document.body.appendChild(field);
+      field.focus();
+      vi.advanceTimersByTime(50);
+      window.dispatchEvent(new Event('touchmove'));
+      vi.advanceTimersByTime(200);
+      resize(tall - 300);
+      vi.advanceTimersByTime(500);
+      expect(document.documentElement.hasAttribute('data-keyboard')).toBe(true);
+      expect(scrollBy).not.toHaveBeenCalled();
+    });
+
+    it('places the next field when the focus moves („Next”), also after a scroll by hand', () => {
+      start();
+      openOn('a');
+      vi.advanceTimersByTime(200);
+      window.dispatchEvent(new Event('touchmove'));
+      const next = document.createElement('textarea');
+      next.getBoundingClientRect = () => box(1200, 1300);
+      document.body.appendChild(next);
+      next.focus();
+      vi.advanceTimersByTime(200);
+      expect(scrollBy).toHaveBeenCalledTimes(2);
+      // Typing in it moves nothing.
+      next.dispatchEvent(new Event('input', { bubbles: true }));
+      vi.advanceTimersByTime(500);
+      expect(scrollBy).toHaveBeenCalledTimes(2);
+    });
+
+    it('places the field again when the keyboard itself grows, the page untouched', () => {
+      start();
+      openOn('a');
+      vi.advanceTimersByTime(200);
+      resize(tall - 300 - KEYBOARD_REGROW_PX + 4); // a few pixels: not the keyboard
+      vi.advanceTimersByTime(200);
+      expect(scrollBy).toHaveBeenCalledTimes(1);
+      resize(tall - 300 - 2 * KEYBOARD_REGROW_PX);
+      vi.advanceTimersByTime(200);
+      expect(scrollBy).toHaveBeenCalledTimes(2);
+    });
+
+    it('a field already seen is left where it is', () => {
+      start();
+      const field = openOn('a');
+      field.getBoundingClientRect = () => box(30, 70);
+      vi.advanceTimersByTime(200);
+      expect(scrollBy).not.toHaveBeenCalled();
+    });
+
+    it('in a window over the page, that window scrolls, never the page behind it', () => {
+      start();
+      const overlay = document.createElement('div');
+      overlay.style.position = 'fixed';
+      overlay.style.overflowY = 'auto';
+      Object.defineProperty(overlay, 'scrollHeight', { value: 2000 });
+      Object.defineProperty(overlay, 'clientHeight', { value: 500 });
+      const inner = vi.fn();
+      overlay.scrollBy = inner as unknown as typeof overlay.scrollBy;
+      const field = document.createElement('input');
+      field.getBoundingClientRect = () => box(900, 950);
+      overlay.appendChild(field);
+      document.body.appendChild(overlay);
+      expect(scrollHost(field)).toEqual({ scroller: overlay });
+      field.focus();
+      resize(tall - 300);
+      vi.advanceTimersByTime(200);
+      expect(inner).toHaveBeenCalledTimes(1);
+      expect(scrollBy).not.toHaveBeenCalled();
+      // A fixed window that does not scroll: nothing is moved.
+      overlay.style.overflowY = 'visible';
+      expect(scrollHost(field)).toEqual({ scroller: null });
+      // In the page itself: the page.
+      document.body.appendChild(field);
+      expect(scrollHost(field)).toBeNull();
+    });
+  });
+
+  it('the keyboard is known right after the phone is turned (the page keeps its height under it)', () => {
+    const area = document.createElement('textarea');
+    document.body.appendChild(area);
+    const listeners = new Map<string, EventListener>();
+    const vv = { height: 700, scale: 1, offsetTop: 0, addEventListener: (n: string, f: EventListener) => listeners.set(n, f), removeEventListener: () => {} };
+    Object.defineProperty(window, 'visualViewport', { configurable: true, value: vv });
+    const inner = window.innerHeight;
+    const width = window.innerWidth;
+    Object.defineProperty(window, 'innerHeight', { configurable: true, value: 700 });
+    const stop = watchKeyboard();
+    area.focus();
+    // Turned on its side with the keyboard open: a width never seen before, 200 of 390 px visible.
+    Object.defineProperty(window, 'innerWidth', { configurable: true, value: 844 });
+    Object.defineProperty(window, 'innerHeight', { configurable: true, value: 390 });
+    vv.height = 200;
+    listeners.get('resize')!(new Event('resize'));
+    expect(document.documentElement.hasAttribute('data-keyboard')).toBe(true);
+    // A page zoomed in twice, no keyboard: half the height seen is not a keyboard.
+    vv.height = 195;
+    vv.scale = 2;
+    listeners.get('resize')!(new Event('resize'));
+    expect(document.documentElement.hasAttribute('data-keyboard')).toBe(false);
+    stop();
+    Object.defineProperty(window, 'visualViewport', { configurable: true, value: undefined });
+    Object.defineProperty(window, 'innerHeight', { configurable: true, value: inner });
+    Object.defineProperty(window, 'innerWidth', { configurable: true, value: width });
   });
 });
