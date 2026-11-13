@@ -17,6 +17,8 @@ export default defineConfig({
     baseURL: `http://localhost:${PORT}`,
     timezoneId: 'Europe/Berlin',
     contextOptions: { reducedMotion: 'reduce' },
+    actionTimeout: 10_000,
+    navigationTimeout: 30_000,
     storageState: {
       cookies: [],
       origins: [{ origin: `http://localhost:${PORT}`, localStorage: [{ name: 'sh_onboarding_off', value: '1' }] }],

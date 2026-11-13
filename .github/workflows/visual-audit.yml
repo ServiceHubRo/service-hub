@@ -2,8 +2,9 @@ name: Visual audit
 
 # A9: every screen of every role at 390, 430, 768, 820, 1024, 1280 and 1440 px against a throwaway
 # Supabase on the runner (the same as the browser tests; never the real project). The screenshots
-# and visual-audit/report.json are kept on the branch `visual-audit-shots` (one commit, replaced on
-# every run) so they can be read without downloading an artifact.
+# and the measurements (visual-audit/rows-*.jsonl) are kept on the branch `visual-audit-<commit>` so
+# they can be read without downloading an artifact. A line `Visual-Audit-Grep: <pattern>` in the
+# pushed commit's message measures only the tests whose title matches (a repeat of a few parts).
 
 on:
   push:
@@ -42,9 +43,13 @@ jobs:
             echo "E2E_SERVICE_ROLE_KEY=$SERVICE_ROLE_KEY"
           } >> "$GITHUB_ENV"
       - name: Audit
-        run: npm run test:visual
+        env:
+          MESSAGE: ${{ github.event.head_commit.message }}
+        run: |
+          only=$(printf '%s\n' "$MESSAGE" | sed -n 's/^Visual-Audit-Grep: //p' | head -1)
+          if [ -n "$only" ]; then npm run test:visual -- --grep "$only"; else npm run test:visual; fi
         continue-on-error: true
-      - name: Keep the screenshots on the visual-audit-shots branch
+      - name: Keep the screenshots on a branch of their own
         if: always()
         env:
           TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -57,4 +62,4 @@ jobs:
           git config user.email "41898237+github-actions[bot]@users.noreply.github.com"
           git add -A
           git commit -qm "Visual audit of ${GITHUB_SHA::7}"
-          git push -qf "https://x-access-token:${TOKEN}@github.com/${GITHUB_REPOSITORY}.git" shots:refs/heads/visual-audit-shots
+          git push -qf "https://x-access-token:${TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "shots:refs/heads/visual-audit-${GITHUB_SHA::7}"

@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { appendFileSync, mkdirSync } from 'node:fs';
 import { dirname } from 'node:path';
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type Browser, type Page } from '@playwright/test';
 import { fleetSetup } from '../e2e/fleet-support';
 import { BACKEND, PASSWORD, SEED, SEED_PASSWORD, createUser, rpcAs, serviceRest, signIn, totp, userIdOf } from '../e2e/support';
 
@@ -339,6 +339,19 @@ async function clickButton(page: Page, name: RegExp) {
   await page.getByRole('button', { name }).filter({ visible: true }).first().click({ timeout: 8_000 });
 }
 
+/** Another person in the same test: their own browser, the sign-in page in Romanian, no tour. */
+async function personPage(browser: Browser): Promise<Page> {
+  const ctx = await browser.newContext({ baseURL: test.info().project.use.baseURL, reducedMotion: 'reduce', timezoneId: 'Europe/Berlin' });
+  await ctx.addInitScript(() => {
+    localStorage.setItem('sh_onboarding_off', '1');
+    if (!sessionStorage.getItem('sh_test_init')) {
+      sessionStorage.setItem('sh_test_init', '1');
+      localStorage.setItem('sh_lang', 'ro');
+    }
+  });
+  return ctx.newPage();
+}
+
 async function signInWithCode(page: Page, email: string, password: string, secret: string) {
   await page.goto('/intra');
   await page.getByLabel('Email').fill(email);
@@ -398,7 +411,7 @@ test.describe('A9 visual audit', () => {
         } },
       { name: 'cont-nou', path: '/cont-nou' },
       { name: 'cont-nou-service', path: '/cont-nou', roOnly: true, prep: async (p) => {
-          await p.getByRole('radio', { name: /service/i }).first().check({ force: true }).catch(() => p.getByText(/Am un service/i).first().click());
+          await p.getByLabel('Tip cont').selectOption('shop');
         } },
       { name: 'parola-uitata', path: '/parola-uitata' },
       { name: 'confirma-email', path: '/confirma-email' },
@@ -456,7 +469,9 @@ test.describe('A9 visual audit', () => {
       { name: 'conversatie', path: `/c/mesaje/${threads[0]?.id ?? 'x'}` },
       { name: 'mesaje-echipa', path: '/c/mesaje/echipa' },
       { name: 'cont', path: '/c/cont' },
-      { name: 'cont-deconectare', path: '/c/cont', roOnly: true, prep: async (p) => clickButton(p, /^Deconectează-mă$/) },
+      { name: 'cont-deconectare', path: '/c/cont', roOnly: true, prep: async (p) => {
+          await p.locator('main').getByRole('button', { name: /^Deconectare$/ }).click();
+        } },
       { name: 'favorite', path: '/c/cont/favorite' },
       { name: 'istoric-alege', path: '/c/cont/istoric' },
       { name: 'rapoarte', path: '/c/cont/rapoarte' },
@@ -477,11 +492,11 @@ test.describe('A9 visual audit', () => {
     await runRole(page, 'client', half === 0 ? screens.slice(0, cut) : screens.slice(cut));
   });
 
-  test('new client and new shop: empty states, first steps', async ({ page, browser }) => {
+  test('new client: empty states', async ({ page }) => {
     const client = await createUser('client');
     await signIn(page, client, PASSWORD);
     await expect(page).toHaveURL(/\/c\/cauta/, { timeout: 20_000 });
-    const clientScreens: Screen[] = [
+    await audit(page, 'client-nou', [
       { name: 'garaj-gol', path: '/c/garaj' },
       { name: 'programari-gol', path: '/c/programari' },
       { name: 'mesaje-gol', path: '/c/mesaje' },
@@ -489,15 +504,15 @@ test.describe('A9 visual audit', () => {
       { name: 'rapoarte-gol', path: '/c/cont/rapoarte' },
       { name: 'solicitari-gol', path: '/c/cont/ajutor/solicitari' },
       { name: 'cont-nou-client', path: '/c/cont' },
-    ];
-    await audit(page, 'client-nou', clientScreens, 'ro');
+    ], 'ro');
+  });
 
-    const shopPage = await (await browser.newContext({ baseURL: test.info().project.use.baseURL, reducedMotion: 'reduce', timezoneId: 'Europe/Berlin' })).newPage();
-    await shopPage.addInitScript(() => localStorage.setItem('sh_onboarding_off', '1'));
+  test('new shop: empty states, first steps', async ({ browser }) => {
+    const shopPage = await personPage(browser);
     const shop = await createUser('shop');
     await signIn(shopPage, shop, PASSWORD);
     await expect(shopPage).toHaveURL(/\/s\/panou/, { timeout: 20_000 });
-    const shopScreens: Screen[] = [
+    await audit(shopPage, 'service-nou', [
       { name: 'panou-nou', path: '/s/panou' },
       { name: 'programari-gol', path: '/s/programari' },
       { name: 'istoric-gol', path: '/s/istoric' },
@@ -506,47 +521,45 @@ test.describe('A9 visual audit', () => {
       { name: 'rapoarte-gol', path: '/s/cont/rapoarte' },
       { name: 'abonament-nou', path: '/s/cont/abonament' },
       { name: 'cont-nou-service', path: '/s/cont' },
-    ];
-    await audit(shopPage, 'service-nou', shopScreens, 'ro');
+    ], 'ro');
   });
 
-  test('company (fleet): admin, manager, driver, accountant', async ({ page, browser }) => {
+  for (const who of ['admin', 'members'] as const) test(`company (fleet): ${who}`, async ({ page, browser }) => {
     const f = await fleetSetup();
     const base = `/c/firme/${f.company}`;
     const s = (section: string, extra = '') => `${base}?sectiune=${section}${extra}`;
-    await signIn(page, f.admin, PASSWORD);
-    await expect(page).toHaveURL(/\/c\/cauta/, { timeout: 20_000 });
-    const adminScreens: Screen[] = [
-      { name: 'firme', path: '/c/cont/firme' },
-      { name: 'firma-detalii', path: `/c/cont/firme/${f.company}` },
-      { name: 'panou', path: s('panou') },
-      { name: 'vehicule', path: s('vehicule') },
-      { name: 'vehicul', path: s('vehicul', `&vehicul=${f.vehicle}`) },
-      { name: 'programari', path: s('programari') },
-      { name: 'costuri', path: s('costuri') },
-      { name: 'rapoarte', path: s('rapoarte') },
-      { name: 'membri', path: s('membri') },
-      { name: 'abonament', path: s('abonament') },
-      { name: 'cont-firma', path: s('cont') },
-    ];
-    await runRole(page, 'firma-admin', adminScreens);
-
-    for (const [who, email, sections] of [
+    if (who === 'admin') {
+      await signIn(page, f.admin, PASSWORD);
+      await expect(page).toHaveURL(/\/c\/cauta/, { timeout: 20_000 });
+      await runRole(page, 'firma-admin', [
+        { name: 'firme', path: '/c/cont/firme' },
+        { name: 'firma-detalii', path: `/c/cont/firme/${f.company}` },
+        { name: 'panou', path: s('panou') },
+        { name: 'vehicule', path: s('vehicule') },
+        { name: 'vehicul', path: s('vehicul', `&vehicul=${f.vehicle}`) },
+        { name: 'programari', path: s('programari') },
+        { name: 'costuri', path: s('costuri') },
+        { name: 'rapoarte', path: s('rapoarte') },
+        { name: 'membri', path: s('membri') },
+        { name: 'abonament', path: s('abonament') },
+        { name: 'cont-firma', path: s('cont') },
+      ]);
+      return;
+    }
+    for (const [role, email, sections] of [
       ['firma-manager', f.manager, ['panou', 'vehicule', 'membri']],
       ['firma-sofer', f.driver, ['panou', 'vehicule', 'programari']],
       ['firma-contabil', f.accountant, ['panou', 'costuri', 'rapoarte']],
     ] as const) {
-      const ctx = await browser.newContext({ baseURL: test.info().project.use.baseURL, reducedMotion: 'reduce', timezoneId: 'Europe/Berlin' });
-      await ctx.addInitScript(() => localStorage.setItem('sh_onboarding_off', '1'));
-      const p = await ctx.newPage();
+      const p = await personPage(browser);
       await signIn(p, email, PASSWORD);
       await expect(p).toHaveURL(/\/c\/cauta/, { timeout: 20_000 });
-      await audit(p, who, sections.map((x) => ({ name: x, path: s(x) })), 'ro');
-      await ctx.close();
+      await audit(p, role, sections.map((x) => ({ name: x, path: s(x) })), 'ro');
+      await p.context().close();
     }
   });
 
-  for (const half of [0, 1] as const) test(`shop: Atelier Demo (seed), part ${half + 1}`, async ({ page, browser }) => {
+  for (const half of [0, 1] as const) test(`shop: Atelier Demo (seed), part ${half + 1}`, async ({ page }) => {
     const ownerId = '10000000-0000-4000-8000-000000000001';
     const atelier = await ids.shop(ownerId);
     const bookings = await serviceRest<{ id: string; status: string }[]>(`bookings?shop_id=eq.${atelier}&select=id,status&order=created_at.desc`, 'GET');
@@ -594,16 +607,15 @@ test.describe('A9 visual audit', () => {
     ];
     const cut = screens.findIndex((x) => x.name === 'cont');
     await runRole(page, 'service', half === 0 ? screens.slice(0, cut) : screens.slice(cut));
-    if (half === 0) return;
+  });
 
-    // A colleague of the shop (staff): what the owner-only pages look like to them.
+  test('shop colleague (staff of Atelier Demo)', async ({ browser }) => {
+    const atelier = await ids.shop('10000000-0000-4000-8000-000000000001');
     const colleague = await createUser('client', { name: 'Coleg Atelier' });
     const colleagueId = await userIdOf(colleague);
     await serviceRest(`profiles?id=eq.${colleagueId}`, 'PATCH', { role: 'shop' });
     await serviceRest('shop_staff', 'POST', { shop_id: atelier, user_id: colleagueId, invited_email: colleague, role: 'staff', accepted_at: new Date().toISOString() });
-    const ctx = await browser.newContext({ baseURL: test.info().project.use.baseURL, reducedMotion: 'reduce', timezoneId: 'Europe/Berlin' });
-    await ctx.addInitScript(() => localStorage.setItem('sh_onboarding_off', '1'));
-    const p = await ctx.newPage();
+    const p = await personPage(browser);
     await signIn(p, colleague, PASSWORD);
     await expect(p).toHaveURL(/\/s\/panou/, { timeout: 20_000 });
     await audit(p, 'service-coleg', [
@@ -614,7 +626,16 @@ test.describe('A9 visual audit', () => {
       { name: 'setari-facturare', path: '/s/cont/setari/facturare' },
       { name: 'abonament', path: '/s/cont/abonament' },
     ], 'ro');
-    await ctx.close();
+  });
+
+  test('client logout confirmation', async ({ page }) => {
+    await signIn(page, SEED.client, SEED_PASSWORD);
+    await expect(page).toHaveURL(/\/c\/cauta/, { timeout: 20_000 });
+    await audit(page, 'client', [
+      { name: 'cont-deconectare', path: '/c/cont', prep: async (p) => {
+          await p.locator('main').getByRole('button', { name: /^Deconectare$/ }).click();
+        } },
+    ], 'ro');
   });
 
   test('support agent (seed)', async ({ page }) => {
