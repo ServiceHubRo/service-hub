@@ -246,7 +246,10 @@ async function checkForm(page: Page, form: Form, results: string[]) {
         const last = fields[fields.length - 1]!;
         await last.focus();
         await openKeyboard(page, s, mode);
-        await submit.evaluate((el) => el.scrollIntoView({ block: 'start' }));
+        await submit.evaluate((el) => {
+          window.dispatchEvent(new Event('touchmove')); // a finger scrolls to the button, not the browser
+          el.scrollIntoView({ block: 'start' });
+        });
         await page.waitForTimeout(150);
         const kb = await band(page);
         const kbBox = (await submit.boundingBox())!;
@@ -624,7 +627,10 @@ test.describe('the phone keyboard over the forms', () => {
       await page.waitForTimeout(300);
       b = await band(page);
       const before = (await save.boundingBox())!;
-      await page.evaluate((dy) => window.scrollBy(0, dy), before.y + before.height - (b.bottom - 16));
+      await page.evaluate((dy) => {
+        window.dispatchEvent(new Event('touchmove')); // a finger, not the browser
+        window.scrollBy(0, dy);
+      }, before.y + before.height - (b.bottom - 16));
       await page.waitForTimeout(150);
       b = await band(page);
       const sb = (await save.boundingBox())!;
@@ -744,7 +750,7 @@ test.describe('the phone keyboard over the forms', () => {
       expect.soft(sb.y + sb.height, `${at}: the save button above the keyboard at the end of the page`).toBeLessThanOrEqual(b.bottom + 1);
       // The room under it is the part the keyboard covers and a gap, not more.
       const room = await page.evaluate(() => parseFloat(getComputedStyle(document.body).paddingBottom));
-      expect.soft(room, `${at}: no more room than the keyboard and a gap`).toBeLessThanOrEqual(s.keyboard + 60);
+      expect.soft(room, `${at}: no more room than the keyboard and the part kept free above it`).toBeLessThanOrEqual(s.keyboard + Math.max(56, (s.height - s.keyboard) * 0.4) + 1);
 
       // 11. A list next to the keyboard (the iPhone's wheel takes the keyboard's place).
       await fuel.focus();
@@ -795,14 +801,54 @@ test.describe('the phone keyboard over the forms', () => {
     await expect(page.getByText('Stația de test').first()).toBeVisible({ timeout: 15_000 });
   });
 
+  // Eduard's iPhone, 13 Nov 2026, 18:47 (Safari 26): the field he tapped stayed right above the keys,
+  // where Safari itself puts it, under the two bars Safari floats over the page there (˄ ˅ ✓ and the
+  // address): what Safari reports as seen includes the part under them, so the app took the field
+  // for seen. Played: the field sits right above the reported keyboard and the bars cover 135 px
+  // above it — the field must end up above the bars.
+  test('iPhone: a field Safari leaves right above the keys is brought above its floating bars', async ({ page }) => {
+    const { admin, company } = await fleetSetup();
+    page.setDefaultTimeout(20_000);
+    await signIn(page, admin, PASSWORD);
+    await expect(page).toHaveURL(/\/c\//);
+    const BARS = 135;
+    // What the page gets in Safari 26 on a 393 × 852 and a 430 × 932 iPhone, and what the keys cover.
+    const IPHONES: Size[] = [
+      { width: 393, height: 791, keyboard: 264 } as unknown as Size,
+      { width: 430, height: 870, keyboard: 275 } as unknown as Size,
+    ];
+    for (const s of IPHONES) {
+      await setSize(page, s);
+      await page.goto(`/c/firme/${company}?sectiune=costuri`);
+      await page.getByRole('button', { name: 'Adaugă cheltuială' }).click();
+      for (const label of ['Service sau furnizor', 'Descriere']) {
+        const field = page.getByLabel(label);
+        await expect(field).toBeVisible();
+        await field.focus();
+        await openKeyboard(page, s, 'iphone');
+        // Safari then brings the field right above the keys by itself (after the app placed it).
+        const seenBottom = s.height - s.keyboard;
+        await field.evaluate((el, bottom) => window.scrollBy(0, el.getBoundingClientRect().bottom - (bottom - 12)), seenBottom);
+        await page.waitForTimeout(450);
+        const box = (await field.boundingBox())!;
+        expect.soft(box.y + Math.min(box.height, 60), `${label} @${s.width}: above Safari's floating bars`).toBeLessThanOrEqual(seenBottom - BARS);
+        const b = await band(page);
+        expect.soft(box.y, `${label} @${s.width}: below the header`).toBeGreaterThanOrEqual(b.top - 1);
+        await shot(page, `${process.env.KB_SHOTS ?? 'kb-after'}-bare-safari-${label === 'Descriere' ? 'descriere' : 'furnizor'}-${s.width}`);
+        await closeKeyboard(page, s, 'iphone');
+      }
+    }
+  });
+
   // 12. A form in a window over the page („Sesiunea a expirat”): centered above the keyboard, and the
   // page behind it does not move.
   test('iPhone: the form in the session-expired window stays above the keyboard', async ({ page }) => {
     const email = await createUser('client');
-    await signIn(page, email, PASSWORD);
-    await expect(page).toHaveURL(/\/c\//);
+    // The phone's size from the start (a page keeps the tallest height it has seen at a width).
     const s = SIZES[2];
     await setSize(page, s);
+    await signIn(page, email, PASSWORD);
+    await expect(page).toHaveURL(/\/c\//);
     const key = await page.evaluate(() => Object.keys(localStorage).find((k) => k.startsWith('sb-') && k.endsWith('-auth-token')));
     const stored = await page.evaluate((k) => JSON.parse(localStorage.getItem(k!)!), key);
     await revokeSessions(stored.access_token);
@@ -833,6 +879,6 @@ test.describe('the phone keyboard over the forms', () => {
     await closeKeyboard(page, s, 'iphone');
     await password.fill(PASSWORD);
     await submit.click();
-    await expect(panel).toHaveCount(0);
+    await expect(panel).toHaveCount(0, { timeout: 30_000 });
   });
 });

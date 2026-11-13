@@ -34,6 +34,33 @@ export function isTextField(el: Element | null): boolean {
   return el instanceof HTMLElement && el.isContentEditable === true;
 }
 
+/** A field typed in with the keys themselves (a date or a time opens a picker instead). */
+export function typedWithKeys(el: Element | null): boolean {
+  if (el instanceof HTMLInputElement && ['date', 'time', 'month', 'week', 'datetime-local'].includes(el.type)) return false;
+  return isTextField(el);
+}
+
+/**
+ * When the browser reports nothing: how long after a field took the focus the keyboard is taken to
+ * be up on a phone (its animation), and how much of the page it is taken to leave seen. Measured on
+ * Eduard's iPhone (Safari 26, 393 × 852): the keys and the bars floating above them cover half.
+ */
+export const KEYBOARD_WAIT_MS = 400;
+export const KEYBOARD_ASSUMED_SEEN = 0.5;
+
+/** A screen that is touched (a phone, a tablet): the only place an on-screen keyboard comes up. */
+export function touchScreen(nav: Pick<Navigator, 'maxTouchPoints'> = navigator): boolean {
+  return (nav.maxTouchPoints ?? 0) > 0;
+}
+
+/**
+ * An iPhone (every browser on it is Safari underneath). Only there the keyboard is assumed when
+ * nothing is reported: Android's browsers report it, and a computer or a test browser has none.
+ */
+export function isIPhone(nav: Pick<Navigator, 'userAgent'> = navigator): boolean {
+  return /iPhone|iPod/.test(nav.userAgent);
+}
+
 /**
  * A field that takes the bottom of the screen while it has the focus: the keyboard, or on the
  * iPhone the wheel of a drop-down list (it takes the keyboard's place).
@@ -65,24 +92,35 @@ export function visibleBand(viewport: { offsetTop: number; height: number } | nu
   return { top: top + navTop, bottom: top + (viewport?.height ?? innerHeight) };
 }
 
-/**
- * Kept free above the keyboard (Eduard, 13 Nov 2026, iPhone): Safari 26 shows its address bar just
- * above the keyboard, over the page (about 40 px on his screenshot), and a field needs a little air.
- */
+/** The least kept free above the keyboard: a field needs a little air. */
 export const KEYBOARD_GAP = 56;
 
 /**
+ * The lower part of what the browser reports as seen is not trusted. Measured on Eduard's iPhone
+ * (13 Nov 2026, Safari 26, 393 × 852): the field he tapped sat right above the keys, where Safari
+ * itself had put it, under the bars Safari floats over the page there — the row with ˄ ˅ ✓ and
+ * the address — about 135 px in all; the app took it for seen and left it. A field is therefore
+ * seen only in the upper part of what is reported: this share of it, never less than KEYBOARD_GAP,
+ * stays free above the keyboard.
+ */
+export const KEYBOARD_FREE_SHARE = 0.4;
+
+/** The part kept free above the keyboard, of `room` px reported as seen between the top bars and it. */
+export function freeAboveKeyboard(room: number): number {
+  return Math.max(KEYBOARD_GAP, Math.round(room * KEYBOARD_FREE_SHARE));
+}
+
+/**
  * How far to scroll the page so the field is seen comfortably: 0 when it already is (`margin` below
- * the top, `bottomMargin` above the bottom); otherwise it goes a third of the way down what is
- * visible, or, taller than that, its top to the top (the caret of a long text stays where the
- * browser keeps it).
+ * the top, `bottomMargin` above the bottom); otherwise it goes to the middle of that part, or,
+ * taller than it, its top to the top (the caret of a long text stays where the browser keeps it).
  */
 export function scrollToShow(field: Band, band: Band, margin = 16, bottomMargin = margin): number {
   const room = band.bottom - band.top;
   const height = field.bottom - field.top;
   if (field.top >= band.top + margin && field.bottom <= band.bottom - bottomMargin) return 0;
   if (height + margin + bottomMargin >= room) return Math.round(field.top - band.top - margin);
-  return Math.round(field.top - (band.top + Math.max(margin, Math.min((room - height) / 3, room - bottomMargin - height))));
+  return Math.round(field.top - (band.top + Math.max(margin, (room - bottomMargin - height) / 2)));
 }
 
 /**
@@ -92,17 +130,20 @@ export function scrollToShow(field: Band, band: Band, margin = 16, bottomMargin 
  * cannot scroll further: Safari then moves what is seen itself and the header slides away
  * (Eduard, 13 Nov 2026). Where the page itself got shorter (Android), the gap only.
  */
-export function keyboardRoom(innerHeight: number, viewportHeight: number): number {
-  return Math.max(0, Math.round(innerHeight - viewportHeight)) + KEYBOARD_GAP;
+export function keyboardRoom(innerHeight: number, viewportHeight: number, navTop = 0): number {
+  // What the keyboard covers, and what is kept free above it: the last field of a page gets there too.
+  return Math.max(0, Math.round(innerHeight - viewportHeight)) + freeAboveKeyboard(viewportHeight - navTop);
 }
 
 /**
- * Where the field goes with the keyboard open: with its label and the gap above the keyboard when
- * all fit; on a small phone the label first (a smaller gap), then the field alone.
+ * Where the field goes with the keyboard open: with its label, above the part kept free over the
+ * keyboard, when all fit; on a small phone the label first (a smaller gap), then the field alone.
  */
 export function placeField(withLabel: Band, field: Band, band: Band): number {
   const room = band.bottom - band.top;
   const fits = (b: Band, gap: number) => b.bottom - b.top + 16 + gap <= room;
+  const free = freeAboveKeyboard(room);
+  if (fits(withLabel, free)) return scrollToShow(withLabel, band, 16, free);
   if (fits(withLabel, KEYBOARD_GAP)) return scrollToShow(withLabel, band, 16, KEYBOARD_GAP);
   if (fits(withLabel, 16)) return scrollToShow(withLabel, band, 16, 16);
   return scrollToShow(field, band, 16, fits(field, KEYBOARD_GAP) ? KEYBOARD_GAP : 16);
@@ -117,7 +158,7 @@ export function fieldArea(field: HTMLElement): Band {
 }
 
 /** What stays at the top: the header (AppShell, --nav-top) and „‹ Înapoi” under it (BackLink, --back-bar). */
-function navTopPx(): number {
+export function navTopPx(): number {
   const style = getComputedStyle(document.documentElement);
   return (parseFloat(style.getPropertyValue('--nav-top')) || 0) + (parseFloat(style.getPropertyValue('--back-bar')) || 0);
 }
@@ -139,6 +180,9 @@ export function scrollHost(field: HTMLElement): { scroller: HTMLElement | null }
 
 /** How much the visible height must change, with the same field in focus, for it to be placed again. */
 export const KEYBOARD_REGROW_PX = 24;
+/** How long the keyboard is taken to be settling on a field, and how many moves a field gets at most. */
+export const KEYBOARD_SETTLE_MS = 1500;
+export const KEYBOARD_MAX_PLACEMENTS = 3;
 
 /**
  * The phone's keyboard, on every platform — the iPhone's Safari, Android's browsers and the
@@ -167,6 +211,18 @@ export function watchKeyboard(): () => void {
   /** When a field last took the focus and when the person last scrolled (the keyboard takes a moment to come). */
   let focusAt = 0;
   let gestureAt = 0;
+  /** Since when the keyboard is on this field, and how many times the page was moved for it. */
+  let since = 0;
+  let placements = 0;
+  /**
+   * The keyboard is taken to be open although the browser reported nothing (Eduard, 13 Nov 2026: the
+   * field must come into view on a real iPhone whatever Safari reports): an iPhone, a field typed in
+   * with the keys, KEYBOARD_WAIT_MS after it took the focus. A report that arrives replaces it.
+   */
+  let assumed = false;
+  let assumeTimer = 0;
+  /** What is seen then: the upper part of the page (the browser's own figure when there is one). */
+  const assumedSeen = () => Math.round(window.innerHeight * KEYBOARD_ASSUMED_SEEN);
 
   // The field in view, once the keyboard has taken its place (the browser's own scroll first).
   const show = () => {
@@ -178,14 +234,26 @@ export function watchKeyboard(): () => void {
       const host = scrollHost(field);
       // In a window over the page the header is behind it: the whole visible part counts.
       const band = visibleBand(viewport, window.innerHeight, host ? 0 : navTopPx());
+      if (assumed) band.bottom = Math.min(band.bottom, (viewport?.offsetTop ?? 0) + assumedSeen());
       // With its label when both fit; the field alone (seen whole) when only it does.
       const delta = placeField(fieldArea(field), field.getBoundingClientRect(), band);
       if (delta === 0) return;
+      placements += 1;
       const smooth = !window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
       const how: ScrollToOptions = { top: delta, behavior: smooth ? 'smooth' : 'auto' };
       if (!host) window.scrollBy(how);
       else host.scroller?.scrollBy(how);
     }, 120);
+  };
+
+  // While the keyboard takes its place the browser may still move the page itself (Safari brings
+  // the field just above the keys once the keyboard has come, after the app placed it): for a
+  // moment, and for a few moves at most, the field is checked again — only until the person scrolls.
+  const settling = () => open && !moved && placements < KEYBOARD_MAX_PLACEMENTS && Date.now() - since <= KEYBOARD_SETTLE_MS;
+  const recheck = () => {
+    if (!settling()) return;
+    pending = true;
+    show();
   };
 
   // The person scrolls: nothing of ours moves the page after that.
@@ -218,8 +286,12 @@ export function watchKeyboard(): () => void {
     // instead of shortening it (the iPhone; also right after the phone is turned).
     const full = Math.max(before, height, Math.round(window.innerHeight));
     const active = document.activeElement;
-    const now = keyboardOpen(height, full, opensKeyboard(active));
-    if (now) root.style.setProperty('--kb-room', `${keyboardRoom(window.innerHeight, height)}px`);
+    // Only where a finger types on the screen: on a computer a window made shorter is not a keyboard.
+    const measured = touchScreen() && keyboardOpen(height, full, opensKeyboard(active));
+    if (measured || !typedWithKeys(active)) assumed = false;
+    const now = measured || assumed;
+    const seen = assumed ? Math.min(height, assumedSeen()) : height;
+    if (now) root.style.setProperty('--kb-room', `${keyboardRoom(window.innerHeight, seen, navTopPx())}px`);
     if (now !== open) {
       open = now;
       root.toggleAttribute('data-keyboard', open);
@@ -227,6 +299,7 @@ export function watchKeyboard(): () => void {
       if (!open) {
         window.cancelAnimationFrame(frame);
         window.clearTimeout(showTimer);
+        window.clearTimeout(assumeTimer);
         pending = false;
         root.style.removeProperty('--vv-top');
         root.style.removeProperty('--kb-room');
@@ -241,6 +314,12 @@ export function watchKeyboard(): () => void {
       moved = gestureAt > focusAt;
       pending = !moved;
       placedFor = height;
+      since = Date.now();
+      placements = 0;
+    } else if (settling()) {
+      // The keyboard is still taking its place: checked again (nothing moves when the field is seen).
+      pending = true;
+      placedFor = height;
     } else if (!moved && Math.abs(height - placedFor) >= KEYBOARD_REGROW_PX) {
       // The keyboard itself changed (its suggestions row, another keyboard) and the page is where we left it.
       pending = true;
@@ -252,6 +331,7 @@ export function watchKeyboard(): () => void {
   const target = viewport ?? window;
   target.addEventListener('resize', update);
   viewport?.addEventListener('scroll', place);
+  window.addEventListener('scroll', recheck, { passive: true });
   window.addEventListener('touchmove', byHand, { passive: true });
   window.addEventListener('wheel', byHand, { passive: true });
   // The keyboard can stay while the focus moves (or go while it stays): checked again then.
@@ -264,15 +344,26 @@ export function watchKeyboard(): () => void {
   const focused = (event: Event) => {
     focusAt = event.timeStamp;
     update();
+    // No report from the browser by the time the keyboard has come: taken to be open (an iPhone only).
+    window.clearTimeout(assumeTimer);
+    const field = event.target as Element | null;
+    if (open || !typedWithKeys(field) || !isIPhone()) return;
+    assumeTimer = window.setTimeout(() => {
+      if (open || document.activeElement !== field) return;
+      assumed = true;
+      update();
+    }, KEYBOARD_WAIT_MS);
   };
   document.addEventListener('focusin', focused);
   document.addEventListener('focusout', later);
   return () => {
     window.clearTimeout(timer);
     window.clearTimeout(showTimer);
+    window.clearTimeout(assumeTimer);
     window.cancelAnimationFrame(frame);
     target.removeEventListener('resize', update);
     viewport?.removeEventListener('scroll', place);
+    window.removeEventListener('scroll', recheck);
     window.removeEventListener('touchmove', byHand);
     window.removeEventListener('wheel', byHand);
     document.removeEventListener('focusin', focused);
@@ -281,4 +372,19 @@ export function watchKeyboard(): () => void {
     root.style.removeProperty('--vv-top');
     root.style.removeProperty('--kb-room');
   };
+}
+
+/**
+ * Whether the keyboard's measurements are asked for on screen (src/lib/keyboardReadout.ts, test
+ * builds only): `?kb=1` on any address, kept for the visit; `?kb=0` ends it.
+ */
+export function keyboardReadoutAsked(search: string, storage: Pick<Storage, 'getItem' | 'setItem' | 'removeItem'> | null): boolean {
+  const asked = new URLSearchParams(search).get('kb');
+  try {
+    if (asked === '1') storage?.setItem('sh_kb', '1');
+    if (asked === '0') storage?.removeItem('sh_kb');
+    return storage ? storage.getItem('sh_kb') === '1' : asked === '1';
+  } catch {
+    return asked === '1';
+  }
 }
