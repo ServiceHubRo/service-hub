@@ -26,7 +26,9 @@ import {
 
 const name = () => test.info().project.name;
 const h1 = (page: Page) => page.getByRole('heading', { level: 1 });
-const stamp = () => Math.random().toString(36).slice(2, 8);
+// Starts with a letter: after „Sugestia-B ” a tag such as „870zwa” reads as a Bucharest plate
+// (B 870 ZWA) and is rightly hidden by the check of old texts.
+const stamp = () => `t${Math.random().toString(36).slice(2, 8)}`;
 const monthsAgo = (n: number) => new Date(Date.now() - n * 31 * 86_400_000).toISOString();
 
 test.beforeEach(async ({ context }) => {
