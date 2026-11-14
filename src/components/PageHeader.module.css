@@ -56,3 +56,8 @@
     margin-bottom: var(--space-4);
   }
 }
+
+/* The tabs under the title: as far from the content as the title is from them. */
+.tabs {
+  margin-bottom: var(--space-2);
+}

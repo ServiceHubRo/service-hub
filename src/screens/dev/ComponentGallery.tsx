@@ -1,4 +1,4 @@
-import { CalendarDays } from 'lucide-react';
+import { CalendarDays, ChevronRight, LayoutTemplate } from 'lucide-react';
 import { useState, type ReactNode } from 'react';
 import { LangSwitch } from '../../app/LangSwitch';
 import { ActionButton } from '../../components/ActionButton';
@@ -13,6 +13,9 @@ import { EmptyState } from '../../components/EmptyState';
 import { Field } from '../../components/Field';
 import { SkeletonList } from '../../components/Skeleton';
 import { StatusBadge } from '../../components/StatusBadge';
+import { BookingStatusPill } from '../../components/StatusPill';
+import { Link } from 'react-router-dom';
+import { TEMPLATE_SLUGS, TEMPLATES_PATH } from './paths';
 import { BOOKING_STATUSES } from '../../lib/status';
 import { Stepper } from '../../components/Stepper';
 import { ViewSelect } from '../../components/ViewSelect';
@@ -29,6 +32,14 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
     </section>
   );
 }
+
+const TEMPLATE_NAME = {
+  lista: 'demo.tpl.list',
+  grila: 'demo.tpl.grid',
+  formular: 'demo.tpl.form',
+  panou: 'demo.tpl.panel',
+  citit: 'demo.tpl.reading',
+} as const;
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -61,6 +72,26 @@ export function ComponentGallery() {
         </div>
         <h1>{t('demo.title')}</h1>
         <p className={styles.sub}>{t('demo.subtitle')}</p>
+
+        <Section title={t('demo.templates')}>
+          <p className={styles.sub}>{t('demo.templatesHint')}</p>
+          <ul className={styles.templates}>
+            {TEMPLATE_SLUGS.map((slug) => (
+              <li key={slug}>
+                <Link to={`${TEMPLATES_PATH}/${slug}`} className={styles.template}>
+                  <LayoutTemplate size={18} aria-hidden="true" />
+                  <span>{t(TEMPLATE_NAME[slug])}</span>
+                  <ChevronRight size={18} aria-hidden="true" />
+                </Link>
+              </li>
+            ))}
+          </ul>
+          <div className={styles.row}>
+            {BOOKING_STATUSES.map((s) => (
+              <BookingStatusPill key={s} status={s} viewer="client" />
+            ))}
+          </div>
+        </Section>
 
         <Section title={t('demo.buttons')}>
           <div className={styles.stack}>

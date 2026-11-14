@@ -98,14 +98,33 @@
   --content-max: 560px;
   --heading-size: 26px;
   --body-size: 14px;
-  /* The smallest text (MOB-02, audit 13 Nov 2026): badges, times, small labels. Only the labels of the
-     phone's bottom bar are smaller (11 px, AppShell). */
+  /* Type scale (DS-01, Eduard 14 Nov 2026: page templates). Every text size is one of these steps;
+     --text-xs is the smallest text (MOB-02): badges, times, small labels. Only the labels of the
+     phone's bottom bar are smaller (11 px, AppShell). --text-base follows --body-size (15 px on a
+     desktop) and the title --heading-size. */
   --text-xs: 12px;
+  --text-sm: 13px;
+  --text-base: var(--body-size);
+  --text-md: 16px;
+  --text-lg: 18px;
+  --text-xl: 22px;
+  --text-title: var(--heading-size);
+  --leading-tight: 1.25;
+  --leading: 1.5;
   /* Reading width (DESK-05, audit 13 Nov 2026): a paragraph or a note never runs wider than this, and
      a one-line field (a name, a list to choose from) never wider than --field-max. A grid that sizes
      its own columns (the quote lines) sets --field-max: none. */
   --measure: 72ch;
   --field-max: 560px;
+  /* Page templates (Eduard, 14 Nov 2026): a form is one column of at most --form-max, centered; a
+     list beside its detail is --list-w wide (from 1024 px); a card of a grid of cards is at least
+     --grid-min (1 column on a phone, 2 on a tablet, 3–4 on a desktop); a row of a list is
+     --row-h high, whatever its text. */
+  --form-max: 720px;
+  --list-w: 400px;
+  --grid-min: 300px;
+  --stat-min: 150px;
+  --row-h: 96px;
 
   /* Pop-up lists and menus: frosted glass over the page (Eduard, 10 Oct). Where blur is missing
      the glass is opaque (--surface2). */

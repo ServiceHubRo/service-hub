@@ -1,0 +1,83 @@
+/* Page template E: one reading column, centered in the content area on a wide screen. */
+.page {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: var(--measure);
+  margin-inline: auto;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  font-size: var(--text-md);
+  line-height: var(--leading);
+  color: var(--text-2);
+}
+
+.body :is(h2, h3) {
+  color: var(--text);
+  line-height: var(--leading-tight);
+}
+
+.body h2 {
+  margin-top: var(--space-4);
+  font-size: var(--text-lg);
+  font-weight: 700;
+}
+
+.body h3 {
+  font-size: var(--text-md);
+  font-weight: 650;
+}
+
+.body :is(ul, ol) {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding-left: var(--space-6);
+}
+
+.body strong {
+  color: var(--text);
+}
+
+/* ---------------------------------------------------------------- loading */
+.bone {
+  display: block;
+  height: var(--text-md);
+  border-radius: var(--radius-pill);
+  background: linear-gradient(90deg, var(--surface2) 0%, var(--border-lit) 50%, var(--surface2) 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+
+.w40 {
+  width: 40%;
+}
+
+.w70 {
+  width: 70%;
+}
+
+.w80 {
+  width: 80%;
+}
+
+.w90 {
+  width: 90%;
+}
+
+.w100 {
+  width: 100%;
+}
+
+@keyframes shimmer {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: -100% 0;
+  }
+}

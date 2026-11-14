@@ -41,6 +41,7 @@ const VerifyScreen = lazyChunk(() => import('../screens/public/VerifyScreen').th
 const ComponentGallery = lazyChunk(() =>
   import('../screens/dev/ComponentGallery').then((m) => ({ default: m.ComponentGallery })),
 );
+const TemplatesApp = lazyChunk(() => import('../screens/dev/TemplatesApp').then((m) => ({ default: m.TemplatesApp })));
 const FleetPreviewScreen = lazyChunk(() =>
   import('../screens/fleet/FleetPreviewScreen').then((m) => ({ default: m.FleetPreviewScreen })),
 );
@@ -159,6 +160,17 @@ export function App({ location }: { location?: string }) {
                       element={
                         <ChunkBoundary>
                           <ComponentGallery />
+                        </ChunkBoundary>
+                      }
+                    />
+                  )}
+                  {/* The page templates (14 Nov 2026) inside the client's shell, sample data, nothing saved. */}
+                  {IS_TEST_BUILD && (
+                    <Route
+                      path="/dev/componente/sabloane/*"
+                      element={
+                        <ChunkBoundary>
+                          <TemplatesApp />
                         </ChunkBoundary>
                       }
                     />
