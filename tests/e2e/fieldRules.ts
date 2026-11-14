@@ -192,7 +192,7 @@ export function measureFields(): FieldIssue[] {
  */
 export async function expectConsistent(page: Page, where: string, rules: readonly string[]) {
   const fields = await page.evaluate(measureFields);
-  const { findings } = await page.evaluate(measurePatterns);
+  const { findings } = await page.evaluate(measurePatterns, rules);
   const broken = [...fields, ...findings].filter((i) => rules.includes(i.rule.split(' ')[0]!)).map((i) => `${i.rule}: ${i.detail}`);
   expect(broken, `docs/MODEL_DE_FOLOSIRE.md on ${where}`).toEqual([]);
 }

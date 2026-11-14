@@ -323,7 +323,7 @@ async function audit(page: Page, role: string, screens: Screen[], lang: 'ro' | '
         const m = await page.evaluate(measure);
         Object.assign(row, m);
         row.fields = await page.evaluate(measureFields);
-        row.patterns = await page.evaluate(measurePatterns);
+        row.patterns = await page.evaluate(measurePatterns, undefined);
         const bad = flagged(m) || row.fields.length > 0;
         const keep = lang === 'ro' ? ALWAYS_SHOT.has(width) || bad : bad || width === 390;
         if (keep) {

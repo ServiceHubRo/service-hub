@@ -79,12 +79,16 @@ const devOnly = (r) => r.path?.startsWith('/dev/');
 /** The visitor's pages (landing, sign-in, legal) keep their own layout (docs/SABLOANE_HARTA.md). */
 const outsideTemplates = (r, code) => r.role === 'visitor' && code === 'P1';
 
+/** Each screen by its Romanian title (the English pass of the same screen joins it). */
+const titles = new Map();
+for (const r of rows) if (r.lang === 'ro' && r.h1 && !titles.has(`${r.role}/${r.screen}`)) titles.set(`${r.role}/${r.screen}`, r.h1);
+
 /** rule code -> detail -> set of "role · screen" (with the widths). */
 const byRule = new Map();
 const note = (code, detail, r) => {
   if (!byRule.has(code)) byRule.set(code, new Map());
   const details = byRule.get(code);
-  const where = `${ROLE[r.role] ?? r.role} · ${r.h1 || r.screen}`;
+  const where = `${ROLE[r.role] ?? r.role} · ${titles.get(`${r.role}/${r.screen}`) || r.h1 || r.screen}`;
   if (!details.has(detail)) details.set(detail, new Map());
   const places = details.get(detail);
   if (!places.has(where)) places.set(where, new Set());

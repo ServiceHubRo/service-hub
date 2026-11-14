@@ -23,7 +23,8 @@ test.skip(!BACKEND, 'needs the local Supabase stack');
 // Many screens per test.
 // The page scrolls as a whole (6 Nov 2026): axe now measures every row of the long admin lists,
 // not only those inside a scrolling area (about 3 minutes for the admin screens).
-test.setTimeout(300_000);
+// The consistency rules on every screen (14 Nov 2026) add about half a minute to the admin walk.
+test.setTimeout(420_000);
 
 async function seedId(path: string): Promise<string> {
   const rows = await serviceRest<{ id: string }[]>(path, 'GET');
