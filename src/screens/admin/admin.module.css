@@ -337,11 +337,21 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: 10px;
+  max-width: var(--field-max);
+}
+
+.fields > * {
+  --field-max: none;
 }
 
 @media (min-width: 768px) {
   .fields {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  /* A field left alone on the last row takes the row (F2: the same edges). */
+  .fields > :last-child:nth-child(odd) {
+    grid-column: 1 / -1;
   }
 }
 
@@ -491,6 +501,11 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: 10px;
+  max-width: var(--field-max);
+}
+
+.dates > * {
+  --field-max: none;
 }
 
 @media (min-width: 768px) {

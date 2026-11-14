@@ -112,10 +112,15 @@
   --leading-tight: 1.25;
   --leading: 1.5;
   /* Reading width (DESK-05, audit 13 Nov 2026): a paragraph or a note never runs wider than this, and
-     a one-line field (a name, a list to choose from) never wider than --field-max. A grid that sizes
-     its own columns (the quote lines) sets --field-max: none. */
+     a field never wider than --field-max: a one-line field, a text area, a search, a row of two fields
+     (Eduard, 14 Nov 2026: fields one under another end at the same edge, docs/MODEL_DE_FOLOSIRE.md
+     F2). Inside a row of fields each field sets --field-max: none and shares the row; a grid that
+     sizes its own columns (the quote lines) sets it too. */
   --measure: 72ch;
   --field-max: 560px;
+  /* One height for every one-line field: a name, a list to choose from, a date, a search, a phone
+     number (docs/MODEL_DE_FOLOSIRE.md F3). Buttons stay --tap. */
+  --field-h: 48px;
   /* Page templates (Eduard, 14 Nov 2026): a form is one column of at most --form-max, centered; a
      list beside its detail is --list-w wide (from 1024 px); a card of a grid of cards is at least
      --grid-min (1 column on a phone, 2 on a tablet, 3–4 on a desktop); a row of a list is

@@ -84,10 +84,27 @@
   gap: 12px;
 }
 
+/* Fields two by two (docs/MODEL_DE_FOLOSIRE.md F1, F2): one field's width in all, equal halves from
+   600 px, a field left alone on its row takes the row. */
 .filters {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 12px;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  max-width: var(--field-max);
+}
+
+.filters > * {
+  --field-max: none;
+}
+
+@media (min-width: 600px) {
+  .filters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .filters > :last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
 }
 
 /* The conversation: the author's messages on one side, the team's on the other. */
@@ -195,6 +212,11 @@
 
 .actions > * {
   min-width: 0;
+}
+
+/* The colleague to give the request to: a field on its own line, as wide as the other fields. */
+.assignPick {
+  flex: 1 1 100%;
 }
 
 .notice {

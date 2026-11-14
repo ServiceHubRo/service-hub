@@ -312,6 +312,11 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 10px;
+  max-width: var(--field-max);
+}
+
+.pair > * {
+  --field-max: none;
 }
 
 .summary {

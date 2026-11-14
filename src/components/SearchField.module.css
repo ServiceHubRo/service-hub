@@ -1,5 +1,7 @@
+/* The same width, height and look as any other field (docs/MODEL_DE_FOLOSIRE.md). */
 .box {
   position: relative;
+  max-width: var(--field-max);
 }
 
 .icon {
@@ -13,10 +15,11 @@
 
 .input {
   width: 100%;
-  min-height: 48px;
+  height: var(--field-h);
+  min-height: var(--field-h);
   padding: 12px 48px 12px 40px;
-  background: var(--surface);
-  border: 1px solid var(--border);
+  background: var(--field-bg);
+  border: 1px solid var(--border-lit);
   border-radius: var(--radius-input);
   font-size: 16px;
   outline: none;

@@ -298,6 +298,7 @@ function Responsible({ request, me, staff, onDone }: { request: StaffRequestDeta
       {others.length > 0 && (
         <>
           <SelectField
+            className={styles.assignPick}
             label={t('support.detail.assignTo')}
             value={chosen}
             onChange={(e) => setTo(e.target.value)}

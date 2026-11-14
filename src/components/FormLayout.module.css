@@ -45,10 +45,12 @@
   background: var(--surface);
 }
 
+/* Two fields on one row: together as wide as one field (F2), each half of it (F1). */
 .pair {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--space-3);
+  max-width: var(--field-max);
 }
 
 /* Inside a pair, a field fills its half. */

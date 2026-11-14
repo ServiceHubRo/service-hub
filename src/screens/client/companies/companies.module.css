@@ -49,10 +49,27 @@
   font-size: 13px;
 }
 
+/* Fields two by two (docs/MODEL_DE_FOLOSIRE.md F1, F2): one field's width in all, equal halves from
+   600 px, a field left alone on its row takes the row. */
 .twoCols {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
+  grid-template-columns: minmax(0, 1fr);
   gap: 12px;
+  max-width: var(--field-max);
+}
+
+.twoCols > * {
+  --field-max: none;
+}
+
+@media (min-width: 600px) {
+  .twoCols {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .twoCols > :last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
 }
 
 .buttons {

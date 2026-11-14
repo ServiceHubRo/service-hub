@@ -880,10 +880,27 @@
   overflow-wrap: anywhere;
 }
 
+/* The fields of a form (docs/MODEL_DE_FOLOSIRE.md): one column on a phone, two equal ones from
+   600 px, never wider than one field's width in all; a field left alone on its row takes the row. */
 .formGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr));
+  grid-template-columns: minmax(0, 1fr);
   gap: 12px;
+  max-width: var(--field-max);
+}
+
+.formGrid > * {
+  --field-max: none;
+}
+
+@media (min-width: 600px) {
+  .formGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .formGrid > :last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
 }
 
 .fieldEnd {
@@ -1035,7 +1052,8 @@
 
 @media (min-width: 600px) {
   .reportBar {
-    grid-template-columns: minmax(0, 280px) minmax(0, 240px) auto;
+    /* The report and the period: two equal fields, one field's width together (F1). */
+    grid-template-columns: repeat(2, minmax(0, calc((var(--field-max) - 10px) / 2))) auto;
   }
 }
 
@@ -1339,7 +1357,11 @@
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
-  max-width: 480px;
+  max-width: var(--field-max);
+}
+
+.twoFields > * {
+  --field-max: none;
 }
 
 /* Abonament (T65): what a plan would add to the company's, in amber. */
