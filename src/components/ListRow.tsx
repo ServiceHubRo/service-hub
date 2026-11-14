@@ -65,7 +65,7 @@ export function ListRows({ label, children }: { label: string; children: ReactNo
 }
 
 /** A list loading: rows of the same shape, never an empty list. */
-export function ListRowsSkeleton({ count = 4, label }: { count?: number; label: string }) {
+export function ListRowsSkeleton({ count = 3, label }: { count?: number; label: string }) {
   return (
     <div className={styles.rows} aria-busy="true" role="status">
       <span className="visually-hidden">{label}</span>

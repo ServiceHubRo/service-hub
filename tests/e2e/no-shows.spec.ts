@@ -125,7 +125,8 @@ test.describe('T53 no-shows', () => {
 
     // Contest the newest no-show.
     await page.goto(`/c/programari?p=${bookings[0]!.id}`);
-    const card = page.locator(`#booking-${bookings[0]!.id}`);
+    // S2: ?p= opens the booking's detail.
+    const card = page.locator('main article').filter({ hasText: bookings[0]!.ref });
     await card.getByRole('button', { name: 'Contestă neprezentarea' }).click();
     const panel = card.getByRole('heading', { name: 'Contestă neprezentarea' }).locator('..');
     await expect(panel.getByRole('button', { name: 'Trimite contestația' })).toBeDisabled();
@@ -137,7 +138,9 @@ test.describe('T53 no-shows', () => {
     await expect(card.getByText('Contestație în analiză la echipa Service-Hub.')).toBeVisible();
     await expect(card.getByRole('button', { name: 'Contestă neprezentarea' })).toHaveCount(0);
     await shot(page, 't53-dispute-pending', name());
-    // A waiting dispute still counts until the admin decides (after the audit, variant A).
+    // A waiting dispute still counts until the admin decides (after the audit, variant A). The
+    // notice stands over the list (S2: on a phone the detail takes the screen).
+    await page.goto('/c/programari');
     await expect(page.getByText('Neprezentări în ultimele 90 de zile: 3. La fiecare programare confirmi prezența')).toBeVisible();
   });
 
@@ -181,7 +184,8 @@ test.describe('T53 no-shows', () => {
     await signIn(clientPage, client, PASSWORD);
     await expect(clientPage).toHaveURL(/\/c\/cauta/);
     await clientPage.goto(`/c/programari?p=${bookings[0]!.id}`);
-    const card = clientPage.locator(`#booking-${bookings[0]!.id}`);
+    // S2: ?p= opens the booking's detail.
+    const card = clientPage.locator('main article').filter({ hasText: bookings[0]!.ref });
     await expect(card.getByText('Contestație acceptată. Neprezentarea a fost anulată.')).toBeVisible();
     await expect(clientPage.getByText('Confirmat telefonic')).toHaveCount(0);
     await clientPage.context().close();

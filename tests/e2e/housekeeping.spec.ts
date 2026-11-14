@@ -11,6 +11,7 @@ import {
   signIn,
   userIdOf,
   switchLanguage,
+  openClientBooking,
 } from './support';
 
 // Bookings that look after themselves (Eduard, 3 oct): a request the shop never answers closes at
@@ -126,7 +127,7 @@ test.describe('Bookings that look after themselves', () => {
     await signIn(page, client, PASSWORD);
     await expect(page).toHaveURL(/\/c\/cauta/);
     await page.goto('/c/programari');
-    const card = page.locator('main li').filter({ hasText: shopName });
+    const card = await openClientBooking(page, shopName);
     await expect(card.getByText('Service-ul nu a răspuns la timp.', { exact: false })).toBeVisible();
     await expectNoHorizontalScroll(page);
     await shot(page, 'request-unanswered', name());

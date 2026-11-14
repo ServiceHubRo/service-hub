@@ -10,6 +10,7 @@ import {
   signIn,
   userIdOf,
   openBooking,
+  openClientBooking,
 } from './support';
 
 // New-client offers (T23): the owner picks a discount on labor for first bookings; a new client
@@ -87,7 +88,7 @@ test.describe('new-client offers', () => {
     await expect(client.getByText('-10% la manoperă', { exact: true })).toBeVisible();
 
     await client.getByRole('link', { name: 'Vezi programările' }).click();
-    const booking = client.locator('li').filter({ hasText: shopName });
+    const booking = await openClientBooking(client, shopName);
     await expect(booking).toContainText('Ofertă client nou: -10% la manoperă');
     await shot(client, 'offer-client-booking', name());
 

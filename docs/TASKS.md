@@ -1970,3 +1970,11 @@ Nimic implementat. O sesiune nouă pornește de aici, după ce Eduard răspunde 
 - **Lucrul DESK-02/03 de dinainte** (2 coloane de carduri) nu intră: e pus deoparte, înlocuit de șabloane.
 
 - [x] Făcut
+
+### S2 — Șabloane de pagină, etapa 2: Programări (client) ca pilot și harta ecranelor (Eduard, 14 nov 2026: „Începe cu etapa 2”, după merge la #137)
+- **Programări (client)** pe șablonul A: file „Active (N)” și „Încheiate” (`?fila=incheiate`); Active = în așteptare, confirmată, în constatare, deviz trimis, deviz acceptat, în lucru, cu ce așteaptă clientul (deviz de răspuns, fișă de preluare de confirmat) primul și marcat; Încheiate = finalizată, anulată, respinsă, expirată, deviz refuzat, neprezentat, cele mai noi primele, cu filtre rapide (Toate · Finalizate · Anulate · Fără lucrare, `?filtru=`) și ultimele 20 + „Mai vechi” (toate programările se citesc deja dintr-o dată; „Mai vechi” e doar afișare, fără funcție nouă în baza de date).
+- **Detaliul** (`ClientBookingDetail`, înlocuiește `ClientBookingCard`) păstrează tot: devizul cu acceptare totală sau parțială (liniile în conținut, „Accept / Refuz” în bara de acțiuni; `QuoteDecision` despărțit în `QuoteLinesChoice` + `QuoteAnswer`, flota folosește în continuare `QuoteDecision` întreg), PDF-urile, Mesaj, anularea (și telefonul service-ului după termen), recenzia, contestarea neprezentării, programează din nou, caută alt service, calendarul, fișa de preluare, istoricul mașinii, ofertele, garanția, devizul firmei.
+- **Adrese:** `?p=<id>` (notificările) deschide programarea în fila ei; `&recenzie=1` deschide recenzia. După o acțiune programarea rămâne deschisă, și în „Încheiate” dacă tocmai s-a încheiat.
+- **Harta ecranelor:** `docs/SABLOANE_HARTA.md` (toate ecranele clientului, firmei, service-ului și agentului de suport → șablon, ce trece în „Încheiate”, ce butoane devin secundare; 7 ecrane care nu se potrivesc exact, cu propunerea).
+- **Testele din browser** caută acum programarea clientului prin `openClientBooking` (`tests/e2e/support.ts`): rândul, apoi detaliul.
+

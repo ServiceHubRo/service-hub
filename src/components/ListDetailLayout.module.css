@@ -196,3 +196,10 @@
 .actions > * {
   flex-shrink: 0;
 }
+
+/* A confirmation opened from the actions takes their place, in the flow of the detail. */
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}

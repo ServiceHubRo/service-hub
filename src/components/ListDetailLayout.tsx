@@ -32,27 +32,21 @@ export function ListDetailLayout({
   backLabel: string;
 }) {
   const detailRef = useFitToScreen(wide && !!detail);
-  if (!wide && open) {
-    return (
-      <div className={styles.single}>
-        <BackLink to={backTo} label={backLabel} />
-        {detail}
-      </div>
-    );
-  }
+  const single = !wide && open;
+  // One tree on every width: the detail open stays the same element when the window crosses
+  // 1024 px (its panel, a half-typed review), only the places change.
   return (
     <>
-      {header}
-      {wide && detail ? (
-        <div className={styles.split}>
-          <div className={styles.list}>{list}</div>
-          <div ref={detailRef} className={styles.detail}>
+      {!single && header}
+      <div className={wide && detail ? styles.split : styles.single}>
+        {!single && <div className={styles.list}>{list}</div>}
+        {(wide || single) && (
+          <div ref={detailRef} className={wide ? styles.detail : styles.single}>
+            {single && <BackLink to={backTo} label={backLabel} />}
             {detail}
           </div>
-        </div>
-      ) : (
-        <div className={styles.single}>{list}</div>
-      )}
+        )}
+      </div>
     </>
   );
 }
@@ -107,6 +101,7 @@ export function DetailPane({
   message,
   documents,
   actions,
+  panel,
   children,
 }: {
   /** The item's id: a new item is read from the top. */
@@ -118,6 +113,8 @@ export function DetailPane({
   message?: DetailMessage;
   documents?: ReactNode;
   actions?: ReactNode;
+  /** An action being confirmed (cancel, a review, a refusal): in the actions' place, in the page. */
+  panel?: ReactNode;
   children?: ReactNode;
 }) {
   const ref = useRef<HTMLElement>(null);
@@ -147,9 +144,10 @@ export function DetailPane({
       )}
       {children && <div className={styles.content}>{children}</div>}
       {documents && <div className={styles.documents}>{documents}</div>}
-      {actions && (
-        <div className={styles.actions} data-fixed-bottom>
-          {actions}
+      {/* One place for both: when a confirmation closes, its opener is found again in it (InlinePanel). */}
+      {(panel || actions) && (
+        <div className={panel ? styles.panel : styles.actions} data-fixed-bottom={panel ? undefined : true}>
+          {panel || actions}
         </div>
       )}
     </article>
