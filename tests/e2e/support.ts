@@ -354,8 +354,11 @@ export async function openBooking(card: Locator) {
  * when it is not among the active ones, and returns its detail.
  */
 export async function openClientBooking(page: Page, text: string | RegExp): Promise<Locator> {
+  // Programări itself (a tap on the menu leaves the screen before for a moment: Caută's cards are articles too).
+  await expect(page).toHaveURL(/\/c\/programari/);
+  await expect(page.getByRole('heading', { level: 1, name: /^(Programări|Bookings)$/ }).or(page.locator('main [data-back-bar]')).first()).toBeVisible();
   const panel = page.locator('main [role="tabpanel"]');
-  const detail = page.locator('main article');
+  const detail = page.locator('main article[aria-labelledby^="detail-"]');
   // The list, or a detail opened from a link (a phone), once the bookings are read.
   await expect(panel.or(detail).first()).toBeVisible({ timeout: 15_000 });
   if (!(await panel.isVisible())) await page.locator('main [data-back-bar] a').click();
