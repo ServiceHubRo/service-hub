@@ -9,7 +9,7 @@ export interface ChipProps {
 
 export function Chip({ selected = false, onClick, children }: ChipProps) {
   return (
-    <button type="button" className={`${styles.chip} ${selected ? styles.on : ''}`} aria-pressed={selected} onClick={onClick}>
+    <button data-ui="chip" type="button" className={`${styles.chip} ${selected ? styles.on : ''}`} aria-pressed={selected} onClick={onClick}>
       {children}
     </button>
   );

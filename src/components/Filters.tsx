@@ -18,6 +18,7 @@ export function FiltersButton({ count, onClick }: { count: number; onClick: () =
   const { t } = useI18n();
   return (
     <button
+      data-ui="filters-button"
       type="button"
       className={`${styles.filtersButton} ${count > 0 ? styles.filtersButtonOn : ''}`}
       onClick={onClick}
@@ -40,7 +41,7 @@ export function ActiveFilters({ items, onClearAll }: { items: readonly ActiveFil
   const { t } = useI18n();
   if (items.length === 0) return null;
   return (
-    <div className={styles.active}>
+    <div data-ui="active-filters" className={styles.active}>
       <p className={styles.activeText}>
         <span className="visually-hidden">{t('filters.active')}: </span>
         {items.map((f) => f.label).join(' · ')}
@@ -83,6 +84,7 @@ export function FilterSheet({
 
   return (
     <dialog
+      data-ui="filter-sheet"
       ref={dialogRef}
       className={styles.sheet}
       aria-labelledby={titleId}

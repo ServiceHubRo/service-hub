@@ -25,7 +25,7 @@ export function FormLayout({
   children: ReactNode;
 }) {
   return (
-    <div className={styles.page}>
+    <div data-ui="form-layout" className={styles.page}>
       {header}
       <form
         className={styles.form}
@@ -60,13 +60,13 @@ export function FormSection({ title, description, children }: { title: string; d
 
 /** Two fields that belong together on one row (make and model, day and time), on every width. */
 export function FieldPair({ children }: { children: ReactNode }) {
-  return <div className={styles.pair}>{children}</div>;
+  return <div data-ui="field-pair" className={styles.pair}>{children}</div>;
 }
 
 /** A form loading (the item to edit): its sections, the same shape. */
 export function FormSkeleton({ sections = 2, label }: { sections?: number; label: string }) {
   return (
-    <div className={styles.form} aria-busy="true" role="status">
+    <div data-ui="skeleton" className={styles.form} aria-busy="true" role="status">
       <span className="visually-hidden">{label}</span>
       {Array.from({ length: sections }, (_, i) => (
         <div key={i} className={styles.section} aria-hidden="true">

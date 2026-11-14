@@ -54,7 +54,7 @@ export function InlinePanel({ title, children, onClose }: { title: string; child
     onClose();
   };
   return (
-    <Card inset className={styles.panel} onKeyDown={onClose ? onKeyDown : undefined}>
+    <Card data-ui="inline-panel" inset className={styles.panel} onKeyDown={onClose ? onKeyDown : undefined}>
       <h3 ref={titleRef} tabIndex={-1} className={styles.title}>
         {title}
       </h3>

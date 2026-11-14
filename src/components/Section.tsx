@@ -19,7 +19,7 @@ export interface SectionProps {
 export function Section({ title, description, id, children }: SectionProps) {
   const headingId = useId();
   return (
-    <section id={id} className={styles.section} aria-labelledby={headingId}>
+    <section data-ui="section" id={id} className={styles.section} aria-labelledby={headingId}>
       <div className={styles.head}>
         <h2 id={headingId} className={styles.title}>
           {title}
@@ -36,5 +36,5 @@ export function Section({ title, description, id, children }: SectionProps) {
  * label on the left and its control on the right (Switch, Stepper, an `inline` field).
  */
 export function SectionCard({ children }: { children: ReactNode }) {
-  return <div className={styles.card}>{children}</div>;
+  return <div data-ui="section-card" className={styles.card}>{children}</div>;
 }

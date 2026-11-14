@@ -19,7 +19,7 @@ export function Disclosure({
   children: ReactNode;
 }) {
   return (
-    <details className={styles.disclosure} open={defaultOpen || undefined}>
+    <details data-ui="disclosure" className={styles.disclosure} open={defaultOpen || undefined}>
       <summary className={styles.summary}>
         <span className={styles.title}>{title}</span>
         {summary !== undefined && <span className={styles.meta}>{summary}</span>}

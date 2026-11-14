@@ -7,7 +7,7 @@ import { useI18n } from '../i18n/context';
 export function LoadError({ message, onRetry }: { message: string; onRetry: () => void }) {
   const { t } = useI18n();
   return (
-    <div role="alert">
+    <div data-ui="load-error" role="alert">
       <EmptyState
         icon={CloudOff}
         title={message}

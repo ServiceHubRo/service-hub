@@ -41,7 +41,7 @@ export function ListRow({ icon, title, detail, status, attention = false, select
   );
   const cls = `${styles.row} ${selected ? styles.selected : ''}`;
   return (
-    <li className={styles.item}>
+    <li data-ui="list-row" className={styles.item}>
       {to ? (
         <Link to={to} className={cls} aria-current={selected ? 'true' : undefined} onClick={onSelect}>
           {body}
@@ -58,7 +58,7 @@ export function ListRow({ icon, title, detail, status, attention = false, select
 /** The rows of a list, one under the other, apart by a little space. */
 export function ListRows({ label, children }: { label: string; children: ReactNode }) {
   return (
-    <ul className={styles.rows} aria-label={label}>
+    <ul data-ui="list-rows" className={styles.rows} aria-label={label}>
       {children}
     </ul>
   );
@@ -67,7 +67,7 @@ export function ListRows({ label, children }: { label: string; children: ReactNo
 /** A list loading: rows of the same shape, never an empty list. */
 export function ListRowsSkeleton({ count = 3, label }: { count?: number; label: string }) {
   return (
-    <div className={styles.rows} aria-busy="true" role="status">
+    <div data-ui="skeleton" className={styles.rows} aria-busy="true" role="status">
       <span className="visually-hidden">{label}</span>
       {Array.from({ length: count }, (_, i) => (
         <div key={i} className={`${styles.row} ${styles.skeleton}`} aria-hidden="true">

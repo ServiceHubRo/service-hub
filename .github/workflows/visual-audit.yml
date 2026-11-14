@@ -3,7 +3,8 @@ name: Visual audit
 # A9: every screen of every role at 390, 430, 768, 820, 1024, 1280 and 1440 px against a throwaway
 # Supabase on the runner (the same as the browser tests; never the real project). Run by hand
 # (Actions → Visual audit → Run workflow), for example after a change to the shared components:
-# the screenshots and the measurements (visual-audit/rows-*.jsonl) are under the run's Artifacts.
+# the screenshots, the measurements (visual-audit/rows-*.jsonl) and the consistency report
+# (visual-audit/consistency.md, docs/MODEL_DE_FOLOSIRE.md) are under the run's Artifacts.
 # `only` measures just the tests whose title matches (for example: visitor|new shop).
 
 on:
@@ -51,6 +52,9 @@ jobs:
         run: |
           if [ -n "$ONLY" ]; then npm run test:visual -- --grep "$ONLY"; else npm run test:visual; fi
         continue-on-error: true
+      - name: Consistency report (docs/MODEL_DE_FOLOSIRE.md)
+        if: always()
+        run: node scripts/consistency-report.mjs visual-audit visual-audit/consistency.md
       - uses: actions/upload-artifact@v4
         if: always()
         with:

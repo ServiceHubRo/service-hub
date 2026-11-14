@@ -13,7 +13,7 @@ export interface SwitchProps extends Omit<ComponentProps<'input'>, 'type' | 'rol
  */
 export function Switch({ children, hint, className, ...rest }: SwitchProps) {
   return (
-    <label className={`${styles.row} ${className ?? ''}`}>
+    <label data-ui="switch" className={`${styles.row} ${className ?? ''}`}>
       <span className={styles.text}>
         <span className={styles.label}>{children}</span>
         {hint && <span className={styles.hint}>{hint}</span>}

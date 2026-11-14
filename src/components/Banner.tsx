@@ -17,7 +17,7 @@ export interface BannerProps {
 export function Banner({ tone = 'info', children, action, icon }: BannerProps) {
   const Icon = ICONS[tone];
   return (
-    <div className={`${styles.banner} ${styles[tone]}`} role={tone === 'error' ? 'alert' : 'status'}>
+    <div data-ui="banner" className={`${styles.banner} ${styles[tone]}`} role={tone === 'error' ? 'alert' : 'status'}>
       {icon ? <span className={styles.icon}>{icon}</span> : <Icon size={18} className={styles.icon} aria-hidden="true" />}
       <div className={styles.text}>{children}</div>
       {action && <div className={styles.action}>{action}</div>}

@@ -322,7 +322,7 @@ function Editor({
     const altBani = part === 'both' && row.altPrice ? rowBani({ ...row, price: row.altPrice }, priceMode) : 0;
     return (
       <li key={row.key} className={styles.line}>
-        <div className={`${styles.grid} ${isPart ? styles.partGrid : styles.laborGrid}`}>
+        <div data-fields="table" className={`${styles.grid} ${isPart ? styles.partGrid : styles.laborGrid}`}>
           <Field
             className={styles.name}
             label={isPart ? t('qe.part') : t('qe.operation')}
@@ -394,7 +394,7 @@ function Editor({
           />
         )}
         {isPart && part === 'both' && (
-          <div className={`${styles.grid} ${styles.altGrid}`}>
+          <div data-fields="table" className={`${styles.grid} ${styles.altGrid}`}>
             <Field
               className={styles.producer}
               label={t('qe.altProducer')}

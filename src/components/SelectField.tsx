@@ -19,7 +19,7 @@ export function SelectField({ label, hint, options, groups, inline, className, o
   const touch = useTouchSelect(onChange);
   const hintId = hint ? `${id}-hint` : undefined;
   return (
-    <div className={`${styles.field} ${inline ? styles.inline : ''} ${className ?? ''}`}>
+    <div data-ui="select" className={`${styles.field} ${inline ? styles.inline : ''} ${className ?? ''}`}>
       <label htmlFor={id} className={styles.label}>
         {label}
       </label>

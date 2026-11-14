@@ -9,12 +9,15 @@ import {
   serviceRest,
   signIn,
 } from './support';
+import { expectConsistent } from './fieldRules';
+import { ENFORCED_RULES } from './patternRules';
 
 // T18: every screen of every role passes the WCAG 2.1 AA checks (axe-core) and has 44 px tap
 // targets, in Romanian and English; keyboard users can skip the navigation. Read-only visits of
 // the demo accounts (conversations are not opened: that would mark them read for other tests).
 // T19c (launch check): on the same visit, nothing sticks out sideways at 390 / 820 / 1440 px and
-// no Romanian text is left on an English screen.
+// no Romanian text is left on an English screen. Consistency (14 Nov 2026): the rules of
+// docs/MODEL_DE_FOLOSIRE.md that every screen already keeps (ENFORCED_RULES).
 
 test.skip(!BACKEND, 'needs the local Supabase stack');
 // Many screens per test.
@@ -57,6 +60,8 @@ async function checkAll(page: Page, lang: 'ro' | 'en', paths: string[]) {
     await open(page, path);
     await expectAccessible(page, `${path} (${lang})`);
     await expectNoHorizontalScroll(page);
+    // One way of doing each thing on every account (docs/MODEL_DE_FOLOSIRE.md).
+    await expectConsistent(page, `${path} (${lang})`, ENFORCED_RULES);
     if (lang === 'en') await expectNoRomanianText(page, path);
   }
 }

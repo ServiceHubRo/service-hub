@@ -22,7 +22,7 @@ export function Stepper({ label, value, min, max, step = 1, onChange, decreaseLa
   const id = useId();
   const set = (next: number) => onChange(Math.min(max, Math.max(min, next)));
   return (
-    <div className={stacked ? styles.stacked : styles.row}>
+    <div data-ui="stepper" className={stacked ? styles.stacked : styles.row}>
       <span id={id} className={styles.label}>
         {label}
       </span>

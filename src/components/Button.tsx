@@ -10,7 +10,7 @@ export interface ButtonProps extends ComponentPropsWithRef<'button'> {
 
 export function Button({ variant = 'secondary', block = false, className, type = 'button', children, ...rest }: ButtonProps) {
   return (
-    <button type={type} className={buttonClass(variant, block, className)} {...rest}>
+    <button data-ui="button" type={type} className={buttonClass(variant, block, className)} {...rest}>
       {typeof children === 'string' ? <KeepHyphens>{children}</KeepHyphens> : children}
     </button>
   );

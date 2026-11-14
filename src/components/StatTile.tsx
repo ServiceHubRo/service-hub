@@ -8,7 +8,7 @@ import styles from './StatTile.module.css';
 /** Page template D, a dashboard: its figures in equal boxes on one row (2 on a phone). */
 export function StatGrid({ label, children }: { label: string; children: ReactNode }) {
   return (
-    <ul className={styles.grid} aria-label={label}>
+    <ul data-ui="stat-grid" className={styles.grid} aria-label={label}>
       {children}
     </ul>
   );
@@ -31,7 +31,7 @@ export function StatTile({ value, label, to, attention = false }: { value: React
 
 export function StatGridSkeleton({ count = 4, label }: { count?: number; label: string }) {
   return (
-    <div className={styles.grid} aria-busy="true" role="status">
+    <div data-ui="skeleton" className={styles.grid} aria-busy="true" role="status">
       <span className="visually-hidden">{label}</span>
       {Array.from({ length: count }, (_, i) => (
         <div key={i} className={styles.tile} aria-hidden="true">

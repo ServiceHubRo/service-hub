@@ -9,7 +9,7 @@ import styles from './StatusPill.module.css';
  * meaning (src/lib/statusTone.ts); the label always says it in words.
  */
 export function StatusPill({ tone, children }: { tone: PillTone; children: ReactNode }) {
-  return <span className={`${styles.pill} ${styles[tone]}`}>{children}</span>;
+  return <span data-ui="status-pill" className={`${styles.pill} ${styles[tone]}`}>{children}</span>;
 }
 
 /** A booking's status, colored for the person reading it. */
