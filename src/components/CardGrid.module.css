@@ -1,0 +1,188 @@
+/* Page template B: equal cards. Every row as tall as the tallest card (grid-auto-rows: 1fr). */
+.grid {
+  list-style: none;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-auto-rows: 1fr;
+  gap: var(--space-4);
+}
+
+@media (min-width: 768px) {
+  .grid {
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, var(--grid-min)), 1fr));
+  }
+}
+
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-width: 0;
+  padding: var(--card-pad);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  color: var(--text);
+  transition: background-color var(--motion-quick) var(--ease);
+}
+
+@media (hover: hover) {
+  .card:hover:not(.skeleton) {
+    background: var(--surface-hover);
+  }
+}
+
+.card:active:not(.skeleton) {
+  background: var(--surface2);
+}
+
+/* The whole card answers the title's link; the ring goes round the card. */
+.head::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-card);
+}
+
+.head:focus-visible {
+  box-shadow: none;
+}
+
+.head:focus-visible::after {
+  box-shadow: var(--focus-ring);
+}
+
+.top {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+  /* Room for the corner control. */
+  padding-right: var(--tap);
+}
+
+.media {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: var(--space-12);
+  height: var(--space-12);
+  border-radius: var(--radius-button);
+  background: var(--amber-tint);
+  color: var(--amber);
+  font-weight: 700;
+  overflow: hidden;
+}
+
+.head {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--space-1);
+  min-width: 0;
+  min-height: var(--tap);
+  color: var(--text);
+  text-decoration: none;
+}
+
+.title,
+.detail {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.title {
+  font-size: var(--text-md);
+  font-weight: 650;
+  line-height: var(--leading-tight);
+}
+
+.detail {
+  color: var(--muted);
+  font-size: var(--text-sm);
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: calc(var(--text-xs) * 2);
+  font-size: var(--text-sm);
+  color: var(--text-2);
+}
+
+/* The foot sits at the bottom of every card, so the cards of a row end on one line. */
+.foot {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: auto;
+  min-height: var(--text-xl);
+  font-size: var(--text-sm);
+}
+
+.footText {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chevron {
+  flex-shrink: 0;
+  color: var(--muted);
+}
+
+.aside {
+  position: absolute;
+  z-index: 1;
+  top: var(--space-2);
+  right: var(--space-2);
+}
+
+/* ---------------------------------------------------------------- loading */
+.skeleton {
+  cursor: default;
+}
+
+.bone {
+  display: block;
+  border-radius: var(--radius-pill);
+  background: linear-gradient(90deg, var(--surface2) 0%, var(--border-lit) 50%, var(--surface2) 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+
+.media.bone {
+  border-radius: var(--radius-button);
+}
+
+.boneTitle {
+  width: 9em;
+  max-width: 100%;
+  height: var(--text-md);
+}
+
+.boneLine {
+  width: 70%;
+  height: var(--text-sm);
+}
+
+.boneShort {
+  width: 40%;
+  height: var(--text-sm);
+  margin-top: auto;
+}
+
+@keyframes shimmer {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: -100% 0;
+  }
+}

@@ -7,22 +7,25 @@ import { BACKEND, PASSWORD, SEED, SEED_PASSWORD, createUser, rpcAs, serviceRest,
 
 /**
  * A9 — the visual audit: every screen of every role, at seven widths (phone to large desktop), in
- * Romanian (and a second pass in English at 390 and 1440 px). For each screen and width it measures
- * what a person would see as broken (horizontal scroll, something off the screen, text out of its
- * box or clipped, small tap targets, buttons on top of each other, tiny text, inputs under 16 px,
- * images that did not load, console errors) and keeps a screenshot. Nothing is asserted: the
- * result is `visual-audit/report.json` and the screenshots, read by a person.
+ * Romanian (and a second pass in English at 390 and 1440 px); other widths with VISUAL_WIDTHS. For
+ * each screen and width it measures what a person would see as broken (horizontal scroll, something
+ * off the screen, text out of its box or clipped, small tap targets, buttons on top of each other,
+ * tiny text, inputs under 16 px, images that did not load, console errors) and keeps a screenshot.
+ * Nothing is asserted: the result is `visual-audit/report.json` and the screenshots, read by a person.
  *
  *   npm run test:visual   (with the local Supabase stack, like the browser tests: CLAUDE.md §9)
  */
 
 const OUT = process.env.VISUAL_OUT ?? 'visual-audit';
-const WIDTHS = [390, 430, 768, 820, 1024, 1280, 1440] as const;
+/** Other widths for one run: `VISUAL_WIDTHS=375,768,1024,1440,1920` (and `VISUAL_EN_WIDTHS=375,1440`). */
+const widthsFrom = (value: string | undefined, fallback: readonly number[]) =>
+  value ? value.split(',').map(Number).filter((n) => n > 0) : fallback;
+const WIDTHS = widthsFrom(process.env.VISUAL_WIDTHS, [390, 430, 768, 820, 1024, 1280, 1440]);
 /** Full-page screenshots at these widths; the others keep the first screen only, or nothing when clean. */
-const FULL = new Set<number>([390, 820, 1440]);
-const ALWAYS_SHOT = new Set<number>([390, 430, 768, 820, 1024, 1280, 1440]);
-const EN_WIDTHS = [390, 1440] as const;
-const HEIGHT: Record<number, number> = { 390: 844, 430: 932, 768: 1024, 820: 1180, 1024: 768, 1280: 800, 1440: 900 };
+const FULL = new Set<number>([375, 390, 768, 820, 1440, 1920]);
+const ALWAYS_SHOT = new Set<number>(WIDTHS);
+const EN_WIDTHS = widthsFrom(process.env.VISUAL_EN_WIDTHS, [390, 1440]);
+const HEIGHT: Record<number, number> = { 375: 812, 390: 844, 430: 932, 768: 1024, 820: 1180, 1024: 768, 1280: 800, 1440: 900, 1920: 1080 };
 
 const SEED_SUPPORT = { email: 'suport@service-hub.test', secret: 'KRSXG5CTKVIFAT2SKRSXG5CTKVIFAT2S' };
 
@@ -425,6 +428,16 @@ test.describe('A9 visual audit', () => {
       { name: 'verifica', path: '/verifica' },
       { name: '404', path: '/nu-exista' },
       { name: 'galerie-componente', path: '/dev/componente' },
+      // The page templates (14 Nov 2026), each with data, loading, empty and failed; a list item open.
+      ...(['lista', 'grila', 'formular', 'panou', 'citit'] as const).flatMap((t) =>
+        ['', '?stare=incarcare', '?stare=gol', '?stare=eroare'].map((q) => ({
+          name: `sablon-${t}${q ? `-${q.slice(7)}` : ''}`,
+          path: `/dev/componente/sabloane/${t}${q}`,
+          roOnly: q !== '',
+        })),
+      ),
+      { name: 'sablon-lista-incheiate', path: '/dev/componente/sabloane/lista?fila=incheiate' },
+      { name: 'sablon-lista-detaliu', path: '/dev/componente/sabloane/lista?id=b1' },
       { name: 'flota-previzualizare', path: '/dev/flota' },
     ];
     await runRole(page, 'visitor', screens);

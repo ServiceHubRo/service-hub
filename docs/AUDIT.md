@@ -503,6 +503,13 @@ Esc cu focusul înapoi) împreună cu testele ecranelor atinse (programare adău
 
 **Găsite în timpul lotului și lăsate neatinse** (în tabel): FUN-07, BRW-02, TXT-02.
 
+## 8c. Șabloane de pagină — etapa 1 (14 noiembrie 2026)
+
+Eduard a înlocuit lotul DESK-02 / DESK-03 (2 coloane de carduri) cu un sistem de 5 șabloane de pagină, în 3 etape
+(`docs/TASKS.md`, S1; ARCHITECTURE §17, „Page templates”). Etapa 1 adaugă doar componentele și tokenii, fără să mute
+vreun ecran: DS-01 are acum scara în `tokens.css` (`--text-xs` … `--text-xl`, `--text-title`); înlocuirea celor 29
+de mărimi și regula de lint vin în etapa 3. DESK-02 și DESK-03 se rezolvă prin șabloanele A și B (etapele 2–3).
+
 ## 9. Plan de reparații pe loturi
 
 Fiecare lot = un pull request separat, testat pe linkul de previzualizare.

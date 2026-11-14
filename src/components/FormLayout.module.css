@@ -1,0 +1,124 @@
+/* Page template C: one centered column; its title at the same left edge as its fields. */
+.page {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: var(--form-max);
+  margin-inline: auto;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--section-gap);
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.sectionHead {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.sectionTitle {
+  font-size: var(--text-md);
+  font-weight: 650;
+}
+
+.sectionText {
+  color: var(--muted);
+  font-size: var(--text-sm);
+  max-width: var(--measure);
+}
+
+.fields {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  padding: var(--card-pad);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+}
+
+.pair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+/* Inside a pair, a field fills its half. */
+.pair > * {
+  --field-max: none;
+}
+
+/* As wide as the form; above the tab bar on a phone, at the foot of the screen on a desktop. The
+   quiet action first, the main one at the end of the row (on a phone it fills the rest of it). */
+.bar {
+  position: sticky;
+  bottom: var(--nav-bottom, 0px);
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: calc(-1 * var(--space-4));
+  padding: var(--space-4) 0 var(--page-pad);
+  background: var(--bg);
+}
+
+.save {
+  flex: 1;
+  display: flex;
+}
+
+.save > * {
+  flex: 1;
+}
+
+@media (min-width: 768px) {
+  .bar {
+    justify-content: flex-end;
+  }
+
+  .save {
+    flex: none;
+  }
+
+  .save > * {
+    flex: none;
+  }
+}
+
+/* ---------------------------------------------------------------- loading */
+.bone {
+  display: block;
+  border-radius: var(--radius-input);
+  background: linear-gradient(90deg, var(--surface2) 0%, var(--border-lit) 50%, var(--surface2) 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+
+.boneTitle {
+  width: 30%;
+  height: var(--text-md);
+  border-radius: var(--radius-pill);
+}
+
+.boneField {
+  width: 100%;
+  max-width: var(--field-max);
+  height: var(--tap);
+}
+
+@keyframes shimmer {
+  from {
+    background-position: 100% 0;
+  }
+  to {
+    background-position: -100% 0;
+  }
+}
