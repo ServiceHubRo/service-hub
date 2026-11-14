@@ -15,6 +15,7 @@ import {
   signIn,
   userIdOf,
   switchLanguage,
+  openClientBooking,
 } from './support';
 
 // T19d — client reminders in the app: a finished job still waiting for a review shows a card on
@@ -124,7 +125,8 @@ test.describe('client reminders', () => {
     // The same address the push opens: the booking, with the review form already open.
     await card.getByRole('link', { name: 'Lasă recenzia' }).click();
     await expect(page).toHaveURL(new RegExp(`/c/programari\\?p=${booking.id}&recenzie=1`));
-    const done = page.locator('main section li').filter({ hasText: booking.ref });
+    // S2: the booking's detail, open.
+    const done = page.locator('main article').filter({ hasText: booking.ref });
     await expect(done.getByRole('button', { name: 'Trimite recenzia' })).toBeVisible();
     await expectNoHorizontalScroll(page);
     await shot(page, 't19d-review-open', name());
@@ -202,7 +204,7 @@ test.describe('client reminders', () => {
     // Already on Programări when the review request is tapped (the app moves there without a
     // reload, as PushBridge does): the card opens its form.
     await page.getByRole('link', { name: 'Programări', exact: true }).filter({ visible: true }).first().click();
-    const done = page.locator('main section li').filter({ hasText: booking.ref });
+    const done = await openClientBooking(page, booking.ref);
     await expect(done.getByRole('button', { name: 'Lasă o recenzie' })).toBeVisible();
     await expect(done.getByRole('button', { name: 'Trimite recenzia' })).toHaveCount(0);
     await page.evaluate((path) => {

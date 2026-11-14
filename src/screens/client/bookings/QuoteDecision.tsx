@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { ActionButton } from '../../../components/ActionButton';
 import { Button } from '../../../components/Button';
 import { Checkbox } from '../../../components/Checkbox';
@@ -10,11 +9,14 @@ import { useI18n } from '../../../i18n/context';
 import { formatDate, formatMoney, formatTime } from '../../../i18n/format';
 import { decisionKind, selectedTotal, type Quote } from '../../../lib/clientBookings';
 import type { MessageKey } from '../../../i18n/ro';
-import { initialSelection, linePick, withLinePick, type QuoteLine } from '../../../lib/quoteLines';
+import { linePick, withLinePick, type QuoteLine } from '../../../lib/quoteLines';
 import { estimateText, hasSections, quantityDetail, quoteSections, vatOf, type QuoteSectionKind } from '../../../lib/quoteSections';
+import { useQuoteChoice, type QuoteChoice } from './useQuoteChoice';
 import styles from './bookings.module.css';
 
 const HEADING: Record<QuoteSectionKind, MessageKey> = { labor: 'qe.labor', part: 'qe.parts', other: 'qe.other' };
+
+type Decide = (bookingId: string, quoteId: string, approvedItemIds: string[], requestId: string) => Promise<Booking>;
 
 /**
  * The client's answer to a quote (P15, P15c, FR §3.5): every line with a checkbox, all ticked at
@@ -24,6 +26,8 @@ const HEADING: Record<QuoteSectionKind, MessageKey> = { labor: 'qe.labor', part:
  * (never mentioned when the fee is 0). The answer names the version seen, so a quote the shop
  * replaced meanwhile is refused by the database instead of accepted blindly.
  * A company's quote (T63d) is answered the same way through `decide` (fleet_decide_quote).
+ * The lines (QuoteLinesChoice) and the answer (QuoteAnswer) are two parts so a detail can hold the
+ * answer with its other actions (page template A); QuoteDecision is both, one under the other.
  */
 export function QuoteDecision({
   bookingId,
@@ -34,11 +38,21 @@ export function QuoteDecision({
   bookingId: string;
   quote: Quote;
   act: (run: () => Promise<Booking>) => Promise<void>;
-  decide?: (bookingId: string, quoteId: string, approvedItemIds: string[], requestId: string) => Promise<Booking>;
+  decide?: Decide;
 }) {
+  const choice = useQuoteChoice(quote);
+  return (
+    <div className={styles.quote}>
+      <QuoteLinesChoice quote={quote} choice={choice} />
+      <QuoteAnswer bookingId={bookingId} quote={quote} choice={choice} act={act} decide={decide} withQuestion />
+    </div>
+  );
+}
+
+/** The quote's lines to tick, the total, the term, the note, the deadline and the fee. */
+export function QuoteLinesChoice({ quote, choice }: { quote: Quote; choice: QuoteChoice }) {
   const { t, lang } = useI18n();
-  const [selected, setSelected] = useState<ReadonlySet<string>>(() => initialSelection(quote.items));
-  const [refusing, setRefusing] = useState(false);
+  const { selected, setSelected, refusing } = choice;
   const kind = decisionKind(quote.items, selected);
   const total = selectedTotal(quote.items, selected);
   const fee = quote.inspection_fee;
@@ -53,7 +67,6 @@ export function QuoteDecision({
     });
   }
 
-  const errorMessage = (e: unknown) => rpcErrorMessage(lang, e);
   const headed = hasSections(quote.items);
 
   const renderLine = (line: QuoteLine<Quote['items'][number]>) => {
@@ -95,7 +108,7 @@ export function QuoteDecision({
   };
 
   return (
-    <div className={styles.quote}>
+    <>
       {quote.version > 1 && <p className={styles.muted}>{t('cb.quote.updated')}</p>}
       <p className={styles.hint}>{t('cb.quote.hint')}</p>
       {/* The lines and the total: one panel on a phone (T52), as they were on a wider screen. */}
@@ -122,46 +135,75 @@ export function QuoteDecision({
         </p>
       )}
       {fee > 0 && <p className={styles.muted}>{t('cb.quote.fee', { fee: formatMoney(lang, fee) })}</p>}
+    </>
+  );
+}
 
-      {refusing ? (
-        <InlinePanel title={t('cb.refuse.title')} onClose={() => setRefusing(false)}>
-          {fee > 0 && <p className={styles.panelBody}>{t('cb.refuse.fee', { fee: formatMoney(lang, fee) })}</p>}
-          <div className={styles.buttons}>
-            <ActionButton
-              variant="danger"
-              block={false}
-              onAction={(rid) => act(() => decide(bookingId, quote.id, [], rid))}
-              errorMessage={errorMessage}
-              canRetry={canRetryRpc}
-            >
-              {t('cb.refuse.submit')}
-            </ActionButton>
-            <Button variant="ghost" onClick={() => setRefusing(false)}>
-              {t('cb.refuse.keep')}
-            </Button>
-          </div>
-        </InlinePanel>
-      ) : (
-        <>
-          <p className={styles.ask}>{t('cb.quote.ask')}</p>
-          <div className={styles.buttons}>
-            <ActionButton
-              variant="success"
-              block={false}
-              disabled={kind === 'none'}
-              onAction={(rid) => act(() => decide(bookingId, quote.id, [...selected], rid))}
-              errorMessage={errorMessage}
-              canRetry={canRetryRpc}
-            >
-              {kind === 'some' ? t('cb.quote.acceptSelected') : t('cb.quote.accept')}
-            </ActionButton>
-            <Button variant="danger" onClick={() => setRefusing(true)}>
-              {t('cb.quote.refuse')}
-            </Button>
-          </div>
-          {kind === 'none' && <p className={styles.muted}>{t('cb.quote.noneSelected')}</p>}
-        </>
-      )}
-    </div>
+/**
+ * „Accept” / „Accept selectate” and „Refuz” (with its confirmation): the answer to the quote.
+ * `withQuestion` puts „Service-ul a trimis un deviz. Îl accepți?” above it (a detail says it in
+ * its status message instead).
+ */
+export function QuoteAnswer({
+  bookingId,
+  quote,
+  choice,
+  act,
+  decide = decideQuote,
+  withQuestion = false,
+}: {
+  bookingId: string;
+  quote: Quote;
+  choice: QuoteChoice;
+  act: (run: () => Promise<Booking>) => Promise<void>;
+  decide?: Decide;
+  withQuestion?: boolean;
+}) {
+  const { t, lang } = useI18n();
+  const { selected, refusing, setRefusing } = choice;
+  const kind = decisionKind(quote.items, selected);
+  const fee = quote.inspection_fee;
+  const errorMessage = (e: unknown) => rpcErrorMessage(lang, e);
+
+  if (refusing)
+    return (
+      <InlinePanel title={t('cb.refuse.title')} onClose={() => setRefusing(false)}>
+        {fee > 0 && <p className={styles.panelBody}>{t('cb.refuse.fee', { fee: formatMoney(lang, fee) })}</p>}
+        <div className={styles.buttons}>
+          <ActionButton
+            variant="danger"
+            block={false}
+            onAction={(rid) => act(() => decide(bookingId, quote.id, [], rid))}
+            errorMessage={errorMessage}
+            canRetry={canRetryRpc}
+          >
+            {t('cb.refuse.submit')}
+          </ActionButton>
+          <Button variant="ghost" onClick={() => setRefusing(false)}>
+            {t('cb.refuse.keep')}
+          </Button>
+        </div>
+      </InlinePanel>
+    );
+  return (
+    <>
+      {withQuestion && <p className={styles.ask}>{t('cb.quote.ask')}</p>}
+      <div className={styles.buttons}>
+        <ActionButton
+          variant="success"
+          block={false}
+          disabled={kind === 'none'}
+          onAction={(rid) => act(() => decide(bookingId, quote.id, [...selected], rid))}
+          errorMessage={errorMessage}
+          canRetry={canRetryRpc}
+        >
+          {kind === 'some' ? t('cb.quote.acceptSelected') : t('cb.quote.accept')}
+        </ActionButton>
+        <Button variant="danger" onClick={() => setRefusing(true)}>
+          {t('cb.quote.refuse')}
+        </Button>
+      </div>
+      {kind === 'none' && <p className={styles.muted}>{t('cb.quote.noneSelected')}</p>}
+    </>
   );
 }

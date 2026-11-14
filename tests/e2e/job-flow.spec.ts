@@ -12,6 +12,7 @@ import {
   cardAction,
   openBooking,
   switchLanguage,
+  openClientBooking,
 } from './support';
 
 // T09 — the client decides on the quote (partially), the shop starts and completes the job with a
@@ -30,7 +31,8 @@ test.beforeEach(async ({ context }) => {
 const name = () => test.info().project.name;
 const navLink = (page: Page, label: string | RegExp) =>
   page.getByRole('link', { name: label, exact: typeof label === 'string' }).filter({ visible: true }).first();
-const clientCard = (page: Page, ref: string) => page.locator('main section li').filter({ hasText: ref });
+/** S2: the client's booking, opened from its row (its detail). */
+const clientCard = (page: Page, ref: string) => openClientBooking(page, ref);
 const shopCard = (page: Page, ref: string) => page.locator('main ul[aria-label] > li').filter({ hasText: ref });
 
 interface Day {
@@ -141,7 +143,7 @@ test.describe('quote, work, completion, review', () => {
     await expect(navLink(page, /^Programări/)).toHaveAccessibleName(/2 devize de aprobat/);
     await navLink(page, /^Programări/).click();
     // Every line ticked: "Accept", total 850. Unticking the discs → 430 and "Accept selectate".
-    const first = clientCard(page, accepted.ref);
+    const first = await clientCard(page, accepted.ref);
     await expect(first.getByRole('checkbox')).toHaveCount(3);
     await expect(first).toContainText('850 lei');
     await expect(first.getByRole('button', { name: 'Accept', exact: true })).toBeVisible();
@@ -168,7 +170,7 @@ test.describe('quote, work, completion, review', () => {
     await expect(shopA.getByRole('button', { name: 'În lucru' })).toBeVisible();
 
     // Refusing asks first and names the fee.
-    const refuseCard = clientCard(page, refused.ref);
+    const refuseCard = await clientCard(page, refused.ref);
     await refuseCard.getByRole('button', { name: 'Refuz', exact: true }).click();
     await expect(refuseCard.getByRole('heading', { name: 'Refuzi devizul?' })).toBeFocused();
     await expect(refuseCard).toContainText('Se percepe taxa de constatare de 100 lei.');
@@ -181,7 +183,7 @@ test.describe('quote, work, completion, review', () => {
     // Shop: În lucru → the client sees it live.
     await shopA.getByRole('button', { name: 'În lucru' }).click();
     await expect(shopPage.getByText(`Lucrarea pentru ${accepted.ref} a început. Clientul a fost anunțat.`)).toBeVisible();
-    await expect(clientCard(page, accepted.ref)).toContainText('Mașina ta este în lucru');
+    await expect(await clientCard(page, accepted.ref)).toContainText('Mașina ta este în lucru');
 
     // Finalizare: prefilled from the approved lines only; no completion without the odometer.
     await shopA.getByRole('button', { name: 'Finalizare' }).click();
@@ -205,7 +207,7 @@ test.describe('quote, work, completion, review', () => {
     await expect(shopA).toHaveCount(0);
 
     // Client: ready for pickup, with the odometer, the work and the amount; then the review.
-    const done = clientCard(page, accepted.ref);
+    const done = await clientCard(page, accepted.ref);
     await expect(done).toContainText('Gata de ridicare');
     await expect(done).toContainText('105.400 km');
     await expect(done).toContainText('Plăcuțe frână față, Manoperă');
@@ -227,7 +229,7 @@ test.describe('quote, work, completion, review', () => {
     await expect(done.getByRole('button', { name: 'Lasă o recenzie' })).toHaveCount(0);
 
     // Cancelling a request: asks first, then it moves to "Încheiate".
-    const pending = clientCard(page, pendingBooking.ref);
+    const pending = await clientCard(page, pendingBooking.ref);
     await expect(pending).toContainText('Service-ul îți confirmă cererea în curând.');
     await (await cardAction(pending, 'Anulează')).click();
     await pending.getByRole('button', { name: 'Anulează programarea' }).click();
@@ -237,8 +239,8 @@ test.describe('quote, work, completion, review', () => {
 
     // English.
     await switchLanguage(page, 'en');
-    await expect(page.getByText('Ready for pickup')).toBeVisible();
-    await expect(page.getByText('Quote declined. Inspection fee: 100 RON.')).toBeVisible();
+    await expect(await clientCard(page, accepted.ref)).toContainText('Ready for pickup');
+    await expect(await clientCard(page, refused.ref)).toContainText('Quote declined. Inspection fee: 100 RON.');
     await shot(page, 't09-client-list-en', name());
     await shopPage.context().close();
   });
@@ -325,7 +327,7 @@ test.describe('quote, work, completion, review', () => {
 
     await signIn(page, client, PASSWORD);
     await navLink(page, /^Programări/).click();
-    const confirmed = clientCard(page, booking.ref);
+    const confirmed = await clientCard(page, booking.ref);
     await expect(confirmed).toContainText('Confirmată');
     await expect(confirmed).toContainText('Contactează service-ul pentru a anula.');
     await expect(await cardAction(confirmed, 'Anulează')).toHaveCount(0);

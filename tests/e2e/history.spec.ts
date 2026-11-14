@@ -13,6 +13,7 @@ import {
   xlsxText,
   pickFilter,
   cardAction,
+  openClientBooking,
 } from './support';
 
 // T10 — the shop's repair history (search, filters, the opened card, CSV) and the client's vehicle
@@ -244,7 +245,7 @@ test.describe('repair history', () => {
 
     // 3. The finished booking in Programări.
     await navLink(me, /^Programări/).click();
-    await (await cardAction(me.locator('main section li').filter({ hasText: done.ref }), 'Vezi istoricul mașinii')).click();
+    await (await cardAction(await openClientBooking(me, done.ref), 'Vezi istoricul mașinii')).click();
     await expect(me).toHaveURL(new RegExp(`/c/programari/${done.id}/istoric$`));
     await expect(me.getByRole('heading', { level: 1, name: 'Dacia Logan' })).toBeVisible();
     await expect(me.getByText('1 lucrare · 430 lei cheltuit în total')).toBeVisible();

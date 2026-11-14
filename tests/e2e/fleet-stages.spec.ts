@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test';
 import { fleetSetup, openAs } from './fleet-support';
-import { BACKEND, SEED, SEED_PASSWORD, bucharestDay, createBookableShop, expectNoHorizontalScroll, expectNoRomanianText, rpcAs, serviceRest, shot, signIn, uniquePlate, userIdOf } from './support';
+import { BACKEND, SEED, SEED_PASSWORD, bucharestDay, createBookableShop, expectNoHorizontalScroll, expectNoRomanianText, rpcAs, serviceRest, shot, signIn, uniquePlate, userIdOf, openClientBooking
+} from './support';
 
 // T72–T77 — the fleet stages in the browser: issues and incidents (M3), odometer and fuel (M2), quote
 // changes and the manager's cancel (M5), maintenance (M4), notifications (M6), amounts hidden from a
@@ -361,7 +362,7 @@ test.describe('107 — amounts hidden from a driver without costs.view', () => {
     await rpcAs(f.manager, 'fleet_decide_quote', { p_booking_id: b.id, p_quote_id: quote!.id, p_approved_item_ids: items.map((i) => i.id), p_request_id: crypto.randomUUID() });
 
     const driver = await openAs(browser, f.driver, 'ro', '/c/programari');
-    const card = driver.locator('article, div').filter({ hasText: b.ref }).filter({ hasText: 'Plăcuțe' }).last();
+    const card = await openClientBooking(driver, b.ref);
     await expect(card).toContainText('Devizul a fost aprobat de firmă.');
     // The total as a number of its own: the shop's name (a timestamp) or the booking code may contain
     // the digits 600 (A7: the test failed on „Atelier Sume 1794497150600”).

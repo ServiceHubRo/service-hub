@@ -348,6 +348,43 @@ export async function openBooking(card: Locator) {
   await expect(summary).toHaveAttribute('aria-expanded', 'true');
 }
 
+/**
+ * S2 (page template A): the client's Programări is a list beside (or before) one booking's detail.
+ * Opens the booking whose row has `text` (the service, the shop, the car, the status…), in Încheiate
+ * when it is not among the active ones, and returns its detail.
+ */
+export async function openClientBooking(page: Page, text: string | RegExp): Promise<Locator> {
+  // Programări itself (a tap on the menu leaves the screen before for a moment: Caută's cards are articles too).
+  await expect(page).toHaveURL(/\/c\/programari/);
+  await expect(page.getByRole('heading', { level: 1, name: /^(Programări|Bookings)$/ }).or(page.locator('main [data-back-bar]')).first()).toBeVisible();
+  const panel = page.locator('main [role="tabpanel"]');
+  const detail = page.locator('main article[aria-labelledby^="detail-"]');
+  // The list, or a detail opened from a link (a phone), once the bookings are read.
+  await expect(panel.or(detail).first()).toBeVisible({ timeout: 15_000 });
+  if (!(await panel.isVisible())) await page.locator('main [data-back-bar] a').click();
+  const rows = panel.locator('li > :is(button, a)');
+  const loaded = async () => {
+    await expect(panel).toBeVisible();
+    await expect(panel.locator('[aria-busy="true"]')).toHaveCount(0, { timeout: 15_000 });
+  };
+  await loaded();
+  const row = rows.filter({ hasText: text }).first();
+  // In the tab on screen (the list is read again quietly on arrival), else in the other one.
+  const here = await row.waitFor({ timeout: 5_000 }).then(
+    () => true,
+    () => false,
+  );
+  if (!here) {
+    await page.getByRole('tab', { selected: false }).click();
+    await loaded();
+  }
+  await row.click();
+  // This booking's detail (the code or the shop is in it), not whichever is open later.
+  const mine = detail.filter({ hasText: text });
+  await expect(mine).toBeVisible();
+  return mine;
+}
+
 /** Opens every shop booking card on the page. */
 export async function openAllBookings(page: Page) {
   const closed = page.locator('main button[aria-controls^="booking-"][aria-expanded="false"]');

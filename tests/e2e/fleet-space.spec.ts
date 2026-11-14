@@ -1,5 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
-import { BACKEND, PASSWORD, SEED, SEED_PASSWORD, createBookableShop, createFleetUser, expectNoHorizontalScroll, rpcAs, serviceRest, shot, signIn, uniquePlate, switchLanguage } from './support';
+import { BACKEND, PASSWORD, SEED, SEED_PASSWORD, createBookableShop, createFleetUser, expectNoHorizontalScroll, rpcAs, serviceRest, shot, signIn, uniquePlate, switchLanguage, openClientBooking
+} from './support';
 
 // The company's fleet space (T63c): the admin opens the fleet from the company page, adds a vehicle
 // with the form (a plate already in the fleet is refused), assigns it to the driver, archives
@@ -266,6 +267,7 @@ test('bookings: the driver books a company vehicle, the manager approves within 
 
   // The driver's Programări: a company car, its quote answered by the company.
   await page.goto('/c/programari');
+  await openClientBooking(page, 'Deviz trimis');
   await expect(page.getByText('Devizul îl aprobă firma, în spațiul flotei.')).toBeVisible();
   await expect(page.getByRole('button', { name: 'Accept', exact: true })).toHaveCount(0);
   await shot(page, 'fleet-driver-bookings', name());

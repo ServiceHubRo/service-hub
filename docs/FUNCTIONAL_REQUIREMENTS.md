@@ -86,13 +86,13 @@ A user has exactly one role. The role decides the entire interface. A client can
 - Per car: "History — N jobs" → vehicle history page (§3.6).
 
 ### 3.5 My bookings
-- Chronological list, active first. Each card: service, shop + city, date/time, car, status badge.
+- Page template A (S2, Eduard 14 Nov 2026): tabs **Active (N)** and **Ended**. A row: service, date/time, shop, car, status; what waits for the client (a quote to answer, an intake sheet to confirm) first and marked. The detail holds everything below. Ended: newest first, quick filters (All · Finished · Canceled · No work done), the latest 20 and „Older”.
 - **Status badges:** Pending · Confirmed · In inspection · Quote sent · Quote accepted · In progress · Done · Declined · Cancelled · Quote refused · Expired · No-show.
 - **Quote decision** happens here when status is Quote sent: full quote (line items, note, total), then **Accept** / **Refuse**. Optional **partial approval**: each line has a checkbox; total recalculates; "Accept selected". A line with variants (T37c) also has two radio buttons, original part or alternative part (with its brand), the original picked at first; a line marked original or alternative only says so under its name. Refuse asks confirmation naming the inspection fee.
 - State displays: In inspection ("Your car is being inspected"), In progress (pulsing dot + start time), Done ("Ready for pickup", with odometer reading, work performed and amount).
 - **Cancel:** allowed while Pending or Confirmed, before the shop's cancellation deadline if it set one. Not allowed from In inspection onward.
 - After Done: **Leave review** (once). Shows "Review sent" afterwards.
-- Message button on every card.
+- Message on every booking (in „More” in the detail).
 - Book again from any Done booking.
 - **Car history for the shop (T27):** on every active booking, "Show" / "Hide" whether the shop sees what was done on this car at other shops (no prices, no shop names). Also offered as an unticked checkbox on the last booking step.
 

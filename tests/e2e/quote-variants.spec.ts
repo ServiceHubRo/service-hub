@@ -1,5 +1,5 @@
 import { expect, test, type Browser, type Page } from '@playwright/test';
-import { BACKEND, PASSWORD, cardAction, createBookableShop, createUser, expectNoHorizontalScroll, rpcAs, shot, signIn, switchLanguage } from './support';
+import { BACKEND, PASSWORD, cardAction, createBookableShop, createUser, expectNoHorizontalScroll, rpcAs, shot, signIn, switchLanguage, openClientBooking } from './support';
 
 // T37c — a quote line with an original and an alternative part: the shop adds the alternative in
 // the composer, the client picks it and accepts, the shop sees which variant was taken.
@@ -15,7 +15,8 @@ test.beforeEach(async ({ context }) => {
 
 const name = () => test.info().project.name;
 const rid = () => crypto.randomUUID();
-const clientCard = (page: Page, ref: string) => page.locator('main section li').filter({ hasText: ref }).first();
+/** S2: the client's booking, opened from its row (its detail). */
+const clientCard = (page: Page, ref: string) => openClientBooking(page, ref);
 const shopCard = (page: Page, ref: string) => page.locator('main ul[aria-label] > li').filter({ hasText: ref });
 
 async function freeSlot(email: string, shopId: string): Promise<{ date: string; slot: string }> {
@@ -98,7 +99,7 @@ test.describe('quote variants', () => {
     // The client: the original is picked at first; the alternative changes the total.
     const clientPage = await signedIn(browser, page, client);
     await clientPage.goto('/c/programari');
-    const quote = clientCard(clientPage, booking.ref);
+    const quote = await clientCard(clientPage, booking.ref);
     const original = quote.getByRole('radio', { name: /^Piesă originală/ });
     const alternative = quote.getByRole('radio', { name: /^Piesă alternativă, Bosch/ });
     await expect(original).toBeChecked();
