@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { BACKEND, SEED, SEED_PASSWORD, serviceRest, signIn } from './support';
+import { BACKEND, SEED, SEED_PASSWORD, openClientBooking, serviceRest, signIn } from './support';
 
 // The fix batch after the audit of 13 Nov 2026: Enter submits a form (FUN-01), the quote's lines take
 // Enter as „next line” (never sending the quote), Escape closes a confirm panel and gives the focus
@@ -52,7 +52,9 @@ test.describe('keyboard on forms and panels', () => {
     await signIn(page, SEED.client, SEED_PASSWORD);
     await expect(page).toHaveURL(/\/c\//);
     await page.goto('/c/programari');
-    const more = page.getByRole('button', { name: 'Mai multe' }).first();
+    // S2: the actions are in the booking's detail; a request waiting for the shop can be canceled.
+    const detail = await openClientBooking(page, 'În așteptare');
+    const more = detail.getByRole('button', { name: 'Mai multe' }).first();
     await expect(more).toBeVisible();
     await more.focus();
     await page.keyboard.press('Enter');

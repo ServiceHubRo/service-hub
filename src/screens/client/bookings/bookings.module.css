@@ -602,3 +602,10 @@
   align-items: center;
   gap: 6px;
 }
+
+/* „Mai vechi” under the ended bookings (page template A). */
+.more {
+  display: flex;
+  justify-content: center;
+  margin-top: var(--space-3);
+}

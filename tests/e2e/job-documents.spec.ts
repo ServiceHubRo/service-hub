@@ -13,6 +13,7 @@ import {
   userIdOf,
   openBooking,
   switchLanguage,
+  openClientBooking,
 } from './support';
 
 // T50 — the complete quote, the intake sheet and the client's company: the owner sets the hourly
@@ -32,7 +33,8 @@ test.beforeEach(async ({ context }) => {
 const name = () => test.info().project.name;
 const rid = () => crypto.randomUUID();
 const shopCard = (page: Page, ref: string) => page.locator('main ul[aria-label] > li').filter({ hasText: ref });
-const clientCard = (page: Page, ref: string) => page.locator('main section li').filter({ hasText: ref });
+/** S2: the client's booking, opened from its row (its detail). */
+const clientCard = (page: Page, ref: string) => openClientBooking(page, ref);
 
 interface Day {
   date: string;
@@ -141,7 +143,7 @@ test.describe('the complete quote and the intake sheet', () => {
     // The client: the prompt on the card, the sheet, the confirmation.
     const clientPage = await signedIn(browser, page, client);
     await clientPage.goto('/c/programari');
-    const cc = clientCard(clientPage, booking.ref);
+    let cc = await clientCard(clientPage, booking.ref);
     await cc.getByRole('link', { name: /Fișa de preluare/ }).click();
     await expect(clientPage.getByRole('heading', { level: 1, name: 'Fișa de preluare' })).toBeVisible();
     await expect(clientPage.getByText('Ușa stânga spate')).toBeVisible();
@@ -186,6 +188,7 @@ test.describe('the complete quote and the intake sheet', () => {
 
     // The client reads it by section.
     await clientPage.goto('/c/programari');
+    cc = await clientCard(clientPage, booking.ref);
     await expect(cc).toContainText('Manoperă');
     await expect(cc).toContainText('Piese și materiale');
     await expect(cc).toContainText('4 × 129 lei · Petronas');

@@ -301,8 +301,9 @@ test.describe('push notifications', () => {
           navigator.serviceWorker.dispatchEvent(new MessageEvent('message', { data: { type: 'sh:navigate', url } }));
         }, push.url);
         await expect(page).toHaveURL(new RegExp(`/c/programari\\?p=${booking.id}$`));
-        await expect(page.locator(`#booking-${booking.id}`)).toBeInViewport();
-        await expect(page.locator(`#booking-${booking.id}`)).toContainText(booking.ref);
+        // S2: that booking's detail is open.
+        await expect(page.locator('main article')).toBeInViewport();
+        await expect(page.locator('main article')).toContainText(booking.ref);
 
         // Turned off here: the device row is gone.
         await openNotifications(page);

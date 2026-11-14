@@ -16,6 +16,7 @@ import {
   cardAction,
   uniquePlate,
   switchLanguage,
+  openClientBooking,
 } from './support';
 
 // T11 — messages between a client and a shop, live on both sides, with automatic messages in the
@@ -133,7 +134,7 @@ test.describe('messages and reviews', () => {
     await signIn(page, client, PASSWORD);
     await expect(page).toHaveURL(/\/c\//);
     await navLink(page, /^Programări/).click();
-    const card = page.locator('main section li').filter({ hasText: booking.ref });
+    const card = await openClientBooking(page, booking.ref);
     await (await cardAction(card, 'Mesaj')).click();
     await expect(page).toHaveURL(/\/c\/mesaje\/[0-9a-f-]{36}$/);
     const log = page.getByRole('log');
@@ -141,7 +142,7 @@ test.describe('messages and reviews', () => {
     await expect(log).toContainText('mesaj automat');
     // Back returns to Programări (the booking's address was replaced by the conversation).
     await page.goBack();
-    await expect(page).toHaveURL(/\/c\/programari$/);
+    await expect(page).toHaveURL(/\/c\/programari(\?p=[0-9a-f-]+)?$/);
     await page.goForward();
 
     // The client writes; the shop's list moves and counts it without a reload.

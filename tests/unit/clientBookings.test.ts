@@ -1,7 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import {
+  activeOrder,
   cancelState,
+  clientTone,
   currentQuote,
+  endedGroup,
+  waitsForClient,
   decisionKind,
   quotesWaiting,
   reviewState,
@@ -156,5 +160,33 @@ describe('odometer (ARCHITECTURE §7)', () => {
 
   it('a first reading accepts any value in range', () => {
     expect(checkOdometer('1.999.999', null)).toEqual({ ok: true, km: 1999999, jump: null });
+  });
+});
+
+describe('Programări as a list (S2, page template A)', () => {
+  const at = (date: string, slot = '10:00') => ({ date, slot });
+
+  it('what waits for the client comes first, then the soonest', () => {
+    const list = activeOrder([
+      { id: 'a', status: 'confirmed' as const, ...at('2026-11-15') },
+      { id: 'b', status: 'quote_sent' as const, ...at('2026-11-20') },
+      { id: 'c', status: 'pending' as const, ...at('2026-11-14') },
+      { id: 'd', status: 'confirmed' as const, ...at('2026-11-18'), intake_sent_at: '2026-11-13T08:00:00Z', intake_confirmed_at: null },
+      { id: 'e', status: 'quote_sent' as const, ...at('2026-11-16'), company_id: 'firma' },
+    ]);
+    expect(list.map((b) => b.id)).toEqual(['d', 'b', 'c', 'a', 'e']);
+  });
+
+  it('a company car’s quote is not the driver’s to answer: not amber, not first', () => {
+    expect(waitsForClient({ status: 'quote_sent', company_id: 'firma' })).toBe(false);
+    expect(clientTone({ status: 'quote_sent', company_id: 'firma' })).toBe('neutral');
+    expect(clientTone({ status: 'quote_sent' })).toBe('action');
+    expect(clientTone({ status: 'done' })).toBe('closed');
+  });
+
+  it('the quick filters of the ended bookings', () => {
+    expect(endedGroup('done')).toBe('done');
+    expect(endedGroup('cancelled')).toBe('cancelled');
+    for (const s of ['declined', 'expired', 'quote_refused', 'no_show'] as const) expect(endedGroup(s)).toBe('noWork');
   });
 });

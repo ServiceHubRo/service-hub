@@ -230,7 +230,8 @@ test.describe('booking', () => {
 
     // The typed car went to the garage; the next booking offers it in one tap.
     await navLink(page, 'Garaj').click();
-    await expect(page.getByText('Dacia Duster')).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1, name: 'Garaj' })).toBeVisible();
+    await expect(page.locator('main').getByText('Dacia Duster').first()).toBeVisible();
 
     // A second client (in English): the same day is full and cannot be picked.
     const other = await browser.newContext({ viewport: page.viewportSize() ?? undefined });

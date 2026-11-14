@@ -1,6 +1,7 @@
 import { decisionKind as linesDecisionKind, type QuoteDetailFields, type QuoteVariantFields } from './quoteLines';
 import { nowKey } from './shopBookings';
-import type { BookingStatus } from './status';
+import { isActiveStatus, type BookingStatus } from './status';
+import { bookingTone, type PillTone } from './statusTone';
 
 /**
  * The client's Programări (FR §3.5, P10b, P15, P15c): which quote a booking shows, the partial
@@ -130,4 +131,44 @@ export function reviewToAsk<T extends { id: string; status: BookingStatus; done_
  */
 export function quotesWaiting(bookings: readonly { status: BookingStatus; company_id?: string | null }[]): number {
   return bookings.filter((b) => b.status === 'quote_sent' && !b.company_id).length;
+}
+
+/**
+ * Waits for the client (page template A: first in the list, marked): a quote of their own car to
+ * answer, or an intake sheet to confirm.
+ */
+export function waitsForClient(b: {
+  status: BookingStatus;
+  company_id?: string | null;
+  intake_sent_at?: string | null;
+  intake_confirmed_at?: string | null;
+}): boolean {
+  if (b.status === 'quote_sent' && !b.company_id) return true;
+  return isActiveStatus(b.status) && !!b.intake_sent_at && !b.intake_confirmed_at;
+}
+
+/** The active bookings: what waits for the client first, then the soonest. */
+export function activeOrder<T extends { status: BookingStatus; date: string; slot: string; company_id?: string | null; intake_sent_at?: string | null; intake_confirmed_at?: string | null }>(
+  bookings: readonly T[],
+): T[] {
+  return [...bookings].sort(
+    (a, b) => Number(waitsForClient(b)) - Number(waitsForClient(a)) || `${a.date} ${a.slot}`.localeCompare(`${b.date} ${b.slot}`),
+  );
+}
+
+/** Quick filters of the ended bookings: finished, cancelled, or never worked on. */
+export type EndedFilter = 'all' | 'done' | 'cancelled' | 'noWork';
+export const ENDED_FILTERS: readonly EndedFilter[] = ['all', 'done', 'cancelled', 'noWork'];
+
+export function endedGroup(status: BookingStatus): Exclude<EndedFilter, 'all'> {
+  return status === 'done' ? 'done' : status === 'cancelled' ? 'cancelled' : 'noWork';
+}
+
+/** How many ended bookings show at first, and how many more each „Mai vechi” adds. */
+export const ENDED_PAGE = 20;
+
+/** A booking's pill for the client: a company car's quote is the company's to answer, so not amber. */
+export function clientTone(b: { status: BookingStatus; company_id?: string | null }): PillTone {
+  if (b.status === 'quote_sent' && b.company_id) return 'neutral';
+  return bookingTone(b.status, 'client');
 }

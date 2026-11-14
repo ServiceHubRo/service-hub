@@ -473,6 +473,9 @@ test.describe('A9 visual audit', () => {
       { name: 'garaj-istoric', path: `/c/garaj/${car}/istoric` },
       { name: 'garaj-raport', path: `/c/garaj/${car}/raport` },
       { name: 'programari', path: '/c/programari' },
+      // S2 (template A): the ended tab and one booking open (a phone: its detail on the whole screen).
+      { name: 'programari-incheiate', path: '/c/programari?fila=incheiate' },
+      { name: 'programare-detaliu', path: `/c/programari?p=${done}` },
       { name: 'programari-eroare', path: '/c/programari', roOnly: true, widths: [390, 1440],
         before: async (p) => {
           await p.route('**/rest/v1/rpc/**', (r) => r.abort());

@@ -1,4 +1,4 @@
-import { useCallback, useLayoutEffect, useRef } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { LIST_DETAIL_QUERY, useMediaQuery } from './useMediaQuery';
 
@@ -9,8 +9,9 @@ interface OpenedFromList {
 /**
  * Which item of a list + detail screen is open (page template A), kept in the address (`?id=` by
  * default) so a link, a notification or Back finds it.
- * - From 1024 px the list stands beside the detail: with nothing chosen the first item is shown,
- *   and choosing another replaces the address (Back leaves the screen, not the item).
+ * - From 1024 px the list stands beside the detail: with nothing chosen the first item is shown and
+ *   written in the address, and choosing another replaces the address (Back leaves the screen, not
+ *   the item).
  * - Below, the detail takes the screen: choosing an item adds a step to the history, so the
  *   phone's Back (and „Înapoi”) returns to the list, scrolled where it was.
  */
@@ -48,6 +49,17 @@ export function useListDetail(ids: readonly string[], param = 'id') {
     next.delete(param);
     setParams(next, { replace: true });
   }, [location.state, navigate, params, param, setParams]);
+
+  // Beside the list, the item shown first is written in the address like a chosen one: it stays
+  // open when it changes under the reader (a booking that ends while it is read moves to the other
+  // tab, and the screen follows it there instead of showing another item).
+  const first = ids[0] ?? null;
+  useEffect(() => {
+    if (!wide || known !== null || first === null) return;
+    const next = new URLSearchParams(params);
+    next.set(param, first);
+    setParams(next, { replace: true, preventScrollReset: true });
+  }, [wide, known, first, params, param, setParams]);
 
   // The detail opens at its top; the list comes back where it was.
   const wasOpen = useRef(open);

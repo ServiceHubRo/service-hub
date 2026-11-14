@@ -10,6 +10,7 @@ import {
   signIn,
   userIdOf,
   cardAction,
+  openClientBooking,
 } from './support';
 
 // Fișa mașinii (T27; shown by default since 10 Oct): the shop the client books with sees what was
@@ -190,7 +191,7 @@ test.describe('Fișa mașinii', () => {
     await shot(page, 't27-vehicle-file-en', name());
 
     // The client cancels: nothing of the other shops stays visible.
-    await (await cardAction(client.locator('li').filter({ hasText: shopName }), 'Anulează')).click();
+    await (await cardAction(await openClientBooking(client, shopName), 'Anulează')).click();
     await client.getByRole('button', { name: 'Anulează programarea' }).click();
     await expect(page.getByRole('region', { name: /Previous repairs at other shops/ })).toContainText('while the client has an open booking');
     await expect(page.getByRole('region', { name: /Previous repairs at other shops/ })).not.toContainText('Plăcuțe față schimbate');

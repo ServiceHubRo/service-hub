@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { BACKEND, PASSWORD, closeFilters, createBookableShop, createUser, expectNoHorizontalScroll, openFilters, rpcAs, serviceRest, shot, signIn, userIdOf, cardAction, selectInPanel, switchLanguage } from './support';
+import { BACKEND, PASSWORD, closeFilters, createBookableShop, createUser, expectNoHorizontalScroll, openFilters, rpcAs, serviceRest, shot, signIn, userIdOf, cardAction, selectInPanel, switchLanguage, openClientBooking } from './support';
 
 // T28a — "like Booking, for car shops": the owner turns on instant confirmation; a client sees in
 // search which shops are free on a day and which confirm at once, opens the shop on its first
@@ -112,7 +112,7 @@ test.describe('instant booking', () => {
 
     // Programări: confirmed, with the calendar and the way there.
     await c.goto('/c/programari');
-    const mine = c.locator('main li').filter({ hasText: shopName });
+    const mine = await openClientBooking(c, shopName);
     await expect(mine).toContainText('Confirmată');
     await expect(await cardAction(mine, 'Adaugă în calendar')).toBeVisible();
     await expect(mine.getByRole('menuitem', { name: 'Indicații' })).toHaveAttribute('href', /^https:\/\/www\.google\.com\/maps\/dir\//);
