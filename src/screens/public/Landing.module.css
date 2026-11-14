@@ -661,9 +661,11 @@
   border-radius: 6px;
 }
 
-.footerLink:hover {
-  color: var(--amber);
-  text-decoration: underline;
+@media (hover: hover) {
+  .footerLink:hover {
+    color: var(--amber);
+    text-decoration: underline;
+  }
 }
 
 .footerSal {

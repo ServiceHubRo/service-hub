@@ -141,18 +141,18 @@ function ReadingForm({ vehicle, onDone }: { vehicle: FleetVehicle; onDone: () =>
   }
 
   return (
-    <div className={styles.inlineForm}>
+    <form className={styles.inlineForm} onSubmit={(e) => e.preventDefault()} noValidate>
       <div className={styles.formGrid}>
         <Field ref={dayRef} label={t('fleet.col.date')} type="date" max={today} value={day} error={errors.day} onChange={(e) => setDay(e.target.value)} />
         <Field ref={kmRef} label={t('fleet.form.km')} inputMode="numeric" mono value={km} error={errors.km} onChange={(e) => setKm(e.target.value)} />
       </div>
       <div className={styles.actions}>
-        <ActionButton variant="primary" onAction={save} errorMessage={(e) => rpcErrorMessage(lang, e)} canRetry={canRetryRpc}>
+        <ActionButton submit variant="primary" onAction={save} errorMessage={(e) => rpcErrorMessage(lang, e)} canRetry={canRetryRpc}>
           {t('fleet.odo.save')}
         </ActionButton>
         <Button onClick={onDone}>{t('fleet.form.cancel')}</Button>
       </div>
-    </div>
+    </form>
   );
 }
 
@@ -175,18 +175,18 @@ function CorrectForm({ entry, onDone }: { entry: LogEntry; onDone: () => void })
   }
 
   return (
-    <div className={styles.inlineForm}>
+    <form className={styles.inlineForm} onSubmit={(e) => e.preventDefault()} noValidate>
       <div className={styles.formGrid}>
         <Field label={t('fleet.odo.newKm')} inputMode="numeric" mono value={km} error={errors.km} onChange={(e) => setKm(e.target.value)} />
         <Field label={t('fleet.odo.reason')} value={reason} maxLength={300} error={errors.reason} onChange={(e) => setReason(e.target.value)} />
       </div>
       <div className={styles.actions}>
-        <ActionButton variant="primary" onAction={save} errorMessage={(e) => rpcErrorMessage(lang, e)} canRetry={canRetryRpc}>
+        <ActionButton submit variant="primary" onAction={save} errorMessage={(e) => rpcErrorMessage(lang, e)} canRetry={canRetryRpc}>
           {t('fleet.odo.correctSave')}
         </ActionButton>
         <Button onClick={onDone}>{t('fleet.form.cancel')}</Button>
       </div>
-    </div>
+    </form>
   );
 }
 
@@ -204,18 +204,18 @@ function IgnoreForm({ entry, onDone }: { entry: LogEntry; onDone: () => void }) 
   }
 
   return (
-    <div className={styles.inlineForm} role="group" aria-labelledby={`ignore-${entry.key}`}>
+    <form className={styles.inlineForm} role="group" aria-labelledby={`ignore-${entry.key}`} onSubmit={(e) => e.preventDefault()} noValidate>
       <p id={`ignore-${entry.key}`} className={styles.note}>
         {t('fleet.odo.ignoreConfirm', { km: formatKm(lang, entry.km) })}
       </p>
       <Field label={t('fleet.odo.reason')} value={reason} maxLength={300} error={error} onChange={(e) => setReason(e.target.value)} />
       <div className={styles.actions}>
-        <ActionButton variant="primary" onAction={save} errorMessage={(e) => rpcErrorMessage(lang, e)} canRetry={canRetryRpc}>
+        <ActionButton submit variant="primary" onAction={save} errorMessage={(e) => rpcErrorMessage(lang, e)} canRetry={canRetryRpc}>
           {t('fleet.odo.ignoreSave')}
         </ActionButton>
         <Button onClick={onDone}>{t('fleet.form.cancel')}</Button>
       </div>
-    </div>
+    </form>
   );
 }
 

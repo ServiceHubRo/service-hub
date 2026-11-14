@@ -69,8 +69,10 @@
   transition: background-color var(--motion-quick) var(--ease);
 }
 
-.link:hover {
-  background: var(--surface-hover);
+@media (hover: hover) {
+  .link:hover {
+    background: var(--surface-hover);
+  }
 }
 
 .linkText {
@@ -144,9 +146,11 @@
     background-color var(--motion-quick) var(--ease);
 }
 
-.category:hover {
-  border-color: var(--border-lit);
-  background: var(--surface-hover);
+@media (hover: hover) {
+  .category:hover {
+    border-color: var(--border-lit);
+    background: var(--surface-hover);
+  }
 }
 
 .categoryIcon {
@@ -174,6 +178,12 @@
   line-height: 1.6;
   color: var(--text);
   overflow-wrap: anywhere;
+}
+
+/* DESK-05: an article's sentences keep a reading width wherever it is shown (Help Center, the
+   answers under a question, the internal procedures). */
+.body > :is(p, ul, ol, blockquote) {
+  max-width: var(--measure);
 }
 
 .body h2 {

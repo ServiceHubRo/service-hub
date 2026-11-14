@@ -232,7 +232,7 @@ function IntakeForm({
   );
 
   return (
-    <div className={styles.form}>
+    <form className={styles.form} onSubmit={(e) => e.preventDefault()} noValidate>
       <BookingHead booking={booking} />
       {sheet && <p className={styles.muted}>{t('in.sentAt', { when: momentText(lang, sheet.updated_at) })}</p>}
 
@@ -312,7 +312,7 @@ function IntakeForm({
           <ul className={styles.photos}>
             {photos.map((p, i) => (
               <li key={p} className={styles.photoItem}>
-                {urls.status === 'ready' && urls.data[p] ? <img src={urls.data[p]} alt="" /> : <span className={styles.photoWait} />}
+                {urls.status === 'ready' && urls.data[p] ? <img src={urls.data[p]} alt="" loading="lazy" decoding="async" /> : <span className={styles.photoWait} />}
                 <button type="button" className={styles.photoRemove} aria-label={t('in.photoRemove', { n: i + 1 })} onClick={() => removePhoto(p)}>
                   <Trash2 size={16} aria-hidden="true" />
                 </button>
@@ -352,6 +352,7 @@ function IntakeForm({
       {walkIn && <p className={styles.muted}>{t('in.walkIn')}</p>}
       <div className={styles.buttons}>
         <ActionButton
+          submit
           block={false}
           disabled={uploading > 0}
           onAction={submit}
@@ -365,6 +366,6 @@ function IntakeForm({
         </Button>
       </div>
       {sheet && <JobDocuments bookingId={booking.id} bookingRef={booking.ref} quoteNumber={booking.quote_number} kinds={['intake']} />}
-    </div>
+    </form>
   );
 }

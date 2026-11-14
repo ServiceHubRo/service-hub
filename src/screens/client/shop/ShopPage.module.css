@@ -145,9 +145,11 @@
   font-family: var(--font-mono);
 }
 
-.phone:hover,
-.link:hover {
-  text-decoration: underline;
+@media (hover: hover) {
+  .phone:hover,
+  .link:hover {
+    text-decoration: underline;
+  }
 }
 
 /* ---------------------------------------------------------------- services */
@@ -188,14 +190,22 @@
     background-color var(--motion-quick) var(--ease);
 }
 
-.category:hover {
-  border-color: var(--border-lit);
+@media (hover: hover) {
+  .category:hover {
+    border-color: var(--border-lit);
+  }
 }
 
-.categoryOn,
-.categoryOn:hover {
+.categoryOn {
   border-color: var(--amber-line);
   background: var(--amber-tint);
+}
+
+@media (hover: hover) {
+  .categoryOn:hover {
+    border-color: var(--amber-line);
+    background: var(--amber-tint);
+  }
 }
 
 .categoryText {
@@ -320,8 +330,10 @@
   white-space: nowrap;
 }
 
-.directions:hover {
-  text-decoration: underline;
+@media (hover: hover) {
+  .directions:hover {
+    text-decoration: underline;
+  }
 }
 
 

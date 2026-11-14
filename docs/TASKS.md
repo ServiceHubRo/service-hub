@@ -1949,3 +1949,13 @@ Nimic implementat. O sesiune nouă pornește de aici, după ce Eduard răspunde 
 - **Încă neconfirmat pe iPhone:** celelalte formulare (Intră în cont, Garaj, Mesaje, Solicitare nouă, setările service-ului), săgețile ˄ ˅, butonul de salvare cu tastatura deschisă, închiderea tastaturii; Chrome pe Android real.
 
 - [x] Făcut
+
+### A13 — Lotul de reparații mici după auditul complet ✅ (Eduard, 13 nov 2026: „un singur PR, tot ce nu depinde de firmă sau de contabil”; pe `main` după #135, fără migrare)
+- **Auditul complet:** `docs/AUDIT.md` (rezumat, harta ecranelor, 38 de probleme, plan pe loturi). Secțiunea 8b spune ce s-a rezolvat aici; ✅ în tabel.
+- **Rezolvate:** MOB-01 (din #135, confirmat de Eduard pe iPhone), FUN-01 (Enter trimite formularele; în deviz Enter duce la rândul următor, nu trimite), FUN-03 (Esc închide panourile de confirmare, focusul înapoi pe butonul care le-a deschis), MOB-02 (`--text-xs`, minimum 12 px; 11 px doar la etichetele barei de jos), MOB-03 (`:hover` doar pe dispozitive cu mouse), DESK-04 (butonul principal sub conținut de la 1440 px), DESK-05 (`--measure: 72ch`, `--field-max: 560px`), A11Y-01 (contrast măsurat pe toate ecranele; eroarea de la favorite pe `--red-text`), TXT-01 („Status” → „Stare”), PERF-04, LINT-01, SEC-03 (hărțile sursă nu se mai publică; încărcate în Sentry când există cheia), SEC-04 (CORS doar pentru adresele aplicației).
+- **Găsite pe parcurs, lăsate pentru alt lot (în audit):** FUN-07 (încă 5 formulare fără Enter), BRW-02 (documentele legale pe Safari < 16.4), TXT-02 („status” în 2 articole din Centrul de ajutor, în baza de date).
+- **Decizii:** (1) pasul „Mașina” din programare conține formularul de verificare a telefonului, deci butonul din bara de jos e legat de câmpurile mașinii prin atributul `form`, nu printr-un formular în formular; (2) regula automată care interzice „status” se pornește după TXT-02; (3) telefonul desenat pe pagina principală (ilustrație) își păstrează textul mic; (4) grila devizului își dimensionează singură câmpurile (`--field-max: none`); (5) `email-logo` rămâne public pentru orice adresă (imaginile din emailuri).
+- **Teste noi:** `tests/unit/cors.test.ts`, `sourcemaps.test.ts`, `InlinePanel.test.tsx`, `buttonTypes.test.ts`, `tests/e2e/forms-keys.spec.ts`.
+- **Pasul lui Eduard (opțional, pentru liniile exacte în Sentry):** în Netlify → Site configuration → Environment variables: `SENTRY_AUTH_TOKEN` (Sentry → Settings → Auth Tokens, drepturile „project:releases” și „org:read”), `SENTRY_ORG`, `SENTRY_PROJECT`.
+
+- [x] Făcut

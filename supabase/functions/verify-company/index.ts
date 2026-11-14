@@ -18,7 +18,7 @@
 // deadlines are enforced (enforce_company_deadlines). ANAF down: nothing is recorded or enforced.
 import { AdminError, adminApi, tokenAal } from '../_shared/admin.ts';
 import { ANAF_BATCH, ANAF_URL, anafRequest, anafRequestMany, cuiDigits, readAnafAnswer } from '../_shared/anaf.ts';
-import { bearerToken, corsHeaders, json } from '../_shared/http.ts';
+import { bearerToken, corsHeaders, json, serve } from '../_shared/http.ts';
 import { reportError } from '../_shared/monitor.ts';
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -74,7 +74,7 @@ async function runBatch(api: ReturnType<typeof adminApi>): Promise<Response> {
   return json({ due: asked.length, recorded, hidden });
 }
 
-Deno.serve(async (req) => {
+serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
   if (req.method !== 'POST') return json({ error: 'method_not_allowed' }, 405);
 

@@ -92,9 +92,11 @@
   color: var(--muted);
 }
 
-.edit:hover {
-  color: var(--text);
-  background: var(--surface2);
+@media (hover: hover) {
+  .edit:hover {
+    color: var(--text);
+    background: var(--surface2);
+  }
 }
 
 /* The documents (and the oil change): one centered tile each, all on one row in equal parts,
@@ -305,8 +307,10 @@
   flex-shrink: 0;
 }
 
-.history:hover .report {
-  margin-top: 0;
+@media (hover: hover) {
+  .history:hover .report {
+    margin-top: 0;
+  }
 }
 
 .historyText {

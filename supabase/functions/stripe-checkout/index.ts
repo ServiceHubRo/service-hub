@@ -21,7 +21,7 @@
 import { AdminError, adminApi } from '../_shared/admin.ts';
 import { linkBase } from '../_shared/app.ts';
 import { appUrlFromEnv, stripeConfigFromEnv } from '../_shared/env.ts';
-import { bearerToken, corsHeaders, json } from '../_shared/http.ts';
+import { bearerToken, corsHeaders, json, serve } from '../_shared/http.ts';
 import { isBillingMonths, recurringFor } from '../_shared/periods.ts';
 import { seatLineItem, seatPrice, type SeatInfo } from '../_shared/seats.ts';
 import { hasLiveSubscription, StripeError, stripeApi, stripeLocale, trialEndForCheckout } from '../_shared/stripe.ts';
@@ -57,7 +57,7 @@ interface Info {
   billing_email: string | null;
 }
 
-Deno.serve(async (req) => {
+serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
   if (req.method !== 'POST') return json({ error: 'method_not_allowed' }, 405);
 

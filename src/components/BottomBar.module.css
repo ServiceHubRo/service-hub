@@ -23,3 +23,12 @@
     width: min(100%, 420px);
   }
 }
+
+/* A wide screen (DESK-04, audit 13 Nov 2026): the action follows the content, at its start, instead
+   of the far corner of the screen; still held in view while a long list scrolls. */
+@media (min-width: 1440px) {
+  .bar {
+    align-items: flex-start;
+    margin-top: var(--space-6);
+  }
+}

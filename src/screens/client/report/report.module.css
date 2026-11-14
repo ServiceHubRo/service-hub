@@ -7,6 +7,7 @@
 
 .sub,
 .muted {
+  max-width: var(--measure);
   color: var(--muted);
   font-size: 13.5px;
   overflow-wrap: anywhere;
@@ -228,8 +229,10 @@
   flex-shrink: 0;
 }
 
-.row:hover .rowText {
-  color: var(--amber);
+@media (hover: hover) {
+  .row:hover .rowText {
+    color: var(--amber);
+  }
 }
 
 .rowText {

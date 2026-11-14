@@ -12,7 +12,7 @@
 // Body: { user_id, reason }. Answers { ok: true, mode } or { error }.
 import { cancelStripeSubscription, removeLogin } from '../_shared/accountDeletion.ts';
 import { AdminError, adminApi, tokenAal, tokenSession } from '../_shared/admin.ts';
-import { bearerToken, corsHeaders, json } from '../_shared/http.ts';
+import { bearerToken, corsHeaders, json, serve } from '../_shared/http.ts';
 import { reportError } from '../_shared/monitor.ts';
 
 /** Refusals the app translates (src/data/admin.ts). */
@@ -22,7 +22,7 @@ const KNOWN_CODES = new Set(['not_allowed', 'account_has_active_bookings', 'shop
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-Deno.serve(async (req) => {
+serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
   if (req.method !== 'POST') return json({ error: 'method_not_allowed' }, 405);
 

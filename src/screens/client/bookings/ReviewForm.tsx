@@ -53,7 +53,7 @@ export function ReviewForm({
   }
 
   return (
-    <InlinePanel title={t('cb.review.title', { shop: shopName })}>
+    <InlinePanel title={t('cb.review.title', { shop: shopName })} onClose={onClose}>
       <div className={styles.rating}>
         <span id={labelId} className={styles.ratingLabel}>
           {t('cb.review.rating')}

@@ -25,7 +25,7 @@
 import { adminApi } from '../_shared/admin.ts';
 import { emailForEvent } from '../_shared/emails.ts';
 import { sendFcm, type FcmConfig } from '../_shared/fcm.ts';
-import { corsHeaders, json } from '../_shared/http.ts';
+import { corsHeaders, json, serve } from '../_shared/http.ts';
 import {
   adminEmailFromEnv,
   appUrlFromEnv,
@@ -389,7 +389,7 @@ async function dispatch(api: Api, config: Config): Promise<number> {
   return processed;
 }
 
-Deno.serve(async (req) => {
+serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: { ...corsHeaders, 'Access-Control-Allow-Methods': 'GET, POST, OPTIONS' } });
   }

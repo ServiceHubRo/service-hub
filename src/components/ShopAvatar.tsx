@@ -20,7 +20,7 @@ export function ShopAvatar({ name, logoUrl, size = 44 }: { name: string; logoUrl
   const style = { width: size, height: size, fontSize: Math.round(size * 0.36) };
   const src = ownImageUrl(logoUrl, supabaseConfig.ok ? supabaseConfig.url : null);
   if (src && !broken) {
-    return <img src={src} alt="" className={styles.logo} style={style} loading="lazy" onError={() => setBroken(true)} />;
+    return <img src={src} alt="" className={styles.logo} style={style} loading="lazy" decoding="async" onError={() => setBroken(true)} />;
   }
   return (
     <span className={styles.initials} style={style} aria-hidden="true">

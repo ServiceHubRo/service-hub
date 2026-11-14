@@ -6,13 +6,13 @@
 import { AdminError, adminApi } from '../_shared/admin.ts';
 import { linkBase } from '../_shared/app.ts';
 import { appUrlFromEnv, stripeConfigFromEnv } from '../_shared/env.ts';
-import { bearerToken, corsHeaders, json } from '../_shared/http.ts';
+import { bearerToken, corsHeaders, json, serve } from '../_shared/http.ts';
 import { stripeApi, stripeLocale } from '../_shared/stripe.ts';
 import { reportError } from '../_shared/monitor.ts';
 
 const KNOWN_CODES = new Set(['not_allowed', 'account_suspended']);
 
-Deno.serve(async (req) => {
+serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
   if (req.method !== 'POST') return json({ error: 'method_not_allowed' }, 405);
 

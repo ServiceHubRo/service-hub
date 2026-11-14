@@ -155,15 +155,15 @@ test.describe('admin', () => {
     await expect(page.getByRole('status').filter({ hasText: 'Perioada gratuită este prelungită.' })).toBeVisible();
 
     // Stop the subscription by hand: out of search; then active again.
-    await page.getByRole('button', { name: 'Schimbă statusul abonamentului' }).click();
-    await page.getByRole('combobox', { name: 'Schimbă statusul abonamentului' }).selectOption({ label: 'Inactiv' });
+    await page.getByRole('button', { name: 'Schimbă starea abonamentului' }).click();
+    await page.getByRole('combobox', { name: 'Schimbă starea abonamentului' }).selectOption({ label: 'Inactiv' });
     await page.getByRole('button', { name: 'Setează „Inactiv”' }).click();
-    await expect(page.getByRole('status').filter({ hasText: 'Statusul abonamentului este schimbat.' })).toBeVisible();
+    await expect(page.getByRole('status').filter({ hasText: 'Starea abonamentului este schimbată.' })).toBeVisible();
     expect(await inSearch(client, shopName)).toBe(false);
-    await page.getByRole('button', { name: 'Schimbă statusul abonamentului' }).click();
-    await page.getByRole('combobox', { name: 'Schimbă statusul abonamentului' }).selectOption({ label: 'Activ' });
+    await page.getByRole('button', { name: 'Schimbă starea abonamentului' }).click();
+    await page.getByRole('combobox', { name: 'Schimbă starea abonamentului' }).selectOption({ label: 'Activ' });
     await page.getByRole('button', { name: 'Setează „Activ”' }).click();
-    await expect(page.getByRole('status').filter({ hasText: 'Statusul abonamentului este schimbat.' })).toBeVisible();
+    await expect(page.getByRole('status').filter({ hasText: 'Starea abonamentului este schimbată.' })).toBeVisible();
     expect(await inSearch(client, shopName)).toBe(true);
 
     // Edit: an invalid IBAN is named; a valid change is saved.
@@ -183,7 +183,7 @@ test.describe('admin', () => {
 
     // Every action, with before and after, on the shop and in the log.
     const audit = page.locator('main ul').last();
-    for (const action of ['Service suspendat', 'Service reactivat', 'Perioadă gratuită prelungită', 'Status abonament schimbat', 'Date service modificate']) {
+    for (const action of ['Service suspendat', 'Service reactivat', 'Perioadă gratuită prelungită', 'Stare abonament schimbată', 'Date service modificate']) {
       await expect(audit.getByText(action, { exact: true }).first()).toBeVisible();
     }
     await expect(audit.getByText('Mașini pe zi:')).toBeVisible();

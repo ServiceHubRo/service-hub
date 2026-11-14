@@ -15,7 +15,7 @@
 //   and every stray object older than 24 hours leaves Storage.
 // Errors answer { error: code } with the code the app translates.
 import { AdminError, adminApi, tokenAal, tokenSession } from '../_shared/admin.ts';
-import { bearerToken, corsHeaders, json } from '../_shared/http.ts';
+import { bearerToken, corsHeaders, json, serve } from '../_shared/http.ts';
 import { reportError } from '../_shared/monitor.ts';
 import { checkFile, MAX_FILE_BYTES } from '../_shared/supportFiles.ts';
 
@@ -128,7 +128,7 @@ async function cleanup(api: Api): Promise<Response> {
   return json({ collected, removed, stray: stray.length });
 }
 
-Deno.serve(async (req) => {
+serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
   if (req.method !== 'POST') return json({ error: 'method_not_allowed' }, 405);
   try {

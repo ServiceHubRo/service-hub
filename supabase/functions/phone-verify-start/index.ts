@@ -10,7 +10,7 @@
 //    (phone_verify_cancel), so it neither blocks nor counts.
 // Answers { status: 'sent' | 'wait', expires_at, resend_in } or { error: code }.
 import { AdminError, adminApi } from '../_shared/admin.ts';
-import { bearerToken, corsHeaders, json } from '../_shared/http.ts';
+import { bearerToken, corsHeaders, json, serve } from '../_shared/http.ts';
 import { codeSms } from '../_shared/sms.ts';
 import { smsConfigFromEnv } from '../_shared/env.ts';
 import { sendSms, toE164 } from '../_shared/smso.ts';
@@ -37,7 +37,7 @@ interface Begin {
   wait_seconds?: number;
 }
 
-Deno.serve(async (req) => {
+serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
   if (req.method !== 'POST') return json({ error: 'method_not_allowed' }, 405);
 

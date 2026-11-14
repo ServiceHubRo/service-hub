@@ -25,7 +25,7 @@ import { parseNumber } from '../../lib/adminTools';
 import { useI18n } from '../../i18n/context';
 import type { MessageKey } from '../../i18n/ro';
 import { plural } from '../../i18n/translate';
-import { useReason } from './ActionPanels';
+import { useReason } from './useReason';
 import { stripeRuns } from './format';
 import styles from './admin.module.css';
 
@@ -36,7 +36,7 @@ export function TrialPanel({ shopId, onDone, onCancel }: { shopId: string; onDon
   const [days, setDays] = useState(30);
   const reason = useReason();
   return (
-    <InlinePanel title={t('admin.trial.title')}>
+    <InlinePanel title={t('admin.trial.title')} onClose={onCancel}>
       <p className={styles.muted}>{t('admin.trial.body')}</p>
       <Stepper
         label={t('admin.trial.days')}
@@ -75,7 +75,7 @@ export function StatusPanel({ detail, onDone, onCancel }: { detail: AdminShopDet
   const options = MANUAL_STATUSES.filter((s) => s !== current);
   const [status, setStatus] = useState<ManualStatus>(options[0]!);
   return (
-    <InlinePanel title={t('admin.status.title')}>
+    <InlinePanel title={t('admin.status.title')} onClose={onCancel}>
       <SelectField
         label={t('admin.status.title')}
         value={status}
@@ -125,7 +125,7 @@ export function PricePanel({
   const valid = price !== null && price >= 1 && price <= 10000;
   const reason = useReason();
   return (
-    <InlinePanel title={t('admin.price.title')}>
+    <InlinePanel title={t('admin.price.title')} onClose={onCancel}>
       <p className={styles.muted}>{t('admin.price.body')}</p>
       {stripeRuns(subscription.stripe_status) && <p className={styles.warning}>{t('admin.price.stripe')}</p>}
       <Field
@@ -235,7 +235,7 @@ export function EditPanel({ detail, onDone, onCancel }: { detail: AdminShopDetai
   };
 
   return (
-    <InlinePanel title={t('admin.edit.title')}>
+    <InlinePanel title={t('admin.edit.title')} onClose={onCancel}>
       <div className={styles.fields}>
         <h4 className={styles.fieldsTitle}>{t('admin.edit.public')}</h4>
         {field('name')}

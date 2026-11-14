@@ -10,7 +10,7 @@
 import fontkit from 'npm:@pdf-lib/fontkit@1.1.1';
 import { PDFDocument, rgb } from 'npm:pdf-lib@1.17.1';
 import { AdminError, adminApi, tokenAal } from '../_shared/admin.ts';
-import { bearerToken, corsHeaders, json } from '../_shared/http.ts';
+import { bearerToken, corsHeaders, json, serve } from '../_shared/http.ts';
 import { jobDocFileName, type JobDocData, type JobDocKind } from '../_shared/jobDoc.ts';
 import { renderJobPdf, type DocPhoto } from '../_shared/jobPdf.ts';
 import { reportError } from '../_shared/monitor.ts';
@@ -20,7 +20,7 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const KINDS: readonly JobDocKind[] = ['quote', 'final', 'intake'];
 const PHOTOS_BUCKET = 'intake-photos';
 
-Deno.serve(async (req) => {
+serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
   if (req.method !== 'POST') return json({ error: 'method_not_allowed' }, 405);
 

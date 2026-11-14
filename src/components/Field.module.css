@@ -2,6 +2,12 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
+  max-width: var(--field-max);
+}
+
+/* A text area keeps the width of its column (DESK-05: only one-line fields are capped). */
+.areaField {
+  max-width: none;
 }
 
 .label {
@@ -46,8 +52,10 @@
   text-align: left;
 }
 
-.input:hover:not(:disabled):not(:focus-visible) {
-  border-color: #46505c;
+@media (hover: hover) {
+  .input:hover:not(:disabled):not(:focus-visible) {
+    border-color: #46505c;
+  }
 }
 
 .input:focus-visible {
@@ -224,10 +232,16 @@
     cursor: pointer;
   }
 
-  .select option:hover,
   .select option:focus-visible {
     background: rgba(255, 255, 255, 0.07);
     outline: none;
+  }
+
+  @media (hover: hover) {
+    .select option:hover {
+      background: rgba(255, 255, 255, 0.07);
+      outline: none;
+    }
   }
 
   .select option:checked {

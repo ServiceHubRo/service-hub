@@ -27,7 +27,7 @@ import { plural } from '../../i18n/translate';
 import { planState, trialDaysLeft, type FleetPlanRow, type PlanState } from '../../lib/fleet';
 import { useLoad } from '../../lib/useLoad';
 import pill from '../../components/StatusBadge.module.css';
-import { useReason } from './ActionPanels';
+import { useReason } from './useReason';
 import { ADMIN_FLEETS_PATH } from './paths';
 import styles from './admin.module.css';
 import own from './fleets.module.css';
@@ -271,7 +271,7 @@ function PlanRow({ p, onChanged }: { p: Plan; onChanged: () => Promise<void> }) 
         {!editing ? (
           <MoreActions items={[{ key: 'edit', label: t('admin.fleets.editPlan'), icon: <Pencil size={18} aria-hidden="true" />, onSelect: () => setEditing(true) }]} />
         ) : (
-          <div className={own.panel}>
+          <form className={own.panel} onSubmit={(e) => e.preventDefault()} noValidate>
             <div className={own.fields}>
               <Field label={t('admin.fleets.price')} hint={t('admin.fleets.emptyCustom')} inputMode="decimal" mono value={price} onChange={(e) => setPrice(e.target.value)} />
               <Field label={t('admin.fleets.vehicleLimit')} hint={t('admin.fleets.emptyNone')} inputMode="numeric" mono value={vehicles} onChange={(e) => setVehicles(e.target.value)} />
@@ -284,7 +284,7 @@ function PlanRow({ p, onChanged }: { p: Plan; onChanged: () => Promise<void> }) 
               </p>
             )}
             <div className={own.panelButtons}>
-              <ActionButton
+              <ActionButton submit
                 block={false}
                 errorMessage={(e) => rpcErrorMessage(lang, e)}
                 canRetry={canRetryRpc}
@@ -311,7 +311,7 @@ function PlanRow({ p, onChanged }: { p: Plan; onChanged: () => Promise<void> }) 
               </ActionButton>
               <Button onClick={() => setEditing(false)}>{t('common.cancel')}</Button>
             </div>
-          </div>
+          </form>
         )}
       </Card>
     </li>

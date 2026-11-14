@@ -228,7 +228,7 @@ function Details({
     .sort((x, y) => x.label.localeCompare(y.label, lang));
 
   return (
-    <InlinePanel title={t('area.details.title')}>
+    <InlinePanel title={t('area.details.title')} onClose={onCancel}>
       <SelectField label={t('area.details.area')} options={options} value={area} onChange={(e) => setArea(e.target.value)} />
       <Field
         label={t('area.details.locality')}
@@ -274,7 +274,7 @@ function Details({
 function Leave({ name, onCancel, onLeft }: { name: string; onCancel: () => void; onLeft: () => void }) {
   const { t, lang } = useI18n();
   return (
-    <InlinePanel title={t('area.leave.title')}>
+    <InlinePanel title={t('area.leave.title')} onClose={onCancel}>
       <p className={styles.text}>{t('area.leave.body', { area: name })}</p>
       <div className={styles.actions}>
         <ActionButton

@@ -126,7 +126,7 @@ export function ReviewCard({ review: r, onChanged, onStale }: ReviewCardProps) {
       )}
 
       {panel === 'reply' && (
-        <InlinePanel title={r.reply ? t('reviews.editReply') : t('reviews.reply')}>
+        <InlinePanel title={r.reply ? t('reviews.editReply') : t('reviews.reply')} onClose={() => setPanel(null)}>
           <TextArea
             label={t('reviews.replyLabel')}
             hint={t('reviews.replyHint')}
@@ -160,7 +160,7 @@ export function ReviewCard({ review: r, onChanged, onStale }: ReviewCardProps) {
       )}
 
       {panel === 'report' && (
-        <InlinePanel title={t('reviews.reportTitle')}>
+        <InlinePanel title={t('reviews.reportTitle')} onClose={() => setPanel(null)}>
           <fieldset className={styles.reasons}>
             <legend className={styles.legend}>{t('reviews.reportLegend')}</legend>
             {REASONS.map((option) => (

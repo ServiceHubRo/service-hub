@@ -18,6 +18,8 @@ export interface ActionButtonProps {
   canRetry?: (error: unknown) => boolean;
   /** The form's submit button: Enter in a field of the form triggers it. */
   submit?: boolean;
+  /** The id of the form it submits, when the button sits outside it (a bar at the bottom of the screen). */
+  form?: string;
   /** Extra class for the button itself (e.g. the sign-in pills). */
   className?: string;
 }
@@ -37,6 +39,7 @@ export function ActionButton({
   errorMessage,
   canRetry,
   submit,
+  form,
   className,
 }: ActionButtonProps) {
   const { t } = useI18n();
@@ -53,6 +56,7 @@ export function ActionButton({
     <div className={block ? styles.wrapBlock : styles.wrap}>
       <button
         type={submit ? 'submit' : 'button'}
+        form={submit ? form : undefined}
         className={buttonClass(variant, block, className ? `${styles.action} ${className}` : styles.action)}
         onClick={(e) => {
           if (submit) e.preventDefault();

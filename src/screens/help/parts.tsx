@@ -1,39 +1,13 @@
-import {
-  Bell,
-  BookOpen,
-  CalendarDays,
-  Car,
-  ChevronRight,
-  CreditCard,
-  FileText,
-  ShieldCheck,
-  Truck,
-  Users,
-  Wrench,
-  type LucideIcon,
-} from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { Fragment, useMemo, useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { ActionButton } from '../../components/ActionButton';
 import { Button } from '../../components/Button';
-import { sendHelpFeedback, type HelpArticle, type HelpIcon } from '../../data/help';
+import { sendHelpFeedback, type HelpArticle } from '../../data/help';
 import { canRetryRpc, rpcErrorMessage } from '../../data/rpc';
 import { useI18n } from '../../i18n/context';
 import { parseMarkdown, type Block, type Inline, type ListItem } from '../../lib/markdown';
 import styles from './help.module.css';
-
-export const HELP_ICON: Record<HelpIcon, LucideIcon> = {
-  book: BookOpen,
-  car: Car,
-  wrench: Wrench,
-  truck: Truck,
-  shield: ShieldCheck,
-  card: CreditCard,
-  calendar: CalendarDays,
-  bell: Bell,
-  users: Users,
-  file: FileText,
-};
 
 // ------------------------------------------------------------------------------------ article text
 

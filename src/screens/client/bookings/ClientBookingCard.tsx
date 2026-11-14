@@ -287,7 +287,7 @@ export function ClientBookingCard({
       )}
 
       {panel === 'cancel' && (
-        <InlinePanel title={t('cb.cancel.title')}>
+        <InlinePanel title={t('cb.cancel.title')} onClose={() => setPanel(null)}>
           <div className={styles.buttons}>
             <ActionButton
               variant="danger"

@@ -174,24 +174,26 @@ function IssueForm({ vehicle, onDone }: { vehicle: FleetVehicle; onDone: () => v
   return (
     <Card className={styles.card}>
       <h3 className={styles.cardTitle}>{t('fleet.vehicle.report')}</h3>
-      <div className={styles.formGrid}>
-        <SelectField
-          label={t('fleet.issues.kind')}
-          value={kind}
-          onChange={(e) => setKind(e.target.value as IssueKind)}
-          options={ISSUE_KINDS.map((k) => ({ value: k, label: t(`fleet.issue.${k}`) }))}
-        />
-        <Field ref={dayRef} label={t('fleet.issues.day')} type="date" max={today} value={day} error={errors.day} onChange={(e) => setDay(e.target.value)} />
-      </div>
-      <Field ref={titleRef} label={t('fleet.issues.title')} value={title} maxLength={120} error={errors.title} onChange={(e) => setTitle(e.target.value)} />
-      <TextArea label={t('fleet.issues.description')} value={description} maxLength={2000} rows={3} onChange={(e) => setDescription(e.target.value)} />
-      <PhotoPicker id="issue-photos" files={files} error={errors.photos} onAdd={addFiles} onRemove={(f) => setFiles((l) => l.filter((x) => x !== f))} />
-      <div className={styles.actions}>
-        <ActionButton variant="primary" onAction={send} errorMessage={(e) => rpcErrorMessage(lang, e)} canRetry={canRetryRpc}>
-          {t('fleet.issues.send')}
-        </ActionButton>
-        <Button onClick={onDone}>{t('fleet.form.cancel')}</Button>
-      </div>
+      <form className="form-contents" onSubmit={(e) => e.preventDefault()} noValidate>
+        <div className={styles.formGrid}>
+          <SelectField
+            label={t('fleet.issues.kind')}
+            value={kind}
+            onChange={(e) => setKind(e.target.value as IssueKind)}
+            options={ISSUE_KINDS.map((k) => ({ value: k, label: t(`fleet.issue.${k}`) }))}
+          />
+          <Field ref={dayRef} label={t('fleet.issues.day')} type="date" max={today} value={day} error={errors.day} onChange={(e) => setDay(e.target.value)} />
+        </div>
+        <Field ref={titleRef} label={t('fleet.issues.title')} value={title} maxLength={120} error={errors.title} onChange={(e) => setTitle(e.target.value)} />
+        <TextArea label={t('fleet.issues.description')} value={description} maxLength={2000} rows={3} onChange={(e) => setDescription(e.target.value)} />
+        <PhotoPicker id="issue-photos" files={files} error={errors.photos} onAdd={addFiles} onRemove={(f) => setFiles((l) => l.filter((x) => x !== f))} />
+        <div className={styles.actions}>
+          <ActionButton submit variant="primary" onAction={send} errorMessage={(e) => rpcErrorMessage(lang, e)} canRetry={canRetryRpc}>
+            {t('fleet.issues.send')}
+          </ActionButton>
+          <Button onClick={onDone}>{t('fleet.form.cancel')}</Button>
+        </div>
+      </form>
     </Card>
   );
 }
@@ -420,30 +422,32 @@ function IssueFollowUp({ issue, jobs, onSaved }: { issue: FleetIssue; jobs: { id
   return (
     <Card className={styles.card}>
       <h3 className={styles.cardTitle}>{t('fleet.issues.followUp')}</h3>
-      <div className={styles.formGrid}>
-        <SelectField
-          label={t('fleet.issues.status')}
-          value={status}
-          onChange={(e) => setStatus(e.target.value as IssueStatus)}
-          options={ISSUE_STATUSES.map((s) => ({ value: s, label: t(`fleet.issueStatus.${s}`) }))}
-        />
-        <SelectField
-          label={t('fleet.issues.booking')}
-          value={booking}
-          onChange={(e) => setBooking(e.target.value)}
-          options={[
-            { value: '', label: t('fleet.issues.noBooking') },
-            ...jobs.map((j) => ({ value: j.id, label: `${j.ref} · ${j.shop_name} · ${formatDate(lang, j.date)}` })),
-          ]}
-        />
-      </div>
-      <TextArea label={t('fleet.issues.note')} value={note} maxLength={500} rows={2} onChange={(e) => setNote(e.target.value)} />
-      <PhotoPicker id="issue-more-photos" files={files} error={photoError} onAdd={addFiles} onRemove={(f) => setFiles((l) => l.filter((x) => x !== f))} />
-      <div className={styles.actions}>
-        <ActionButton variant="primary" onAction={save} errorMessage={(e) => rpcErrorMessage(lang, e)} canRetry={canRetryRpc}>
-          {t('fleet.issues.save')}
-        </ActionButton>
-      </div>
+      <form className="form-contents" onSubmit={(e) => e.preventDefault()} noValidate>
+        <div className={styles.formGrid}>
+          <SelectField
+            label={t('fleet.issues.status')}
+            value={status}
+            onChange={(e) => setStatus(e.target.value as IssueStatus)}
+            options={ISSUE_STATUSES.map((s) => ({ value: s, label: t(`fleet.issueStatus.${s}`) }))}
+          />
+          <SelectField
+            label={t('fleet.issues.booking')}
+            value={booking}
+            onChange={(e) => setBooking(e.target.value)}
+            options={[
+              { value: '', label: t('fleet.issues.noBooking') },
+              ...jobs.map((j) => ({ value: j.id, label: `${j.ref} · ${j.shop_name} · ${formatDate(lang, j.date)}` })),
+            ]}
+          />
+        </div>
+        <TextArea label={t('fleet.issues.note')} value={note} maxLength={500} rows={2} onChange={(e) => setNote(e.target.value)} />
+        <PhotoPicker id="issue-more-photos" files={files} error={photoError} onAdd={addFiles} onRemove={(f) => setFiles((l) => l.filter((x) => x !== f))} />
+        <div className={styles.actions}>
+          <ActionButton submit variant="primary" onAction={save} errorMessage={(e) => rpcErrorMessage(lang, e)} canRetry={canRetryRpc}>
+            {t('fleet.issues.save')}
+          </ActionButton>
+        </div>
+      </form>
     </Card>
   );
 }

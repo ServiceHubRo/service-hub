@@ -83,8 +83,10 @@
   transition: background-color var(--motion-quick) var(--ease);
 }
 
-.row:hover {
-  background: var(--surface-hover);
+@media (hover: hover) {
+  .row:hover {
+    background: var(--surface-hover);
+  }
 }
 
 .rowText {
@@ -438,6 +440,8 @@
   align-items: center;
 }
 
-.inlineLink:hover {
-  text-decoration: underline;
+@media (hover: hover) {
+  .inlineLink:hover {
+    text-decoration: underline;
+  }
 }

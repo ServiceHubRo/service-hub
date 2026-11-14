@@ -32,7 +32,7 @@ export function NoShowDisputePanel({
   const [reason, setReason] = useState('');
   const length = reason.trim().length;
   return (
-    <InlinePanel title={t('cb.dispute.title')}>
+    <InlinePanel title={t('cb.dispute.title')} onClose={onClose}>
       <p className={styles.panelBody}>{t('cb.dispute.body')}</p>
       <TextArea
         label={t('cb.dispute.reason')}

@@ -206,7 +206,7 @@ export function AddBookingScreen() {
 
         {/* T59: on a wide page, what is booked on the left (client, car, service, note), when and the
             button that books it on the right, held in view; on a phone the same, one under the other. */}
-        <div className={styles.form}>
+        <form className={styles.form} onSubmit={(e) => e.preventDefault()} noValidate>
           <div className={styles.main}>
             <Card className={styles.section}>
               <h2 className={styles.sectionTitle}>{t('wi.client')}</h2>
@@ -381,11 +381,11 @@ export function AddBookingScreen() {
                 {t('wi.err.fix')}
               </p>
             )}
-            <ActionButton onAction={submit} errorMessage={(e) => rpcErrorMessage(lang, e)} canRetry={canRetryRpc}>
+            <ActionButton submit onAction={submit} errorMessage={(e) => rpcErrorMessage(lang, e)} canRetry={canRetryRpc}>
               {t('wi.submit')}
             </ActionButton>
           </div>
-        </div>
+        </form>
       </>
     );
   }

@@ -381,116 +381,118 @@ export function ExpenseForm({ expense, fuelOnly = false, fixedVehicle, onDone }:
   return (
     <Card className={styles.card}>
       <h2 className={styles.cardTitle}>{expense ? t('fleet.costs.editTitle') : fuelOnly ? t('fleet.costs.addFuel') : t('fleet.costs.add')}</h2>
-      <div className={styles.formGrid}>
-        {!fixedVehicle && (
-          <SelectField
-            label={t('fleet.col.vehicle')}
-            value={vehicleId}
-            onChange={(e) => setVehicleId(e.target.value)}
-            options={cars.map((v) => ({ value: v.id, label: vehicleLabel(v) }))}
-          />
-        )}
-        {!fuelOnly && (
-          <SelectField
-            label={t('fleet.col.category')}
-            value={category}
-            onChange={(e) => setCategory(e.target.value as ExpenseCategory)}
-            options={categories.map((c) => ({ value: c, label: t(c === 'repairs' ? 'fleet.cat.externalRepairs' : `fleet.cat.${c}`) }))}
-          />
-        )}
-        <Field ref={dayRef} label={t('fleet.col.date')} type="date" max={today} value={day} error={errors.day} onChange={(e) => setDay(e.target.value)} />
-        <Field
-          ref={amountRef}
-          label={t('fleet.form.amount')}
-          inputMode="decimal"
-          mono
-          value={amount}
-          error={errors.amount}
-          end={<span className={styles.fieldEnd}>{t('fleet.form.currency')}</span>}
-          onChange={(e) => setAmount(e.target.value)}
-        />
-        {fuel && (
-          <>
-            <Field
-              ref={litersRef}
-              label={t('fleet.form.liters')}
-              inputMode="decimal"
-              mono
-              value={liters}
-              error={errors.liters}
-              onChange={(e) => setLiters(e.target.value)}
-            />
+      <form className="form-contents" onSubmit={(e) => e.preventDefault()} noValidate>
+        <div className={styles.formGrid}>
+          {!fixedVehicle && (
             <SelectField
-              label={t('fleet.form.fuelType')}
-              value={fuelType}
-              onChange={(e) => setFuelType(e.target.value as FuelType | '')}
-              options={[{ value: '', label: t('in.unset') }, ...FUEL_TYPES.map((f) => ({ value: f, label: t(`fleet.fuel.${f}`) }))]}
+              label={t('fleet.col.vehicle')}
+              value={vehicleId}
+              onChange={(e) => setVehicleId(e.target.value)}
+              options={cars.map((v) => ({ value: v.id, label: vehicleLabel(v) }))}
             />
-          </>
+          )}
+          {!fuelOnly && (
+            <SelectField
+              label={t('fleet.col.category')}
+              value={category}
+              onChange={(e) => setCategory(e.target.value as ExpenseCategory)}
+              options={categories.map((c) => ({ value: c, label: t(c === 'repairs' ? 'fleet.cat.externalRepairs' : `fleet.cat.${c}`) }))}
+            />
+          )}
+          <Field ref={dayRef} label={t('fleet.col.date')} type="date" max={today} value={day} error={errors.day} onChange={(e) => setDay(e.target.value)} />
+          <Field
+            ref={amountRef}
+            label={t('fleet.form.amount')}
+            inputMode="decimal"
+            mono
+            value={amount}
+            error={errors.amount}
+            end={<span className={styles.fieldEnd}>{t('fleet.form.currency')}</span>}
+            onChange={(e) => setAmount(e.target.value)}
+          />
+          {fuel && (
+            <>
+              <Field
+                ref={litersRef}
+                label={t('fleet.form.liters')}
+                inputMode="decimal"
+                mono
+                value={liters}
+                error={errors.liters}
+                onChange={(e) => setLiters(e.target.value)}
+              />
+              <SelectField
+                label={t('fleet.form.fuelType')}
+                value={fuelType}
+                onChange={(e) => setFuelType(e.target.value as FuelType | '')}
+                options={[{ value: '', label: t('in.unset') }, ...FUEL_TYPES.map((f) => ({ value: f, label: t(`fleet.fuel.${f}`) }))]}
+              />
+            </>
+          )}
+          <Field label={t('fleet.col.vendor')} value={supplier} maxLength={120} onChange={(e) => setSupplier(e.target.value)} />
+          <Field
+            ref={odometerRef}
+            label={t('fleet.form.km')}
+            hint={t('fleet.form.kmHint')}
+            inputMode="numeric"
+            mono
+            value={odometer}
+            error={errors.odometer}
+            onChange={(e) => setOdometer(e.target.value)}
+          />
+        </div>
+        {fuel && (
+          <Checkbox checked={fullTank} onChange={(e) => setFullTank(e.target.checked)}>
+            {t('fleet.form.fullTank')}
+          </Checkbox>
         )}
-        <Field label={t('fleet.col.vendor')} value={supplier} maxLength={120} onChange={(e) => setSupplier(e.target.value)} />
-        <Field
-          ref={odometerRef}
-          label={t('fleet.form.km')}
-          hint={t('fleet.form.kmHint')}
-          inputMode="numeric"
-          mono
-          value={odometer}
-          error={errors.odometer}
-          onChange={(e) => setOdometer(e.target.value)}
-        />
-      </div>
-      {fuel && (
-        <Checkbox checked={fullTank} onChange={(e) => setFullTank(e.target.checked)}>
-          {t('fleet.form.fullTank')}
-        </Checkbox>
-      )}
-      <TextArea label={t('fleet.form.description')} value={description} maxLength={500} rows={2} onChange={(e) => setDescription(e.target.value)} />
-      {actions && (
-        <div className={styles.receiptField}>
-          <span className={styles.receiptLabel} id="expense-receipt-label">
-            {t('fleet.form.receipt')}
-          </span>
-          {/* The browser's own file button speaks the browser's language; this one speaks the app's. */}
-          <div className={styles.receiptPick}>
-            <input
-              id="expense-receipt"
-              type="file"
-              accept={RECEIPT_TYPES.join(',')}
-              className={`visually-hidden ${styles.receiptInput}`}
-              aria-labelledby="expense-receipt-label"
-              aria-describedby="expense-receipt-hint"
-              aria-invalid={errors.receipt ? true : undefined}
-              onChange={(e) => pickFile(e.target.files?.[0] ?? null)}
-            />
-            <label htmlFor="expense-receipt" className={buttonClass('secondary', false)}>
-              <Paperclip size={18} aria-hidden="true" /> {t('fleet.form.receiptPick')}
-            </label>
-            <span className={styles.receiptName}>{file ? file.name : expense?.receipt_path ? t('fleet.form.receiptAttached') : t('fleet.form.receiptNone')}</span>
+        <TextArea label={t('fleet.form.description')} value={description} maxLength={500} rows={2} onChange={(e) => setDescription(e.target.value)} />
+        {actions && (
+          <div className={styles.receiptField}>
+            <span className={styles.receiptLabel} id="expense-receipt-label">
+              {t('fleet.form.receipt')}
+            </span>
+            {/* The browser's own file button speaks the browser's language; this one speaks the app's. */}
+            <div className={styles.receiptPick}>
+              <input
+                id="expense-receipt"
+                type="file"
+                accept={RECEIPT_TYPES.join(',')}
+                className={`visually-hidden ${styles.receiptInput}`}
+                aria-labelledby="expense-receipt-label"
+                aria-describedby="expense-receipt-hint"
+                aria-invalid={errors.receipt ? true : undefined}
+                onChange={(e) => pickFile(e.target.files?.[0] ?? null)}
+              />
+              <label htmlFor="expense-receipt" className={buttonClass('secondary', false)}>
+                <Paperclip size={18} aria-hidden="true" /> {t('fleet.form.receiptPick')}
+              </label>
+              <span className={styles.receiptName}>{file ? file.name : expense?.receipt_path ? t('fleet.form.receiptAttached') : t('fleet.form.receiptNone')}</span>
+            </div>
+            <p id="expense-receipt-hint" className={errors.receipt ? styles.fieldErrorLine : styles.hintLine}>
+              {errors.receipt ?? (expense?.receipt_path && !file ? t('fleet.form.receiptKept') : t('fleet.form.receiptHint'))}
+            </p>
           </div>
-          <p id="expense-receipt-hint" className={errors.receipt ? styles.fieldErrorLine : styles.hintLine}>
-            {errors.receipt ?? (expense?.receipt_path && !file ? t('fleet.form.receiptKept') : t('fleet.form.receiptHint'))}
-          </p>
-        </div>
-      )}
-      {duplicate ? (
-        <div className={styles.confirmPanel} role="group" aria-labelledby="expense-dup">
-          <p id="expense-dup">{t('rpcError.expense_possible_duplicate')}</p>
+        )}
+        {duplicate ? (
+          <div className={styles.confirmPanel} role="group" aria-labelledby="expense-dup">
+            <p id="expense-dup">{t('rpcError.expense_possible_duplicate')}</p>
+            <div className={styles.actions}>
+              <ActionButton variant="primary" onAction={(rid) => save(rid, true)} errorMessage={(e) => rpcErrorMessage(lang, e)} canRetry={canRetryRpc}>
+                {t('fleet.form.saveAnyway')}
+              </ActionButton>
+              <Button onClick={() => setDuplicate(false)}>{t('fleet.form.cancel')}</Button>
+            </div>
+          </div>
+        ) : (
           <div className={styles.actions}>
-            <ActionButton variant="primary" onAction={(rid) => save(rid, true)} errorMessage={(e) => rpcErrorMessage(lang, e)} canRetry={canRetryRpc}>
-              {t('fleet.form.saveAnyway')}
+            <ActionButton submit variant="primary" onAction={(rid) => save(rid)} errorMessage={(e) => rpcErrorMessage(lang, e)} canRetry={canRetryRpc}>
+              {t('fleet.form.save')}
             </ActionButton>
-            <Button onClick={() => setDuplicate(false)}>{t('fleet.form.cancel')}</Button>
+            <Button onClick={onDone}>{t('fleet.form.cancel')}</Button>
           </div>
-        </div>
-      ) : (
-        <div className={styles.actions}>
-          <ActionButton variant="primary" onAction={(rid) => save(rid)} errorMessage={(e) => rpcErrorMessage(lang, e)} canRetry={canRetryRpc}>
-            {t('fleet.form.save')}
-          </ActionButton>
-          <Button onClick={onDone}>{t('fleet.form.cancel')}</Button>
-        </div>
-      )}
+        )}
+      </form>
     </Card>
   );
 }

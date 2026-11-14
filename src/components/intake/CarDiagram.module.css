@@ -14,8 +14,10 @@
   transition: border-color var(--motion-quick) var(--ease);
 }
 
-.editable:hover {
-  border-color: var(--border-lit);
+@media (hover: hover) {
+  .editable:hover {
+    border-color: var(--border-lit);
+  }
 }
 
 .svg {
@@ -42,7 +44,7 @@
 
 .side {
   fill: var(--muted);
-  font-size: 11px;
+  font-size: var(--text-xs);
   font-weight: 700;
   letter-spacing: 0.08em;
 }

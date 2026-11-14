@@ -16,7 +16,7 @@ export function TextArea({ label, hint, count, error, className, ...rest }: Text
   const countId = count ? `${id}-count` : undefined;
   const errorId = error ? `${id}-error` : undefined;
   return (
-    <div className={`${styles.field} ${className ?? ''}`}>
+    <div className={`${styles.field} ${styles.areaField} ${className ?? ''}`}>
       <label htmlFor={id} className={styles.label}>
         {label}
       </label>

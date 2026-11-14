@@ -36,7 +36,7 @@ import { HELP_LIMITS, HELP_SLUG_PATTERN, helpTextProblem, slugify } from '../../
 import { fold } from '../../lib/helpSearch';
 import { useLoad } from '../../lib/useLoad';
 import { audienceLabel, problemText } from './helpFormat';
-import { HELP_ICON } from '../help/parts';
+import { HELP_ICON } from '../help/helpIcons';
 import { Pill } from './parts';
 import { ADMIN_HELP_PATH, adminHelpArticlePath } from './paths';
 import { useUrlParams } from './useUrlParams';
@@ -95,71 +95,74 @@ function CategoryPanel({ category, onDone, onCancel }: { category?: AdminHelpCat
   };
   const ok = Object.values(problems).every((p) => p === null);
   return (
-    <InlinePanel title={category ? t('admin.help.cat.edit') : t('admin.help.newCategory')}>
-      <div className={styles.fields}>
-        <Field label={t('admin.help.cat.nameRo')} value={nameRo} maxLength={80} error={nameRo ? problems.nameRo : null} onChange={(e) => setNameRo(e.target.value)} />
-        <Field label={t('admin.help.cat.nameEn')} value={nameEn} maxLength={80} error={nameEn ? problems.nameEn : null} onChange={(e) => setNameEn(e.target.value)} />
-        <Field label={t('admin.help.cat.descRo')} value={descRo} maxLength={200} error={problems.descRo} onChange={(e) => setDescRo(e.target.value)} />
-        <Field label={t('admin.help.cat.descEn')} value={descEn} maxLength={200} error={problems.descEn} onChange={(e) => setDescEn(e.target.value)} />
-        <Field
-          label={t('admin.help.slug')}
-          hint={t('admin.help.slugHint')}
-          error={shownSlug ? problems.slug : null}
-          value={shownSlug}
-          mono
-          maxLength={60}
-          onChange={(e) => {
-            setSlugTouched(true);
-            setSlug(e.target.value.toLowerCase());
-          }}
-        />
-        <SelectField
-          label={t('admin.help.cat.icon')}
-          value={icon}
-          options={HELP_ICONS.map((i) => ({ value: i, label: t(`admin.help.icon.${i}` as MessageKey) }))}
-          onChange={(e) => setIcon(e.target.value as HelpIcon)}
-        />
-        <div className={styles.full}>
-          <CheckMenu
-            label={t('admin.help.audience')}
-            summary={audienceLabel(t, audience)}
-            options={HELP_AUDIENCES.map((a) => ({ value: a, label: t(`help.audience.${a}` as MessageKey) }))}
-            selected={audience}
-            onToggle={(v) => setAudience((prev) => (prev.includes(v as HelpAudience) ? prev.filter((x) => x !== v) : [...prev, v as HelpAudience]))}
-            all={{ label: t('admin.help.audienceAll'), selected: audience.length === 0, onSelect: () => setAudience([]) }}
+    <InlinePanel title={category ? t('admin.help.cat.edit') : t('admin.help.newCategory')} onClose={onCancel}>
+      <form className="form-contents" onSubmit={(e) => e.preventDefault()} noValidate>
+        <div className={styles.fields}>
+          <Field label={t('admin.help.cat.nameRo')} value={nameRo} maxLength={80} error={nameRo ? problems.nameRo : null} onChange={(e) => setNameRo(e.target.value)} />
+          <Field label={t('admin.help.cat.nameEn')} value={nameEn} maxLength={80} error={nameEn ? problems.nameEn : null} onChange={(e) => setNameEn(e.target.value)} />
+          <Field label={t('admin.help.cat.descRo')} value={descRo} maxLength={200} error={problems.descRo} onChange={(e) => setDescRo(e.target.value)} />
+          <Field label={t('admin.help.cat.descEn')} value={descEn} maxLength={200} error={problems.descEn} onChange={(e) => setDescEn(e.target.value)} />
+          <Field
+            label={t('admin.help.slug')}
+            hint={t('admin.help.slugHint')}
+            error={shownSlug ? problems.slug : null}
+            value={shownSlug}
+            mono
+            maxLength={60}
+            onChange={(e) => {
+              setSlugTouched(true);
+              setSlug(e.target.value.toLowerCase());
+            }}
           />
+          <SelectField
+            label={t('admin.help.cat.icon')}
+            value={icon}
+            options={HELP_ICONS.map((i) => ({ value: i, label: t(`admin.help.icon.${i}` as MessageKey) }))}
+            onChange={(e) => setIcon(e.target.value as HelpIcon)}
+          />
+          <div className={styles.full}>
+            <CheckMenu
+              label={t('admin.help.audience')}
+              summary={audienceLabel(t, audience)}
+              options={HELP_AUDIENCES.map((a) => ({ value: a, label: t(`help.audience.${a}` as MessageKey) }))}
+              selected={audience}
+              onToggle={(v) => setAudience((prev) => (prev.includes(v as HelpAudience) ? prev.filter((x) => x !== v) : [...prev, v as HelpAudience]))}
+              all={{ label: t('admin.help.audienceAll'), selected: audience.length === 0, onSelect: () => setAudience([]) }}
+            />
+          </div>
         </div>
-      </div>
-      <Switch checked={active} onChange={(e) => setActive(e.target.checked)} hint={t('admin.help.cat.activeHint')}>
-        {t('admin.help.cat.active')}
-      </Switch>
-      <div className={styles.panelButtons}>
-        <ActionButton
-          disabled={!ok}
-          onAction={async (requestId) => {
-            await saveHelpCategory(
-              category?.id ?? null,
-              {
-                slug: shownSlug,
-                icon,
-                audience,
-                active,
-                name_ro: nameRo.trim(),
-                name_en: nameEn.trim(),
-                description_ro: descRo.trim() || null,
-                description_en: descEn.trim() || null,
-              },
-              requestId,
-            );
-            onDone(t('admin.help.cat.saved'));
-          }}
-          errorMessage={(e) => rpcErrorMessage(lang, e)}
-          canRetry={canRetryRpc}
-        >
-          {t('admin.save')}
-        </ActionButton>
-        <Button onClick={onCancel}>{t('common.cancel')}</Button>
-      </div>
+        <Switch checked={active} onChange={(e) => setActive(e.target.checked)} hint={t('admin.help.cat.activeHint')}>
+          {t('admin.help.cat.active')}
+        </Switch>
+        <div className={styles.panelButtons}>
+          <ActionButton
+            submit
+            disabled={!ok}
+            onAction={async (requestId) => {
+              await saveHelpCategory(
+                category?.id ?? null,
+                {
+                  slug: shownSlug,
+                  icon,
+                  audience,
+                  active,
+                  name_ro: nameRo.trim(),
+                  name_en: nameEn.trim(),
+                  description_ro: descRo.trim() || null,
+                  description_en: descEn.trim() || null,
+                },
+                requestId,
+              );
+              onDone(t('admin.help.cat.saved'));
+            }}
+            errorMessage={(e) => rpcErrorMessage(lang, e)}
+            canRetry={canRetryRpc}
+          >
+            {t('admin.save')}
+          </ActionButton>
+          <Button onClick={onCancel}>{t('common.cancel')}</Button>
+        </div>
+      </form>
       {category && category.articles === 0 && (
         <>
           {!confirmDelete ? (
@@ -167,7 +170,7 @@ function CategoryPanel({ category, onDone, onCancel }: { category?: AdminHelpCat
               {t('admin.help.cat.delete')}
             </Button>
           ) : (
-            <InlinePanel title={t('admin.help.cat.deleteConfirm')}>
+            <InlinePanel title={t('admin.help.cat.deleteConfirm')} onClose={() => setConfirmDelete(false)}>
               <div className={styles.panelButtons}>
                 <ActionButton
                   variant="danger"

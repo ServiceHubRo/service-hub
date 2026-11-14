@@ -102,9 +102,11 @@
     background-color var(--motion-quick) var(--ease);
 }
 
-.row:hover {
-  border-color: var(--border-lit);
-  background: var(--surface-hover);
+@media (hover: hover) {
+  .row:hover {
+    border-color: var(--border-lit);
+    background: var(--surface-hover);
+  }
 }
 
 .rowIcon {
