@@ -14,7 +14,6 @@ import { fetchSubscriptions, type AdminInvoiceRow, type AdminSubscriptionRow } f
 import { adminZoneBack } from '../../app/adminZones';
 import { useI18n } from '../../i18n/context';
 import type { MessageKey } from '../../i18n/ro';
-import { plural } from '../../i18n/translate';
 import { filterSubscriptions, isSubscriptionFilter, SUBSCRIPTION_FILTERS } from '../../lib/adminTools';
 import { ExportButton } from './ExportButton';
 import { Money, Pill, RowLink, SubscriptionPill } from './parts';
@@ -110,7 +109,7 @@ function InvoiceRow({ i }: { i: AdminInvoiceRow }) {
  * Search, status chips and the tab live in the address. Live.
  */
 export function SubscriptionsScreen() {
-  const { t, lang } = useI18n();
+  const { t } = useI18n();
   const { state, reload } = useLiveData(fetchSubscriptions, LIVE, 'admin-subscriptions');
   const { params, setParam, text, setText } = useUrlParams();
   const tab: Tab = params.get('tab') === 'plati' ? 'plati' : 'abonamente';
@@ -170,7 +169,7 @@ export function SubscriptionsScreen() {
                   onClearAll={() => setParam({ stare: null })}
                   end={
                     <div className={styles.toolbar}>
-                      <span className={styles.sub}>{plural(lang, 'unit.subscriptions', shown.length)}</span>
+                      {/* No count here (Eduard, 14 Nov 2026): it already stands on „Afișează: Abonamente (n)”. */}
                       <ExportButton<AdminSubscriptionRow>
                         kind="subscriptions"
                         filters={{ q: query || undefined, status: filter === 'all' ? undefined : filter }}

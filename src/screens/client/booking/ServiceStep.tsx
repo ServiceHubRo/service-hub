@@ -1,13 +1,16 @@
 import { Check } from 'lucide-react';
+import { useState } from 'react';
 import { CheckMenu } from '../../../components/CheckMenu';
 import { BottomBar } from '../../../components/BottomBar';
 import { buttonClass } from '../../../components/buttonClass';
+import { SearchField } from '../../../components/SearchField';
 import { ServiceIcon } from '../../../components/ServiceIcon';
 import type { ShopPageService } from '../../../data/search';
 import { useI18n } from '../../../i18n/context';
 import { plural } from '../../../i18n/translate';
 import { MAX_BOOKING_SERVICES } from '../../../lib/bookingServices';
 import { SYMPTOMS, UNSURE_SERVICE_ID, type Symptom } from '../../../lib/symptoms';
+import { matchesWords, searchWords } from '../../../lib/text';
 import { groupServices, serviceName } from '../shop/serviceGroups';
 import styles from './booking.module.css';
 
@@ -16,7 +19,9 @@ import styles from './booking.module.css';
  * Several services can go in the same booking (T21): each tap ticks or unticks one, up to five;
  * "Continuă" stays in sight at the bottom and names how many are picked.
  * "Constatare tehnică" (the `constatare` service, when the shop offers it) comes first, on its own;
- * ticked, it shows the symptoms the client may select.
+ * ticked, it shows the symptoms the client may select. A search over the shop's services narrows the
+ * list as one types, by any word of a service or of its category, in both languages (Eduard, 14 Nov
+ * 2026: no scrolling through every service to find one); a ticked service stays ticked while hidden.
  */
 export function ServiceStep({
   services,
@@ -37,7 +42,11 @@ export function ServiceStep({
   const full = selected.length >= MAX_BOOKING_SERVICES;
   const unsure = services.find((s) => s.id === UNSURE_SERVICE_ID);
   const unsureOn = unsure ? selected.includes(unsure.id) : false;
-  const others = services.filter((s) => s.id !== UNSURE_SERVICE_ID);
+  const [query, setQuery] = useState('');
+  const words = searchWords(query);
+  const others = services
+    .filter((s) => s.id !== UNSURE_SERVICE_ID)
+    .filter((s) => words.length === 0 || matchesWords(words, s.name_ro, s.name_en, s.category_ro, s.category_en));
   return (
     <>
       {unsure && (
@@ -73,7 +82,21 @@ export function ServiceStep({
           )}
         </section>
       )}
+      <SearchField
+        id="booking-service-q"
+        label={t('booking.servicesSearch')}
+        placeholder={t('booking.servicesSearch')}
+        value={query}
+        onChange={setQuery}
+        onClear={() => setQuery('')}
+        clearLabel={t('search.clearQuery')}
+      />
       <p className={styles.muted}>{t('booking.servicesHint')}</p>
+      {others.length === 0 && words.length > 0 && (
+        <p className={styles.muted} role="status">
+          {t('booking.servicesSearchEmpty', { q: query.trim() })}
+        </p>
+      )}
       <div className={styles.groups}>
         {groupServices(others, lang).map((g) => (
           <section key={g.key} aria-label={g.name}>

@@ -312,15 +312,14 @@ export function SettingsFields({
           { value: 'exceptional', label: t('proc.kind.exceptional') },
         ]}
       />
-      <div className={styles.full}>
-        <CheckMenu
-          label={t('proc.settings.requests')}
-          summary={draft.support_categories.length === 0 ? t('proc.settings.requestsNone') : draft.support_categories.map(name).join(', ')}
-          options={categories.map((c) => ({ value: c.key, label: name(c.key) }))}
-          selected={draft.support_categories}
-          onToggle={toggle}
-        />
-      </div>
+      {/* In a cell like the others, two on a row (Eduard, 14 Nov 2026: one size for every field). */}
+      <CheckMenu
+        label={t('proc.settings.requests')}
+        summary={draft.support_categories.length === 0 ? t('proc.settings.requestsNone') : draft.support_categories.map(name).join(', ')}
+        options={categories.map((c) => ({ value: c.key, label: name(c.key) }))}
+        selected={draft.support_categories}
+        onToggle={toggle}
+      />
       {admin && (
         <>
           <SelectField

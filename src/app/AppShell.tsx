@@ -76,37 +76,6 @@ function SidebarLink({ item, badge }: { item: NavItem; badge?: Badge }) {
   );
 }
 
-/**
- * An admin zone in the sidebar (A1): the zone, and under it, while the zone is open, its
- * sub-sections — one level, the current one marked like the zone (tint, amber icon, bold).
- */
-function SidebarZone({ item, badges }: { item: NavItem; badges: Record<string, Badge> }) {
-  const { t } = useI18n();
-  const { pathname } = useLocation();
-  const open = pathname === item.path || pathname.startsWith(`${item.path}/`);
-  return (
-    <>
-      <SidebarLink item={item} badge={badges[item.path]} />
-      {open && item.children && item.children.length > 0 && (
-        <ul className={styles.sideSub} aria-label={t(item.labelKey)}>
-          {item.children.map((child) => (
-            <li key={child.path}>
-              <NavLink
-                to={child.path}
-                className={({ isActive }) => `${styles.sideLink} ${styles.sideSubLink} ${isActive ? styles.sideActive : ''}`}
-              >
-                <NavIcon item={child} size={17} badge={badges[child.path]?.count ?? 0} />
-                <span>{t(child.labelKey)}</span>
-                <BadgeText badge={badges[child.path]} />
-              </NavLink>
-            </li>
-          ))}
-        </ul>
-      )}
-    </>
-  );
-}
-
 /** A count on a navigation item and what it counts (read out after the label). */
 interface Badge {
   count: number;
@@ -323,13 +292,9 @@ export function AppShell({ role }: { role: Role }) {
           <nav className={styles.sideNav} aria-label={t('nav.main')}>
             {companyNav
               ? companyNav.slice(0, 4).map((item) => <CompanyNavLink key={item.key} item={item} variant="side" />)
-              : nav.main.map((item) =>
-                  item.children ? (
-                    <SidebarZone key={item.path} item={item} badges={badges} />
-                  ) : (
-                    <SidebarLink key={item.path} item={item} badge={badges[item.path]} />
-                  ),
-                )}
+              : // An admin zone is one link: its sub-sections are the tiles on its page, not repeated
+                // here (Eduard, 14 Nov 2026); the zone stays marked while one of them is open.
+                nav.main.map((item) => <SidebarLink key={item.path} item={item} badge={badges[item.path]} />)}
           </nav>
           <div className={styles.sideBottom}>
             {companyNav ? <CompanyNavLink item={companyNav[4]!} variant="side" /> : <SidebarLink item={nav.account} />}

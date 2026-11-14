@@ -226,31 +226,16 @@ test.describe('A1 — admin navigation', () => {
       await expectNoHorizontalScroll(page);
     }
 
-    // From 1024 px: the open zone lists its sub-sections in the sidebar, one level, the current one marked.
+    // From 1024 px: the sidebar holds the five zones only; a zone's sub-sections are the tiles on its
+    // page (Eduard, 14 Nov 2026: the list in the sidebar repeated them).
     if (isDesktop(page)) {
       const sidebar = page.getByRole('navigation', { name: 'Navigare principală' }).filter({ visible: true });
       await adminZoneLink(page, 'Platformă').click();
-      const sub = sidebar.getByRole('list', { name: 'Platformă' });
-      await expect(sub.getByRole('link')).toHaveText([
-        'Setări platformă',
-        'Textele notificărilor',
-        'Anunțuri',
-        'Zone',
-        'Catalog de servicii',
-        'Jurnal de audit',
-        'Securitate',
-        'Notificări flotă eșuate',
-        'Echipa de suport',
-        'Administratori',
-        'Retenția datelor',
-      ]);
-      await sub.getByRole('link', { name: 'Anunțuri' }).click();
+      await expect(sidebar.getByRole('link')).toHaveCount(5);
+      await main(page).getByRole('link', { name: /^Anunțuri/ }).first().click();
       await expect(h1(page)).toHaveText('Anunțuri');
-      await expect(sub.getByRole('link', { name: 'Anunțuri' })).toHaveAttribute('aria-current', 'page');
-      // Another zone: Platformă's sub-sections close, Activitate's open.
-      await adminZoneLink(page, 'Activitate').click();
-      await expect(sidebar.getByRole('list', { name: 'Platformă' })).toHaveCount(0);
-      await expect(sidebar.getByRole('list', { name: 'Activitate' }).getByRole('link')).toHaveCount(6);
+      await expect(sidebar.getByRole('link')).toHaveCount(5);
+      await expect(adminZoneLink(page, 'Platformă')).toHaveAttribute('aria-current', 'page');
     } else {
       // A phone or a tablet: exactly the five zones in the bottom bar.
       const bar = page.getByRole('navigation', { name: 'Navigare principală' }).filter({ visible: true });

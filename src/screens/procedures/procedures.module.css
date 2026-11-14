@@ -402,6 +402,11 @@
   }
 }
 
+/* Every field fills its cell: the same width for a list, a menu and a choice (Eduard, 14 Nov 2026). */
+.fields > * {
+  --field-max: none;
+}
+
 .full {
   grid-column: 1 / -1;
 }
