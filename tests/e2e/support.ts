@@ -369,16 +369,27 @@ export async function openClientBooking(page: Page, text: string | RegExp): Prom
   };
   await loaded();
   const row = rows.filter({ hasText: text }).first();
-  // In the tab on screen (the list is read again quietly on arrival), else in the other one.
-  const here = await row.waitFor({ timeout: 5_000 }).then(
-    () => true,
-    () => false,
-  );
-  if (!here) {
-    await page.getByRole('tab', { selected: false }).click();
-    await loaded();
+  // In the tab on screen (the list is read again quietly on arrival), else in the other one. A
+  // booking can move between the tabs under the tap (a live change: the shop finishes the job), so
+  // a row gone before the click is looked for again.
+  for (let attempt = 0; attempt < 6; attempt++) {
+    // Already open (a tap that went through just as its row moved).
+    if (attempt > 0 && (await detail.filter({ hasText: text }).isVisible())) break;
+    const here = await row.waitFor({ timeout: 5_000 }).then(
+      () => true,
+      () => false,
+    );
+    if (!here) {
+      await page.getByRole('tab', { selected: false }).click();
+      await loaded();
+      continue;
+    }
+    const clicked = await row.click({ timeout: 5_000 }).then(
+      () => true,
+      () => false,
+    );
+    if (clicked) break;
   }
-  await row.click();
   // This booking's detail (the code or the shop is in it), not whichever is open later.
   const mine = detail.filter({ hasText: text });
   await expect(mine).toBeVisible();
