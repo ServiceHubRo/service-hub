@@ -199,7 +199,7 @@ test.describe('repair history', () => {
     const [download] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: 'Descarcă istoricul' }).click()]);
     expect(download.suggestedFilename()).toMatch(/^istoric-reparatii-\d{4}-\d{2}-\d{2}\.xlsx$/);
     const csv = xlsxText(await readFile((await download.path())!));
-    expect(csv).toContain('Data;Cod programare;Status;Număr');
+    expect(csv).toContain('Data;Cod programare;Stare;Număr');
     expect(csv).toContain(`${done.ref};Finalizată;${plate};Dacia Logan 2019`);
     expect(csv).toContain(';105400;');
     expect(csv).not.toContain(otherPlate);
