@@ -38,9 +38,9 @@ regula e respectată, iar raportul e în `docs/AUDIT_CONSISTENTA.md`. Detaliile 
 | Cod | Regula | Piesa comună |
 |---|---|---|
 | P6 | Un câmp e mereu câmpul comun: etichetă deasupra, caseta, indicația dedesubt. | `Field`, `SelectField`, `TextArea`, `PhoneField`, `PasswordField`, `CheckMenu`, `SearchField` |
-| — | Un câmp nu e mai lat de 560 px (`--field-max`): câmp pe un rând, text mai lung, căutare, „Afișează”, o pereche de câmpuri. Pe telefon, cât cardul. | `--field-max` |
-| F1 | Câmpurile de pe același rând au aceeași lățime (două pe rând = două jumătăți egale; de la 600 px, pe telefon unul sub altul). Un câmp rămas singur pe ultimul rând ia tot rândul. | `FieldPair` |
-| F2 | Câmpurile puse unul sub altul în același formular încep și se termină la aceleași margini. | — |
+| — | Modelul unui formular e „Adaugă vehicul” din firmă: câmpurile umplu cardul, în coloane egale (cât încap la 240 px: una pe telefon, patru pe laptop). Un câmp singur, un text mai lung, căutarea și „Afișează” umplu și ele lățimea. | `formGrid` (flotă), `--field-max: none` |
+| F1 | Câmpurile de pe același rând au aceeași lățime. | `FieldPair` |
+| F2 | Câmpurile puse unul sub altul în același formular încep și se termină la aceleași margini, sau stau în aceleași coloane (un rând mai scurt al unei grile). | — |
 | F3 | Toate câmpurile pe un rând au aceeași înălțime: 48 px (`--field-h`); butoanele au 44 px. | `--field-h` |
 | F4 | Un câmp nu iese din cardul în care stă. | — |
 | F5 | Textul din câmp are cel puțin 16 px (altfel iPhone mărește pagina). | — |

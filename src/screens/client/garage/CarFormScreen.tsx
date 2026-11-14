@@ -1,7 +1,8 @@
 import { CarFront } from 'lucide-react';
-import { useCallback, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { ActionButton } from '../../../components/ActionButton';
+import { BackLink } from '../../../components/BackLink';
 import { PageHeader } from '../../../components/PageHeader';
 import { Button } from '../../../components/Button';
 import { buttonClass } from '../../../components/buttonClass';
@@ -58,6 +59,8 @@ export function CarFormScreen() {
 }
 
 type DateKey = (typeof CAR_DOCS)[number]['column'];
+type FieldName = 'make' | 'model' | 'plate' | 'year' | 'vin';
+const FIELD_ORDER: readonly FieldName[] = ['make', 'model', 'year', 'plate', 'vin'];
 
 function CarEditor({ car }: { car: Car | null }) {
   const { t, lang } = useI18n();
@@ -79,24 +82,42 @@ function CarEditor({ car }: { car: Car | null }) {
   const [oilMonths, setOilMonths] = useState(car?.oil_change_months ? String(car.oil_change_months) : '');
   const [oilLast, setOilLast] = useState(car?.last_oil_change ?? '');
   const { state: oilStandard } = useLoad(fetchOilStandard);
-  const [touched, setTouched] = useState({ year: false, vin: false, plate: false });
+  const [errors, setErrors] = useState<Partial<Record<FieldName, string>>>({});
+  const makeRef = useRef<HTMLInputElement>(null);
+  const modelRef = useRef<HTMLInputElement>(null);
+  const plateRef = useRef<HTMLInputElement>(null);
+  const yearRef = useRef<HTMLInputElement>(null);
+  const vinRef = useRef<HTMLInputElement>(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
 
   const vinNorm = normalizeCode(vin);
-  const yearError = isValidCarYear(year) ? null : t('car.yearInvalid', { max: carYearMax() });
-  const vinError = vinNorm && !isValidVin(vinNorm) ? t('rpcError.car_vin_invalid') : null;
-  // M7: a new or changed plate must be a plate; one already saved is left as it is.
-  const plateChanged = canonicalPlate(plate) !== canonicalPlate(car?.plate);
-  const plateError = plateChanged && plate.trim() !== '' && !isValidPlate(plate) ? t('rpcError.car_plate_invalid') : null;
   const today = ymdInBucharest(new Date());
   const oilLastError = oilLast && oilLast > today ? t('rpcError.car_oil_date_invalid') : null;
-  const filled = make.trim() !== '' && model.trim() !== '';
-  const canSave = filled && !yearError && !vinError && !plateError && !oilLastError;
   const standardMonths = oilStandard.status === 'ready' ? oilStandard.data.months : null;
+  /** A field changed: its message goes until the next save (as in the company's form). */
+  const edited = (k: FieldName, set: (v: string) => void) => (v: string) => {
+    set(v);
+    setErrors((e) => ({ ...e, [k]: undefined }));
+  };
 
   // No request id here: an edit gives the same result however often it is sent, and a new car
   // carries its own id (newId).
   async function save() {
+    // The same checks, at the same moment, as „Adaugă vehicul” in a company's space.
+    const next: Partial<Record<FieldName, string>> = {};
+    if (!make.trim()) next.make = t('car.required');
+    if (!model.trim()) next.model = t('car.required');
+    if (year.trim() && !isValidCarYear(year.trim())) next.year = t('car.yearInvalid', { max: carYearMax() });
+    // M7: a new or changed plate must be a plate; one already saved is left as it is.
+    if (plate.trim() && canonicalPlate(plate) !== canonicalPlate(car?.plate) && !isValidPlate(plate)) next.plate = t('rpcError.car_plate_invalid');
+    if (vinNorm && !isValidVin(vinNorm)) next.vin = t('rpcError.car_vin_invalid');
+    setErrors(next);
+    const first = FIELD_ORDER.find((k) => next[k]);
+    if (first) {
+      ({ make: makeRef, model: modelRef, year: yearRef, plate: plateRef, vin: vinRef })[first].current?.focus();
+      return;
+    }
+    if (oilLastError) return;
     const fields: CarFields = {
       make: make.trim(),
       model: model.trim(),
@@ -129,16 +150,19 @@ function CarEditor({ car }: { car: Car | null }) {
 
   return (
     <div className={styles.page}>
-      <PageHeader back={{ to: GARAGE_PATH, label: t('nav.client.garage') }} title={car ? t('garage.editTitle') : t('garage.newTitle')} />
+      <BackLink to={GARAGE_PATH} label={t('nav.client.garage')} />
 
-      {/* The same card as „Adaugă vehicul” in a company's space (Eduard, 14 Nov 2026): equal fields in
-          one grid, the documents and the oil change under their own titles, then the actions. */}
+      {/* Exactly the card of „Adaugă vehicul” in a company's space (Eduard, 14 Nov 2026): the title in
+          the card, equal fields that fill it, „Documente”, then the button across and „Renunță”. The
+          oil change is the garage's own, built the same way as the documents. */}
       <Card className={fleetStyles.card}>
+        <h1 className={fleetStyles.cardTitle}>{car ? t('garage.editTitle') : t('garage.add')}</h1>
         <form className={fleetStyles.stack} onSubmit={(e) => e.preventDefault()} noValidate>
           <div className={fleetStyles.formGrid}>
-            <Field label={t('car.make')} placeholder={t('car.makePlaceholder')} value={make} maxLength={60} autoComplete="off" onChange={(e) => setMake(e.target.value)} />
-            <Field label={t('car.model')} placeholder={t('car.modelPlaceholder')} value={model} maxLength={60} autoComplete="off" onChange={(e) => setModel(e.target.value)} />
+            <Field ref={makeRef} label={t('car.make')} placeholder={t('car.makePlaceholder')} value={make} maxLength={60} autoComplete="off" error={errors.make} onChange={(e) => edited('make', setMake)(e.target.value)} />
+            <Field ref={modelRef} label={t('car.model')} placeholder={t('car.modelPlaceholder')} value={model} maxLength={60} autoComplete="off" error={errors.model} onChange={(e) => edited('model', setModel)(e.target.value)} />
             <Field
+              ref={plateRef}
               label={t('car.plate')}
               placeholder={t('car.platePlaceholder')}
               value={plate}
@@ -147,22 +171,22 @@ function CarEditor({ car }: { car: Car | null }) {
               upper
               autoCapitalize="characters"
               autoComplete="off"
-              error={touched.plate ? plateError : null}
-              onBlur={() => setTouched((s) => ({ ...s, plate: true }))}
-              onChange={(e) => setPlate(e.target.value)}
+              error={errors.plate}
+              onChange={(e) => edited('plate', setPlate)(e.target.value.toUpperCase())}
             />
             <Field
+              ref={yearRef}
               label={t('car.year')}
               value={year}
               inputMode="numeric"
               maxLength={4}
               mono
               autoComplete="off"
-              error={touched.year ? yearError : null}
-              onBlur={() => setTouched((s) => ({ ...s, year: true }))}
-              onChange={(e) => setYear(e.target.value.replace(/\D/g, ''))}
+              error={errors.year}
+              onChange={(e) => edited('year', setYear)(e.target.value.replace(/\D/g, ''))}
             />
             <Field
+              ref={vinRef}
               label={t('car.vin')}
               hint={t('car.vinHint')}
               value={vin}
@@ -172,14 +196,12 @@ function CarEditor({ car }: { car: Car | null }) {
               autoCapitalize="characters"
               autoComplete="off"
               spellCheck={false}
-              error={touched.vin ? vinError : null}
-              onBlur={() => setTouched((s) => ({ ...s, vin: true }))}
-              onChange={(e) => setVin(e.target.value)}
+              error={errors.vin}
+              onChange={(e) => edited('vin', setVin)(e.target.value.toUpperCase())}
             />
           </div>
 
-          <h3 className={fleetStyles.subTitle}>{t('garage.docsTitle')}</h3>
-          <p className={styles.sub}>{t('garage.docsHint')}</p>
+          <h3 className={fleetStyles.subTitle}>{t('fleet.vtab.documents')}</h3>
           <div className={fleetStyles.formGrid}>
             {CAR_DOCS.map(({ doc, column }) => (
               <Field
@@ -197,7 +219,6 @@ function CarEditor({ car }: { car: Car | null }) {
 
           {/* T30: the client's own interval (else the catalog's) and a change made outside Service-Hub. */}
           <h3 className={fleetStyles.subTitle}>{t('garage.oilTitle')}</h3>
-          <p className={styles.sub}>{t('garage.oilHint')}</p>
           <div className={fleetStyles.formGrid}>
             <SelectField
               label={t('garage.oilEvery')}
@@ -224,14 +245,11 @@ function CarEditor({ car }: { car: Car | null }) {
             />
           </div>
 
-          {!filled && <p className={styles.sub}>{t('car.required')}</p>}
           <div className={fleetStyles.actions}>
-            <ActionButton submit block={false} onAction={save} disabled={!canSave} errorMessage={(e) => rpcErrorMessage(lang, e)} canRetry={canRetryRpc}>
-              {t('common.save')}
+            <ActionButton submit variant="primary" onAction={save} errorMessage={(e) => rpcErrorMessage(lang, e)} canRetry={canRetryRpc}>
+              {t('garage.saveCar')}
             </ActionButton>
-            <Link to={GARAGE_PATH} className={buttonClass('secondary')}>
-              {t('common.cancel')}
-            </Link>
+            <Button onClick={() => navigate(GARAGE_PATH)}>{t('common.cancel')}</Button>
           </div>
           {duplicateOf && (
             <Link to={carEditPath(duplicateOf)} className={buttonClass('secondary')}>

@@ -59,18 +59,21 @@ test.describe('garage', () => {
     await shot(page, 't07-garage-empty', name());
 
     await page.getByRole('link', { name: 'Adaugă mașină' }).click();
-    await expect(page.getByRole('heading', { level: 1, name: 'Mașină nouă' })).toBeVisible();
-    const save = page.getByRole('button', { name: 'Salvează' });
-    await expect(save).toBeDisabled(); // make and model first
+    // The same card as „Adaugă vehicul” in a company's space (14 Nov 2026): the checks come on save.
+    await expect(page.getByRole('heading', { level: 1, name: 'Adaugă mașină' })).toBeVisible();
+    const save = page.getByRole('button', { name: 'Salvează mașina' });
+    await save.click(); // make and model first
+    await expect(page.getByText('Marca și modelul sunt obligatorii.').first()).toBeVisible();
+    await expect(page.getByLabel('Marcă')).toBeFocused();
     await page.getByLabel('Marcă').fill('Volkswagen');
     await page.getByLabel('Model').fill('Golf 7');
     await page.getByLabel('An fabricație').fill('2016');
     await page.getByLabel('Nr. înmatriculare').fill('bv 12 abc');
     // A wrong VIN is refused with a reason; the page stays where it is.
     await page.getByLabel(/Serie de șasiu/).fill('WVWZZZ');
-    await page.getByLabel(/ITP/).click();
+    await save.click();
     await expect(page.getByText('Seria de șasiu (VIN) are 17 caractere, fără I, O și Q.')).toBeVisible();
-    await expect(save).toBeDisabled();
+    await expect(page).toHaveURL(/\/c\/garaj\/nou$/);
     await page.getByLabel(/Serie de șasiu/).fill('wvwzzzauzgw123456');
     await page.getByLabel(/ITP/).fill(inDays(10));
     await expectNoHorizontalScroll(page);
@@ -112,7 +115,7 @@ test.describe('garage', () => {
     await page.getByRole('button', { name: 'Șterge mașina' }).click();
     await expect(page.getByText('Ștergi mașina din garaj?')).toBeVisible();
     await shot(page, 't07-car-delete', name());
-    await page.getByRole('button', { name: 'Renunță' }).click();
+    await page.getByRole('group', { name: 'Ștergi mașina din garaj?' }).getByRole('button', { name: 'Renunță' }).click();
     await expect(page.getByText('Ștergi mașina din garaj?')).toHaveCount(0);
     await page.getByRole('button', { name: 'Șterge mașina' }).click();
     await page.getByRole('button', { name: 'Da, șterge' }).click();

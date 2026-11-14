@@ -7,8 +7,9 @@ import { measurePatterns } from './patternRules';
  * every screen the visual audit and the accessibility walk open:
  *
  *  F1 row       fields side by side in one group are equally wide (two per row: two equal halves);
- *  F2 column    rows of fields stacked in one group start and end at the same edges (no field
- *               narrower than the one above it, no ragged right edge);
+ *  F2 column    rows of fields stacked in one group start and end at the same edges, or line up
+ *               column by column like a grid (no field narrower than the one above it, no ragged
+ *               right edge);
  *  F3 height    one-line fields side by side are equally high;
  *  F4 inside    a field never sticks out of the card or panel it is in;
  *  F5 text      a field's text is at least 16 px (iPhone zooms in otherwise);
@@ -179,7 +180,11 @@ export function measureFields(): FieldIssue[] {
     const sa = span(a);
     const sb = span(b);
     if (Math.abs(sa.left - sb.left) > 2) continue;
-    if (Math.abs(sa.right - sb.right) > 2) {
+    // A shorter row of a grid is fine when each of its fields sits exactly under (or over) a field
+    // of the longer row: the columns line up (the company's „Adaugă vehicul”).
+    const [short, long] = sa.right - sa.left < sb.right - sb.left ? [a, b] : [b, a];
+    const aligned = short.every((u) => long.some((v) => Math.abs(u.r.left - v.r.left) <= 2 && Math.abs(u.r.width - v.r.width) <= 2));
+    if (Math.abs(sa.right - sb.right) > 2 && !aligned) {
       add('F2 column', `${a.map((u) => name(u.control)).join(' + ')} ends at ${px(sa.right)}, ${b.map((u) => name(u.control)).join(' + ')} at ${px(sb.right)}`);
     }
   }
