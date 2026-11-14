@@ -25,6 +25,7 @@ import { useLoad } from '../../../lib/useLoad';
 import { canonicalPlate, isValidPlate } from '../../../lib/plate';
 import { isValidVin, normalizeCode } from '../../../lib/validators';
 import { carPath as carEditPath, GARAGE_PATH } from '../paths';
+import fleetStyles from '../../fleet/fleet.module.css';
 import styles from './garage.module.css';
 
 /** Garaj → "Adaugă mașină" (`/c/garaj/nou`) or the pencil on a car (`/c/garaj/:carId`). */
@@ -130,24 +131,13 @@ function CarEditor({ car }: { car: Car | null }) {
     <div className={styles.page}>
       <PageHeader back={{ to: GARAGE_PATH, label: t('nav.client.garage') }} title={car ? t('garage.editTitle') : t('garage.newTitle')} />
 
-      <form className={styles.form} data-layout="columns" onSubmit={(e) => e.preventDefault()} noValidate>
-        <div className={styles.form}>
-          <div className={styles.pair}>
+      {/* The same card as „Adaugă vehicul” in a company's space (Eduard, 14 Nov 2026): equal fields in
+          one grid, the documents and the oil change under their own titles, then the actions. */}
+      <Card className={fleetStyles.card}>
+        <form className={fleetStyles.stack} onSubmit={(e) => e.preventDefault()} noValidate>
+          <div className={fleetStyles.formGrid}>
             <Field label={t('car.make')} placeholder={t('car.makePlaceholder')} value={make} maxLength={60} autoComplete="off" onChange={(e) => setMake(e.target.value)} />
             <Field label={t('car.model')} placeholder={t('car.modelPlaceholder')} value={model} maxLength={60} autoComplete="off" onChange={(e) => setModel(e.target.value)} />
-          </div>
-          <div className={styles.pair}>
-            <Field
-              label={t('car.year')}
-              value={year}
-              inputMode="numeric"
-              maxLength={4}
-              mono
-              autoComplete="off"
-              error={touched.year ? yearError : null}
-              onBlur={() => setTouched((s) => ({ ...s, year: true }))}
-              onChange={(e) => setYear(e.target.value.replace(/\D/g, ''))}
-            />
             <Field
               label={t('car.plate')}
               placeholder={t('car.platePlaceholder')}
@@ -161,26 +151,36 @@ function CarEditor({ car }: { car: Car | null }) {
               onBlur={() => setTouched((s) => ({ ...s, plate: true }))}
               onChange={(e) => setPlate(e.target.value)}
             />
+            <Field
+              label={t('car.year')}
+              value={year}
+              inputMode="numeric"
+              maxLength={4}
+              mono
+              autoComplete="off"
+              error={touched.year ? yearError : null}
+              onBlur={() => setTouched((s) => ({ ...s, year: true }))}
+              onChange={(e) => setYear(e.target.value.replace(/\D/g, ''))}
+            />
+            <Field
+              label={t('car.vin')}
+              hint={t('car.vinHint')}
+              value={vin}
+              maxLength={24}
+              mono
+              upper
+              autoCapitalize="characters"
+              autoComplete="off"
+              spellCheck={false}
+              error={touched.vin ? vinError : null}
+              onBlur={() => setTouched((s) => ({ ...s, vin: true }))}
+              onChange={(e) => setVin(e.target.value)}
+            />
           </div>
-          <Field
-            label={t('car.vin')}
-            hint={t('car.vinHint')}
-            value={vin}
-            maxLength={24}
-            mono
-            upper
-            autoCapitalize="characters"
-            autoComplete="off"
-            spellCheck={false}
-            error={touched.vin ? vinError : null}
-            onBlur={() => setTouched((s) => ({ ...s, vin: true }))}
-            onChange={(e) => setVin(e.target.value)}
-          />
-        </div>
-        <div className={styles.form}>
-          <Card inset className={styles.docsPanel}>
-            <p className={styles.panelTitle}>{t('garage.docsTitle')}</p>
-            <p className={styles.sub}>{t('garage.docsHint')}</p>
+
+          <h3 className={fleetStyles.subTitle}>{t('garage.docsTitle')}</h3>
+          <p className={styles.sub}>{t('garage.docsHint')}</p>
+          <div className={fleetStyles.formGrid}>
             {CAR_DOCS.map(({ doc, column }) => (
               <Field
                 key={doc}
@@ -193,12 +193,12 @@ function CarEditor({ car }: { car: Car | null }) {
                 }}
               />
             ))}
-          </Card>
+          </div>
 
           {/* T30: the client's own interval (else the catalog's) and a change made outside Service-Hub. */}
-          <Card inset className={styles.docsPanel}>
-            <p className={styles.panelTitle}>{t('garage.oilTitle')}</p>
-            <p className={styles.sub}>{t('garage.oilHint')}</p>
+          <h3 className={fleetStyles.subTitle}>{t('garage.oilTitle')}</h3>
+          <p className={styles.sub}>{t('garage.oilHint')}</p>
+          <div className={fleetStyles.formGrid}>
             <SelectField
               label={t('garage.oilEvery')}
               value={oilMonths}
@@ -222,23 +222,24 @@ function CarEditor({ car }: { car: Car | null }) {
               error={oilLastError}
               onChange={(e) => setOilLast(e.target.value)}
             />
-          </Card>
-        </div>
+          </div>
 
-        {!filled && (
-          <p className={styles.sub} data-span="all">
-            {t('car.required')}
-          </p>
-        )}
-        <ActionButton submit onAction={save} disabled={!canSave} errorMessage={(e) => rpcErrorMessage(lang, e)} canRetry={canRetryRpc}>
-          {t('common.save')}
-        </ActionButton>
-        {duplicateOf && (
-          <Link to={carEditPath(duplicateOf)} className={buttonClass('secondary')} data-span="all">
-            {t('garage.openExisting')}
-          </Link>
-        )}
-      </form>
+          {!filled && <p className={styles.sub}>{t('car.required')}</p>}
+          <div className={fleetStyles.actions}>
+            <ActionButton submit block={false} onAction={save} disabled={!canSave} errorMessage={(e) => rpcErrorMessage(lang, e)} canRetry={canRetryRpc}>
+              {t('common.save')}
+            </ActionButton>
+            <Link to={GARAGE_PATH} className={buttonClass('secondary')}>
+              {t('common.cancel')}
+            </Link>
+          </div>
+          {duplicateOf && (
+            <Link to={carEditPath(duplicateOf)} className={buttonClass('secondary')}>
+              {t('garage.openExisting')}
+            </Link>
+          )}
+        </form>
+      </Card>
 
       {car &&
         (confirmDelete ? (

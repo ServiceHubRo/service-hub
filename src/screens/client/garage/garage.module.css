@@ -221,31 +221,7 @@
   }
 }
 
-/* ---------------------------------------------------------------- form */
-.form {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.pair {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: 10px;
-}
-
-.docsPanel {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.panelTitle {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--muted);
-}
-
+/* ---------------------------------------------------------------- deleting a car */
 .confirm {
   display: flex;
   flex-direction: column;

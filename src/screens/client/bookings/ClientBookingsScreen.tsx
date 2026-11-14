@@ -4,12 +4,12 @@ import { Link, useLocation, useSearchParams } from 'react-router-dom';
 import { Banner } from '../../../components/Banner';
 import { Button } from '../../../components/Button';
 import { buttonClass } from '../../../components/buttonClass';
-import { Chip, ChipRow } from '../../../components/Chip';
 import { EmptyState } from '../../../components/EmptyState';
 import { ListDetailLayout } from '../../../components/ListDetailLayout';
 import { ListRow, ListRows, ListRowsSkeleton } from '../../../components/ListRow';
 import { LoadError } from '../../../components/LoadError';
 import { PageHeader } from '../../../components/PageHeader';
+import { SelectField } from '../../../components/SelectField';
 import { ServiceIcon } from '../../../components/ServiceIcon';
 import { StatusPill } from '../../../components/StatusPill';
 import { Tabs, TabPanel } from '../../../components/Tabs';
@@ -74,6 +74,7 @@ export function ClientBookingsScreen() {
   const rawFilter = params.get('filtru') as EndedFilter | null;
   const filter: EndedFilter = rawFilter && ENDED_FILTERS.includes(rawFilter) ? rawFilter : 'all';
   const present = useMemo(() => new Set((groups?.past ?? []).map((b) => endedGroup(b.status))), [groups]);
+  const countOf = (f: EndedFilter) => (groups?.past ?? []).filter((b) => f === 'all' || endedGroup(b.status) === f).length;
   const filteredPast = useMemo(() => (groups?.past ?? []).filter((b) => filter === 'all' || endedGroup(b.status) === filter), [groups, filter]);
   const [pastShown, setPastShown] = useState(ENDED_PAGE);
   const pastPage = useMemo(() => {
@@ -205,14 +206,17 @@ export function ClientBookingsScreen() {
               {t(needsAcknowledgement(data.noShows) ? 'bookings.noShows.ack' : 'bookings.noShows', { n: data.noShows.count })}
             </Banner>
           )}
+          {/* A list to choose from, not chips (Eduard, 14 Nov 2026: „Filtre, nu tip bulină”). */}
           {tab === 'incheiate' && present.size > 1 && (
-            <ChipRow label={t('bookings.filter.label')}>
-              {ENDED_FILTERS.filter((f) => f === 'all' || present.has(f)).map((f) => (
-                <Chip key={f} selected={f === filter} onClick={() => setFilter(f)}>
-                  {t(FILTER_LABEL[f])}
-                </Chip>
-              ))}
-            </ChipRow>
+            <SelectField
+              label={t('bookings.filter.label')}
+              value={filter}
+              onChange={(e) => setFilter(e.target.value as EndedFilter)}
+              options={ENDED_FILTERS.filter((f) => f === 'all' || present.has(f)).map((f) => ({
+                value: f,
+                label: `${t(FILTER_LABEL[f])} (${countOf(f)})`,
+              }))}
+            />
           )}
         </>
       }

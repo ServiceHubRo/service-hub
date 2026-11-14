@@ -172,14 +172,12 @@ export function FleetCosts({ initialPeriod }: { initialPeriod?: string }) {
       {adding && <ExpenseForm onDone={() => setAdding(false)} />}
       {editing && <ExpenseForm key={editing.id} expense={editing} onDone={() => setEditing(null)} />}
 
+      {/* The total and what the company entered itself; no box of its own for Service-Hub's jobs
+          (Eduard, 14 Nov 2026). */}
       <ul className={styles.summary}>
         <li className={styles.summaryItem}>
           <span className={styles.kpiLabel}>{t('fleet.costs.total')}</span>
           <span className={`mono ${styles.summaryValue}`}>{formatMoney(lang, total)}</span>
-        </li>
-        <li className={styles.summaryItem}>
-          <span className={styles.kpiLabel}>{t('fleet.source.service')}</span>
-          <span className={`mono ${styles.summaryValue}`}>{formatMoney(lang, service)}</span>
         </li>
         <li className={styles.summaryItem}>
           <span className={styles.kpiLabel}>{t('fleet.source.manual')}</span>
