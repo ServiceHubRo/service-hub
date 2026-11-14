@@ -177,6 +177,11 @@ test.describe('Help Center (A4)', () => {
     await expect(page.getByText('Fără etichete HTML.')).toBeVisible();
     await expect(page.getByRole('button', { name: 'Salvează articolul' })).toBeDisabled();
     await page.getByLabel('Text', { exact: true }).first().fill('Primul paragraf al articolului.\n\n- un pas\n- alt pas');
+    // For drivers only: published for a moment, it must not change what the other tests running at
+    // the same time see for shops (the agent's „Pentru: Service-uri” check).
+    await page.getByRole('button', { name: /^Pentru cine/ }).click();
+    await page.getByRole('group', { name: 'Pentru cine' }).getByRole('checkbox', { name: 'Șoferi' }).check();
+    await page.keyboard.press('Escape');
     await expect(page.getByRole('listitem').filter({ hasText: 'alt pas' })).toBeVisible(); // the preview
     await page.getByRole('button', { name: 'Salvează articolul' }).click();
     await expect(page).toHaveURL(/\/admin\/suport\/centrul-de-ajutor\/articol\/[0-9a-f-]{36}$/);
