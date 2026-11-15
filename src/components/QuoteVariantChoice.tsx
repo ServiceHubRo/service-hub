@@ -39,7 +39,7 @@ export function QuoteVariantChoice({
       <fieldset className={styles.options} disabled={disabled || off}>
         <legend className="visually-hidden">{t('cb.quote.variants', { name: line.original.name })}</legend>
         {[line.original, line.alternative].map((item) => (
-          <label key={item.id} className={styles.option}>
+          <label key={item.id} data-ui="choice" className={styles.option}>
             <input
               type="radio"
               className={styles.input}

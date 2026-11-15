@@ -119,7 +119,8 @@ export function measurePatterns(only?: readonly string[]): Patterns {
       if (owner && !choice && !ownButtons.includes(owner) && b.tagName === 'BUTTON' && looksLikeButton && r.height >= 30 && !b.closest('[data-ui="button"], [data-ui="action-button"]')) {
         add('P4 button', `„${text(b) || b.getAttribute('aria-label')}” is a button built by hand inside ${owner}`);
       }
-      if (amber(cs) && !(b as HTMLButtonElement).disabled) {
+      // A panel opened in the page is its own small context: its confirm button may be filled.
+    if (amber(cs) && !(b as HTMLButtonElement).disabled && !b.closest('[data-ui="inline-panel"]')) {
         primaries++;
         if (primaries === 2) add('P5 primary', 'more than one filled (amber) button on the screen');
       }
@@ -130,7 +131,9 @@ export function measurePatterns(only?: readonly string[]): Patterns {
 
   // P6 — fields are the shared Field / SelectField / TextArea / SearchField / PhoneField / CheckMenu.
   if (want('P6')) {
-    const fieldUis = ['field', 'select', 'textarea', 'search', 'phone', 'check-menu', 'checkbox', 'switch', 'stepper'];
+    // The message box of a conversation and a choice made on a card (a payment period, a quote's
+  // variant) are shared pieces of their own (docs/MODEL_DE_FOLOSIRE.md).
+  const fieldUis = ['field', 'select', 'textarea', 'search', 'phone', 'check-menu', 'checkbox', 'switch', 'stepper', 'composer', 'choice'];
     for (const c of Array.from(main.querySelectorAll<HTMLElement>('input, select, textarea'))) {
       if (quiet(c) || !shown(c)) continue;
       const type = (c as HTMLInputElement).type;
@@ -177,9 +180,10 @@ export function measurePatterns(only?: readonly string[]): Patterns {
     }
   }
 
-  // P9 — loading is the skeleton; an empty list or an error is the shared empty state.
+  // P9 — loading is the skeleton; an empty list or an error is the shared empty state. (A bar of
+  // steps done, „0 din 4”, is progress, not loading.)
   if (want('P9')) {
-    for (const el of Array.from(main.querySelectorAll('[aria-busy="true"], [role="progressbar"]'))) {
+    for (const el of Array.from(main.querySelectorAll('[aria-busy="true"]'))) {
       if (!shown(el) || el.closest('[data-ui="skeleton"], [data-ui="action-button"]')) continue;
       add('P9 state', `a loading state that is not the skeleton (${el.tagName.toLowerCase()})`);
     }

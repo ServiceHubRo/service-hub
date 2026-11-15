@@ -14,6 +14,7 @@ import { webOrigin } from '../../../lib/native';
 import { referralSignUpPath } from '../../auth/paths';
 import sub from './subscription.module.css';
 import styles from './ReferralCard.module.css';
+import { Field } from '../../../components/Field';
 
 /**
  * "Recomandă Service-Hub" on Abonament (owner only): the code, the sign-up link to send (WhatsApp
@@ -60,7 +61,7 @@ function Referrals({ data }: { data: MyReferrals }) {
         <span className={`mono ${styles.code}`}>{data.code}</span>
       </div>
       <a
-        className={buttonClass('primary', true)}
+        className={buttonClass('secondary', true)}
         href={`https://wa.me/?text=${encodeURIComponent(message)}`}
         target="_blank"
         rel="noopener noreferrer"
@@ -123,7 +124,7 @@ function ReferralRow({ item, max }: { item: ReferralItem; max: number }) {
  * The link, selectable, with a copy button (the field is selected when copying is not allowed).
  * Also the client's invitation card (T35).
  */
-export function CopyLink({ url, id = 'referral-link' }: { url: string; id?: string }) {
+export function CopyLink({ url }: { url: string }) {
   const { t } = useI18n();
   const [copied, setCopied] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -143,17 +144,7 @@ export function CopyLink({ url, id = 'referral-link' }: { url: string; id?: stri
 
   return (
     <>
-      <label htmlFor={id} className="visually-hidden">
-        {t('ref.link')}
-      </label>
-      <input
-        id={id}
-        ref={inputRef}
-        readOnly
-        className={`mono ${styles.linkInput}`}
-        value={url}
-        onFocus={(e) => e.target.select()}
-      />
+      <Field ref={inputRef} label={t('ref.link')} readOnly mono value={url} onFocus={(e) => e.target.select()} />
       <Button variant="secondary" block onClick={() => void copy()}>
         <Copy size={18} aria-hidden="true" />
         <span role="status">{copied ? t('ref.copied') : t('ref.copy')}</span>

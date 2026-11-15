@@ -235,7 +235,7 @@ function PeriodChoice({ offers, months, onChange }: { offers: PeriodOffer[]; mon
     <fieldset className={styles.periods}>
       <legend className={styles.periodsLegend}>{t('sub.period.legend')}</legend>
       {offers.map((o) => (
-        <label key={o.months} className={styles.period}>
+        <label key={o.months} data-ui="choice" className={styles.period}>
           <input
             type="radio"
             name={name}

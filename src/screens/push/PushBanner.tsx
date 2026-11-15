@@ -79,7 +79,7 @@ export function PushBanner({ role }: { role: 'client' | 'shop' }) {
       <p className={styles.text}>{t(ios ? 'push.banner.ios' : role === 'shop' ? 'push.banner.shop' : 'push.banner.client')}</p>
       <div className={styles.actions}>
         {!ios && (
-          <ActionButton block={false} onAction={enable} errorMessage={(e) => rpcErrorMessage(lang, e)}>
+          <ActionButton variant="secondary" block={false} onAction={enable} errorMessage={(e) => rpcErrorMessage(lang, e)}>
             {t('push.enable')}
           </ActionButton>
         )}

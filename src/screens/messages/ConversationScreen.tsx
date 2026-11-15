@@ -338,6 +338,7 @@ export function ConversationScreen() {
         (canWrite ? (
           <div className={styles.composerWrap} data-fixed-bottom>
             <form
+              data-ui="composer"
               className={styles.composer}
               onSubmit={(e) => {
                 e.preventDefault();

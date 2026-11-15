@@ -14,6 +14,7 @@ import { inviteSignUpPath } from '../auth/paths';
 import { MY_REPORTS_PATH } from '../client/paths';
 import styles from '../shop/subscription/ReferralCard.module.css';
 import sub from '../shop/subscription/subscription.module.css';
+import { Field } from '../../components/Field';
 
 /**
  * "Invită un prieten" in the client's Cont (T35): the client's code and one "Trimite invitația"
@@ -108,19 +109,7 @@ function Invites({ data }: { data: MyInvites }) {
         {copied === 'yes' ? t('ref.copied') : ''}
       </p>
       {copied === 'manual' && (
-        <>
-          <label htmlFor="invite-link" className="visually-hidden">
-            {t('ref.link')}
-          </label>
-          <input
-            id="invite-link"
-            ref={linkRef}
-            readOnly
-            className={`mono ${styles.linkInput}`}
-            value={url}
-            onFocus={(e) => e.target.select()}
-          />
-        </>
+        <Field ref={linkRef} label={t('ref.link')} readOnly mono value={url} onFocus={(e) => e.target.select()} />
       )}
       {data.friendsPerReport > 1 && data.creditsPerYear > 0 && (
         <>

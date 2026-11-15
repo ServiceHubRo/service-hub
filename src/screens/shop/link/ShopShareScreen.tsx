@@ -130,7 +130,7 @@ export function ShopShareScreen() {
             <div className={styles.previewFrame}>
               <Poster shopName={shop.name} url={url} qr={qr} lang={posterLang} />
             </div>
-            <Button variant="primary" onClick={() => window.print()}>
+            <Button variant="secondary" onClick={() => window.print()}>
               <Printer size={18} aria-hidden="true" />
               {t('slk.print')}
             </Button>

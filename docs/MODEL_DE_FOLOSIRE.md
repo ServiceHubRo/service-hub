@@ -37,7 +37,7 @@ regula e respectată, iar raportul e în `docs/AUDIT_CONSISTENTA.md`. Detaliile 
 
 | Cod | Regula | Piesa comună |
 |---|---|---|
-| P6 | Un câmp e mereu câmpul comun: etichetă deasupra, caseta, indicația dedesubt. | `Field`, `SelectField`, `TextArea`, `PhoneField`, `PasswordField`, `CheckMenu`, `SearchField` |
+| P6 | Un câmp e mereu câmpul comun: etichetă deasupra, caseta, indicația dedesubt. Câmpul de scris din conversații (același la client și la service) și o alegere făcută pe un card (perioada de plată, varianta unei piese din deviz) sunt piese comune ale lor. | `Field`, `SelectField`, `TextArea`, `PhoneField`, `PasswordField`, `CheckMenu`, `SearchField`; conversația; `data-ui="choice"` |
 | — | Modelul unui formular e „Adaugă vehicul” din firmă: câmpurile umplu cardul, în coloane egale (cât încap la 240 px: una pe telefon, patru pe laptop). Un câmp singur, un text mai lung, căutarea și „Afișează” umplu și ele lățimea. | `formGrid` (flotă), `--field-max: none` |
 | F1 | Câmpurile de pe același rând au aceeași lățime. | `FieldPair` |
 | F2 | Câmpurile puse unul sub altul în același formular încep și se termină la aceleași margini, sau stau în aceleași coloane (un rând mai scurt al unei grile). | — |

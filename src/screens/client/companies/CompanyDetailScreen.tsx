@@ -207,7 +207,7 @@ function DetailsCard({ company, canEdit, onSaved }: { company: Company; canEdit:
           <div className={styles.buttons}>
             <ActionButton
               submit
-              variant="primary"
+              variant="secondary"
               errorMessage={(e) => rpcErrorMessage(lang, e)}
               onAction={async (requestId) => {
                 const next: Partial<Record<DetailField, string>> = {};
@@ -307,7 +307,7 @@ function RulesCard({
         <div>
           <ActionButton
             submit
-            variant="primary"
+            variant="secondary"
             errorMessage={(e) => rpcErrorMessage(lang, e)}
             onAction={async (requestId) => {
               const parse = (v: string) => (v.trim() ? importAmount(v) : null);
@@ -375,7 +375,7 @@ function InviteCard({ companyId, adminInvite, onInvited }: { companyId: string; 
         <div>
           <ActionButton
             submit
-            variant="primary"
+            variant="secondary"
             errorMessage={(e) => rpcErrorMessage(lang, e)}
             onAction={async (requestId) => {
               if (!looksLikeEmail(email)) {
@@ -423,7 +423,7 @@ function LinkPanel({ email, url }: { email: string; url: string }) {
         {t('staff.link')}
       </label>
       <input id="company-invite-link" ref={inputRef} readOnly className={`mono ${styles.linkInput}`} value={url} onFocus={(e) => e.target.select()} />
-      <Button variant="primary" block onClick={() => void copy()}>
+      <Button variant="secondary" block onClick={() => void copy()}>
         {copied ? <Check size={18} aria-hidden="true" /> : <Copy size={18} aria-hidden="true" />}
         {copied ? t('staff.copied') : t('staff.copy')}
       </Button>
@@ -700,7 +700,7 @@ function RightsPanel({
       )}
       <div className={styles.buttons}>
         <ActionButton
-          variant="primary"
+          variant="secondary"
           errorMessage={(e) => rpcErrorMessage(lang, e)}
           onAction={async (requestId) => {
             const value = limitField && limit.trim() ? importAmount(limit) : null;
