@@ -125,8 +125,9 @@ export function measurePatterns(only?: readonly string[]): Patterns {
       if (owner && !choice && !ownButtons.includes(owner) && b.tagName === 'BUTTON' && looksLikeButton && r.height >= 30 && !b.closest('[data-ui="button"], [data-ui="action-button"]')) {
         add('P4 button', `„${text(b) || b.getAttribute('aria-label')}” is a button built by hand inside ${owner}`);
       }
-      // A panel opened in the page is its own small context: its confirm button may be filled.
-    if (amber(cs) && !(b as HTMLButtonElement).disabled && !b.closest('[data-ui="inline-panel"]')) {
+      // A panel opened in the page is its own small context: its confirm button may be filled; an add
+    // top right (the page header or a section's head, P12) is always filled.
+    if (amber(cs) && !(b as HTMLButtonElement).disabled && !b.closest('[data-ui="inline-panel"], [data-ui="page-header"], [data-ui="section-head"]')) {
         primaries++;
         if (primaries === 2) add('P5 primary', 'more than one filled (amber) button on the screen');
       }
@@ -209,12 +210,15 @@ export function measurePatterns(only?: readonly string[]): Patterns {
   // de adăugare … în dreapta sus”). A form's own button, an empty state's and a panel's are not adds
   // of the page.
   if (want('P12')) {
-    // „Adaugă …”, „Invită …”, „Procedură nouă”, „Add …”, „New procedure” (never „Verifică din nou”).
-    const ADD = /^(\+\s*)?(Adaugă|Invită|Creează|Propune|Add|Invite|Create|Propose)\b|^(?!din\b)\p{L}+ (nou|nouă)$|^New \p{L}+$/u;
+    // An add: its „+” drawing (Plus, UserPlus, CalendarPlus, ImagePlus…), or „Adaugă …”, „Invită …”,
+    // „Procedură nouă”, „Add …”, „New procedure” (never „Verifică din nou”). JavaScript's \b does not
+    // know „ă”, so the words end with a space or the end.
+    const ADD = /^(Adaugă|Invită|Add|Invite)(\s|$)|^(?!din\s)\p{L}+ (nou|nouă)$|^New \p{L}+$/u;
+    const plusIcon = (el: Element) => !!el.querySelector('svg[class*="plus"]');
     for (const b of Array.from(main.querySelectorAll<HTMLElement>('button, a[href]'))) {
       if (quiet(b) || !shown(b)) continue;
       const t = text(b);
-      if (!ADD.test(t)) continue;
+      if (!ADD.test(t) && !plusIcon(b)) continue;
       // A form's own button (its submit, its save bar) is not an add of the page.
       if ((b as HTMLButtonElement).type === 'submit' || b.closest('[data-fixed-bottom], [data-ui="inline-panel"]')) continue;
       if (b.closest('[data-ui="page-header"], [data-ui="section-head"], [data-ui="empty-state"], [role="menu"], dialog, [data-ui="filter-sheet"]')) continue;

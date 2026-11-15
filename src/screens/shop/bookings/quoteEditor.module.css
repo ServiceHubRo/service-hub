@@ -52,7 +52,7 @@
 
 .sectionHead {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
   gap: 12px;
   padding-bottom: 6px;
@@ -69,6 +69,12 @@
 
 .sectionHead .mono {
   font-weight: 700;
+}
+
+.sectionEnd {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .lines {

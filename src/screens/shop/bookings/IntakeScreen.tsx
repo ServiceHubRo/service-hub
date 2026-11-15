@@ -305,9 +305,16 @@ function IntakeForm({
       </section>
 
       <section aria-labelledby="in-photos-edit" className={styles.section}>
-        <h2 id="in-photos-edit" className={styles.heading}>
-          {t('in.photos')}
-        </h2>
+        {/* The section's add, top right of its head (docs/MODEL_DE_FOLOSIRE.md P12). */}
+        <div data-ui="section-head" className={styles.sectionHead}>
+          <h2 id="in-photos-edit" className={styles.heading}>
+            {t('in.photos')}
+          </h2>
+          <Button variant="primary" onClick={() => fileRef.current?.click()} disabled={photos.length >= INTAKE_PHOTO_LIMIT || uploading > 0}>
+            {uploading > 0 ? <Spinner /> : <Camera size={18} aria-hidden="true" />}
+            {uploading > 0 ? t('in.photoUploading') : t('in.photoAdd')}
+          </Button>
+        </div>
         {photos.length > 0 && (
           <ul className={styles.photos}>
             {photos.map((p, i) => (
@@ -330,13 +337,7 @@ function IntakeForm({
           aria-hidden="true"
           onChange={(e) => void addPhotos(e.target.files)}
         />
-        <div className={styles.photoActions}>
-          <Button onClick={() => fileRef.current?.click()} disabled={photos.length >= INTAKE_PHOTO_LIMIT || uploading > 0}>
-            {uploading > 0 ? <Spinner /> : <Camera size={18} aria-hidden="true" />}
-            {uploading > 0 ? t('in.photoUploading') : t('in.photoAdd')}
-          </Button>
-          <span className={styles.muted}>{t('in.photoCount', { n: photos.length, max: INTAKE_PHOTO_LIMIT })}</span>
-        </div>
+        <p className={styles.muted}>{t('in.photoCount', { n: photos.length, max: INTAKE_PHOTO_LIMIT })}</p>
         {photoError && (
           <p className={styles.error} role="alert">
             {photoError}

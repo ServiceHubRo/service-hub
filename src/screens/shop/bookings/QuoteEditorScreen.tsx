@@ -434,15 +434,18 @@ function Editor({
     const id = `qe-${kind}`;
     return (
       <section className={styles.section} aria-labelledby={id}>
-        <div className={styles.sectionHead}>
+        {/* The section's add, top right of its head (docs/MODEL_DE_FOLOSIRE.md P12). */}
+        <div data-ui="section-head" className={styles.sectionHead}>
           <h2 id={id}>{kind === 'labor' ? t('qe.labor') : t('qe.parts')}</h2>
-          <span className="mono">{formatMoney(lang, sum)}</span>
+          <span className={styles.sectionEnd}>
+            <span className="mono">{formatMoney(lang, sum)}</span>
+            <Button variant="primary" onClick={() => addRow(kind)} disabled={rows.length >= QUOTE_ROWS_MAX}>
+              <Plus size={18} aria-hidden="true" />
+              {kind === 'labor' ? t('qe.addLabor') : t('qe.addPart')}
+            </Button>
+          </span>
         </div>
         <ol className={styles.lines}>{list.map((r, i) => renderRow(r, i + 1))}</ol>
-        <Button variant="ghost" className={styles.add} onClick={() => addRow(kind)} disabled={rows.length >= QUOTE_ROWS_MAX}>
-          <Plus size={18} aria-hidden="true" />
-          {kind === 'labor' ? t('qe.addLabor') : t('qe.addPart')}
-        </Button>
       </section>
     );
   };
