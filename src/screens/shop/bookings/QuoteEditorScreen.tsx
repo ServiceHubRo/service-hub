@@ -127,7 +127,12 @@ export function QuoteEditorScreen() {
     const booking = state.data.bookings.find((b) => b.id === bookingId);
     // An old link to a booking that can no longer get a quote: a state of its own (A9), not a bare line.
     if (!booking || (booking.status !== 'in_inspection' && booking.status !== 'quote_sent'))
-      body = <EmptyState icon={FileLock} title={t('qe.unavailable')} />;
+      body = (
+        <>
+          <PageHeader title={t('qe.title.send')} />
+          <EmptyState icon={FileLock} title={t('qe.unavailable')} />
+        </>
+      );
     else
       body = (
         <Editor

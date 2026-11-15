@@ -78,7 +78,7 @@ export function TeamNoticesScreen() {
             const newDay = !prev || ymdInBucharest(new Date(prev.created_at)) !== day;
             return (
               <li key={n.id} className={msgStyles.item}>
-                {newDay && <p className={msgStyles.day}>{formatDayHeading(lang, day, now)}</p>}
+                {newDay && <p data-ui="day" className={msgStyles.day}>{formatDayHeading(lang, day, now)}</p>}
                 <NoticeBubble id={`anunt-${n.id}`} notice={n} lang={lang} isNew={fresh.has(n.id)} />
               </li>
             );

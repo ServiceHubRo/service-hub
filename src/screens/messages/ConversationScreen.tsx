@@ -309,7 +309,7 @@ export function ConversationScreen() {
               const own = isOwnSide(m, side, clientId);
               return (
                 <li key={m.id} className={styles.item}>
-                  {newDay && <p className={styles.day}>{formatDayHeading(lang, day, now)}</p>}
+                  {newDay && <p data-ui="day" className={styles.day}>{formatDayHeading(lang, day, now)}</p>}
                   {m.kind === 'system' ? (
                     <div className={styles.system}>
                       <p>{systemMessageText(lang, side, m.event, m.params)}</p>

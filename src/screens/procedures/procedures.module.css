@@ -8,16 +8,16 @@
   min-width: 0;
 }
 
+/* The search on its own row, then the lists to choose from in equal columns (F1, F2). */
 .toolbar {
   display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr));
+  align-items: end;
   gap: var(--space-3);
 }
 
-@media (min-width: 768px) {
-  .toolbar {
-    grid-template-columns: minmax(0, 1fr) repeat(3, minmax(0, 200px));
-    align-items: end;
-  }
+.toolbar > :first-child {
+  grid-column: 1 / -1;
 }
 
 .chips {

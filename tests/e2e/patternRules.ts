@@ -57,12 +57,14 @@ export function measurePatterns(only?: readonly string[]): Patterns {
   // P1 — the title of the screen is the shared page header.
   if (want('P1')) {
     const h1s = Array.from(main.querySelectorAll('h1')).filter((h) => !quiet(h) && shown(h));
-    if (h1s.length === 0) add('P1 title', 'no title (h1) on the screen');
+    // On a phone an item of a list opens on the whole screen with its own head (page template A).
+    if (h1s.length === 0 && !main.querySelector('[data-ui="detail-pane"]')) add('P1 title', 'no title (h1) on the screen');
     if (h1s.length > 1) add('P1 title', `${h1s.length} titles (h1)`);
     // The page header, or one of the headers of a kind of its own, the same on every account
     // (docs/MODEL_DE_FOLOSIRE.md): a conversation, a shop's page, a step of booking, a request sent,
     // the garage's car card (Eduard, 14 Nov 2026: exactly the company's „Adaugă vehicul”).
-    const HEADERS = '[data-ui="page-header"], [data-ui="conversation-header"], [data-ui="shop-header"], [data-ui="step-header"], [data-ui="success"], [data-ui="form-card"]';
+    const HEADERS =
+      '[data-ui="page-header"], [data-ui="conversation-header"], [data-ui="shop-header"], [data-ui="step-header"], [data-ui="success"], [data-ui="form-card"], [data-ui="legal-document"]';
     for (const h of h1s) if (!h.closest(HEADERS)) add('P1 title', `„${text(h)}” is not in the page header`);
 
     for (const level of ['h1', 'h2', 'h3'] as const) {
@@ -106,7 +108,7 @@ export function measurePatterns(only?: readonly string[]): Patterns {
 
   // P4 — buttons are the shared Button / ActionButton (or a shared control that has its own).
   if (want('P4', 'P5')) {
-    const ownButtons = ['composer', 'diagram', 'button', 'action-button', 'chip', 'tabs', 'menu', 'filters-button', 'search', 'check-menu', 'stepper', 'back-link', 'list-row', 'tile', 'disclosure', 'checkbox', 'switch', 'phone', 'field', 'select'];
+    const ownButtons = ['stat-tile', 'composer', 'diagram', 'button', 'action-button', 'chip', 'tabs', 'menu', 'filters-button', 'search', 'check-menu', 'stepper', 'back-link', 'list-row', 'tile', 'disclosure', 'checkbox', 'switch', 'phone', 'field', 'select'];
     const amber = (cs: CSSStyleDeclaration) => /rgb\(245, 165, 36\)/.test(cs.backgroundColor);
     let primaries = 0;
     for (const b of Array.from(document.querySelectorAll<HTMLElement>('button, a[href], [role="button"]'))) {
@@ -152,7 +154,7 @@ export function measurePatterns(only?: readonly string[]): Patterns {
   if (want('P7')) {
     // Any small rounded label with words (a status, a role, a state) that is not the shared pill.
     for (const el of Array.from(main.querySelectorAll<HTMLElement>('span, strong, em, small, p, div'))) {
-      if (quiet(el) || !shown(el) || el.closest('[data-ui="status-pill"], button, a, [role="button"], [data-ui="chip"]')) continue;
+      if (quiet(el) || !shown(el) || el.closest('[data-ui="status-pill"], [data-ui="day"], button, a, [role="button"], [data-ui="chip"]')) continue;
       const r = el.getBoundingClientRect();
       const cs = getComputedStyle(el);
       const filled = cs.backgroundColor !== 'rgba(0, 0, 0, 0)' && cs.backgroundColor !== 'transparent';
