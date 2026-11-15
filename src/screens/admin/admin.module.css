@@ -109,41 +109,6 @@
   color: var(--muted);
 }
 
-/* ---------------------------------------------------------------- pills */
-.pill {
-  display: inline-block;
-  font-size: 12px;
-  font-weight: 700;
-  padding: 3px 9px;
-  border-radius: var(--radius-pill);
-  white-space: nowrap;
-}
-
-.amber {
-  color: var(--amber);
-  background: var(--amber-soft);
-}
-
-.green {
-  color: var(--green);
-  background: var(--green-soft);
-}
-
-.blue {
-  color: var(--blue);
-  background: var(--blue-soft);
-}
-
-.red {
-  color: var(--red-text);
-  background: var(--red-soft);
-}
-
-.greyPill {
-  color: var(--muted-strong);
-  background: var(--muted-soft);
-}
-
 /* ---------------------------------------------------------------- verification marks (icon + text) */
 .checks {
   display: flex;

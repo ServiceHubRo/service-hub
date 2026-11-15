@@ -1,6 +1,6 @@
 import { useI18n } from '../../i18n/context';
 import type { SuggestionStatus } from '../../data/suggestions';
-import styles from './suggestions.module.css';
+import { StatusPill, toneOf } from '../../components/StatusPill';
 
 const TONE: Record<SuggestionStatus, 'blue' | 'amber' | 'green' | 'grey'> = {
   new: 'blue',
@@ -16,8 +16,6 @@ const TONE: Record<SuggestionStatus, 'blue' | 'amber' | 'green' | 'grey'> = {
 export function SuggestionStatusPill({ status, admin = false }: { status: SuggestionStatus; admin?: boolean }) {
   const { t } = useI18n();
   return (
-    <span className={`${styles.pill} ${styles[TONE[status]]}`}>
-      {t(admin && status === 'new' ? 'admin.sugg.status.new' : `sugg.status.${status}`)}
-    </span>
+    <StatusPill tone={toneOf(TONE[status])}>{t(admin && status === 'new' ? 'admin.sugg.status.new' : `sugg.status.${status}`)}</StatusPill>
   );
 }

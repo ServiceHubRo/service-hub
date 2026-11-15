@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { CountUp } from '../../../components/CountUp';
 import { Button } from '../../../components/Button';
 import { EmptyState } from '../../../components/EmptyState';
-import { StatusBadge } from '../../../components/StatusBadge';
+import { BookingStatusPill } from '../../../components/StatusPill';
 import type { ShopBooking, ShopBookingsData } from '../../../data/shopBookings';
 import { useI18n } from '../../../i18n/context';
 import { formatDate } from '../../../i18n/format';
@@ -132,7 +132,7 @@ export function TodayBoard({ data, today }: { data: ShopBookingsData; today: str
                         {[carText(b), b.car_snapshot.plate, b.client_name].filter(Boolean).join(' · ')}
                       </span>
                     </span>
-                    <StatusBadge status={b.status} />
+                    <BookingStatusPill status={b.status} viewer="shop" />
                   </Link>
                 </li>
               ))}

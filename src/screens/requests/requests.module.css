@@ -37,40 +37,6 @@
   font-size: 13.5px;
 }
 
-.pill {
-  display: inline-block;
-  font-size: 12px;
-  font-weight: 700;
-  padding: 3px 9px;
-  border-radius: var(--radius-pill);
-  white-space: nowrap;
-}
-
-.blue {
-  color: var(--blue);
-  background: var(--blue-soft);
-}
-
-.amber {
-  color: var(--amber);
-  background: var(--amber-soft);
-}
-
-.green {
-  color: var(--green);
-  background: var(--green-soft);
-}
-
-.red {
-  color: var(--red);
-  background: var(--red-soft);
-}
-
-.grey {
-  color: var(--muted-strong);
-  background: var(--muted-soft);
-}
-
 .toolbar {
   display: flex;
   flex-wrap: wrap;
@@ -452,12 +418,6 @@ input:focus-visible + .attachButton {
 .more {
   align-self: center;
   margin-top: 4px;
-}
-
-/* Over 48 hours without an answer: the lighter red reads on a card (contrast ≥ 4.5:1). */
-.urgent {
-  color: var(--red-text);
-  background: var(--red-soft);
 }
 
 /* A3c2b1: a suggestion's text under review, kept as written (line breaks included). */

@@ -26,11 +26,11 @@ import { formatDate, formatMoney } from '../../i18n/format';
 import { plural } from '../../i18n/translate';
 import { planState, trialDaysLeft, type FleetPlanRow, type PlanState } from '../../lib/fleet';
 import { useLoad } from '../../lib/useLoad';
-import pill from '../../components/StatusBadge.module.css';
 import { useReason } from './useReason';
 import { ADMIN_FLEETS_PATH } from './paths';
 import styles from './admin.module.css';
 import own from './fleets.module.css';
+import { StatusPill, toneOf } from '../../components/StatusPill';
 
 /** „‹ Înapoi” goes to the screen's zone (A1). */
 const ZONE_BACK = adminZoneBack(ADMIN_FLEETS_PATH);
@@ -142,7 +142,7 @@ function CompanyRow({ c, plans, onChanged }: { c: AdminFleetCompany; plans: Plan
             <span className={own.rowName}>{c.name}</span>
             <span className={styles.muted}>{[c.admin_email, c.vat_id].filter(Boolean).join(' · ')}</span>
           </div>
-          <span className={`${pill.pill} ${pill[STATE_TONE[st]]}`}>{t(`fleet.sub.state.${st}`)}</span>
+          <StatusPill tone={toneOf(STATE_TONE[st])}>{t(`fleet.sub.state.${st}`)}</StatusPill>
         </div>
         <dl className={own.facts}>
           <div>

@@ -6,7 +6,7 @@ import { Card } from '../../components/Card';
 import { LoadError } from '../../components/LoadError';
 import { SkeletonList } from '../../components/Skeleton';
 import { Stars } from '../../components/Stars';
-import { StatusBadge } from '../../components/StatusBadge';
+import { BookingStatusPill } from '../../components/StatusPill';
 import { fetchBooking, type AdminQuote } from '../../data/admin';
 import { adminForceCancel, toRpcError } from '../../data/rpc';
 import { useI18n } from '../../i18n/context';
@@ -99,7 +99,7 @@ export function BookingDetailScreen() {
       <Card className={styles.stack}>
         <div className={styles.cardHead}>
           <h1 className={styles.cardTitle}>{service}</h1>
-          <StatusBadge status={b.status} />
+          <BookingStatusPill status={b.status} viewer="admin" />
         </div>
         <span className={styles.rowMeta}>
           <span className={styles.id}>{b.ref}</span>

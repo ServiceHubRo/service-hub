@@ -12,8 +12,8 @@ import { offeredFeatures, overLimit, planState, trialDaysLeft, trialUsed, type F
 import { useLoad } from '../../lib/useLoad';
 import { Meter } from '../shop/reports/Charts';
 import { useFleet } from './fleetContext';
-import pill from '../../components/StatusBadge.module.css';
 import styles from './fleet.module.css';
+import { StatusPill, toneOf } from '../../components/StatusPill';
 
 const STATE_TONE = { trial: 'amber', trial_over: 'muted', active: 'green', past_due: 'red', cancelled: 'muted', inactive: 'muted' } as const;
 
@@ -56,7 +56,7 @@ function Subscription({ view }: { view: FleetSubscriptionView }) {
             <span className={styles.planEyebrow}>
               <CreditCard size={16} aria-hidden="true" /> {t('fleet.sub.current')}
             </span>
-            <span className={`${pill.pill} ${pill[STATE_TONE[st]]}`}>{t(`fleet.sub.state.${st}`)}</span>
+            <StatusPill tone={toneOf(STATE_TONE[st])}>{t(`fleet.sub.state.${st}`)}</StatusPill>
           </div>
           <p className={styles.planName}>{name}</p>
           <p className={styles.planPrice}>
@@ -164,7 +164,7 @@ function PlanCard({ p, current, have, largest }: { p: FleetPlanRow; current: boo
     <li className={`${styles.planCard} ${current ? styles.planCardOn : ''}`}>
       <div className={styles.cardHead}>
         <span className={styles.planCardName}>{lang === 'ro' ? p.name_ro : p.name_en}</span>
-        {current && <span className={`${pill.pill} ${pill.amber}`}>{t('fleet.sub.yours')}</span>}
+        {current && <StatusPill tone={toneOf('amber')}>{t('fleet.sub.yours')}</StatusPill>}
       </div>
       <p className={styles.planCardPrice}>
         {p.price_ron === null ? (

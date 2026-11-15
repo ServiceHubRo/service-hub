@@ -8,13 +8,15 @@ import type { BookingStatus } from './status';
  */
 export type PillTone = 'action' | 'success' | 'problem' | 'closed' | 'neutral';
 
-export type Viewer = 'client' | 'shop';
+/** Who reads the pill: the client, the shop, or the platform's team (nothing waits for them). */
+export type Viewer = 'client' | 'shop' | 'admin';
 
 const ENDED: ReadonlySet<BookingStatus> = new Set(['done', 'declined', 'cancelled', 'quote_refused', 'expired', 'no_show']);
 
 /** A booking's pill for the person looking at it: what waits for them is amber. */
 export function bookingTone(status: BookingStatus, viewer: Viewer): PillTone {
   if (ENDED.has(status)) return 'closed';
+  if (viewer === 'admin') return status === 'confirmed' || status === 'approved' ? 'success' : 'neutral';
   if (viewer === 'client') {
     if (status === 'quote_sent') return 'action';
     if (status === 'confirmed' || status === 'approved') return 'success';

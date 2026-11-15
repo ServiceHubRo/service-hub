@@ -109,7 +109,7 @@ test.describe('P1 — navigation', () => {
     await page.getByRole('button', { name: new RegExp(f.plate) }).first().click();
     await expect(page).toHaveURL(new RegExp(`sectiune=vehicul&vehicul=${f.vehicle}`));
     const length = await historyLength(page);
-    await page.getByRole('button', { name: 'Înapoi la vehicule' }).first().click();
+    await page.getByRole('link', { name: 'Înapoi la vehicule' }).first().click();
     await expect(page).toHaveURL(/sectiune=vehicule$/);
     expect(await historyLength(page)).toBe(length);
     await page.goBack();

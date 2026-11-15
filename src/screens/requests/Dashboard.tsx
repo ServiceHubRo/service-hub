@@ -6,6 +6,7 @@ import { formatDecimal } from '../../i18n/format';
 import { DEFAULT_FILTERS, filterSearch, waitingLevel, waitingSpan, type RequestFilters } from '../../lib/supportRequests';
 import adminStyles from '../admin/admin.module.css';
 import styles from './requests.module.css';
+import { StatusPill, toneOf } from '../../components/StatusPill';
 
 /** A counter: its number, its words and the one filter it opens the list with. */
 interface Tile {
@@ -43,8 +44,7 @@ export function WaitingPill({ hours }: { hours: number }) {
   const level = waitingLevel(hours);
   const span = waitingSpan(hours);
   const time = span.unit === 'lessThanHour' ? t('support.wait.lessThanHour') : t(`support.wait.${span.unit}`, { n: formatDecimal(lang, span.n) });
-  const tone = level === 'urgent' ? styles.urgent : level === 'late' ? styles.amber : styles.grey;
-  return <span className={`${styles.pill} ${tone}`}>{t('support.inbox.waitingFor', { time })}</span>;
+  return <StatusPill tone={level === 'urgent' ? 'problem' : level === 'late' ? 'action' : 'closed'}>{t('support.inbox.waitingFor', { time })}</StatusPill>;
 }
 
 /**
@@ -101,7 +101,7 @@ export function SupportDashboardPanel({
             {t('support.dash.reviews', { count: formatDecimal(lang, counts.reviews ?? 0) })}
           </Link>
           {(counts.reviews_soon ?? 0) > 0 && (
-            <span className={`${styles.pill} ${styles.amber}`}>{t('support.dash.reviewsSoon', { count: formatDecimal(lang, counts.reviews_soon ?? 0) })}</span>
+            <StatusPill tone={toneOf('amber')}>{t('support.dash.reviewsSoon', { count: formatDecimal(lang, counts.reviews_soon ?? 0) })}</StatusPill>
           )}
         </div>
       )}

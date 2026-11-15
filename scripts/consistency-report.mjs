@@ -63,6 +63,7 @@ const RO = [
   [/^(\d+) filled buttons$/, '$1 butoane pline'],
   [/ is built by hand$/, ' e un câmp făcut separat'],
   [/ uses StatusBadge, not StatusPill$/, ' are eticheta de stare veche (StatusBadge)'],
+  [/ is a pill built by hand$/, ' e o etichetă făcută separat'],
   [/^(\d+) cards one after another \((.*)\): a list built from cards$/, '$1 carduri unul sub altul ($2)'],
   [/^a loading state that is not the skeleton.*$/, 'o stare „se încarcă” făcută separat'],
   [/ opens a menu built by hand$/, ' deschide un meniu făcut separat'],
@@ -77,7 +78,7 @@ const ro = (detail) => RO.reduce((d, [re, to]) => d.replace(re, to), detail);
 /** Screens only in test builds (the component gallery, the template samples): not part of the app. */
 const devOnly = (r) => r.path?.startsWith('/dev/');
 /** The visitor's pages (landing, sign-in, legal) keep their own layout (docs/SABLOANE_HARTA.md). */
-const outsideTemplates = (r, code) => r.role === 'visitor' && code === 'P1';
+const outsideTemplates = (r, code) => r.role === 'visitor' && (code === 'P1' || code === 'P2');
 
 /** Each screen by its Romanian title (the English pass of the same screen joins it). */
 const titles = new Map();

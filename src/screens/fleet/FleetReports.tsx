@@ -37,8 +37,8 @@ import { MonthBars, ShareBars } from './FleetCharts';
 import { useFleet, vehicleLabel } from './fleetContext';
 import { LockedFeature } from './PlanGate';
 import { useFleetReport } from './useFleetReport';
-import pill from '../../components/StatusBadge.module.css';
 import styles from './fleet.module.css';
+import { StatusPill, toneOf } from '../../components/StatusPill';
 
 type ReportKey = 'totals' | 'vehicles' | 'repairs' | 'perKm' | 'budget' | 'documents' | 'trend';
 const REPORT_KEYS: readonly ReportKey[] = ['totals', 'vehicles', 'repairs', 'perKm', 'budget', 'documents', 'trend'];
@@ -398,7 +398,7 @@ function Reports({ initialReport }: { initialReport?: string }) {
                 {x.status === 'ok' ? (
                   <span className="mono">{t('fleet.perKm.value', { amount: formatMoney(lang, x.per_km) })}</span>
                 ) : (
-                  <span className={`${pill.pill} ${pill.muted}`}>{t('fleet.perKm.noFigure')}</span>
+                  <StatusPill tone={toneOf('muted')}>{t('fleet.perKm.noFigure')}</StatusPill>
                 )}
               </li>
             ))}
@@ -559,7 +559,7 @@ function Reports({ initialReport }: { initialReport?: string }) {
                         </span>
                         <span className={styles.muted}>{d.date ? formatDate(lang, d.date) : t('fleet.docs.missing')}</span>
                       </span>
-                      <span className={`${pill.pill} ${pill[tone]}`}>{t(`fleet.docs.${d.urgency}`)}</span>
+                      <StatusPill tone={toneOf(tone)}>{t(`fleet.docs.${d.urgency}`)}</StatusPill>
                     </button>
                   </li>
                 );
@@ -578,5 +578,5 @@ function PlanTagInline({ feature }: { feature: 'reports_advanced' | 'budget_fore
   const { plans } = useFleet();
   const p = requiredPlan(feature, plans);
   if (!p) return null;
-  return <span className={`${pill.pill} ${pill.amber} ${styles.planTag}`}>{t('fleet.plan.availableIn', { plan: lang === 'ro' ? p.name_ro : p.name_en })}</span>;
+  return <StatusPill tone={toneOf('amber')} className={styles.planTag}>{t('fleet.plan.availableIn', { plan: lang === 'ro' ? p.name_ro : p.name_en })}</StatusPill>;
 }

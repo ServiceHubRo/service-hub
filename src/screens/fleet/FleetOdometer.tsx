@@ -15,8 +15,8 @@ import { importOdometer } from '../../lib/importRows';
 import { odometerLog, type FleetVehicle, type LogEntry } from '../../lib/fleet';
 import { useLoad } from '../../lib/useLoad';
 import { useFleet } from './fleetContext';
-import pill from '../../components/StatusBadge.module.css';
 import styles from './fleet.module.css';
+import { StatusPill, toneOf } from '../../components/StatusPill';
 
 /**
  * „Kilometraj și consum” (M2): the vehicle's odometer log (readings and finished jobs), a reading typed
@@ -66,8 +66,8 @@ export function VehicleOdometer({ vehicle }: { vehicle: FleetVehicle }) {
                     </span>
                   </span>
                   <span className={styles.lineEnd}>
-                    {e.ignored && <span className={`${pill.pill} ${pill.muted}`}>{t('fleet.odo.ignored')}</span>}
-                    {e.anomaly && <span className={`${pill.pill} ${pill.amber}`}>{t('fleet.odo.anomaly')}</span>}
+                    {e.ignored && <StatusPill tone={toneOf('muted')}>{t('fleet.odo.ignored')}</StatusPill>}
+                    {e.anomaly && <StatusPill tone={toneOf('amber')}>{t('fleet.odo.anomaly')}</StatusPill>}
                     {mode === 'live' && actions && manage && <EntryActions entry={e} onCorrect={() => setEditing(e.key)} />}
                   </span>
                 </div>
@@ -91,7 +91,7 @@ export function VehicleOdometer({ vehicle }: { vehicle: FleetVehicle }) {
                     {formatDate(lang, x.day)} · {x.reasons.map((r) => t(`fleet.odo.reason.${r}`)).join(' · ')}
                   </span>
                 </span>
-                <span className={`${pill.pill} ${pill.amber}`}>{t('fleet.odo.anomaly')}</span>
+                <StatusPill tone={toneOf('amber')}>{t('fleet.odo.anomaly')}</StatusPill>
               </li>
             ))}
           </ul>

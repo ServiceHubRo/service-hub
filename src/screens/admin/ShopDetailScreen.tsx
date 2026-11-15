@@ -5,7 +5,7 @@ import { Button } from '../../components/Button';
 import { Card } from '../../components/Card';
 import { LoadError } from '../../components/LoadError';
 import { SkeletonList } from '../../components/Skeleton';
-import { StatusBadge } from '../../components/StatusBadge';
+import { BookingStatusPill } from '../../components/StatusPill';
 import { Stars } from '../../components/Stars';
 import { deleteAccount, fetchShop, setShopSuspended, verifyPhone, type AdminShopDetail } from '../../data/admin';
 import { toRpcError } from '../../data/rpc';
@@ -396,7 +396,7 @@ export function ShopDetailScreen() {
                   <span className={styles.rowMain}>
                     <span className={styles.rowTop}>
                       <span className={styles.rowTitle}>{(lang === 'ro' ? b.service_ro : b.service_en) ?? ''}</span>
-                      <StatusBadge status={b.status} />
+                      <BookingStatusPill status={b.status} viewer="admin" />
                     </span>
                     <span className={styles.rowMeta}>
                       <span className={styles.id}>{b.ref}</span>

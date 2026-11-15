@@ -7,7 +7,7 @@ import { LoadError } from '../../components/LoadError';
 import { SearchField } from '../../components/SearchField';
 import { SelectField } from '../../components/SelectField';
 import { SkeletonList } from '../../components/Skeleton';
-import { StatusBadge } from '../../components/StatusBadge';
+import { BookingStatusPill } from '../../components/StatusPill';
 import { fetchBookings } from '../../data/admin';
 import { ExportButton } from './ExportButton';
 import { BackLink } from '../../components/BackLink';
@@ -143,7 +143,7 @@ export function BookingsScreen() {
                   <RowLink to={adminBookingPath(b.id)}>
                     <span className={styles.rowTop}>
                       <span className={styles.rowTitle}>{(lang === 'ro' ? b.service_ro : b.service_en) ?? b.service_id}</span>
-                      <StatusBadge status={b.status} />
+                      <BookingStatusPill status={b.status} viewer="admin" />
                     </span>
                     <span className={styles.rowMeta}>
                       <span className={styles.id}>{b.ref}</span>

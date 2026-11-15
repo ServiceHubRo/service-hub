@@ -39,8 +39,8 @@ import { saveFile } from '../../lib/saveFile';
 import { SourcePill } from './FleetPills';
 import { COST_PERIODS, periodRange, type CostPeriod } from './periods';
 import { useFleet, vehicleLabel } from './fleetContext';
-import pill from '../../components/StatusBadge.module.css';
 import styles from './fleet.module.css';
+import { StatusPill, toneOf } from '../../components/StatusPill';
 
 /**
  * Costuri (docs/FLEET_PLAN.md §5): the one ledger — Service-Hub jobs and the company's own expenses,
@@ -213,7 +213,7 @@ export function FleetCosts({ initialPeriod }: { initialPeriod?: string }) {
                 </span>
                 <span className={styles.lineEnd}>
                   <SourcePill source={e.source} />
-                  {expenseOf(e.id)?.status === 'to_check' && <span className={`${pill.pill} ${pill.amber}`}>{t('fleet.expense.toCheck')}</span>}
+                  {expenseOf(e.id)?.status === 'to_check' && <StatusPill tone={toneOf('amber')}>{t('fleet.expense.toCheck')}</StatusPill>}
                   <span className="mono">{formatMoney(lang, e.amount)}</span>
                 </span>
                 {e.source === 'manual' && expenseOf(e.id) && (

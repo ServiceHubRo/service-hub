@@ -12,8 +12,8 @@ import { formatMoney } from '../../i18n/format';
 import { can, FLEET_CAPABILITY_GROUPS, FLEET_ROLES, hasFeature, type FleetCapability, type FleetRole } from '../../lib/fleet';
 import { rightsSummary } from '../client/companies/rights';
 import { useFleet } from './fleetContext';
-import pill from '../../components/StatusBadge.module.css';
 import styles from './fleet.module.css';
+import { StatusPill, toneOf } from '../../components/StatusPill';
 
 const ROLE_TONE = { admin: 'amber', manager: 'blue', driver: 'muted', accountant: 'green' } as const;
 
@@ -59,7 +59,7 @@ export function FleetMembers() {
                   <span className={styles.rightsLine}>{rightsSummary(lang, m.role, m.extra_caps, ownLimit ? m.approval_limit : null)}</span>
                 )}
               </span>
-              <span className={`${pill.pill} ${pill[ROLE_TONE[m.role]]}`}>{t(`fleet.role.${m.role}`)}</span>
+              <StatusPill tone={toneOf(ROLE_TONE[m.role])}>{t(`fleet.role.${m.role}`)}</StatusPill>
             </li>
           ))}
         </ul>

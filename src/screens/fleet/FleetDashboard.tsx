@@ -39,10 +39,10 @@ import { MonthBars, ShareBars } from './FleetCharts';
 import { useFleet, vehicleLabel, type FleetLink } from './fleetContext';
 import { LockedFeature } from './PlanGate';
 import { useFleetReport } from './useFleetReport';
-import pill from '../../components/StatusBadge.module.css';
 import { MaintenancePill } from './FleetMaintenance';
 import { useMaintenanceName } from './maintenanceName';
 import styles from './fleet.module.css';
+import { StatusPill, toneOf } from '../../components/StatusPill';
 
 const ACTIVITY_ICON: Record<ActivityKind, LucideIcon> = {
   booking_created: CalendarClock,
@@ -133,7 +133,7 @@ export function FleetDashboard() {
                     </span>
                     <span className={styles.muted}>{d.date ? formatDate(lang, d.date) : ''}</span>
                   </span>
-                  <span className={`${pill.pill} ${pill[d.urgency === 'expired' ? 'red' : 'amber']}`}>{t(`fleet.docs.${d.urgency}`)}</span>
+                  <StatusPill tone={toneOf(d.urgency === 'expired' ? 'red' : 'amber')}>{t(`fleet.docs.${d.urgency}`)}</StatusPill>
                 </button>
               </li>
             ))}

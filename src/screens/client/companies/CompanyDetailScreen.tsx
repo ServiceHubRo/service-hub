@@ -31,7 +31,6 @@ import {
 } from '../../../data/companies';
 import { rpcErrorMessage } from '../../../data/rpc';
 import { fetchFleetPlans, fetchPlanSummary } from '../../../data/fleet';
-import pill from '../../../components/StatusBadge.module.css';
 import { useI18n } from '../../../i18n/context';
 import { formatDate, formatMoney } from '../../../i18n/format';
 import { can, FLEET_ROLES, memberCan, requiredPlan, type FleetPlanRow, type FleetRole, type PlanFeature } from '../../../lib/fleet';
@@ -44,6 +43,7 @@ import { RolePill } from './RolePill';
 import { rightsSummary, ticksFor } from './rights';
 import styles from './companies.module.css';
 import { useOptionalWorkspace } from '../../../app/workspace/workspaceContext';
+import { StatusPill, toneOf } from '../../../components/StatusPill';
 
 interface Loaded {
   company: Company;
@@ -766,5 +766,5 @@ function PlanPill({ feature, plans }: { feature: PlanFeature; plans: FleetPlanRo
   const { t, lang } = useI18n();
   const plan = requiredPlan(feature, plans);
   if (!plan) return null;
-  return <span className={`${pill.pill} ${pill.amber}`}>{t('fleet.plan.availableIn', { plan: lang === 'ro' ? plan.name_ro : plan.name_en })}</span>;
+  return <StatusPill tone={toneOf('amber')}>{t('fleet.plan.availableIn', { plan: lang === 'ro' ? plan.name_ro : plan.name_en })}</StatusPill>;
 }

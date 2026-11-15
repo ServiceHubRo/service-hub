@@ -6,7 +6,7 @@ import { Card } from '../../components/Card';
 import { LoadError } from '../../components/LoadError';
 import { SkeletonList } from '../../components/Skeleton';
 import { Stars } from '../../components/Stars';
-import { StatusBadge } from '../../components/StatusBadge';
+import { BookingStatusPill } from '../../components/StatusPill';
 import { deleteAccount, fetchClient, grantReportCredit, setAccountSuspended } from '../../data/admin';
 import { toRpcError } from '../../data/rpc';
 import { useI18n } from '../../i18n/context';
@@ -219,7 +219,7 @@ export function ClientDetailScreen() {
                 <RowLink to={adminBookingPath(b.id)}>
                   <span className={styles.rowTop}>
                     <span className={styles.rowTitle}>{(lang === 'ro' ? b.service_ro : b.service_en) ?? ''}</span>
-                    <StatusBadge status={b.status} />
+                    <BookingStatusPill status={b.status} viewer="admin" />
                   </span>
                   <span className={styles.rowMeta}>
                     <span className={styles.id}>{b.ref}</span>

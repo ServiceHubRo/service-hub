@@ -8,7 +8,7 @@ import { Button } from '../../../components/Button';
 import { Card } from '../../../components/Card';
 import { MoreActions } from '../../../components/MoreActions';
 import { ServiceIcon } from '../../../components/ServiceIcon';
-import { StatusBadge } from '../../../components/StatusBadge';
+import { BookingStatusPill } from '../../../components/StatusPill';
 import { OfferNote } from '../../../components/OfferNote';
 import { useOfferText } from '../../../lib/useOfferText';
 import {
@@ -134,7 +134,7 @@ export function ShopBookingCard({ booking: b, shopId, now, fresh = false, onDone
         </span>
         <span className={styles.meta}>
           {amount !== null && <span className={`mono ${styles.amount}`}>{formatMoney(lang, amount)}</span>}
-          <StatusBadge status={b.status} />
+          <BookingStatusPill status={b.status} viewer="shop" />
         </span>
         <ChevronDown size={18} className={styles.chevron} aria-hidden="true" />
       </button>

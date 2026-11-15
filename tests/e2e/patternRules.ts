@@ -77,7 +77,8 @@ export function measurePatterns(only?: readonly string[]): Patterns {
     for (const a of Array.from(main.querySelectorAll('a, button'))) {
       if (quiet(a) || !shown(a)) continue;
       const t = text(a);
-      if (/^(‹\s*)?(Înapoi|Back)\b/i.test(t) && !a.closest('[data-ui="back-link"]')) add('P2 back', `„${t}” is not the shared back link`);
+      // An empty state's action („Înapoi în aplicație”) is a button of that state, not a back link.
+      if (/^(‹\s*)?(Înapoi|Back)\b/i.test(t) && !a.closest('[data-ui="back-link"], [data-ui="empty-state"]')) add('P2 back', `„${t}” is not the shared back link`);
     }
   }
 
@@ -142,7 +143,16 @@ export function measurePatterns(only?: readonly string[]): Patterns {
 
   // P7 — a status is the shared StatusPill.
   if (want('P7')) {
-    for (const el of Array.from(main.querySelectorAll('[data-ui="status-badge"]'))) if (shown(el)) add('P7 status', `„${text(el)}” uses StatusBadge, not StatusPill`);
+    // Any small rounded label with words (a status, a role, a state) that is not the shared pill.
+    for (const el of Array.from(main.querySelectorAll<HTMLElement>('span, strong, em, small, p, div'))) {
+      if (quiet(el) || !shown(el) || el.closest('[data-ui="status-pill"], button, a, [role="button"], [data-ui="chip"]')) continue;
+      const r = el.getBoundingClientRect();
+      const cs = getComputedStyle(el);
+      const filled = cs.backgroundColor !== 'rgba(0, 0, 0, 0)' && cs.backgroundColor !== 'transparent';
+      const round = parseFloat(cs.borderTopLeftRadius) >= r.height / 2 - 1;
+      const words = /\p{L}{2,}/u.test(text(el));
+      if (filled && round && words && r.height >= 14 && r.height <= 32 && r.width < 320) add('P7 status', `„${text(el)}” is a pill built by hand`);
+    }
   }
 
   // P8 — a list of items is rows (ListRow) or a grid of equal cards (CardGrid), not a stack of cards.

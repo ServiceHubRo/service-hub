@@ -15,6 +15,7 @@ import { categoryName, whenText } from './format';
 import { RequestStatusPill } from './parts';
 import { useAuthorSignals } from './useAuthorSignals';
 import styles from './requests.module.css';
+import { StatusPill, toneOf } from '../../components/StatusPill';
 
 const load = () => Promise.all([fetchMyRequests(), fetchSupportCategories()]);
 
@@ -55,7 +56,7 @@ export function MyRequestsScreen({ role }: { role: 'client' | 'shop' }) {
                     <span className={styles.rowTop}>
                       <span className={styles.rowTitle}>{r.title}</span>
                       <RequestStatusPill status={r.status} />
-                      {r.unread && <span className={`${styles.pill} ${styles.blue}`}>{t('support.my.unread')}</span>}
+                      {r.unread && <StatusPill tone={toneOf('blue')}>{t('support.my.unread')}</StatusPill>}
                     </span>
                     <span className={styles.meta}>
                       <span>{categoryName(state.data[1], r.category, lang)}</span>
