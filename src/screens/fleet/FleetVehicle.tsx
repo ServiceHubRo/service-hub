@@ -36,6 +36,7 @@ import styles from './fleet.module.css';
 import { StatusPill } from '../../components/StatusPill';
 import { toneOf } from '../../lib/statusTone';
 import { BackLink } from '../../components/BackLink';
+import { HeaderAction } from '../../components/HeaderSlot';
 
 type Tab = 'overview' | 'history' | 'costs' | 'odometer' | 'maintenance' | 'bookings' | 'quotes' | 'documents' | 'driver' | 'notes';
 
@@ -153,7 +154,8 @@ export function FleetVehicle({ vehicleId }: { vehicleId: string }) {
               <p className={styles.note}>{t('fleet.vehicle.nothingOpen')}</p>
             )}
             {mode === 'live' && actions && allowed('bookings.create') && !v.archived_at && (
-              <div className={styles.actions}>
+              // The vehicle's adds, top right of the page (docs/MODEL_DE_FOLOSIRE.md P12).
+              <HeaderAction>
                 <Button variant="primary" onClick={() => actions.book(v.id)}>
                   <CalendarPlus size={18} aria-hidden="true" /> {t('fleet.vehicle.book')}
                 </Button>
@@ -163,7 +165,7 @@ export function FleetVehicle({ vehicleId }: { vehicleId: string }) {
                     <Fuel size={18} aria-hidden="true" /> {t('fleet.costs.addFuel')}
                   </Button>
                 )}
-              </div>
+              </HeaderAction>
             )}
             {/* M3: report an issue from the overview too; the form opens in the section. */}
             {mode === 'live' && actions && canReport && (
@@ -181,12 +183,14 @@ export function FleetVehicle({ vehicleId }: { vehicleId: string }) {
             {addingFuel && <ExpenseForm fuelOnly fixedVehicle={v.id} onDone={() => setAddingFuel(false)} />}
             {mode === 'preview' && (
               <>
-                <div className={styles.actions}>
-                  {allowed('bookings.create') && (
+                {allowed('bookings.create') && (
+                  <HeaderAction>
                     <Button variant="primary" disabled title={t('fleet.preview.notSaved')}>
                       <CalendarPlus size={18} aria-hidden="true" /> {t('fleet.vehicle.book')}
                     </Button>
-                  )}
+                  </HeaderAction>
+                )}
+                <div className={styles.actions}>
                   {allowed('issues.report') && (
                     <Button disabled title={t('fleet.preview.notSaved')}>
                       <AlertTriangle size={18} aria-hidden="true" /> {t('fleet.vehicle.report')}
