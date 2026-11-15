@@ -42,6 +42,7 @@ import { useFleet, vehicleLabel } from './fleetContext';
 import styles from './fleet.module.css';
 import { StatusPill } from '../../components/StatusPill';
 import { toneOf } from '../../lib/statusTone';
+import { HeaderAction } from '../../components/HeaderSlot';
 
 /**
  * Costuri (docs/FLEET_PLAN.md §5): the one ledger — Service-Hub jobs and the company's own expenses,
@@ -161,9 +162,12 @@ export function FleetCosts({ initialPeriod }: { initialPeriod?: string }) {
               </ActionButton>
             )}
             {allowed('costs.manage') && (addExpense || actions) && (
-              <Button variant="primary" onClick={() => setAdding((a) => !a)} aria-expanded={adding}>
-                <Plus size={18} aria-hidden="true" /> {t('fleet.costs.add')}
-              </Button>
+              // The add, top right of the page (docs/MODEL_DE_FOLOSIRE.md P12).
+              <HeaderAction>
+                <Button variant="primary" onClick={() => setAdding((a) => !a)} aria-expanded={adding}>
+                  <Plus size={18} aria-hidden="true" /> {t('fleet.costs.add')}
+                </Button>
+              </HeaderAction>
             )}
           </div>
         }

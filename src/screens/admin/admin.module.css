@@ -25,6 +25,13 @@
   gap: 8px;
 }
 
+.sectionHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
 .sectionTitle {
   font-size: 13px;
   font-weight: 600;

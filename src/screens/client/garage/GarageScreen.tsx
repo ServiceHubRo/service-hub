@@ -47,6 +47,15 @@ export function GarageScreen() {
       <PageHeader
         title={t('nav.client.garage')}
         subtitle={state.status === 'ready' && state.data.length > 0 ? plural(lang, 'unit.savedCars', state.data.length) : undefined}
+        actions={
+          // The add, top right, like every add (docs/MODEL_DE_FOLOSIRE.md P12).
+          state.status === 'ready' && state.data.length > 0 ? (
+            <Link to={NEW_CAR_PATH} className={buttonClass('primary')}>
+              <Plus size={18} aria-hidden="true" />
+              {t('garage.add')}
+            </Link>
+          ) : undefined
+        }
       />
       {state.status === 'loading' && <SkeletonList cards />}
       {state.status === 'error' && <LoadError message={t('garage.loadError')} onRetry={reload} />}
@@ -90,10 +99,6 @@ export function GarageScreen() {
                 </li>
               ))}
             </ul>
-            <Link to={NEW_CAR_PATH} className={buttonClass('primary', true, styles.add)}>
-              <Plus size={18} aria-hidden="true" />
-              {t('garage.add')}
-            </Link>
           </>
         ))}
     </div>

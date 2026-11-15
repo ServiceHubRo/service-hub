@@ -204,6 +204,21 @@ export function measurePatterns(only?: readonly string[]): Patterns {
     }
   }
 
+  // P12 — an add (a car, a colleague, an expense, a category…) sits top right: in the page header for
+  // the whole page, in the head of its section for a section (Eduard, 15 Nov 2026: „toate butoanele
+  // de adăugare … în dreapta sus”). A form's own button, an empty state's and a panel's are not adds
+  // of the page.
+  if (want('P12')) {
+    const ADD = /^(\+\s*)?(Adaugă|Add|Invită|Invite|Creează|Create|Propune|Propose)\b|^[\p{L} ]{0,24}\b(nou|nouă|new)$|^New\b/iu;
+    for (const b of Array.from(main.querySelectorAll<HTMLElement>('button, a[href]'))) {
+      if (quiet(b) || !shown(b)) continue;
+      const t = text(b);
+      if (!ADD.test(t)) continue;
+      if (b.closest('[data-ui="page-header"], [data-ui="section-head"], form, [data-ui="inline-panel"], [data-ui="empty-state"], [role="menu"], dialog, [data-ui="filter-sheet"]')) continue;
+      add('P12 add', `„${t}” is not top right`);
+    }
+  }
+
   // P11 — a confirmation or a form opened from a button is an inline panel, not a dialog.
   if (want('P11')) {
     for (const d of Array.from(document.querySelectorAll('dialog[open], [role="dialog"], [role="alertdialog"]'))) {

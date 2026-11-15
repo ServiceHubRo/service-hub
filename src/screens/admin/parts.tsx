@@ -62,8 +62,15 @@ export function Facts({ rows }: { rows: [string, ReactNode][] }) {
   );
 }
 
-export function SectionTitle({ children }: { children: ReactNode }) {
-  return <h2 className={styles.sectionTitle}>{children}</h2>;
+export function SectionTitle({ children, action }: { children: ReactNode; action?: ReactNode }) {
+  if (!action) return <h2 className={styles.sectionTitle}>{children}</h2>;
+  // With its own add: the title on the left, the button on the right (docs/MODEL_DE_FOLOSIRE.md P12).
+  return (
+    <div data-ui="section-head" className={styles.sectionHead}>
+      <h2 className={styles.sectionTitle}>{children}</h2>
+      {action}
+    </div>
+  );
 }
 
 /** A list row that opens a detail screen. */

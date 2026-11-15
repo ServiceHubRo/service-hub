@@ -7,6 +7,8 @@ export interface SectionProps {
   description?: string;
   /** Anchor for a link straight to this section (`#capacitate`). */
   id?: string;
+  /** The section's own action (an add): in the head, on the right (docs/MODEL_DE_FOLOSIRE.md P12). */
+  action?: ReactNode;
   children: ReactNode;
 }
 
@@ -16,15 +18,18 @@ export interface SectionProps {
  * rhythm and the same left edge; a page with `data-layout="sections"` sets them two side by side on
  * a wide screen.
  */
-export function Section({ title, description, id, children }: SectionProps) {
+export function Section({ title, description, id, action, children }: SectionProps) {
   const headingId = useId();
   return (
     <section data-ui="section" id={id} className={styles.section} aria-labelledby={headingId}>
-      <div className={styles.head}>
-        <h2 id={headingId} className={styles.title}>
-          {title}
-        </h2>
-        {description && <p className={styles.description}>{description}</p>}
+      <div data-ui="section-head" className={action ? `${styles.head} ${styles.headWithAction}` : styles.head}>
+        <div className={styles.headText}>
+          <h2 id={headingId} className={styles.title}>
+            {title}
+          </h2>
+          {description && <p className={styles.description}>{description}</p>}
+        </div>
+        {action && <div className={styles.headAction}>{action}</div>}
       </div>
       <div className={styles.body}>{children}</div>
     </section>

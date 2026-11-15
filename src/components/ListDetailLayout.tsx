@@ -155,10 +155,13 @@ export function DetailPane({
 }
 
 /** A part of a detail under a small heading (the quote, the car, the job). */
-export function DetailSection({ title, children }: { title: string; children: ReactNode }) {
+export function DetailSection({ title, action, children }: { title: string; action?: ReactNode; children: ReactNode }) {
   return (
     <section className={styles.section}>
-      <h3 className={styles.sectionTitle}>{title}</h3>
+      <div data-ui="section-head" className={styles.sectionHead}>
+        <h3 className={styles.sectionTitle}>{title}</h3>
+        {action}
+      </div>
       {children}
     </section>
   );

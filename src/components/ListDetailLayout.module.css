@@ -132,6 +132,13 @@
   min-width: 0;
 }
 
+.sectionHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
 .sectionTitle {
   color: var(--muted);
   font-size: var(--text-xs);

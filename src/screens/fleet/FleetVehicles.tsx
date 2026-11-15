@@ -30,6 +30,7 @@ import { VehicleStatusPill } from './FleetPills';
 import { FleetVehicleForm } from './FleetVehicleForm';
 import { useFleet } from './fleetContext';
 import styles from './fleet.module.css';
+import { HeaderAction } from '../../components/HeaderSlot';
 
 /**
  * Vehicule (docs/FLEET_PLAN.md §4): every car the member may see, searched by plate (with or without
@@ -86,13 +87,13 @@ export function FleetVehicles({ initialStatus }: { initialStatus?: string }) {
             clearLabel={t('fleet.vehicles.searchClear')}
           />
         </div>
-        <div className={styles.toolbarActions}>
-          {allowed('vehicles.manage') && (
+        {allowed('vehicles.manage') && (
+          <HeaderAction>
             <Button variant="primary" onClick={() => setAdding((a) => !a)} aria-expanded={adding}>
               <Plus size={18} aria-hidden="true" /> {t('fleet.vehicles.add')}
             </Button>
-          )}
-        </div>
+          </HeaderAction>
+        )}
       </div>
 
       <ChoiceFilters

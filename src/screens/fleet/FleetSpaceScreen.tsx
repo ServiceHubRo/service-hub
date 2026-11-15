@@ -5,6 +5,7 @@ import { useDocumentTitle } from '../../app/useDocumentTitle';
 import { buttonClass } from '../../components/buttonClass';
 import { EmptyState } from '../../components/EmptyState';
 import { LoadError } from '../../components/LoadError';
+import { HeaderSlotProvider, HeaderSlotTarget } from '../../components/HeaderSlot';
 import { PageHeader } from '../../components/PageHeader';
 import { SkeletonList } from '../../components/Skeleton';
 import {
@@ -248,16 +249,19 @@ function FleetSpace({ companyId }: { companyId: string }) {
   const { overview: data, plan, plans } = state.data;
   return (
     <FleetContext.Provider value={{ data, go, back, mode: 'live', actions, companyPage: companyPath(companyId), addExpense: null, plan, loadSubscription, plans, loadReport, logExport }}>
-      <PageHeader
+      <HeaderSlotProvider>
+        <PageHeader
           title={title}
           subtitle={
             <span className={styles.spaceLine}>
               <Building2 size={15} aria-hidden="true" /> {data.company.name} · {t(`fleet.role.${data.me.role}`)}
             </span>
           }
+          actions={<HeaderSlotTarget />}
         />
         <FleetPlanNotice section={section} onOpen={() => go({ section: 'abonament' })} />
         <FleetSectionBody section={section} vehicleId={vehicleId} filter={filter} />
+      </HeaderSlotProvider>
     </FleetContext.Provider>
   );
 }
