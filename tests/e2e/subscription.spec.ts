@@ -310,8 +310,8 @@ test.describe('subscription', () => {
     await expect(page.getByText(/^Primul coleg cu cont în service este inclus în abonament\. Fiecare coleg în plus/)).toBeVisible();
     await expect(page.getByText('Acum abonamentul tău este 120 lei pe lună, cu 1 coleg în plus.', { exact: false })).toBeVisible();
     await shot(page, 'seats-staff', name());
-    const card = page.locator('div').filter({ hasText: 'Coleg Plătit' }).filter({ has: page.getByRole('button', { name: 'Elimină' }) }).last();
-    await card.getByRole('button', { name: 'Elimină' }).click();
+    await page.getByRole('button', { name: /Coleg Plătit/ }).click();
+    await page.getByRole('button', { name: 'Elimină' }).click();
     await page.getByRole('button', { name: 'Da, elimină' }).click();
     await expect.poll(seatsInStripe, { timeout: 30_000 }).toBe(0);
     await expect

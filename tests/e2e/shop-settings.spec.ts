@@ -273,6 +273,8 @@ test.describe('shop settings', () => {
     await expect(page.getByText('Proprietar', { exact: true })).toBeVisible();
 
     const colleague = uniqueEmail('coleg');
+    // „Invită un coleg”, top right (P12), opens the invitation in the page.
+    await page.getByRole('button', { name: 'Invită un coleg' }).click();
     await page.getByLabel('Emailul colegului').fill('nu-e-email');
     await page.getByRole('button', { name: 'Trimite invitația' }).click();
     await expect(page.getByText('Adresa de email nu este validă.')).toBeVisible();
@@ -340,7 +342,8 @@ test.describe('shop settings', () => {
 
     // The owner sees the colleague and removes them.
     await page.reload();
-    await expect(page.getByText('Mihai Coleg')).toBeVisible();
+    // One row per colleague (page template A): the chosen one holds „Elimină”.
+    await page.getByRole('button', { name: /Mihai Coleg/ }).click();
     await page.getByRole('button', { name: 'Elimină' }).click();
     await expect(page.getByText('Elimini din echipă: Mihai Coleg?', { exact: false })).toBeVisible();
     await page.getByRole('button', { name: 'Da, elimină' }).click();

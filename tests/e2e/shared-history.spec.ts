@@ -11,6 +11,7 @@ import {
   userIdOf,
   cardAction,
   openClientBooking,
+  detailPane,
 } from './support';
 
 // Fișa mașinii (T27; shown by default since 10 Oct): the shop the client books with sees what was
@@ -176,7 +177,7 @@ test.describe('Fișa mașinii', () => {
     await page.goto('/s/istoric');
     const job = page.locator('li').filter({ hasText: 'Ulei și filtre' });
     await job.getByRole('button').first().click();
-    await (await cardAction(job, 'Fișa mașinii')).click();
+    await (await cardAction(detailPane(page), 'Fișa mașinii')).click();
     await expect(page).toHaveURL(/\/s\/istoric\/fisa\//);
     await expect(page.getByRole('region', { name: /Reparații anterioare la alte service-uri/ })).toContainText('Plăcuțe față schimbate');
     await page.getByRole('link', { name: 'Istoric' }).first().click();

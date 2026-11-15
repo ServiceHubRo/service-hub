@@ -3907,6 +3907,7 @@ export const ro = {
   'fleet.vehicles.search': 'Caută vehicul',
   'fleet.vehicles.searchPlaceholder': 'Număr, marcă, model sau VIN',
   'fleet.vehicles.searchClear': 'Șterge căutarea',
+  'fleet.vehicles.list': "Vehiculele firmei",
   'fleet.vehicles.add': 'Adaugă vehicul',
   'fleet.vehicles.addTitle': 'Adaugă vehicul',
   'fleet.vehicles.addPreview': 'În previzualizare nu se adaugă vehicule. După aprobarea bazei de date, butonul deschide formularul garajului, cu șoferul, departamentul și tipul vehiculului.',

@@ -327,7 +327,9 @@ export function ShopHistoryScreen() {
               key={b.id}
               icon={<ServiceIcon name={b.service_icon} size={20} />}
               title={titleText(b, lang, t)}
-              detail={[formatDayMonth(lang, endedDay(b)), [carText(b), b.car_snapshot.plate].filter(Boolean).join(' · '), b.client_name].filter(Boolean).join(' · ')}
+              detail={[formatDayMonth(lang, endedDay(b)), b.imported ? t('imp.badge') : null, [carText(b), b.car_snapshot.plate].filter(Boolean).join(' · '), b.client_name]
+                .filter(Boolean)
+                .join(' · ')}
               status={b.status === 'done' ? (b.cost !== null ? <span className="mono">{formatMoney(lang, b.cost)}</span> : undefined) : <BookingStatusPill status={b.status} viewer="shop" />}
               selected={wide && b.id === selectedId}
               onSelect={() => select(b.id)}

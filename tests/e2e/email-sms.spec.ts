@@ -151,6 +151,7 @@ test.describe('email and SMS', () => {
     await expect(page).toHaveURL(/\/s\/panou$/);
     await page.goto('/s/cont/setari/personal');
     const colleague = uniqueEmail('invitat');
+    await page.getByRole('button', { name: 'Invită un coleg' }).click();
     await page.getByLabel('Emailul colegului').fill(colleague);
     await page.getByRole('button', { name: 'Trimite invitația' }).click();
     await expect(page.getByText(`Invitația a fost trimisă la ${colleague}`, { exact: false })).toBeVisible();
@@ -170,6 +171,7 @@ test.describe('email and SMS', () => {
     await expect(guest.getByText(/Atelier Email din Brașov te-a invitat/)).toBeVisible();
 
     // "Retrimite invitația" sends a new email with a new link.
+    await page.getByRole('button', { name: new RegExp(colleague.replace(/[.+]/g, '\\$&')) }).click();
     await page.getByRole('button', { name: 'Retrimite invitația' }).click();
     const again = await nextEmail(colleague, 1);
     expect(again.text).not.toContain(link);

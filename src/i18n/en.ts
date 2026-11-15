@@ -3908,6 +3908,7 @@ export const en: Record<MessageKey, string> = {
   'fleet.vehicles.search': 'Search vehicles',
   'fleet.vehicles.searchPlaceholder': 'Plate, make, model or VIN',
   'fleet.vehicles.searchClear': 'Clear search',
+  'fleet.vehicles.list': "The company's vehicles",
   'fleet.vehicles.add': 'Add vehicle',
   'fleet.vehicles.addTitle': 'Add vehicle',
   'fleet.vehicles.addPreview': 'Vehicles cannot be added in the preview. Once the database changes are approved, this opens the garage form with driver, department and vehicle type.',

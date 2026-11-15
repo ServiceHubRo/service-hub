@@ -15,6 +15,7 @@ import {
   userIdOf,
   verifyPhoneByAdmin,
   cardAction,
+  detailPane,
 } from './support';
 
 // T31a — a shop imports its clients, cars and past jobs from another program: the file, the
@@ -94,7 +95,7 @@ test.describe('import from another program', () => {
     await expect(card).toContainText('420 lei');
     await expect(page.getByText('Lucrările importate nu intră în total.')).toBeVisible();
     await card.getByRole('button').first().click();
-    await expect(await cardAction(card, 'Fișa mașinii')).toHaveCount(0);
+    await expect(await cardAction(detailPane(page), 'Fișa mașinii')).toHaveCount(0);
     await expectNoHorizontalScroll(page);
     await shot(page, 't31a-history', name());
 

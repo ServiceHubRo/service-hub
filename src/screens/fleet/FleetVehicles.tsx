@@ -1,4 +1,4 @@
-import { CarFront, ChevronRight, Download, Plus, SearchX } from 'lucide-react';
+import { CarFront, Download, Plus, SearchX } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { ActionButton } from '../../components/ActionButton';
 import { Button } from '../../components/Button';
@@ -31,6 +31,7 @@ import { FleetVehicleForm } from './FleetVehicleForm';
 import { useFleet } from './fleetContext';
 import styles from './fleet.module.css';
 import { HeaderAction } from '../../components/HeaderSlot';
+import { ListRow, ListRows } from '../../components/ListRow';
 
 /**
  * Vehicule (docs/FLEET_PLAN.md §4): every car the member may see, searched by plate (with or without
@@ -198,43 +199,26 @@ export function FleetVehicles({ initialStatus }: { initialStatus?: string }) {
           action={<Button onClick={() => setFilter(NO_FILTER)}>{t('fleet.vehicles.reset')}</Button>}
         />
       ) : (
-        <ul className={styles.vehicleList}>
+        // One row per vehicle (page template A, docs/MODEL_DE_FOLOSIRE.md P8): the vehicle's page opens on a tap.
+        <ListRows label={t('fleet.vehicles.list')}>
           {shown.map((r) => (
-            <li key={r.vehicle.id}>
-              <button type="button" className={styles.vehicleRow} onClick={() => go({ section: 'vehicul', vehicle: r.vehicle.id })}>
-                <span className={styles.vehicleMain}>
-                  <span className={`mono ${styles.plate}`}>{r.vehicle.plate ?? t('fleet.vehicle.noPlate')}</span>
-                  <span className={styles.vehicleName}>
-                    {r.vehicle.make} {r.vehicle.model}
-                    {r.vehicle.year ? ` · ${r.vehicle.year}` : ''}
-                  </span>
-                </span>
-                <VehicleStatusPill status={r.status} />
-                <span className={styles.vehicleFacts}>
-                  <span>
-                    <span className={styles.factLabel}>{t('fleet.col.driver')}</span>
-                    {memberName(r.vehicle.driver_id) ?? <span className={styles.muted}>{t('fleet.vehicle.noDriver')}</span>}
-                  </span>
-                  <span>
-                    <span className={styles.factLabel}>{t('fleet.col.km')}</span>
-                    <span className="mono">{r.odometer === null ? '—' : formatKm(lang, r.odometer)}</span>
-                  </span>
-                  {money && (
-                    <span>
-                      <span className={styles.factLabel}>{t('fleet.col.costYear')}</span>
-                      <span className="mono">{formatMoney(lang, r.cost ?? 0)}</span>
-                    </span>
-                  )}
-                  <span>
-                    <span className={styles.factLabel}>{t('fleet.col.lastService')}</span>
-                    {r.lastService ? formatDate(lang, r.lastService) : <span className={styles.muted}>—</span>}
-                  </span>
-                </span>
-                <ChevronRight size={18} className={styles.chevron} aria-hidden="true" />
-              </button>
-            </li>
+            <ListRow
+              key={r.vehicle.id}
+              icon={<CarFront size={20} />}
+              title={[r.vehicle.plate ?? t('fleet.vehicle.noPlate'), [r.vehicle.make, r.vehicle.model].filter(Boolean).join(' '), r.vehicle.year].filter(Boolean).join(' · ')}
+              detail={[
+                memberName(r.vehicle.driver_id) ?? t('fleet.vehicle.noDriver'),
+                r.odometer === null ? null : formatKm(lang, r.odometer),
+                money ? formatMoney(lang, r.cost ?? 0) : null,
+                r.lastService ? formatDate(lang, r.lastService) : null,
+              ]
+                .filter(Boolean)
+                .join(' · ')}
+              status={<VehicleStatusPill status={r.status} />}
+              onSelect={() => go({ section: 'vehicul', vehicle: r.vehicle.id })}
+            />
           ))}
-        </ul>
+        </ListRows>
       )}
     </div>
   );

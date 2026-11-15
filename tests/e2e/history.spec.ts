@@ -14,6 +14,8 @@ import {
   pickFilter,
   cardAction,
   openClientBooking,
+  detailPane,
+  backToList,
 } from './support';
 
 // T10 — the shop's repair history (search, filters, the opened card, CSV) and the client's vehicle
@@ -32,6 +34,8 @@ const name = () => test.info().project.name;
 const rid = () => crypto.randomUUID();
 const navLink = (page: Page, label: string | RegExp) =>
   page.getByRole('link', { name: label, exact: typeof label === 'string' }).filter({ visible: true }).first();
+/** The shop's Istoric: one row per job (page template A). */
+const historyRows = (page: Page) => page.getByRole('list', { name: 'Istoric reparații' }).locator(':scope > li');
 const jobCards = (page: Page) => page.locator('main ul > li').filter({ has: page.locator('button[aria-expanded]') });
 
 interface Day {
@@ -167,33 +171,36 @@ test.describe('repair history', () => {
     await navLink(page, 'Istoric').click();
     await expect(page.getByRole('heading', { level: 1, name: 'Istoric reparații' })).toBeVisible();
     await expect(page.getByText('2 reparații · 860 lei încasat')).toBeVisible();
-    await expect(jobCards(page)).toHaveCount(3);
+    await expect(historyRows(page)).toHaveCount(3);
 
     // "BV 12" finds every job on that plate (with or without spaces), and nothing else.
     await page.getByLabel('Caută în istoric').fill(`BV ${n}`);
-    await expect(jobCards(page)).toHaveCount(2);
+    await expect(historyRows(page)).toHaveCount(2);
     await expect(page.getByText('1 reparație · 430 lei încasat')).toBeVisible();
     await expect(page).toHaveURL(new RegExp(`q=BV\\+${n}`));
     await page.getByLabel('Caută în istoric').fill(plate.replace(/\s/g, '').toLowerCase());
-    await expect(jobCards(page)).toHaveCount(2);
+    await expect(historyRows(page)).toHaveCount(2);
 
     // The finished job opens with the quote, the odometer and the conversation.
-    const card = jobCards(page).filter({ hasText: '430 lei' });
-    await expect(card).toContainText('105.400 km');
-    await card.getByRole('button', { expanded: false }).click();
-    await expect(card).toContainText('Plăcuțe frână față');
-    await expect(card).toContainText('Total aprobat');
-    await expect(card).toContainText(`Programarea ${done.ref}`);
-    await expect(await cardAction(card, 'Mesaj')).toBeVisible();
+    // A row per job (page template A, 15 Nov 2026); the chosen one opens beside the list or in its place.
+    await historyRows(page).filter({ hasText: '430 lei' }).getByRole('button').click();
+    const job = detailPane(page);
+    await expect(job).toContainText('105.400 km');
+    await expect(job).toContainText('Plăcuțe frână față');
+    await expect(job).toContainText('Total aprobat');
+    await expect(job).toContainText(`Programarea ${done.ref}`);
+    await expect(await cardAction(job, 'Mesaj')).toBeVisible();
     await expectNoHorizontalScroll(page);
     await shot(page, 't10-shop-history', name());
+    await backToList(page);
 
     // Status chip: the refused quote alone, with its inspection fee.
     await pickFilter(page, 'Deviz refuzat');
-    await expect(jobCards(page)).toHaveCount(1);
-    await expect(jobCards(page).first()).toContainText('Deviz refuzat');
-    await jobCards(page).first().getByRole('button', { expanded: false }).click();
-    await expect(jobCards(page).first()).toContainText('Taxă de constatare: 100 lei');
+    await expect(historyRows(page)).toHaveCount(1);
+    await expect(historyRows(page).first()).toContainText('Deviz refuzat');
+    await historyRows(page).first().getByRole('button').click();
+    await expect(detailPane(page)).toContainText('Taxă de constatare: 100 lei');
+    await backToList(page);
 
     // The CSV holds the filtered list, with the odometer.
     await pickFilter(page, 'Toate');
@@ -209,7 +216,7 @@ test.describe('repair history', () => {
     await page.getByLabel('Caută în istoric').fill('zzzz');
     await expect(page.getByText('Nu există rezultate pentru „zzzz”.')).toBeVisible();
     await page.getByRole('button', { name: 'Șterge filtrele' }).click();
-    await expect(jobCards(page)).toHaveCount(3);
+    await expect(historyRows(page)).toHaveCount(3);
 
     // ------------------------------------------------------------------ client
     const me = await signedIn(browser, page, client);
