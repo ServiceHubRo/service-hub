@@ -43,7 +43,8 @@ import { RolePill } from './RolePill';
 import { rightsSummary, ticksFor } from './rights';
 import styles from './companies.module.css';
 import { useOptionalWorkspace } from '../../../app/workspace/workspaceContext';
-import { StatusPill, toneOf } from '../../../components/StatusPill';
+import { StatusPill } from '../../../components/StatusPill';
+import { toneOf } from '../../../lib/statusTone';
 
 interface Loaded {
   company: Company;

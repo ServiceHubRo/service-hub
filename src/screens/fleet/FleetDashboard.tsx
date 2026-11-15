@@ -42,7 +42,8 @@ import { useFleetReport } from './useFleetReport';
 import { MaintenancePill } from './FleetMaintenance';
 import { useMaintenanceName } from './maintenanceName';
 import styles from './fleet.module.css';
-import { StatusPill, toneOf } from '../../components/StatusPill';
+import { StatusPill } from '../../components/StatusPill';
+import { toneOf } from '../../lib/statusTone';
 
 const ACTIVITY_ICON: Record<ActivityKind, LucideIcon> = {
   booking_created: CalendarClock,

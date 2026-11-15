@@ -30,7 +30,8 @@ import { useReason } from './useReason';
 import { ADMIN_FLEETS_PATH } from './paths';
 import styles from './admin.module.css';
 import own from './fleets.module.css';
-import { StatusPill, toneOf } from '../../components/StatusPill';
+import { StatusPill } from '../../components/StatusPill';
+import { toneOf } from '../../lib/statusTone';
 
 /** „‹ Înapoi” goes to the screen's zone (A1). */
 const ZONE_BACK = adminZoneBack(ADMIN_FLEETS_PATH);

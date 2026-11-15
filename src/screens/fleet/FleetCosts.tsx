@@ -40,7 +40,8 @@ import { SourcePill } from './FleetPills';
 import { COST_PERIODS, periodRange, type CostPeriod } from './periods';
 import { useFleet, vehicleLabel } from './fleetContext';
 import styles from './fleet.module.css';
-import { StatusPill, toneOf } from '../../components/StatusPill';
+import { StatusPill } from '../../components/StatusPill';
+import { toneOf } from '../../lib/statusTone';
 
 /**
  * Costuri (docs/FLEET_PLAN.md §5): the one ledger — Service-Hub jobs and the company's own expenses,

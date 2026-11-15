@@ -13,7 +13,8 @@ import { useLoad } from '../../lib/useLoad';
 import { Meter } from '../shop/reports/Charts';
 import { useFleet } from './fleetContext';
 import styles from './fleet.module.css';
-import { StatusPill, toneOf } from '../../components/StatusPill';
+import { StatusPill } from '../../components/StatusPill';
+import { toneOf } from '../../lib/statusTone';
 
 const STATE_TONE = { trial: 'amber', trial_over: 'muted', active: 'green', past_due: 'red', cancelled: 'muted', inactive: 'muted' } as const;
 

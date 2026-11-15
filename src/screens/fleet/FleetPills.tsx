@@ -1,6 +1,7 @@
 import { useI18n } from '../../i18n/context';
 import type { CostSource, JobStage, VehicleStatus } from '../../lib/fleet';
-import { StatusPill, toneOf } from '../../components/StatusPill';
+import { StatusPill } from '../../components/StatusPill';
+import { toneOf } from '../../lib/statusTone';
 
 /** The pills of the fleet screens: the same shapes and tones as a booking's status, always a word. */
 const VEHICLE_TONE: Record<VehicleStatus, string> = {

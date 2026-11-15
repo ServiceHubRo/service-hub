@@ -45,7 +45,8 @@ import { categoryName, dayText, whenText } from './format';
 import { AttachmentPicker } from './Attachments';
 import { Conversation, RequestStatusPill, type ConversationItem } from './parts';
 import styles from './requests.module.css';
-import { StatusPill, toneOf } from '../../components/StatusPill';
+import { StatusPill } from '../../components/StatusPill';
+import { toneOf } from '../../lib/statusTone';
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 

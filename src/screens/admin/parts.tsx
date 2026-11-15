@@ -11,7 +11,8 @@ import { auditChanges } from '../../lib/admin';
 import { actionLabel, dateTime } from './format';
 import { ro } from '../../i18n/ro';
 import styles from './admin.module.css';
-import { StatusPill, toneOf } from '../../components/StatusPill';
+import { StatusPill } from '../../components/StatusPill';
+import { toneOf } from '../../lib/statusTone';
 
 type Tone = 'amber' | 'green' | 'blue' | 'red' | 'grey';
 

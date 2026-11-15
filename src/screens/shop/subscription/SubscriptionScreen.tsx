@@ -38,7 +38,8 @@ import { SETTINGS_LINKS } from '../settings/paths';
 import { ACCOUNT_PATH } from '../paths';
 import { ReferralCard } from './ReferralCard';
 import styles from './subscription.module.css';
-import { StatusPill, toneOf } from '../../../components/StatusPill';
+import { StatusPill } from '../../../components/StatusPill';
+import { toneOf } from '../../../lib/statusTone';
 
 /**
  * Abonament (FR §4.7, P12, P12b): the owner's tile in Cont. Where the subscription stands (free

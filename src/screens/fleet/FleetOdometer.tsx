@@ -16,7 +16,8 @@ import { odometerLog, type FleetVehicle, type LogEntry } from '../../lib/fleet';
 import { useLoad } from '../../lib/useLoad';
 import { useFleet } from './fleetContext';
 import styles from './fleet.module.css';
-import { StatusPill, toneOf } from '../../components/StatusPill';
+import { StatusPill } from '../../components/StatusPill';
+import { toneOf } from '../../lib/statusTone';
 
 /**
  * „Kilometraj și consum” (M2): the vehicle's odometer log (readings and finished jobs), a reading typed

@@ -6,7 +6,8 @@ import { formatDecimal } from '../../i18n/format';
 import { DEFAULT_FILTERS, filterSearch, waitingLevel, waitingSpan, type RequestFilters } from '../../lib/supportRequests';
 import adminStyles from '../admin/admin.module.css';
 import styles from './requests.module.css';
-import { StatusPill, toneOf } from '../../components/StatusPill';
+import { StatusPill } from '../../components/StatusPill';
+import { toneOf } from '../../lib/statusTone';
 
 /** A counter: its number, its words and the one filter it opens the list with. */
 interface Tile {

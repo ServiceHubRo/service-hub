@@ -1,6 +1,7 @@
 import { useI18n } from '../../../i18n/context';
 import type { FleetRole } from '../../../lib/fleet';
-import { StatusPill, toneOf } from '../../../components/StatusPill';
+import { StatusPill } from '../../../components/StatusPill';
+import { toneOf } from '../../../lib/statusTone';
 
 const TONE: Record<FleetRole, string> = { admin: 'amber', manager: 'blue', driver: 'muted', accountant: 'green' };
 

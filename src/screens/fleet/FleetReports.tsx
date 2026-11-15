@@ -38,7 +38,8 @@ import { useFleet, vehicleLabel } from './fleetContext';
 import { LockedFeature } from './PlanGate';
 import { useFleetReport } from './useFleetReport';
 import styles from './fleet.module.css';
-import { StatusPill, toneOf } from '../../components/StatusPill';
+import { StatusPill } from '../../components/StatusPill';
+import { toneOf } from '../../lib/statusTone';
 
 type ReportKey = 'totals' | 'vehicles' | 'repairs' | 'perKm' | 'budget' | 'documents' | 'trend';
 const REPORT_KEYS: readonly ReportKey[] = ['totals', 'vehicles', 'repairs', 'perKm', 'budget', 'documents', 'trend'];

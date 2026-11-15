@@ -33,7 +33,8 @@ import { VehicleOdometer } from './FleetOdometer';
 import { VehicleMaintenance } from './FleetMaintenance';
 import { useFleet } from './fleetContext';
 import styles from './fleet.module.css';
-import { StatusPill, toneOf } from '../../components/StatusPill';
+import { StatusPill } from '../../components/StatusPill';
+import { toneOf } from '../../lib/statusTone';
 import { BackLink } from '../../components/BackLink';
 
 type Tab = 'overview' | 'history' | 'costs' | 'odometer' | 'maintenance' | 'bookings' | 'quotes' | 'documents' | 'driver' | 'notes';

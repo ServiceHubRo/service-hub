@@ -31,3 +31,12 @@ export function bookingTone(status: BookingStatus, viewer: Viewer): PillTone {
 export function needsAction(status: BookingStatus, viewer: Viewer): boolean {
   return bookingTone(status, viewer) === 'action';
 }
+
+/**
+ * The colors the screens used before one pill (consistency audit, Eduard 14 Nov 2026), by what they
+ * meant: amber asked to act, green went well, red is a problem, grey / muted is closed, blue was
+ * information (a step someone else takes).
+ */
+export type LegacyTone = 'amber' | 'green' | 'red' | 'grey' | 'muted' | 'blue';
+const LEGACY: Record<LegacyTone, PillTone> = { amber: 'action', green: 'success', red: 'problem', grey: 'closed', muted: 'closed', blue: 'neutral' };
+export const toneOf = (tone: string): PillTone => LEGACY[tone as LegacyTone] ?? 'neutral';

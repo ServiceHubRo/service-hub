@@ -27,7 +27,8 @@ import {
 import { useLoad } from '../../lib/useLoad';
 import { useFleet } from './fleetContext';
 import styles from './fleet.module.css';
-import { StatusPill, toneOf } from '../../components/StatusPill';
+import { StatusPill } from '../../components/StatusPill';
+import { toneOf } from '../../lib/statusTone';
 
 const STATUS_TONE: Record<IssueStatus, string> = {
   new: 'amber',

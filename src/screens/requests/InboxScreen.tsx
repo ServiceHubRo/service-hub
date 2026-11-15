@@ -22,7 +22,8 @@ import { SupportDashboardPanel, WaitingPill } from './Dashboard';
 import { RequestStatusPill } from './parts';
 import { useInbox } from './useInbox';
 import styles from './requests.module.css';
-import { StatusPill, toneOf } from '../../components/StatusPill';
+import { StatusPill } from '../../components/StatusPill';
+import { toneOf } from '../../lib/statusTone';
 
 const loadMeta = () => Promise.all([fetchSupportCategories(), listStaff()]);
 

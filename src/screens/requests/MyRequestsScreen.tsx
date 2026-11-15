@@ -15,7 +15,8 @@ import { categoryName, whenText } from './format';
 import { RequestStatusPill } from './parts';
 import { useAuthorSignals } from './useAuthorSignals';
 import styles from './requests.module.css';
-import { StatusPill, toneOf } from '../../components/StatusPill';
+import { StatusPill } from '../../components/StatusPill';
+import { toneOf } from '../../lib/statusTone';
 
 const load = () => Promise.all([fetchMyRequests(), fetchSupportCategories()]);
 

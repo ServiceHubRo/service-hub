@@ -3,7 +3,8 @@ import type { RequestStatus } from '../../data/supportRequests';
 import { FileList } from './Attachments';
 import { useI18n } from '../../i18n/context';
 import styles from './requests.module.css';
-import { StatusPill, toneOf } from '../../components/StatusPill';
+import { StatusPill } from '../../components/StatusPill';
+import { toneOf } from '../../lib/statusTone';
 
 const TONE: Record<RequestStatus, 'blue' | 'amber' | 'green' | 'grey' | 'red'> = {
   new: 'blue',

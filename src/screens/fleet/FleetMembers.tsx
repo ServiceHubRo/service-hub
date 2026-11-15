@@ -13,7 +13,8 @@ import { can, FLEET_CAPABILITY_GROUPS, FLEET_ROLES, hasFeature, type FleetCapabi
 import { rightsSummary } from '../client/companies/rights';
 import { useFleet } from './fleetContext';
 import styles from './fleet.module.css';
-import { StatusPill, toneOf } from '../../components/StatusPill';
+import { StatusPill } from '../../components/StatusPill';
+import { toneOf } from '../../lib/statusTone';
 
 const ROLE_TONE = { admin: 'amber', manager: 'blue', driver: 'muted', accountant: 'green' } as const;
 

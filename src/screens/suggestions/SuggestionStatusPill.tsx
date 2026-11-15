@@ -1,6 +1,7 @@
 import { useI18n } from '../../i18n/context';
 import type { SuggestionStatus } from '../../data/suggestions';
-import { StatusPill, toneOf } from '../../components/StatusPill';
+import { StatusPill } from '../../components/StatusPill';
+import { toneOf } from '../../lib/statusTone';
 
 const TONE: Record<SuggestionStatus, 'blue' | 'amber' | 'green' | 'grey'> = {
   new: 'blue',
