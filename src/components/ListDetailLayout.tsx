@@ -122,7 +122,7 @@ export function DetailPane({
     ref.current?.scrollTo?.(0, 0);
   }, [id]);
   return (
-    <article ref={ref} className={styles.pane} aria-labelledby={`detail-${id}`}>
+    <article data-ui="detail-pane" ref={ref} className={styles.pane} aria-labelledby={`detail-${id}`}>
       <header className={styles.head}>
         {icon && (
           <span className={styles.icon} aria-hidden="true">

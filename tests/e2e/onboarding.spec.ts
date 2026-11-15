@@ -29,13 +29,29 @@ const tour = (page: Page) => page.getByRole('dialog');
 
 /** The lit spot is around the element and the card is on screen. */
 async function expectLit(page: Page, target: Locator) {
-  // The light glides from spot to spot (CLAUDE.md §10): measure it once it has arrived.
-  await page
-    .locator('[data-tour-spot]')
-    .evaluate((el) =>
-      Promise.all(el.getAnimations().filter((a) => a.effect?.getComputedTiming().iterations !== Infinity).map((a) => a.finished)),
-    );
-  const spot = (await page.locator('[data-tour-spot]').boundingBox())!;
+  // The light glides from spot to spot (CLAUDE.md §10): measure it once it has arrived. The glide can
+  // start a frame after the step changes, so wait until the light stands still around the element.
+  const spotBox = () => page.locator('[data-tour-spot]').boundingBox();
+  await expect
+    .poll(
+      async () => {
+        await page
+          .locator('[data-tour-spot]')
+          .evaluate((el) =>
+            Promise.all(el.getAnimations().filter((a) => a.effect?.getComputedTiming().iterations !== Infinity).map((a) => a.finished)),
+          );
+        const a = await spotBox();
+        await page.waitForTimeout(100);
+        const b = await spotBox();
+        const t = await target.boundingBox();
+        if (!a || !b || !t) return false;
+        const still = Math.abs(a.x - b.x) < 1 && Math.abs(a.width - b.width) < 1 && Math.abs(a.y - b.y) < 1;
+        return still && b.x <= Math.max(t.x, 4) + 1 && b.x + b.width >= Math.min(t.x + t.width, page.viewportSize()!.width - 4) - 1;
+      },
+      { timeout: 5_000 },
+    )
+    .toBe(true);
+  const spot = (await spotBox())!;
   const box = (await target.boundingBox())!;
   // The light stays 4 px inside the screen (a sidebar item starts at its very edge).
   expect(spot.x).toBeLessThanOrEqual(Math.max(box.x, 4) + 1);

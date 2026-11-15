@@ -5,7 +5,9 @@ import { useSession } from '../../app/sessionContext';
 import { useDocumentTitle } from '../../app/useDocumentTitle';
 import { useNoIndex } from '../../app/useNoIndex';
 import { buttonClass } from '../../components/buttonClass';
+import { EmptyState } from '../../components/EmptyState';
 import { LogoTile } from '../../components/LogoTile';
+import { PageHeader } from '../../components/PageHeader';
 import { Wordmark } from '../../components/Wordmark';
 import { useI18n } from '../../i18n/context';
 import legal from '../legal/LegalPages.module.css';
@@ -35,7 +37,22 @@ export function NotFound({ inShell = false }: { inShell?: boolean }) {
     </div>
   );
 
-  if (inShell) return body;
+  // Inside the app: the shared title and empty state, like any other screen (docs/MODEL_DE_FOLOSIRE.md).
+  if (inShell)
+    return (
+      <>
+        <PageHeader title={t('notFound.title')} />
+        <EmptyState
+          icon={MapPinOff}
+          title={t('notFound.text')}
+          action={
+            <Link to="/" className={buttonClass('primary')}>
+              {t('notFound.appHome')}
+            </Link>
+          }
+        />
+      </>
+    );
   return (
     <div className={legal.page}>
       <div className="status-backdrop" aria-hidden="true" />

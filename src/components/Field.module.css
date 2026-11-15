@@ -5,9 +5,9 @@
   max-width: var(--field-max);
 }
 
-/* A text area keeps the width of its column (DESK-05: only one-line fields are capped). */
+/* A text area is as wide as the other fields (docs/MODEL_DE_FOLOSIRE.md F2), not the whole card. */
 .areaField {
-  max-width: none;
+  max-width: var(--field-max);
 }
 
 .label {
@@ -56,6 +56,12 @@
   .input:hover:not(:disabled):not(:focus-visible) {
     border-color: #46505c;
   }
+}
+
+/* Every one-line field the same height (F3): a text, a list to choose from, a date. */
+.input:not(textarea) {
+  height: var(--field-h);
+  min-height: var(--field-h);
 }
 
 .input:focus-visible {

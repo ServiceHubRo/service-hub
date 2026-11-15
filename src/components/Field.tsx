@@ -23,7 +23,7 @@ export function Field({ label, hint, error, mono, upper, end, inline, className,
   const hintId = hint ? `${id}-hint` : undefined;
   const errorId = error ? `${id}-error` : undefined;
   return (
-    <div className={`${styles.field} ${inline ? styles.inline : ''} ${className ?? ''}`}>
+    <div data-ui="field" className={`${styles.field} ${inline ? styles.inline : ''} ${className ?? ''}`}>
       <label htmlFor={id} className={styles.label}>
         {label}
       </label>

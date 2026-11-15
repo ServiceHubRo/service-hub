@@ -35,7 +35,7 @@ export function BackLink({ to, label }: { to: string; label?: string }) {
     goUp(navigate as (to: string | number, options?: { replace?: boolean }) => void, to);
   }
   return (
-    <div ref={barRef} className={styles.bar} data-back-bar>
+    <div data-ui="back-link" ref={barRef} className={styles.bar} data-back-bar>
       <Link to={to} className={styles.back} onClick={onClick}>
         <ChevronLeft size={18} aria-hidden="true" />
         {label ?? t('common.back')}

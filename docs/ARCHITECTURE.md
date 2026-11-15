@@ -610,6 +610,8 @@ The security audit of 23 Oct 2026 (T42) and what is left to the launch settings:
 
 **Code splitting (T18):** `src/app/App.tsx` keeps the public and sign-in screens in the start file; each role's screens are one file loaded after sign-in (`src/app/routes/ClientApp.tsx`, `ShopApp.tsx`, `AdminApp.tsx`, routes relative to `/c`, `/s`, `/admin`). A file that fails to load after a new deploy reloads the page once (`lazyChunk`), then shows "Reîncarcă pagina".
 
+**Consistency (Eduard, 14 Nov 2026):** one usage model for every account, `docs/MODEL_DE_FOLOSIRE.md`. Shared components carry a `data-ui` mark; `tests/e2e/patternRules.ts` (P1–P11: page header, back link, tabs not chips, shared buttons and fields, one filled button, `StatusPill`, rows not card stacks, skeletons, shared menu, inline panels) and `tests/e2e/fieldRules.ts` (F1–F7: equal widths in a row, same edges in a column, same height, inside the card, 16 px, a label, label aligned; quote lines are a table, `data-fields="table"`) measure every screen in the visual audit; `scripts/consistency-report.mjs` writes `docs/AUDIT_CONSISTENTA.md`. The rules no screen breaks (`ENFORCED_RULES`) are asserted on every screen of `a11y.spec.ts`.
+
 **Accessibility checks (T18):** `tests/e2e/a11y.spec.ts` and `public.spec.ts` run axe-core (WCAG 2.1 AA) on every screen of every role in RO and EN, plus a 44 px tap-target check (links inside a sentence excepted). Muted text on a tinted background uses `--muted-strong`. The shell starts with a "Sari la conținut" link; every page sets the tab title ("Programări · Service-Hub").
 
 ---

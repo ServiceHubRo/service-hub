@@ -3,7 +3,6 @@ import { useDeferredValue, useMemo, useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { useLiveSearchParams } from '../../app/useLiveSearchParams';
 import { buttonClass } from '../../components/buttonClass';
-import { Chip, ChipRow } from '../../components/Chip';
 import { EmptyState } from '../../components/EmptyState';
 import { LoadError } from '../../components/LoadError';
 import { PageHeader } from '../../components/PageHeader';
@@ -143,15 +142,22 @@ export function ProceduresScreen({ mode }: { mode: ProcedureMode }) {
             { value: 'none', label: t('proc.filter.noOne') },
           ]}
         />
+        {/* A list to choose from, not chips (docs/MODEL_DE_FOLOSIRE.md P3). */}
+        <SelectField
+          label={t('proc.filter.label')}
+          value={`${filters.critical ? 'c' : ''}${filters.inWork ? 'w' : ''}`}
+          onChange={(e) => {
+            const v = e.target.value;
+            setFilters((f) => ({ ...f, critical: v.includes('c'), inWork: v.includes('w') }));
+          }}
+          options={[
+            { value: '', label: t('proc.filter.all') },
+            { value: 'c', label: t('proc.filter.critical') },
+            { value: 'w', label: t('proc.filter.inWork') },
+            { value: 'cw', label: t('proc.filter.both') },
+          ]}
+        />
       </div>
-      <ChipRow label={t('proc.filter.label')}>
-        <Chip selected={filters.critical} onClick={() => set('critical', !filters.critical)}>
-          {t('proc.filter.critical')}
-        </Chip>
-        <Chip selected={filters.inWork} onClick={() => set('inWork', !filters.inWork)}>
-          {t('proc.filter.inWork')}
-        </Chip>
-      </ChipRow>
 
       {state.status === 'loading' && <SkeletonList count={3} />}
       {state.status === 'error' && <LoadError message={t('proc.loadError')} onRetry={reload} />}

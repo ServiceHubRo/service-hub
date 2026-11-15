@@ -1,5 +1,5 @@
 import { Card } from '../../components/Card';
-import { StatusBadge } from '../../components/StatusBadge';
+import { BookingStatusPill } from '../../components/StatusPill';
 import type { InvitePreview } from '../../data/claim';
 import { useI18n } from '../../i18n/context';
 import { formatDate } from '../../i18n/format';
@@ -33,7 +33,7 @@ export function InviteSummary({ preview: p }: { preview: InvitePreview }) {
         )}
         <dt>{t('lk.row.status')}</dt>
         <dd>
-          <StatusBadge status={p.status} />
+          <BookingStatusPill status={p.status} viewer="client" />
         </dd>
       </dl>
     </Card>

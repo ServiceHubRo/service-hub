@@ -49,7 +49,7 @@ export function CheckMenu({ label, summary, options, selected, onToggle, all, er
   }, [open]);
 
   return (
-    <div className={fieldStyles.field} ref={wrapRef}>
+    <div data-ui="check-menu" className={fieldStyles.field} ref={wrapRef}>
       <span id={`${id}-label`} className={fieldStyles.label}>
         {label}
       </span>

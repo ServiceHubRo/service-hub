@@ -109,41 +109,6 @@
   color: var(--muted);
 }
 
-/* ---------------------------------------------------------------- pills */
-.pill {
-  display: inline-block;
-  font-size: 12px;
-  font-weight: 700;
-  padding: 3px 9px;
-  border-radius: var(--radius-pill);
-  white-space: nowrap;
-}
-
-.amber {
-  color: var(--amber);
-  background: var(--amber-soft);
-}
-
-.green {
-  color: var(--green);
-  background: var(--green-soft);
-}
-
-.blue {
-  color: var(--blue);
-  background: var(--blue-soft);
-}
-
-.red {
-  color: var(--red-text);
-  background: var(--red-soft);
-}
-
-.greyPill {
-  color: var(--muted-strong);
-  background: var(--muted-soft);
-}
-
 /* ---------------------------------------------------------------- verification marks (icon + text) */
 .checks {
   display: flex;
@@ -337,11 +302,21 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: 10px;
+  max-width: var(--field-max);
+}
+
+.fields > * {
+  --field-max: none;
 }
 
 @media (min-width: 768px) {
   .fields {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  /* A field left alone on the last row takes the row (F2: the same edges). */
+  .fields > :last-child:nth-child(odd) {
+    grid-column: 1 / -1;
   }
 }
 
@@ -491,6 +466,11 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: 10px;
+  max-width: var(--field-max);
+}
+
+.dates > * {
+  --field-max: none;
 }
 
 @media (min-width: 768px) {

@@ -3,6 +3,8 @@ import type { RequestStatus } from '../../data/supportRequests';
 import { FileList } from './Attachments';
 import { useI18n } from '../../i18n/context';
 import styles from './requests.module.css';
+import { StatusPill } from '../../components/StatusPill';
+import { toneOf } from '../../lib/statusTone';
 
 const TONE: Record<RequestStatus, 'blue' | 'amber' | 'green' | 'grey' | 'red'> = {
   new: 'blue',
@@ -21,7 +23,7 @@ const TONE: Record<RequestStatus, 'blue' | 'amber' | 'green' | 'grey' | 'red'> =
  */
 export function RequestStatusPill({ status, staff = false }: { status: RequestStatus; staff?: boolean }) {
   const { t } = useI18n();
-  return <span className={`${styles.pill} ${styles[TONE[status]]}`}>{t(`${staff ? 'support.staffStatus' : 'support.status'}.${status}`)}</span>;
+  return <StatusPill tone={toneOf(TONE[status])}>{t(`${staff ? 'support.staffStatus' : 'support.status'}.${status}`)}</StatusPill>;
 }
 
 export interface ConversationItem {

@@ -5,10 +5,6 @@ import {
   Car,
   CarFront,
   CheckCircle2,
-  ClipboardCheck,
-  FileWarning,
-  Gauge,
-  PiggyBank,
   Plus,
   Receipt,
   Wallet,
@@ -39,10 +35,12 @@ import { MonthBars, ShareBars } from './FleetCharts';
 import { useFleet, vehicleLabel, type FleetLink } from './fleetContext';
 import { LockedFeature } from './PlanGate';
 import { useFleetReport } from './useFleetReport';
-import pill from '../../components/StatusBadge.module.css';
 import { MaintenancePill } from './FleetMaintenance';
 import { useMaintenanceName } from './maintenanceName';
 import styles from './fleet.module.css';
+import { StatusPill } from '../../components/StatusPill';
+import { toneOf } from '../../lib/statusTone';
+import { StatGrid, StatTile } from '../../components/StatTile';
 
 const ACTIVITY_ICON: Record<ActivityKind, LucideIcon> = {
   booking_created: CalendarClock,
@@ -100,23 +98,24 @@ export function FleetDashboard() {
 
   return (
     <div className={styles.stack}>
-      <ul className={styles.kpis} aria-label={t('fleet.kpi.label')}>
-        {kpi({ icon: CarFront, label: allowed('vehicles.viewAll') ? t('fleet.kpi.vehicles') : t('fleet.kpi.myVehicles'), value: String(k.vehicles), link: { section: 'vehicule' } })}
-        {kpi({ icon: CheckCircle2, label: t('fleet.kpi.active'), value: String(k.active), link: { section: 'vehicule', filter: 'active' } })}
-        {kpi({ icon: Wrench, label: t('fleet.kpi.inService'), value: String(k.inService), link: { section: 'vehicule', filter: 'in_service' }, tone: k.inService > 0 ? 'amber' : undefined })}
-        {kpi({ icon: CalendarClock, label: t('fleet.kpi.upcoming'), value: String(k.upcoming), link: { section: 'programari', filter: 'active' } })}
+      {/* The figures in the shared boxes of every dashboard (docs/MODEL_DE_FOLOSIRE.md). */}
+      <StatGrid label={t('fleet.kpi.label')}>
+        {kpi({ label: allowed('vehicles.viewAll') ? t('fleet.kpi.vehicles') : t('fleet.kpi.myVehicles'), value: String(k.vehicles), link: { section: 'vehicule' } })}
+        {kpi({ label: t('fleet.kpi.active'), value: String(k.active), link: { section: 'vehicule', filter: 'active' } })}
+        {kpi({ label: t('fleet.kpi.inService'), value: String(k.inService), link: { section: 'vehicule', filter: 'in_service' }, tone: k.inService > 0 ? 'amber' : undefined })}
+        {kpi({ label: t('fleet.kpi.upcoming'), value: String(k.upcoming), link: { section: 'programari', filter: 'active' } })}
         {(allowed('quotes.approve') || money) &&
-          kpi({ icon: ClipboardCheck, label: t('fleet.kpi.quotes'), value: String(k.quotesWaiting), link: { section: 'programari', filter: 'approve' }, tone: k.quotesWaiting > 0 ? 'amber' : undefined })}
-        {kpi({ icon: FileWarning, label: t('fleet.kpi.docs'), value: String(k.docsExpiring), link: { section: allowed('reports.view') && hasFeature(plan, 'reports') ? 'rapoarte' : 'vehicule', filter: 'documents' }, tone: k.docsExpiring > 0 ? 'red' : undefined })}
-        {money && kpi({ icon: Wallet, label: t('fleet.kpi.month'), value: money0(k.monthSpend), link: { section: 'costuri', filter: 'month' }, wide: true })}
+          kpi({ label: t('fleet.kpi.quotes'), value: String(k.quotesWaiting), link: { section: 'programari', filter: 'approve' }, tone: k.quotesWaiting > 0 ? 'amber' : undefined })}
+        {kpi({ label: t('fleet.kpi.docs'), value: String(k.docsExpiring), link: { section: allowed('reports.view') && hasFeature(plan, 'reports') ? 'rapoarte' : 'vehicule', filter: 'documents' }, tone: k.docsExpiring > 0 ? 'red' : undefined })}
+        {money && kpi({ label: t('fleet.kpi.month'), value: money0(k.monthSpend), link: { section: 'costuri', filter: 'month' }, wide: true })}
         {finance && (
           <>
-            {kpi({ icon: BarChart3, label: t('fleet.kpi.year'), value: r ? money0(r.total) : '…', link: { section: 'costuri', filter: 'year' }, wide: true })}
-            {kpi({ icon: Gauge, label: t('fleet.kpi.avg'), value: r ? money0(r.avg_per_vehicle) : '…', hint: t('fleet.kpi.avgHint'), link: { section: 'rapoarte', filter: 'vehicles' }, wide: true })}
+            {kpi({ label: t('fleet.kpi.year'), value: r ? money0(r.total) : '…', link: { section: 'costuri', filter: 'year' }, wide: true })}
+            {kpi({ label: t('fleet.kpi.avg'), value: r ? money0(r.avg_per_vehicle) : '…', hint: t('fleet.kpi.avgHint'), link: { section: 'rapoarte', filter: 'vehicles' }, wide: true })}
             {budgetKpi(k.monthBudget, allowed('budget.manage'))}
           </>
         )}
-      </ul>
+      </StatGrid>
 
       <Card className={styles.card}>
         <h2 className={styles.cardTitle}>{t('fleet.deadlines.title')}</h2>
@@ -133,7 +132,7 @@ export function FleetDashboard() {
                     </span>
                     <span className={styles.muted}>{d.date ? formatDate(lang, d.date) : ''}</span>
                   </span>
-                  <span className={`${pill.pill} ${pill[d.urgency === 'expired' ? 'red' : 'amber']}`}>{t(`fleet.docs.${d.urgency}`)}</span>
+                  <StatusPill tone={toneOf(d.urgency === 'expired' ? 'red' : 'amber')}>{t(`fleet.docs.${d.urgency}`)}</StatusPill>
                 </button>
               </li>
             ))}
@@ -252,58 +251,34 @@ export function FleetDashboard() {
     );
   }
 
-  function kpi({ icon: Icon, label, value, hint, link, tone, wide }: { icon: LucideIcon; label: string; value: string; hint?: string; link?: FleetLink; tone?: 'amber' | 'red'; wide?: boolean }) {
-    const body = (
-      <>
-        <span className={`${styles.kpiIcon} ${tone ? styles[`kpi_${tone}`] : ''}`} aria-hidden="true">
-          <Icon size={18} />
-        </span>
-        <span className={styles.kpiLabel}>{label}</span>
-        <span className={`mono ${styles.kpiValue}`}>{value}</span>
-        {hint && <span className={styles.kpiHint}>{hint}</span>}
-      </>
-    );
+  function kpi({ label, value, hint, link, tone, wide }: { label: string; value: string; hint?: string; link?: FleetLink; tone?: 'amber' | 'red'; wide?: boolean }) {
     return (
-      <li className={wide ? styles.kpiWide : undefined}>
-        {link ? (
-          <button type="button" className={styles.kpi} onClick={() => go(link)}>
-            {body}
-          </button>
-        ) : (
-          <div className={styles.kpi}>{body}</div>
-        )}
-      </li>
+      <StatTile
+        key={label}
+        value={value}
+        label={label}
+        hint={hint}
+        onSelect={link ? () => go(link) : undefined}
+        attention={tone === 'amber'}
+        problem={tone === 'red'}
+        wide={wide}
+      />
     );
   }
 
   function budgetKpi(usage: BudgetUsage | null, canSet: boolean) {
-    if (!usage) {
-      return (
-        <li className={styles.kpiWide}>
-          <button type="button" className={styles.kpi} onClick={() => go({ section: 'rapoarte', filter: 'budget' })}>
-            <span className={styles.kpiIcon} aria-hidden="true">
-              <PiggyBank size={18} />
-            </span>
-            <span className={styles.kpiLabel}>{t('fleet.kpi.budget')}</span>
-            <span className={styles.kpiEmpty}>{canSet ? t('fleet.budget.setCta') : t('fleet.budget.notSet')}</span>
-          </button>
-        </li>
-      );
-    }
+    const open = () => go({ section: 'rapoarte', filter: 'budget' });
+    if (!usage) return <StatTile value="—" label={t('fleet.kpi.budget')} hint={canSet ? t('fleet.budget.setCta') : t('fleet.budget.notSet')} onSelect={open} wide />;
     const over = usage.over > 0;
     return (
-      <li className={styles.kpiWide}>
-        <button type="button" className={styles.kpi} onClick={() => go({ section: 'rapoarte', filter: 'budget' })}>
-          <span className={`${styles.kpiIcon} ${over ? styles.kpi_red : ''}`} aria-hidden="true">
-            <PiggyBank size={18} />
-          </span>
-          <span className={styles.kpiLabel}>{t('fleet.kpi.budget')}</span>
-          <span className={`mono ${styles.kpiValue} ${over ? styles.red : ''}`}>{formatPercent(lang, usage.used)}</span>
-          <span className={styles.kpiHint}>
-            {over ? t('fleet.budget.over', { pct: formatPercent(lang, usage.over) }) : t('fleet.budget.left', { amount: formatMoney(lang, usage.remaining) })}
-          </span>
-        </button>
-      </li>
+      <StatTile
+        value={formatPercent(lang, usage.used)}
+        label={t('fleet.kpi.budget')}
+        hint={over ? t('fleet.budget.over', { pct: formatPercent(lang, usage.over) }) : t('fleet.budget.left', { amount: formatMoney(lang, usage.remaining) })}
+        problem={over}
+        onSelect={open}
+        wide
+      />
     );
   }
 }

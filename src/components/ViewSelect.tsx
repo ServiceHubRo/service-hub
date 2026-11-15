@@ -1,6 +1,5 @@
 import { useI18n } from '../i18n/context';
 import { SelectField } from './SelectField';
-import styles from './ViewSelect.module.css';
 
 export interface ViewItem<K extends string> {
   key: K;
@@ -27,7 +26,6 @@ export function ViewSelect<K extends string>({
   const { t } = useI18n();
   return (
     <SelectField
-      className={styles.view}
       label={label ?? t('common.view')}
       value={value}
       onChange={(e) => onChange(e.target.value as K)}

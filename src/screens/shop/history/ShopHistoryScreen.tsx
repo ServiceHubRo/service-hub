@@ -11,7 +11,7 @@ import { SearchField } from '../../../components/SearchField';
 import { ServiceIcon } from '../../../components/ServiceIcon';
 import { PageHeader } from '../../../components/PageHeader';
 import { SkeletonList } from '../../../components/Skeleton';
-import { StatusBadge } from '../../../components/StatusBadge';
+import { BookingStatusPill } from '../../../components/StatusPill';
 import { subscribeRows } from '../../../data/realtime';
 import { fetchImportedPage, fetchShopHistory, mergeHistory, type ShopHistoryItem } from '../../../data/shopHistory';
 import { useI18n, type I18nValue } from '../../../i18n/context';
@@ -384,7 +384,7 @@ function HistoryCard({ item: b, open, onToggle }: { item: ShopHistoryItem; open:
           {b.status === 'done' ? (
             b.cost !== null && <span className={`mono ${styles.amount}`}>{formatMoney(lang, b.cost)}</span>
           ) : (
-            <StatusBadge status={b.status} />
+            <BookingStatusPill status={b.status} viewer="shop" />
           )}
         </span>
         <ChevronDown size={18} className={`${styles.chevron} ${styles.jobChevron}`} aria-hidden="true" />

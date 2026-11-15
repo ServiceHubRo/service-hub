@@ -22,14 +22,15 @@ import {
 } from '../../lib/fleet';
 import { useFleet } from './fleetContext';
 import { useMaintenanceName } from './maintenanceName';
-import pill from '../../components/StatusBadge.module.css';
 import styles from './fleet.module.css';
+import { StatusPill } from '../../components/StatusPill';
+import { toneOf } from '../../lib/statusTone';
 
 const TONE: Record<MaintenanceStatus, string> = { ok: 'green', soon: 'amber', overdue: 'red', insufficient_data: 'muted' };
 
 export function MaintenancePill({ status }: { status: MaintenanceStatus }) {
   const { t } = useI18n();
-  return <span className={`${pill.pill} ${pill[TONE[status]]}`}>{t(`fleet.maint.status.${status}`)}</span>;
+  return <StatusPill tone={toneOf(TONE[status])}>{t(`fleet.maint.status.${status}`)}</StatusPill>;
 }
 
 /**

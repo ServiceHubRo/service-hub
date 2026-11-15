@@ -1,7 +1,6 @@
 import { UserCog } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { ActionButton } from '../../components/ActionButton';
-import { BackLink } from '../../components/BackLink';
 import { Button } from '../../components/Button';
 import { Card } from '../../components/Card';
 import { EmptyState } from '../../components/EmptyState';
@@ -28,6 +27,7 @@ import { Pill, SectionTitle } from './parts';
 import { ADMIN_TEAM_PATH } from './paths';
 import styles from './admin.module.css';
 import supportStyles from '../support/support.module.css';
+import { PageHeader } from '../../components/PageHeader';
 
 /** „‹ Înapoi” goes to the screen's zone (A1). */
 const ZONE_BACK = adminZoneBack(ADMIN_TEAM_PATH);
@@ -56,10 +56,7 @@ export function TeamScreen() {
 
   return (
     <div className={styles.page}>
-      <BackLink to={ZONE_BACK.to} label={t(ZONE_BACK.label)} />
-      <div>
-        <h1>{t('admin.team.title')}</h1>
-      </div>
+      <PageHeader back={{ to: ZONE_BACK.to, label: t(ZONE_BACK.label) }} title={t('admin.team.title')} />
 
       <GrantForm
         onGranted={(displayId) => {

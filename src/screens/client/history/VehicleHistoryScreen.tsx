@@ -35,6 +35,7 @@ import {
 } from '../paths';
 import styles from '../../history/history.module.css';
 import { timelineClass, timelineItem } from '../../history/timeline';
+import { PageHeader } from '../../../components/PageHeader';
 
 /**
  * The history of one car (FR §3.6, P16c): the car, how many jobs and how much was spent, then every
@@ -137,18 +138,16 @@ export function VehicleHistoryScreen() {
   return (
     <div className={styles.page}>
       {back}
-      <div>
-        <h1>{name || t('sb.card.noCar')}</h1>
-        <p className={styles.sub}>
-          {v.year && <>{v.year} · </>}
-          {v.plate ? <span className={`mono ${styles.plate}`}>{v.plate}</span> : t('vh.noPlate')}
-        </p>
-        {jobs.length > 0 && (
-          <p className={styles.sub}>
-            {t('vh.summary', { jobs: plural(lang, 'unit.jobs', jobs.length), amount: formatMoney(lang, sumCosts(jobs)) })}
-          </p>
-        )}
-      </div>
+      <PageHeader
+        title={name || t('sb.card.noCar')}
+        subtitle={
+          <>
+            {v.year && <>{v.year} · </>}
+            {v.plate ? <span className={`mono ${styles.plate}`}>{v.plate}</span> : t('vh.noPlate')}
+            {jobs.length > 0 && <> · {t('vh.summary', { jobs: plural(lang, 'unit.jobs', jobs.length), amount: formatMoney(lang, sumCosts(jobs)) })}</>}
+          </>
+        }
+      />
 
       {jobs.length === 0 && imported.length === 0 ? (
         <EmptyState

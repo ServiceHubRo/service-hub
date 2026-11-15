@@ -104,7 +104,7 @@ export function MenuButton({
   }, [open]);
 
   return (
-    <div className={styles.wrap} ref={wrapRef}>
+    <div data-ui="menu" className={styles.wrap} ref={wrapRef}>
       <button
         ref={buttonRef}
         type="button"

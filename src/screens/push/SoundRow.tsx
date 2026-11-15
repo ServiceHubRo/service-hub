@@ -1,11 +1,11 @@
 import { Play, Volume2, VolumeX } from 'lucide-react';
 import { useState } from 'react';
-import { buttonClass } from '../../components/buttonClass';
 import { Card } from '../../components/Card';
 import { Switch } from '../../components/Switch';
 import { useI18n } from '../../i18n/context';
 import { playChime, setChimeOn, useChimeOn } from '../../lib/chime';
 import styles from './push.module.css';
+import { Button } from '../../components/Button';
 
 /**
  * The new-booking chime on this device (T47), in the shop's Cont under push: on or off, and
@@ -40,10 +40,10 @@ export function SoundRow() {
           {t('notif.sound')}
         </Switch>
       </div>
-      <button type="button" className={buttonClass('secondary', false, styles.listen)} onClick={() => void listen()}>
+      <Button className={styles.listen} onClick={() => void listen()}>
         <Play size={16} aria-hidden="true" />
         {t('notif.sound.play')}
-      </button>
+      </Button>
       {failed && (
         <p className={styles.hint} role="status">
           {t('notif.sound.failed')}

@@ -5,7 +5,7 @@ import { Button } from '../../components/Button';
 import { Card } from '../../components/Card';
 import { LoadError } from '../../components/LoadError';
 import { SkeletonList } from '../../components/Skeleton';
-import { StatusBadge } from '../../components/StatusBadge';
+import { BookingStatusPill } from '../../components/StatusPill';
 import { Stars } from '../../components/Stars';
 import { deleteAccount, fetchShop, setShopSuspended, verifyPhone, type AdminShopDetail } from '../../data/admin';
 import { toRpcError } from '../../data/rpc';
@@ -24,6 +24,7 @@ import { EditPanel, PricePanel, StatusPanel, TrialPanel } from './ShopPanels';
 import { useLiveData } from './useLiveData';
 import { carText, dateTime, day, stripeRuns } from './format';
 import styles from './admin.module.css';
+import { PageHeader } from '../../components/PageHeader';
 
 type Panel = 'suspend' | 'unsuspend' | 'phone' | 'trial' | 'status' | 'price' | 'edit' | 'delete' | null;
 
@@ -75,13 +76,9 @@ export function ShopDetailScreen() {
 
   return (
     <div className={styles.page}>
-      <BackLink to={ADMIN_SHOPS_PATH} label={t('nav.admin.shops')} />
+      <PageHeader back={{ to: ADMIN_SHOPS_PATH, label: t('nav.admin.shops') }} title={s.name} subtitle={<ShopStatePill state={d.state} />} />
 
       <Card className={styles.stack}>
-        <div className={styles.cardHead}>
-          <h1 className={styles.cardTitle}>{s.name}</h1>
-          <ShopStatePill state={d.state} />
-        </div>
         <span className={styles.rowMeta}>
           <span className={styles.id}>{o.display_id}</span>
           <span>{[s.street, s.city].filter(Boolean).join(', ')}</span>
@@ -396,7 +393,7 @@ export function ShopDetailScreen() {
                   <span className={styles.rowMain}>
                     <span className={styles.rowTop}>
                       <span className={styles.rowTitle}>{(lang === 'ro' ? b.service_ro : b.service_en) ?? ''}</span>
-                      <StatusBadge status={b.status} />
+                      <BookingStatusPill status={b.status} viewer="admin" />
                     </span>
                     <span className={styles.rowMeta}>
                       <span className={styles.id}>{b.ref}</span>

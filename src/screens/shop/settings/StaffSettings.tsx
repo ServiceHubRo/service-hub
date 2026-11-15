@@ -31,6 +31,7 @@ import { SETTINGS_PATH } from './paths';
 import { useShopSettings } from './shopSettingsContext';
 import styles from './settings.module.css';
 import own from './StaffSettings.module.css';
+import { StatusPill } from '../../../components/StatusPill';
 
 /**
  * The invitation token belongs to one request id: a retry of the same request must send the same
@@ -245,9 +246,7 @@ function MemberCard({
             </p>
           )}
         </div>
-        <span className={member.role === 'owner' ? own.roleOwner : own.role}>
-          {t(member.role === 'owner' ? 'staff.owner' : 'staff.member')}
-        </span>
+        <StatusPill tone={member.role === 'owner' ? 'action' : 'neutral'}>{t(member.role === 'owner' ? 'staff.owner' : 'staff.member')}</StatusPill>
       </div>
 
       {member.role === 'staff' && !confirming && (

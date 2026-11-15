@@ -29,7 +29,7 @@ export function PhoneField({ label, country, onCountryChange, value, onChange, h
   const dial = PHONE_COUNTRIES.find((c) => c.code === country)?.dial ?? '40';
   const touch = useTouchSelect((e) => onCountryChange(e.target.value));
   return (
-    <div className={fieldStyles.field}>
+    <div data-ui="phone" className={fieldStyles.field}>
       <label htmlFor={id} className={fieldStyles.label}>
         {label}
       </label>

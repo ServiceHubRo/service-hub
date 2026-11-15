@@ -22,6 +22,8 @@ import { SupportDashboardPanel, WaitingPill } from './Dashboard';
 import { RequestStatusPill } from './parts';
 import { useInbox } from './useInbox';
 import styles from './requests.module.css';
+import { StatusPill } from '../../components/StatusPill';
+import { toneOf } from '../../lib/statusTone';
 
 const loadMeta = () => Promise.all([fetchSupportCategories(), listStaff()]);
 
@@ -172,8 +174,8 @@ function InboxRow({ r, now, to, categoryLabel }: { r: StaffRequestItem; now: Dat
         <span className={styles.rowTop}>
           <span className={styles.rowTitle}>{r.title}</span>
           <RequestStatusPill status={r.status} staff />
-          {r.escalated && <span className={`${styles.pill} ${styles.red}`}>{t('support.inbox.escalated')}</span>}
-          {r.held && <span className={`${styles.pill} ${styles.amber}`}>{t('admin.holds.pill')}</span>}
+          {r.escalated && <StatusPill tone={toneOf('red')}>{t('support.inbox.escalated')}</StatusPill>}
+          {r.held && <StatusPill tone={toneOf('amber')}>{t('admin.holds.pill')}</StatusPill>}
         </span>
         <span className={styles.meta}>
           <span>{categoryLabel}</span>

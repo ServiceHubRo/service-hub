@@ -16,7 +16,7 @@ export interface SearchFieldProps {
 /** Search box with the magnifier and a clear button (Caută, Istoric). 16 px text: no iOS zoom. */
 export function SearchField({ id, label, placeholder, value, onChange, onClear, clearLabel }: SearchFieldProps) {
   return (
-    <div className={styles.box}>
+    <div data-ui="search" className={styles.box}>
       <label htmlFor={id} className="visually-hidden">
         {label}
       </label>

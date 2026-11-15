@@ -55,6 +55,7 @@ export function ActionButton({
   return (
     <div className={block ? styles.wrapBlock : styles.wrap}>
       <button
+        data-ui="action-button"
         type={submit ? 'submit' : 'button'}
         form={submit ? form : undefined}
         className={buttonClass(variant, block, className ? `${styles.action} ${className}` : styles.action)}

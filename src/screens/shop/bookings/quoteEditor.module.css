@@ -312,11 +312,6 @@
     padding-bottom: 10px;
   }
 
-  .extra {
-    grid-template-columns: minmax(0, 260px) minmax(0, 1fr);
-    align-items: start;
-  }
-
   .totals {
     align-self: flex-end;
     width: 360px;

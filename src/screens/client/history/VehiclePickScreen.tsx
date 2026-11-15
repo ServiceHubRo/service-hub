@@ -14,6 +14,7 @@ import { NAV } from '../../../app/roles';
 import { useClientBookings } from '../bookings/clientBookingsContext';
 import { bookingCarHistoryPath, carHistoryPath, SEARCH_PATH, type VehicleHistoryLinkState } from '../paths';
 import styles from './vehiclePick.module.css';
+import { PageHeader } from '../../../components/PageHeader';
 
 const FROM_ACCOUNT: VehicleHistoryLinkState = { from: 'account' };
 
@@ -90,10 +91,7 @@ export function VehiclePickScreen() {
   return (
     <div className={styles.page}>
       {back}
-      <div>
-        <h1>{t('vh.title')}</h1>
-        <p className={styles.hint}>{t('vh.pick')}</p>
-      </div>
+      <PageHeader title={t('vh.title')} subtitle={t('vh.pick')} />
       {body}
     </div>
   );

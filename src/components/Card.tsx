@@ -12,5 +12,5 @@ export function Card({ highlight, inset, className, ...rest }: CardProps) {
   const cls = [inset ? styles.inset : styles.card, highlight ? styles.highlight : '', className ?? '']
     .filter(Boolean)
     .join(' ');
-  return <div className={cls} {...rest} />;
+  return <div data-ui="card" className={cls} {...rest} />;
 }

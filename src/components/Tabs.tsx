@@ -50,7 +50,7 @@ export function Tabs<K extends string>({
   }
 
   return (
-    <div className={styles.tabs} role="tablist" aria-label={label}>
+    <div data-ui="tabs" className={styles.tabs} role="tablist" aria-label={label}>
       {items.map((item, i) => {
         const on = item.key === value;
         return (

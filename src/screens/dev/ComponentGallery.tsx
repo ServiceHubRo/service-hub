@@ -12,7 +12,6 @@ import { Chip, ChipRow } from '../../components/Chip';
 import { EmptyState } from '../../components/EmptyState';
 import { Field } from '../../components/Field';
 import { SkeletonList } from '../../components/Skeleton';
-import { StatusBadge } from '../../components/StatusBadge';
 import { BookingStatusPill } from '../../components/StatusPill';
 import { Link } from 'react-router-dom';
 import { TEMPLATE_SLUGS, TEMPLATES_PATH } from './paths';
@@ -155,7 +154,7 @@ export function ComponentGallery() {
         <Section title={t('demo.statuses')}>
           <div className={styles.wrap}>
             {BOOKING_STATUSES.map((s) => (
-              <StatusBadge key={s} status={s} />
+              <BookingStatusPill key={s} status={s} viewer="shop" />
             ))}
           </div>
         </Section>
@@ -239,7 +238,7 @@ export function ComponentGallery() {
             <Card>
               <div className={styles.cardRow}>
                 <strong>{t('demo.cardTitle')}</strong>
-                <StatusBadge status="quote_sent" />
+                <BookingStatusPill status="quote_sent" viewer="shop" />
               </div>
               <p className={styles.muted}>{t('demo.cardBody')}</p>
               <Card inset>
@@ -252,7 +251,7 @@ export function ComponentGallery() {
             <Card highlight>
               <div className={styles.cardRow}>
                 <strong>{t('demo.cardTitle')}</strong>
-                <StatusBadge status="pending" />
+                <BookingStatusPill status="pending" viewer="shop" />
               </div>
             </Card>
           </div>

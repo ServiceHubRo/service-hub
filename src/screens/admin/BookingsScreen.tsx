@@ -7,10 +7,9 @@ import { LoadError } from '../../components/LoadError';
 import { SearchField } from '../../components/SearchField';
 import { SelectField } from '../../components/SelectField';
 import { SkeletonList } from '../../components/Skeleton';
-import { StatusBadge } from '../../components/StatusBadge';
+import { BookingStatusPill } from '../../components/StatusPill';
 import { fetchBookings } from '../../data/admin';
 import { ExportButton } from './ExportButton';
-import { BackLink } from '../../components/BackLink';
 import { adminZoneBack } from '../../app/adminZones';
 import { useI18n } from '../../i18n/context';
 import {
@@ -27,6 +26,7 @@ import { useLiveData } from './useLiveData';
 import { useUrlParams } from './useUrlParams';
 import { carText, day } from './format';
 import styles from './admin.module.css';
+import { PageHeader } from '../../components/PageHeader';
 
 /** „‹ Înapoi” goes to the screen's zone (A1). */
 const ZONE_BACK = adminZoneBack(ADMIN_BOOKINGS_PATH);
@@ -68,11 +68,7 @@ export function BookingsScreen() {
 
   return (
     <div className={styles.page}>
-      <BackLink to={ZONE_BACK.to} label={t(ZONE_BACK.label)} />
-      <div>
-        <h1>{t('nav.admin.bookings')}</h1>
-        {data && <p className={styles.sub}>{t('admin.bookings.count', { shown: data.bookings.length, total: data.total })}</p>}
-      </div>
+      <PageHeader back={{ to: ZONE_BACK.to, label: t(ZONE_BACK.label) }} title={t('nav.admin.bookings')} subtitle={data ? t('admin.bookings.count', { shown: data.bookings.length, total: data.total }) : undefined} />
 
       <div className={styles.controls}>
         <SearchField
@@ -143,7 +139,7 @@ export function BookingsScreen() {
                   <RowLink to={adminBookingPath(b.id)}>
                     <span className={styles.rowTop}>
                       <span className={styles.rowTitle}>{(lang === 'ro' ? b.service_ro : b.service_en) ?? b.service_id}</span>
-                      <StatusBadge status={b.status} />
+                      <BookingStatusPill status={b.status} viewer="admin" />
                     </span>
                     <span className={styles.rowMeta}>
                       <span className={styles.id}>{b.ref}</span>

@@ -1,7 +1,6 @@
 import { ScrollText } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { BackLink } from '../../components/BackLink';
 import { Button } from '../../components/Button';
 import { EmptyState } from '../../components/EmptyState';
 import { LoadError } from '../../components/LoadError';
@@ -15,6 +14,7 @@ import { useLoad } from '../../lib/useLoad';
 import { AuditList } from './parts';
 import { ADMIN_AUDIT_PATH, ADMIN_TEAM_PATH, ADMIN_CATALOG_PATH, ADMIN_MODERATION_PATH, ADMIN_NOTICES_PATH, ADMIN_REPORTS_PATH, adminHoldPath, adminRequestPath, ADMIN_RETENTION_PATH, ADMIN_TEXT_REVIEWS_PATH, ADMIN_TEXTS_PATH, adminBookingPath, adminClientPath, adminShopPath } from './paths';
 import styles from './admin.module.css';
+import { PageHeader } from '../../components/PageHeader';
 
 /** „‹ Înapoi” goes to the screen's zone (A1). */
 const ZONE_BACK = adminZoneBack(ADMIN_AUDIT_PATH);
@@ -114,10 +114,7 @@ export function AuditScreen() {
 
   return (
     <div className={styles.page}>
-      <BackLink to={ZONE_BACK.to} label={t(ZONE_BACK.label)} />
-      <div>
-        <h1>{t('admin.audit.title')}</h1>
-      </div>
+      <PageHeader back={{ to: ZONE_BACK.to, label: t(ZONE_BACK.label) }} title={t('admin.audit.title')} />
       {state.status === 'loading' && <SkeletonList />}
       {state.status === 'error' && <LoadError message={t('admin.loadError')} onRetry={reload} />}
       {state.status === 'ready' &&

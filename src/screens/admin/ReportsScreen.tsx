@@ -2,7 +2,6 @@ import { FileCheck, SearchX } from 'lucide-react';
 import { useDeferredValue, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ActionButton } from '../../components/ActionButton';
-import { BackLink } from '../../components/BackLink';
 import { Button } from '../../components/Button';
 import { Card } from '../../components/Card';
 import { EmptyState } from '../../components/EmptyState';
@@ -26,6 +25,7 @@ import { useLiveData } from './useLiveData';
 import { useUrlParams } from './useUrlParams';
 import { carText, dateTime } from './format';
 import styles from './admin.module.css';
+import { PageHeader } from '../../components/PageHeader';
 
 /** „‹ Înapoi” goes to the screen's zone (A1). */
 const ZONE_BACK = adminZoneBack(ADMIN_REPORTS_PATH);
@@ -132,11 +132,7 @@ export function ReportsScreen() {
 
   return (
     <div className={styles.page}>
-      <BackLink to={ZONE_BACK.to} label={t(ZONE_BACK.label)} />
-      <div>
-        <h1>{t('admin.reports.title')}</h1>
-        <p className={styles.sub}>{all ? plural(lang, 'unit.reports', shown.length) : t('admin.reports.sub')}</p>
-      </div>
+      <PageHeader back={{ to: ZONE_BACK.to, label: t(ZONE_BACK.label) }} title={t('admin.reports.title')} subtitle={all ? plural(lang, 'unit.reports', shown.length) : t('admin.reports.sub')} />
       {state.status === 'loading' && <SkeletonList />}
       {state.status === 'error' && <LoadError message={t('admin.loadError')} onRetry={reload} />}
       {all && all.length === 0 && <EmptyState icon={FileCheck} title={t('admin.reports.empty')} />}

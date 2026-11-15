@@ -3,6 +3,8 @@ import { appendFileSync, mkdirSync } from 'node:fs';
 import { dirname } from 'node:path';
 import { expect, test, type Browser, type Page } from '@playwright/test';
 import { fleetSetup } from '../e2e/fleet-support';
+import { measureFields, type FieldIssue } from '../e2e/fieldRules';
+import { measurePatterns, type Patterns } from '../e2e/patternRules';
 import { BACKEND, PASSWORD, SEED, SEED_PASSWORD, createUser, rpcAs, serviceRest, signIn, totp, userIdOf } from '../e2e/support';
 
 /**
@@ -10,8 +12,11 @@ import { BACKEND, PASSWORD, SEED, SEED_PASSWORD, createUser, rpcAs, serviceRest,
  * Romanian (and a second pass in English at 390 and 1440 px); other widths with VISUAL_WIDTHS. For
  * each screen and width it measures what a person would see as broken (horizontal scroll, something
  * off the screen, text out of its box or clipped, small tap targets, buttons on top of each other,
- * tiny text, inputs under 16 px, images that did not load, console errors) and keeps a screenshot.
- * Nothing is asserted: the result is `visual-audit/report.json` and the screenshots, read by a person.
+ * tiny text, inputs under 16 px, images that did not load, console errors, the field rules of
+ * tests/e2e/fieldRules.ts) and keeps a screenshot.
+ * Nothing is asserted: the result is the rows (`visual-audit/rows-*.jsonl`) and the screenshots, read by a
+ * person; `node scripts/consistency-report.mjs` turns the rows into the consistency report
+ * (docs/MODEL_DE_FOLOSIRE.md, docs/AUDIT_CONSISTENTA.md).
  *
  *   npm run test:visual   (with the local Supabase stack, like the browser tests: CLAUDE.md §9)
  */
@@ -68,6 +73,10 @@ interface Row extends Partial<Measured> {
   url: string;
   width: number;
   shot?: string;
+  /** The field rules (tests/e2e/fieldRules.ts): fields of one form equally wide, aligned, labelled. */
+  fields?: FieldIssue[];
+  /** The consistency audit (tests/e2e/patternRules.ts): which shared pattern builds each part of the screen. */
+  patterns?: Patterns;
   errors: string[];
   console: string[];
 }
@@ -313,7 +322,10 @@ async function audit(page: Page, role: string, screens: Screen[], lang: 'ro' | '
         }
         const m = await page.evaluate(measure);
         Object.assign(row, m);
-        const keep = lang === 'ro' ? ALWAYS_SHOT.has(width) || flagged(m) : flagged(m) || width === 390;
+        row.fields = await page.evaluate(measureFields);
+        row.patterns = await page.evaluate(measurePatterns, undefined);
+        const bad = flagged(m) || row.fields.length > 0;
+        const keep = lang === 'ro' ? ALWAYS_SHOT.has(width) || bad : bad || width === 390;
         if (keep) {
           const file = `shots/${lang}/${slug(role)}/${slug(screen.name)}__${width}.jpg`;
           mkdirSync(dirname(`${OUT}/${file}`), { recursive: true });
@@ -587,6 +599,7 @@ test.describe('A9 visual audit', () => {
     const screens: Screen[] = [
       { name: 'panou', path: '/s/panou' },
       { name: 'programari', path: '/s/programari' },
+      { name: 'programari-programate', path: '/s/programari?tab=programate' },
       { name: 'programari-deschise', path: '/s/programari', roOnly: true, prep: async (p) => {
           const closed = p.locator('main button[aria-controls^="booking-"][aria-expanded="false"]');
           for (let i = 0; i < 4 && (await closed.count()) > 0; i++) await closed.first().click();

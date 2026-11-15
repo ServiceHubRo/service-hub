@@ -8,7 +8,7 @@ import styles from './Skeleton.module.css';
 export function SkeletonList({ count = 3, cards = false }: { count?: number; cards?: boolean }) {
   const { t } = useI18n();
   return (
-    <div className={styles.list} aria-busy="true" role="status" data-layout={cards ? 'cards' : undefined}>
+    <div data-ui="skeleton" className={styles.list} aria-busy="true" role="status" data-layout={cards ? 'cards' : undefined}>
       <span className="visually-hidden">{t('common.loading')}</span>
       {Array.from({ length: count }, (_, i) => (
         <div key={i} className={styles.card} aria-hidden="true">
@@ -28,7 +28,7 @@ export function SkeletonList({ count = 3, cards = false }: { count?: number; car
 export function SkeletonGrid({ count, className }: { count: number; className?: string }) {
   const { t } = useI18n();
   return (
-    <div className={className} aria-busy="true" role="status">
+    <div data-ui="skeleton" className={className} aria-busy="true" role="status">
       <span className="visually-hidden">{t('common.loading')}</span>
       {Array.from({ length: count }, (_, i) => (
         <span key={i} className={`${styles.bar} ${styles.tile}`} aria-hidden="true" />
@@ -41,7 +41,7 @@ export function SkeletonGrid({ count, className }: { count: number; className?: 
 export function SkeletonBar() {
   const { t } = useI18n();
   return (
-    <div className={styles.single} aria-busy="true" role="status">
+    <div data-ui="skeleton" className={styles.single} aria-busy="true" role="status">
       <span className="visually-hidden">{t('common.loading')}</span>
       <span className={`${styles.bar} ${styles.w80}`} aria-hidden="true" />
       <span className={`${styles.bar} ${styles.w40}`} aria-hidden="true" />

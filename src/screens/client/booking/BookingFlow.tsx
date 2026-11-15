@@ -171,7 +171,7 @@ function Flow({ page }: { page: ShopPage }) {
         <BackLink to={urlFor({ pas: String(step - 1) })} />
       )}
       <Progress step={step} />
-      <div>
+      <div data-ui="step-header">
         <h1 ref={headingRef} tabIndex={-1} className={styles.title}>
           {t(STEP_TITLES[step as 1 | 2 | 3 | 4])}
         </h1>

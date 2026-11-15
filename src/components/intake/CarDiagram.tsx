@@ -68,7 +68,7 @@ export function CarDiagram({
   }
 
   return (
-    <button type="button" className={`${styles.frame} ${styles.editable}`} aria-label={label} onClick={add}>
+    <button type="button" data-ui="diagram" className={`${styles.frame} ${styles.editable}`} aria-label={label} onClick={add}>
       {drawing}
     </button>
   );

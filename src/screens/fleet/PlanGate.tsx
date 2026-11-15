@@ -4,8 +4,9 @@ import { Card } from '../../components/Card';
 import { useI18n } from '../../i18n/context';
 import { requiredPlan, type PlanFeature } from '../../lib/fleet';
 import { useFleet } from './fleetContext';
-import pill from '../../components/StatusBadge.module.css';
 import styles from './fleet.module.css';
+import { StatusPill } from '../../components/StatusPill';
+import { toneOf } from '../../lib/statusTone';
 
 /**
  * "Disponibil în Business" (T65): a discreet tag beside something the company's plan does not
@@ -16,7 +17,7 @@ export function PlanTag({ feature }: { feature: PlanFeature }) {
   const { plans } = useFleet();
   const plan = requiredPlan(feature, plans);
   if (!plan) return null;
-  return <span className={`${pill.pill} ${pill.amber} ${styles.planTag}`}>{t('fleet.plan.availableIn', { plan: lang === 'ro' ? plan.name_ro : plan.name_en })}</span>;
+  return <StatusPill tone={toneOf('amber')} className={styles.planTag}>{t('fleet.plan.availableIn', { plan: lang === 'ro' ? plan.name_ro : plan.name_en })}</StatusPill>;
 }
 
 /**

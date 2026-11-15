@@ -45,6 +45,8 @@ import { categoryName, dayText, whenText } from './format';
 import { AttachmentPicker } from './Attachments';
 import { Conversation, RequestStatusPill, type ConversationItem } from './parts';
 import styles from './requests.module.css';
+import { StatusPill } from '../../components/StatusPill';
+import { toneOf } from '../../lib/statusTone';
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -155,8 +157,8 @@ export function RequestScreen({ mode }: { mode: 'support' | 'admin' }) {
       <PageHeader back={back} title={r.title} />
       <div className={styles.meta}>
         <RequestStatusPill status={r.status} staff />
-        {escalated && <span className={`${styles.pill} ${styles.red}`}>{t('support.inbox.escalated')}</span>}
-        {held && <span className={`${styles.pill} ${styles.amber}`}>{t('admin.holds.pill')}</span>}
+        {escalated && <StatusPill tone={toneOf('red')}>{t('support.inbox.escalated')}</StatusPill>}
+        {held && <StatusPill tone={toneOf('amber')}>{t('admin.holds.pill')}</StatusPill>}
         <span>{categoryName(categories, r.category, lang)}</span>
       </div>
 
@@ -298,6 +300,7 @@ function Responsible({ request, me, staff, onDone }: { request: StaffRequestDeta
       {others.length > 0 && (
         <>
           <SelectField
+            className={styles.assignPick}
             label={t('support.detail.assignTo')}
             value={chosen}
             onChange={(e) => setTo(e.target.value)}

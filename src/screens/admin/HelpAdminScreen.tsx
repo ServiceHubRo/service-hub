@@ -3,7 +3,6 @@ import { useCallback, useDeferredValue, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { adminZoneBack } from '../../app/adminZones';
 import { ActionButton } from '../../components/ActionButton';
-import { BackLink } from '../../components/BackLink';
 import { Button } from '../../components/Button';
 import { buttonClass } from '../../components/buttonClass';
 import { Card } from '../../components/Card';
@@ -43,6 +42,7 @@ import { useUrlParams } from './useUrlParams';
 import styles from './admin.module.css';
 import tools from './tools.module.css';
 import rowStyles from './helpAdmin.module.css';
+import { PageHeader } from '../../components/PageHeader';
 
 const ZONE_BACK = adminZoneBack(ADMIN_HELP_PATH);
 const STATUS_TONE: Record<HelpStatus, 'green' | 'amber' | 'grey'> = { published: 'green', draft: 'amber', archived: 'grey' };
@@ -257,11 +257,7 @@ export function HelpAdminScreen() {
 
   return (
     <div className={styles.page}>
-      <BackLink to={ZONE_BACK.to} label={t(ZONE_BACK.label)} />
-      <div>
-        <h1>{t('admin.help.title')}</h1>
-        <p className={styles.sub}>{t('admin.help.sub')}</p>
-      </div>
+      <PageHeader back={{ to: ZONE_BACK.to, label: t(ZONE_BACK.label) }} title={t('admin.help.title')} subtitle={t('admin.help.sub')} />
       {state.status === 'loading' && <SkeletonList />}
       {state.status === 'error' && <LoadError message={t('admin.loadError')} onRetry={reload} />}
       {data && (
@@ -279,16 +275,17 @@ export function HelpAdminScreen() {
               }}
               clearLabel={t('admin.search.clear')}
             />
+            {/* The filter under the search, as wide as it (docs/MODEL_DE_FOLOSIRE.md F2). */}
+            <SelectField
+              label={t('admin.help.statusFilter')}
+              value={status}
+              options={[
+                { value: '', label: t('admin.help.statusAll') },
+                ...(['published', 'draft', 'archived'] as const).map((s) => ({ value: s, label: t(`admin.help.status.${s}`) })),
+              ]}
+              onChange={(e) => setParam({ stare: e.target.value || null })}
+            />
             <div className={rowStyles.toolbar}>
-              <SelectField
-                label={t('admin.help.statusFilter')}
-                value={status}
-                options={[
-                  { value: '', label: t('admin.help.statusAll') },
-                  ...(['published', 'draft', 'archived'] as const).map((s) => ({ value: s, label: t(`admin.help.status.${s}`) })),
-                ]}
-                onChange={(e) => setParam({ stare: e.target.value || null })}
-              />
               <div className={`${styles.panelButtons} ${rowStyles.toolbarButtons}`}>
                 <Link to={adminHelpArticlePath('nou')} className={buttonClass('primary')}>
                   <Plus size={18} aria-hidden="true" /> {t('admin.help.newArticle')}

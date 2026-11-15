@@ -1,7 +1,6 @@
 import { Megaphone } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { ActionButton } from '../../components/ActionButton';
-import { BackLink } from '../../components/BackLink';
 import { Button } from '../../components/Button';
 import { Card } from '../../components/Card';
 import { Switch } from '../../components/Switch';
@@ -34,6 +33,7 @@ import { useLiveData } from './useLiveData';
 import { dateTime } from './format';
 import styles from './admin.module.css';
 import tools from './tools.module.css';
+import { PageHeader } from '../../components/PageHeader';
 
 /** „‹ Înapoi” goes to the screen's zone (A1). */
 const ZONE_BACK = adminZoneBack(ADMIN_NOTICES_PATH);
@@ -234,11 +234,7 @@ export function NoticesScreen() {
 
   return (
     <div className={styles.page}>
-      <BackLink to={ZONE_BACK.to} label={t(ZONE_BACK.label)} />
-      <div>
-        <h1>{t('admin.notices.title')}</h1>
-        <p className={styles.sub}>{t('admin.notices.sub')}</p>
-      </div>
+      <PageHeader back={{ to: ZONE_BACK.to, label: t(ZONE_BACK.label) }} title={t('admin.notices.title')} subtitle={t('admin.notices.sub')} />
       <SectionTitle>{t('admin.notices.new')}</SectionTitle>
       <Composer
         key={composer}

@@ -38,6 +38,8 @@ import { SETTINGS_LINKS } from '../settings/paths';
 import { ACCOUNT_PATH } from '../paths';
 import { ReferralCard } from './ReferralCard';
 import styles from './subscription.module.css';
+import { StatusPill } from '../../../components/StatusPill';
+import { toneOf } from '../../../lib/statusTone';
 
 /**
  * Abonament (FR §4.7, P12, P12b): the owner's tile in Cont. Where the subscription stands (free
@@ -163,7 +165,7 @@ function StatusCard({ data, view }: { data: SubscriptionData; view: Subscription
     <Card className={view.goodStanding ? styles.status : `${styles.status} ${styles.statusBad}`}>
       <div className={styles.statusHead}>
         <span className={styles.statusLabel}>{t('sub.status')}</span>
-        <span className={`${styles.pill} ${styles[TONE_CLASS[STATE_TONE[view.state]]]}`}>{t(`sub.state.${view.state}`)}</span>
+        <StatusPill tone={toneOf(STATE_TONE[view.state])}>{t(`sub.state.${view.state}`)}</StatusPill>
       </div>
       {inTrial && view.daysLeft! > 0 && (
         <>
@@ -214,7 +216,6 @@ function SeatsLine({ sub }: { sub: SubscriptionData['subscription'] }) {
   );
 }
 
-const TONE_CLASS = { amber: 'toneAmber', green: 'toneGreen', red: 'toneRed', muted: 'toneMuted' } as const;
 
 const FEATURES: MessageKey[] = ['sub.feature.all', 'sub.feature.capacity', 'sub.feature.ranking', 'sub.feature.cancel'];
 
@@ -234,7 +235,7 @@ function PeriodChoice({ offers, months, onChange }: { offers: PeriodOffer[]; mon
     <fieldset className={styles.periods}>
       <legend className={styles.periodsLegend}>{t('sub.period.legend')}</legend>
       {offers.map((o) => (
-        <label key={o.months} className={styles.period}>
+        <label key={o.months} data-ui="choice" className={styles.period}>
           <input
             type="radio"
             name={name}

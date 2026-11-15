@@ -31,7 +31,6 @@ import {
 } from '../../../data/companies';
 import { rpcErrorMessage } from '../../../data/rpc';
 import { fetchFleetPlans, fetchPlanSummary } from '../../../data/fleet';
-import pill from '../../../components/StatusBadge.module.css';
 import { useI18n } from '../../../i18n/context';
 import { formatDate, formatMoney } from '../../../i18n/format';
 import { can, FLEET_ROLES, memberCan, requiredPlan, type FleetPlanRow, type FleetRole, type PlanFeature } from '../../../lib/fleet';
@@ -44,6 +43,8 @@ import { RolePill } from './RolePill';
 import { rightsSummary, ticksFor } from './rights';
 import styles from './companies.module.css';
 import { useOptionalWorkspace } from '../../../app/workspace/workspaceContext';
+import { StatusPill } from '../../../components/StatusPill';
+import { toneOf } from '../../../lib/statusTone';
 
 interface Loaded {
   company: Company;
@@ -206,7 +207,7 @@ function DetailsCard({ company, canEdit, onSaved }: { company: Company; canEdit:
           <div className={styles.buttons}>
             <ActionButton
               submit
-              variant="primary"
+              variant="secondary"
               errorMessage={(e) => rpcErrorMessage(lang, e)}
               onAction={async (requestId) => {
                 const next: Partial<Record<DetailField, string>> = {};
@@ -306,7 +307,7 @@ function RulesCard({
         <div>
           <ActionButton
             submit
-            variant="primary"
+            variant="secondary"
             errorMessage={(e) => rpcErrorMessage(lang, e)}
             onAction={async (requestId) => {
               const parse = (v: string) => (v.trim() ? importAmount(v) : null);
@@ -374,7 +375,7 @@ function InviteCard({ companyId, adminInvite, onInvited }: { companyId: string; 
         <div>
           <ActionButton
             submit
-            variant="primary"
+            variant="secondary"
             errorMessage={(e) => rpcErrorMessage(lang, e)}
             onAction={async (requestId) => {
               if (!looksLikeEmail(email)) {
@@ -422,7 +423,7 @@ function LinkPanel({ email, url }: { email: string; url: string }) {
         {t('staff.link')}
       </label>
       <input id="company-invite-link" ref={inputRef} readOnly className={`mono ${styles.linkInput}`} value={url} onFocus={(e) => e.target.select()} />
-      <Button variant="primary" block onClick={() => void copy()}>
+      <Button variant="secondary" block onClick={() => void copy()}>
         {copied ? <Check size={18} aria-hidden="true" /> : <Copy size={18} aria-hidden="true" />}
         {copied ? t('staff.copied') : t('staff.copy')}
       </Button>
@@ -699,7 +700,7 @@ function RightsPanel({
       )}
       <div className={styles.buttons}>
         <ActionButton
-          variant="primary"
+          variant="secondary"
           errorMessage={(e) => rpcErrorMessage(lang, e)}
           onAction={async (requestId) => {
             const value = limitField && limit.trim() ? importAmount(limit) : null;
@@ -766,5 +767,5 @@ function PlanPill({ feature, plans }: { feature: PlanFeature; plans: FleetPlanRo
   const { t, lang } = useI18n();
   const plan = requiredPlan(feature, plans);
   if (!plan) return null;
-  return <span className={`${pill.pill} ${pill.amber}`}>{t('fleet.plan.availableIn', { plan: lang === 'ro' ? plan.name_ro : plan.name_en })}</span>;
+  return <StatusPill tone={toneOf('amber')}>{t('fleet.plan.availableIn', { plan: lang === 'ro' ? plan.name_ro : plan.name_en })}</StatusPill>;
 }

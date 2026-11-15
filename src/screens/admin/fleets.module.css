@@ -71,6 +71,11 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 140px), 1fr));
   gap: 10px;
+  max-width: var(--field-max);
+}
+
+.fields > * {
+  --field-max: none;
 }
 
 /* Vehicule duplicate (T66): the records of one car, one per line. */

@@ -11,20 +11,14 @@ import { auditChanges } from '../../lib/admin';
 import { actionLabel, dateTime } from './format';
 import { ro } from '../../i18n/ro';
 import styles from './admin.module.css';
+import { StatusPill } from '../../components/StatusPill';
+import { toneOf } from '../../lib/statusTone';
 
 type Tone = 'amber' | 'green' | 'blue' | 'red' | 'grey';
 
-const TONE_CLASS: Record<Tone, string> = {
-  amber: styles.amber!,
-  green: styles.green!,
-  blue: styles.blue!,
-  red: styles.red!,
-  grey: styles.greyPill!,
-};
-
-/** Text + color, never color alone (ARCHITECTURE §17). */
+/** Text + color, never color alone (ARCHITECTURE §17): the shared StatusPill. */
 export function Pill({ tone, children }: { tone: Tone; children: ReactNode }) {
-  return <span className={`${styles.pill} ${TONE_CLASS[tone]}`}>{children}</span>;
+  return <StatusPill tone={toneOf(tone)}>{children}</StatusPill>;
 }
 
 const SHOP_TONE: Record<ShopState, Tone> = { active: 'green', trial: 'blue', inactive: 'amber', suspended: 'red', deleted: 'grey' };

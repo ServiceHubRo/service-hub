@@ -260,7 +260,9 @@ test.describe('client reminders', () => {
     const lastField = page.getByLabel('Ultimul schimb de ulei');
     await lastField.fill(addMonths(today, 1));
     await expect(page.getByText('Data ultimului schimb de ulei nu poate fi în viitor.')).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Salvează' })).toBeDisabled();
+    // Saved only once the date is right (the form of „Adaugă vehicul”: the button stays on).
+    await page.getByRole('button', { name: 'Salvează mașina' }).click();
+    await expect(page).toHaveURL(/\/c\/garaj\/[^/]+$/);
     await lastField.fill(lastDay);
     await expect(page.getByText('Data ultimului schimb de ulei nu poate fi în viitor.')).toHaveCount(0);
     await expectNoHorizontalScroll(page);

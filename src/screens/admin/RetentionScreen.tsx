@@ -1,6 +1,5 @@
 import { Fragment, useCallback, useState } from 'react';
 import { ActionButton } from '../../components/ActionButton';
-import { BackLink } from '../../components/BackLink';
 import { Button } from '../../components/Button';
 import { Card } from '../../components/Card';
 import { InlinePanel } from '../../components/InlinePanel';
@@ -41,6 +40,7 @@ import { Pill, SectionTitle } from './parts';
 import { ADMIN_RETENTION_PATH } from './paths';
 import styles from './admin.module.css';
 import supportStyles from '../support/support.module.css';
+import { PageHeader } from '../../components/PageHeader';
 
 /** „‹ Platformă” (A1). */
 const ZONE_BACK = adminZoneBack(ADMIN_RETENTION_PATH);
@@ -508,11 +508,7 @@ export function RetentionScreen() {
 
   return (
     <div className={styles.page}>
-      <BackLink to={ZONE_BACK.to} label={t(ZONE_BACK.label)} />
-      <div>
-        <h1>{t('admin.retention.title')}</h1>
-        <p className={styles.muted}>{t('admin.retention.desc')}</p>
-      </div>
+      <PageHeader back={{ to: ZONE_BACK.to, label: t(ZONE_BACK.label) }} title={t('admin.retention.title')} subtitle={t('admin.retention.desc')} />
       {state.status === 'loading' && <SkeletonList />}
       {state.status === 'error' && <LoadError message={t('admin.retention.loadError')} onRetry={reload} />}
       {state.status === 'ready' && (

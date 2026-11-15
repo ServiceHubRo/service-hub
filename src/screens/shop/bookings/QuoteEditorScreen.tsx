@@ -46,6 +46,7 @@ import { shopBookingsLink } from '../paths';
 import type { DoneState } from './ShopBookingsScreen';
 import { useShopBookings } from './shopBookingsContext';
 import styles from './quoteEditor.module.css';
+import { PageHeader } from '../../../components/PageHeader';
 
 const NOTE_MAX = 2000;
 /** A VAT payer's choice of typing prices without VAT, kept on this device. */
@@ -126,7 +127,12 @@ export function QuoteEditorScreen() {
     const booking = state.data.bookings.find((b) => b.id === bookingId);
     // An old link to a booking that can no longer get a quote: a state of its own (A9), not a bare line.
     if (!booking || (booking.status !== 'in_inspection' && booking.status !== 'quote_sent'))
-      body = <EmptyState icon={FileLock} title={t('qe.unavailable')} />;
+      body = (
+        <>
+          <PageHeader title={t('qe.title.send')} />
+          <EmptyState icon={FileLock} title={t('qe.unavailable')} />
+        </>
+      );
     else
       body = (
         <Editor
@@ -322,7 +328,7 @@ function Editor({
     const altBani = part === 'both' && row.altPrice ? rowBani({ ...row, price: row.altPrice }, priceMode) : 0;
     return (
       <li key={row.key} className={styles.line}>
-        <div className={`${styles.grid} ${isPart ? styles.partGrid : styles.laborGrid}`}>
+        <div data-fields="table" className={`${styles.grid} ${isPart ? styles.partGrid : styles.laborGrid}`}>
           <Field
             className={styles.name}
             label={isPart ? t('qe.part') : t('qe.operation')}
@@ -375,14 +381,9 @@ function Editor({
             <span className={styles.amountLabel}>{t('qe.lineTotal')}</span>
             <span className="mono">{formatMoney(lang, amount)}</span>
           </p>
-          <button
-            type="button"
-            className={styles.remove}
-            aria-label={t(isPart ? 'qe.removePart' : 'qe.removeLabor', { n })}
-            onClick={() => removeRow(row.key)}
-          >
+          <Button variant="ghost" className={styles.remove} aria-label={t(isPart ? 'qe.removePart' : 'qe.removeLabor', { n })} onClick={() => removeRow(row.key)}>
             <Trash2 size={18} aria-hidden="true" />
-          </button>
+          </Button>
         </div>
         {isPart && (
           <SelectField
@@ -394,7 +395,7 @@ function Editor({
           />
         )}
         {isPart && part === 'both' && (
-          <div className={`${styles.grid} ${styles.altGrid}`}>
+          <div data-fields="table" className={`${styles.grid} ${styles.altGrid}`}>
             <Field
               className={styles.producer}
               label={t('qe.altProducer')}
@@ -438,10 +439,10 @@ function Editor({
           <span className="mono">{formatMoney(lang, sum)}</span>
         </div>
         <ol className={styles.lines}>{list.map((r, i) => renderRow(r, i + 1))}</ol>
-        <button type="button" className={styles.add} onClick={() => addRow(kind)} disabled={rows.length >= QUOTE_ROWS_MAX}>
+        <Button variant="ghost" className={styles.add} onClick={() => addRow(kind)} disabled={rows.length >= QUOTE_ROWS_MAX}>
           <Plus size={18} aria-hidden="true" />
           {kind === 'labor' ? t('qe.addLabor') : t('qe.addPart')}
-        </button>
+        </Button>
       </section>
     );
   };
@@ -460,8 +461,7 @@ function Editor({
         nextRow(key);
       }}
     >
-      <h1>{mode === 'send' ? t('qe.title.send') : t('qe.title.replace')}</h1>
-      {mode === 'replace' && <p className={styles.muted}>{t('sb.quote.editBody')}</p>}
+      <PageHeader title={mode === 'send' ? t('qe.title.send') : t('qe.title.replace')} subtitle={mode === 'replace' ? t('sb.quote.editBody') : undefined} />
 
       <Card className={styles.car}>
         <p className={styles.carName}>

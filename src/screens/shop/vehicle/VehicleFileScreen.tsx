@@ -19,6 +19,7 @@ import { SHOP_HISTORY_PATH, shopBookingsLink, type VehicleFileFrom } from '../pa
 import history from '../../history/history.module.css';
 import { timelineClass, timelineItem } from '../../history/timeline';
 import styles from './vehicleFile.module.css';
+import { PageHeader } from '../../../components/PageHeader';
 
 /**
  * Fișa mașinii (T27): the car of one booking — make, model, plate, VIN, the client — and every job
@@ -84,7 +85,7 @@ export function VehicleFileScreen({ from }: { from: VehicleFileFrom }) {
   return (
     <div className={history.page}>
       {back}
-      <h1>{t('vf.title')}</h1>
+      <PageHeader title={t('vf.title')} />
 
       <Card className={styles.head}>
         <p className={styles.carName}>

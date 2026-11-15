@@ -11,7 +11,7 @@ export interface CheckboxProps extends Omit<ComponentProps<'input'>, 'type'> {
 /** A real checkbox (keyboard and screen reader friendly) with the amber box look. */
 export function Checkbox({ children, className, indeterminate = false, ...rest }: CheckboxProps) {
   return (
-    <label className={`${styles.row} ${className ?? ''}`}>
+    <label data-ui="checkbox" className={`${styles.row} ${className ?? ''}`}>
       <input
         type="checkbox"
         className={styles.input}

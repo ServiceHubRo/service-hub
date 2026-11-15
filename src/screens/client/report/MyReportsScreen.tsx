@@ -4,7 +4,6 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { NAV } from '../../../app/roles';
 import { useSession } from '../../../app/sessionContext';
 import { ActionButton } from '../../../components/ActionButton';
-import { BackLink } from '../../../components/BackLink';
 import { Banner } from '../../../components/Banner';
 import { Card } from '../../../components/Card';
 import { EmptyState } from '../../../components/EmptyState';
@@ -31,6 +30,8 @@ import { useNow } from '../../../lib/useNow';
 import { useClientBookings } from '../bookings/clientBookingsContext';
 import { bookingReportPath, carReportPath, type ReportLinkState } from '../paths';
 import styles from './report.module.css';
+import { StatusPill } from '../../../components/StatusPill';
+import { PageHeader } from '../../../components/PageHeader';
 
 const FROM_REPORTS: ReportLinkState = { from: 'reports' };
 /** A paid report still without its PDF after this long gets "Pregătește raportul acum". */
@@ -80,10 +81,7 @@ export function MyReportsScreen() {
 
   return (
     <div className={styles.page}>
-      <BackLink to={NAV.client.account.path} label={t('nav.account')} />
-      <div>
-        <h1>{t('reports.title')}</h1>
-      </div>
+      <PageHeader back={{ to: NAV.client.account.path, label: t('nav.account') }} title={t('reports.title')} />
 
       {returned && (
         <Banner tone="info">{justPaid?.status === 'generated' ? t('reports.return.done') : t('reports.return.ok')}</Banner>
@@ -121,8 +119,6 @@ function ReportCard({ report: r, highlighted }: { report: MyReport; highlighted:
   const now = useNow(15_000);
   const [retried, setRetried] = useState(false);
   const car = [r.car_snapshot.make, r.car_snapshot.model].filter(Boolean).join(' ') || t('sb.card.noCar');
-  const pill =
-    r.status === 'generated' ? styles.pillGreen : r.status === 'void' ? styles.pillMuted : styles.pillAmber;
   const since = r.paid_at ? now.getTime() - new Date(r.paid_at).getTime() : 0;
   const errorMessage = (e: unknown) => (e instanceof ReportError ? t(`report.error.${e.problem}` as MessageKey) : rpcErrorMessage(lang, e));
 
@@ -133,10 +129,10 @@ function ReportCard({ report: r, highlighted }: { report: MyReport; highlighted:
           <p className={styles.carName}>{car}</p>
           {r.car_snapshot.plate && <p className={`mono ${styles.plate}`}>{r.car_snapshot.plate}</p>}
         </div>
-        <span className={`${styles.pill} ${pill}`}>
+        <StatusPill tone={r.status === 'generated' ? 'success' : r.status === 'void' ? 'closed' : 'action'}>
           {r.status === 'paid' && <LoaderCircle size={12} className={styles.spin} aria-hidden="true" />}
           {t(`reports.state.${r.status === 'pending_payment' ? 'paid' : r.status}` as MessageKey)}
-        </span>
+        </StatusPill>
       </div>
       <p className={`mono ${styles.code}`}>{r.code}</p>
       <p className={styles.muted}>

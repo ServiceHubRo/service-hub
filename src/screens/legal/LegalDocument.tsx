@@ -141,7 +141,7 @@ export function LegalDocument({ id, title }: { id: LegalDocId; title: string }) 
   }, [id, lang, key]);
 
   return (
-    <article className={styles.doc}>
+    <article data-ui="legal-document" className={styles.doc}>
       <h1>{title}</h1>
       {load.state === 'loading' && <SkeletonList count={3} />}
       {load.state === 'error' && (

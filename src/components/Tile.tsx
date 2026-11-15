@@ -35,13 +35,13 @@ export function Tile({ to, href, icon: Icon, label, hint, onClick }: TileProps) 
   );
   if (href !== undefined) {
     return (
-      <a href={href} className={styles.tile} target={href.startsWith('http') ? '_blank' : undefined} rel="noopener noreferrer">
+      <a data-ui="tile" href={href} className={styles.tile} target={href.startsWith('http') ? '_blank' : undefined} rel="noopener noreferrer">
         {inner}
       </a>
     );
   }
   return (
-    <Link to={to ?? '/'} className={styles.tile} onClick={onClick}>
+    <Link data-ui="tile" to={to ?? '/'} className={styles.tile} onClick={onClick}>
       {inner}
     </Link>
   );

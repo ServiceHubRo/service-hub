@@ -37,7 +37,7 @@ export function BookingSent() {
   // A state from before T21 (one service) has no list: the summary then leaves the services out.
   const sent = state && Array.isArray(state.services) ? state : null;
   return (
-    <div className={`${styles.page} ${styles.sent}`}>
+    <div data-ui="success" className={`${styles.page} ${styles.sent}`}>
       <span className={styles.sentIcon}>
         <SuccessCheck size={72} />
       </span>

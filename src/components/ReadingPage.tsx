@@ -8,7 +8,7 @@ import styles from './ReadingPage.module.css';
  */
 export function ReadingPage({ header, children }: { header: ReactNode; children: ReactNode }) {
   return (
-    <div className={styles.page}>
+    <div data-ui="reading-page" className={styles.page}>
       {header}
       <div className={styles.body}>{children}</div>
     </div>
@@ -18,7 +18,7 @@ export function ReadingPage({ header, children }: { header: ReactNode; children:
 /** A page to read, loading: lines of text of the same measure. */
 export function ReadingSkeleton({ label }: { label: string }) {
   return (
-    <div className={styles.body} aria-busy="true" role="status">
+    <div data-ui="skeleton" className={styles.body} aria-busy="true" role="status">
       <span className="visually-hidden">{label}</span>
       {['w90', 'w100', 'w70', 'w40', 'w100', 'w80'].map((w, i) => (
         <span key={i} className={`${styles.bone} ${styles[w]}`} aria-hidden="true" />

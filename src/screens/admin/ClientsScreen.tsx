@@ -7,7 +7,6 @@ import { LoadError } from '../../components/LoadError';
 import { SearchField } from '../../components/SearchField';
 import { SkeletonList } from '../../components/Skeleton';
 import { fetchClients, type AdminClientRow } from '../../data/admin';
-import { BackLink } from '../../components/BackLink';
 import { adminZoneBack } from '../../app/adminZones';
 import { useI18n } from '../../i18n/context';
 import { plural } from '../../i18n/translate';
@@ -20,6 +19,7 @@ import { useLiveData } from './useLiveData';
 import { useUrlParams } from './useUrlParams';
 import { day } from './format';
 import styles from './admin.module.css';
+import { PageHeader } from '../../components/PageHeader';
 
 /** „‹ Înapoi” goes to the screen's zone (A1). */
 const ZONE_BACK = adminZoneBack(ADMIN_CLIENTS_PATH);
@@ -42,11 +42,7 @@ export function ClientsScreen() {
 
   return (
     <div className={styles.page}>
-      <BackLink to={ZONE_BACK.to} label={t(ZONE_BACK.label)} />
-      <div>
-        <h1>{t('nav.admin.clients')}</h1>
-        {all && <p className={styles.sub}>{plural(lang, 'unit.clients', shown.length)}</p>}
-      </div>
+      <PageHeader back={{ to: ZONE_BACK.to, label: t(ZONE_BACK.label) }} title={t('nav.admin.clients')} subtitle={all ? plural(lang, 'unit.clients', shown.length) : undefined} />
       {state.status === 'loading' && <SkeletonList />}
       {state.status === 'error' && <LoadError message={t('admin.loadError')} onRetry={reload} />}
       {all && all.length === 0 && <EmptyState icon={Users} title={t('admin.clients.empty')} />}

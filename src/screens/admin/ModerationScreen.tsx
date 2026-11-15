@@ -2,7 +2,6 @@ import { ShieldAlert, ShieldCheck, Star, UserX } from 'lucide-react';
 import { useCallback, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { adminZoneBack } from '../../app/adminZones';
-import { BackLink } from '../../components/BackLink';
 import { Button } from '../../components/Button';
 import { Card } from '../../components/Card';
 import { EmptyState } from '../../components/EmptyState';
@@ -34,6 +33,7 @@ import { useLiveData } from './useLiveData';
 import { useUrlParams } from './useUrlParams';
 import { dateTime, day } from './format';
 import styles from './admin.module.css';
+import { PageHeader } from '../../components/PageHeader';
 
 const LIVE = [{ table: 'reviews' }, { table: 'no_show_disputes' }];
 const back = adminZoneBack(ADMIN_MODERATION_PATH);
@@ -189,8 +189,7 @@ export function ModerationScreen() {
 
   return (
     <div className={styles.page}>
-      <BackLink to={back.to} label={t(back.label)} />
-      <h1>{t('nav.admin.moderation')}</h1>
+      <PageHeader back={{ to: back.to, label: t(back.label) }} title={t('nav.admin.moderation')} />
       {state.status === 'loading' && <SkeletonList />}
       {state.status === 'error' && <LoadError message={t('admin.loadError')} onRetry={reload} />}
       {state.status === 'ready' && (

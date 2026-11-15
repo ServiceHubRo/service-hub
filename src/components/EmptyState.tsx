@@ -22,7 +22,7 @@ export function EmptyState({ icon: Icon, title, body, action }: EmptyStateProps)
     art.current?.querySelectorAll(`.${styles.icon} > *`).forEach((el) => el.setAttribute('pathLength', '1'));
   }, [Icon]);
   return (
-    <div className={styles.empty}>
+    <div data-ui="empty-state" className={styles.empty}>
       {Icon && (
         <span ref={art} className={`${styles.art} ${motionOn('emptyDrawings') ? styles.draw : ''}`} aria-hidden="true">
           <svg className={styles.orbit} viewBox="0 0 80 80" focusable="false">

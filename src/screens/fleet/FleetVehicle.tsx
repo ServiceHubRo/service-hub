@@ -1,4 +1,5 @@
-import { AlertTriangle, ArrowLeft, CalendarPlus, FileText, Fuel, Info } from 'lucide-react';
+import { AlertTriangle, CalendarPlus, FileText, Fuel, Info } from 'lucide-react';
+import { useLocation } from 'react-router-dom';
 import { useMemo, useState } from 'react';
 import { Button } from '../../components/Button';
 import { Card } from '../../components/Card';
@@ -31,8 +32,10 @@ import { VehicleIssues } from './FleetIssues';
 import { VehicleOdometer } from './FleetOdometer';
 import { VehicleMaintenance } from './FleetMaintenance';
 import { useFleet } from './fleetContext';
-import pill from '../../components/StatusBadge.module.css';
 import styles from './fleet.module.css';
+import { StatusPill } from '../../components/StatusPill';
+import { toneOf } from '../../lib/statusTone';
+import { BackLink } from '../../components/BackLink';
 
 type Tab = 'overview' | 'history' | 'costs' | 'odometer' | 'maintenance' | 'bookings' | 'quotes' | 'documents' | 'driver' | 'notes';
 
@@ -45,6 +48,7 @@ type Tab = 'overview' | 'history' | 'costs' | 'odometer' | 'maintenance' | 'book
 export function FleetVehicle({ vehicleId }: { vehicleId: string }) {
   const { t, lang } = useI18n();
   const { data, back, allowed, vehicle, mode, actions } = useFleet();
+  const { pathname } = useLocation();
   const [editing, setEditing] = useState(false);
   const [addingFuel, setAddingFuel] = useState(false);
   const [reporting, setReporting] = useState(false);
@@ -95,11 +99,8 @@ export function FleetVehicle({ vehicleId }: { vehicleId: string }) {
 
   return (
     <div className={styles.stack}>
-      <div>
-        <Button variant="ghost" onClick={() => back({ section: 'vehicule' })}>
-          <ArrowLeft size={18} aria-hidden="true" /> {t('fleet.vehicle.back')}
-        </Button>
-      </div>
+      {/* The shared „‹ Înapoi” (docs/MODEL_DE_FOLOSIRE.md P2): the same history step as `back`. */}
+      <BackLink to={`${pathname}?sectiune=vehicule`} label={t('fleet.vehicle.back')} />
       <Card className={styles.vehicleHead}>
         <div className={styles.vehicleHeadTop}>
           <div className={styles.vehicleHeadText}>
@@ -343,11 +344,11 @@ export function FleetVehicle({ vehicleId }: { vehicleId: string }) {
           </p>
         )}
         <div className={styles.timelineTags}>
-          {job.warranty_until && <span className={`${pill.pill} ${pill.green}`}>{t('fleet.history.warranty', { date: formatDate(lang, job.warranty_until) })}</span>}
+          {job.warranty_until && <StatusPill tone={toneOf('green')}>{t('fleet.history.warranty', { date: formatDate(lang, job.warranty_until) })}</StatusPill>}
           {job.quote && (
-            <span className={`${pill.pill} ${pill.muted}`}>
+            <StatusPill tone="closed">
               <FileText size={12} aria-hidden="true" /> {t('fleet.history.quote', { v: job.quote.version })}
-            </span>
+            </StatusPill>
           )}
         </div>
       </li>
@@ -367,7 +368,7 @@ export function FleetVehicle({ vehicleId }: { vehicleId: string }) {
                 <span>{t(`doc.${doc}`)}</span>
                 <span className={styles.muted}>{d.date ? formatDate(lang, d.date) : t('fleet.docs.missing')}</span>
               </span>
-              <span className={`${pill.pill} ${pill[tone]}`}>{t(`fleet.docs.${d.urgency}`)}</span>
+              <StatusPill tone={toneOf(tone)}>{t(`fleet.docs.${d.urgency}`)}</StatusPill>
             </li>
           );
         })}

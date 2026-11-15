@@ -26,8 +26,9 @@ import {
 } from '../../lib/fleet';
 import { useLoad } from '../../lib/useLoad';
 import { useFleet } from './fleetContext';
-import pill from '../../components/StatusBadge.module.css';
 import styles from './fleet.module.css';
+import { StatusPill } from '../../components/StatusPill';
+import { toneOf } from '../../lib/statusTone';
 
 const STATUS_TONE: Record<IssueStatus, string> = {
   new: 'amber',
@@ -39,7 +40,7 @@ const STATUS_TONE: Record<IssueStatus, string> = {
 
 export function IssueStatusPill({ status }: { status: IssueStatus }) {
   const { t } = useI18n();
-  return <span className={`${pill.pill} ${pill[STATUS_TONE[status]]}`}>{t(`fleet.issueStatus.${status}`)}</span>;
+  return <StatusPill tone={toneOf(STATUS_TONE[status])}>{t(`fleet.issueStatus.${status}`)}</StatusPill>;
 }
 
 /**

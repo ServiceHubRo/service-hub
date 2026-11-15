@@ -26,6 +26,7 @@ import {
 import { useLiveData } from './useLiveData';
 import { dateTime } from './format';
 import styles from './admin.module.css';
+import { PageHeader } from '../../components/PageHeader';
 
 const LIVE = [{ table: 'bookings' }, { table: 'reviews' }, { table: 'shops' }, { table: 'subscriptions' }, { table: 'profiles' }] as const;
 
@@ -110,7 +111,7 @@ export function OverviewScreen() {
 
   return (
     <div className={styles.page}>
-      <h1>{t('nav.admin.overview')}</h1>
+      <PageHeader title={t('nav.admin.overview')} />
       {state.status === 'loading' && <SkeletonList />}
       {state.status === 'error' && <LoadError message={t('admin.loadError')} onRetry={reload} />}
       {state.status === 'ready' &&

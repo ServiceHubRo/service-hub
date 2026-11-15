@@ -2,7 +2,6 @@ import { Check } from 'lucide-react';
 import { useState } from 'react';
 import { CheckMenu } from '../../../components/CheckMenu';
 import { BottomBar } from '../../../components/BottomBar';
-import { buttonClass } from '../../../components/buttonClass';
 import { SearchField } from '../../../components/SearchField';
 import { ServiceIcon } from '../../../components/ServiceIcon';
 import type { ShopPageService } from '../../../data/search';
@@ -13,6 +12,7 @@ import { SYMPTOMS, UNSURE_SERVICE_ID, type Symptom } from '../../../lib/symptoms
 import { matchesWords, searchWords } from '../../../lib/text';
 import { groupServices, serviceName } from '../shop/serviceGroups';
 import styles from './booking.module.css';
+import { Button } from '../../../components/Button';
 
 /**
  * Step 1: only what this shop offers, under category labels. No prices — those come with the quote.
@@ -133,11 +133,11 @@ export function ServiceStep({
             {t('booking.servicesMax')}
           </p>
         )}
-        <button type="button" className={buttonClass('primary', true)} disabled={selected.length === 0} onClick={onContinue}>
+        <Button variant="primary" block disabled={selected.length === 0} onClick={onContinue}>
           {selected.length === 0
             ? t('booking.servicesPick')
             : t('booking.servicesContinue', { services: plural(lang, 'unit.services', selected.length) })}
-        </button>
+        </Button>
       </BottomBar>
     </>
   );

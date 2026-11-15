@@ -8,8 +8,8 @@ import styles from './StatusPill.module.css';
  * A status as a short label in a pill (page templates, Eduard 14 Nov 2026). The tone carries the
  * meaning (src/lib/statusTone.ts); the label always says it in words.
  */
-export function StatusPill({ tone, children }: { tone: PillTone; children: ReactNode }) {
-  return <span className={`${styles.pill} ${styles[tone]}`}>{children}</span>;
+export function StatusPill({ tone, children, className }: { tone: PillTone; children: ReactNode; className?: string }) {
+  return <span data-ui="status-pill" className={`${styles.pill} ${styles[tone]}${className ? ` ${className}` : ''}`}>{children}</span>;
 }
 
 /** A booking's status, colored for the person reading it. */

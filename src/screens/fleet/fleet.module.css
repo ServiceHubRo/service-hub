@@ -880,6 +880,8 @@
   overflow-wrap: anywhere;
 }
 
+/* The fields of a form (Eduard, 14 Nov 2026: the model for every form): equal columns that fill
+   the card, as many as fit at 240 px (one on a phone, four on a laptop). */
 .formGrid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr));
@@ -1035,7 +1037,8 @@
 
 @media (min-width: 600px) {
   .reportBar {
-    grid-template-columns: minmax(0, 280px) minmax(0, 240px) auto;
+    /* The report and the period: two equal fields (F1). */
+    grid-template-columns: repeat(2, minmax(0, 280px)) auto;
   }
 }
 
@@ -1339,7 +1342,11 @@
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
-  max-width: 480px;
+  max-width: var(--field-max);
+}
+
+.twoFields > * {
+  --field-max: none;
 }
 
 /* Abonament (T65): what a plan would add to the company's, in amber. */

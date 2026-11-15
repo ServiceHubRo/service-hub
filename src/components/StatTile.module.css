@@ -33,6 +33,11 @@
 }
 
 .link {
+  width: 100%;
+  border: 0;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
   transition: background-color var(--motion-quick) var(--ease);
 }
 
@@ -54,6 +59,23 @@
 
 .attention {
   color: var(--amber);
+}
+
+.problem {
+  color: var(--red-text);
+}
+
+.hint {
+  color: var(--muted);
+  font-size: var(--text-xs);
+  line-height: var(--leading-tight);
+}
+
+/* A sum of money takes two columns. */
+@media (min-width: 768px) {
+  .wide {
+    grid-column: span 2;
+  }
 }
 
 .zero {

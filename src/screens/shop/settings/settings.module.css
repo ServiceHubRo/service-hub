@@ -32,10 +32,27 @@
 /* Two fields side by side when the card is wide enough for both (16rem each, an IBAN fits), one
    under the other otherwise: by the card's width, not the screen's, since a card can be half of a
    wide page (T62). */
+/* Fields two by two (docs/MODEL_DE_FOLOSIRE.md F1, F2): one field's width in all, equal halves from
+   600 px, a field left alone on its row takes the row. */
 .grid2 {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, max(16rem, calc(50% - 6px))), 1fr));
+  grid-template-columns: minmax(0, 1fr);
   gap: 12px;
+  max-width: var(--field-max);
+}
+
+.grid2 > * {
+  --field-max: none;
+}
+
+@media (min-width: 600px) {
+  .grid2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .grid2 > :last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
 }
 
 .hint {

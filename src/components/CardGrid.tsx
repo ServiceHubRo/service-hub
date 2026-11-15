@@ -10,7 +10,7 @@ import styles from './CardGrid.module.css';
  */
 export function CardGrid({ label, children }: { label: string; children: ReactNode }) {
   return (
-    <ul className={styles.grid} aria-label={label}>
+    <ul data-ui="card-grid" className={styles.grid} aria-label={label}>
       {children}
     </ul>
   );
@@ -41,7 +41,7 @@ export function GridCard({
 }) {
   // The title and its line are the link; its hit area covers the card (::after), the corner control stays apart.
   return (
-    <li className={styles.card}>
+    <li data-ui="grid-card" className={styles.card}>
       <span className={styles.top}>
         <span className={styles.media} aria-hidden="true">
           {media}
@@ -64,7 +64,7 @@ export function GridCard({
 /** A grid loading: cards of the same shape. */
 export function CardGridSkeleton({ count = 6, label }: { count?: number; label: string }) {
   return (
-    <div className={styles.grid} aria-busy="true" role="status">
+    <div data-ui="skeleton" className={styles.grid} aria-busy="true" role="status">
       <span className="visually-hidden">{label}</span>
       {Array.from({ length: count }, (_, i) => (
         <div key={i} className={`${styles.card} ${styles.skeleton}`} aria-hidden="true">

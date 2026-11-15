@@ -6,11 +6,12 @@ import { useI18n } from '../../i18n/context';
 import { procedureTitle } from '../../lib/procedures';
 import { ArticleBody } from '../help/parts';
 import styles from './procedures.module.css';
+import { StatusPill } from '../../components/StatusPill';
 
 /** A label next to a title: text and color together (never color alone). */
 export function Tag({ tone, children }: { tone?: 'critical' | 'amber' | 'green'; children: ReactNode }) {
-  const cls = tone === 'critical' ? styles.tagCritical : tone === 'amber' ? styles.tagAmber : tone === 'green' ? styles.tagGreen : '';
-  return <span className={`${styles.tag} ${cls}`}>{children}</span>;
+  // The shared pill (docs/MODEL_DE_FOLOSIRE.md P7): critical is a problem, amber waits, green is done.
+  return <StatusPill tone={tone === 'critical' ? 'problem' : tone === 'amber' ? 'action' : tone === 'green' ? 'success' : 'neutral'}>{children}</StatusPill>;
 }
 
 /** The labels of a procedure: kind, critical, its state when not simply published. */
