@@ -1758,6 +1758,7 @@ export const ro = {
   'hist.clearFilters': 'Șterge filtrele',
   'hist.loadError': 'Istoricul nu s-a încărcat.',
   'hist.card.booking': 'Programarea {ref} · {when}',
+  'hist.card.client': 'Client',
   'hist.card.clientNote': 'Nota clientului',
   'hist.card.quote': 'Devizul',
   'hist.card.fee': 'Deviz refuzat. Taxă de constatare: {fee}.',

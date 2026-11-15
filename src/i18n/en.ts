@@ -1760,6 +1760,7 @@ export const en: Record<MessageKey, string> = {
   'hist.clearFilters': 'Clear filters',
   'hist.loadError': 'The history could not be loaded.',
   'hist.card.booking': 'Booking {ref} · {when}',
+  'hist.card.client': 'Client',
   'hist.card.clientNote': 'Client note',
   'hist.card.quote': 'Quote',
   'hist.card.fee': 'Quote declined. Inspection fee: {fee}.',
