@@ -1374,6 +1374,7 @@ export const ro = {
   'dash.billing.dismiss': 'Mai târziu',
   'dash.capacity': 'Mașini pe zi: {n} · Azi: {today}',
   'dash.loadError': 'Panoul nu s-a încărcat. Verifică conexiunea.',
+  'dash.counters': 'Programările pe stări',
   'dash.card.requests': 'Cereri noi',
   'dash.card.today': 'Azi',
   'dash.card.week': '7 zile',

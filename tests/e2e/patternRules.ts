@@ -102,7 +102,7 @@ export function measurePatterns(only?: readonly string[]): Patterns {
 
   // P4 — buttons are the shared Button / ActionButton (or a shared control that has its own).
   if (want('P4', 'P5')) {
-    const ownButtons = ['button', 'action-button', 'chip', 'tabs', 'menu', 'filters-button', 'search', 'check-menu', 'stepper', 'back-link', 'list-row', 'tile', 'disclosure', 'checkbox', 'switch', 'phone', 'field', 'select'];
+    const ownButtons = ['composer', 'diagram', 'button', 'action-button', 'chip', 'tabs', 'menu', 'filters-button', 'search', 'check-menu', 'stepper', 'back-link', 'list-row', 'tile', 'disclosure', 'checkbox', 'switch', 'phone', 'field', 'select'];
     const amber = (cs: CSSStyleDeclaration) => /rgb\(245, 165, 36\)/.test(cs.backgroundColor);
     let primaries = 0;
     for (const b of Array.from(document.querySelectorAll<HTMLElement>('button, a[href], [role="button"]'))) {

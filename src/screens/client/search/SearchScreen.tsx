@@ -309,10 +309,10 @@ export function SearchScreen() {
       <div className={styles.toolbar}>
         <FiltersButton count={active.length} onClick={() => setFiltersOpen(true)} />
         {/* One button that switches to the other view (no pair of pills). */}
-        <button type="button" className={styles.viewButton} onClick={() => setParam({ vedere: asMap ? null : 'harta' })}>
+        <Button variant="ghost" className={styles.viewButton} onClick={() => setParam({ vedere: asMap ? null : 'harta' })}>
           {asMap ? <List size={16} aria-hidden="true" /> : <MapIcon size={16} aria-hidden="true" />}
           {t(asMap ? 'search.view.list' : 'search.view.map')}
-        </button>
+        </Button>
       </div>
 
       <ActiveFilters items={active} onClearAll={filtersOn ? clearFilters : undefined} />

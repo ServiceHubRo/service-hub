@@ -1,32 +1,73 @@
 import { ChevronRight } from 'lucide-react';
-import type { ReactNode } from 'react';
+import type { ReactNode, Ref } from 'react';
 import { Link } from 'react-router-dom';
 import { useI18n } from '../i18n/context';
 import { ListRows } from './ListRow';
 import styles from './StatTile.module.css';
 
 /** Page template D, a dashboard: its figures in equal boxes on one row (2 on a phone). */
-export function StatGrid({ label, children }: { label: string; children: ReactNode }) {
+export function StatGrid({ label, children, className, tour }: { label: string; children: ReactNode; className?: string; tour?: string }) {
   return (
-    <ul data-ui="stat-grid" className={styles.grid} aria-label={label}>
+    <ul data-ui="stat-grid" className={`${styles.grid}${className ? ` ${className}` : ''}`} aria-label={label} data-tour={tour}>
       {children}
     </ul>
   );
 }
 
 /**
- * One figure and what it counts. `attention`: it waits for the reader (an amber number); a zero is
- * quiet. With `to` the whole box opens the list it counts.
+ * One figure and what it counts, the same box on every dashboard (shop, company, admin, support;
+ * docs/MODEL_DE_FOLOSIRE.md). `attention`: it waits for the reader (an amber number); `problem`: a
+ * red one (over budget, documents expired); a zero is quiet. `hint`: one line under the label. With
+ * `to` (a page) or `onSelect` (a section of the same page) the whole box opens what it counts.
  */
-export function StatTile({ value, label, to, attention = false }: { value: ReactNode; label: string; to?: string; attention?: boolean }) {
+export function StatTile({
+  value,
+  label,
+  hint,
+  to,
+  onSelect,
+  attention = false,
+  problem = false,
+  wide = false,
+  valueRef,
+}: {
+  value: ReactNode;
+  label: string;
+  hint?: string;
+  to?: string;
+  onSelect?: () => void;
+  attention?: boolean;
+  problem?: boolean;
+  /** Takes two columns (a sum of money). */
+  wide?: boolean;
+  valueRef?: Ref<HTMLSpanElement>;
+}) {
   const zero = value === 0 || value === '0';
+  const tone = zero ? styles.zero : problem ? styles.problem : attention ? styles.attention : '';
   const body = (
     <>
-      <span className={`mono ${styles.value} ${attention && !zero ? styles.attention : ''} ${zero ? styles.zero : ''}`}>{value}</span>
+      <span ref={valueRef} className={`mono ${styles.value} ${tone}`}>
+        {value}
+      </span>
       <span className={styles.label}>{label}</span>
+      {hint && <span className={styles.hint}>{hint}</span>}
     </>
   );
-  return <li className={styles.item}>{to ? <Link to={to} className={`${styles.tile} ${styles.link}`}>{body}</Link> : <div className={styles.tile}>{body}</div>}</li>;
+  return (
+    <li data-ui="stat-tile" className={`${styles.item} ${wide ? styles.wide : ''}`}>
+      {to ? (
+        <Link to={to} className={`${styles.tile} ${styles.link}`}>
+          {body}
+        </Link>
+      ) : onSelect ? (
+        <button type="button" className={`${styles.tile} ${styles.link}`} onClick={onSelect}>
+          {body}
+        </button>
+      ) : (
+        <div className={styles.tile}>{body}</div>
+      )}
+    </li>
+  );
 }
 
 export function StatGridSkeleton({ count = 4, label }: { count?: number; label: string }) {

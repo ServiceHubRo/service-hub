@@ -1,4 +1,4 @@
-import { CalendarDays, ChevronRight, Printer } from 'lucide-react';
+import { CalendarDays, Printer } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { CountUp } from '../../../components/CountUp';
@@ -17,6 +17,7 @@ import { useBumps } from '../../../lib/useBumps';
 import { formatPhone } from '../../../lib/validators';
 import { shopBookingsLink } from '../paths';
 import styles from './Dashboard.module.css';
+import { StatGrid, StatTile } from '../../../components/StatTile';
 
 interface StatCard {
   key: string;
@@ -68,30 +69,20 @@ export function TodayBoard({ data, today }: { data: ShopBookingsData; today: str
 
   return (
     <>
-      <ul className={`${styles.stats} no-print`} data-tour="dashboard">
-        {cards.map((c) => {
-          const inner = (
-            <>
-              <span ref={c.key === 'requests' ? requestsNumber : undefined} className={`${styles.statNumber} ${styles[c.tone]}`}>
-                <CountUp value={c.n} />
-              </span>
-              <span className={styles.statLabel}>{t(c.labelKey)}</span>
-              {c.n > 0 && <ChevronRight size={16} className={styles.statChevron} aria-hidden="true" />}
-            </>
-          );
-          return (
-            <li key={c.key}>
-              {c.n > 0 ? (
-                <Link to={shopBookingsLink(c.to)} className={styles.stat}>
-                  {inner}
-                </Link>
-              ) : (
-                <div className={`${styles.stat} ${styles.statZero}`}>{inner}</div>
-              )}
-            </li>
-          );
-        })}
-      </ul>
+      {/* The figures in the shared boxes of every dashboard (docs/MODEL_DE_FOLOSIRE.md): amber what
+          waits for the shop; a box opens Programări filtered once there is something to open. */}
+      <StatGrid label={t('dash.counters')} className="no-print" tour="dashboard">
+        {cards.map((c) => (
+          <StatTile
+            key={c.key}
+            valueRef={c.key === 'requests' ? requestsNumber : undefined}
+            value={<CountUp value={c.n} />}
+            label={t(c.labelKey)}
+            attention={c.tone === 'amber' && c.n > 0}
+            to={c.n > 0 ? shopBookingsLink(c.to) : undefined}
+          />
+        ))}
+      </StatGrid>
 
       {counts.quote > 0 && (
         <p className={`${styles.quoteNote} no-print`}>

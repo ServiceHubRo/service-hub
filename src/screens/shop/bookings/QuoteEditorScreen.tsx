@@ -375,14 +375,9 @@ function Editor({
             <span className={styles.amountLabel}>{t('qe.lineTotal')}</span>
             <span className="mono">{formatMoney(lang, amount)}</span>
           </p>
-          <button
-            type="button"
-            className={styles.remove}
-            aria-label={t(isPart ? 'qe.removePart' : 'qe.removeLabor', { n })}
-            onClick={() => removeRow(row.key)}
-          >
+          <Button variant="ghost" className={styles.remove} aria-label={t(isPart ? 'qe.removePart' : 'qe.removeLabor', { n })} onClick={() => removeRow(row.key)}>
             <Trash2 size={18} aria-hidden="true" />
-          </button>
+          </Button>
         </div>
         {isPart && (
           <SelectField
@@ -438,10 +433,10 @@ function Editor({
           <span className="mono">{formatMoney(lang, sum)}</span>
         </div>
         <ol className={styles.lines}>{list.map((r, i) => renderRow(r, i + 1))}</ol>
-        <button type="button" className={styles.add} onClick={() => addRow(kind)} disabled={rows.length >= QUOTE_ROWS_MAX}>
+        <Button variant="ghost" className={styles.add} onClick={() => addRow(kind)} disabled={rows.length >= QUOTE_ROWS_MAX}>
           <Plus size={18} aria-hidden="true" />
           {kind === 'labor' ? t('qe.addLabor') : t('qe.addPart')}
-        </button>
+        </Button>
       </section>
     );
   };

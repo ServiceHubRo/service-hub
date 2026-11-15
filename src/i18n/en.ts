@@ -1376,6 +1376,7 @@ export const en: Record<MessageKey, string> = {
   'dash.billing.dismiss': 'Later',
   'dash.capacity': 'Cars per day: {n} · Today: {today}',
   'dash.loadError': 'The dashboard could not be loaded. Check your connection.',
+  'dash.counters': 'Bookings by status',
   'dash.card.requests': 'New requests',
   'dash.card.today': 'Today',
   'dash.card.week': '7 days',
