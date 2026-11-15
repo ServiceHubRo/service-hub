@@ -209,12 +209,15 @@ export function measurePatterns(only?: readonly string[]): Patterns {
   // de adăugare … în dreapta sus”). A form's own button, an empty state's and a panel's are not adds
   // of the page.
   if (want('P12')) {
-    const ADD = /^(\+\s*)?(Adaugă|Add|Invită|Invite|Creează|Create|Propune|Propose)\b|^[\p{L} ]{0,24}\b(nou|nouă|new)$|^New\b/iu;
+    // „Adaugă …”, „Invită …”, „Procedură nouă”, „Add …”, „New procedure” (never „Verifică din nou”).
+    const ADD = /^(\+\s*)?(Adaugă|Invită|Creează|Propune|Add|Invite|Create|Propose)\b|^(?!din\b)\p{L}+ (nou|nouă)$|^New \p{L}+$/u;
     for (const b of Array.from(main.querySelectorAll<HTMLElement>('button, a[href]'))) {
       if (quiet(b) || !shown(b)) continue;
       const t = text(b);
       if (!ADD.test(t)) continue;
-      if (b.closest('[data-ui="page-header"], [data-ui="section-head"], form, [data-ui="inline-panel"], [data-ui="empty-state"], [role="menu"], dialog, [data-ui="filter-sheet"]')) continue;
+      // A form's own button (its submit, its save bar) is not an add of the page.
+      if ((b as HTMLButtonElement).type === 'submit' || b.closest('[data-fixed-bottom], [data-ui="inline-panel"]')) continue;
+      if (b.closest('[data-ui="page-header"], [data-ui="section-head"], [data-ui="empty-state"], [role="menu"], dialog, [data-ui="filter-sheet"]')) continue;
       add('P12 add', `„${t}” is not top right`);
     }
   }

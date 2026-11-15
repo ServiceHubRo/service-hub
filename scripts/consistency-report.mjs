@@ -80,7 +80,7 @@ const ro = (detail) => RO.reduce((d, [re, to]) => d.replace(re, to), detail);
 /** Screens only in test builds (the component gallery, the template samples): not part of the app. */
 const devOnly = (r) => r.path?.startsWith('/dev/');
 /** The visitor's pages (landing, sign-in, legal) keep their own layout (docs/SABLOANE_HARTA.md). */
-const outsideTemplates = (r, code) => r.role === 'visitor' && ['P1', 'P2', 'P7'].includes(code);
+const outsideTemplates = (r, code) => r.role === 'visitor' && ['P1', 'P2', 'P7', 'P12'].includes(code);
 
 /** Each screen by its Romanian title (the English pass of the same screen joins it). */
 const titles = new Map();

@@ -56,7 +56,7 @@ const ROWS = {
 } as const;
 
 /** Cont → one of the client's reminders (T19d, T24): on by default (offers: off), switched here. */
-export function ReminderRow({ setting }: { setting: ReminderSetting }) {
+export function ReminderRow({ setting, bare = false }: { setting: ReminderSetting; /** A row of a SectionCard, not a card of its own. */ bare?: boolean }) {
   const { t, lang } = useI18n();
   const session = useSession();
   const profile = session.profile;
@@ -65,21 +65,30 @@ export function ReminderRow({ setting }: { setting: ReminderSetting }) {
   const Icon = row.icon;
   const on = profile[setting];
 
+  const content = (
+    <div className={styles.switchRow}>
+      <Icon size={20} aria-hidden="true" className={styles.switchIcon} />
+      <ActionSwitch
+        checked={on}
+        hint={t(on ? row.on : row.off)}
+        onToggle={async (next) => {
+          session.setProfile(await setReminder(profile.id, setting, next));
+        }}
+        errorMessage={(e) => rpcErrorMessage(lang, e)}
+      >
+        {t(row.title)}
+      </ActionSwitch>
+    </div>
+  );
+  if (bare)
+    return (
+      <div role="group" aria-label={t(row.title)}>
+        {content}
+      </div>
+    );
   return (
     <Card role="group" aria-label={t(row.title)}>
-      <div className={styles.switchRow}>
-        <Icon size={20} aria-hidden="true" className={styles.switchIcon} />
-        <ActionSwitch
-          checked={on}
-          hint={t(on ? row.on : row.off)}
-          onToggle={async (next) => {
-            session.setProfile(await setReminder(profile.id, setting, next));
-          }}
-          errorMessage={(e) => rpcErrorMessage(lang, e)}
-        >
-          {t(row.title)}
-        </ActionSwitch>
-      </div>
+      {content}
     </Card>
   );
 }

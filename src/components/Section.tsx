@@ -1,5 +1,6 @@
 import { useId, type ReactNode } from 'react';
 import styles from './Section.module.css';
+import { HeaderSlotProvider, HeaderSlotTarget } from './HeaderSlot';
 
 export interface SectionProps {
   title: string;
@@ -21,18 +22,24 @@ export interface SectionProps {
 export function Section({ title, description, id, action, children }: SectionProps) {
   const headingId = useId();
   return (
-    <section data-ui="section" id={id} className={styles.section} aria-labelledby={headingId}>
-      <div data-ui="section-head" className={action ? `${styles.head} ${styles.headWithAction}` : styles.head}>
-        <div className={styles.headText}>
-          <h2 id={headingId} className={styles.title}>
-            {title}
-          </h2>
-          {description && <p className={styles.description}>{description}</p>}
+    // A HeaderAction inside the section (an add in one of its cards) lands in its head, top right.
+    <HeaderSlotProvider>
+      <section data-ui="section" id={id} className={styles.section} aria-labelledby={headingId}>
+        <div data-ui="section-head" className={`${styles.head} ${styles.headWithAction}`}>
+          <div className={styles.headText}>
+            <h2 id={headingId} className={styles.title}>
+              {title}
+            </h2>
+            {description && <p className={styles.description}>{description}</p>}
+          </div>
+          <div className={styles.headAction}>
+            {action}
+            <HeaderSlotTarget />
+          </div>
         </div>
-        {action && <div className={styles.headAction}>{action}</div>}
-      </div>
-      <div className={styles.body}>{children}</div>
-    </section>
+        <div className={styles.body}>{children}</div>
+      </section>
+    </HeaderSlotProvider>
   );
 }
 

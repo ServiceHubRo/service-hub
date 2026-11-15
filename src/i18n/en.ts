@@ -1128,6 +1128,7 @@ export const en: Record<MessageKey, string> = {
   'qs.sec.terms.desc': 'Printed at the end of every quote.',
   'notif.sec.device': 'On this device',
   'notif.sec.device.desc': 'Notifications and sound on the phone or computer you are using.',
+  'notif.sec.reminders': 'Reminders and offers',
   'notif.sec.summary': 'Summaries',
   'notif.sec.summary.desc': 'The daily summary and the monthly report.',
   'hours.sec.week.desc': 'The hours you take bookings, day by day.',

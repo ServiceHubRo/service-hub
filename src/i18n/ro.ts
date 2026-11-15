@@ -1126,6 +1126,7 @@ export const ro = {
   'qs.sec.terms.desc': 'Textul tipărit la finalul fiecărui deviz.',
   'notif.sec.device': 'Pe acest dispozitiv',
   'notif.sec.device.desc': 'Notificările și sunetul pe telefonul sau calculatorul folosit acum.',
+  'notif.sec.reminders': 'Mementouri și oferte',
   'notif.sec.summary': 'Rezumate',
   'notif.sec.summary.desc': 'Rezumatul zilei și raportul lunii.',
   'hours.sec.week.desc': 'Orele la care primești programări, pe fiecare zi.',
