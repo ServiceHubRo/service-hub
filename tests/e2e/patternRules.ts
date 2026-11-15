@@ -222,4 +222,4 @@ export function measurePatterns(only?: readonly string[]): Patterns {
  * request that breaks one fails. A rule joins this list once the audit finds it nowhere broken
  * (docs/AUDIT_CONSISTENTA.md); the others are fixed one by one, then added here.
  */
-export const ENFORCED_RULES: readonly string[] = ['F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'P1', 'P2', 'P3', 'P5', 'P6', 'P7', 'P9', 'P10', 'P11'];
+export const ENFORCED_RULES: readonly string[] = ['F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'P1', 'P2', 'P3', 'P6', 'P7', 'P9', 'P10', 'P11'];

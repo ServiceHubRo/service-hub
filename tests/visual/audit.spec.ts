@@ -599,6 +599,7 @@ test.describe('A9 visual audit', () => {
     const screens: Screen[] = [
       { name: 'panou', path: '/s/panou' },
       { name: 'programari', path: '/s/programari' },
+      { name: 'programari-programate', path: '/s/programari?tab=programate' },
       { name: 'programari-deschise', path: '/s/programari', roOnly: true, prep: async (p) => {
           const closed = p.locator('main button[aria-controls^="booking-"][aria-expanded="false"]');
           for (let i = 0; i < 4 && (await closed.count()) > 0; i++) await closed.first().click();
