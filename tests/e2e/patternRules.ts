@@ -182,7 +182,9 @@ export function measurePatterns(only?: readonly string[]): Patterns {
       stacks.set(key, [...(stacks.get(key) ?? []), c]);
     }
     for (const cards of stacks.values()) {
-      if (cards.length >= 3) add('P8 list', `${cards.length} cards one after another (${text(cards[0]!).slice(0, 30)}…): a list built from cards`);
+      // Side by side in a grid (two or more columns) is a grid of cards, not a list.
+      const lefts = new Set(cards.map((c) => Math.round(c.getBoundingClientRect().left)));
+      if (cards.length >= 3 && lefts.size === 1) add('P8 list', `${cards.length} cards one after another (${text(cards[0]!).slice(0, 30)}…): a list built from cards`);
     }
   }
 
@@ -220,4 +222,4 @@ export function measurePatterns(only?: readonly string[]): Patterns {
  * request that breaks one fails. A rule joins this list once the audit finds it nowhere broken
  * (docs/AUDIT_CONSISTENTA.md); the others are fixed one by one, then added here.
  */
-export const ENFORCED_RULES: readonly string[] = ['F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'P10'];
+export const ENFORCED_RULES: readonly string[] = ['F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'P1', 'P2', 'P3', 'P5', 'P6', 'P7', 'P9', 'P10', 'P11'];

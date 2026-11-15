@@ -95,10 +95,15 @@ const note = (code, detail, r) => {
   if (!places.has(where)) places.set(where, new Set());
   places.get(where).add(`${r.width}${r.lang === 'en' ? ' EN' : ''}`);
 };
+/** P8: cards one under another on a laptop too (a grid of cards becomes one column on a phone). */
+const listOnDesktop = new Set(
+  rows.filter((r) => r.width >= 1024).flatMap((r) => (r.patterns?.findings ?? []).filter((f) => f.rule.startsWith('P8')).map((f) => `${r.role}/${r.screen}|${f.detail}`)),
+);
 for (const r of rows) {
   if (devOnly(r)) continue;
   for (const f of [...(r.patterns?.findings ?? []), ...(r.fields ?? [])]) {
     const code = f.rule.split(' ')[0];
+    if (code === 'P8' && !listOnDesktop.has(`${r.role}/${r.screen}|${f.detail}`)) continue;
     if (!outsideTemplates(r, code)) note(code, f.detail, r);
   }
 }

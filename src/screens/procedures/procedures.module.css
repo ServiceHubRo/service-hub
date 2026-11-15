@@ -11,7 +11,7 @@
 /* The search on its own row, then the lists to choose from in equal columns (F1, F2). */
 .toolbar {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
   align-items: end;
   gap: var(--space-3);
 }
