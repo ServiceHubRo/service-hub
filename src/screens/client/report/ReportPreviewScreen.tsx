@@ -28,6 +28,7 @@ import {
   type ReportLinkState,
 } from '../paths';
 import styles from './report.module.css';
+import { PageHeader } from '../../../components/PageHeader';
 
 /**
  * The official report of one car, before paying (FR §3.6b, P16e): the car, how many jobs, the
@@ -101,18 +102,20 @@ export function ReportPreviewScreen() {
   return (
     <div className={styles.page}>
       {back}
-      <div>
-        <h1>{t('report.title')}</h1>
-        <p className={styles.sub}>
-          {name}
-          {car.plate && (
-            <>
-              {' · '}
-              <span className="mono">{car.plate}</span>
-            </>
-          )}
-        </p>
-      </div>
+      <PageHeader
+        title={t('report.title')}
+        subtitle={
+          <>
+            {name}
+            {car.plate && (
+              <>
+                {' · '}
+                <span className="mono">{car.plate}</span>
+              </>
+            )}
+          </>
+        }
+      />
       {params.get('plata') === 'anulata' && <Banner tone="warning">{t('report.cancelled')}</Banner>}
 
       {jobs.length === 0 ? (

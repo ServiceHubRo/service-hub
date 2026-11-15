@@ -61,7 +61,7 @@ export function TeamNoticesScreen() {
     <div className={msgStyles.conversation}>
       <div className={msgStyles.top}>
         <BackLink to={messagesPath(side)} label={t('nav.messages')} />
-        <div className={msgStyles.header}>
+        <div data-ui="conversation-header" className={msgStyles.header}>
           <TeamAvatar size={40} />
           <h1 className={msgStyles.headerName}>{t('notices.from')}</h1>
         </div>

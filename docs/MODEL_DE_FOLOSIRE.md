@@ -10,7 +10,7 @@ regula e respectată, iar raportul e în `docs/AUDIT_CONSISTENTA.md`. Detaliile 
 
 | Cod | Regula | Piesa comună |
 |---|---|---|
-| P1 | Fiecare ecran are un singur titlu, sus, în antetul paginii: titlu, o frază sub el (opțional), acțiunea paginii în dreapta, filele sub el. | `PageHeader` |
+| P1 | Fiecare ecran are un singur titlu, sus, în antetul paginii: titlu, o frază sub el (opțional), acțiunea paginii în dreapta, filele sub el. Antete de un fel al lor, la fel pe fiecare cont: conversația (cu poza celui cu care vorbești), pagina unui service, pasul unei programări (sub bara de pași), „Cerere trimisă”, cardul mașinii din garaj (exact ca „Adaugă vehicul” din firmă). | `PageHeader` |
 | P2 | „‹ Înapoi” stă deasupra titlului, mereu la fel. | `BackLink` (prin `PageHeader back`) |
 | — | Fiecare ecran folosește unul din cele cinci șabloane: A listă + detaliu, B grilă de carduri egale, C formular, D panou, E pagină de citit. | `ListDetailLayout`, `CardGrid`, `FormLayout`, `StatGrid` + `PanelSections`, `ReadingPage` |
 

@@ -46,6 +46,7 @@ import { shopBookingsLink } from '../paths';
 import type { DoneState } from './ShopBookingsScreen';
 import { useShopBookings } from './shopBookingsContext';
 import styles from './quoteEditor.module.css';
+import { PageHeader } from '../../../components/PageHeader';
 
 const NOTE_MAX = 2000;
 /** A VAT payer's choice of typing prices without VAT, kept on this device. */
@@ -455,8 +456,7 @@ function Editor({
         nextRow(key);
       }}
     >
-      <h1>{mode === 'send' ? t('qe.title.send') : t('qe.title.replace')}</h1>
-      {mode === 'replace' && <p className={styles.muted}>{t('sb.quote.editBody')}</p>}
+      <PageHeader title={mode === 'send' ? t('qe.title.send') : t('qe.title.replace')} subtitle={mode === 'replace' ? t('sb.quote.editBody') : undefined} />
 
       <Card className={styles.car}>
         <p className={styles.carName}>

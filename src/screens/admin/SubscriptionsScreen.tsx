@@ -1,7 +1,6 @@
 import { CreditCard, Receipt, SearchX } from 'lucide-react';
 import { useDeferredValue, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { BackLink } from '../../components/BackLink';
 import { Button } from '../../components/Button';
 import { Card } from '../../components/Card';
 import { EmptyState } from '../../components/EmptyState';
@@ -22,6 +21,7 @@ import { useLiveData } from './useLiveData';
 import { useUrlParams } from './useUrlParams';
 import { day } from './format';
 import styles from './admin.module.css';
+import { PageHeader } from '../../components/PageHeader';
 
 /** „‹ Înapoi” goes to the screen's zone (A1). */
 const ZONE_BACK = adminZoneBack(ADMIN_SUBSCRIPTIONS_PATH);
@@ -121,10 +121,7 @@ export function SubscriptionsScreen() {
 
   return (
     <div className={styles.page}>
-      <BackLink to={ZONE_BACK.to} label={t(ZONE_BACK.label)} />
-      <div>
-        <h1>{t('admin.subs.title')}</h1>
-      </div>
+      <PageHeader back={{ to: ZONE_BACK.to, label: t(ZONE_BACK.label) }} title={t('admin.subs.title')} />
       {state.status === 'loading' && <SkeletonList />}
       {state.status === 'error' && <LoadError message={t('admin.loadError')} onRetry={reload} />}
       {data && (

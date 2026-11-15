@@ -1,7 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ActionButton } from '../../components/ActionButton';
-import { BackLink } from '../../components/BackLink';
 import { Button } from '../../components/Button';
 import { Card } from '../../components/Card';
 import { CheckMenu } from '../../components/CheckMenu';
@@ -41,6 +40,7 @@ import { audienceLabel, problemText } from './helpFormat';
 import { Pill } from './parts';
 import { ADMIN_HELP_PATH, adminHelpArticlePath } from './paths';
 import styles from './admin.module.css';
+import { PageHeader } from '../../components/PageHeader';
 
 /** The form's own state: keywords as the line the admin types. */
 interface Draft {
@@ -135,8 +135,7 @@ export function HelpArticleEditScreen() {
 
   return (
     <div className={styles.page}>
-      <BackLink to={ADMIN_HELP_PATH} label={t('admin.help.title')} />
-      <h1>{isNew ? t('admin.help.editor.new') : t('admin.help.editor.edit')}</h1>
+      <PageHeader back={{ to: ADMIN_HELP_PATH, label: t('admin.help.title') }} title={isNew ? t('admin.help.editor.new') : t('admin.help.editor.edit')} />
       {state.status === 'loading' && <SkeletonList count={3} />}
       {state.status === 'error' && <LoadError message={t('admin.help.editor.loadError')} onRetry={reload} />}
       {state.status === 'ready' && (

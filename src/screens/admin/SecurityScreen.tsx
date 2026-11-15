@@ -1,6 +1,5 @@
 import { ShieldAlert } from 'lucide-react';
 import { useCallback, useState } from 'react';
-import { BackLink } from '../../components/BackLink';
 import { Button } from '../../components/Button';
 import { Card } from '../../components/Card';
 import { EmptyState } from '../../components/EmptyState';
@@ -25,6 +24,7 @@ import { dateTime } from './format';
 import { Pill } from './parts';
 import { ADMIN_SECURITY_PATH } from './paths';
 import styles from './admin.module.css';
+import { PageHeader } from '../../components/PageHeader';
 
 /** „‹ Înapoi” goes to the screen's zone (A1). */
 const ZONE_BACK = adminZoneBack(ADMIN_SECURITY_PATH);
@@ -65,11 +65,7 @@ export function SecurityScreen() {
 
   return (
     <div className={styles.page}>
-      <BackLink to={ZONE_BACK.to} label={t(ZONE_BACK.label)} />
-      <div>
-        <h1>{t('admin.security.title')}</h1>
-        <p className={styles.muted}>{t('admin.security.desc')}</p>
-      </div>
+      <PageHeader back={{ to: ZONE_BACK.to, label: t(ZONE_BACK.label) }} title={t('admin.security.title')} subtitle={t('admin.security.desc')} />
       <ChoiceFilters
         groups={[
           {

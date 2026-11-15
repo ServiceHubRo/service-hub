@@ -1,6 +1,5 @@
 import { ShieldCheck } from 'lucide-react';
 import { useState } from 'react';
-import { BackLink } from '../../components/BackLink';
 import { Button } from '../../components/Button';
 import { Card } from '../../components/Card';
 import { EmptyState } from '../../components/EmptyState';
@@ -18,6 +17,7 @@ import { dateTime } from './format';
 import { Pill, SectionTitle } from './parts';
 import { ADMIN_ADMINS_PATH } from './paths';
 import styles from './admin.module.css';
+import { PageHeader } from '../../components/PageHeader';
 
 /** „‹ Înapoi” goes to the screen's zone (A1). */
 const ZONE_BACK = adminZoneBack(ADMIN_ADMINS_PATH);
@@ -62,11 +62,7 @@ export function AdminsScreen() {
 
   return (
     <div className={styles.page}>
-      <BackLink to={ZONE_BACK.to} label={t(ZONE_BACK.label)} />
-      <div>
-        <h1>{t('admin.admins.title')}</h1>
-        <p className={styles.muted}>{t('admin.admins.desc')}</p>
-      </div>
+      <PageHeader back={{ to: ZONE_BACK.to, label: t(ZONE_BACK.label) }} title={t('admin.admins.title')} subtitle={t('admin.admins.desc')} />
       {notice && (
         <p className={styles.muted} role="status">
           {notice}

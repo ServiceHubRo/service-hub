@@ -59,7 +59,11 @@ export function measurePatterns(only?: readonly string[]): Patterns {
     const h1s = Array.from(main.querySelectorAll('h1')).filter((h) => !quiet(h) && shown(h));
     if (h1s.length === 0) add('P1 title', 'no title (h1) on the screen');
     if (h1s.length > 1) add('P1 title', `${h1s.length} titles (h1)`);
-    for (const h of h1s) if (!h.closest('[data-ui="page-header"]')) add('P1 title', `„${text(h)}” is not in the page header`);
+    // The page header, or one of the headers of a kind of its own, the same on every account
+    // (docs/MODEL_DE_FOLOSIRE.md): a conversation, a shop's page, a step of booking, a request sent,
+    // the garage's car card (Eduard, 14 Nov 2026: exactly the company's „Adaugă vehicul”).
+    const HEADERS = '[data-ui="page-header"], [data-ui="conversation-header"], [data-ui="shop-header"], [data-ui="step-header"], [data-ui="success"], [data-ui="form-card"]';
+    for (const h of h1s) if (!h.closest(HEADERS)) add('P1 title', `„${text(h)}” is not in the page header`);
 
     for (const level of ['h1', 'h2', 'h3'] as const) {
       for (const h of Array.from(main.querySelectorAll(level))) {

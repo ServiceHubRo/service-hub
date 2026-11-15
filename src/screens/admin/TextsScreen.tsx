@@ -2,7 +2,6 @@ import { SearchX } from 'lucide-react';
 import { useDeferredValue, useMemo, useState } from 'react';
 import { TEMPLATES } from '../../../supabase/functions/_shared/templates.ts';
 import { ActionButton } from '../../components/ActionButton';
-import { BackLink } from '../../components/BackLink';
 import { Button } from '../../components/Button';
 import { Card } from '../../components/Card';
 import { EmptyState } from '../../components/EmptyState';
@@ -24,6 +23,7 @@ import { ADMIN_TEXTS_PATH } from './paths';
 import { useUrlParams } from './useUrlParams';
 import styles from './admin.module.css';
 import tools from './tools.module.css';
+import { PageHeader } from '../../components/PageHeader';
 
 /** „‹ Înapoi” goes to the screen's zone (A1). */
 const ZONE_BACK = adminZoneBack(ADMIN_TEXTS_PATH);
@@ -139,11 +139,7 @@ export function TextsScreen() {
 
   return (
     <div className={styles.page}>
-      <BackLink to={ZONE_BACK.to} label={t(ZONE_BACK.label)} />
-      <div>
-        <h1>{t('admin.texts.title')}</h1>
-        <p className={styles.sub}>{t('admin.texts.sub')}</p>
-      </div>
+      <PageHeader back={{ to: ZONE_BACK.to, label: t(ZONE_BACK.label) }} title={t('admin.texts.title')} subtitle={t('admin.texts.sub')} />
       {state.status === 'loading' && <SkeletonList />}
       {state.status === 'error' && <LoadError message={t('admin.loadError')} onRetry={reload} />}
       {texts && (

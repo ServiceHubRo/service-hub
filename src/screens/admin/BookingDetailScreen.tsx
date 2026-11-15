@@ -24,6 +24,7 @@ import { ADMIN_BOOKINGS_PATH, adminClientPath, adminShopPath } from './paths';
 import { useLiveData } from './useLiveData';
 import { carText, dateTime, day } from './format';
 import styles from './admin.module.css';
+import { PageHeader } from '../../components/PageHeader';
 
 function QuoteCard({ q }: { q: AdminQuote }) {
   const { t, lang } = useI18n();
@@ -94,13 +95,9 @@ export function BookingDetailScreen() {
 
   return (
     <div className={styles.page}>
-      <BackLink to={ADMIN_BOOKINGS_PATH} label={t('nav.admin.bookings')} />
+      <PageHeader back={{ to: ADMIN_BOOKINGS_PATH, label: t('nav.admin.bookings') }} title={service} subtitle={<BookingStatusPill status={b.status} viewer="admin" />} />
 
       <Card className={styles.stack}>
-        <div className={styles.cardHead}>
-          <h1 className={styles.cardTitle}>{service}</h1>
-          <BookingStatusPill status={b.status} viewer="admin" />
-        </div>
         <span className={styles.rowMeta}>
           <span className={styles.id}>{b.ref}</span>
           <span>

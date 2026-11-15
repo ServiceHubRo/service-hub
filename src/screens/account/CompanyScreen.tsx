@@ -1,6 +1,5 @@
 import { useRef, useState } from 'react';
 import { useSession } from '../../app/sessionContext';
-import { BackLink } from '../../components/BackLink';
 import { Card } from '../../components/Card';
 import { SelectField } from '../../components/SelectField';
 import { Field } from '../../components/Field';
@@ -9,6 +8,7 @@ import { useI18n } from '../../i18n/context';
 import { isValidCui, isValidRegCom, normalizeCode } from '../../lib/validators';
 import { SaveButton } from '../shop/settings/SaveButton';
 import styles from './account.module.css';
+import { PageHeader } from '../../components/PageHeader';
 
 type Kind = DocParty['doc_party'];
 type FieldName = 'personAddress' | 'name' | 'vat' | 'regCom' | 'address';
@@ -82,8 +82,7 @@ export function CompanyScreen() {
 
   return (
     <div className={styles.page}>
-      <BackLink to="/c/cont" label={t('nav.account')} />
-      <h1>{t('co.title')}</h1>
+      <PageHeader back={{ to: '/c/cont', label: t('nav.account') }} title={t('co.title')} />
       <Card className={styles.stack}>
         <SelectField
           label={t('co.kind')}

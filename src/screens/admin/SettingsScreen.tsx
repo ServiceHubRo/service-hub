@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { ActionButton } from '../../components/ActionButton';
-import { BackLink } from '../../components/BackLink';
 import { Card } from '../../components/Card';
 import { Field } from '../../components/Field';
 import { LoadError } from '../../components/LoadError';
@@ -23,6 +22,7 @@ import { SectionTitle } from './parts';
 import { ADMIN_SETTINGS_PATH } from './paths';
 import { dateTime } from './format';
 import styles from './admin.module.css';
+import { PageHeader } from '../../components/PageHeader';
 
 /** „‹ Înapoi” goes to the screen's zone (A1). */
 const ZONE_BACK = adminZoneBack(ADMIN_SETTINGS_PATH);
@@ -142,13 +142,11 @@ export function SettingsScreen() {
 
   return (
     <div className={styles.page}>
-      <BackLink to={ZONE_BACK.to} label={t(ZONE_BACK.label)} />
-      <div>
-        <h1>{t('admin.settings.title')}</h1>
-        <p className={styles.sub}>
-          {state.status === 'ready' ? t('admin.settings.updated', { date: dateTime(lang, state.data.updated_at) }) : null}
-        </p>
-      </div>
+      <PageHeader
+        back={{ to: ZONE_BACK.to, label: t(ZONE_BACK.label) }}
+        title={t('admin.settings.title')}
+        subtitle={state.status === 'ready' ? t('admin.settings.updated', { date: dateTime(lang, state.data.updated_at) }) : undefined}
+      />
       {state.status === 'loading' && <SkeletonList />}
       {state.status === 'error' && <LoadError message={t('admin.loadError')} onRetry={reload} />}
       {state.status === 'ready' && <SettingsForm key={lang} settings={state.data} onSaved={setData} />}

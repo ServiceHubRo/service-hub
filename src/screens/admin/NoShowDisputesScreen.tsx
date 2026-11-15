@@ -1,6 +1,5 @@
 import { useCallback, useState } from 'react';
 import { adminZoneBack } from '../../app/adminZones';
-import { BackLink } from '../../components/BackLink';
 import { LoadError } from '../../components/LoadError';
 import { SkeletonList } from '../../components/Skeleton';
 import { fetchNoShowDisputes } from '../../data/noShows';
@@ -10,6 +9,7 @@ import { NoShowDisputesSection } from './NoShowDisputes';
 import { ADMIN_DISPUTES_PATH } from './paths';
 import { useLiveData } from './useLiveData';
 import styles from './admin.module.css';
+import { PageHeader } from '../../components/PageHeader';
 
 const LIVE = [{ table: 'no_show_disputes' }];
 const back = adminZoneBack(ADMIN_DISPUTES_PATH);
@@ -26,8 +26,7 @@ export function NoShowDisputesScreen() {
 
   return (
     <div className={styles.page}>
-      <BackLink to={back.to} label={t(back.label)} />
-      <h1>{t('admin.disputes.title')}</h1>
+      <PageHeader back={{ to: back.to, label: t(back.label) }} title={t('admin.disputes.title')} />
       {state.status === 'loading' && <SkeletonList />}
       {state.status === 'error' && <LoadError message={t('admin.loadError')} onRetry={reload} />}
       {state.status === 'ready' && (

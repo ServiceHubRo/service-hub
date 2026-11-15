@@ -2,7 +2,6 @@ import { FileSearch } from 'lucide-react';
 import { useCallback, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { ActionButton } from '../../components/ActionButton';
-import { BackLink } from '../../components/BackLink';
 import { Button } from '../../components/Button';
 import { Card } from '../../components/Card';
 import { EmptyState } from '../../components/EmptyState';
@@ -34,6 +33,7 @@ import { SUPPORT_REQUESTS_PATH } from '../support/paths';
 import adminStyles from '../admin/admin.module.css';
 import supportStyles from '../support/support.module.css';
 import styles from './requests.module.css';
+import { PageHeader } from '../../components/PageHeader';
 
 type T = (key: MessageKey, params?: Record<string, string | number>) => string;
 
@@ -212,11 +212,7 @@ export function TextReviewsScreen({ mode }: { mode: 'support' | 'admin' }) {
 
   return (
     <div className={adminStyles.page}>
-      <BackLink to={back.to} label={t(back.label)} />
-      <div>
-        <h1>{t('support.textReview.title')}</h1>
-        <p className={adminStyles.muted}>{t('support.textReview.desc')}</p>
-      </div>
+      <PageHeader back={{ to: back.to, label: t(back.label) }} title={t('support.textReview.title')} subtitle={t('support.textReview.desc')} />
       {notice && (
         <p className={supportStyles.notice} role="status">
           {notice}

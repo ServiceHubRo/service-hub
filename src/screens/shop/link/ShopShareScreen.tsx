@@ -1,6 +1,5 @@
 import { Copy, Download, Printer, Share2 } from 'lucide-react';
 import { useCallback, useMemo, useState } from 'react';
-import { BackLink } from '../../../components/BackLink';
 import { Button } from '../../../components/Button';
 import { Card } from '../../../components/Card';
 import { LoadError } from '../../../components/LoadError';
@@ -17,6 +16,7 @@ import { saveFile } from '../../../lib/saveFile';
 import { useLoad } from '../../../lib/useLoad';
 import { ACCOUNT_PATH } from '../paths';
 import styles from './shopShare.module.css';
+import { PageHeader } from '../../../components/PageHeader';
 
 /**
  * Linkul service-ului (T31b, Cont → `/s/cont/link`): the address that opens the shop's page,
@@ -57,12 +57,8 @@ export function ShopShareScreen() {
   return (
     <div className={styles.page} data-layout="columns">
       <div className="no-print" data-span="all">
-        <BackLink to={ACCOUNT_PATH} label={t('nav.account')} />
+        <PageHeader back={{ to: ACCOUNT_PATH, label: t('nav.account') }} title={t('slk.title')} subtitle={t('slk.intro')} />
       </div>
-      <h1 className="no-print">{t('slk.title')}</h1>
-      <p className={`${styles.muted} no-print`} data-span="all">
-        {t('slk.intro')}
-      </p>
 
       {state.status === 'loading' && <SkeletonList count={2} />}
       {state.status === 'error' && <LoadError message={t('slk.loadError')} onRetry={reload} />}

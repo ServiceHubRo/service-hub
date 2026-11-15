@@ -18,6 +18,7 @@ import { ADMIN_CLIENTS_PATH, adminBookingPath, adminBookingsLink } from './paths
 import { useLiveData } from './useLiveData';
 import { carText, dateTime, day } from './format';
 import styles from './admin.module.css';
+import { PageHeader } from '../../components/PageHeader';
 
 type Panel = 'suspend' | 'unsuspend' | 'delete' | 'report' | null;
 
@@ -61,16 +62,20 @@ export function ClientDetailScreen() {
 
   return (
     <div className={styles.page}>
-      <BackLink to={ADMIN_CLIENTS_PATH} label={t('nav.admin.clients')} />
+      <PageHeader
+        back={{ to: ADMIN_CLIENTS_PATH, label: t('nav.admin.clients') }}
+        title={p.name || t('admin.noName')}
+        subtitle={
+          p.suspended || c.no_shows >= NO_SHOW_FLAG ? (
+            <span className={styles.rowTop}>
+              {p.suspended && <Pill tone="red">{t('admin.suspended')}</Pill>}
+              {c.no_shows >= NO_SHOW_FLAG && <Pill tone="amber">{t('admin.noShowFlag', { n: c.no_shows })}</Pill>}
+            </span>
+          ) : undefined
+        }
+      />
 
       <Card className={styles.stack}>
-        <div className={styles.cardHead}>
-          <h1 className={styles.cardTitle}>{p.name || t('admin.noName')}</h1>
-          <span className={styles.rowTop}>
-            {p.suspended && <Pill tone="red">{t('admin.suspended')}</Pill>}
-            {c.no_shows >= NO_SHOW_FLAG && <Pill tone="amber">{t('admin.noShowFlag', { n: c.no_shows })}</Pill>}
-          </span>
-        </div>
         <span className={styles.id}>{p.display_id}</span>
         <span className={styles.checks}>
           <Verified ok={Boolean(p.email_verified_at)} label={t('admin.email')} />

@@ -4,7 +4,6 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { NAV } from '../../../app/roles';
 import { useSession } from '../../../app/sessionContext';
 import { ActionButton } from '../../../components/ActionButton';
-import { BackLink } from '../../../components/BackLink';
 import { Banner } from '../../../components/Banner';
 import { Card } from '../../../components/Card';
 import { EmptyState } from '../../../components/EmptyState';
@@ -32,6 +31,7 @@ import { useClientBookings } from '../bookings/clientBookingsContext';
 import { bookingReportPath, carReportPath, type ReportLinkState } from '../paths';
 import styles from './report.module.css';
 import { StatusPill } from '../../../components/StatusPill';
+import { PageHeader } from '../../../components/PageHeader';
 
 const FROM_REPORTS: ReportLinkState = { from: 'reports' };
 /** A paid report still without its PDF after this long gets "Pregătește raportul acum". */
@@ -81,10 +81,7 @@ export function MyReportsScreen() {
 
   return (
     <div className={styles.page}>
-      <BackLink to={NAV.client.account.path} label={t('nav.account')} />
-      <div>
-        <h1>{t('reports.title')}</h1>
-      </div>
+      <PageHeader back={{ to: NAV.client.account.path, label: t('nav.account') }} title={t('reports.title')} />
 
       {returned && (
         <Banner tone="info">{justPaid?.status === 'generated' ? t('reports.return.done') : t('reports.return.ok')}</Banner>

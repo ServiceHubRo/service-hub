@@ -269,7 +269,7 @@ export function ConversationScreen() {
     <div className={styles.conversation} data-fill-screen>
       <div className={styles.top}>
         <BackLink to={messagesPath(side)} label={t('nav.messages')} />
-        <div className={styles.header}>
+        <div data-ui="conversation-header" className={styles.header}>
           {thread && <ThreadAvatar side={side} thread={thread} size={40} />}
           <h1 className={styles.headerName}>
             {thread && side === 'client' ? <Link to={shopPath(thread.shop_id)}>{name}</Link> : name}

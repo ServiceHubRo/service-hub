@@ -142,7 +142,7 @@ function ShopDetails({ page, day, onFavorite }: { page: ShopPageData; day: strin
           column empty below); the parts inside lay out across the width. */}
       <div className={styles.columns}>
         <div className={styles.column}>
-          <header className={styles.header}>
+          <header data-ui="shop-header" className={styles.header}>
             <ShopAvatar name={shop.name} logoUrl={shop.logo_url} size={56} />
             <div className={styles.headText}>
               <h1 className={styles.name}>{shop.name}</h1>

@@ -24,6 +24,7 @@ import { EditPanel, PricePanel, StatusPanel, TrialPanel } from './ShopPanels';
 import { useLiveData } from './useLiveData';
 import { carText, dateTime, day, stripeRuns } from './format';
 import styles from './admin.module.css';
+import { PageHeader } from '../../components/PageHeader';
 
 type Panel = 'suspend' | 'unsuspend' | 'phone' | 'trial' | 'status' | 'price' | 'edit' | 'delete' | null;
 
@@ -75,13 +76,9 @@ export function ShopDetailScreen() {
 
   return (
     <div className={styles.page}>
-      <BackLink to={ADMIN_SHOPS_PATH} label={t('nav.admin.shops')} />
+      <PageHeader back={{ to: ADMIN_SHOPS_PATH, label: t('nav.admin.shops') }} title={s.name} subtitle={<ShopStatePill state={d.state} />} />
 
       <Card className={styles.stack}>
-        <div className={styles.cardHead}>
-          <h1 className={styles.cardTitle}>{s.name}</h1>
-          <ShopStatePill state={d.state} />
-        </div>
         <span className={styles.rowMeta}>
           <span className={styles.id}>{o.display_id}</span>
           <span>{[s.street, s.city].filter(Boolean).join(', ')}</span>

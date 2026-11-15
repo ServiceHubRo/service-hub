@@ -15,6 +15,7 @@ import { PhoneVerify } from '../../phone/PhoneVerify';
 import { InviteSummary } from '../../public/InviteSummary';
 import { BOOKINGS_PATH } from '../paths';
 import styles from '../../public/BookingLink.module.css';
+import { PageHeader } from '../../../components/PageHeader';
 
 /**
  * /c/preia/:token (T29): a booking a shop added for this client, taken into the account with one
@@ -104,7 +105,7 @@ export function ClaimScreen() {
 
   return (
     <div className={styles.buttons}>
-      <h1>{t('cl.title')}</h1>
+      <PageHeader title={t('cl.title')} />
       {body}
     </div>
   );

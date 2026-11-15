@@ -43,6 +43,7 @@ import { basisLabel, holdError, type HoldField } from './legalHoldText';
 import { ADMIN_HOLDS_PATH, adminHoldPath, adminRequestPath } from './paths';
 import styles from './admin.module.css';
 import supportStyles from '../support/support.module.css';
+import { PageHeader } from '../../components/PageHeader';
 
 /** „‹ Suport” (A1). */
 const ZONE_BACK = adminZoneBack(ADMIN_HOLDS_PATH);
@@ -240,10 +241,7 @@ export function LegalHoldsScreen() {
 
   return (
     <div className={styles.page}>
-      <BackLink to={ZONE_BACK.to} label={t(ZONE_BACK.label)} />
-      <div>
-        <h1>{t('admin.holds.title')}</h1>
-      </div>
+      <PageHeader back={{ to: ZONE_BACK.to, label: t(ZONE_BACK.label) }} title={t('admin.holds.title')} />
 
       <section className={styles.section}>
         <SectionTitle>{t('admin.holds.new.title')}</SectionTitle>
@@ -319,8 +317,7 @@ export function LegalHoldScreen() {
   if (state.status !== 'ready') {
     return (
       <div className={styles.page}>
-        <BackLink to={back.to} label={back.label} />
-        <h1>{t('admin.holds.title')}</h1>
+        <PageHeader back={{ to: back.to, label: back.label }} title={t('admin.holds.title')} />
         {state.status === 'loading' ? <SkeletonList count={3} /> : <LoadError message={t('admin.holds.detail.loadError')} onRetry={reload} />}
       </div>
     );

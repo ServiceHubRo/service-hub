@@ -1,7 +1,6 @@
 import { ArrowDown, ArrowUp, ChevronDown, ChevronRight, ListTree, Plus, SearchX } from 'lucide-react';
 import { useCallback, useDeferredValue, useMemo, useRef, useState } from 'react';
 import { ActionButton } from '../../components/ActionButton';
-import { BackLink } from '../../components/BackLink';
 import { Button } from '../../components/Button';
 import { Card } from '../../components/Card';
 import { Switch } from '../../components/Switch';
@@ -43,6 +42,7 @@ import { ADMIN_CATALOG_PATH } from './paths';
 import { useUrlParams } from './useUrlParams';
 import styles from './admin.module.css';
 import tools from './tools.module.css';
+import { PageHeader } from '../../components/PageHeader';
 
 /** „‹ Înapoi” goes to the screen's zone (A1). */
 const ZONE_BACK = adminZoneBack(ADMIN_CATALOG_PATH);
@@ -355,11 +355,7 @@ export function CatalogScreen() {
 
   return (
     <div className={styles.page}>
-      <BackLink to={ZONE_BACK.to} label={t(ZONE_BACK.label)} />
-      <div>
-        <h1>{t('admin.catalog.title')}</h1>
-        <p className={styles.sub}>{t('admin.catalog.sub')}</p>
-      </div>
+      <PageHeader back={{ to: ZONE_BACK.to, label: t(ZONE_BACK.label) }} title={t('admin.catalog.title')} subtitle={t('admin.catalog.sub')} />
       {state.status === 'loading' && <SkeletonList />}
       {state.status === 'error' && <LoadError message={t('admin.loadError')} onRetry={reload} />}
       {all && (

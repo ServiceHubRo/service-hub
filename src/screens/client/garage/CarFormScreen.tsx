@@ -155,7 +155,7 @@ function CarEditor({ car }: { car: Car | null }) {
       {/* Exactly the card of „Adaugă vehicul” in a company's space (Eduard, 14 Nov 2026): the title in
           the card, equal fields that fill it, „Documente”, then the button across and „Renunță”. The
           oil change is the garage's own, built the same way as the documents. */}
-      <Card className={fleetStyles.card}>
+      <Card data-ui="form-card" className={fleetStyles.card}>
         <h1 className={fleetStyles.cardTitle}>{car ? t('garage.editTitle') : t('garage.add')}</h1>
         <form className={fleetStyles.stack} onSubmit={(e) => e.preventDefault()} noValidate>
           <div className={fleetStyles.formGrid}>
