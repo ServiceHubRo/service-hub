@@ -183,7 +183,8 @@ test.describe('Fișa mașinii', () => {
     await expect(page).toHaveURL(/\/s\/istoric\/fisa\//);
     await expect(page.getByRole('region', { name: /Reparații anterioare la alte service-uri/ })).toContainText('Plăcuțe față schimbate');
     await page.getByRole('link', { name: 'Istoric' }).first().click();
-    await expect(page).toHaveURL(/\/s\/istoric$/);
+    // Back to Istoric: on a phone the job that was open is still the one in the address (?reparatie=).
+    await expect(page).toHaveURL(/\/s\/istoric(\?reparatie=[0-9a-f-]+)?$/);
 
     await serviceRest(`profiles?id=eq.${await userIdOf(shopEmail)}`, 'PATCH', { lang: 'en' });
     await openFileFromBookingsEn(page);
