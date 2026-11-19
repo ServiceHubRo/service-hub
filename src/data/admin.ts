@@ -105,7 +105,13 @@ export interface AccountActivityPage {
   items: AccountActivityItem[];
   /** Older events exist: ask again with the last item's `at` and `key`. */
   more: boolean;
+  /** Events per category for the words searched (only on the first page). */
+  counts: Partial<Record<ActivityCategory, number>> | null;
 }
+
+/** The groups the history of an account is split in (the tabs under „Activitate”). */
+export const ACTIVITY_CATEGORIES = ['bookings', 'quotes', 'reviews', 'payments', 'account', 'admin'] as const;
+export type ActivityCategory = (typeof ACTIVITY_CATEGORIES)[number];
 
 export const ACTIVITY_PAGE = 30;
 
@@ -113,6 +119,7 @@ export async function fetchAccountActivity(
   kind: 'client' | 'shop',
   id: string,
   after?: { at: string; key: string },
+  filter: { category?: ActivityCategory; q?: string } = {},
 ): Promise<AccountActivityPage> {
   return (await call('admin_account_activity', {
     p_kind: kind,
@@ -120,6 +127,8 @@ export async function fetchAccountActivity(
     p_before: after?.at,
     p_before_key: after?.key,
     p_limit: ACTIVITY_PAGE,
+    p_category: filter.category,
+    p_q: filter.q || undefined,
   })) as unknown as AccountActivityPage;
 }
 

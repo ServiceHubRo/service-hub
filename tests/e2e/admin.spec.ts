@@ -130,6 +130,17 @@ test.describe('admin', () => {
     // The activity of this shop is under it: the creation of the account, newest first.
     const activity = page.getByRole('list', { name: 'Activitatea contului' });
     await expect(activity).toContainText('Service creat');
+    // By category (tabs with how many each holds) and by search, both answered by the database.
+    const categories = page.getByRole('tablist', { name: 'Categoriile activității' });
+    await expect(categories.getByRole('tab', { name: /^Toate/ })).toBeVisible();
+    await expect(categories.getByRole('tab', { name: /^Plăți/ })).toHaveCount(0);
+    await categories.getByRole('tab', { name: /^Cont/ }).click();
+    await expect(activity).toContainText('Service creat');
+    await categories.getByRole('tab', { name: /^Toate/ }).click();
+    await page.getByRole('searchbox', { name: 'Caută după cod, nume sau service' }).fill('zzzz-nu-exista');
+    await expect(page.getByText('Nu există rezultate pentru filtrele selectate.')).toBeVisible();
+    await page.getByRole('button', { name: 'Șterge căutarea' }).click();
+    await expect(activity).toContainText('Service creat');
     await shot(page, 't16a-shop', name());
 
     // Suspend: a reason is required, the shop leaves search at once.

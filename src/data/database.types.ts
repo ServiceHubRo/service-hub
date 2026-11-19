@@ -4957,7 +4957,15 @@ export type Database = {
         Returns: string
       }
       admin_account_activity: {
-        Args: { p_before?: string; p_before_key?: string; p_id: string; p_kind: string; p_limit?: number }
+        Args: {
+          p_before?: string
+          p_before_key?: string
+          p_category?: string
+          p_id: string
+          p_kind: string
+          p_limit?: number
+          p_q?: string
+        }
         Returns: Json
       }
       admin_account_deletion: {

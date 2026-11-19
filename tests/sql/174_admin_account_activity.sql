@@ -85,6 +85,48 @@ end
 $$;
 drop table pg_all;
 
+-- ------------------------------------------------------------------ categories and search
+select test.fails(format($$select public.admin_account_activity('client', %L, null, null, 30, 'nonsense')$$, test.id('client_a')), 'field_invalid',
+  'an unknown category is refused');
+select test.ok((select bool_and(i->>'kind' like 'booking\_%')
+                from jsonb_array_elements(public.admin_account_activity('client', test.id('client_a'), null, null, 100, 'bookings')->'items') i),
+  'the bookings category holds only the steps of bookings');
+select test.ok((select count(*) > 0
+                from jsonb_array_elements(public.admin_account_activity('client', test.id('client_a'), null, null, 100, 'bookings')->'items') i),
+  'and the client has some');
+select test.ok((select bool_and(i->>'kind' = 'review_written')
+                from jsonb_array_elements(public.admin_account_activity('client', test.id('client_a'), null, null, 100, 'reviews')->'items') i),
+  'the reviews category holds only reviews');
+select test.eq(jsonb_array_length(public.admin_account_activity('client', test.id('client_a'), null, null, 100, 'payments')->'items'), 0,
+  'a client has no payments');
+-- The counts add up to the whole list and agree with each category.
+select test.eq((select sum(value::int) from jsonb_each_text(public.admin_account_activity('client', test.id('client_a'), null, null, 100)->'counts')),
+               (select count(*)::bigint from jsonb_array_elements(public.admin_account_activity('client', test.id('client_a'), null, null, 100)->'items')),
+  'the counts per category add up to every event');
+select test.eq((public.admin_account_activity('client', test.id('client_a'), null, null, 100)->'counts'->>'bookings')::int,
+               jsonb_array_length(public.admin_account_activity('client', test.id('client_a'), null, null, 100, 'bookings')->'items'),
+  'the count of a category is the length of that category');
+-- Search: by booking code, by name (without diacritics), by service; the counts follow the words.
+create temp table s_ref as
+  select (i->>'ref') as ref from jsonb_array_elements(public.admin_account_activity('client', test.id('client_a'), null, null, 100)->'items') i
+  where i->>'ref' is not null limit 1;
+select test.ok((select count(*) > 0 and bool_and(i->>'ref' = (select ref from s_ref))
+                from jsonb_array_elements(public.admin_account_activity('client', test.id('client_a'), null, null, 100, null, (select lower(ref) from s_ref))->'items') i),
+  'searching a booking code finds the events of that booking only');
+select test.eq(jsonb_array_length(public.admin_account_activity('client', test.id('client_a'), null, null, 100, null, 'zzzz-nu-exista')->'items'), 0,
+  'words that match nothing find nothing');
+select test.eq(public.admin_account_activity('client', test.id('client_a'), null, null, 100, null, 'zzzz-nu-exista')->'counts', '{}'::jsonb,
+  'and every count is empty');
+select test.ok(jsonb_array_length(public.admin_account_activity('client', test.id('client_a'), null, null, 100, null, '  ')->'items')
+               = jsonb_array_length(public.admin_account_activity('client', test.id('client_a'), null, null, 100)->'items'),
+  'blank words are no filter');
+select test.ok(jsonb_array_length(public.admin_account_activity('client', test.id('client_a'), null, null, 100, null, (select upper(ref) from s_ref))->'items') > 0,
+  'search is not case sensitive');
+-- Another category changes nothing about the page of the same filter: 2 at a time, the next page of the SAME filter.
+select test.ok((public.admin_account_activity('client', test.id('client_a'), null, null, 1, 'bookings')->>'more')::boolean,
+  'a short page of a category says there are older ones');
+drop table s_ref;
+
 -- ------------------------------------------------------------------ a shop
 select test.ok((select array_agg(i->>'kind') @> array['shop_created', 'booking_created', 'booking_done', 'quote_sent']
                 from jsonb_array_elements(public.admin_account_activity('shop', test.id('shop1'), null, null, 100)->'items') i),

@@ -1,5 +1,6 @@
 import {
   Activity,
+  SearchX,
   CalendarCheck,
   CalendarPlus,
   CalendarX,
@@ -16,12 +17,21 @@ import {
   Wrench,
   type LucideIcon,
 } from 'lucide-react';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Button } from '../../components/Button';
 import { EmptyState } from '../../components/EmptyState';
 import { ListRow, ListRows, ListRowsSkeleton } from '../../components/ListRow';
 import { LoadError } from '../../components/LoadError';
-import { fetchAccountActivity, type AccountActivityItem, type AccountActivityKind } from '../../data/admin';
+import { SearchField } from '../../components/SearchField';
+import { TabPanel, Tabs, type TabItem } from '../../components/Tabs';
+import {
+  ACTIVITY_CATEGORIES,
+  fetchAccountActivity,
+  type AccountActivityItem,
+  type AccountActivityKind,
+  type AccountActivityPage,
+  type ActivityCategory,
+} from '../../data/admin';
 import { useI18n, type I18nValue } from '../../i18n/context';
 import { formatMoney } from '../../i18n/format';
 import type { MessageKey } from '../../i18n/ro';
@@ -114,24 +124,73 @@ function linkOf(a: AccountActivityItem): string | undefined {
   return undefined;
 }
 
+const ALL = 'all';
+type Tab = typeof ALL | ActivityCategory;
+
 /**
  * The history of ONE account, under that account in admin (Eduard, 16 Nov 2026: a list of the last 50
- * things of the whole platform does not work with thousands of users): newest first, a page of 30 at
- * a time with „Mai vechi”. It comes from the database as it is (the moments a booking reached each
- * step, the quotes, the reviews, the payments, the team, what an admin did): nothing private, no message.
+ * things of the whole platform does not work with thousands of users; 19 Nov: „pe categorii, cu câmp de
+ * căutare”): newest first, a page of 30 at a time with „Mai vechi”, split in categories (tabs with how
+ * many each holds) and searched by booking code, name or service. The category and the words are
+ * applied in the database, so every page is a page of the same filter. It comes from the database as
+ * it is (the moments a booking reached each step, the quotes, the reviews, the payments, the team,
+ * what an admin did): nothing private, no message.
  */
 export function AccountActivity({ kind, id }: { kind: 'client' | 'shop'; id: string }) {
   const { t, lang } = useI18n();
-  const load = useCallback(() => fetchAccountActivity(kind, id), [kind, id]);
+  const [tab, setTab] = useState<Tab>(ALL);
+  const [text, setText] = useState('');
+  // The words reach the database after a short pause in typing.
+  const [q, setQ] = useState('');
+  useEffect(() => {
+    const timer = window.setTimeout(() => setQ(text.trim()), 350);
+    return () => window.clearTimeout(timer);
+  }, [text]);
+
+  const category = tab === ALL ? undefined : tab;
+  const filterKey = `${tab}|${q}`;
+  const load = useCallback(() => fetchAccountActivity(kind, id, undefined, { category, q }), [kind, id, category, q]);
   const { state, reload } = useLoad(load);
-  // The pages after the first one: kept here, the first one is read (and read again) by useLoad.
-  const [extra, setExtra] = useState<{ items: AccountActivityItem[]; more: boolean } | null>(null);
+  // The pages after the first one belong to the filter they were asked with.
+  const [extra, setExtra] = useState<{ key: string; items: AccountActivityItem[]; more: boolean } | null>(null);
   const [busy, setBusy] = useState(false);
   const [failed, setFailed] = useState(false);
+  // The tabs keep their counts while the next answer is on its way.
+  const [counts, setCounts] = useState<AccountActivityPage['counts']>(null);
+  if (state.status === 'ready' && state.data.counts && state.data.counts !== counts) setCounts(state.data.counts);
 
-  if (state.status === 'loading') return <ListRowsSkeleton label={t('common.loading')} />;
-  if (state.status === 'error')
-    return (
+  const mine = extra?.key === filterKey ? extra : null;
+  const filtered = q !== '' || tab !== ALL;
+
+  async function older(from: AccountActivityItem) {
+    setBusy(true);
+    setFailed(false);
+    try {
+      const page = await fetchAccountActivity(kind, id, { at: from.at, key: from.key }, { category, q });
+      setExtra({ key: filterKey, items: [...(mine?.items ?? []), ...page.items], more: page.more });
+    } catch {
+      setFailed(true);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  const total = Object.values(counts ?? {}).reduce((sum, n) => sum + (n ?? 0), 0);
+  // An account with no events at all has nothing to search or sort.
+  const hasAny = total > 0 || filtered;
+  const tabs: TabItem<Tab>[] = [
+    { key: ALL, label: t('admin.acct.cat.all'), count: total },
+    ...ACTIVITY_CATEGORIES.filter((c) => (counts?.[c] ?? 0) > 0 || c === tab).map((c) => ({
+      key: c as Tab,
+      label: t(`admin.acct.cat.${c}` as MessageKey),
+      count: counts?.[c] ?? 0,
+    })),
+  ];
+
+  let body;
+  if (state.status === 'loading') body = <ListRowsSkeleton label={t('common.loading')} />;
+  else if (state.status === 'error')
+    body = (
       <LoadError
         message={t('admin.loadError')}
         onRetry={() => {
@@ -140,58 +199,72 @@ export function AccountActivity({ kind, id }: { kind: 'client' | 'shop'; id: str
         }}
       />
     );
-
-  const items = [...state.data.items, ...(extra?.items ?? [])];
-  const more = extra ? extra.more : state.data.more;
-  if (items.length === 0) return <EmptyState icon={Activity} title={t('admin.acct.empty')} />;
-
-  async function older() {
-    const last = items[items.length - 1]!;
-    setBusy(true);
-    setFailed(false);
-    try {
-      const page = await fetchAccountActivity(kind, id, { at: last.at, key: last.key });
-      setExtra({ items: [...(extra?.items ?? []), ...page.items], more: page.more });
-    } catch {
-      setFailed(true);
-    } finally {
-      setBusy(false);
-    }
+  else {
+    const items = [...state.data.items, ...(mine?.items ?? [])];
+    const more = mine ? mine.more : state.data.more;
+    body =
+      items.length === 0 ? (
+        filtered ? (
+          <EmptyState icon={SearchX} title={t('admin.noResults')} />
+        ) : (
+          <EmptyState icon={Activity} title={t('admin.acct.empty')} />
+        )
+      ) : (
+        <>
+          <ListRows label={t('admin.acct.list')}>
+            {items.map((a) => {
+              const Icon = ICON[a.kind];
+              const line = lineOf(t, lang, a);
+              return (
+                <ListRow
+                  key={a.key}
+                  icon={<Icon size={20} />}
+                  title={kindLabel(t, a.kind)}
+                  detail={[dateTime(lang, a.at), line].filter(Boolean).join(' · ')}
+                  attention={NEEDS_EYES.has(a.kind)}
+                  to={linkOf(a)}
+                />
+              );
+            })}
+          </ListRows>
+          {more && (
+            <div>
+              <Button onClick={() => void older(items[items.length - 1]!)} disabled={busy} aria-busy={busy}>
+                {t('bookings.older')}
+              </Button>
+            </div>
+          )}
+          {failed && (
+            <p role="alert">
+              {t('admin.loadError')}{' '}
+              <Button variant="ghost" onClick={() => void older(items[items.length - 1]!)}>
+                {t('action.retry')}
+              </Button>
+            </p>
+          )}
+        </>
+      );
   }
 
   return (
     <>
-      <ListRows label={t('admin.acct.list')}>
-        {items.map((a) => {
-          const Icon = ICON[a.kind];
-          const line = lineOf(t, lang, a);
-          return (
-            <ListRow
-              key={a.key}
-              icon={<Icon size={20} />}
-              title={kindLabel(t, a.kind)}
-              detail={[dateTime(lang, a.at), line].filter(Boolean).join(' · ')}
-              attention={NEEDS_EYES.has(a.kind)}
-              to={linkOf(a)}
-            />
-          );
-        })}
-      </ListRows>
-      {more && (
-        <div>
-          <Button onClick={() => void older()} disabled={busy} aria-busy={busy}>
-            {t('bookings.older')}
-          </Button>
-        </div>
+      {hasAny && (
+        <>
+          <SearchField
+            id={`activity-q-${kind}`}
+            label={t('admin.acct.search')}
+            placeholder={t('admin.acct.search')}
+            value={text}
+            onChange={setText}
+            onClear={() => setText('')}
+            clearLabel={t('admin.search.clear')}
+          />
+          <Tabs id={`activity-${kind}`} label={t('admin.acct.categories')} items={tabs} value={tab} onChange={setTab} />
+        </>
       )}
-      {failed && (
-        <p role="alert">
-          {t('admin.loadError')}{' '}
-          <Button variant="ghost" onClick={() => void older()}>
-            {t('action.retry')}
-          </Button>
-        </p>
-      )}
+      <TabPanel id={`activity-${kind}`} value={tab}>
+        {body}
+      </TabPanel>
     </>
   );
 }
