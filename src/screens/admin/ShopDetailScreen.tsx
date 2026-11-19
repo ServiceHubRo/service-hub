@@ -18,6 +18,7 @@ import { monthlyAverage } from '../../lib/subscription';
 import { formatPhone } from '../../lib/validators';
 import { CompanyCheckCard } from '../company/CompanyCheckCard';
 import { ConfirmPanel } from './ActionPanels';
+import { AccountActivity } from './AccountActivity';
 import { AuditList, Facts, Money, Pill, SectionTitle, ShopStatePill, SubscriptionPill, Verified } from './parts';
 import { ADMIN_SHOPS_PATH, adminBookingPath, adminBookingsLink } from './paths';
 import { EditPanel, PricePanel, StatusPanel, TrialPanel } from './ShopPanels';
@@ -445,6 +446,9 @@ export function ShopDetailScreen() {
           ))}
         </ul>
       )}
+
+      <SectionTitle>{t('admin.acct.title')}</SectionTitle>
+      <AccountActivity kind="shop" id={s.id} />
 
       <SectionTitle>{t('admin.audit.title')}</SectionTitle>
       <AuditList entries={d.audit} />

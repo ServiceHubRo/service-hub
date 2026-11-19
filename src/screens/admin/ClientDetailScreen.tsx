@@ -13,6 +13,7 @@ import { useI18n } from '../../i18n/context';
 import { NO_SHOW_FLAG } from '../../lib/admin';
 import { formatPhone } from '../../lib/validators';
 import { ConfirmPanel } from './ActionPanels';
+import { AccountActivity } from './AccountActivity';
 import { AuditList, Facts, Money, Pill, RowLink, SectionTitle, Verified } from './parts';
 import { ADMIN_CLIENTS_PATH, adminBookingPath, adminBookingsLink } from './paths';
 import { useLiveData } from './useLiveData';
@@ -290,6 +291,9 @@ export function ClientDetailScreen() {
           ))}
         </ul>
       )}
+
+      <SectionTitle>{t('admin.acct.title')}</SectionTitle>
+      <AccountActivity kind="client" id={clientId} />
 
       <SectionTitle>{t('admin.audit.title')}</SectionTitle>
       <AuditList entries={c.audit} />

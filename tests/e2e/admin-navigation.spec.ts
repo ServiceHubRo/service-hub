@@ -202,7 +202,7 @@ test.describe('A1 — admin navigation', () => {
 
   test('the five zones and every function of the inventory open from the menu, each with what it shows', async ({ page }) => {
     await signInAdmin(page);
-    await expect(main(page).getByText('Activitate recentă')).toBeVisible();
+    await expect(main(page).getByText('Activitate recentă')).toHaveCount(0);
 
     // The five zones, in this order, nothing else in the main navigation (a phone: the bottom bar).
     for (const zone of ZONES) {

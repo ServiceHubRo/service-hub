@@ -52,33 +52,75 @@ export interface BookingWindow {
   by_status: Partial<Record<BookingStatus, number>>;
 }
 
-export type ActivityItem =
-  | { kind: 'shop_created'; at: string; id: string; name: string; city: string }
-  | { kind: 'client_created'; at: string; id: string; name: string | null; display_id: string }
-  | {
-      kind: 'booking_created';
-      at: string;
-      id: string;
-      ref: string;
-      name: string;
-      status: BookingStatus;
-      service_ro: string | null;
-      service_en: string | null;
-    }
-  | { kind: 'review_reported'; at: string; id: string; name: string; reason: ReportReason; rating: number; status: ReportStatus }
-  | { kind: 'payment_failed'; at: string; id: string; name: string };
-
 export interface AdminOverview {
   shops: Record<'active' | 'trial' | 'inactive' | 'suspended' | 'total', number>;
   clients: number;
   bookings: Record<'today' | 'week' | 'month', BookingWindow>;
   reports_pending: number;
   subscriptions: { active: number; past_due: number; trial: number; trial_ending: number; mrr: number };
-  activity: ActivityItem[];
 }
 
 export async function fetchOverview(): Promise<AdminOverview> {
   return (await call('admin_overview', {} as never)) as unknown as AdminOverview;
+}
+
+// ------------------------------------------------------------------------------------ an account's activity
+
+/**
+ * What happened to ONE account (Eduard, 16 Nov 2026: the history is under each account, not one list
+ * of the whole platform). `booking_<step>` is the moment a booking reached a step (`created`,
+ * `confirmed`, `in_inspection`, `in_progress`, `done`, `cancelled`, or an end: `declined`, `expired`,
+ * `no_show`, `quote_refused`); `quote_<state>`; reviews; money and team of a shop; what an admin did.
+ */
+export type AccountActivityKind =
+  | 'account_created'
+  | 'shop_created'
+  | `booking_${'created' | 'confirmed' | 'in_inspection' | 'in_progress' | 'done' | 'cancelled' | 'declined' | 'expired' | 'no_show' | 'quote_refused'}`
+  | `quote_${'sent' | 'accepted' | 'partially_accepted' | 'refused'}`
+  | 'review_written'
+  | 'review_received'
+  | 'review_reply'
+  | 'review_reported'
+  | 'invoice_issued'
+  | 'payment_failed'
+  | 'staff_joined'
+  | 'admin_action';
+
+export interface AccountActivityItem {
+  /** Unique and stable: with `at` it is the place of the event in the list (the next page starts after it). */
+  key: string;
+  kind: AccountActivityKind;
+  at: string;
+  booking_id: string | null;
+  ref: string | null;
+  /** The other side: the shop for a client, the client for a shop (a review: its author or the shop). */
+  name: string | null;
+  service_ro: string | null;
+  service_en: string | null;
+  /** Per kind: `by` (who canceled or decided), `version`, `rating`, `reason`, `status`, `amount`, `currency`, `city`, `action`. */
+  detail: Record<string, string | number | null>;
+}
+
+export interface AccountActivityPage {
+  items: AccountActivityItem[];
+  /** Older events exist: ask again with the last item's `at` and `key`. */
+  more: boolean;
+}
+
+export const ACTIVITY_PAGE = 30;
+
+export async function fetchAccountActivity(
+  kind: 'client' | 'shop',
+  id: string,
+  after?: { at: string; key: string },
+): Promise<AccountActivityPage> {
+  return (await call('admin_account_activity', {
+    p_kind: kind,
+    p_id: id,
+    p_before: after?.at,
+    p_before_key: after?.key,
+    p_limit: ACTIVITY_PAGE,
+  })) as unknown as AccountActivityPage;
 }
 
 // ------------------------------------------------------------------------------------ shops

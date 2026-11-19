@@ -2010,3 +2010,9 @@ Nimic implementat. O sesiune nouă pornește de aici, după ce Eduard răspunde 
 - **Notificări (client):** aceleași secțiuni ca la service — „Pe acest dispozitiv”, apoi mementourile ca rânduri ale unui singur card.
 - **P12, adăugarea în dreapta sus:** regulă nouă în audit; Garaj, Vehicule, Cheltuieli, Membri (firmă), Firmele mele, Catalog, Centrul de ajutor — în antet; zile libere și fotografii — în capul secțiunii (`Section` are un loc pentru ele; `HeaderSlot` duce adăugarea unei secțiuni a firmei în antetul paginii).
 - **Rămas:** partea 2 — listele din admin (Catalog, Contestații, Echipa de suport, Export, Moderare, Rapoarte, Retenție, Texte, ANAF, Zone); partea 3 — Programări la service pe rânduri, cu un singur buton plin în detaliu (P5).
+
+### C3 — Activitatea stă sub fiecare cont, nu în Panou (Eduard, 16 nov 2026: „inacceptabil, ce fac când am 4000 de utilizatori? Istoricul de activitate trebuie să fie sub fiecare cont în admin”) ✅ schema 124
+- **Panou (admin):** lista „Activitate recentă” (ultimele 50 de evenimente ale întregii platforme) a dispărut; rămân numerele.
+- **Sub fiecare cont:** pagina unui client și a unui service din admin au secțiunea „Activitate”: cronologia contului, cea mai nouă sus, 30 de evenimente pe pagină și „Mai vechi” (paginare fără limită de volum). Programări (creată, confirmată, în inspecție, în lucru, gata, anulată, refuzată, expirată, neprezentare), devize (trimis, acceptat, refuzat), recenzii (lăsate, primite, răspunsuri, raportate), facturi, plată eșuată, colegi intrați, acțiunile adminului. Fără text din mesaje.
+- **Cum e făcut:** funcția `admin_account_activity` citește din tabelele existente (nu e un jurnal nou, nimic nu se stochează de două ori). Test SQL `174_admin_account_activity.sql`; `admin_overview()` nu mai întoarce `activity` (`80_admin.sql` ajustat).
+

@@ -119,7 +119,7 @@ select test.eq(
   string_agg(p.proname, ', ' order by p.proname) filter (
     where has_function_privilege('authenticated', p.oid, 'execute')
       and not has_function_privilege('anon', p.oid, 'execute')),
-  'accept_company_invite, acknowledge_no_show_notice, admin_audit_privacy_report, admin_create_category, admin_create_service, '
+  'accept_company_invite, acknowledge_no_show_notice, admin_account_activity, admin_audit_privacy_report, admin_create_category, admin_create_service, '
   || 'admin_decide_no_show_dispute, admin_decide_review, admin_decide_suspect_review, admin_end_admin_sessions, admin_end_my_other_sessions, admin_export, '
   || 'admin_extend_company_trial, admin_extend_trial, admin_force_cancel, admin_get_booking, admin_get_client, admin_get_legal_hold, admin_get_settings, admin_get_shop, '
   || 'admin_grant_report_credit, admin_grant_support, admin_help_delete_article, admin_help_delete_category, admin_help_get_article, admin_help_list, '

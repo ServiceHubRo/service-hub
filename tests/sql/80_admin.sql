@@ -55,9 +55,7 @@ select test.eq((o->'shops'->>'trial')::int, 2, 'both shops in their free period'
        test.eq((o->'bookings'->'month'->>'total')::int, 3, 'three bookings made this month'),
        test.eq((o->'bookings'->'month'->'by_status'->>'done')::int, 2, 'two of them done'),
        test.eq((o->'subscriptions'->>'mrr')::numeric, 0::numeric, 'nobody pays yet'),
-       test.ok(jsonb_array_length(o->'activity') between 1 and 50, 'recent activity, at most 50'),
-       test.ok(exists (select 1 from jsonb_array_elements(o->'activity') a where a->>'kind' = 'booking_created'),
-               'new bookings are in the activity feed')
+       test.ok(not (o ? 'activity'), 'no feed of the whole platform: the activity is under each account')
 from public.admin_overview() o;
 
 select test.eq(jsonb_array_length(l), 2, 'both shops listed'),
