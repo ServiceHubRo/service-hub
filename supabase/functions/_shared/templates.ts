@@ -378,28 +378,28 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
     },
     // ------------------------------------------------------------------ the company at ANAF (Raport ANAF, automated)
     'shop.company_problem': {
-      title: 'Verifică CUI-ul firmei',
+      title: 'Verifică CUI-ul',
       body: 'CUI-ul {cui} nu a fost găsit în registrul ANAF. Verifică-l în Date de facturare până pe {expiry}, pentru ca service-ul să rămână vizibil în căutări.',
     },
     'shop.company_problem_inactive': {
-      title: 'Verifică datele firmei',
-      body: 'La ANAF, firma cu CUI-ul {cui} apare inactivă fiscal. Verifică datele în Date de facturare până pe {expiry}, ca service-ul să rămână vizibil în căutări.',
+      title: 'Verifică datele fiscale',
+      body: 'La ANAF, CUI-ul {cui} apare inactiv fiscal. Verifică datele în Date de facturare până pe {expiry}, ca service-ul să rămână vizibil în căutări.',
     },
     'shop.company_problem_deregistered': {
-      title: 'Verifică datele firmei',
-      body: 'La ANAF, firma cu CUI-ul {cui} apare radiată. Verifică datele în Date de facturare până pe {expiry}, ca service-ul să rămână vizibil în căutări.',
+      title: 'Verifică datele fiscale',
+      body: 'La ANAF, CUI-ul {cui} apare radiat. Verifică datele în Date de facturare până pe {expiry}, ca service-ul să rămână vizibil în căutări.',
     },
     'shop.company_name_mismatch': {
-      title: 'Verifică denumirea firmei',
-      body: 'La ANAF, CUI-ul {cui} apare pe numele „{anaf_name}”. Dacă este cazul, actualizează denumirea legală în Date de facturare.',
+      title: 'Verifică denumirea',
+      body: 'La ANAF, CUI-ul {cui} apare pe numele „{anaf_name}”. Dacă este cazul, actualizează denumirea sau numele în Date de facturare.',
     },
     'shop.company_hidden': {
       title: 'Service-ul este ascuns temporar din căutări',
-      body: 'Firma cu CUI-ul {cui} nu a putut fi confirmată încă la ANAF. Contul și programările funcționează în continuare. După ce verifici datele în Date de facturare, service-ul revine automat în căutări.',
+      body: 'CUI-ul {cui} nu a putut fi confirmat încă la ANAF. Contul și programările funcționează în continuare. După ce verifici datele în Date de facturare, service-ul revine automat în căutări.',
     },
     'shop.company_ok': {
-      title: 'Datele firmei sunt confirmate',
-      body: 'Firma cu CUI-ul {cui} a fost confirmată la ANAF. Mulțumim. Service-ul apare din nou în căutări.',
+      title: 'Datele fiscale sunt confirmate',
+      body: 'CUI-ul {cui} a fost confirmat la ANAF. Service-ul apare din nou în căutări.',
     },
     // ------------------------------------------------------------------ account suspended / reactivated
     'client.account_suspended': {
@@ -725,24 +725,24 @@ export const TEMPLATES: Record<Lang, Record<string, Text>> = {
       body: 'Tax ID {cui} was not found in the ANAF register. Check it under Billing details by {expiry} so your shop stays visible in search.',
     },
     'shop.company_problem_inactive': {
-      title: 'Please check your company details',
-      body: 'At ANAF, the company with tax ID {cui} shows as inactive for tax purposes. Check your details under Billing details by {expiry} so your shop stays visible in search.',
+      title: 'Please check your tax details',
+      body: 'At ANAF, tax ID {cui} shows as inactive for tax purposes. Check your details under Billing details by {expiry} so your shop stays visible in search.',
     },
     'shop.company_problem_deregistered': {
-      title: 'Please check your company details',
-      body: 'At ANAF, the company with tax ID {cui} shows as struck off. Check your details under Billing details by {expiry} so your shop stays visible in search.',
+      title: 'Please check your tax details',
+      body: 'At ANAF, tax ID {cui} shows as struck off. Check your details under Billing details by {expiry} so your shop stays visible in search.',
     },
     'shop.company_name_mismatch': {
-      title: 'Check your company name',
-      body: 'At ANAF, tax ID {cui} is registered as "{anaf_name}". If needed, update the legal name under Billing details.',
+      title: 'Check your name',
+      body: 'At ANAF, tax ID {cui} is registered as "{anaf_name}". If needed, update the name under Billing details.',
     },
     'shop.company_hidden': {
       title: 'Your shop is temporarily hidden from search',
-      body: 'The company with tax ID {cui} could not be confirmed at ANAF yet. Your account and bookings keep working. Once you check your details under Billing details, your shop returns to search automatically.',
+      body: 'Tax ID {cui} could not be confirmed at ANAF yet. Your account and bookings keep working. Once you check your details under Billing details, your shop returns to search automatically.',
     },
     'shop.company_ok': {
-      title: 'Company details confirmed',
-      body: 'The company with tax ID {cui} is confirmed at ANAF. Thank you. Your shop shows in search again.',
+      title: 'Tax details confirmed',
+      body: 'Tax ID {cui} is confirmed at ANAF. Your shop shows in search again.',
     },
     // ------------------------------------------------------------------ account suspended / reactivated
     'client.account_suspended': {

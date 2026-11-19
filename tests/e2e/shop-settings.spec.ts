@@ -215,18 +215,18 @@ test.describe('shop settings', () => {
     await page.getByRole('link', { name: 'Setări service' }).click();
     await page.getByRole('link', { name: /Date de facturare/ }).click();
     await expect(page.getByText('Obligatorii până la sfârșitul perioadei gratuite.', { exact: false })).toBeVisible();
-    await page.getByLabel('Denumire legală').fill('AUTO TEST S.R.L.');
-    await page.getByLabel('CUI / Cod fiscal').fill('14872302');
+    await page.getByLabel('Denumire sau nume').fill('AUTO TEST S.R.L.');
+    await page.getByLabel('CUI (opțional)').fill('14872302');
     await page.getByLabel('Nr. Registrul Comerțului').fill('J08/1234/2015');
     await page.getByLabel('IBAN').fill('RO49AAAA1B31007593840001');
     await page.getByRole('button', { name: 'Salvează datele de facturare' }).click();
     await expect(page.getByText('CUI invalid. Verifică cifrele (ex. RO14872301).')).toBeVisible();
     await expect(page.getByText('IBAN invalid.', { exact: false })).toBeVisible();
-    await expect(page.getByLabel('CUI / Cod fiscal')).toBeFocused();
-    await page.getByLabel('CUI / Cod fiscal').fill('RO14872301');
+    await expect(page.getByLabel('CUI (opțional)')).toBeFocused();
+    await page.getByLabel('CUI (opțional)').fill('RO14872301');
     await page.getByLabel('IBAN').fill('RO49 AAAA 1B31 0075 9384 0000');
     await page.getByRole('button', { name: 'Copiază adresa service-ului' }).click();
-    await expect(page.getByLabel('Sediul social')).toHaveValue('Str. Lungă 42, Brașov, Brașov');
+    await expect(page.getByLabel('Adresa de facturare')).toHaveValue('Str. Lungă 42, Brașov, Brașov');
     await page.getByRole('switch', { name: 'Plătitor de TVA' }).check();
     await page.getByRole('button', { name: 'Salvează datele de facturare' }).click();
     await expect(page.getByRole('button', { name: 'Salvat' })).toBeVisible();
@@ -234,7 +234,7 @@ test.describe('shop settings', () => {
     await shot(page, 't05-billing', name());
     await page.reload();
     await expect(page.getByLabel('IBAN')).toHaveValue('RO49AAAA1B31007593840000');
-    await expect(page.getByLabel('CUI / Cod fiscal')).toHaveValue('RO14872301');
+    await expect(page.getByLabel('CUI (opțional)')).toHaveValue('RO14872301');
     await expect(page.getByRole('switch', { name: 'Plătitor de TVA' })).toBeChecked();
   });
 

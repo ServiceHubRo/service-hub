@@ -21,6 +21,16 @@ where shop_id = test.id('shop1');
 select test.eq((public.subscription_checkout_info(test.id('owner1'))->>'billing_complete')::boolean, true,
   'complete once the registered office and billing email are there');
 
+-- Any legal form pays the same way (Eduard, 19 Nov 2026): a sole proprietor or a person has no CUI and no Trade
+-- Register number; a name, an address and the email for invoices are enough.
+update public.shop_billing set vat_id = null, reg_com = null where shop_id = test.id('shop1');
+select test.eq((public.subscription_checkout_info(test.id('owner1'))->>'billing_complete')::boolean, true,
+  'complete without a CUI and without a Trade Register number');
+update public.shop_billing set legal_name = null where shop_id = test.id('shop1');
+select test.eq((public.subscription_checkout_info(test.id('owner1'))->>'billing_complete')::boolean, false,
+  'but never without a name');
+update public.shop_billing set legal_name = 'AUTO UNU SRL', vat_id = 'RO14872301', reg_com = 'J08/1245/2009' where shop_id = test.id('shop1');
+
 select test.eq(public.set_stripe_customer(test.id('shop1'), 'cus_1'), 'cus_1', 'the customer is recorded');
 select test.eq(public.set_stripe_customer(test.id('shop1'), 'cus_other'), 'cus_1', 'the first customer wins');
 

@@ -86,9 +86,9 @@ export async function getSubscription(): Promise<SubscriptionData | null> {
     shopId: row.shop_id,
     subscription: row,
     invoices: (invoices.data ?? []).map((i) => ({ ...i, amount: Number(i.amount) })),
-    billingComplete: Boolean(
-      b && b.legal_name?.trim() && b.vat_id && b.reg_com && b.legal_address?.trim() && b.billing_email,
-    ),
+    // A name (or company name), an address and the email for invoices: the CUI and the Trade Register
+    // number are only for those who have them (a sole proprietor or a person may have neither).
+    billingComplete: Boolean(b && b.legal_name?.trim() && b.legal_address?.trim() && b.billing_email),
     offers: parseOffers(offers),
   };
 }
