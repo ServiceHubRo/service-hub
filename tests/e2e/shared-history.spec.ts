@@ -175,8 +175,10 @@ test.describe('Fișa mașinii', () => {
 
     // ------------------------------------------------------------ from Istoric, and in English
     await page.goto('/s/istoric');
-    const job = page.locator('li').filter({ hasText: 'Ulei și filtre' });
+    // One row per job (page template A): the job is found by its amount, its work reads in the detail.
+    const job = page.getByRole('list', { name: 'Istoric reparații' }).locator(':scope > li').filter({ hasText: '389 lei' });
     await job.getByRole('button').first().click();
+    await expect(detailPane(page)).toContainText('Ulei și filtre');
     await (await cardAction(detailPane(page), 'Fișa mașinii')).click();
     await expect(page).toHaveURL(/\/s\/istoric\/fisa\//);
     await expect(page.getByRole('region', { name: /Reparații anterioare la alte service-uri/ })).toContainText('Plăcuțe față schimbate');

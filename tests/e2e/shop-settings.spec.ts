@@ -270,7 +270,7 @@ test.describe('shop settings', () => {
     const owner = await createUser('shop');
     await signIn(page, owner, PASSWORD);
     await openSettings(page, 'Personal');
-    await expect(page.getByText('Proprietar', { exact: true })).toBeVisible();
+    await expect(page.getByRole('list', { name: 'Echipa' }).getByText('Proprietar', { exact: true })).toBeVisible();
 
     const colleague = uniqueEmail('coleg');
     // „Invită un coleg”, top right (P12), opens the invitation in the page.
