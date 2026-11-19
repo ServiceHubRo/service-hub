@@ -4,7 +4,8 @@
   margin: 0;
   padding: 0;
   display: grid;
-  grid-template-columns: max-content max-content;
+  grid-template-columns: auto auto;
+  max-width: 100%;
   justify-content: var(--hours-justify, start);
   column-gap: var(--space-6);
   row-gap: var(--space-1);

@@ -251,10 +251,6 @@ export function ShopDetailScreen() {
             [t('admin.field.cancel_deadline_hours'), s.cancel_deadline_hours],
             [t('admin.field.inspection_fee'), <Money key="fee" amount={s.inspection_fee} />],
             [
-              t('admin.shop.hours'),
-              <HoursTable key="hours" hours={d.hours} />,
-            ],
-            [
               t('admin.shop.closures'),
               d.closures.length === 0 ? null : d.closures.map((c) => `${day(lang, c.start_date)} – ${day(lang, c.end_date)}`).join(', '),
             ],
@@ -264,6 +260,11 @@ export function ShopDetailScreen() {
             ],
           ]}
         />
+      </Card>
+
+      <SectionTitle>{t('admin.shop.hours')}</SectionTitle>
+      <Card>
+        <HoursTable hours={d.hours} />
       </Card>
 
       <SectionTitle>{t('admin.shop.billing')}</SectionTitle>

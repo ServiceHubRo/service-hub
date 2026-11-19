@@ -2,7 +2,7 @@ import {
   Activity,
   SearchX,
   CalendarCheck,
-  CalendarPlus,
+  CalendarClock,
   CalendarX,
   CircleCheck,
   ClipboardCheck,
@@ -12,7 +12,7 @@ import {
   ShieldCheck,
   Star,
   Store,
-  UserPlus,
+  UserRound,
   Users,
   Wrench,
   type LucideIcon,
@@ -40,9 +40,9 @@ import { dateTime, actionLabel } from './format';
 import { adminBookingPath, ADMIN_MODERATION_PATH } from './paths';
 
 const ICON: Record<AccountActivityKind, LucideIcon> = {
-  account_created: UserPlus,
+  account_created: UserRound,
   shop_created: Store,
-  booking_created: CalendarPlus,
+  booking_created: CalendarClock,
   booking_confirmed: CalendarCheck,
   booking_in_inspection: ClipboardCheck,
   booking_in_progress: Wrench,
