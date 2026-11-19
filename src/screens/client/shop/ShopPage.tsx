@@ -29,7 +29,7 @@ import { AMENITIES, AMENITY_ICONS } from '../../../lib/amenities';
 import { resolveDay } from '../../../lib/freePlace';
 import { distanceTo } from '../../../lib/geo';
 import { directionsUrl } from '../../../lib/maps';
-import { groupHours, type HoursRow } from '../../../lib/hours';
+import { HoursTable } from '../../../components/HoursTable';
 import { useLocation } from '../../../lib/location';
 import { useLoad } from '../../../lib/useLoad';
 import { bookingPath, REVIEWS_HASH, SEARCH_PATH, type ShopLinkState } from '../paths';
@@ -220,7 +220,7 @@ function ShopDetails({ page, day, onFavorite }: { page: ShopPageData; day: strin
 
           <Card className={styles.info}>
             <InfoRow label={t('shop.hours')}>
-              <HoursList rows={groupHours(page.hours)} />
+              <HoursTable hours={page.hours} className={styles.hoursEnd} />
             </InfoRow>
             {page.closures.length > 0 && (
               <InfoRow label={t('shop.closures')}>
@@ -354,21 +354,6 @@ function InfoRow({ label, note, children }: { label: string; note?: string; chil
       </div>
       {note && <p className={styles.infoNote}>{note}</p>}
     </div>
-  );
-}
-
-function HoursList({ rows }: { rows: HoursRow[] }) {
-  const { t } = useI18n();
-  const day = (d: number) => t(`weekday.short.${d}` as MessageKey);
-  return (
-    <ul className={styles.hours}>
-      {rows.map((r) => (
-        <li key={r.days.join('-')} className={styles.hoursRow}>
-          <span className={styles.days}>{r.days.length === 1 ? day(r.days[0]!) : `${day(r.days[0]!)} – ${day(r.days[r.days.length - 1]!)}`}</span>
-          <span className={r.closed ? styles.closed : 'mono'}>{r.closed ? t('shop.closed') : `${r.open} – ${r.close}`}</span>
-        </li>
-      ))}
-    </ul>
   );
 }
 

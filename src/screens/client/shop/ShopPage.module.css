@@ -96,7 +96,6 @@
   font-size: 12.5px;
 }
 
-.hours,
 .plainList {
   list-style: none;
   display: flex;
@@ -104,25 +103,9 @@
   gap: 2px;
 }
 
-.hoursRow {
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-}
-
-.days {
-  color: var(--text);
-}
-
-.closed {
-  color: var(--muted);
-  min-width: 7.5em;
-}
-
-.hoursRow .mono,
-.closed {
-  min-width: 7.5em;
-  text-align: right;
+/* The week sits against the right edge, like every other value of the card. */
+.hoursEnd {
+  --hours-justify: end;
 }
 
 .phones {

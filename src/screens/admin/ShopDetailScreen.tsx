@@ -18,6 +18,7 @@ import { monthlyAverage } from '../../lib/subscription';
 import { formatPhone } from '../../lib/validators';
 import { CompanyCheckCard } from '../company/CompanyCheckCard';
 import { ConfirmPanel } from './ActionPanels';
+import { HoursTable } from '../../components/HoursTable';
 import { AccountActivity } from './AccountActivity';
 import { AuditList, Facts, Money, Pill, SectionTitle, ShopStatePill, SubscriptionPill, Verified } from './parts';
 import { ADMIN_SHOPS_PATH, adminBookingPath, adminBookingsLink } from './paths';
@@ -251,13 +252,7 @@ export function ShopDetailScreen() {
             [t('admin.field.inspection_fee'), <Money key="fee" amount={s.inspection_fee} />],
             [
               t('admin.shop.hours'),
-              d.hours
-                .map((h) =>
-                  h.is_closed
-                    ? `${t(`weekday.${h.weekday}` as MessageKey)}: ${t('admin.closed')}`
-                    : `${t(`weekday.${h.weekday}` as MessageKey)}: ${h.open_time}–${h.close_time}`,
-                )
-                .join(' · '),
+              <HoursTable key="hours" hours={d.hours} />,
             ],
             [
               t('admin.shop.closures'),
