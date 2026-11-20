@@ -66,7 +66,7 @@ interface Fn {
  * The address without the item a list + detail screen shows first: from 1024 px page template A writes
  * it into the address (?recenzie=, ?zona=, …), which the old addresses and the menu know nothing about.
  */
-const SELECTION = ['recenzie', 'contestatie', 'zona', 'text', 'ce', 'lista', 'agent', 'cat', 'raport', 'firma', 'cont', 'unitate', 'programare', 'abonament'];
+const SELECTION = ['recenzie', 'contestatie', 'zona', 'text', 'ce', 'lista', 'agent', 'cat', 'raport', 'firma', 'cont', 'unitate', 'programare', 'abonament', 'flota'];
 /** On a phone the chosen item is still open when the way back ends at its list: „‹ Înapoi” of the detail first. */
 async function openDetailGone(page: Page) {
   if ((page.viewportSize()?.width ?? 0) >= 1024) return;
@@ -414,13 +414,13 @@ test.describe('A1 — admin navigation', () => {
       history.pushState(history.state, '', '/admin/cont/flote?plan=fleet_pro');
       window.dispatchEvent(new PopStateEvent('popstate', { state: history.state }));
     });
-    await expect(page).toHaveURL('/admin/parteneri/firme?plan=fleet_pro');
+    await expectAddress(page, '/admin/parteneri/firme?plan=fleet_pro');
     await expect(h1(page)).toHaveText('Firme și flote');
     expect(await historyLength(page)).toBe(length + 1);
     await page.goBack();
     await expect(page).toHaveURL('/admin/panou');
     await page.goForward();
-    await expect(page).toHaveURL('/admin/parteneri/firme?plan=fleet_pro');
+    await expectAddress(page, '/admin/parteneri/firme?plan=fleet_pro');
   });
 
   test('an old or a new address opened before signing in: after the two steps of sign-in, its page, query kept', async ({ browser }) => {
