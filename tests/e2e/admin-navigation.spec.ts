@@ -382,8 +382,9 @@ test.describe('A1 — admin navigation', () => {
     // Several query parameters, in either order, exactly as written; the anchor too.
     for (const query of [`?service=${s.shopId}&client=${s.clientId}&q=P-0`, `?q=P-0&client=${s.clientId}&service=${s.shopId}`]) {
       await page.goto(`/admin/rezervari${query}#lista`);
-      await expect(page).toHaveURL(`/admin/activitate/programari${query}#lista`);
-      expect(new URL(page.url()).search).toBe(query);
+      // The list writes the booking it shows first after them; the query and the anchor stay as written.
+      await expectAddress(page, `/admin/activitate/programari${query}#lista`);
+      expect(new URL(page.url()).search.startsWith(query)).toBe(true);
       expect(new URL(page.url()).hash).toBe('#lista');
     }
     // Special characters in an ID and in the query, encoded as they were.
@@ -436,7 +437,7 @@ test.describe('A1 — admin navigation', () => {
         route.request().method() === 'PATCH' ? route.fulfill({ status: 204 }) : route.continue(),
       );
       await signInFrom(page, asked!);
-      await expect(page).toHaveURL(landed!);
+      await expectAddress(page, landed!);
       await loaded(page);
       await ctx.close();
     }

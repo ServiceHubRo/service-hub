@@ -207,6 +207,6 @@ test.describe('Fișa mașinii', () => {
 
 async function openFileFromBookingsEn(page: Page) {
   await page.goto('/s/programari');
-  await (await cardAction(await openShopBooking(page, 'Ford Focus'), 'Vehicle file')).click();
+  await (await openShopBooking(page, 'Ford Focus')).getByRole('link', { name: 'Vehicle file', exact: true }).click();
   await expect(page.getByRole('heading', { level: 1, name: 'Vehicle file' })).toBeVisible();
 }

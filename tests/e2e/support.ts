@@ -630,6 +630,10 @@ export const detailPane = (page: Page) => page.locator('[data-ui="detail-pane"]'
  */
 export const shopRow = (page: Page, text: string | RegExp) => page.locator('[data-ui="list-row"]').filter({ hasText: text });
 export async function openShopBooking(page: Page, text: string | RegExp): Promise<Locator> {
+  // On a phone another booking's detail hides the list: back to it first.
+  if ((page.viewportSize()?.width ?? 0) < 1024 && (await detailPane(page).count()) > 0 && (await detailPane(page).filter({ hasText: text }).count()) === 0) {
+    await backToList(page);
+  }
   // The list, or a detail opened from the address (on a phone the list is hidden behind it), once read.
   await expect(shopRow(page, text).or(detailPane(page).filter({ hasText: text })).first()).toBeVisible({ timeout: 15_000 });
   // Already the open one: nothing to choose.

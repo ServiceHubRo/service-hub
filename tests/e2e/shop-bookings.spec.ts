@@ -101,7 +101,7 @@ test.describe('demo shop', () => {
     await expect(page).toHaveURL(/\/s\/programari\?tab=programate&p=/);
     await expect(detailPane(page)).toContainText('B 123 IRD');
     await expect(detailPane(page)).toContainText('În lucru din');
-    await expect(detailPane(page).getByText(/Programarea P-\d+/).first()).toBeVisible();
+    await expect(detailPane(page)).toContainText(/P-\d{6}/);
     await backToList(page);
     await expect.poll(() => cards(page).count()).toBeGreaterThan(1);
 
@@ -136,6 +136,7 @@ test.describe('demo shop', () => {
     await expect(request.getByRole('button', { name: 'Confirmă' })).toBeVisible();
 
     // Programate: every state; the no-show mark; "Neprezentat" only after the booking's time.
+    await backToList(page);
     await page.getByRole('combobox', { name: 'Afișează' }).selectOption('programate');
     const cristina = await openShopBooking(page, 'Cristina Dobre');
     await expect(await cardAction(cristina, 'Neprezentat')).toHaveCount(0);

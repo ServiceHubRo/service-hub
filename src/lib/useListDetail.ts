@@ -17,7 +17,7 @@ interface OpenedFromList {
  */
 export function useListDetail(ids: readonly string[], param = 'id') {
   const wide = useMediaQuery(LIST_DETAIL_QUERY);
-  const [params, setParams] = useSearchParams();
+  const [params] = useSearchParams();
   const navigate = useNavigate();
   const location = useLocation();
   const asked = params.get(param);
@@ -31,13 +31,14 @@ export function useListDetail(ids: readonly string[], param = 'id') {
       const next = new URLSearchParams(params);
       next.set(param, id);
       if (wide) {
-        setParams(next, { replace: true, preventScrollReset: true });
+        // The anchor of the address (`#lista`) stays: only the chosen item changes.
+        navigate({ search: `?${next.toString()}`, hash: window.location.hash }, { replace: true, preventScrollReset: true });
         return;
       }
       listScroll.current = window.scrollY;
-      navigate({ search: `?${next.toString()}` }, { state: { listDetail: true } satisfies OpenedFromList });
+      navigate({ search: `?${next.toString()}`, hash: window.location.hash }, { state: { listDetail: true } satisfies OpenedFromList });
     },
-    [params, param, wide, setParams, navigate],
+    [params, param, wide, navigate],
   );
 
   const back = useCallback(() => {
@@ -47,8 +48,8 @@ export function useListDetail(ids: readonly string[], param = 'id') {
     }
     const next = new URLSearchParams(params);
     next.delete(param);
-    setParams(next, { replace: true });
-  }, [location.state, navigate, params, param, setParams]);
+    navigate({ search: `?${next.toString()}`, hash: window.location.hash }, { replace: true });
+  }, [location.state, navigate, params, param]);
 
   // Beside the list, the item shown first is written in the address like a chosen one: it stays
   // open when it changes under the reader (a booking that ends while it is read moves to the other
@@ -62,8 +63,8 @@ export function useListDetail(ids: readonly string[], param = 'id') {
     const next = new URLSearchParams(window.location.search);
     if (next.get(param) === first) return;
     next.set(param, first);
-    setParams(next, { replace: true, preventScrollReset: true });
-  }, [wide, known, first, params, param, setParams]);
+    navigate({ search: `?${next.toString()}`, hash: window.location.hash }, { replace: true, preventScrollReset: true });
+  }, [wide, known, first, params, param, navigate]);
 
   // The detail opens at its top; the list comes back where it was.
   const wasOpen = useRef(open);
