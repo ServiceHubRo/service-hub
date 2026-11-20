@@ -118,7 +118,6 @@ export function ShopReviewsScreen() {
                   {removed && <StatusPill tone={toneOf('grey')}>{t('reviews.removed')}</StatusPill>}
                 </>
               }
-              attention={r.reply === null && !removed}
               selected={wide && r.id === selectedId}
               onSelect={() => select(r.id)}
             />
