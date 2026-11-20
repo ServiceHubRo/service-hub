@@ -291,7 +291,9 @@ test.describe('admin tools', () => {
     await adminOpen(page, 'Platformă', 'Textele notificărilor');
     await expect(page.getByRole('heading', { level: 1, name: 'Textele notificărilor' })).toBeVisible();
     await page.getByLabel('Caută în texte').fill('shop.new_review');
-    const row = page.getByRole('listitem').filter({ hasText: 'shop.new_review' });
+    // One row per text (page template A); the chosen one beside the list, or in its place on a phone.
+    await page.getByRole('list', { name: 'Către service-uri' }).locator(':scope > li').filter({ hasText: 'shop.new_review' }).getByRole('button').click();
+    const row = detailPane(page);
     await row.getByRole('button', { name: 'Editează textul: shop.new_review' }).click();
     await row.getByLabel('Text în română').fill('{client} a lăsat {rating} stele și {nume}');
     await expect(row.getByText('Aceste cuvinte nu se completează la această notificare: {nume}.', { exact: false })).toBeVisible();
