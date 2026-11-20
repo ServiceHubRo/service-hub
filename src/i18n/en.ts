@@ -4509,6 +4509,7 @@ export const en: Record<MessageKey, string> = {
   'support.inbox.list': 'Request list',
   'support.inbox.moreError': 'The next requests could not be loaded.',
   'support.detail.loadError': 'The request could not be loaded.',
+  'support.detail.notFound': 'The request does not exist.',
   'support.detail.author': 'Author',
   'support.detail.deletedAuthor': 'Deleted account',
   'support.detail.category': 'Category',

@@ -4508,6 +4508,7 @@ export const ro = {
   'support.inbox.list': 'Lista solicitărilor',
   'support.inbox.moreError': 'Următoarele solicitări nu s-au încărcat.',
   'support.detail.loadError': 'Solicitarea nu s-a încărcat.',
+  'support.detail.notFound': 'Solicitarea nu există.',
   'support.detail.author': 'Autor',
   'support.detail.deletedAuthor': 'Cont șters',
   'support.detail.category': 'Categorie',

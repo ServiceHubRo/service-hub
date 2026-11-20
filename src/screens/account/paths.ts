@@ -15,8 +15,11 @@ export function newRequestPath(role: Role): string {
   return `${requestsPath(role)}/noua`;
 }
 
+/** The address parameter of the request chosen in a list (C7: the list with its detail beside it). */
+export const REQUEST_PARAM = 'solicitare';
+
 export function requestPath(role: Role, id: string): string {
-  return `${requestsPath(role)}/${id}`;
+  return `${requestsPath(role)}?${REQUEST_PARAM}=${id}`;
 }
 
 /** Cont → Sugestii (T26): `/c/cont/sugestii`, `/s/cont/sugestii`. */

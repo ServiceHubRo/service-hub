@@ -5,9 +5,10 @@ import { HelpScreen } from '../../screens/account/HelpScreen';
 import { helpPath, newRequestPath, requestsPath, suggestionsPath } from '../../screens/account/paths';
 import { HelpArticleScreen } from '../../screens/help/HelpArticleScreen';
 import { HelpCategoryScreen } from '../../screens/help/HelpCategoryScreen';
-import { MyRequestScreen } from '../../screens/requests/MyRequestScreen';
+
 import { MyRequestsScreen } from '../../screens/requests/MyRequestsScreen';
 import { NewRequestScreen } from '../../screens/requests/NewRequestScreen';
+import { MyRequestRedirect } from '../../screens/requests/MyRequestsScreen';
 import { AccountLegal } from '../../screens/legal/LegalPages';
 import { BookingThreadRedirect } from '../../screens/messages/BookingThreadRedirect';
 import { ConversationScreen } from '../../screens/messages/ConversationScreen';
@@ -49,7 +50,7 @@ export function commonRoutes(role: Role, screens: Record<string, ReactElement>) 
       {/* A3a: Cont → Ajutor și contact → Solicitările mele. */}
       {!isStaff(role) && <Route path={rel(role, requestsPath(role))} element={<MyRequestsScreen role={role} />} />}
       {!isStaff(role) && <Route path={rel(role, newRequestPath(role))} element={<NewRequestScreen role={role} />} />}
-      {!isStaff(role) && <Route path={`${rel(role, requestsPath(role))}/:requestId`} element={<MyRequestScreen role={role} />} />}
+      {!isStaff(role) && <Route path={`${rel(role, requestsPath(role))}/:requestId`} element={<MyRequestRedirect role={role} />} />}
       <Route path="*" element={<NotFound inShell />} />
     </>
   );
