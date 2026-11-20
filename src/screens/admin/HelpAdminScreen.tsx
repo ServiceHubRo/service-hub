@@ -263,8 +263,9 @@ export function HelpAdminScreen() {
         subtitle={t('admin.help.sub')}
         actions={
           // The adds, top right (docs/MODEL_DE_FOLOSIRE.md P12).
+          // Side by side, like every pair of header actions (they wrap on a phone).
           data ? (
-            <div className={styles.panelButtons}>
+            <>
               <Link to={adminHelpArticlePath('nou')} className={buttonClass('primary')}>
                 <Plus size={18} aria-hidden="true" /> {t('admin.help.newArticle')}
               </Link>
@@ -273,7 +274,7 @@ export function HelpAdminScreen() {
                   <Plus size={18} aria-hidden="true" /> {t('admin.help.newCategory')}
                 </Button>
               )}
-            </div>
+            </>
           ) : undefined
         }
       />
