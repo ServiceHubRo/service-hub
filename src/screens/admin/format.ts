@@ -31,3 +31,12 @@ export function stripeRuns(stripeStatus: string | null | undefined): boolean {
   return stripeStatus === 'trialing' || stripeStatus === 'active' || stripeStatus === 'past_due' || stripeStatus === 'incomplete';
 }
 
+
+/** What the row of a no-show dispute says: the booking, the client and the day it was sent. */
+export function disputeLine(
+  t: (key: MessageKey) => string,
+  lang: Lang,
+  d: { created_at: string; booking: { ref: string } | null; client: { name: string | null } | null },
+): string {
+  return [d.booking?.ref, d.client?.name || t('admin.deletedAccount'), dateTime(lang, d.created_at)].filter(Boolean).join(' · ');
+}

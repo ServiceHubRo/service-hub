@@ -7,7 +7,9 @@ import {
   SEED,
   SEED_PASSWORD,
   adminOpen,
+  backToList,
   createUser,
+  detailPane,
   expectAccessible,
   expectNoHorizontalScroll,
   expectNoRomanianText,
@@ -169,7 +171,8 @@ test.describe('support agent (A2)', () => {
     await adminOpen(page, 'Platformă', 'Echipa de suport');
     await expect(h1(page)).toHaveText('Echipa de suport');
 
-    // A reason is required; a shop account is refused.
+    // „Numește un agent” top right opens the form in the page; a reason is required; a shop account is refused.
+    await page.getByRole('button', { name: 'Numește un agent' }).click();
     await page.getByLabel('ID cont sau email').fill(email);
     await page.getByRole('button', { name: 'Numește agentul' }).click();
     await expect(page.getByText('Scrie motivul.')).toBeVisible();
@@ -183,7 +186,8 @@ test.describe('support agent (A2)', () => {
     const notice = page.getByRole('status').filter({ hasText: /este agent de suport/ });
     await expect(notice).toBeVisible();
     const displayId = /E-\d{5}/.exec((await notice.textContent()) ?? '')![0];
-    const agentCard = page.locator('main li').filter({ hasText: displayId });
+    // One row per agent (page template A); the chosen one beside the list, or in its place on a phone.
+    const agentCard = page.getByRole('list', { name: 'Agenți' }).locator(':scope > li').filter({ hasText: displayId });
     await expect(agentCard.getByText('Fără verificarea în doi pași, fără acces')).toBeVisible();
     await expectNoHorizontalScroll(page);
     await expectAccessible(page, 'Echipa de suport');
@@ -209,16 +213,18 @@ test.describe('support agent (A2)', () => {
     // The admin sees it active, then withdraws the role with a reason.
     await page.reload();
     await expect(agentCard.getByText('Activ', { exact: true })).toBeVisible();
-    await agentCard.getByRole('button', { name: 'Retrage rolul' }).click();
-    await expect(agentCard.getByText(`Retragi rolul de agent pentru ${displayId}?`)).toBeVisible();
+    await agentCard.getByRole('button').click();
+    const detail = detailPane(page);
+    await detail.getByRole('button', { name: 'Retrage rolul' }).click();
+    await expect(detail.getByText(`Retragi rolul de agent pentru ${displayId}?`)).toBeVisible();
     const reason = `Contract încheiat ${displayId}`;
-    await agentCard.getByLabel('Motiv').fill(reason);
-    await agentCard.getByRole('button', { name: 'Retrage rolul' }).click();
+    await detail.getByLabel('Motiv').fill(reason);
+    await detail.getByRole('button', { name: 'Retrage rolul' }).click();
     await expect(page.getByRole('status').filter({ hasText: `Rolul de agent pentru ${displayId} a fost retras.` })).toBeVisible();
-    const former = page.locator('main section').filter({ has: page.getByRole('heading', { name: 'Foști agenți' }) });
-    const formerCard = former.locator('li').filter({ hasText: displayId });
+    await backToList(page);
+    const formerCard = page.getByRole('list', { name: 'Foști agenți' }).locator('li').filter({ hasText: displayId });
     await expect(formerCard).toBeVisible();
-    await expect(formerCard.getByText(`Motiv: ${reason}`)).toBeVisible();
+    await expect(formerCard).toContainText(`Motiv: ${reason}`);
     await shot(page, 'a2-team-former', name());
 
     // At once: the token the agent still holds is refused, and its session cannot be renewed.

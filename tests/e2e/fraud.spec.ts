@@ -17,6 +17,7 @@ import {
   uniquePhone,
   userIdOf,
   switchLanguage,
+  detailPane,
 } from './support';
 
 // T25 — fewer ways to cheat: the admin's second step of sign-in (first setup and every sign-in),
@@ -224,17 +225,21 @@ test.describe('T25 fraud checks', () => {
     // The link carries the number of reported reviews when other tests reported some: go straight there.
     await page.goto('/admin/activitate/moderare');
     await expect(page.getByRole('heading', { level: 1, name: 'Moderare' })).toBeVisible();
-    const card = page.getByRole('listitem').filter({ hasText: shopName }).filter({ hasText: 'Lucrare foarte rapidă' });
-    await expect(card).toBeVisible();
+    // One row per suspect review (page template A); its why and its decisions in the detail.
+    const row = page.getByRole('list', { name: /^Recenzii suspecte/ }).locator(':scope > li').filter({ hasText: shopName });
+    await expect(row).toBeVisible();
+    await row.getByRole('button').click();
+    const card = detailPane(page);
+    await expect(card).toContainText('Lucrare foarte rapidă');
     await expect(card).toContainText('Lucrarea a fost terminată la mai puțin de 3 ore după ce s-a făcut programarea.');
-    await card.scrollIntoViewIfNeeded();
     await expectNoHorizontalScroll(page);
     await shot(page, 't25-suspect', name());
 
     await card.getByRole('button', { name: 'Este în regulă' }).click();
     await expect(card.getByText('Recenzia rămâne publicată și iese din această listă.')).toBeVisible();
     await card.getByRole('button', { name: 'Este în regulă' }).click();
-    await expect(card).toHaveCount(0);
+    await expect(page.getByText('Decizia este salvată.', { exact: false })).toBeVisible();
+    await expect(row).toHaveCount(0);
     const [review] = await serviceRest<{ signals_cleared_at: string | null; removed_at: string | null }[]>(
       `reviews?booking_id=eq.${booking.id}&select=signals_cleared_at,removed_at`,
       'GET',

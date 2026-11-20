@@ -161,7 +161,8 @@ export function ChoiceFilters({
     <>
       <div className={styles.bar}>
         <FiltersButton count={on.length} onClick={() => setOpen(true)} />
-        {end}
+        {/* Filters on the left, what belongs to the list (Descarcă Excel) on the right, in one row. */}
+        {end && <div className={styles.end}>{end}</div>}
       </div>
       <ActiveFilters
         items={on.map((g) => ({ key: g.key, label: g.options.find((o) => o.value === g.value)?.label ?? g.value }))}

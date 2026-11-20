@@ -22,6 +22,8 @@ regula e respectată, iar raportul e în `docs/AUDIT_CONSISTENTA.md`. Detaliile 
 | — | Căutarea e o singură casetă, cu lupă și „×”. | `SearchField` |
 | — | Filtrele suplimentare sunt în butonul „Filtre” (cu numărul celor active) și panoul lui. | `FiltersButton`, `FilterSheet` |
 | P8 | Elementele unei liste sunt rânduri de aceeași înălțime (iconiță, titlu, un rând de detalii, stare, săgeată) sau carduri egale într-o grilă, nu carduri puse unul sub altul. | `ListRow`, `CardGrid` |
+| P13 | Lângă o listă (de la 1024 px) ecranul are înălțimea ferestrei: antetul (titlul, căutarea, filtrele) și detaliul rămân pe loc, doar lista derulează în coloana ei. Sub 1024 px pagina derulează ca de obicei. | `ListDetailLayout` |
+| P14 | Filtrele și acțiunea listei („Descarcă Excel”) stau pe același rând: filtrele în stânga, acțiunea în dreapta; nu unul sub altul. | `ChoiceFilters end` |
 | P7 | Starea (programare, deviz, abonament) e o etichetă colorată după sens: chihlimbar = ai de făcut ceva, verde = gata, roșu = problemă, gri = închis. | `StatusPill` |
 
 ## Butoane și acțiuni

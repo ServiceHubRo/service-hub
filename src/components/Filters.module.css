@@ -7,6 +7,19 @@
   gap: 8px;
 }
 
+/* The other action of the row (Descarcă Excel): at the right end; its panel, once open, takes the row. */
+.end {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.end:has([data-ui="inline-panel"]) {
+  flex: 1 1 100%;
+  margin-left: 0;
+}
+
 .filtersButton {
   display: inline-flex;
   align-items: center;

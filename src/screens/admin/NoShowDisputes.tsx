@@ -2,20 +2,18 @@ import { UserX } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '../../components/Button';
-import { Card } from '../../components/Card';
-import { EmptyState } from '../../components/EmptyState';
+import { DetailPane } from '../../components/ListDetailLayout';
 import {
   decideNoShowDispute,
   type AdminNoShowDispute,
-  type AdminNoShowDisputes,
   type NoShowDecision,
 } from '../../data/noShows';
 import { useI18n } from '../../i18n/context';
 import { formatDate } from '../../i18n/format';
 import { ConfirmPanel } from './ActionPanels';
-import { Pill, SectionTitle } from './parts';
+import { Pill } from './parts';
 import { adminBookingPath, adminClientPath, adminShopPath } from './paths';
-import { dateTime } from './format';
+import { dateTime, disputeLine } from './format';
 import styles from './admin.module.css';
 
 /** The booking, the shop, the client and what the client wrote. */
@@ -59,92 +57,64 @@ function DisputeBody({ d }: { d: AdminNoShowDispute }) {
   );
 }
 
-function PendingCard({ d, onDecided }: { d: AdminNoShowDispute; onDecided: () => void }) {
-  const { t } = useI18n();
-  const [panel, setPanel] = useState<NoShowDecision | null>(null);
-  return (
-    <Card highlight className={styles.stack}>
-      <div className={styles.rowTop}>
-        <Pill tone="amber">{t('admin.noShowDispute.status.pending')}</Pill>
-      </div>
-      <DisputeBody d={d} />
-      {panel === null ? (
-        <div className={styles.panelButtons}>
-          <Button variant="success" onClick={() => setPanel('upheld')}>
-            {t('admin.noShowDispute.uphold')}
-          </Button>
-          <Button variant="secondary" onClick={() => setPanel('rejected')}>
-            {t('admin.noShowDispute.reject')}
-          </Button>
-        </div>
-      ) : (
-        <ConfirmPanel
-          title={t(panel === 'upheld' ? 'admin.noShowDispute.upholdTitle' : 'admin.noShowDispute.rejectTitle')}
-          body={t(panel === 'upheld' ? 'admin.noShowDispute.upholdBody' : 'admin.noShowDispute.rejectBody')}
-          textLabel={t('admin.moderation.note')}
-          textHint={t('admin.moderation.noteHint')}
-          confirmLabel={t(panel === 'upheld' ? 'admin.noShowDispute.uphold' : 'admin.noShowDispute.reject')}
-          onConfirm={async (note, requestId) => {
-            await decideNoShowDispute(d.id, panel, note, requestId);
-            onDecided();
-          }}
-          onCancel={() => setPanel(null)}
-        />
-      )}
-    </Card>
-  );
-}
-
 /**
- * Contestații la neprezentări (T53): the waiting ones first, oldest first, each with the booking,
- * the shop, the client's count and what the client wrote. "Anulează neprezentarea" (it no longer
- * counts) or "Menține neprezentarea"; the note stays internal; the client is told. Then the last
- * decided ones.
+ * A dispute in detail (T53): the booking, the shop, the client's count and what the client wrote.
+ * A waiting one is decided here: "Anulează neprezentarea" (it no longer counts) or "Menține
+ * neprezentarea"; the note stays internal; the client is told.
  */
-export function NoShowDisputesSection({ data, onDecided }: { data: AdminNoShowDisputes; onDecided: () => void }) {
+export function DisputeDetail({ d, notice, onDecided }: { d: AdminNoShowDispute; notice: string | null; onDecided: () => void }) {
   const { t, lang } = useI18n();
+  const [panel, setPanel] = useState<NoShowDecision | null>(null);
+  const pending = d.status === 'pending';
   return (
-    <>
-      <SectionTitle>{t('admin.noShowDispute.title', { n: data.pending.length })}</SectionTitle>
-      {data.pending.length === 0 ? (
-        <EmptyState icon={UserX} title={t('admin.noShowDispute.empty')} />
-      ) : (
-        <ul className={styles.list}>
-          {data.pending.map((d) => (
-            <li key={d.id}>
-              <PendingCard d={d} onDecided={onDecided} />
-            </li>
-          ))}
-        </ul>
+    <DetailPane
+      id={d.id}
+      icon={<UserX size={20} />}
+      title={d.booking?.shop_name ?? t('admin.noShowDispute.title', { n: 1 })}
+      detail={disputeLine(t, lang, d)}
+      status={<Pill tone={pending ? 'amber' : d.status === 'upheld' ? 'green' : 'grey'}>{t(`admin.noShowDispute.status.${d.status}`)}</Pill>}
+      message={notice ? { tone: 'success', text: notice } : undefined}
+      panel={
+        pending && panel !== null ? (
+          <ConfirmPanel
+            title={t(panel === 'upheld' ? 'admin.noShowDispute.upholdTitle' : 'admin.noShowDispute.rejectTitle')}
+            body={t(panel === 'upheld' ? 'admin.noShowDispute.upholdBody' : 'admin.noShowDispute.rejectBody')}
+            textLabel={t('admin.moderation.note')}
+            textHint={t('admin.moderation.noteHint')}
+            confirmLabel={t(panel === 'upheld' ? 'admin.noShowDispute.uphold' : 'admin.noShowDispute.reject')}
+            onConfirm={async (note, requestId) => {
+              await decideNoShowDispute(d.id, panel, note, requestId);
+              onDecided();
+            }}
+            onCancel={() => setPanel(null)}
+          />
+        ) : undefined
+      }
+      actions={
+        pending ? (
+          <>
+            <Button variant="success" onClick={() => setPanel('upheld')}>
+              {t('admin.noShowDispute.uphold')}
+            </Button>
+            <Button variant="secondary" onClick={() => setPanel('rejected')}>
+              {t('admin.noShowDispute.reject')}
+            </Button>
+          </>
+        ) : undefined
+      }
+    >
+      <DisputeBody d={d} />
+      {!pending && d.decided_at && (
+        <p className={styles.muted}>
+          {dateTime(lang, d.decided_at)}
+          {d.decided_by ? ` · ${d.decided_by}` : ''}
+        </p>
       )}
-      {data.decided.length > 0 && (
-        <details className={styles.stack}>
-          <summary className={styles.link}>{t('admin.noShowDispute.decided', { n: data.decided.length })}</summary>
-          <ul className={styles.list}>
-            {data.decided.map((d) => (
-              <li key={d.id}>
-                <Card className={styles.stack}>
-                  <div className={styles.rowTop}>
-                    <Pill tone={d.status === 'upheld' ? 'green' : 'grey'}>{t(`admin.noShowDispute.status.${d.status}`)}</Pill>
-                    {d.decided_at && (
-                      <span className={styles.muted}>
-                        {dateTime(lang, d.decided_at)}
-                        {d.decided_by ? ` · ${d.decided_by}` : ''}
-                      </span>
-                    )}
-                  </div>
-                  <DisputeBody d={d} />
-                  {d.decision_note && (
-                    <p className={styles.muted}>
-                      {t('admin.moderation.noteShown')}: {d.decision_note}
-                    </p>
-                  )}
-                </Card>
-              </li>
-            ))}
-          </ul>
-        </details>
+      {d.decision_note && (
+        <p className={styles.muted}>
+          {t('admin.moderation.noteShown')}: {d.decision_note}
+        </p>
       )}
-    </>
+    </DetailPane>
   );
 }

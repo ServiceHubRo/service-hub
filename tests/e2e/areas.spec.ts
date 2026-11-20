@@ -13,6 +13,7 @@ import {
   shot,
   signIn,
   userIdOf,
+  detailPane,
 } from './support';
 
 // Zones (Eduard, 8 Oct): a client whose position is in a county where Service-Hub does not work
@@ -133,8 +134,11 @@ test.describe('zones', () => {
     await expectNoHorizontalScroll(page);
     await shot(page, 'zones-admin', name());
 
-    const card = page.locator('main li').filter({ has: page.getByRole('heading', { name: zone.ro, exact: true }) });
-    await expect(card).toContainText('Nepornită');
+    // One row per zone (page template A); the chosen one beside the list, or in its place on a phone.
+    const row = page.getByRole('list', { name: 'Zone' }).locator(':scope > li').filter({ has: page.getByText(zone.ro, { exact: true }) });
+    await expect(row).toContainText('Nepornită');
+    await row.getByRole('button').click();
+    const card = detailPane(page);
     await expect(card).toContainText('Test (');
     await card.getByRole('combobox', { name: 'Cum pornește' }).selectOption({ label: 'Pornită' });
     await card.getByRole('button', { name: 'Salvează' }).click();

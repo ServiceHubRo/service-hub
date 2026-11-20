@@ -221,7 +221,8 @@ export function measurePatterns(only?: readonly string[]): Patterns {
       if (!ADD.test(t) && !plusIcon(b)) continue;
       // A form's own button (its submit, its save bar) is not an add of the page.
       if ((b as HTMLButtonElement).type === 'submit' || b.closest('[data-fixed-bottom], [data-ui="inline-panel"]')) continue;
-      if (b.closest('[data-ui="page-header"], [data-ui="section-head"], [data-ui="empty-state"], [data-ui="stepper"], [role="menu"], dialog, [data-ui="filter-sheet"]')) continue;
+      // A row of a list opens its item: whatever its title says (a text that starts with „Adaugă …”) it is not an add.
+      if (b.closest('[data-ui="page-header"], [data-ui="section-head"], [data-ui="empty-state"], [data-ui="stepper"], [data-ui="list-row"], [role="menu"], dialog, [data-ui="filter-sheet"]')) continue;
       add('P12 add', `„${t}” is not top right`);
     }
   }

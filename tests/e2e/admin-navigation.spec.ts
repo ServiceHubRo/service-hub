@@ -60,6 +60,22 @@ interface Fn {
   shows?: (page: Page) => Promise<void>;
 }
 
+/**
+ * The address without the item a list + detail screen shows first: from 1024 px page template A writes
+ * it into the address (?recenzie=, ?zona=, …), which the old addresses and the menu know nothing about.
+ */
+const SELECTION = ['recenzie', 'contestatie', 'zona', 'text', 'ce', 'lista', 'agent', 'cat', 'raport', 'firma'];
+const withoutSelection = (address: string) => {
+  const u = new URL(address);
+  for (const k of SELECTION) u.searchParams.delete(k);
+  return `${u.pathname}${u.search}${u.hash}`;
+};
+async function expectAddress(page: Page, expected: string | RegExp, message?: string) {
+  const poll = expect.poll(() => withoutSelection(page.url()), { message });
+  if (typeof expected === 'string') await poll.toBe(expected);
+  else await poll.toMatch(expected);
+}
+
 const label = (page: Page, text: string) => async () => {
   await expect(page.getByLabel(text).first()).toBeVisible();
 };
@@ -108,7 +124,7 @@ const FUNCTIONS = (page: Page): Fn[] => [
     path: '/admin/activitate/export',
     title: 'Export',
     shows: async () => {
-      await expect(main(page).getByRole('button', { name: 'Descarcă tot' }).first()).toBeVisible();
+      await expect(main(page).getByRole('list', { name: 'Export' })).toBeVisible();
     },
   },
   { zone: 'Suport', item: 'Solicitări', path: '/admin/suport/solicitari', title: 'Solicitări' },
@@ -128,7 +144,10 @@ const FUNCTIONS = (page: Page): Fn[] => [
   { zone: 'Platformă', item: 'Jurnal de audit', path: '/admin/platforma/jurnal', title: 'Jurnal de audit' },
   { zone: 'Platformă', item: 'Notificări flotă eșuate', path: '/admin/platforma/notificari-flota', title: 'Notificări flotă eșuate' },
   // A2
-  { zone: 'Platformă', item: 'Echipa de suport', path: '/admin/platforma/echipa', title: 'Echipa de suport', shows: label(page, 'ID cont sau email') },
+  { zone: 'Platformă', item: 'Echipa de suport', path: '/admin/platforma/echipa', title: 'Echipa de suport', shows: async () => {
+      await expect(page.getByRole('button', { name: 'Numește un agent' })).toBeVisible();
+    },
+  },
   // A6
   { zone: 'Platformă', item: 'Securitate', path: '/admin/platforma/securitate', title: 'Securitate' },
   { zone: 'Platformă', item: 'Administratori', path: '/admin/platforma/administratori', title: 'Administratori' },
@@ -144,7 +163,7 @@ const FUNCTIONS = (page: Page): Fn[] => [
     path: '/admin/platforma/retentie',
     title: 'Retenția datelor',
     shows: async () => {
-      await expect(main(page).getByRole('button', { name: 'Previzualizează' }).first()).toBeVisible();
+      await expect(main(page).getByRole('list', { name: 'Retenția datelor' })).toBeVisible();
     },
   },
 ];
@@ -216,7 +235,7 @@ test.describe('A1 — admin navigation', () => {
     for (const fn of FUNCTIONS(page)) {
       await adminZoneLink(page, fn.zone).click();
       await main(page).getByRole('link', { name: new RegExp(`^${fn.item}`) }).first().click();
-      await expect(page, fn.item).toHaveURL(new RegExp(`${fn.path}$`));
+      await expectAddress(page, new RegExp(`${fn.path}$`), fn.item);
       await expect(h1(page)).toHaveText(fn.title);
       await loaded(page);
       await fn.shows?.(page);
@@ -353,7 +372,7 @@ test.describe('A1 — admin navigation', () => {
     ];
     for (const [old, now] of map) {
       await page.goto(old);
-      await expect(page, old).toHaveURL(new RegExp(`${now.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`));
+      await expectAddress(page, new RegExp(`${now.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`), old);
       await loaded(page);
     }
 
@@ -372,7 +391,7 @@ test.describe('A1 — admin navigation', () => {
 
     // Overlapping starts: the longest one wins; a start matches whole segments only.
     await page.goto('/admin/cont/setari/texte?q=new_review');
-    await expect(page).toHaveURL('/admin/platforma/texte?q=new_review');
+    await expectAddress(page, '/admin/platforma/texte?q=new_review');
     await page.goto('/admin/cont/setari');
     await expect(page).toHaveURL('/admin/platforma/setari');
     await page.goto('/admin/cont');

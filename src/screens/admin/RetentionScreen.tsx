@@ -1,11 +1,13 @@
+import { DatabaseZap, ShieldCheck } from 'lucide-react';
 import { Fragment, useCallback, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { ActionButton } from '../../components/ActionButton';
 import { Button } from '../../components/Button';
-import { Card } from '../../components/Card';
 import { InlinePanel } from '../../components/InlinePanel';
 import { LoadError } from '../../components/LoadError';
 import { SelectField } from '../../components/SelectField';
-import { SkeletonList } from '../../components/Skeleton';
+import { DetailPane, ListDetailLayout } from '../../components/ListDetailLayout';
+import { ListRow, ListRows, ListRowsSkeleton } from '../../components/ListRow';
 import { Spinner } from '../../components/Spinner';
 import { TextArea } from '../../components/TextArea';
 import { adminZoneBack } from '../../app/adminZones';
@@ -34,6 +36,7 @@ import { useI18n } from '../../i18n/context';
 import { formatDecimal, formatTime } from '../../i18n/format';
 import type { MessageKey } from '../../i18n/ro';
 import { ro } from '../../i18n/ro';
+import { useListDetail } from '../../lib/useListDetail';
 import { useLoad } from '../../lib/useLoad';
 import { actionLabel, dateTime } from './format';
 import { Pill, SectionTitle } from './parts';
@@ -44,6 +47,9 @@ import { PageHeader } from '../../components/PageHeader';
 
 /** „‹ Platformă” (A1). */
 const ZONE_BACK = adminZoneBack(ADMIN_RETENTION_PATH);
+
+/** The row of the report on the audit log, next to the jobs. */
+const REPORT_ID = 'report';
 
 type T = (key: MessageKey, params?: Record<string, string | number>) => string;
 
@@ -306,7 +312,7 @@ function DisablePanel({ job, onDone, onCancel }: { job: RetentionJobState; onDon
 
 type PreviewState = { status: 'idle' } | { status: 'loading' } | { status: 'error' } | { status: 'ready'; data: RetentionPreview };
 
-function JobCard({ job, cutoff, onChanged }: { job: RetentionJobState; cutoff: string; onChanged: () => Promise<void> }) {
+function JobDetail({ job, cutoff, onChanged }: { job: RetentionJobState; cutoff: string; onChanged: () => Promise<void> }) {
   const { t, lang } = useI18n();
   const [preview, setPreview] = useState<PreviewState>({ status: 'idle' });
   const [panel, setPanel] = useState<'enable' | 'disable' | null>(null);
@@ -323,16 +329,35 @@ function JobCard({ job, cutoff, onChanged }: { job: RetentionJobState; cutoff: s
   }, [job.key]);
 
   return (
-    <Card>
+    <DetailPane
+      id={job.key}
+      icon={<DatabaseZap size={20} />}
+      title={t(`admin.retention.job.${job.key}`)}
+      status={
+        <Pill tone={job.enabled ? 'amber' : 'grey'}>
+          {t(job.locked_reason ? 'admin.retention.locked' : job.enabled ? 'admin.retention.on' : 'admin.retention.off')}
+        </Pill>
+      }
+      actions={
+        <>
+          <Button
+            variant="secondary"
+            onClick={() => {
+              setNotice(null);
+              void loadPreview();
+            }}
+          >
+            {t('admin.retention.preview')}
+          </Button>
+          {job.enabled && panel === null && (
+            <Button variant="secondary" onClick={() => setPanel('disable')}>
+              {t('admin.retention.disable')}
+            </Button>
+          )}
+        </>
+      }
+    >
       <div className={styles.stack}>
-        <div className={styles.cardHead}>
-          <h2 id={`job-${job.key}`} className={styles.cardTitle}>
-            {t(`admin.retention.job.${job.key}`)}
-          </h2>
-          <Pill tone={job.enabled ? 'amber' : 'grey'}>
-            {t(job.locked_reason ? 'admin.retention.locked' : job.enabled ? 'admin.retention.on' : 'admin.retention.off')}
-          </Pill>
-        </div>
         <p className={styles.muted}>{t(`admin.retention.rule.${job.key}`, { cutoff: dateTime(lang, cutoff) })}</p>
         {job.locked_reason && <p className={styles.warning}>{t('admin.retention.lockedBody')}</p>}
         <p>
@@ -353,23 +378,6 @@ function JobCard({ job, cutoff, onChanged }: { job: RetentionJobState; cutoff: s
             {notice}
           </p>
         )}
-
-        <div className={styles.panelButtons}>
-          <Button
-            variant="secondary"
-            onClick={() => {
-              setNotice(null);
-              void loadPreview();
-            }}
-          >
-            {t('admin.retention.preview')}
-          </Button>
-          {job.enabled && panel === null && (
-            <Button variant="secondary" onClick={() => setPanel('disable')}>
-              {t('admin.retention.disable')}
-            </Button>
-          )}
-        </div>
 
         {preview.status !== 'idle' && (
           <section aria-label={t('admin.retention.previewTitle')} aria-busy={preview.status === 'loading' || undefined}>
@@ -418,7 +426,7 @@ function JobCard({ job, cutoff, onChanged }: { job: RetentionJobState; cutoff: s
           />
         )}
       </div>
-    </Card>
+    </DetailPane>
   );
 }
 
@@ -426,7 +434,7 @@ function JobCard({ job, cutoff, onChanged }: { job: RetentionJobState; cutoff: s
  * What the audit log holds that may be personal data or a secret (A3c2b2), counted per action, for
  * every row (the older ones included). Numbers only: no value ever leaves the database.
  */
-function PrivacyReport() {
+function ReportDetail() {
   const { t, lang } = useI18n();
   const [state, setState] = useState<{ status: 'idle' } | { status: 'loading' } | { status: 'error' } | { status: 'ready'; data: AuditPrivacyReport }>({
     status: 'idle',
@@ -441,15 +449,18 @@ function PrivacyReport() {
     }
   };
   return (
-    <Card>
+    <DetailPane
+      id="report"
+      icon={<ShieldCheck size={20} />}
+      title={t('admin.retention.report.title')}
+      actions={
+        <Button variant="secondary" onClick={() => void load()}>
+          {t('admin.retention.report.run')}
+        </Button>
+      }
+    >
       <div className={styles.stack}>
-        <h2 className={styles.cardTitle}>{t('admin.retention.report.title')}</h2>
         <p className={styles.muted}>{t('admin.retention.report.desc')}</p>
-        <div className={styles.panelButtons}>
-          <Button variant="secondary" onClick={() => void load()}>
-            {t('admin.retention.report.run')}
-          </Button>
-        </div>
         {state.status === 'loading' && <Spinner />}
         {state.status === 'error' && <LoadError message={t('admin.retention.reportLoadError')} onRetry={() => void load()} />}
         {state.status === 'ready' && (
@@ -490,7 +501,7 @@ function PrivacyReport() {
           </>
         )}
       </div>
-    </Card>
+    </DetailPane>
   );
 }
 
@@ -499,28 +510,75 @@ function PrivacyReport() {
  * numbers of its preview; what each run did. Admin only (the database refuses everyone else).
  */
 export function RetentionScreen() {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
+  const { pathname } = useLocation();
   const { state, reload, setData } = useLoad(listRetentionJobs);
   const refresh = useCallback(async () => {
     const fresh = await listRetentionJobs().catch(() => null);
     if (fresh) setData(() => fresh);
   }, [setData]);
 
+  // Page template A (docs/MODEL_DE_FOLOSIRE.md P8): a row per job and one for the report on the audit
+  // log; the chosen one beside the list from 1024 px (in its place below).
+  const jobs = state.status === 'ready' ? state.data.items : [];
+  const { wide, selectedId, open, select } = useListDetail(
+    [...jobs.map((j) => j.key), ...(state.status === 'ready' ? [REPORT_ID] : [])],
+    'ce',
+  );
+  const job = jobs.find((j) => j.key === selectedId) ?? null;
+
+  let list;
+  if (state.status === 'loading') list = <ListRowsSkeleton label={t('common.loading')} />;
+  else if (state.status === 'error') list = <LoadError message={t('admin.retention.loadError')} onRetry={reload} />;
+  else
+    list = (
+      <ListRows label={t('admin.retention.title')}>
+        {jobs.map((j) => {
+          const last = j.runs[0];
+          return (
+            <ListRow
+              key={j.key}
+              icon={<DatabaseZap size={20} />}
+              title={t(`admin.retention.job.${j.key}`)}
+              detail={last ? `${t('admin.retention.lastRun', { date: dateTime(lang, last.finished_at) })}` : t('admin.retention.noRun')}
+              status={
+                <Pill tone={j.enabled ? 'amber' : 'grey'}>
+                  {t(j.locked_reason ? 'admin.retention.locked' : j.enabled ? 'admin.retention.on' : 'admin.retention.off')}
+                </Pill>
+              }
+              selected={wide && j.key === selectedId}
+              onSelect={() => select(j.key)}
+            />
+          );
+        })}
+        <ListRow
+          icon={<ShieldCheck size={20} />}
+          title={t('admin.retention.report.title')}
+          detail={t('admin.retention.report.desc')}
+          selected={wide && selectedId === REPORT_ID}
+          onSelect={() => select(REPORT_ID)}
+        />
+      </ListRows>
+    );
+
   return (
     <div className={styles.page}>
-      <PageHeader back={{ to: ZONE_BACK.to, label: t(ZONE_BACK.label) }} title={t('admin.retention.title')} subtitle={t('admin.retention.desc')} />
-      {state.status === 'loading' && <SkeletonList />}
-      {state.status === 'error' && <LoadError message={t('admin.retention.loadError')} onRetry={reload} />}
-      {state.status === 'ready' && (
-        <ul className={styles.list}>
-          {state.data.items.map((j) => (
-            <li key={j.key}>
-              <JobCard job={j} cutoff={state.data.cutoff} onChanged={refresh} />
-            </li>
-          ))}
-        </ul>
-      )}
-      {state.status === 'ready' && <PrivacyReport />}
+      <ListDetailLayout
+        wide={wide}
+        open={open}
+        backTo={pathname}
+        backLabel={t('admin.retention.title')}
+        header={<PageHeader back={{ to: ZONE_BACK.to, label: t(ZONE_BACK.label) }} title={t('admin.retention.title')} subtitle={t('admin.retention.desc')} />}
+        list={list}
+        detail={
+          state.status === 'ready' &&
+          (selectedId === REPORT_ID ? (
+            <ReportDetail key={REPORT_ID} />
+          ) : (
+            job && <JobDetail key={job.key} job={job} cutoff={state.data.cutoff} onChanged={refresh} />
+          ))
+        }
+      />
     </div>
   );
 }

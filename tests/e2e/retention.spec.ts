@@ -6,7 +6,9 @@ import {
   SEED,
   SEED_PASSWORD,
   adminOpen,
+  backToList,
   createUser,
+  detailPane,
   expectAccessible,
   expectNoHorizontalScroll,
   expectNoRomanianText,
@@ -110,38 +112,45 @@ test.describe('retention (A3c2b1)', () => {
     await expect(page).toHaveURL(/\/admin\//);
     await adminOpen(page, 'Platformă', 'Retenția datelor');
     await expect(h1(page)).toHaveText('Retenția datelor');
-    const card = page.getByRole('listitem').filter({ has: page.getByRole('heading', { name: 'Solicitări de suport' }) });
-    const suggestions = page.getByRole('listitem').filter({ has: page.getByRole('heading', { name: 'Sugestii', exact: true }) });
-    await expect(card).toBeVisible();
-    await expect(suggestions).toBeVisible();
+    // One row per job and one for the report (page template A); the chosen one beside the list, or in its place on a phone.
+    const rows = page.getByRole('list', { name: 'Retenția datelor' }).locator(':scope > li');
+    const openRow = async (title: string) => {
+      await backToList(page);
+      await rows.filter({ has: page.getByText(title, { exact: true }) }).getByRole('button').click();
+      return detailPane(page);
+    };
 
     // The preview: what would be processed, the exceptions apart.
+    const card = await openRow('Solicitări de suport');
     await card.getByRole('button', { name: 'Previzualizează' }).click();
     await expect(card.getByText('Se procesează')).toBeVisible();
     await expect(card.getByText('Exceptate')).toBeVisible();
     await expect(card.getByText('Sub păstrare legală')).toBeVisible();
+    const suggestions = await openRow('Sugestii');
     await suggestions.getByRole('button', { name: 'Previzualizează' }).click();
     await expect(suggestions.getByText('Date găsite în texte')).toBeVisible();
     // A3c2b2: the log jobs; the administrative one is locked until the legal validation.
-    const supportLog = page.getByRole('listitem').filter({ has: page.getByRole('heading', { name: 'Jurnalul echipei de suport' }) });
-    const adminLog = page.getByRole('listitem').filter({ has: page.getByRole('heading', { name: 'Jurnalul administrativ' }) });
+    const adminLog = await openRow('Jurnalul administrativ');
     await expect(adminLog.getByText('Blocat', { exact: true })).toBeVisible();
     await expect(adminLog.getByText('Termenul de 3 ani așteaptă validarea juridică.', { exact: false })).toBeVisible();
     await adminLog.getByRole('button', { name: 'Previzualizează' }).click();
     await expect(adminLog.getByText('Înregistrări de șters')).toBeVisible();
     await expect(adminLog.getByRole('button', { name: 'Activează', exact: true })).toHaveCount(0);
+    const supportLog = await openRow('Jurnalul echipei de suport');
     await supportLog.getByRole('button', { name: 'Previzualizează' }).click();
     await expect(supportLog.getByText('Căutări din care se șterg cuvintele')).toBeVisible();
     await expect(supportLog.getByText('Scrise înainte de această etapă (neatinse)')).toBeVisible();
 
     // The report on the log: numbers only.
-    await page.getByRole('button', { name: 'Generează raportul' }).click();
+    const report = await openRow('Date personale în jurnal');
+    await report.getByRole('button', { name: 'Generează raportul' }).click();
     await expect(page.getByText(/^Înregistrări în jurnal: /)).toBeVisible();
     await expect(page.getByText('Cu cuvinte căutate', { exact: true })).toBeVisible();
     await expectNoHorizontalScroll(page);
     await expectAccessible(page, 'retention');
     await shot(page, 'a3c2b1-retention-preview', name());
 
+    await backToList(page);
     await switchLanguage(page, 'en');
     await expect(h1(page)).toHaveText('Data retention');
     await expectNoRomanianText(page, 'retention (EN)');
@@ -155,6 +164,7 @@ test.describe('retention (A3c2b1)', () => {
     const token = await adminToken();
     await switchOff(token, 'support_requests');
     await page.reload();
+    await openRow('Solicitări de suport');
     await card.getByRole('button', { name: 'Previzualizează' }).click();
     await card.getByRole('button', { name: 'Activează', exact: true }).click();
     await expect(card.getByText('Activezi jobul?')).toBeVisible();

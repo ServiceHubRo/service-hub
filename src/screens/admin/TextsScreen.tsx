@@ -1,15 +1,16 @@
-import { SearchX } from 'lucide-react';
+import { BellRing, SearchX } from 'lucide-react';
 import { useDeferredValue, useMemo, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { TEMPLATES } from '../../../supabase/functions/_shared/templates.ts';
 import { ActionButton } from '../../components/ActionButton';
 import { Button } from '../../components/Button';
-import { Card } from '../../components/Card';
 import { EmptyState } from '../../components/EmptyState';
 import { Field } from '../../components/Field';
 import { InlinePanel } from '../../components/InlinePanel';
 import { LoadError } from '../../components/LoadError';
 import { SearchField } from '../../components/SearchField';
-import { SkeletonList } from '../../components/Skeleton';
+import { DetailPane, ListDetailLayout } from '../../components/ListDetailLayout';
+import { ListRow, ListRows, ListRowsSkeleton } from '../../components/ListRow';
 import { TextArea } from '../../components/TextArea';
 import { fetchSettings, setNotificationText, type NotificationTexts, type TextInput } from '../../data/adminTools';
 import { canRetryRpc, rpcErrorMessage } from '../../data/rpc';
@@ -17,6 +18,7 @@ import { adminZoneBack } from '../../app/adminZones';
 import { useI18n } from '../../i18n/context';
 import { placeholdersOf, unknownPlaceholders } from '../../lib/adminTools';
 import { matchesWords, searchWords } from '../../lib/text';
+import { useListDetail } from '../../lib/useListDetail';
 import { useLoad } from '../../lib/useLoad';
 import { Pill, SectionTitle } from './parts';
 import { ADMIN_TEXTS_PATH } from './paths';
@@ -104,18 +106,64 @@ function TextPanel({ textKey, texts, onDone, onCancel }: { textKey: string; text
   );
 }
 
+function TextDetail({ k, texts, notice, onDone }: { k: string; texts: NotificationTexts; notice: string | null; onDone: (t: NotificationTexts, message: string) => void }) {
+  const { t, lang } = useI18n();
+  const [editing, setEditing] = useState(false);
+  const own = texts[k]?.[lang];
+  const base = TEMPLATES[lang][k]!;
+  return (
+    <DetailPane
+      id={k}
+      icon={<BellRing size={20} />}
+      title={own?.title || base.title}
+      detail={k}
+      status={texts[k] ? <Pill tone="amber">{t('admin.texts.changed')}</Pill> : undefined}
+      message={notice ? { tone: 'success', text: notice } : undefined}
+      actions={
+        !editing ? (
+          <Button onClick={() => setEditing(true)} aria-label={`${t('admin.texts.edit')}: ${k}`}>
+            {t('admin.texts.edit')}
+          </Button>
+        ) : undefined
+      }
+    >
+      <div className={tools.textRow}>
+        <span>{own?.body || base.body}</span>
+        {texts[k] && (
+          <span className={tools.defaultText}>
+            {t('admin.texts.builtIn')}: {base.title} — {base.body}
+          </span>
+        )}
+      </div>
+      {editing && (
+        <TextPanel
+          textKey={k}
+          texts={texts}
+          onDone={(next, message) => {
+            setEditing(false);
+            onDone(next, message);
+          }}
+          onCancel={() => setEditing(false)}
+        />
+      )}
+    </DetailPane>
+  );
+}
+
 /**
  * Textele notificărilor (FR §5.10, P21): every push text, to clients and to shops, in Romanian and
  * English — the built-in one, or the admin's own. Placeholders like {shop} are filled for each
  * person; a placeholder the text never gets is flagged before saving. An empty field keeps the
  * built-in text; "Revino la textul inițial" drops the change. Applies to the next notifications.
+ * Page template A (docs/MODEL_DE_FOLOSIRE.md P8): one row per text, in two sections (to clients, to
+ * shops); the chosen one beside the list from 1024 px (in its place below).
  */
 export function TextsScreen() {
   const { t, lang } = useI18n();
+  const { pathname } = useLocation();
   const { state, reload, setData } = useLoad(fetchSettings);
   const { setParam, text, setText } = useUrlParams();
   const query = useDeferredValue(text);
-  const [open, setOpen] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const texts = state.status === 'ready' ? state.data.notification_texts : null;
 
@@ -137,83 +185,98 @@ export function TextsScreen() {
     });
   }, [query, texts, lang]);
 
-  return (
-    <div className={styles.page}>
+  const { wide, selectedId, open, select } = useListDetail(shownKeys, 'text');
+  const chosen = shownKeys.find((k) => k === selectedId) ?? null;
+
+  const header = (
+    <>
       <PageHeader back={{ to: ZONE_BACK.to, label: t(ZONE_BACK.label) }} title={t('admin.texts.title')} subtitle={t('admin.texts.sub')} />
-      {state.status === 'loading' && <SkeletonList />}
-      {state.status === 'error' && <LoadError message={t('admin.loadError')} onRetry={reload} />}
       {texts && (
+        <SearchField
+          id="admin-texts-q"
+          label={t('admin.texts.search')}
+          placeholder={t('admin.texts.search')}
+          value={text}
+          onChange={setText}
+          onClear={() => {
+            setText('');
+            setParam({ q: null });
+          }}
+          clearLabel={t('admin.search.clear')}
+        />
+      )}
+      {notice && !open && (
+        <p className={styles.muted} role="status">
+          {notice}
+        </p>
+      )}
+    </>
+  );
+
+  let list;
+  if (state.status === 'loading') list = <ListRowsSkeleton label={t('common.loading')} />;
+  else if (state.status === 'error') list = <LoadError message={t('admin.loadError')} onRetry={reload} />;
+  else if (texts)
+    list =
+      shownKeys.length === 0 ? (
+        <EmptyState icon={SearchX} title={t('admin.noResults')} />
+      ) : (
         <>
-          <SearchField
-            id="admin-texts-q"
-            label={t('admin.texts.search')}
-            placeholder={t('admin.texts.search')}
-            value={text}
-            onChange={setText}
-            onClear={() => {
-              setText('');
-              setParam({ q: null });
-            }}
-            clearLabel={t('admin.search.clear')}
-          />
-          {notice && (
-            <p className={styles.muted} role="status">
-              {notice}
-            </p>
-          )}
-          {shownKeys.length === 0 && <EmptyState icon={SearchX} title={t('admin.noResults')} />}
           {SIDES.map((side) => {
             const keys = shownKeys.filter((k) => k.startsWith(`${side}.`));
             if (keys.length === 0) return null;
+            const label = t(side === 'client' ? 'admin.texts.toClients' : 'admin.texts.toShops');
             return (
               <section key={side} className={styles.section}>
-                <SectionTitle>{t(side === 'client' ? 'admin.texts.toClients' : 'admin.texts.toShops')}</SectionTitle>
-                <ul className={styles.list}>
+                <SectionTitle>{label}</SectionTitle>
+                <ListRows label={label}>
                   {keys.map((k) => {
                     const own = texts[k]?.[lang];
                     const base = TEMPLATES[lang][k]!;
                     return (
-                      <li key={k}>
-                        <Card className={styles.stack}>
-                          <div className={styles.cardHead}>
-                            <span className={`${styles.id}`}>{k}</span>
-                            {texts[k] && <Pill tone="amber">{t('admin.texts.changed')}</Pill>}
-                          </div>
-                          <div className={tools.textRow}>
-                            <span className={styles.rowTitle}>{own?.title || base.title}</span>
-                            <span>{own?.body || base.body}</span>
-                            {texts[k] && (
-                              <span className={tools.defaultText}>
-                                {t('admin.texts.builtIn')}: {base.title} — {base.body}
-                              </span>
-                            )}
-                          </div>
-                          {open === k ? (
-                            <TextPanel
-                              textKey={k}
-                              texts={texts}
-                              onDone={(next, message) => {
-                                if (state.status === 'ready') setData({ ...state.data, notification_texts: next });
-                                setOpen(null);
-                                setNotice(message);
-                              }}
-                              onCancel={() => setOpen(null)}
-                            />
-                          ) : (
-                            <Button className={styles.loneAction} onClick={() => setOpen(k)} aria-label={`${t('admin.texts.edit')}: ${k}`}>
-                              {t('admin.texts.edit')}
-                            </Button>
-                          )}
-                        </Card>
-                      </li>
+                      <ListRow
+                        key={k}
+                        icon={<BellRing size={20} />}
+                        title={own?.title || base.title}
+                        detail={`${k} · ${own?.body || base.body}`}
+                        status={texts[k] ? <Pill tone="amber">{t('admin.texts.changed')}</Pill> : undefined}
+                        selected={wide && k === selectedId}
+                        onSelect={() => select(k)}
+                      />
                     );
                   })}
-                </ul>
+                </ListRows>
               </section>
             );
           })}
         </>
-      )}
+      );
+
+  return (
+    <div className={styles.page}>
+      <ListDetailLayout
+        wide={wide}
+        open={open}
+        backTo={pathname}
+        backLabel={t('admin.texts.title')}
+        header={header}
+        list={list}
+        detail={
+          chosen &&
+          texts && (
+            <TextDetail
+              key={chosen}
+              k={chosen}
+              texts={texts}
+              notice={open ? notice : null}
+              onDone={(next, message) => {
+                if (state.status === 'ready') setData({ ...state.data, notification_texts: next });
+                setNotice(message);
+              }}
+            />
+          )
+        }
+      />
     </div>
   );
 }
