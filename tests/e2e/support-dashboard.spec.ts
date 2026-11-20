@@ -12,6 +12,7 @@ import {
   expectNoHorizontalScroll,
   expectNoRomanianText,
   inboxRow,
+  requestTitle,
   rpcAs,
   serviceRest,
   shot,
@@ -269,7 +270,7 @@ test.describe('support dashboard (A3c1)', () => {
 
       await tile(page, 'Ale mele').click();
       await expect(page).toHaveURL(/\?responsabil=mine$/);
-      const titles = () => page.getByRole('list').last().getByRole('link').allInnerTexts();
+      const titles = () => page.locator('[data-ui="list-row"]').allInnerTexts();
       await expect(inboxRow(page, `Volum ${s}`)).toHaveCount(30);
       for (const shown of [60, 90]) {
         const t0 = Date.now();
@@ -357,13 +358,10 @@ test.describe('support dashboard (A3c1)', () => {
     await signIn(author, clientA, PASSWORD);
     await expect(author).toHaveURL(/\/c\//);
     await author.goto(`/c/cont/ajutor/solicitari/${live}`);
-    await expect(h1(author)).toHaveText(`Live ${s}`);
+    await expect(requestTitle(author)).toHaveText(`Live ${s}`);
 
-    await page
-      .getByRole('link')
-      .filter({ hasText: `Live ${s}` })
-      .click();
-    await expect(h1(page)).toHaveText(`Live ${s}`);
+    await inboxRow(page, `Live ${s}`).click();
+    await expect(requestTitle(page)).toHaveText(`Live ${s}`);
     const token = await appToken(page);
     const before = hearA.heard.length;
     expect(

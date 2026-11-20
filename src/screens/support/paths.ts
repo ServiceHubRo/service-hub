@@ -12,7 +12,7 @@ export const SUPPORT_PROCEDURES_PATH = '/suport/proceduri';
 export const SUPPORT_TEXT_REVIEWS_PATH = '/suport/sugestii-de-verificat';
 
 /** One request (A3a). */
-export const supportRequestPath = (id: string) => `${SUPPORT_REQUESTS_PATH}/${id}`;
+export const supportRequestPath = (id: string) => `${SUPPORT_REQUESTS_PATH}?solicitare=${id}`;
 
 /** One account's card, reached from a search or a request. */
 export const supportAccountPath = (id: string) => `${SUPPORT_SEARCH_PATH}/${id}`;

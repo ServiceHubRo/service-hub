@@ -70,7 +70,7 @@ import { TeamScreen } from '../../screens/admin/TeamScreen';
 import { RetentionScreen } from '../../screens/admin/RetentionScreen';
 import { TextReviewsScreen } from '../../screens/requests/TextReviewsScreen';
 import { InboxScreen } from '../../screens/requests/InboxScreen';
-import { RequestScreen } from '../../screens/requests/RequestScreen';
+import { RequestRedirect } from '../../screens/requests/RequestScreen';
 import { TextsScreen } from '../../screens/admin/TextsScreen';
 import { ZoneScreen } from '../../screens/admin/ZoneScreen';
 import { ZonesScreen } from '../../screens/admin/ZonesScreen';
@@ -124,7 +124,7 @@ export default function AdminApp() {
         <Route path={at(ADMIN_EXPORT_PATH)} element={<ExportScreen />} />
         {/* Suport */}
         <Route path={at(ADMIN_REQUESTS_PATH)} element={<InboxScreen mode="admin" />} />
-        <Route path={`${at(ADMIN_REQUESTS_PATH)}/:requestId`} element={<RequestScreen mode="admin" />} />
+        <Route path={`${at(ADMIN_REQUESTS_PATH)}/:requestId`} element={<RequestRedirect mode="admin" />} />
         <Route path={at(ADMIN_HOLDS_PATH)} element={<LegalHoldsScreen />} />
         <Route path={`${at(ADMIN_HOLDS_PATH)}/:holdId`} element={<LegalHoldScreen />} />
         <Route path={at(ADMIN_HELP_PATH)} element={<HelpAdminScreen />} />

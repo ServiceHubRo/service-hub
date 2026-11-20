@@ -378,6 +378,12 @@ input:focus-visible + .attachButton {
   background: var(--red-soft);
 }
 
+/* Over the detail's lighter ground the warning tints need the stronger text to keep 4.5:1. */
+.dashStats .statLate > span + span,
+.dashStats .statUrgent > span + span {
+  color: var(--muted-strong);
+}
+
 .dashStats .statCurrent {
   border-color: var(--amber);
   box-shadow: inset 0 0 0 1px var(--amber);

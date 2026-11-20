@@ -8,7 +8,9 @@ import {
   createUser,
   expectAccessible,
   expectNoHorizontalScroll,
+  detailPane,
   inboxRow,
+  requestTitle,
   openAccount,
   shot,
   signIn,
@@ -48,15 +50,20 @@ async function adminMarks(browser: Browser, page: Page, text: string, who: RegEx
   await shot(admin, 'suggestions-admin', name());
 
   await row.click();
-  await expect(admin.getByRole('heading', { level: 1, name: text })).toBeVisible();
-  await admin.getByRole('combobox', { name: 'Stare', exact: true }).selectOption({ label: mark });
+  await expect(requestTitle(admin)).toHaveText(text);
+  await detailPane(admin).getByRole('combobox', { name: 'Stare', exact: true }).selectOption({ label: mark });
   await admin.getByRole('button', { name: 'Schimbă starea' }).click();
   // Its own state is no longer offered; the pill says it.
-  await expect(admin.getByRole('combobox', { name: 'Stare', exact: true }).locator('option', { hasText: mark })).toHaveCount(0);
-  await expect(admin.locator('main').getByText(mark, { exact: true }).first()).toBeVisible();
+  await expect(detailPane(admin).getByRole('combobox', { name: 'Stare', exact: true }).locator('option', { hasText: mark })).toHaveCount(0);
+  await expect(detailPane(admin).getByText(mark, { exact: true }).first()).toBeVisible();
   await admin.goto('/admin/platforma/jurnal');
   await expect(admin.getByText('Stare solicitare schimbată').first()).toBeVisible();
   await context.close();
+}
+
+/** On a phone the list comes first: „Adaugă” opens the form (beside the list the form is already there). */
+async function openForm(page: Page) {
+  if ((page.viewportSize()?.width ?? 0) < 1024) await page.getByRole('button', { name: 'Adaugă o sugestie' }).click();
 }
 
 test('a client sends a suggestion, the admin plans it, the client sees it planned', async ({ page, browser }) => {
@@ -66,9 +73,10 @@ test('a client sends a suggestion, the admin plans it, the client sees it planne
   await expect(page).toHaveURL(/\/c\/cauta/);
   await openAccount(page);
   await page.getByRole('link', { name: /^Sugestii/ }).click();
-  await expect(page).toHaveURL(/\/c\/cont\/sugestii$/);
+  await expect(page).toHaveURL(/\/c\/cont\/sugestii(\?sugestie=nou)?$/);
   await expect(page.getByRole('heading', { level: 1, name: 'Sugestii' })).toBeVisible();
   await expect(page.getByText('Nu există sugestii trimise.')).toBeVisible();
+  await openForm(page);
 
   const send = page.getByRole('button', { name: 'Trimite sugestia' });
   await expect(send).toBeDisabled();
@@ -77,7 +85,6 @@ test('a client sends a suggestion, the admin plans it, the client sees it planne
   await expect(page.getByText(`${text.length} / 1.000 de caractere`)).toBeVisible();
   await send.click();
   await expect(page.getByRole('status').filter({ hasText: 'Sugestie trimisă.' })).toBeVisible();
-  await expect(field).toHaveValue('');
   const mine = page.getByRole('listitem').filter({ hasText: text });
   await expect(mine).toContainText('Primită');
   await expectAccessible(page, 'client suggestions');
@@ -97,6 +104,7 @@ test('a shop sends one; the admin sees the shop and marks it done', async ({ pag
   await signIn(page, email, PASSWORD);
   await expect(page).toHaveURL(/\/s\/panou$/);
   await page.goto('/s/cont/sugestii');
+  await openForm(page);
   await page.getByLabel('Sugestia ta').fill(text);
   await page.getByRole('button', { name: 'Trimite sugestia' }).click();
   await expect(page.getByRole('listitem').filter({ hasText: text })).toContainText('Primită');

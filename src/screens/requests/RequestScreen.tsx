@@ -1,13 +1,15 @@
+import { MessageSquare, SearchX } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, Navigate, useParams } from 'react-router-dom';
 import { useSession } from '../../app/sessionContext';
 import { ActionButton } from '../../components/ActionButton';
 import { Button } from '../../components/Button';
 import { Card } from '../../components/Card';
 import { LoadError } from '../../components/LoadError';
-import { PageHeader } from '../../components/PageHeader';
 import { SelectField } from '../../components/SelectField';
-import { SkeletonList } from '../../components/Skeleton';
+import { EmptyState } from '../../components/EmptyState';
+import { DetailPane } from '../../components/ListDetailLayout';
+import { ListRowsSkeleton } from '../../components/ListRow';
 import { TextArea } from '../../components/TextArea';
 import { subscribeRows } from '../../data/realtime';
 import { canRetryRpc, rpcErrorMessage, toRpcError } from '../../data/rpc';
@@ -36,11 +38,10 @@ import { ConfirmPanel } from '../admin/ActionPanels';
 import { day } from '../admin/format';
 import { HoldForm } from '../admin/LegalHoldsScreen';
 import { basisLabel } from '../admin/legalHoldText';
-import { ADMIN_REQUESTS_PATH, adminClientPath, adminHoldPath } from '../admin/paths';
+import { adminClientPath, adminHoldPath, adminRequestPath } from '../admin/paths';
 import adminStyles from '../admin/admin.module.css';
-import { NotFound } from '../public/NotFound';
 import { RelevantProcedures } from '../procedures/RelevantProcedures';
-import { SUPPORT_REQUESTS_PATH, supportAccountPath } from '../support/paths';
+import { supportAccountPath, supportRequestPath } from '../support/paths';
 import { categoryName, dayText, whenText } from './format';
 import { AttachmentPicker } from './Attachments';
 import { Conversation, RequestStatusPill, type ConversationItem } from './parts';
@@ -53,25 +54,27 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const staffName = (s: Partial<StaffRef> | null | undefined) => [s?.display_id, s?.name].filter(Boolean).join(' · ');
 
 /**
- * One request for the team (A3a): who wrote it (as an agent may see the account), the booking's
+ * One request for the team (A3a), beside the list of Solicitări since C7: who wrote it (as an agent may see the account), the booking's
  * minimal reference, the conversation with which member answered, the internal notes (never the
  * author's), and the work: take, assign, answer, change the state, note, escalate (agent) or give back
  * (admin). An escalated request is read-only for an agent; a closed one for everybody. Every opening
  * and every action is in the audit log (the database writes it). Live since A3c1. The procedures that
  * fit its category are shown under the facts (A5), read only.
  */
-export function RequestScreen({ mode }: { mode: 'support' | 'admin' }) {
+export function RequestDetail({ mode, requestId, onChanged }: { mode: 'support' | 'admin'; requestId: string; onChanged: () => void }) {
   const { t, lang } = useI18n();
   const session = useSession();
   const me = session.profile?.id ?? '';
-  const { requestId = '' } = useParams();
   const valid = UUID.test(requestId);
   const load = useCallback(
     () => (valid ? Promise.all([getRequest(requestId), fetchSupportCategories(), listStaff()]) : Promise.reject(new Error('invalid id'))),
     [valid, requestId],
   );
   const { state, reload, setData } = useLoad(load);
-  const back = { to: mode === 'admin' ? ADMIN_REQUESTS_PATH : SUPPORT_REQUESTS_PATH, label: t('support.requests.title') };
+  const changed = useRef(onChanged);
+  useEffect(() => {
+    changed.current = onChanged;
+  });
 
   // After an action: the request again, quietly (no skeleton; the page stays where it is).
   const lastRead = useRef(0);
@@ -79,6 +82,8 @@ export function RequestScreen({ mode }: { mode: 'support' | 'admin' }) {
     lastRead.current = Date.now();
     const fresh = await getRequest(requestId).catch(() => null);
     if (fresh) setData(([, cats, staff]) => [fresh, cats, staff]);
+    // The row in the list follows (its state, who is responsible).
+    changed.current();
   }, [requestId, setData]);
 
   // A3c1 — live: someone else answered, noted, took or escalated it. The signal names only the
@@ -111,15 +116,10 @@ export function RequestScreen({ mode }: { mode: 'support' | 'admin' }) {
     };
   }, [ready, valid, requestId, refresh]);
 
-  if (!valid || (state.status === 'error' && toRpcError(state.error).code === 'request_not_found')) return <NotFound inShell />;
-  if (state.status !== 'ready') {
-    return (
-      <div className={adminStyles.page}>
-        <PageHeader back={back} title={t('support.requests.title')} />
-        {state.status === 'loading' ? <SkeletonList count={3} /> : <LoadError message={t('support.detail.loadError')} onRetry={reload} />}
-      </div>
-    );
-  }
+  if (!valid || (state.status === 'error' && toRpcError(state.error).code === 'request_not_found'))
+    return <EmptyState icon={SearchX} title={t('support.detail.notFound')} />;
+  if (state.status === 'loading') return <ListRowsSkeleton count={3} label={t('common.loading')} />;
+  if (state.status === 'error') return <LoadError message={t('support.detail.loadError')} onRetry={reload} />;
 
   const [r, categories, staff] = state.data;
   const closed = r.status === 'closed';
@@ -153,14 +153,19 @@ export function RequestScreen({ mode }: { mode: 'support' | 'admin' }) {
   const bookingStatus = r.booking && `status.${r.booking.status}` in ro ? t(`status.${r.booking.status}` as MessageKey) : r.booking?.status;
 
   return (
-    <div className={adminStyles.page}>
-      <PageHeader back={back} title={r.title} />
-      <div className={styles.meta}>
-        <RequestStatusPill status={r.status} staff />
-        {escalated && <StatusPill tone={toneOf('red')}>{t('support.inbox.escalated')}</StatusPill>}
-        {held && <StatusPill tone={toneOf('amber')}>{t('admin.holds.pill')}</StatusPill>}
-        <span>{categoryName(categories, r.category, lang)}</span>
-      </div>
+    <DetailPane
+      id={r.id}
+      icon={<MessageSquare size={20} />}
+      title={r.title}
+      detail={categoryName(categories, r.category, lang)}
+      status={
+        <span className={styles.meta}>
+          <RequestStatusPill status={r.status} staff />
+          {escalated && <StatusPill tone={toneOf('red')}>{t('support.inbox.escalated')}</StatusPill>}
+          {held && <StatusPill tone={toneOf('amber')}>{t('admin.holds.pill')}</StatusPill>}
+        </span>
+      }
+    >
 
       {escalated && (
         <div className={styles.banner} data-tone="escalated" role="note">
@@ -216,8 +221,14 @@ export function RequestScreen({ mode }: { mode: 'support' | 'admin' }) {
 
       {mode === 'support' && editable && <EscalateAction request={r} onDone={refresh} />}
       {mode === 'admin' && <HoldSection request={r} onDone={refresh} />}
-    </div>
+    </DetailPane>
   );
+}
+
+/** An old address of one request (`…/solicitari/<id>`: e-mails, the audit log): the list with it chosen. */
+export function RequestRedirect({ mode }: { mode: 'support' | 'admin' }) {
+  const { requestId = '' } = useParams();
+  return <Navigate replace to={mode === 'admin' ? adminRequestPath(requestId) : supportRequestPath(requestId)} />;
 }
 
 /** A3c2a, admin only: the legal holds covering the request, or placing one on it. */

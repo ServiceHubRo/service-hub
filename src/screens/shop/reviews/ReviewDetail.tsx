@@ -2,6 +2,8 @@ import { useId, useState } from 'react';
 import { ActionButton } from '../../../components/ActionButton';
 import { Button } from '../../../components/Button';
 import { Card } from '../../../components/Card';
+import { DetailPane } from '../../../components/ListDetailLayout';
+import { StatusPill } from '../../../components/StatusPill';
 import { InlinePanel } from '../../../components/InlinePanel';
 import { ShopAvatar } from '../../../components/ShopAvatar';
 import { Stars } from '../../../components/Stars';
@@ -19,6 +21,7 @@ import { useI18n } from '../../../i18n/context';
 import { formatDayMonth } from '../../../i18n/format';
 import type { MessageKey } from '../../../i18n/ro';
 import styles from './reviews.module.css';
+import { toneOf } from '../../../lib/statusTone';
 import { useIsShopOwner } from '../shopRole';
 
 const REASONS: { value: ReportReason; label: MessageKey }[] = [
@@ -30,7 +33,7 @@ const REASONS: { value: ReportReason; label: MessageKey }[] = [
 
 const MAX_REPLY = 2000;
 
-export interface ReviewCardProps {
+export interface ReviewDetailProps {
   review: ShopReview;
   /** A reply or report went through: the review as the database returned it. */
   onChanged: (review: Partial<ShopReview> & { id: string }) => void;
@@ -39,12 +42,12 @@ export interface ReviewCardProps {
 }
 
 /**
- * One review on the shop's Recenzii (P10): who, stars, date, text, the booking it is about; the
- * shop's public reply in a nested panel; "Răspunde" / "Editează răspunsul" and "Raportează" open
- * inside the card. A reported review keeps an amber border and a line saying so until admin decides;
+ * One review on the shop's Recenzii (P10; page template A since C7): who, stars, date, text, the booking
+ * it is about; the shop's public reply in a nested panel; "Răspunde" / "Editează răspunsul" and
+ * "Raportează" open in the actions' place. A reported review keeps an amber border and a line saying so until admin decides;
  * it stays public meanwhile. Replying and reporting are the owner's; a colleague reads.
  */
-export function ReviewCard({ review: r, onChanged, onStale }: ReviewCardProps) {
+export function ReviewDetail({ review: r, onChanged, onStale }: ReviewDetailProps) {
   const { t, lang } = useI18n();
   const isOwner = useIsShopOwner();
   const [panel, setPanel] = useState<'reply' | 'report' | null>(null);
@@ -72,60 +75,40 @@ export function ReviewCard({ review: r, onChanged, onStale }: ReviewCardProps) {
   const replyText = reply.trim();
   const removingReply = r.reply !== null && replyText === '';
 
-  return (
-    <Card highlight={pending} className={`${styles.card} ${removed ? styles.removed : ''}`}>
-      <div className={styles.top}>
-        <ShopAvatar name={name} logoUrl={null} size={36} />
-        <div className={styles.who}>
-          <p className={styles.name}>{name}</p>
-          <p className={styles.muted}>
-            {formatDayMonth(lang, new Date(r.created_at))}
-            {about && <span className="mono"> · {about}</span>}
-          </p>
-        </div>
-      </div>
-      {/* A block around the stars: as a flex item they would stretch and fill all five. */}
-      <div>
-        <Stars value={r.rating} size={16} />
-      </div>
-      {r.text && <p className={styles.text}>{r.text}</p>}
-
-      {r.reply && panel !== 'reply' && (
-        <Card inset className={styles.reply}>
-          <p className={styles.replyLabel}>{t('reviews.yourReply')}</p>
-          <p className={styles.text}>{r.reply}</p>
-        </Card>
-      )}
-
-      {removed && <p className={styles.muted}>{t('reviews.removedBody')}</p>}
-      {pending && <p className={styles.muted}>{justReported ? t('reviews.reportSent') : t('reviews.reportPending')}</p>}
-      {r.report_status === 'kept' && <p className={styles.muted}>{t('reviews.reportKept')}</p>}
-
-      {panel === null && !removed && isOwner && (
-        <div className={styles.actions}>
+  const status = (
+    <span className={styles.statusLine}>
+      <Stars value={r.rating} size={16} />
+      {pending && <StatusPill tone={toneOf('amber')}>{t('reviews.reported')}</StatusPill>}
+    </span>
+  );
+  const actions =
+    panel === null && !removed && isOwner ? (
+      <>
+        <Button
+          variant="primary"
+          onClick={() => {
+            setReply(r.reply ?? '');
+            setPanel('reply');
+          }}
+        >
+          {r.reply ? t('reviews.editReply') : t('reviews.reply')}
+        </Button>
+        {r.report_status === null && (
           <Button
+            variant="ghost"
             onClick={() => {
-              setReply(r.reply ?? '');
-              setPanel('reply');
+              setReason(null);
+              setPanel('report');
             }}
           >
-            {r.reply ? t('reviews.editReply') : t('reviews.reply')}
+            {t('reviews.report')}
           </Button>
-          {r.report_status === null && (
-            <Button
-              variant="ghost"
-              onClick={() => {
-                setReason(null);
-                setPanel('report');
-              }}
-            >
-              {t('reviews.report')}
-            </Button>
-          )}
-        </div>
-      )}
+        )}
+      </>
+    ) : undefined;
 
-      {panel === 'reply' && (
+  const replyPanel =
+    panel === 'reply' ? (
         <InlinePanel title={r.reply ? t('reviews.editReply') : t('reviews.reply')} onClose={() => setPanel(null)}>
           <TextArea
             label={t('reviews.replyLabel')}
@@ -157,9 +140,7 @@ export function ReviewCard({ review: r, onChanged, onStale }: ReviewCardProps) {
             </Button>
           </div>
         </InlinePanel>
-      )}
-
-      {panel === 'report' && (
+    ) : panel === 'report' ? (
         <InlinePanel title={t('reviews.reportTitle')} onClose={() => setPanel(null)}>
           <fieldset className={styles.reasons}>
             <legend className={styles.legend}>{t('reviews.reportLegend')}</legend>
@@ -202,7 +183,28 @@ export function ReviewCard({ review: r, onChanged, onStale }: ReviewCardProps) {
             </Button>
           </div>
         </InlinePanel>
+    ) : undefined;
+
+  return (
+    <DetailPane
+      id={r.id}
+      icon={<ShopAvatar name={name} logoUrl={null} size={36} />}
+      title={name}
+      detail={<>{formatDayMonth(lang, new Date(r.created_at))}{about && <span className="mono"> · {about}</span>}</>}
+      status={status}
+      actions={actions}
+      panel={replyPanel}
+    >
+      {r.text && <p className={styles.text}>{r.text}</p>}
+      {r.reply && panel !== 'reply' && (
+        <Card inset className={styles.reply}>
+          <p className={styles.replyLabel}>{t('reviews.yourReply')}</p>
+          <p className={styles.text}>{r.reply}</p>
+        </Card>
       )}
-    </Card>
+      {removed && <p className={styles.muted}>{t('reviews.removedBody')}</p>}
+      {pending && <p className={styles.muted}>{justReported ? t('reviews.reportSent') : t('reviews.reportPending')}</p>}
+      {r.report_status === 'kept' && <p className={styles.muted}>{t('reviews.reportKept')}</p>}
+    </DetailPane>
   );
 }

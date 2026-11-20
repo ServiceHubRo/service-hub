@@ -7,12 +7,14 @@ import {
   SEED_PASSWORD,
   adminOpen,
   backToList,
+  chooseRow,
   createUser,
   detailPane,
   expectAccessible,
   expectNoHorizontalScroll,
   expectNoRomanianText,
   serviceRest,
+  shopRow,
   shot,
   signIn,
   switchLanguage,
@@ -224,7 +226,8 @@ test.describe('retention (A3c2b1)', () => {
     await expect(h1(agentPage)).toHaveText('Solicitări');
     await agentPage.getByRole('link', { name: /^Sugestii de verificat: / }).click();
     await expect(h1(agentPage)).toHaveText('Sugestii de verificat');
-    const card = agentPage.getByRole('listitem').filter({ hasText: `Sugestia-A ${s}` });
+    // Page template A: a row per text, the chosen one beside the list.
+    const card = await chooseRow(agentPage, 'Sugestii de verificat', `Sugestia-A ${s}`);
     await expect(card).toContainText('Date găsite: email (1), telefon (1)');
     await expect(card).toContainText(`Sugestia-A ${s}: sunați-mă la [telefon] sau la [email]`);
     await expect(card).toContainText(/Zile până la ștergerea textului: (29|30)/);
@@ -241,9 +244,10 @@ test.describe('retention (A3c2b1)', () => {
     await card.getByLabel('Textul păstrat').fill(`Sugestia-A ${s}: contact direct cu echipa`);
     await card.getByRole('button', { name: 'Salvează textul' }).click();
     await expect(agentPage.getByRole('status').filter({ hasText: 'Textul a fost salvat.' })).toBeVisible();
-    await expect(agentPage.getByRole('listitem').filter({ hasText: `Sugestia-A ${s}` })).toHaveCount(0);
+    await backToList(agentPage);
+    await expect(shopRow(agentPage, `Sugestia-A ${s}`)).toHaveCount(0);
     await agentPage.getByRole('combobox', { name: 'Afișează' }).selectOption('kept');
-    await expect(agentPage.getByText(`Sugestia-A ${s}: contact direct cu echipa`)).toBeVisible();
+    await expect(shopRow(agentPage, `Sugestia-A ${s}: contact direct cu echipa`)).toBeVisible();
 
     await switchLanguage(agentPage, 'en');
     await expect(h1(agentPage)).toHaveText('Suggestions to check');
@@ -256,19 +260,21 @@ test.describe('retention (A3c2b1)', () => {
     await signIn(page, SEED.admin, SEED_PASSWORD);
     await adminOpen(page, 'Suport', 'Sugestii de verificat');
     await expect(h1(page)).toHaveText('Sugestii de verificat');
-    const confirm = page.getByRole('listitem').filter({ hasText: `Sugestia-B ${s}` });
+    const confirm = await chooseRow(page, 'Sugestii de verificat', `Sugestia-B ${s}`);
     await expect(confirm).toContainText(`Sugestia-B ${s}: un filtru pentru [nr. înmatriculare]`);
     await confirm.getByRole('button', { name: 'Confirmă textul propus' }).click();
     await expect(page.getByRole('status').filter({ hasText: 'Textul a fost confirmat.' })).toBeVisible();
 
-    const remove = page.getByRole('listitem').filter({ hasText: `Sugestia-C ${s}` });
+    await backToList(page);
+    const remove = await chooseRow(page, 'Sugestii de verificat', `Sugestia-C ${s}`);
     await expect(remove).toContainText('Nu au fost găsite date. Verifică numele din text.');
     await remove.getByRole('button', { name: 'Șterge textul' }).click();
     await expect(remove.getByText('Ștergi textul?')).toBeVisible();
     await shot(page, 'a3c2b1-reviews-delete', name());
     await remove.getByRole('button', { name: 'Șterge textul' }).last().click();
     await expect(page.getByRole('status').filter({ hasText: 'Textul a fost șters.' })).toBeVisible();
-    await expect(page.getByRole('listitem').filter({ hasText: `Sugestia-C ${s}` })).toHaveCount(0);
+    await backToList(page);
+    await expect(shopRow(page, `Sugestia-C ${s}`)).toHaveCount(0);
     await expectNoHorizontalScroll(page);
   });
 });

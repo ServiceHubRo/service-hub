@@ -400,6 +400,8 @@ test.describe('the phone keyboard over the forms', () => {
         open: async (p) => {
           await p.goto('/c/cont/sugestii');
           await expect(h1(p)).toBeVisible();
+          // On a phone the list comes first: „Adaugă” opens the form.
+          if ((p.viewportSize()?.width ?? 0) < 1024) await p.getByRole('button', { name: /^Adaugă o sugestie$/ }).click();
           await expect(p.locator('main textarea')).toBeVisible();
         },
       },

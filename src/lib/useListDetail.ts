@@ -15,14 +15,19 @@ interface OpenedFromList {
  * - Below, the detail takes the screen: choosing an item adds a step to the history, so the
  *   phone's Back (and „Înapoi”) returns to the list, scrolled where it was.
  */
-export function useListDetail(ids: readonly string[], param = 'id') {
+export function useListDetail(ids: readonly string[], param = 'id', options: { autoSelect?: boolean; anyId?: boolean } = {}) {
+  // An item whose opening is recorded (a support request in the audit log) is never opened for the
+  // reader: beside the list nothing is shown until one is chosen.
+  const autoSelect = options.autoSelect ?? true;
   const wide = useMediaQuery(LIST_DETAIL_QUERY);
   const [params] = useSearchParams();
   const navigate = useNavigate();
   const location = useLocation();
   const asked = params.get(param);
-  const known = asked !== null && ids.includes(asked) ? asked : null;
-  const selectedId = known ?? (wide ? (ids[0] ?? null) : null);
+  // `anyId`: an item opened from elsewhere (a link, a counter) stays open even when the list on screen
+  // (a filter, a page) does not hold it.
+  const known = asked !== null && (options.anyId || ids.includes(asked)) ? asked : null;
+  const selectedId = known ?? (wide && autoSelect ? (ids[0] ?? null) : null);
   const open = !wide && known !== null;
   const listScroll = useRef(0);
 
@@ -56,7 +61,7 @@ export function useListDetail(ids: readonly string[], param = 'id') {
   // tab, and the screen follows it there instead of showing another item).
   const first = ids[0] ?? null;
   useEffect(() => {
-    if (!wide || known !== null || first === null) return;
+    if (!wide || !autoSelect || known !== null || first === null) return;
     // The address as it is now: a screen that keeps its filters live (useLiveSearchParams) shows a
     // filter at once while the router renders the new address a moment later, so `params` can still be
     // the old one, and writing it back would undo the filter just chosen.
@@ -64,7 +69,7 @@ export function useListDetail(ids: readonly string[], param = 'id') {
     if (next.get(param) === first) return;
     next.set(param, first);
     navigate({ search: `?${next.toString()}`, hash: window.location.hash }, { replace: true, preventScrollReset: true });
-  }, [wide, known, first, params, param, navigate]);
+  }, [wide, autoSelect, known, first, params, param, navigate]);
 
   // The detail opens at its top; the list comes back where it was.
   const wasOpen = useRef(open);

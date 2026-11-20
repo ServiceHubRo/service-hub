@@ -12,6 +12,7 @@ import {
   expectNoRomanianText,
   functionAs,
   inboxRow,
+  requestTitle,
   rpcAs,
   serviceRest,
   shot,
@@ -117,7 +118,7 @@ test.describe('legal hold (A3c2a)', () => {
     ).toBeVisible();
     await expect(agentPage.getByText(s)).toHaveCount(0);
     await agentPage.goto(`/suport/solicitari/${first}`);
-    await expect(agentPage.getByRole('heading', { level: 1 })).not.toHaveText(`Plată contestată ${s}`);
+    await expect(agentPage.getByText('Solicitarea nu există.')).toBeVisible();
     await expect(agentPage.getByText(`Descriere Plată contestată ${s}`)).toHaveCount(0);
     const agentToken = await appToken(agentPage);
     const opened = await rpc(agentToken, 'support_get_request', { p_id: first });
@@ -128,7 +129,7 @@ test.describe('legal hold (A3c2a)', () => {
     await page.goto('/admin/suport/solicitari?stare=all');
     await expect(inboxRow(page, `Plată contestată ${s}`)).toContainText('Păstrare legală');
     await inboxRow(page, `Plată contestată ${s}`).click();
-    await expect(h1(page)).toHaveText(`Plată contestată ${s}`);
+    await expect(requestTitle(page)).toHaveText(`Plată contestată ${s}`);
     const holdSection = page.getByRole('region', { name: 'Păstrare legală' });
     await expect(holdSection).toContainText('Agenții nu mai au acces la ea.');
     await expect(holdSection).toContainText('Cont întreg');
@@ -232,7 +233,7 @@ test.describe('legal hold (A3c2a)', () => {
     await signIn(page, SEED.admin, SEED_PASSWORD);
     await expect(page).toHaveURL(/\/admin\//);
     await page.goto(`/admin/suport/solicitari/${held}`);
-    await expect(h1(page)).toHaveText(`Păstrată ${s}`);
+    await expect(requestTitle(page)).toHaveText(`Păstrată ${s}`);
     await expect(page.getByText(/^Cont șters · C-\d+/).first()).toBeVisible();
     await shot(page, 'a3c2a-request-orphan', name());
 

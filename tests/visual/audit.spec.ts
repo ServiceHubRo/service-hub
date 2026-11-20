@@ -522,7 +522,7 @@ test.describe('A9 visual audit', () => {
       { name: 'ajutor-articol', path: `/c/cont/ajutor/articol/${articles[0]?.slug ?? 'x'}` },
       { name: 'solicitari', path: '/c/cont/ajutor/solicitari' },
       { name: 'solicitare-noua', path: '/c/cont/ajutor/solicitari/noua' },
-      { name: 'solicitare', path: '/c/cont/ajutor/solicitari', prep: async (p) => clickFirst(p, 'a[href^="/c/cont/ajutor/solicitari/"]:not([href$="/noua"])') },
+      { name: 'solicitare', path: '/c/cont/ajutor/solicitari', prep: async (p) => openRow(p) },
       { name: 'sugestii', path: '/c/cont/sugestii' },
       { name: 'cont-legal', path: '/c/cont/legal/termeni', roOnly: true },
       { name: 'necunoscut', path: '/c/nu-exista', roOnly: true },
@@ -702,7 +702,7 @@ test.describe('A9 visual audit', () => {
     await signInWithCode(page, SEED_SUPPORT.email, SEED_PASSWORD, SEED_SUPPORT.secret);
     const screens: Screen[] = [
       { name: 'solicitari', path: '/suport/solicitari' },
-      { name: 'solicitare', path: '/suport/solicitari', prep: async (p) => clickFirst(p, 'a[href^="/suport/solicitari/"]') },
+      { name: 'solicitare', path: '/suport/solicitari', prep: async (p) => openRow(p) },
       { name: 'cautare', path: '/suport/cautare' },
       { name: 'cautare-rezultat', path: '/suport/cautare', roOnly: true, prep: async (p) => {
           await p.locator('main input[type="search"]').first().fill('client@service-hub.test');
@@ -747,7 +747,7 @@ test.describe('A9 visual audit', () => {
       { name: 'rapoarte', path: `${a}/activitate/rapoarte` },
       { name: 'export', path: `${a}/activitate/export` },
       { name: 'solicitari', path: `${a}/suport/solicitari` },
-      { name: 'solicitare', path: `${a}/suport/solicitari`, prep: async (p) => clickFirst(p, 'a[href^="/admin/suport/solicitari/"]') },
+      { name: 'solicitare', path: `${a}/suport/solicitari`, prep: async (p) => openRow(p) },
       { name: 'pastrare-legala', path: `${a}/suport/pastrare-legala` },
       { name: 'sugestii-de-verificat', path: `${a}/suport/sugestii-de-verificat` },
       { name: 'centrul-de-ajutor', path: `${a}/suport/centrul-de-ajutor` },

@@ -32,7 +32,7 @@ export const ADMIN_EXPORT_PATH = `${ADMIN_ACTIVITY_PATH}/export`;
 // Suport
 /** Solicitări (A3a): the support requests, the suggestions (T26) among them, and the escalations. */
 export const ADMIN_REQUESTS_PATH = `${ADMIN_SUPPORT_PATH}/solicitari`;
-export const adminRequestPath = (id: string) => `${ADMIN_REQUESTS_PATH}/${id}`;
+export const adminRequestPath = (id: string) => `${ADMIN_REQUESTS_PATH}?solicitare=${id}`;
 /** Păstrare legală (A3c2a): the support data kept for a dispute or an authority, admin only. */
 export const ADMIN_HOLDS_PATH = `${ADMIN_SUPPORT_PATH}/pastrare-legala`;
 export const adminHoldPath = (id: string) => `${ADMIN_HOLDS_PATH}/${id}`;

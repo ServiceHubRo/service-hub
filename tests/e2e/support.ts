@@ -618,8 +618,11 @@ export async function switchLanguage(page: Page, lang: 'ro' | 'en') {
  * „Cea mai veche fără răspuns” above it.
  */
 export function inboxRow(page: Page, text: string): Locator {
-  return page.getByRole('list', { name: /^(Lista solicitărilor|Request list)$/ }).getByRole('link').filter({ hasText: text });
+  return page.getByRole('list', { name: /^(Lista solicitărilor|Request list)$/ }).getByRole('button').filter({ hasText: text });
 }
+
+/** The title of the request open beside the list (Solicitări, page template A): the detail's heading. */
+export const requestTitle = (page: Page) => page.locator('[data-ui="detail-pane"]').getByRole('heading', { level: 2 }).first();
 
 /** The detail of the item chosen in a list + detail screen (page template A). */
 export const detailPane = (page: Page) => page.locator('[data-ui="detail-pane"]');

@@ -5,7 +5,10 @@ import {
   createBookableShop,
   createUser,
   expectAccessible,
+  backToList,
+  chooseRow,
   expectNoHorizontalScroll,
+  shopRow,
   isDesktop,
   openAccount,
   rpcAs,
@@ -270,7 +273,8 @@ test.describe('messages and reviews', () => {
     await expect(page.getByRole('heading', { level: 1, name: 'Recenzii' })).toBeVisible();
     await expect(page.locator('main')).toContainText('4,0');
     await expect(page.locator('main')).toContainText('1 recenzie');
-    const review = page.locator('main li').filter({ hasText: 'Treabă bună' });
+    // Page template A: a row per review, the chosen one beside the list (in its place on a phone).
+    const review = await chooseRow(page, 'Recenzii', 'Treabă bună');
     await expect(review).toContainText('Maria P.');
     await expect(review).toContainText(first.ref);
 
@@ -287,11 +291,12 @@ test.describe('messages and reviews', () => {
     await expect(review).toContainText('Mulțumim!');
 
     // A new review appears without a reload.
+    await backToList(page);
     await doneAndReviewed(shop, client, second.id, 1, 'Nu recomand.');
-    const bad = page.locator('main li').filter({ hasText: 'Nu recomand.' });
-    await expect(bad).toBeVisible();
+    await expect(shopRow(page, 'Nu recomand.')).toBeVisible();
     await expect(page.locator('main')).toContainText('2 recenzii');
     await expect(page.locator('main')).toContainText('2,5');
+    const bad = await chooseRow(page, 'Recenzii', 'Nu recomand.');
 
     // Report: a reason is required; afterwards the confirmation, no button to report again.
     await bad.getByRole('button', { name: 'Raportează' }).click();
