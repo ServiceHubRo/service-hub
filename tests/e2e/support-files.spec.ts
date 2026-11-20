@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto';
 import { expect, test, type Page } from '@playwright/test';
 import { JPEG, PNG } from '../unit/fixtures/support-files/images';
 import { appToken, createAgent, newPage, signInAgent } from './agent';
-import { BACKEND, PASSWORD, SEED, SEED_PASSWORD, createUser, expectAccessible, expectNoHorizontalScroll, inboxRow, serviceRest, shot, signIn, switchLanguage } from './support';
+import { BACKEND, PASSWORD, SEED, SEED_PASSWORD, createUser, expectAccessible, expectNoHorizontalScroll, inboxRow, requestTitle, serviceRest, shot, signIn, switchLanguage } from './support';
 
 // A3b — files of support requests, end to end with the Edge Function support-files: the real type and
 // soundness checked on the server (a text named .png, a broken image, an active PDF and a file over
@@ -16,7 +16,6 @@ const API = process.env.VITE_SUPABASE_URL ?? 'http://127.0.0.1:54321';
 const ANON_KEY = process.env.VITE_SUPABASE_ANON_KEY ?? '';
 const SERVICE_KEY = process.env.E2E_SERVICE_ROLE_KEY ?? '';
 const name = () => test.info().project.name;
-const h1 = (page: Page) => page.getByRole('heading', { level: 1 });
 const stamp = () => Math.random().toString(36).slice(2, 8);
 const b = (s: string) => Buffer.from(s, 'latin1');
 
@@ -127,7 +126,7 @@ test.describe('support files (A3b)', () => {
     await expectAccessible(page, 'Solicitare nouă cu fișiere');
     await shot(page, 'a3b-new-with-files', name());
     await page.getByRole('button', { name: 'Trimite solicitarea' }).click();
-    await expect(h1(page)).toHaveText(title);
+    await expect(requestTitle(page)).toHaveText(title);
     const files = page.getByRole('list', { name: 'Fișiere atașate' });
     await expect(files.getByText('captura-ecran.png')).toBeVisible();
     await expect(files.getByText('IMG_2026.jpg')).toBeVisible();
