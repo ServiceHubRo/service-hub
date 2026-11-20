@@ -644,6 +644,8 @@ export const detailPane = (page: Page) => page.locator('[data-ui="detail-pane"]'
 
 /** On a phone the detail takes the screen: „‹ Înapoi” returns to the list (wide: nothing to do). */
 export async function backToList(page: Page) {
+  // From 1024 px the list stands beside the detail, and the page's own „‹ Înapoi” leaves the screen.
+  if ((page.viewportSize()?.width ?? 0) >= 1024) return;
   const back = page.locator('[data-back-bar] a').filter({ visible: true });
   if ((await back.count()) > 0 && (await detailPane(page).count()) > 0) {
     await back.first().click();

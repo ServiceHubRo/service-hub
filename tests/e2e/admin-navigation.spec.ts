@@ -128,7 +128,10 @@ const FUNCTIONS = (page: Page): Fn[] => [
   { zone: 'Platformă', item: 'Jurnal de audit', path: '/admin/platforma/jurnal', title: 'Jurnal de audit' },
   { zone: 'Platformă', item: 'Notificări flotă eșuate', path: '/admin/platforma/notificari-flota', title: 'Notificări flotă eșuate' },
   // A2
-  { zone: 'Platformă', item: 'Echipa de suport', path: '/admin/platforma/echipa', title: 'Echipa de suport', shows: label(page, 'ID cont sau email') },
+  { zone: 'Platformă', item: 'Echipa de suport', path: '/admin/platforma/echipa', title: 'Echipa de suport', shows: async () => {
+      await expect(page.getByRole('button', { name: 'Numește un agent' })).toBeVisible();
+    },
+  },
   // A6
   { zone: 'Platformă', item: 'Securitate', path: '/admin/platforma/securitate', title: 'Securitate' },
   { zone: 'Platformă', item: 'Administratori', path: '/admin/platforma/administratori', title: 'Administratori' },
