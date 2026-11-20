@@ -280,7 +280,7 @@ export function ShopBookingsScreen() {
         detail={
           chosen &&
           data && (
-            <ShopBookingDetail key={chosen.id} booking={chosen} shopId={data.shop.id} now={now} onDone={onDone} onStale={refresh} top={open ? banner : undefined} />
+            <ShopBookingDetail key={chosen.id} booking={chosen} shopId={data.shop.id} shopName={data.shop.name} now={now} onDone={onDone} onStale={refresh} top={open ? banner : undefined} />
           )
         }
       />

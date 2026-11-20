@@ -1,12 +1,13 @@
 import { CalendarClock, ClipboardCheck, ClipboardList, FilePen, MessageSquare, Phone, Store } from 'lucide-react';
-import { useState, type ReactNode } from 'react';
+import { useCallback, useState, type ReactNode } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ActionButton } from '../../../components/ActionButton';
 import { JobDocuments } from '../../../components/JobDocuments';
 import type { JobDocKind } from '../../../data/jobDocs';
 import { Button } from '../../../components/Button';
+import { buttonClass } from '../../../components/buttonClass';
 import { Card } from '../../../components/Card';
-import { DetailPane, type DetailMessage } from '../../../components/ListDetailLayout';
+import { DetailFacts, DetailPane, DetailSection, type DetailMessage } from '../../../components/ListDetailLayout';
 import { MoreActions } from '../../../components/MoreActions';
 import { ServiceIcon } from '../../../components/ServiceIcon';
 import { BookingStatusPill } from '../../../components/StatusPill';
@@ -26,8 +27,11 @@ import {
   type Booking,
 } from '../../../data/rpc';
 import { isUnclaimedWalkIn, type ShopBooking } from '../../../data/shopBookings';
+import { fetchVehicleFile, lastKnownOdometer, type VehicleFileJob } from '../../../data/vehicleFile';
+import { useLoad } from '../../../lib/useLoad';
 import { useI18n } from '../../../i18n/context';
-import { daysFromToday, formatDate, formatMoney, formatTime, ymdInBucharest } from '../../../i18n/format';
+import { plural } from '../../../i18n/translate';
+import { daysFromToday, formatDate, formatDayMonth, formatKm, formatMoney, formatTime, ymdInBucharest } from '../../../i18n/format';
 import { rowServicesText } from '../../../lib/bookingServices';
 import { quoteTotal, slotStarted } from '../../../lib/shopBookings';
 import { formatPhone, normalizePhone } from '../../../lib/validators';
@@ -54,6 +58,8 @@ const NO_SHOW_MARK = 3;
 export interface ShopBookingDetailProps {
   booking: ShopBooking;
   shopId: string;
+  /** The shop's name: „La …” over its own jobs on the car. */
+  shopName: string;
   now: Date;
   /** An action went through: the booking as the database returned it. */
   onDone: (before: ShopBooking, after: Booking) => void;
@@ -70,7 +76,7 @@ export interface ShopBookingDetailProps {
  * action opens in the detail (no dialogs) and goes through a database function; the buttons only
  * mirror what the database allows.
  */
-export function ShopBookingDetail({ booking: b, shopId, now, onDone, onStale, top }: ShopBookingDetailProps) {
+export function ShopBookingDetail({ booking: b, shopId, shopName, now, onDone, onStale, top }: ShopBookingDetailProps) {
   const { t, lang } = useI18n();
   const offerText = useOfferText();
   const [panel, setPanel] = useState<PanelKind | null>(null);
@@ -249,6 +255,8 @@ export function ShopBookingDetail({ booking: b, shopId, now, onDone, onStale, to
       actions={primary}
     >
       {top}
+      <BookingFacts booking={b} />
+      <CarHistory booking={b} shopName={shopName} />
         <div className={`${styles.details} ${b.quote ? styles.split : ''}`}>
           {/* On a wide card the quote stands on the right, the rest on the left; on a narrow one all
               of it reads in one column, in this order: client, quote, intake sheet, documents. */}
@@ -324,6 +332,102 @@ function statusMessage(
       text: `${t('sb.detail.confirmedPast')}${!noShowOpen && b.no_show_from ? ` ${t('sb.detail.noShowFrom', { time: formatTime(lang, new Date(b.no_show_from)) })}` : ''}`,
     };
   return undefined;
+}
+
+/** What is known about the booking at a glance: the client, the car, when it was asked for. */
+function BookingFacts({ booking: b }: { booking: ShopBooking }) {
+  const { t, lang } = useI18n();
+  const car = [b.car_snapshot.make, b.car_snapshot.model, b.car_snapshot.year].filter(Boolean).join(' ');
+  return (
+    <DetailFacts
+      items={[
+        { label: t('sb.facts.client'), value: b.client_name || t('sb.card.deletedClient') },
+        { label: t('sb.facts.car'), value: car || t('sb.card.noCar') },
+        ...(b.car_snapshot.plate ? [{ label: t('sb.facts.plate'), value: <span className="mono">{b.car_snapshot.plate}</span> }] : []),
+        { label: t('sb.facts.asked'), value: `${formatDate(lang, ymdInBucharest(new Date(b.created_at)))}, ${formatTime(lang, new Date(b.created_at))}` },
+      ]}
+    />
+  );
+}
+
+/** How many of the car's last jobs are listed here; the whole file is one tap away. */
+const CAR_JOBS_SHOWN = 3;
+
+/**
+ * The car's recent history, read from its file (T27): the last jobs at this shop (with the work and the
+ * odometer) and, when the client agreed, the last jobs at other shops — never a price or a shop name —
+ * then the VIN and the last known odometer. „Fișa mașinii” has all of it.
+ */
+function CarHistory({ booking: b, shopName }: { booking: ShopBooking; shopName: string }) {
+  const { t, lang } = useI18n();
+  const load = useCallback(() => fetchVehicleFile(b.id), [b.id]);
+  const { state, reload } = useLoad(load);
+  if (state.status === 'loading') return <p className={styles.muted}>{t('common.loading')}</p>;
+  if (state.status === 'error')
+    return (
+      <p className={styles.muted} role="alert">
+        {t('vf.loadError')}{' '}
+        <Button variant="ghost" onClick={reload}>
+          {t('action.retry')}
+        </Button>
+      </p>
+    );
+  const file = state.data;
+  const km = lastKnownOdometer(file);
+  return (
+    <DetailSection
+      title={t('sb.history.title')}
+      action={
+        <Link className={buttonClass('secondary')} to={vehicleFilePath(b.id, 'bookings')}>
+          {t('sb.history.all')}
+        </Link>
+      }
+    >
+      <DetailFacts
+        items={[
+          ...(file.car.vin ? [{ label: t('vf.vin'), value: <span className="mono">{file.car.vin}</span> }] : []),
+          ...(km !== null ? [{ label: t('sb.history.km'), value: formatKm(lang, km) }] : []),
+        ]}
+      />
+      <JobLines title={shopName ? t('vf.own', { shop: shopName }) : t('vf.ownFallback')} jobs={file.own} empty={t('vf.ownEmpty')} />
+      <JobLines
+        title={t('vf.others')}
+        jobs={file.share === 'shared' ? file.others : []}
+        empty={t(file.share === 'shared' ? 'vf.othersEmpty' : file.share === 'not_shared' ? 'vf.notShared' : 'vf.noActive')}
+        note={file.share === 'shared' ? t('vf.othersNote') : undefined}
+      />
+    </DetailSection>
+  );
+}
+
+/** The last few jobs of a list, one line each: day, services, odometer, and under it the work. */
+function JobLines({ title, jobs, empty, note }: { title: string; jobs: (VehicleFileJob & { imported?: boolean })[]; empty: string; note?: string }) {
+  const { t, lang } = useI18n();
+  const shown = jobs.slice(0, CAR_JOBS_SHOWN);
+  return (
+    <div className={styles.carJobs}>
+      <p className={styles.groupLabel}>
+        {title}
+        {jobs.length > 0 ? ` · ${plural(lang, 'unit.jobs', jobs.length)}` : ''}
+      </p>
+      {note && <p className={styles.muted}>{note}</p>}
+      {shown.length === 0 ? (
+        <p className={styles.muted}>{empty}</p>
+      ) : (
+        <ul className={styles.carJobList}>
+          {shown.map((j) => (
+            <li key={j.id}>
+              <span>
+                {formatDayMonth(lang, j.date)} · {j.imported ? t('imp.badge') : lang === 'ro' ? j.service_ro : j.service_en}
+                {j.odometer !== null && <span className="mono"> · {formatKm(lang, j.odometer)}</span>}
+              </span>
+              {(j.work || j.items.length > 0) && <span className={styles.muted}>{j.work || j.items.join(', ')}</span>}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
 }
 
 /** What the status means in the details (and the quote, once there is one). */
