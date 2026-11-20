@@ -199,7 +199,7 @@ test.describe('admin tools', () => {
     const t = tag();
     await signInAdmin(page);
     await openTool(page, 'Catalog de servicii');
-    await expect(page.getByText('Revizii & Întreținere')).toBeVisible();
+    await expect(page.getByText('Revizii & Întreținere').first()).toBeVisible();
     await expectNoHorizontalScroll(page);
     await shot(page, 't16b-catalog', name());
 
@@ -211,8 +211,11 @@ test.describe('admin tools', () => {
     await expect(page.getByText('Categoria este adăugată la sfârșitul listei.')).toBeVisible();
 
     await page.getByLabel('Caută serviciu sau categorie').fill(`Tractoare ${t}`);
-    const card = page.getByRole('listitem').filter({ hasText: `Tractoare ${t}` });
-    await card.getByRole('button', { name: new RegExp(`^Serviciu nou în Tractoare ${t}`) }).click();
+    // One row per category (page template A); the chosen one beside the list, or in its place on a phone,
+    // with its services as rows and „Serviciu nou” top right of them.
+    await page.getByRole('list', { name: 'Catalog de servicii' }).locator(':scope > li').filter({ hasText: `Tractoare ${t}` }).getByRole('button').click();
+    const card = detailPane(page);
+    await card.getByRole('button', { name: 'Serviciu nou' }).click();
     await card.getByLabel('Nume în română').fill(`Revizie tractor ${t}`);
     await card.getByLabel('Nume în engleză').fill(`Tractor service ${t}`);
     await expect(card.getByLabel('Cod serviciu')).toHaveValue(`revizie_tractor_${t}`);
@@ -229,14 +232,14 @@ test.describe('admin tools', () => {
     await shot(page, 't16b-catalog-new', name());
 
     // Renamed: the id stays.
-    await card.getByRole('button', { name: `Editează: Revizie tractor ${t}` }).click();
+    await card.getByRole('button', { name: new RegExp(`^Revizie tractor ${t}`) }).click();
     await expect(card.getByLabel('Reminder de revizie (luni)')).toHaveValue('18');
     await shot(page, 't19d-catalog-reminder', name());
     await card.getByLabel('Nume în română').fill(`Revizie completă tractor ${t}`);
     await card.getByLabel('Reminder de revizie (luni)').fill('');
     await card.getByRole('button', { name: 'Salvează' }).click();
     await expect(card.getByText(`Revizie completă tractor ${t}`)).toBeVisible();
-    await expect(card.getByText(/^Reminder:/)).toHaveCount(0);
+    await expect(card).not.toContainText('Reminder:');
     // The list shows the name in the screen's language only; the code stays.
     const [renamed] = await serviceRest<{ name_ro: string }[]>(`services?id=eq.revizie_tractor_${t}&select=name_ro`, 'GET');
     expect(renamed!.name_ro).toBe(`Revizie completă tractor ${t}`);
