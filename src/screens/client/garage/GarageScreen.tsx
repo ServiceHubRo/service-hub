@@ -1,12 +1,13 @@
 import { Car as CarIcon, ChevronRight, Copy, FileCheck, History, Pencil, Plus } from 'lucide-react';
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { ActionButton } from '../../../components/ActionButton';
 import { Button } from '../../../components/Button';
 import { buttonClass } from '../../../components/buttonClass';
 import { Card } from '../../../components/Card';
 import { EmptyState } from '../../../components/EmptyState';
 import { LoadError } from '../../../components/LoadError';
+import { ListDetailLayout } from '../../../components/ListDetailLayout';
 import { PageHeader } from '../../../components/PageHeader';
 import { SkeletonList } from '../../../components/Skeleton';
 import { fetchCars, fetchOilStandard, mergeCars, type Car } from '../../../data/garage';
@@ -23,7 +24,7 @@ import { newRequestId } from '../../../lib/requestId';
 import { useLoad } from '../../../lib/useLoad';
 import { duplicateGroups } from '../../../lib/vehicleIdentity';
 import { useClientBookings } from '../bookings/clientBookingsContext';
-import { carHistoryPath, carPath, carReportPath, NEW_CAR_PATH, type ReportLinkState, type VehicleHistoryLinkState } from '../paths';
+import { carHistoryPath, carPath, carReportPath, GARAGE_PATH, NEW_CAR_PATH, type ReportLinkState, type VehicleHistoryLinkState } from '../paths';
 import { ExpiryRing } from './ExpiryRing';
 import styles from './garage.module.css';
 
@@ -31,9 +32,18 @@ import styles from './garage.module.css';
  * Garaj (FR §3.4, P7): the client's cars with their ITP / RCA / vignette dates — muted when far,
  * amber within 30 days, red on or after the day. Only clients have a garage.
  */
-export function GarageScreen() {
+export function GarageScreen({ selectedCarId, detail, wide = false }: { selectedCarId?: string; detail?: ReactNode; wide?: boolean } = {}) {
   const { t, lang } = useI18n();
-  const { state, reload } = useLoad(fetchCars);
+  const { state, reload, setData } = useLoad(fetchCars);
+  // The cars stay on screen while a form, a history or a report opens beside them: after a save or a
+  // change of the address, they are read again, quietly (a new car, new dates).
+  const { pathname } = useLocation();
+  const firstPath = useRef(pathname);
+  useEffect(() => {
+    if (pathname === firstPath.current) return;
+    firstPath.current = pathname;
+    fetchCars().then(setData, () => {});
+  }, [pathname, setData]);
   const { state: bookingsState } = useClientBookings();
   const bookings = bookingsState.status === 'ready' ? bookingsState.data.bookings : null;
   const { state: oilState } = useLoad(fetchOilStandard);
@@ -42,65 +52,85 @@ export function GarageScreen() {
   const { state: importedState } = useLoad(fetchMyImportedJobsQuietly);
   const imported = importedState.status === 'ready' ? importedState.data : [];
 
-  return (
-    <div className={styles.page}>
-      <PageHeader
-        title={t('nav.client.garage')}
-        subtitle={state.status === 'ready' && state.data.length > 0 ? plural(lang, 'unit.savedCars', state.data.length) : undefined}
-        actions={
-          // The add, top right, like every add (docs/MODEL_DE_FOLOSIRE.md P12).
-          state.status === 'ready' && state.data.length > 0 ? (
-            <Link to={NEW_CAR_PATH} className={buttonClass('primary')} aria-label={t('garage.add')}>
-              <Plus size={18} aria-hidden="true" />
-              {t('action.add')}
-            </Link>
-          ) : undefined
+  const cars = state.status === 'ready' ? state.data : [];
+  const header = (
+    <PageHeader
+      title={t('nav.client.garage')}
+      subtitle={state.status === 'ready' && cars.length > 0 ? plural(lang, 'unit.savedCars', cars.length) : undefined}
+      actions={
+        // The add, top right, like every add (docs/MODEL_DE_FOLOSIRE.md P12).
+        state.status === 'ready' && cars.length > 0 ? (
+          <Link to={NEW_CAR_PATH} className={buttonClass('primary')} aria-label={t('garage.add')}>
+            <Plus size={18} aria-hidden="true" />
+            {t('action.add')}
+          </Link>
+        ) : undefined
+      }
+    />
+  );
+
+  let list;
+  if (state.status === 'loading') list = <SkeletonList cards />;
+  else if (state.status === 'error') list = <LoadError message={t('garage.loadError')} onRetry={reload} />;
+  else if (cars.length === 0)
+    list = (
+      <EmptyState
+        icon={CarIcon}
+        title={t('garage.empty')}
+        body={t('garage.emptyBody')}
+        action={
+          <Link to={NEW_CAR_PATH} className={buttonClass('primary')}>
+            <Plus size={18} aria-hidden="true" />
+            {t('garage.add')}
+          </Link>
         }
       />
-      {state.status === 'loading' && <SkeletonList cards />}
-      {state.status === 'error' && <LoadError message={t('garage.loadError')} onRetry={reload} />}
-      {state.status === 'ready' &&
-        (state.data.length === 0 ? (
-          <EmptyState
-            icon={CarIcon}
-            title={t('garage.empty')}
-            body={t('garage.emptyBody')}
-            action={
-              <Link to={NEW_CAR_PATH} className={buttonClass('primary')}>
-                <Plus size={18} aria-hidden="true" />
-                {t('garage.add')}
-              </Link>
-            }
+    );
+  else
+    list = (
+      <>
+        {/* T66: copies of one car the garage already had before the check existed; the owner merges them. */}
+        {duplicateGroups(cars).map((group) => (
+          <DuplicateCard
+            key={group.map((c) => c.id).join()}
+            cars={group}
+            jobs={(car) => (bookings ? jobsOf(bookings, car).length : 0)}
+            onMerged={reload}
           />
-        ) : (
-          <>
-            {/* T66: copies of one car the garage already had before the check existed; the owner merges them. */}
-            {duplicateGroups(state.data).map((group) => (
-              <DuplicateCard
-                key={group.map((c) => c.id).join()}
-                cars={group}
-                jobs={(car) => (bookings ? jobsOf(bookings, car).length : 0)}
-                onMerged={reload}
-              />
-            ))}
-            <ul className={styles.list} data-layout="cards">
-              {state.data.map((car) => (
-                <li key={car.id}>
-                  <CarCard
-                    car={car}
-                    jobs={bookings ? jobsOf(bookings, car).length : null}
-                    importedJobs={imported.filter((j) => sameVehicle(car, j.car_snapshot)).length}
-                    oilDue={
-                      bookings && oilStandard?.enabled
-                        ? oilDue(lastOilChange(car, bookings), car.oil_change_months ?? oilStandard.months)
-                        : null
-                    }
-                  />
-                </li>
-              ))}
-            </ul>
-          </>
         ))}
+        <ul className={styles.list} data-layout="cards">
+          {cars.map((car) => (
+            <li key={car.id}>
+              <CarCard
+                car={car}
+                selected={car.id === selectedCarId}
+                jobs={bookings ? jobsOf(bookings, car).length : null}
+                importedJobs={imported.filter((j) => sameVehicle(car, j.car_snapshot)).length}
+                // The oil change shows on every car whose reminder is on: set or not, with or without a service history.
+                oil={
+                  oilStandard?.enabled && bookings
+                    ? { due: oilDue(lastOilChange(car, bookings), car.oil_change_months ?? oilStandard.months) }
+                    : null
+                }
+              />
+            </li>
+          ))}
+        </ul>
+      </>
+    );
+
+  // Beside the cards (a laptop), what is opened from a card — its form, its history, its report — stands
+  // on the right (C8, Eduard, 21 Nov 2026); on a phone each is a page, as before.
+  if (wide && detail)
+    return (
+      <div className={styles.page}>
+        <ListDetailLayout wide open={false} backTo={GARAGE_PATH} backLabel={t('nav.client.garage')} header={header} list={list} detail={detail} />
+      </div>
+    );
+  return (
+    <div className={styles.page}>
+      {header}
+      {list}
     </div>
   );
 }
@@ -170,26 +200,28 @@ const FROM_GARAGE: VehicleHistoryLinkState = { from: 'garage' };
 const REPORT_FROM_GARAGE: ReportLinkState = { from: 'garage' };
 
 /**
- * `jobs`: finished jobs on this car (P16c), null while the bookings load (or did not). `oilDue`: when
- * the next oil change is due (T30), null when unknown.
+ * `jobs`: finished jobs on this car (P16c), null while the bookings load (or did not). `oil`: the oil
+ * change's reminder (T30) — `due` is when the next one is, null when not known; null when the reminder
+ * is off. The documents and the oil change show on every car, with or without a service history.
+ * `selected`: the car whose form, history or report is open beside the list.
  */
 function CarCard({
   car,
+  selected,
   jobs,
   importedJobs,
-  oilDue,
+  oil,
 }: {
   car: Car;
+  selected: boolean;
   jobs: number | null;
   importedJobs: number;
-  oilDue: string | null;
+  oil: { due: string | null } | null;
 }) {
   const { t, lang } = useI18n();
   const name = `${car.make} ${car.model}`;
-  const anyDate = CAR_DOCS.some(({ column }) => car[column]) || oilDue !== null;
   return (
-    <Card className={anyDate ? styles.carSplit : undefined}>
-      {/* A wide card (T58): the car and its links on the left, the documents on the right. */}
+    <Card highlight={selected} aria-current={selected ? 'true' : undefined}>
       <div className={styles.carMain}>
         <div className={styles.head}>
           <span className={styles.carTile} aria-hidden="true">
@@ -225,20 +257,18 @@ function CarCard({
           <p className={styles.historyNone}>{t('vh.noJobs')}</p>
         )}
       </div>
-      {anyDate && (
-        <ul className={styles.docs}>
-          {CAR_DOCS.map(({ doc, column }) => (
-            <li key={doc}>
-              <DocPill doc={doc} date={car[column]} />
-            </li>
-          ))}
-          {oilDue && (
-            <li>
-              <OilPill due={oilDue} />
-            </li>
-          )}
-        </ul>
-      )}
+      <ul className={styles.docs}>
+        {CAR_DOCS.map(({ doc, column }) => (
+          <li key={doc}>
+            <DocPill doc={doc} date={car[column]} />
+          </li>
+        ))}
+        {oil && (
+          <li>
+            <OilPill due={oil.due} />
+          </li>
+        )}
+      </ul>
     </Card>
   );
 }
@@ -275,9 +305,18 @@ function DocPill({ doc, date }: { doc: CarDoc; date: string | null }) {
   );
 }
 
-/** The oil change: the month only; amber within 30 days, red once the day has passed (T30). */
-function OilPill({ due }: { due: string }) {
+/** The oil change: the month only; amber within 30 days, red once the day has passed (T30); „nesetat” when not known. */
+function OilPill({ due }: { due: string | null }) {
   const { t, lang } = useI18n();
+  if (!due) {
+    return (
+      <span className={styles.docTile}>
+        <ExpiryRing days={null} urgency={null} />
+        <span className={styles.docName}>{t('garage.oil')}</span>
+        <span className={styles.docWhen}>{t('garage.when.notSet')}</span>
+      </span>
+    );
+  }
   const days = daysFromToday(due);
   const urgency = urgencyOf(days);
   // Short, so the tile keeps to one line: „oct.”, „sept. 2027”.

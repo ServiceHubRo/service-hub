@@ -3,6 +3,7 @@ import { useCallback, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { ActionButton } from '../../../components/ActionButton';
 import { BackLink } from '../../../components/BackLink';
+import { useEmbedded } from '../../../lib/embedded';
 import { PageHeader } from '../../../components/PageHeader';
 import { Button } from '../../../components/Button';
 import { buttonClass } from '../../../components/buttonClass';
@@ -65,6 +66,8 @@ const FIELD_ORDER: readonly FieldName[] = ['make', 'model', 'year', 'plate', 'vi
 function CarEditor({ car }: { car: Car | null }) {
   const { t, lang } = useI18n();
   const navigate = useNavigate();
+  // Beside the garage's list the title is a second-level heading (the page keeps one title).
+  const Title = useEmbedded() ? 'h2' : 'h1';
   // The id of a new car is made once, so "Încearcă din nou" never adds it twice (data/garage.ts).
   const [newId] = useState(newRequestId);
   /** The car already in the garage when a save was refused as a copy (T66). */
@@ -156,7 +159,7 @@ function CarEditor({ car }: { car: Car | null }) {
           the card, equal fields that fill it, „Documente”, then the button across and „Renunță”. The
           oil change is the garage's own, built the same way as the documents. */}
       <Card data-ui="form-card" className={fleetStyles.card}>
-        <h1 className={fleetStyles.cardTitle}>{car ? t('garage.editTitle') : t('garage.add')}</h1>
+        <Title className={fleetStyles.cardTitle}>{car ? t('garage.editTitle') : t('garage.add')}</Title>
         <form className={fleetStyles.stack} onSubmit={(e) => e.preventDefault()} noValidate>
           <div className={fleetStyles.formGrid}>
             <Field ref={makeRef} label={t('car.make')} placeholder={t('car.makePlaceholder')} value={make} maxLength={60} autoComplete="off" error={errors.make} onChange={(e) => edited('make', setMake)(e.target.value)} />

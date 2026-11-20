@@ -309,3 +309,28 @@
     width: min(100%, 420px);
   }
 }
+
+/* The garage's right-hand panel on a laptop: a way to close it, in the panel's corner. */
+.paneBar {
+  position: relative;
+  height: 0;
+  margin-bottom: calc(var(--space-6) * -1);
+}
+
+.paneClose {
+  position: absolute;
+  top: calc(var(--space-2) * -1);
+  right: calc(var(--space-2) * -1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--tap);
+  height: var(--tap);
+  border-radius: var(--radius-input);
+  color: var(--muted);
+}
+
+.paneClose:hover {
+  color: var(--text);
+  background: var(--surface2);
+}

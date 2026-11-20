@@ -157,6 +157,18 @@ export function DetailPane({
   );
 }
 
+/**
+ * A panel for a whole screen shown beside a list (the garage's history, report or form on a laptop):
+ * the detail's shade and scroll, without the head and actions of a DetailPane.
+ */
+export function DetailFrame({ children }: { children: ReactNode }) {
+  return (
+    <section data-ui="detail-frame" className={styles.pane}>
+      {children}
+    </section>
+  );
+}
+
 /** A part of a detail under a small heading (the quote, the car, the job). */
 export function DetailSection({ title, action, children }: { title: string; action?: ReactNode; children: ReactNode }) {
   return (

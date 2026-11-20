@@ -15,8 +15,7 @@ import { FleetSpaceScreen } from '../../screens/fleet/FleetSpaceScreen';
 import { ClientBookingsProvider } from '../../screens/client/bookings/ClientBookingsProvider';
 import { ClientBookingsScreen } from '../../screens/client/bookings/ClientBookingsScreen';
 import { FavoritesScreen } from '../../screens/client/favorites/FavoritesScreen';
-import { CarFormScreen } from '../../screens/client/garage/CarFormScreen';
-import { GarageScreen } from '../../screens/client/garage/GarageScreen';
+import { GarageSpace } from '../../screens/client/garage/GarageSpace';
 import { VehicleHistoryScreen } from '../../screens/client/history/VehicleHistoryScreen';
 import { VehiclePickScreen } from '../../screens/client/history/VehiclePickScreen';
 import { MyReportsScreen } from '../../screens/client/report/MyReportsScreen';
@@ -79,21 +78,21 @@ export default function ClientApp() {
         >
           {commonRoutes('client', {
             '/c/cauta': <SearchScreen />,
-            '/c/garaj': <GarageScreen />,
+            '/c/garaj': <GarageSpace />,
             '/c/programari': <ClientBookingsScreen />,
             '/c/mesaje': <MessagesScreen />,
           })}
           <Route path="service/:shopId" element={<ShopPage />} />
           <Route path="service/:shopId/programare" element={<BookingFlow />} />
           <Route path="service/:shopId/programare/trimisa" element={<BookingSent />} />
-          <Route path="garaj/nou" element={<CarFormScreen />} />
-          <Route path="garaj/:carId" element={<CarFormScreen />} />
-          <Route path="garaj/:carId/istoric" element={<VehicleHistoryScreen />} />
+          <Route path="garaj/nou" element={<GarageSpace />} />
+          <Route path="garaj/:carId" element={<GarageSpace />} />
+          <Route path="garaj/:carId/istoric" element={<GarageSpace />} />
           <Route path="programari/:bookingId/istoric" element={<VehicleHistoryScreen />} />
           <Route path="programari/:bookingId/preluare" element={<ClientIntakeScreen />} />
           <Route path="cont/favorite" element={<FavoritesScreen />} />
           <Route path="cont/istoric" element={<VehiclePickScreen />} />
-          <Route path="garaj/:carId/raport" element={<ReportPreviewScreen />} />
+          <Route path="garaj/:carId/raport" element={<GarageSpace />} />
           <Route path="programari/:bookingId/raport" element={<ReportPreviewScreen />} />
           <Route path="cont/rapoarte" element={<MyReportsScreen />} />
           <Route path="cont/notificari" element={<ClientNotificationsScreen />} />

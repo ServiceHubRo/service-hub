@@ -137,14 +137,16 @@ test.describe('history report', () => {
     await expect(page).toHaveURL(/\/c\//);
     await page.goto('/c/garaj');
     await page.getByRole('link', { name: 'Raport oficial pentru cumpărător' }).click();
-    await expect(page.getByRole('heading', { level: 1, name: 'Raport oficial' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Raport oficial' })).toBeVisible();
     await expect(page.getByText('Raportul conține doar lucrările efectuate prin Service-Hub.')).toBeVisible();
     await expect(page.getByText('WVWZZZAUZGW123456')).toBeVisible();
     await expect(page.getByText('1.020 lei', { exact: true })).toBeVisible();
     await expect(page.getByText('97.500 km', { exact: true })).toBeVisible();
     // Three jobs, the last two hidden until paid (and hidden from screen readers).
-    await expect(page.locator('main li')).toHaveCount(3);
-    await expect(page.locator('main li[aria-hidden="true"]')).toHaveCount(2);
+    // On a laptop the report opens beside the garage's cars: only its own list counts.
+    const reportList = page.locator('[data-ui="detail-frame"], main').last();
+    await expect(reportList.locator('li')).toHaveCount(3);
+    await expect(reportList.locator('li[aria-hidden="true"]')).toHaveCount(2);
     await expect(page.getByText('Vizibil în raport după plată')).toBeVisible();
     await expectNoHorizontalScroll(page);
     await shot(page, 't15-report-preview', name());
@@ -256,7 +258,7 @@ test.describe('history report', () => {
     await expect(page.getByRole('heading', { level: 1, name: 'My reports' })).toBeVisible();
     await expect(page.getByText('No reports.')).toBeVisible();
     await page.getByRole('link', { name: /Volkswagen Golf 7/ }).click();
-    await expect(page.getByRole('heading', { level: 1, name: 'Official report' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Official report' })).toBeVisible();
     await expect(page.getByText('This report covers only work carried out through Service-Hub.')).toBeVisible();
     // One job: shown in full.
     await expect(page.locator('main li[aria-hidden="true"]')).toHaveCount(0);

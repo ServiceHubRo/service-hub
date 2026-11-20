@@ -226,7 +226,7 @@ test.describe('repair history', () => {
     await me.getByRole('link', { name: 'Istoric — 1 lucrare' }).click();
     await expect(me).toHaveURL(/\/c\/garaj\/[^/]+\/istoric$/);
     const carUrl = me.url();
-    await expect(me.getByRole('heading', { level: 1, name: 'Dacia Logan' })).toBeVisible();
+    await expect(me.getByRole('heading', { name: 'Dacia Logan' })).toBeVisible();
     await expect(me.getByText('1 lucrare · 430 lei cheltuit în total')).toBeVisible();
     await expect(jobCards(me)).toHaveCount(1);
     await expect(jobCards(me).first()).toContainText('105.400 km');
@@ -254,7 +254,7 @@ test.describe('repair history', () => {
     await navLink(me, /^Programări/).click();
     await (await cardAction(await openClientBooking(me, done.ref), 'Vezi istoricul mașinii')).click();
     await expect(me).toHaveURL(new RegExp(`/c/programari/${done.id}/istoric$`));
-    await expect(me.getByRole('heading', { level: 1, name: 'Dacia Logan' })).toBeVisible();
+    await expect(me.getByRole('heading', { name: 'Dacia Logan' })).toBeVisible();
     await expect(me.getByText('1 lucrare · 430 lei cheltuit în total')).toBeVisible();
     await me.context().close();
   });

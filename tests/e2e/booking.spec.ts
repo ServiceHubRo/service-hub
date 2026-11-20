@@ -61,7 +61,7 @@ test.describe('garage', () => {
 
     await page.getByRole('link', { name: 'Adaugă mașină' }).click();
     // The same card as „Adaugă vehicul” in a company's space (14 Nov 2026): the checks come on save.
-    await expect(page.getByRole('heading', { level: 1, name: 'Adaugă mașină' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Adaugă mașină' })).toBeVisible();
     const save = page.getByRole('button', { name: 'Salvează mașina' });
     await save.click(); // make and model first
     await expect(page.getByText('Marca și modelul sunt obligatorii.').first()).toBeVisible();
