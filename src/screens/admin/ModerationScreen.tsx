@@ -1,13 +1,13 @@
 import { ShieldAlert, ShieldCheck, Star, UserX } from 'lucide-react';
 import { useCallback, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { adminZoneBack } from '../../app/adminZones';
 import { Button } from '../../components/Button';
-import { Card } from '../../components/Card';
 import { EmptyState } from '../../components/EmptyState';
 import { LoadError } from '../../components/LoadError';
 import { SearchField } from '../../components/SearchField';
-import { SkeletonList } from '../../components/Skeleton';
+import { DetailPane, ListDetailLayout } from '../../components/ListDetailLayout';
+import { ListRow, ListRows, ListRowsSkeleton } from '../../components/ListRow';
 import { Stars } from '../../components/Stars';
 import { Tile } from '../../components/Tile';
 import {
@@ -22,8 +22,9 @@ import {
 } from '../../data/admin';
 import { fetchNoShowDisputes } from '../../data/noShows';
 import { useI18n } from '../../i18n/context';
-import { plural, type Msg } from '../../i18n/translate';
+import { plural } from '../../i18n/translate';
 import { reportAge } from '../../lib/admin';
+import { useListDetail } from '../../lib/useListDetail';
 import { useNow } from '../../lib/useNow';
 import { ConfirmPanel } from './ActionPanels';
 import { ExportButton } from './ExportButton';
@@ -65,101 +66,124 @@ function ReviewBody({ r }: { r: AdminReview }) {
   );
 }
 
-function QueueCard({ r, now, onDecided }: { r: AdminReview; now: Date; onDecided: () => void }) {
-  const { t, lang } = useI18n();
-  const [panel, setPanel] = useState<ReviewDecision | null>(null);
-  const age = r.reported_at ? reportAge(r.reported_at, now) : null;
-  return (
-    <Card highlight className={styles.stack}>
-      <div className={styles.rowTop}>
-        <Pill tone="amber">{r.report_reason ? t(`reviews.reason.${r.report_reason}`) : t('admin.reportStatus.pending')}</Pill>
-        {age && (
-          <span className={age.overdue ? styles.overdue : styles.muted}>
-            {t('admin.moderation.waiting', { days: plural(lang, 'unit.days', age.days) })}
-            {age.overdue ? ` · ${t('admin.moderation.overdue')}` : ''}
-          </span>
-        )}
-      </div>
-      <span className={styles.muted}>{t('admin.moderation.reportedAt', { date: dateTime(lang, r.reported_at) })}</span>
-      <ReviewBody r={r} />
-      {panel === null ? (
-        <div className={styles.panelButtons}>
-          <Button variant="success" onClick={() => setPanel('keep')}>
-            {t('admin.moderation.keep')}
-          </Button>
-          <Button variant="danger" onClick={() => setPanel('remove')}>
-            {t('admin.moderation.remove')}
-          </Button>
-        </div>
-      ) : (
-        <ConfirmPanel
-          title={panel === 'keep' ? t('admin.moderation.keepTitle') : t('admin.moderation.removeTitle')}
-          body={panel === 'keep' ? t('admin.moderation.keepBody') : t('admin.moderation.removeBody')}
-          textLabel={t('admin.moderation.note')}
-          textHint={t('admin.moderation.noteHint')}
-          confirmLabel={panel === 'keep' ? t('admin.moderation.keep') : t('admin.moderation.remove')}
-          danger={panel === 'remove'}
-          onConfirm={async (note, requestId) => {
-            await decideReview(r.id, panel, note, requestId);
-            onDecided();
-          }}
-          onCancel={() => setPanel(null)}
-        />
-      )}
-    </Card>
-  );
-}
-
-/** A review that looks staged (T25): why, and "Este în regulă" or "Șterge recenzia". */
-function SuspectCard({ r, onDecided }: { r: SuspectReview; onDecided: () => void }) {
-  const { t } = useI18n();
-  const [panel, setPanel] = useState<SuspectDecision | null>(null);
-  return (
-    <Card highlight className={styles.stack}>
-      <ul className={styles.signalList}>
-        {r.signals.map((s) => (
-          <li key={s} className={styles.muted}>
-            <strong className={s === 'same_phone' || s === 'quick_job' ? styles.signalRed : styles.signalAmber}>
-              {t(`admin.signal.${s}`)}
-            </strong>{' '}
-            · {t(`admin.signal.${s}.why`)}
-          </li>
-        ))}
-      </ul>
-      <ReviewBody r={r} />
-      {panel === null ? (
-        <div className={styles.panelButtons}>
-          <Button variant="success" onClick={() => setPanel('clear')}>
-            {t('admin.suspect.clear')}
-          </Button>
-          <Button variant="danger" onClick={() => setPanel('remove')}>
-            {t('admin.suspect.remove')}
-          </Button>
-        </div>
-      ) : (
-        <ConfirmPanel
-          title={panel === 'clear' ? t('admin.suspect.clearTitle') : t('admin.moderation.removeTitle')}
-          body={panel === 'clear' ? t('admin.suspect.clearBody') : t('admin.suspect.removeBody')}
-          textLabel={t('admin.moderation.note')}
-          textHint={t('admin.moderation.noteHint')}
-          confirmLabel={panel === 'clear' ? t('admin.suspect.clear') : t('admin.suspect.remove')}
-          danger={panel === 'remove'}
-          onConfirm={async (note, requestId) => {
-            await decideSuspectReview(r.id, panel, note, requestId);
-            onDecided();
-          }}
-          onCancel={() => setPanel(null)}
-        />
-      )}
-    </Card>
-  );
-}
-
 function statusPill(r: AdminReview, t: (k: 'admin.reportStatus.removed' | 'admin.reportStatus.kept' | 'admin.reportStatus.pending' | 'admin.moderation.visible') => string) {
   if (r.removed_at) return <Pill tone="grey">{t('admin.reportStatus.removed')}</Pill>;
   if (r.report_status === 'pending') return <Pill tone="amber">{t('admin.reportStatus.pending')}</Pill>;
   if (r.report_status === 'kept') return <Pill tone="green">{t('admin.reportStatus.kept')}</Pill>;
   return <Pill tone="blue">{t('admin.moderation.visible')}</Pill>;
+}
+
+type Kind = 'queue' | 'suspect' | 'all';
+interface Item {
+  /** The kind and the review: the same review may be in two of the lists. */
+  id: string;
+  kind: Kind;
+  r: AdminReview | SuspectReview;
+}
+const asItem = (kind: Kind, r: AdminReview | SuspectReview): Item => ({ id: `${kind}:${r.id}`, kind, r });
+
+/** The words that tell what a row is about: the author, the day, then what they wrote. */
+function reviewLine(t: ReturnType<typeof useI18n>['t'], lang: 'ro' | 'en', r: AdminReview): string {
+  return [
+    t('admin.acct.rating', { n: r.rating }),
+    r.client_display_name || t('admin.deletedAccount'),
+    day(lang, r.created_at),
+    r.text ? `„${r.text}”` : null,
+  ]
+    .filter(Boolean)
+    .join(' · ');
+}
+
+/** One review in detail: what was written, and what the admin can do with it (a reported one, a suspect one). */
+function ReviewDetail({ item, now, onDecided }: { item: Item; now: Date; onDecided: () => void }) {
+  const { t, lang } = useI18n();
+  const r = item.r;
+  const [panel, setPanel] = useState<ReviewDecision | SuspectDecision | null>(null);
+  const age = item.kind === 'queue' && r.reported_at ? reportAge(r.reported_at, now) : null;
+  const suspect = item.kind === 'suspect' ? (r as SuspectReview) : null;
+  const decide = item.kind !== 'all';
+  const keepLabel = item.kind === 'queue' ? t('admin.moderation.keep') : t('admin.suspect.clear');
+  const removeLabel = item.kind === 'queue' ? t('admin.moderation.remove') : t('admin.suspect.remove');
+  const keepAction: ReviewDecision | SuspectDecision = item.kind === 'queue' ? 'keep' : 'clear';
+  return (
+    <DetailPane
+      id={item.id}
+      icon={<Star size={20} />}
+      title={r.shop_name}
+      detail={[r.shop_city, r.client_display_name || t('admin.deletedAccount'), day(lang, r.created_at)].filter(Boolean).join(' · ')}
+      status={
+        item.kind === 'queue' ? (
+          <Pill tone="amber">{r.report_reason ? t(`reviews.reason.${r.report_reason}`) : t('admin.reportStatus.pending')}</Pill>
+        ) : item.kind === 'all' ? (
+          statusPill(r, t)
+        ) : undefined
+      }
+      message={
+        age
+          ? {
+              tone: age.overdue ? 'problem' : 'neutral',
+              text: `${t('admin.moderation.waiting', { days: plural(lang, 'unit.days', age.days) })}${age.overdue ? ` · ${t('admin.moderation.overdue')}` : ''}`,
+            }
+          : undefined
+      }
+      panel={
+        decide && panel !== null ? (
+          <ConfirmPanel
+            title={panel === keepAction ? (item.kind === 'queue' ? t('admin.moderation.keepTitle') : t('admin.suspect.clearTitle')) : t('admin.moderation.removeTitle')}
+            body={
+              panel === keepAction
+                ? item.kind === 'queue'
+                  ? t('admin.moderation.keepBody')
+                  : t('admin.suspect.clearBody')
+                : item.kind === 'queue'
+                  ? t('admin.moderation.removeBody')
+                  : t('admin.suspect.removeBody')
+            }
+            textLabel={t('admin.moderation.note')}
+            textHint={t('admin.moderation.noteHint')}
+            confirmLabel={panel === keepAction ? keepLabel : removeLabel}
+            danger={panel === 'remove'}
+            onConfirm={async (note, requestId) => {
+              if (item.kind === 'queue') await decideReview(r.id, panel as ReviewDecision, note, requestId);
+              else await decideSuspectReview(r.id, panel as SuspectDecision, note, requestId);
+              onDecided();
+            }}
+            onCancel={() => setPanel(null)}
+          />
+        ) : undefined
+      }
+      actions={
+        decide ? (
+          <>
+            <Button variant="success" onClick={() => setPanel(keepAction)}>
+              {keepLabel}
+            </Button>
+            <Button variant="danger" onClick={() => setPanel('remove')}>
+              {removeLabel}
+            </Button>
+          </>
+        ) : undefined
+      }
+    >
+      {item.kind === 'queue' && <p className={styles.muted}>{t('admin.moderation.reportedAt', { date: dateTime(lang, r.reported_at) })}</p>}
+      {suspect && (
+        <ul className={styles.signalList}>
+          {suspect.signals.map((s) => (
+            <li key={s} className={styles.muted}>
+              <strong className={s === 'same_phone' || s === 'quick_job' ? styles.signalRed : styles.signalAmber}>{t(`admin.signal.${s}`)}</strong> ·{' '}
+              {t(`admin.signal.${s}.why`)}
+            </li>
+          ))}
+        </ul>
+      )}
+      <ReviewBody r={r} />
+      {item.kind === 'all' && r.report_note && (
+        <p className={styles.muted}>
+          {t('admin.moderation.noteShown')}: {r.report_note}
+        </p>
+      )}
+    </DetailPane>
+  );
 }
 
 /**
@@ -172,6 +196,7 @@ function statusPill(r: AdminReview, t: (k: 'admin.reportStatus.removed' | 'admin
  */
 export function ModerationScreen() {
   const { t, lang } = useI18n();
+  const { pathname } = useLocation();
   const now = useNow();
   const { params, setParam, text, setText } = useUrlParams();
   const q = params.get('q') ?? '';
@@ -185,112 +210,138 @@ export function ModerationScreen() {
     [q],
   );
   const { state, reload, refetch } = useLiveData(load, LIVE, 'admin-moderation');
-  const [notice, setNotice] = useState<Msg | null>(null);
+  // A decided review leaves its list: the answer is told above the lists.
+  const [notice, setNotice] = useState<string | null>(null);
+
+  // Page template A (docs/MODEL_DE_FOLOSIRE.md P8): the reported reviews, the ones that look staged and
+  // every review are rows; the chosen one beside the list from 1024 px (in its place below).
+  const data = state.status === 'ready' ? state.data : null;
+  const queue = data ? data.queue.map((r) => asItem('queue', r)) : [];
+  const suspects = data ? data.suspects.map((r) => asItem('suspect', r)) : [];
+  const everyone = data ? data.reviews.map((r) => asItem('all', r)) : [];
+  const items = [...queue, ...suspects, ...everyone];
+  const { wide, selectedId, open, select } = useListDetail(
+    items.map((i) => i.id),
+    'recenzie',
+  );
+  const chosen = items.find((i) => i.id === selectedId) ?? null;
+
+  const header = (
+    <>
+      <PageHeader back={{ to: back.to, label: t(back.label) }} title={t('nav.admin.moderation')} />
+      {notice && (
+        <p className={styles.muted} role="status">
+          {notice}
+        </p>
+      )}
+    </>
+  );
+
+  const row = (i: Item) => {
+    const r = i.r;
+    return (
+      <ListRow
+        key={i.id}
+        icon={i.kind === 'suspect' ? <ShieldAlert size={20} /> : <Star size={20} />}
+        title={r.shop_name}
+        detail={reviewLine(t, lang, r)}
+        status={
+          i.kind === 'queue' ? (
+            <Pill tone="amber">{r.report_reason ? t(`reviews.reason.${r.report_reason}`) : t('admin.reportStatus.pending')}</Pill>
+          ) : i.kind === 'suspect' ? (
+            <Pill tone="amber">{t(`admin.signal.${(r as SuspectReview).signals[0]!}`)}</Pill>
+          ) : (
+            statusPill(r, t)
+          )
+        }
+        attention={i.kind !== 'all'}
+        selected={wide && i.id === selectedId}
+        onSelect={() => select(i.id)}
+      />
+    );
+  };
+
+  let list;
+  if (state.status === 'loading') list = <ListRowsSkeleton label={t('common.loading')} />;
+  else if (state.status === 'error') list = <LoadError message={t('admin.loadError')} onRetry={reload} />;
+  else if (data)
+    list = (
+      <>
+        <SectionTitle>{t('admin.moderation.queue', { n: queue.length })}</SectionTitle>
+        {queue.length === 0 ? (
+          <EmptyState icon={ShieldCheck} title={t('admin.moderation.queueEmpty')} body={t('admin.moderation.queueEmptyBody')} />
+        ) : (
+          <ListRows label={t('admin.moderation.queue', { n: queue.length })}>{queue.map(row)}</ListRows>
+        )}
+
+        <SectionTitle>{t('admin.suspect.title', { n: suspects.length })}</SectionTitle>
+        {suspects.length === 0 ? (
+          <EmptyState icon={ShieldAlert} title={t('admin.suspect.empty')} />
+        ) : (
+          <>
+            <p className={styles.muted}>{t('admin.suspect.intro')}</p>
+            <ListRows label={t('admin.suspect.title', { n: suspects.length })}>{suspects.map(row)}</ListRows>
+          </>
+        )}
+
+        {/* The contested no-shows have a page of their own since A1; here, the way to it. */}
+        <Tile
+          to={ADMIN_DISPUTES_PATH}
+          icon={UserX}
+          label={t('admin.disputes.title')}
+          hint={
+            data.disputes.pending.length > 0 ? plural(lang, 'unit.disputesPending', data.disputes.pending.length) : t('admin.zone.disputes.hint')
+          }
+        />
+
+        <SectionTitle>{t('admin.moderation.all')}</SectionTitle>
+        <SearchField
+          id="admin-reviews-q"
+          label={t('admin.moderation.search')}
+          placeholder={t('admin.moderation.search')}
+          value={text}
+          onChange={setText}
+          onClear={() => {
+            setText('');
+            setParam({ q: null });
+          }}
+          clearLabel={t('admin.search.clear')}
+        />
+        <div className={styles.toolbar}>
+          <span className={styles.sub}>{t('admin.moderation.exportHint')}</span>
+          <ExportButton kind="reviews" filters={{ q: q || undefined }} />
+        </div>
+        {everyone.length === 0 ? (
+          <EmptyState icon={Star} title={q ? t('admin.noResults') : t('admin.noReviews')} />
+        ) : (
+          <ListRows label={t('admin.moderation.all')}>{everyone.map(row)}</ListRows>
+        )}
+      </>
+    );
 
   return (
     <div className={styles.page}>
-      <PageHeader back={{ to: back.to, label: t(back.label) }} title={t('nav.admin.moderation')} />
-      {state.status === 'loading' && <SkeletonList />}
-      {state.status === 'error' && <LoadError message={t('admin.loadError')} onRetry={reload} />}
-      {state.status === 'ready' && (
-        <>
-          <SectionTitle>{t('admin.moderation.queue', { n: state.data.queue.length })}</SectionTitle>
-          {notice && (
-            <p className={styles.muted} role="status">
-              {t(notice.key, notice.params)}
-            </p>
-          )}
-          {state.data.queue.length === 0 ? (
-            <EmptyState icon={ShieldCheck} title={t('admin.moderation.queueEmpty')} body={t('admin.moderation.queueEmptyBody')} />
-          ) : (
-            <ul className={styles.list}>
-              {state.data.queue.map((r) => (
-                <li key={r.id}>
-                  <QueueCard
-                    r={r}
-                    now={now}
-                    onDecided={() => {
-                      setNotice({ key: 'admin.done.decided' });
-                      void refetch().catch(() => {});
-                    }}
-                  />
-                </li>
-              ))}
-            </ul>
-          )}
-
-          <SectionTitle>{t('admin.suspect.title', { n: state.data.suspects.length })}</SectionTitle>
-          {state.data.suspects.length === 0 ? (
-            <EmptyState icon={ShieldAlert} title={t('admin.suspect.empty')} />
-          ) : (
-            <>
-              <p className={styles.muted}>{t('admin.suspect.intro')}</p>
-              <ul className={styles.list}>
-                {state.data.suspects.map((r) => (
-                  <li key={r.id}>
-                    <SuspectCard
-                      r={r}
-                      onDecided={() => {
-                        setNotice({ key: 'admin.done.decided' });
-                        void refetch().catch(() => {});
-                      }}
-                    />
-                  </li>
-                ))}
-              </ul>
-            </>
-          )}
-
-          {/* The contested no-shows have a page of their own since A1; here, the way to it. */}
-          <Tile
-            to={ADMIN_DISPUTES_PATH}
-            icon={UserX}
-            label={t('admin.disputes.title')}
-            hint={
-              state.data.disputes.pending.length > 0
-                ? plural(lang, 'unit.disputesPending', state.data.disputes.pending.length)
-                : t('admin.zone.disputes.hint')
-            }
-          />
-
-          <SectionTitle>{t('admin.moderation.all')}</SectionTitle>
-          <SearchField
-            id="admin-reviews-q"
-            label={t('admin.moderation.search')}
-            placeholder={t('admin.moderation.search')}
-            value={text}
-            onChange={setText}
-            onClear={() => {
-              setText('');
-              setParam({ q: null });
-            }}
-            clearLabel={t('admin.search.clear')}
-          />
-          <div className={styles.toolbar}>
-            <span className={styles.sub}>{t('admin.moderation.exportHint')}</span>
-            <ExportButton kind="reviews" filters={{ q: q || undefined }} />
-          </div>
-          {state.data.reviews.length === 0 ? (
-            <EmptyState icon={Star} title={q ? t('admin.noResults') : t('admin.noReviews')} />
-          ) : (
-            <ul className={styles.list}>
-              {state.data.reviews.map((r) => (
-                <li key={r.id}>
-                  <Card className={styles.stack}>
-                    <div className={styles.rowTop}>{statusPill(r, t)}</div>
-                    <ReviewBody r={r} />
-                    {r.report_note && (
-                      <p className={styles.muted}>
-                        {t('admin.moderation.noteShown')}: {r.report_note}
-                      </p>
-                    )}
-                  </Card>
-                </li>
-              ))}
-            </ul>
-          )}
-        </>
-      )}
+      <ListDetailLayout
+        wide={wide}
+        open={open}
+        backTo={pathname}
+        backLabel={t('nav.admin.moderation')}
+        header={header}
+        list={list}
+        detail={
+          chosen && (
+            <ReviewDetail
+              key={chosen.id}
+              item={chosen}
+              now={now}
+              onDecided={() => {
+                setNotice(t('admin.done.decided'));
+                void refetch().catch(() => {});
+              }}
+            />
+          )
+        }
+      />
     </div>
   );
 }

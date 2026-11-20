@@ -16,6 +16,7 @@ import {
   userIdOf,
   pickFilter,
   switchLanguage,
+  detailPane,
 } from './support';
 
 // T16a — the admin: overview, shops, clients, bookings, moderation, the audit log. Every action
@@ -291,8 +292,11 @@ test.describe('admin', () => {
     await adminZoneLink(page, 'Activitate').click();
     await expect(page.locator('main').getByRole('link', { name: /^Moderare.*(recenzii raportate|o recenzie raportată)/ })).toBeVisible();
     await adminOpen(page, 'Activitate', 'Moderare');
-    const card = page.locator('main li').filter({ hasText: text }).first();
-    await expect(card.getByText('Limbaj abuziv')).toBeVisible();
+    // One row per review (page template A); the chosen one beside the list, or in its place on a phone.
+    const queued = page.getByRole('list', { name: /^Raportate, în așteptare/ }).locator(':scope > li').filter({ hasText: text });
+    await expect(queued.getByText('Limbaj abuziv')).toBeVisible();
+    await queued.getByRole('button').click();
+    const card = detailPane(page);
     await expect(card.getByText(/Așteaptă de/)).toBeVisible();
     await card.getByRole('button', { name: 'Șterge' }).click();
     await card.getByLabel('Notă (opțional)').fill('Insultă');
@@ -302,10 +306,12 @@ test.describe('admin', () => {
     await expect(page.getByText('Decizia este salvată. Părțile sunt anunțate.')).toBeVisible();
 
     // Out of the queue; in the list as removed, with the note.
-    const listed = page.locator('main li').filter({ hasText: text });
+    await expect(queued).toHaveCount(0);
+    const listed = page.getByRole('list', { name: 'Toate recenziile' }).locator(':scope > li').filter({ hasText: text });
     await expect(listed).toHaveCount(1);
     await expect(listed.getByText('Ștearsă')).toBeVisible();
-    await expect(listed.getByText('Notă: Insultă')).toBeVisible();
+    await listed.getByRole('button').click();
+    await expect(detailPane(page).getByText('Notă: Insultă')).toBeVisible();
     const [rating] = await serviceRest<{ review_count: number }[]>(`shop_ratings?shop_id=eq.${shopId}`, 'GET');
     expect(rating!.review_count).toBe(0);
     const told = await serviceRest<{ user_id: string }[]>(
