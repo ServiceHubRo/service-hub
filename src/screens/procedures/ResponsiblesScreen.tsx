@@ -146,21 +146,29 @@ function CategoryBody({
   const who = responsible ? [responsible.display_id, responsible.user?.name].filter(Boolean).join(' · ') : t('proc.page.noResponsible');
   return (
     <>
-      <dl className={styles.facts}>
-        <div>
-          <dt>{t('proc.page.responsible')}</dt>
-          <dd>
-            {who}{' '}
-            {responsible?.needs_reassignment && <Tag tone="amber">{t('proc.resp.reassign')}</Tag>}
-          </dd>
-        </div>
-        {responsible && (
-          <div>
-            <dt>{t('proc.resp.assigned')}</dt>
-            <dd>{t('proc.resp.since', { date: day(lang, responsible.assigned_at), who: responsible.assigned_by ?? '—' })}</dd>
-          </div>
-        )}
-      </dl>
+      {/* Whoever may change the responsible sees the list below, not the same name twice; a reader sees the name. */}
+      {(!lib.team || responsible) && (
+        <dl className={styles.facts}>
+          {!lib.team && (
+            <div>
+              <dt>{t('proc.page.responsible')}</dt>
+              <dd>
+                {who}{' '}
+                {responsible?.needs_reassignment && <Tag tone="amber">{t('proc.resp.reassign')}</Tag>}
+              </dd>
+            </div>
+          )}
+          {responsible && (
+            <div>
+              <dt>{t('proc.resp.assigned')}</dt>
+              <dd>
+                {t('proc.resp.since', { date: day(lang, responsible.assigned_at), who: responsible.assigned_by ?? '—' })}{' '}
+                {lib.team && responsible.needs_reassignment && <Tag tone="amber">{t('proc.resp.reassign')}</Tag>}
+              </dd>
+            </div>
+          )}
+        </dl>
+      )}
       {lib.team && (
         <div className={styles.stack}>
           <SelectField
