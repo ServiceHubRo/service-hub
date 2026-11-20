@@ -230,8 +230,10 @@ test.describe('client reminders', () => {
     await page.getByRole('button', { name: /: \d+ loc/ }).first().click();
     await page.getByRole('button', { name: /^\d{2}:\d{2}$/, disabled: false }).first().click();
     await expect(page.getByRole('heading', { level: 1, name: 'Mașina' })).toBeVisible();
-    await expect(page.getByRole('button', { name: /Skoda Octavia/ })).toHaveAttribute('aria-pressed', 'true');
-    await expect(page.getByRole('button', { name: /Dacia Logan/ })).toHaveAttribute('aria-pressed', 'false');
+    // On a phone the cars are options (pressed); from 1024 px rows beside the car's details (current).
+    const mark = (page.viewportSize()?.width ?? 0) >= 1024 ? 'aria-current' : 'aria-pressed';
+    await expect(page.getByRole('button', { name: /Skoda Octavia/ })).toHaveAttribute(mark, 'true');
+    await expect(page.getByRole('button', { name: /Dacia Logan/ })).not.toHaveAttribute(mark, 'true');
     await expectNoHorizontalScroll(page);
     await shot(page, 't19d-service-reminder-car', name());
   });
