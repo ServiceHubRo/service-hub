@@ -360,6 +360,8 @@ export const ro = {
   'sugg.empty': 'Nu există sugestii trimise.',
   'sugg.loadError': 'Sugestiile nu s-au încărcat.',
   'sugg.sentOn': 'Trimisă {date}',
+  'sugg.add': 'Adaugă o sugestie',
+  'sugg.new': 'Sugestie nouă',
   'sugg.status.new': 'Primită',
   'sugg.status.planned': 'Planificată',
   'sugg.status.done': 'Făcută',

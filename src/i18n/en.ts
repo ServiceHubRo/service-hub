@@ -362,6 +362,8 @@ export const en: Record<MessageKey, string> = {
   'sugg.empty': 'No suggestions sent.',
   'sugg.loadError': 'Your suggestions could not be loaded.',
   'sugg.sentOn': 'Sent {date}',
+  'sugg.add': 'Add a suggestion',
+  'sugg.new': 'New suggestion',
   'sugg.status.new': 'Received',
   'sugg.status.planned': 'Planned',
   'sugg.status.done': 'Done',
