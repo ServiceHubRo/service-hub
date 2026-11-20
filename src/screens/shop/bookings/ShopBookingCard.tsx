@@ -1,4 +1,4 @@
-import { CalendarClock, ClipboardCheck, ClipboardList, FilePen, MessageSquare, Phone, Store } from 'lucide-react';
+import { CalendarClock, ClipboardCheck, FilePen, MessageSquare, Phone, Store } from 'lucide-react';
 import { useCallback, useState, type ReactNode } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ActionButton } from '../../../components/ActionButton';
@@ -186,7 +186,7 @@ export function ShopBookingDetail({ booking: b, shopId, shopName, now, onDone, o
               ...(INTAKE_STATUSES.has(b.status)
                 ? [{ key: 'intake', label: t('in.title'), icon: <ClipboardCheck size={18} aria-hidden="true" />, to: intakePath(b.id) }]
                 : []),
-              { key: 'file', label: t('vf.title'), icon: <ClipboardList size={18} aria-hidden="true" />, to: vehicleFilePath(b.id, 'bookings') },
+              // „Fișa mașinii” is the button of the car's history section, not repeated here.
               ...(noShowOpen
                 ? [{ key: 'noShow', label: t('sb.action.noShow'), onSelect: () => setPanel('noShow') }]
                 : []),

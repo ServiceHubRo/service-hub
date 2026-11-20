@@ -69,7 +69,8 @@ async function doneJob(shopId: string, clientId: string, plate: string, job: { w
 
 async function openFileFromBookings(page: Page) {
   await page.goto('/s/programari');
-  await (await cardAction(await openShopBooking(page, 'Ford Focus'), 'Fișa mașinii')).click();
+  // „Fișa mașinii” is the button of the car's history, once that history has loaded.
+  await (await openShopBooking(page, 'Ford Focus')).getByRole('link', { name: 'Fișa mașinii', exact: true }).click();
   await expect(page.getByRole('heading', { level: 1, name: 'Fișa mașinii' })).toBeVisible();
 }
 

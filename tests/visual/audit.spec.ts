@@ -611,7 +611,7 @@ test.describe('A9 visual audit', () => {
       { name: 'programari', path: '/s/programari' },
       { name: 'programari-programate', path: '/s/programari?tab=programate' },
       // Page template A: a row opens its booking (beside the list from 1024 px, in its place below).
-      { name: 'programari-deschise', path: '/s/programari', roOnly: true, prep: async (p) => openRow(p) },
+      { name: 'programari-deschise', path: '/s/programari?tab=programate', roOnly: true, prep: async (p) => openRow(p) },
       { name: 'programari-mai-multe', path: '/s/programari?tab=programate', roOnly: true, prep: async (p) => {
           await openRow(p);
           await clickButton(p, /^Mai multe/);
