@@ -237,24 +237,22 @@ function CarCard({
             <Pencil size={18} aria-hidden="true" />
           </Link>
         </div>
-        {jobs === null ? null : jobs + importedJobs > 0 ? (
+        {/* Every car has both rows, with or without jobs: "Istoric — 0 lucrări" and the report, whose own
+            screen explains that there is nothing to report yet. */}
+        {jobs !== null && (
           <>
             <Link to={carHistoryPath(car.id)} state={FROM_GARAGE} className={styles.history}>
               <History size={16} aria-hidden="true" />
               <span className={styles.historyText}>{t('vh.garageRow', { jobs: plural(lang, 'unit.jobs', jobs + importedJobs) })}</span>
               <ChevronRight size={18} aria-hidden="true" />
             </Link>
-            {/* The paid report (T15, P16e): a secondary action, only for a car with jobs done through Service-Hub. */}
-            {jobs > 0 && (
-              <Link to={carReportPath(car.id)} state={REPORT_FROM_GARAGE} className={`${styles.history} ${styles.report}`}>
-                <FileCheck size={16} aria-hidden="true" />
-                <span className={styles.historyText}>{t('report.garageRow')}</span>
-                <ChevronRight size={18} aria-hidden="true" />
-              </Link>
-            )}
+            {/* The paid report (T15, P16e), a secondary action. */}
+            <Link to={carReportPath(car.id)} state={REPORT_FROM_GARAGE} className={`${styles.history} ${styles.report}`}>
+              <FileCheck size={16} aria-hidden="true" />
+              <span className={styles.historyText}>{t('report.garageRow')}</span>
+              <ChevronRight size={18} aria-hidden="true" />
+            </Link>
           </>
-        ) : (
-          <p className={styles.historyNone}>{t('vh.noJobs')}</p>
         )}
       </div>
       <ul className={styles.docs}>

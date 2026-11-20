@@ -267,12 +267,14 @@ test.describe('history report', () => {
     await expectNoHorizontalScroll(page);
     await shot(page, 't15-report-preview-en', name());
 
-    // A saved car with no finished job: no report row in the garage, and its preview says why.
+    // A saved car with no finished job: the same rows in the garage ("History — 0 jobs", the report),
+    // and the report's screen says why there is nothing to report.
     const owner = await userIdOf(client);
     const [car] = await serviceRest<{ id: string }[]>('cars', 'POST', { owner_id: owner, make: 'Dacia', model: 'Spring', plate: 'B 01 NEW' });
     await page.goto('/c/garaj');
     await expect(page.getByText('Dacia Spring')).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Official report for a buyer' })).toHaveCount(1);
+    await expect(page.getByRole('link', { name: 'Official report for a buyer' })).toHaveCount(2);
+    await expect(page.getByRole('link', { name: 'History — 0 jobs' })).toHaveCount(1);
     await page.goto(`/c/garaj/${car!.id}/raport`);
     await expect(page.getByText('There are no finished jobs for this car.')).toBeVisible();
     await expect(page.getByRole('button', { name: /Pay/ })).toHaveCount(0);

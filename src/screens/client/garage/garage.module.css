@@ -260,8 +260,7 @@
 }
 
 /* ---------------------------------------------------------------- history row (P16c) */
-.history,
-.historyNone {
+.history {
   display: flex;
   align-items: center;
   gap: 8px;
@@ -296,11 +295,6 @@
 .historyText {
   flex: 1;
   min-width: 0;
-}
-
-.historyNone {
-  min-height: var(--tap);
-  color: var(--muted);
 }
 
 /* A desktop (T51): "Adaugă mașină" as wide as a form column, under the cards. */
