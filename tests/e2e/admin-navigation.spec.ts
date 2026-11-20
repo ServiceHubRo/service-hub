@@ -66,7 +66,7 @@ interface Fn {
  * The address without the item a list + detail screen shows first: from 1024 px page template A writes
  * it into the address (?recenzie=, ?zona=, …), which the old addresses and the menu know nothing about.
  */
-const SELECTION = ['recenzie', 'contestatie', 'zona', 'text', 'ce', 'lista', 'agent', 'cat', 'raport', 'firma', 'cont', 'unitate', 'programare', 'abonament', 'flota'];
+const SELECTION = ['recenzie', 'contestatie', 'zona', 'text', 'ce', 'lista', 'agent', 'cat', 'raport', 'firma', 'cont', 'unitate', 'programare', 'abonament', 'flota', 'eveniment', 'grup'];
 /** On a phone the chosen item is still open when the way back ends at its list: „‹ Înapoi” of the detail first. */
 async function openDetailGone(page: Page) {
   if ((page.viewportSize()?.width ?? 0) >= 1024) return;

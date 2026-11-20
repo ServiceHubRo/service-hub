@@ -320,13 +320,16 @@ test.describe('M6 — fleet notifications', () => {
     await page.addInitScript(() => localStorage.setItem('sh_lang', 'ro'));
     await signIn(page, SEED.admin, SEED_PASSWORD);
     await page.goto('/admin/platforma/notificari-flota');
-    const row = page.locator('li').filter({ hasText: 'Document care expiră' }).filter({ hasText: /Etape \d+/ }).first();
-    await expect(row).toContainText('22007');
+    // The list holds every failed event (other tests leave some): this company's, by its name.
+    const row = page.locator('[data-ui="list-row"]').filter({ hasText: 'Document care expiră' }).filter({ hasText: /Etape \d+/ }).first();
+    await row.getByRole('button').click();
+    const detail = page.locator('[data-ui="detail-pane"]');
+    await expect(detail).toContainText('22007');
     await expect(page.getByText('invalid input syntax')).toHaveCount(0);
     await expect(page.getByText(f.plate)).toHaveCount(0);
     await expectNoHorizontalScroll(page);
     await shot(page, 'admin-fleet-failed', name());
-    await row.getByRole('button', { name: 'Încearcă din nou' }).click();
+    await detail.getByRole('button', { name: 'Încearcă din nou' }).click();
     await expect.poll(async () => (await serviceRest<{ failed_at: string | null }[]>(`fleet_events?company_id=eq.${f.company}&select=failed_at`, 'GET'))[0]!.failed_at).toBeNull();
     await ctx.close();
   });

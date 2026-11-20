@@ -338,17 +338,6 @@ export async function adminOpen(page: Page, zone: string, item: string) {
 }
 
 /**
- * T57: a shop booking card shows its summary; its details (phone, quote lines, intake, PDFs) open
- * with a tap on the summary. Opens the card if it is closed.
- */
-export async function openBooking(card: Locator) {
-  const summary = card.locator('button[aria-controls^="booking-"]');
-  await expect(summary).toBeVisible();
-  if ((await summary.getAttribute('aria-expanded')) !== 'true') await summary.click();
-  await expect(summary).toHaveAttribute('aria-expanded', 'true');
-}
-
-/**
  * S2 (page template A): the client's Programări is a list beside (or before) one booking's detail.
  * Opens the booking whose row has `text` (the service, the shop, the car, the status…), in Încheiate
  * when it is not among the active ones, and returns its detail.
@@ -394,13 +383,6 @@ export async function openClientBooking(page: Page, text: string | RegExp): Prom
   const mine = detail.filter({ hasText: text });
   await expect(mine).toBeVisible();
   return mine;
-}
-
-/** Opens every shop booking card on the page. */
-export async function openAllBookings(page: Page) {
-  const closed = page.locator('main button[aria-controls^="booking-"][aria-expanded="false"]');
-  await expect(page.locator('main button[aria-controls^="booking-"]').first()).toBeVisible();
-  while ((await closed.count()) > 0) await closed.first().click();
 }
 
 export async function expectNoHorizontalScroll(page: Page) {

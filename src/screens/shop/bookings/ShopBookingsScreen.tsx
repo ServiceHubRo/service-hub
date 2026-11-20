@@ -29,6 +29,7 @@ import {
   type ShopFilter,
   type ShopTab,
 } from '../../../lib/shopBookings';
+import { motionOn } from '../../../lib/motion';
 import { isActiveStatus, type BookingStatus } from '../../../lib/status';
 import { rowServicesText } from '../../../lib/bookingServices';
 import { useListDetail } from '../../../lib/useListDetail';
@@ -86,12 +87,12 @@ function doneMessage(before: BookingStatus, after: BookingStatus, moved: boolean
 /**
  * Programări of the shop (FR §4.2, P8, P8c): the tabs Cereri (requests waiting for an answer) and
  * Programate (confirmed until done), each with its count. A Panou card opens the list already
- * filtered (`?filtru=`), a row of "Programul de azi" opens one booking (`?p=`); a chip names the
- * filter and clears it. Live through ShopBookingsProvider.
+ * filtered (`?filtru=`), a row of "Programul de azi" opens one booking (`?p=`), in its tab; a chip names
+ * the filter and clears it. Live through ShopBookingsProvider.
  */
 export function ShopBookingsScreen() {
   const { t, lang } = useI18n();
-  const { state, reload, refresh, apply } = useShopBookings();
+  const { state, reload, refresh, apply, isFresh } = useShopBookings();
   const [params, setParams] = useLiveSearchParams();
   const now = useNow();
   const today = ymdInBucharest(now);
@@ -112,11 +113,21 @@ export function ShopBookingsScreen() {
     refresh();
   }, [refresh]);
 
-  const onlyId = params.get('p');
-  const filter = onlyId ? null : parseFilter(params.get('filtru'));
+  const filter = parseFilter(params.get('filtru'));
   const data = state.status === 'ready' ? state.data : null;
-  const only = data && onlyId ? (data.bookings.find((b) => b.id === onlyId) ?? null) : null;
-  const tab: ShopTab = only ? tabOf(only.status) : filter ? 'programate' : parseTab(params.get('tab'));
+  // The open booking (`?p=`) names the tab only when the address does not (a notification): a booking
+  // confirmed from Cereri leaves that list, and the list stays where it was.
+  const askedTab = params.get('tab');
+  const askedId = askedTab ? null : params.get('p');
+  const asked = data && askedId ? (data.bookings.find((b) => b.id === askedId) ?? null) : null;
+  const tab: ShopTab = asked ? tabOf(asked.status) : filter ? 'programate' : parseTab(askedTab);
+  // Once read, the address names its tab, so a later change of the open booking does not move the list.
+  useEffect(() => {
+    if (!data || askedTab) return;
+    const next = new URLSearchParams(params);
+    next.set('tab', tab);
+    setParams(next, { replace: true });
+  }, [data, askedTab, tab, params, setParams]);
 
   const lists = useMemo(
     () => (data ? { cereri: tabList(data.bookings, 'cereri'), programate: tabList(data.bookings, 'programate') } : null),
@@ -147,9 +158,7 @@ export function ShopBookingsScreen() {
     if (!key) return;
     // Still active but no longer in the list on screen (a request confirmed from Cereri, a
     // booking moved off today's filter): offer the way to it.
-    const stillShown =
-      onlyId === after.id ||
-      (tabOf(status) === tab && (!filter || matchesFilter({ status, date: after.date, slot: after.slot }, filter, today)));
+    const stillShown = tabOf(status) === tab && (!filter || matchesFilter({ status, date: after.date, slot: after.slot }, filter, today));
     setNotice({
       key,
       ref: after.ref,
@@ -199,6 +208,7 @@ export function ShopBookingsScreen() {
                 status={<BookingStatusPill status={b.status} viewer="shop" />}
                 attention={b.status === 'pending'}
                 selected={wide && b.id === selectedId}
+                fresh={isFresh(b.id) && motionOn('newRequestGlow')}
                 onSelect={() => select(b.id)}
               />
             );
