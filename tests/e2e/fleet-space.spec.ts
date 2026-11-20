@@ -247,7 +247,11 @@ test('bookings: the driver books a company vehicle, the manager approves within 
   await page.goto(`/c/service/${shopId}/programare?pas=2&serviciu=ulei`);
   await page.getByRole('button', { name: /: \d+ loc/ }).first().click();
   await page.getByRole('button', { name: /^\d{2}:\d{2}$/, disabled: false }).first().click();
-  await expect(page.getByRole('button', { name: new RegExp(plate), pressed: true })).toBeVisible();
+  // A phone: options (pressed); from 1024 px: rows beside the vehicle's details (current).
+  const picked = (page.viewportSize()?.width ?? 0) >= 1024 ? { name: new RegExp(plate) } : { name: new RegExp(plate), pressed: true };
+  const row = page.getByRole('button', picked);
+  await expect(row).toBeVisible();
+  if ((page.viewportSize()?.width ?? 0) >= 1024) await expect(row).toHaveAttribute('aria-current', 'true');
   await expect(page.getByText('Devizul îl aprobă firma.')).toBeVisible();
   await expectNoHorizontalScroll(page);
   await shot(page, 'fleet-book-car-step', name());

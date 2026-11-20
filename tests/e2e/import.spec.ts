@@ -224,8 +224,9 @@ test.describe('import from another program', () => {
     await expect(loganCard).toContainText('Dacia Logan');
     await expect(page.locator('main li').filter({ hasText: golf })).toContainText('VW Golf');
     await expect(loganCard.getByRole('link', { name: /2 lucrări/ })).toBeVisible();
-    // No paid report for a car with imported jobs only.
-    await expect(loganCard.getByRole('link', { name: /raport/i })).toHaveCount(0);
+    // Every car has its report row (Eduard, 21 Nov 2026); for a car with imported jobs only the report
+    // screen says there is nothing to report.
+    await expect(loganCard.getByRole('link', { name: /raport/i })).toHaveCount(1);
     await expectNoHorizontalScroll(page);
     await shot(page, 't31b-garage', name());
     await loganCard.getByRole('link', { name: /2 lucrări/ }).click();

@@ -153,7 +153,7 @@ test.describe('admin tools', () => {
     await shot(clientPage, 't20a-notice-messages', name());
     await team.click();
     await expect(clientPage).toHaveURL(/\/c\/mesaje\/echipa$/);
-    await expect(clientPage.getByRole('heading', { level: 1, name: 'Echipa Service-Hub' })).toBeVisible();
+    await expect(clientPage.getByRole('heading', { name: 'Echipa Service-Hub' })).toBeVisible();
     const notice = clientPage.getByRole('region', { name: 'Anunț Service-Hub' }).filter({ hasText: title });
     await expect(notice).toBeVisible();
     await expect(notice.getByText('Pe 1 decembrie service-urile sunt închise.')).toBeVisible();
@@ -170,7 +170,8 @@ test.describe('admin tools', () => {
     await clientPage.reload();
     await expect(notice).toBeVisible();
     await expect(notice.getByText('Nou', { exact: true })).toHaveCount(0);
-    await clientPage.locator('main').getByRole('link', { name: 'Mesaje', exact: true }).click();
+    // From 1024 px the conversations stand beside this one; on a phone „‹ Mesaje” goes back to the list.
+    if ((clientPage.viewportSize()?.width ?? 0) < 1024) await clientPage.locator('main').getByRole('link', { name: 'Mesaje', exact: true }).click();
     await expect(team).not.toContainText('Anunțuri noi');
     // A push about it (sent before as "Mesaje?anunt=…") opens it in the team's conversation.
     const [sent] = await serviceRest<{ id: string }[]>(`notices?title_ro=eq.${encodeURIComponent(title)}&select=id`, 'GET');

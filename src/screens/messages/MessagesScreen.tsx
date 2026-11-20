@@ -33,7 +33,9 @@ export function MessagesScreen({ selectedId, detail, wide = false }: { selectedI
   const latest = notices?.notices[0];
   const newNotices = notices?.unread ?? 0;
 
-  if (pushed) return <Navigate to={`${teamPath(side)}?anunt=${encodeURIComponent(pushed)}`} replace />;
+  // A push sent before (`/mesaje?anunt=…`) goes to the team's conversation; beside the list that is already
+  // the one shown, so it is not sent there again.
+  if (pushed && selectedId !== TEAM_ROW) return <Navigate to={`${teamPath(side)}?anunt=${encodeURIComponent(pushed)}`} replace />;
 
   const header = <PageHeader title={t('nav.messages')} />;
   const hasThreads = state.status === 'ready' && state.data.threads.length > 0;
