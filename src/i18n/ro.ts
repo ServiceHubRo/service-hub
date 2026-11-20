@@ -684,7 +684,7 @@ export const ro = {
   'shop.fee': 'Taxă de constatare',
   'shop.feeNote': 'Se percepe doar dacă refuzi devizul după verificare.',
   'shop.services': 'Servicii oferite',
-  'shop.noServices': 'Niciun serviciu adăugat.',
+  'shop.noServices': 'Nu există servicii adăugate.',
   'shop.priceNote': 'Prețul se stabilește prin deviz, după ce service-ul vede mașina.',
   'shop.book': 'Programează-te',
   'shop.reviews': 'Recenzii',

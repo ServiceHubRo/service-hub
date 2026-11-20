@@ -9,7 +9,6 @@ import { Card } from '../../../components/Card';
 import { EmptyState } from '../../../components/EmptyState';
 import { FavoriteButton } from '../../../components/FavoriteButton';
 import { FreePlaceNote } from '../../../components/FreePlaceNote';
-import { ListRow, ListRows } from '../../../components/ListRow';
 import { LoadError } from '../../../components/LoadError';
 import { OfferNote } from '../../../components/OfferNote';
 import { PhotoGallery } from '../../../components/PhotoGallery';
@@ -270,31 +269,28 @@ function ShopDetails({ page, day, onFavorite }: { page: ShopPageData; day: strin
 
         </div>
         <div className={styles.column}>
-          {/* The services are on a screen of their own (C9): categories on the left, the chosen one's services on the right. */}
-          <ListRows label={t('shop.services')}>
-            <ListRow
-              icon={<Wrench size={18} aria-hidden="true" />}
-              title={t('shop.services')}
-              detail={plural(lang, 'unit.services', page.services.length)}
-              to={shopServicesPath(shop.id)}
-            />
-          </ListRows>
-
         </div>
       </div>
 
-      {/* Always at hand (asked at testing): at the bottom, just above the menu. */}
-      {page.bookable && (
-        <BottomBar>
-          <Link
-            to={day ? `${bookingPath(shop.id)}?zi=${day}` : bookingPath(shop.id)}
-            className={buttonClass('primary', true, styles.book)}
-          >
-            <CalendarPlus size={18} aria-hidden="true" />
-            {t('shop.book')}
+      {/* Always at hand (asked at testing): at the bottom, just above the menu. The services (a screen of their
+          own, C9) on the left, "Programează-te" on the right, the same size (Eduard, 21 Nov 2026). */}
+      <BottomBar>
+        <div className={`${styles.bookRow} ${page.bookable ? '' : styles.bookRowSingle}`}>
+          <Link to={shopServicesPath(shop.id)} className={buttonClass('secondary', true, styles.book)}>
+            <Wrench size={18} aria-hidden="true" />
+            {t('shop.services')}
           </Link>
-        </BottomBar>
-      )}
+          {page.bookable && (
+            <Link
+              to={day ? `${bookingPath(shop.id)}?zi=${day}` : bookingPath(shop.id)}
+              className={buttonClass('primary', true, styles.book)}
+            >
+              <CalendarPlus size={18} aria-hidden="true" />
+              {t('shop.book')}
+            </Link>
+          )}
+        </div>
+      </BottomBar>
     </>
   );
 }

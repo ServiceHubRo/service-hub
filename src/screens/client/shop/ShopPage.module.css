@@ -152,6 +152,27 @@
   gap: 8px;
 }
 
+/* Services and booking side by side, the same size. */
+.bookRow {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.bookRowSingle {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@media (min-width: 1024px) {
+  div.bookRow {
+    width: min(100%, 520px);
+  }
+
+  div.bookRowSingle {
+    width: min(100%, 260px);
+  }
+}
+
 .freePlace {
   display: flex;
   flex-direction: column;
