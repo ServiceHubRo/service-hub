@@ -78,35 +78,57 @@ test.describe('shop settings', () => {
     await expect(page.getByRole('status').filter({ hasText: 'Vulcanizare: 7 servicii bifate.' })).toBeVisible();
     await expect(page.getByText('Selectate: 7 din 151')).toBeVisible();
     await expect(kind).toHaveValue('');
-    // Closed rows with how many are ticked; "Toate" is the first line of an opened one.
-    const tires = page.getByRole('button', { name: /^Anvelope & Jante / });
-    await expect(tires).toHaveAccessibleName('Anvelope & Jante 6/6');
-    await expect(tires).toHaveAttribute('aria-expanded', 'false');
-    await expect(page.getByRole('checkbox', { name: 'Montaj + echilibrare anvelope' })).toHaveCount(0);
-    await clickInPlace(page, tires);
-    await toTop(tires);
-    const allTires = page.getByRole('checkbox', { name: 'Toate: Anvelope & Jante' });
-    await expect(allTires).toBeChecked();
-    await clickInPlace(page, allTires);
-    await expect(page.getByText('Selectate: 1 din 151')).toBeVisible();
-    await expect(tires).toHaveAccessibleName('Anvelope & Jante 0/6');
-    // Closing it near the end of the page makes the page shorter: the browser has to move up.
-    await tires.click();
-    await expect(tires).toHaveAttribute('aria-expanded', 'false');
-    const alignment = page.getByRole('button', { name: /^Geometrie & Punte 1\/3$/ });
-    await clickInPlace(page, alignment);
-    await toTop(alignment);
-    await expect(page.getByRole('checkbox', { name: 'Toate: Geometrie & Punte' })).toBeChecked({ indeterminate: true });
-    await clickInPlace(page, page.getByRole('checkbox', { name: 'Geometrie roți (2D/3D)' }));
-    await expect(page.getByText('Selectate: 0 din 151')).toBeVisible();
-    const maintenance = page.getByRole('button', { name: /^Revizii & Întreținere 0\/11$/ });
-    await clickInPlace(page, maintenance);
-    await expect(maintenance).toHaveAttribute('aria-expanded', 'true');
-    await toTop(maintenance);
-    await clickInPlace(page, page.getByRole('checkbox', { name: 'Lamele ștergătoare' }));
-    await clickInPlace(page, page.getByRole('checkbox', { name: 'Schimb ulei + filtru ulei' }));
-    await expect(page.getByText('Selectate: 2 din 151')).toBeVisible();
+    const wide = (page.viewportSize()?.width ?? 0) >= 1024;
+    if (wide) {
+      // From 1024 px (C9) the categories are rows on the left and the chosen one's services stand on the right.
+      const rows = page.getByRole('list', { name: 'Servicii oferite' }).locator(':scope > li');
+      await rows.filter({ hasText: 'Anvelope & Jante' }).getByRole('button').click();
+      const allTires = page.getByRole('checkbox', { name: 'Toate: Anvelope & Jante' });
+      await expect(allTires).toBeChecked();
+      await allTires.click();
+      await expect(page.getByText('Selectate: 1 din 151')).toBeVisible();
+      await expect(rows.filter({ hasText: 'Anvelope & Jante' })).toContainText('0/6');
+      await rows.filter({ hasText: 'Geometrie & Punte' }).getByRole('button').click();
+      await expect(page.getByRole('checkbox', { name: 'Toate: Geometrie & Punte' })).toBeChecked({ indeterminate: true });
+      await page.getByRole('checkbox', { name: 'Geometrie roți (2D/3D)' }).click();
+      await expect(page.getByText('Selectate: 0 din 151')).toBeVisible();
+      await rows.filter({ hasText: 'Revizii & Întreținere' }).getByRole('button').click();
+      await page.getByRole('checkbox', { name: 'Lamele ștergătoare' }).click();
+      await page.getByRole('checkbox', { name: 'Schimb ulei + filtru ulei' }).click();
+      await expect(page.getByText('Selectate: 2 din 151')).toBeVisible();
+    } else {
+      // Closed rows with how many are ticked; "Toate" is the first line of an opened one.
+      const tires = page.getByRole('button', { name: /^Anvelope & Jante / });
+      await expect(tires).toHaveAccessibleName('Anvelope & Jante 6/6');
+      await expect(tires).toHaveAttribute('aria-expanded', 'false');
+      await expect(page.getByRole('checkbox', { name: 'Montaj + echilibrare anvelope' })).toHaveCount(0);
+      await clickInPlace(page, tires);
+      await toTop(tires);
+      const allTires = page.getByRole('checkbox', { name: 'Toate: Anvelope & Jante' });
+      await expect(allTires).toBeChecked();
+      await clickInPlace(page, allTires);
+      await expect(page.getByText('Selectate: 1 din 151')).toBeVisible();
+      await expect(tires).toHaveAccessibleName('Anvelope & Jante 0/6');
+      // Closing it near the end of the page makes the page shorter: the browser has to move up.
+      await tires.click();
+      await expect(tires).toHaveAttribute('aria-expanded', 'false');
+      const alignment = page.getByRole('button', { name: /^Geometrie & Punte 1\/3$/ });
+      await clickInPlace(page, alignment);
+      await toTop(alignment);
+      await expect(page.getByRole('checkbox', { name: 'Toate: Geometrie & Punte' })).toBeChecked({ indeterminate: true });
+      await clickInPlace(page, page.getByRole('checkbox', { name: 'Geometrie roți (2D/3D)' }));
+      await expect(page.getByText('Selectate: 0 din 151')).toBeVisible();
+      const maintenance = page.getByRole('button', { name: /^Revizii & Întreținere 0\/11$/ });
+      await clickInPlace(page, maintenance);
+      await expect(maintenance).toHaveAttribute('aria-expanded', 'true');
+      await toTop(maintenance);
+      await clickInPlace(page, page.getByRole('checkbox', { name: 'Lamele ștergătoare' }));
+      await clickInPlace(page, page.getByRole('checkbox', { name: 'Schimb ulei + filtru ulei' }));
+      await expect(page.getByText('Selectate: 2 din 151')).toBeVisible();
+    }
     await page.getByLabel('Caută un serviciu').fill('frane');
+    // Beside the categories only the ones with a match are left: the Frânare row opens its matches.
+    if (wide) await page.getByRole('list', { name: 'Servicii oferite' }).locator(':scope > li').filter({ hasText: 'Frânare' }).getByRole('button').click();
     await expect(page.getByRole('checkbox', { name: 'Plăcuțe de frână' })).toBeVisible();
     await expect(page.getByRole('checkbox', { name: 'Schimb ulei + filtru ulei' })).toHaveCount(0);
     await page.getByLabel('Caută un serviciu').fill('xyz nimic');

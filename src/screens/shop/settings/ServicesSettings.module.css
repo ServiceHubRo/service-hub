@@ -152,3 +152,16 @@
     border-top: none;
   }
 }
+
+/* The chosen category's services beside the categories (C9): two columns when the panel is wide enough. */
+.panelItems {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@media (min-width: 1280px) {
+  .panelItems {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: var(--space-8);
+  }
+}
