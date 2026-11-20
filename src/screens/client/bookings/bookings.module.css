@@ -275,20 +275,21 @@
 }
 
 .facts {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+  /* The labels share one column as wide as the longest one, each on a single line. */
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: 6px 12px;
   font-size: 14px;
 }
 
 .facts div {
-  display: flex;
-  gap: 12px;
+  display: contents;
 }
 
 .facts dt {
-  flex: 0 0 92px;
+  min-width: 92px;
   color: var(--muted);
+  white-space: nowrap;
 }
 
 /* On the blue box of a finished job the grey labels need one step more to stay readable (4.5:1). */
