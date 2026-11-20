@@ -1,5 +1,8 @@
 .wrap {
   width: 100%;
+  /* Scrolling it into view stops above the bottom bar and below the top bar, not under them. */
+  scroll-margin-top: calc(var(--nav-top, 0px) + var(--space-4));
+  scroll-margin-bottom: calc(var(--nav-bottom, 0px) + var(--space-4));
 }
 
 .body {

@@ -13,8 +13,11 @@ export function LogoutConfirm({ onConfirm, onCancel }: { onConfirm: () => void; 
   const ref = useRef<HTMLDivElement>(null);
   // On Cont the button is the last thing on the page: the whole panel, buttons included, comes
   // into view (the title already has the focus).
+  // It waits one frame: the panel takes the button's place first, and the focus on its title
+  // (which scrolls on its own, on a phone too) has to settle before the whole panel is brought in.
   useEffect(() => {
-    ref.current?.scrollIntoView?.({ block: 'nearest' });
+    const frame = requestAnimationFrame(() => ref.current?.scrollIntoView?.({ block: 'nearest' }));
+    return () => cancelAnimationFrame(frame);
   }, []);
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
