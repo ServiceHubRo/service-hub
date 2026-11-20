@@ -14,6 +14,7 @@ import {
   signIn,
   userIdOf,
   verifyPhoneByAdmin,
+  detailPane,
 } from './support';
 
 // T53 — no-shows: marked only after the slot and the grace period, the client's acknowledgement
@@ -159,18 +160,22 @@ test.describe('T53 no-shows', () => {
     await expect(page.getByRole('heading', { level: 1, name: 'Moderare' })).toBeVisible();
     await page.locator('main').getByRole('link', { name: /^Contestații de neprezentare/ }).click();
     await expect(page.getByRole('heading', { level: 1, name: 'Contestații de neprezentare' })).toBeVisible();
-    const item = page.getByRole('listitem').filter({ hasText: shopName }).filter({ hasText: 'Service-ul a amânat programarea' });
-    await expect(item).toBeVisible();
-    await expect(item).toContainText(bookings[0]!.ref);
-    await item.scrollIntoViewIfNeeded();
+    // One row per dispute (page template A); the chosen one beside the list, or in its place on a phone.
+    const row = page.getByRole('list', { name: /^Contestații la neprezentări/ }).locator(':scope > li').filter({ hasText: shopName });
+    await expect(row).toBeVisible();
+    await expect(row).toContainText(bookings[0]!.ref);
+    await row.getByRole('button').click();
+    const item = detailPane(page);
+    await expect(item).toContainText('Service-ul a amânat programarea');
     await expectNoHorizontalScroll(page);
     await shot(page, 't53-moderation', name());
     await item.getByRole('button', { name: 'Anulează neprezentarea' }).click();
     await expect(item.getByText('Nu se mai ia în calcul nicăieri. Clientul este anunțat.')).toBeVisible();
     await item.getByLabel('Notă (opțional)').fill('Confirmat telefonic cu service-ul.');
     await item.getByRole('button', { name: 'Anulează neprezentarea' }).click();
+    await expect(page.getByText('Decizia este salvată.', { exact: false })).toBeVisible();
     // Tests on other screen sizes run at the same time: only this shop's dispute counts.
-    await expect(page.getByRole('listitem').filter({ hasText: shopName }).filter({ hasText: 'În analiză' })).toHaveCount(0);
+    await expect(row.filter({ hasText: 'În analiză' })).toHaveCount(0);
 
     const [d] = await serviceRest<{ status: string; decision_note: string }[]>(
       `no_show_disputes?booking_id=eq.${bookings[0]!.id}&select=status,decision_note`,
