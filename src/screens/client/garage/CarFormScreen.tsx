@@ -1,4 +1,4 @@
-import { CarFront } from 'lucide-react';
+import { CarFront, Trash2 } from 'lucide-react';
 import { useCallback, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { ActionButton } from '../../../components/ActionButton';
@@ -23,6 +23,7 @@ import { carYearMax, isValidCarYear } from '../../../lib/car';
 import { CAR_DOCS } from '../../../lib/expiry';
 import { OIL_MONTH_CHOICES } from '../../../lib/oil';
 import { newRequestId } from '../../../lib/requestId';
+import { FOOT_ROW_QUERY, useMediaQuery } from '../../../lib/useMediaQuery';
 import { useLoad } from '../../../lib/useLoad';
 import { canonicalPlate, isValidPlate } from '../../../lib/plate';
 import { isValidVin, normalizeCode } from '../../../lib/validators';
@@ -64,6 +65,8 @@ type FieldName = 'make' | 'model' | 'plate' | 'year' | 'vin';
 const FIELD_ORDER: readonly FieldName[] = ['make', 'model', 'year', 'plate', 'vin'];
 
 function CarEditor({ car }: { car: Car | null }) {
+  // On a phone the buttons fill the width, one under another; from 600 px they sit in one row.
+  const narrow = !useMediaQuery(FOOT_ROW_QUERY);
   const { t, lang } = useI18n();
   const navigate = useNavigate();
   // Beside the garage's list the title is a second-level heading (the page keeps one title).
@@ -248,12 +251,36 @@ function CarEditor({ car }: { car: Car | null }) {
             />
           </div>
 
-          <div className={fleetStyles.actions}>
-            <ActionButton submit variant="primary" onAction={save} errorMessage={(e) => rpcErrorMessage(lang, e)} canRetry={canRetryRpc}>
-              {t('garage.saveCar')}
-            </ActionButton>
-            <Button onClick={() => navigate(GARAGE_PATH)}>{t('common.cancel')}</Button>
-          </div>
+          {car && confirmDelete ? (
+            <div className={styles.confirm} role="group" aria-labelledby="delete-car-q">
+              <p id="delete-car-q" className={styles.confirmTitle}>
+                {t('garage.deleteConfirm')}
+              </p>
+              <p className={styles.sub}>{t('garage.deleteNote')}</p>
+              <div className={styles.footMain}>
+                <ActionButton block={narrow} variant="danger" onAction={remove} errorMessage={(e) => rpcErrorMessage(lang, e)} canRetry={canRetryRpc}>
+                  {t('garage.deleteYes')}
+                </ActionButton>
+                <Button block={narrow} onClick={() => setConfirmDelete(false)}>{t('common.cancel')}</Button>
+              </div>
+            </div>
+          ) : (
+            /* One foot under a hairline: save and cancel on the right, delete — quiet, on the left. */
+            <div className={styles.foot}>
+              <div className={styles.footMain}>
+                <ActionButton submit block={narrow} variant="primary" onAction={save} errorMessage={(e) => rpcErrorMessage(lang, e)} canRetry={canRetryRpc}>
+                  {t('garage.saveCar')}
+                </ActionButton>
+                <Button block={narrow} onClick={() => navigate(GARAGE_PATH)}>{t('common.cancel')}</Button>
+              </div>
+              {car && (
+                <Button variant="danger" block={narrow} onClick={() => setConfirmDelete(true)}>
+                  <Trash2 size={16} aria-hidden="true" />
+                  {t('garage.delete')}
+                </Button>
+              )}
+            </div>
+          )}
           {duplicateOf && (
             <Link to={carEditPath(duplicateOf)} className={buttonClass('secondary')}>
               {t('garage.openExisting')}
@@ -262,27 +289,6 @@ function CarEditor({ car }: { car: Car | null }) {
         </form>
       </Card>
 
-      {car &&
-        (confirmDelete ? (
-          <Card className={styles.confirm} role="group" aria-labelledby="delete-car-q">
-            <p id="delete-car-q" className={styles.confirmTitle}>
-              {t('garage.deleteConfirm')}
-            </p>
-            <p className={styles.sub}>{t('garage.deleteNote')}</p>
-            <div className={styles.confirmActions}>
-              <ActionButton variant="danger" onAction={remove} errorMessage={(e) => rpcErrorMessage(lang, e)} canRetry={canRetryRpc}>
-                {t('garage.deleteYes')}
-              </ActionButton>
-              <Button block onClick={() => setConfirmDelete(false)}>
-                {t('common.cancel')}
-              </Button>
-            </div>
-          </Card>
-        ) : (
-          <Button variant="danger" block onClick={() => setConfirmDelete(true)}>
-            {t('garage.delete')}
-          </Button>
-        ))}
     </div>
   );
 }
