@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 import { JPEG, PNG } from '../unit/fixtures/support-files/images';
 import { appToken, createAgent, newPage, signInAgent } from './agent';
 import { BACKEND, PASSWORD, SEED, SEED_PASSWORD, createUser, expectAccessible, expectNoHorizontalScroll, inboxRow, requestTitle, serviceRest, shot, signIn, switchLanguage } from './support';
