@@ -158,7 +158,7 @@ test.describe('client search', () => {
     // Shop page: the same heart.
     await page.getByRole('button', { name: 'Șterge filtrele' }).last().click();
     await openResult(page, 'Atelier Demo');
-    await expect(page.getByRole('heading', { level: 1, name: 'Atelier Demo' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Atelier Demo' })).toBeVisible();
     await page.getByRole('button', { name: 'Salvează Atelier Demo la favorite' }).click();
     await expect(page.getByRole('button', { name: 'Elimină Atelier Demo din favorite' })).toBeVisible();
 
@@ -181,9 +181,13 @@ test.describe('client search', () => {
     await signInNewClient(page);
     await search(page).fill('frane');
     await resultsSettled(page);
+    // On a laptop (C9) the shop shows beside the results — its title is a second-level heading, the page
+    // stays on the search; on a phone it is a page of its own.
+    const wide = (page.viewportSize()?.width ?? 0) >= 1024;
+    const shopTitle = page.getByRole('heading', { name: 'Atelier Demo' });
     await openResult(page, 'Atelier Demo');
-    await expect(page).toHaveURL(/\/c\/service\//);
-    await expect(page.getByRole('heading', { level: 1, name: 'Atelier Demo' })).toBeVisible();
+    if (!wide) await expect(page).toHaveURL(/\/c\/service\//);
+    await expect(shopTitle).toBeVisible();
     await expect(page.getByText('Str. Lungă 42, Brașov')).toBeVisible();
     await expect(page.getByText('Lun – Vin')).toBeVisible();
     await expect(page.getByText('08:00 – 18:00')).toBeVisible();
@@ -202,9 +206,10 @@ test.describe('client search', () => {
     await expect(page.getByText('Plăcuțe de frână')).toBeVisible();
     await expectNoHorizontalScroll(page);
     await shot(page, 'c9-shop-services', name());
+    // Back: to the search (the shop stays beside the results) on a laptop, to the shop page on a phone.
     await backToList(page);
-    await page.getByRole('link', { name: 'Atelier Demo' }).first().click();
-    await expect(page.getByRole('heading', { level: 1, name: 'Atelier Demo' })).toBeVisible();
+    await page.getByRole('link', { name: wide ? 'Toate service-urile' : 'Atelier Demo' }).first().click();
+    await expect(shopTitle).toBeVisible();
     // The reviews are not on the shop page: only the stars, which open them.
     await expect(page.getByRole('heading', { name: 'Recenzii' })).toHaveCount(0);
     // Fiscal data never reaches the client.
@@ -222,11 +227,11 @@ test.describe('client search', () => {
     await expectNoHorizontalScroll(page);
     await shot(page, 't20a-shop-reviews', name());
     await backToList(page);
-    await page.getByRole('link', { name: 'Atelier Demo' }).first().click();
-    await expect(page.getByRole('heading', { level: 1, name: 'Atelier Demo' })).toBeVisible();
+    await page.getByRole('link', { name: wide ? 'Toate service-urile' : 'Atelier Demo' }).first().click();
+    await expect(shopTitle).toBeVisible();
 
     // Back keeps the search.
-    await page.getByRole('link', { name: 'Toate service-urile' }).click();
+    if (!wide) await page.getByRole('link', { name: 'Toate service-urile' }).click();
     await expect(search(page)).toHaveValue('frane');
 
     // The stars on a search card open the shop's reviews.
@@ -253,7 +258,7 @@ test.describe('client search', () => {
     // A shop without reviews has no review section.
     await page.goto('/c/cauta?q=vulcanizare');
     await openResult(page, 'Vulcanizare Roți Expres');
-    await expect(page.getByRole('heading', { level: 1, name: 'Vulcanizare Roți Expres' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Vulcanizare Roți Expres' })).toBeVisible();
     await expect(page.getByText('Fără recenzii')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Recenzii' })).toHaveCount(0);
 

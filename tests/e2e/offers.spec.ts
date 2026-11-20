@@ -69,7 +69,7 @@ test.describe('new-client offers', () => {
     await shot(client, 'offer-search-card', name());
 
     await card.getByRole('link').first().click();
-    await expect(client.getByRole('heading', { level: 1, name: shopName })).toBeVisible();
+    await expect(client.getByRole('heading', { name: shopName })).toBeVisible();
     await expect(client.getByText('-10% la manoperă la prima ta programare aici.', { exact: false })).toBeVisible();
     await expectNoHorizontalScroll(client);
     await shot(client, 'offer-shop-page', name());

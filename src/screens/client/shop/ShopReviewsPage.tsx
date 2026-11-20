@@ -1,6 +1,6 @@
 import { Star, Store } from 'lucide-react';
 import { useCallback, useEffect } from 'react';
-import { Link, useLocation, useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { buttonClass } from '../../../components/buttonClass';
 import { Card } from '../../../components/Card';
 import { EmptyState } from '../../../components/EmptyState';
@@ -18,7 +18,8 @@ import { formatDayMonth, formatRating } from '../../../i18n/format';
 import { plural } from '../../../i18n/translate';
 import { useListDetail } from '../../../lib/useListDetail';
 import { useLoad } from '../../../lib/useLoad';
-import { SEARCH_PATH, shopPath, shopReviewsPath, type ShopLinkState } from '../paths';
+import { SEARCH_PATH, shopReviewsPath } from '../paths';
+import { useShopBack } from './useShopBack';
 import styles from './shopReviews.module.css';
 
 /**
@@ -60,11 +61,7 @@ export function ShopReviewsPage() {
   const reviews = page?.reviews ?? null;
   const { wide, selectedId, open, select } = useListDetail((reviews ?? []).map((r) => r.id), 'recenzie');
   const chosen = reviews?.find((r) => r.id === selectedId) ?? null;
-  // From a search card (its stars) the way back is the search; from the shop page, the shop page.
-  const from = useLocation().state as ShopLinkState | null;
-  const back = from?.backTo
-    ? { to: from.backTo, label: from.backLabel === 'favorites' ? t('favorites.title') : t('shop.allShops') }
-    : { to: shopPath(shopId), label: page?.shop.name ?? t('shop.allShops') };
+  const back = useShopBack(shopId, page?.shop.name);
 
   const header = (
     <>

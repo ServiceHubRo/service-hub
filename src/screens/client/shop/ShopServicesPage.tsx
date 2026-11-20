@@ -14,7 +14,8 @@ import { useI18n } from '../../../i18n/context';
 import { plural } from '../../../i18n/translate';
 import { useListDetail } from '../../../lib/useListDetail';
 import { useLoad } from '../../../lib/useLoad';
-import { SEARCH_PATH, shopPath, shopServicesPath } from '../paths';
+import { SEARCH_PATH, shopServicesPath } from '../paths';
+import { useShopBack } from './useShopBack';
 import { groupServices, serviceName } from './serviceGroups';
 import styles from './shopReviews.module.css';
 
@@ -35,7 +36,7 @@ export function ShopServicesPage() {
     'categorie',
   );
   const chosen = groups.find((g) => g.key === selectedId) ?? null;
-  const back = { to: shopPath(shopId), label: page?.shop.name ?? t('shop.allShops') };
+  const back = useShopBack(shopId, page?.shop.name);
 
   const header = (
     <>
