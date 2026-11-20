@@ -1,5 +1,8 @@
 import type { Side } from '../../lib/messages';
 
+/** The id of the team's notices among the conversations of Mesaje (they are not a thread). */
+export const TEAM_ROW = 'echipa';
+
 /** Mesaje of each side (T11): the list, one conversation, and the way in from a booking card. */
 export function messagesPath(side: Side): string {
   return side === 'client' ? '/c/mesaje' : '/s/mesaje';
@@ -11,7 +14,7 @@ export function threadPath(side: Side, threadId: string): string {
 
 /** The notices from the Service-Hub team, one conversation at the top of Mesaje. */
 export function teamPath(side: Side): string {
-  return `${messagesPath(side)}/echipa`;
+  return `${messagesPath(side)}/${TEAM_ROW}`;
 }
 
 /** Opens the conversation of a booking's client and shop (looked up, then replaced by the thread). */

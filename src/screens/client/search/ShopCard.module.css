@@ -72,6 +72,12 @@
   font-size: 13px;
 }
 
+.reviewsMeta {
+  /* Only the stars and the count open the reviews, not the empty space beside them. */
+  width: fit-content;
+  max-width: 100%;
+}
+
 .rating {
   color: var(--text);
   font-weight: 600;

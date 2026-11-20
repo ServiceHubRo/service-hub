@@ -1,20 +1,21 @@
-import { Megaphone } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import { BackLink } from '../../components/BackLink';
-import { EmptyState } from '../../components/EmptyState';
-import { SkeletonList } from '../../components/Skeleton';
-import { useI18n } from '../../i18n/context';
-import { ymdInBucharest } from '../../i18n/format';
-import { formatDayHeading } from '../../lib/messages';
-import { useNow } from '../../lib/useNow';
-import { messagesPath } from '../messages/paths';
-import { useThreads } from '../messages/threadsContext';
-import msgStyles from '../messages/messages.module.css';
-import { NoticeBubble } from './NoticeBubble';
-import { TeamAvatar } from './TeamAvatar';
-import { useOptionalNotices } from './noticesContext';
-import styles from './notices.module.css';
+import { Megaphone } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { useSearchParams } from "react-router-dom";
+import { BackLink } from "../../components/BackLink";
+import { EmptyState } from "../../components/EmptyState";
+import { SkeletonList } from "../../components/Skeleton";
+import { useI18n } from "../../i18n/context";
+import { useEmbedded } from "../../lib/embedded";
+import { ymdInBucharest } from "../../i18n/format";
+import { formatDayHeading } from "../../lib/messages";
+import { useNow } from "../../lib/useNow";
+import { messagesPath } from "../messages/paths";
+import { useThreads } from "../messages/threadsContext";
+import msgStyles from "../messages/messages.module.css";
+import { NoticeBubble } from "./NoticeBubble";
+import { TeamAvatar } from "./TeamAvatar";
+import { useOptionalNotices } from "./noticesContext";
+import styles from "./notices.module.css";
 
 /**
  * "Echipa Service-Hub" (Eduard, 23 Oct): the team's notices of the last 30 days as one conversation,
@@ -24,6 +25,8 @@ import styles from './notices.module.css';
  */
 export function TeamNoticesScreen() {
   const { t, lang } = useI18n();
+  const embedded = useEmbedded();
+  const Title = embedded ? "h2" : "h1";
   const { side } = useThreads();
   const notices = useOptionalNotices();
   const [params] = useSearchParams();
@@ -36,56 +39,70 @@ export function TeamNoticesScreen() {
   const unreadIds = list.filter((n) => !n.read).map((n) => n.id);
   const unseen = unreadIds.filter((id) => !fresh.has(id));
   if (unseen.length > 0) setFresh(new Set([...fresh, ...unseen]));
-  const unreadKey = unreadIds.join(',');
+  const unreadKey = unreadIds.join(",");
   useEffect(() => {
-    if (unreadKey) notices?.markRead(unreadKey.split(','));
+    if (unreadKey) notices?.markRead(unreadKey.split(","));
   }, [unreadKey, notices]);
 
   // Once the notices are on screen: to the one a push was about, else to the newest at the bottom.
   const placed = useRef(false);
   const endRef = useRef<HTMLDivElement>(null);
-  const target = params.get('anunt');
+  const target = params.get("anunt");
   useEffect(() => {
     if (!loaded || placed.current || list.length === 0) return;
     placed.current = true;
     const el = target ? document.getElementById(`anunt-${target}`) : null;
     if (el) {
-      el.scrollIntoView({ block: 'center' });
+      el.scrollIntoView({ block: "center" });
       el.focus({ preventScroll: true });
     } else {
-      endRef.current?.scrollIntoView({ block: 'end' });
+      endRef.current?.scrollIntoView({ block: "end" });
     }
   }, [loaded, list.length, target]);
 
   return (
-    <div className={msgStyles.conversation}>
+    <div
+      className={`${msgStyles.conversation} ${embedded ? msgStyles.embedded : ""}`}
+    >
       <div className={msgStyles.top}>
-        <BackLink to={messagesPath(side)} label={t('nav.messages')} />
+        <BackLink to={messagesPath(side)} label={t("nav.messages")} />
         <div data-ui="conversation-header" className={msgStyles.header}>
           <TeamAvatar size={40} />
-          <h1 className={msgStyles.headerName}>{t('notices.from')}</h1>
+          <Title className={msgStyles.headerName}>{t("notices.from")}</Title>
         </div>
       </div>
-      {!loaded ? (
-        <SkeletonList />
-      ) : list.length === 0 ? (
-        <EmptyState icon={Megaphone} title={t('notices.empty')} />
-      ) : (
-        <ol className={styles.feed} aria-label={t('notices.listLabel')}>
-          {list.map((n, i) => {
-            const day = ymdInBucharest(new Date(n.created_at));
-            const prev = list[i - 1];
-            const newDay = !prev || ymdInBucharest(new Date(prev.created_at)) !== day;
-            return (
-              <li key={n.id} className={msgStyles.item}>
-                {newDay && <p data-ui="day" className={msgStyles.day}>{formatDayHeading(lang, day, now)}</p>}
-                <NoticeBubble id={`anunt-${n.id}`} notice={n} lang={lang} isNew={fresh.has(n.id)} />
-              </li>
-            );
-          })}
-        </ol>
-      )}
-      <div ref={endRef} />
+      <div className={msgStyles.feedScroll}>
+        {!loaded ? (
+          <SkeletonList />
+        ) : list.length === 0 ? (
+          <EmptyState icon={Megaphone} title={t("notices.empty")} />
+        ) : (
+          <ol className={styles.feed} aria-label={t("notices.listLabel")}>
+            {list.map((n, i) => {
+              const day = ymdInBucharest(new Date(n.created_at));
+              const prev = list[i - 1];
+              const newDay =
+                !prev || ymdInBucharest(new Date(prev.created_at)) !== day;
+              return (
+                <li key={n.id} className={msgStyles.item}>
+                  {newDay && (
+                    <p data-ui="day" className={msgStyles.day}>
+                      {formatDayHeading(lang, day, now)}
+                    </p>
+                  )}
+                  <NoticeBubble
+                    id={`anunt-${n.id}`}
+                    notice={n}
+                    lang={lang}
+                    isNew={fresh.has(n.id)}
+                  />
+                </li>
+              );
+            })}
+          </ol>
+        )}
+        <div ref={endRef} />
+      </div>
     </div>
   );
 }

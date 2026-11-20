@@ -1,6 +1,8 @@
 import { MessageSquare } from 'lucide-react';
+import type { ReactNode } from 'react';
 import { Link, Navigate, useSearchParams } from 'react-router-dom';
 import { EmptyState } from '../../components/EmptyState';
+import { DetailFrame, ListDetailLayout } from '../../components/ListDetailLayout';
 import { LoadError } from '../../components/LoadError';
 import { PageHeader } from '../../components/PageHeader';
 import { SkeletonList } from '../../components/Skeleton';
@@ -9,7 +11,7 @@ import { counterpartName, formatListTime, systemMessageText } from '../../lib/me
 import { useNow } from '../../lib/useNow';
 import { useOptionalNotices } from '../notices/noticesContext';
 import { TeamAvatar } from '../notices/TeamAvatar';
-import { teamPath, threadPath } from './paths';
+import { messagesPath, TEAM_ROW, teamPath, threadPath } from './paths';
 import { ThreadAvatar } from './ThreadAvatar';
 import { useThreads } from './threadsContext';
 import styles from './messages.module.css';
@@ -21,7 +23,7 @@ import styles from './messages.module.css';
  * (Eduard, 23 Oct): the newest title and the number of new ones. A push about one opens it there
  * (`?anunt=<id>`, here too for the pushes sent before).
  */
-export function MessagesScreen() {
+export function MessagesScreen({ selectedId, detail, wide = false }: { selectedId?: string; detail?: ReactNode; wide?: boolean } = {}) {
   const { t, lang } = useI18n();
   const { side, state, reload } = useThreads();
   const now = useNow();
@@ -33,11 +35,17 @@ export function MessagesScreen() {
 
   if (pushed) return <Navigate to={`${teamPath(side)}?anunt=${encodeURIComponent(pushed)}`} replace />;
 
-  return (
-    <div className={styles.page}>
-      <PageHeader title={t('nav.messages')} />
+  const header = <PageHeader title={t('nav.messages')} />;
+  const hasThreads = state.status === 'ready' && state.data.threads.length > 0;
+
+  const list = (
+    <>
       {latest && (
-        <Link to={teamPath(side)} className={`${styles.thread} ${newNotices > 0 ? styles.threadUnread : ''}`}>
+        <Link
+          to={teamPath(side)}
+          aria-current={selectedId === TEAM_ROW ? 'true' : undefined}
+          className={`${styles.thread} ${newNotices > 0 ? styles.threadUnread : ''} ${selectedId === TEAM_ROW ? styles.threadSelected : ''}`}
+        >
           <TeamAvatar />
           <span className={styles.threadText}>
             <span className={styles.threadTop}>
@@ -74,7 +82,11 @@ export function MessagesScreen() {
               const unread = thread.unread > 0;
               return (
                 <li key={thread.thread_id}>
-                  <Link to={threadPath(side, thread.thread_id)} className={`${styles.thread} ${unread ? styles.threadUnread : ''}`}>
+                  <Link
+                    to={threadPath(side, thread.thread_id)}
+                    aria-current={selectedId === thread.thread_id ? 'true' : undefined}
+                    className={`${styles.thread} ${unread ? styles.threadUnread : ''} ${selectedId === thread.thread_id ? styles.threadSelected : ''}`}
+                  >
                     <ThreadAvatar side={side} thread={thread} />
                     <span className={styles.threadText}>
                       <span className={styles.threadTop}>
@@ -99,6 +111,35 @@ export function MessagesScreen() {
             })}
           </ul>
         ))}
+    </>
+  );
+
+  // Beside the list, nothing is opened by itself: opening a conversation marks it read.
+  const split = hasThreads || !!latest;
+  if (wide && (detail || split))
+    return (
+      <div className={styles.page}>
+        <ListDetailLayout
+          wide
+          open={false}
+          backTo={messagesPath(side)}
+          backLabel={t('nav.messages')}
+          header={header}
+          list={list}
+          detail={
+            detail ?? (
+              <DetailFrame>
+                <EmptyState icon={MessageSquare} title={t('msg.paneEmpty')} />
+              </DetailFrame>
+            )
+          }
+        />
+      </div>
+    );
+  return (
+    <div className={styles.page}>
+      {header}
+      {list}
     </div>
   );
 }

@@ -39,7 +39,7 @@ export function ShopCard({ shop, distanceKm, back, onFavorite, day }: ShopCardPr
         state={back}
         className={styles.link}
         onClick={(e) => {
-          // A tap on the stars opens the shop page at its reviews; anywhere else, at the top.
+          // A tap on the stars opens the shop's reviews; anywhere else, the shop page.
           if (hasReviews && (e.target as HTMLElement).closest('[data-reviews]')) {
             e.preventDefault();
             navigate(shopReviewsPath(shop.shop_id), { state: back });
@@ -50,7 +50,7 @@ export function ShopCard({ shop, distanceKm, back, onFavorite, day }: ShopCardPr
         <span className={styles.body}>
           <span className={styles.name}>{shop.name}</span>
           {shop.founder && <FounderBadge />}
-          <span className={styles.meta} data-reviews="">
+          <span className={`${styles.meta} ${styles.reviewsMeta}`} data-reviews="">
             {hasReviews ? (
               <>
                 <Stars value={Number(shop.average)} />

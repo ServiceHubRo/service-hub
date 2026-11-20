@@ -23,7 +23,9 @@ import { ClientNotificationsScreen } from '../../screens/account/ClientNotificat
 import { ReportPreviewScreen } from '../../screens/client/report/ReportPreviewScreen';
 import { SearchScreen } from '../../screens/client/search/SearchScreen';
 import { ShopPage } from '../../screens/client/shop/ShopPage';
-import { MessagesScreen } from '../../screens/messages/MessagesScreen';
+import { ShopReviewsPage } from '../../screens/client/shop/ShopReviewsPage';
+import { ShopServicesPage } from '../../screens/client/shop/ShopServicesPage';
+import { MessagesSpace } from '../../screens/messages/MessagesSpace';
 import { ThreadsProvider } from '../../screens/messages/ThreadsProvider';
 import { NoticesProvider } from '../../screens/notices/NoticesProvider';
 import { AppShell } from '../AppShell';
@@ -80,9 +82,11 @@ export default function ClientApp() {
             '/c/cauta': <SearchScreen />,
             '/c/garaj': <GarageSpace />,
             '/c/programari': <ClientBookingsScreen />,
-            '/c/mesaje': <MessagesScreen />,
+            '/c/mesaje': <MessagesSpace />,
           })}
           <Route path="service/:shopId" element={<ShopPage />} />
+          <Route path="service/:shopId/recenzii" element={<ShopReviewsPage />} />
+          <Route path="service/:shopId/servicii" element={<ShopServicesPage />} />
           <Route path="service/:shopId/programare" element={<BookingFlow />} />
           <Route path="service/:shopId/programare/trimisa" element={<BookingSent />} />
           <Route path="garaj/nou" element={<GarageSpace />} />

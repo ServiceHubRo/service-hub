@@ -311,7 +311,7 @@ test.describe('messages and reviews', () => {
 
     // The client sees the reply on the shop page.
     const clientPage = await signedIn(browser, page, client);
-    await clientPage.goto(`/c/service/${shopId}`);
+    await clientPage.goto(`/c/service/${shopId}/recenzii`);
     await expect(clientPage.locator('main')).toContainText('Mulțumim!');
   });
 });

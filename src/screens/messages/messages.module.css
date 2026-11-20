@@ -360,6 +360,44 @@
   padding: 12px 0;
 }
 
+/* ---------------------------------------------------------------- beside the list (a laptop, C9) */
+/* The conversation fills its panel: the messages scroll inside it, the box to write in stays under them. */
+.thread.threadSelected {
+  border-color: var(--amber);
+}
+
+.feedScroll {
+  display: contents;
+}
+
+.embedded {
+  min-height: 0;
+  height: 100%;
+}
+
+:global(#continut) .embedded .top {
+  position: static;
+  background: transparent;
+  box-shadow: none;
+}
+
+.embedded .log,
+.embedded .feedScroll {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 0;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.embedded .composerWrap {
+  position: static;
+  margin-bottom: 0;
+  padding: 10px 0 0;
+  background: transparent;
+}
+
 /* ---------------------------------------------------------------- "Mesaj" on booking cards */
 .messageLink {
   display: inline-flex;

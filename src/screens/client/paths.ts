@@ -13,11 +13,14 @@ export function shopPath(shopId: string): string {
   return `/c/service/${shopId}`;
 }
 
-/** The reviews section of the shop page (the stars on a search card open it). */
-export const REVIEWS_HASH = 'recenzii';
-
+/** The reviews of a shop, on a screen of their own (the stars on a search card and on the shop page open it). */
 export function shopReviewsPath(shopId: string): string {
-  return `${shopPath(shopId)}#${REVIEWS_HASH}`;
+  return `${shopPath(shopId)}/recenzii`;
+}
+
+/** The services of a shop, on a screen of their own: its categories and what each holds. */
+export function shopServicesPath(shopId: string): string {
+  return `${shopPath(shopId)}/servicii`;
 }
 
 export function bookingPath(shopId: string): string {

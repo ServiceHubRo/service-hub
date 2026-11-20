@@ -11,6 +11,7 @@ import { fetchMessages, MESSAGE_PAGE, type ChatMessage } from '../../data/messag
 import { subscribeRows } from '../../data/realtime';
 import { canRetryRpc, markThreadRead, rpcErrorMessage, sendMessage, toRpcError } from '../../data/rpc';
 import { useI18n } from '../../i18n/context';
+import { useEmbedded } from '../../lib/embedded';
 import { formatTime, ymdInBucharest } from '../../i18n/format';
 import { counterpartName, formatDayHeading, isOwnSide, mergeMessages, systemMessageText } from '../../lib/messages';
 import { useLoad } from '../../lib/useLoad';
@@ -33,7 +34,7 @@ interface Page {
 function scrollerOf(el: HTMLElement | null): HTMLElement {
   for (let node = el?.parentElement; node; node = node.parentElement) {
     const overflow = getComputedStyle(node).overflowY;
-    if ((overflow === 'auto' || overflow === 'scroll') && node.scrollHeight > node.clientHeight) return node;
+    if (node.hasAttribute('data-scroller') || ((overflow === 'auto' || overflow === 'scroll') && node.scrollHeight > node.clientHeight)) return node;
   }
   return (document.scrollingElement as HTMLElement | null) ?? document.documentElement;
 }
@@ -57,6 +58,9 @@ function enterSends(): boolean {
 export function ConversationScreen() {
   const { t, lang } = useI18n();
   const { threadId = '' } = useParams();
+  // Beside the list of conversations (a laptop) the messages scroll inside the panel (C9).
+  const embedded = useEmbedded();
+  const Title = embedded ? 'h2' : 'h1';
   const threads = useThreads();
   const { side, patch, refresh: refreshThreads } = threads;
   const thread = threads.state.status === 'ready' ? threads.state.data.threads.find((x) => x.thread_id === threadId) : undefined;
@@ -266,14 +270,14 @@ export function ConversationScreen() {
   }
 
   return (
-    <div className={styles.conversation} data-fill-screen>
+    <div className={`${styles.conversation} ${embedded ? styles.embedded : ''}`} data-fill-screen={embedded ? undefined : true}>
       <div className={styles.top}>
         <BackLink to={messagesPath(side)} label={t('nav.messages')} />
         <div data-ui="conversation-header" className={styles.header}>
           {thread && <ThreadAvatar side={side} thread={thread} size={40} />}
-          <h1 className={styles.headerName}>
+          <Title className={styles.headerName}>
             {thread && side === 'client' ? <Link to={shopPath(thread.shop_id)}>{name}</Link> : name}
-          </h1>
+          </Title>
         </div>
       </div>
 
@@ -285,7 +289,7 @@ export function ConversationScreen() {
       {state.status === 'error' && <LoadError message={t('msg.loadConversationError')} onRetry={reload} />}
 
       {messages && (
-        <div role="log" aria-label={t('msg.conversationWith', { name })} className={styles.log}>
+        <div role="log" aria-label={t('msg.conversationWith', { name })} className={styles.log} data-scroller={embedded ? true : undefined}>
           {state.status === 'ready' && state.data.hasOlder && (
             <div className={styles.older}>
               <Button onClick={() => void loadOlder()} disabled={olderBusy} aria-busy={olderBusy}>
@@ -336,7 +340,7 @@ export function ConversationScreen() {
 
       {messages &&
         (canWrite ? (
-          <div className={styles.composerWrap} data-fixed-bottom>
+          <div className={styles.composerWrap} data-fixed-bottom={embedded ? undefined : true}>
             <form
               data-ui="composer"
               className={styles.composer}

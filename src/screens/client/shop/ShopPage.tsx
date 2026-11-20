@@ -1,5 +1,5 @@
-import { CalendarPlus, ChevronDown, Globe, MapPin, Navigation, Phone, Store } from 'lucide-react';
-import { lazy, Suspense, useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
+import { CalendarPlus, Globe, MapPin, Navigation, Phone, Store, Wrench } from 'lucide-react';
+import { lazy, Suspense, useCallback, useEffect, type ReactNode } from 'react';
 import { Link, useLocation as useRouterLocation, useParams, useSearchParams } from 'react-router-dom';
 import { BackLink } from '../../../components/BackLink';
 import { Banner } from '../../../components/Banner';
@@ -9,10 +9,10 @@ import { Card } from '../../../components/Card';
 import { EmptyState } from '../../../components/EmptyState';
 import { FavoriteButton } from '../../../components/FavoriteButton';
 import { FreePlaceNote } from '../../../components/FreePlaceNote';
+import { ListRow, ListRows } from '../../../components/ListRow';
 import { LoadError } from '../../../components/LoadError';
 import { OfferNote } from '../../../components/OfferNote';
 import { PhotoGallery } from '../../../components/PhotoGallery';
-import { ServiceIcon } from '../../../components/ServiceIcon';
 import { FounderBadge } from '../../../components/FounderBadge';
 import { useOfferText } from '../../../lib/useOfferText';
 import { ShopAvatar } from '../../../components/ShopAvatar';
@@ -20,9 +20,9 @@ import { SkeletonList } from '../../../components/Skeleton';
 import { Stars } from '../../../components/Stars';
 import { subscribeRows } from '../../../data/realtime';
 import { toRpcError } from '../../../data/rpc';
-import { fetchShopPage, type ShopPage as ShopPageData, type ShopPageService } from '../../../data/search';
+import { fetchShopPage, type ShopPage as ShopPageData } from '../../../data/search';
 import { useI18n } from '../../../i18n/context';
-import { formatDate, formatDateRange, formatDayMonth, formatDistance, formatMoney, formatRating } from '../../../i18n/format';
+import { formatDate, formatDateRange, formatDistance, formatMoney, formatRating } from '../../../i18n/format';
 import type { MessageKey } from '../../../i18n/ro';
 import { plural } from '../../../i18n/translate';
 import { AMENITIES, AMENITY_ICONS } from '../../../lib/amenities';
@@ -32,8 +32,7 @@ import { directionsUrl } from '../../../lib/maps';
 import { HoursTable } from '../../../components/HoursTable';
 import { useLocation } from '../../../lib/location';
 import { useLoad } from '../../../lib/useLoad';
-import { bookingPath, REVIEWS_HASH, SEARCH_PATH, type ShopLinkState } from '../paths';
-import { groupServices, serviceName } from './serviceGroups';
+import { bookingPath, SEARCH_PATH, shopReviewsPath, shopServicesPath, type ShopLinkState } from '../paths';
 import styles from './ShopPage.module.css';
 
 /** The small map under the address (T28b), loaded only for a shop with coordinates. */
@@ -117,23 +116,7 @@ function ShopDetails({ page, day, onFavorite }: { page: ShopPageData; day: strin
   const { coords } = useLocation();
   const { shop, rating } = page;
   const distance = distanceTo(coords, shop);
-  const reviewsRef = useRef<HTMLHeadingElement>(null);
   const hasReviews = page.reviews.length > 0;
-  const routerHash = useRouterLocation().hash;
-
-  /** Straight to the reviews: the heading takes the focus, so a screen reader starts there too. */
-  const showReviews = useCallback((smooth: boolean) => {
-    const heading = reviewsRef.current;
-    if (!heading) return;
-    const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
-    heading.scrollIntoView?.({ block: 'start', behavior: smooth && !reduce ? 'smooth' : 'auto' });
-    heading.focus({ preventScroll: true });
-  }, []);
-
-  // Opened from the stars on a search card (…#recenzii).
-  useEffect(() => {
-    if (routerHash === `#${REVIEWS_HASH}` && hasReviews) showReviews(false);
-  }, [routerHash, hasReviews, showReviews]);
   const address = [shop.street, shop.city].filter(Boolean).join(', ');
 
   return (
@@ -152,11 +135,11 @@ function ShopDetails({ page, day, onFavorite }: { page: ShopPageData; day: strin
                 </p>
               )}
               {hasReviews && rating.review_count > 0 && rating.average !== null ? (
-                <button type="button" className={`${styles.rating} ${styles.ratingButton}`} onClick={() => showReviews(true)}>
+                <Link to={shopReviewsPath(shop.id)} className={`${styles.rating} ${styles.ratingButton}`}>
                   <Stars value={rating.average} />
                   <span className={styles.ratingValue}>{formatRating(lang, rating.average)}</span>
                   <span className={styles.ratingLink}>· {plural(lang, 'unit.reviews', rating.review_count)}</span>
-                </button>
+                </Link>
               ) : (
                 <p className={styles.rating}>
                   {rating.review_count > 0 && rating.average !== null ? (
@@ -287,44 +270,15 @@ function ShopDetails({ page, day, onFavorite }: { page: ShopPageData; day: strin
 
         </div>
         <div className={styles.column}>
-          <h2 className={styles.sectionTitle}>{t('shop.services')}</h2>
-          <ServiceGroups services={page.services} />
-          <p className={styles.muted}>{t('shop.priceNote')}</p>
-
-          {hasReviews && (
-            <section id={REVIEWS_HASH} className={styles.reviews} aria-labelledby="reviews-title">
-              <h2 id="reviews-title" ref={reviewsRef} tabIndex={-1} className={`${styles.sectionTitle} ${styles.reviewsTitle}`}>
-                {t('shop.reviews')}
-              </h2>
-              <ul className={styles.plainList}>
-                {page.reviews.map((r) => (
-                  <li key={r.id}>
-                    {/* T59: who wrote it and when on the left, the stars and the words on the right
-                        (one under the other on a phone), like the shop's own Recenzii. */}
-                    <Card className={styles.review}>
-                      <div className={styles.reviewAuthor}>
-                        <ShopAvatar name={r.display_name} logoUrl={null} size={40} />
-                        <div className={styles.reviewWho}>
-                          <p className={styles.reviewer}>{r.display_name}</p>
-                          <p className={styles.muted}>{formatDayMonth(lang, new Date(r.created_at))}</p>
-                        </div>
-                      </div>
-                      <div className={styles.reviewBody}>
-                        <Stars value={r.rating} size={16} />
-                        {r.text && <p className={styles.reviewText}>{r.text}</p>}
-                        {r.reply && (
-                          <Card inset className={styles.reply}>
-                            <p className={styles.replyLabel}>{t('shop.reply')}</p>
-                            <p className={styles.reviewText}>{r.reply}</p>
-                          </Card>
-                        )}
-                      </div>
-                    </Card>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          )}
+          {/* The services are on a screen of their own (C9): categories on the left, the chosen one's services on the right. */}
+          <ListRows label={t('shop.services')}>
+            <ListRow
+              icon={<Wrench size={18} aria-hidden="true" />}
+              title={t('shop.services')}
+              detail={plural(lang, 'unit.services', page.services.length)}
+              to={shopServicesPath(shop.id)}
+            />
+          </ListRows>
 
         </div>
       </div>
@@ -368,56 +322,6 @@ function PhoneLinks({ phones, shopName }: { phones: (string | null)[]; shopName:
         </a>
       ))}
     </span>
-  );
-}
-
-/**
- * The shop's services by category (T58): the categories as tiles with how many services each has;
- * a tap shows that category's services under them (one at a time). The services are chosen again
- * when booking.
- */
-function ServiceGroups({ services }: { services: ShopPageService[] }) {
-  const { lang } = useI18n();
-  const groups = groupServices(services, lang);
-  const [openKey, setOpenKey] = useState<string | null>(null);
-  const open = groups.find((g) => g.key === openKey) ?? null;
-  // The open category's services: under its tile on a narrow page, under all the tiles on a wide one
-  // (CSS shows one of the two).
-  const list = (where: 'inline' | 'below') =>
-    open && (
-      <ul id={`shop-category-services-${where}`} className={`${styles.services} ${styles[where]}`} aria-label={open.name}>
-        {open.items.map((s) => (
-          <li key={s.id} className={styles.service}>
-            <ServiceIcon name={s.icon} className={styles.serviceIcon} />
-            {serviceName(s, lang)}
-          </li>
-        ))}
-      </ul>
-    );
-  return (
-    <div className={styles.serviceGroups}>
-      <ul className={styles.categories}>
-        {groups.map((g) => (
-          <li key={g.key} className={styles.categoryItem}>
-            <button
-              type="button"
-              className={`${styles.category} ${g.key === openKey ? styles.categoryOn : ''}`}
-              aria-expanded={g.key === openKey}
-              aria-controls="shop-category-services-inline shop-category-services-below"
-              onClick={() => setOpenKey((k) => (k === g.key ? null : g.key))}
-            >
-              <span className={styles.categoryText}>
-                <span className={styles.categoryTitle}>{g.name}</span>
-                <span className={styles.categoryCount}>{plural(lang, 'unit.services', g.items.length)}</span>
-              </span>
-              <ChevronDown size={18} className={styles.categoryChevron} aria-hidden="true" />
-            </button>
-            {g.key === openKey && list('inline')}
-          </li>
-        ))}
-      </ul>
-      {list('below')}
-    </div>
   );
 }
 
