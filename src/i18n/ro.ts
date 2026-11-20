@@ -2861,6 +2861,8 @@ export const ro = {
   'anaf.category.no_cui': 'Fără CUI',
   'anaf.vatMismatch': 'TVA diferit',
   'anaf.vatMismatchBody': 'Bifa „Plătitor de TVA” a service-ului nu se potrivește cu ANAF.',
+  'anaf.openShop': 'Deschide service-ul',
+  'anaf.state': 'Stare',
   'anaf.cui': 'CUI',
   'anaf.declaredName': 'Denumire declarată',
   'anaf.officialName': 'Denumire la ANAF',

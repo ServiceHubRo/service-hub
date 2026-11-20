@@ -2863,6 +2863,8 @@ export const en: Record<MessageKey, string> = {
   'anaf.category.no_cui': 'No tax ID',
   'anaf.vatMismatch': 'Different VAT',
   'anaf.vatMismatchBody': 'The shop\'s "VAT payer" setting does not match ANAF.',
+  'anaf.openShop': 'Open shop',
+  'anaf.state': 'Status',
   'anaf.cui': 'Tax ID (CUI)',
   'anaf.declaredName': 'Declared name',
   'anaf.officialName': 'Name at ANAF',

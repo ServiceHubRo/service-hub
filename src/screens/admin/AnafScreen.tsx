@@ -1,14 +1,16 @@
 import { Landmark, SearchX } from 'lucide-react';
 import { useDeferredValue, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { ActionButton } from '../../components/ActionButton';
 import { Button } from '../../components/Button';
-import { Card } from '../../components/Card';
 import { EmptyState } from '../../components/EmptyState';
 import { ChoiceFilters } from '../../components/Filters';
 import { LoadError } from '../../components/LoadError';
 import { SearchField } from '../../components/SearchField';
-import { SkeletonList } from '../../components/Skeleton';
+import { buttonClass } from '../../components/buttonClass';
+import { DetailFacts, DetailPane, ListDetailLayout, type DetailMessage } from '../../components/ListDetailLayout';
+import { ListRow, ListRows, ListRowsSkeleton } from '../../components/ListRow';
+import { StatusPill } from '../../components/StatusPill';
 import { fetchCompanyChecks, type CompanyCategory, type CompanyCheckRow } from '../../data/adminTools';
 import { canRetryRpc, rpcErrorMessage } from '../../data/rpc';
 import { verifyCompany } from '../../data/shop';
@@ -22,11 +24,14 @@ import {
   companyFilterCounts,
   filterCompanyChecks,
   isCompanyFilter,
+  isCompanyProblem,
   type CompanyFilter,
 } from '../../lib/adminTools';
+import { useListDetail } from '../../lib/useListDetail';
 import { useLoad } from '../../lib/useLoad';
+import { toneOf } from '../../lib/statusTone';
 import { ExportButton } from './ExportButton';
-import { Facts, Pill, ShopStatePill } from './parts';
+import { Pill, ShopStatePill } from './parts';
 import { ADMIN_ANAF_PATH, adminShopPath } from './paths';
 import { useUrlParams } from './useUrlParams';
 import { dateTime } from './format';
@@ -51,69 +56,64 @@ function vatText(t: (k: MessageKey) => string, v: boolean | null): string {
   return v === null ? '—' : t(v ? 'admin.yes' : 'admin.no');
 }
 
-function CompanyCard({ r, onChecked }: { r: CompanyCheckRow; onChecked: (unavailable: boolean) => Promise<void> }) {
+function CompanyDetail({ r, notice, onChecked }: { r: CompanyCheckRow; notice: string | null; onChecked: (unavailable: boolean) => Promise<void> }) {
   const { t, lang } = useI18n();
+  // What waits or went wrong is said first, under the title.
+  const message: DetailMessage | undefined = r.hidden_at
+    ? { tone: 'problem', text: `${t('anaf.hidden')}: ${t('anaf.hiddenSince', { date: dateTime(lang, r.hidden_at) })}` }
+    : r.deadline
+      ? { tone: 'action', text: `${t('anaf.waiting')}: ${t('anaf.deadline', { date: formatDayMonth(lang, r.deadline) })}` }
+      : r.vat_mismatch
+        ? { tone: 'action', text: `${t('anaf.vatMismatch')}: ${t('anaf.vatMismatchBody')}` }
+        : undefined;
   return (
-    <Card className={styles.stack}>
-      <div className={styles.cardHead}>
-        <Link className={`${styles.rowTitle} ${styles.link}`} to={adminShopPath(r.shop_id)}>
-          {r.shop_name}
-        </Link>
-        <Pill tone={TONE[r.category]}>{t(`anaf.category.${r.category}`)}</Pill>
-      </div>
-      <p className={styles.muted}>
-        <span className="mono">{r.display_id}</span> · {r.city} · <ShopStatePill state={r.state} />
-      </p>
-      {r.hidden_at ? (
-        <p className={styles.muted} role="note">
-          <Pill tone="red">{t('anaf.hidden')}</Pill> {t('anaf.hiddenSince', { date: dateTime(lang, r.hidden_at) })}
+    <DetailPane
+      id={r.shop_id}
+      icon={<Landmark size={20} />}
+      title={r.shop_name}
+      detail={[r.display_id, r.city].filter(Boolean).join(' · ')}
+      status={<Pill tone={TONE[r.category]}>{t(`anaf.category.${r.category}`)}</Pill>}
+      message={message}
+      actions={
+        <>
+          {r.vat_id && (
+            <ActionButton
+              variant="secondary"
+              block={false}
+              onAction={async () => {
+                const result = await verifyCompany(r.shop_id);
+                await onChecked('unavailable' in result);
+              }}
+              errorMessage={(e) => rpcErrorMessage(lang, e)}
+              canRetry={canRetryRpc}
+            >
+              {t(r.anaf_checked_at ? 'company.recheck' : 'company.check')}
+            </ActionButton>
+          )}
+          <Link className={buttonClass('secondary')} to={adminShopPath(r.shop_id)}>
+            {t('anaf.openShop')}
+          </Link>
+        </>
+      }
+    >
+      {notice && (
+        <p className={styles.muted} role="status">
+          {notice}
         </p>
-      ) : (
-        r.deadline && (
-          <p className={styles.muted} role="note">
-            <Pill tone="amber">{t('anaf.waiting')}</Pill> {t('anaf.deadline', { date: formatDayMonth(lang, r.deadline) })}
-          </p>
-        )
       )}
-      {r.vat_mismatch && (
-        <p className={styles.muted} role="note">
-          <Pill tone="amber">{t('anaf.vatMismatch')}</Pill> {t('anaf.vatMismatchBody')}
-        </p>
-      )}
-      <Facts
-        rows={[
-          [
-            t('anaf.cui'),
-            r.vat_id ? (
-              <span key="cui" className="mono">
-                {r.vat_id}
-              </span>
-            ) : null,
-          ],
-          [t('anaf.declaredName'), r.legal_name],
-          [t('anaf.officialName'), r.anaf_name],
-          [t('anaf.address'), r.anaf_address],
-          [t('anaf.vatDeclared'), r.vat_id ? vatText(t, r.vat_payer) : null],
-          [t('anaf.vatAnaf'), r.anaf_status ? vatText(t, r.anaf_vat_payer) : null],
-          [t('anaf.checkedAt'), r.anaf_checked_at ? dateTime(lang, r.anaf_checked_at) : null],
+      <DetailFacts
+        items={[
+          { label: t('anaf.state'), value: <ShopStatePill state={r.state} /> },
+          { label: t('anaf.cui'), value: r.vat_id ? <span className="mono">{r.vat_id}</span> : '—' },
+          { label: t('anaf.declaredName'), value: r.legal_name || '—' },
+          { label: t('anaf.officialName'), value: r.anaf_name || '—' },
+          { label: t('anaf.address'), value: r.anaf_address || '—' },
+          { label: t('anaf.vatDeclared'), value: r.vat_id ? vatText(t, r.vat_payer) : '—' },
+          { label: t('anaf.vatAnaf'), value: r.anaf_status ? vatText(t, r.anaf_vat_payer) : '—' },
+          { label: t('anaf.checkedAt'), value: r.anaf_checked_at ? dateTime(lang, r.anaf_checked_at) : '—' },
         ]}
       />
-      {r.vat_id && (
-        <div className={styles.panelButtons}>
-          <ActionButton
-            variant="secondary"
-            onAction={async () => {
-              const result = await verifyCompany(r.shop_id);
-              await onChecked('unavailable' in result);
-            }}
-            errorMessage={(e) => rpcErrorMessage(lang, e)}
-            canRetry={canRetryRpc}
-          >
-            {t(r.anaf_checked_at ? 'company.recheck' : 'company.check')}
-          </ActionButton>
-        </div>
-      )}
-    </Card>
+    </DetailPane>
   );
 }
 
@@ -126,6 +126,7 @@ function CompanyCard({ r, onChecked }: { r: CompanyCheckRow; onChecked: (unavail
  */
 export function AnafScreen() {
   const { t, lang } = useI18n();
+  const { pathname } = useLocation();
   const { state, reload, setData } = useLoad(fetchCompanyChecks);
   const { params, setParam, text, setText } = useUrlParams();
   const filterParam = params.get('categorie');
@@ -134,88 +135,122 @@ export function AnafScreen() {
   const all = state.status === 'ready' ? state.data : null;
   const shown = useMemo(() => (all ? filterCompanyChecks(all, query, filter) : []), [all, query, filter]);
   const counts = useMemo(() => (all ? companyFilterCounts(all) : null), [all]);
-  const [notice, setNotice] = useState<string | null>(null);
+  // The answer of a check, shown in the detail of the shop it was made for.
+  const [notice, setNotice] = useState<{ shopId: string; text: string } | null>(null);
+
+  // Page template A (docs/MODEL_DE_FOLOSIRE.md P8): one row per shop, the chosen one beside the list
+  // from 1024 px (in its place below).
+  const { wide, selectedId, open, select } = useListDetail(
+    shown.map((r) => r.shop_id),
+    'service',
+  );
+  const chosen = shown.find((r) => r.shop_id === selectedId) ?? null;
+
+  const header = (
+    <>
+      <PageHeader back={{ to: ZONE_BACK.to, label: t(ZONE_BACK.label) }} title={t('anaf.title')} subtitle={all ? plural(lang, 'unit.shops', shown.length) : null} />
+      <p className={styles.muted}>{t('anaf.intro')}</p>
+      {all && all.length > 0 && counts && (
+        <div className={styles.controls}>
+          <SearchField
+            id="admin-anaf-q"
+            label={t('anaf.search')}
+            placeholder={t('anaf.search')}
+            value={text}
+            onChange={setText}
+            onClear={() => {
+              setText('');
+              setParam({ q: null });
+            }}
+            clearLabel={t('admin.search.clear')}
+          />
+          <ChoiceFilters
+            groups={[
+              {
+                key: 'categorie',
+                title: t('anaf.categories'),
+                options: COMPANY_FILTERS.map((f) => ({
+                  value: f,
+                  label: `${t(`anaf.filter.${f}` as MessageKey)} · ${counts[f]}`,
+                })),
+                value: filter,
+                defaultValue: 'all',
+                onChange: (v) => setParam({ categorie: v === 'all' ? null : v }),
+              },
+            ]}
+            onClearAll={() => setParam({ categorie: null })}
+          />
+          <div>
+            <ExportButton<CompanyCheckRow> kind="company_checks" narrow={(rows) => filterCompanyChecks(rows, query, filter)} ids={shown.map((r) => r.shop_id)} />
+          </div>
+        </div>
+      )}
+    </>
+  );
+
+  let list;
+  if (state.status === 'loading') list = <ListRowsSkeleton label={t('common.loading')} />;
+  else if (state.status === 'error') list = <LoadError message={t('admin.loadError')} onRetry={reload} />;
+  else if (all && all.length === 0) list = <EmptyState icon={Landmark} title={t('admin.shops.empty')} />;
+  else if (shown.length === 0)
+    list = (
+      <EmptyState
+        icon={SearchX}
+        title={t('admin.noResults')}
+        action={
+          <Button
+            variant="primary"
+            onClick={() => {
+              setText('');
+              setParam({ q: null, categorie: null });
+            }}
+          >
+            {t('admin.clearFilters')}
+          </Button>
+        }
+      />
+    );
+  else
+    list = (
+      <ListRows label={t('anaf.title')}>
+        {shown.map((r) => (
+          <ListRow
+            key={r.shop_id}
+            icon={<Landmark size={20} />}
+            title={r.shop_name}
+            detail={[r.display_id, r.city, r.vat_id].filter(Boolean).join(' · ')}
+            status={<StatusPill tone={toneOf(TONE[r.category])}>{t(`anaf.category.${r.category}`)}</StatusPill>}
+            attention={isCompanyProblem(r)}
+            selected={wide && r.shop_id === selectedId}
+            onSelect={() => select(r.shop_id)}
+          />
+        ))}
+      </ListRows>
+    );
 
   return (
     <div className={styles.page}>
-      <PageHeader back={{ to: ZONE_BACK.to, label: t(ZONE_BACK.label) }} title={t('anaf.title')} subtitle={all ? plural(lang, 'unit.shops', shown.length) : null} />
-      <p className={styles.muted}>{t('anaf.intro')}</p>
-      {state.status === 'loading' && <SkeletonList />}
-      {state.status === 'error' && <LoadError message={t('admin.loadError')} onRetry={reload} />}
-      {all && all.length === 0 && <EmptyState icon={Landmark} title={t('admin.shops.empty')} />}
-      {all && all.length > 0 && counts && (
-        <>
-          <div className={styles.controls}>
-            <SearchField
-              id="admin-anaf-q"
-              label={t('anaf.search')}
-              placeholder={t('anaf.search')}
-              value={text}
-              onChange={setText}
-              onClear={() => {
-                setText('');
-                setParam({ q: null });
+      <ListDetailLayout
+        wide={wide}
+        open={open}
+        backTo={pathname}
+        backLabel={t('anaf.title')}
+        header={header}
+        list={list}
+        detail={
+          chosen && (
+            <CompanyDetail
+              key={chosen.shop_id}
+              r={chosen}
+              notice={notice?.shopId === chosen.shop_id ? notice.text : null}
+              onChecked={async (unavailable) => {
+                setNotice({ shopId: chosen.shop_id, text: unavailable ? t('company.unavailable') : t('anaf.checked', { shop: chosen.shop_name }) });
+                setData(await fetchCompanyChecks());
               }}
-              clearLabel={t('admin.search.clear')}
             />
-            <ChoiceFilters
-              groups={[
-                {
-                  key: 'categorie',
-                  title: t('anaf.categories'),
-                  options: COMPANY_FILTERS.map((f) => ({
-                    value: f,
-                    label: `${t(`anaf.filter.${f}` as MessageKey)} · ${counts[f]}`,
-                  })),
-                  value: filter,
-                  defaultValue: 'all',
-                  onChange: (v) => setParam({ categorie: v === 'all' ? null : v }),
-                },
-              ]}
-              onClearAll={() => setParam({ categorie: null })}
-            />
-            <div>
-              <ExportButton<CompanyCheckRow> kind="company_checks" narrow={(rows) => filterCompanyChecks(rows, query, filter)} ids={shown.map((r) => r.shop_id)} />
-            </div>
-          </div>
-          {notice && (
-            <p className={styles.muted} role="status">
-              {notice}
-            </p>
-          )}
-          {shown.length === 0 ? (
-            <EmptyState
-              icon={SearchX}
-              title={t('admin.noResults')}
-              action={
-                <Button
-                  variant="primary"
-                  onClick={() => {
-                    setText('');
-                    setParam({ q: null, categorie: null });
-                  }}
-                >
-                  {t('admin.clearFilters')}
-                </Button>
-              }
-            />
-          ) : (
-            <ul className={styles.list}>
-              {shown.map((r) => (
-                <li key={r.shop_id}>
-                  <CompanyCard
-                    r={r}
-                    onChecked={async (unavailable) => {
-                      setNotice(unavailable ? t('company.unavailable') : t('anaf.checked', { shop: r.shop_name }));
-                      setData(await fetchCompanyChecks());
-                    }}
-                  />
-                </li>
-              ))}
-            </ul>
-          )}
-        </>
-      )}
+          )
+        }
+      />
     </div>
   );
 }

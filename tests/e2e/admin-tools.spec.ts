@@ -17,6 +17,8 @@ import {
   xlsxText,
   pickFilter,
   switchLanguage,
+  detailPane,
+  backToList,
 } from './support';
 
 // T16b — the admin's platform tools: subscriptions and payments, history reports, the catalog,
@@ -311,8 +313,11 @@ test.describe('admin tools', () => {
     await signInAdmin(page);
     await openTool(page, 'Rapoarte de istoric');
     await page.getByLabel('Caută cod, număr, mașină, client').fill(r!.code);
-    const card = page.getByRole('listitem').filter({ hasText: r!.code });
-    await expect(card.getByText('Generat', { exact: true })).toBeVisible();
+    // One row per report (page template A); its detail beside the list, or in its place on a phone.
+    const row = page.getByRole('list', { name: 'Rapoarte de istoric' }).locator(':scope > li').filter({ hasText: r!.code });
+    await expect(row.getByText('Generat', { exact: true })).toBeVisible();
+    await row.getByRole('button').click();
+    const card = detailPane(page);
     await expectNoHorizontalScroll(page);
     await shot(page, 't16b-reports', name());
     await card.getByRole('button', { name: 'Anulează raportul' }).click();
@@ -412,8 +417,10 @@ test.describe('Raport ANAF', () => {
     await signInAdmin(page);
     await openTool(page, 'Verificare ANAF');
     await page.getByLabel('Caută după service, cod, CUI sau denumire').fill(id);
-    const unknownCard = page.locator('li').filter({ hasText: unknownName });
-    const mismatchCard = page.locator('li').filter({ hasText: mismatchName });
+    // One row per shop (page template A); the chosen one beside the list, or in its place on a phone.
+    const rows = page.getByRole('list', { name: 'Verificare ANAF' }).locator(':scope > li');
+    const unknownCard = rows.filter({ hasText: unknownName });
+    const mismatchCard = rows.filter({ hasText: mismatchName });
     await expect(unknownCard).toContainText('Negăsită la ANAF');
     await expect(unknownCard).toContainText('160796');
     // (The daily batch of another test may have checked it already.)
@@ -421,13 +428,16 @@ test.describe('Raport ANAF', () => {
     await expectNoHorizontalScroll(page);
     await shot(page, 'anaf-report', name());
 
-    // Checked from the list: ANAF knows the CUI under another name, as a VAT payer; the VAT tick follows ANAF.
-    await mismatchCard.getByRole('button', { name: /^Verifică (la ANAF|din nou)$/ }).click();
-    await expect(page.getByText(`${mismatchName} a fost verificat din nou la ANAF.`)).toBeVisible();
+    // Checked from its detail: ANAF knows the CUI under another name, as a VAT payer; the VAT tick follows ANAF.
+    await mismatchCard.getByRole('button').click();
+    await detailPane(page).getByRole('button', { name: /^Verifică (la ANAF|din nou)$/ }).click();
+    await expect(detailPane(page).getByText(`${mismatchName} a fost verificat din nou la ANAF.`)).toBeVisible();
+    await expect(detailPane(page)).toContainText('Nume diferit');
+    await expect(detailPane(page)).toContainText('AUTO TEST S.R.L.');
+    await expect(detailPane(page)).not.toContainText('TVA diferit');
+    await expect(detailPane(page).getByRole('button', { name: 'Verifică din nou' })).toBeVisible();
+    await backToList(page);
     await expect(mismatchCard).toContainText('Nume diferit');
-    await expect(mismatchCard).toContainText('AUTO TEST S.R.L.');
-    await expect(mismatchCard).not.toContainText('TVA diferit');
-    await expect(mismatchCard.getByRole('button', { name: 'Verifică din nou' })).toBeVisible();
 
     // The chips.
     await pickFilter(page, /^Negăsită · \d+$/);
@@ -447,8 +457,9 @@ test.describe('Raport ANAF', () => {
     expect(file.text).toContain('AUTO TEST S.R.L.');
     expect(file.text).toContain('Negăsită la ANAF');
 
-    // A card opens the shop.
-    await unknownCard.getByRole('link', { name: unknownName }).click();
+    // The detail opens the shop.
+    await unknownCard.getByRole('button').click();
+    await detailPane(page).getByRole('link', { name: 'Deschide service-ul' }).click();
     await expect(page.getByRole('heading', { level: 1, name: unknownName })).toBeVisible();
   });
 
