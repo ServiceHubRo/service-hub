@@ -309,7 +309,8 @@
 
 /* The period: one select instead of a row of buttons; not wider than it needs. */
 .period {
-  max-width: 320px;
+  /* As wide as the column, like every other field (and the company's Rapoarte). */
+  max-width: none;
 }
 
 /* Opening the report (src/lib/motion.ts, countUp): the bars grow from the axis one after another,
