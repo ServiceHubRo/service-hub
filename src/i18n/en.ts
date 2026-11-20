@@ -1982,8 +1982,6 @@ export const en: Record<MessageKey, string> = {
   'rpcError.nothing_to_pay': 'The report has no price set. Try again later.',
   'rpcError.not_found': 'This report no longer exists.',
   'rpcError.report_void': 'This report was canceled by the Service-Hub team.',
-  'report.buy': 'Get official report — {price}',
-  'report.buyShort': 'Official report',
   'report.garageRow': 'Official report for a buyer',
   'report.title': 'Official report',
   'report.intro': 'A PDF of the jobs done through Service-Hub, with mileage and a verification code.',

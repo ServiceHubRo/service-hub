@@ -1,4 +1,4 @@
-import { Car as CarIcon, ChevronDown, FileCheck, Wrench } from 'lucide-react';
+import { Car as CarIcon, ChevronDown, Wrench } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { Link, useLocation, useParams } from 'react-router-dom';
 import { WarrantyNote } from '../../../components/WarrantyNote';
@@ -12,7 +12,6 @@ import { SkeletonList } from '../../../components/Skeleton';
 import { quoteOf, type ClientBooking } from '../../../data/bookings';
 import { fetchCars } from '../../../data/garage';
 import { fetchMyImportedJobsQuietly, type MyImportedJob } from '../../../data/myImported';
-import { getReportPrice } from '../../../data/reports';
 import { useI18n } from '../../../i18n/context';
 import { formatDayMonth, formatKm, formatMoney } from '../../../i18n/format';
 import { plural } from '../../../i18n/translate';
@@ -25,12 +24,9 @@ import { useClientBookings } from '../bookings/clientBookingsContext';
 import {
   BOOKINGS_PATH,
   bookingPath,
-  bookingReportPath,
-  carReportPath,
   GARAGE_PATH,
   SEARCH_PATH,
   VEHICLE_HISTORY_PICK_PATH,
-  type ReportLinkState,
   type VehicleHistoryLinkState,
 } from '../paths';
 import styles from '../../history/history.module.css';
@@ -44,7 +40,8 @@ import { PageHeader } from '../../../components/PageHeader';
  * (/c/garaj/:carId/istoric), Cont → "Istoricul mașinilor mele", and a finished booking
  * (/c/programari/:bookingId/istoric, which also works for a car no longer in the garage). Jobs are
  * matched to the car by plate (see `vehicleKey`), so editing or deleting the car changes nothing.
- * Under the jobs, "Generează raport oficial — 29 lei" (T15) opens the report's preview.
+ * The paid report is asked for from the garage card and from Cont → Rapoartele mele, not from here
+ * (Eduard, 21 Nov 2026: one place for it is enough).
  * Live through ClientBookingsProvider.
  */
 export function VehicleHistoryScreen() {
@@ -63,7 +60,6 @@ export function VehicleHistoryScreen() {
 
   const { state: bookingsState, reload: reloadBookings } = useClientBookings();
   const { state: carsState, reload: reloadCars } = useLoad(fetchCars);
-  const { state: priceState } = useLoad(getReportPrice);
   // T31b: jobs the shops imported for this client (by the confirmed phone).
   const { state: importedState } = useLoad(fetchMyImportedJobsQuietly);
 
@@ -184,26 +180,11 @@ export function VehicleHistoryScreen() {
             </>
           )}
           <p className={styles.sub}>{t('vh.onlyServiceHub')}</p>
-          {/* The paid report of this car (T15, P16e): only jobs done through Service-Hub. */}
-          {jobs.length > 0 && (
-            <Link
-              to={carId ? carReportPath(carId) : bookingReportPath(bookingId ?? '')}
-              state={FROM_HISTORY}
-              className={buttonClass('secondary', true, styles.reportButton)}
-            >
-              <FileCheck size={18} aria-hidden="true" />
-              {priceState.status === 'ready' && priceState.data !== null
-                ? t('report.buy', { price: formatMoney(lang, priceState.data) })
-                : t('report.buyShort')}
-            </Link>
-          )}
         </>
       )}
     </div>
   );
 }
-
-const FROM_HISTORY: ReportLinkState = { from: 'history' };
 
 /** A job a shop imported from its old program (T31b): the day, the shop, the work and the amount. */
 function ImportedCard({ job: j }: { job: MyImportedJob }) {

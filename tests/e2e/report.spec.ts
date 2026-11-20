@@ -204,12 +204,13 @@ test.describe('history report', () => {
     // The client is told by email, with the code.
     await expect.poll(async () => (await emailsTo(client)).some((m) => m.subject === `Raportul de istoric este gata: ${code}`), { timeout: 20_000 }).toBe(true);
 
-    // Cont has the tile; the vehicle history has the button with the price.
+    // Cont has the tile; the vehicle history has no report button (the report is asked for from the garage card and from Cont).
     await page.goto('/c/cont');
     await expect(page.getByRole('link', { name: /Rapoartele mele/ })).toBeVisible();
     await page.goto('/c/garaj');
     await page.getByRole('link', { name: /Istoric — 3 lucrări/ }).click();
-    await expect(page.getByRole('link', { name: 'Generează raport oficial — 29 lei' })).toBeVisible();
+    await expect(page.getByText('Aici apar doar lucrările făcute prin Service-Hub.')).toBeVisible();
+    await expect(page.getByRole('link', { name: /Generează raport oficial/ })).toHaveCount(0);
 
     // ------------------------------------------------------------------ /verifica, signed out
     const buyer = await visitor(browser, page, 'ro');

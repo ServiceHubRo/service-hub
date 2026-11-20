@@ -1980,8 +1980,6 @@ export const ro = {
   'rpcError.nothing_to_pay': 'Raportul nu are un preț setat. Încearcă mai târziu.',
   'rpcError.not_found': 'Raportul nu mai există.',
   'rpcError.report_void': 'Raportul a fost anulat de echipa Service-Hub.',
-  'report.buy': 'Generează raport oficial — {price}',
-  'report.buyShort': 'Raport oficial',
   'report.garageRow': 'Raport oficial pentru cumpărător',
   'report.title': 'Raport oficial',
   'report.intro': 'Un PDF cu lucrările făcute prin Service-Hub, cu kilometrajul și un cod de verificare.',
