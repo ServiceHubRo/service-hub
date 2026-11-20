@@ -8,8 +8,7 @@ import { HelpArticleScreen } from '../../screens/help/HelpArticleScreen';
 import { HelpCategoryScreen } from '../../screens/help/HelpCategoryScreen';
 import { SupportHelpScreen } from '../../screens/help/SupportHelpScreen';
 import { ProcedureEditScreen } from '../../screens/procedures/ProcedureEditScreen';
-import { ProcedureScreen } from '../../screens/procedures/ProcedureScreen';
-import { ProceduresScreen } from '../../screens/procedures/ProceduresScreen';
+import { ProceduresSpace } from '../../screens/procedures/ProceduresSpace';
 import { ResponsiblesScreen } from '../../screens/procedures/ResponsiblesScreen';
 import {
   SUPPORT_HELP_PATH,
@@ -41,13 +40,13 @@ export default function SupportApp() {
           [SUPPORT_REQUESTS_PATH]: <InboxScreen mode="support" />,
           [SUPPORT_SEARCH_PATH]: <SearchScreen />,
           [SUPPORT_HELP_PATH]: <SupportHelpScreen />,
-          [SUPPORT_PROCEDURES_PATH]: <ProceduresScreen mode="support" />,
+          [SUPPORT_PROCEDURES_PATH]: <ProceduresSpace mode="support" />,
         })}
         <Route path={`${rel('support', SUPPORT_HELP_PATH)}/categorie/:slug`} element={<HelpCategoryScreen role="support" />} />
         <Route path={`${rel('support', SUPPORT_HELP_PATH)}/articol/:slug`} element={<HelpArticleScreen role="support" />} />
         <Route path={`${rel('support', SUPPORT_PROCEDURES_PATH)}/nou`} element={<ProcedureEditScreen mode="support" />} />
         <Route path={`${rel('support', SUPPORT_PROCEDURES_PATH)}/responsabili`} element={<ResponsiblesScreen mode="support" />} />
-        <Route path={`${rel('support', SUPPORT_PROCEDURES_PATH)}/:procedureId`} element={<ProcedureScreen mode="support" />} />
+        <Route path={`${rel('support', SUPPORT_PROCEDURES_PATH)}/:procedureId`} element={<ProceduresSpace mode="support" />} />
         <Route path={`${rel('support', SUPPORT_PROCEDURES_PATH)}/:procedureId/editare`} element={<ProcedureEditScreen mode="support" />} />
         <Route path={`${rel('support', SUPPORT_REQUESTS_PATH)}/:requestId`} element={<RequestRedirect mode="support" />} />
         <Route path={`${rel('support', SUPPORT_SEARCH_PATH)}/:accountId`} element={<SupportAccountScreen />} />

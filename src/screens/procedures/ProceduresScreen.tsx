@@ -1,10 +1,11 @@
 import { ClipboardList, Plus, SearchX, Users } from 'lucide-react';
-import { useDeferredValue, useMemo, useState, type ReactNode } from 'react';
-import { Link } from 'react-router-dom';
+import { createContext, useContext, useDeferredValue, useMemo, useState, type ReactNode } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { useLiveSearchParams } from '../../app/useLiveSearchParams';
 import { buttonClass } from '../../components/buttonClass';
 import { EmptyState } from '../../components/EmptyState';
 import { LoadError } from '../../components/LoadError';
+import { DetailFrame, ListDetailLayout } from '../../components/ListDetailLayout';
 import { PageHeader } from '../../components/PageHeader';
 import { SearchField } from '../../components/SearchField';
 import { SelectField } from '../../components/SelectField';
@@ -20,14 +21,21 @@ import styles from './procedures.module.css';
 
 const ZONE_BACK = adminZoneBack(proceduresHome('admin'));
 
+/** Beside the library (a laptop, C9): the procedure shown on the right, marked in the rows. */
+const SelectedContext = createContext<string | undefined>(undefined);
+
 function Rows({ items, mode, snippets }: { items: Procedure[]; mode: ProcedureMode; snippets?: Map<string, string | null> }) {
+  const selectedId = useContext(SelectedContext);
+  // The search typed stays in the address while another procedure is chosen.
+  const { search } = useLocation();
   return (
     <ul className={styles.rows}>
       {items.map((p) => (
         <ProcedureRow
           key={p.id}
           p={p}
-          to={procedurePath(mode, p.id)}
+          to={`${procedurePath(mode, p.id)}${selectedId !== undefined ? search : ''}`}
+          selected={p.id === selectedId}
           extra={snippets?.get(p.id) ? <span className={styles.rowSnippet}>{snippets.get(p.id)}</span> : undefined}
         />
       ))}
@@ -53,7 +61,18 @@ function Block({ id, title, children }: { id: string; title: string; children: R
  * exceptional ones. An agent sees only what is published for agents and the drafts it may edit; the
  * database decides.
  */
-export function ProceduresScreen({ mode }: { mode: ProcedureMode }) {
+export function ProceduresScreen({
+  mode,
+  wide = false,
+  selectedId,
+  detail,
+}: {
+  mode: ProcedureMode;
+  /** From 1024 px (ProceduresSpace): the library on the left, `detail` — the procedure chosen — on the right. */
+  wide?: boolean;
+  selectedId?: string;
+  detail?: ReactNode;
+}) {
   const { t, lang, plural } = useI18n();
   const { state, reload } = useLoad(fetchProcedures);
   const [params, setParams] = useLiveSearchParams();
@@ -86,8 +105,8 @@ export function ProceduresScreen({ mode }: { mode: ProcedureMode }) {
     return [...seen.entries()];
   }, [data]);
 
-  return (
-    <div className={styles.page}>
+  const header = (
+    <>
       <PageHeader
         back={mode === 'admin' ? { to: ZONE_BACK.to, label: t(ZONE_BACK.label) } : undefined}
         title={t('proc.title')}
@@ -163,6 +182,10 @@ export function ProceduresScreen({ mode }: { mode: ProcedureMode }) {
         />
       </div>
 
+    </>
+  );
+  const list = (
+    <>
       {state.status === 'loading' && <SkeletonList count={3} />}
       {state.status === 'error' && <LoadError message={t('proc.loadError')} onRetry={reload} />}
       {data && data.procedures.length === 0 && <EmptyState icon={ClipboardList} title={t('proc.empty')} />}
@@ -185,6 +208,35 @@ export function ProceduresScreen({ mode }: { mode: ProcedureMode }) {
       )}
 
       {data && shown.length > 0 && !searching && !filtered && <Overview procedures={shown} mode={mode} />}
+    </>
+  );
+  if (wide) {
+    return (
+      <SelectedContext.Provider value={selectedId ?? ''}>
+        <div className={styles.page}>
+          <ListDetailLayout
+            wide
+            open={false}
+            backTo={proceduresHome(mode)}
+            backLabel={t('proc.title')}
+            header={header}
+            list={list}
+            detail={
+              detail ?? (
+                <DetailFrame>
+                  <EmptyState icon={ClipboardList} title={t('proc.pick')} />
+                </DetailFrame>
+              )
+            }
+          />
+        </div>
+      </SelectedContext.Provider>
+    );
+  }
+  return (
+    <div className={styles.page}>
+      {header}
+      {list}
     </div>
   );
 }

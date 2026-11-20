@@ -5054,6 +5054,7 @@ export const en: Record<MessageKey, string> = {
   'proc.tileHint': 'Procedures, versions, approvals and read confirmations',
   'proc.loadError': 'The procedures could not be loaded.',
   'proc.detailLoadError': 'The procedure could not be loaded.',
+  'proc.pick': 'Choose a procedure.',
   'proc.empty': 'No published procedures.',
   'proc.emptyFiltered': 'No procedures match the filters chosen.',
   'proc.search.label': 'Search procedures',

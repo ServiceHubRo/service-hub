@@ -6,6 +6,8 @@ import { ActionButton } from '../../components/ActionButton';
 import { Button } from '../../components/Button';
 import { buttonClass } from '../../components/buttonClass';
 import { Card } from '../../components/Card';
+import { DetailPane, ListDetailLayout } from '../../components/ListDetailLayout';
+import { ListRow, ListRows } from '../../components/ListRow';
 import { CheckMenu } from '../../components/CheckMenu';
 import { EmptyState } from '../../components/EmptyState';
 import { Field } from '../../components/Field';
@@ -33,6 +35,7 @@ import { useI18n } from '../../i18n/context';
 import type { MessageKey } from '../../i18n/ro';
 import { HELP_LIMITS, HELP_SLUG_PATTERN, helpTextProblem, slugify } from '../../lib/helpCenter';
 import { fold } from '../../lib/helpSearch';
+import { LIST_DETAIL_QUERY, useMediaQuery } from '../../lib/useMediaQuery';
 import { useLoad } from '../../lib/useLoad';
 import { audienceLabel, problemText } from './helpFormat';
 import { HELP_ICON } from '../help/helpIcons';
@@ -255,8 +258,13 @@ export function HelpAdminScreen() {
     );
   }, [data, query, status]);
 
-  return (
-    <div className={styles.page}>
+  const wide = useMediaQuery(LIST_DETAIL_QUERY);
+  const [categoryId, setCategoryId] = useState<string | null>(null);
+  const visibleCategories = data ? data.categories.filter((c) => !filtering || shown.some((a) => a.category_id === c.id)) : [];
+  const active = visibleCategories.find((c) => c.id === categoryId) ?? visibleCategories[0];
+
+  const header = (
+    <>
       <PageHeader
         back={{ to: ZONE_BACK.to, label: t(ZONE_BACK.label) }}
         title={t('admin.help.title')}
@@ -278,10 +286,10 @@ export function HelpAdminScreen() {
           ) : undefined
         }
       />
-      {state.status === 'loading' && <SkeletonList />}
-      {state.status === 'error' && <LoadError message={t('admin.loadError')} onRetry={reload} />}
-      {data && (
-        <>
+    </>
+  );
+  const above = data && (
+    <>
           <div className={styles.controls}>
             <SearchField
               id="admin-help-q"
@@ -313,6 +321,115 @@ export function HelpAdminScreen() {
               {notice}
             </p>
           )}
+    </>
+  );
+  const noResults = data && filtering && shown.length === 0 && (
+    <EmptyState
+      icon={SearchX}
+      title={t('admin.help.noResults')}
+      action={
+        <Button
+          variant="primary"
+          onClick={() => {
+            setText('');
+            setParam({ q: null, stare: null });
+          }}
+        >
+          {t('admin.clearFilters')}
+        </Button>
+      }
+    />
+  );
+
+  // Beside the categories (a laptop, C9): the categories as rows, the chosen one — its articles, in order, and
+  // the ↑ ↓ and „Editează” of the category itself — on the right. The same tree while searching and filtering.
+  if (wide && data) {
+    const own = active ? shown.filter((a) => a.category_id === active.id).sort((a, b) => a.position - b.position) : [];
+    const index = active ? data.categories.findIndex((c) => c.id === active.id) : -1;
+    const ActiveIcon = active ? HELP_ICON[active.icon] : null;
+    return (
+      <div className={styles.page}>
+        <ListDetailLayout
+          wide
+          open={false}
+          backTo={ADMIN_HELP_PATH}
+          backLabel={t('admin.help.title')}
+          header={
+            <>
+              {header}
+              {above}
+            </>
+          }
+          list={
+            noResults ||
+            (data.categories.length === 0 ? (
+              <EmptyState icon={BookOpen} title={t('help.empty')} />
+            ) : (
+              <ListRows label={t('admin.help.title')}>
+                {visibleCategories.map((c) => {
+                  const Icon = HELP_ICON[c.icon];
+                  const count = shown.filter((a) => a.category_id === c.id).length;
+                  return (
+                    <ListRow
+                      key={c.id}
+                      icon={<Icon size={18} />}
+                      title={lang === 'en' ? c.name_en : c.name_ro}
+                      detail={`${audienceLabel(t, c.audience)} · ${count}`}
+                      status={!c.active ? <Pill tone="grey">{t('admin.help.categoryHidden')}</Pill> : undefined}
+                      selected={c.id === active?.id}
+                      onSelect={() => setCategoryId(c.id)}
+                    />
+                  );
+                })}
+              </ListRows>
+            ))
+          }
+          detail={
+            active && ActiveIcon ? (
+              <DetailPane
+                key={active.id}
+                id={active.id}
+                icon={<ActiveIcon size={18} />}
+                title={lang === 'en' ? active.name_en : active.name_ro}
+                detail={audienceLabel(t, active.audience)}
+                status={!active.active ? <Pill tone="grey">{t('admin.help.categoryHidden')}</Pill> : undefined}
+                actions={
+                  <div className={tools.categoryActions}>
+                    {!filtering && <MoveButtons kind="category" id={active.id} first={index === 0} last={index === data.categories.length - 1} onMoved={refresh} />}
+                    <Button onClick={() => setPanel({ kind: 'category', id: active.id })} aria-label={`${t('admin.help.cat.edit')}: ${active.name_ro}`}>
+                      {t('admin.help.edit')}
+                    </Button>
+                  </div>
+                }
+              >
+                {panel?.kind === 'category' && panel.id === active.id && <CategoryPanel category={active} onDone={done} onCancel={() => setPanel(null)} />}
+                {own.length === 0 ? (
+                  <p className={styles.muted}>{t('admin.help.emptyCategory')}</p>
+                ) : (
+                  <ul className={tools.services}>
+                    {own.map((a, ai) => (
+                      <li key={a.id}>
+                        <ArticleRow a={a} first={ai === 0} last={ai === own.length - 1} canMove={!filtering} onMoved={refresh} />
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </DetailPane>
+            ) : null
+          }
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div className={styles.page}>
+      {header}
+      {state.status === 'loading' && <SkeletonList />}
+      {state.status === 'error' && <LoadError message={t('admin.loadError')} onRetry={reload} />}
+      {data && (
+        <>
+          {above}
           {filtering && shown.length === 0 ? (
             <EmptyState
               icon={SearchX}

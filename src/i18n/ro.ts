@@ -5053,6 +5053,7 @@ export const ro = {
   'proc.tileHint': 'Proceduri, versiuni, aprobări și confirmări de citire',
   'proc.loadError': 'Procedurile nu s-au încărcat.',
   'proc.detailLoadError': 'Procedura nu s-a încărcat.',
+  'proc.pick': 'Alege o procedură.',
   'proc.empty': 'Nu există proceduri publicate.',
   'proc.emptyFiltered': 'Nu există proceduri pentru filtrele alese.',
   'proc.search.label': 'Caută în proceduri',
