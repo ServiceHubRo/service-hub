@@ -4,7 +4,7 @@
 .flow {
   display: flex;
   flex-direction: column;
-  gap: inherit;
+  gap: var(--space-4);
   min-width: 0;
 }
 
@@ -14,7 +14,7 @@
 .fixed {
   display: flex;
   flex-direction: column;
-  gap: inherit;
+  gap: var(--space-4);
   min-width: 0;
   height: calc(100dvh - var(--nav-top, 0px) - var(--nav-bottom, 0px) - 2 * var(--page-pad));
   min-height: 30rem;
