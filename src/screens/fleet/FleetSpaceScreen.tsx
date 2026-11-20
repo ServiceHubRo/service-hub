@@ -1,6 +1,6 @@
 import { Building2 } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useDocumentTitle } from '../../app/useDocumentTitle';
 import { buttonClass } from '../../components/buttonClass';
 import { EmptyState } from '../../components/EmptyState';
@@ -67,6 +67,9 @@ export function FleetSpaceScreen() {
 function FleetSpace({ companyId }: { companyId: string }) {
   const { t } = useI18n();
   const { section, vehicleId, filter, go, back } = useFleetLocation();
+  const { pathname } = useLocation();
+  // One vehicle: „‹ Înapoi la vehicule” above the title, like every sub-page (docs/MODEL_DE_FOLOSIRE.md P2).
+  const vehicleBack = section === 'vehicul' ? { to: `${pathname}?sectiune=vehicule`, label: t('fleet.vehicle.back') } : undefined;
   const navigate = useNavigate();
   const load = useCallback(async () => {
     const [overview, plan, plans] = await Promise.all([fetchFleetOverview(companyId), fetchPlanSummary(companyId), fetchFleetPlans()]);
@@ -257,6 +260,7 @@ function FleetSpace({ companyId }: { companyId: string }) {
               <Building2 size={15} aria-hidden="true" /> {data.company.name} · {t(`fleet.role.${data.me.role}`)}
             </span>
           }
+          back={vehicleBack}
           actions={<HeaderSlotTarget />}
         />
         <FleetPlanNotice section={section} onOpen={() => go({ section: 'abonament' })} />

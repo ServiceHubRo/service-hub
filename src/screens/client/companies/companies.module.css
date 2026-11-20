@@ -194,13 +194,17 @@
 
 .memberHead {
   display: flex;
+  flex-wrap: wrap;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 12px;
+  gap: 8px 12px;
 }
 
+/* The name and email keep at least a readable width: on a narrow card the role and „Mai multe” go under
+   them, on the right, instead of squeezing the email into a column of a few letters. */
 .memberText {
   display: flex;
+  flex: 1 1 13rem;
   flex-direction: column;
   gap: 1px;
   min-width: 0;
@@ -251,6 +255,7 @@
   align-items: center;
   gap: 8px;
   flex: none;
+  margin-left: auto;
 }
 
 .rightsLine {

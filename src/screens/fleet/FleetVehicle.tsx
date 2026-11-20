@@ -1,5 +1,4 @@
 import { AlertTriangle, CalendarPlus, FileText, Fuel, Info } from 'lucide-react';
-import { useLocation } from 'react-router-dom';
 import { useMemo, useState } from 'react';
 import { Button } from '../../components/Button';
 import { Card } from '../../components/Card';
@@ -35,7 +34,6 @@ import { useFleet } from './fleetContext';
 import styles from './fleet.module.css';
 import { StatusPill } from '../../components/StatusPill';
 import { toneOf } from '../../lib/statusTone';
-import { BackLink } from '../../components/BackLink';
 import { HeaderAction } from '../../components/HeaderSlot';
 
 type Tab = 'overview' | 'history' | 'costs' | 'odometer' | 'maintenance' | 'bookings' | 'quotes' | 'documents' | 'driver' | 'notes';
@@ -49,7 +47,6 @@ type Tab = 'overview' | 'history' | 'costs' | 'odometer' | 'maintenance' | 'book
 export function FleetVehicle({ vehicleId }: { vehicleId: string }) {
   const { t, lang } = useI18n();
   const { data, back, allowed, vehicle, mode, actions } = useFleet();
-  const { pathname } = useLocation();
   const [editing, setEditing] = useState(false);
   const [addingFuel, setAddingFuel] = useState(false);
   const [reporting, setReporting] = useState(false);
@@ -100,8 +97,6 @@ export function FleetVehicle({ vehicleId }: { vehicleId: string }) {
 
   return (
     <div className={styles.stack}>
-      {/* The shared „‹ Înapoi” (docs/MODEL_DE_FOLOSIRE.md P2): the same history step as `back`. */}
-      <BackLink to={`${pathname}?sectiune=vehicule`} label={t('fleet.vehicle.back')} />
       <Card className={styles.vehicleHead}>
         <div className={styles.vehicleHeadTop}>
           <div className={styles.vehicleHeadText}>
