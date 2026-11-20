@@ -189,7 +189,7 @@ function Flow({ page }: { page: ShopPage }) {
 
   return (
     <div className={styles.page} data-fill-screen>
-      {step !== 1 && lead}
+      {step !== 1 && step !== 4 && lead}
 
       {step === 1 && (
         <ServiceStep
@@ -225,6 +225,8 @@ function Flow({ page }: { page: ShopPage }) {
       )}
       {step === 4 && service && day && time && (
         <CarStep
+          lead={lead}
+          onChangeStep={(n) => navigate(urlFor({ pas: String(n) }))}
           shop={shop}
           services={services}
           unsure={unsure}

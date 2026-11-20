@@ -428,3 +428,10 @@
 .companyNote {
   margin-top: 8px;
 }
+
+/* Step 4 beside the cars (C9): the links back to the services and the day, under the summary. */
+.changeRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}

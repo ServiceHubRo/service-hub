@@ -13,6 +13,7 @@ import {
   userIdOf,
   switchLanguage,
   shopRow,
+  pickService,
 } from './support';
 
 // T07 — the garage with its expiry alerts, the 4-step booking, capacity, a day that fills up while
@@ -147,7 +148,7 @@ test.describe('booking', () => {
     const continueButton = page.getByRole('button', { name: /^Continuă/ });
     await expect(page.getByRole('button', { name: 'Alege cel puțin un serviciu' })).toBeDisabled();
     await page.getByRole('button', { name: 'Schimb ulei + filtru ulei' }).click();
-    await page.getByRole('button', { name: 'Plăcuțe de frână' }).click();
+    await pickService(page, 'Plăcuțe de frână', 'Frânare');
     await expect(page.getByRole('button', { name: 'Plăcuțe de frână', pressed: true })).toBeVisible();
     await expect(continueButton).toHaveText('Continuă · 2 servicii');
     await expect(continueButton).toBeInViewport();

@@ -287,6 +287,19 @@ function CarCard({
   );
 }
 
+/** A car's documents (ITP, RCA, rovinietă) as the garage card shows them, without the oil change. */
+export function CarDocs({ car }: { car: Pick<Car, 'itp_expiry' | 'rca_expiry' | 'vignette_expiry'> }) {
+  return (
+    <ul className={styles.docs}>
+      {CAR_DOCS.map(({ doc, column }) => (
+        <li key={doc}>
+          <DocPill doc={doc} date={car[column]} />
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 /** One document: its ring, its name and when it expires, centered in a tile of its own. */
 function DocPill({ doc, date }: { doc: CarDoc; date: string | null }) {
   const { t, lang } = useI18n();
