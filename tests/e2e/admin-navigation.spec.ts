@@ -67,6 +67,12 @@ interface Fn {
  * it into the address (?recenzie=, ?zona=, …), which the old addresses and the menu know nothing about.
  */
 const SELECTION = ['recenzie', 'contestatie', 'zona', 'text', 'ce', 'lista', 'agent', 'cat', 'raport', 'firma', 'cont', 'unitate', 'programare', 'abonament'];
+/** On a phone the chosen item is still open when the way back ends at its list: „‹ Înapoi” of the detail first. */
+async function openDetailGone(page: Page) {
+  if ((page.viewportSize()?.width ?? 0) >= 1024) return;
+  await expect(page.locator('[data-ui="detail-pane"]')).toBeVisible();
+  await backToList(page);
+}
 const withoutSelection = (address: string) => {
   const u = new URL(address);
   for (const k of SELECTION) u.searchParams.delete(k);
@@ -293,7 +299,7 @@ test.describe('A1 — admin navigation', () => {
     // client is still open in the list: „‹ Înapoi” of the detail first).
     await backLink(page).click();
     await expect(page).toHaveURL(/\/admin\/parteneri\/clienti(\?.*)?$/);
-    await backToList(page);
+    await openDetailGone(page);
     await backLink(page).click();
     await expect(page).toHaveURL(/\/admin\/parteneri$/);
     expect(await historyLength(page), 'no entry added by „‹ Înapoi”').toBe(length);
@@ -317,7 +323,8 @@ test.describe('A1 — admin navigation', () => {
     await loaded(page);
     await expect(backLink(page)).toHaveText(/Programări/);
     await backLink(page).click();
-    await backToList(page);
+    await expect(page).toHaveURL(/\/admin\/activitate\/programari\?/);
+    await openDetailGone(page);
     await expect(h1(page)).toHaveText('Programări');
     await backLink(page).click();
     await expect(h1(page)).toHaveText('Activitate');
