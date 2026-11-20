@@ -9,7 +9,7 @@ import {
   shot,
   signIn,
   userIdOf,
-  openBooking,
+  openShopBooking,
   openClientBooking,
 } from './support';
 
@@ -100,8 +100,7 @@ test.describe('new-client offers', () => {
 
     // ------------------------------------------------------------ the shop sees the promise
     await page.goto('/s/programari');
-    const shopCard = page.locator('li').filter({ hasText: 'Skoda Octavia' });
-    await openBooking(shopCard);
+    const shopCard = await openShopBooking(page, 'Skoda Octavia');
     await expect(shopCard).toContainText('Client nou: i-ai promis -10% la manoperă');
     await expectNoHorizontalScroll(page);
     await shot(page, 'offer-shop-booking', name());
@@ -114,7 +113,7 @@ test.describe('new-client offers', () => {
     });
     await page.reload();
     await page.getByRole('combobox', { name: 'Afișează' }).selectOption('programate');
-    await page.locator('li').filter({ hasText: 'Skoda Octavia' }).getByRole('button', { name: 'Trimite deviz' }).click();
+    await (await openShopBooking(page, 'Skoda Octavia')).getByRole('button', { name: 'Trimite deviz' }).click();
     await expect(page.getByText('Scade reducerea din prețul manoperei înainte să trimiți devizul.', { exact: false })).toBeVisible();
     await expectNoHorizontalScroll(page);
     await shot(page, 'offer-quote-form', name());
@@ -122,8 +121,7 @@ test.describe('new-client offers', () => {
     // In English too (the quote editor is a screen of its own since T50: back to the list).
     await serviceRest(`profiles?id=eq.${await userIdOf(shopEmail)}`, 'PATCH', { lang: 'en' });
     await page.goto('/s/programari?tab=programate');
-    await openBooking(page.locator('li').filter({ hasText: 'Skoda Octavia' }));
-    await expect(page.locator('li').filter({ hasText: 'Skoda Octavia' })).toContainText('New client: you promised 10% off labor');
+    await expect(await openShopBooking(page, 'Skoda Octavia')).toContainText('New client: you promised 10% off labor');
     await page.goto('/s/cont/setari/reguli');
     const offerEn = page.getByRole('switch', { name: /^New-client offer/ });
     await expect(offerEn).toBeChecked();

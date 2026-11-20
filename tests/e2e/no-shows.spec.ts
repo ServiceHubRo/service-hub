@@ -5,6 +5,7 @@ import {
   SEED,
   SEED_PASSWORD,
   cardAction,
+  openShopBooking,
   createBookableShop,
   createUser,
   expectNoHorizontalScroll,
@@ -233,7 +234,7 @@ test.describe('T53 no-shows', () => {
     // 11:05: the slot ended at 11:00, 15 minutes of grace.
     await page.clock.setFixedTime(bucharestTime(day, '11:05'));
     await page.goto('/s/programari?tab=programate');
-    const booking = page.getByRole('listitem').filter({ hasText: 'Andrei Toma' });
+    const booking = await openShopBooking(page, 'Andrei Toma');
     await expect(booking).toContainText('Neprezentarea se poate marca de la 11:15.');
     await expect(await cardAction(booking, 'Neprezentat')).toHaveCount(0);
     await page.keyboard.press('Escape');

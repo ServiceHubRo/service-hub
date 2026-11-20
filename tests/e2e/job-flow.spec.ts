@@ -10,7 +10,8 @@ import {
   shot,
   signIn,
   cardAction,
-  openBooking,
+  openShopBooking,
+  shopRow,
   switchLanguage,
   openClientBooking,
 } from './support';
@@ -33,7 +34,6 @@ const navLink = (page: Page, label: string | RegExp) =>
   page.getByRole('link', { name: label, exact: typeof label === 'string' }).filter({ visible: true }).first();
 /** S2: the client's booking, opened from its row (its detail). */
 const clientCard = (page: Page, ref: string) => openClientBooking(page, ref);
-const shopCard = (page: Page, ref: string) => page.locator('main ul[aria-label] > li').filter({ hasText: ref });
 
 interface Day {
   date: string;
@@ -135,8 +135,7 @@ test.describe('quote, work, completion, review', () => {
     // The shop watches its scheduled bookings in a second browser.
     const shopPage = await signedIn(browser, page, shop);
     await shopPage.goto('/s/programari?tab=programate');
-    await openBooking(shopCard(shopPage, accepted.ref));
-    await expect(shopCard(shopPage, accepted.ref)).toContainText('Deviz trimis — se așteaptă răspunsul clientului.');
+    await expect(await openShopBooking(shopPage, accepted.ref)).toContainText('Deviz trimis — se așteaptă răspunsul clientului.');
 
     // Client: the tab badge counts the two quotes waiting.
     await signIn(page, client, PASSWORD);
@@ -165,7 +164,7 @@ test.describe('quote, work, completion, review', () => {
     await expect(first).toContainText('Deviz acceptat');
 
     // The shop sees it without a reload: exactly the approved lines, and "În lucru".
-    const shopA = shopCard(shopPage, accepted.ref);
+    const shopA = await openShopBooking(shopPage, accepted.ref);
     await expect(shopA).toContainText('Clientul a acceptat 2 din 3 poziții: 430 lei.');
     await expect(shopA.getByRole('button', { name: 'În lucru' })).toBeVisible();
 
@@ -178,7 +177,7 @@ test.describe('quote, work, completion, review', () => {
     await refuseCard.getByRole('button', { name: 'Refuz devizul' }).click();
     await expect(refuseCard).toContainText('Deviz refuzat. Taxă de constatare: 100 lei.');
     await expect(navLink(page, /^Programări/)).not.toHaveAccessibleName(/de aprobat/);
-    await expect(shopCard(shopPage, refused.ref)).toHaveCount(0);
+    await expect(shopRow(shopPage, refused.ref)).toHaveCount(0);
 
     // Shop: În lucru → the client sees it live.
     await shopA.getByRole('button', { name: 'În lucru' }).click();
@@ -204,7 +203,7 @@ test.describe('quote, work, completion, review', () => {
     await shot(shopPage, 't37-shop-warranty', name());
     await shopA.getByRole('button', { name: 'Confirmă finalizarea' }).click();
     await expect(shopPage.getByText(`Lucrarea ${accepted.ref} este finalizată.`, { exact: false })).toBeVisible();
-    await expect(shopA).toHaveCount(0);
+    await expect(shopRow(shopPage, accepted.ref)).toHaveCount(0);
 
     // Client: ready for pickup, with the odometer, the work and the amount; then the review.
     const done = await clientCard(page, accepted.ref);
@@ -260,7 +259,7 @@ test.describe('quote, work, completion, review', () => {
     await signIn(page, shop, PASSWORD);
     await expect(page).toHaveURL(/\/s\/panou$/);
     await page.goto('/s/programari?tab=programate&filtru=lucru');
-    const job = shopCard(page, second.ref);
+    const job = await openShopBooking(page, second.ref);
     await job.getByRole('button', { name: 'Finalizare' }).click();
     await expect(job.getByText('Ultima valoare înregistrată: 105.400 km.')).toBeVisible();
     const odometer = job.getByLabel('Kilometraj');
@@ -295,7 +294,7 @@ test.describe('quote, work, completion, review', () => {
     await signIn(page, shop, PASSWORD);
     await expect(page).toHaveURL(/\/s\/panou$/);
     await page.goto('/s/programari?tab=programate&filtru=lucru');
-    const job = shopCard(page, second.ref);
+    const job = await openShopBooking(page, second.ref);
     await job.getByRole('button', { name: 'Finalizare' }).click();
     await job.getByLabel('Kilometraj').fill('105400');
     await job.getByRole('button', { name: 'Confirmă finalizarea' }).click();

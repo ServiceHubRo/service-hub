@@ -10,7 +10,10 @@ import { ActiveFilters } from '../../../components/Filters';
 import { EmptyState } from '../../../components/EmptyState';
 import { LoadError } from '../../../components/LoadError';
 import { PageHeader } from '../../../components/PageHeader';
-import { SkeletonList } from '../../../components/Skeleton';
+import { ListDetailLayout } from '../../../components/ListDetailLayout';
+import { ListRow, ListRows, ListRowsSkeleton } from '../../../components/ListRow';
+import { ServiceIcon } from '../../../components/ServiceIcon';
+import { BookingStatusPill } from '../../../components/StatusPill';
 import { ViewSelect } from '../../../components/ViewSelect';
 import { RpcError, type Booking } from '../../../data/rpc';
 import type { ShopBooking } from '../../../data/shopBookings';
@@ -27,10 +30,12 @@ import {
   type ShopTab,
 } from '../../../lib/shopBookings';
 import { isActiveStatus, type BookingStatus } from '../../../lib/status';
+import { rowServicesText } from '../../../lib/bookingServices';
+import { useListDetail } from '../../../lib/useListDetail';
 import { useNow } from '../../../lib/useNow';
 import { ADD_BOOKING_PATH } from '../paths';
 import type { AddedBookingState } from './AddBookingScreen';
-import { ShopBookingCard } from './ShopBookingCard';
+import { ShopBookingDetail } from './ShopBookingCard';
 import { useShopBookings } from './shopBookingsContext';
 import styles from './shopBookings.module.css';
 
@@ -86,7 +91,7 @@ function doneMessage(before: BookingStatus, after: BookingStatus, moved: boolean
  */
 export function ShopBookingsScreen() {
   const { t, lang } = useI18n();
-  const { state, reload, refresh, apply, isFresh } = useShopBookings();
+  const { state, reload, refresh, apply } = useShopBookings();
   const [params, setParams] = useLiveSearchParams();
   const now = useNow();
   const today = ymdInBucharest(now);
@@ -118,6 +123,16 @@ export function ShopBookingsScreen() {
     [data],
   );
 
+  // Page template A (docs/MODEL_DE_FOLOSIRE.md P8): one row per booking, the chosen one (`?p=`) beside the
+  // list from 1024 px (in its place below). A Panou card or a notification opens its booking, in its tab.
+  const shown = lists ? lists[tab].filter((b) => !filter || matchesFilter(b, filter, today)) : [];
+  const { wide, selectedId, open, select } = useListDetail(
+    shown.map((b) => b.id),
+    'p',
+  );
+  const chosen = shown.find((b) => b.id === selectedId) ?? null;
+  const { pathname } = location;
+
   function go(next: { tab: ShopTab; booking?: string }) {
     const p = new URLSearchParams({ tab: next.tab });
     if (next.booking) p.set('p', next.booking);
@@ -144,106 +159,57 @@ export function ShopBookingsScreen() {
     });
   }
 
-  let body;
-  if (state.status === 'loading') body = <SkeletonList />;
+  let list;
+  if (state.status === 'loading') list = <ListRowsSkeleton label={t('common.loading')} />;
   else if (state.status === 'error') {
-    body =
+    list =
       state.error instanceof RpcError && state.error.code === 'not_allowed' ? (
         <EmptyState icon={Unlink} title={t('settings.noShop')} />
       ) : (
         <LoadError message={t('sb.loadError')} onRetry={reload} />
       );
   } else if (data && lists) {
-    const list = onlyId ? (only ? [only] : []) : lists[tab].filter((b) => !filter || matchesFilter(b, filter, today));
-    const chip = onlyId
-      ? t('sb.filter.one', { ref: only?.ref ?? '' })
-      : filter
-        ? t(FILTER_LABEL[filter])
-        : null;
-    body = (
-      <>
-        <ViewSelect
-          value={tab}
-          onChange={(key) => {
-            setNotice(null);
-            go({ tab: key });
-          }}
-          items={[
-            { key: 'cereri', label: t('sb.tab.requests'), count: lists.cereri.length },
-            { key: 'programate', label: t('sb.tab.scheduled'), count: lists.programate.length },
-          ]}
-        />
-        {chip && (
-          <ActiveFilters items={[{ key: 'focus', label: chip }]} onClearAll={() => go({ tab })} />
-        )}
-        {notice && (
-          <Banner
-            key={`${notice.key}:${notice.ref}`}
-            tone="info"
-            icon={<SuccessCheck size={22} />}
+    list =
+      shown.length === 0 ? (
+        filter ? (
+          <EmptyState
+            icon={CalendarCheck}
+            title={t('sb.empty.filtered')}
             action={
-              <div className={styles.noticeButtons}>
-                {notice.show && (
-                  <Button
-                    onClick={() => {
-                      const show = notice.show!;
-                      setNotice(null);
-                      go(show);
-                    }}
-                  >
-                    {t('sb.done.show')}
-                  </Button>
-                )}
-                <button type="button" className={styles.noticeClose} aria-label={t('common.close')} onClick={() => setNotice(null)}>
-                  <X size={18} aria-hidden="true" />
-                </button>
-              </div>
+              <Button variant="primary" onClick={() => go({ tab })}>
+                {t('sb.filter.clear')}
+              </Button>
             }
-          >
-            {t(notice.key, { ref: notice.ref, when: `${formatDate(lang, notice.date)}, ${notice.slot}` })}
-          </Banner>
-        )}
-        {list.length === 0 ? (
-          onlyId ? (
-            <EmptyState icon={CalendarCheck} title={t('sb.empty.gone')} body={t('sb.empty.goneBody')} />
-          ) : filter ? (
-            <EmptyState
-              icon={CalendarCheck}
-              title={t('sb.empty.filtered')}
-              action={
-                <Button variant="primary" onClick={() => go({ tab })}>
-                  {t('sb.filter.clear')}
-                </Button>
-              }
-            />
-          ) : tab === 'cereri' ? (
-            <EmptyState icon={Inbox} title={t('sb.empty.requests')} body={t('sb.empty.requestsBody')} />
-          ) : (
-            <EmptyState icon={CalendarCheck} title={t('sb.empty.scheduled')} body={t('sb.empty.scheduledBody')} />
-          )
+          />
+        ) : tab === 'cereri' ? (
+          <EmptyState icon={Inbox} title={t('sb.empty.requests')} body={t('sb.empty.requestsBody')} />
         ) : (
-          <ul className={styles.list} aria-label={tab === 'cereri' ? t('sb.tab.requests') : t('sb.tab.scheduled')}>
-            {list.map((b) => (
-              <li key={b.id}>
-                <ShopBookingCard
-                  booking={b}
-                  shopId={data.shop.id}
-                  now={now}
-                  fresh={isFresh(b.id)}
-                  onDone={onDone}
-                  onStale={refresh}
-                  defaultOpen={!!onlyId}
-                />
-              </li>
-            ))}
-          </ul>
-        )}
-      </>
-    );
+          <EmptyState icon={CalendarCheck} title={t('sb.empty.scheduled')} body={t('sb.empty.scheduledBody')} />
+        )
+      ) : (
+        <ListRows label={tab === 'cereri' ? t('sb.tab.requests') : t('sb.tab.scheduled')}>
+          {shown.map((b) => {
+            const car = [[b.car_snapshot.make, b.car_snapshot.model].filter(Boolean).join(' '), b.car_snapshot.plate].filter(Boolean).join(' · ');
+            return (
+              <ListRow
+                key={b.id}
+                icon={<ServiceIcon name={b.service_icon} size={20} />}
+                title={rowServicesText(lang, b)}
+                detail={[`${formatDate(lang, b.date)}, ${b.slot}`, b.client_name || t('sb.card.deletedClient'), car || t('sb.card.noCar'), b.ref].join(' · ')}
+                status={<BookingStatusPill status={b.status} viewer="shop" />}
+                attention={b.status === 'pending'}
+                selected={wide && b.id === selectedId}
+                onSelect={() => select(b.id)}
+              />
+            );
+          })}
+        </ListRows>
+      );
   }
 
-  return (
-    <div className={styles.page}>
+  const chip = filter ? t(FILTER_LABEL[filter]) : null;
+  const header = (
+    <>
       <PageHeader
         title={t('nav.bookings')}
         actions={
@@ -255,7 +221,66 @@ export function ShopBookingsScreen() {
           )
         }
       />
-      {body}
+      {lists && (
+        <ViewSelect
+          value={tab}
+          onChange={(key) => {
+            setNotice(null);
+            go({ tab: key });
+          }}
+          items={[
+            { key: 'cereri', label: t('sb.tab.requests'), count: lists.cereri.length },
+            { key: 'programate', label: t('sb.tab.scheduled'), count: lists.programate.length },
+          ]}
+        />
+      )}
+      {chip && <ActiveFilters items={[{ key: 'focus', label: chip }]} onClearAll={() => go({ tab })} />}
+      {notice && (
+        <Banner
+          key={`${notice.key}:${notice.ref}`}
+          tone="info"
+          icon={<SuccessCheck size={22} />}
+          action={
+            <div className={styles.noticeButtons}>
+              {notice.show && (
+                <Button
+                  onClick={() => {
+                    const show = notice.show!;
+                    setNotice(null);
+                    go(show);
+                  }}
+                >
+                  {t('sb.done.show')}
+                </Button>
+              )}
+              <button type="button" className={styles.noticeClose} aria-label={t('common.close')} onClick={() => setNotice(null)}>
+                <X size={18} aria-hidden="true" />
+              </button>
+            </div>
+          }
+        >
+          {t(notice.key, { ref: notice.ref, when: `${formatDate(lang, notice.date)}, ${notice.slot}` })}
+        </Banner>
+      )}
+    </>
+  );
+
+  return (
+    <div className={styles.page}>
+      <ListDetailLayout
+        wide={wide}
+        open={open}
+        backTo={`${pathname}?tab=${tab}`}
+        backLabel={t('nav.bookings')}
+        header={header}
+        list={list}
+        detail={
+          chosen &&
+          data && (
+            <ShopBookingDetail key={chosen.id} booking={chosen} shopId={data.shop.id} now={now} onDone={onDone} onStale={refresh} />
+          )
+        }
+      />
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import { expect, test, type Browser, type Page } from '@playwright/test';
-import { BACKEND, PASSWORD, cardAction, createBookableShop, createUser, expectNoHorizontalScroll, rpcAs, shot, signIn, switchLanguage, openClientBooking } from './support';
+import { BACKEND, PASSWORD, cardAction, openShopBooking, createBookableShop, createUser, expectNoHorizontalScroll, rpcAs, shot, signIn, switchLanguage, openClientBooking } from './support';
 
 // T37c — a quote line with an original and an alternative part: the shop adds the alternative in
 // the composer, the client picks it and accepts, the shop sees which variant was taken.
@@ -17,7 +17,6 @@ const name = () => test.info().project.name;
 const rid = () => crypto.randomUUID();
 /** S2: the client's booking, opened from its row (its detail). */
 const clientCard = (page: Page, ref: string) => openClientBooking(page, ref);
-const shopCard = (page: Page, ref: string) => page.locator('main ul[aria-label] > li').filter({ hasText: ref });
 
 async function freeSlot(email: string, shopId: string): Promise<{ date: string; slot: string }> {
   const av = await rpcAs<{ days: { date: string; bookable: boolean }[] }>(email, 'get_availability', { p_shop_id: shopId, p_days: 30 });
@@ -72,7 +71,7 @@ test.describe('quote variants', () => {
     await signIn(page, shop, PASSWORD);
     await expect(page).toHaveURL(/\/s\//);
     await page.goto('/s/programari?tab=programate');
-    const card = shopCard(page, booking.ref);
+    const card = await openShopBooking(page, booking.ref);
     await (await cardAction(card, 'Trimite deviz')).click();
     await page.getByLabel('Piesă sau material').first().fill('Plăcuțe frână față');
     await page.getByLabel('Preț unitar, lei').first().fill('420');

@@ -642,6 +642,23 @@ export function inboxRow(page: Page, text: string): Locator {
 /** The detail of the item chosen in a list + detail screen (page template A). */
 export const detailPane = (page: Page) => page.locator('[data-ui="detail-pane"]');
 
+/**
+ * The shop's Programări (page template A): the row of a booking by its words (a ref, a plate…), and its
+ * detail once the row is chosen. The detail stays the open one until another row is chosen.
+ */
+export const shopRow = (page: Page, text: string | RegExp) => page.locator('[data-ui="list-row"]').filter({ hasText: text });
+export async function openShopBooking(page: Page, text: string | RegExp): Promise<Locator> {
+  // Already the open one (on a phone the list is hidden behind it): nothing to choose.
+  if ((await detailPane(page).filter({ hasText: text }).count()) > 0) return detailPane(page);
+  await backToList(page);
+  const row = shopRow(page, text).first();
+  await expect(row).toBeVisible();
+  await row.getByRole('button').click();
+  const detail = detailPane(page);
+  await expect(detail).toBeVisible();
+  return detail;
+}
+
 /** A list + detail screen (page template A): chooses the row whose words are `text`; returns the detail. */
 export async function chooseRow(page: Page, listName: string | RegExp, text: string | RegExp) {
   await page.getByRole('list', { name: listName }).locator(':scope > li').filter({ hasText: text }).first().getByRole('button').click();
