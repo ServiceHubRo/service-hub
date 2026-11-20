@@ -108,7 +108,7 @@ const FUNCTIONS = (page: Page): Fn[] => [
     path: '/admin/activitate/export',
     title: 'Export',
     shows: async () => {
-      await expect(main(page).getByRole('button', { name: 'Descarcă tot' }).first()).toBeVisible();
+      await expect(main(page).getByRole('list', { name: 'Export' })).toBeVisible();
     },
   },
   { zone: 'Suport', item: 'Solicitări', path: '/admin/suport/solicitari', title: 'Solicitări' },
