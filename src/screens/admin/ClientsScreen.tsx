@@ -1,19 +1,23 @@
 import { SearchX, Users } from 'lucide-react';
 import { useDeferredValue, useMemo } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { Button } from '../../components/Button';
 import { EmptyState } from '../../components/EmptyState';
 import { ChoiceFilters } from '../../components/Filters';
 import { LoadError } from '../../components/LoadError';
 import { SearchField } from '../../components/SearchField';
-import { SkeletonList } from '../../components/Skeleton';
+import { buttonClass } from '../../components/buttonClass';
+import { DetailFacts, DetailPane, ListDetailLayout } from '../../components/ListDetailLayout';
+import { ListRow, ListRows, ListRowsSkeleton } from '../../components/ListRow';
 import { fetchClients, type AdminClientRow } from '../../data/admin';
 import { adminZoneBack } from '../../app/adminZones';
 import { useI18n } from '../../i18n/context';
 import { plural } from '../../i18n/translate';
 import { ExportButton } from './ExportButton';
 import { CLIENT_FILTERS, filterClients, isClientFilter, NO_SHOW_FLAG } from '../../lib/admin';
+import { useListDetail } from '../../lib/useListDetail';
 import { formatPhone } from '../../lib/validators';
-import { Pill, RowLink, Verified } from './parts';
+import { Pill, Verified } from './parts';
 import { ADMIN_CLIENTS_PATH, adminClientPath } from './paths';
 import { useLiveData } from './useLiveData';
 import { useUrlParams } from './useUrlParams';
@@ -32,6 +36,7 @@ const LIVE = [{ table: 'profiles' }, { table: 'bookings' }];
  */
 export function ClientsScreen() {
   const { t, lang } = useI18n();
+  const { pathname } = useLocation();
   const { state, reload } = useLiveData(fetchClients, LIVE, 'admin-clients');
   const { params, setParam, text, setText } = useUrlParams();
   const filterParam = params.get('filtru');
@@ -40,14 +45,18 @@ export function ClientsScreen() {
   const all = state.status === 'ready' ? state.data : null;
   const shown = useMemo(() => (all ? filterClients(all, query, filter) : []), [all, query, filter]);
 
-  return (
-    <div className={styles.page}>
+  // Page template A (docs/MODEL_DE_FOLOSIRE.md P8): one row per client, the chosen one beside the list
+  // from 1024 px (in its place below); the whole file is „Deschide fișa”.
+  const { wide, selectedId, open, select } = useListDetail(
+    shown.map((c) => c.id),
+    'cont',
+  );
+  const chosen = shown.find((c) => c.id === selectedId) ?? null;
+
+  const header = (
+    <>
       <PageHeader back={{ to: ZONE_BACK.to, label: t(ZONE_BACK.label) }} title={t('nav.admin.clients')} subtitle={all ? plural(lang, 'unit.clients', shown.length) : undefined} />
-      {state.status === 'loading' && <SkeletonList />}
-      {state.status === 'error' && <LoadError message={t('admin.loadError')} onRetry={reload} />}
-      {all && all.length === 0 && <EmptyState icon={Users} title={t('admin.clients.empty')} />}
       {all && all.length > 0 && (
-        <>
           <div className={styles.controls}>
             <SearchField
               id="admin-clients-q"
@@ -85,7 +94,16 @@ export function ClientsScreen() {
               }
             />
           </div>
-          {shown.length === 0 ? (
+      )}
+    </>
+  );
+
+  let list;
+  if (state.status === 'loading') list = <ListRowsSkeleton label={t('common.loading')} />;
+  else if (state.status === 'error') list = <LoadError message={t('admin.loadError')} onRetry={reload} />;
+  else if (all && all.length === 0) list = <EmptyState icon={Users} title={t('admin.clients.empty')} />;
+  else if (shown.length === 0)
+    list = (
             <EmptyState
               icon={SearchX}
               title={t('admin.noResults')}
@@ -101,39 +119,73 @@ export function ClientsScreen() {
                 </Button>
               }
             />
-          ) : (
-            <ul className={styles.list}>
-              {shown.map((c) => (
-                <li key={c.id}>
-                  <RowLink to={adminClientPath(c.id)}>
-                    <span className={styles.rowTop}>
-                      <span className={styles.rowTitle}>{c.name || t('admin.noName')}</span>
-                      {c.suspended && <Pill tone="red">{t('admin.suspended')}</Pill>}
-                      {c.no_shows >= NO_SHOW_FLAG && <Pill tone="amber">{t('admin.noShowFlag', { n: c.no_shows })}</Pill>}
-                    </span>
-                    <span className={styles.rowMeta}>
-                      <span className={styles.id}>{c.display_id}</span>
-                      {c.email && <span>{c.email}</span>}
-                      {c.phone && <span className="mono">{formatPhone(c.phone)}</span>}
-                    </span>
-                    <span className={styles.checks}>
-                      <Verified ok={c.email_verified} label={t('admin.email')} />
-                    </span>
-                    <span className={styles.rowMeta}>
-                      <span>{t('admin.clients.bookings', { n: c.bookings })}</span>
-                      <span>{t('admin.clients.noShows', { n: c.no_shows })}</span>
-                      <span>{t('admin.createdOn', { date: day(lang, c.created_at) })}</span>
-                      <span>
-                        {t('admin.lastActive', { date: c.last_active_at ? day(lang, c.last_active_at) : t('admin.never') })}
-                      </span>
-                    </span>
-                  </RowLink>
-                </li>
-              ))}
-            </ul>
-          )}
-        </>
-      )}
+    );
+  else
+    list = (
+      <ListRows label={t('nav.admin.clients')}>
+        {shown.map((c) => (
+          <ListRow
+            key={c.id}
+            icon={<Users size={20} />}
+            title={c.name || t('admin.noName')}
+            detail={[c.display_id, c.email, c.phone ? formatPhone(c.phone) : null].filter(Boolean).join(' · ')}
+            status={<ClientPill c={c} />}
+            selected={wide && c.id === selectedId}
+            onSelect={() => select(c.id)}
+          />
+        ))}
+      </ListRows>
+    );
+
+  return (
+    <div className={styles.page}>
+      <ListDetailLayout
+        wide={wide}
+        open={open}
+        backTo={pathname}
+        backLabel={t('nav.admin.clients')}
+        header={header}
+        list={list}
+        detail={chosen && <ClientDetail key={chosen.id} c={chosen} />}
+      />
     </div>
+  );
+}
+
+/** What stands out about a client: suspended, or past the no-show limit. */
+function ClientPill({ c }: { c: AdminClientRow }) {
+  const { t } = useI18n();
+  if (c.suspended) return <Pill tone="red">{t('admin.suspended')}</Pill>;
+  if (c.no_shows >= NO_SHOW_FLAG) return <Pill tone="amber">{t('admin.noShowFlag', { n: c.no_shows })}</Pill>;
+  return null;
+}
+
+/** One client in the list's detail; the whole file (cars, bookings, reviews, the log) is „Deschide fișa”. */
+function ClientDetail({ c }: { c: AdminClientRow }) {
+  const { t, lang } = useI18n();
+  return (
+    <DetailPane
+      id={c.id}
+      icon={<Users size={20} />}
+      title={c.name || t('admin.noName')}
+      detail={c.display_id}
+      status={<ClientPill c={c} />}
+      actions={
+        <Link className={buttonClass('secondary')} to={adminClientPath(c.id)}>
+          {t('admin.clients.open')}
+        </Link>
+      }
+    >
+      <DetailFacts
+        items={[
+          { label: t('admin.email'), value: c.email ? <span>{c.email} <Verified ok={c.email_verified} label={t('admin.email')} /></span> : '—' },
+          { label: t('admin.phone'), value: c.phone ? <span className="mono">{formatPhone(c.phone)}</span> : '—' },
+        ]}
+      />
+      <p className={styles.muted}>{t('admin.clients.bookings', { n: c.bookings })}</p>
+      <p className={styles.muted}>{t('admin.clients.noShows', { n: c.no_shows })}</p>
+      <p className={styles.muted}>{t('admin.createdOn', { date: day(lang, c.created_at) })}</p>
+      <p className={styles.muted}>{t('admin.lastActive', { date: c.last_active_at ? day(lang, c.last_active_at) : t('admin.never') })}</p>
+    </DetailPane>
   );
 }

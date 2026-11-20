@@ -19,6 +19,7 @@ import {
   switchLanguage,
   detailPane,
   backToList,
+  chooseRow,
 } from './support';
 
 // T16b — the admin's platform tools: subscriptions and payments, history reports, the catalog,
@@ -342,8 +343,9 @@ test.describe('admin tools', () => {
     await signInAdmin(page);
     await openTool(page, 'Abonamente și plăți');
     await page.getByLabel('Caută service, oraș, cont, email, Stripe').fill(shopName);
-    await expect(page.getByRole('link', { name: new RegExp(shopName) })).toBeVisible();
-    await expect(page.getByText('Gratuit până pe', { exact: false }).first()).toBeVisible();
+    const subscription = await chooseRow(page, 'Abonamente', shopName);
+    await expect(subscription.getByText('Gratuit până pe', { exact: false }).first()).toBeVisible();
+    await backToList(page);
     await expectNoHorizontalScroll(page);
     await shot(page, 't16b-subscriptions', name());
 
@@ -355,7 +357,7 @@ test.describe('admin tools', () => {
 
     await page.getByRole('combobox', { name: 'Afișează' }).selectOption('plati');
     await page.getByRole('combobox', { name: 'Afișează' }).selectOption('abonamente');
-    await page.getByRole('link', { name: new RegExp(shopName) }).click();
+    await (await chooseRow(page, 'Abonamente', shopName)).getByRole('link', { name: 'Deschide fișa service-ului' }).click();
     await expect(page).toHaveURL(new RegExp(`/admin/parteneri/service-uri/${shopId}$`));
     await expect(page.getByRole('heading', { level: 1, name: shopName })).toBeVisible();
     await page.getByRole('button', { name: 'Schimbă prețul' }).click();

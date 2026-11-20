@@ -1,19 +1,23 @@
 import { SearchX, Store } from 'lucide-react';
 import { useDeferredValue, useMemo } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { Button } from '../../components/Button';
 import { EmptyState } from '../../components/EmptyState';
 import { ChoiceFilters } from '../../components/Filters';
 import { LoadError } from '../../components/LoadError';
 import { SearchField } from '../../components/SearchField';
-import { SkeletonList } from '../../components/Skeleton';
+import { buttonClass } from '../../components/buttonClass';
+import { DetailFacts, DetailPane, ListDetailLayout } from '../../components/ListDetailLayout';
+import { ListRow, ListRows, ListRowsSkeleton } from '../../components/ListRow';
 import { fetchShops, type AdminShopRow } from '../../data/admin';
 import { adminZoneBack } from '../../app/adminZones';
 import { useI18n } from '../../i18n/context';
 import { plural } from '../../i18n/translate';
 import { filterShops, isShopFilter, SHOP_FILTERS } from '../../lib/admin';
+import { useListDetail } from '../../lib/useListDetail';
 import { formatPhone } from '../../lib/validators';
 import { ExportButton } from './ExportButton';
-import { RowLink, ShopStatePill, Verified } from './parts';
+import { ShopStatePill, Verified } from './parts';
 import { ADMIN_SHOPS_PATH, adminShopPath } from './paths';
 import { useLiveData } from './useLiveData';
 import { useUrlParams } from './useUrlParams';
@@ -32,6 +36,7 @@ const LIVE = [{ table: 'shops' }, { table: 'subscriptions' }, { table: 'profiles
  */
 export function ShopsScreen() {
   const { t, lang } = useI18n();
+  const { pathname } = useLocation();
   const { state, reload } = useLiveData(fetchShops, LIVE, 'admin-shops');
   const { params, setParam, text, setText } = useUrlParams();
   const filterParam = params.get('stare');
@@ -40,14 +45,18 @@ export function ShopsScreen() {
   const all = state.status === 'ready' ? state.data : null;
   const shown = useMemo(() => (all ? filterShops(all, query, filter) : []), [all, query, filter]);
 
-  return (
-    <div className={styles.page}>
+  // Page template A (docs/MODEL_DE_FOLOSIRE.md P8): one row per shop, the chosen one beside the list
+  // from 1024 px (in its place below); the whole file is „Deschide fișa”.
+  const { wide, selectedId, open, select } = useListDetail(
+    shown.map((x) => x.id),
+    'unitate',
+  );
+  const chosen = shown.find((x) => x.id === selectedId) ?? null;
+
+  const header = (
+    <>
       <PageHeader back={{ to: ZONE_BACK.to, label: t(ZONE_BACK.label) }} title={t('nav.admin.shops')} subtitle={all ? plural(lang, 'unit.shops', shown.length) : undefined} />
-      {state.status === 'loading' && <SkeletonList />}
-      {state.status === 'error' && <LoadError message={t('admin.loadError')} onRetry={reload} />}
-      {all && all.length === 0 && <EmptyState icon={Store} title={t('admin.shops.empty')} />}
       {all && all.length > 0 && (
-        <>
           <div className={styles.controls}>
             <SearchField
               id="admin-shops-q"
@@ -85,7 +94,16 @@ export function ShopsScreen() {
               }
             />
           </div>
-          {shown.length === 0 ? (
+      )}
+    </>
+  );
+
+  let list;
+  if (state.status === 'loading') list = <ListRowsSkeleton label={t('common.loading')} />;
+  else if (state.status === 'error') list = <LoadError message={t('admin.loadError')} onRetry={reload} />;
+  else if (all && all.length === 0) list = <EmptyState icon={Store} title={t('admin.shops.empty')} />;
+  else if (shown.length === 0)
+    list = (
             <EmptyState
               icon={SearchX}
               title={t('admin.noResults')}
@@ -101,38 +119,63 @@ export function ShopsScreen() {
                 </Button>
               }
             />
-          ) : (
-            <ul className={styles.list}>
-              {shown.map((s) => (
-                <li key={s.id}>
-                  <RowLink to={adminShopPath(s.id)}>
-                    <span className={styles.rowTop}>
-                      <span className={styles.rowTitle}>{s.name}</span>
-                      <ShopStatePill state={s.state} />
-                    </span>
-                    <span className={styles.rowMeta}>
-                      <span className={styles.id}>{s.display_id}</span>
-                      <span>{s.city}</span>
-                      {s.email && <span>{s.email}</span>}
-                      {s.phone && <span className="mono">{formatPhone(s.phone)}</span>}
-                    </span>
-                    <span className={styles.checks}>
-                      <Verified ok={s.email_verified} label={t('admin.email')} />
-                      <Verified ok={s.phone_verified} label={t('admin.phone')} />
-                    </span>
-                    <span className={styles.rowMeta}>
-                      <span>{t('admin.createdOn', { date: day(lang, s.created_at) })}</span>
-                      <span>
-                        {t('admin.lastActive', { date: s.last_active_at ? day(lang, s.last_active_at) : t('admin.never') })}
-                      </span>
-                    </span>
-                  </RowLink>
-                </li>
-              ))}
-            </ul>
-          )}
-        </>
-      )}
+    );
+  else
+    list = (
+      <ListRows label={t('nav.admin.shops')}>
+        {shown.map((x) => (
+          <ListRow
+            key={x.id}
+            icon={<Store size={20} />}
+            title={x.name}
+            detail={[x.display_id, x.city, x.email, x.phone ? formatPhone(x.phone) : null].filter(Boolean).join(' · ')}
+            status={<ShopStatePill state={x.state} />}
+            selected={wide && x.id === selectedId}
+            onSelect={() => select(x.id)}
+          />
+        ))}
+      </ListRows>
+    );
+
+  return (
+    <div className={styles.page}>
+      <ListDetailLayout
+        wide={wide}
+        open={open}
+        backTo={pathname}
+        backLabel={t('nav.admin.shops')}
+        header={header}
+        list={list}
+        detail={chosen && <ShopDetail key={chosen.id} s={chosen} />}
+      />
     </div>
+  );
+}
+
+/** One shop in the list's detail; the whole file (billing, subscription, hours, staff, the log) is „Deschide fișa”. */
+function ShopDetail({ s }: { s: AdminShopRow }) {
+  const { t, lang } = useI18n();
+  return (
+    <DetailPane
+      id={s.id}
+      icon={<Store size={20} />}
+      title={s.name}
+      detail={[s.display_id, s.city].filter(Boolean).join(' · ')}
+      status={<ShopStatePill state={s.state} />}
+      actions={
+        <Link className={buttonClass('secondary')} to={adminShopPath(s.id)}>
+          {t('admin.shops.open')}
+        </Link>
+      }
+    >
+      <DetailFacts
+        items={[
+          { label: t('admin.email'), value: s.email ? <span>{s.email} <Verified ok={s.email_verified} label={t('admin.email')} /></span> : '—' },
+          { label: t('admin.phone'), value: s.phone ? <span><span className="mono">{formatPhone(s.phone)}</span> <Verified ok={s.phone_verified} label={t('admin.phone')} /></span> : '—' },
+        ]}
+      />
+      <p className={styles.muted}>{t('admin.createdOn', { date: day(lang, s.created_at) })}</p>
+      <p className={styles.muted}>{t('admin.lastActive', { date: s.last_active_at ? day(lang, s.last_active_at) : t('admin.never') })}</p>
+    </DetailPane>
   );
 }

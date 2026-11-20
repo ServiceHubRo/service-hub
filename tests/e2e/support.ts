@@ -642,6 +642,12 @@ export function inboxRow(page: Page, text: string): Locator {
 /** The detail of the item chosen in a list + detail screen (page template A). */
 export const detailPane = (page: Page) => page.locator('[data-ui="detail-pane"]');
 
+/** A list + detail screen (page template A): chooses the row whose words are `text`; returns the detail. */
+export async function chooseRow(page: Page, listName: string | RegExp, text: string | RegExp) {
+  await page.getByRole('list', { name: listName }).locator(':scope > li').filter({ hasText: text }).first().getByRole('button').click();
+  return detailPane(page);
+}
+
 /** On a phone the detail takes the screen: „‹ Înapoi” returns to the list (wide: nothing to do). */
 export async function backToList(page: Page) {
   // From 1024 px the list stands beside the detail, and the page's own „‹ Înapoi” leaves the screen.
