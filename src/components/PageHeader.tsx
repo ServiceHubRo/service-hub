@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { BackLink } from './BackLink';
+import { useEmbedded } from '../lib/embedded';
 import styles from './PageHeader.module.css';
 
 export interface PageHeaderProps {
@@ -20,12 +21,15 @@ export interface PageHeaderProps {
  * screen's tabs, when it has views, stand under the title (page templates, 14 Nov 2026).
  */
 export function PageHeader({ title, subtitle, back, actions, tabs }: PageHeaderProps) {
+  // Inside another screen (the garage's panel): a second-level title, no way back of its own.
+  const embedded = useEmbedded();
+  const Heading = embedded ? 'h2' : 'h1';
   return (
     <>
-      {back && <BackLink to={back.to} label={back.label} />}
+      {back && !embedded && <BackLink to={back.to} label={back.label} />}
       <header data-ui="page-header" className={styles.header} data-span="all">
         <div className={styles.text}>
-          <h1>{title}</h1>
+          <Heading>{title}</Heading>
           {subtitle && <p className={styles.subtitle}>{subtitle}</p>}
         </div>
         {actions && <div className={styles.actions}>{actions}</div>}

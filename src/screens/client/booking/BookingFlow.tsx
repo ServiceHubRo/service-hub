@@ -1,6 +1,6 @@
 import { Store } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useLiveSearchParams } from '../../../app/useLiveSearchParams';
 import { BackLink } from '../../../components/BackLink';
 import { PageHeader } from '../../../components/PageHeader';
@@ -17,7 +17,7 @@ import { parseServiceIds, servicesLine, toggleServiceId } from '../../../lib/boo
 import { bestOffer } from '../../../lib/offers';
 import { parseSymptoms, toggleSymptom, UNSURE_SERVICE_ID } from '../../../lib/symptoms';
 import { useLoad } from '../../../lib/useLoad';
-import { bookingPath, bookingSentPath, SEARCH_PATH, shopPath } from '../paths';
+import { bookingPath, bookingSentPath, SEARCH_PATH, shopPath, type ShopLinkState } from '../paths';
 import { serviceName } from '../shop/serviceGroups';
 import type { SentState } from './BookingSent';
 import { EMPTY_CAR_DRAFT, type CarDraft } from './carDraft';
@@ -76,6 +76,10 @@ function Flow({ page }: { page: ShopPage }) {
   const navigate = useNavigate();
   const [params, setParams] = useLiveSearchParams();
   const { shop } = page;
+  // Opened from the search (the shop shown beside the results) or from the favorites: Back on step 1
+  // returns there. Kept from the first render, because the steps change the address without it.
+  const routerState = useLocation().state as ShopLinkState | null;
+  const [from] = useState(routerState);
 
   // The services picked, in the order they were ticked; only those this shop offers.
   const serviceIds = parseServiceIds(params.get('serviciu')).filter((id) => page.services.some((s) => s.id === id));
@@ -163,10 +167,13 @@ function Flow({ page }: { page: ShopPage }) {
           ? `${svc} · ${formatDate(lang, day!)}`
           : `${svc} · ${formatDate(lang, day!)}, ${time}`;
 
-  return (
-    <div className={styles.page} data-fill-screen>
+  const lead = (
+    <>
       {step === 1 ? (
-        <BackLink to={shopPath(shop.id)} label={t('booking.backToShop')} />
+        <BackLink
+          to={from?.backTo ?? shopPath(shop.id)}
+          label={from?.backTo ? (from.backLabel === 'favorites' ? t('favorites.title') : t('shop.allShops')) : t('booking.backToShop')}
+        />
       ) : (
         <BackLink to={urlFor({ pas: String(step - 1) })} />
       )}
@@ -177,9 +184,16 @@ function Flow({ page }: { page: ShopPage }) {
         </h1>
         <p className={styles.sub}>{subtitle}</p>
       </div>
+    </>
+  );
+
+  return (
+    <div className={styles.page} data-fill-screen>
+      {step !== 1 && step !== 4 && lead}
 
       {step === 1 && (
         <ServiceStep
+          lead={lead}
           services={page.services}
           selected={serviceIds}
           // Ticks change the address in place: Back leaves step 1, not one tick.
@@ -211,6 +225,8 @@ function Flow({ page }: { page: ShopPage }) {
       )}
       {step === 4 && service && day && time && (
         <CarStep
+          lead={lead}
+          onChangeStep={(n) => navigate(urlFor({ pas: String(n) }))}
           shop={shop}
           services={services}
           unsure={unsure}

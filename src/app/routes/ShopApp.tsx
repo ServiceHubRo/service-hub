@@ -1,5 +1,5 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
-import { MessagesScreen } from '../../screens/messages/MessagesScreen';
+import { MessagesSpace } from '../../screens/messages/MessagesSpace';
 import { ThreadsProvider } from '../../screens/messages/ThreadsProvider';
 import { NoticesProvider } from '../../screens/notices/NoticesProvider';
 import { AddBookingScreen } from '../../screens/shop/bookings/AddBookingScreen';
@@ -68,7 +68,7 @@ export default function ShopApp() {
           '/s/panou': <Dashboard />,
           '/s/programari': <ShopBookingsScreen />,
           '/s/istoric': <ShopHistoryScreen />,
-          '/s/mesaje': <MessagesScreen />,
+          '/s/mesaje': <MessagesSpace />,
         })}
         {messageRoutes('shop')}
         <Route path={rel('shop', ADD_BOOKING_PATH)} element={<AddBookingScreen />} />

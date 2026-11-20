@@ -137,14 +137,16 @@ test.describe('history report', () => {
     await expect(page).toHaveURL(/\/c\//);
     await page.goto('/c/garaj');
     await page.getByRole('link', { name: 'Raport oficial pentru cumpărător' }).click();
-    await expect(page.getByRole('heading', { level: 1, name: 'Raport oficial' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Raport oficial' })).toBeVisible();
     await expect(page.getByText('Raportul conține doar lucrările efectuate prin Service-Hub.')).toBeVisible();
     await expect(page.getByText('WVWZZZAUZGW123456')).toBeVisible();
     await expect(page.getByText('1.020 lei', { exact: true })).toBeVisible();
     await expect(page.getByText('97.500 km', { exact: true })).toBeVisible();
     // Three jobs, the last two hidden until paid (and hidden from screen readers).
-    await expect(page.locator('main li')).toHaveCount(3);
-    await expect(page.locator('main li[aria-hidden="true"]')).toHaveCount(2);
+    // On a laptop the report opens beside the garage's cars: only its own list counts.
+    const reportList = page.locator('[data-ui="detail-frame"], main').last();
+    await expect(reportList.locator('li')).toHaveCount(3);
+    await expect(reportList.locator('li[aria-hidden="true"]')).toHaveCount(2);
     await expect(page.getByText('Vizibil în raport după plată')).toBeVisible();
     await expectNoHorizontalScroll(page);
     await shot(page, 't15-report-preview', name());
@@ -202,12 +204,13 @@ test.describe('history report', () => {
     // The client is told by email, with the code.
     await expect.poll(async () => (await emailsTo(client)).some((m) => m.subject === `Raportul de istoric este gata: ${code}`), { timeout: 20_000 }).toBe(true);
 
-    // Cont has the tile; the vehicle history has the button with the price.
+    // Cont has the tile; the vehicle history has no report button (the report is asked for from the garage card and from Cont).
     await page.goto('/c/cont');
     await expect(page.getByRole('link', { name: /Rapoartele mele/ })).toBeVisible();
     await page.goto('/c/garaj');
     await page.getByRole('link', { name: /Istoric — 3 lucrări/ }).click();
-    await expect(page.getByRole('link', { name: 'Generează raport oficial — 29 lei' })).toBeVisible();
+    await expect(page.getByText('Aici apar doar lucrările făcute prin Service-Hub.')).toBeVisible();
+    await expect(page.getByRole('link', { name: /Generează raport oficial/ })).toHaveCount(0);
 
     // ------------------------------------------------------------------ /verifica, signed out
     const buyer = await visitor(browser, page, 'ro');
@@ -256,7 +259,7 @@ test.describe('history report', () => {
     await expect(page.getByRole('heading', { level: 1, name: 'My reports' })).toBeVisible();
     await expect(page.getByText('No reports.')).toBeVisible();
     await page.getByRole('link', { name: /Volkswagen Golf 7/ }).click();
-    await expect(page.getByRole('heading', { level: 1, name: 'Official report' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Official report' })).toBeVisible();
     await expect(page.getByText('This report covers only work carried out through Service-Hub.')).toBeVisible();
     // One job: shown in full.
     await expect(page.locator('main li[aria-hidden="true"]')).toHaveCount(0);
@@ -264,12 +267,14 @@ test.describe('history report', () => {
     await expectNoHorizontalScroll(page);
     await shot(page, 't15-report-preview-en', name());
 
-    // A saved car with no finished job: no report row in the garage, and its preview says why.
+    // A saved car with no finished job: the same rows in the garage ("History — 0 jobs", the report),
+    // and the report's screen says why there is nothing to report.
     const owner = await userIdOf(client);
     const [car] = await serviceRest<{ id: string }[]>('cars', 'POST', { owner_id: owner, make: 'Dacia', model: 'Spring', plate: 'B 01 NEW' });
     await page.goto('/c/garaj');
     await expect(page.getByText('Dacia Spring')).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Official report for a buyer' })).toHaveCount(1);
+    await expect(page.getByRole('link', { name: 'Official report for a buyer' })).toHaveCount(2);
+    await expect(page.getByRole('link', { name: 'History — 0 jobs' })).toHaveCount(1);
     await page.goto(`/c/garaj/${car!.id}/raport`);
     await expect(page.getByText('There are no finished jobs for this car.')).toBeVisible();
     await expect(page.getByRole('button', { name: /Pay/ })).toHaveCount(0);

@@ -1,0 +1,72 @@
+/* The reviews of one shop (C9): the summary, then rows and the chosen review (page template A). */
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.summary {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.average {
+  font-family: var(--font-display);
+  font-size: 40px;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--amber);
+}
+
+.summaryText {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.muted {
+  color: var(--muted);
+  font-size: 13.5px;
+  overflow-wrap: anywhere;
+}
+
+.text {
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+.reply {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.replyLabel {
+  font-size: 13px;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+/* The chosen category's services (ShopServicesPage). */
+.serviceList {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr));
+  gap: 6px;
+}
+
+.service {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 13px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-input);
+}
+
+.serviceIcon {
+  flex-shrink: 0;
+  color: var(--amber);
+}

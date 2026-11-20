@@ -143,143 +143,6 @@
   font-weight: 600;
 }
 
-.serviceGroups {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.categories {
-  list-style: none;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 230px), 1fr));
-  gap: 8px;
-}
-
-/* A category tile (T58): its name and how many services; the open one tinted amber. */
-.category {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  width: 100%;
-  min-height: 56px;
-  padding: 9px 13px;
-  text-align: left;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-input);
-  transition:
-    border-color var(--motion-quick) var(--ease),
-    background-color var(--motion-quick) var(--ease);
-}
-
-@media (hover: hover) {
-  .category:hover {
-    border-color: var(--border-lit);
-  }
-}
-
-.categoryOn {
-  border-color: var(--amber-line);
-  background: var(--amber-tint);
-}
-
-@media (hover: hover) {
-  .categoryOn:hover {
-    border-color: var(--amber-line);
-    background: var(--amber-tint);
-  }
-}
-
-.categoryText {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  overflow-wrap: anywhere;
-}
-
-.categoryTitle {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text);
-}
-
-.categoryCount {
-  color: var(--muted);
-  font-size: 12.5px;
-}
-
-.categoryOn .categoryCount {
-  color: var(--muted-strong);
-}
-
-.categoryChevron {
-  flex-shrink: 0;
-  color: var(--muted);
-}
-
-.categoryOn .categoryChevron {
-  transform: rotate(180deg);
-  color: var(--amber);
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .categoryChevron {
-    transition: transform var(--motion-quick) var(--ease);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .category {
-    transition: none;
-  }
-}
-
-/* The open category's services, across the width. */
-.services {
-  list-style: none;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr));
-  gap: 6px;
-}
-
-.categoryItem {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-/* Under the tapped tile on a narrow page; under all the tiles on a wide one. */
-.below {
-  display: none;
-}
-
-@container (min-width: 900px) {
-  .inline {
-    display: none;
-  }
-
-  .below {
-    display: grid;
-  }
-}
-
-.service {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 13px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-input);
-}
-
-.serviceIcon {
-  flex-shrink: 0;
-  color: var(--amber);
-}
-
 .muted {
   color: var(--muted);
   font-size: 13px;
@@ -287,6 +150,27 @@
 
 .book {
   gap: 8px;
+}
+
+/* Services and booking side by side, the same size. */
+.bookRow {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.bookRowSingle {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@media (min-width: 1024px) {
+  div.bookRow {
+    width: min(100%, 520px);
+  }
+
+  div.bookRowSingle {
+    width: min(100%, 260px);
+  }
 }
 
 .freePlace {
@@ -320,62 +204,6 @@
 }
 
 
-/* ---------------------------------------------------------------- reviews */
-.reviews {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.reviews .plainList {
-  gap: 8px;
-}
-
-.review {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.reviewAuthor {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  min-width: 0;
-}
-
-.reviewWho {
-  min-width: 0;
-  overflow-wrap: anywhere;
-}
-
-.reviewer {
-  font-weight: 650;
-}
-
-.reviewBody {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  min-width: 0;
-}
-
-.reviewText {
-  white-space: pre-line;
-  overflow-wrap: anywhere;
-}
-
-.reply {
-  margin-top: 6px;
-}
-
-.replyLabel {
-  margin-bottom: 2px;
-  font-size: 13px;
-  color: var(--muted);
-  font-weight: 600;
-}
-
 /* The rating in the header opens the reviews (Eduard, T20a): a real button, 44 px tall. */
 .ratingButton {
   min-height: 44px;
@@ -387,6 +215,8 @@
   font: inherit;
   font-size: 13.5px;
   text-align: left;
+  text-decoration: none;
+  color: inherit;
   cursor: pointer;
 }
 
@@ -396,14 +226,6 @@
 }
 
 /* Below the sticky top bar when scrolled to. */
-.reviewsTitle {
-  scroll-margin-top: 80px;
-}
-
-.reviewsTitle:focus {
-  outline: none;
-}
-
 .amenities {
   list-style: none;
   margin: 0;
@@ -471,14 +293,5 @@
 
   .info .infoRow {
     padding-block: 7px;
-  }
-
-  /* A review on a wide page (T59): who and when on the left, the stars and the words across the
-     rest; one review under the other, so a single review is never a stretched, empty card. */
-  .review {
-    display: grid;
-    grid-template-columns: minmax(180px, 240px) minmax(0, 1fr);
-    align-items: start;
-    column-gap: var(--space-8);
   }
 }

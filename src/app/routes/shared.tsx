@@ -11,8 +11,7 @@ import { NewRequestScreen } from '../../screens/requests/NewRequestScreen';
 import { MyRequestRedirect } from '../../screens/requests/MyRequestsScreen';
 import { AccountLegal } from '../../screens/legal/LegalPages';
 import { BookingThreadRedirect } from '../../screens/messages/BookingThreadRedirect';
-import { ConversationScreen } from '../../screens/messages/ConversationScreen';
-import { TeamNoticesScreen } from '../../screens/notices/TeamNoticesScreen';
+import { MessagesSpace } from '../../screens/messages/MessagesSpace';
 import { messagesPath } from '../../screens/messages/paths';
 import { NotFound } from '../../screens/public/NotFound';
 import { SuggestionsScreen } from '../../screens/suggestions/SuggestionsScreen';
@@ -61,9 +60,9 @@ export function messageRoutes(side: 'client' | 'shop') {
   const base = rel(side, messagesPath(side));
   return (
     <>
-      <Route path={`${base}/echipa`} element={<TeamNoticesScreen />} />
+      <Route path={`${base}/echipa`} element={<MessagesSpace />} />
       <Route path={`${base}/programare/:bookingId`} element={<BookingThreadRedirect />} />
-      <Route path={`${base}/:threadId`} element={<ConversationScreen />} />
+      <Route path={`${base}/:threadId`} element={<MessagesSpace />} />
     </>
   );
 }

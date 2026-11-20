@@ -1,10 +1,13 @@
 import { Building2, Car as CarIcon, Check, Plus } from 'lucide-react';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, type ReactNode } from 'react';
 import { useSession } from '../../../app/sessionContext';
 import { ActionButton } from '../../../components/ActionButton';
 import { Banner } from '../../../components/Banner';
+import { Button } from '../../../components/Button';
 import { BottomBar } from '../../../components/BottomBar';
 import { Card } from '../../../components/Card';
+import { DetailFacts, DetailPane, ListDetailLayout } from '../../../components/ListDetailLayout';
+import { ListRow, ListRows } from '../../../components/ListRow';
 import { Checkbox } from '../../../components/Checkbox';
 import { Switch } from '../../../components/Switch';
 import { Field } from '../../../components/Field';
@@ -28,9 +31,12 @@ import { useI18n } from '../../../i18n/context';
 import { formatDate, formatMoney } from '../../../i18n/format';
 import { carYearMax, isValidCarYear } from '../../../lib/car';
 import { isValidPlate } from '../../../lib/plate';
+import { LIST_DETAIL_QUERY, useMediaQuery } from '../../../lib/useMediaQuery';
 import { useLoad } from '../../../lib/useLoad';
 import type { OfferKind } from '../../../lib/offers';
 import { composeUnsureNote, unsureDescribed, type Symptom } from '../../../lib/symptoms';
+import { SEARCH_PATH } from '../paths';
+import { CarDocs } from '../garage/GarageScreen';
 import { PhoneVerify } from '../../phone/PhoneVerify';
 import { ResendConfirmation } from '../../auth/ResendConfirmation';
 import { SERVICE_SEPARATOR } from '../../../lib/bookingServices';
@@ -69,7 +75,13 @@ export function CarStep({
   onDraft,
   onSent,
   onStale,
+  lead,
+  onChangeStep,
 }: {
+  /** What stands above the step: the way back, the progress, the title. */
+  lead: ReactNode;
+  /** „Schimbă”: back to the services (1) or the day (2), what was chosen kept. */
+  onChangeStep: (step: 1 | 2) => void;
   shop: ShopPageShop;
   services: ShopPageService[];
   /** A constatare tehnică is among the services. */
@@ -85,6 +97,7 @@ export function CarStep({
   onStale: (message: string) => void;
 }) {
   const { t, lang } = useI18n();
+  const wide = useMediaQuery(LIST_DETAIL_QUERY);
   const session = useSession();
   const load = useCallback(async () => {
     // The company vehicles never stop a personal booking: without them, the garage as before.
@@ -125,8 +138,20 @@ export function CarStep({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loaded]);
 
-  if (state.status === 'loading') return <SkeletonList count={2} />;
-  if (state.status === 'error') return <LoadError message={t('booking.car.loadError')} onRetry={reload} />;
+  if (state.status === 'loading')
+    return (
+      <>
+        {lead}
+        <SkeletonList count={2} />
+      </>
+    );
+  if (state.status === 'error')
+    return (
+      <>
+        {lead}
+        <LoadError message={t('booking.car.loadError')} onRetry={reload} />
+      </>
+    );
 
   const { cars, companies } = state.data;
   const manual = draft.manual || (cars.length === 0 && companies.length === 0);
@@ -211,8 +236,248 @@ export function CarStep({
     }
   }
 
+  const form = (
+    <>
+      {manual && (
+        <form id={CAR_FORM_ID} className="form-contents" onSubmit={(e) => e.preventDefault()} noValidate>
+          <Card className={styles.form}>
+            <div className={styles.pair}>
+              <Field label={t('car.make')} placeholder={t('car.makePlaceholder')} value={draft.make} maxLength={60} autoComplete="off" onChange={(e) => set({ make: e.target.value })} />
+              <Field label={t('car.model')} placeholder={t('car.modelPlaceholder')} value={draft.model} maxLength={60} autoComplete="off" onChange={(e) => set({ model: e.target.value })} />
+            </div>
+            <div className={styles.pair}>
+              <Field
+                label={t('car.year')}
+                value={draft.year}
+                inputMode="numeric"
+                maxLength={4}
+                mono
+                autoComplete="off"
+                error={yearTouched ? yearProblem : null}
+                onBlur={() => setYearTouched(true)}
+                onChange={(e) => set({ year: e.target.value.replace(/\D/g, '') })}
+              />
+              <Field
+                label={t('car.plate')}
+                placeholder={t('car.platePlaceholder')}
+                value={draft.plate}
+                maxLength={20}
+                mono
+                upper
+                autoCapitalize="characters"
+                autoComplete="off"
+                error={plateTouched ? plateProblem : null}
+                onBlur={() => setPlateTouched(true)}
+                onChange={(e) => set({ plate: e.target.value })}
+              />
+            </div>
+            <Switch checked={draft.save} onChange={(e) => set({ save: e.target.checked })}>
+              {t('booking.car.save')}
+            </Switch>
+          </Card>
+        </form>
+      )}
+
+    </>
+  );
+  const noteField = (
+    <>
+      <TextArea
+        label={t(unsure ? 'booking.unsure.noteLabel' : 'booking.note')}
+        placeholder={t(unsure ? 'booking.unsure.notePlaceholder' : 'booking.notePlaceholder')}
+        value={draft.note}
+        maxLength={unsure ? NOTE_MAX - SYMPTOMS_LINE_MAX : NOTE_MAX}
+        rows={3}
+        onChange={(e) => set({ note: e.target.value })}
+      />
+
+    </>
+  );
+  const summaryCard = (
+    <>
+      <Card className={styles.summary}>
+        <h2 className={styles.groupTitle}>{t('booking.summary')}</h2>
+        <SummaryRow label={t('booking.summary.shop')} value={shop.name} />
+        <SummaryRow
+          label={t(services.length > 1 ? 'booking.summary.services' : 'booking.summary.service')}
+          value={services.map((x) => serviceName(x, lang)).join(SERVICE_SEPARATOR)}
+        />
+        {symptomNames.length > 0 && <SummaryRow label={t('booking.summary.symptoms')} value={symptomNames.join(', ')} />}
+        <SummaryRow label={t('booking.summary.when')} value={`${formatDate(lang, day)}, ${time}`} mono />
+        {carText && <SummaryRow label={t('booking.summary.car')} value={carText} />}
+        {offer !== null && (
+          <OfferNote>{t(offer.kind === 'quiet_day' ? 'offer.quiet.booking' : 'offer.booking', { n: offer.percent })}</OfferNote>
+        )}
+        {shop.inspection_fee > 0 && (
+          <>
+            <SummaryRow label={t('shop.fee')} value={formatMoney(lang, shop.inspection_fee)} mono />
+            <p className={styles.muted}>{t('shop.feeNote')}</p>
+          </>
+        )}
+      </Card>
+
+    </>
+  );
+  const phoneCard = (
+    <>
+      {phoneNeeded !== null && (
+        <Card>
+          <section aria-labelledby="booking-phone-title" className={styles.stack}>
+            <h2 id="booking-phone-title" className={styles.groupTitle}>
+              {t('booking.phone.title')}
+            </h2>
+            <p className={styles.muted}>{t('booking.phone.why', { n: phoneNeeded })}</p>
+            {phoneDone ? (
+              <p role="status">{t('booking.phone.done')}</p>
+            ) : session.profile?.phone ? (
+              <PhoneVerify
+                phone={session.profile.phone}
+                onVerified={async () => {
+                  setPhoneDone(true);
+                  await session.refreshProfile();
+                }}
+              />
+            ) : (
+              <p>{t('booking.phone.missing')}</p>
+            )}
+          </section>
+        </Card>
+      )}
+
+    </>
+  );
+  const ackCard = (
+    <>
+      {ackNeeded !== null && (
+        <Card>
+          <section aria-labelledby="booking-ack-title" className={styles.stack}>
+            <h2 id="booking-ack-title" className={styles.groupTitle}>
+              {t('booking.ack.title')}
+            </h2>
+            <p className={styles.muted}>{t('booking.ack.why', { n: ackNeeded })}</p>
+            <Checkbox checked={acked} onChange={(e) => setAcked(e.target.checked)}>
+              {t('booking.ack.label')}
+            </Checkbox>
+          </section>
+        </Card>
+      )}
+
+    </>
+  );
+  const submitButtons = (
+    <>
+          {manual && !typedOk && <p className={styles.muted}>{t('car.required')}</p>}
+          {!described && <p className={styles.muted}>{t('booking.unsure.required')}</p>}
+          {ackNeeded !== null && !acked && <p className={styles.muted}>{t('booking.ack.required')}</p>}
+          {shop.auto_confirm && <p className={styles.muted}>{t('booking.instantNote')}</p>}
+          <ActionButton submit form={CAR_FORM_ID} onAction={send} disabled={!ready} errorMessage={(e) => rpcErrorMessage(lang, e)} canRetry={canRetryRpc}>
+            {t(shop.auto_confirm ? 'booking.submitInstant' : 'booking.submit')}
+          </ActionButton>
+    </>
+  );
+  const unverified = (
+        <Banner tone="warning">
+          <div className={styles.stack}>
+            <span>{t('booking.unverified', { email: session.user?.email ?? '' })}</span>
+            {session.user?.email && <ResendConfirmation email={session.user.email} />}
+          </div>
+        </Banner>
+  );
+
+  // Beside the cars (a laptop, C9): the cars as rows on the left (the garage, a company's, "Altă mașină"),
+  // the chosen one's details on the right — or its form when it is typed in — then the note, the summary
+  // and "Trimite cererea" at the foot of the panel.
+  if (wide) {
+    const vehicleRow = (v: { id: string; make: string; model: string; year: number | null; plate: string | null }, on: boolean, pick: () => void) => (
+      <ListRow
+        key={v.id}
+        icon={<CarIcon size={18} />}
+        title={`${v.make} ${v.model}`.trim()}
+        detail={[v.plate, v.year].filter(Boolean).join(' · ') || ' '}
+        selected={on}
+        onSelect={pick}
+      />
+    );
+    const chosen = manual ? null : (vehicle ?? picked);
+    const title = manual ? t('booking.car.other') : chosen ? `${chosen.make} ${chosen.model}`.trim() : t('booking.car.garage');
+    return (
+      <ListDetailLayout
+        wide
+        open={false}
+        backTo={SEARCH_PATH}
+        backLabel={t('nav.client.search')}
+        header={lead}
+        list={
+          <>
+            {cars.length > 0 && (
+              <ListRows label={t('booking.car.garage')}>
+                {cars.map((c) =>
+                  vehicleRow(c, !manual && !vehicle && c.id === draft.carId, () => set({ carId: c.id, companyVehicleId: null, manual: false })),
+                )}
+              </ListRows>
+            )}
+            {companies.map((co) => (
+              <ListRows key={co.company_id} label={co.company_name}>
+                {co.vehicles.map((v) => vehicleRow(v, !manual && vehicle?.id === v.id, () => set({ companyVehicleId: v.id, carId: null, manual: false })))}
+              </ListRows>
+            ))}
+            <ListRows label={t('booking.car.other')}>
+              <ListRow
+                icon={<Plus size={18} />}
+                title={t('booking.car.other')}
+                detail={t('booking.car.otherHint')}
+                selected={manual}
+                onSelect={() => set({ manual: true, carId: null, companyVehicleId: null })}
+              />
+            </ListRows>
+          </>
+        }
+        detail={
+          <DetailPane
+            key={manual ? 'manual' : (chosen?.id ?? 'none')}
+            id={manual ? 'manual' : (chosen?.id ?? 'none')}
+            icon={manual ? <Plus size={18} /> : <CarIcon size={18} />}
+            title={title}
+            detail={manual ? t('booking.car.newHint') : chosen ? [chosen.plate, chosen.year].filter(Boolean).join(' · ') : undefined}
+            actions={phoneNeeded !== null && !phoneDone ? undefined : session.emailVerified ? submitButtons : undefined}
+          >
+            {manual && form}
+            {chosen && (
+              <>
+                <DetailFacts
+                  items={[
+                    { label: t('car.make'), value: chosen.make },
+                    { label: t('car.model'), value: chosen.model },
+                    ...(chosen.plate ? [{ label: t('car.plate'), value: <span className="mono">{chosen.plate}</span> }] : []),
+                    ...(chosen.year ? [{ label: t('car.year'), value: chosen.year }] : []),
+                  ]}
+                />
+                {picked && <CarDocs car={picked} />}
+                {vehicle && <p className={`${styles.muted} ${styles.companyNote}`}>{t('booking.car.companyNote')}</p>}
+              </>
+            )}
+            {noteField}
+            {summaryCard}
+            <div className={styles.changeRow}>
+              <Button variant="ghost" onClick={() => onChangeStep(1)}>
+                {t('booking.change.services')}
+              </Button>
+              <Button variant="ghost" onClick={() => onChangeStep(2)}>
+                {t('booking.change.day')}
+              </Button>
+            </div>
+            {phoneCard}
+            {ackCard}
+            {!(phoneNeeded !== null && !phoneDone) && !session.emailVerified && unverified}
+          </DetailPane>
+        }
+      />
+    );
+  }
+
   return (
     <>
+      {lead}
       {cars.length > 0 && (
         <section aria-labelledby="garage-cars">
           <h2 id="garage-cars" className={styles.groupTitle}>
@@ -280,132 +545,12 @@ export function CarStep({
       ))}
       {cars.length === 0 && companies.length > 0 && <ul className={styles.options}>{otherOption()}</ul>}
 
-      {manual && (
-        <form id={CAR_FORM_ID} className="form-contents" onSubmit={(e) => e.preventDefault()} noValidate>
-          <Card className={styles.form}>
-            <div className={styles.pair}>
-              <Field label={t('car.make')} placeholder={t('car.makePlaceholder')} value={draft.make} maxLength={60} autoComplete="off" onChange={(e) => set({ make: e.target.value })} />
-              <Field label={t('car.model')} placeholder={t('car.modelPlaceholder')} value={draft.model} maxLength={60} autoComplete="off" onChange={(e) => set({ model: e.target.value })} />
-            </div>
-            <div className={styles.pair}>
-              <Field
-                label={t('car.year')}
-                value={draft.year}
-                inputMode="numeric"
-                maxLength={4}
-                mono
-                autoComplete="off"
-                error={yearTouched ? yearProblem : null}
-                onBlur={() => setYearTouched(true)}
-                onChange={(e) => set({ year: e.target.value.replace(/\D/g, '') })}
-              />
-              <Field
-                label={t('car.plate')}
-                placeholder={t('car.platePlaceholder')}
-                value={draft.plate}
-                maxLength={20}
-                mono
-                upper
-                autoCapitalize="characters"
-                autoComplete="off"
-                error={plateTouched ? plateProblem : null}
-                onBlur={() => setPlateTouched(true)}
-                onChange={(e) => set({ plate: e.target.value })}
-              />
-            </div>
-            <Switch checked={draft.save} onChange={(e) => set({ save: e.target.checked })}>
-              {t('booking.car.save')}
-            </Switch>
-          </Card>
-        </form>
-      )}
-
-      <TextArea
-        label={t(unsure ? 'booking.unsure.noteLabel' : 'booking.note')}
-        placeholder={t(unsure ? 'booking.unsure.notePlaceholder' : 'booking.notePlaceholder')}
-        value={draft.note}
-        maxLength={unsure ? NOTE_MAX - SYMPTOMS_LINE_MAX : NOTE_MAX}
-        rows={3}
-        onChange={(e) => set({ note: e.target.value })}
-      />
-
-      <Card className={styles.summary}>
-        <h2 className={styles.groupTitle}>{t('booking.summary')}</h2>
-        <SummaryRow label={t('booking.summary.shop')} value={shop.name} />
-        <SummaryRow
-          label={t(services.length > 1 ? 'booking.summary.services' : 'booking.summary.service')}
-          value={services.map((x) => serviceName(x, lang)).join(SERVICE_SEPARATOR)}
-        />
-        {symptomNames.length > 0 && <SummaryRow label={t('booking.summary.symptoms')} value={symptomNames.join(', ')} />}
-        <SummaryRow label={t('booking.summary.when')} value={`${formatDate(lang, day)}, ${time}`} mono />
-        {carText && <SummaryRow label={t('booking.summary.car')} value={carText} />}
-        {offer !== null && (
-          <OfferNote>{t(offer.kind === 'quiet_day' ? 'offer.quiet.booking' : 'offer.booking', { n: offer.percent })}</OfferNote>
-        )}
-        {shop.inspection_fee > 0 && (
-          <>
-            <SummaryRow label={t('shop.fee')} value={formatMoney(lang, shop.inspection_fee)} mono />
-            <p className={styles.muted}>{t('shop.feeNote')}</p>
-          </>
-        )}
-      </Card>
-
-      {phoneNeeded !== null && (
-        <Card>
-          <section aria-labelledby="booking-phone-title" className={styles.stack}>
-            <h2 id="booking-phone-title" className={styles.groupTitle}>
-              {t('booking.phone.title')}
-            </h2>
-            <p className={styles.muted}>{t('booking.phone.why', { n: phoneNeeded })}</p>
-            {phoneDone ? (
-              <p role="status">{t('booking.phone.done')}</p>
-            ) : session.profile?.phone ? (
-              <PhoneVerify
-                phone={session.profile.phone}
-                onVerified={async () => {
-                  setPhoneDone(true);
-                  await session.refreshProfile();
-                }}
-              />
-            ) : (
-              <p>{t('booking.phone.missing')}</p>
-            )}
-          </section>
-        </Card>
-      )}
-
-      {ackNeeded !== null && (
-        <Card>
-          <section aria-labelledby="booking-ack-title" className={styles.stack}>
-            <h2 id="booking-ack-title" className={styles.groupTitle}>
-              {t('booking.ack.title')}
-            </h2>
-            <p className={styles.muted}>{t('booking.ack.why', { n: ackNeeded })}</p>
-            <Checkbox checked={acked} onChange={(e) => setAcked(e.target.checked)}>
-              {t('booking.ack.label')}
-            </Checkbox>
-          </section>
-        </Card>
-      )}
-
-      {phoneNeeded !== null && !phoneDone ? null : session.emailVerified ? (
-        <BottomBar>
-          {manual && !typedOk && <p className={styles.muted}>{t('car.required')}</p>}
-          {!described && <p className={styles.muted}>{t('booking.unsure.required')}</p>}
-          {ackNeeded !== null && !acked && <p className={styles.muted}>{t('booking.ack.required')}</p>}
-          {shop.auto_confirm && <p className={styles.muted}>{t('booking.instantNote')}</p>}
-          <ActionButton submit form={CAR_FORM_ID} onAction={send} disabled={!ready} errorMessage={(e) => rpcErrorMessage(lang, e)} canRetry={canRetryRpc}>
-            {t(shop.auto_confirm ? 'booking.submitInstant' : 'booking.submit')}
-          </ActionButton>
-        </BottomBar>
-      ) : (
-        <Banner tone="warning">
-          <div className={styles.stack}>
-            <span>{t('booking.unverified', { email: session.user?.email ?? '' })}</span>
-            {session.user?.email && <ResendConfirmation email={session.user.email} />}
-          </div>
-        </Banner>
-      )}
+      {manual && form}
+      {noteField}
+      {summaryCard}
+      {phoneCard}
+      {ackCard}
+      {phoneNeeded !== null && !phoneDone ? null : session.emailVerified ? <BottomBar>{submitButtons}</BottomBar> : unverified}
     </>
   );
 }

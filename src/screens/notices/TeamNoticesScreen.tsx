@@ -5,6 +5,7 @@ import { BackLink } from '../../components/BackLink';
 import { EmptyState } from '../../components/EmptyState';
 import { SkeletonList } from '../../components/Skeleton';
 import { useI18n } from '../../i18n/context';
+import { useEmbedded } from '../../lib/embedded';
 import { ymdInBucharest } from '../../i18n/format';
 import { formatDayHeading } from '../../lib/messages';
 import { useNow } from '../../lib/useNow';
@@ -24,6 +25,8 @@ import styles from './notices.module.css';
  */
 export function TeamNoticesScreen() {
   const { t, lang } = useI18n();
+  const embedded = useEmbedded();
+  const Title = embedded ? 'h2' : 'h1';
   const { side } = useThreads();
   const notices = useOptionalNotices();
   const [params] = useSearchParams();
@@ -58,14 +61,15 @@ export function TeamNoticesScreen() {
   }, [loaded, list.length, target]);
 
   return (
-    <div className={msgStyles.conversation}>
+    <div className={`${msgStyles.conversation} ${embedded ? msgStyles.embedded : ''}`}>
       <div className={msgStyles.top}>
         <BackLink to={messagesPath(side)} label={t('nav.messages')} />
         <div data-ui="conversation-header" className={msgStyles.header}>
           <TeamAvatar size={40} />
-          <h1 className={msgStyles.headerName}>{t('notices.from')}</h1>
+          <Title className={msgStyles.headerName}>{t('notices.from')}</Title>
         </div>
       </div>
+      <div className={msgStyles.feedScroll}>
       {!loaded ? (
         <SkeletonList />
       ) : list.length === 0 ? (
@@ -86,6 +90,7 @@ export function TeamNoticesScreen() {
         </ol>
       )}
       <div ref={endRef} />
+      </div>
     </div>
   );
 }

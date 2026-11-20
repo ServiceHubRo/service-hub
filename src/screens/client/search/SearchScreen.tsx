@@ -10,6 +10,7 @@ import { ActiveFilters, FilterGroup, FilterSheet, FiltersButton } from '../../..
 import { LoadError } from '../../../components/LoadError';
 import { SearchField } from '../../../components/SearchField';
 import { SelectField } from '../../../components/SelectField';
+import { DetailFrame, ListDetailLayout } from '../../../components/ListDetailLayout';
 import { PageHeader } from '../../../components/PageHeader';
 import { SkeletonList } from '../../../components/Skeleton';
 import { Switch } from '../../../components/Switch';
@@ -25,6 +26,8 @@ import { hasOffer } from '../../../lib/offers';
 import { distanceTo, nearby, sortByDistance } from '../../../lib/geo';
 import { useLocation } from '../../../lib/location';
 import { cityNamedBy, fold } from '../../../lib/text';
+import { EmbeddedProvider } from '../../../lib/embedded';
+import { LIST_DETAIL_QUERY, useMediaQuery } from '../../../lib/useMediaQuery';
 import { useLoad } from '../../../lib/useLoad';
 import { PushBanner } from '../../push/PushBanner';
 import { SEARCH_PATH, shopPath, type ShopLinkState } from '../paths';
@@ -37,6 +40,7 @@ import { ExpiryBanner } from './ExpiryBanner';
 import { LocationBanner } from './LocationBanner';
 import { ReviewPrompt } from './ReviewPrompt';
 import { RankingExplanation, RankingToggle } from './RankingInfo';
+import { ShopPage } from '../shop/ShopPage';
 import { ShopCard } from './ShopCard';
 import styles from './SearchScreen.module.css';
 
@@ -55,6 +59,8 @@ const ShopsMap = lazy(() => import('../../../components/map/ShopsMap'));
 
 /** Last results per search, so coming back from a shop page shows the list at once (then refreshes). */
 const cache = new Map<string, ShopSearchResult[]>();
+/** The shop shown beside the results, kept while the reader goes to a shop's reviews and back. */
+const lastPicked = new Map<'shop', string>();
 
 /**
  * Caută (FR §3.1; P11, P16, P16d): one field for name, city or service; everything else (day,
@@ -90,6 +96,13 @@ export function SearchScreen() {
   const datePicked = Boolean(day && dayParam !== 'azi' && dayParam !== 'maine');
   const location = useLocation();
   const coords = location.coords;
+
+  const wide = useMediaQuery(LIST_DETAIL_QUERY);
+  const [pickedId, setPickedId] = useState<string | null>(lastPicked.get('shop') ?? null);
+  const pick = (id: string) => {
+    lastPicked.set('shop', id);
+    setPickedId(id);
+  };
 
   const { state: meta, reload: reloadMeta } = useLoad(loadMeta);
   const cities = meta.status === 'ready' ? meta.data.cities : null;
@@ -190,6 +203,11 @@ export function SearchScreen() {
   }, [results, favOnly, instantOnly, offerOnly, wanted, byDistance, coords, distance]);
   const near = useMemo(() => (coords && !byDistance ? nearby(list, distance) : []), [coords, byDistance, list, distance]);
 
+  /** Beside the shop's panel a card is chosen, not opened; the chosen one (the first until a choice) is marked. */
+  const chosenId = (list.find((s) => s.shop_id === pickedId) ?? list[0])?.shop_id;
+  const cardSelect = (s: ShopSearchResult) =>
+    wide && !asMap ? { selected: s.shop_id === chosenId, onSelect: () => pick(s.shop_id) } : {};
+
   const filtersOn = Boolean(category || city || favOnly || day || instantOnly || offerOnly || wanted.length > 0);
   const [explainOpen, setExplainOpen] = useState(false);
   const explainId = useId();
@@ -279,10 +297,9 @@ export function SearchScreen() {
     />
   );
 
-  return (
-    <div className={styles.page}>
-      <PageHeader title={t('nav.client.search')} />
-
+  const title = <PageHeader title={t('nav.client.search')} />;
+  const notices = (
+    <>
       {guide.visible && <ClientGuide guide={guide} />}
       {guide.pending && <span hidden data-guide-pending />}
       {/* One notice at a time (T52, Eduard 30 Oct: the search in sight on a phone), in this order;
@@ -296,6 +313,10 @@ export function SearchScreen() {
       </div>
       <AreaCard />
 
+    </>
+  );
+  const controls = (
+    <>
       <SearchField
         id="search-q"
         label={t('search.label')}
@@ -413,6 +434,10 @@ export function SearchScreen() {
         )}
       </FilterSheet>
 
+    </>
+  );
+  const resultsBlock = (
+    <>
       {status === 'error' && <LoadError message={t('search.resultsError')} onRetry={() => setAttempt((a) => a + 1)} />}
       {status !== 'error' && !results && <SkeletonList cards />}
       {status !== 'error' && results && (
@@ -470,7 +495,7 @@ export function SearchScreen() {
                   <ul className={styles.list} data-layout="cards">
                     {near.map((s) => (
                       <li key={s.shop_id}>
-                        <ShopCard shop={s} distanceKm={distance(s)} back={back} onFavorite={onFavorite} day={day} />
+                        <ShopCard shop={s} distanceKm={distance(s)} back={back} onFavorite={onFavorite} day={day} {...cardSelect(s)} />
                       </li>
                     ))}
                   </ul>
@@ -485,7 +510,7 @@ export function SearchScreen() {
                 <ul className={styles.list} data-layout="cards">
                   {list.map((s) => (
                     <li key={s.shop_id}>
-                      <ShopCard shop={s} distanceKm={distance(s)} back={back} onFavorite={onFavorite} day={day} />
+                      <ShopCard shop={s} distanceKm={distance(s)} back={back} onFavorite={onFavorite} day={day} {...cardSelect(s)} />
                     </li>
                   ))}
                 </ul>
@@ -494,6 +519,54 @@ export function SearchScreen() {
           )}
         </div>
       )}
+    </>
+  );
+
+  // Beside the results (a laptop, C9): the shops as cards on the left, the chosen shop's page on the
+  // right (the first one until another is chosen). The map view and a phone keep the page as it was.
+  // The same tree whatever the results (none, loading): the field being typed in and the open filters
+  // are never rebuilt under the reader.
+  if (wide && !asMap) {
+    const open = list.find((s) => s.shop_id === pickedId) ?? list[0];
+    return (
+      <div className={styles.page}>
+        <ListDetailLayout
+          wide
+          open={false}
+          backTo={SEARCH_PATH}
+          backLabel={t('nav.client.search')}
+          header={
+            <>
+              {title}
+              {controls}
+            </>
+          }
+          list={
+            <>
+              {notices}
+              {resultsBlock}
+            </>
+          }
+          detail={
+            open && results ? (
+              <DetailFrame>
+                <EmbeddedProvider value>
+                  <ShopPage key={open.shop_id} shopId={open.shop_id} linkState={back} />
+                </EmbeddedProvider>
+              </DetailFrame>
+            ) : null
+          }
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div className={styles.page}>
+      {title}
+      {notices}
+      {controls}
+      {resultsBlock}
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { BACKEND, PASSWORD, bucharestDay, createBookableShop, createUser, expectNoHorizontalScroll, openShopBooking, serviceRest, shot, signIn } from './support';
+import { BACKEND, PASSWORD, bucharestDay, createBookableShop, createUser, expectNoHorizontalScroll, openShopBooking, pickService, serviceRest, shot, signIn } from './support';
 
 // Offers, completed (Eduard, 8 Oct): the new-client offer with a last day and chosen services, the
 // quiet-day offer; the "Doar cu ofertă" filter and the badges; "-15%" on the quiet days of step 2
@@ -88,7 +88,7 @@ test.describe('offers: last day, services, quiet days', () => {
 
     // Step 2: every weekday with places shows -15 %; book the first one.
     await c.getByRole('link', { name: 'Programează-te' }).click();
-    await c.getByRole('button', { name: /^Plăcuțe de frână|^Frâne/ }).first().click();
+    await pickService(c, /^Plăcuțe de frână|^Frâne/, 'Frânare');
     await c.getByRole('button', { name: /^Continuă/ }).click();
     const quietDay = c.getByRole('button', { name: /: 1 loc, reducere de 15%$/ }).first();
     await expect(quietDay).toBeVisible();

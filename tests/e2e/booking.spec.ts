@@ -13,6 +13,7 @@ import {
   userIdOf,
   switchLanguage,
   shopRow,
+  pickService,
 } from './support';
 
 // T07 — the garage with its expiry alerts, the 4-step booking, capacity, a day that fills up while
@@ -61,7 +62,7 @@ test.describe('garage', () => {
 
     await page.getByRole('link', { name: 'Adaugă mașină' }).click();
     // The same card as „Adaugă vehicul” in a company's space (14 Nov 2026): the checks come on save.
-    await expect(page.getByRole('heading', { level: 1, name: 'Adaugă mașină' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Adaugă mașină' })).toBeVisible();
     const save = page.getByRole('button', { name: 'Salvează mașina' });
     await save.click(); // make and model first
     await expect(page.getByText('Marca și modelul sunt obligatorii.').first()).toBeVisible();
@@ -147,7 +148,7 @@ test.describe('booking', () => {
     const continueButton = page.getByRole('button', { name: /^Continuă/ });
     await expect(page.getByRole('button', { name: 'Alege cel puțin un serviciu' })).toBeDisabled();
     await page.getByRole('button', { name: 'Schimb ulei + filtru ulei' }).click();
-    await page.getByRole('button', { name: 'Plăcuțe de frână' }).click();
+    await pickService(page, 'Plăcuțe de frână', 'Frânare');
     await expect(page.getByRole('button', { name: 'Plăcuțe de frână', pressed: true })).toBeVisible();
     await expect(continueButton).toHaveText('Continuă · 2 servicii');
     await expect(continueButton).toBeInViewport();

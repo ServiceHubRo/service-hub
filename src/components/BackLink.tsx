@@ -3,6 +3,7 @@ import { useLayoutEffect, useRef, type MouseEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useI18n } from '../i18n/context';
 import { goUp } from '../lib/navHistory';
+import { useEmbedded } from '../lib/embedded';
 import styles from './BackLink.module.css';
 
 /**
@@ -12,6 +13,7 @@ import styles from './BackLink.module.css';
  */
 export function BackLink({ to, label }: { to: string; label?: string }) {
   const { t } = useI18n();
+  const embedded = useEmbedded();
   const navigate = useNavigate();
   // Held under the header inside the app: its height joins the header's for what is scrolled into
   // view (global.css scroll-padding-top) and for the field typed in with the keyboard open (11 Nov 2026).
@@ -34,6 +36,7 @@ export function BackLink({ to, label }: { to: string; label?: string }) {
     e.preventDefault();
     goUp(navigate as (to: string | number, options?: { replace?: boolean }) => void, to);
   }
+  if (embedded) return null;
   return (
     <div data-ui="back-link" ref={barRef} className={styles.bar} data-back-bar>
       <Link to={to} className={styles.back} onClick={onClick}>

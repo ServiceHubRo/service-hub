@@ -666,3 +666,14 @@ export async function backToList(page: Page) {
     await expect(detailPane(page)).toHaveCount(0);
   }
 }
+
+/**
+ * Ticks a service on step 1 of the booking. From 1024 px the categories are rows on the left and only the
+ * chosen category's services show (C9): the category row is chosen first.
+ */
+export async function pickService(page: Page, service: string | RegExp, category?: string) {
+  if (category && (page.viewportSize()?.width ?? 0) >= 1024) {
+    await page.getByRole('list', { name: 'Servicii oferite' }).locator(':scope > li').filter({ hasText: category }).first().getByRole('button').click();
+  }
+  await page.getByRole('button', { name: service }).first().click();
+}

@@ -15,6 +15,11 @@ interface OpenedFromList {
  * - Below, the detail takes the screen: choosing an item adds a step to the history, so the
  *   phone's Back (and „Înapoi”) returns to the list, scrolled where it was.
  */
+/** The state a screen was opened with (where the way back leads), kept when an item is chosen. */
+function stateOf(state: unknown): object {
+  return state && typeof state === 'object' ? state : {};
+}
+
 export function useListDetail(ids: readonly string[], param = 'id', options: { autoSelect?: boolean; anyId?: boolean } = {}) {
   // An item whose opening is recorded (a support request in the audit log) is never opened for the
   // reader: beside the list nothing is shown until one is chosen.
@@ -37,13 +42,13 @@ export function useListDetail(ids: readonly string[], param = 'id', options: { a
       next.set(param, id);
       if (wide) {
         // The anchor of the address (`#lista`) stays: only the chosen item changes.
-        navigate({ search: `?${next.toString()}`, hash: window.location.hash }, { replace: true, preventScrollReset: true });
+        navigate({ search: `?${next.toString()}`, hash: window.location.hash }, { replace: true, preventScrollReset: true, state: location.state });
         return;
       }
       listScroll.current = window.scrollY;
-      navigate({ search: `?${next.toString()}`, hash: window.location.hash }, { state: { listDetail: true } satisfies OpenedFromList });
+      navigate({ search: `?${next.toString()}`, hash: window.location.hash }, { state: { ...stateOf(location.state), listDetail: true } satisfies OpenedFromList });
     },
-    [params, param, wide, navigate],
+    [params, param, wide, navigate, location.state],
   );
 
   const back = useCallback(() => {
@@ -53,7 +58,7 @@ export function useListDetail(ids: readonly string[], param = 'id', options: { a
     }
     const next = new URLSearchParams(params);
     next.delete(param);
-    navigate({ search: `?${next.toString()}`, hash: window.location.hash }, { replace: true });
+    navigate({ search: `?${next.toString()}`, hash: window.location.hash }, { replace: true, state: location.state });
   }, [location.state, navigate, params, param]);
 
   // Beside the list, the item shown first is written in the address like a chosen one: it stays
@@ -68,8 +73,8 @@ export function useListDetail(ids: readonly string[], param = 'id', options: { a
     const next = new URLSearchParams(window.location.search);
     if (next.get(param) === first) return;
     next.set(param, first);
-    navigate({ search: `?${next.toString()}`, hash: window.location.hash }, { replace: true, preventScrollReset: true });
-  }, [wide, autoSelect, known, first, params, param, navigate]);
+    navigate({ search: `?${next.toString()}`, hash: window.location.hash }, { replace: true, preventScrollReset: true, state: location.state });
+  }, [wide, autoSelect, known, first, params, param, navigate, location.state]);
 
   // The detail opens at its top; the list comes back where it was.
   const wasOpen = useRef(open);
