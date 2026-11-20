@@ -11,6 +11,7 @@ import {
   userIdOf,
   openShopBooking,
   backToList,
+  detailPane,
   openClientBooking,
 } from './support';
 
@@ -113,6 +114,7 @@ test.describe('new-client offers', () => {
       inspection_started_at: new Date().toISOString(),
     });
     await page.reload();
+    await expect(page.getByRole('combobox', { name: 'Afișează' }).or(detailPane(page)).first()).toBeVisible();
     await backToList(page);
     await page.getByRole('combobox', { name: 'Afișează' }).selectOption('programate');
     await (await openShopBooking(page, 'Skoda Octavia')).getByRole('button', { name: 'Trimite deviz' }).click();
