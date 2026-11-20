@@ -166,3 +166,42 @@
     background: var(--surface);
   }
 }
+
+/* A request that arrived live (src/lib/motion.ts, newRequestGlow): it comes in from above and an
+   amber glow around it fades. */
+.fresh {
+  animation:
+    row-in var(--motion) var(--ease),
+    row-glow 2.6s ease-out;
+}
+
+@keyframes row-in {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes row-glow {
+  0%,
+  25% {
+    box-shadow:
+      0 0 0 2px var(--amber),
+      0 0 22px var(--amber-line);
+  }
+  100% {
+    box-shadow:
+      0 0 0 2px transparent,
+      0 0 22px transparent;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fresh {
+    animation: none;
+  }
+}

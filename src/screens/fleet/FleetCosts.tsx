@@ -164,8 +164,8 @@ export function FleetCosts({ initialPeriod }: { initialPeriod?: string }) {
             {allowed('costs.manage') && (addExpense || actions) && (
               // The add, top right of the page (docs/MODEL_DE_FOLOSIRE.md P12).
               <HeaderAction>
-                <Button variant="primary" onClick={() => setAdding((a) => !a)} aria-expanded={adding}>
-                  <Plus size={18} aria-hidden="true" /> {t('fleet.costs.add')}
+                <Button variant="primary" onClick={() => setAdding((a) => !a)} aria-expanded={adding} aria-label={t('fleet.costs.add')}>
+                  <Plus size={18} aria-hidden="true" /> {t('action.add')}
                 </Button>
               </HeaderAction>
             )}

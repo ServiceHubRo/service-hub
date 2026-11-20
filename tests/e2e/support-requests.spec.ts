@@ -41,7 +41,7 @@ async function newRequest(page: Page, title: string, body: string) {
   await page.goto('/c/cont/ajutor');
   await page.getByRole('link', { name: /^Solicitările mele/ }).click();
   await expect(h1(page)).toHaveText('Solicitările mele');
-  await page.getByRole('link', { name: 'Solicitare nouă' }).click();
+  await page.getByRole('link', { name: 'Adaugă o solicitare' }).click();
   await expect(h1(page)).toHaveText('Solicitare nouă');
   await page.getByLabel('Categorie').selectOption({ label: 'Probleme tehnice' });
   await page.getByLabel('Titlu').fill(title);
@@ -76,7 +76,7 @@ test.describe('support requests (A3a)', () => {
     await shot(page, 'a3a-my-empty', name());
 
     // A new request: everything missing is named, an unknown booking code refused.
-    await page.getByRole('link', { name: 'Solicitare nouă' }).click();
+    await page.getByRole('link', { name: 'Adaugă o solicitare' }).click();
     await page.getByRole('button', { name: 'Trimite solicitarea' }).click();
     await expect(page.getByText('Alege categoria.')).toBeVisible();
     await expect(page.getByText('Scrie un titlu de cel puțin 3 caractere.')).toBeVisible();

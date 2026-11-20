@@ -9,8 +9,10 @@ import {
   createBookableShop,
   createUser,
   expectNoHorizontalScroll,
-  openAllBookings,
-  openBooking,
+  backToList,
+  detailPane,
+  openShopBooking,
+  shopRow,
   rpcAs,
   scrollTopOf,
   serviceRest,
@@ -36,7 +38,6 @@ const navLink = (page: Page, label: string | RegExp) =>
   page.getByRole('link', { name: label, exact: typeof label === 'string' }).filter({ visible: true }).first();
 /** The booking cards on screen (not the quote lines inside them). */
 const cards = (page: Page) => page.locator('main ul[aria-label] > li');
-const card = (page: Page, text: string) => cards(page).filter({ hasText: text });
 
 interface Day {
   date: string;
@@ -95,14 +96,13 @@ test.describe('demo shop', () => {
     await shot(page, 't08-panou-print', name());
     await page.emulateMedia({ media: 'screen' });
 
-    // A row of today's schedule opens that booking alone; "Șterge filtrele" shows the rest again.
+    // A row of today's schedule opens that booking, in its list.
     await page.getByRole('link', { name: /08:00/ }).click();
     await expect(page).toHaveURL(/\/s\/programari\?tab=programate&p=/);
-    await expect(cards(page)).toHaveCount(1);
-    await expect(cards(page)).toContainText('B 123 IRD');
-    await expect(cards(page)).toContainText('În lucru din');
-    await expect(page.getByText(/Programarea P-\d+/).first()).toBeVisible();
-    await page.getByRole('button', { name: 'Șterge filtrele' }).click();
+    await expect(detailPane(page)).toContainText('B 123 IRD');
+    await expect(detailPane(page)).toContainText('În lucru din');
+    await expect(detailPane(page)).toContainText(/P-\d{6}/);
+    await backToList(page);
     await expect.poll(() => cards(page).count()).toBeGreaterThan(1);
 
     // Back to Panou: the "În lucru" card opens the filtered list.
@@ -115,8 +115,8 @@ test.describe('demo shop', () => {
 
     // Cereri: the request with the note, the car and the client's account id.
     await page.getByRole('combobox', { name: 'Afișează' }).selectOption('cereri');
-    await openAllBookings(page);
-    const request = card(page, 'Aș vrea și verificarea lichidelor.');
+    const request = await openShopBooking(page, 'Andrei Marin');
+    await expect(request).toContainText('Aș vrea și verificarea lichidelor.');
     await expect(request).toContainText('Andrei Marin');
     await expect(request).toContainText('BV 12 ABC');
     await expect(request).toContainText(/ID cont C-\d+/);
@@ -136,24 +136,28 @@ test.describe('demo shop', () => {
     await expect(request.getByRole('button', { name: 'Confirmă' })).toBeVisible();
 
     // Programate: every state; the no-show mark; "Neprezentat" only after the booking's time.
+    await backToList(page);
     await page.getByRole('combobox', { name: 'Afișează' }).selectOption('programate');
-    await openAllBookings(page);
-    const george = card(page, 'George Toma');
+    const cristina = await openShopBooking(page, 'Cristina Dobre');
+    await expect(await cardAction(cristina, 'Neprezentat')).toHaveCount(0);
+    await page.keyboard.press('Escape');
+    const george = await openShopBooking(page, 'George Toma');
     await expect(george).toContainText('Client cu 3 neprezentări');
     await expect(george).toContainText('Ora programării a trecut');
-    await expect(await cardAction(card(page, 'Cristina Dobre'), 'Neprezentat')).toHaveCount(0);
-    await page.keyboard.press('Escape');
     await (await cardAction(george, 'Neprezentat')).click();
     await expect(george.getByText('Clientul nu a venit?')).toBeVisible();
     await george.getByRole('button', { name: 'Renunță' }).click();
-    await expect(card(page, 'Mihai Petrescu')).toContainText('Clientul a acceptat 2 din 3 poziții');
-    await expect(card(page, 'Scârțâie la frânare dimineața.')).toContainText('se așteaptă răspunsul clientului');
-    await expect(card(page, 'Martorul de motor aprins.').getByRole('button', { name: 'Trimite deviz' })).toBeVisible();
+    await expect(await openShopBooking(page, 'Mihai Petrescu')).toContainText('Clientul a acceptat 2 din 3 poziții');
+    const inspected = await openShopBooking(page, /Diagnoză computerizată.*BV 07 DAC/);
+    await expect(inspected).toContainText('Martorul de motor aprins.');
+    await expect(inspected.getByRole('button', { name: 'Trimite deviz' })).toBeVisible();
+    const quoted = await openShopBooking(page, /Plăcuțe de frână.*BV 12 ABC/);
+    await expect(quoted).toContainText('Scârțâie la frânare dimineața.');
+    await expect(quoted).toContainText('se așteaptă răspunsul clientului');
     await expectNoHorizontalScroll(page);
     await shot(page, 't08-programate', name());
 
     // "Editează devizul" opens the editor (T50) with the sent lines.
-    const quoted = card(page, 'Scârțâie la frânare dimineața.');
     await (await cardAction(quoted, 'Editează devizul')).click();
     await expect(page.getByRole('heading', { level: 1, name: 'Modifică devizul' })).toBeVisible();
     await expect(page.getByLabel('Piesă sau material').nth(1)).toHaveValue('Discuri frână față');
@@ -189,8 +193,8 @@ test.describe('shop flow', () => {
     await shot(page, 't08-live-request', name());
 
     await page.getByRole('link', { name: /^\d+ Cereri noi$/ }).click();
-    await openAllBookings(page);
-    const c = card(page, 'Zgomot la roata din față.');
+    const c = await openShopBooking(page, 'BV 99 TST');
+    await expect(c).toContainText('Zgomot la roata din față.');
     await expect(c).toContainText('Maria Pop');
     await expect(c).toContainText(clientPhone.national);
     await expect(c).toContainText('BV 99 TST');
@@ -211,8 +215,8 @@ test.describe('shop flow', () => {
     // The confirmed booking left Cereri; the notice leads to it.
     await page.getByRole('button', { name: 'Vezi programarea' }).click();
     await expect(page).toHaveURL(/tab=programate&p=/);
-    await page.getByRole('button', { name: 'În constatare' }).click();
-    await expect(cards(page)).toContainText('Mașina este în constatare din');
+    await detailPane(page).getByRole('button', { name: 'În constatare' }).click();
+    await expect(detailPane(page)).toContainText('Mașina este în constatare din');
 
     // The client's Programări (another browser) follows live.
     const other = await browser.newContext({ viewport: page.viewportSize() ?? undefined });
@@ -226,7 +230,7 @@ test.describe('shop flow', () => {
 
     // The quote (T50, its own screen): parts with quantity × price, a fixed-price labor line, the
     // total live, a line with a missing price refused in place.
-    await page.getByRole('button', { name: 'Trimite deviz' }).click();
+    await detailPane(page).getByRole('button', { name: 'Trimite deviz' }).click();
     await expect(page.getByRole('heading', { level: 1, name: 'Deviz nou' })).toBeVisible();
     await page.getByLabel('Piesă sau material').first().fill('Plăcuțe frână');
     await page.getByLabel('Preț unitar, lei').first().fill('280');
@@ -252,8 +256,7 @@ test.describe('shop flow', () => {
     await page.getByRole('button', { name: 'Șterge piesa 3' }).click();
     await page.getByRole('button', { name: 'Trimite devizul' }).click();
     await expect(page.getByText(`Devizul pentru ${booking.ref} a fost trimis clientului.`)).toBeVisible();
-    const sent = card(page, booking.ref);
-    await openBooking(sent);
+    let sent = await openShopBooking(page, booking.ref);
     await expect(sent).toContainText('Deviz trimis — se așteaptă răspunsul clientului.');
     await expect(sent).toContainText('Discuri frână');
     await expect(sent).toContainText('Piese și materiale');
@@ -266,18 +269,19 @@ test.describe('shop flow', () => {
     await page.getByLabel('Preț, lei').first().fill('200');
     await page.getByRole('button', { name: 'Trimite devizul nou' }).click();
     await expect(page.getByText(`Devizul nou pentru ${booking.ref} a fost trimis clientului.`)).toBeVisible();
+    sent = await openShopBooking(page, booking.ref);
     await expect(sent).toContainText('900,50 lei');
     await (await cardAction(sent, 'Retrage devizul')).click();
     await sent.getByRole('button', { name: 'Retrage devizul' }).click();
     await expect(page.getByText(`Devizul pentru ${booking.ref} a fost retras.`)).toBeVisible();
-    await openBooking(sent);
+    sent = await openShopBooking(page, booking.ref);
     await expect(sent).toContainText('Mașina este în constatare din');
     await expect(clientCard).toContainText('În constatare');
-    await page.getByRole('button', { name: 'Trimite deviz' }).click();
+    await sent.getByRole('button', { name: 'Trimite deviz' }).click();
     await page.getByLabel('Piesă sau material').first().fill('Plăcuțe frână');
     await page.getByLabel('Preț unitar, lei').first().fill('280');
     await page.getByRole('button', { name: 'Trimite devizul' }).click();
-    await openBooking(sent);
+    sent = await openShopBooking(page, booking.ref);
     await expect(sent).toContainText('Deviz trimis — se așteaptă răspunsul clientului.');
     await expect(clientCard).toContainText('Deviz trimis');
     const quotes = await serviceRest<{ status: string }[]>(`quotes?booking_id=eq.${booking.id}&select=status&order=version`, 'GET');
@@ -303,8 +307,7 @@ test.describe('shop flow', () => {
     await expect(page.getByText(/Cars per day: 1 · Today: \d/)).toBeVisible();
     await shot(page, 't08-panou-en', name());
     await navLink(page, /^Bookings/).click();
-    await openAllBookings(page);
-    const cx = card(page, 'BV 01 XXX');
+    const cx = await openShopBooking(page, 'BV 01 XXX');
     await (await cardAction(cx, 'Reschedule')).click();
     await expect(cx.getByRole('button', { name: /: full$/ }).first()).toBeDisabled(); // day B, confirmed Y
     const tile = (d: string) => cx.getByRole('button', { name: `${formatDate('en', d)}: 1 spot` });
@@ -326,12 +329,12 @@ test.describe('shop flow', () => {
     await cx.getByRole('button', { name: /^\d{2}:\d{2}$/, disabled: false }).first().click();
     await cx.getByRole('button', { name: 'Move and confirm' }).click();
     await expect(page.getByText(new RegExp(`Booking ${x.ref} moved to .* and confirmed\\.`))).toBeVisible();
-    await expect(card(page, 'BV 01 XXX')).toHaveCount(0);
+    await backToList(page);
+    await expect(shopRow(page, 'BV 01 XXX')).toHaveCount(0);
 
     // Cancel needs a reason, which the client gets.
     await page.getByRole('combobox', { name: 'Show' }).selectOption('programate');
-    await openAllBookings(page);
-    const cy = card(page, 'BV 02 YYY');
+    const cy = await openShopBooking(page, 'BV 02 YYY');
     await (await cardAction(cy, 'Cancel')).click();
     await cy.getByRole('button', { name: 'Cancel booking' }).click();
     await expect(cy.getByText('Enter the reason.')).toBeVisible();
@@ -346,12 +349,12 @@ test.describe('shop flow', () => {
     const freeNow = await freeDays(clients[3]!, shopId);
     const z = await book(clients[3]!, shopId, freeNow[0]!, await slotOf(freeNow[0]!), 'BV 04 WWW', 'Booking Z');
     await page.getByRole('combobox', { name: 'Show' }).selectOption('cereri');
-    await openAllBookings(page);
-    const cz = card(page, 'BV 04 WWW');
+    const cz = await openShopBooking(page, 'BV 04 WWW');
     await (await cardAction(cz, 'Decline')).click();
     await cz.getByRole('button', { name: 'Decline request' }).click();
     await expect(page.getByText(`Request ${z.ref} was declined. The client has been notified.`)).toBeVisible();
-    await expect(card(page, 'BV 04 WWW')).toHaveCount(0);
+    await backToList(page);
+    await expect(shopRow(page, 'BV 04 WWW')).toHaveCount(0);
     await expectNoHorizontalScroll(page);
   });
 });

@@ -17,6 +17,7 @@ import {
   pickFilter,
   switchLanguage,
   detailPane,
+  chooseRow,
 } from './support';
 
 // T16a — the admin: overview, shops, clients, bookings, moderation, the audit log. Every action
@@ -85,7 +86,7 @@ test.describe('admin', () => {
     await adminOpen(page, 'Parteneri', 'Service-uri');
     await expect(page.getByRole('heading', { level: 1, name: 'Service-uri' })).toBeVisible();
     await page.getByLabel('Caută după nume, oraș, email, telefon sau S-00001').fill(shopName);
-    await expect(page.getByRole('link', { name: new RegExp(shopName) })).toHaveCount(1);
+    await expect(page.getByRole('list', { name: 'Service-uri' }).locator(':scope > li').filter({ hasText: shopName })).toHaveCount(1);
     await expect(page).toHaveURL(/q=Atelier/);
     await pickFilter(page, 'Suspendate');
     await expect(page.getByText('Nu există rezultate pentru filtrele selectate.')).toBeVisible();
@@ -236,7 +237,7 @@ test.describe('admin', () => {
     await adminOpen(page, 'Activitate', 'Programări');
     await page.getByLabel('Caută după cod, număr, client sau service').fill(booking.ref);
     await expect(page.getByText('Afișate 1 din 1')).toBeVisible();
-    await page.getByRole('link', { name: new RegExp(booking.ref) }).click();
+    await (await chooseRow(page, 'Programări', booking.ref)).getByRole('link', { name: 'Deschide programarea' }).click();
     await expect(page.getByRole('heading', { level: 1, name: /Schimb ulei/ })).toBeVisible();
     await expect(page.getByRole('heading', { level: 2, name: 'Istoricul programării' })).toBeVisible();
     await expect(page.getByText(secret)).toHaveCount(0);
@@ -329,7 +330,7 @@ test.describe('admin', () => {
     await signInAdmin(page);
     await adminOpen(page, 'Parteneri', 'Clienți');
     await page.getByLabel('Caută după nume, email, telefon sau C-00001').fill(client);
-    await page.getByRole('link', { name: new RegExp(client.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')) }).click();
+    await (await chooseRow(page, 'Clienți', client)).getByRole('link', { name: 'Deschide fișa clientului' }).click();
     await expect(page.getByRole('heading', { level: 1, name: 'Maria Pop' })).toBeVisible();
     await expect(page.getByRole('list', { name: 'Activitatea contului' })).toContainText('Cont creat');
 
@@ -368,7 +369,7 @@ test.describe('admin', () => {
     await signInAdmin(page);
     await adminOpen(page, 'Parteneri', 'Clienți');
     await page.getByLabel('Caută după nume, email, telefon sau C-00001').fill(client);
-    await page.getByRole('link', { name: new RegExp(client.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')) }).click();
+    await (await chooseRow(page, 'Clienți', client)).getByRole('link', { name: 'Deschide fișa clientului' }).click();
     await expect(page.getByText('disponibile: 0 · folosite: 0')).toBeVisible();
 
     // An inline confirmation first; "Renunță" gives nothing.

@@ -1,14 +1,17 @@
 import { CalendarDays, SearchX, X } from 'lucide-react';
 import { useCallback, useState } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { Button } from '../../components/Button';
 import { EmptyState } from '../../components/EmptyState';
 import { Field } from '../../components/Field';
 import { LoadError } from '../../components/LoadError';
 import { SearchField } from '../../components/SearchField';
 import { SelectField } from '../../components/SelectField';
-import { SkeletonList } from '../../components/Skeleton';
+import { buttonClass } from '../../components/buttonClass';
+import { DetailFacts, DetailPane, ListDetailLayout } from '../../components/ListDetailLayout';
+import { ListRow, ListRows, ListRowsSkeleton } from '../../components/ListRow';
 import { BookingStatusPill } from '../../components/StatusPill';
-import { fetchBookings } from '../../data/admin';
+import { fetchBookings, type AdminBookingListRow } from '../../data/admin';
 import { ExportButton } from './ExportButton';
 import { adminZoneBack } from '../../app/adminZones';
 import { useI18n } from '../../i18n/context';
@@ -20,8 +23,9 @@ import {
   isYmd,
   statusesFor,
 } from '../../lib/admin';
-import { Money, RowLink } from './parts';
-import { ADMIN_BOOKINGS_PATH, adminBookingPath } from './paths';
+import { useListDetail } from '../../lib/useListDetail';
+import { Money } from './parts';
+import { ADMIN_BOOKINGS_PATH, adminBookingPath, adminClientPath, adminShopPath } from './paths';
 import { useLiveData } from './useLiveData';
 import { useUrlParams } from './useUrlParams';
 import { carText, day } from './format';
@@ -42,6 +46,7 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
  */
 export function BookingsScreen() {
   const { t, lang } = useI18n();
+  const { pathname } = useLocation();
   const { params, setParam, text, setText } = useUrlParams();
   const statusParam = params.get('stare');
   const status = isBookingStatusFilter(statusParam) ? statusParam : 'all';
@@ -66,8 +71,17 @@ export function BookingsScreen() {
     setParam({ q: null, stare: null, de_la: null, pana_la: null, service: null, client: null });
   };
 
-  return (
-    <div className={styles.page}>
+  // Page template A (docs/MODEL_DE_FOLOSIRE.md P8): one row per booking, the chosen one beside the list
+  // from 1024 px (in its place below); the whole booking is one tap away („Deschide programarea”).
+  const rows = data ? data.bookings : [];
+  const { wide, selectedId, open, select } = useListDetail(
+    rows.map((b) => b.id),
+    'programare',
+  );
+  const chosen = rows.find((b) => b.id === selectedId) ?? null;
+
+  const header = (
+    <>
       <PageHeader back={{ to: ZONE_BACK.to, label: t(ZONE_BACK.label) }} title={t('nav.admin.bookings')} subtitle={data ? t('admin.bookings.count', { shown: data.bookings.length, total: data.total }) : undefined} />
 
       <div className={styles.controls}>
@@ -116,66 +130,107 @@ export function BookingsScreen() {
           </div>
         )}
       </div>
+    </>
+  );
 
-      {state.status === 'loading' && <SkeletonList />}
-      {state.status === 'error' && <LoadError message={t('admin.loadError')} onRetry={reload} />}
-      {data &&
-        (data.bookings.length === 0 ? (
-          filtered ? (
-            <EmptyState
-              icon={SearchX}
-              title={t('admin.noResults')}
-              action={
-                <Button variant="primary" onClick={clearAll}>
-                  {t('admin.clearFilters')}
-                </Button>
-              }
+  let list;
+  if (state.status === 'loading') list = <ListRowsSkeleton label={t('common.loading')} />;
+  else if (state.status === 'error') list = <LoadError message={t('admin.loadError')} onRetry={reload} />;
+  else if (data && data.bookings.length === 0)
+    list = filtered ? (
+      <EmptyState
+        icon={SearchX}
+        title={t('admin.noResults')}
+        action={
+          <Button variant="primary" onClick={clearAll}>
+            {t('admin.clearFilters')}
+          </Button>
+        }
+      />
+    ) : (
+      <EmptyState icon={CalendarDays} title={t('admin.bookings.empty')} />
+    );
+  else if (data)
+    list = (
+      <>
+        <ListRows label={t('nav.admin.bookings')}>
+          {data.bookings.map((b) => (
+            <ListRow
+              key={b.id}
+              icon={<CalendarDays size={20} />}
+              title={(lang === 'ro' ? b.service_ro : b.service_en) ?? b.service_id}
+              detail={[b.ref, `${day(lang, b.date)}, ${b.slot}`, `${b.shop_name}, ${b.shop_city}`].join(' · ')}
+              status={<BookingStatusPill status={b.status} viewer="admin" />}
+              selected={wide && b.id === selectedId}
+              onSelect={() => select(b.id)}
             />
-          ) : (
-            <EmptyState icon={CalendarDays} title={t('admin.bookings.empty')} />
-          )
-        ) : (
-          <>
-            <ul className={styles.list}>
-              {data.bookings.map((b) => (
-                <li key={b.id}>
-                  <RowLink to={adminBookingPath(b.id)}>
-                    <span className={styles.rowTop}>
-                      <span className={styles.rowTitle}>{(lang === 'ro' ? b.service_ro : b.service_en) ?? b.service_id}</span>
-                      <BookingStatusPill status={b.status} viewer="admin" />
-                    </span>
-                    <span className={styles.rowMeta}>
-                      <span className={styles.id}>{b.ref}</span>
-                      <span>
-                        {day(lang, b.date)}, {b.slot}
-                      </span>
-                      <span>
-                        {b.shop_name}, {b.shop_city}
-                      </span>
-                    </span>
-                    <span className={styles.rowMeta}>
-                      <span>
-                        {b.client_name || t('admin.deletedAccount')}
-                        {b.client_display_id ? ` · ${b.client_display_id}` : ''}
-                      </span>
-                      <span>
-                        {carText(b.car_snapshot)}
-                        {b.car_snapshot.plate ? ` · ${b.car_snapshot.plate}` : ''}
-                      </span>
-                      {b.cost !== null && <Money amount={b.cost} />}
-                    </span>
-                  </RowLink>
-                </li>
-              ))}
-            </ul>
+          ))}
+        </ListRows>
             {data.bookings.length < data.total && limit < BOOKINGS_MAX && (
               <Button className={styles.more} onClick={() => setLimit((l) => Math.min(l + BOOKINGS_PAGE, BOOKINGS_MAX))}>
                 {t('admin.showMore')}
               </Button>
             )}
             {data.bookings.length < data.total && limit >= BOOKINGS_MAX && <p className={styles.muted}>{t('admin.bookings.narrow')}</p>}
-          </>
-        ))}
+      </>
+    );
+
+  return (
+    <div className={styles.page}>
+      <ListDetailLayout
+        wide={wide}
+        open={open}
+        backTo={pathname}
+        backLabel={t('nav.admin.bookings')}
+        header={header}
+        list={list}
+        detail={chosen && <BookingDetail key={chosen.id} b={chosen} />}
+      />
     </div>
+  );
+}
+
+/** One booking in the list's detail: who, where, what, how much; the whole booking is „Deschide programarea”. */
+function BookingDetail({ b }: { b: AdminBookingListRow }) {
+  const { t, lang } = useI18n();
+  return (
+    <DetailPane
+      id={b.id}
+      icon={<CalendarDays size={20} />}
+      title={(lang === 'ro' ? b.service_ro : b.service_en) ?? b.service_id}
+      detail={b.ref}
+      status={<BookingStatusPill status={b.status} viewer="admin" />}
+      actions={
+        <Link className={buttonClass('secondary')} to={adminBookingPath(b.id)}>
+          {t('admin.bookings.open')}
+        </Link>
+      }
+    >
+      <DetailFacts
+        items={[
+          { label: t('admin.booking.when'), value: `${day(lang, b.date)}, ${b.slot}` },
+          {
+            label: t('admin.booking.shop'),
+            value: (
+              <Link className={styles.link} to={adminShopPath(b.shop_id)}>
+                {b.shop_name}, {b.shop_city}
+              </Link>
+            ),
+          },
+          {
+            label: t('admin.booking.client'),
+            value: b.client_id ? (
+              <Link className={styles.link} to={adminClientPath(b.client_id)}>
+                {[b.client_name, b.client_display_id].filter(Boolean).join(' · ')}
+              </Link>
+            ) : (
+              t('admin.deletedAccount')
+            ),
+          },
+          { label: t('admin.booking.car'), value: [carText(b.car_snapshot), b.car_snapshot.plate].filter(Boolean).join(' · ') || '—' },
+          { label: t('admin.booking.cost'), value: b.cost !== null ? <Money amount={b.cost} /> : '—' },
+        ]}
+      />
+    </DetailPane>
   );
 }

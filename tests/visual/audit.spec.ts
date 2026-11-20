@@ -346,8 +346,18 @@ async function audit(page: Page, role: string, screens: Screen[], lang: 'ro' | '
 
 async function clickFirst(page: Page, selector: string) {
   const link = page.locator(`main ${selector}`).filter({ visible: true }).first();
+  // A list + detail screen on a phone: the link to the full page is in the detail of a row.
+  const rows = page.locator('main [data-ui="list-row"]').filter({ visible: true });
+  await link.or(rows.first()).first().waitFor({ timeout: 8_000 });
+  if (!(await link.isVisible()) && (await rows.count()) > 0) await openRow(page);
   await link.click({ timeout: 8_000 });
   await page.waitForLoadState('domcontentloaded');
+}
+
+/** A list + detail screen: chooses its first row (on a phone the detail then takes the screen). */
+async function openRow(page: Page) {
+  await page.locator('main [data-ui="list-row"] :is(button, a)').filter({ visible: true }).first().click({ timeout: 8_000 });
+  await page.locator('[data-ui="detail-pane"]').first().waitFor({ timeout: 8_000 });
 }
 
 async function clickButton(page: Page, name: RegExp) {
@@ -600,11 +610,12 @@ test.describe('A9 visual audit', () => {
       { name: 'panou', path: '/s/panou' },
       { name: 'programari', path: '/s/programari' },
       { name: 'programari-programate', path: '/s/programari?tab=programate' },
-      { name: 'programari-deschise', path: '/s/programari', roOnly: true, prep: async (p) => {
-          const closed = p.locator('main button[aria-controls^="booking-"][aria-expanded="false"]');
-          for (let i = 0; i < 4 && (await closed.count()) > 0; i++) await closed.first().click();
+      // Page template A: a row opens its booking (beside the list from 1024 px, in its place below).
+      { name: 'programari-deschise', path: '/s/programari?tab=programate', roOnly: true, prep: async (p) => openRow(p) },
+      { name: 'programari-mai-multe', path: '/s/programari?tab=programate', roOnly: true, prep: async (p) => {
+          await openRow(p);
+          await clickButton(p, /^Mai multe/);
         } },
-      { name: 'programari-mai-multe', path: '/s/programari', roOnly: true, prep: async (p) => clickButton(p, /^Mai multe/) },
       { name: 'programare-noua', path: '/s/programari/nou' },
       { name: 'import', path: '/s/programari/import' },
       { name: 'deviz-editor', path: `/s/programari/deviz/${by('in_inspection')}` },
@@ -612,9 +623,7 @@ test.describe('A9 visual audit', () => {
       { name: 'preluare', path: `/s/programari/preluare/${by('confirmed', 'in_inspection')}` },
       { name: 'fisa-vehicul', path: `/s/istoric/fisa/${by('completed')}` },
       { name: 'istoric', path: '/s/istoric' },
-      { name: 'istoric-deschis', path: '/s/istoric', roOnly: true, prep: async (p) => {
-          await p.locator('main button[aria-controls]').filter({ visible: true }).first().click();
-        } },
+      { name: 'istoric-deschis', path: '/s/istoric', roOnly: true, prep: async (p) => openRow(p) },
       { name: 'mesaje', path: '/s/mesaje' },
       { name: 'conversatie', path: `/s/mesaje/${threads[0]?.id ?? 'x'}` },
       { name: 'cont', path: '/s/cont' },

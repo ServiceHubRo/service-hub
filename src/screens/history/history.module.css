@@ -131,20 +131,21 @@
 }
 
 .facts {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+  /* The labels share one column as wide as the longest one, each on a single line. */
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: 6px 12px;
   font-size: 14px;
 }
 
 .facts div {
-  display: flex;
-  gap: 12px;
+  display: contents;
 }
 
 .facts dt {
-  flex: 0 0 104px;
+  min-width: 104px;
   color: var(--muted);
+  white-space: nowrap;
 }
 
 .facts dd {

@@ -338,17 +338,6 @@ export async function adminOpen(page: Page, zone: string, item: string) {
 }
 
 /**
- * T57: a shop booking card shows its summary; its details (phone, quote lines, intake, PDFs) open
- * with a tap on the summary. Opens the card if it is closed.
- */
-export async function openBooking(card: Locator) {
-  const summary = card.locator('button[aria-controls^="booking-"]');
-  await expect(summary).toBeVisible();
-  if ((await summary.getAttribute('aria-expanded')) !== 'true') await summary.click();
-  await expect(summary).toHaveAttribute('aria-expanded', 'true');
-}
-
-/**
  * S2 (page template A): the client's Programări is a list beside (or before) one booking's detail.
  * Opens the booking whose row has `text` (the service, the shop, the car, the status…), in Încheiate
  * when it is not among the active ones, and returns its detail.
@@ -394,13 +383,6 @@ export async function openClientBooking(page: Page, text: string | RegExp): Prom
   const mine = detail.filter({ hasText: text });
   await expect(mine).toBeVisible();
   return mine;
-}
-
-/** Opens every shop booking card on the page. */
-export async function openAllBookings(page: Page) {
-  const closed = page.locator('main button[aria-controls^="booking-"][aria-expanded="false"]');
-  await expect(page.locator('main button[aria-controls^="booking-"]').first()).toBeVisible();
-  while ((await closed.count()) > 0) await closed.first().click();
 }
 
 export async function expectNoHorizontalScroll(page: Page) {
@@ -641,6 +623,35 @@ export function inboxRow(page: Page, text: string): Locator {
 
 /** The detail of the item chosen in a list + detail screen (page template A). */
 export const detailPane = (page: Page) => page.locator('[data-ui="detail-pane"]');
+
+/**
+ * The shop's Programări (page template A): the row of a booking by its words (a ref, a plate…), and its
+ * detail once the row is chosen. The detail stays the open one until another row is chosen.
+ */
+export const shopRow = (page: Page, text: string | RegExp) => page.locator('[data-ui="list-row"]').filter({ hasText: text });
+export async function openShopBooking(page: Page, text: string | RegExp): Promise<Locator> {
+  // On a phone another booking's detail hides the list: back to it first.
+  if ((page.viewportSize()?.width ?? 0) < 1024 && (await detailPane(page).count()) > 0 && (await detailPane(page).filter({ hasText: text }).count()) === 0) {
+    await backToList(page);
+  }
+  // The list, or a detail opened from the address (on a phone the list is hidden behind it), once read.
+  await expect(shopRow(page, text).or(detailPane(page).filter({ hasText: text })).first()).toBeVisible({ timeout: 15_000 });
+  // Already the open one: nothing to choose.
+  if ((await detailPane(page).filter({ hasText: text }).count()) > 0) return detailPane(page);
+  await backToList(page);
+  const row = shopRow(page, text).first();
+  await expect(row).toBeVisible();
+  await row.getByRole('button').click();
+  const detail = detailPane(page);
+  await expect(detail).toBeVisible();
+  return detail;
+}
+
+/** A list + detail screen (page template A): chooses the row whose words are `text`; returns the detail. */
+export async function chooseRow(page: Page, listName: string | RegExp, text: string | RegExp) {
+  await page.getByRole('list', { name: listName }).locator(':scope > li').filter({ hasText: text }).first().getByRole('button').click();
+  return detailPane(page);
+}
 
 /** On a phone the detail takes the screen: „‹ Înapoi” returns to the list (wide: nothing to do). */
 export async function backToList(page: Page) {

@@ -19,6 +19,7 @@ import {
   switchLanguage,
   detailPane,
   backToList,
+  chooseRow,
 } from './support';
 
 // T16b — the admin's platform tools: subscriptions and payments, history reports, the catalog,
@@ -203,7 +204,7 @@ test.describe('admin tools', () => {
     await expectNoHorizontalScroll(page);
     await shot(page, 't16b-catalog', name());
 
-    await page.getByRole('button', { name: 'Categorie nouă' }).click();
+    await page.getByRole('button', { name: 'Adaugă o categorie' }).click();
     await page.getByLabel('Nume în română').fill(`Tractoare ${t}`);
     await page.getByLabel('Nume în engleză').fill(`Tractors ${t}`);
     await expect(page.getByLabel('Cod categorie')).toHaveValue(`cat_tractoare_${t}`);
@@ -215,7 +216,7 @@ test.describe('admin tools', () => {
     // with its services as rows and „Serviciu nou” top right of them.
     await page.getByRole('list', { name: 'Catalog de servicii' }).locator(':scope > li').filter({ hasText: `Tractoare ${t}` }).getByRole('button').click();
     const card = detailPane(page);
-    await card.getByRole('button', { name: 'Serviciu nou' }).click();
+    await card.getByRole('button', { name: 'Adaugă un serviciu' }).click();
     await card.getByLabel('Nume în română').fill(`Revizie tractor ${t}`);
     await card.getByLabel('Nume în engleză').fill(`Tractor service ${t}`);
     await expect(card.getByLabel('Cod serviciu')).toHaveValue(`revizie_tractor_${t}`);
@@ -342,8 +343,9 @@ test.describe('admin tools', () => {
     await signInAdmin(page);
     await openTool(page, 'Abonamente și plăți');
     await page.getByLabel('Caută service, oraș, cont, email, Stripe').fill(shopName);
-    await expect(page.getByRole('link', { name: new RegExp(shopName) })).toBeVisible();
-    await expect(page.getByText('Gratuit până pe', { exact: false }).first()).toBeVisible();
+    const subscription = await chooseRow(page, 'Abonamente', shopName);
+    await expect(subscription.getByText('Gratuit până pe', { exact: false }).first()).toBeVisible();
+    await backToList(page);
     await expectNoHorizontalScroll(page);
     await shot(page, 't16b-subscriptions', name());
 
@@ -355,7 +357,7 @@ test.describe('admin tools', () => {
 
     await page.getByRole('combobox', { name: 'Afișează' }).selectOption('plati');
     await page.getByRole('combobox', { name: 'Afișează' }).selectOption('abonamente');
-    await page.getByRole('link', { name: new RegExp(shopName) }).click();
+    await (await chooseRow(page, 'Abonamente', shopName)).getByRole('link', { name: 'Deschide fișa service-ului' }).click();
     await expect(page).toHaveURL(new RegExp(`/admin/parteneri/service-uri/${shopId}$`));
     await expect(page.getByRole('heading', { level: 1, name: shopName })).toBeVisible();
     await page.getByRole('button', { name: 'Schimbă prețul' }).click();

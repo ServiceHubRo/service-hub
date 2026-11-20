@@ -180,14 +180,16 @@ test('the plan: Abonament, the limits of Fleet Start, and the admin changes the 
   const adminPage = await context.newPage();
   await signIn(adminPage, SEED.admin, SEED_PASSWORD);
   await adminPage.goto('/admin/parteneri/firme');
-  const row = adminPage.locator('li', { hasText: 'Plan Test' }).filter({ hasText: admin }).first();
+  // One row per company (page template A); the chosen one beside the list, or in its place on a phone.
+  const row = adminPage.getByRole('list', { name: 'Firme și flote' }).locator(':scope > li').filter({ hasText: 'Plan Test' }).filter({ hasText: admin }).first();
   await expect(row).toBeVisible();
-  await row.getByRole('button', { name: 'Mai multe' }).click();
-  await adminPage.getByRole('menuitem', { name: 'Schimbă planul' }).click();
-  await row.getByLabel('Plan', { exact: true }).selectOption('fleet_pro');
-  await row.getByLabel('Motiv').fill('Upgrade cerut de client');
-  await row.getByRole('button', { name: 'Salvează' }).click();
-  await expect(row.getByText('5 / 15')).toBeVisible();
+  await row.getByRole('button').click();
+  const card = adminPage.locator('[data-ui="detail-pane"]');
+  await card.getByRole('button', { name: 'Schimbă planul' }).click();
+  await card.getByLabel('Plan', { exact: true }).selectOption('fleet_pro');
+  await card.getByLabel('Motiv').fill('Upgrade cerut de client');
+  await card.getByRole('button', { name: 'Salvează' }).click();
+  await expect(card.getByText('5 / 15')).toBeVisible();
   await expectNoHorizontalScroll(adminPage);
   await shot(adminPage, 'admin-fleets', name());
   await context.close();

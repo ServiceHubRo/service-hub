@@ -3,6 +3,7 @@ import {
   BACKEND,
   PASSWORD,
   cardAction,
+  openShopBooking,
   createBookableShop,
   createUser,
   expectNoHorizontalScroll,
@@ -11,7 +12,6 @@ import {
   shot,
   signIn,
   userIdOf,
-  openBooking,
   switchLanguage,
   openClientBooking,
 } from './support';
@@ -32,7 +32,6 @@ test.beforeEach(async ({ context }) => {
 
 const name = () => test.info().project.name;
 const rid = () => crypto.randomUUID();
-const shopCard = (page: Page, ref: string) => page.locator('main ul[aria-label] > li').filter({ hasText: ref });
 /** S2: the client's booking, opened from its row (its detail). */
 const clientCard = (page: Page, ref: string) => openClientBooking(page, ref);
 
@@ -111,8 +110,7 @@ test.describe('the complete quote and the intake sheet', () => {
 
     // The intake sheet: odometer, fuel, two marks on the drawing, a note, the options.
     await page.goto('/s/programari?tab=programate');
-    const card = shopCard(page, booking.ref);
-    await openBooking(card);
+    const card = await openShopBooking(page, booking.ref);
     await card.getByRole('link', { name: 'Completează fișa de preluare' }).click();
     await expect(page.getByRole('heading', { level: 1, name: 'Fișa de preluare' })).toBeVisible();
     await page.getByLabel('Km la intrare').fill('23611');
@@ -157,6 +155,7 @@ test.describe('the complete quote and the intake sheet', () => {
     // The quote editor: the hourly rate filled in, parts with quantity, VAT; prices without VAT.
     await rpcAs(shop, 'start_inspection', { p_booking_id: booking.id, p_request_id: rid() });
     await page.goto('/s/programari?tab=programate');
+    await openShopBooking(page, booking.ref);
     await (await cardAction(card, 'Trimite deviz')).click();
     await expect(page.getByRole('heading', { level: 1, name: 'Deviz nou' })).toBeVisible();
     await expect(page.getByLabel('Tarif / oră, lei')).toHaveValue('181,50');
@@ -200,6 +199,8 @@ test.describe('the complete quote and the intake sheet', () => {
     await expect(cc).toContainText('Estimated time: 2 hours.');
     await shot(clientPage, 't50-client-quote-en', name());
     await switchLanguage(page, 'en');
+    await page.goto('/s/programari?tab=programate');
+    await openShopBooking(page, booking.ref);
     await (await cardAction(card, 'Edit quote')).click();
     await expect(page.getByRole('heading', { level: 1, name: 'Edit quote' })).toBeVisible();
     await expectNoHorizontalScroll(page);

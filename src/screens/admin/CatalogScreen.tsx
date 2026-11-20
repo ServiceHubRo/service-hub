@@ -344,8 +344,8 @@ function CategoryDetail({
         title={t('admin.catalog.services')}
         action={
           panel?.kind === 'new-service' && panel.category === c.key ? undefined : (
-            <Button variant="primary" onClick={() => setPanel({ kind: 'new-service', category: c.key })}>
-              <Plus size={18} aria-hidden="true" /> {t('admin.catalog.newService')}
+            <Button variant="primary" onClick={() => setPanel({ kind: 'new-service', category: c.key })} aria-label={t('admin.catalog.openService')}>
+              <Plus size={18} aria-hidden="true" /> {t('action.add')}
             </Button>
           )
         }
@@ -432,8 +432,8 @@ export function CatalogScreen() {
         actions={
           // The add, top right (docs/MODEL_DE_FOLOSIRE.md P12).
           all && panel?.kind !== 'new-category' ? (
-            <Button variant="primary" onClick={() => setPanel({ kind: 'new-category' })}>
-              <Plus size={18} aria-hidden="true" /> {t('admin.catalog.newCategory')}
+            <Button variant="primary" onClick={() => setPanel({ kind: 'new-category' })} aria-label={t('admin.catalog.openCategory')}>
+              <Plus size={18} aria-hidden="true" /> {t('action.add')}
             </Button>
           ) : undefined
         }

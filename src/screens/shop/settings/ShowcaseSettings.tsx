@@ -199,8 +199,8 @@ function PhotosCard() {
             photos.length < PHOTO_LIMIT && (
               // The section's add, in its head top right (docs/MODEL_DE_FOLOSIRE.md P12).
               <HeaderAction>
-                <Button variant="primary" onClick={() => inputRef.current?.click()}>
-                  <ImagePlus size={18} aria-hidden="true" /> {t('showcase.photos.add')}
+                <Button variant="primary" onClick={() => inputRef.current?.click()} aria-label={t('showcase.photos.add')}>
+                  <ImagePlus size={18} aria-hidden="true" /> {t('action.add')}
                 </Button>
               </HeaderAction>
             )

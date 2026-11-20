@@ -1,3 +1,4 @@
+import { useLocation } from 'react-router-dom';
 import { Building2 } from 'lucide-react';
 import { useCallback, useMemo, useState } from 'react';
 import { useDocumentTitle } from '../../app/useDocumentTitle';
@@ -27,6 +28,9 @@ const DATA_MODES: readonly DataMode[] = ['sample', 'empty', 'loading', 'error'];
 export function FleetPreviewScreen() {
   const { t } = useI18n();
   const { section, vehicleId, filter, update, go, back, params } = useFleetLocation();
+  const { pathname } = useLocation();
+  // One vehicle: „‹ Înapoi la vehicule” above the title, like every sub-page (docs/MODEL_DE_FOLOSIRE.md P2).
+  const vehicleBack = section === 'vehicul' ? { to: `${pathname}?sectiune=vehicule`, label: t('fleet.vehicle.back') } : undefined;
   const role: FleetRole = FLEET_ROLES.includes(params.get('rol') as FleetRole) ? (params.get('rol') as FleetRole) : 'admin';
   const mode: DataMode = DATA_MODES.includes(params.get('date') as DataMode) ? (params.get('date') as DataMode) : 'sample';
   const [added, setAdded] = useState<FleetExpense[]>([]);
@@ -85,6 +89,7 @@ export function FleetPreviewScreen() {
                 <Building2 size={15} aria-hidden="true" /> {data.company.name} · {t(`fleet.role.${role}`)}
               </span>
             }
+            back={vehicleBack}
             actions={<HeaderSlotTarget />}
           />
           <FleetPlanNotice section={section} onOpen={() => go({ section: 'abonament' })} />

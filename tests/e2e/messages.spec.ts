@@ -14,6 +14,7 @@ import {
   signIn,
   userIdOf,
   cardAction,
+  openShopBooking,
   uniquePlate,
   switchLanguage,
   openClientBooking,
@@ -198,7 +199,7 @@ test.describe('messages and reviews', () => {
 
     // The shop's booking card has the button too.
     await shopPage.goto(`/s/programari?tab=programate&p=${booking.id}`);
-    await (await cardAction(shopPage.locator('main li').filter({ hasText: booking.ref }), 'Mesaj')).click();
+    await (await cardAction(await openShopBooking(shopPage, booking.ref), 'Mesaj')).click();
     await expect(shopPage).toHaveURL(/\/s\/mesaje\/[0-9a-f-]{36}$/);
     await expect(shopPage.getByRole('heading', { level: 1 })).toHaveText('Maria Pop');
   });

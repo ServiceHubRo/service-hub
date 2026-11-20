@@ -1,19 +1,20 @@
 import { BellOff } from 'lucide-react';
+import { useLocation } from 'react-router-dom';
 import { ActionButton } from '../../components/ActionButton';
-import { Card } from '../../components/Card';
 import { EmptyState } from '../../components/EmptyState';
 import { LoadError } from '../../components/LoadError';
 import { PageHeader } from '../../components/PageHeader';
-import { SkeletonList } from '../../components/Skeleton';
+import { DetailPane, ListDetailLayout } from '../../components/ListDetailLayout';
+import { ListRow, ListRows, ListRowsSkeleton } from '../../components/ListRow';
 import { adminFailedFleetEvents, adminRetryFleetEvent } from '../../data/fleet';
 import { canRetryRpc, rpcErrorMessage } from '../../data/rpc';
 import { adminZoneBack } from '../../app/adminZones';
 import { useI18n } from '../../i18n/context';
 import { formatDate, formatTime } from '../../i18n/format';
+import { useListDetail } from '../../lib/useListDetail';
 import { useLoad } from '../../lib/useLoad';
 import { ADMIN_FLEET_FAILED_PATH } from './paths';
 import styles from './admin.module.css';
-import own from './fleets.module.css';
 
 /** „‹ Înapoi” goes to the screen's zone (A1). */
 const ZONE_BACK = adminZoneBack(ADMIN_FLEET_FAILED_PATH);
@@ -25,53 +26,80 @@ const ZONE_BACK = adminZoneBack(ADMIN_FLEET_FAILED_PATH);
  */
 export function FleetFailedEventsScreen() {
   const { t, lang } = useI18n();
+  const { pathname } = useLocation();
   const { state, reload } = useLoad(adminFailedFleetEvents);
   const when = (iso: string) => `${formatDate(lang, new Date(iso))} ${formatTime(lang, new Date(iso))}`;
+  const eventName = (event: string) => t(`admin.fleetFailed.event.${event}` as 'admin.fleetFailed.event.fleet_quote_waiting');
 
-  let body;
-  if (state.status === 'loading') body = <SkeletonList />;
-  else if (state.status === 'error') body = <LoadError message={t('admin.fleetFailed.loadError')} onRetry={reload} />;
-  else if (state.data.length === 0) body = <EmptyState icon={BellOff} title={t('admin.fleetFailed.empty')} />;
+  // Page template A (docs/MODEL_DE_FOLOSIRE.md P8): one row per failed event, the chosen one beside the
+  // list from 1024 px (in its place below).
+  const events = state.status === 'ready' ? state.data : [];
+  const { wide, selectedId, open, select } = useListDetail(
+    events.map((e) => String(e.id)),
+    'eveniment',
+  );
+  const chosen = events.find((e) => String(e.id) === selectedId) ?? null;
+
+  let list;
+  if (state.status === 'loading') list = <ListRowsSkeleton label={t('common.loading')} />;
+  else if (state.status === 'error') list = <LoadError message={t('admin.fleetFailed.loadError')} onRetry={reload} />;
+  else if (events.length === 0) list = <EmptyState icon={BellOff} title={t('admin.fleetFailed.empty')} />;
   else
-    body = (
-      <ul className={own.list}>
-        {state.data.map((e) => (
-          <li key={e.id}>
-            <Card className={own.row}>
-              <div className={own.rowHead}>
-                <div className={own.rowText}>
-                  <span className={own.rowName}>{t(`admin.fleetFailed.event.${e.event}` as 'admin.fleetFailed.event.fleet_quote_waiting')}</span>
-                  <span className={styles.muted}>{e.company_name}</span>
-                  <span className={styles.muted}>
-                    {t('admin.fleetFailed.meta', { created: when(e.created_at), failed: when(e.failed_at), n: e.attempts })}
-                  </span>
-                  <span className={`mono ${styles.muted}`}>
-                    #{e.id} · {e.last_error_code ?? '—'}
-                  </span>
-                </div>
-              </div>
-              <ActionButton
-                variant="secondary"
-                block={false}
-                onAction={async (rid) => {
-                  await adminRetryFleetEvent(e.id, rid);
-                  reload();
-                }}
-                errorMessage={(err) => rpcErrorMessage(lang, err)}
-                canRetry={canRetryRpc}
-              >
-                {t('admin.fleetFailed.retry')}
-              </ActionButton>
-            </Card>
-          </li>
+    list = (
+      <ListRows label={t('admin.fleetFailed.title')}>
+        {events.map((e) => (
+          <ListRow
+            key={e.id}
+            icon={<BellOff size={20} />}
+            title={eventName(e.event)}
+            detail={[e.company_name, when(e.failed_at)].filter(Boolean).join(' · ')}
+            selected={wide && String(e.id) === selectedId}
+            onSelect={() => select(String(e.id))}
+          />
         ))}
-      </ul>
+      </ListRows>
     );
 
   return (
     <div className={styles.page}>
-      <PageHeader back={{ to: ZONE_BACK.to, label: t(ZONE_BACK.label) }} title={t('admin.fleetFailed.title')} />
-      {body}
+      <ListDetailLayout
+        wide={wide}
+        open={open}
+        backTo={pathname}
+        backLabel={t('admin.fleetFailed.title')}
+        header={<PageHeader back={{ to: ZONE_BACK.to, label: t(ZONE_BACK.label) }} title={t('admin.fleetFailed.title')} />}
+        list={list}
+        detail={
+          chosen && (
+            <DetailPane
+              key={chosen.id}
+              id={String(chosen.id)}
+              icon={<BellOff size={20} />}
+              title={eventName(chosen.event)}
+              detail={chosen.company_name}
+              actions={
+                <ActionButton
+                  variant="secondary"
+                  block={false}
+                  onAction={async (rid) => {
+                    await adminRetryFleetEvent(chosen.id, rid);
+                    reload();
+                  }}
+                  errorMessage={(err) => rpcErrorMessage(lang, err)}
+                  canRetry={canRetryRpc}
+                >
+                  {t('admin.fleetFailed.retry')}
+                </ActionButton>
+              }
+            >
+              <p className={styles.muted}>{t('admin.fleetFailed.meta', { created: when(chosen.created_at), failed: when(chosen.failed_at), n: chosen.attempts })}</p>
+              <p className={`mono ${styles.muted}`}>
+                #{chosen.id} · {chosen.last_error_code ?? '—'}
+              </p>
+            </DetailPane>
+          )
+        }
+      />
     </div>
   );
 }

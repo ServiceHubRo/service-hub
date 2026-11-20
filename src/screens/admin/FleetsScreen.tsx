@@ -1,16 +1,16 @@
-import { CalendarPlus, Pencil, Repeat, Truck } from 'lucide-react';
+import { Repeat, Truck } from 'lucide-react';
 import { useCallback, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { ActionButton } from '../../components/ActionButton';
 import { Button } from '../../components/Button';
-import { Card } from '../../components/Card';
 import { EmptyState } from '../../components/EmptyState';
 import { Field } from '../../components/Field';
 import { ChoiceFilters } from '../../components/Filters';
 import { LoadError } from '../../components/LoadError';
-import { MoreActions } from '../../components/MoreActions';
+import { DetailPane, ListDetailLayout } from '../../components/ListDetailLayout';
+import { ListRow, ListRows, ListRowsSkeleton } from '../../components/ListRow';
 import { PageHeader } from '../../components/PageHeader';
 import { SelectField } from '../../components/SelectField';
-import { SkeletonList } from '../../components/Skeleton';
 import {
   adminExtendCompanyTrial,
   adminFleetPlans,
@@ -25,6 +25,7 @@ import { useI18n } from '../../i18n/context';
 import { formatDate, formatMoney } from '../../i18n/format';
 import { plural } from '../../i18n/translate';
 import { planState, trialDaysLeft, type FleetPlanRow, type PlanState } from '../../lib/fleet';
+import { useListDetail } from '../../lib/useListDetail';
 import { useLoad } from '../../lib/useLoad';
 import { useReason } from './useReason';
 import { ADMIN_FLEETS_PATH } from './paths';
@@ -47,6 +48,7 @@ const STATES: readonly PlanState[] = ['trial', 'trial_over', 'active', 'past_due
  */
 export function FleetsScreen() {
   const { t, lang } = useI18n();
+  const { pathname } = useLocation();
   const load = useCallback(async () => {
     const [companies, plans] = await Promise.all([adminListFleetCompanies(), adminFleetPlans()]);
     return { companies, plans };
@@ -56,22 +58,29 @@ export function FleetsScreen() {
   const [stateFilter, setStateFilter] = useState('');
   const refresh = useCallback(async () => setData(await load()), [load, setData]);
 
-  let body;
-  if (state.status === 'loading') body = <SkeletonList />;
-  else if (state.status === 'error') body = <LoadError message={t('admin.fleets.loadError')} onRetry={reload} />;
-  else {
-    const { companies, plans } = state.data;
-    const shown = companies.filter(
-      (c) => (!planFilter || c.plan.plan_key === planFilter) && (!stateFilter || planState(c.plan) === stateFilter),
-    );
-    body = (
-      <>
+  const data = state.status === 'ready' ? state.data : null;
+  const shown = data
+    ? data.companies.filter((c) => (!planFilter || c.plan.plan_key === planFilter) && (!stateFilter || planState(c.plan) === stateFilter))
+    : [];
+  // Page template A (docs/MODEL_DE_FOLOSIRE.md P8): a row per company and one per plan; the chosen one
+  // beside the list from 1024 px (in its place below).
+  const { wide, selectedId, open, select } = useListDetail(
+    [...shown.map((c) => `c:${c.id}`), ...(data ? data.plans.map((p) => `p:${p.key}`) : [])],
+    'flota',
+  );
+  const company = data ? shown.find((c) => `c:${c.id}` === selectedId) ?? null : null;
+  const plan = data ? data.plans.find((p) => `p:${p.key}` === selectedId) ?? null : null;
+
+  const header = (
+    <>
+      <PageHeader back={{ to: ZONE_BACK.to, label: t(ZONE_BACK.label) }} title={t('admin.fleets.title')} subtitle={t('admin.fleets.subtitle')} />
+      {data && (
         <ChoiceFilters
           groups={[
             {
               key: 'plan',
               title: t('admin.fleets.plan'),
-              options: [{ value: '', label: t('admin.fleets.anyPlan') }, ...plans.map((p) => ({ value: p.key, label: lang === 'ro' ? p.name_ro : p.name_en }))],
+              options: [{ value: '', label: t('admin.fleets.anyPlan') }, ...data.plans.map((p) => ({ value: p.key, label: lang === 'ro' ? p.name_ro : p.name_en }))],
               value: planFilter,
               defaultValue: '',
               onChange: setPlanFilter,
@@ -91,14 +100,35 @@ export function FleetsScreen() {
           }}
           doneLabel={t('fleet.filters.show', { n: shown.length })}
         />
+      )}
+    </>
+  );
+
+  let list;
+  if (state.status === 'loading') list = <ListRowsSkeleton label={t('common.loading')} />;
+  else if (state.status === 'error') list = <LoadError message={t('admin.fleets.loadError')} onRetry={reload} />;
+  else if (data)
+    list = (
+      <>
         {shown.length === 0 ? (
-          <EmptyState icon={Truck} title={companies.length === 0 ? t('admin.fleets.none') : t('admin.fleets.noMatch')} />
+          <EmptyState icon={Truck} title={data.companies.length === 0 ? t('admin.fleets.none') : t('admin.fleets.noMatch')} />
         ) : (
-          <ul className={own.list}>
-            {shown.map((c) => (
-              <CompanyRow key={c.id} c={c} plans={plans} onChanged={refresh} />
-            ))}
-          </ul>
+          <ListRows label={t('admin.fleets.title')}>
+            {shown.map((c) => {
+              const st = planState(c.plan);
+              return (
+                <ListRow
+                  key={c.id}
+                  icon={<Truck size={20} />}
+                  title={c.name}
+                  detail={[c.admin_email, c.vat_id, lang === 'ro' ? c.plan.name_ro : c.plan.name_en].filter(Boolean).join(' · ')}
+                  status={<StatusPill tone={toneOf(STATE_TONE[st])}>{t(`fleet.sub.state.${st}`)}</StatusPill>}
+                  selected={wide && selectedId === `c:${c.id}`}
+                  onSelect={() => select(`c:${c.id}`)}
+                />
+              );
+            })}
+          </ListRows>
         )}
 
         <section className={styles.section} aria-labelledby="admin-fleet-plans">
@@ -106,25 +136,45 @@ export function FleetsScreen() {
             {t('admin.fleets.plans')}
           </h2>
           <p className={styles.muted}>{t('admin.fleets.plansNote')}</p>
-          <ul className={own.planGrid}>
-            {plans.map((p) => (
-              <PlanRow key={p.key} p={p} onChanged={refresh} />
+          <ListRows label={t('admin.fleets.plans')}>
+            {data.plans.map((p) => (
+              <ListRow
+                key={p.key}
+                icon={<Repeat size={20} />}
+                title={lang === 'ro' ? p.name_ro : p.name_en}
+                detail={p.price_ron === null ? t('fleet.sub.customPrice') : t('fleet.sub.perMonth', { amount: formatMoney(lang, p.price_ron) })}
+                selected={wide && selectedId === `p:${p.key}`}
+                onSelect={() => select(`p:${p.key}`)}
+              />
             ))}
-          </ul>
+          </ListRows>
         </section>
       </>
     );
-  }
 
   return (
     <div className={styles.page}>
-      <PageHeader back={{ to: ZONE_BACK.to, label: t(ZONE_BACK.label) }} title={t('admin.fleets.title')} subtitle={t('admin.fleets.subtitle')} />
-      {body}
+      <ListDetailLayout
+        wide={wide}
+        open={open}
+        backTo={pathname}
+        backLabel={t('admin.fleets.title')}
+        header={header}
+        list={list}
+        detail={
+          data &&
+          (company ? (
+            <CompanyDetail key={company.id} c={company} plans={data.plans} onChanged={refresh} />
+          ) : plan ? (
+            <PlanDetail key={plan.key} p={plan} onChanged={refresh} />
+          ) : null)
+        }
+      />
     </div>
   );
 }
 
-function CompanyRow({ c, plans, onChanged }: { c: AdminFleetCompany; plans: Plan[]; onChanged: () => Promise<void> }) {
+function CompanyDetail({ c, plans, onChanged }: { c: AdminFleetCompany; plans: Plan[]; onChanged: () => Promise<void> }) {
   const { t, lang } = useI18n();
   const [mode, setMode] = useState<'view' | 'plan' | 'trial'>('view');
   const [planKey, setPlanKey] = useState(c.plan.plan_key);
@@ -136,15 +186,27 @@ function CompanyRow({ c, plans, onChanged }: { c: AdminFleetCompany; plans: Plan
   const err = (e: unknown) => rpcErrorMessage(lang, e);
 
   return (
-    <li>
-      <Card className={own.row}>
-        <div className={own.rowHead}>
-          <div className={own.rowText}>
-            <span className={own.rowName}>{c.name}</span>
-            <span className={styles.muted}>{[c.admin_email, c.vat_id].filter(Boolean).join(' · ')}</span>
-          </div>
-          <StatusPill tone={toneOf(STATE_TONE[st])}>{t(`fleet.sub.state.${st}`)}</StatusPill>
-        </div>
+    <DetailPane
+      id={c.id}
+      icon={<Truck size={20} />}
+      title={c.name}
+      detail={[c.admin_email, c.vat_id].filter(Boolean).join(' · ')}
+      status={<StatusPill tone={toneOf(STATE_TONE[st])}>{t(`fleet.sub.state.${st}`)}</StatusPill>}
+      actions={
+        mode === 'view' ? (
+          <>
+            <Button variant="secondary" onClick={() => setMode('plan')}>
+              {t('admin.fleets.changePlan')}
+            </Button>
+            {(c.plan.status === 'trial' || c.plan.status === 'inactive') && (
+              <Button variant="secondary" onClick={() => setMode('trial')}>
+                {t('admin.fleets.extendTrial')}
+              </Button>
+            )}
+          </>
+        ) : undefined
+      }
+    >
         <dl className={own.facts}>
           <div>
             <dt>{t('admin.fleets.plan')}</dt>
@@ -172,16 +234,6 @@ function CompanyRow({ c, plans, onChanged }: { c: AdminFleetCompany; plans: Plan
             </dd>
           </div>
         </dl>
-        {mode === 'view' && (
-          <MoreActions
-            items={[
-              { key: 'plan', label: t('admin.fleets.changePlan'), icon: <Repeat size={18} aria-hidden="true" />, onSelect: () => setMode('plan') },
-              ...(c.plan.status === 'trial' || c.plan.status === 'inactive'
-                ? [{ key: 'trial', label: t('admin.fleets.extendTrial'), icon: <CalendarPlus size={18} aria-hidden="true" />, onSelect: () => setMode('trial') }]
-                : []),
-            ]}
-          />
-        )}
         {mode === 'plan' && (
           <div className={own.panel}>
             <SelectField
@@ -239,12 +291,11 @@ function CompanyRow({ c, plans, onChanged }: { c: AdminFleetCompany; plans: Plan
             </div>
           </div>
         )}
-      </Card>
-    </li>
+    </DetailPane>
   );
 }
 
-function PlanRow({ p, onChanged }: { p: Plan; onChanged: () => Promise<void> }) {
+function PlanDetail({ p, onChanged }: { p: Plan; onChanged: () => Promise<void> }) {
   const { t, lang } = useI18n();
   const [editing, setEditing] = useState(false);
   const text = (n: number | null) => (n === null ? '' : String(n));
@@ -256,12 +307,19 @@ function PlanRow({ p, onChanged }: { p: Plan; onChanged: () => Promise<void> }) 
   const num = (v: string) => (v.trim() === '' ? null : Number(v.replace(',', '.')));
 
   return (
-    <li>
-      <Card className={own.row}>
-        <div className={own.rowHead}>
-          <span className={own.rowName}>{lang === 'ro' ? p.name_ro : p.name_en}</span>
-          <span className="mono">{p.price_ron === null ? t('fleet.sub.customPrice') : t('fleet.sub.perMonth', { amount: formatMoney(lang, p.price_ron) })}</span>
-        </div>
+    <DetailPane
+      id={p.key}
+      icon={<Repeat size={20} />}
+      title={lang === 'ro' ? p.name_ro : p.name_en}
+      detail={p.price_ron === null ? t('fleet.sub.customPrice') : t('fleet.sub.perMonth', { amount: formatMoney(lang, p.price_ron) })}
+      actions={
+        !editing ? (
+          <Button variant="secondary" onClick={() => setEditing(true)}>
+            {t('admin.fleets.editPlan')}
+          </Button>
+        ) : undefined
+      }
+    >
         <p className={styles.muted}>
           {p.vehicle_limit === null ? t('fleet.sub.vehiclesCustom') : t('fleet.sub.vehiclesUpTo', { n: p.vehicle_limit })} ·{' '}
           {p.included_members === null
@@ -269,9 +327,7 @@ function PlanRow({ p, onChanged }: { p: Plan; onChanged: () => Promise<void> }) 
             : t(p.included_members === 1 ? 'fleet.sub.colleaguesIncludedOne' : 'fleet.sub.colleaguesIncluded', { n: plural(lang, 'unit.colleagues', p.included_members) })}
           {p.included_members !== null && p.member_price_ron !== null ? ` · ${t('fleet.sub.colleaguePrice', { price: formatMoney(lang, p.member_price_ron) })}` : ''}
         </p>
-        {!editing ? (
-          <MoreActions items={[{ key: 'edit', label: t('admin.fleets.editPlan'), icon: <Pencil size={18} aria-hidden="true" />, onSelect: () => setEditing(true) }]} />
-        ) : (
+        {editing && (
           <form className={own.panel} onSubmit={(e) => e.preventDefault()} noValidate>
             <div className={own.fields}>
               <Field label={t('admin.fleets.price')} hint={t('admin.fleets.emptyCustom')} inputMode="decimal" mono value={price} onChange={(e) => setPrice(e.target.value)} />
@@ -314,7 +370,6 @@ function PlanRow({ p, onChanged }: { p: Plan; onChanged: () => Promise<void> }) 
             </div>
           </form>
         )}
-      </Card>
-    </li>
+    </DetailPane>
   );
 }

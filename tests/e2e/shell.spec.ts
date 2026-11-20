@@ -132,15 +132,25 @@ for (const role of Object.keys(NAV) as (keyof typeof NAV)[]) {
   });
 }
 
-test('"Mai multe" on the last card shows every entry, above the tab bar', async ({ page }) => {
+test('"Mai multe" of a booking shows every entry, above the tab bar', async ({ page }) => {
   test.skip(!BACKEND, 'needs the local Supabase stack');
   await signIn(page, SEED.shop, SEED_PASSWORD);
   await expect(page).toHaveURL(/\/s\//);
   await page.goto('/s/programari?tab=programate');
-  const more = page.getByRole('button', { name: 'Mai multe' });
-  await expect(more.first()).toBeVisible();
+  // The last booking of the list whose detail has „Mai multe” (its actions sit at the bottom).
+  const rows = page.locator('[data-ui="list-row"]');
+  await expect(rows.first()).toBeVisible();
+  const detail = page.locator('[data-ui="detail-pane"]');
+  const more = detail.getByRole('button', { name: 'Mai multe' });
+  for (let i = (await rows.count()) - 1; i >= 0; i--) {
+    if ((await detail.count()) > 0 && (page.viewportSize()?.width ?? 0) < 1024) await page.locator('[data-back-bar] a').filter({ visible: true }).first().click();
+    await rows.nth(i).getByRole('button').click();
+    await expect(detail).toBeVisible();
+    if ((await more.count()) > 0) break;
+  }
+  await expect(more).toBeVisible();
   await page.evaluate(() => window.scrollTo(0, document.scrollingElement!.scrollHeight));
-  await more.last().click();
+  await more.click();
   const items = page.getByRole('menu').getByRole('menuitem');
   await expect(items.first()).toBeVisible();
   expect(await items.count()).toBeGreaterThan(1);

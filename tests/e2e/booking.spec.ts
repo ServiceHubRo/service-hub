@@ -12,6 +12,7 @@ import {
   signIn,
   userIdOf,
   switchLanguage,
+  shopRow,
 } from './support';
 
 // T07 — the garage with its expiry alerts, the 4-step booking, capacity, a day that fills up while
@@ -219,7 +220,7 @@ test.describe('booking', () => {
     await signIn(shopPage, shopEmail, PASSWORD);
     await expect(shopPage).toHaveURL(/\/s\//);
     await shopPage.goto('/s/programari?tab=cereri');
-    const request = shopPage.locator('main ul[aria-label] > li').filter({ hasText: booking!.ref });
+    const request = shopRow(shopPage, booking!.ref);
     await expect(request).toContainText('Schimb ulei + filtru ulei, Plăcuțe de frână');
     await expectNoHorizontalScroll(shopPage);
     await shot(shopPage, 't21-shop-request', name());

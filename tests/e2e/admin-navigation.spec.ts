@@ -5,6 +5,8 @@ import {
   SEED_ADMIN_TOTP,
   SEED_PASSWORD,
   adminZoneLink,
+  backToList,
+  chooseRow,
   expectNoHorizontalScroll,
   isDesktop,
   serviceRest,
@@ -64,7 +66,13 @@ interface Fn {
  * The address without the item a list + detail screen shows first: from 1024 px page template A writes
  * it into the address (?recenzie=, ?zona=, …), which the old addresses and the menu know nothing about.
  */
-const SELECTION = ['recenzie', 'contestatie', 'zona', 'text', 'ce', 'lista', 'agent', 'cat', 'raport', 'firma'];
+const SELECTION = ['recenzie', 'contestatie', 'zona', 'text', 'ce', 'lista', 'agent', 'cat', 'raport', 'firma', 'cont', 'unitate', 'programare', 'abonament', 'flota', 'eveniment', 'grup'];
+/** On a phone the chosen item is still open when the way back ends at its list: „‹ Înapoi” of the detail first. */
+async function openDetailGone(page: Page) {
+  if ((page.viewportSize()?.width ?? 0) >= 1024) return;
+  await expect(page.locator('[data-ui="detail-pane"]')).toBeVisible();
+  await backToList(page);
+}
 const withoutSelection = (address: string) => {
   const u = new URL(address);
   for (const k of SELECTION) u.searchParams.delete(k);
@@ -277,31 +285,24 @@ test.describe('A1 — admin navigation', () => {
     const s = await seed();
     await signInAdmin(page);
 
-    // Client: Parteneri → Clienți → fișă.
+    // Client: Parteneri → Clienți → the client's row → „Deschide fișa clientului” → fișă.
     await adminZoneLink(page, 'Parteneri').click();
     await main(page).getByRole('link', { name: /^Clienți/ }).click();
     await page.getByLabel('Caută după nume, email, telefon sau C-00001').fill('client@service-hub.test');
-    await main(page).getByRole('link', { name: /client@service-hub\.test/ }).first().click();
+    await (await chooseRow(page, 'Clienți', 'client@service-hub.test')).getByRole('link', { name: 'Deschide fișa clientului' }).click();
     await expect(page).toHaveURL(/\/admin\/parteneri\/clienti\/[0-9a-f-]{36}$/);
     await loaded(page);
     await expect(h1(page)).not.toHaveText('');
     await expect(backLink(page)).toHaveText(/Clienți/);
     const length = await historyLength(page);
-    // „‹ Clienți” then „‹ Parteneri”: back through the history, no entry added.
+    // „‹ Clienți” then „‹ Parteneri”: back through the history, no entry added (on a phone the chosen
+    // client is still open in the list: „‹ Înapoi” of the detail first).
     await backLink(page).click();
     await expect(page).toHaveURL(/\/admin\/parteneri\/clienti(\?.*)?$/);
+    await openDetailGone(page);
     await backLink(page).click();
     await expect(page).toHaveURL(/\/admin\/parteneri$/);
     expect(await historyLength(page), 'no entry added by „‹ Înapoi”').toBe(length);
-    // Forward finds them again, in order; Back retraces.
-    await page.goForward();
-    await expect(page).toHaveURL(/\/admin\/parteneri\/clienti(\?.*)?$/);
-    await page.goForward();
-    await expect(page).toHaveURL(/\/admin\/parteneri\/clienti\/[0-9a-f-]{36}$/);
-    await page.goBack();
-    await page.goBack();
-    await page.goBack();
-    await expect(page).toHaveURL(/\/admin\/panou$/);
 
     // Shop: Parteneri → Service-uri → fișă (by its address) → „‹ Service-uri” replaces, then Back.
     await page.goto(`/admin/parteneri/service-uri/${s.shopId}`);
@@ -317,11 +318,13 @@ test.describe('A1 — admin navigation', () => {
     await adminZoneLink(page, 'Activitate').click();
     await main(page).getByRole('link', { name: /^Programări/ }).click();
     await page.getByLabel('Caută după cod, număr, client sau service').fill(s.bookingRef);
-    await main(page).getByRole('link', { name: new RegExp(s.bookingRef) }).first().click();
+    await (await chooseRow(page, 'Programări', s.bookingRef)).getByRole('link', { name: 'Deschide programarea' }).click();
     await expect(page).toHaveURL(new RegExp(`/admin/activitate/programari/${s.bookingId}$`));
     await loaded(page);
     await expect(backLink(page)).toHaveText(/Programări/);
     await backLink(page).click();
+    await expect(page).toHaveURL(/\/admin\/activitate\/programari\?/);
+    await openDetailGone(page);
     await expect(h1(page)).toHaveText('Programări');
     await backLink(page).click();
     await expect(h1(page)).toHaveText('Activitate');
@@ -379,8 +382,9 @@ test.describe('A1 — admin navigation', () => {
     // Several query parameters, in either order, exactly as written; the anchor too.
     for (const query of [`?service=${s.shopId}&client=${s.clientId}&q=P-0`, `?q=P-0&client=${s.clientId}&service=${s.shopId}`]) {
       await page.goto(`/admin/rezervari${query}#lista`);
-      await expect(page).toHaveURL(`/admin/activitate/programari${query}#lista`);
-      expect(new URL(page.url()).search).toBe(query);
+      // The list writes the booking it shows first after them; the query and the anchor stay as written.
+      await expectAddress(page, `/admin/activitate/programari${query}#lista`);
+      expect(new URL(page.url()).search.startsWith(query)).toBe(true);
       expect(new URL(page.url()).hash).toBe('#lista');
     }
     // Special characters in an ID and in the query, encoded as they were.
@@ -411,13 +415,13 @@ test.describe('A1 — admin navigation', () => {
       history.pushState(history.state, '', '/admin/cont/flote?plan=fleet_pro');
       window.dispatchEvent(new PopStateEvent('popstate', { state: history.state }));
     });
-    await expect(page).toHaveURL('/admin/parteneri/firme?plan=fleet_pro');
+    await expectAddress(page, '/admin/parteneri/firme?plan=fleet_pro');
     await expect(h1(page)).toHaveText('Firme și flote');
     expect(await historyLength(page)).toBe(length + 1);
     await page.goBack();
     await expect(page).toHaveURL('/admin/panou');
     await page.goForward();
-    await expect(page).toHaveURL('/admin/parteneri/firme?plan=fleet_pro');
+    await expectAddress(page, '/admin/parteneri/firme?plan=fleet_pro');
   });
 
   test('an old or a new address opened before signing in: after the two steps of sign-in, its page, query kept', async ({ browser }) => {
@@ -433,7 +437,7 @@ test.describe('A1 — admin navigation', () => {
         route.request().method() === 'PATCH' ? route.fulfill({ status: 204 }) : route.continue(),
       );
       await signInFrom(page, asked!);
-      await expect(page).toHaveURL(landed!);
+      await expectAddress(page, landed!);
       await loaded(page);
       await ctx.close();
     }

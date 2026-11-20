@@ -37,9 +37,9 @@ export function MyRequestsScreen({ role }: { role: 'client' | 'shop' }) {
         back={{ to: helpPath(role), label: t('help.title') }}
         title={t('support.my.title')}
         actions={
-          <Link to={newRequestPath(role)} className={buttonClass('primary')}>
+          <Link to={newRequestPath(role)} className={buttonClass('primary')} aria-label={t('support.my.add')}>
             <Plus size={18} aria-hidden="true" />
-            {t('support.my.new')}
+            {t('action.add')}
           </Link>
         }
       />

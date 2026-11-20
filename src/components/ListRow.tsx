@@ -15,6 +15,8 @@ export interface ListRowProps {
   attention?: boolean;
   /** The item open beside the list (from 1024 px). */
   selected?: boolean;
+  /** Just arrived live (a request): it slides in with an amber glow that fades. */
+  fresh?: boolean;
   /** A screen to open, or what choosing the row does. */
   to?: string;
   onSelect?: () => void;
@@ -25,7 +27,7 @@ export interface ListRowProps {
  * line of details, the status — and a chevron. A list shows the summary; the detail shows the rest,
  * so a row never carries a quote, a progress bar or buttons.
  */
-export function ListRow({ icon, title, detail, status, attention = false, selected = false, to, onSelect }: ListRowProps) {
+export function ListRow({ icon, title, detail, status, attention = false, selected = false, fresh = false, to, onSelect }: ListRowProps) {
   // A row that opens nothing (an event in a history) is a plain row: no button, no chevron.
   const opens = to !== undefined || onSelect !== undefined;
   const body = (
@@ -41,7 +43,7 @@ export function ListRow({ icon, title, detail, status, attention = false, select
       {opens && <ChevronRight size={18} className={styles.chevron} aria-hidden="true" />}
     </>
   );
-  const cls = `${styles.row} ${selected ? styles.selected : ''}`;
+  const cls = `${styles.row} ${selected ? styles.selected : ''} ${fresh ? styles.fresh : ''}`;
   return (
     <li data-ui="list-row" className={styles.item}>
       {!opens ? (
