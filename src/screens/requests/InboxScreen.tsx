@@ -4,7 +4,7 @@ import { useLocation, useSearchParams } from 'react-router-dom';
 import { adminZoneBack } from '../../app/adminZones';
 import { BackLink } from '../../components/BackLink';
 import { Button } from '../../components/Button';
-import { ListDetailLayout } from '../../components/ListDetailLayout';
+import { DetailPane, ListDetailLayout } from '../../components/ListDetailLayout';
 import { ListRow, ListRows, ListRowsSkeleton } from '../../components/ListRow';
 import { EmptyState } from '../../components/EmptyState';
 import { LoadError } from '../../components/LoadError';
@@ -78,19 +78,25 @@ export function InboxScreen({ mode }: { mode: 'support' | 'admin' }) {
   const data = inbox.state.status === 'ready' ? inbox.state.data : null;
   const empty = ready && data !== null && !Object.values(data.dashboard.counts).some((n) => n > 0) && data.items.length === 0;
 
+  const dashboard =
+    ready && data ? (
+      <SupportDashboardPanel
+        dashboard={data.dashboard}
+        filters={filters}
+        listPath={listPath}
+        detailPath={detailPath}
+        reviewsPath={mode === 'admin' ? ADMIN_TEXT_REVIEWS_PATH : SUPPORT_TEXT_REVIEWS_PATH}
+      />
+    ) : null;
+
   const header = (
     <>
       {zoneBack && <BackLink to={zoneBack.to} label={t(zoneBack.label)} />}
       <PageHeader title={t('support.requests.title')} subtitle={t('support.inbox.desc')} />
       {ready && data && !empty && (
         <>
-          <SupportDashboardPanel
-            dashboard={data.dashboard}
-            filters={filters}
-            listPath={listPath}
-            detailPath={detailPath}
-            reviewsPath={mode === 'admin' ? ADMIN_TEXT_REVIEWS_PATH : SUPPORT_TEXT_REVIEWS_PATH}
-          />
+          {/* Beside the list the counters stand in the detail's place while no request is open. */}
+          {!wide && dashboard}
           <div className={styles.filters}>
             <SelectField
               label={t('support.filter.owner')}
@@ -189,7 +195,15 @@ export function InboxScreen({ mode }: { mode: 'support' | 'admin' }) {
         backLabel={t('support.requests.title')}
         header={header}
         list={list}
-        detail={selectedId && <RequestDetail key={selectedId} mode={mode} requestId={selectedId} onChanged={() => void inbox.refetch()} />}
+        detail={
+          selectedId ? (
+            <RequestDetail key={selectedId} mode={mode} requestId={selectedId} onChanged={() => void inbox.refetch()} />
+          ) : wide && ready && !empty ? (
+            <DetailPane id="overview" icon={<Inbox size={20} />} title={t('support.dash.label')}>
+              {dashboard}
+            </DetailPane>
+          ) : null
+        }
       />
     </div>
   );

@@ -10,6 +10,8 @@ import {
   expectNoHorizontalScroll,
   expectNoRomanianText,
   inboxRow,
+  detailPane,
+  requestTitle,
   serviceRest,
   shot,
   signIn,
@@ -47,14 +49,14 @@ async function newRequest(page: Page, title: string, body: string) {
   await page.getByLabel('Titlu').fill(title);
   await page.getByLabel('Descriere').fill(body);
   await page.getByRole('button', { name: 'Trimite solicitarea' }).click();
-  await expect(h1(page)).toHaveText(title);
+  await expect(requestTitle(page)).toHaveText(title);
 }
 
 async function agentOpens(page: Page, agent: Agent, title: string) {
   await signInAgent(page, agent);
   await expect(h1(page)).toHaveText('Solicitări');
   await inboxRow(page, title).click();
-  await expect(h1(page)).toHaveText(title);
+  await expect(requestTitle(page)).toHaveText(title);
 }
 
 test.describe('support requests (A3a)', () => {
@@ -93,8 +95,8 @@ test.describe('support requests (A3a)', () => {
     await expect(page.getByRole('alert').filter({ hasText: /programare/i }).first()).toBeVisible();
     await page.getByLabel('Codul programării (opțional)').fill('');
     await page.getByRole('button', { name: /^(Trimite solicitarea|Încearcă din nou)$/ }).click();
-    await expect(h1(page)).toHaveText(title);
-    await expect(page.locator('main').getByText('Primită', { exact: true })).toBeVisible();
+    await expect(requestTitle(page)).toHaveText(title);
+    await expect(detailPane(page).getByText('Primită', { exact: true })).toBeVisible();
     const requestUrl = page.url();
     // Away from the request: an open request shows the team's answer live and counts it as read (A3c1).
     await page.goto('/c/cont/ajutor');
@@ -102,24 +104,24 @@ test.describe('support requests (A3a)', () => {
     // The agent takes it, writes a note and answers.
     const agentPage = await newPage(browser);
     await agentOpens(agentPage, agent, title);
-    await expect(agentPage.getByText('Fără responsabil').first()).toBeVisible();
+    await expect(detailPane(agentPage).getByText('Fără responsabil').first()).toBeVisible();
     await agentPage.getByRole('button', { name: 'Preia solicitarea' }).click();
-    await expect(agentPage.getByText(`${agent.displayId} · Maria Pop`).first()).toBeVisible();
+    await expect(detailPane(agentPage).getByText(`${agent.displayId} · Maria Pop`).first()).toBeVisible();
     await agentPage.getByLabel('Notă nouă').fill(`${note} clientul are Android 10`);
     await agentPage.getByRole('button', { name: 'Adaugă nota' }).click();
-    await expect(agentPage.getByText(note, { exact: false })).toBeVisible();
+    await expect(detailPane(agentPage).getByText(note, { exact: false })).toBeVisible();
     await agentPage.getByLabel('Răspuns către utilizator').fill('Ce browser folosești?');
     await agentPage.getByLabel('Starea după răspuns').selectOption({ label: 'Așteaptă utilizatorul' });
     await agentPage.getByRole('button', { name: 'Trimite răspunsul' }).click();
-    await expect(agentPage.getByText('Ce browser folosești?')).toBeVisible();
-    await expect(agentPage.locator('main').getByText('Așteaptă utilizatorul', { exact: true }).first()).toBeVisible();
+    await expect(detailPane(agentPage).getByText('Ce browser folosești?')).toBeVisible();
+    await expect(detailPane(agentPage).getByText('Așteaptă utilizatorul', { exact: true }).first()).toBeVisible();
     await expectNoHorizontalScroll(agentPage);
     await expectAccessible(agentPage, 'Solicitare (agent)');
     await shot(agentPage, 'a3a-agent-request', name());
 
     // The client: a new answer, signed by the team; never the note, never the agent's ID.
     await page.goto('/c/cont/ajutor/solicitari');
-    const row = page.getByRole('link').filter({ hasText: title });
+    const row = page.getByRole('list', { name: 'Solicitările mele' }).getByRole('button').filter({ hasText: title });
     await expect(row).toContainText('Răspuns nou');
     await expect(row).toContainText('Așteaptă răspunsul tău');
     await shot(page, 'a3a-my-list', name());
@@ -131,7 +133,7 @@ test.describe('support requests (A3a)', () => {
     await page.getByLabel('Mesajul tău').fill('Chrome, pe telefon.');
     await page.getByRole('button', { name: 'Trimite mesajul' }).click();
     await expect(page.getByRole('status').filter({ hasText: 'Mesaj trimis.' })).toBeVisible();
-    await expect(page.locator('main').getByText('În lucru', { exact: true })).toBeVisible();
+    await expect(detailPane(page).getByText('În lucru', { exact: true })).toBeVisible();
     await expectNoHorizontalScroll(page);
     await expectAccessible(page, 'Solicitarea mea');
     await shot(page, 'a3a-my-request', name());
@@ -147,16 +149,16 @@ test.describe('support requests (A3a)', () => {
 
     // Solved; a message in the 14 days reopens it.
     await agentPage.reload();
-    await expect(agentPage.getByText('Chrome, pe telefon.')).toBeVisible();
-    await agentPage.getByRole('combobox', { name: 'Stare', exact: true }).selectOption({ label: 'Rezolvată' });
+    await expect(detailPane(agentPage).getByText('Chrome, pe telefon.')).toBeVisible();
+    await detailPane(agentPage).getByRole('combobox', { name: 'Stare', exact: true }).selectOption({ label: 'Rezolvată' });
     await agentPage.getByRole('button', { name: 'Schimbă starea' }).click();
-    await expect(agentPage.locator('main').getByText('Rezolvată', { exact: true }).first()).toBeVisible();
+    await expect(detailPane(agentPage).getByText('Rezolvată', { exact: true }).first()).toBeVisible();
     await page.goto(requestUrl);
-    await expect(page.locator('main').getByText('Rezolvată', { exact: true })).toBeVisible();
+    await expect(detailPane(page).getByText('Rezolvată', { exact: true })).toBeVisible();
     await expect(page.getByText(/Un mesaj nou redeschide solicitarea, până pe/)).toBeVisible();
     await page.getByLabel('Mesajul tău').fill('Problema a revenit.');
     await page.getByRole('button', { name: 'Trimite mesajul' }).click();
-    await expect(page.locator('main').getByText('În lucru', { exact: true })).toBeVisible();
+    await expect(detailPane(page).getByText('În lucru', { exact: true })).toBeVisible();
 
     // The client is told by push and email, without the team's words.
     const events = await serviceRest<{ event: string; channels: string[]; params: Record<string, unknown> }[]>(
@@ -171,7 +173,7 @@ test.describe('support requests (A3a)', () => {
     await switchLanguage(page, 'en');
     await page.goto(requestUrl);
     await expect(page.getByText('Service-Hub team').first()).toBeVisible();
-    await expect(page.locator('main').getByText('In progress', { exact: true })).toBeVisible();
+    await expect(detailPane(page).getByText('In progress', { exact: true })).toBeVisible();
     await expectNoRomanianText(page, 'My request (EN)');
     await shot(page, 'a3a-my-request-en', name());
     await switchLanguage(page, 'ro');
@@ -191,11 +193,11 @@ test.describe('support requests (A3a)', () => {
     await agentOpens(agentPage, agent, title);
     await agentPage.getByRole('button', { name: 'Escaladează' }).click();
     await agentPage.getByRole('button', { name: 'Escaladează' }).last().click();
-    await expect(agentPage.getByText('Scrie motivul.')).toBeVisible();
+    await expect(detailPane(agentPage).getByText('Scrie motivul.')).toBeVisible();
     await agentPage.getByLabel('Motiv').fill('Posibil acces neautorizat');
     await agentPage.getByRole('button', { name: 'Escaladează' }).last().click();
-    await expect(agentPage.getByText(/^Escaladată de E-\d{5}/)).toBeVisible();
-    await expect(agentPage.getByText('Doar administratorul o poate modifica.')).toBeVisible();
+    await expect(detailPane(agentPage).getByText(/^Escaladată de E-\d{5}/)).toBeVisible();
+    await expect(detailPane(agentPage).getByText('Doar administratorul o poate modifica.')).toBeVisible();
     await expect(agentPage.getByLabel('Răspuns către utilizator')).toHaveCount(0);
     await expect(agentPage.getByRole('button', { name: 'Preia solicitarea' })).toHaveCount(0);
     await expect(agentPage.getByLabel('Notă nouă')).toHaveCount(0);
@@ -203,7 +205,7 @@ test.describe('support requests (A3a)', () => {
 
     // The client sees no difference.
     await page.reload();
-    await expect(page.locator('main').getByText('Primită', { exact: true })).toBeVisible();
+    await expect(detailPane(page).getByText('Primită', { exact: true })).toBeVisible();
     await expect(page.locator('body')).not.toContainText('Posibil acces neautorizat');
 
     // The admin: the escalated ones, answer, give back.
@@ -215,15 +217,15 @@ test.describe('support requests (A3a)', () => {
     await expectNoHorizontalScroll(adminPage);
     await shot(adminPage, 'a3a-admin-escalated', name());
     await inboxRow(adminPage, title).click();
-    await expect(adminPage.getByText('Motiv: Posibil acces neautorizat')).toBeVisible();
+    await expect(detailPane(adminPage).getByText('Motiv: Posibil acces neautorizat')).toBeVisible();
     await adminPage.getByLabel('Răspuns către utilizator').fill('Am schimbat parola contului. Verifică emailul.');
     await adminPage.getByRole('button', { name: 'Trimite răspunsul' }).click();
-    await expect(adminPage.getByText('Am schimbat parola contului. Verifică emailul.')).toBeVisible();
+    await expect(detailPane(adminPage).getByText('Am schimbat parola contului. Verifică emailul.')).toBeVisible();
     await adminPage.getByRole('button', { name: 'Returnează echipei' }).click();
     await adminPage.getByLabel('Motiv').fill('Cont verificat');
     await adminPage.getByRole('button', { name: 'Returnează echipei' }).last().click();
-    await expect(adminPage.getByText(/^Escaladată de/)).toHaveCount(0);
-    await expect(adminPage.getByText(`${agent.displayId} · Maria Pop`).first()).toBeVisible();
+    await expect(detailPane(adminPage).getByText(/^Escaladată de/)).toHaveCount(0);
+    await expect(detailPane(adminPage).getByText(`${agent.displayId} · Maria Pop`).first()).toBeVisible();
     await expectAccessible(adminPage, 'Solicitare (admin)');
 
     // Given back: the agent works on it again.
