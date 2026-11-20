@@ -1727,6 +1727,8 @@ export const ro = {
   'reviews.removedBody': 'Recenzia a fost eliminată după verificare și nu mai apare public.',
   'reviews.reportSent': 'Recenzia a fost trimisă spre verificare. Primești răspuns în cel mult 5 zile lucrătoare.',
   'reviews.reportPending': 'Raportarea este în verificare. Până atunci recenzia rămâne publică.',
+  'reviews.reported': 'Raportată',
+  'reviews.removed': 'Eliminată',
   'reviews.reportKept': 'Raportarea a fost verificată: recenzia rămâne publicată.',
   'reviews.yourReply': 'Răspunsul service-ului',
   'reviews.reply': 'Răspunde',

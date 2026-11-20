@@ -164,3 +164,11 @@
 .radioInput:focus-visible + .radioDot {
   box-shadow: var(--focus-ring);
 }
+
+/* The stars and the „Raportată” mark side by side in a detail's head. */
+.statusLine {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}

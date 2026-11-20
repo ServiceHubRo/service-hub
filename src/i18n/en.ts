@@ -1729,6 +1729,8 @@ export const en: Record<MessageKey, string> = {
   'reviews.removedBody': 'This review was removed after moderation and is no longer public.',
   'reviews.reportSent': "The review was sent for moderation. You'll get a decision within 5 business days.",
   'reviews.reportPending': 'Your report is being reviewed. Until then, the review stays public.',
+  'reviews.reported': 'Reported',
+  'reviews.removed': 'Removed',
   'reviews.reportKept': 'Your report was checked: the review stays published.',
   'reviews.yourReply': "Shop's reply",
   'reviews.reply': 'Reply',
