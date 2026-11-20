@@ -164,6 +164,7 @@ test.describe('retention (A3c2b1)', () => {
     const token = await adminToken();
     await switchOff(token, 'support_requests');
     await page.reload();
+    await openRow('Solicitări de suport');
     await card.getByRole('button', { name: 'Previzualizează' }).click();
     await card.getByRole('button', { name: 'Activează', exact: true }).click();
     await expect(card.getByText('Activezi jobul?')).toBeVisible();
