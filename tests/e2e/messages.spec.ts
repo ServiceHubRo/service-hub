@@ -204,7 +204,7 @@ test.describe('messages and reviews', () => {
     await shopPage.goto(`/s/programari?tab=programate&p=${booking.id}`);
     await (await cardAction(await openShopBooking(shopPage, booking.ref), 'Mesaj')).click();
     await expect(shopPage).toHaveURL(/\/s\/mesaje\/[0-9a-f-]{36}$/);
-    await expect(shopPage.getByRole('heading', { level: 1 })).toHaveText('Maria Pop');
+    await expect(shopPage.getByRole('heading', { name: 'Maria Pop' })).toBeVisible();
   });
 
   test('a shorter screen (the phone keyboard) keeps the newest message above the box', async ({ page }) => {

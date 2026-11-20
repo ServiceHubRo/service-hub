@@ -32,3 +32,17 @@
     margin-top: var(--space-6);
   }
 }
+
+/* In a panel (C9): held at the panel's foot while its content scrolls, as wide as the panel's content. */
+.bar.embedded {
+  position: sticky;
+  bottom: calc(-1 * var(--card-pad));
+  align-items: stretch;
+  margin: auto calc(-1 * var(--card-pad)) calc(-1 * var(--card-pad));
+  padding: 14px var(--card-pad);
+  background: linear-gradient(to bottom, transparent, var(--surface) 14px);
+}
+
+.bar.embedded > * {
+  width: 100%;
+}

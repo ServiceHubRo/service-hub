@@ -21,6 +21,7 @@ import { subscribeRows } from '../../../data/realtime';
 import { toRpcError } from '../../../data/rpc';
 import { fetchShopPage, type ShopPage as ShopPageData } from '../../../data/search';
 import { useI18n } from '../../../i18n/context';
+import { useEmbedded } from '../../../lib/embedded';
 import { formatDate, formatDateRange, formatDistance, formatMoney, formatRating } from '../../../i18n/format';
 import type { MessageKey } from '../../../i18n/ro';
 import { plural } from '../../../i18n/translate';
@@ -42,9 +43,13 @@ const ShopsMap = lazy(() => import('../../../components/map/ShopsMap'));
  * they do, what the inspection costs, what other clients said — and "Programează-te".
  * Read in one call with public columns only; fiscal data never reaches this screen.
  */
-export function ShopPage() {
+export function ShopPage({ shopId: panelShopId, linkState }: { shopId?: string; linkState?: ShopLinkState } = {}) {
   const { t } = useI18n();
-  const { shopId = '' } = useParams();
+  // Beside the search results (a laptop, C9) the page is the right-hand panel: the shop is the one
+  // chosen in the list, the links to its reviews and services lead back to the search.
+  const embedded = useEmbedded();
+  const params0 = useParams();
+  const shopId = panelShopId ?? params0.shopId ?? '';
   const routerState = useRouterLocation().state as ShopLinkState | null;
   const back = routerState?.backTo ?? SEARCH_PATH;
   const backLabel = routerState?.backLabel === 'favorites' ? t('favorites.title') : t('shop.allShops');
@@ -84,7 +89,7 @@ export function ShopPage() {
   }, [ready, shopId, day, setData]);
 
   return (
-    <div className={styles.page} data-fill-screen>
+    <div className={styles.page} data-fill-screen={embedded ? undefined : true}>
       <BackLink to={back} label={backLabel} />
       {state.status === 'loading' && <SkeletonList count={3} />}
       {state.status === 'error' &&
@@ -103,13 +108,24 @@ export function ShopPage() {
           <LoadError message={t('shop.loadError')} onRetry={reload} />
         ))}
       {state.status === 'ready' && (
-        <ShopDetails page={state.data} day={day} onFavorite={(on) => setData((p) => ({ ...p, is_favorite: on }))} />
+        <ShopDetails page={state.data} day={day} linkState={linkState} onFavorite={(on) => setData((p) => ({ ...p, is_favorite: on }))} />
       )}
     </div>
   );
 }
 
-function ShopDetails({ page, day, onFavorite }: { page: ShopPageData; day: string | null; onFavorite: (on: boolean) => void }) {
+function ShopDetails({
+  page,
+  day,
+  linkState,
+  onFavorite,
+}: {
+  page: ShopPageData;
+  day: string | null;
+  linkState?: ShopLinkState;
+  onFavorite: (on: boolean) => void;
+}) {
+  const Title = useEmbedded() ? 'h2' : 'h1';
   const { t, lang } = useI18n();
   const offerText = useOfferText();
   const { coords } = useLocation();
@@ -127,14 +143,14 @@ function ShopDetails({ page, day, onFavorite }: { page: ShopPageData; day: strin
           <header data-ui="shop-header" className={styles.header}>
             <ShopAvatar name={shop.name} logoUrl={shop.logo_url} size={56} />
             <div className={styles.headText}>
-              <h1 className={styles.name}>{shop.name}</h1>
+              <Title className={styles.name}>{shop.name}</Title>
               {page.founder && (
                 <p className={styles.founder}>
                   <FounderBadge withHint />
                 </p>
               )}
               {hasReviews && rating.review_count > 0 && rating.average !== null ? (
-                <Link to={shopReviewsPath(shop.id)} className={`${styles.rating} ${styles.ratingButton}`}>
+                <Link to={shopReviewsPath(shop.id)} state={linkState} className={`${styles.rating} ${styles.ratingButton}`}>
                   <Stars value={rating.average} />
                   <span className={styles.ratingValue}>{formatRating(lang, rating.average)}</span>
                   <span className={styles.ratingLink}>· {plural(lang, 'unit.reviews', rating.review_count)}</span>
@@ -276,7 +292,7 @@ function ShopDetails({ page, day, onFavorite }: { page: ShopPageData; day: strin
           own, C9) on the left, "Programează-te" on the right, the same size (Eduard, 21 Nov 2026). */}
       <BottomBar>
         <div className={`${styles.bookRow} ${page.bookable ? '' : styles.bookRowSingle}`}>
-          <Link to={shopServicesPath(shop.id)} className={buttonClass('secondary', true, styles.book)}>
+          <Link to={shopServicesPath(shop.id)} state={linkState} className={buttonClass('secondary', true, styles.book)}>
             <Wrench size={18} aria-hidden="true" />
             {t('shop.services')}
           </Link>

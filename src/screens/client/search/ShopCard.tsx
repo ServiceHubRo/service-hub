@@ -22,10 +22,14 @@ export interface ShopCardProps {
   onFavorite: (shopId: string, on: boolean) => void;
   /** The day the search asked for (`YYYY-MM-DD`): the shop page opens on it. */
   day?: string | null;
+  /** Beside the shop's panel (a laptop, C9): this card is the one shown on the right. */
+  selected?: boolean;
+  /** Beside the panel a tap on the card shows the shop there instead of opening its page. */
+  onSelect?: () => void;
 }
 
 /** One search result (FR §3.1): one shop per row, whole card opens the shop page. */
-export function ShopCard({ shop, distanceKm, back, onFavorite, day }: ShopCardProps) {
+export function ShopCard({ shop, distanceKm, back, onFavorite, day, selected = false, onSelect }: ShopCardProps) {
   const { t, lang } = useI18n();
   const offerText = useOfferText();
   const matched = lang === 'ro' ? shop.matched_service_ro : shop.matched_service_en;
@@ -33,7 +37,7 @@ export function ShopCard({ shop, distanceKm, back, onFavorite, day }: ShopCardPr
   const hasReviews = shop.review_count > 0 && shop.average !== null;
 
   return (
-    <article className={styles.card}>
+    <article className={`${styles.card} ${selected ? styles.selected : ''}`} aria-current={selected ? 'true' : undefined}>
       <Link
         to={day ? `${shopPath(shop.shop_id)}?zi=${day}` : shopPath(shop.shop_id)}
         state={back}
@@ -43,6 +47,9 @@ export function ShopCard({ shop, distanceKm, back, onFavorite, day }: ShopCardPr
           if (hasReviews && (e.target as HTMLElement).closest('[data-reviews]')) {
             e.preventDefault();
             navigate(shopReviewsPath(shop.shop_id), { state: back });
+          } else if (onSelect) {
+            e.preventDefault();
+            onSelect();
           }
         }}
       >
