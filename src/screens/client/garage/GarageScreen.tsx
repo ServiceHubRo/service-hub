@@ -50,9 +50,9 @@ export function GarageScreen() {
         actions={
           // The add, top right, like every add (docs/MODEL_DE_FOLOSIRE.md P12).
           state.status === 'ready' && state.data.length > 0 ? (
-            <Link to={NEW_CAR_PATH} className={buttonClass('primary')}>
+            <Link to={NEW_CAR_PATH} className={buttonClass('primary')} aria-label={t('garage.add')}>
               <Plus size={18} aria-hidden="true" />
-              {t('garage.add')}
+              {t('action.add')}
             </Link>
           ) : undefined
         }

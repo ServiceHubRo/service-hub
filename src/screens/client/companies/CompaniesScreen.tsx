@@ -75,8 +75,8 @@ export function CompaniesScreen() {
         actions={
           // The add, top right (docs/MODEL_DE_FOLOSIRE.md P12); with no company yet, the empty state has it.
           state.status === 'ready' && state.data.length > 0 && !creating ? (
-            <Button variant="primary" onClick={() => setCreating(true)}>
-              <Plus size={18} aria-hidden="true" /> {t('cos.create')}
+            <Button variant="primary" onClick={() => setCreating(true)} aria-label={t('cos.add')}>
+              <Plus size={18} aria-hidden="true" /> {t('action.add')}
             </Button>
           ) : undefined
         }

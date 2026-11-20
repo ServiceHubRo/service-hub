@@ -439,9 +439,14 @@ function Editor({
           <h2 id={id}>{kind === 'labor' ? t('qe.labor') : t('qe.parts')}</h2>
           <span className={styles.sectionEnd}>
             <span className="mono">{formatMoney(lang, sum)}</span>
-            <Button variant="primary" onClick={() => addRow(kind)} disabled={rows.length >= QUOTE_ROWS_MAX}>
+            <Button
+              variant="primary"
+              onClick={() => addRow(kind)}
+              disabled={rows.length >= QUOTE_ROWS_MAX}
+              aria-label={kind === 'labor' ? t('qe.addLabor') : t('qe.addPart')}
+            >
               <Plus size={18} aria-hidden="true" />
-              {kind === 'labor' ? t('qe.addLabor') : t('qe.addPart')}
+              {t('action.add')}
             </Button>
           </span>
         </div>

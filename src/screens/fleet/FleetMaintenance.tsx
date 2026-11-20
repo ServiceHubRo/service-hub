@@ -52,8 +52,8 @@ export function VehicleMaintenance({ vehicle }: { vehicle: FleetVehicle }) {
       <div className={styles.cardHead}>
         <h3 className={styles.cardTitle}>{t('fleet.vtab.maintenance')}</h3>
         {manage && form === null && !vehicle.archived_at && (
-          <Button onClick={() => setForm('new')}>
-            <Plus size={18} aria-hidden="true" /> {t('fleet.maint.add')}
+          <Button onClick={() => setForm('new')} aria-label={t('fleet.maint.add')}>
+            <Plus size={18} aria-hidden="true" /> {t('action.add')}
           </Button>
         )}
       </div>

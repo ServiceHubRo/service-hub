@@ -253,9 +253,9 @@ export function ShopBookingsScreen() {
         title={t('nav.bookings')}
         actions={
           state.status === 'ready' && (
-            <Link to={ADD_BOOKING_PATH} className={buttonClass('primary')}>
+            <Link to={ADD_BOOKING_PATH} className={buttonClass('primary')} aria-label={t('wi.add')}>
               <CalendarPlus size={18} aria-hidden="true" />
-              {t('wi.add')}
+              {t('action.add')}
             </Link>
           )
         }

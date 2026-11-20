@@ -90,8 +90,8 @@ export function FleetVehicles({ initialStatus }: { initialStatus?: string }) {
         </div>
         {allowed('vehicles.manage') && (
           <HeaderAction>
-            <Button variant="primary" onClick={() => setAdding((a) => !a)} aria-expanded={adding}>
-              <Plus size={18} aria-hidden="true" /> {t('fleet.vehicles.add')}
+            <Button variant="primary" onClick={() => setAdding((a) => !a)} aria-expanded={adding} aria-label={t('fleet.vehicles.add')}>
+              <Plus size={18} aria-hidden="true" /> {t('action.add')}
             </Button>
           </HeaderAction>
         )}

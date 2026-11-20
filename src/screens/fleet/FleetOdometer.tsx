@@ -44,8 +44,8 @@ export function VehicleOdometer({ vehicle }: { vehicle: FleetVehicle }) {
         <div className={styles.cardHead}>
           <h3 className={styles.cardTitle}>{t('fleet.odo.title')}</h3>
           {canAdd && !adding && (
-            <Button onClick={() => setAdding(true)}>
-              <Plus size={18} aria-hidden="true" /> {t('fleet.odo.add')}
+            <Button onClick={() => setAdding(true)} aria-label={t('fleet.odo.add')}>
+              <Plus size={18} aria-hidden="true" /> {t('action.add')}
             </Button>
           )}
         </div>

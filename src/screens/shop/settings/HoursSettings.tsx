@@ -224,9 +224,9 @@ function Closures() {
           ) : (
             // The section's add, in its head top right (docs/MODEL_DE_FOLOSIRE.md P12).
             <HeaderAction>
-              <Button variant="primary" onClick={() => setAdding(true)}>
+              <Button variant="primary" onClick={() => setAdding(true)} aria-label={t('hours.closures.add')}>
                 <CalendarPlus size={18} aria-hidden="true" />
-                {t('hours.closures.add')}
+                {t('action.add')}
               </Button>
             </HeaderAction>
           )}

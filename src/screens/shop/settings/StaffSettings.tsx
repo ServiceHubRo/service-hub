@@ -87,8 +87,8 @@ export function StaffSettings() {
         title={t('settings.staff')}
         actions={
           !inviting ? (
-            <Button variant="primary" onClick={() => setInviting(true)}>
-              <UserPlus size={18} aria-hidden="true" /> {t('staff.invite')}
+            <Button variant="primary" onClick={() => setInviting(true)} aria-label={t('staff.invite')}>
+              <UserPlus size={18} aria-hidden="true" /> {t('action.invite')}
             </Button>
           ) : undefined
         }

@@ -94,9 +94,13 @@ export function ProceduresScreen({ mode }: { mode: ProcedureMode }) {
         subtitle={t('proc.sub')}
         actions={
           <div className={styles.headerActions}>
-            <Link to={newProcedurePath(mode)} className={buttonClass('primary')}>
+            <Link
+              to={newProcedurePath(mode)}
+              className={buttonClass('primary')}
+              aria-label={mode === 'admin' ? t('proc.add') : undefined}
+            >
               <Plus size={18} aria-hidden="true" />
-              {mode === 'admin' ? t('proc.new') : t('proc.propose')}
+              {mode === 'admin' ? t('action.add') : t('proc.propose')}
             </Link>
             <Link to={responsiblesPath(mode)} className={buttonClass('secondary')}>
               <Users size={18} aria-hidden="true" />

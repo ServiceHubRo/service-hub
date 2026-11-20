@@ -91,7 +91,7 @@ test.describe('Internal procedures (A5)', () => {
     await shot(page, 'a5-admin-library', name());
 
     // A new procedure: settings, the Romanian text, the preview; a script is refused before saving.
-    await page.getByRole('link', { name: 'Procedură nouă' }).click();
+    await page.getByRole('link', { name: 'Adaugă o procedură' }).click();
     await expect(h1(page)).toHaveText('Procedură nouă');
     await page.getByLabel('Categorie', { exact: true }).selectOption({ label: 'Securitate și incidente' });
     await page.getByLabel('Tip', { exact: true }).selectOption({ label: 'Excepțională' });

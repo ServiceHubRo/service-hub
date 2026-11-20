@@ -204,7 +204,7 @@ test.describe('admin tools', () => {
     await expectNoHorizontalScroll(page);
     await shot(page, 't16b-catalog', name());
 
-    await page.getByRole('button', { name: 'Categorie nouă' }).click();
+    await page.getByRole('button', { name: 'Adaugă o categorie' }).click();
     await page.getByLabel('Nume în română').fill(`Tractoare ${t}`);
     await page.getByLabel('Nume în engleză').fill(`Tractors ${t}`);
     await expect(page.getByLabel('Cod categorie')).toHaveValue(`cat_tractoare_${t}`);
@@ -216,7 +216,7 @@ test.describe('admin tools', () => {
     // with its services as rows and „Serviciu nou” top right of them.
     await page.getByRole('list', { name: 'Catalog de servicii' }).locator(':scope > li').filter({ hasText: `Tractoare ${t}` }).getByRole('button').click();
     const card = detailPane(page);
-    await card.getByRole('button', { name: 'Serviciu nou' }).click();
+    await card.getByRole('button', { name: 'Adaugă un serviciu' }).click();
     await card.getByLabel('Nume în română').fill(`Revizie tractor ${t}`);
     await card.getByLabel('Nume în engleză').fill(`Tractor service ${t}`);
     await expect(card.getByLabel('Cod serviciu')).toHaveValue(`revizie_tractor_${t}`);
