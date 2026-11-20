@@ -490,17 +490,38 @@
   align-self: center;
 }
 
-/* The date filters and the Excel button in one row: the button at the right end (Eduard, 20 Nov 2026). */
-.datesRow {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-end;
+/* The search and the date filters stand in the same columns (they end at the same edge); the Excel
+   button is in the second column of the search's row (Eduard, 20 Nov 2026). */
+.filterGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 10px;
 }
 
-.datesRow > .dates {
-  flex: 1 1 30rem;
-  max-width: none;
+.exportCell {
+  display: flex;
+  align-items: center;
+  /* On a phone below the dates, at the right of the search on a wider screen. */
+  order: 3;
+}
+
+.exportCell:has([data-ui="inline-panel"]) {
+  grid-column: 1 / -1;
+}
+
+@media (min-width: 768px) {
+  .filterGrid {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .exportCell {
+    order: 0;
+  }
+
+  .filterGrid > .dates {
+    grid-column: 1;
+    max-width: none;
+  }
 }
 
 

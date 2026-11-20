@@ -71,19 +71,26 @@ export function BookingsScreen() {
       <PageHeader back={{ to: ZONE_BACK.to, label: t(ZONE_BACK.label) }} title={t('nav.admin.bookings')} subtitle={data ? t('admin.bookings.count', { shown: data.bookings.length, total: data.total }) : undefined} />
 
       <div className={styles.controls}>
-        <SearchField
-          id="admin-bookings-q"
-          label={t('admin.bookings.search')}
-          placeholder={t('admin.bookings.search')}
-          value={text}
-          onChange={setText}
-          onClear={() => {
-            setText('');
-            setParam({ q: null });
-          }}
-          clearLabel={t('admin.search.clear')}
-        />
-        <div className={styles.datesRow}>
+        {/* The search and the dates end at the same edge; the Excel button stands at the right of the search. */}
+        <div className={styles.filterGrid}>
+          <SearchField
+            id="admin-bookings-q"
+            label={t('admin.bookings.search')}
+            placeholder={t('admin.bookings.search')}
+            value={text}
+            onChange={setText}
+            onClear={() => {
+              setText('');
+              setParam({ q: null });
+            }}
+            clearLabel={t('admin.search.clear')}
+          />
+          <div className={styles.exportCell}>
+            <ExportButton
+              kind="bookings"
+              filters={{ statuses: statusesFor(status), from: from || undefined, to: to || undefined, q: q || undefined, shop_id: shopId, client_id: clientId }}
+            />
+          </div>
           <div className={styles.dates}>
             <SelectField
               label={t('admin.bookings.status')}
@@ -97,10 +104,6 @@ export function BookingsScreen() {
             <Field label={t('admin.bookings.from')} type="date" value={from} max={to || undefined} onChange={(e) => setParam({ de_la: e.target.value || null })} />
             <Field label={t('admin.bookings.to')} type="date" value={to} min={from || undefined} onChange={(e) => setParam({ pana_la: e.target.value || null })} />
           </div>
-          <ExportButton
-            kind="bookings"
-            filters={{ statuses: statusesFor(status), from: from || undefined, to: to || undefined, q: q || undefined, shop_id: shopId, client_id: clientId }}
-          />
         </div>
         {(shopId || clientId) && (
           <div className={styles.actions}>
