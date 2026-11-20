@@ -142,7 +142,7 @@ export function AnafScreen() {
   // from 1024 px (in its place below).
   const { wide, selectedId, open, select } = useListDetail(
     shown.map((r) => r.shop_id),
-    'service',
+    'firma',
   );
   const chosen = shown.find((r) => r.shop_id === selectedId) ?? null;
 
