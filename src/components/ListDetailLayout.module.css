@@ -1,4 +1,50 @@
 /* Page template A (list + detail). */
+
+/* Below 1024 px, or with nothing chosen: the screen is a column like any other. */
+.flow {
+  display: flex;
+  flex-direction: column;
+  gap: inherit;
+  min-width: 0;
+}
+
+/* Beside a list (from 1024 px): as tall as the window under the page's padding. The header and the
+   detail stay in place; only the list scrolls inside its column. A window too short for a usable
+   list scrolls the page instead (min-height). */
+.fixed {
+  display: flex;
+  flex-direction: column;
+  gap: inherit;
+  min-width: 0;
+  height: calc(100dvh - var(--nav-top, 0px) - var(--nav-bottom, 0px) - 2 * var(--page-pad));
+  min-height: 30rem;
+}
+
+.fixed > * {
+  flex-shrink: 0;
+}
+
+.fixed > .split {
+  flex: 1 1 0;
+  min-height: 0;
+  align-items: stretch;
+  grid-template-rows: minmax(0, 1fr);
+}
+
+.fixed .list {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  min-height: 0;
+  /* Room for the focus ring inside the scrolling column. */
+  padding: var(--space-1);
+  margin: calc(-1 * var(--space-1));
+}
+
+.fixed .detail {
+  position: static;
+  max-height: none;
+  min-height: 0;
+}
 .single {
   display: flex;
   flex-direction: column;

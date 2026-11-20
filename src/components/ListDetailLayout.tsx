@@ -33,12 +33,15 @@ export function ListDetailLayout({
 }) {
   const detailRef = useFitToScreen(wide && !!detail);
   const single = !wide && open;
+  // Beside a list the screen is as tall as the window: the header (title, search, filters) and the
+  // detail stay where they are and only the list scrolls (Eduard, 20 Nov 2026).
+  const beside = wide && !!detail;
   // One tree on every width: the detail open stays the same element when the window crosses
   // 1024 px (its panel, a half-typed review), only the places change.
   return (
-    <>
+    <div className={beside ? styles.fixed : styles.flow}>
       {!single && header}
-      <div className={wide && detail ? styles.split : styles.single}>
+      <div className={beside ? styles.split : styles.single}>
         {!single && <div className={styles.list}>{list}</div>}
         {(wide || single) && (
           <div ref={detailRef} className={wide ? styles.detail : styles.single}>
@@ -47,7 +50,7 @@ export function ListDetailLayout({
           </div>
         )}
       </div>
-    </>
+    </div>
   );
 }
 
