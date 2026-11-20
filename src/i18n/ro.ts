@@ -697,6 +697,7 @@ export const ro = {
   'booking.servicesSearch': 'Caută un serviciu (ex. frâne, ulei, anvelope)',
   'booking.servicesSearchEmpty': 'Nu există servicii pentru „{q}”.',
   'booking.servicesPick': 'Alege cel puțin un serviciu',
+  'booking.pickedCount': '{n} alese',
   'booking.servicesMax': 'Ai atins limita de 5 servicii pe programare.',
   'booking.servicesContinue': 'Continuă · {services}',
   'booking.servicesMore': '{first} și încă {n}',

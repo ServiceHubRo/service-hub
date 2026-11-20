@@ -299,6 +299,7 @@ function ShopDetails({
           {page.bookable && (
             <Link
               to={day ? `${bookingPath(shop.id)}?zi=${day}` : bookingPath(shop.id)}
+              state={linkState}
               className={buttonClass('primary', true, styles.book)}
             >
               <CalendarPlus size={18} aria-hidden="true" />

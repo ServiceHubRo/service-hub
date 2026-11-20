@@ -699,6 +699,7 @@ export const en: Record<MessageKey, string> = {
   'booking.servicesSearch': 'Search for a service (e.g. brakes, oil, tires)',
   'booking.servicesSearchEmpty': 'No services for “{q}”.',
   'booking.servicesPick': 'Pick at least one service',
+  'booking.pickedCount': '{n} selected',
   'booking.servicesMax': 'You have reached the limit of 5 services per booking.',
   'booking.servicesContinue': 'Continue · {services}',
   'booking.servicesMore': '{first} and {n} more',

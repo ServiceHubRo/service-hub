@@ -45,9 +45,11 @@ test('a favorite: the heart pops once saved, not when removed', async ({ page })
   await expect(page).toHaveURL(/\/c\/cauta/);
   await page.goto(`/c/cauta?q=${encodeURIComponent(shopName)}`);
 
-  const save = page.getByRole('button', { name: `Salvează ${shopName} la favorite` });
+  // The heart of the card (beside the results a laptop also shows the shop's own panel with one).
+  const card = page.locator('article');
+  const save = card.getByRole('button', { name: `Salvează ${shopName} la favorite` });
   await save.click();
-  const remove = page.getByRole('button', { name: `Elimină ${shopName} din favorite` });
+  const remove = card.getByRole('button', { name: `Elimină ${shopName} din favorite` });
   await expect(remove).toBeVisible();
   expect(await running(remove.locator('svg'))).toBeGreaterThan(0);
   await shot(page, 'motion-favorite', name());

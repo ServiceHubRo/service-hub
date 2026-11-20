@@ -159,8 +159,10 @@ test.describe('client search', () => {
     await page.getByRole('button', { name: 'Șterge filtrele' }).last().click();
     await openResult(page, 'Atelier Demo');
     await expect(page.getByRole('heading', { name: 'Atelier Demo' })).toBeVisible();
-    await page.getByRole('button', { name: 'Salvează Atelier Demo la favorite' }).click();
-    await expect(page.getByRole('button', { name: 'Elimină Atelier Demo din favorite' })).toBeVisible();
+    // The shop's own heart (beside the results the card has one too).
+    const shopHeader = page.locator('[data-ui="shop-header"]');
+    await shopHeader.getByRole('button', { name: 'Salvează Atelier Demo la favorite' }).click();
+    await expect(shopHeader.getByRole('button', { name: 'Elimină Atelier Demo din favorite' })).toBeVisible();
 
     await openAccount(page);
     await page.getByRole('link', { name: /Favorite/ }).click();
@@ -220,7 +222,7 @@ test.describe('client search', () => {
     // The rating in the header opens the reviews on a screen of their own: rows on the left, the chosen
     // review in full on the right — the stars, the client's words, the shop's reply.
     await shot(page, 't20a-shop-header', name());
-    await page.getByRole('link', { name: /recenzi/ }).click();
+    await page.locator('[data-ui="shop-header"]').getByRole('link', { name: /recenzi/ }).click();
     await expect(page.getByRole('heading', { level: 1, name: 'Recenzii' })).toBeVisible();
     const review = await chooseRow(page, 'Recenzii', 'Prompt');
     await expect(review).toContainText('Răspunsul service-ului');
@@ -259,7 +261,7 @@ test.describe('client search', () => {
     await page.goto('/c/cauta?q=vulcanizare');
     await openResult(page, 'Vulcanizare Roți Expres');
     await expect(page.getByRole('heading', { name: 'Vulcanizare Roți Expres' })).toBeVisible();
-    await expect(page.getByText('Fără recenzii')).toBeVisible();
+    await expect(page.locator('[data-ui="shop-header"]').getByText('Fără recenzii')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Recenzii' })).toHaveCount(0);
 
     // An unknown shop.
