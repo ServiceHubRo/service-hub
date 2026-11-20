@@ -147,7 +147,7 @@ test.describe('bookings added by the shop', () => {
 
     // The shop sees the client has it now, and a conversation is possible.
     await page.reload();
-    await openShopBooking(page, 'Dan Marin');
+    await openShopBooking(page, booking!.ref);
     await expect(card).toContainText('Adăugată de service · în contul clientului');
   });
 

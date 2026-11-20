@@ -10,6 +10,7 @@ import {
   signIn,
   userIdOf,
   openShopBooking,
+  backToList,
   openClientBooking,
 } from './support';
 
@@ -112,6 +113,7 @@ test.describe('new-client offers', () => {
       inspection_started_at: new Date().toISOString(),
     });
     await page.reload();
+    await backToList(page);
     await page.getByRole('combobox', { name: 'Afișează' }).selectOption('programate');
     await (await openShopBooking(page, 'Skoda Octavia')).getByRole('button', { name: 'Trimite deviz' }).click();
     await expect(page.getByText('Scade reducerea din prețul manoperei înainte să trimiți devizul.', { exact: false })).toBeVisible();

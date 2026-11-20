@@ -1,5 +1,5 @@
 import { CalendarClock, ClipboardCheck, ClipboardList, FilePen, MessageSquare, Phone, Store } from 'lucide-react';
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ActionButton } from '../../../components/ActionButton';
 import { JobDocuments } from '../../../components/JobDocuments';
@@ -59,6 +59,8 @@ export interface ShopBookingDetailProps {
   onDone: (before: ShopBooking, after: Booking) => void;
   /** The booking changed under this detail (another device, the client): read the list again. */
   onStale: () => void;
+  /** What stands above the content (the answer of an action, on a phone). */
+  top?: ReactNode;
 }
 
 /**
@@ -68,7 +70,7 @@ export interface ShopBookingDetailProps {
  * action opens in the detail (no dialogs) and goes through a database function; the buttons only
  * mirror what the database allows.
  */
-export function ShopBookingDetail({ booking: b, shopId, now, onDone, onStale }: ShopBookingDetailProps) {
+export function ShopBookingDetail({ booking: b, shopId, now, onDone, onStale, top }: ShopBookingDetailProps) {
   const { t, lang } = useI18n();
   const offerText = useOfferText();
   const [panel, setPanel] = useState<PanelKind | null>(null);
@@ -246,6 +248,7 @@ export function ShopBookingDetail({ booking: b, shopId, now, onDone, onStale }: 
       }
       actions={primary}
     >
+      {top}
         <div className={`${styles.details} ${b.quote ? styles.split : ''}`}>
           {/* On a wide card the quote stands on the right, the rest on the left; on a narrow one all
               of it reads in one column, in this order: client, quote, intake sheet, documents. */}

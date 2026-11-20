@@ -207,6 +207,35 @@ export function ShopBookingsScreen() {
       );
   }
 
+  // The answer of an action: above the list, or at the top of the open detail on a phone (the header is hidden then).
+  const banner = notice && (
+        <Banner
+          key={`${notice.key}:${notice.ref}`}
+          tone="info"
+          icon={<SuccessCheck size={22} />}
+          action={
+            <div className={styles.noticeButtons}>
+              {notice.show && (
+                <Button
+                  onClick={() => {
+                    const show = notice.show!;
+                    setNotice(null);
+                    go(show);
+                  }}
+                >
+                  {t('sb.done.show')}
+                </Button>
+              )}
+              <button type="button" className={styles.noticeClose} aria-label={t('common.close')} onClick={() => setNotice(null)}>
+                <X size={18} aria-hidden="true" />
+              </button>
+            </div>
+          }
+        >
+          {t(notice.key, { ref: notice.ref, when: `${formatDate(lang, notice.date)}, ${notice.slot}` })}
+        </Banner>
+  );
+
   const chip = filter ? t(FILTER_LABEL[filter]) : null;
   const header = (
     <>
@@ -235,33 +264,7 @@ export function ShopBookingsScreen() {
         />
       )}
       {chip && <ActiveFilters items={[{ key: 'focus', label: chip }]} onClearAll={() => go({ tab })} />}
-      {notice && (
-        <Banner
-          key={`${notice.key}:${notice.ref}`}
-          tone="info"
-          icon={<SuccessCheck size={22} />}
-          action={
-            <div className={styles.noticeButtons}>
-              {notice.show && (
-                <Button
-                  onClick={() => {
-                    const show = notice.show!;
-                    setNotice(null);
-                    go(show);
-                  }}
-                >
-                  {t('sb.done.show')}
-                </Button>
-              )}
-              <button type="button" className={styles.noticeClose} aria-label={t('common.close')} onClick={() => setNotice(null)}>
-                <X size={18} aria-hidden="true" />
-              </button>
-            </div>
-          }
-        >
-          {t(notice.key, { ref: notice.ref, when: `${formatDate(lang, notice.date)}, ${notice.slot}` })}
-        </Banner>
-      )}
+      {!open && banner}
     </>
   );
 
@@ -277,7 +280,7 @@ export function ShopBookingsScreen() {
         detail={
           chosen &&
           data && (
-            <ShopBookingDetail key={chosen.id} booking={chosen} shopId={data.shop.id} now={now} onDone={onDone} onStale={refresh} />
+            <ShopBookingDetail key={chosen.id} booking={chosen} shopId={data.shop.id} now={now} onDone={onDone} onStale={refresh} top={open ? banner : undefined} />
           )
         }
       />

@@ -648,7 +648,9 @@ export const detailPane = (page: Page) => page.locator('[data-ui="detail-pane"]'
  */
 export const shopRow = (page: Page, text: string | RegExp) => page.locator('[data-ui="list-row"]').filter({ hasText: text });
 export async function openShopBooking(page: Page, text: string | RegExp): Promise<Locator> {
-  // Already the open one (on a phone the list is hidden behind it): nothing to choose.
+  // The list, or a detail opened from the address (on a phone the list is hidden behind it), once read.
+  await expect(shopRow(page, text).or(detailPane(page).filter({ hasText: text })).first()).toBeVisible({ timeout: 15_000 });
+  // Already the open one: nothing to choose.
   if ((await detailPane(page).filter({ hasText: text }).count()) > 0) return detailPane(page);
   await backToList(page);
   const row = shopRow(page, text).first();
