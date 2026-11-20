@@ -33,6 +33,7 @@ import { SaveButton } from './SaveButton';
 import { useShopSettings } from './shopSettingsContext';
 import styles from './settings.module.css';
 import own from './HoursSettings.module.css';
+import { HeaderAction } from '../../../components/HeaderSlot';
 
 /** Monday first, the way a Romanian workshop reads its week. */
 const WEEK_ORDER = [1, 2, 3, 4, 5, 6, 0];
@@ -221,10 +222,13 @@ function Closures() {
               />
             </Card>
           ) : (
-            <Button block className={styles.addButton} onClick={() => setAdding(true)}>
-              <CalendarPlus size={18} aria-hidden="true" />
-              {t('hours.closures.add')}
-            </Button>
+            // The section's add, in its head top right (docs/MODEL_DE_FOLOSIRE.md P12).
+            <HeaderAction>
+              <Button variant="primary" onClick={() => setAdding(true)}>
+                <CalendarPlus size={18} aria-hidden="true" />
+                {t('hours.closures.add')}
+              </Button>
+            </HeaderAction>
           )}
         </div>
       )}

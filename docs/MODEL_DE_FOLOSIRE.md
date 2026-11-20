@@ -29,8 +29,9 @@ regula e respectată, iar raportul e în `docs/AUDIT_CONSISTENTA.md`. Detaliile 
 | Cod | Regula | Piesa comună |
 |---|---|---|
 | P4 | Un buton e mereu butonul comun: aceeași înălțime, aceleași colțuri, aceleași stări (apăsat, se trimite, eroare cu „Încearcă din nou”). | `Button`, `ActionButton` |
-| P5 | Un singur buton plin (chihlimbar) pe ecran: acțiunea principală. Restul sunt secundare sau în „Mai multe”. | — |
+| P5 | Un singur buton plin (chihlimbar) pe ecran: acțiunea principală. Restul sunt secundare sau în „Mai multe”. Adăugarea din dreapta sus e mereu plină. | — |
 | P10 | Acțiunile rare stau în „Mai multe”, în același loc. | `MoreActions` |
+| P12 | Orice adăugare (o mașină, un coleg, o cheltuială, o categorie, zile libere, fotografii) stă în dreapta sus: în antetul paginii pentru toată pagina, în capul secțiunii pentru o secțiune. Butonul e plin, cu „+” (ca „Adaugă programare” la service). Excepții: butonul unui formular deschis (îl trimite) și cel din starea goală. | `PageHeader actions`, `Section action`, `HeaderAction` |
 | P11 | O confirmare sau un formular deschis dintr-un buton se deschide în pagină, sub buton, nu într-o fereastră peste pagină. | `InlinePanel` |
 
 ## Câmpuri

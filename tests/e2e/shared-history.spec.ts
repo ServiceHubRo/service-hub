@@ -11,6 +11,7 @@ import {
   userIdOf,
   cardAction,
   openClientBooking,
+  detailPane,
 } from './support';
 
 // Fișa mașinii (T27; shown by default since 10 Oct): the shop the client books with sees what was
@@ -174,13 +175,16 @@ test.describe('Fișa mașinii', () => {
 
     // ------------------------------------------------------------ from Istoric, and in English
     await page.goto('/s/istoric');
-    const job = page.locator('li').filter({ hasText: 'Ulei și filtre' });
+    // One row per job (page template A): the job is found by its amount, its work reads in the detail.
+    const job = page.getByRole('list', { name: 'Istoric reparații' }).locator(':scope > li').filter({ hasText: '389 lei' });
     await job.getByRole('button').first().click();
-    await (await cardAction(job, 'Fișa mașinii')).click();
+    await expect(detailPane(page)).toContainText('Ulei și filtre');
+    await (await cardAction(detailPane(page), 'Fișa mașinii')).click();
     await expect(page).toHaveURL(/\/s\/istoric\/fisa\//);
     await expect(page.getByRole('region', { name: /Reparații anterioare la alte service-uri/ })).toContainText('Plăcuțe față schimbate');
     await page.getByRole('link', { name: 'Istoric' }).first().click();
-    await expect(page).toHaveURL(/\/s\/istoric$/);
+    // Back to Istoric: on a phone the job that was open is still the one in the address (?reparatie=).
+    await expect(page).toHaveURL(/\/s\/istoric(\?reparatie=[0-9a-f-]+)?$/);
 
     await serviceRest(`profiles?id=eq.${await userIdOf(shopEmail)}`, 'PATCH', { lang: 'en' });
     await openFileFromBookingsEn(page);

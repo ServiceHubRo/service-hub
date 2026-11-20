@@ -185,8 +185,8 @@ test.describe('T25 fraud checks', () => {
       )[0];
     const save = () => page.getByRole('button', { name: 'Salvează datele de facturare' }).click();
 
-    await page.getByLabel('Denumire legală').fill('Auto Test SRL');
-    await page.getByLabel('CUI / Cod fiscal').fill('RO18000003');
+    await page.getByLabel('Denumire sau nume').fill('Auto Test SRL');
+    await page.getByLabel('CUI (opțional)').fill('RO18000003');
     await save();
     await expect.poll(anaf).toMatchObject({ anaf_status: 'active', anaf_name: 'AUTO TEST S.R.L.', anaf_name_match: true });
     // The shop is not told it was checked.
@@ -196,13 +196,13 @@ test.describe('T25 fraud checks', () => {
     await shot(page, 't25-anaf-quiet', name());
 
     // Another legal name, an inactive company, an unknown CUI: each answer is stored.
-    await page.getByLabel('Denumire legală').fill('Alt Nume SRL');
+    await page.getByLabel('Denumire sau nume').fill('Alt Nume SRL');
     await save();
     await expect.poll(anaf).toMatchObject({ anaf_status: 'active', anaf_name_match: false });
-    await page.getByLabel('CUI / Cod fiscal').fill('18000011');
+    await page.getByLabel('CUI (opțional)').fill('18000011');
     await save();
     await expect.poll(anaf).toMatchObject({ anaf_status: 'inactive' });
-    await page.getByLabel('CUI / Cod fiscal').fill('160796');
+    await page.getByLabel('CUI (opțional)').fill('160796');
     await save();
     await expect.poll(anaf).toMatchObject({ anaf_status: 'not_found' });
     await expect(page.getByText('ANAF')).toHaveCount(0);

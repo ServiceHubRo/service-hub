@@ -1,5 +1,6 @@
 import { useId, type ReactNode } from 'react';
 import styles from './Section.module.css';
+import { HeaderSlotProvider, HeaderSlotTarget } from './HeaderSlot';
 
 export interface SectionProps {
   title: string;
@@ -7,6 +8,8 @@ export interface SectionProps {
   description?: string;
   /** Anchor for a link straight to this section (`#capacitate`). */
   id?: string;
+  /** The section's own action (an add): in the head, on the right (docs/MODEL_DE_FOLOSIRE.md P12). */
+  action?: ReactNode;
   children: ReactNode;
 }
 
@@ -16,18 +19,27 @@ export interface SectionProps {
  * rhythm and the same left edge; a page with `data-layout="sections"` sets them two side by side on
  * a wide screen.
  */
-export function Section({ title, description, id, children }: SectionProps) {
+export function Section({ title, description, id, action, children }: SectionProps) {
   const headingId = useId();
   return (
-    <section data-ui="section" id={id} className={styles.section} aria-labelledby={headingId}>
-      <div className={styles.head}>
-        <h2 id={headingId} className={styles.title}>
-          {title}
-        </h2>
-        {description && <p className={styles.description}>{description}</p>}
-      </div>
-      <div className={styles.body}>{children}</div>
-    </section>
+    // A HeaderAction inside the section (an add in one of its cards) lands in its head, top right.
+    <HeaderSlotProvider>
+      <section data-ui="section" id={id} className={styles.section} aria-labelledby={headingId}>
+        <div data-ui="section-head" className={`${styles.head} ${styles.headWithAction}`}>
+          <div className={styles.headText}>
+            <h2 id={headingId} className={styles.title}>
+              {title}
+            </h2>
+            {description && <p className={styles.description}>{description}</p>}
+          </div>
+          <div className={styles.headAction}>
+            {action}
+            <HeaderSlotTarget />
+          </div>
+        </div>
+        <div className={styles.body}>{children}</div>
+      </section>
+    </HeaderSlotProvider>
   );
 }
 

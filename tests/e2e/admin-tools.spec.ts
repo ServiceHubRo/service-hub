@@ -509,7 +509,7 @@ test.describe('Raport ANAF', () => {
     expect(await events('company_problem')).toBe(1);
     expect(await events('company_hidden')).toBe(1);
     await page.reload();
-    await expect(page.getByText('Firma nu a putut fi confirmată încă la ANAF. Verifică CUI-ul în Date de facturare; service-ul revine automat în căutări.')).toBeVisible();
+    await expect(page.getByText('Datele fiscale nu au putut fi confirmate încă la ANAF. Verifică CUI-ul în Date de facturare; service-ul revine automat în căutări.')).toBeVisible();
     await expect(banner).toHaveCount(0);
     await shot(page, 'anaf-hidden-banner', name());
 
@@ -520,7 +520,7 @@ test.describe('Raport ANAF', () => {
     expect(await billing()).toMatchObject({ anaf_status: 'active', anaf_problem_since: null });
     expect(await events('company_ok')).toBe(1);
     await page.reload();
-    await expect(page.getByText('Firma nu a putut fi confirmată încă la ANAF.', { exact: false })).toHaveCount(0);
+    await expect(page.getByText('Datele fiscale nu au putut fi confirmate încă la ANAF.', { exact: false })).toHaveCount(0);
     await expect(banner).toHaveCount(0);
   });
 });

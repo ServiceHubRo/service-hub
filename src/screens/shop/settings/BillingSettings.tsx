@@ -139,6 +139,7 @@ function BillingForm({ initial }: { initial: ShopBilling | null }) {
           <div className={styles.grid2}>
             <Field
               label={t('billing.vatId')}
+              hint={t('billing.vatIdHint')}
               mono
               autoCapitalize="characters"
               maxLength={14}

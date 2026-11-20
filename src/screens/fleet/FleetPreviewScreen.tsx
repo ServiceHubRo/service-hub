@@ -3,6 +3,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { useDocumentTitle } from '../../app/useDocumentTitle';
 import { Banner } from '../../components/Banner';
 import { LoadError } from '../../components/LoadError';
+import { HeaderSlotProvider, HeaderSlotTarget } from '../../components/HeaderSlot';
 import { PageHeader } from '../../components/PageHeader';
 import { SelectField } from '../../components/SelectField';
 import { SkeletonList } from '../../components/Skeleton';
@@ -76,16 +77,19 @@ export function FleetPreviewScreen() {
             options={FLEET_SECTIONS.filter((x) => x !== 'vehicul').map((x) => ({ value: x, label: t(`fleet.nav.${x}`) }))}
           />
         </div>
-        <PageHeader
-          title={title}
-          subtitle={
-            <span className={styles.spaceLine}>
-              <Building2 size={15} aria-hidden="true" /> {data.company.name} · {t(`fleet.role.${role}`)}
-            </span>
-          }
-        />
-        <FleetPlanNotice section={section} onOpen={() => go({ section: 'abonament' })} />
-        {body}
+        <HeaderSlotProvider>
+          <PageHeader
+            title={title}
+            subtitle={
+              <span className={styles.spaceLine}>
+                <Building2 size={15} aria-hidden="true" /> {data.company.name} · {t(`fleet.role.${role}`)}
+              </span>
+            }
+            actions={<HeaderSlotTarget />}
+          />
+          <FleetPlanNotice section={section} onOpen={() => go({ section: 'abonament' })} />
+          {body}
+        </HeaderSlotProvider>
       </div>
     </FleetContext.Provider>
   );

@@ -355,7 +355,19 @@ export function CatalogScreen() {
 
   return (
     <div className={styles.page}>
-      <PageHeader back={{ to: ZONE_BACK.to, label: t(ZONE_BACK.label) }} title={t('admin.catalog.title')} subtitle={t('admin.catalog.sub')} />
+      <PageHeader
+        back={{ to: ZONE_BACK.to, label: t(ZONE_BACK.label) }}
+        title={t('admin.catalog.title')}
+        subtitle={t('admin.catalog.sub')}
+        actions={
+          // The add, top right (docs/MODEL_DE_FOLOSIRE.md P12).
+          all && panel?.kind !== 'new-category' ? (
+            <Button variant="primary" onClick={() => setPanel({ kind: 'new-category' })}>
+              <Plus size={18} aria-hidden="true" /> {t('admin.catalog.newCategory')}
+            </Button>
+          ) : undefined
+        }
+      />
       {state.status === 'loading' && <SkeletonList />}
       {state.status === 'error' && <LoadError message={t('admin.loadError')} onRetry={reload} />}
       {all && (
@@ -373,11 +385,7 @@ export function CatalogScreen() {
               }}
               clearLabel={t('admin.search.clear')}
             />
-            {panel?.kind !== 'new-category' && (
-              <Button className={styles.loneAction} onClick={() => setPanel({ kind: 'new-category' })}>
-                <Plus size={18} aria-hidden="true" /> {t('admin.catalog.newCategory')}
-              </Button>
-            )}
+
           </div>
           {panel?.kind === 'new-category' && <CategoryPanel onDone={done} onCancel={() => setPanel(null)} />}
           {notice && (

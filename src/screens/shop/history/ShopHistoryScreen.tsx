@@ -1,9 +1,11 @@
-import { ChevronDown, ClipboardList, Download, History as HistoryIcon, MessageSquare, Phone, Printer, SearchX } from 'lucide-react';
+import { ClipboardList, Download, History as HistoryIcon, MessageSquare, Phone, Printer, SearchX } from 'lucide-react';
 import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useLiveSearchParams } from '../../../app/useLiveSearchParams';
 import { WarrantyNote } from '../../../components/WarrantyNote';
 import { Button } from '../../../components/Button';
-import { Card } from '../../../components/Card';
+import { DetailPane, ListDetailLayout } from '../../../components/ListDetailLayout';
+import { ListRow, ListRows } from '../../../components/ListRow';
 import { EmptyState } from '../../../components/EmptyState';
 import { ChoiceFilters } from '../../../components/Filters';
 import { LoadError } from '../../../components/LoadError';
@@ -30,6 +32,7 @@ import {
   isHistoryPeriod,
 } from '../../../lib/history';
 import { rowServicesText } from '../../../lib/bookingServices';
+import { useListDetail } from '../../../lib/useListDetail';
 import { useLoad } from '../../../lib/useLoad';
 import { useNow } from '../../../lib/useNow';
 import { saveFile } from '../../../lib/saveFile';
@@ -201,14 +204,17 @@ export function ShopHistoryScreen() {
   // The takings are the owner's: a colleague sees how many jobs, each job's amount, no total, no CSV.
   const isOwner = useIsShopOwner();
 
-  const [open, setOpen] = useState<ReadonlySet<string>>(() => new Set());
-  const toggle = (id: string) =>
-    setOpen((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
+  // Page template A (docs/MODEL_DE_FOLOSIRE.md P8): one row per job; the chosen one beside the list
+  // from 1024 px, on the whole screen below (`?reparatie=` in the address).
+  const { wide, selectedId, open, select } = useListDetail(
+    shown.map((b) => b.id),
+    'reparatie',
+  );
+  const chosen = shown.find((b) => b.id === selectedId) ?? null;
+  const { pathname } = useLocation();
+  const backParams = new URLSearchParams(params);
+  backParams.delete('reparatie');
+  const backTo = `${pathname}${backParams.size ? `?${backParams.toString()}` : ''}`;
 
   const clearFilters = () => {
     setText('');
@@ -217,137 +223,156 @@ export function ShopHistoryScreen() {
 
   const filtered = text.trim() !== '' || filter !== 'all' || period !== 'all';
 
-  return (
-    <div className={styles.page}>
-      <div>
-        <PageHeader
-          title={t('hist.title')}
-          subtitle={
-            anything
-              ? isOwner
-                ? t('hist.totals', { jobs: plural(lang, 'unit.repairs', totals.jobs), amount: formatMoney(lang, totals.revenue) })
-                : plural(lang, 'unit.repairs', totals.jobs)
-              : undefined
-          }
-        />
-        {shown.some((b) => b.imported) && <p className={`${styles.sub} no-print`}>{t('imp.histNote')}</p>}
-        {state.status === 'ready' && (
-          <p className={`${styles.sub} print-only`}>
-            {t('hist.printedOn', { shop: state.data.shop.name, date: formatDayMonth(lang, now) })}
-          </p>
-        )}
-      </div>
-
-      {state.status === 'loading' && <SkeletonList />}
-      {state.status === 'error' && <LoadError message={t('hist.loadError')} onRetry={reload} />}
-      {data && !anything && <EmptyState icon={HistoryIcon} title={t('hist.empty')} body={t('hist.emptyBody')} />}
-
-      {anything && (
-        <>
-          <div className={`${styles.controls} no-print`}>
-            <SearchField
-              id="history-q"
-              label={t('hist.search.label')}
-              placeholder={t('hist.search.placeholder')}
-              value={text}
-              onChange={setText}
-              onClear={() => {
-                setText('');
-                setParam({ q: null });
-              }}
-              clearLabel={t('hist.search.clear')}
-            />
-            <ChoiceFilters
-              groups={[
-                {
-                  key: 'filtru',
-                  title: t('hist.filter.label'),
-                  options: HISTORY_FILTERS.map((f) => ({ value: f, label: t(`hist.filter.${f}`) })),
-                  value: filter,
-                  defaultValue: 'all',
-                  onChange: (v) => setParam({ filtru: v === 'all' ? null : v }),
-                },
-                {
-                  key: 'perioada',
-                  title: t('hist.period.label'),
-                  options: HISTORY_PERIODS.map((p) => ({ value: p, label: t(`hist.period.${p}`) })),
-                  value: period,
-                  defaultValue: 'all',
-                  onChange: (v) => setParam({ perioada: v === 'all' ? null : v }),
-                },
-              ]}
-              onClearAll={() => setParam({ filtru: null, perioada: null })}
-              doneLabel={t('filters.show', { count: plural(lang, 'unit.repairs', shown.length) })}
-              end={
-                shown.length > 0 ? (
-                  <div className={styles.tools}>
-                    {isOwner && (
-                      <Button variant="ghost" className={styles.tool} onClick={() => void downloadCsv(shown, lang, t, today)}>
-                        <Download size={18} aria-hidden="true" />
-                        {t('hist.download')}
-                      </Button>
-                    )}
-                    <Button variant="ghost" className={styles.tool} onClick={() => window.print()}>
-                      <Printer size={18} aria-hidden="true" />
-                      {t('hist.print')}
-                    </Button>
-                  </div>
-                ) : undefined
-              }
-            />
-          </div>
-
-          {shown.length === 0 ? (
-            <EmptyState
-              icon={SearchX}
-              title={text.trim() ? t('hist.noResults', { query: text.trim() }) : t('hist.noResultsFilters')}
-              action={
-                filtered ? (
-                  <Button variant="primary" onClick={clearFilters}>
-                    {t('hist.clearFilters')}
-                  </Button>
-                ) : undefined
-              }
-            />
-          ) : (
-            <>
-              <ul className={`${styles.list} ${styles.jobList} no-print`}>
-                {shown.map((b) => (
-                  <li key={b.id}>
-                    <HistoryCard item={b} open={open.has(b.id)} onToggle={() => toggle(b.id)} />
-                  </li>
-                ))}
-              </ul>
-              <PrintTable items={shown} />
-            </>
-          )}
-          {imported.more && (
-            <div className={`${styles.more} no-print`}>
-              <Button variant="secondary" onClick={loadMore} disabled={pageState === 'loading'}>
-                {t('imp.more')}
-              </Button>
-              {pageState === 'error' && (
-                <p className={styles.sub} role="alert">
-                  {t('imp.moreError')}
-                </p>
-              )}
-            </div>
-          )}
-        </>
+  const header = (
+    <>
+    <div>
+      <PageHeader
+        title={t('hist.title')}
+        subtitle={
+          anything
+            ? isOwner
+              ? t('hist.totals', { jobs: plural(lang, 'unit.repairs', totals.jobs), amount: formatMoney(lang, totals.revenue) })
+              : plural(lang, 'unit.repairs', totals.jobs)
+            : undefined
+        }
+      />
+      {shown.some((b) => b.imported) && <p className={`${styles.sub} no-print`}>{t('imp.histNote')}</p>}
+      {state.status === 'ready' && (
+        <p className={`${styles.sub} print-only`}>
+          {t('hist.printedOn', { shop: state.data.shop.name, date: formatDayMonth(lang, now) })}
+        </p>
       )}
     </div>
+      {anything && (
+      <div className={`${styles.controls} no-print`}>
+        <SearchField
+          id="history-q"
+          label={t('hist.search.label')}
+          placeholder={t('hist.search.placeholder')}
+          value={text}
+          onChange={setText}
+          onClear={() => {
+            setText('');
+            setParam({ q: null });
+          }}
+          clearLabel={t('hist.search.clear')}
+        />
+        <ChoiceFilters
+          groups={[
+            {
+              key: 'filtru',
+              title: t('hist.filter.label'),
+              options: HISTORY_FILTERS.map((f) => ({ value: f, label: t(`hist.filter.${f}`) })),
+              value: filter,
+              defaultValue: 'all',
+              onChange: (v) => setParam({ filtru: v === 'all' ? null : v }),
+            },
+            {
+              key: 'perioada',
+              title: t('hist.period.label'),
+              options: HISTORY_PERIODS.map((p) => ({ value: p, label: t(`hist.period.${p}`) })),
+              value: period,
+              defaultValue: 'all',
+              onChange: (v) => setParam({ perioada: v === 'all' ? null : v }),
+            },
+          ]}
+          onClearAll={() => setParam({ filtru: null, perioada: null })}
+          doneLabel={t('filters.show', { count: plural(lang, 'unit.repairs', shown.length) })}
+          end={
+            shown.length > 0 ? (
+              <div className={styles.tools}>
+                {isOwner && (
+                  <Button variant="ghost" className={styles.tool} onClick={() => void downloadCsv(shown, lang, t, today)}>
+                    <Download size={18} aria-hidden="true" />
+                    {t('hist.download')}
+                  </Button>
+                )}
+                <Button variant="ghost" className={styles.tool} onClick={() => window.print()}>
+                  <Printer size={18} aria-hidden="true" />
+                  {t('hist.print')}
+                </Button>
+              </div>
+            ) : undefined
+          }
+        />
+      </div>
+      )}
+    </>
+  );
+
+  let list;
+  if (state.status === 'loading') list = <SkeletonList />;
+  else if (state.status === 'error') list = <LoadError message={t('hist.loadError')} onRetry={reload} />;
+  else if (data && !anything) list = <EmptyState icon={HistoryIcon} title={t('hist.empty')} body={t('hist.emptyBody')} />;
+  else if (shown.length === 0)
+    list = (
+          <EmptyState
+            icon={SearchX}
+            title={text.trim() ? t('hist.noResults', { query: text.trim() }) : t('hist.noResultsFilters')}
+            action={
+              filtered ? (
+                <Button variant="primary" onClick={clearFilters}>
+                  {t('hist.clearFilters')}
+                </Button>
+              ) : undefined
+            }
+          />
+    );
+  else
+    list = (
+      <>
+        <ListRows label={t('hist.title')}>
+          {shown.map((b) => (
+            <ListRow
+              key={b.id}
+              icon={<ServiceIcon name={b.service_icon} size={20} />}
+              title={titleText(b, lang, t)}
+              detail={[formatDayMonth(lang, endedDay(b)), b.imported ? t('imp.badge') : null, [carText(b), b.car_snapshot.plate].filter(Boolean).join(' · '), b.client_name]
+                .filter(Boolean)
+                .join(' · ')}
+              status={b.status === 'done' ? (b.cost !== null ? <span className="mono">{formatMoney(lang, b.cost)}</span> : undefined) : <BookingStatusPill status={b.status} viewer="shop" />}
+              selected={wide && b.id === selectedId}
+              onSelect={() => select(b.id)}
+            />
+          ))}
+        </ListRows>
+        <PrintTable items={shown} />
+        {imported.more && (
+          <div className={`${styles.more} no-print`}>
+            <Button variant="secondary" onClick={loadMore} disabled={pageState === 'loading'}>
+              {t('imp.more')}
+            </Button>
+            {pageState === 'error' && (
+              <p className={styles.sub} role="alert">
+                {t('imp.moreError')}
+              </p>
+            )}
+          </div>
+        )}
+      </>
+    );
+
+  return (
+    <ListDetailLayout
+      wide={wide}
+      open={open}
+      backTo={backTo}
+      backLabel={t('hist.title')}
+      header={header}
+      list={list}
+      detail={chosen && <HistoryDetail item={chosen} />}
+    />
   );
 }
 
 /**
- * One finished job (P16b), one under the other (T57): the summary is a button — what, when, car,
- * client, amount or status — and opened, the whole record appears under it in the same card.
+ * The detail of one finished job (P16b; page template A, 15 Nov 2026): what, when, car, client and
+ * the amount or status in its head; how it ended, the work, the notes, the quote, the documents;
+ * the phone and „Mai multe” last.
  */
-function HistoryCard({ item: b, open, onToggle }: { item: ShopHistoryItem; open: boolean; onToggle: () => void }) {
+function HistoryDetail({ item: b }: { item: ShopHistoryItem }) {
   const { t, lang } = useI18n();
-  const detailsId = `history-${b.id}`;
-  const car = carText(b);
-  const plate = b.car_snapshot.plate;
+  const car = [carText(b), b.car_snapshot.plate].filter(Boolean).join(' · ');
   const phone = b.client_phone;
   const docs: JobDocKind[] = b.imported
     ? []
@@ -357,125 +382,73 @@ function HistoryCard({ item: b, open, onToggle }: { item: ShopHistoryItem; open:
         ...(b.intake_sent_at ? (['intake'] as const) : []),
       ];
   const work = b.work && !b.imported ? b.work : null;
-  const warranty = !!b.warranty_months && !!b.warranty_until;
-
   return (
-    <Card className={`${styles.card} ${open ? styles.open : ''}`}>
-      <button type="button" className={styles.jobSummary} aria-expanded={open} aria-controls={detailsId} onClick={onToggle}>
-        <ServiceIcon name={b.service_icon} className={`${styles.icon} ${styles.jobIcon}`} />
-        <span className={`${styles.what} ${styles.jobWhat}`}>
-          <span className={`${styles.service} ${styles.block}`}>{titleText(b, lang, t)}</span>
-          <span className={`${styles.muted} ${styles.block}`}>
-            {formatDayMonth(lang, endedDay(b))}
-            {b.imported && <span className={styles.importedBadge}> · {t('imp.badge')}</span>}
-          </span>
-        </span>
-        <span className={styles.jobWho}>
-          <span className={styles.carRow}>
-            <span className={styles.car}>{car || t('sb.card.noCar')}</span>
-            {plate && <span className={`mono ${styles.plate}`}>{plate}</span>}
-          </span>
-          <span className={`${styles.muted} ${styles.block}`}>
+    <DetailPane
+      id={b.id}
+      icon={<ServiceIcon name={b.service_icon} size={20} />}
+      title={titleText(b, lang, t)}
+      detail={[formatDayMonth(lang, endedDay(b)), car || t('sb.card.noCar')].join(' · ')}
+      status={b.status === 'done' ? (b.cost !== null ? <span className={`mono ${styles.amount}`}>{formatMoney(lang, b.cost)}</span> : undefined) : <BookingStatusPill status={b.status} viewer="shop" />}
+      documents={docs.length > 0 ? <JobDocuments bookingId={b.id} bookingRef={b.ref} quoteNumber={b.quote_number} kinds={docs} /> : undefined}
+      actions={
+        <>
+          {phone && (
+            <a
+              className={`mono ${styles.phone}`}
+              href={`tel:${normalizePhone(phone) ?? phone.replace(/[^\d+]/g, '')}`}
+              aria-label={t('sb.card.call', { name: b.client_name ?? '', phone: formatPhone(phone) })}
+            >
+              <Phone size={15} aria-hidden="true" />
+              {formatPhone(phone)}
+            </a>
+          )}
+          <MoreActions
+            items={[
+              ...(b.has_client
+                ? [{ key: 'message', label: t('msg.button'), icon: <MessageSquare size={18} aria-hidden="true" />, to: bookingMessagesPath('shop', b.id) }]
+                : []),
+              ...(!b.imported
+                ? [{ key: 'file', label: t('vf.title'), icon: <ClipboardList size={18} aria-hidden="true" />, to: vehicleFilePath(b.id, 'history') }]
+                : []),
+            ]}
+          />
+        </>
+      }
+    >
+      {OUTCOME_STATUSES.has(b.status) && <Outcome item={b} />}
+      <dl className={styles.facts}>
+        <div>
+          <dt>{t('hist.card.client')}</dt>
+          <dd>
             {b.client_name || t('sb.card.deletedClient')}
             {b.odometer !== null && <span className={`mono ${styles.nowrap}`}> · {formatKm(lang, b.odometer)}</span>}
-          </span>
-        </span>
-        <span className={styles.jobMeta}>
-          {b.status === 'done' ? (
-            b.cost !== null && <span className={`mono ${styles.amount}`}>{formatMoney(lang, b.cost)}</span>
-          ) : (
-            <BookingStatusPill status={b.status} viewer="shop" />
-          )}
-        </span>
-        <ChevronDown size={18} className={`${styles.chevron} ${styles.jobChevron}`} aria-hidden="true" />
-        {(work || warranty) && (
-          <span className={styles.jobExtra}>
-            {work && <span className={`${styles.work} ${styles.block}`}>{work}</span>}
-            <WarrantyNote months={b.warranty_months} until={b.warranty_until} />
-          </span>
-        )}
-      </button>
-
-      {open && (
-        <div id={detailsId} className={`${styles.details} ${styles.jobDetails}`}>
-          {/* On a wide card the quote stands on the right, the record on the left; on a narrow one it
-              all reads in one column: how it ended, the quote, the rest. */}
-          <div className={`${styles.jobRecord} ${b.quote ? styles.jobSplit : ''}`}>
-            <div className={styles.jobMain}>
-              {OUTCOME_STATUSES.has(b.status) && (
-                <div className={styles.jobOutcome}>
-                  <Outcome item={b} />
-                </div>
-              )}
-              {(b.note || b.work_by || b.checked_by) && (
-                <dl className={styles.facts}>
-                  {b.note && (
-                    <div>
-                      <dt>{t('hist.card.clientNote')}</dt>
-                      <dd className={styles.note}>{b.note}</dd>
-                    </div>
-                  )}
-                  {b.work_by && (
-                    <div>
-                      <dt>{t('sb.complete.workBy')}</dt>
-                      <dd>{b.work_by}</dd>
-                    </div>
-                  )}
-                  {b.checked_by && (
-                    <div>
-                      <dt>{t('sb.complete.checkedBy')}</dt>
-                      <dd>{b.checked_by}</dd>
-                    </div>
-                  )}
-                </dl>
-              )}
-              {b.imported ? (
-                // The whole work, when it is more than the first line already shown as the title.
-                b.work && b.work.trim() !== titleText(b, lang, t) && <p className={styles.work}>{b.work}</p>
-              ) : (
-                <p className={`mono ${styles.muted}`}>
-                  {t('hist.card.booking', { ref: b.ref, when: `${formatDayMonth(lang, b.date)}, ${b.slot}` })}
-                </p>
-              )}
-              {/* The documents read only, under their own heading. */}
-              {docs.length > 0 && (
-                <div className={styles.jobDocs}>
-                  <p className={styles.groupLabel}>{t('doc.title')}</p>
-                  <JobDocuments bookingId={b.id} bookingRef={b.ref} quoteNumber={b.quote_number} kinds={docs} />
-                </div>
-              )}
-            </div>
-            {b.quote && (
-              <div className={styles.jobQuote}>
-                <HistoryQuote quote={b.quote} />
-              </div>
-            )}
-          </div>
-          <div className={styles.jobActions}>
-            {phone && (
-              <a
-                className={`mono ${styles.phone}`}
-                href={`tel:${normalizePhone(phone) ?? phone.replace(/[^\d+]/g, '')}`}
-                aria-label={t('sb.card.call', { name: b.client_name ?? '', phone: formatPhone(phone) })}
-              >
-                <Phone size={15} aria-hidden="true" />
-                {formatPhone(phone)}
-              </a>
-            )}
-            <MoreActions
-              items={[
-                ...(b.has_client
-                  ? [{ key: 'message', label: t('msg.button'), icon: <MessageSquare size={18} aria-hidden="true" />, to: bookingMessagesPath('shop', b.id) }]
-                  : []),
-                ...(!b.imported
-                  ? [{ key: 'file', label: t('vf.title'), icon: <ClipboardList size={18} aria-hidden="true" />, to: vehicleFilePath(b.id, 'history') }]
-                  : []),
-              ]}
-            />
-          </div>
+          </dd>
         </div>
-      )}
-    </Card>
+        {b.note && (
+          <div>
+            <dt>{t('hist.card.clientNote')}</dt>
+            <dd className={styles.note}>{b.note}</dd>
+          </div>
+        )}
+        {b.work_by && (
+          <div>
+            <dt>{t('sb.complete.workBy')}</dt>
+            <dd>{b.work_by}</dd>
+          </div>
+        )}
+        {b.checked_by && (
+          <div>
+            <dt>{t('sb.complete.checkedBy')}</dt>
+            <dd>{b.checked_by}</dd>
+          </div>
+        )}
+      </dl>
+      {work && <p className={styles.work}>{work}</p>}
+      {b.imported && b.work && b.work.trim() !== titleText(b, lang, t) && <p className={styles.work}>{b.work}</p>}
+      <WarrantyNote months={b.warranty_months} until={b.warranty_until} />
+      {!b.imported && <p className={`mono ${styles.muted}`}>{t('hist.card.booking', { ref: b.ref, when: `${formatDayMonth(lang, b.date)}, ${b.slot}` })}</p>}
+      {b.quote && <HistoryQuote quote={b.quote} />}
+    </DetailPane>
   );
 }
 

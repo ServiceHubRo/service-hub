@@ -15,6 +15,7 @@ import { useFleet } from './fleetContext';
 import styles from './fleet.module.css';
 import { StatusPill } from '../../components/StatusPill';
 import { toneOf } from '../../lib/statusTone';
+import { HeaderAction } from '../../components/HeaderSlot';
 
 const ROLE_TONE = { admin: 'amber', manager: 'blue', driver: 'muted', accountant: 'green' } as const;
 
@@ -40,6 +41,9 @@ export function FleetMembers() {
       <Card className={styles.card}>
         <div className={styles.cardHead}>
           <h2 className={styles.cardTitle}>{t('fleet.members.title')}</h2>
+        </div>
+        {/* The add, top right of the page (docs/MODEL_DE_FOLOSIRE.md P12). */}
+        <HeaderAction>
           {companyPage ? (
             <Link to={companyPage} className={buttonClass('primary')}>
               <UserPlus size={18} aria-hidden="true" /> {t('fleet.members.manage')}
@@ -49,7 +53,7 @@ export function FleetMembers() {
               <UserPlus size={18} aria-hidden="true" /> {t('fleet.members.invite')}
             </Button>
           )}
-        </div>
+        </HeaderAction>
         <ul className={styles.plainList}>
           {data.members.map((m) => (
             <li key={m.id} className={styles.lineRow}>

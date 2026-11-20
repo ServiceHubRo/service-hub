@@ -18,6 +18,8 @@ import { monthlyAverage } from '../../lib/subscription';
 import { formatPhone } from '../../lib/validators';
 import { CompanyCheckCard } from '../company/CompanyCheckCard';
 import { ConfirmPanel } from './ActionPanels';
+import { HoursTable } from '../../components/HoursTable';
+import { AccountActivity } from './AccountActivity';
 import { AuditList, Facts, Money, Pill, SectionTitle, ShopStatePill, SubscriptionPill, Verified } from './parts';
 import { ADMIN_SHOPS_PATH, adminBookingPath, adminBookingsLink } from './paths';
 import { EditPanel, PricePanel, StatusPanel, TrialPanel } from './ShopPanels';
@@ -249,16 +251,6 @@ export function ShopDetailScreen() {
             [t('admin.field.cancel_deadline_hours'), s.cancel_deadline_hours],
             [t('admin.field.inspection_fee'), <Money key="fee" amount={s.inspection_fee} />],
             [
-              t('admin.shop.hours'),
-              d.hours
-                .map((h) =>
-                  h.is_closed
-                    ? `${t(`weekday.${h.weekday}` as MessageKey)}: ${t('admin.closed')}`
-                    : `${t(`weekday.${h.weekday}` as MessageKey)}: ${h.open_time}–${h.close_time}`,
-                )
-                .join(' · '),
-            ],
-            [
               t('admin.shop.closures'),
               d.closures.length === 0 ? null : d.closures.map((c) => `${day(lang, c.start_date)} – ${day(lang, c.end_date)}`).join(', '),
             ],
@@ -268,6 +260,11 @@ export function ShopDetailScreen() {
             ],
           ]}
         />
+      </Card>
+
+      <SectionTitle>{t('admin.shop.hours')}</SectionTitle>
+      <Card>
+        <HoursTable hours={d.hours} />
       </Card>
 
       <SectionTitle>{t('admin.shop.billing')}</SectionTitle>
@@ -445,6 +442,9 @@ export function ShopDetailScreen() {
           ))}
         </ul>
       )}
+
+      <SectionTitle>{t('admin.acct.title')}</SectionTitle>
+      <AccountActivity kind="shop" id={s.id} />
 
       <SectionTitle>{t('admin.audit.title')}</SectionTitle>
       <AuditList entries={d.audit} />

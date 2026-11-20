@@ -76,8 +76,8 @@ test.describe('admin', () => {
     await createBookableShop(shopName, ['ulei']);
     await signInAdmin(page);
     await expect(page.getByRole('heading', { name: 'Service-uri', level: 2 })).toBeVisible();
-    await expect(page.getByText('Activitate recentă')).toBeVisible();
-    await expect(page.getByText(shopName).first()).toBeVisible();
+    // No list of the whole platform's events (Eduard, 16 Nov 2026): the activity is under each account.
+    await expect(page.getByText('Activitate recentă')).toHaveCount(0);
     await expectNoHorizontalScroll(page);
     await shot(page, 't16a-overview', name());
 
@@ -127,6 +127,20 @@ test.describe('admin', () => {
     await page.goto(`/admin/parteneri/service-uri/${shopId}`);
     await expect(page.getByRole('heading', { level: 1, name: shopName })).toBeVisible();
     await expect(page.getByText('Apare în căutări și primește programări.')).toBeVisible();
+    // The activity of this shop is under it: the creation of the account, newest first.
+    const activity = page.getByRole('list', { name: 'Activitatea contului' });
+    await expect(activity).toContainText('Service creat');
+    // By category (tabs with how many each holds) and by search, both answered by the database.
+    const categories = page.getByRole('tablist', { name: 'Categoriile activității' });
+    await expect(categories.getByRole('tab', { name: /^Toate/ })).toBeVisible();
+    await expect(categories.getByRole('tab', { name: /^Plăți/ })).toHaveCount(0);
+    await categories.getByRole('tab', { name: /^Cont/ }).click();
+    await expect(activity).toContainText('Service creat');
+    await categories.getByRole('tab', { name: /^Toate/ }).click();
+    await page.getByRole('searchbox', { name: 'Caută după cod, nume sau service' }).fill('zzzz-nu-exista');
+    await expect(page.getByText('Nu există rezultate pentru filtrele selectate.')).toBeVisible();
+    await page.getByRole('button', { name: 'Șterge căutarea' }).click();
+    await expect(activity).toContainText('Service creat');
     await shot(page, 't16a-shop', name());
 
     // Suspend: a reason is required, the shop leaves search at once.
@@ -311,6 +325,7 @@ test.describe('admin', () => {
     await page.getByLabel('Caută după nume, email, telefon sau C-00001').fill(client);
     await page.getByRole('link', { name: new RegExp(client.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')) }).click();
     await expect(page.getByRole('heading', { level: 1, name: 'Maria Pop' })).toBeVisible();
+    await expect(page.getByRole('list', { name: 'Activitatea contului' })).toContainText('Cont creat');
 
     await page.getByRole('button', { name: 'Suspendă contul' }).click();
     await page.getByLabel('Motiv').fill('Programări false');

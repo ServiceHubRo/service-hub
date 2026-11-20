@@ -257,7 +257,26 @@ export function HelpAdminScreen() {
 
   return (
     <div className={styles.page}>
-      <PageHeader back={{ to: ZONE_BACK.to, label: t(ZONE_BACK.label) }} title={t('admin.help.title')} subtitle={t('admin.help.sub')} />
+      <PageHeader
+        back={{ to: ZONE_BACK.to, label: t(ZONE_BACK.label) }}
+        title={t('admin.help.title')}
+        subtitle={t('admin.help.sub')}
+        actions={
+          // The adds, top right (docs/MODEL_DE_FOLOSIRE.md P12).
+          data ? (
+            <div className={styles.panelButtons}>
+              <Link to={adminHelpArticlePath('nou')} className={buttonClass('primary')}>
+                <Plus size={18} aria-hidden="true" /> {t('admin.help.newArticle')}
+              </Link>
+              {panel?.kind !== 'new-category' && (
+                <Button onClick={() => setPanel({ kind: 'new-category' })}>
+                  <Plus size={18} aria-hidden="true" /> {t('admin.help.newCategory')}
+                </Button>
+              )}
+            </div>
+          ) : undefined
+        }
+      />
       {state.status === 'loading' && <SkeletonList />}
       {state.status === 'error' && <LoadError message={t('admin.loadError')} onRetry={reload} />}
       {data && (
@@ -285,18 +304,7 @@ export function HelpAdminScreen() {
               ]}
               onChange={(e) => setParam({ stare: e.target.value || null })}
             />
-            <div className={rowStyles.toolbar}>
-              <div className={`${styles.panelButtons} ${rowStyles.toolbarButtons}`}>
-                <Link to={adminHelpArticlePath('nou')} className={buttonClass('primary')}>
-                  <Plus size={18} aria-hidden="true" /> {t('admin.help.newArticle')}
-                </Link>
-                {panel?.kind !== 'new-category' && (
-                  <Button onClick={() => setPanel({ kind: 'new-category' })}>
-                    <Plus size={18} aria-hidden="true" /> {t('admin.help.newCategory')}
-                  </Button>
-                )}
-              </div>
-            </div>
+
           </div>
           {panel?.kind === 'new-category' && <CategoryPanel onDone={done} onCancel={() => setPanel(null)} />}
           {notice && (

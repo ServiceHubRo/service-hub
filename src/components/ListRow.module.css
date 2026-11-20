@@ -153,3 +153,16 @@
     background-position: -100% 0;
   }
 }
+
+/* A row that opens nothing: not tappable, no hover, the same shape as the others. */
+.plain,
+.plain:active {
+  cursor: default;
+  background: var(--surface);
+}
+
+@media (hover: hover) {
+  .plain:hover {
+    background: var(--surface);
+  }
+}

@@ -638,3 +638,15 @@ export async function switchLanguage(page: Page, lang: 'ro' | 'en') {
 export function inboxRow(page: Page, text: string): Locator {
   return page.getByRole('list', { name: /^(Lista solicitărilor|Request list)$/ }).getByRole('link').filter({ hasText: text });
 }
+
+/** The detail of the item chosen in a list + detail screen (page template A). */
+export const detailPane = (page: Page) => page.locator('[data-ui="detail-pane"]');
+
+/** On a phone the detail takes the screen: „‹ Înapoi” returns to the list (wide: nothing to do). */
+export async function backToList(page: Page) {
+  const back = page.locator('[data-back-bar] a').filter({ visible: true });
+  if ((await back.count()) > 0 && (await detailPane(page).count()) > 0) {
+    await back.first().click();
+    await expect(detailPane(page)).toHaveCount(0);
+  }
+}

@@ -26,6 +26,8 @@ export interface ListRowProps {
  * so a row never carries a quote, a progress bar or buttons.
  */
 export function ListRow({ icon, title, detail, status, attention = false, selected = false, to, onSelect }: ListRowProps) {
+  // A row that opens nothing (an event in a history) is a plain row: no button, no chevron.
+  const opens = to !== undefined || onSelect !== undefined;
   const body = (
     <>
       <span className={`${styles.icon} ${attention ? styles.iconAttention : ''}`} aria-hidden="true">
@@ -36,13 +38,15 @@ export function ListRow({ icon, title, detail, status, attention = false, select
         <span className={styles.detail}>{detail}</span>
         {status && <span className={styles.status}>{status}</span>}
       </span>
-      <ChevronRight size={18} className={styles.chevron} aria-hidden="true" />
+      {opens && <ChevronRight size={18} className={styles.chevron} aria-hidden="true" />}
     </>
   );
   const cls = `${styles.row} ${selected ? styles.selected : ''}`;
   return (
     <li data-ui="list-row" className={styles.item}>
-      {to ? (
+      {!opens ? (
+        <div className={`${cls} ${styles.plain}`}>{body}</div>
+      ) : to ? (
         <Link to={to} className={cls} aria-current={selected ? 'true' : undefined} onClick={onSelect}>
           {body}
         </Link>

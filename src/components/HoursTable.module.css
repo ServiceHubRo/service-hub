@@ -1,0 +1,29 @@
+/* Two columns shared by every row: the days, then the hours; both start at the same edge. */
+.table {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: auto auto;
+  max-width: 100%;
+  justify-content: var(--hours-justify, start);
+  column-gap: var(--space-6);
+  row-gap: var(--space-1);
+  text-align: left;
+}
+
+.row {
+  display: contents;
+}
+
+.days {
+  color: var(--text);
+}
+
+.time {
+  color: var(--text);
+}
+
+.closed {
+  color: var(--muted);
+}

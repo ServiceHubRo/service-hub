@@ -45,6 +45,15 @@ const BILLING = {
   billing_email: 'facturi@service-hub.test',
 };
 
+// A sole proprietor (PFA) or a person: a name, an address and the email are enough, no CUI and no Trade Register number.
+const SOLE_PROPRIETOR = {
+  legal_name: 'Ion Popescu PFA',
+  vat_id: null,
+  reg_com: null,
+  legal_address: 'Str. Lungă 10, Brașov',
+  billing_email: 'facturi@service-hub.test',
+};
+
 async function shopWith(options: { billing?: boolean; lang?: string } = {}) {
   const shop = await createBookableShop(`Atelier Abonament ${Date.now()}`, ['ulei'], {}, options.lang ? { lang: options.lang } : {});
   if (options.billing !== false) await serviceRest(`shop_billing?shop_id=eq.${shop.shopId}`, 'PATCH', BILLING);
@@ -87,7 +96,7 @@ test.describe('subscription', () => {
     await expect(page.getByText('100 lei', { exact: true })).toBeVisible();
     await expect(page.getByText('Fără contract, anulezi oricând')).toBeVisible();
     await expect(page.getByText('Nu există plăți.')).toBeVisible();
-    // No invoice without the company's details: the button is a link to them.
+    // No invoice without the billing details: the button is a link to them (a sole proprietor pays the same way, with no CUI).
     await expect(page.getByText('Completează datele de facturare înainte de plată.')).toBeVisible();
     await expect(page.getByRole('button', { name: 'Activează abonamentul' })).toHaveCount(0);
     await expectNoHorizontalScroll(page);
@@ -95,7 +104,7 @@ test.describe('subscription', () => {
     await page.getByRole('link', { name: 'Completează datele de facturare' }).click();
     await expect(page).toHaveURL(/\/s\/cont\/setari\/facturare$/);
 
-    await serviceRest(`shop_billing?shop_id=eq.${shopId}`, 'PATCH', BILLING);
+    await serviceRest(`shop_billing?shop_id=eq.${shopId}`, 'PATCH', SOLE_PROPRIETOR);
     await page.goto('/s/cont/abonament');
     await expect(page.getByText('Salvezi cardul acum; prima plată se face la sfârșitul perioadei gratuite.')).toBeVisible();
     await page.getByRole('button', { name: 'Activează abonamentul' }).click();
@@ -310,8 +319,8 @@ test.describe('subscription', () => {
     await expect(page.getByText(/^Primul coleg cu cont în service este inclus în abonament\. Fiecare coleg în plus/)).toBeVisible();
     await expect(page.getByText('Acum abonamentul tău este 120 lei pe lună, cu 1 coleg în plus.', { exact: false })).toBeVisible();
     await shot(page, 'seats-staff', name());
-    const card = page.locator('div').filter({ hasText: 'Coleg Plătit' }).filter({ has: page.getByRole('button', { name: 'Elimină' }) }).last();
-    await card.getByRole('button', { name: 'Elimină' }).click();
+    await page.getByRole('button', { name: /Coleg Plătit/ }).click();
+    await page.getByRole('button', { name: 'Elimină' }).click();
     await page.getByRole('button', { name: 'Da, elimină' }).click();
     await expect.poll(seatsInStripe, { timeout: 30_000 }).toBe(0);
     await expect

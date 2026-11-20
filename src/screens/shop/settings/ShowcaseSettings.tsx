@@ -30,6 +30,7 @@ import { SaveButton } from './SaveButton';
 import { useShopSettings } from './shopSettingsContext';
 import styles from './settings.module.css';
 import own from './ShowcaseSettings.module.css';
+import { HeaderAction } from '../../../components/HeaderSlot';
 
 /**
  * Poze și facilități (T28b): up to 10 photos of the workshop, in the order clients see them on the
@@ -196,9 +197,12 @@ function PhotosCard() {
             </div>
           ) : (
             photos.length < PHOTO_LIMIT && (
-              <Button onClick={() => inputRef.current?.click()}>
-                <ImagePlus size={18} aria-hidden="true" /> {t('showcase.photos.add')}
-              </Button>
+              // The section's add, in its head top right (docs/MODEL_DE_FOLOSIRE.md P12).
+              <HeaderAction>
+                <Button variant="primary" onClick={() => inputRef.current?.click()}>
+                  <ImagePlus size={18} aria-hidden="true" /> {t('showcase.photos.add')}
+                </Button>
+              </HeaderAction>
             )
           )}
         </>

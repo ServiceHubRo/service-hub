@@ -56,7 +56,11 @@ export function useListDetail(ids: readonly string[], param = 'id') {
   const first = ids[0] ?? null;
   useEffect(() => {
     if (!wide || known !== null || first === null) return;
-    const next = new URLSearchParams(params);
+    // The address as it is now: a screen that keeps its filters live (useLiveSearchParams) shows a
+    // filter at once while the router renders the new address a moment later, so `params` can still be
+    // the old one, and writing it back would undo the filter just chosen.
+    const next = new URLSearchParams(window.location.search);
+    if (next.get(param) === first) return;
     next.set(param, first);
     setParams(next, { replace: true, preventScrollReset: true });
   }, [wide, known, first, params, param, setParams]);

@@ -40,6 +40,7 @@ const RULES = {
   P9: '„Se încarcă” e forma gri comună',
   P10: '„Mai multe” e meniul comun',
   P11: 'Confirmările și formularele se deschid în pagină, nu în fereastră',
+  P12: 'Adăugarea e în dreapta sus (în antet sau în capul secțiunii)',
   F1: 'Câmpurile de pe un rând au aceeași lățime',
   F2: 'Câmpurile unul sub altul au aceleași margini',
   F3: 'Câmpurile de pe un rând au aceeași înălțime',
@@ -64,6 +65,7 @@ const RO = [
   [/ is built by hand$/, ' e un câmp făcut separat'],
   [/ uses StatusBadge, not StatusPill$/, ' are eticheta de stare veche (StatusBadge)'],
   [/ is a pill built by hand$/, ' e o etichetă făcută separat'],
+  [/ is not top right$/, ' nu e în dreapta sus'],
   [/^(\d+) cards one after another \((.*)\): a list built from cards$/, '$1 carduri unul sub altul ($2)'],
   [/^a loading state that is not the skeleton.*$/, 'o stare „se încarcă” făcută separat'],
   [/ opens a menu built by hand$/, ' deschide un meniu făcut separat'],
@@ -78,7 +80,7 @@ const ro = (detail) => RO.reduce((d, [re, to]) => d.replace(re, to), detail);
 /** Screens only in test builds (the component gallery, the template samples): not part of the app. */
 const devOnly = (r) => r.path?.startsWith('/dev/');
 /** The visitor's pages (landing, sign-in, legal) keep their own layout (docs/SABLOANE_HARTA.md). */
-const outsideTemplates = (r, code) => r.role === 'visitor' && ['P1', 'P2', 'P7'].includes(code);
+const outsideTemplates = (r, code) => r.role === 'visitor' && ['P1', 'P2', 'P7', 'P12'].includes(code);
 
 /** Each screen by its Romanian title (the English pass of the same screen joins it). */
 const titles = new Map();

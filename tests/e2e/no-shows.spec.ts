@@ -196,8 +196,8 @@ test.describe('T53 no-shows', () => {
     await signIn(shopPage, shop, PASSWORD);
     await expect(shopPage).toHaveURL(/\/s\//);
     await shopPage.goto(`/s/istoric?q=${bookings[0]!.ref}`);
-    // The job's details open with a tap on it.
-    await shopPage.getByRole('button', { expanded: false }).filter({ hasText: 'Maria Pop' }).first().click();
+    // One row per job (page template A): the job's details open with a tap on its row.
+    await shopPage.getByRole('list', { name: 'Istoric reparații' }).locator(':scope > li').filter({ hasText: 'Maria Pop' }).getByRole('button').first().click();
     await expect(shopPage.getByText('Clientul nu s-a prezentat. Neprezentare anulată după contestație.')).toBeVisible();
     await shot(shopPage, 't53-history', name());
     await shopPage.context().close();

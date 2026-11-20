@@ -62,21 +62,25 @@ export function CompaniesScreen() {
             ))}
           </ul>
         )}
-        {creating ? (
-          <CreateForm onCancel={() => setCreating(false)} />
-        ) : (
-          <div>
-            <Button onClick={() => setCreating(true)}>
-              <Plus size={18} aria-hidden="true" /> {t('cos.create')}
-            </Button>
-          </div>
-        )}
+        {creating && <CreateForm onCancel={() => setCreating(false)} />}
       </>
     );
 
   return (
     <div className={styles.page}>
-      <PageHeader back={{ to: '/c/cont', label: t('nav.account') }} title={t('cos.title')} subtitle={t('cos.subtitle')} />
+      <PageHeader
+        back={{ to: '/c/cont', label: t('nav.account') }}
+        title={t('cos.title')}
+        subtitle={t('cos.subtitle')}
+        actions={
+          // The add, top right (docs/MODEL_DE_FOLOSIRE.md P12); with no company yet, the empty state has it.
+          state.status === 'ready' && state.data.length > 0 && !creating ? (
+            <Button variant="primary" onClick={() => setCreating(true)}>
+              <Plus size={18} aria-hidden="true" /> {t('cos.create')}
+            </Button>
+          ) : undefined
+        }
+      />
       {body}
     </div>
   );
