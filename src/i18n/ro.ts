@@ -3671,6 +3671,7 @@ export const ro = {
   'rpcError.expense_invalid': 'Verifică datele cheltuielii.',
   'rpcError.expense_not_found': 'Cheltuiala nu există sau a fost ștearsă.',
   'rpcError.expense_possible_duplicate': 'Există deja o cheltuială identică pentru acest vehicul.',
+  'garage.paneEmpty': 'Alege istoricul, raportul sau editarea unei mașini.',
   'garage.openExisting': 'Deschide mașina din garaj',
   'garage.dupTitle': 'Aceeași mașină apare de două ori',
   'garage.dupBody': '{a} și {b} au același {key}. Unește înregistrările; istoricul se păstrează.',

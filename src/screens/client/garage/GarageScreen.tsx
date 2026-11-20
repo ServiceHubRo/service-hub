@@ -7,7 +7,7 @@ import { buttonClass } from '../../../components/buttonClass';
 import { Card } from '../../../components/Card';
 import { EmptyState } from '../../../components/EmptyState';
 import { LoadError } from '../../../components/LoadError';
-import { ListDetailLayout } from '../../../components/ListDetailLayout';
+import { DetailFrame, ListDetailLayout } from '../../../components/ListDetailLayout';
 import { PageHeader } from '../../../components/PageHeader';
 import { SkeletonList } from '../../../components/Skeleton';
 import { fetchCars, fetchOilStandard, mergeCars, type Car } from '../../../data/garage';
@@ -121,10 +121,26 @@ export function GarageScreen({ selectedCarId, detail, wide = false }: { selected
 
   // Beside the cards (a laptop), what is opened from a card — its form, its history, its report — stands
   // on the right (C8, Eduard, 21 Nov 2026); on a phone each is a page, as before.
-  if (wide && detail)
+  // The two columns are there from the start: with nothing opened yet, the right one says what it is for.
+  const split = state.status === 'ready' && cars.length > 0;
+  if (wide && (detail || split))
     return (
       <div className={styles.page}>
-        <ListDetailLayout wide open={false} backTo={GARAGE_PATH} backLabel={t('nav.client.garage')} header={header} list={list} detail={detail} />
+        <ListDetailLayout
+          wide
+          open={false}
+          backTo={GARAGE_PATH}
+          backLabel={t('nav.client.garage')}
+          header={header}
+          list={list}
+          detail={
+            detail ?? (
+              <DetailFrame>
+                <EmptyState icon={CarIcon} title={t('garage.paneEmpty')} />
+              </DetailFrame>
+            )
+          }
+        />
       </div>
     );
   return (

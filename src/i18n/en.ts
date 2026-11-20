@@ -3672,6 +3672,7 @@ export const en: Record<MessageKey, string> = {
   'rpcError.expense_invalid': 'Check the expense details.',
   'rpcError.expense_not_found': 'The expense does not exist or was deleted.',
   'rpcError.expense_possible_duplicate': 'An identical expense already exists for this vehicle.',
+  'garage.paneEmpty': 'Choose the history, report or edit of a car.',
   'garage.openExisting': 'Open the car in the garage',
   'garage.dupTitle': 'The same car appears twice',
   'garage.dupBody': '{a} and {b} share the same {key}. Merge the records; the history is kept.',
