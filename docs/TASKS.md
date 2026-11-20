@@ -2032,3 +2032,9 @@ Nimic implementat. O sesiune nouă pornește de aici, după ce Eduard răspunde 
 - **Filtrele și „Descarcă Excel” pe același rând (P14):** filtrele în stânga, descărcarea în dreapta (`ChoiceFilters end`); ANAF și Programări (admin) au fost mutate pe rând.
 - **Rămas:** partea 3 — Programări (service) pe rânduri, cu un singur buton plin în detaliu (P5); apoi regulile P8 și P5 intră în paza de la fiecare PR.
 
+### C6 — Liste pe rânduri, partea 3: ce a rămas și Programări la service (Eduard, 20 nov 2026: „de ce nu facem ecranul de programări cu carduri pe stânga și ecran care se deschide pe dreapta? … exact ca la verificare ANAF. Așa ar trebui să fie toate”)
+- **Admin:** Programări, Clienți, Service-uri, Abonamente și plăți (cu fila Plăți), Firme și flote (companiile și planurile), Vehicule duplicate și Notificări flotă eșuate sunt acum rânduri cu detaliul alături. Detaliul arată rezumatul; fișa completă (programarea, clientul, service-ul) rămâne o pagină, la „Deschide programarea / fișa clientului / fișa service-ului”.
+- **Service → Programări:** un rând pe programare (serviciu, ziua și ora, client, mașină, cod, stare), tab-urile Cereri și Programate neschimbate; programarea aleasă (`?p=`) stă în detaliu cu telefonul clientului, devizul, fișa de preluare, documentele și o singură acțiune principală, plină (Confirmă, Începe constatarea, Trimite devizul, Începe lucrul, Finalizare); restul sunt în „Mai multe”. Răspunsul unei acțiuni apare deasupra listei, iar pe telefon, cu detaliul deschis, în capul detaliului.
+- **Teste:** ajutoarele `openShopBooking`, `shopRow` și `chooseRow` (tests/e2e/support.ts); testele care căutau cardul programării aleg acum rândul și lucrează în detaliu.
+- **Rămas:** Jurnal de audit, Anunțuri, Admini și Păstrare legală rămân liste de intrări sau formulare (nu liste de elemente cu acțiuni); le judecăm separat.
+
