@@ -2028,5 +2028,7 @@ Nimic implementat. O sesiune nouă pornește de aici, după ce Eduard răspunde 
 - **Fără migrare, fără schimbări de date.** Același cod face aceleași apeluri; se schimbă doar forma ecranelor.
 - **Rezultatul unei acțiuni** (o decizie, o verificare) apare deasupra listelor când elementul pleacă din listă și în detaliu când rămâne.
 - **Teste:** testele de browser ale celor zece ecrane urmează rândurile (`detailPane`, `backToList`); `backToList` nu face nimic de la 1024 px (acolo lista stă lângă detaliu).
+- **Lista derulează, restul stă pe loc (Eduard, 20 nov 2026: „câmpul de căutare rămâne fix … și asta să fie regulă la toate ecranele de genul”):** lângă o listă (de la 1024 px) ecranul are înălțimea ferestrei; titlul, căutarea și filtrele rămân sus, detaliul rămâne pe loc, iar lista derulează în coloana ei (`ListDetailLayout`, regula P13; valabil pe toate ecranele cu listă și detaliu, nu doar în admin). Sub 1024 px pagina derulează ca înainte.
+- **Filtrele și „Descarcă Excel” pe același rând (P14):** filtrele în stânga, descărcarea în dreapta (`ChoiceFilters end`); ANAF și Programări (admin) au fost mutate pe rând.
 - **Rămas:** partea 3 — Programări (service) pe rânduri, cu un singur buton plin în detaliu (P5); apoi regulile P8 și P5 intră în paza de la fiecare PR.
 

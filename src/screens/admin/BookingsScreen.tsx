@@ -83,20 +83,20 @@ export function BookingsScreen() {
           }}
           clearLabel={t('admin.search.clear')}
         />
-        <div className={styles.dates}>
-          <SelectField
-            label={t('admin.bookings.status')}
-            value={status}
-            onChange={(e) => setParam({ stare: e.target.value === 'all' ? null : e.target.value })}
-            options={BOOKING_STATUS_FILTERS.map((f) => ({
-              value: f,
-              label: f === 'all' ? t('admin.bookings.allStatuses') : f === 'active' ? t('admin.bookings.active') : t(`status.${f}`),
-            }))}
-          />
-          <Field label={t('admin.bookings.from')} type="date" value={from} max={to || undefined} onChange={(e) => setParam({ de_la: e.target.value || null })} />
-          <Field label={t('admin.bookings.to')} type="date" value={to} min={from || undefined} onChange={(e) => setParam({ pana_la: e.target.value || null })} />
-        </div>
-        <div className={styles.toolbar}>
+        <div className={styles.datesRow}>
+          <div className={styles.dates}>
+            <SelectField
+              label={t('admin.bookings.status')}
+              value={status}
+              onChange={(e) => setParam({ stare: e.target.value === 'all' ? null : e.target.value })}
+              options={BOOKING_STATUS_FILTERS.map((f) => ({
+                value: f,
+                label: f === 'all' ? t('admin.bookings.allStatuses') : f === 'active' ? t('admin.bookings.active') : t(`status.${f}`),
+              }))}
+            />
+            <Field label={t('admin.bookings.from')} type="date" value={from} max={to || undefined} onChange={(e) => setParam({ de_la: e.target.value || null })} />
+            <Field label={t('admin.bookings.to')} type="date" value={to} min={from || undefined} onChange={(e) => setParam({ pana_la: e.target.value || null })} />
+          </div>
           <ExportButton
             kind="bookings"
             filters={{ statuses: statusesFor(status), from: from || undefined, to: to || undefined, q: q || undefined, shop_id: shopId, client_id: clientId }}

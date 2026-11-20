@@ -490,6 +490,20 @@
   align-self: center;
 }
 
+/* The date filters and the Excel button in one row: the button at the right end (Eduard, 20 Nov 2026). */
+.datesRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.datesRow > .dates {
+  flex: 1 1 30rem;
+  max-width: none;
+}
+
+
 /* ---------------------------------------------------------------- platform tools (T16b) */
 .toolbar {
   display: flex;
