@@ -23,7 +23,7 @@ export function LangSwitch() {
       <label htmlFor={id} className="visually-hidden">
         {t('lang.switch')}
       </label>
-      <select id={id} className={styles.select} value={lang} {...touch}>
+      <select id={id} className={styles.select} value={lang} data-picker {...touch}>
         {LANGS.map((code) => (
           <option key={code} value={code} lang={code} aria-label={t(code === 'ro' ? 'lang.ro' : 'lang.en')}>
             {t(code === 'ro' ? 'lang.code.ro' : 'lang.code.en')}

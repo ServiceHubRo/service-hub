@@ -72,6 +72,18 @@
   gap: 8px;
 }
 
+/* A phone: the form's buttons one under another, full width, the main one first (as the garage form). */
+@media (max-width: 599px) {
+  .actions {
+    flex-direction: column;
+    flex-wrap: nowrap;
+  }
+
+  .actions > * {
+    width: 100%;
+  }
+}
+
 .grid2 {
   display: grid;
   grid-template-columns: minmax(0, 1fr);

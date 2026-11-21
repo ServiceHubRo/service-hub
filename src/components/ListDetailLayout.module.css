@@ -226,6 +226,12 @@
   gap: var(--space-2);
 }
 
+/* Whatever sits in it takes the whole row, so a pair of PDF buttons can share it equally. */
+.documents > * {
+  flex: 1 1 100%;
+  min-width: 0;
+}
+
 /* The actions: last, one main action and the others quiet. On a phone they stay above the tab bar
    while the detail scrolls (put back in the page while the keyboard is open, global.css); beside
    a list, at the foot of the panel. */
@@ -252,6 +258,14 @@
 
 .actions > * {
   flex-shrink: 0;
+}
+
+/* A phone: the buttons share the row in equal parts (a lone one fills it); more than fit wrap. */
+@media (max-width: 599px) {
+  .actions > * {
+    flex: 1 1 140px;
+    min-width: 0;
+  }
 }
 
 /* A confirmation opened from the actions takes their place, in the flow of the detail. */

@@ -272,6 +272,17 @@
   min-width: 96px;
 }
 
+/* A phone: „Da” and „Nu” share the row in equal parts. */
+@media (max-width: 599px) {
+  .feedbackButtons > * {
+    flex: 1 1 0;
+  }
+
+  .feedbackButtons button {
+    width: 100%;
+  }
+}
+
 .feedbackDone {
   color: var(--text-2);
 }

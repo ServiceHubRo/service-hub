@@ -180,6 +180,17 @@
   min-width: 0;
 }
 
+/* A phone: each button the whole width, one under another (as every form's buttons). */
+@media (max-width: 599px) {
+  .actions > * {
+    flex: 1 1 100%;
+  }
+
+  .actions button {
+    width: 100%;
+  }
+}
+
 /* The colleague to give the request to: a field on its own line, as wide as the other fields. */
 .assignPick {
   flex: 1 1 100%;

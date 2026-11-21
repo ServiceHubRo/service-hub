@@ -47,6 +47,55 @@
   appearance: none;
 }
 
+/* The icon on the right and, while empty, what to choose on the left (the native empty text is
+   hidden: it differs from phone to phone, and some draw nothing). */
+.whenWrap {
+  position: relative;
+}
+
+.whenWrap .input {
+  padding-right: 44px;
+}
+
+/* The browser's own calendar button is hidden (our icon stands in); a tap anywhere on the field still opens the picker. */
+.whenWrap .input::-webkit-calendar-picker-indicator {
+  position: absolute;
+  inset: 0;
+  width: auto;
+  height: auto;
+  margin: 0;
+  padding: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.whenIcon {
+  position: absolute;
+  top: 50%;
+  right: 14px;
+  transform: translateY(-50%);
+  color: var(--muted);
+  pointer-events: none;
+}
+
+.whenHint {
+  position: absolute;
+  top: 50%;
+  left: 15px;
+  transform: translateY(-50%);
+  color: var(--muted);
+  font-size: 16px;
+  pointer-events: none;
+}
+
+.emptyWhen:not(:focus)::-webkit-datetime-edit {
+  opacity: 0;
+}
+
+.emptyWhen:focus ~ .whenHint {
+  display: none;
+}
+
 .input::-webkit-date-and-time-value {
   min-height: 1.5em;
   text-align: left;

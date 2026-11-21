@@ -41,6 +41,7 @@ const RULES = {
   P10: '„Mai multe” e meniul comun',
   P11: 'Confirmările și formularele se deschid în pagină, nu în fereastră',
   P12: 'Adăugarea e în dreapta sus (în antet sau în capul secțiunii)',
+  P13: 'Pe telefon, butoanele unui loc împart rândul în părți egale sau stau unul sub altul la fel de late',
   F1: 'Câmpurile de pe un rând au aceeași lățime',
   F2: 'Câmpurile unul sub altul au aceleași margini',
   F3: 'Câmpurile de pe un rând au aceeași înălțime',

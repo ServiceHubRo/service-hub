@@ -2,3 +2,16 @@
 .end {
   margin-left: auto;
 }
+
+/* A phone: it shares the row with the main action in equal parts (ListDetailLayout .actions). */
+@media (max-width: 599px) {
+  .end {
+    margin-left: 0;
+  }
+
+  .end > a,
+  .end > button,
+  .end > [data-ui='menu'] > button {
+    width: 100%;
+  }
+}

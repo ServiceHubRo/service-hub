@@ -250,6 +250,20 @@ function measure(): Measured {
   return out;
 }
 
+/** The buttons of the screen that only open something in the page (a form, a confirmation): never one that acts at once. */
+function openerNames(): string[] {
+  const opens = /^(Adaugă|Editează|Modifică|Schimbă|Răspunde|Scrie|Raportează|Lasă|Contestă|Anulează|Refuză|Respinge|Creează|Invită|Redenumește|Reprogramează|Mută|Șterge|Elimină|Numește|Cere)(?!\p{L})/u;
+  const names: string[] = [];
+  for (const b of Array.from(document.querySelectorAll<HTMLElement>('main button'))) {
+    if (b.hasAttribute('aria-haspopup') || b.closest('nav, [aria-hidden="true"], [hidden]')) continue;
+    const r = b.getBoundingClientRect();
+    if (r.width < 2 || r.height < 2) continue;
+    const text = (b.innerText ?? '').trim().replace(/\s+/g, ' ');
+    if (opens.test(text) && !names.includes(text)) names.push(text);
+  }
+  return names.slice(0, 8);
+}
+
 async function settle(page: Page) {
   await page
     .waitForFunction(() => document.readyState === 'complete' && !document.querySelector('[aria-busy="true"]'), null, { timeout: 6_000 })
@@ -331,6 +345,27 @@ async function audit(page: Page, role: string, screens: Screen[], lang: 'ro' | '
           mkdirSync(dirname(`${OUT}/${file}`), { recursive: true });
           await page.screenshot({ path: `${OUT}/${file}`, fullPage: FULL.has(width), type: 'jpeg', quality: 45, animations: 'disabled', caret: 'hide' });
           row.shot = file;
+        }
+        // Buttons that open a form or a confirmation in the page: look at the buttons of each
+        // (VISUAL_OPENERS=1, a phone; P13 of tests/e2e/patternRules.ts).
+        if (process.env.VISUAL_OPENERS === '1' && width < 600 && lang === 'ro') {
+          const openers = await page.evaluate(openerNames);
+          for (const name of openers) {
+            try {
+              await page.locator('main button').filter({ hasText: new RegExp(`^\\s*${name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*$`) }).filter({ visible: true }).first().click({ timeout: 3_000 });
+              await page.waitForTimeout(350);
+              const found = await page.evaluate(measurePatterns, ['P13']);
+              for (const f of found.findings) row.patterns?.findings.push({ rule: f.rule, detail: `after „${name}”: ${f.detail}` });
+            } catch {
+              // Not there any more, or covered: the next.
+            }
+            await page.goto(screen.path, { waitUntil: 'domcontentloaded' });
+            await settle(page);
+            if (screen.prep) {
+              await screen.prep(page);
+              await settle(page);
+            }
+          }
         }
       } catch (e) {
         row.errors.push(String(e).slice(0, 300));

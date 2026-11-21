@@ -1,0 +1,103 @@
+/* The list of a select drawn in the app's style (Chrome 135+, the Android app): frosted over the page,
+   sliding in. Elsewhere (Safari on the iPhone) the system's own picker. The same as SelectField's
+   (Field.module.css), for the selects that are not a SelectField: the language and the phone's
+   country. Mark such a select with `data-picker`. */
+@supports (appearance: base-select) {
+  select[data-picker],
+  select[data-picker]::picker(select) {
+    appearance: base-select;
+  }
+
+  select[data-picker]::picker-icon {
+    display: none;
+  }
+
+  select[data-picker]::picker(select) {
+    margin-block: 6px;
+    padding: 6px;
+    max-height: min(360px, 60dvh);
+    color: var(--text);
+    background: var(--surface2);
+    border: 1px solid var(--border-lit);
+    border-radius: var(--glass-radius);
+    box-shadow: var(--glass-shadow);
+    opacity: 1;
+    transform: none;
+    transition:
+      opacity var(--motion-quick) var(--ease),
+      transform var(--motion-quick) var(--ease),
+      display var(--motion-quick) allow-discrete,
+      overlay var(--motion-quick) allow-discrete;
+  }
+
+  select[data-picker]:not(:open)::picker(select) {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.98);
+  }
+
+  @starting-style {
+    select[data-picker]:open::picker(select) {
+      opacity: 0;
+      transform: translateY(-6px) scale(0.98);
+    }
+  }
+
+  select[data-picker] option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: var(--tap);
+    padding: 0 12px;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+  }
+
+  select[data-picker] option:focus-visible {
+    background: rgba(255, 255, 255, 0.07);
+    outline: none;
+  }
+
+  @media (hover: hover) {
+    select[data-picker] option:hover {
+      background: rgba(255, 255, 255, 0.07);
+      outline: none;
+    }
+  }
+
+  select[data-picker] option:checked {
+    color: var(--amber);
+    font-weight: 600;
+  }
+
+  select[data-picker] option::checkmark {
+    order: 1;
+    margin-left: auto;
+    color: var(--amber);
+  }
+
+  select[data-picker] legend {
+    padding: 10px 12px 4px;
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+}
+
+@supports (appearance: base-select) and ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  select[data-picker]::picker(select) {
+    background: var(--glass-bg);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  select[data-picker]::picker(select) {
+    transition: none;
+  }
+}
+
