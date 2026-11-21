@@ -234,17 +234,25 @@ export function watchKeyboard(): () => void {
   // a moment, a few times at most for one field. Nothing else about the browser's scroll is answered.
   let guardTimer = 0;
   let fixes = 0;
+  /** What the guard decided, for the measurements on screen (keyboardReadout; nobody listens otherwise). */
+  const said = (text: string) => window.dispatchEvent(new CustomEvent('sh-kb-note', { detail: text }));
   const keepInSight = () => {
     window.clearTimeout(guardTimer);
     guardTimer = window.setTimeout(() => {
       const field = document.activeElement;
-      if (!open || moved || pending || fixes >= HEADER_FIXES || !(field instanceof HTMLElement) || !opensKeyboard(field) || scrollHost(field)) return;
+      if (!open) return said('off');
+      if (moved) return said('moved');
+      if (pending) return said('pending');
+      if (fixes >= HEADER_FIXES) return said('max');
+      if (!(field instanceof HTMLElement) || !opensKeyboard(field)) return said('nofield');
+      if (scrollHost(field)) return said('host');
       const band = visibleBand(viewport, window.innerHeight, navTopPx(), window.scrollY);
       const rect = field.getBoundingClientRect();
-      if (!fieldUnderHeader(rect, band)) return;
+      if (!fieldUnderHeader(rect, band)) return said(`ok ${Math.round(rect.top)}/${Math.round(band.top)}`);
       const delta = placeField(fieldArea(field), rect, band);
-      if (delta === 0) return;
+      if (delta === 0) return said('delta0');
       fixes += 1;
+      said(`fix ${delta}`);
       window.scrollBy({ top: delta, behavior: 'auto' });
     }, 150);
   };

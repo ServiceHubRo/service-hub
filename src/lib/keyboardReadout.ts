@@ -41,8 +41,15 @@ export function showKeyboardReadout(): () => void {
   let start = performance.now();
   let events: string[] = [];
   let first: string[] = [];
+  // Where the field is (its top, as the browser answers it) and how long the page is, with every entry:
+  // a page that grows above the field moves it, and the browser follows (Eduard, 21 Nov 2026).
+  const where = () => {
+    const el = document.activeElement;
+    const top = el instanceof HTMLElement && opensKeyboard(el) ? Math.round(el.getBoundingClientRect().top) : '-';
+    return `f${top} H${document.documentElement.scrollHeight}`;
+  };
   const note = (text: string) => {
-    const line = `+${Math.round(performance.now() - start)} ${text}`;
+    const line = `+${Math.round(performance.now() - start)} ${text} ${where()}`;
     // The first ones (how the keyboard came) and the last ones (where things ended).
     if (first.length < 12) first.push(line);
     else events.push(line);
@@ -78,6 +85,16 @@ export function showKeyboardReadout(): () => void {
 
   document.addEventListener('focusin', onFocus);
   document.addEventListener('focusout', onBlur);
+  // What the guard against a field under the header decided (src/lib/keyboard.ts), and when the page's own height changes.
+  const onGuard = (event: Event) => note(`G ${(event as CustomEvent<string>).detail}`);
+  window.addEventListener('sh-kb-note', onGuard);
+  let height = document.documentElement.scrollHeight;
+  const watchHeight = new ResizeObserver(() => {
+    const now = document.documentElement.scrollHeight;
+    if (now !== height) note(`H ${now - height > 0 ? '+' : ''}${now - height}`);
+    height = now;
+  });
+  watchHeight.observe(document.documentElement);
   vv?.addEventListener('resize', onVvResize);
   vv?.addEventListener('scroll', onVvScroll);
   window.addEventListener('scroll', onScroll, { passive: true });
@@ -155,6 +172,8 @@ export function showKeyboardReadout(): () => void {
     window.removeEventListener('scroll', onScroll);
     window.removeEventListener('touchmove', onTouch);
     window.removeEventListener('resize', onWinResize);
+    window.removeEventListener('sh-kb-note', onGuard);
+    watchHeight.disconnect();
     strip.remove();
     safe.remove();
   };
