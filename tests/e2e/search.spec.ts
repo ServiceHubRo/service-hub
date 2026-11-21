@@ -173,8 +173,13 @@ test.describe('client search', () => {
     await expectNoHorizontalScroll(page);
     await shot(page, 't06-favorites', name());
 
-    // Back from a shop page returns to the list it came from.
+    // Back from a shop page returns to the list it came from. From 1024 px the shop shows beside the list
+    // (C9); its reviews are a screen of their own, and Back from there returns to the list.
     await openResult(page, 'Rapid Service');
+    if ((page.viewportSize()?.width ?? 0) >= 1024) {
+      await page.locator('[data-ui="shop-header"]').getByRole('link', { name: /recenzi/ }).click();
+      await expect(page.getByRole('heading', { level: 1, name: 'Recenzii' })).toBeVisible();
+    }
     await page.getByRole('link', { name: 'Favorite' }).first().click();
     await expect(page.getByRole('heading', { level: 1, name: 'Favorite' })).toBeVisible();
   });

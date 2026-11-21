@@ -26,6 +26,8 @@ import {
 
 const name = () => test.info().project.name;
 const h1 = (page: Page) => page.getByRole('heading', { level: 1 });
+/** A procedure's title: the page's title on a phone, a second-level heading beside the library from 1024 px (C9). */
+const procTitle = (page: Page) => ((page.viewportSize()?.width ?? 0) >= 1024 ? page.locator('[data-ui="detail-frame"]').getByRole('heading', { level: 2 }).first() : h1(page));
 const stamp = () => Math.random().toString(36).slice(2, 8);
 const nav = (page: Page) => page.getByRole('navigation', { name: /^(Navigare principală|Main navigation)$/ }).filter({ visible: true });
 
@@ -116,7 +118,7 @@ test.describe('Internal procedures (A5)', () => {
     // Any admin approves, its own draft included.
     await page.getByRole('button', { name: 'Aprobă și publică' }).click();
     await expect(page).toHaveURL(/\/admin\/suport\/proceduri\/[0-9a-f-]{36}$/);
-    await expect(h1(page)).toHaveText(title);
+    await expect(procTitle(page)).toHaveText(title);
     await expect(page.getByText('Versiunea 1, publicată pe')).toBeVisible();
     // „Am citit”: required, only by the button (opening the page confirmed nothing).
     await expect(page.getByText('Citirea este obligatorie.', { exact: false })).toBeVisible();
@@ -194,7 +196,7 @@ test.describe('Internal procedures (A5)', () => {
 
     // „Am citit” on the critical one.
     await page.getByRole('link', { name: new RegExp(`^${critical}`) }).first().click();
-    await expect(h1(page)).toHaveText(critical);
+    await expect(procTitle(page)).toHaveText(critical);
     await expect(page.getByRole('heading', { name: 'Pași de urmat' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Confirmări de citire' })).toHaveCount(0);
     await expectAccessible(page, 'agent procedure');
@@ -203,7 +205,7 @@ test.describe('Internal procedures (A5)', () => {
     await expect(page.getByText('Citire confirmată pentru versiunea 1')).toBeVisible();
     // English text where it exists.
     await switchLanguage(page, 'en');
-    await expect(h1(page)).toHaveText(`${critical} EN`);
+    await expect(procTitle(page)).toHaveText(`${critical} EN`);
     await expectNoRomanianText(page, 'agent procedure (en)');
     await switchLanguage(page, 'ro');
 
@@ -237,7 +239,7 @@ test.describe('Internal procedures (A5)', () => {
     await expectAccessible(page, 'request with procedures');
     await shot(page, 'a5-request-procedures', name());
     await fits.getByRole('link', { name: 'Deschide procedura' }).click();
-    await expect(h1(page)).toHaveText(forRequests);
+    await expect(procTitle(page)).toHaveText(forRequests);
   });
 
   test('a client never reaches the procedures, in the app or through the API', async ({ page }) => {

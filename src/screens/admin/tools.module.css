@@ -161,3 +161,12 @@
   justify-content: space-between;
   gap: var(--space-4);
 }
+
+/* The category's own actions at the foot of its panel (Centrul de ajutor beside the categories, C9). */
+.categoryActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-2);
+}

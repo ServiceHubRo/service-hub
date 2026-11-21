@@ -40,11 +40,11 @@ export function VersionTag({ status }: { status: VersionStatus }) {
 }
 
 /** One procedure as a row: title, category, labels, and an optional line under it. */
-export function ProcedureRow({ p, to, extra }: { p: Procedure; to: string; extra?: ReactNode }) {
+export function ProcedureRow({ p, to, extra, selected = false }: { p: Procedure; to: string; extra?: ReactNode; selected?: boolean }) {
   const { t, lang } = useI18n();
   return (
     <li>
-      <Link to={to} className={styles.row}>
+      <Link to={to} className={`${styles.row} ${selected ? styles.rowSelected : ''}`} aria-current={selected ? 'true' : undefined}>
         <span className={styles.rowText}>
           <span className={styles.rowTitle}>{procedureTitle(lang, p)}</span>
           <span className={styles.rowMeta}>

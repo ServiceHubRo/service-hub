@@ -1,6 +1,7 @@
 import { Heart } from 'lucide-react';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { DetailFrame, ListDetailLayout } from '../../../components/ListDetailLayout';
 import { PageHeader } from '../../../components/PageHeader';
 import { buttonClass } from '../../../components/buttonClass';
 import { EmptyState } from '../../../components/EmptyState';
@@ -12,11 +13,17 @@ import { useI18n } from '../../../i18n/context';
 import { plural } from '../../../i18n/translate';
 import { distanceTo } from '../../../lib/geo';
 import { useLocation } from '../../../lib/location';
+import { EmbeddedProvider } from '../../../lib/embedded';
+import { LIST_DETAIL_QUERY, useMediaQuery } from '../../../lib/useMediaQuery';
 import { useLoad } from '../../../lib/useLoad';
 import { NAV } from '../../../app/roles';
 import { FAVORITES_PATH, SEARCH_PATH } from '../paths';
+import { ShopPage } from '../shop/ShopPage';
 import { ShopCard } from '../search/ShopCard';
 import styles from '../search/SearchScreen.module.css';
+
+/** The shop shown beside the list, kept while the reader goes to its reviews or services and back. */
+const lastPicked = new Map<'shop', string>();
 
 interface Loaded {
   shops: ShopSearchResult[];
@@ -44,13 +51,20 @@ export function FavoritesScreen() {
     setData((prev) => ({ ...prev, shops: prev.shops.map((s) => (s.shop_id === shopId ? { ...s, is_favorite: on } : s)) }));
   }
 
-  return (
-    <div className={styles.page}>
-      <PageHeader back={{ to: NAV.client.account.path, label: t('nav.account') }} title={t('favorites.title')} />
+  const wide = useMediaQuery(LIST_DETAIL_QUERY);
+  const [pickedId, setPickedId] = useState<string | null>(lastPicked.get('shop') ?? null);
+  const shops = state.status === 'ready' ? state.data.shops : [];
+  const chosen = shops.find((s) => s.shop_id === pickedId) ?? shops[0];
+  const back = { backTo: FAVORITES_PATH, backLabel: 'favorites' } as const;
+  const beside = wide && state.status === 'ready' && shops.length > 0;
+
+  const header = <PageHeader back={{ to: NAV.client.account.path, label: t('nav.account') }} title={t('favorites.title')} />;
+  const list = (
+    <>
       {state.status === 'loading' && <SkeletonList cards />}
       {state.status === 'error' && <LoadError message={t('favorites.loadError')} onRetry={reload} />}
       {state.status === 'ready' &&
-        (state.data.shops.length === 0 ? (
+        (shops.length === 0 ? (
           <EmptyState
             icon={Heart}
             title={t('search.empty.favorites')}
@@ -63,15 +77,25 @@ export function FavoritesScreen() {
           />
         ) : (
           <>
-            <p className={styles.count}>{plural(lang, 'unit.shops', state.data.shops.filter((s) => s.is_favorite).length)}</p>
+            <p className={styles.count}>{plural(lang, 'unit.shops', shops.filter((s) => s.is_favorite).length)}</p>
             <ul className={styles.list} data-layout="cards">
-              {state.data.shops.map((s) => (
+              {shops.map((s) => (
                 <li key={s.shop_id}>
                   <ShopCard
                     shop={s}
                     distanceKm={distanceTo(coords, s)}
-                    back={{ backTo: FAVORITES_PATH, backLabel: 'favorites' }}
+                    back={back}
                     onFavorite={onFavorite}
+                    // Beside the shop's panel (a laptop, C9) a card is chosen, not opened.
+                    {...(beside
+                      ? {
+                          selected: s.shop_id === chosen?.shop_id,
+                          onSelect: () => {
+                            lastPicked.set('shop', s.shop_id);
+                            setPickedId(s.shop_id);
+                          },
+                        }
+                      : {})}
                   />
                 </li>
               ))}
@@ -81,6 +105,37 @@ export function FavoritesScreen() {
       {state.status === 'ready' && state.data.hidden > 0 && (
         <p className={styles.count}>{t('favorites.hidden', { count: plural(lang, 'unit.shops', state.data.hidden) })}</p>
       )}
+    </>
+  );
+
+  // Beside the saved shops (a laptop): the chosen shop's page on the right, as in Caută.
+  if (wide) {
+    return (
+      <div className={styles.page}>
+        <ListDetailLayout
+          wide
+          open={false}
+          backTo={FAVORITES_PATH}
+          backLabel={t('favorites.title')}
+          header={header}
+          list={list}
+          detail={
+            beside && chosen ? (
+              <DetailFrame>
+                <EmbeddedProvider value>
+                  <ShopPage key={chosen.shop_id} shopId={chosen.shop_id} linkState={back} />
+                </EmbeddedProvider>
+              </DetailFrame>
+            ) : null
+          }
+        />
+      </div>
+    );
+  }
+  return (
+    <div className={styles.page}>
+      {header}
+      {list}
     </div>
   );
 }

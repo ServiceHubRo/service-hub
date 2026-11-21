@@ -1,9 +1,11 @@
-import { ChevronDown, SearchX } from 'lucide-react';
-import { useCallback, useMemo, useState } from 'react';
+import { ChevronDown, SearchX, Wrench } from 'lucide-react';
+import { useCallback, useMemo, useState, type ReactNode } from 'react';
 import { Button } from '../../../components/Button';
 import { Checkbox } from '../../../components/Checkbox';
 import { EmptyState } from '../../../components/EmptyState';
 import { Field } from '../../../components/Field';
+import { DetailPane, ListDetailLayout } from '../../../components/ListDetailLayout';
+import { ListRow, ListRows } from '../../../components/ListRow';
 import { PageHeader } from '../../../components/PageHeader';
 import { SelectField } from '../../../components/SelectField';
 import { SkeletonList } from '../../../components/Skeleton';
@@ -12,6 +14,7 @@ import { useI18n } from '../../../i18n/context';
 import { plural } from '../../../i18n/translate';
 import { SERVICE_PRESETS } from '../../../lib/servicePresets';
 import { matchesWords, searchWords } from '../../../lib/text';
+import { LIST_DETAIL_QUERY, useMediaQuery } from '../../../lib/useMediaQuery';
 import { useLoad } from '../../../lib/useLoad';
 import { LoadError } from '../../../components/LoadError';
 import { SETTINGS_PATH } from './paths';
@@ -39,18 +42,21 @@ export function ServicesSettings() {
   }, [shop.id]);
   const { state, reload } = useLoad(load);
 
+  const header = <PageHeader back={{ to: SETTINGS_PATH, label: t('settings.title') }} title={t('settings.services')} subtitle={t('services.intro')} />;
+  if (state.status === 'ready') return <Catalog lead={header} catalog={state.data.catalog} initial={state.data.selected} />;
   return (
     <div className={styles.page}>
-      <PageHeader back={{ to: SETTINGS_PATH, label: t('settings.title') }} title={t('settings.services')} subtitle={t('services.intro')} />
+      {header}
       {state.status === 'loading' && <SkeletonList />}
       {state.status === 'error' && <LoadError message={t('settings.loadError')} onRetry={reload} />}
-      {state.status === 'ready' && <Catalog catalog={state.data.catalog} initial={state.data.selected} />}
     </div>
   );
 }
 
-function Catalog({ catalog, initial }: { catalog: CatalogCategory[]; initial: string[] }) {
+function Catalog({ lead, catalog, initial }: { lead: ReactNode; catalog: CatalogCategory[]; initial: string[] }) {
   const { t, lang } = useI18n();
+  const wide = useMediaQuery(LIST_DETAIL_QUERY);
+  const [categoryKey, setCategoryKey] = useState<string | null>(null);
   const all = useMemo(() => catalog.flatMap((c) => c.services.map((s) => s.id)), [catalog]);
   // Only services still in the catalog count (a disabled one disappears on the next save).
   const [selected, setSelected] = useState<Set<string>>(() => new Set(initial.filter((id) => all.includes(id))));
@@ -111,8 +117,137 @@ function Catalog({ catalog, initial }: { catalog: CatalogCategory[]; initial: st
     setSaved(next);
   }
 
-  return (
+  const saveButton = (
     <>
+      <SaveButton
+        footer
+        onSave={save}
+        note={
+          selected.size === 0 ? (
+            <p className={styles.warn}>{t('services.none')}</p>
+          ) : (
+            changed && <p className={styles.warn}>{t('common.unsaved')}</p>
+          )
+        }
+      >
+        {t('services.save')}
+      </SaveButton>
+    </>
+  );
+  const controls = (
+    <>
+      <div className={own.top}>
+        <SelectField
+          label={t('services.presetLabel')}
+          value=""
+          options={[
+            { value: '', label: t('services.presetPick') },
+            ...SERVICE_PRESETS.map((p) => ({ value: p.key, label: t(`services.preset.${p.key}`) })),
+          ]}
+          onChange={(e) => applyPreset(e.target.value)}
+        />
+        <p className={own.note} role="status">
+          {presetNote}
+        </p>
+        <Field
+          label={t('services.search')}
+          type="search"
+          placeholder={t('services.searchPlaceholder')}
+          autoComplete="off"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+        />
+        <p className={own.count} aria-live="polite">
+          {t('services.count', { n: selected.size, total: all.length })}
+        </p>
+      </div>
+
+      {visible.length === 0 && (
+        <EmptyState
+          icon={SearchX}
+          title={t('services.empty', { q: query.trim() })}
+          action={<Button onClick={() => setQuery('')}>{t('services.clearSearch')}</Button>}
+        />
+      )}
+
+    </>
+  );
+
+  // Beside the categories (a laptop, C9): the categories as rows on the left, the chosen one's services to
+  // tick on the right, "Salvează" at the foot of the panel — as the client sees them on the shop's page.
+  const active = visible.find((c) => c.key === categoryKey) ?? visible[0];
+  // The same tree whatever the search finds, so the field being typed in is never rebuilt.
+  if (wide) {
+    const activeIds = active ? catalog.find((x) => x.key === active.key)!.services.map((s) => s.id) : [];
+    const activeTicked = activeIds.filter((id) => selected.has(id)).length;
+    return (
+      <ListDetailLayout
+        wide
+        open={false}
+        backTo={SETTINGS_PATH}
+        backLabel={t('settings.title')}
+        header={
+          <>
+            {lead}
+            {controls}
+          </>
+        }
+        list={
+          <ListRows label={t('settings.services')}>
+            {visible.map((c) => {
+              const ids = catalog.find((x) => x.key === c.key)!.services.map((s) => s.id);
+              const ticked = ids.filter((id) => selected.has(id)).length;
+              return (
+                <ListRow
+                  key={c.key}
+                  icon={<Wrench size={18} />}
+                  title={name(c)}
+                  detail={t('services.catCount', { n: ticked, total: ids.length })}
+                  selected={c.key === active?.key}
+                  onSelect={() => setCategoryKey(c.key)}
+                />
+              );
+            })}
+          </ListRows>
+        }
+        detail={
+          active ? (
+          <DetailPane
+            key={active.key}
+            id={active.key}
+            icon={<Wrench size={18} />}
+            title={name(active)}
+            detail={t('services.catCount', { n: activeTicked, total: activeIds.length })}
+            actions={saveButton}
+          >
+            <div className={own.panelItems}>
+              {!searching && (
+                <Checkbox
+                  className={`${own.item} ${own.itemAll}`}
+                  checked={activeTicked === activeIds.length}
+                  indeterminate={activeTicked > 0 && activeTicked < activeIds.length}
+                  aria-label={t('services.catAllLabel', { category: name(active) })}
+                  onChange={(e) => setMany(activeIds, e.target.checked)}
+                >
+                  {t('services.catAll')}
+                </Checkbox>
+              )}
+              {active.services.map((s) => (
+                <Checkbox key={s.id} className={own.item} checked={selected.has(s.id)} onChange={(e) => setMany([s.id], e.target.checked)}>
+                  {name(s)}
+                </Checkbox>
+              ))}
+            </div>
+          </DetailPane>
+          ) : null
+        }
+      />
+    );
+  }
+
+  return (
+    <div className={styles.page}>
+      {lead}
       <div className={own.top}>
         <SelectField
           label={t('services.presetLabel')}
@@ -213,6 +348,6 @@ function Catalog({ catalog, initial }: { catalog: CatalogCategory[]; initial: st
       >
         {t('services.save')}
       </SaveButton>
-    </>
+    </div>
   );
 }
