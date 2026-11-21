@@ -45,7 +45,7 @@
   flex-direction: column;
   gap: 8px;
   padding: 20px;
-  background: var(--dialog-bg);
+  background: var(--dialog-bg-dense);
   -webkit-backdrop-filter: var(--dialog-blur);
   backdrop-filter: var(--dialog-blur);
   border: 1px solid var(--border-lit);
