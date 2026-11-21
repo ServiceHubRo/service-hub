@@ -8,7 +8,9 @@
   align-items: flex-start;
   justify-content: center;
   padding: var(--page-pad);
-  background: rgba(10, 11, 13, 0.82);
+  background: var(--dialog-shade);
+  -webkit-backdrop-filter: var(--dialog-shade-blur);
+  backdrop-filter: var(--dialog-shade-blur);
   overflow-y: auto;
 }
 
@@ -16,9 +18,12 @@
   margin: auto;
   width: 100%;
   max-width: 420px;
-  background: var(--surface);
+  background: var(--dialog-bg);
+  -webkit-backdrop-filter: var(--dialog-blur);
+  backdrop-filter: var(--dialog-blur);
   border: 1px solid var(--border-lit);
-  border-radius: var(--radius-card);
+  border-radius: var(--dialog-radius);
+  box-shadow: var(--glass-shadow);
   padding: 20px;
   display: flex;
   flex-direction: column;
