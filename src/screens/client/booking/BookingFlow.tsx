@@ -175,7 +175,9 @@ function Flow({ page }: { page: ShopPage }) {
           label={from?.backTo ? (from.backLabel === 'favorites' ? t('favorites.title') : t('shop.allShops')) : t('booking.backToShop')}
         />
       ) : (
-        <BackLink to={urlFor({ pas: String(step - 1) })} />
+        // Step 1 is the address without `pas`, as the entry before is: so Back goes back in the history
+        // instead of replacing this entry (src/lib/navHistory.ts) and the way back stays whole.
+        <BackLink to={urlFor({ pas: step === 2 ? null : String(step - 1) })} />
       )}
       <Progress step={step} />
       <div data-ui="step-header">
