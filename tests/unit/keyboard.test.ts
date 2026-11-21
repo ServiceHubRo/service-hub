@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { KEYBOARD_GAP, KEYBOARD_REGROW_PX, fieldArea, isTextField, keyboardOpen, keyboardRoom, opensKeyboard, placeField, keyboardReadoutAsked, resizeForKeyboard, scrollHost, scrollToShow, seenTop, touchScreen, visibleBand, watchKeyboard } from '../../src/lib/keyboard';
+import { KEYBOARD_GAP, KEYBOARD_REGROW_PX, fieldArea, fieldUnderHeader, isTextField, keyboardOpen, keyboardRoom, opensKeyboard, placeField, keyboardReadoutAsked, resizeForKeyboard, scrollHost, scrollToShow, seenTop, touchScreen, visibleBand, watchKeyboard } from '../../src/lib/keyboard';
 
 describe('keyboard', () => {
   // A phone: its screen is touched (a computer never gets an on-screen keyboard, see the last test).
@@ -182,6 +182,24 @@ describe('keyboard', () => {
     Object.defineProperty(window, 'innerHeight', { configurable: true, value: tall });
     window.requestAnimationFrame = raf;
   });
+  describe('a field that Safari left under the header (Eduard, 21 Nov 2026, Caută)', () => {
+    // His iPhone: the header is 61 px, the visible part 447 px high; after the first letter Safari
+    // moved the page again and the search field (48 px high) ended 5 px under the header.
+    const band = { top: 61, bottom: 447 };
+    it('is under the header when its top is above the header\'s bottom', () => {
+      expect(fieldUnderHeader({ top: 56, bottom: 104 }, band)).toBe(true);
+      expect(fieldUnderHeader({ top: -16, bottom: 32 }, band)).toBe(true);
+    });
+    it('is not when it is seen, even right under the header', () => {
+      expect(fieldUnderHeader({ top: 61, bottom: 109 }, band)).toBe(false);
+      expect(fieldUnderHeader({ top: 73, bottom: 121 }, band)).toBe(false);
+    });
+    it('leaves the keyboard\'s side and a long text to the browser', () => {
+      expect(fieldUnderHeader({ top: 420, bottom: 468 }, band)).toBe(false);
+      expect(fieldUnderHeader({ top: -200, bottom: 400 }, band)).toBe(false);
+    });
+  });
+
   describe('the page stays where the person put it (Eduard, 13 Nov 2026)', () => {
     const box = (top: number, bottom: number) => ({ top, bottom, left: 0, right: 100, width: 100, height: bottom - top, x: 0, y: top, toJSON: () => ({}) }) as DOMRect;
     let tall = 0;

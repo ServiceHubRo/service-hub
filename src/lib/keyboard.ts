@@ -134,6 +134,20 @@ export function placeField(withLabel: Band, field: Band, band: Band): number {
   return scrollToShow(field, band, 16, fits(field, KEYBOARD_GAP) ? KEYBOARD_GAP : 16);
 }
 
+/**
+ * A field whose top has gone under the app's own header (not a long text, whose caret the browser
+ * keeps in sight instead). Only the header: what the browser does about the keyboard's side is left
+ * to it (13 Nov 2026: the app fighting the browser's scroll made the page jump back and forth).
+ */
+export function fieldUnderHeader(field: Band, band: Band): boolean {
+  const room = band.bottom - band.top;
+  if (field.bottom - field.top > room - 32) return false;
+  return field.top < band.top;
+}
+
+/** How many times, for one field, a scroll that left it under the header is put right. */
+export const HEADER_FIXES = 3;
+
 /** The field with its label when the label is just above it (so the person sees what is asked). */
 export function fieldArea(field: HTMLElement): Band {
   const rect = field.getBoundingClientRect();
@@ -214,6 +228,27 @@ export function watchKeyboard(): () => void {
     }, 120);
   };
 
+  // Safari scrolls again by itself while a letter is typed (it knows nothing of our header) and can leave
+  // the field under the header (Eduard, 21 Nov 2026, Caută): when a scroll that was not the person's
+  // leaves its top under the header, the field is brought back below it, once the page has been still
+  // a moment, a few times at most for one field. Nothing else about the browser's scroll is answered.
+  let guardTimer = 0;
+  let fixes = 0;
+  const keepInSight = () => {
+    window.clearTimeout(guardTimer);
+    guardTimer = window.setTimeout(() => {
+      const field = document.activeElement;
+      if (!open || moved || pending || fixes >= HEADER_FIXES || !(field instanceof HTMLElement) || !opensKeyboard(field) || scrollHost(field)) return;
+      const band = visibleBand(viewport, window.innerHeight, navTopPx(), window.scrollY);
+      const rect = field.getBoundingClientRect();
+      if (!fieldUnderHeader(rect, band)) return;
+      const delta = placeField(fieldArea(field), rect, band);
+      if (delta === 0) return;
+      fixes += 1;
+      window.scrollBy({ top: delta, behavior: 'auto' });
+    }, 150);
+  };
+
   // The person scrolls: nothing of ours moves the page after that.
   const byHand = (event: Event) => {
     gestureAt = event.timeStamp;
@@ -265,6 +300,7 @@ export function watchKeyboard(): () => void {
       // The keyboard opened on this field, or the focus moved to it („Next”, a tap).
       // Not when the person began to scroll while the keyboard was still coming.
       current = active;
+      fixes = 0;
       moved = gestureAt > focusAt;
       pending = !moved;
       placedFor = height;
@@ -281,6 +317,7 @@ export function watchKeyboard(): () => void {
   viewport?.addEventListener('scroll', place);
   window.addEventListener('touchmove', byHand, { passive: true });
   window.addEventListener('wheel', byHand, { passive: true });
+  window.addEventListener('scroll', keepInSight, { passive: true });
   // The keyboard can stay while the focus moves (or go while it stays): checked again then.
   // After a focusout the next field may take the focus at once: no flash of the bar in between.
   let timer = 0;
@@ -297,11 +334,13 @@ export function watchKeyboard(): () => void {
   return () => {
     window.clearTimeout(timer);
     window.clearTimeout(showTimer);
+    window.clearTimeout(guardTimer);
     window.cancelAnimationFrame(frame);
     target.removeEventListener('resize', update);
     viewport?.removeEventListener('scroll', place);
     window.removeEventListener('touchmove', byHand);
     window.removeEventListener('wheel', byHand);
+    window.removeEventListener('scroll', keepInSight);
     document.removeEventListener('focusin', focused);
     document.removeEventListener('focusout', later);
     root.removeAttribute('data-keyboard');
