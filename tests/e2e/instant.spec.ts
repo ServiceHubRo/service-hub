@@ -79,7 +79,7 @@ test.describe('instant booking', () => {
     await expectNoHorizontalScroll(c);
     await shot(c, 't28-shop-free', name());
     // "Programează-te" opens on the day asked, so another time can be picked; the free place has its own button.
-    await expect(c.getByRole('link', { name: 'Programează-te' })).toHaveAttribute('href', `/c/service/${shopId}/programare?zi=${free.free_date}`);
+    await expect(c.getByRole('link', { name: 'Programează', exact: true })).toHaveAttribute('href', `/c/service/${shopId}/programare?zi=${free.free_date}`);
     await c.getByRole('link', { name: new RegExp(`^Rezervă: .+, ${free.free_slot}$`) }).click();
     await expect.poll(() => new URL(c.url()).searchParams.get('ora')).toBe(free.free_slot);
     expect(new URL(c.url()).searchParams.get('zi')).toBe(free.free_date);

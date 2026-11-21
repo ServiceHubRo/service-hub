@@ -253,13 +253,13 @@ test.describe('client search', () => {
     await resultsSettled(page);
     await openResult(page, 'Atelier Demo');
     // Always at hand: fixed at the bottom while the page scrolls, at the top of the page and further down.
-    const book = page.getByRole('link', { name: 'Programează-te' });
+    const book = page.getByRole('link', { name: 'Programează', exact: true });
     await expect(book).toBeInViewport();
     await shot(page, 't20a-shop-book-button', name());
     await page.getByText('Se percepe doar dacă refuzi devizul după verificare.').scrollIntoViewIfNeeded();
     await expect(book).toBeInViewport();
     await shot(page, 't21-shop-book-sticky', name());
-    await page.getByRole('link', { name: 'Programează-te' }).click();
+    await page.getByRole('link', { name: 'Programează', exact: true }).click();
     await expect(page.getByRole('heading', { level: 1, name: 'Ce ai nevoie?' })).toBeVisible();
 
     // A shop without reviews has no review section.

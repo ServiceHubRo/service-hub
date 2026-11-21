@@ -688,7 +688,7 @@ export const ro = {
   'shop.services': 'Servicii oferite',
   'shop.noServices': 'Nu există servicii adăugate.',
   'shop.priceNote': 'Prețul se stabilește prin deviz, după ce service-ul vede mașina.',
-  'shop.book': 'Programează-te',
+  'shop.book': 'Programează',
   'shop.reviews': 'Recenzii',
   'shop.reply': 'Răspunsul service-ului',
   'booking.title': 'Programare',

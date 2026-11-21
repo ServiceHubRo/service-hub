@@ -138,7 +138,7 @@ test.describe('booking', () => {
 
     await signInClient(page);
     await page.goto(`/c/service/${shopId}`);
-    await page.getByRole('link', { name: 'Programează-te' }).click();
+    await page.getByRole('link', { name: 'Programează', exact: true }).click();
 
     // 1 — service, grouped by category, no prices.
     await expect(page.getByRole('heading', { level: 1, name: 'Ce ai nevoie?' })).toBeVisible();

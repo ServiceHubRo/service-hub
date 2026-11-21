@@ -87,7 +87,7 @@ test.describe('offers: last day, services, quiet days', () => {
     await shot(c, 'offers-shop-page', name());
 
     // Step 2: every weekday with places shows -15 %; book the first one.
-    await c.getByRole('link', { name: 'Programează-te' }).click();
+    await c.getByRole('link', { name: 'Programează', exact: true }).click();
     await pickService(c, /^Plăcuțe de frână|^Frâne/, 'Frânare');
     await c.getByRole('button', { name: /^Continuă/ }).click();
     const quietDay = c.getByRole('button', { name: /: 1 loc, reducere de 15%$/ }).first();

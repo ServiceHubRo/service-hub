@@ -91,7 +91,7 @@ test.describe('Back goes where the reader came from', () => {
     await signInNewClient(page);
     await searchFor(page, 'frane');
     await openShop(page, 'Atelier Demo');
-    await page.getByRole('link', { name: 'Programează-te' }).click();
+    await page.getByRole('link', { name: 'Programează', exact: true }).click();
     await expect(page.getByRole('heading', { level: 1, name: 'Ce ai nevoie?' })).toBeVisible();
     // One service, on to the day, and Back to the services: what was ticked is kept.
     await page.getByRole('button', { name: /^(Schimb ulei|Plăcuțe de frână)/ }).first().click();
@@ -205,7 +205,7 @@ test.describe('Back goes where the reader came from', () => {
     await signInNewClient(page);
     await searchFor(page, 'frane');
     await openShop(page, 'Atelier Demo');
-    await page.getByRole('link', { name: 'Programează-te' }).click();
+    await page.getByRole('link', { name: 'Programează', exact: true }).click();
     await page.getByRole('button', { name: /^Schimb ulei/ }).first().click();
     await page.getByRole('button', { name: /^Continuă/ }).click();
     await page.getByRole('button', { name: /: \d+ loc/ }).first().click();

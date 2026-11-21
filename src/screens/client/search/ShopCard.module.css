@@ -61,6 +61,14 @@
   gap: 2px;
 }
 
+.head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  min-width: 0;
+}
+
 .name {
   font-weight: 650;
   font-size: 15px;

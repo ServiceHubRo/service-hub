@@ -107,7 +107,7 @@ test.describe('Fișa mașinii', () => {
     await expect(client).toHaveURL(/\/c\/cauta$/);
     await client.goto(`/c/cauta?q=${encodeURIComponent(shopName)}`);
     await client.locator('article').filter({ hasText: shopName }).getByRole('link').first().click();
-    await client.getByRole('link', { name: 'Programează-te' }).click();
+    await client.getByRole('link', { name: 'Programează', exact: true }).click();
     await client.getByRole('button', { name: 'Schimb ulei + filtru ulei' }).click();
     await client.getByRole('button', { name: /^Continuă/ }).click();
     await client.getByRole('button', { name: /: \d+ loc(uri)?$/ }).first().click();
