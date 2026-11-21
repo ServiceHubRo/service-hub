@@ -83,6 +83,49 @@ export function showKeyboardReadout(): () => void {
     return (scrollBy as (...a: unknown[]) => void).apply(this, args);
   } as typeof window.scrollBy;
 
+  // Tries for the page that jumps when the first letter is typed (Eduard, 21 Nov 2026, iPhone, Caută): the
+  // address says which, `&kbx=pad` (no scroll padding), `&kbx=room` (no room kept under the page) or
+  // `&kbx=hold` (the page put back where it was when a letter moves it). Test builds only; whichever
+  // works is built into the app (src/lib/keyboard.ts) and these go.
+  const tryName = new URLSearchParams(window.location.search).get('kbx') ?? '';
+  let removeTry = () => {};
+  if (tryName === 'pad' || tryName === 'room') {
+    const style = document.createElement('style');
+    style.textContent = tryName === 'pad' ? 'html { scroll-padding: 0 !important; }' : 'html { --kb-room: 0px !important; }';
+    document.head.appendChild(style);
+    removeTry = () => style.remove();
+  } else if (tryName === 'hold') {
+    let typedAt = -1e9;
+    let typedY = 0;
+    let handAt = -1e9;
+    let putBack = 0;
+    const typed = () => {
+      typedAt = performance.now();
+      typedY = window.scrollY;
+    };
+    const hand = () => {
+      handAt = performance.now();
+    };
+    const moved = () => {
+      const now = performance.now();
+      if (now - typedAt > 900 || now - handAt < 1500 || putBack >= 6) return;
+      if (Math.abs(window.scrollY - typedY) < 24) return;
+      putBack += 1;
+      note(`HOLD ${r(window.scrollY)} -> ${r(typedY)}`);
+      window.scrollTo(0, typedY);
+    };
+    document.addEventListener('input', typed, true);
+    window.addEventListener('touchmove', hand, { passive: true });
+    window.addEventListener('wheel', hand, { passive: true });
+    window.addEventListener('scroll', moved, { passive: true });
+    removeTry = () => {
+      document.removeEventListener('input', typed, true);
+      window.removeEventListener('touchmove', hand);
+      window.removeEventListener('wheel', hand);
+      window.removeEventListener('scroll', moved);
+    };
+  }
+
   document.addEventListener('focusin', onFocus);
   document.addEventListener('focusout', onBlur);
   // What the guard against a field under the header decided (src/lib/keyboard.ts), and when the page's own height changes.
@@ -157,7 +200,7 @@ export function showKeyboardReadout(): () => void {
       `y ${r(window.scrollY)}/${scroller.scrollHeight - window.innerHeight} room ${css.getPropertyValue('--kb-room').trim() || '-'} ` +
       `vvtop ${css.getPropertyValue('--vv-top').trim() || '-'} nav ${css.getPropertyValue('--nav-top').trim() || '-'}+${css.getPropertyValue('--back-bar').trim() || '0'} ` +
       `bar ${css.getPropertyValue('--nav-bottom').trim() || '-'} safe ${parseFloat(getComputedStyle(safe).borderTopWidth) || 0}/${parseFloat(getComputedStyle(safe).borderBottomWidth) || 0}\n` +
-      `${about} hdr ${r(document.querySelector('header')?.getBoundingClientRect().top ?? -1)}\n${first.join(' | ')}${events.length ? ' ... ' : ''}${events.join(' | ')}\n${under}\n${APP_RELEASE.slice(0, 7)} ${navigator.userAgent.match(/OS [\d_]+|Android [\d.]+|Chrome\/[\d]+/)?.[0] ?? ''}`;
+      `${about} hdr ${r(document.querySelector('header')?.getBoundingClientRect().top ?? -1)} x:${tryName || '-'}\n${first.join(' | ')}${events.length ? ' ... ' : ''}${events.join(' | ')}\n${under}\n${APP_RELEASE.slice(0, 7)} ${navigator.userAgent.match(/OS [\d_]+|Android [\d.]+|Chrome\/[\d]+/)?.[0] ?? ''}`;
     frame = window.requestAnimationFrame(draw);
   };
   draw();
@@ -174,6 +217,7 @@ export function showKeyboardReadout(): () => void {
     window.removeEventListener('resize', onWinResize);
     window.removeEventListener('sh-kb-note', onGuard);
     watchHeight.disconnect();
+    removeTry();
     strip.remove();
     safe.remove();
   };
