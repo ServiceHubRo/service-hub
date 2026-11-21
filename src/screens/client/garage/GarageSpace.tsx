@@ -3,7 +3,7 @@ import { Link, useLocation, useParams } from 'react-router-dom';
 import { EmbeddedProvider } from '../../../lib/embedded';
 import { DetailFrame } from '../../../components/ListDetailLayout';
 import { useI18n } from '../../../i18n/context';
-import { LIST_DETAIL_QUERY, useMediaQuery } from '../../../lib/useMediaQuery';
+import { RICH_PANEL_QUERY, useMediaQuery } from '../../../lib/useMediaQuery';
 import { VehicleHistoryScreen } from '../history/VehicleHistoryScreen';
 import { GARAGE_PATH } from '../paths';
 import { ReportPreviewScreen } from '../report/ReportPreviewScreen';
@@ -19,7 +19,7 @@ import styles from './garage.module.css';
  */
 export function GarageSpace() {
   const { t } = useI18n();
-  const wide = useMediaQuery(LIST_DETAIL_QUERY);
+  const wide = useMediaQuery(RICH_PANEL_QUERY);
   const { carId } = useParams();
   const { pathname, state } = useLocation();
   // Opened from Cont (the history of a car, a report) it stays a page of its own, with its way back.

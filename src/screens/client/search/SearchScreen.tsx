@@ -27,7 +27,7 @@ import { distanceTo, nearby, sortByDistance } from '../../../lib/geo';
 import { useLocation } from '../../../lib/location';
 import { cityNamedBy, fold } from '../../../lib/text';
 import { EmbeddedProvider } from '../../../lib/embedded';
-import { LIST_DETAIL_QUERY, useMediaQuery } from '../../../lib/useMediaQuery';
+import { RICH_PANEL_QUERY, useMediaQuery } from '../../../lib/useMediaQuery';
 import { useLoad } from '../../../lib/useLoad';
 import { PushBanner } from '../../push/PushBanner';
 import { SEARCH_PATH, shopPath, type ShopLinkState } from '../paths';
@@ -97,7 +97,7 @@ export function SearchScreen() {
   const location = useLocation();
   const coords = location.coords;
 
-  const wide = useMediaQuery(LIST_DETAIL_QUERY);
+  const wide = useMediaQuery(RICH_PANEL_QUERY);
   const [pickedId, setPickedId] = useState<string | null>(lastPicked.get('shop') ?? null);
   const pick = (id: string) => {
     lastPicked.set('shop', id);

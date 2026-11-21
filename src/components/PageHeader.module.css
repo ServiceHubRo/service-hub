@@ -17,6 +17,8 @@
   grid-column: 1;
   grid-row: 1;
   min-width: 0;
+  /* A long name (a company, a plate) breaks instead of leaving the screen. */
+  overflow-wrap: anywhere;
 }
 
 /* No action: the title has the whole line. */
