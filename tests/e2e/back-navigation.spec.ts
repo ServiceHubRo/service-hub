@@ -31,7 +31,7 @@ async function signInNewClient(page: Page) {
   return email;
 }
 
-/** The results for `q` have arrived (until then the previous list shows, dimmed). */
+/** The results for `q` have arrived (until then the previous list shows). */
 async function searchFor(page: Page, q: string) {
   await page.getByLabel('Caută un service').fill(q);
   await expect(page).toHaveURL(/[?&]q=/);

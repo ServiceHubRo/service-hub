@@ -26,7 +26,7 @@ const openResult = (page: Page, shop: string) => result(page, shop).getByText(sh
 const search = (page: Page) => page.getByLabel('Caută un service');
 
 /**
- * The list for the query on screen has arrived. Until then the previous list shows (dimmed) and is
+ * The list for the query on screen has arrived. Until then the previous list shows and is
  * replaced when the answer comes, so a tap would land on whatever card moves under it.
  */
 async function resultsSettled(page: Page) {
@@ -124,6 +124,32 @@ test.describe('client search', () => {
     // The filters live in the address: a reload keeps them.
     await page.reload();
     await expect(search(page)).toHaveValue('zzzz');
+  });
+
+  test('coming back to Caută shows the list at full brightness while it refreshes in the background', async ({ page }) => {
+    await signInNewClient(page);
+    await expect(result(page, 'Atelier Demo')).toBeVisible();
+    // The answer to the next search is slow: the list from memory is not marked busy meanwhile.
+    await page.route('**/rest/v1/rpc/search_shops', async (route) => {
+      await new Promise((r) => setTimeout(r, 2_500));
+      await route.continue();
+    });
+    // Inside the app (a reload would empty the memory of the search).
+    await page.getByRole('navigation').getByRole('link', { name: 'Garaj' }).filter({ visible: true }).first().click();
+    await expect(page).toHaveURL(/\/c\/garaj/);
+    await page.getByRole('navigation').getByRole('link', { name: 'Caută' }).filter({ visible: true }).first().click();
+    await expect(result(page, 'Atelier Demo')).toBeVisible();
+    const results = page.locator('main [aria-busy]').filter({ has: result(page, 'Atelier Demo') });
+    // Read at once (an assertion would wait for the answer and then pass).
+    expect(await results.first().getAttribute('aria-busy')).toBe('false');
+    expect(await results.first().evaluate((el) => getComputedStyle(el).opacity)).toBe('1');
+    // Typing: the list never dims while the answer is on its way (it did on every keystroke).
+    await search(page).fill('Atelier');
+    await expect(page).toHaveURL(/[?&]q=Atelier/);
+    for (const wait of [0, 300, 800]) {
+      await page.waitForTimeout(wait);
+      expect(await results.first().evaluate((el) => getComputedStyle(el).opacity)).toBe('1');
+    }
   });
 
   test('no shop open yet: its own message, and the map still shows', async ({ page }) => {

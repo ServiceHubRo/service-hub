@@ -811,6 +811,51 @@ test.describe('the phone keyboard over the forms', () => {
 
   // 12. A form in a window over the page („Sesiunea a expirat”): centered above the keyboard, and the
   // page behind it does not move.
+  // Eduard, 21 Nov 2026 (iPhone, Caută): after the first letter Safari scrolled the page again by itself
+  // and left the search field partly under the header (it knows nothing of the header). The app brings
+  // the field back below it, a few times at most, and never fights a scroll by hand.
+  test('iPhone: the search field Safari scrolled under the header comes back below it', async ({ page }) => {
+    const email = await createUser('client');
+    await signIn(page, email, PASSWORD);
+    await expect(page).toHaveURL(/\/c\/cauta/);
+    for (const s of [SIZES[1], SIZES[2]]) {
+      const at = `@${s.width}`;
+      await setSize(page, s);
+      await page.goto('/c/cauta');
+      const field = page.getByLabel('Caută un service');
+      await expect(field).toBeVisible();
+      await field.focus();
+      await openKeyboard(page, s, 'iphone');
+      // Safari's second scroll, with the first letter: far enough to put the field's top under the header.
+      const left = await page.evaluate(() => {
+        // Room to scroll whatever the list under the field holds.
+        const room = document.createElement('div');
+        room.style.height = '2000px';
+        document.querySelector('main')!.appendChild(room);
+        const header = document.querySelector('header')!.getBoundingClientRect().bottom;
+        const input = document.querySelector<HTMLInputElement>('input[type="search"], input#search-q')!;
+        window.scrollBy(0, input.getBoundingClientRect().top - (header - 12));
+        // Read in the same breath: the app answers a moment later.
+        return { top: input.getBoundingClientRect().top, header: document.querySelector('header')!.getBoundingClientRect().bottom };
+      });
+      expect(left.top, `${at}: the scroll left the field under the header`).toBeLessThan(left.header);
+      await page.waitForTimeout(500);
+      const b = await band(page);
+      expect.soft((await field.boundingBox())!.y, `${at}: the field is back below the header`).toBeGreaterThanOrEqual(b.top - 1);
+      await expect(field).toBeFocused();
+      // A scroll by hand is the person's: the field may go under the header then.
+      await page.evaluate(() => {
+        window.dispatchEvent(new Event('touchmove'));
+        window.scrollBy(0, 400);
+      });
+      await page.waitForTimeout(500);
+      const after = await page.evaluate(() => Math.round(window.scrollY));
+      await page.waitForTimeout(300);
+      expect(await page.evaluate(() => Math.round(window.scrollY)), `${at}: a scroll by hand is left alone`).toBe(after);
+      await closeKeyboard(page, s, 'iphone');
+    }
+  });
+
   test('iPhone: the form in the session-expired window stays above the keyboard', async ({ page }) => {
     const email = await createUser('client');
     // The phone's size from the start (a page keeps the tallest height it has seen at a width).
