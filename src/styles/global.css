@@ -35,9 +35,12 @@ html[data-keyboard] body {
 }
 
 /* What is scrolled into view meanwhile (an error under a button, the browser's own move to a field)
-   stops above the keyboard, not at the bottom of the page behind it. */
+   stops a little above the keyboard where the page itself got shorter. Where the keyboard covers the page
+   (the iPhone) it is 0: with the whole room here Safari moved the page again by itself at the first
+   letter typed, 89 px up, and the page jumped (Eduard, 21 Nov 2026, measured on his iPhone: no jump
+   without this padding, with the room kept). */
 html[data-keyboard] {
-  scroll-padding-bottom: var(--kb-room, 0px);
+  scroll-padding-bottom: var(--kb-pad, 0px);
 }
 
 /* A window over the whole page with a form in it (data-keyboard-fit: „Sesiunea a expirat”): while

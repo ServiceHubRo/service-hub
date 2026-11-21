@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { KEYBOARD_GAP, KEYBOARD_REGROW_PX, fieldArea, fieldUnderHeader, isTextField, keyboardOpen, keyboardRoom, opensKeyboard, placeField, keyboardReadoutAsked, resizeForKeyboard, scrollHost, scrollToShow, seenTop, touchScreen, visibleBand, watchKeyboard } from '../../src/lib/keyboard';
+import { KEYBOARD_GAP, KEYBOARD_REGROW_PX, fieldArea, fieldUnderHeader, isTextField, keyboardOpen, keyboardRoom, keyboardScrollPad, opensKeyboard, placeField, keyboardReadoutAsked, resizeForKeyboard, scrollHost, scrollToShow, seenTop, touchScreen, visibleBand, watchKeyboard } from '../../src/lib/keyboard';
 
 describe('keyboard', () => {
   // A phone: its screen is touched (a computer never gets an on-screen keyboard, see the last test).
@@ -142,6 +142,14 @@ describe('keyboard', () => {
     expect(keyboardRoom(664, 328)).toBe(336 + KEYBOARD_GAP);
     // Android (the page itself got shorter): the gap only.
     expect(keyboardRoom(328, 328)).toBe(KEYBOARD_GAP);
+  });
+
+  it('the scroll padding at the bottom: none where the keyboard covers the page (the iPhone), the gap where the page got shorter', () => {
+    // His iPhone (21 Nov 2026): the page 796 px, what is seen 447 px — with the whole room as padding Safari jumped.
+    expect(keyboardScrollPad(796, 447)).toBe(0);
+    expect(keyboardScrollPad(664, 328)).toBe(0);
+    // The Android app: the page itself is as short as what is seen.
+    expect(keyboardScrollPad(328, 328)).toBe(KEYBOARD_GAP);
   });
 
   it('a field above the keyboard with a gap; the label kept first on a small phone', () => {

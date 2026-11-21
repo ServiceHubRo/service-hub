@@ -827,7 +827,7 @@ test.describe('the phone keyboard over the forms', () => {
       await field.focus();
       await openKeyboard(page, s, 'iphone');
       // Safari's second scroll, with the first letter: far enough to put the field's top under the header.
-      await page.evaluate(() => {
+      const left = await page.evaluate(() => {
         // Room to scroll whatever the list under the field holds.
         const room = document.createElement('div');
         room.style.height = '2000px';
@@ -835,10 +835,10 @@ test.describe('the phone keyboard over the forms', () => {
         const header = document.querySelector('header')!.getBoundingClientRect().bottom;
         const input = document.querySelector<HTMLInputElement>('input[type="search"], input#search-q')!;
         window.scrollBy(0, input.getBoundingClientRect().top - (header - 12));
+        // Read in the same breath: the app answers a moment later.
+        return { top: input.getBoundingClientRect().top, header: document.querySelector('header')!.getBoundingClientRect().bottom };
       });
-      const hidden = (await field.boundingBox())!.y;
-      const headerBottom = await page.evaluate(() => document.querySelector('header')!.getBoundingClientRect().bottom);
-      expect(hidden, `${at}: the scroll left the field under the header`).toBeLessThan(headerBottom);
+      expect(left.top, `${at}: the scroll left the field under the header`).toBeLessThan(left.header);
       await page.waitForTimeout(500);
       const b = await band(page);
       expect.soft((await field.boundingBox())!.y, `${at}: the field is back below the header`).toBeGreaterThanOrEqual(b.top - 1);

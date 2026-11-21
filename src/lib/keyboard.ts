@@ -123,6 +123,16 @@ export function keyboardRoom(innerHeight: number, viewportHeight: number): numbe
 }
 
 /**
+ * The scroll padding at the bottom while the keyboard is open (--kb-pad, global.css): the gap above
+ * the keyboard where the page itself got shorter; none where the keyboard covers the page (the
+ * iPhone). There the whole room as padding made Safari move the page by itself at the first letter
+ * typed (Eduard, 21 Nov 2026).
+ */
+export function keyboardScrollPad(innerHeight: number, viewportHeight: number): number {
+  return innerHeight - viewportHeight >= KEYBOARD_MIN_PX ? 0 : KEYBOARD_GAP;
+}
+
+/**
  * Where the field goes with the keyboard open: with its label and the gap above the keyboard when
  * all fit; on a small phone the label first (a smaller gap), then the field alone.
  */
@@ -289,7 +299,10 @@ export function watchKeyboard(): () => void {
     const active = document.activeElement;
     // Only where a finger types on the screen: on a computer a window made shorter is not a keyboard.
     const now = touchScreen() && keyboardOpen(height, full, opensKeyboard(active));
-    if (now) root.style.setProperty('--kb-room', `${keyboardRoom(window.innerHeight, height)}px`);
+    if (now) {
+      root.style.setProperty('--kb-room', `${keyboardRoom(window.innerHeight, height)}px`);
+      root.style.setProperty('--kb-pad', `${keyboardScrollPad(window.innerHeight, height)}px`);
+    }
     if (now !== open) {
       open = now;
       root.toggleAttribute('data-keyboard', open);
@@ -300,6 +313,7 @@ export function watchKeyboard(): () => void {
         pending = false;
         root.style.removeProperty('--vv-top');
         root.style.removeProperty('--kb-room');
+        root.style.removeProperty('--kb-pad');
       }
     }
     if (!open) return;
@@ -354,6 +368,7 @@ export function watchKeyboard(): () => void {
     root.removeAttribute('data-keyboard');
     root.style.removeProperty('--vv-top');
     root.style.removeProperty('--kb-room');
+    root.style.removeProperty('--kb-pad');
   };
 }
 
