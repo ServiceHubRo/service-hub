@@ -159,6 +159,8 @@ export function SearchScreen() {
   /** The answer to the latest request: while it is for an older one, the list shows as loading. */
   const [answer, setAnswer] = useState<{ fetchKey: string; ok: boolean } | null>(null);
   const status = answer?.fetchKey !== fetchKey ? 'loading' : answer.ok ? 'ready' : 'error';
+  // The list is dimmed only while it is replaced by the answer to another search; the same search shown from the
+  // memory (coming back to Caută) refreshes quietly (Eduard, 21 Nov 2026: it lit up after a second).
 
   useEffect(() => {
     let cancelled = false;
@@ -441,7 +443,7 @@ export function SearchScreen() {
       {status === 'error' && <LoadError message={t('search.resultsError')} onRetry={() => setAttempt((a) => a + 1)} />}
       {status !== 'error' && !results && <SkeletonList cards />}
       {status !== 'error' && results && (
-        <div className={styles.results} aria-busy={status === 'loading'}>
+        <div className={styles.results} aria-busy={status === 'loading' && results.key !== key}>
           <div className={styles.countRow}>
             <p className={styles.count} role="status">
               {countText}

@@ -25,15 +25,13 @@
 
 
 /* ---------------------------------------------------------------- results */
+/* Never dimmed while a new answer is on its way: the list dimming and lighting up again on every keystroke
+   (and on coming back to Caută) read as flicker (Eduard, 21 Nov 2026). The list is replaced when the answer
+   arrives; a screen reader is told by aria-busy. */
 .results {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  transition: opacity var(--motion-quick) var(--ease);
-}
-
-.results[aria-busy='true'] {
-  opacity: 0.6;
 }
 
 .countRow {
