@@ -40,7 +40,7 @@ const ShopsMap = lazy(() => import('../../../components/map/ShopsMap'));
 
 /**
  * The shop page a client opens from search (FR §3.2, P11b): who they are, when they work, what
- * they do, what the inspection costs, what other clients said — and "Programează-te".
+ * they do, what the inspection costs, what other clients said — and "Programează".
  * Read in one call with public columns only; fiscal data never reaches this screen.
  */
 export function ShopPage({ shopId: panelShopId, linkState }: { shopId?: string; linkState?: ShopLinkState } = {}) {
@@ -195,7 +195,7 @@ function ShopDetails({
                 <FreePlaceNote free={page.free} instant={shop.auto_confirm} response={page.response} />
               ) : null}
               {page.free ? (
-                // Straight to that day and time; "Programează-te" below still lets the client choose.
+                // Straight to that day and time; "Programează" below still lets the client choose.
                 <Link to={`${bookingPath(shop.id)}?zi=${page.free.date}&ora=${page.free.slot}`} state={linkState} className={buttonClass('secondary', false, styles.freeBook)}>
                   {t('free.bookThis', { when: `${formatDate(lang, page.free.date)}, ${page.free.slot}` })}
                 </Link>
@@ -289,7 +289,7 @@ function ShopDetails({
       </div>
 
       {/* Always at hand (asked at testing): at the bottom, just above the menu. The services (a screen of their
-          own, C9) on the left, "Programează-te" on the right, the same size (Eduard, 21 Nov 2026). */}
+          own, C9) on the left, "Programează" on the right, the same size (Eduard, 21 Nov 2026). */}
       <BottomBar>
         <div className={`${styles.bookRow} ${page.bookable ? '' : styles.bookRowSingle}`}>
           <Link to={shopServicesPath(shop.id)} state={linkState} className={buttonClass('secondary', true, styles.book)}>

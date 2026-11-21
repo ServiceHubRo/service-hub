@@ -74,7 +74,7 @@ test.describe('new-client offers', () => {
     await expectNoHorizontalScroll(client);
     await shot(client, 'offer-shop-page', name());
 
-    await client.getByRole('link', { name: 'Programează-te' }).click();
+    await client.getByRole('link', { name: 'Programează', exact: true }).click();
     await client.getByRole('button', { name: 'Schimb ulei + filtru ulei' }).click();
     await client.getByRole('button', { name: /^Continuă/ }).click();
     await client.getByRole('button', { name: /: \d+ loc(uri)?$/ }).first().click();

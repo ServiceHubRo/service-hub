@@ -5,7 +5,6 @@ import { FounderBadge } from '../../../components/FounderBadge';
 import { useOfferText } from '../../../lib/useOfferText';
 import { FreePlaceNote } from '../../../components/FreePlaceNote';
 import { OfferNote } from '../../../components/OfferNote';
-import { ShopAvatar } from '../../../components/ShopAvatar';
 import { Stars } from '../../../components/Stars';
 import type { ShopSearchResult } from '../../../data/rpc';
 import { useI18n } from '../../../i18n/context';
@@ -55,10 +54,12 @@ export function ShopCard({ shop, distanceKm, back, onFavorite, day, selected = f
           }
         }}
       >
-        <ShopAvatar name={shop.name} logoUrl={shop.logo_url} />
         <span className={styles.body}>
-          <span className={styles.name}>{shop.name}</span>
-          {shop.founder && <FounderBadge />}
+          {/* The name and the badge on one line (Eduard, 21 Nov 2026); no logo tile on the card. */}
+          <span className={styles.head}>
+            <span className={styles.name}>{shop.name}</span>
+            {shop.founder && <FounderBadge />}
+          </span>
           <span className={`${styles.meta} ${styles.reviewsMeta}`} data-reviews="">
             {hasReviews ? (
               <>

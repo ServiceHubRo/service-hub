@@ -12,6 +12,25 @@ import { inactiveTooLong, markSeen, rememberMe } from '../lib/remember';
 import type { Role } from './roles';
 import { SessionContext, type SessionStatus, type SessionValue } from './sessionContext';
 
+/** The language chosen on a page opened before signing in (the language list of the login page, the landing page). */
+const PICKED_KEY = 'sh_lang_picked';
+function pickedBeforeSignIn(): Lang | null {
+  try {
+    const v = sessionStorage.getItem(PICKED_KEY);
+    return v === 'ro' || v === 'en' ? v : null;
+  } catch {
+    return null;
+  }
+}
+function rememberPick(lang: Lang | null) {
+  try {
+    if (lang) sessionStorage.setItem(PICKED_KEY, lang);
+    else sessionStorage.removeItem(PICKED_KEY);
+  } catch {
+    // No storage: the saved language simply wins.
+  }
+}
+
 interface State {
   status: SessionStatus;
   user: User | null;
@@ -59,9 +78,19 @@ export function SessionProvider({ children }: { children: ReactNode }) {
           setState({ status: 'signedOut', user: null, profile: null });
           return;
         }
-        // After login the language saved on the profile wins.
-        if (profile.lang !== langRef.current) setLang(profile.lang as Lang);
-        setState({ status: 'signedIn', user, profile });
+        // After login the language saved on the profile wins, unless the person has just chosen another
+        // one on a page before signing in (Eduard, 21 Nov 2026): that choice stays and is saved.
+        const picked = pickedBeforeSignIn();
+        rememberPick(null);
+        let signedIn = profile;
+        if (picked && picked !== profile.lang) {
+          setLang(picked);
+          signedIn = { ...profile, lang: picked };
+          updateLang(profile.id, picked).catch(() => undefined);
+        } else if (profile.lang !== langRef.current) {
+          setLang(profile.lang as Lang);
+        }
+        setState({ status: 'signedIn', user, profile: signedIn });
         void touchLastActive();
       } catch {
         if (loadedForRef.current === user.id) setState({ status: 'error', user, profile: null });
@@ -158,6 +187,8 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     (next: Lang) => {
       setLang(next);
       const current = stateRef.current;
+      // Chosen before signing in: it is kept when the profile is read after sign-in.
+      if (current.status !== 'signedIn') rememberPick(next);
       if (current.status === 'signedIn' && current.profile && current.profile.lang !== next) {
         const profile = { ...current.profile, lang: next };
         setState({ ...current, profile });

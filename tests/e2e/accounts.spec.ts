@@ -16,6 +16,8 @@ import {
   uniqueEmail,
   uniquePhone,
   switchLanguage,
+  serviceRest,
+  userIdOf,
 } from './support';
 
 test.beforeEach(async ({ context }) => {
@@ -377,6 +379,22 @@ test.describe('with accounts', () => {
     await page.evaluate(() => localStorage.setItem('sh_lang', 'ro'));
     await signIn(page, email, 'Alta-Parola-2026!');
     await expect(page).toHaveURL(/\/s\/panou$/);
+  });
+
+  test('the language chosen before signing in stays after signing in, and is saved on the profile', async ({ page }) => {
+    const email = await createUser('client');
+    // The account's saved language is Romanian; the person picks English on the sign-in page.
+    await page.goto('/intra');
+    await switchLanguage(page, 'en');
+    await expect(page.getByRole('heading', { level: 1, name: 'Sign in' })).toBeVisible();
+    await page.getByLabel('Email').fill(email);
+    await page.getByLabel('Password', { exact: true }).fill(PASSWORD);
+    await page.getByRole('button', { name: 'Sign in', exact: true }).click();
+    await expect(page).toHaveURL(/\/c\/cauta/);
+    await expect(page.getByRole('link', { name: 'Search' }).first()).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1, name: 'Search' })).toBeVisible();
+    // Saved on the profile: a fresh browser signing in without choosing anything gets English too.
+    await expect.poll(async () => (await serviceRest<{ lang: string }[]>(`profiles?id=eq.${await userIdOf(email)}&select=lang`, 'GET'))[0]?.lang).toBe('en');
   });
 
   test('Cont: name and phone, language saved on the profile, legal documents, data export', async ({ page, browser }) => {
