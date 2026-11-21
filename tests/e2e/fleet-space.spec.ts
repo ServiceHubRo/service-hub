@@ -1,6 +1,7 @@
 import { expect, test, type Page } from '@playwright/test';
 import { BACKEND, PASSWORD, SEED, SEED_PASSWORD, createBookableShop, createFleetUser, expectNoHorizontalScroll, rpcAs, serviceRest, shot, signIn, uniquePlate, switchLanguage, openClientBooking
 } from './support';
+import { openAs } from './fleet-support';
 
 // The company's fleet space (T63c): the admin opens the fleet from the company page, adds a vehicle
 // with the form (a plate already in the fleet is refused), assigns it to the driver, archives
@@ -114,6 +115,69 @@ test('admin adds and assigns vehicles; the driver sees only theirs', async ({ pa
   await expect(page.getByRole('heading', { level: 1, name: 'Vehicles' })).toBeVisible();
   await expectNoHorizontalScroll(page);
   await shot(page, 'fleet-live-en', name());
+});
+
+test('Panou of a fleet without vehicles is the first steps (not a copy of Vehicule); a driver has none', async ({ page, browser }) => {
+  test.skip(!BACKEND, 'needs the local Supabase stack');
+  const admin = await createFleetUser();
+  const driver = await createFleetUser();
+  const company = await rpcAs<{ id: string }>(admin, 'create_company', {
+    p_name: 'Flota Pași SRL',
+    p_vat_id: null,
+    p_reg_com: null,
+    p_address: null,
+    p_request_id: crypto.randomUUID(),
+  });
+  const token = Array.from(crypto.getRandomValues(new Uint8Array(32)), (b) => b.toString(16).padStart(2, '0')).join('');
+  await rpcAs(admin, 'invite_company_member', { p_company: company.id, p_email: driver, p_role: 'driver', p_token: token, p_request_id: crypto.randomUUID() });
+  await rpcAs(driver, 'accept_company_invite', { p_token: token, p_request_id: crypto.randomUUID() });
+
+  await signIn(page, admin, PASSWORD);
+  await expect(page).toHaveURL(/\/c\/cauta/);
+  await page.goto(`/c/cont/firme/${company.id}`);
+  await page.getByRole('link', { name: 'Deschide flota' }).click();
+  await expect(page.getByRole('heading', { level: 1, name: 'Panou' })).toBeVisible();
+  // The first steps are all of Panou: no figures, no second „Adaugă vehicul” button.
+  await expect(page.getByRole('heading', { level: 2, name: 'Primii pași' })).toBeVisible();
+  await expect(page.getByRole('button', { name: /^Adaugă primul vehicul/ })).toBeVisible();
+  // The driver is already a member: that step is ticked (and is no button).
+  await expect(page.getByText('Invită un șofer sau un coleg — făcut')).toBeVisible();
+  await expect(page.getByRole('button', { name: /^Invită un șofer sau un coleg/ })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: /^Setează bugetul lunar/ })).toBeVisible();
+  await expect(page.getByText('Vehicule în flotă')).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Adaugă vehicul' })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Ascunde primii pași' })).toHaveCount(0);
+  await expectNoHorizontalScroll(page);
+  await shot(page, 'fleet-first-steps', name());
+  // The first step opens the form of Vehicule.
+  await page.getByRole('button', { name: /^Adaugă primul vehicul/ }).click();
+  await expect(page.getByRole('heading', { level: 1, name: 'Vehicule' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Salvează vehiculul' })).toBeVisible();
+
+  // With a vehicle, Panou is the overview again; the steps left stay on top and can be hidden.
+  await rpcAs(admin, 'fleet_save_vehicle', {
+    p_company: company.id,
+    p_vehicle: null,
+    p_fields: { make: 'Dacia', model: 'Logan', plate: uniquePlate('B') },
+    p_request_id: crypto.randomUUID(),
+  });
+  await page.goto(`/c/firme/${company.id}`);
+  await expect(page.getByText('Vehicule în flotă')).toBeVisible();
+  await expect(page.getByRole('heading', { level: 2, name: 'Primii pași' })).toBeVisible();
+  await expect(page.getByText('Adaugă primul vehicul — făcut')).toBeVisible();
+  await shot(page, 'fleet-first-steps-after', name());
+  await page.getByRole('button', { name: 'Ascunde primii pași' }).click();
+  await expect(page.getByRole('heading', { level: 2, name: 'Primii pași' })).toHaveCount(0);
+  await page.reload();
+  await expect(page.getByText('Vehicule în flotă')).toBeVisible();
+  await expect(page.getByRole('heading', { level: 2, name: 'Primii pași' })).toHaveCount(0);
+
+  // A driver without a vehicle: no steps, only the sentence.
+  const d = await openAs(browser, driver, 'ro', `/c/firme/${company.id}`);
+  await expect(d.getByRole('heading', { level: 1, name: 'Panou' })).toBeVisible();
+  await expect(d.getByText('Nu ai vehicule alocate.')).toBeVisible();
+  await expect(d.getByRole('heading', { level: 2, name: 'Primii pași' })).toHaveCount(0);
+  await d.context().close();
 });
 
 test('the plan: Abonament, the limits of Fleet Start, and the admin changes the plan', async ({ page, browser }) => {
