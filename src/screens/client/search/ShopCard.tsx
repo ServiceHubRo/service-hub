@@ -43,6 +43,8 @@ export function ShopCard({ shop, distanceKm, back, onFavorite, day, selected = f
         state={back}
         className={styles.link}
         onClick={(e) => {
+          // Open in a new tab / window keeps the link's own behavior.
+          if (e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
           // A tap on the stars opens the shop's reviews; anywhere else, the shop page.
           if (hasReviews && (e.target as HTMLElement).closest('[data-reviews]')) {
             e.preventDefault();

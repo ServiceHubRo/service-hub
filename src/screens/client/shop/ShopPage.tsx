@@ -196,7 +196,7 @@ function ShopDetails({
               ) : null}
               {page.free ? (
                 // Straight to that day and time; "Programează-te" below still lets the client choose.
-                <Link to={`${bookingPath(shop.id)}?zi=${page.free.date}&ora=${page.free.slot}`} className={buttonClass('secondary', false, styles.freeBook)}>
+                <Link to={`${bookingPath(shop.id)}?zi=${page.free.date}&ora=${page.free.slot}`} state={linkState} className={buttonClass('secondary', false, styles.freeBook)}>
                   {t('free.bookThis', { when: `${formatDate(lang, page.free.date)}, ${page.free.slot}` })}
                 </Link>
               ) : (

@@ -43,7 +43,7 @@ export function ListDetailLayout({
       {!single && header}
       <div className={beside ? styles.split : styles.single}>
         {!single && <div className={styles.list}>{list}</div>}
-        {(wide || single) && (
+        {((wide && !!detail) || single) && (
           <div ref={detailRef} className={wide ? styles.detail : styles.single}>
             {single && <BackLink to={backTo} label={backLabel} />}
             {detail}
