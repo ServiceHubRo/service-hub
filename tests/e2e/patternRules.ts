@@ -189,6 +189,54 @@ export function measurePatterns(only?: readonly string[]): Patterns {
     }
   }
 
+  // P13 — on a phone the buttons of one place are one family: those side by side share the row in
+  // equal parts and fill it; those one under another are equally wide (Eduard, 21 Nov 2026, from
+  // the Android app: „Salvează” on the whole width and „Renunță” narrow, PDF buttons not filling
+  // the row, „Lasă o recenzie” wider than „Mai multe”).
+  if (want('P13') && window.innerWidth < 600) {
+    // An ActionButton is a button inside its own wrapper (with the error line under it); a menu too.
+    const unitOf = (el: HTMLElement) => (el.matches('[data-ui="action-button"]') ? el.parentElement ?? el : el.closest<HTMLElement>('[data-ui="menu"]') ?? el);
+    const groups = new Map<Element, HTMLElement[]>();
+    const skip = '[data-ui="page-header"], [data-ui="section-head"], [data-ui="tabs"], [data-ui="list-row"], [data-ui="chip"], [data-ui="stepper"], [data-ui="switch"], [data-ui="checkbox"], [data-ui="filters-button"], [data-ui="search"], [data-ui="back-link"], [data-ui="tile"], nav, [role="tablist"]';
+    for (const b of Array.from(document.querySelectorAll<HTMLElement>('[data-ui="button"], [data-ui="action-button"], [data-ui="menu"] > button, a[class*="button"]'))) {
+      if (quiet(b) || !shown(b) || b.closest(skip) || !(b.getBoundingClientRect().height >= 40)) continue;
+      // A text-only (ghost) button is a quiet link next to the real buttons, not one of them.
+      if (/ghost/.test(b.className)) continue;
+      // Text around it: a link inside a sentence, not an action.
+      if (Array.from(b.parentElement?.childNodes ?? []).some((n) => n.nodeType === Node.TEXT_NODE && (n.textContent ?? '').trim() !== '')) continue;
+      const unit = unitOf(b);
+      const parent = unit.parentElement;
+      if (!parent) continue;
+      groups.set(parent, [...(groups.get(parent) ?? []), unit]);
+    }
+    for (const [parent, units] of groups) {
+      const items = Array.from(new Set(units));
+      if (items.length < 2) continue;
+      const pr = parent.getBoundingClientRect();
+      const pcs = getComputedStyle(parent);
+      const inner = pr.right - (parseFloat(pcs.paddingRight) || 0);
+      const rows: HTMLElement[][] = [];
+      for (const u of items.sort((a, b) => a.getBoundingClientRect().top - b.getBoundingClientRect().top || a.getBoundingClientRect().left - b.getBoundingClientRect().left)) {
+        const last = rows[rows.length - 1];
+        if (last && Math.abs(last[0]!.getBoundingClientRect().top - u.getBoundingClientRect().top) < 8) last.push(u);
+        else rows.push([u]);
+      }
+      const widths = (row: HTMLElement[]) => row.map((u) => Math.round(u.getBoundingClientRect().width));
+      const name = (u: HTMLElement) => `„${text(u)}”`;
+      const where = ui(parent) ?? parent.tagName.toLowerCase();
+      for (const row of rows) {
+        const w = widths(row);
+        if (row.length > 1 && Math.max(...w) - Math.min(...w) > 8) add('P13 buttons', `${row.map(name).join(' + ')} share a row unequally (${w.join(' / ')} px) in ${where}`);
+        const right = Math.max(...row.map((u) => u.getBoundingClientRect().right));
+        if (row.length > 1 && inner - right > 12) add('P13 buttons', `${row.map(name).join(' + ')} do not fill their row (${Math.round(inner - right)} px left) in ${where}`);
+      }
+      if (rows.length > 1) {
+        const all = rows.flatMap(widths);
+        if (Math.max(...all) - Math.min(...all) > 8 && rows.every((r) => r.length === 1)) add('P13 buttons', `${items.map(name).join(' / ')} one under another with different widths (${all.join(' / ')} px) in ${where}`);
+      }
+    }
+  }
+
   // P9 — loading is the skeleton; an empty list or an error is the shared empty state. (A bar of
   // steps done, „0 din 4”, is progress, not loading.)
   if (want('P9')) {

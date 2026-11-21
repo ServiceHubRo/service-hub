@@ -148,6 +148,8 @@ export const ro = {
   'common.cancel': 'Renunță',
   'common.view': 'Afișează',
   'common.yes': 'Da',
+  'field.pickDate': 'Alege data',
+  'field.pickTime': 'Alege ora',
   'common.more': 'Mai multe',
   'common.no': 'Nu',
   'common.edit': 'Editează',

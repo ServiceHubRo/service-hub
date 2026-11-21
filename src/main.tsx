@@ -10,6 +10,7 @@ import { openReloadAtTop } from './lib/scrollMemory';
 import '@fontsource-variable/inter/wght.css';
 import './styles/tokens.css';
 import './styles/global.css';
+import './styles/picker.css';
 
 // A reload opens the page at its top (src/lib/scrollMemory.ts); nothing else is touched.
 openReloadAtTop();

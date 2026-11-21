@@ -31,6 +31,19 @@
   }
 }
 
+/* The list in the app's style where the browser can draw it (styles/picker.css); the select stays as drawn here. */
+@supports (appearance: base-select) {
+  .wrap .select {
+    appearance: base-select;
+    display: flex;
+    align-items: center;
+  }
+
+  .wrap .select::picker-icon {
+    display: none;
+  }
+}
+
 .wrap .select:focus-visible {
   outline: none;
   box-shadow: var(--focus-ring);

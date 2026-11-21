@@ -150,6 +150,8 @@ export const en: Record<MessageKey, string> = {
   'common.cancel': 'Cancel',
   'common.view': 'Show',
   'common.yes': 'Yes',
+  'field.pickDate': 'Select date',
+  'field.pickTime': 'Select time',
   'common.more': 'More',
   'common.no': 'No',
   'common.edit': 'Edit',
