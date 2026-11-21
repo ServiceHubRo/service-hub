@@ -60,6 +60,8 @@ export function FleetStart({ steps, canHide }: { steps: StartStep[]; canHide: bo
               <span className={styles.stepText}>
                 <span className={s.done ? styles.stepLabelDone : undefined}>{t(`fleet.start.${s.key}`)}</span>
                 <span className="visually-hidden"> — {t(s.done ? 'dash.setup.done' : 'dash.setup.todo')}</span>
+                {/* Only the first vehicle is needed; a fleet without colleagues or a budget is fine. */}
+                {s.key !== 'vehicle' && !s.done && <span className={styles.stepNote}>{t('fleet.start.optional')}</span>}
               </span>
             </>
           );

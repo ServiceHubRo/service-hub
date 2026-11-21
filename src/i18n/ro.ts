@@ -3843,6 +3843,7 @@ export const ro = {
   'fleet.role.manager': 'Manager de flotă',
   'fleet.role.driver': 'Șofer',
   'fleet.role.accountant': 'Contabil',
+  'fleet.start.optional': 'opțional',
   'fleet.start.vehicle': 'Adaugă primul vehicul',
   'fleet.start.members': 'Invită un șofer sau un coleg',
   'fleet.start.budget': 'Setează bugetul lunar',

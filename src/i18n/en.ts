@@ -3844,6 +3844,7 @@ export const en: Record<MessageKey, string> = {
   'fleet.role.manager': 'Fleet manager',
   'fleet.role.driver': 'Driver',
   'fleet.role.accountant': 'Accountant',
+  'fleet.start.optional': 'optional',
   'fleet.start.vehicle': 'Add the first vehicle',
   'fleet.start.members': 'Invite a driver or a colleague',
   'fleet.start.budget': 'Set the monthly budget',
