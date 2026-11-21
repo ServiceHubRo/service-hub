@@ -435,3 +435,27 @@
   flex-wrap: wrap;
   gap: var(--space-2);
 }
+
+/* „Programezi pentru <firma>” (C17): two buttons under the lines; on a phone they share the row equally. */
+.fleetBannerTitle {
+  margin: 0;
+  font-weight: 650;
+}
+
+.fleetBannerLine {
+  margin: 2px 0 0;
+  color: var(--text-2);
+}
+
+.fleetBannerActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+@media (max-width: 599px) {
+  .fleetBannerActions > * {
+    flex: 1 1 140px;
+  }
+}

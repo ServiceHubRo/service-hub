@@ -8,6 +8,7 @@ import type { MapPlace } from '../../../lib/maps';
 import { useI18n } from '../../../i18n/context';
 import { formatDate } from '../../../i18n/format';
 import { BOOKINGS_PATH, SEARCH_PATH } from '../paths';
+import { fleetBookingsPath } from './fleetBookingHint';
 import { SERVICE_SEPARATOR } from '../../../lib/bookingServices';
 import { serviceName } from '../shop/serviceGroups';
 import styles from './booking.module.css';
@@ -26,6 +27,8 @@ export interface SentState {
   confirmed?: boolean;
   shopId?: string;
   bookingId?: string;
+  /** Booked for a company from its fleet space: the way on leads back there. */
+  fleet?: { companyId: string; companyName: string };
   /** For "Adaugă în calendar" and "Indicații" once confirmed. */
   calendar?: { event: CalendarEvent; place: MapPlace };
 }
@@ -57,8 +60,8 @@ export function BookingSent() {
         </Card>
       )}
       <div className={styles.sentActions}>
-        <Link to={BOOKINGS_PATH} className={buttonClass('primary', true)}>
-          {t('booking.sent.toBookings')}
+        <Link to={sent?.fleet ? fleetBookingsPath(sent.fleet.companyId) : BOOKINGS_PATH} className={buttonClass('primary', true)}>
+          {t(sent?.fleet ? 'booking.sent.toFleet' : 'booking.sent.toBookings')}
         </Link>
         {sent?.confirmed && sent.calendar && <AddToCalendar event={sent.calendar.event} />}
         <Link to={SEARCH_PATH} className={buttonClass('ghost', true)}>

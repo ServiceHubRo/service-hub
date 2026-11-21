@@ -17,6 +17,8 @@ import { parseServiceIds, servicesLine, toggleServiceId } from '../../../lib/boo
 import { bestOffer } from '../../../lib/offers';
 import { parseSymptoms, toggleSymptom, UNSURE_SERVICE_ID } from '../../../lib/symptoms';
 import { useLoad } from '../../../lib/useLoad';
+import { clearFleetBookingContext, fleetBookingContext } from './fleetBookingHint';
+import { FleetBookingBanner } from './FleetBookingBanner';
 import { bookingPath, bookingSentPath, SEARCH_PATH, shopPath, type ShopLinkState } from '../paths';
 import { serviceName } from '../shop/serviceGroups';
 import type { SentState } from './BookingSent';
@@ -120,8 +122,11 @@ function Flow({ page }: { page: ShopPage }) {
     headingRef.current?.focus({ preventScroll: true });
   }, [step]);
 
-  function onSent(booking: Booking, car: string) {
+  function onSent(booking: Booking, car: string, forCompany: boolean) {
     if (!service || !day || !time) return;
+    // A booking for a company vehicle ends the fleet booking: the success screen leads back to the fleet.
+    const fleet = forCompany ? fleetBookingContext() : null;
+    clearFleetBookingContext();
     const sent: SentState = {
       ref: booking.ref,
       shopName: shop.name,
@@ -133,6 +138,7 @@ function Flow({ page }: { page: ShopPage }) {
       confirmed: booking.status === 'confirmed',
       shopId: shop.id,
       bookingId: booking.id,
+      fleet: fleet ? { companyId: fleet.companyId, companyName: fleet.companyName } : undefined,
       calendar: {
         event: {
           uid: booking.id,
@@ -180,6 +186,7 @@ function Flow({ page }: { page: ShopPage }) {
         <BackLink to={urlFor({ pas: step === 2 ? null : String(step - 1) })} />
       )}
       <Progress step={step} />
+      <FleetBookingBanner />
       <div data-ui="step-header">
         <h1 ref={headingRef} tabIndex={-1} className={styles.title}>
           {t(STEP_TITLES[step as 1 | 2 | 3 | 4])}

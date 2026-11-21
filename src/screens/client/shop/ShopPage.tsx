@@ -19,6 +19,7 @@ import { SkeletonList } from '../../../components/Skeleton';
 import { Stars } from '../../../components/Stars';
 import { subscribeRows } from '../../../data/realtime';
 import { toRpcError } from '../../../data/rpc';
+import { FleetBookingBanner } from '../booking/FleetBookingBanner';
 import { fetchShopPage, type ShopPage as ShopPageData } from '../../../data/search';
 import { useI18n } from '../../../i18n/context';
 import { useEmbedded } from '../../../lib/embedded';
@@ -125,7 +126,8 @@ function ShopDetails({
   linkState?: ShopLinkState;
   onFavorite: (on: boolean) => void;
 }) {
-  const Title = useEmbedded() ? 'h2' : 'h1';
+  const embedded = useEmbedded();
+  const Title = embedded ? 'h2' : 'h1';
   const { t, lang } = useI18n();
   const offerText = useOfferText();
   const { coords } = useLocation();
@@ -136,6 +138,8 @@ function ShopDetails({
 
   return (
     <>
+      {/* A booking for a company started from its fleet space (beside the search, the search shows it). */}
+      {!embedded && <FleetBookingBanner />}
       {/* One column the whole width (T58, Eduard 30 Oct: the long list of services left the shop's
           column empty below); the parts inside lay out across the width. */}
       <div className={styles.columns}>
