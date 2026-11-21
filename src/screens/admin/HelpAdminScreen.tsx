@@ -35,7 +35,7 @@ import { useI18n } from '../../i18n/context';
 import type { MessageKey } from '../../i18n/ro';
 import { HELP_LIMITS, HELP_SLUG_PATTERN, helpTextProblem, slugify } from '../../lib/helpCenter';
 import { fold } from '../../lib/helpSearch';
-import { LIST_DETAIL_QUERY, useMediaQuery } from '../../lib/useMediaQuery';
+import { RICH_PANEL_QUERY, useMediaQuery } from '../../lib/useMediaQuery';
 import { useLoad } from '../../lib/useLoad';
 import { audienceLabel, problemText } from './helpFormat';
 import { HELP_ICON } from '../help/helpIcons';
@@ -258,7 +258,7 @@ export function HelpAdminScreen() {
     );
   }, [data, query, status]);
 
-  const wide = useMediaQuery(LIST_DETAIL_QUERY);
+  const wide = useMediaQuery(RICH_PANEL_QUERY);
   const [categoryId, setCategoryId] = useState<string | null>(null);
   const visibleCategories = data ? data.categories.filter((c) => !filtering || shown.some((a) => a.category_id === c.id)) : [];
   const active = visibleCategories.find((c) => c.id === categoryId) ?? visibleCategories[0];

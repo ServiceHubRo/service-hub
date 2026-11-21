@@ -31,7 +31,7 @@ import { useI18n } from '../../../i18n/context';
 import { formatDate, formatMoney } from '../../../i18n/format';
 import { carYearMax, isValidCarYear } from '../../../lib/car';
 import { isValidPlate } from '../../../lib/plate';
-import { LIST_DETAIL_QUERY, useMediaQuery } from '../../../lib/useMediaQuery';
+import { RICH_PANEL_QUERY, useMediaQuery } from '../../../lib/useMediaQuery';
 import { useLoad } from '../../../lib/useLoad';
 import type { OfferKind } from '../../../lib/offers';
 import { composeUnsureNote, unsureDescribed, type Symptom } from '../../../lib/symptoms';
@@ -97,7 +97,7 @@ export function CarStep({
   onStale: (message: string) => void;
 }) {
   const { t, lang } = useI18n();
-  const wide = useMediaQuery(LIST_DETAIL_QUERY);
+  const wide = useMediaQuery(RICH_PANEL_QUERY);
   const session = useSession();
   const load = useCallback(async () => {
     // The company vehicles never stop a personal booking: without them, the garage as before.

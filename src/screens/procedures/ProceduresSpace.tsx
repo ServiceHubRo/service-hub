@@ -1,7 +1,7 @@
 import { useParams } from 'react-router-dom';
 import { DetailFrame } from '../../components/ListDetailLayout';
 import { EmbeddedProvider } from '../../lib/embedded';
-import { LIST_DETAIL_QUERY, useMediaQuery } from '../../lib/useMediaQuery';
+import { RICH_PANEL_QUERY, useMediaQuery } from '../../lib/useMediaQuery';
 import { ProcedureScreen } from './ProcedureScreen';
 import { ProceduresScreen } from './ProceduresScreen';
 import type { ProcedureMode } from './paths';
@@ -12,7 +12,7 @@ import type { ProcedureMode } from './paths';
  * before: the library, and a procedure as a page of its own. The library and a procedure both render this.
  */
 export function ProceduresSpace({ mode }: { mode: ProcedureMode }) {
-  const wide = useMediaQuery(LIST_DETAIL_QUERY);
+  const wide = useMediaQuery(RICH_PANEL_QUERY);
   const { procedureId } = useParams();
   if (!wide) return procedureId ? <ProcedureScreen mode={mode} /> : <ProceduresScreen mode={mode} />;
   return (

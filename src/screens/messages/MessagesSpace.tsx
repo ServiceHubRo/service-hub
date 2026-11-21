@@ -1,7 +1,7 @@
 import { useLocation, useParams } from 'react-router-dom';
 import { DetailFrame } from '../../components/ListDetailLayout';
 import { EmbeddedProvider } from '../../lib/embedded';
-import { LIST_DETAIL_QUERY, useMediaQuery } from '../../lib/useMediaQuery';
+import { RICH_PANEL_QUERY, useMediaQuery } from '../../lib/useMediaQuery';
 import { TeamNoticesScreen } from '../notices/TeamNoticesScreen';
 import { ConversationScreen } from './ConversationScreen';
 import { MessagesScreen } from './MessagesScreen';
@@ -14,7 +14,7 @@ import { TEAM_ROW } from './paths';
  * this, so the list stays where it is while the conversation changes.
  */
 export function MessagesSpace() {
-  const wide = useMediaQuery(LIST_DETAIL_QUERY);
+  const wide = useMediaQuery(RICH_PANEL_QUERY);
   const { threadId } = useParams();
   const { pathname } = useLocation();
   const team = pathname.replace(/\/+$/, '').endsWith(`/${TEAM_ROW}`);

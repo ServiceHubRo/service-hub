@@ -14,7 +14,7 @@ import { plural } from '../../../i18n/translate';
 import { distanceTo } from '../../../lib/geo';
 import { useLocation } from '../../../lib/location';
 import { EmbeddedProvider } from '../../../lib/embedded';
-import { LIST_DETAIL_QUERY, useMediaQuery } from '../../../lib/useMediaQuery';
+import { RICH_PANEL_QUERY, useMediaQuery } from '../../../lib/useMediaQuery';
 import { useLoad } from '../../../lib/useLoad';
 import { NAV } from '../../../app/roles';
 import { FAVORITES_PATH, SEARCH_PATH } from '../paths';
@@ -51,7 +51,7 @@ export function FavoritesScreen() {
     setData((prev) => ({ ...prev, shops: prev.shops.map((s) => (s.shop_id === shopId ? { ...s, is_favorite: on } : s)) }));
   }
 
-  const wide = useMediaQuery(LIST_DETAIL_QUERY);
+  const wide = useMediaQuery(RICH_PANEL_QUERY);
   const [pickedId, setPickedId] = useState<string | null>(lastPicked.get('shop') ?? null);
   const shops = state.status === 'ready' ? state.data.shops : [];
   const chosen = shops.find((s) => s.shop_id === pickedId) ?? shops[0];
