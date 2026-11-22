@@ -14,6 +14,7 @@ import { ShopHistoryScreen } from '../../screens/shop/history/ShopHistoryScreen'
 import {
   ADD_BOOKING_PATH,
   IMPORT_PATH,
+  LEGACY_IMPORT_PATH,
   INTAKE_SEGMENT,
   QUOTE_EDITOR_SEGMENT,
   SHOP_LINK_PATH,
@@ -73,6 +74,7 @@ export default function ShopApp() {
         {messageRoutes('shop')}
         <Route path={rel('shop', ADD_BOOKING_PATH)} element={<AddBookingScreen />} />
         <Route path={rel('shop', IMPORT_PATH)} element={<ImportScreen />} />
+        <Route path={rel('shop', LEGACY_IMPORT_PATH)} element={<Navigate to={IMPORT_PATH} replace />} />
         {/* The quote editor and the intake sheet (T50), full screen under Programări. */}
         <Route path={`${rel('shop', SHOP_BOOKINGS_PATH)}/${QUOTE_EDITOR_SEGMENT}/:bookingId`} element={<QuoteEditorScreen />} />
         <Route path={`${rel('shop', SHOP_BOOKINGS_PATH)}/${INTAKE_SEGMENT}/:bookingId`} element={<IntakeScreen />} />

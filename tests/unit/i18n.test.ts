@@ -20,14 +20,12 @@ describe('dictionaries', () => {
 
 describe('detectLang', () => {
   it('uses the stored choice first', () => {
-    expect(detectLang('en', 'ro-RO')).toBe('en');
-    expect(detectLang('ro', 'en-US')).toBe('ro');
+    expect(detectLang('en')).toBe('en');
+    expect(detectLang('ro')).toBe('ro');
   });
-  it('falls back to the browser language', () => {
-    expect(detectLang(null, 'ro-RO')).toBe('ro');
-    expect(detectLang(null, 'ro')).toBe('ro');
-    expect(detectLang(null, 'de-DE')).toBe('en');
-    expect(detectLang('xx', undefined)).toBe('en');
+  it('is Romanian unless English was chosen: the browser language does not decide (Eduard, 22 Nov 2026)', () => {
+    expect(detectLang(null)).toBe('ro');
+    expect(detectLang('xx')).toBe('ro');
   });
 });
 

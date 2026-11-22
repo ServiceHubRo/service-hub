@@ -1,6 +1,6 @@
 import { FileUp, History as HistoryIcon } from 'lucide-react';
 import { useCallback, useMemo, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { ActionButton } from '../../../components/ActionButton';
 import { PageHeader } from '../../../components/PageHeader';
 import { Banner } from '../../../components/Banner';
@@ -19,7 +19,7 @@ import { checkRows, chunks, guessMapping, IMPORT_FIELDS, type ImportField, type 
 import { newRequestId } from '../../../lib/requestId';
 import { useLoad } from '../../../lib/useLoad';
 import { columnName } from '../../../lib/xlsx';
-import { SHOP_BOOKINGS_PATH, SHOP_HISTORY_PATH } from '../paths';
+import { ACCOUNT_PATH, ADD_BOOKING_PATH, SHOP_HISTORY_PATH } from '../paths';
 import { useIsShopOwner } from '../shopRole';
 import styles from './import.module.css';
 
@@ -102,6 +102,9 @@ export function ImportScreen() {
     }
   }
 
+  // Opened from „Adaugă programare” it leads back there; from the tile in Cont, to Cont.
+  const fromAdd = (useLocation().state as { from?: string } | null)?.from === 'add';
+
   const header = loaded?.table[0] ?? [];
   const columnOptions = [
     { value: '', label: t('imp.none') },
@@ -110,7 +113,7 @@ export function ImportScreen() {
 
   return (
     <div className={styles.page}>
-      <PageHeader back={{ to: SHOP_BOOKINGS_PATH, label: t('nav.bookings') }} title={t('imp.title')} />
+      <PageHeader back={fromAdd ? { to: ADD_BOOKING_PATH, label: t('wi.title') } : { to: ACCOUNT_PATH, label: t('nav.account') }} title={t('imp.title')} />
       <p className={styles.muted}>{t('imp.intro')}</p>
 
       {!isOwner ? (

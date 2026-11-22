@@ -328,7 +328,7 @@ export const en: Record<MessageKey, string> = {
   'tour.client.account.body': 'Your cars’ history, favorites and settings.',
   'tour.shop.guide.body': 'Four steps and your shop shows up in search.',
   'tour.shop.dashboard.title': 'Dashboard',
-  'tour.shop.dashboard.body': 'New requests and today at a glance.',
+  'tour.shop.dashboard.body': 'New requests and daily overview at a glance.',
   'tour.shop.bookings.body': 'Confirm requests, inspect the car and send the quote.',
   'tour.shop.history.body': 'Finished jobs and each car’s file.',
   'tour.shop.messages.body': 'Talk with your clients.',

@@ -71,7 +71,7 @@ async function ensureChannel(): Promise<void> {
  * app (ShopBookingsProvider), named in the app's language. A client's phone never gets it.
  */
 export async function ensureBookingsChannel(): Promise<void> {
-  const lang = detectLang(storage.get(LANG_STORAGE_KEY), navigator.language);
+  const lang = detectLang(storage.get(LANG_STORAGE_KEY));
   await PushNotifications.createChannel({
     id: BOOKINGS_CHANNEL_ID,
     name: translate(lang, 'push.channel.bookings'),

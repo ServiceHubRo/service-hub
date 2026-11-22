@@ -17,10 +17,13 @@ const dictionaries: Record<Lang, Record<MessageKey, string>> = { ro, en };
 
 export const LANG_STORAGE_KEY = 'sh_lang';
 
-/** `navigator.language` starting with "ro" → Romanian, anything else → English (ARCHITECTURE §15). */
-export function detectLang(stored: string | null, browserLang: string | undefined): Lang {
-  if (stored === 'ro' || stored === 'en') return stored;
-  return browserLang?.toLowerCase().startsWith('ro') ? 'ro' : 'en';
+/**
+ * Romanian unless the person chose English (stored): the browser's language no longer decides — a visitor
+ * whose browser is in English saw English everywhere, then a tour in English (Eduard, 22 Nov 2026: „set
+ * default to Romanian; if someone needs English, they'll switch”).
+ */
+export function detectLang(stored: string | null): Lang {
+  return stored === 'en' ? 'en' : 'ro';
 }
 
 export function interpolate(template: string, params?: Params): string {

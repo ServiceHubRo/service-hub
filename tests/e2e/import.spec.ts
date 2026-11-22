@@ -54,9 +54,21 @@ test.describe('import from another program', () => {
     await expect(page).toHaveURL(/\/s\/panou$/);
     await page.goto('/s/programari/nou');
     await page.getByRole('link', { name: 'Importă clienți din alt program' }).click();
-    await expect(page).toHaveURL(/\/s\/programari\/import$/);
+    await expect(page).toHaveURL(/\/s\/cont\/import$/);
     await expect(page.getByRole('heading', { level: 1, name: 'Importă clienți' })).toBeVisible();
     await expect(page.getByText('Importă clienții dintr-un fișier Excel sau CSV', { exact: false })).toBeVisible();
+    // From „Adaugă programare” „Înapoi” leads back there; from the tile in Cont, to Cont (the navigation shows Cont).
+    await expect(page.locator('main [data-back-bar] a')).toContainText('Adaugă programare');
+    await page.goto('/s/cont');
+    await page.getByRole('link', { name: /^Importă clienți/ }).click();
+    await expect(page).toHaveURL(/\/s\/cont\/import$/);
+    await expect(page.locator('main [data-back-bar] a')).toContainText('Cont');
+    await expect(page.locator('a[aria-current="page"]').filter({ hasText: /^Cont$/ }).filter({ visible: true })).toHaveCount(1);
+    // The old address still opens it.
+    await page.goto('/s/programari/import');
+    await expect(page).toHaveURL(/\/s\/cont\/import$/);
+    await page.goto('/s/programari/nou');
+    await page.getByRole('link', { name: 'Importă clienți din alt program' }).click();
 
     // A file that is not a table says so.
     await page
@@ -111,7 +123,7 @@ test.describe('import from another program', () => {
     await shot(page, 't31a-known-client', name());
 
     // Undo: everything it brought goes.
-    await page.goto('/s/programari/import');
+    await page.goto('/s/cont/import');
     await past.getByRole('button', { name: 'Anulează importul' }).click();
     await past.getByRole('button', { name: 'Da, anulează' }).click();
     await expect(past).toContainText('Anulat');
@@ -122,7 +134,7 @@ test.describe('import from another program', () => {
 
     // In English.
     await serviceRest(`profiles?id=eq.${await userIdOf(shop.email)}`, 'PATCH', { lang: 'en' });
-    await page.goto('/s/programari/import');
+    await page.goto('/s/cont/import');
     await expect(page.getByRole('heading', { level: 1, name: 'Import clients' })).toBeVisible();
     await expect(page.locator('main').getByText('Undone')).toBeVisible();
     await expect(page.locator('main')).not.toContainText('Importă');
