@@ -19,17 +19,21 @@ export function FleetBookingBanner() {
   if (!context) return null;
   return (
     <Banner tone="info" icon={<Building2 size={18} aria-hidden="true" />}>
-      <p className={styles.fleetBannerTitle}>{t('fleetBook.title', { company: context.companyName })}</p>
-      <p className={styles.fleetBannerLine}>
-        {context.vehicleLabel ? t('fleetBook.vehicle', { vehicle: context.vehicleLabel }) : t('fleetBook.pickVehicle')}
-      </p>
-      <div className={styles.fleetBannerActions}>
-        <Link to={fleetBookingsPath(context.companyId)} className={buttonClass('secondary', false)} onClick={clearFleetBookingContext}>
-          {t('fleetBook.back')}
-        </Link>
-        <Button variant="secondary" onClick={clearFleetBookingContext}>
-          {t('fleetBook.quit')}
-        </Button>
+      <div className={styles.fleetBannerRow}>
+        <div className={styles.fleetBannerText}>
+          <p className={styles.fleetBannerTitle}>{t('fleetBook.title', { company: context.companyName })}</p>
+          <p className={styles.fleetBannerLine}>
+            {context.vehicleLabel ? t('fleetBook.vehicle', { vehicle: context.vehicleLabel }) : t('fleetBook.pickVehicle')}
+          </p>
+        </div>
+        <div className={styles.fleetBannerActions}>
+          <Link to={fleetBookingsPath(context.companyId)} className={buttonClass('secondary', false)} onClick={clearFleetBookingContext}>
+            {t('fleetBook.back')}
+          </Link>
+          <Button variant="secondary" onClick={clearFleetBookingContext}>
+            {t('fleetBook.quit')}
+          </Button>
+        </div>
       </div>
     </Banner>
   );
