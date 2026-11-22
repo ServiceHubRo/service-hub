@@ -1,29 +1,12 @@
 import { Building2 } from 'lucide-react';
-import { useSyncExternalStore } from 'react';
 import { Link } from 'react-router-dom';
 import { Banner } from '../../../components/Banner';
 import { Button } from '../../../components/Button';
 import { buttonClass } from '../../../components/buttonClass';
 import { useI18n } from '../../../i18n/context';
-import { clearFleetBookingContext, FLEET_BOOKING_EVENT, fleetBookingContext, fleetBookingsPath } from './fleetBookingHint';
+import { clearFleetBookingContext, fleetBookingsPath } from './fleetBookingHint';
+import { useFleetBookingContext } from './useFleetBookingContext';
 import styles from './booking.module.css';
-
-// The context lives in the tab's storage: read as a string so that React sees a stable value.
-const read = () => {
-  try {
-    return sessionStorage.getItem('sh.fleetBook') ?? '';
-  } catch {
-    return '';
-  }
-};
-const subscribe = (notify: () => void) => {
-  window.addEventListener(FLEET_BOOKING_EVENT, notify);
-  window.addEventListener('storage', notify);
-  return () => {
-    window.removeEventListener(FLEET_BOOKING_EVENT, notify);
-    window.removeEventListener('storage', notify);
-  };
-};
 
 /**
  * „Programezi pentru <firma>” (C17): on every screen of a booking started from a company's fleet space
@@ -32,8 +15,7 @@ const subscribe = (notify: () => void) => {
  */
 export function FleetBookingBanner() {
   const { t } = useI18n();
-  const raw = useSyncExternalStore(subscribe, read, () => '');
-  const context = raw ? fleetBookingContext() : null;
+  const context = useFleetBookingContext();
   if (!context) return null;
   return (
     <Banner tone="info" icon={<Building2 size={18} aria-hidden="true" />}>

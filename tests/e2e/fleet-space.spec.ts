@@ -311,6 +311,12 @@ test('bookings: the driver books a company vehicle, the manager approves within 
   // The search is the person's own; the banner says it is a booking for the company, with the vehicle (C17).
   await expect(page.getByText(/^Programare pentru /)).toBeVisible();
   await expect(page.getByText(new RegExp(`^Vehicul: ${plate}`))).toBeVisible();
+  // The company's frame stays around the booking: its name in the header (not „Personal”), its navigation
+  // with Programări as the current page (Eduard, 22 Nov 2026).
+  const space = page.getByRole('button', { name: /^Spațiul activ: / });
+  await expect(space).not.toHaveAccessibleName(/^Spațiul activ: Personal/);
+  await expect(page.getByRole('link', { name: 'Programări', exact: true }).filter({ visible: true }).first()).toHaveAttribute('aria-current', 'page');
+  await expect(page.getByRole('link', { name: 'Vehicule', exact: true }).filter({ visible: true }).first()).toHaveAttribute('href', /\/c\/firme\//);
   await expectNoHorizontalScroll(page);
   await shot(page, 'fleet-book-search-banner', name());
   // „Înapoi la flotă” goes to the company's bookings and ends the fleet booking: the search is plain again.
@@ -318,6 +324,7 @@ test('bookings: the driver books a company vehicle, the manager approves within 
   await expect(page).toHaveURL(new RegExp(`/c/firme/${company.id}\\?sectiune=programari`));
   await page.goto('/c/cauta');
   await expect(page.getByText(/^Programare pentru /)).toHaveCount(0);
+  await expect(page.getByRole('button', { name: /^Spațiul activ: Personal/ })).toBeVisible();
   // Again from the vehicle, now on to the shop: the banner follows on the shop page and the steps.
   await page.goto(`/c/firme/${company.id}?sectiune=vehicul&vehicul=${vehicle.id}`);
   await page.getByRole('button', { name: 'Programează la service' }).click();

@@ -4,6 +4,8 @@ import { fetchMyCompanies, type MyCompany } from '../../data/companies';
 import { fetchMyFleetAccess } from '../../data/fleet';
 import { subscribeRows } from '../../data/realtime';
 import { SEARCH_PATH } from '../../screens/client/paths';
+import { clearFleetBookingContext, isFleetBookingPath } from '../../screens/client/booking/fleetBookingHint';
+import { useFleetBookingContext } from '../../screens/client/booking/useFleetBookingContext';
 import { fleetSpacePath } from '../../screens/client/companies/paths';
 import { useSession } from '../sessionContext';
 import { companyOfPath, WorkspaceContext, type ActiveWorkspace } from './workspaceContext';
@@ -84,15 +86,25 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
   }, [uid, reload]);
 
   const companyId = companyOfPath(pathname);
-  const active = useMemo<ActiveWorkspace>(() => (companyId ? { kind: 'company', id: companyId } : { kind: 'personal' }), [companyId]);
+  // A booking for a company, started from its fleet space: the search and the shop's pages keep the
+  // company's frame (its name in the header, its navigation) instead of showing „Personal” (Eduard,
+  // 22 Nov 2026). Only for a company the member belongs to.
+  const booking = useFleetBookingContext();
+  const bookingCompany = !companyId && booking && isFleetBookingPath(pathname) && companies.some((c) => c.id === booking.companyId) ? booking.companyId : null;
+  const active = useMemo<ActiveWorkspace>(
+    () => (companyId ? { kind: 'company', id: companyId } : bookingCompany ? { kind: 'company', id: bookingCompany, booking: true } : { kind: 'personal' }),
+    [companyId, bookingCompany],
+  );
 
   const switchTo = useCallback(
     (target: ActiveWorkspace) => {
       if (target.kind === 'personal') {
-        if (active.kind !== 'personal') navigate(SEARCH_PATH);
+        // From a booking for a company: the booking is left, the search stays.
+        if (active.kind === 'company' && active.booking) clearFleetBookingContext();
+        else if (active.kind !== 'personal') navigate(SEARCH_PATH);
         return;
       }
-      if (active.kind === 'company' && active.id === target.id) return;
+      if (active.kind === 'company' && active.id === target.id && !active.booking) return;
       // From one company to another: the same page when the new company has it, else its Panou.
       const section = active.kind === 'company' ? new URLSearchParams(search).get('sectiune') : null;
       const keep = section && CARRIED_SECTIONS.has(section) ? `?sectiune=${section}` : '';

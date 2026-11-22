@@ -58,3 +58,6 @@ export const FLEET_BOOKING_EVENT = EVENT;
 
 /** The company's own place of bookings in its fleet space. */
 export const fleetBookingsPath = (companyId: string) => `/c/firme/${companyId}?sectiune=programari`;
+
+/** The screens of a booking started from a fleet: the search and the shop's pages (the company's frame stays around them). */
+export const isFleetBookingPath = (pathname: string) => pathname === '/c/cauta' || pathname.startsWith('/c/cauta/') || pathname.startsWith('/c/service/');
