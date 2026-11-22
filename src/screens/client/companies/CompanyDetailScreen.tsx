@@ -542,10 +542,14 @@ function MemberRow({
       <div className={styles.memberHead}>
         <div className={styles.memberText}>
           <span className={styles.memberName}>
-            {who}
+            {member.name ? who : <BreakableEmail value={who} />}
             {member.is_me && <span className={styles.muted}> ({t('staff.you')})</span>}
           </span>
-          {member.name && <span className={styles.muted}>{member.email}</span>}
+          {member.name && (
+            <span className={styles.muted}>
+              <BreakableEmail value={member.email} />
+            </span>
+          )}
           {pending && (
             <span className={member.expired ? styles.warn : styles.muted}>
               {member.expired ? t('staff.expired') : t('staff.pending', { date: formatDate(lang, new Date(member.invited_at)) })}
@@ -768,4 +772,17 @@ function PlanPill({ feature, plans }: { feature: PlanFeature; plans: FleetPlanRo
   const plan = requiredPlan(feature, plans);
   if (!plan) return null;
   return <StatusPill tone={toneOf('amber')}>{t('fleet.plan.availableIn', { plan: lang === 'ro' ? plan.name_ro : plan.name_en })}</StatusPill>;
+}
+
+/** An address that may break after the „@” on a narrow row, never in the middle of a word. */
+function BreakableEmail({ value }: { value: string }) {
+  const at = value.indexOf('@');
+  if (at < 0) return <>{value}</>;
+  return (
+    <>
+      {value.slice(0, at + 1)}
+      <wbr />
+      {value.slice(at + 1)}
+    </>
+  );
 }
