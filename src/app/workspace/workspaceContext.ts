@@ -6,7 +6,10 @@ import type { MyCompany } from '../../data/companies';
  * to. The company comes from the address (`/c/firme/<company>`), so a refresh or a shared link keeps
  * it; the database decides what the member may read there (a changed id answers "not found").
  */
-export type ActiveWorkspace = { kind: 'personal' } | { kind: 'company'; id: string };
+export type ActiveWorkspace =
+  | { kind: 'personal' }
+  /** `booking`: not a fleet address: the search and the booking of a company's vehicle, inside the company's frame. */
+  | { kind: 'company'; id: string; booking?: true };
 
 export interface WorkspaceValue {
   /** The companies the caller is an accepted member of, not archived (`my_companies()`); [] without fleets. */

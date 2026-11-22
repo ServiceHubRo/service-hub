@@ -148,7 +148,8 @@ function useCompanyNav(): CompanyLink[] | null {
   const { search } = useLocation();
   if (ws?.active.kind !== 'company') return null;
   const base = fleetSpacePath(ws.active.id);
-  const current = companyNavOf(new URLSearchParams(search).get('sectiune'));
+  // A booking for the company (the search, the shop's pages) belongs to Programări.
+  const current = ws.active.booking ? 'programari' : companyNavOf(new URLSearchParams(search).get('sectiune'));
   return COMPANY_NAV.map(({ section, icon }) => ({
     key: section,
     to: `${base}?sectiune=${section}`,

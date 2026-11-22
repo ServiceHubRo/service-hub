@@ -308,7 +308,33 @@ test('bookings: the driver books a company vehicle, the manager approves within 
   await page.goto(`/c/firme/${company.id}?sectiune=vehicul&vehicul=${vehicle.id}`);
   await page.getByRole('button', { name: 'Programează la service' }).click();
   await expect(page).toHaveURL(/\/c\/cauta/);
+  // The search is the person's own; the banner says it is a booking for the company, with the vehicle (C17).
+  await expect(page.getByText(/^Programare pentru /)).toBeVisible();
+  await expect(page.getByText(new RegExp(`^Vehicul: ${plate}`))).toBeVisible();
+  // The company's frame stays around the booking: its name in the header (not „Personal”), its navigation
+  // with Programări as the current page (Eduard, 22 Nov 2026).
+  const space = page.getByRole('button', { name: /^Spațiul activ: / });
+  await expect(space).not.toHaveAccessibleName(/^Spațiul activ: Personal/);
+  await expect(page.getByRole('link', { name: 'Programări', exact: true }).filter({ visible: true }).first()).toHaveAttribute('aria-current', 'page');
+  await expect(page.getByRole('link', { name: 'Vehicule', exact: true }).filter({ visible: true }).first()).toHaveAttribute('href', /\/c\/firme\//);
+  await expectNoHorizontalScroll(page);
+  await shot(page, 'fleet-book-search-banner', name());
+  // „Înapoi la flotă” leaves the booking and goes back to where it started: the vehicle's page (a booking
+  // started from Programări goes back to the company's bookings); the search is plain again.
+  await expect(page.getByRole('link', { name: 'Renunță' })).toHaveCount(0);
+  await page.getByRole('link', { name: 'Înapoi la flotă' }).click();
+  await expect(page).toHaveURL(new RegExp(`/c/firme/${company.id}\\?sectiune=vehicul&vehicul=${vehicle.id}`));
+  await page.goto('/c/cauta');
+  await expect(page.getByText(/^Programare pentru /)).toHaveCount(0);
+  await expect(page.getByRole('button', { name: /^Spațiul activ: Personal/ })).toBeVisible();
+  // Again from the vehicle, now on to the shop: the banner follows on the shop page and the steps.
+  await page.goto(`/c/firme/${company.id}?sectiune=vehicul&vehicul=${vehicle.id}`);
+  await page.getByRole('button', { name: 'Programează la service' }).click();
+  await expect(page.getByText(/^Programare pentru /)).toBeVisible();
+  await page.goto(`/c/service/${shopId}`);
+  await expect(page.getByText(/^Programare pentru /)).toBeVisible();
   await page.goto(`/c/service/${shopId}/programare?pas=2&serviciu=ulei`);
+  await expect(page.getByText(/^Programare pentru /)).toBeVisible();
   await page.getByRole('button', { name: /: \d+ loc/ }).first().click();
   await page.getByRole('button', { name: /^\d{2}:\d{2}$/, disabled: false }).first().click();
   // A phone: options (pressed); from 1024 px: rows beside the vehicle's details (current).
@@ -321,6 +347,9 @@ test('bookings: the driver books a company vehicle, the manager approves within 
   await shot(page, 'fleet-book-car-step', name());
   await page.getByRole('button', { name: 'Trimite cererea' }).click();
   await expect(page.getByRole('heading', { level: 1, name: 'Cerere trimisă' })).toBeVisible();
+  // A booking for a company vehicle leads back to the fleet, and the banner is gone.
+  await expect(page.getByRole('link', { name: 'Programările firmei' })).toHaveAttribute('href', `/c/firme/${company.id}?sectiune=programari`);
+  await expect(page.getByText(/^Programare pentru /)).toHaveCount(0);
 
   // The shop inspects and sends a quote of 600 lei.
   const [booking] = await serviceRest<{ id: string }[]>(`bookings?company_id=eq.${company.id}&select=id`, 'GET');

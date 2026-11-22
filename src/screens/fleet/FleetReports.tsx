@@ -160,6 +160,10 @@ function Reports({ initialReport }: { initialReport?: string }) {
 
   const periods: Period[] = advanced ? [...COST_PERIODS, 'custom'] : [...COST_PERIODS];
   const withPeriod = report !== 'documents' && report !== 'budget';
+  // „Mai multe” (the exports) and „Filtre” share one row (Eduard, 22 Nov 2026): with the filters bar it is
+  // the bar's end; without it, it stays beside the report and the period.
+  const filtersBar = withPeriod && included && advanced;
+  const more = exportItems.length > 0 && included ? <MoreActions items={exportItems} /> : null;
 
   return (
     <div className={styles.stack}>
@@ -184,11 +188,7 @@ function Reports({ initialReport }: { initialReport?: string }) {
             options={periods.map((p) => ({ value: p, label: t(`fleet.period.${p}`) }))}
           />
         )}
-        {exportItems.length > 0 && included && (
-          <div className={styles.reportMore}>
-            <MoreActions items={exportItems} />
-          </div>
-        )}
+        {more && !filtersBar && <div className={styles.reportMore}>{more}</div>}
       </div>
 
       {exportError && (
@@ -204,7 +204,7 @@ function Reports({ initialReport }: { initialReport?: string }) {
         </div>
       )}
 
-      {withPeriod && included && advanced && (
+      {filtersBar && (
         <ChoiceFilters
           groups={[
             ...(departments.length > 0
@@ -227,6 +227,7 @@ function Reports({ initialReport }: { initialReport?: string }) {
           ]}
           onClearAll={() => setFilters({})}
           doneLabel={t('fleet.filters.done')}
+          end={more ?? undefined}
         />
       )}
       {withPeriod && included && !advanced && (

@@ -45,10 +45,11 @@ import { toRpcError } from '../../data/rpc';
 import { useOptionalWorkspace } from '../../app/workspace/workspaceContext';
 import { useI18n } from '../../i18n/context';
 import { useLoad } from '../../lib/useLoad';
-import { clearFleetBookingHint, setFleetBookingHint } from '../client/booking/fleetBookingHint';
+import type { FleetOverview } from '../../lib/fleet';
+import { clearFleetBookingContext, setFleetBookingContext } from '../client/booking/fleetBookingHint';
 import { COMPANIES_PATH, companyPath } from '../client/companies/paths';
 import { SEARCH_PATH } from '../client/paths';
-import { FleetContext, useFleetLocation, type FleetActions, type FleetContextValue } from './fleetContext';
+import { FleetContext, useFleetLocation, vehicleLabel, type FleetActions, type FleetContextValue } from './fleetContext';
 import { FleetPlanNotice, FleetSectionBody } from './FleetSections';
 import styles from './fleet.module.css';
 
@@ -76,6 +77,16 @@ function FleetSpace({ companyId }: { companyId: string }) {
     return { overview, plan, plans };
   }, [companyId]);
   const { state, reload, setData } = useLoad(load);
+  // What „Programează la service” needs to say whose booking it is (the company's name, the vehicle).
+  const latest = useRef<FleetOverview | null>(null);
+  const readOverview = state.status === 'ready' ? state.data.overview : null;
+  useEffect(() => {
+    latest.current = readOverview;
+  }, [readOverview]);
+  // Back in the fleet: a booking started here is over (done or left), the banners of the search go.
+  useEffect(() => {
+    clearFleetBookingContext();
+  }, []);
   const loadSubscription = useCallback(() => fetchSubscription(companyId), [companyId]);
   const loadReport = useCallback<FleetContextValue['loadReport']>((range, previous, filters) => fetchFleetReport(companyId, range, previous, filters), [companyId]);
   const logExport = useCallback<FleetContextValue['logExport']>((kind, rows) => logFleetExport(companyId, kind, rows), [companyId]);
@@ -142,8 +153,14 @@ function FleetSpace({ companyId }: { companyId: string }) {
         return row;
       },
       book: (id) => {
-        if (id) setFleetBookingHint(id);
-        else clearFleetBookingHint();
+        const overview = latest.current;
+        const v = id ? overview?.vehicles.find((x) => x.id === id) : undefined;
+        setFleetBookingContext({
+          companyId,
+          companyName: overview?.company.name ?? '',
+          vehicleId: v?.id ?? null,
+          vehicleLabel: v ? vehicleLabel(v) : null,
+        });
         navigate(SEARCH_PATH);
       },
       saveExpense: async (id, fields, requestId) => {

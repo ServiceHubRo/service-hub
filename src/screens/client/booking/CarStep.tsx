@@ -43,7 +43,7 @@ import { SERVICE_SEPARATOR } from '../../../lib/bookingServices';
 import { serviceName } from '../shop/serviceGroups';
 import { SummaryRow } from './BookingSent';
 import type { CarDraft } from './carDraft';
-import { clearFleetBookingHint, fleetBookingHint } from './fleetBookingHint';
+import { fleetBookingHint } from './fleetBookingHint';
 import styles from './booking.module.css';
 
 const NOTE_MAX = 1000;
@@ -93,7 +93,8 @@ export function CarStep({
   time: string;
   draft: CarDraft;
   onDraft: (next: CarDraft) => void;
-  onSent: (booking: Booking, car: string) => void;
+  /** `forCompany`: a company vehicle was booked (the banner of a fleet booking ends with it). */
+  onSent: (booking: Booking, car: string, forCompany: boolean) => void;
   onStale: (message: string) => void;
 }) {
   const { t, lang } = useI18n();
@@ -213,8 +214,7 @@ export function CarStep({
         },
         requestId,
       );
-      if (vehicle) clearFleetBookingHint();
-      onSent(booking, carText);
+      onSent(booking, carText, vehicle !== null);
     } catch (e) {
       // The day filled up or the time went while the screen was open: back to a fresh calendar.
       if (RELOAD_AVAILABILITY_CODES.has(toRpcError(e).code)) {

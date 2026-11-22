@@ -435,3 +435,45 @@
   flex-wrap: wrap;
   gap: var(--space-2);
 }
+
+/* „Programezi pentru <firma>” (C17): the text on the left and the two buttons at the right of the card
+   (Eduard, 22 Nov 2026); on a phone the buttons go under the text and share the row equally. */
+.fleetBannerRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 16px;
+}
+
+.fleetBannerText {
+  flex: 1 1 16rem;
+  min-width: 0;
+}
+
+.fleetBannerTitle {
+  margin: 0;
+  font-weight: 650;
+}
+
+.fleetBannerLine {
+  margin: 2px 0 0;
+  color: var(--text-2);
+}
+
+.fleetBannerActions {
+  display: flex;
+  flex: none;
+  gap: 8px;
+}
+
+@media (max-width: 599px) {
+  .fleetBannerActions {
+    flex: 1 1 100%;
+  }
+
+  .fleetBannerActions > * {
+    flex: 1 1 140px;
+    justify-content: center;
+  }
+}

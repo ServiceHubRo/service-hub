@@ -34,6 +34,7 @@ import { SEARCH_PATH, shopPath, type ShopLinkState } from '../paths';
 import { useFreePlaceText } from '../../../lib/useFreePlaceText';
 import { formatRating } from '../../../i18n/format';
 import { AreaCard } from './AreaCard';
+import { FleetBookingBanner } from '../booking/FleetBookingBanner';
 import { ClientGuide } from './ClientGuide';
 import { useClientGuide } from './useClientGuide';
 import { ExpiryBanner } from './ExpiryBanner';
@@ -302,6 +303,7 @@ export function SearchScreen() {
   const title = <PageHeader title={t('nav.client.search')} />;
   const notices = (
     <>
+      <FleetBookingBanner />
       {guide.visible && <ClientGuide guide={guide} />}
       {guide.pending && <span hidden data-guide-pending />}
       {/* One notice at a time (T52, Eduard 30 Oct: the search in sight on a phone), in this order;
