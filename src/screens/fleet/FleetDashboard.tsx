@@ -5,7 +5,6 @@ import {
   Car,
   CarFront,
   CheckCircle2,
-  Plus,
   Receipt,
   Wallet,
   Wrench,
@@ -26,6 +25,7 @@ import {
   fleetKpis,
   hasFeature,
   recentActivity,
+  startSteps,
   yearRange,
   type Activity,
   type ActivityKind,
@@ -33,6 +33,7 @@ import {
 } from '../../lib/fleet';
 import { MonthBars, ShareBars } from './FleetCharts';
 import { useFleet, vehicleLabel, type FleetLink } from './fleetContext';
+import { FleetStart } from './FleetStart';
 import { LockedFeature } from './PlanGate';
 import { useFleetReport } from './useFleetReport';
 import { MaintenancePill } from './FleetMaintenance';
@@ -71,21 +72,11 @@ export function FleetDashboard() {
   const finance = money && hasFeature(plan, 'dashboard_finance');
   const report = useFleetReport(finance && allowed('reports.view') ? { range: yearRange(today), previous: null, filters: {} } : null);
 
+  const steps = startSteps(data, allowed, plan);
   if (data.vehicles.length === 0) {
-    return (
-      <EmptyState
-        icon={CarFront}
-        title={t('fleet.empty.title')}
-        body={allowed('vehicles.manage') ? t('fleet.empty.body') : t('fleet.empty.bodyDriver')}
-        action={
-          allowed('vehicles.manage') ? (
-            <Button variant="primary" onClick={() => go({ section: 'vehicule', filter: 'nou' })}>
-              <Plus size={18} aria-hidden="true" /> {t('fleet.vehicles.add')}
-            </Button>
-          ) : undefined
-        }
-      />
-    );
+    // The first steps are all there is to do (Eduard, 21 Nov 2026); a driver without a vehicle has none.
+    if (steps.length > 0) return <FleetStart steps={steps} canHide={false} />;
+    return <EmptyState icon={CarFront} title={t('fleet.empty.title')} body={t('fleet.empty.bodyDriver')} />;
   }
 
   const money0 = (n: number | null) => (n === null ? '—' : formatMoney(lang, n));
@@ -98,6 +89,7 @@ export function FleetDashboard() {
 
   return (
     <div className={styles.stack}>
+      {steps.some((st) => !st.done) && <FleetStart steps={steps} canHide />}
       {/* The figures in the shared boxes of every dashboard (docs/MODEL_DE_FOLOSIRE.md). */}
       <StatGrid label={t('fleet.kpi.label')}>
         {kpi({ label: allowed('vehicles.viewAll') ? t('fleet.kpi.vehicles') : t('fleet.kpi.myVehicles'), value: String(k.vehicles), link: { section: 'vehicule' } })}
