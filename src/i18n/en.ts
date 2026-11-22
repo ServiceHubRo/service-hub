@@ -3849,7 +3849,6 @@ export const en: Record<MessageKey, string> = {
   'fleetBook.vehicle': 'Vehicle: {vehicle}',
   'fleetBook.pickVehicle': 'The vehicle is chosen on the car step.',
   'fleetBook.back': 'Back to the fleet',
-  'fleetBook.quit': 'Cancel',
   'booking.sent.toFleet': 'Company bookings',
   'fleet.start.vehicle': 'Add the first vehicle',
   'fleet.start.members': 'Invite a driver or a colleague',

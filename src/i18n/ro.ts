@@ -3848,7 +3848,6 @@ export const ro = {
   'fleetBook.vehicle': 'Vehicul: {vehicle}',
   'fleetBook.pickVehicle': 'Vehiculul se alege la pasul Mașina.',
   'fleetBook.back': 'Înapoi la flotă',
-  'fleetBook.quit': 'Renunță',
   'booking.sent.toFleet': 'Programările firmei',
   'fleet.start.vehicle': 'Adaugă primul vehicul',
   'fleet.start.members': 'Invită un șofer sau un coleg',

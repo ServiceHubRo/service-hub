@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Banner } from '../../../components/Banner';
 import { buttonClass } from '../../../components/buttonClass';
 import { useI18n } from '../../../i18n/context';
-import { clearFleetBookingContext, fleetBookingOrigin, fleetBookingsPath } from './fleetBookingHint';
+import { clearFleetBookingContext, fleetBookingOrigin } from './fleetBookingHint';
 import { useFleetBookingContext } from './useFleetBookingContext';
 import styles from './booking.module.css';
 
@@ -26,11 +26,8 @@ export function FleetBookingBanner() {
           </p>
         </div>
         <div className={styles.fleetBannerActions}>
-          <Link to={fleetBookingsPath(context.companyId)} className={buttonClass('secondary', false)} onClick={clearFleetBookingContext}>
-            {t('fleetBook.back')}
-          </Link>
           <Link to={fleetBookingOrigin(context)} className={buttonClass('secondary', false)} onClick={clearFleetBookingContext}>
-            {t('fleetBook.quit')}
+            {t('fleetBook.back')}
           </Link>
         </div>
       </div>
