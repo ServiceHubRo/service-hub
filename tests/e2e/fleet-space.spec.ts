@@ -319,6 +319,11 @@ test('bookings: the driver books a company vehicle, the manager approves within 
   await expect(page.getByRole('link', { name: 'Vehicule', exact: true }).filter({ visible: true }).first()).toHaveAttribute('href', /\/c\/firme\//);
   await expectNoHorizontalScroll(page);
   await shot(page, 'fleet-book-search-banner', name());
+  // „Renunță” leaves the booking and goes back to where it started: the vehicle's page (Eduard, 22 Nov 2026).
+  await page.getByRole('link', { name: 'Renunță' }).click();
+  await expect(page).toHaveURL(new RegExp(`/c/firme/${company.id}\\?sectiune=vehicul&vehicul=${vehicle.id}`));
+  await page.getByRole('button', { name: 'Programează la service' }).click();
+  await expect(page.getByText(/^Programare pentru /)).toBeVisible();
   // „Înapoi la flotă” goes to the company's bookings and ends the fleet booking: the search is plain again.
   await page.getByRole('link', { name: 'Înapoi la flotă' }).click();
   await expect(page).toHaveURL(new RegExp(`/c/firme/${company.id}\\?sectiune=programari`));

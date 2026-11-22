@@ -1,10 +1,9 @@
 import { Building2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Banner } from '../../../components/Banner';
-import { Button } from '../../../components/Button';
 import { buttonClass } from '../../../components/buttonClass';
 import { useI18n } from '../../../i18n/context';
-import { clearFleetBookingContext, fleetBookingsPath } from './fleetBookingHint';
+import { clearFleetBookingContext, fleetBookingOrigin, fleetBookingsPath } from './fleetBookingHint';
 import { useFleetBookingContext } from './useFleetBookingContext';
 import styles from './booking.module.css';
 
@@ -30,9 +29,9 @@ export function FleetBookingBanner() {
           <Link to={fleetBookingsPath(context.companyId)} className={buttonClass('secondary', false)} onClick={clearFleetBookingContext}>
             {t('fleetBook.back')}
           </Link>
-          <Button variant="secondary" onClick={clearFleetBookingContext}>
+          <Link to={fleetBookingOrigin(context)} className={buttonClass('secondary', false)} onClick={clearFleetBookingContext}>
             {t('fleetBook.quit')}
-          </Button>
+          </Link>
         </div>
       </div>
     </Banner>

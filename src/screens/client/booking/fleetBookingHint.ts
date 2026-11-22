@@ -61,3 +61,7 @@ export const fleetBookingsPath = (companyId: string) => `/c/firme/${companyId}?s
 
 /** The screens of a booking started from a fleet: the search and the shop's pages (the company's frame stays around them). */
 export const isFleetBookingPath = (pathname: string) => pathname === '/c/cauta' || pathname.startsWith('/c/cauta/') || pathname.startsWith('/c/service/');
+
+/** Where „Renunță” leads: back to the place the booking started from — the vehicle's page, else the company's bookings. */
+export const fleetBookingOrigin = (c: Pick<FleetBookingContext, 'companyId' | 'vehicleId'>) =>
+  c.vehicleId ? `/c/firme/${c.companyId}?sectiune=vehicul&vehicul=${c.vehicleId}` : fleetBookingsPath(c.companyId);
