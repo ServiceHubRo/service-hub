@@ -122,7 +122,8 @@ test.describe('support requests (A3a)', () => {
     // The client: a new answer, signed by the team; never the note, never the agent's ID.
     await page.goto('/c/cont/ajutor/solicitari');
     const row = page.getByRole('list', { name: 'Solicitările mele' }).getByRole('button').filter({ hasText: title });
-    await expect(row).toContainText('Răspuns nou');
+    // Beside the list (from 1024 px) the only request opens at once and counts as read: the badge is a phone's.
+    if ((page.viewportSize()?.width ?? 0) < 1024) await expect(row).toContainText('Răspuns nou');
     await expect(row).toContainText('Așteaptă răspunsul tău');
     await shot(page, 'a3a-my-list', name());
     await row.click();
