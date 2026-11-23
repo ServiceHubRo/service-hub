@@ -34,6 +34,9 @@ for (const [role, email, prefix] of [
       'href',
       'https://anpc.ro/ce-este-sal/',
     );
+    // Only the picture leads to ANPC, not the empty row beside it (Eduard, 23 Nov 2026).
+    const sal = (await page.getByRole('link', { name: 'ANPC – Soluționarea alternativă a litigiilor' }).boundingBox())!;
+    expect(sal.width).toBeLessThanOrEqual(251);
     await page.getByRole('link', { name: /^Ajutor și contact/ }).click();
     await expect(page).toHaveURL(role === 'client' ? /\/c\/cont\/ajutor$/ : /\/s\/cont\/ajutor$/);
     await expect(page.getByRole('heading', { level: 1, name: 'Ajutor și contact' })).toBeVisible();
