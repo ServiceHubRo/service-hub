@@ -15,8 +15,13 @@ export function shopBookingsLink(options: { tab?: ShopTab; filter?: ShopFilter; 
 /** "Adaugă programare" (T29): a client who called or walked in. */
 export const ADD_BOOKING_PATH = `${SHOP_BOOKINGS_PATH}/nou`;
 
-/** "Importă clienți" (T31a): clients, cars and jobs from another program. */
-export const IMPORT_PATH = `${SHOP_BOOKINGS_PATH}/import`;
+/**
+ * "Importă clienți" (T31a): clients, cars and jobs from another program. A tile of Cont, so it lives under
+ * Cont (the navigation shows Cont and „Înapoi” leads to it, Eduard, 22 Nov 2026); it was under Programări.
+ */
+export const IMPORT_PATH = '/s/cont/import';
+/** The old address, kept so that a saved link still opens it. */
+export const LEGACY_IMPORT_PATH = `${SHOP_BOOKINGS_PATH}/import`;
 
 /** Cont of the shop and the Recenzii tile inside it (T11). */
 export const ACCOUNT_PATH = '/s/cont';

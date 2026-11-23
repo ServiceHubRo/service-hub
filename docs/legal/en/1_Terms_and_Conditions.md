@@ -239,7 +239,7 @@ We may update these Terms, for example when new features arrive or the law chang
 These Terms are governed by Romanian law. If you have a complaint, please write to us first at {{email}}; we answer within 30 days (15 working days for Shops). If you are a consumer, you can also contact:
 
 - **ANPC**, the Romanian National Authority for Consumer Protection, [anpc.ro](https://anpc.ro);
-- the **Alternative Dispute Resolution (SAL)** body within ANPC, [anpc.ro/ce-este-sal](https://anpc.ro/ce-este-sal/).
+- the **Alternative Dispute Resolution (SAL)** body within ANPC, [reclamatiisal.anpc.ro](https://reclamatiisal.anpc.ro/).
 
 Disputes that cannot be settled amicably go to the competent courts of Romania. If you are a consumer, you keep the protection given by the law of the country where you live.
 

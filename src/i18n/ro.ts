@@ -326,7 +326,7 @@ export const ro = {
   'tour.client.account.body': 'Istoricul mașinilor, favoritele și setările.',
   'tour.shop.guide.body': 'Patru pași și service-ul tău apare în căutări.',
   'tour.shop.dashboard.title': 'Panoul',
-  'tour.shop.dashboard.body': 'Cererile noi și ziua de azi, dintr-o privire.',
+  'tour.shop.dashboard.body': 'Cererile noi și rezumatul zilei, dintr-o privire.',
   'tour.shop.bookings.body': 'Confirmi cererile, faci constatarea și trimiți devizul.',
   'tour.shop.history.body': 'Lucrările terminate și fișa fiecărei mașini.',
   'tour.shop.messages.body': 'Vorbești cu clienții.',

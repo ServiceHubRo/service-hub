@@ -1,8 +1,11 @@
 import { useI18n } from '../i18n/context';
 import styles from './AnpcSal.module.css';
 
-/** ANPC's page on alternative dispute resolution, where the pictogram must lead. */
-export const ANPC_SAL_URL = 'https://anpc.ro/ce-este-sal/';
+/**
+ * ANPC's SAL platform, where the pictogram leads. The old page (anpc.ro/ce-este-sal/) no longer exists: ANPC's
+ * placard names the platform, reclamatiisal.anpc.ro (Eduard, 23 Nov 2026).
+ */
+export const ANPC_SAL_URL = 'https://reclamatiisal.anpc.ro/';
 
 /**
  * The official ANPC pictogram for alternative dispute resolution (SAL), which a site selling to

@@ -61,9 +61,8 @@
       (function () {
         var keep = location.pathname === '/' && !location.hash && !window.Capacitor;
         try {
-          var lang = localStorage.getItem('sh_lang');
-          if (lang !== 'ro' && lang !== 'en') lang = (navigator.language || '').toLowerCase().indexOf('ro') === 0 ? 'ro' : 'en';
-          if (lang !== 'ro') keep = false;
+          // Romanian unless English was chosen (src/i18n/translate.ts, detectLang).
+          if (localStorage.getItem('sh_lang') === 'en') keep = false;
           [localStorage, sessionStorage].forEach(function (store) {
             for (var i = 0; i < store.length; i++) if (/^sb-.+-auth-token/.test(store.key(i) || '')) keep = false;
           });
@@ -117,7 +116,7 @@
           done = true;
           try { window.Capacitor.Plugins.SplashScreen.hide(); } catch (e) {}
           var lang = 'ro';
-          try { lang = localStorage.getItem('sh_lang') || ((navigator.language || '').indexOf('ro') === 0 ? 'ro' : 'en'); } catch (e) {}
+          try { lang = localStorage.getItem('sh_lang') === 'en' ? 'en' : 'ro'; } catch (e) {}
           var m = /Chrome\/(\d+)/.exec(navigator.userAgent);
           var version = m ? ' (' + (native() ? 'WebView ' : 'Chrome ') + m[1] + ')' : '';
           var ro = lang !== 'en';

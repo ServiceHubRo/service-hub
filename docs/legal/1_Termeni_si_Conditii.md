@@ -239,7 +239,7 @@ Putem actualiza Termenii, de exemplu când apar funcții noi sau se schimbă leg
 Termenii sunt guvernați de legea română. Dacă ai o nemulțumire, scrie-ne întâi la {{email}}; răspundem în cel mult 30 de zile (15 zile lucrătoare pentru Service-uri). Dacă ești consumator, te poți adresa și:
 
 - **ANPC** (Autoritatea Națională pentru Protecția Consumatorilor), [anpc.ro](https://anpc.ro);
-- entității de **Soluționare Alternativă a Litigiilor (SAL)** din cadrul ANPC, [anpc.ro/ce-este-sal](https://anpc.ro/ce-este-sal/).
+- entității de **Soluționare Alternativă a Litigiilor (SAL)** din cadrul ANPC, [reclamatiisal.anpc.ro](https://reclamatiisal.anpc.ro/).
 
 Neînțelegerile care nu se rezolvă amiabil ajung la instanțele competente din România. Dacă ești consumator, păstrezi protecția pe care ți-o dă legea țării în care locuiești.
 

@@ -394,7 +394,7 @@ export function AddBookingScreen() {
     <div className={styles.page}>
       <PageHeader back={{ to: SHOP_BOOKINGS_PATH, label: t('nav.bookings') }} title={t('wi.title')} />
       {isOwner && (
-        <Link to={IMPORT_PATH} className={styles.importLink}>
+        <Link to={IMPORT_PATH} state={{ from: 'add' }} className={styles.importLink}>
           <FileUp size={16} aria-hidden="true" />
           {t('imp.link')}
         </Link>
