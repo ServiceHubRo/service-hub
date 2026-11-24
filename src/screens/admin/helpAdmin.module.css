@@ -35,3 +35,22 @@
     flex: 0 0 auto;
   }
 }
+
+/* The search takes the room; „Categorie nouă” sits at its end, under it (the whole width) on a phone. */
+.searchRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.searchRow > :first-child {
+  flex: 1 1 16rem;
+  min-width: 0;
+}
+
+@media (max-width: 599px) {
+  .searchRow > button {
+    flex: 1 1 100%;
+  }
+}

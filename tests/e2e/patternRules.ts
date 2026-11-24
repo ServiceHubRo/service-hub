@@ -275,6 +275,17 @@ export function measurePatterns(only?: readonly string[]): Patterns {
     }
   }
 
+  // P12 (header) — the page header has one action at the most, top right, next to the whole title
+  // (Eduard, 24 Nov 2026: Proceduri interne and Centrul de ajutor had two stacked buttons). A second
+  // action of the page goes beside the search or the list it belongs to.
+  if (want('P12')) {
+    for (const h of Array.from(main.querySelectorAll<HTMLElement>('[data-ui="page-header"]'))) {
+      if (quiet(h) || !shown(h)) continue;
+      const own = Array.from(h.querySelectorAll<HTMLElement>('button, a[href]')).filter((b) => shown(b) && !h.firstElementChild?.contains(b) && !b.closest('[role="menu"]'));
+      if (own.length > 1) add('P12 header', `${own.length} actions in the page header: ${own.map((b) => `„${text(b) || b.getAttribute('aria-label')}”`).join(' + ')}`);
+    }
+  }
+
   // P11 — a confirmation or a form opened from a button is an inline panel, not a dialog.
   if (want('P11')) {
     for (const d of Array.from(document.querySelectorAll('dialog[open], [role="dialog"], [role="alertdialog"]'))) {

@@ -111,34 +111,35 @@ export function ProceduresScreen({
         back={mode === 'admin' ? { to: ZONE_BACK.to, label: t(ZONE_BACK.label) } : undefined}
         title={t('proc.title')}
         subtitle={t('proc.sub')}
+        // One action at the top right, like every page (Eduard, 24 Nov 2026); „Responsabili” stands beside the search.
         actions={
-          <div className={styles.headerActions}>
-            <Link
-              to={newProcedurePath(mode)}
-              className={buttonClass('primary')}
-              aria-label={mode === 'admin' ? t('proc.add') : undefined}
-            >
-              <Plus size={18} aria-hidden="true" />
-              {mode === 'admin' ? t('action.add') : t('proc.propose')}
-            </Link>
-            <Link to={responsiblesPath(mode)} className={buttonClass('secondary')}>
-              <Users size={18} aria-hidden="true" />
-              {t('proc.responsibles')}
-            </Link>
-          </div>
+          <Link
+            to={newProcedurePath(mode)}
+            className={buttonClass('primary')}
+            aria-label={mode === 'admin' ? t('proc.add') : undefined}
+          >
+            <Plus size={18} aria-hidden="true" />
+            {mode === 'admin' ? t('action.add') : t('proc.propose')}
+          </Link>
         }
       />
 
       <div className={styles.toolbar}>
-        <SearchField
-          id="proc-q"
-          label={t('proc.search.label')}
-          placeholder={t('proc.search.placeholder')}
-          value={text}
-          onChange={setQuery}
-          onClear={() => setQuery('')}
-          clearLabel={t('proc.search.clear')}
-        />
+        <div className={styles.searchRow}>
+          <SearchField
+            id="proc-q"
+            label={t('proc.search.label')}
+            placeholder={t('proc.search.placeholder')}
+            value={text}
+            onChange={setQuery}
+            onClear={() => setQuery('')}
+            clearLabel={t('proc.search.clear')}
+          />
+          <Link to={responsiblesPath(mode)} className={buttonClass('secondary')}>
+            <Users size={18} aria-hidden="true" />
+            {t('proc.responsibles')}
+          </Link>
+        </div>
         <SelectField
           label={t('proc.filter.category')}
           value={filters.category}

@@ -39,10 +39,23 @@
   gap: var(--space-2);
 }
 
-.headerActions {
+.searchRow {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-2);
+  align-items: flex-end;
+  gap: var(--space-3);
+}
+
+/* The search takes the room; „Responsabili” sits at its end, under it (the whole width) on a phone. */
+.searchRow > :first-child {
+  flex: 1 1 16rem;
+  min-width: 0;
+}
+
+@media (max-width: 599px) {
+  .searchRow > a {
+    flex: 1 1 100%;
+  }
 }
 
 .block {
