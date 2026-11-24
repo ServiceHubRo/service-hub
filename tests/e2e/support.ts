@@ -537,20 +537,22 @@ export async function pickFilter(page: Page, name: string | RegExp) {
   await selectInPage(page, name);
 }
 
-/** Picks the option with this label in whichever visible dropdown of the page has it. */
+/** Picks the option with this label in whichever visible dropdown of the page has it (waits for the list to load). */
 export async function selectInPage(page: Page, name: string | RegExp) {
-  const selects = page.locator('main').getByRole('combobox');
-  for (let i = 0; i < (await selects.count()); i++) {
-    const select = selects.nth(i);
-    if (!(await select.isVisible())) continue;
-    const labels = await select.locator('option').allTextContents();
-    const label = labels.find((l) => (typeof name === 'string' ? l.trim() === name : name.test(l)));
-    if (label !== undefined) {
-      await select.selectOption({ label });
-      return;
+  await expect(async () => {
+    const selects = page.locator('main').getByRole('combobox');
+    for (let i = 0; i < (await selects.count()); i++) {
+      const select = selects.nth(i);
+      if (!(await select.isVisible())) continue;
+      const labels = await select.locator('option').allTextContents();
+      const label = labels.find((l) => (typeof name === 'string' ? l.trim() === name : name.test(l)));
+      if (label !== undefined) {
+        await select.selectOption({ label });
+        return;
+      }
     }
-  }
-  throw new Error(`No filter option ${String(name)}`);
+    throw new Error(`No filter option ${String(name)}`);
+  }).toPass({ timeout: 10_000 });
 }
 
 /** In the open "Filtre" panel (Caută): picks the option with this label in whichever dropdown has it. */

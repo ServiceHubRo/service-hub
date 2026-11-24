@@ -172,7 +172,10 @@ export function measureFields(): FieldIssue[] {
   }
 
   // F2 — rows stacked in one group: the same left and right edges.
-  const span = (row: Unit[]) => ({ left: Math.min(...row.map((u) => u.r.left)), right: Math.max(...row.map((u) => u.r.right)) });
+  // The dropdowns of a list's filters share their row with the list's action (Descarcă Excel) at the
+  // end: the row reaches the edge of the filter bar, as wide as the search above it.
+  const barRight = (u: Unit) => u.unit.closest('[data-ui="choice-filters"]')?.getBoundingClientRect().right ?? u.r.right;
+  const span = (row: Unit[]) => ({ left: Math.min(...row.map((u) => u.r.left)), right: Math.max(...row.map((u) => barRight(u))) });
   for (let i = 0; i + 1 < rows.length; i++) {
     const a = rows[i]!;
     const b = rows[i + 1]!;
