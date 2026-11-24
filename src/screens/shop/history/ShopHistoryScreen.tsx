@@ -276,8 +276,6 @@ export function ShopHistoryScreen() {
               onChange: (v) => setParam({ perioada: v === 'all' ? null : v }),
             },
           ]}
-          onClearAll={() => setParam({ filtru: null, perioada: null })}
-          doneLabel={t('filters.show', { count: plural(lang, 'unit.repairs', shown.length) })}
           end={
             shown.length > 0 ? (
               <div className={styles.tools}>

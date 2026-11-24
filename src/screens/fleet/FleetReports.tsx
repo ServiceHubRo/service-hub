@@ -225,8 +225,6 @@ function Reports({ initialReport }: { initialReport?: string }) {
               ? [{ key: 'shop', title: t('fleet.bk.shop'), options: [{ value: '', label: t('fleet.costs.anyShop') }, ...shops.map((s) => ({ value: s.key, label: s.name }))], value: filters.shop_ids?.[0] ?? '', defaultValue: '', onChange: (v: string) => setFilter('shop_ids', v) }]
               : []),
           ]}
-          onClearAll={() => setFilters({})}
-          doneLabel={t('fleet.filters.done')}
           end={more ?? undefined}
         />
       )}

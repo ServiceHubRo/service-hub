@@ -146,14 +146,6 @@ export function FleetCosts({ initialPeriod }: { initialPeriod?: string }) {
             onChange: (v) => setSource(v as CostSource | ''),
           },
         ]}
-        onClearAll={() => {
-          setPeriod('year');
-          setVehicleId('');
-          setCategory('');
-          setShopId('');
-          setSource('');
-        }}
-        doneLabel={t('fleet.filters.show', { n: shown.length })}
         end={
           <div className={styles.toolbarEnd}>
             {shown.length > 0 && hasFeature(plan, 'export_csv') && (

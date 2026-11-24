@@ -94,11 +94,6 @@ export function FleetsScreen() {
               onChange: setStateFilter,
             },
           ]}
-          onClearAll={() => {
-            setPlanFilter('');
-            setStateFilter('');
-          }}
-          doneLabel={t('fleet.filters.show', { n: shown.length })}
         />
       )}
     </>

@@ -45,7 +45,8 @@ async function setup() {
 }
 
 async function fillExpense(page: Page, amount: string, supplier: string) {
-  await page.getByRole('combobox', { name: 'Categorie' }).selectOption('parts');
+  // The list's own „Categorie” filter is in the page too: the form's is the one inside the form.
+  await page.locator('form').getByRole('combobox', { name: 'Categorie' }).selectOption('parts');
   await page.getByLabel('Suma').fill(amount);
   await page.getByLabel('Service sau furnizor').fill(supplier);
 }

@@ -178,7 +178,6 @@ export function AnafScreen() {
                 onChange: (v) => setParam({ categorie: v === 'all' ? null : v }),
               },
             ]}
-            onClearAll={() => setParam({ categorie: null })}
             end={<ExportButton<CompanyCheckRow> kind="company_checks" narrow={(rows) => filterCompanyChecks(rows, query, filter)} ids={shown.map((r) => r.shop_id)} />}
           />
         </div>

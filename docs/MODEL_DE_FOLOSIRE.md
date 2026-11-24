@@ -20,7 +20,7 @@ regula e respectată, iar raportul e în `docs/AUDIT_CONSISTENTA.md`. Detaliile 
 |---|---|---|
 | P3 | Ce arată lista se alege din **file** (Active · Încheiate) sau dintr-o **listă de ales** („Afișează”), niciodată din bule. Bulele rămân doar în panoul „Filtre”, ca opțiuni. | `Tabs`, `SelectField` |
 | — | Căutarea e o singură casetă, cu lupă și „×”. | `SearchField` |
-| — | Filtrele suplimentare sunt în butonul „Filtre” (cu numărul celor active) și panoul lui. | `FiltersButton`, `FilterSheet` |
+| — | Caută are filtrele în butonul „Filtre” (cu numărul celor active) și panoul lui; fundalul rămâne vizibil, doar întunecat, fără blur. Listele (Istoric, listele din admin, flotă) nu au panou: fiecare filtru e un dropdown în pagină, cu „Toate” (fără filtru) ca primă opțiune, apoi filtrele; se aplică imediat (Eduard, 24 nov 2026). | `FiltersButton`, `FilterSheet`, `ChoiceFilters` |
 | P8 | Elementele unei liste sunt rânduri de aceeași înălțime (iconiță, titlu, un rând de detalii, stare, săgeată) sau carduri egale într-o grilă, nu carduri puse unul sub altul. | `ListRow`, `CardGrid` |
 | P13 | Lângă o listă (de la 1024 px) ecranul are înălțimea ferestrei: antetul (titlul, căutarea, filtrele) și detaliul rămân pe loc, doar lista derulează în coloana ei. Sub 1024 px pagina derulează ca de obicei. | `ListDetailLayout` |
 | P14 | Filtrele și acțiunea listei („Descarcă Excel”) stau pe același rând: filtrele în stânga, acțiunea în dreapta; nu unul sub altul. | `ChoiceFilters end` |
