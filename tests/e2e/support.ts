@@ -517,7 +517,7 @@ export function xlsxText(file: Uint8Array): string {
     .join('\r\n');
 }
 
-/** Caută: opens the "Filtre" panel (every filter lives there). */
+/** Caută: opens the "Filtre" panel (every filter of Caută lives there). */
 export async function openFilters(page: Page) {
   await page.getByRole('button', { name: /^(Filtre|Filters)/ }).click();
   await expect(page.getByRole('dialog', { name: /^(Filtre|Filters)$/ })).toBeVisible();
@@ -530,16 +530,30 @@ export async function closeFilters(page: Page) {
 }
 
 /**
- * Any list with a "Filtre" panel (Istoric, the admin lists, Caută): opens it, picks the choice in
- * whichever dropdown offers it, closes it.
+ * Any list with filter dropdowns in the page (Istoric, the admin lists, the fleet lists): picks the
+ * choice in whichever dropdown offers it.
  */
 export async function pickFilter(page: Page, name: string | RegExp) {
-  await openFilters(page);
-  await selectInPanel(page, name);
-  await closeFilters(page);
+  await selectInPage(page, name);
 }
 
-/** In the open "Filtre" panel: picks the option with this label in whichever dropdown has it. */
+/** Picks the option with this label in whichever visible dropdown of the page has it. */
+export async function selectInPage(page: Page, name: string | RegExp) {
+  const selects = page.locator('main').getByRole('combobox');
+  for (let i = 0; i < (await selects.count()); i++) {
+    const select = selects.nth(i);
+    if (!(await select.isVisible())) continue;
+    const labels = await select.locator('option').allTextContents();
+    const label = labels.find((l) => (typeof name === 'string' ? l.trim() === name : name.test(l)));
+    if (label !== undefined) {
+      await select.selectOption({ label });
+      return;
+    }
+  }
+  throw new Error(`No filter option ${String(name)}`);
+}
+
+/** In the open "Filtre" panel (Caută): picks the option with this label in whichever dropdown has it. */
 export async function selectInPanel(page: Page, name: string | RegExp) {
   const selects = page.getByRole('dialog').getByRole('combobox');
   for (let i = 0; i < (await selects.count()); i++) {

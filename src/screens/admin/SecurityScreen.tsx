@@ -83,7 +83,6 @@ export function SecurityScreen() {
             },
           },
         ]}
-        onClearAll={() => setSeverity('')}
       />
       {state.status === 'loading' && <SkeletonList />}
       {state.status === 'error' && <LoadError message={t('admin.loadError')} onRetry={reload} />}

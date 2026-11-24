@@ -81,7 +81,6 @@ export function ClientsScreen() {
                   onChange: (v) => setParam({ filtru: v === 'all' ? null : v }),
                 },
               ]}
-              onClearAll={() => setParam({ filtru: null })}
               end={
                 <div className={styles.toolbar}>
                   <ExportButton<AdminClientRow>

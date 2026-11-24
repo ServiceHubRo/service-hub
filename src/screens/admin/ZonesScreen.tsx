@@ -108,7 +108,6 @@ export function ZonesScreen() {
                   onChange: (v) => setParam({ stare: v === 'all' ? null : v }),
                 },
               ]}
-              onClearAll={() => setParam({ stare: null })}
             />
           </div>
         </>

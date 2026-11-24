@@ -84,7 +84,7 @@ test('Start, Business and Pro: the same identity, different tools', async ({ pag
   await expect(page.getByLabel('Perioada').locator('option', { hasText: 'Interval ales' })).toHaveCount(1);
   await page.getByLabel('Perioada').selectOption('custom');
   await expect(page.getByLabel('De la')).toBeVisible();
-  await expect(page.getByRole('button', { name: /Filtre/ }).filter({ visible: true }).first()).toBeVisible();
+  await expect(page.getByRole('combobox', { name: /Categorie/ }).filter({ visible: true }).first()).toBeVisible();
   await page.getByRole('button', { name: 'Mai multe' }).filter({ visible: true }).first().click();
   await expect(page.getByRole('menuitem', { name: 'Descarcă Excel' })).toBeVisible();
   await page.keyboard.press('Escape');

@@ -101,16 +101,9 @@
   flex-direction: column;
 }
 
+/* The page stays in sight behind the sheet, only dimmed (Eduard, 24 Nov 2026: no blur). */
 .sheet::backdrop {
-  background: rgba(10, 11, 13, 0.82);
-}
-
-@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .sheet::backdrop {
-    background: rgba(10, 11, 13, 0.5);
-    -webkit-backdrop-filter: blur(18px) saturate(140%);
-    backdrop-filter: blur(18px) saturate(140%);
-  }
+  background: rgba(10, 11, 13, 0.6);
 }
 
 @media (min-width: 768px) {
@@ -189,5 +182,41 @@
 @media (max-width: 599px) {
   .filtersButton {
     background: var(--surface);
+  }
+}
+
+/* Filters of a list (ChoiceFilters): dropdowns in the page, side by side where there is room, one under
+   another on a phone; what belongs to the list (Descarcă Excel) at the end of the row. */
+.choices {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--space-3);
+}
+
+.choice {
+  flex: 1 1 14rem;
+  min-width: 0;
+}
+
+.choicesEnd {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.choicesEnd:has([data-ui="inline-panel"]) {
+  flex: 1 1 100%;
+  margin-left: 0;
+}
+
+@media (max-width: 599px) {
+  .choicesEnd {
+    flex: 1 1 100%;
+    margin-left: 0;
+  }
+  .choicesEnd > * {
+    flex: 1 1 0;
   }
 }

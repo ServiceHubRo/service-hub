@@ -198,7 +198,6 @@ export function SubscriptionsScreen() {
                 onChange: (v) => setParam({ stare: v === 'all' ? null : v }),
               },
             ]}
-            onClearAll={() => setParam({ stare: null })}
             end={
               <div className={styles.toolbar}>
                 {/* No count here (Eduard, 14 Nov 2026): it already stands on „Afișează: Abonamente (n)”. */}

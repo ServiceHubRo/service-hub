@@ -1,5 +1,5 @@
 import { SlidersHorizontal, X } from 'lucide-react';
-import { useEffect, useId, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useId, useRef, type ReactNode } from 'react';
 import { useI18n } from '../i18n/context';
 import { Button } from './Button';
 import { SelectField } from './SelectField';
@@ -10,7 +10,7 @@ import styles from './Filters.module.css';
  * and switches, no pills). "Filtre" opens a panel — a sheet from the bottom on phones, centered on
  * wider screens — and the filters in use show under it as one quiet line, with "Șterge filtrele".
  * Caută builds its own panel from these pieces; the lists with one-of-several filters use
- * <ChoiceFilters>.
+ * <ChoiceFilters>: dropdowns in the page, no panel.
  */
 
 /** The "Filtre" button, with how many filters are on. */
@@ -139,52 +139,24 @@ export interface ChoiceGroup {
 
 /**
  * Lists whose filters are each one choice of several (Istoric: status and period; the admin lists:
- * the state). Choices apply at once; the list stays in sight behind the panel.
+ * the state). Each filter is a dropdown in the page, beside the search or under it; its first
+ * choice is "no filter" ("Toate") and the others are the filters (Eduard, 24 Nov 2026: no panel, no
+ * "Aplică"). Choices apply at once.
  */
-export function ChoiceFilters({
-  groups,
-  onClearAll,
-  doneLabel,
-  end,
-}: {
-  groups: readonly ChoiceGroup[];
-  /** Resets every group at once (a screen keeping filters in the address changes it once). */
-  onClearAll: () => void;
-  doneLabel?: string;
-  /** Next to the button (e.g. Descarcă, Tipărește). */
-  end?: ReactNode;
-}) {
-  const [open, setOpen] = useState(false);
-  const on = groups.filter((g) => g.value !== g.defaultValue);
-  const clearAll = onClearAll;
+export function ChoiceFilters({ groups, end }: { groups: readonly ChoiceGroup[]; /** Next to the dropdowns (e.g. Descarcă, Tipărește). */ end?: ReactNode }) {
   return (
-    <>
-      <div className={styles.bar}>
-        <FiltersButton count={on.length} onClick={() => setOpen(true)} />
-        {/* Filters on the left, what belongs to the list (Descarcă Excel) on the right, in one row. */}
-        {end && <div className={styles.end}>{end}</div>}
-      </div>
-      <ActiveFilters
-        items={on.map((g) => ({ key: g.key, label: g.options.find((o) => o.value === g.value)?.label ?? g.value }))}
-        onClearAll={clearAll}
-      />
-      <FilterSheet
-        open={open}
-        onClose={() => setOpen(false)}
-        onClear={clearAll}
-        clearDisabled={on.length === 0}
-        doneLabel={doneLabel}
-      >
-        {groups.map((g) => (
-          <SelectField
-            key={g.key}
-            label={g.title}
-            value={g.value}
-            options={[...g.options]}
-            onChange={(e) => g.onChange(e.target.value)}
-          />
-        ))}
-      </FilterSheet>
-    </>
+    <div data-ui="choice-filters" className={styles.choices}>
+      {groups.map((g) => (
+        <SelectField
+          key={g.key}
+          className={styles.choice}
+          label={g.title}
+          value={g.value}
+          options={[...g.options]}
+          onChange={(e) => g.onChange(e.target.value)}
+        />
+      ))}
+      {end && <div className={styles.choicesEnd}>{end}</div>}
+    </div>
   );
 }

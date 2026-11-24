@@ -81,7 +81,6 @@ export function ShopsScreen() {
                   onChange: (v) => setParam({ stare: v === 'all' ? null : v }),
                 },
               ]}
-              onClearAll={() => setParam({ stare: null })}
               end={
                 <div className={styles.toolbar}>
                   <ExportButton<AdminShopRow>

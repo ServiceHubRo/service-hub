@@ -89,8 +89,6 @@ export function FleetBookings({ initialGroup }: { initialGroup?: string }) {
               ]
             : []),
         ]}
-        onClearAll={() => setFilter(NO_JOB_FILTER)}
-        doneLabel={t('fleet.filters.show', { n: shown.length })}
         end={bookButton ?? undefined}
       />
 

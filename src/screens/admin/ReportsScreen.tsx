@@ -177,7 +177,6 @@ export function ReportsScreen() {
                 onChange: (v) => setParam({ stare: v === 'all' ? null : v }),
               },
             ]}
-            onClearAll={() => setParam({ stare: null })}
           />
         </div>
       )}

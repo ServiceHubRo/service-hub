@@ -152,11 +152,6 @@ export function FleetVehicles({ initialStatus }: { initialStatus?: string }) {
             onChange: (v) => setSort(v as VehicleSort),
           },
         ]}
-        onClearAll={() => {
-          setFilter((f) => ({ ...NO_FILTER, query: f.query }));
-          setSort('plate');
-        }}
-        doneLabel={t('fleet.filters.show', { n: shown.length })}
         end={
           shown.length > 0 && hasFeature(plan, 'export_csv') ? (
             <ActionButton variant="ghost" block={false} className={styles.tool} onAction={() => exportCsv()} errorMessage={(e) => rpcErrorMessage(lang, e)} canRetry={canRetryRpc}>
