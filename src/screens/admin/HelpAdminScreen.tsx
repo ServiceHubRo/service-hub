@@ -270,19 +270,11 @@ export function HelpAdminScreen() {
         title={t('admin.help.title')}
         subtitle={t('admin.help.sub')}
         actions={
-          // The adds, top right (docs/MODEL_DE_FOLOSIRE.md P12).
-          // Side by side, like every pair of header actions (they wrap on a phone).
+          // The page's add, top right (docs/MODEL_DE_FOLOSIRE.md P12): one action; the category is added beside the search.
           data ? (
-            <>
-              <Link to={adminHelpArticlePath('nou')} className={buttonClass('primary')}>
-                <Plus size={18} aria-hidden="true" /> {t('admin.help.newArticle')}
-              </Link>
-              {panel?.kind !== 'new-category' && (
-                <Button onClick={() => setPanel({ kind: 'new-category' })}>
-                  <Plus size={18} aria-hidden="true" /> {t('admin.help.newCategory')}
-                </Button>
-              )}
-            </>
+            <Link to={adminHelpArticlePath('nou')} className={buttonClass('primary')}>
+              <Plus size={18} aria-hidden="true" /> {t('admin.help.newArticle')}
+            </Link>
           ) : undefined
         }
       />
@@ -291,18 +283,25 @@ export function HelpAdminScreen() {
   const above = data && (
     <>
           <div className={styles.controls}>
-            <SearchField
-              id="admin-help-q"
-              label={t('admin.help.search')}
-              placeholder={t('admin.help.search')}
-              value={text}
-              onChange={setText}
-              onClear={() => {
-                setText('');
-                setParam({ q: null });
-              }}
-              clearLabel={t('admin.search.clear')}
-            />
+            <div className={rowStyles.searchRow}>
+              <SearchField
+                id="admin-help-q"
+                label={t('admin.help.search')}
+                placeholder={t('admin.help.search')}
+                value={text}
+                onChange={setText}
+                onClear={() => {
+                  setText('');
+                  setParam({ q: null });
+                }}
+                clearLabel={t('admin.search.clear')}
+              />
+              {panel?.kind !== 'new-category' && (
+                <Button onClick={() => setPanel({ kind: 'new-category' })}>
+                  <Plus size={18} aria-hidden="true" /> {t('admin.help.newCategory')}
+                </Button>
+              )}
+            </div>
             {/* The filter under the search, as wide as it (docs/MODEL_DE_FOLOSIRE.md F2). */}
             <SelectField
               label={t('admin.help.statusFilter')}
