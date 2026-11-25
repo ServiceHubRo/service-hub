@@ -3,7 +3,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } fro
 import { isAwaitingSignUp, signOut as authSignOut } from '../data/auth';
 import { fetchProfile, touchLastActive, updateLang, type Profile } from '../data/profile';
 import { forgetPushDevice } from '../data/push';
-import { onSessionLost } from '../data/sessionEvents';
+import { onSessionLost, reportSessionRestored } from '../data/sessionEvents';
 import { supabase } from '../data/supabase';
 import { useI18n } from '../i18n/context';
 import type { Lang } from '../i18n/translate';
@@ -141,7 +141,12 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     const { data } = client.auth.onAuthStateChange((event, session) => {
       // For error reports: what the session did just before (event names only).
       addBreadcrumb('auth', session ? event : `${event} (no session)`);
-      window.setTimeout(() => handleSession(event, session), 0);
+      // Signed in again after the session ended, or the second step passed: the session is good again.
+      const restored = !!session && (event === 'MFA_CHALLENGE_VERIFIED' || (event === 'SIGNED_IN' && stateRef.current.status === 'expired'));
+      window.setTimeout(() => {
+        handleSession(event, session);
+        if (restored) reportSessionRestored();
+      }, 0);
     });
     const stopLost = onSessionLost(() => {
       // The server refused our token: check whether the session is really gone.

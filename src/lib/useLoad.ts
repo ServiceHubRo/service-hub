@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { onSessionRestored } from '../data/sessionEvents';
 
 export type LoadState<T> = { status: 'loading' } | { status: 'error'; error: unknown } | { status: 'ready'; data: T };
 
@@ -25,6 +26,21 @@ export function useLoad<T>(load: () => Promise<T>) {
       cancelled = true;
     };
   }, [load, attempt]);
+
+  // A screen that failed while the session was gone loads again once it is back (no tap on „Încearcă din nou”).
+  const failed = useRef(false);
+  useEffect(() => {
+    failed.current = state.status === 'error';
+  }, [state.status]);
+  useEffect(
+    () =>
+      onSessionRestored(() => {
+        if (!failed.current) return;
+        setState({ status: 'loading' });
+        setAttempt((a) => a + 1);
+      }),
+    [],
+  );
 
   const reload = useCallback(() => {
     setState({ status: 'loading' });
