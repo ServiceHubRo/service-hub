@@ -152,7 +152,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
       // The server refused our token: check whether the session is really gone.
       void client.auth.getUser().then(({ data: fresh, error }) => {
         addBreadcrumb('auth', `session check: ${error ? `${error.name} ${error.status ?? ''}` : fresh.user ? 'valid' : 'no user'}`);
-        // The team's sessions also end after 8 hours in the database (staff_session_hours) while Supabase
+        // The team's sessions also end after 1 hour in the database (staff_session_hours) while Supabase
         // Auth still calls them valid: the screens would only say „nu s-au încărcat”. Sign in again.
         const staff = stateRef.current.profile?.role === 'admin' || stateRef.current.profile?.role === 'support';
         if (error || !fresh.user || staff) void client.auth.signOut({ scope: 'local' });

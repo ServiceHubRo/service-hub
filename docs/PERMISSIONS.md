@@ -33,7 +33,7 @@ to end.
 | Works | Solicitări, Căutare, its account card, its own Cont | `require_staff()` in every `support_*` function | every search, opened card and change |
 | Suspended | `admin_set_account_suspended`: its sessions are deleted at once | trigger `profiles_end_staff_sessions`; `require_caller()` → `account_suspended` | `suspend_account` |
 | Role withdrawn | `admin_revoke_support(user, reason, request)`: back to a client account (its `E-` ID stays), sessions deleted at once | `require_admin()`, reason required; trigger `profiles_end_staff_sessions` | `revoke_support`, reason |
-| An old token | Refused by every `support_*` function: the role is read from the database at every call, and an agent's session must still exist and be younger than 8 hours (A6) | `require_staff()` → `not_allowed`, `caller_session_alive()` → `not_signed_in` | — |
+| An old token | Refused by every `support_*` function: the role is read from the database at every call, and an agent's session must still exist and be younger than 1 hour (A6; 8 hours until 25 Nov 2026) | `require_staff()` → `not_allowed`, `caller_session_alive()` → `not_signed_in` | — |
 | Appointed again | Possible while the account is still clean; same `E-` ID | as "Appointed" | `grant_support` |
 | Deleted | Only after the role is withdrawn (`prepare_account_deletion` refuses an agent, like an admin) | `prepare_account_deletion` | `delete_account` |
 
@@ -139,10 +139,10 @@ key) plus `actor_role` and `actor_display_id`, filled by a trigger at insert, so
 - **Roles are read from the database at every call**, never from the browser or the token:
   `require_caller()` (signed in, not suspended), `require_admin()` (role `admin`, not deleted, aal2,
   and since A6 the session id of the token must still exist in `auth.sessions`, not past its end and
-  younger than 8 hours), `require_staff()` (role `support` or `admin`, not deleted, aal2, the same
+  younger than 1 hour), `require_staff()` (role `support` or `admin`, not deleted, aal2, the same
   session check). `is_admin()` (the access rules) and `support_file_caller()` (the support files'
   Edge Function) apply the same session check since A6: an admin who signed out, whose sessions
-  another admin ended, or who signed in more than 8 hours ago, is refused at once (`not_signed_in`).
+  another admin ended, or who signed in more than 1 hour ago, is refused at once (`not_signed_in`).
 - **A suspended account cannot write directly** (A6): every write rule on its own rows asks
   `caller_can_write()` (signed in, not suspended, not deleted), every write rule on a shop's rows and
   files `shop_writable(shop)` (also the shop not suspended and its owner not suspended); the trigger
