@@ -67,15 +67,15 @@ reset role;
 update auth.sessions set not_after = now() + interval '1 hour' where id = current_setting('test.admin_sid')::uuid;
 set local role authenticated;
 select test.ok(jsonb_array_length(public.admin_list_clients()) >= 2, 'the same session within its time works');
--- A6 L4: a team member's sign-in lasts 8 hours, whatever Supabase's settings (they apply to everyone).
+-- A6 L4: a team member's sign-in lasts 1 hour (8 until 25 Nov 2026), whatever Supabase's settings (they apply to everyone).
 reset role;
-update auth.sessions set created_at = now() - interval '8 hours 1 minute' where id = current_setting('test.admin_sid')::uuid;
+update auth.sessions set created_at = now() - interval '1 hour 1 minute' where id = current_setting('test.admin_sid')::uuid;
 set local role authenticated;
-select test.fails($$select public.admin_list_clients()$$, 'not_signed_in', 'an admin signed in more than 8 hours ago signs in again');
+select test.fails($$select public.admin_list_clients()$$, 'not_signed_in', 'an admin signed in more than 1 hour ago signs in again');
 reset role;
-update auth.sessions set created_at = now() - interval '7 hours 59 minutes' where id = current_setting('test.admin_sid')::uuid;
+update auth.sessions set created_at = now() - interval '59 minutes' where id = current_setting('test.admin_sid')::uuid;
 set local role authenticated;
-select test.ok(jsonb_array_length(public.admin_list_clients()) >= 2, 'within 8 hours it works');
+select test.ok(jsonb_array_length(public.admin_list_clients()) >= 2, 'within the hour it works');
 
 -- The second step stays required; a session of another person does not count.
 select set_config('request.jwt.claims', jsonb_build_object('sub', test.id('admin'), 'role', 'authenticated', 'aal', 'aal1',

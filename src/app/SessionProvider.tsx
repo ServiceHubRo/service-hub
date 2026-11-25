@@ -3,7 +3,7 @@ import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } fro
 import { isAwaitingSignUp, signOut as authSignOut } from '../data/auth';
 import { fetchProfile, touchLastActive, updateLang, type Profile } from '../data/profile';
 import { forgetPushDevice } from '../data/push';
-import { onSessionLost } from '../data/sessionEvents';
+import { onSessionLost, reportSessionRestored } from '../data/sessionEvents';
 import { supabase } from '../data/supabase';
 import { useI18n } from '../i18n/context';
 import type { Lang } from '../i18n/translate';
@@ -141,13 +141,18 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     const { data } = client.auth.onAuthStateChange((event, session) => {
       // For error reports: what the session did just before (event names only).
       addBreadcrumb('auth', session ? event : `${event} (no session)`);
-      window.setTimeout(() => handleSession(event, session), 0);
+      // Signed in again after the session ended, or the second step passed: the session is good again.
+      const restored = !!session && (event === 'MFA_CHALLENGE_VERIFIED' || (event === 'SIGNED_IN' && stateRef.current.status === 'expired'));
+      window.setTimeout(() => {
+        handleSession(event, session);
+        if (restored) reportSessionRestored();
+      }, 0);
     });
     const stopLost = onSessionLost(() => {
       // The server refused our token: check whether the session is really gone.
       void client.auth.getUser().then(({ data: fresh, error }) => {
         addBreadcrumb('auth', `session check: ${error ? `${error.name} ${error.status ?? ''}` : fresh.user ? 'valid' : 'no user'}`);
-        // The team's sessions also end after 8 hours in the database (staff_session_hours) while Supabase
+        // The team's sessions also end after 1 hour in the database (staff_session_hours) while Supabase
         // Auth still calls them valid: the screens would only say „nu s-au încărcat”. Sign in again.
         const staff = stateRef.current.profile?.role === 'admin' || stateRef.current.profile?.role === 'support';
         if (error || !fresh.user || staff) void client.auth.signOut({ scope: 'local' });
