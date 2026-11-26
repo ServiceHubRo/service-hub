@@ -1,6 +1,6 @@
 -- One active booking per car at a shop (30 Oct 2026, Eduard: "Una la același service"): a second
 -- booking for the same car at the same shop is refused while one is active; at another shop the
--- client cannot take the same day. A client is checked against their own bookings only; a shop
+-- client cannot take the same day and time (until 26 Nov 2026: the whole day). A client is checked against their own bookings only; a shop
 -- adding a booking is checked at its own shop only. Rows written by the server are not checked.
 begin;
 select test.make_world();
@@ -55,12 +55,13 @@ select test.ok(pg_temp.book('shop1', 'test.d2', '10:00', 'ulei', 'B 999 XYZ') is
 select test.logout();
 
 -- ------------------------------------------------------------------ another shop
-select test.fails($$select pg_temp.book('shop2', 'test.d1', '15:00')$$, 'car_booked_that_day',
-  'the same car at another shop on the same day: refused');
+-- SH_to_fix (26 Nov 2026): the mechanic in the morning, the tyre shop in the afternoon.
+select test.fails($$select pg_temp.book('shop2', 'test.d1', '10:00')$$, 'car_booked_that_time',
+  'the same car at another shop on the same day and at the same time: refused');
 select test.logout();
-select set_config('test.b2', pg_temp.book('shop2', 'test.d2', '15:00')::text, true);
+select set_config('test.b2', pg_temp.book('shop2', 'test.d1', '15:00')::text, true);
 select test.logout();
-select test.ok(current_setting('test.b2') <> '', 'the same car at another shop on another day: made');
+select test.ok(current_setting('test.b2') <> '', 'the same car at another shop on the same day, at another time: made');
 
 -- ------------------------------------------------------------------ another person's account
 -- Bogdan types Ana's plate: he is checked against his own bookings only, never told about hers.

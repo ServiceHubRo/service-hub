@@ -1,8 +1,9 @@
-import { ClipboardList, Download, History as HistoryIcon, MessageSquare, Phone, Printer, SearchX } from 'lucide-react';
+import { ClipboardList, Download, FileText, History as HistoryIcon, MessageSquare, Phone, SearchX } from 'lucide-react';
 import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useLiveSearchParams } from '../../../app/useLiveSearchParams';
 import { WarrantyNote } from '../../../components/WarrantyNote';
+import { ActionButton } from '../../../components/ActionButton';
 import { Button } from '../../../components/Button';
 import { DetailPane, ListDetailLayout } from '../../../components/ListDetailLayout';
 import { ListRow, ListRows } from '../../../components/ListRow';
@@ -14,7 +15,9 @@ import { ServiceIcon } from '../../../components/ServiceIcon';
 import { PageHeader } from '../../../components/PageHeader';
 import { SkeletonList } from '../../../components/Skeleton';
 import { BookingStatusPill } from '../../../components/StatusPill';
+import { downloadHistoryDocument } from '../../../data/jobDocs';
 import { subscribeRows } from '../../../data/realtime';
+import { canRetryRpc, rpcErrorMessage } from '../../../data/rpc';
 import { fetchImportedPage, fetchShopHistory, mergeHistory, type ShopHistoryItem } from '../../../data/shopHistory';
 import { useI18n, type I18nValue } from '../../../i18n/context';
 import { formatDayMonth, formatKm, formatMoney, ymdInBucharest } from '../../../i18n/format';
@@ -222,6 +225,15 @@ export function ShopHistoryScreen() {
   };
 
   const filtered = text.trim() !== '' || filter !== 'all' || period !== 'all';
+  // How the PDF names what the list was narrowed to (the screen's own words).
+  const filtersLabel =
+    [
+      filter !== 'all' ? `${t('hist.filter.label')}: ${t(`hist.filter.${filter}`)}` : '',
+      period !== 'all' ? `${t('hist.period.label')}: ${t(`hist.period.${period}`)}` : '',
+      text.trim() ? `${t('hist.search.label')}: „${text.trim()}”` : '',
+    ]
+      .filter(Boolean)
+      .join(' · ') || null;
 
   const header = (
     <>
@@ -285,10 +297,25 @@ export function ShopHistoryScreen() {
                     {t('hist.download')}
                   </Button>
                 )}
-                <Button variant="ghost" className={styles.tool} onClick={() => window.print()}>
-                  <Printer size={18} aria-hidden="true" />
-                  {t('hist.print')}
-                </Button>
+                {/* SH_to_fix (26 Nov 2026): the list as a PDF in the quote's format, to save or print. */}
+                <ActionButton
+                  variant="ghost"
+                  block={false}
+                  className={styles.tool}
+                  onAction={async () => {
+                    const blob = await downloadHistoryDocument(
+                      shown.map((b) => b.id),
+                      filtersLabel,
+                      lang,
+                    );
+                    await saveFile(blob, `${lang === 'en' ? 'repair-history' : 'istoric-reparatii'}-${today}.pdf`);
+                  }}
+                  errorMessage={(e) => rpcErrorMessage(lang, e)}
+                  canRetry={canRetryRpc}
+                >
+                  <FileText size={18} aria-hidden="true" />
+                  {t('hist.pdf')}
+                </ActionButton>
               </div>
             ) : undefined
           }

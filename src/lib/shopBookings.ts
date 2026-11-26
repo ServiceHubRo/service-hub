@@ -99,6 +99,15 @@ export function parseTab(value: string | null): ShopTab {
   return value === 'programate' ? 'programate' : 'cereri';
 }
 
+/**
+ * The list Programări opens on when the address names none (SH_to_fix, 26 Nov 2026): Cereri while
+ * a request waits, else Programate when something is booked (a booking confirmed on the spot never
+ * passes through Cereri), so a new booking is never hidden behind the list chooser.
+ */
+export function defaultTab(requests: number, scheduled: number): ShopTab {
+  return requests === 0 && scheduled > 0 ? 'programate' : 'cereri';
+}
+
 export function parseFilter(value: string | null): ShopFilter | null {
   return SHOP_FILTERS.includes(value as ShopFilter) ? (value as ShopFilter) : null;
 }

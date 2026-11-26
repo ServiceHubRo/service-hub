@@ -140,3 +140,18 @@ export async function downloadJobDocument(bookingId: string, kind: JobDocKind, l
   if (!(data instanceof Blob)) throw new RpcError('unknown');
   return data;
 }
+
+/**
+ * The shop's repair history as a PDF (SH_to_fix, 26 Nov 2026), in the quote's format: the rows the
+ * screen shows (`ids`, in their order) and how the filters are named, read again on the server as
+ * the person (Edge Function `history-document`).
+ */
+export async function downloadHistoryDocument(ids: readonly string[], filters: string | null, lang: Lang): Promise<Blob> {
+  const { data, error } = await db().functions.invoke<Blob>('history-document', {
+    method: 'POST',
+    body: { ids, lang, ...(filters ? { filters } : {}) },
+  });
+  if (error) throw await functionError(error);
+  if (!(data instanceof Blob)) throw new RpcError('unknown');
+  return data;
+}

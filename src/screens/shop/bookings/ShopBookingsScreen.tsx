@@ -21,6 +21,7 @@ import { useI18n } from '../../../i18n/context';
 import { formatDate, ymdInBucharest } from '../../../i18n/format';
 import type { MessageKey } from '../../../i18n/ro';
 import {
+  defaultTab,
   matchesFilter,
   parseFilter,
   parseTab,
@@ -117,10 +118,20 @@ export function ShopBookingsScreen() {
   const data = state.status === 'ready' ? state.data : null;
   // The open booking (`?p=`) names the tab only when the address does not (a notification): a booking
   // confirmed from Cereri leaves that list, and the list stays where it was.
+  const lists = useMemo(
+    () => (data ? { cereri: tabList(data.bookings, 'cereri'), programate: tabList(data.bookings, 'programate') } : null),
+    [data],
+  );
   const askedTab = params.get('tab');
   const askedId = askedTab ? null : params.get('p');
   const asked = data && askedId ? (data.bookings.find((b) => b.id === askedId) ?? null) : null;
-  const tab: ShopTab = asked ? tabOf(asked.status) : filter ? 'programate' : parseTab(askedTab);
+  const tab: ShopTab = asked
+    ? tabOf(asked.status)
+    : filter
+      ? 'programate'
+      : askedTab || !lists
+        ? parseTab(askedTab)
+        : defaultTab(lists.cereri.length, lists.programate.length);
   // Once read, the address names its tab, so a later change of the open booking does not move the list.
   useEffect(() => {
     if (!data || askedTab) return;
@@ -129,10 +140,6 @@ export function ShopBookingsScreen() {
     setParams(next, { replace: true });
   }, [data, askedTab, tab, params, setParams]);
 
-  const lists = useMemo(
-    () => (data ? { cereri: tabList(data.bookings, 'cereri'), programate: tabList(data.bookings, 'programate') } : null),
-    [data],
-  );
 
   // Page template A (docs/MODEL_DE_FOLOSIRE.md P8): one row per booking, the chosen one (`?p=`) beside the
   // list from 1024 px (in its place below). A Panou card or a notification opens its booking, in its tab.

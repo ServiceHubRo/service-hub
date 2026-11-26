@@ -1,5 +1,6 @@
 import { expect, test, type Browser, type Page } from '@playwright/test';
 import { readFile } from 'node:fs/promises';
+import { PDFDocument } from 'pdf-lib';
 import {
   BACKEND,
   PASSWORD,
@@ -211,6 +212,13 @@ test.describe('repair history', () => {
     expect(csv).toContain(`${done.ref};Finalizată;${plate};Dacia Logan 2019`);
     expect(csv).toContain(';105400;');
     expect(csv).not.toContain(otherPlate);
+
+    // The same list as a document in the quote's format (SH_to_fix, 26 Nov 2026).
+    const [pdf] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: 'Descarcă PDF' }).click()]);
+    expect(pdf.suggestedFilename()).toMatch(/^istoric-reparatii-\d{4}-\d{2}-\d{2}\.pdf$/);
+    const doc = await PDFDocument.load(await readFile((await pdf.path())!));
+    expect(doc.getTitle()).toContain('Istoric reparații');
+    expect(doc.getPageCount()).toBe(1);
 
     // A search with no match offers to clear the filters.
     await page.getByLabel('Caută în istoric').fill('zzzz');

@@ -91,6 +91,12 @@ describe('rpcErrorMessage', () => {
     expect(rpcErrorMessage('ro', pgError('car_booked_that_day', '{"date":"2026-11-02"}'))).toBe(
       'Mașina are deja o programare la alt service pe Lun 2 nov. Alege altă zi.',
     );
+    expect(rpcErrorMessage('ro', pgError('car_booked_that_time', '{"date":"2026-11-02","slot":"10:00"}'))).toBe(
+      'Mașina are deja o programare la alt service pe Lun 2 nov, la 10:00. Alege altă oră.',
+    );
+    expect(rpcErrorMessage('en', pgError('car_booked_that_time', '{"date":"2026-11-02","slot":"10:00"}'))).toBe(
+      'This car already has a booking at another shop on Mon, Nov 2 at 10:00. Pick another time.',
+    );
   });
 
   it('formats odometer values in each language', () => {

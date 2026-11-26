@@ -42,9 +42,15 @@ select test.eq(status, 'confirmed', 'confirmed at once') from public.bookings wh
 select test.ok(confirmed_at is not null, 'with its time') from public.bookings where id = current_setting('test.b')::uuid;
 select test.eq((select count(*) from public.bookings where client_id = test.id('client_a') and slot = '10:00' and date = current_setting('test.day')::date), 1::bigint,
   'one booking');
-select test.eq((select array_agg(event order by created_at, event) from public.messages
-                where booking_id = current_setting('test.b')::uuid), array['booking_auto_confirmed', 'booking_requested'],
-  'the conversation says it was asked and confirmed');
+select test.eq((select array_agg(event order by created_at) from public.messages
+                where booking_id = current_setting('test.b')::uuid), array['booking_requested', 'booking_auto_confirmed'],
+  'the conversation says it was asked, then confirmed: the confirmation last (SH_to_fix, 26 Nov 2026)');
+select test.eq((select event from public.messages where booking_id = current_setting('test.b')::uuid
+                order by created_at desc, id desc limit 1), 'booking_auto_confirmed',
+  'the list of conversations shows the confirmation, never „Cerere nouă”');
+select test.ok((select created_at from public.messages where booking_id = current_setting('test.b')::uuid and event = 'booking_requested')
+             < (select created_at from public.messages where booking_id = current_setting('test.b')::uuid and event = 'booking_auto_confirmed'),
+  'the request is strictly before the confirmation, not at the same instant');
 select test.eq((select (params->>'auto')::boolean from public.notification_events
                 where user_id = test.id('client_a') and event = 'booking_confirmed'
                   and booking_id = current_setting('test.b')::uuid), true, 'the client is told it is confirmed');

@@ -44,6 +44,7 @@ export const RPC_ERROR_CODES = [
   'cannot_move',
   'car_already_booked',
   'car_booked_that_day',
+  'car_booked_that_time',
   'car_invalid',
   'car_not_found',
   'car_oil_date_invalid',
@@ -379,7 +380,7 @@ export function rpcErrorMessage(lang: Lang, error: unknown): string {
     case 'too_soon':
     case 'cancel_deadline_passed':
       return translate(lang, `rpcError.${code}`, { hours: plural(lang, 'unit.hours', num(p.hours) ?? 0) });
-    // T60: one active booking per car at a shop; not the same day at another shop.
+    // T60: one active booking per car at a shop; not the same day and time at another shop.
     case 'car_already_booked':
       return translate(lang, 'rpcError.car_already_booked', {
         ref: typeof p.ref === 'string' ? p.ref : '',
@@ -387,6 +388,12 @@ export function rpcErrorMessage(lang: Lang, error: unknown): string {
       });
     case 'car_booked_that_day':
       return translate(lang, 'rpcError.car_booked_that_day', { date: typeof p.date === 'string' ? formatDate(lang, p.date) : '' });
+    // SH_to_fix (26 Nov 2026): another shop the same day is fine, only not at the same time.
+    case 'car_booked_that_time':
+      return translate(lang, 'rpcError.car_booked_that_time', {
+        date: typeof p.date === 'string' ? formatDate(lang, p.date) : '',
+        slot: typeof p.slot === 'string' ? p.slot : '',
+      });
     case 'too_far':
     case 'review_window_closed':
       return translate(lang, `rpcError.${code}`, { days: plural(lang, 'unit.days', num(p.days) ?? 0) });
