@@ -44,13 +44,17 @@ test('a reload from the middle or the end of the public page opens it at the top
   await reloadExpectTop(page, /^Programarea la service/);
 });
 
-test('the browser’s Back and Forward on the public pages keep their places', async ({ page }) => {
+test('a link opens the next public page at its top; Back and Forward keep their places', async ({ page }) => {
   await page.goto('/');
   const offer = page.getByRole('link', { name: /^Profită acum/ }).first();
   await offer.scrollIntoViewIfNeeded();
   await expect.poll(() => scrollTopOf(page)).toBeGreaterThan(400);
   await offer.click();
   await expect(page).toHaveURL(/\/cont-nou/);
+  // A link opens the next page at its top, not where the landing page was (Eduard, 27 Nov 2026).
+  await expect.poll(() => scrollTopOf(page)).toBe(0);
+  await page.waitForTimeout(600);
+  expect(await scrollTopOf(page)).toBe(0);
   await page.goBack();
   await expect(page).toHaveURL((url) => url.pathname === '/');
   // Where it was left (the browser's own restoring), not the top.

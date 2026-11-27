@@ -23,6 +23,7 @@ import { ScreenErrorBoundary } from './ScreenErrorBoundary';
 import { SessionProvider } from './SessionProvider';
 import { useSession } from './sessionContext';
 import styles from './App.module.css';
+import { usePublicPageTop } from '../lib/scrollMemory';
 
 // Each role's screens are a file of their own, loaded after sign-in (T18): a client never
 // downloads the shop's or the admin's code, and the public page stays small.
@@ -72,6 +73,7 @@ function Router({ location, children }: { location?: string; children: ReactNode
  */
 function RouteGuard({ children }: { children: ReactNode }) {
   const location = useLocation();
+  usePublicPageTop();
   useEffect(() => {
     addBreadcrumb('navigation', safePath(window.location.href));
     // P1: the address of each history entry, for the in-app „‹ Înapoi” (src/lib/navHistory.ts).

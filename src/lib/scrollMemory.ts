@@ -148,3 +148,23 @@ export function useScrollMemory(): void {
     };
   }, [pathname, navigationType]);
 }
+
+/**
+ * Outside the signed-in app, a link to another page opens it at its top (Eduard, 27 Nov 2026:
+ * „Profită acum” on the landing page opened the sign-up form at its end, where the landing page had
+ * been scrolled to). Back and Forward are left to the browser, which puts the page back where it
+ * was; a link to a place on the same page (`#…`) is left alone. In the signed-in app
+ * `useScrollMemory` decides.
+ */
+export function usePublicPageTop(): void {
+  const { pathname, hash } = useLocation();
+  const navigationType = useNavigationType();
+  const current = useRef(pathname);
+
+  useLayoutEffect(() => {
+    const prev = current.current;
+    current.current = pathname;
+    if (prev === pathname || navigationType === 'POP' || hash || shells > 0) return;
+    pageScroller().scrollTo(0, 0);
+  }, [pathname, hash, navigationType]);
+}
