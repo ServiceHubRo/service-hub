@@ -111,6 +111,14 @@ test.describe('instant booking', () => {
     );
     expect(events.map((e) => e.event)).toEqual(['booking_auto_confirmed']);
 
+    // The shop (SH_to_fix, 26 Nov 2026): Programări opens on Programate, where the booking is, not on
+    // an empty Cereri; its conversation ends with the confirmation, never with „Cerere nouă”.
+    await page.goto('/s/programari');
+    await expect(page.getByRole('combobox', { name: 'Afișează' })).toHaveValue('programate');
+    await expect(page).toHaveURL(/tab=programate/);
+    const threads = await rpcAs<{ last_event: string }[]>(owner, 'list_threads', {});
+    expect(threads.map((th) => th.last_event)).toEqual(['booking_auto_confirmed']);
+
     // Programări: confirmed, with the calendar and the way there.
     await c.goto('/c/programari');
     const mine = await openClientBooking(c, shopName);

@@ -231,8 +231,11 @@ test.describe('new shop', () => {
     await expect(page.getByText('1 reparație', { exact: true })).toBeVisible();
     await expect(page.getByText(/încasat/)).toHaveCount(0);
     await expect(page.getByRole('button', { name: 'Descarcă istoricul' })).toHaveCount(0);
-    await expect(page.getByRole('button', { name: 'Tipărește' })).toBeVisible();
     await shot(page, 'staff-history', name());
+    // A colleague gets the PDF too (SH_to_fix, 26 Nov 2026).
+    const [pdf] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: 'Descarcă PDF' }).click()]);
+    expect(pdf.suggestedFilename()).toMatch(/^istoric-reparatii-\d{4}-\d{2}-\d{2}\.pdf$/);
+    expect((await readFile((await pdf.path())!)).subarray(0, 5).toString()).toBe('%PDF-');
     // The owner sees the total and the CSV.
     const context = await browser.newContext({ viewport: page.viewportSize()!, locale: 'ro-RO', timezoneId: 'Europe/Berlin' });
     await context.addInitScript(() => localStorage.setItem('sh_lang', 'ro'));

@@ -14,6 +14,7 @@ import {
 import {
   addDays,
   dashboardCounts,
+  defaultTab,
   matchesFilter,
   parseFilter,
   parseTab,
@@ -85,6 +86,12 @@ describe('shop bookings: tabs, filters, counters', () => {
     expect(parseTab(null)).toBe('cereri');
     expect(parseFilter('lucru')).toBe('lucru');
     expect(parseFilter('x')).toBeNull();
+  });
+
+  it('opens on the list that has something new (a booking confirmed on the spot is in Programate)', () => {
+    expect(defaultTab(1, 3)).toBe('cereri');
+    expect(defaultTab(0, 1)).toBe('programate');
+    expect(defaultTab(0, 0)).toBe('cereri');
   });
 });
 
